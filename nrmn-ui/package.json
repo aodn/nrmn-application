@@ -19,7 +19,11 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test-build": "react-scripts test --watchAll=false && react-scripts build",
+    "eject": "react-scripts eject",
+    "storybook": "start-storybook -p 9009 -s public",
+    "build-storybook": "build-storybook -s public",
+    "ci-build-storybook": "build-storybook -c .storybook -o public/storybook"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -37,6 +41,11 @@
     ]
   },
   "devDependencies": {
+    "@storybook/addon-actions": "^5.3.7",
+    "@storybook/addon-links": "^5.3.7",
+    "@storybook/addons": "^5.3.7",
+    "@storybook/preset-create-react-app": "^1.5.2",
+    "@storybook/react": "^5.3.7",
     "prettier": "1.19.1"
   }
 }
