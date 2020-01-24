@@ -18,4 +18,4 @@ yarn --cwd $WEBAPP_DIR ci-build-storybook
 yarn --cwd $WEBAPP_DIR test-build
 
 # build the api
-mvn -f $API_DIR clean package
+mvn -f $API_DIR -B -DskipTests clean package
