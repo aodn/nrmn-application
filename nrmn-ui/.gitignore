@@ -10,8 +10,12 @@
 
 # production
 /build
+/.storybook_out
+/src/storybook_out
+/public/storybook
 
 # misc
+/.idea
 .DS_Store
 .env.local
 .env.development.local
