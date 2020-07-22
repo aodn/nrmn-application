@@ -1,26 +1,54 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import clsx from 'clsx';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import TopBar from './components/layout/TopBar';
+import SideMenu from './components/layout/SideMenu';
+import XlxsUpload from './components/import/XlxsUpload';
+import DataSheetView from './components/import/DataSheetView';
+const drawerWidth = 240;
 
-function App() {
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+  },
+
+  content: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginLeft: -drawerWidth,
+  },
+  contentShift: {
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginLeft: 0,
+  },
+}));
+
+export default function PersistentDrawerLeft() {
+  const classes = useStyles();
+  const theme = useTheme();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className={classes.root}>
+      <CssBaseline />
+      <TopBar></TopBar>
+      <SideMenu></SideMenu>
+      <main
+        className={clsx(classes.content, {
+          [classes.contentShift]: false,
+        })}
+      >W
+        <div className={classes.drawerHeader} />
+       <XlxsUpload></XlxsUpload>
+       <DataSheetView></DataSheetView>
+      </main>
     </div>
   );
 }
-
-export default App;

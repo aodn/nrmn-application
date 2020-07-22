@@ -12,7 +12,7 @@ public class SiteRefEntity {
     private String siteName;
     private Double longitude;
     private Double latitude;
-    private Json siteAttribute;
+    private String siteAttribute;
     private Boolean isActive;
 
     @Id
@@ -66,13 +66,13 @@ public class SiteRefEntity {
     }
 
     @Basic
-    @Column(name = "site_attribute")
-    @Type(type = "JsonType")
-    public Json getSiteAttribute() {
+    @Column(name = "site_attribute", columnDefinition = "jsonb")
+    @Type(type = "jsonb")
+    public String getSiteAttribute() {
         return siteAttribute;
     }
 
-    public void setSiteAttribute(Json siteAttribute) {
+    public void setSiteAttribute(String siteAttribute) {
         this.siteAttribute = siteAttribute;
     }
 
