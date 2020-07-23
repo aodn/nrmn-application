@@ -2,30 +2,77 @@ import React from "react";
 import { connect } from "react-redux";
 import { AgGridReact } from "ag-grid-react";
 import { AllModules } from "ag-grid-enterprise";
+import { useState, useEffect } from 'react';
+
+
+
 const mapStateToProps = state => {
     return { sheet: state.import.sheet, columnDefs: state.import.columnDefs };
 };
 
+function useWindowSize() {
+    const isClient = typeof window === 'object';
+
+    function getSize() {
+        return {
+            width: isClient ? window.innerWidth : undefined,
+            height: isClient ? window.innerHeight : undefined
+        };
+    }
+
+    const [windowSize, setWindowSize] = useState(getSize);
+
+    useEffect(() => {
+        if (!isClient) {
+            return false;
+        }
+
+        function handleResize() {
+            setWindowSize(getSize());
+        }
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []); // Empty array ensures that effect is only run on mount and unmount
+
+    return windowSize;
+}
+
+
+
+
 const ReduxDataSheetView = (data) => {
+    const size = useWindowSize();
+
+    console.log(size)
     console.log("dataviewSheet got:", data)
     return (data.sheet.length) ? (
-        <div style={{ height: 650, width: '100%', marginTop: 25 }} className="ag-theme-alpine">
+        <div style={{ height: size.height - 170, width: '100%', marginTop: 25 }} className="ag-theme-alpine">
             <AgGridReact
-                // properties
                 pivotMode={true}
                 pivotColumnGroupTotals={"before"}
                 sideBar={true}
-                autoGroupColumnDef={{ minWidth: 200 }}
+                autoGroupColumnDef={{
+                    width: 100,
+                    cellRendererParams: {
+                        suppressCount: true,
+                        innerRenderer: 'nameCellRenderer'
+                    }
+                }}
                 columnDefs={data.columnDefs}
+                groupDefaultExpanded={4}
                 rowData={data.sheet}
                 rowSelection="multiple"
-                animateRows
+                animateRows={true}
                 groupMultiAutoColumn={true}
                 enableRangeSelection={true}
-                defaultColDef={{
-                    sortable: true,
-                    filter: true,
+                groupHideOpenParents={true}
+                groupUseEntireRow={true}
 
+                defaultColDef={{
+                    filter: true,
+                    sortable: true,
+                    resizable: true,
                     headerComponentParams: {
                         menuIcon: 'fa-bars'
                     }
@@ -36,7 +83,7 @@ const ReduxDataSheetView = (data) => {
             >
             </AgGridReact>
         </div>
-    ) : (<div>no data</div>)
+    ) : (<></>)
 }
 
 const DataSheetView = connect(mapStateToProps)(ReduxDataSheetView);

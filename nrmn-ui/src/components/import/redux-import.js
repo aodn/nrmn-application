@@ -16,7 +16,7 @@ const array2obj = (header, rowArr) => {
     return obj;
 }
 
-const sheet2JSON = (sheet) => {
+const arrray2JSON = (sheet) => {
     const header = sheet.shift();
     return sheet.map(rowArr => {
         return array2obj(header, rowArr)
@@ -24,18 +24,21 @@ const sheet2JSON = (sheet) => {
 }
 
 const header2ColDef = (header) => {
-    console.log(header)
-    var coldef = header.map(key => ({field: key + "", editable : true}));
+
+    const group = {
+        hide: true,
+        rowGroup: true,
+    }
+
+    var coldef = header.map(key => ({ field: key + "", editable: true, width: 100 }));
     coldef[1].enablePivot = true;
-    coldef[3].enableRowGroup = true;
-    coldef[12].enableRowGroup = true;
-    coldef[13].enableRowGroup = true;
-    coldef[14].enableRowGroup = true;
-    coldef[15].enableRowGroup = true;
-    coldef[16].aggFunc = 'count';
+    Object.assign(coldef[3], group);
+    Object.assign(coldef[12], group);
+    Object.assign(coldef[13], group);
+    Object.assign(coldef[14], group);
+    Object.assign(coldef[16], {aggFunc : 'count', headerName: ''});
     return coldef
 }
-
 
 const importSlice = createSlice({
     name: "import",
@@ -43,10 +46,10 @@ const importSlice = createSlice({
     reducers: {
         loadXlxs: (state, action) => {
             state.columnDefs = header2ColDef(action.payload[0])
-            state.sheet = sheet2JSON(action.payload)
+            state.sheet = arrray2JSON(action.payload)
         }
     },
-});{}
+}); { }
 
 export const importReducer = importSlice.reducer;
 export const { loadXlxs } = importSlice.actions;
