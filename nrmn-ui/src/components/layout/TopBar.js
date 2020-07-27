@@ -5,7 +5,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import { toggleMenu } from './redux-layout';
 import { connect } from 'react-redux';
@@ -49,7 +49,7 @@ const handleClick = () => {
 
 const ReduxTopBar = ({ menuIsOpen }) => {
   const classes = useStyles();
-  const theme = useTheme();
+
   return (<AppBar
     position="fixed"
     className={clsx(classes.appBar, {

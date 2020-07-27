@@ -28,15 +28,17 @@ const header2ColDef = (header) => {
     const group = {
         hide: true,
         rowGroup: true,
+        enableRowGroup: true,
+        columnGroupShow: "open"
     }
 
     var coldef = header.map(key => ({ field: key + "", editable: true, width: 100 }));
-    coldef[1].enablePivot = true;
-    Object.assign(coldef[3], group);
-    Object.assign(coldef[12], group);
-    Object.assign(coldef[13], group);
-    Object.assign(coldef[14], group);
-    Object.assign(coldef[16], {aggFunc : 'count', headerName: ''});
+    coldef[1].enablePivot = true; // diver
+    Object.assign(coldef[3], group); // site
+    Object.assign(coldef[12], group); //depth
+    Object.assign(coldef[13], group); //method
+    Object.assign(coldef[14], group); //block
+    Object.assign(coldef[16], {aggFunc : "count",}); // species 
     return coldef
 }
 
@@ -49,7 +51,7 @@ const importSlice = createSlice({
             state.sheet = arrray2JSON(action.payload)
         }
     },
-}); { }
+});
 
 export const importReducer = importSlice.reducer;
 export const { loadXlxs } = importSlice.actions;

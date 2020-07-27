@@ -47,7 +47,7 @@ const ReduxDataSheetView = (data) => {
     console.log(size)
     console.log("dataviewSheet got:", data)
     return (data.sheet.length) ? (
-        <div style={{ height: size.height - 170, width: '100%', marginTop: 25 }} className="ag-theme-alpine">
+        <div style={{ height: size.height - 200,width: '100%', marginTop: 25 }} className="ag-theme-alpine">
             <AgGridReact
                 pivotMode={true}
                 pivotColumnGroupTotals={"before"}

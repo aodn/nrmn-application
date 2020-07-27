@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TopBar from './components/layout/TopBar';
 import SideMenu from './components/layout/SideMenu';
@@ -33,7 +33,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function PersistentDrawerLeft() {
   const classes = useStyles();
-  const theme = useTheme();
 
   return (
     <div className={classes.root}>
