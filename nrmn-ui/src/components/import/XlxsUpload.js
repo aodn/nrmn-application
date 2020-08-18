@@ -2,12 +2,17 @@ import React from 'react';
 import { DropzoneDialog } from 'material-ui-dropzone';
 import XLSX from 'xlsx';
 import store from "../store";
-import { loadXlxs } from './redux-import';
+import { ImportRequested, ImportStarted } from './reducers/create-import';
 import { Fab } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add'
 import Tooltip from '@material-ui/core/Tooltip';
 
+
 const XlxsUpload = () => {
+
+
+
+
     const [openPopup, setOpenPopup] = React.useState(false);
 
     const handleClose = () => {
@@ -19,14 +24,16 @@ const XlxsUpload = () => {
     }
 
     const onAddFile = (fileObjs) => {
+        store.dispatch(ImportStarted);
         setOpenPopup(false)
-        const reader = new FileReader();
+        const reader = new FileReader()
         reader.onload = (event) => {
             const workbook = XLSX.read(event.target.result, { type: 'binary' });
             console.log(workbook)
-            const dataSheet = XLSX.utils.sheet_to_json(workbook.Sheets["data"], { header: 1 });
-            store.dispatch(loadXlxs(dataSheet))
+            const dataSheet = XLSX.utils.sheet_to_json(workbook.Sheets["DATA"], { header: 1 });
+            store.dispatch(ImportRequested({ sheet: dataSheet, fileID: fileObjs[0].name + "-" + fileObjs[0].lastModified }))
         };
+        console.log(fileObjs)
         reader.readAsBinaryString(fileObjs[0]);
 
     }
@@ -34,16 +41,16 @@ const XlxsUpload = () => {
     return (
         <div style={{ marginTop: 50 }}>
             <Tooltip title="Import Excel Data" aria-label="Import Excel Data">
-             <Fab size="small" color="primary" aria-label='Import Excel Data' onClick={handleOpen}><AddIcon></AddIcon></Fab>
-             </Tooltip>
-             <DropzoneDialog
+                <Fab size="small" color="primary" aria-label='Import Excel Data' onClick={handleOpen}><AddIcon></AddIcon></Fab>
+            </Tooltip>
+            <DropzoneDialog
                 open={openPopup}
                 onSave={onAddFile}
                 showPreviews={true}
                 acceptedFiles={
                     ["text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]
                 }
-                maxFileSize={5000000}
+                maxFileSize={50000000000000000000000000000000}
                 onClose={handleClose}
             />
         </div>

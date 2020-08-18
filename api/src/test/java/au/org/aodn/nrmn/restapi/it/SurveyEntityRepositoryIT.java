@@ -1,10 +1,8 @@
 package au.org.aodn.nrmn.restapi.it;
 
 import au.org.aodn.nrmn.restapi.RestApiApplication;
-import au.org.aodn.nrmn.restapi.model.SurveyEntity;
-import au.org.aodn.nrmn.restapi.repository.SurveyEntityRepository;
+import au.org.aodn.nrmn.restapi.model.db.SurveyEntity;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -18,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;

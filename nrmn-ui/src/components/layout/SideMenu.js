@@ -20,6 +20,10 @@ import StarBorder from '@material-ui/icons/StarBorder';
 import { connect } from 'react-redux';
 import { toggleMenu } from './redux-layout';
 import store from '../store';
+import {
+    NavLink
+  } from "react-router-dom";
+
 
 const drawerWidth = 240;
 
@@ -84,13 +88,13 @@ const ReduxSideMenu = ({menuIsOpen}) => {
                 </ListItem>
                 <Collapse in={openSub} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                        <ListItem button className={classes.nested}>
+                        <ListItem button  onClick={handleMainMenu}  className={classes.nested} component={NavLink} to="/list-file">
                             <ListItemIcon>
                                 <StarBorder />
                             </ListItemIcon>
-                            <ListItemText primary="List" />
+                            <ListItemText primary="List"   />
                         </ListItem>
-                        <ListItem button className={classes.nested}>
+                        <ListItem button  onClick={handleMainMenu} className={classes.nested} component={NavLink} to="/import-file">
                             <ListItemIcon>
                                 <StarBorder />
                             </ListItemIcon>

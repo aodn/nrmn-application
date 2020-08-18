@@ -1,0 +1,13 @@
+klilk lkkkkl@SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
+@SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
+KUMY-=[ignore]
+
+[include]
+
+[libs]
+
+[lints]
+
+[options]
+
+[strict]

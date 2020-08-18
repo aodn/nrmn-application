@@ -4,8 +4,17 @@ import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TopBar from './components/layout/TopBar';
 import SideMenu from './components/layout/SideMenu';
-import XlxsUpload from './components/import/XlxsUpload';
-import DataSheetView from './components/import/DataSheetView';
+
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route
+} from "react-router-dom";
+
+import FileList from './components/import/FileList';
+import ImportPage from './components/import/Index';
+
+
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -14,6 +23,7 @@ const useStyles = makeStyles((theme) => ({
   },
 
   content: {
+    marginTop: 50,
     flexGrow: 1,
     padding: theme.spacing(3),
     transition: theme.transitions.create('margin', {
@@ -36,18 +46,24 @@ export default function PersistentDrawerLeft() {
 
   return (
     <div className={classes.root}>
-      <CssBaseline />
-      <TopBar></TopBar>
-      <SideMenu></SideMenu>
-      <main
-        className={clsx(classes.content, {
-          [classes.contentShift]: false,
-        })}
-      >W
-        <div className={classes.drawerHeader} />
-       <XlxsUpload></XlxsUpload>
-       <DataSheetView></DataSheetView>
+      <Router>
+        <CssBaseline />
+        <TopBar></TopBar>
+        <SideMenu></SideMenu>
+        <main
+          className={clsx(classes.content, {
+            [classes.contentShift]: false,
+          })}
+        >
+          <div className={classes.drawerHeader} />
+          <Switch>
+            <Route path="/import-file/:fileID?" component={ImportPage}>
+            </Route>
+            <Route path="/list-file" component={FileList} >
+            </Route>
+          </Switch>
       </main>
+      </Router>
     </div>
   );
 }
