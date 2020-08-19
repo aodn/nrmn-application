@@ -67,7 +67,7 @@ const ReduxTopBar = ({ menuIsOpen }) => {
         <MenuIcon />
       </IconButton>
       <Typography variant="h6" noWrap>
-        NRMN
+        {process.env.REACT_APP_SITE_TITLE}
       </Typography>
     </Toolbar>
   </AppBar>
