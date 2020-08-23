@@ -1,15 +1,19 @@
 
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles, withStyles} from '@material-ui/core/styles';
 import clsx from 'clsx';
 import { toggleMenu } from './redux-layout';
 import { connect } from 'react-redux';
 import store from '../store';
+import AuthState from "./AuthState";
+import { TopbarButton } from './TopbarButton'
 
 const drawerWidth = 240;
 
@@ -50,25 +54,39 @@ const handleClick = () => {
 const ReduxTopBar = ({ menuIsOpen }) => {
   const classes = useStyles();
 
-  return (<AppBar
+  return (
+  <AppBar
     position="fixed"
     className={clsx(classes.appBar, {
       [classes.appBarShift]: menuIsOpen,
     })}
   >
-    <Toolbar>
-      <IconButton
-        color="inherit"
-        aria-label="open drawer"
-        onClick={handleClick}
-        edge="start"
-        className={clsx(classes.menuButton, menuIsOpen && classes.hide)}
-      >
-        <MenuIcon />
-      </IconButton>
-      <Typography variant="h6" noWrap>
-        {process.env.REACT_APP_SITE_TITLE}
-      </Typography>
+    <Toolbar position="static">
+      <Grid container alignItems={'center'} justify="space-between" >
+        <Grid item xs={1}>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleClick}
+            edge="start"
+            className={clsx(classes.menuButton, menuIsOpen && classes.hide)} >
+            <MenuIcon />
+          </IconButton>
+        </Grid>
+        <Grid item xs={7} >
+          <Typography variant="h5" noWrap>
+            {process.env.REACT_APP_SITE_TITLE}
+          </Typography>
+        </Grid>
+        <Grid item >
+          <AuthState /> |
+          <TopbarButton
+              variant="text"
+              color="secondary"
+              size="small"
+              >Notifications</TopbarButton>
+        </Grid>
+      </Grid>
     </Toolbar>
   </AppBar>
   )

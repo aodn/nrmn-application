@@ -1,9 +1,15 @@
 import React from 'react';
 import clsx from 'clsx';
-import { makeStyles } from '@material-ui/core/styles';
+import {
+  ThemeProvider ,
+  createMuiTheme,
+  responsiveFontSizes,
+  makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TopBar from './components/layout/TopBar';
 import SideMenu from './components/layout/SideMenu';
+
+import {blueGrey, grey} from '@material-ui/core/colors';
 
 import {
   BrowserRouter as Router,
@@ -16,12 +22,18 @@ import ImportPage from './components/import/Index';
 
 
 const drawerWidth = 240;
+let theme = createMuiTheme({
+  palette: {
+    primary: blueGrey,
+    secondary: grey
+  },
+});
+theme = responsiveFontSizes(theme);
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
   },
-
   content: {
     marginTop: 50,
     flexGrow: 1,
@@ -46,24 +58,26 @@ export default function PersistentDrawerLeft() {
 
   return (
     <div className={classes.root}>
-      <Router>
-        <CssBaseline />
-        <TopBar></TopBar>
-        <SideMenu></SideMenu>
-        <main
-          className={clsx(classes.content, {
-            [classes.contentShift]: false,
-          })}
-        >
-          <div className={classes.drawerHeader} />
-          <Switch>
-            <Route path="/import-file/:fileID?" >
-            </Route>
-            <Route path="/list-file" >
-            </Route>
-          </Switch>
-      </main>
-      </Router>
+      <ThemeProvider theme={theme}>
+        <Router>
+          <CssBaseline />
+          <TopBar></TopBar>
+          <SideMenu></SideMenu>
+          <main
+            className={clsx(classes.content, {
+              [classes.contentShift]: false,
+            })}
+          >
+            <div className={classes.drawerHeader} />
+            <Switch>
+              <Route path="/import-file/:fileID?" >
+              </Route>
+              <Route path="/list-file" >
+              </Route>
+            </Switch>
+        </main>
+        </Router>
+      </ThemeProvider>
     </div>
   );
 }

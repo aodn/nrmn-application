@@ -13,6 +13,7 @@ import ListFileMiddleware from './import/middleware/list-import';
 import FileMiddleware from './import/middleware/file-import';
 
 import { all } from "redux-saga/effects";
+import { authReducer } from "./import/reducers/auth-reducer";
 
 const initialiseSagaMiddleware = createSagaMiddleware();
 
@@ -24,6 +25,7 @@ const middleware = [
 
 const store = configureStore({
   reducer: {
+    auth: authReducer,
     toggle: toggleReducer,
     import: importReducer,
     fileList: listFileReducer
@@ -38,9 +40,8 @@ const store = configureStore({
     FileMiddleware()
     
   ])
-};
+}
 
 initialiseSagaMiddleware.run(rootSaga);
-
 
 export default store;
