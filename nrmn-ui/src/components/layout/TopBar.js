@@ -18,9 +18,6 @@ import { TopbarButton } from './TopbarButton'
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-  },
   appBar: {
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.sharp,
@@ -64,20 +61,27 @@ const ReduxTopBar = ({ menuIsOpen }) => {
     <Toolbar position="static">
       <Grid container alignItems={'center'} justify="space-between" >
         <Grid item >
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleClick}
-            edge="start"
-            className={clsx(classes.menuButton, menuIsOpen && classes.hide)} >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-              variant="h5"
-              display={"inline"}
-              noWrap>
-            {process.env.REACT_APP_SITE_TITLE}
-          </Typography>
+          <Grid container alignItems={'center'} justify="space-between" >
+            <Grid item >
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleClick}
+                edge="start"
+                className={clsx(classes.menuButton, menuIsOpen && classes.hide)} >
+                <MenuIcon />
+              </IconButton>
+            </Grid>
+            <Grid item >
+              <Typography
+                  variant="h5"
+                  display={"inline-flex"}
+                  className={clsx(classes.header)}
+                  noWrap>
+                {process.env.REACT_APP_SITE_TITLE}
+              </Typography>
+            </Grid>
+          </Grid>
         </Grid>
         <Grid item >
           <AuthState /> |
