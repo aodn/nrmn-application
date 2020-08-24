@@ -63,7 +63,7 @@ const ReduxTopBar = ({ menuIsOpen }) => {
   >
     <Toolbar position="static">
       <Grid container alignItems={'center'} justify="space-between" >
-        <Grid item xs={1}>
+        <Grid item >
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -72,9 +72,10 @@ const ReduxTopBar = ({ menuIsOpen }) => {
             className={clsx(classes.menuButton, menuIsOpen && classes.hide)} >
             <MenuIcon />
           </IconButton>
-        </Grid>
-        <Grid item xs={7} >
-          <Typography variant="h5" noWrap>
+          <Typography
+              variant="h5"
+              display={"inline"}
+              noWrap>
             {process.env.REACT_APP_SITE_TITLE}
           </Typography>
         </Grid>
