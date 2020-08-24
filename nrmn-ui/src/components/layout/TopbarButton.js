@@ -11,10 +11,8 @@ const useStyles = makeStyles({
 export const TopbarButton = (props) => {
   const classes = useStyles();
   return <Button
-      style={props.style}
-      startIcon={props.startIcon}
+      {...props}
       color="secondary"
       size="small"
-      onClick={props.onClick}
       className={classes.root}>{props.children}</Button>;
 }
