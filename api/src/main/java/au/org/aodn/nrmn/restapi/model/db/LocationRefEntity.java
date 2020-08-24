@@ -1,10 +1,14 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import au.org.aodn.nrmn.restapi.model.db.audit.DateAudit;
+import org.hibernate.envers.Audited;
+
 import javax.persistence.*;
 
 @Entity
+@Audited(withModifiedFlag = true)
 @Table(name = "location_ref", schema = "nrmn", catalog = "nrmn")
-public class LocationRefEntity {
+public class LocationRefEntity extends DateAudit {
     private int locationId;
     private String locationName;
     private Boolean isActive;

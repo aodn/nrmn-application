@@ -1,10 +1,14 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import au.org.aodn.nrmn.restapi.model.db.audit.DateAudit;
+import org.hibernate.envers.Audited;
+
 import javax.persistence.*;
 
 @Entity
+@Audited(withModifiedFlag = true)
 @Table(name = "diver_ref", schema = "nrmn", catalog = "nrmn")
-public class DiverRefEntity {
+public class DiverRefEntity  extends DateAudit {
     private int diverId;
     private String initials;
     private String fullName;

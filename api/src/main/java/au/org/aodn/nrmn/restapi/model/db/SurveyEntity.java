@@ -1,8 +1,10 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import au.org.aodn.nrmn.restapi.model.db.audit.DateAudit;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 import java.sql.Date;
@@ -12,7 +14,8 @@ import java.sql.Time;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "survey")
-public class SurveyEntity {
+@Audited(withModifiedFlag = true)
+public class SurveyEntity extends DateAudit {
     @Id
     @Column(name = "survey_id")
     public int surveyId;

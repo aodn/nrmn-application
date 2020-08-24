@@ -1,10 +1,14 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import au.org.aodn.nrmn.restapi.model.db.audit.DateAudit;
+import org.hibernate.envers.Audited;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "user_sec", schema = "nrmn", catalog = "nrmn")
-public class UserSecEntity {
+@Audited(withModifiedFlag = true)
+public class UserSecEntity extends DateAudit {
     private int userId;
     private String fullName;
     private String email;

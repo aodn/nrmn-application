@@ -1,12 +1,15 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import au.org.aodn.nrmn.restapi.model.db.audit.DateAudit;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "site_ref", schema = "nrmn", catalog = "nrmn")
-public class SiteRefEntity {
+@Audited(withModifiedFlag = true)
+public class SiteRefEntity extends DateAudit {
     private int siteId;
     private String siteCode;
     private String siteName;

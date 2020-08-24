@@ -1,10 +1,14 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import au.org.aodn.nrmn.restapi.model.db.audit.DateAudit;
+import org.hibernate.envers.Audited;
+
 import javax.persistence.*;
 
 @Entity
+@Audited(withModifiedFlag = true)
 @Table(name = "observation", schema = "nrmn", catalog = "nrmn")
-public class ObservationEntity {
+public class ObservationEntity extends DateAudit {
     private int observationId;
     private Integer measureValue;
     private String observationAttribute;

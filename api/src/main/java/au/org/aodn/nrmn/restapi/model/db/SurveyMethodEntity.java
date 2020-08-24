@@ -1,10 +1,14 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import au.org.aodn.nrmn.restapi.model.db.audit.DateAudit;
+import org.hibernate.envers.Audited;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "survey_method", schema = "nrmn", catalog = "nrmn")
-public class SurveyMethodEntity {
+@Audited(withModifiedFlag = true)
+public class SurveyMethodEntity  extends DateAudit {
     private int surveyMethodId;
     private Integer blockNum;
     private Boolean surveyNotDone;
