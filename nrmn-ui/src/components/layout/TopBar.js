@@ -75,7 +75,6 @@ const ReduxTopBar = ({ menuIsOpen }) => {
             <Grid item >
               <Typography
                   variant="h5"
-                  display={"inline-flex"}
                   className={clsx(classes.header)}
                   noWrap>
                 {process.env.REACT_APP_SITE_TITLE}
