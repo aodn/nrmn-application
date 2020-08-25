@@ -70,9 +70,9 @@ export default function PersistentDrawerLeft() {
           >
             <div className={classes.drawerHeader} />
             <Switch>
-              <Route path="/import-file/:fileID?" >
+              <Route path="/import-file/:fileID?" component={ImportPage} >
               </Route>
-              <Route path="/list-file" >
+              <Route path="/list-file" component={FileList} >
               </Route>
             </Switch>
         </main>
