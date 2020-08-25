@@ -1,94 +1,53 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import au.org.aodn.nrmn.restapi.model.db.enums.UserSecStatus;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "user_sec", schema = "nrmn", catalog = "nrmn")
 public class UserSecEntity {
-    private int userId;
-    private String fullName;
-    private String email;
-    private String hashedPassword;
-    private Boolean isActive;
-    private Boolean isSuperuser;
 
     @Id
-    @Column(name = "user_id")
-    public int getUserId() {
-        return userId;
-    }
+    @SequenceGenerator(name="entity_id_seq", sequenceName="hibernate_sequence", allocationSize=1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    @Column(name="id", unique=true, updatable=false, nullable=false)
+    @Getter @Setter private int userId;
 
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
+    @Version
+    @Column(name = "version", nullable = false)
+    @Getter @Setter  private Integer version;
 
-    @Basic
+
+
     @Column(name = "full_name")
-    public String getFullName() {
-        return fullName;
-    }
+    @Getter @Setter private String fullName;
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
+    @Column(name = "email_address", nullable = false, unique = true)
+    @Getter @Setter private String email;
 
-    @Basic
-    @Column(name = "email")
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @Basic
     @Column(name = "hashed_password")
-    public String getHashedPassword() {
-        return hashedPassword;
-    }
+    @Getter @Setter private String hashedPassword;
 
-    public void setHashedPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable=false)
+    @Getter @Setter private UserSecStatus status;
 
-    @Basic
-    @Column(name = "is_active")
-    public Boolean getActive() {
-        return isActive;
-    }
 
-    public void setActive(Boolean active) {
-        isActive = active;
-    }
-
-    @Basic
-    @Column(name = "is_superuser")
-    public Boolean getSuperuser() {
-        return isSuperuser;
-    }
-
-    public void setSuperuser(Boolean superuser) {
-        isSuperuser = superuser;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        UserSecEntity that = (UserSecEntity) o;
-
-        if (userId != that.userId) return false;
-        if (fullName != null ? !fullName.equals(that.fullName) : that.fullName != null) return false;
-        if (email != null ? !email.equals(that.email) : that.email != null) return false;
-        if (hashedPassword != null ? !hashedPassword.equals(that.hashedPassword) : that.hashedPassword != null)
-            return false;
-        if (isActive != null ? !isActive.equals(that.isActive) : that.isActive != null) return false;
-        if (isSuperuser != null ? !isSuperuser.equals(that.isSuperuser) : that.isSuperuser != null) return false;
-
-        return true;
-    }
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "user_sec_roles",
+            joinColumns = @JoinColumn(name = "user_sec_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_sec_role_id"))
+    @Getter @Setter private Set<UserSecRoleEntity> roles = new HashSet<>();
 
     @Override
     public int hashCode() {
@@ -96,8 +55,7 @@ public class UserSecEntity {
         result = 31 * result + (fullName != null ? fullName.hashCode() : 0);
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (hashedPassword != null ? hashedPassword.hashCode() : 0);
-        result = 31 * result + (isActive != null ? isActive.hashCode() : 0);
-        result = 31 * result + (isSuperuser != null ? isSuperuser.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
         return result;
     }
 }
