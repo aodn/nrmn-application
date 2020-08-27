@@ -1,4 +1,5 @@
 
+<<<<<<< HEAD
     alter table if exists nrmn.sec_user_sec_role 
        drop constraint if exists FK_ROLE_USER_SEC;
 
@@ -38,12 +39,12 @@
         primary key (sec_user_id, sec_role_id)
     );
 
-    alter table if exists nrmn.sec_user 
+    alter table if exists nrmn.sec_user
        add constraint UNIQUE_EMAIL unique (email_address);
 create sequence role_id_seq start 1 increment 1;
 create sequence user_id_seq start 1 increment 1;
 
-    alter table if exists nrmn.sec_user_sec_role 
+    alter table if exists nrmn.sec_user_sec_role
        add constraint FK_ROLE_USER_SEC 
        foreign key (sec_role_id) 
        references nrmn.sec_role;
@@ -52,3 +53,4 @@ create sequence user_id_seq start 1 increment 1;
        add constraint FK_USER_SEC_ROLE 
        foreign key (sec_user_id) 
        references nrmn.sec_user;
+

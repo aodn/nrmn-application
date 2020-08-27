@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.config;
 
 import au.org.aodn.nrmn.restapi.model.db.SecUserEntity;
 import au.org.aodn.nrmn.restapi.model.db.SecRoleEntity;
+
 import lombok.val;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -52,6 +53,7 @@ public class GenerateApplicationTables implements ApplicationListener<Applicatio
             );
             metadata.addAnnotatedClass(SecUserEntity.class);
             metadata.addAnnotatedClass(SecRoleEntity.class);
+
             SchemaExport schemaExport = new SchemaExport();
             schemaExport.setFormat(true);
             schemaExport.setDelimiter(";");
