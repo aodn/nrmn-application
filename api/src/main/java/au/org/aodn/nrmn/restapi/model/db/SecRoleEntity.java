@@ -9,8 +9,8 @@ import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor
-@Table(name = "user_sec_role", schema = "nrmn", catalog = "nrmn")
-public class UserSecRoleEntity {
+@Table(name = "sec_role", schema = "nrmn", catalog = "nrmn")
+public class SecRoleEntity {
 
     @Id
     @SequenceGenerator(name="role_id_seq", allocationSize=1)
@@ -31,7 +31,7 @@ public class UserSecRoleEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        UserSecRoleEntity that = (UserSecRoleEntity) o;
+        SecRoleEntity that = (SecRoleEntity) o;
 
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (version != null ? !version.equals(that.version) : that.version != null) return false;

@@ -1,21 +1,27 @@
-
-    drop table if exists nrmn.user_sec cascade;
-
-    drop table if exists nrmn.user_sec_role cascade;
-
-    alter table if exists nrmn.user_sec_roles
+    alter table if exists nrmn.sec_user_sec_role
        drop constraint if exists FK_ROLE_USER_SEC;
 
-    alter table if exists nrmn.user_sec_roles
+    alter table if exists nrmn.sec_user_sec_role 
        drop constraint if exists FK_USER_SEC_ROLE;
 
-    drop table if exists nrmn.user_sec_roles cascade;
+    drop table if exists nrmn.sec_role cascade;
+
+    drop table if exists nrmn.sec_user cascade;
+
+    drop table if exists nrmn.sec_user_sec_role cascade;
 
     drop sequence if exists role_id_seq;
 
     drop sequence if exists user_id_seq;
 
-    create table nrmn.user_sec (
+    create table nrmn.sec_role (
+       id int8 not null,
+        name varchar(255) not null,
+        version int4 not null,
+        primary key (id)
+    );
+
+    create table nrmn.sec_user (
        id int4 not null,
         email_address varchar(255) not null,
         full_name varchar(255),
@@ -25,30 +31,24 @@
         primary key (id)
     );
 
-    create table nrmn.user_sec_role (
-       id int8 not null,
-        name varchar(255) not null,
-        version int4 not null,
-        primary key (id)
+    create table nrmn.sec_user_sec_role (
+       sec_user_id int4 not null,
+        sec_role_id int8 not null,
+        primary key (sec_user_id, sec_role_id)
     );
 
-    alter table if exists nrmn.user_sec 
+    alter table if exists nrmn.sec_user
        add constraint UNIQUE_EMAIL unique (email_address);
 create sequence role_id_seq start 1 increment 1;
 create sequence user_id_seq start 1 increment 1;
 
-    create table nrmn.user_sec_roles (
-       user_sec_id int4 not null,
-        user_sec_role_id int8 not null,
-        primary key (user_sec_id, user_sec_role_id)
-    );
-
-    alter table if exists nrmn.user_sec_roles
+    alter table if exists nrmn.sec_user_sec_role
        add constraint FK_ROLE_USER_SEC 
-       foreign key (user_sec_role_id) 
-       references nrmn.user_sec_role;
+       foreign key (sec_role_id) 
+       references nrmn.sec_role;
 
-    alter table if exists nrmn.user_sec_roles
+    alter table if exists nrmn.sec_user_sec_role 
        add constraint FK_USER_SEC_ROLE 
-       foreign key (user_sec_id) 
-       references nrmn.user_sec;
+       foreign key (sec_user_id) 
+       references nrmn.sec_user;
+

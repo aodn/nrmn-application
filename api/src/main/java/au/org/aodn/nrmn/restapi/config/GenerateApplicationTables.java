@@ -1,7 +1,8 @@
 package au.org.aodn.nrmn.restapi.config;
 
-import au.org.aodn.nrmn.restapi.model.db.UserSecEntity;
-import au.org.aodn.nrmn.restapi.model.db.UserSecRoleEntity;
+import au.org.aodn.nrmn.restapi.model.db.SecUserEntity;
+import au.org.aodn.nrmn.restapi.model.db.SecRoleEntity;
+
 import lombok.val;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -50,8 +51,9 @@ public class GenerateApplicationTables implements ApplicationListener<Applicatio
             MetadataSources metadata = new MetadataSources(
                     new StandardServiceRegistryBuilder().applySettings(settings).build()
             );
-            metadata.addAnnotatedClass(UserSecEntity.class);
-            metadata.addAnnotatedClass(UserSecRoleEntity.class);
+            metadata.addAnnotatedClass(SecUserEntity.class);
+            metadata.addAnnotatedClass(SecRoleEntity.class);
+
             SchemaExport schemaExport = new SchemaExport();
             schemaExport.setFormat(true);
             schemaExport.setDelimiter(";");
