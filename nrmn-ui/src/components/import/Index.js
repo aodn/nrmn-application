@@ -1,7 +1,7 @@
 import React from 'react';
 import XlxsUpload from './XlxsUpload';
 import DataSheetView from './DataSheetView';
-import { useParams } from 'react-router-dom';
+import '../../ag-grid.scss'
 
 
 const ImportPage = () => {
