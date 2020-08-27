@@ -23,7 +23,7 @@ import java.util.Map;
 
 
 @Component
-public class CreateSchema implements ApplicationListener<ApplicationReadyEvent> {
+public class GenerateApplicationTables implements ApplicationListener<ApplicationReadyEvent> {
 
     @Value("${spring.datasource.url}")
     String url;
@@ -33,7 +33,7 @@ public class CreateSchema implements ApplicationListener<ApplicationReadyEvent> 
     String pwd;
     @Autowired
     private Environment environment;
-   static Logger logger = LoggerFactory.getLogger(CreateSchema.class);
+   static Logger logger = LoggerFactory.getLogger(GenerateApplicationTables.class);
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
 

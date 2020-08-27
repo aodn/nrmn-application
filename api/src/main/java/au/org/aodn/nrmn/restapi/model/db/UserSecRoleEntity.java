@@ -13,8 +13,8 @@ import javax.persistence.*;
 public class UserSecRoleEntity {
 
     @Id
-    @SequenceGenerator(name="entity_id_seq", sequenceName="hibernate_sequence", allocationSize=1)
-    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    @SequenceGenerator(name="role_id_seq", allocationSize=1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "role_id_seq")
     @Column(name="id", unique=true, updatable=false, nullable=false)
     @Getter @Setter private Long id;
 

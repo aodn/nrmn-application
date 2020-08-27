@@ -11,7 +11,7 @@ import java.sql.Time;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "survey")
+@Table(name = "survey", schema = "nrmn", catalog = "nrmn")
 public class SurveyEntity {
     @Id
     @Column(name = "survey_id")
