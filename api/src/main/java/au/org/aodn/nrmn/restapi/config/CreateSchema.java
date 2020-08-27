@@ -56,7 +56,7 @@ public class CreateSchema implements ApplicationListener<ApplicationReadyEvent> 
             schemaExport.setFormat(true);
             schemaExport.setDelimiter(";");
             schemaExport.setHaltOnError(true);
-            schemaExport.setOutputFile("sql/db-schema.sql");
+            schemaExport.setOutputFile("sql/createAuthTables.sql");
             schemaExport.execute(EnumSet.of(TargetType.SCRIPT), SchemaExport.Action.BOTH, metadata.buildMetadata());
         }
     }

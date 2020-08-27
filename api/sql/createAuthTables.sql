@@ -4,10 +4,10 @@
     drop table if exists nrmn.user_sec_role cascade;
 
     alter table if exists user_sec_roles 
-       drop constraint if exists FK66b1mjokf7kr304482svj793e;
+       drop constraint if exists FK_ROLE_USER_SEC;
 
     alter table if exists user_sec_roles 
-       drop constraint if exists FKcsp4dn4ir904edwa6o68fnry2;
+       drop constraint if exists FK_USER_SEC_ROLE;
 
     drop table if exists user_sec_roles cascade;
 
@@ -31,7 +31,7 @@
     );
 
     alter table if exists nrmn.user_sec 
-       add constraint UK_lw7syc93lfq5iatr1xj7s73yl unique (email_address);
+       add constraint UNIQUE_EMAIL unique (email_address);
 create sequence hibernate_sequence start 1 increment 1;
 
     create table user_sec_roles (
@@ -41,11 +41,11 @@ create sequence hibernate_sequence start 1 increment 1;
     );
 
     alter table if exists user_sec_roles 
-       add constraint FK66b1mjokf7kr304482svj793e 
+       add constraint FK_ROLE_USER_SEC 
        foreign key (user_sec_role_id) 
        references nrmn.user_sec_role;
 
     alter table if exists user_sec_roles 
-       add constraint FKcsp4dn4ir904edwa6o68fnry2 
+       add constraint FK_USER_SEC_ROLE 
        foreign key (user_sec_id) 
        references nrmn.user_sec;
