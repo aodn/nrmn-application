@@ -22,12 +22,14 @@ import ImportPage from './components/import/Index';
 
 
 const drawerWidth = 240;
+
 let theme = createMuiTheme({
   palette: {
     primary: blueGrey,
     secondary: grey
   },
 });
+
 theme = responsiveFontSizes(theme);
 
 const useStyles = makeStyles((theme) => ({
@@ -70,9 +72,9 @@ export default function PersistentDrawerLeft() {
           >
             <div className={classes.drawerHeader} />
             <Switch>
-              <Route path="/import-file/:fileID?" component={ImportPage} >
+              <Route path="/import-file/:fileID?" >
               </Route>
-              <Route path="/list-file" component={FileList} >
+              <Route path="/list-file"  >
               </Route>
             </Switch>
         </main>

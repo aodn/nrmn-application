@@ -65,7 +65,11 @@ export const user = params => {
   return axiosInstance.get(`/api/user`, config);
 };
 
-// Injest
+// Ingest
 export const rawSurvey = params => {
   return  axiosInstance.get("/api/raw-survey", params).then(res => res );
+}
+
+export const rawSurveySave = params => {
+  return  axiosInstance.put("/api/raw-survey", params).then(res => res );
 }
