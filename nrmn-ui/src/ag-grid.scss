@@ -1,0 +1,12 @@
+@import "~ag-grid-community/src/styles/ag-grid.scss";
+@import "~ag-grid-community/src/styles/ag-theme-alpine/sass/ag-theme-alpine-mixin";
+
+.ag-theme-alpine {
+  @include ag-theme-alpine((
+    // use theme parameters where possible
+    // references colors from material-ui createMuiTheme() in App.js
+    alpine-active-color: slategray
+  ));
+
+
+}
