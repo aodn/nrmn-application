@@ -13,11 +13,11 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user_sec",
+@Table(name = "sec_user",
         schema = "nrmn",
         catalog = "nrmn",
         uniqueConstraints ={@UniqueConstraint( name = "UNIQUE_EMAIL",columnNames = {"email_address"})} )
-public class UserSecEntity {
+public class SecUserEntity {
 
     @Id
     @SequenceGenerator(name="user_id_seq", allocationSize=1)
@@ -47,10 +47,12 @@ public class UserSecEntity {
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
-            name = "user_sec_roles",
-            joinColumns = @JoinColumn(name = "user_sec_id",foreignKey=@ForeignKey(name="FK_USER_SEC_ROLE")),
-            inverseJoinColumns = @JoinColumn(name = "user_sec_role_id", foreignKey=@ForeignKey(name="FK_ROLE_USER_SEC")))
-    @Getter @Setter private Set<UserSecRoleEntity> roles = new HashSet<>();
+            schema = "nrmn",
+            catalog = "nrmn",
+            name = "sec_user_sec_role",
+            joinColumns = @JoinColumn(name = "sec_user_id",foreignKey=@ForeignKey(name="FK_USER_SEC_ROLE")),
+            inverseJoinColumns = @JoinColumn(name = "sec_role_id", foreignKey=@ForeignKey(name="FK_ROLE_USER_SEC")))
+    @Getter @Setter private Set<SecRoleEntity> roles = new HashSet<>();
 
     @Override
     public int hashCode() {
