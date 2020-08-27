@@ -22,12 +22,14 @@ import ImportPage from './components/import/Index';
 
 
 const drawerWidth = 240;
+
 let theme = createMuiTheme({
   palette: {
     primary: blueGrey,
     secondary: grey
   },
 });
+
 theme = responsiveFontSizes(theme);
 
 const useStyles = makeStyles((theme) => ({
