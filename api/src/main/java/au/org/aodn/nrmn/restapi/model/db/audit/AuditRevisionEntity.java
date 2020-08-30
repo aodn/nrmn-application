@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "REVINFO", schema = "nrmn", catalog = "nrmn")
+@Table(name = "REVINFO")
 @RevisionEntity(AuditRevisionEntityListener.class)
 public class AuditRevisionEntity extends DefaultRevisionEntity {
 

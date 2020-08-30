@@ -3,7 +3,7 @@ package au.org.aodn.nrmn.restapi.model.db;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "aphia_rel_type_ref", schema = "nrmn", catalog = "nrmn")
+@Table(name = "aphia_rel_type_ref"  )
 public class AphiaRelTypeRefEntity {
     private int aphiaRelTypeId;
     private String aphiaRelTypeName;

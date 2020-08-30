@@ -1,8 +1,8 @@
 package au.org.aodn.nrmn.restapi.config;
 
-import au.org.aodn.nrmn.restapi.model.db.SecUserEntity;
-import au.org.aodn.nrmn.restapi.model.db.SecRoleEntity;
+import au.org.aodn.nrmn.restapi.model.db.*;
 
+import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAuditEntity;
 import lombok.val;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -17,10 +17,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.util.*;
 
 
 @Component
@@ -34,7 +32,8 @@ public class GenerateApplicationTables implements ApplicationListener<Applicatio
     String pwd;
     @Autowired
     private Environment environment;
-   static Logger logger = LoggerFactory.getLogger(GenerateApplicationTables.class);
+    static Logger logger = LoggerFactory.getLogger(GenerateApplicationTables.class);
+
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
 
@@ -47,19 +46,39 @@ public class GenerateApplicationTables implements ApplicationListener<Applicatio
             settings.put("hibernate.connection.username", username);
             settings.put("hibernate.connection.password", pwd);
             settings.put("hibernate.hbm2ddl.auto", "create");
+            settings.put("hibernate.default_schema","nrmn");
+            settings.put("hibernate.default_catalog","nrmn");
             settings.put("show_sql", "true");
-            MetadataSources metadata = new MetadataSources(
-                    new StandardServiceRegistryBuilder().applySettings(settings).build()
-            );
-            metadata.addAnnotatedClass(SecUserEntity.class);
-            metadata.addAnnotatedClass(SecRoleEntity.class);
 
-            SchemaExport schemaExport = new SchemaExport();
-            schemaExport.setFormat(true);
-            schemaExport.setDelimiter(";");
-            schemaExport.setHaltOnError(true);
-            schemaExport.setOutputFile("sql/createAuthTables.sql");
-            schemaExport.execute(EnumSet.of(TargetType.SCRIPT), SchemaExport.Action.BOTH, metadata.buildMetadata());
+            _generatingTables(settings, Arrays.asList(SecRoleEntity.class, SecUserEntity.class), "createAuthTables");
+            _generatingTables(
+                    settings,
+                    Arrays.asList(
+                            DiverRefEntity.class,
+                            UserActionAuditEntity.class,
+                            ObservableItemRefEntity.class,
+                            ObservationEntity.class,
+                            SurveyEntity.class,
+                            SurveyMethodEntity.class,
+                            SiteRefEntity.class,
+                            LocationRefEntity.class
+                    ),
+            "createAuditTable");
         }
+    }
+
+    private void _generatingTables(Map<String, String> settings, List<Class> entities, String sqlFileName) {
+        MetadataSources metadata = new MetadataSources(
+                new StandardServiceRegistryBuilder().applySettings(settings).build()
+        );
+        entities.forEach(c -> metadata.addAnnotatedClass(c));
+        val schemaExport = new SchemaExport();
+        schemaExport.setFormat(true);
+        schemaExport.setDelimiter(";");
+        schemaExport.setHaltOnError(true);
+        val timestamp = new Timestamp(System.currentTimeMillis());
+
+        schemaExport.setOutputFile("sql/" + sqlFileName + "." + timestamp.getTime() + ".sql");
+        schemaExport.execute(EnumSet.of(TargetType.SCRIPT), SchemaExport.Action.BOTH, metadata.buildMetadata());
     }
 }
