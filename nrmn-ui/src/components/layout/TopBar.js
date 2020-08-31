@@ -1,15 +1,16 @@
 
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
-import Button from '@material-ui/core/Button';
+import Switch from "@material-ui/core/Switch";
 import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import {makeStyles, withStyles} from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import { toggleMenu } from './redux-layout';
+import { toggleTheme } from '../import/reducers/theme-reducer';
 import { connect } from 'react-redux';
 import store from '../store';
 import AuthState from "./AuthState";
@@ -48,6 +49,10 @@ const handleClick = () => {
   store.dispatch(toggleMenu())
 }
 
+const handleToggleThemeChange = event => {
+  store.dispatch(toggleTheme(event.target.checked))
+}
+
 const ReduxTopBar = ({ menuIsOpen }) => {
   const classes = useStyles();
 
@@ -75,7 +80,6 @@ const ReduxTopBar = ({ menuIsOpen }) => {
             <Grid item >
               <Typography
                   variant="h5"
-                  display={"inline-flex"}
                   className={clsx(classes.header)}
                   noWrap>
                 {process.env.REACT_APP_SITE_TITLE}
@@ -90,6 +94,7 @@ const ReduxTopBar = ({ menuIsOpen }) => {
               color="secondary"
               size="small"
               >Notifications</TopbarButton>
+          <Switch title="Dark/Light theme toggle" onChange={handleToggleThemeChange} size="small" checked={store.getState().theme.themeType}/>
         </Grid>
       </Grid>
     </Toolbar>

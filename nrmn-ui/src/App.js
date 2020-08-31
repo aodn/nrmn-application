@@ -8,9 +8,7 @@ import {
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TopBar from './components/layout/TopBar';
 import SideMenu from './components/layout/SideMenu';
-
 import {blueGrey, grey} from '@material-ui/core/colors';
-
 import {
   BrowserRouter as Router,
   Switch,
@@ -19,18 +17,10 @@ import {
 
 import FileList from './components/import/FileList';
 import ImportPage from './components/import/Index';
+import { useSelector} from "react-redux";
 
 
 const drawerWidth = 240;
-
-let theme = createMuiTheme({
-  palette: {
-    primary: blueGrey,
-    secondary: grey
-  },
-});
-
-theme = responsiveFontSizes(theme);
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -55,8 +45,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function PersistentDrawerLeft() {
+export default function App()  {
   const classes = useStyles();
+
+  const themeType = useSelector(state =>  state.theme.themeType);
+
+  let theme = createMuiTheme({
+    palette: {
+      primary: blueGrey,
+      secondary: grey,
+      type: themeType ? "dark" : "light"
+    }
+  });
+  theme = responsiveFontSizes(theme);
 
   return (
     <div className={classes.root}>
@@ -83,3 +84,4 @@ export default function PersistentDrawerLeft() {
     </div>
   );
 }
+

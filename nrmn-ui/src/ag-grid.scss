@@ -1,12 +1,19 @@
 @import "~ag-grid-community/src/styles/ag-grid.scss";
 @import "~ag-grid-community/src/styles/ag-theme-alpine/sass/ag-theme-alpine-mixin";
+@import "~ag-grid-community/src/styles/ag-theme-alpine-dark/sass/ag-theme-alpine-dark-mixin";
 
 .ag-theme-alpine {
   @include ag-theme-alpine((
     // use theme parameters where possible
     // references colors from material-ui createMuiTheme() in App.js
-    alpine-active-color: slategray
+          alpine-active-color: slategray
   ));
+}
 
-
+.ag-theme-alpine-dark {
+  @include ag-theme-alpine-dark((
+    // use theme parameters where possible
+    // references colors from material-ui createMuiTheme() in App.js
+          alpine-active-color: slategray
+  ));
 }

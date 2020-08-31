@@ -79,8 +79,10 @@ const DataSheetView = () => {
     }));
     const classes = useStyles();
     const size = useWindowSize();
+    const themeType = useSelector(state =>  state.theme.themeType);
+
     return (sheet && sheet.length && !isLoading) ? (
-        <div style={{ height: size.height - 200, width: '100%', marginTop: 25 }} className="ag-theme-alpine">
+        <div style={{ height: size.height - 200, width: '100%', marginTop: 25 }} className={ themeType ? "ag-theme-alpine-dark" : "ag-theme-alpine" } >
             <AgGridReact
                 pivotMode={true}
                 pivotColumnGroupTotals={"before"}
