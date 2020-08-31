@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.warning;
 
 import au.org.aodn.nrmn.restapi.model.db.ErrorCheckEntity;
-import au.org.aodn.nrmn.restapi.model.db.RawSurveyEntity;
+import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
 import au.org.aodn.nrmn.restapi.repository.ErrorCheckEntityRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRefEntityRepository;
 import au.org.aodn.nrmn.restapi.validation.BaseValidator;
@@ -23,7 +23,7 @@ public class SiteCodeExists extends BaseValidator {
     }
 
     @Override
-    public Validated<ErrorCheckEntity, String> valid(RawSurveyEntity target) {
+    public Validated<ErrorCheckEntity, String> valid(StagedSurveyEntity target) {
         val sites = siteRepo.findBySiteCode(target.SiteNo);
         return warningNotFound(sites, target, target.SiteNo);
     }

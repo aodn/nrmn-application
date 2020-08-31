@@ -6,14 +6,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "error_check", schema = "nrmn", catalog = "nrmn")
+@Table(name = "error_check")
 public class ErrorCheckEntity {
     @EmbeddedId
     @JsonUnwrapped
@@ -28,5 +27,5 @@ public class ErrorCheckEntity {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-     public RawSurveyEntity rawSurveyEntity;
+     public StagedSurveyEntity rawSurveyEntity;
 }

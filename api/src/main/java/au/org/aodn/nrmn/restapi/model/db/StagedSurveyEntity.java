@@ -6,8 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.Type;
 
@@ -19,91 +18,94 @@ import java.util.Map;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name = "raw_survey", schema = "nrmn", catalog = "nrmn")
-public class RawSurveyEntity {
+public class StagedSurveyEntity {
     @EmbeddedId
     @JsonUnwrapped
-    public RawSurveyID rid;
+    private RawSurveyID rid;
 
     @JsonProperty(value = "Site No")
     @Column(name = "site_no")
-    public String SiteNo;
+    private String SiteNo;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @Column(name = "date")
-    public Date Date;
+    private Date Date;
 
     @Column(name = "diver")
-    public String Diver;
+    private String Diver;
 
     @Column(name = "depth")
-    public Double Depth;
+    private Double Depth;
 
     @Column(name = "method")
-    public Integer Method;
+    private Integer Method;
 
     @Column(name = "block")
-    public Integer Block;
+    private Integer Block;
 
     @Column(name = "species")
-    public String Species;
+    private String Species;
 
     @Column(name = "buddy")
-    public String Buddy;
+    private String Buddy;
 
     @JsonProperty(value = "Site Name")
     @Column(name = "site_name")
-    public String SiteName;
+    private String SiteName;
 
     @Column(name = "longitude")
-    public Double Longitude;
+    private Double Longitude;
 
     @Column(name = "latitude")
-    public Double Latitude;
+    private Double Latitude;
 
     @Column(name = "vis")
-    public Integer vis;
+    private Integer vis;
 
     @Column(name = "direction")
-    public String Direction;
+    private String Direction;
 
     @Column(name = "time")
-    public Double Time;
+    private Double Time;
 
     @JsonProperty(value = "P-Qs")
     @Column(name = "PQs")
-    public Integer PQs;
+    private Integer PQs;
 
     @Column(name = "code")
-    public String Code;
+    private String Code;
 
     @JsonProperty(value = "Common name")
     @Column(name = "common_name")
-    public String CommonName;
+    private String CommonName;
 
     @Column(name = "total")
-    public Integer Total;
+    private Integer Total;
 
     @Column(name = "inverts")
-    public Integer Inverts;
+    private Integer Inverts;
 
     @Column(name = "m2_invert_sizing_species")
-    public Boolean M2InvertSizingSpecies;
+    private Boolean M2InvertSizingSpecies;
 
     @Column(name = "L5")
-    public Integer L5;
+    private Integer L5;
 
     @Column(name = "L95")
-    public Integer L95;
+    private Integer L95;
 
     @Column(name = "is_invert_Sizing")
-    public Boolean IsInvertSizing;
+    private Boolean IsInvertSizing;
 
     @Column(name = "measureValue", columnDefinition = "json")
     @Type(type = "jsonb")
-    public Map<String, Double> MeasureJson;
+    private Map<String, Double> MeasureJson;
 
     @OneToMany
-    public List<ErrorCheckEntity> Errors;
+    private List<ErrorCheckEntity> Errors;
 }

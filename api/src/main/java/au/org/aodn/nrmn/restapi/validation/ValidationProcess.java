@@ -2,7 +2,7 @@ package au.org.aodn.nrmn.restapi.validation;
 
 import au.org.aodn.nrmn.restapi.model.api.ValidationResult;
 import au.org.aodn.nrmn.restapi.model.db.ErrorCheckEntity;
-import au.org.aodn.nrmn.restapi.model.db.RawSurveyEntity;
+import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
 import au.org.aodn.nrmn.restapi.repository.ErrorCheckEntityRepository;
 import au.org.aodn.nrmn.restapi.repository.RawSurveyEntityRepository;
 import au.org.aodn.nrmn.restapi.validation.warning.DiverExists;
@@ -15,9 +15,7 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class ValidationProcess {
@@ -33,19 +31,19 @@ public class ValidationProcess {
     ErrorCheckEntityRepository errorRepo;
 
 
-    public Seq<ErrorCheckEntity> processError(RawSurveyEntity rawSurvey) {
+    public Seq<ErrorCheckEntity> processError(StagedSurveyEntity rawSurvey) {
         val res = diverExists.valid(rawSurvey).combine(
                 Semigroups.stringJoin(". "),
                 siteCodeExists.valid(rawSurvey));
         return res.bimap(Seq::of, Functions.identity()).foldInvalidLeft(Monoids.seqConcat());
     }
 
-    public ValidationResult processList(List<RawSurveyEntity> entities, String fileID) {
+    public ValidationResult processList(List<StagedSurveyEntity> entities, String fileID) {
         val currentFile =rawSurveyRepo.findRawSurveyByFileID(fileID);
         if (!currentFile.isEmpty())
             return new ValidationResult(currentFile, fileID);
         errorRepo.deleteWithFileID(fileID);
-        Seq<RawSurveyEntity> rawDataWithFile = Seq.fromStream(entities.stream()).map(v -> {
+        Seq<StagedSurveyEntity> rawDataWithFile = Seq.fromStream(entities.stream()).map(v -> {
             v.rid.fileID = fileID;
             return v;
         });
