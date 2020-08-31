@@ -71,5 +71,5 @@ export const rawSurvey = params => {
 }
 
 export const rawSurveySave = params => {
-  return  axiosInstance.put("/api/raw-survey", params).then(res => res );
+  return  axiosInstance.post("/api/raw-survey", params).then(res => res );
 }
