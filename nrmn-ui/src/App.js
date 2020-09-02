@@ -18,6 +18,7 @@ import {
 import FileList from './components/import/FileList';
 import ImportPage from './components/import/Index';
 import { useSelector} from "react-redux";
+import green from "@material-ui/core/colors/green";
 
 
 const drawerWidth = 240;
@@ -42,19 +43,24 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.enteringScreen,
     }),
     marginLeft: 0,
-  },
+  }
 }));
 
 export default function App()  {
   const classes = useStyles();
 
-  const themeType = useSelector(state =>  state.theme.themeType);
+  const themeState = useSelector(state =>  state.theme);
 
   let theme = createMuiTheme({
     palette: {
       primary: blueGrey,
       secondary: grey,
-      type: themeType ? "dark" : "light"
+      type: themeState.themeType ? "dark" : "light",
+    },
+    props: {
+      MuiTable: {
+        size: themeState.tableSize
+      }
     }
   });
   theme = responsiveFontSizes(theme);
@@ -73,9 +79,9 @@ export default function App()  {
           >
             <div className={classes.drawerHeader} />
             <Switch>
-              <Route path="/import-file/:fileID?" >
+            <Route path={["/import-file/:fileID?"]} component={ImportPage}>
               </Route>
-              <Route path="/list-file" >
+            <Route path="/list-file" component={FileList} >
               </Route>
             </Switch>
         </main>

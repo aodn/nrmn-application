@@ -2,11 +2,14 @@
 @import "~ag-grid-community/src/styles/ag-theme-alpine/sass/ag-theme-alpine-mixin";
 @import "~ag-grid-community/src/styles/ag-theme-alpine-dark/sass/ag-theme-alpine-dark-mixin";
 
+$grid-size: 4px;
+
 .ag-theme-alpine {
   @include ag-theme-alpine((
     // use theme parameters where possible
     // references colors from material-ui createMuiTheme() in App.js
-          alpine-active-color: slategray
+    grid-size: $grid-size,
+    alpine-active-color: slategray
   ));
 }
 
@@ -14,7 +17,8 @@
   @include ag-theme-alpine-dark((
     // use theme parameters where possible
     // references colors from material-ui createMuiTheme() in App.js
-          alpine-active-color: slategray,
-          background-color: #2f2f2f
+    grid-size: $grid-size,
+    alpine-active-color: slategray,
+    background-color: #2f2f2f
   ));
 }

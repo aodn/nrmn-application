@@ -1,7 +1,5 @@
-
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
-import Switch from "@material-ui/core/Switch";
 import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -10,11 +8,10 @@ import MenuIcon from '@material-ui/icons/Menu';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import { toggleMenu } from './redux-layout';
-import { toggleTheme } from '../import/reducers/theme-reducer';
 import { connect } from 'react-redux';
 import store from '../store';
 import AuthState from "./AuthState";
-import { TopbarButton } from './TopbarButton'
+import SettingsMenu from "./SettingsMenu";
 
 const drawerWidth = 240;
 
@@ -47,10 +44,6 @@ const mapStateToProps = state => {
 
 const handleClick = () => {
   store.dispatch(toggleMenu())
-}
-
-const handleToggleThemeChange = event => {
-  store.dispatch(toggleTheme(event.target.checked))
 }
 
 const ReduxTopBar = ({ menuIsOpen }) => {
@@ -89,12 +82,7 @@ const ReduxTopBar = ({ menuIsOpen }) => {
         </Grid>
         <Grid item >
           <AuthState /> |
-          <TopbarButton
-              variant="text"
-              color="secondary"
-              size="small"
-              >Notifications</TopbarButton>
-          <Switch title="Dark/Light theme toggle" onChange={handleToggleThemeChange} size="small" checked={store.getState().theme.themeType}/>
+          <SettingsMenu />
         </Grid>
       </Grid>
     </Toolbar>

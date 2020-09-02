@@ -15,4 +15,4 @@ const toggleThemeSlice = createSlice({
 });
 
 export const themeReducer = toggleThemeSlice.reducer;
-export const { toggleTheme} = toggleThemeSlice.actions;
+export const { toggleTheme } = toggleThemeSlice.actions;
