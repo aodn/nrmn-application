@@ -1,50 +1,50 @@
 
-alter table if exists nrmn.diver_ref_AUD
+alter table if exists nrmn.diver_ref_aud
     drop constraint if exists FK_DIVER_AUD_REV;
 
-alter table if exists nrmn.location_ref_AUD
+alter table if exists nrmn.location_ref_aud
     drop constraint if exists FK_LOCATION_AUD_REV;
 
-alter table if exists nrmn.observable_item_ref_AUD
+alter table if exists nrmn.observable_item_ref_aud
     drop constraint if exists FK_OBS_ITEM_AUD_REV;
 
-alter table if exists nrmn.observation_AUD
+alter table if exists nrmn.observation_aud
     drop constraint if exists FK_OBS_AUD_REV;
 
-alter table if exists nrmn.site_ref_AUD
+alter table if exists nrmn.site_ref_aud
     drop constraint if exists FK_SITE_AUD_REV;
 
-alter table if exists nrmn.survey_AUD
+alter table if exists nrmn.survey_aud
     drop constraint if exists FK_SURVEY_AUD_REV;
 
-alter table if exists nrmn.survey_method_AUD
+alter table if exists nrmn.survey_method_aud
     drop constraint if exists FK_SURVEY_METHOD_AUD_REV;
 
-drop table if exists nrmn.diver_ref_AUD cascade;
+drop table if exists nrmn.diver_ref_aud cascade;
 
 drop table if exists nrmn.location_ref cascade;
 
-drop table if exists nrmn.location_ref_AUD cascade;
+drop table if exists nrmn.location_ref_aud cascade;
 
 
-drop table if exists nrmn.observable_item_ref_AUD cascade;
+drop table if exists nrmn.observable_item_ref_aud cascade;
 
-drop table if exists nrmn.observation_AUD cascade;
+drop table if exists nrmn.observation_aud cascade;
 
 drop table if exists nrmn.REVINFO cascade;
 
 
-drop table if exists nrmn.site_ref_AUD cascade;
+drop table if exists nrmn.site_ref_aud cascade;
 
 
-drop table if exists nrmn.survey_AUD cascade;
+drop table if exists nrmn.survey_aud cascade;
 
-drop table if exists nrmn.survey_method_AUD cascade;
+drop table if exists nrmn.survey_method_aud cascade;
 
 drop table if exists nrmn.user_action_aud cascade;
 
 
-create table nrmn.diver_ref_AUD (
+create table nrmn.diver_ref_aud (
                                     diver_id int4 not null,
                                     REV int4 not null,
                                     REVTYPE int2,
@@ -57,7 +57,7 @@ create table nrmn.diver_ref_AUD (
 
 
 
-create table nrmn.location_ref_AUD (
+create table nrmn.location_ref_aud (
                                        location_id int4 not null,
                                        REV int4 not null,
                                        REVTYPE int2,
@@ -69,7 +69,7 @@ create table nrmn.location_ref_AUD (
 );
 
 
-create table nrmn.observable_item_ref_AUD (
+create table nrmn.observable_item_ref_aud (
                                               observable_item_id int4 not null,
                                               REV int4 not null,
                                               REVTYPE int2,
@@ -81,7 +81,7 @@ create table nrmn.observable_item_ref_AUD (
 );
 
 
-create table nrmn.observation_AUD (
+create table nrmn.observation_aud (
                                       observation_id int4 not null,
                                       REV int4 not null,
                                       REVTYPE int2,
@@ -99,7 +99,7 @@ create table nrmn.REVINFO (
 );
 
 
-create table nrmn.site_ref_AUD (
+create table nrmn.site_ref_aud (
                                    site_id int4 not null,
                                    REV int4 not null,
                                    REVTYPE int2,
@@ -119,7 +119,7 @@ create table nrmn.site_ref_AUD (
 );
 
 
-create table nrmn.survey_AUD (
+create table nrmn.survey_aud (
                                  survey_id int4 not null,
                                  REV int4 not null,
                                  REVTYPE int2,
@@ -140,7 +140,7 @@ create table nrmn.survey_AUD (
                                  primary key (survey_id, REV)
 );
 
-create table nrmn.survey_method_AUD (
+create table nrmn.survey_method_aud (
                                         survey_method_id int4 not null,
                                         REV int4 not null,
                                         REVTYPE int2,
@@ -161,37 +161,37 @@ create table nrmn.user_action_aud (
                                       primary key (id)
 );
 
-alter table if exists nrmn.diver_ref_AUD
+alter table if exists nrmn.diver_ref_aud
     add constraint FK_DIVER_AUD_REV
         foreign key (REV)
             references nrmn.REVINFO;
 
-alter table if exists nrmn.location_ref_AUD
+alter table if exists nrmn.location_ref_aud
     add constraint FK_LOCATION_AUD_REV
         foreign key (REV)
             references nrmn.REVINFO;
 
-alter table if exists nrmn.observable_item_ref_AUD
+alter table if exists nrmn.observable_item_ref_aud
     add constraint FK_OBS_ITEM_AUD_REV
         foreign key (REV)
             references nrmn.REVINFO;
 
-alter table if exists nrmn.observation_AUD
+alter table if exists nrmn.observation_aud
     add constraint FK_OBS_AUD_REV
         foreign key (REV)
             references nrmn.REVINFO;
 
-alter table if exists nrmn.site_ref_AUD
+alter table if exists nrmn.site_ref_aud
     add constraint FK_SITE_AUD_REV
         foreign key (REV)
             references nrmn.REVINFO;
 
-alter table if exists nrmn.survey_AUD
+alter table if exists nrmn.survey_aud
     add constraint FK_SURVEY_AUD_REV
         foreign key (REV)
             references nrmn.REVINFO;
 
-alter table if exists nrmn.survey_method_AUD
+alter table if exists nrmn.survey_method_aud
     add constraint FK_SURVEY_METHOD_AUD_REV
         foreign key (REV)
             references nrmn.REVINFO;

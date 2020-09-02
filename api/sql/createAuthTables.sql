@@ -1,5 +1,5 @@
 
-alter table if exists nrmn.sec_user_AUD
+alter table if exists nrmn.sec_user_aud
     drop constraint if exists FK_SEC_USER_AUD_REV;
 
 alter table if exists nrmn.sec_user_sec_role
@@ -14,7 +14,7 @@ drop table if exists nrmn.sec_role cascade;
 
 drop table if exists nrmn.sec_user cascade;
 
-drop table if exists nrmn.sec_user_AUD cascade;
+drop table if exists nrmn.sec_user_aud cascade;
 
 drop table if exists nrmn.sec_user_sec_role cascade;
 
@@ -50,7 +50,7 @@ create table nrmn.sec_user (
                                primary key (id)
 );
 
-create table nrmn.sec_user_AUD (
+create table nrmn.sec_user_aud (
                                    id int4 not null,
                                    REV int4 not null,
                                    REVTYPE int2,
@@ -74,7 +74,7 @@ create table nrmn.sec_user_sec_role (
 alter table if exists nrmn.sec_user
     add constraint UNIQUE_EMAIL unique (email_address);
 
-alter table if exists nrmn.sec_user_AUD
+alter table if exists nrmn.sec_user_aud
     add constraint FK_SEC_USER_AUD_REV
         foreign key (REV)
             references nrmn.REVINFO;
