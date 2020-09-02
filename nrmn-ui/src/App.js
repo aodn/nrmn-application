@@ -74,7 +74,7 @@ export default function PersistentDrawerLeft() {
             <Switch>
               <Route path="/import-file/:fileID?" >
               </Route>
-              <Route path="/list-file" >
+              <Route path="/list-file"  >
               </Route>
             </Switch>
         </main>
