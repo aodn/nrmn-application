@@ -11,6 +11,8 @@ import SideMenu from './components/layout/SideMenu';
 
 import {blueGrey, grey} from '@material-ui/core/colors';
 
+import RegisterUser from "./components/user/register"
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -72,10 +74,11 @@ export default function PersistentDrawerLeft() {
           >
             <div className={classes.drawerHeader} />
             <Switch>
-              <Route path="/import-file/:fileID?" >
+            <Route path={["/import-file/:fileID?"]} >
               </Route>
-              <Route path="/list-file"  >
+            <Route path="/list-file"  >
               </Route>
+              <Route path="/register" component={RegisterUser} />
             </Switch>
         </main>
         </Router>
