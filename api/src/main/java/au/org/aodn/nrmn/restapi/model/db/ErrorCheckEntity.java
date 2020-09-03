@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "error_check", schema = "nrmn", catalog = "nrmn")
+@Table(name = "error_check")
 public class ErrorCheckEntity {
     @EmbeddedId
     @JsonUnwrapped

@@ -3,7 +3,7 @@ package au.org.aodn.nrmn.restapi.model.db;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "obs_item_type_ref", schema = "nrmn", catalog = "nrmn")
+@Table(name = "obs_item_type_ref"  )
 public class ObsItemTypeRefEntity {
     private int obsItemTypeId;
     private String obsItemTypeName;

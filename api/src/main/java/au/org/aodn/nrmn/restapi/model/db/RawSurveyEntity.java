@@ -20,7 +20,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name = "raw_survey", schema = "nrmn", catalog = "nrmn")
+@Table(name = "raw_survey"  )
 public class RawSurveyEntity {
     @EmbeddedId
     @JsonUnwrapped
