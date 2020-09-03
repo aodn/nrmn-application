@@ -24,7 +24,7 @@ public class SiteCodeExists extends BaseValidator {
 
     @Override
     public Validated<ErrorCheckEntity, String> valid(StagedSurveyEntity target) {
-        val sites = siteRepo.findBySiteCode(target.SiteNo);
-        return warningNotFound(sites, target, target.SiteNo);
+        val sites = siteRepo.findBySiteCode(target.getSiteNo());
+        return warningNotFound(sites, target, target.getSiteNo());
     }
 }

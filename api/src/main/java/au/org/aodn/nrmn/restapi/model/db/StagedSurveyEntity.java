@@ -1,13 +1,9 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.model.db.composedID.RawSurveyID;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
-import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -22,76 +18,76 @@ import java.util.Map;
 @Setter
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name = "raw_survey", schema = "nrmn", catalog = "nrmn")
+@Table(name = "staged_survey")
 public class StagedSurveyEntity {
-    @EmbeddedId
-    @JsonUnwrapped
-    private RawSurveyID rid;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY )
+    private long id;
 
     @JsonProperty(value = "Site No")
     @Column(name = "site_no")
-    private String SiteNo;
+    private String siteNo;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @Column(name = "date")
-    private Date Date;
+    private Date date;
 
     @Column(name = "diver")
-    private String Diver;
+    private String diver;
 
     @Column(name = "depth")
-    private Double Depth;
+    private Double depth;
 
     @Column(name = "method")
-    private Integer Method;
+    private Integer method;
 
     @Column(name = "block")
-    private Integer Block;
+    private Integer block;
 
     @Column(name = "species")
-    private String Species;
+    private String species;
 
     @Column(name = "buddy")
-    private String Buddy;
+    private String buddy;
 
     @JsonProperty(value = "Site Name")
     @Column(name = "site_name")
-    private String SiteName;
+    private String siteName;
 
     @Column(name = "longitude")
-    private Double Longitude;
+    private Double longitude;
 
     @Column(name = "latitude")
-    private Double Latitude;
+    private Double latitude;
 
     @Column(name = "vis")
     private Integer vis;
 
     @Column(name = "direction")
-    private String Direction;
+    private String direction;
 
     @Column(name = "time")
-    private Double Time;
+    private Double time;
 
     @JsonProperty(value = "P-Qs")
     @Column(name = "PQs")
     private Integer PQs;
 
     @Column(name = "code")
-    private String Code;
+    private String code;
 
     @JsonProperty(value = "Common name")
     @Column(name = "common_name")
-    private String CommonName;
+    private String CmmonName;
 
     @Column(name = "total")
-    private Integer Total;
+    private Integer total;
 
     @Column(name = "inverts")
-    private Integer Inverts;
+    private Integer inverts;
 
     @Column(name = "m2_invert_sizing_species")
-    private Boolean M2InvertSizingSpecies;
+    private Boolean m2InvertSizingSpecies;
 
     @Column(name = "L5")
     private Integer L5;
@@ -100,12 +96,15 @@ public class StagedSurveyEntity {
     private Integer L95;
 
     @Column(name = "is_invert_Sizing")
-    private Boolean IsInvertSizing;
+    private Boolean isInvertSizing;
 
     @Column(name = "measureValue", columnDefinition = "json")
     @Type(type = "jsonb")
-    private Map<String, Double> MeasureJson;
+    private Map<String, Double> measureJson;
+
+    @ManyToOne
+    private StagedJobEntity stagedJob;
 
     @OneToMany
-    private List<ErrorCheckEntity> Errors;
+    private List<ErrorCheckEntity> errors;
 }

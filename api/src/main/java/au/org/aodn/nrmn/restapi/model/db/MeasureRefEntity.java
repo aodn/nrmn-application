@@ -3,7 +3,7 @@ package au.org.aodn.nrmn.restapi.model.db;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "measure_ref", schema = "nrmn", catalog = "nrmn")
+@Table(name = "measure_ref"  )
 public class MeasureRefEntity {
     private int measureId;
     private String measureName;

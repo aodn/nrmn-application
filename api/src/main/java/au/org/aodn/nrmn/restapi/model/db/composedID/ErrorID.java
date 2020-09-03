@@ -11,7 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorID implements Serializable {
-    public long RawSurveyID;
+    public long stageSurveyID;
     public String FileID;
     public String Message;
 }

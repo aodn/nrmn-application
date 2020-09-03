@@ -5,6 +5,7 @@ import au.org.aodn.nrmn.restapi.model.api.RawSurveyImport;
 import au.org.aodn.nrmn.restapi.model.api.UpdatedResult;
 import au.org.aodn.nrmn.restapi.model.api.ValidationResult;
 import au.org.aodn.nrmn.restapi.model.db.ErrorCheckEntity;
+import au.org.aodn.nrmn.restapi.model.db.StagedJobEntity;
 import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
 import au.org.aodn.nrmn.restapi.model.db.SurveyEntity;
 import au.org.aodn.nrmn.restapi.repository.SurveyEntityRepository;
@@ -36,7 +37,7 @@ public class SurveyController {
 
 
     @GetMapping(path = "/raw-survey", produces = "application/json")
-    public List<String> getRawSurvey() {
+    public List<StagedJobEntity> getRawSurvey() {
         return rawSurveyCRUD.getSurveyFiles();
     }
 

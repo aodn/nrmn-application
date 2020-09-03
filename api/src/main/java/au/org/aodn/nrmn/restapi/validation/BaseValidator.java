@@ -23,7 +23,9 @@ public abstract class BaseValidator {
     protected <T> Validated<ErrorCheckEntity, String> warningNotFound(List<T> entitiesFound, StagedSurveyEntity target, String msg) {
         if (entitiesFound.isEmpty()) {
             val error = new ErrorCheckEntity(
-                    new ErrorID(target.rid.id, msg + " Couldn't be found", target.rid.fileID),
+                    new ErrorID(target.getId(),
+                            target.getStagedJob().getId(),
+                            msg + " Couldn't be found"),
                     ValidationLevelType.WARNING,
                     colunmTagert,
                     target);

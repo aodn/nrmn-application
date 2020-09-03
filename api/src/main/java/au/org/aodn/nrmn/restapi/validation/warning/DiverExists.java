@@ -24,7 +24,7 @@ public class DiverExists  extends BaseValidator {
 
     @Override
     public Validated<ErrorCheckEntity, String> valid(StagedSurveyEntity target) {
-        val divers = diverRepo.findByInitials(target.Diver);
-       return warningNotFound(divers, target, target.Diver);
+        val divers = diverRepo.findByInitials(target.getDiver());
+       return warningNotFound(divers, target, target.getDiver());
     }
 }

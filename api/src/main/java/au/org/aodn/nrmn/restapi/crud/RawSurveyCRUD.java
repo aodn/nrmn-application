@@ -1,11 +1,12 @@
 package au.org.aodn.nrmn.restapi.crud;
 
+import au.org.aodn.nrmn.restapi.model.db.StagedJobEntity;
 import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
-import au.org.aodn.nrmn.restapi.model.db.composedID.RawSurveyID;
 import au.org.aodn.nrmn.restapi.repository.ErrorCheckEntityRepository;
-import au.org.aodn.nrmn.restapi.repository.RawSurveyEntityRepository;
-import lombok.val;
+import au.org.aodn.nrmn.restapi.repository.StagedJobEntityRepository;
+import au.org.aodn.nrmn.restapi.repository.StagedSurveyEntityRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,7 +15,10 @@ import java.util.Optional;
 @Component
 public class RawSurveyCRUD {
     @Autowired
-    RawSurveyEntityRepository rawRepo;
+    StagedSurveyEntityRepository rawRepo;
+
+    @Autowired
+    StagedJobEntityRepository jobRepo;
 
     @Autowired
     ErrorCheckEntityRepository errorRepo;
@@ -25,8 +29,8 @@ public class RawSurveyCRUD {
     }
 
 
-    public List<String> getSurveyFiles() {
-        return rawRepo.getFileLIst();
+    public List<StagedJobEntity> getSurveyFiles() {
+        return jobRepo.findAll();
 
     }
 

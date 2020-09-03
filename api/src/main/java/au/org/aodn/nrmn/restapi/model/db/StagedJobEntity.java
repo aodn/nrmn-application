@@ -14,19 +14,19 @@ import java.util.Map;
 @Getter
 @Setter
 @EqualsAndHashCode
-@Table("staged_file")
-public class StagingJob {
+@Table(name = "staged_file")
+public class StagedJobEntity {
 
     @Id
-    @Column("file_id")
+    @Column(name = "file_id")
     private String id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type")
+    @Column(name = "status")
     private StatusJobType status;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type")
+    @Column(name = "source")
     private SourceJobType source;
 
     @Column(name="job_attributes")

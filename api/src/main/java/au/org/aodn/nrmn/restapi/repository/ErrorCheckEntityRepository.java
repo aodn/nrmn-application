@@ -12,6 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 public interface ErrorCheckEntityRepository extends JpaRepository<ErrorCheckEntity, Long>, JpaSpecificationExecutor<ErrorCheckEntity> {
     @Modifying
     @Transactional
-    @Query("delete  FROM ErrorCheckEntity r WHERE  r.rawSurveyEntity.rid.fileID = :fileid")
+    @Query("delete  FROM ErrorCheckEntity r WHERE  r.row.stagedJob.id = :fileid")
     Integer deleteWithFileID(@Param("fileid")String fileID);
 }
