@@ -9,6 +9,9 @@ import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import store from "../store";
 import {registerUser} from "../import/reducers/auth-reducer";
+import Typography from "@material-ui/core/Typography";
+import Paper from "@material-ui/core/Paper";
+import {SpaceBar} from "@material-ui/icons";
 
 
 // https://data-driven-forms.org/
@@ -27,14 +30,14 @@ const schema = {
   fields: [{
     component: componentTypes.TEXT_FIELD,
     name: 'full_name',
-    label: 'Your full name',
+    label: 'Users full name',
     isRequired: true,
     validate: [{ type: validatorTypes.REQUIRED }]
   },
     {
     component: componentTypes.TEXT_FIELD,
     name: 'email',
-    label: 'Email',
+    label: 'Users Email',
     isRequired: true,
     validate: [
       { type: validatorTypes.REQUIRED },
@@ -69,18 +72,23 @@ const RegisterUser = () => {
         justify="center"
         style={{ minHeight: "70vh" }}
         >
-      <Container  maxWidth="sm">
-        <FormRenderer
-            initialValues={{
-              'full_name': 'set by "initialValues"'
-            }}
-            schema={schema}
-            componentMapper={componentMapper}
-            FormTemplate={FormTemplate}
-            onSubmit={submitRegisterUser}
-            validatorMapper={validatorMapper}
-        />
-      </Container>
+      <Paper >
+        <Container  maxWidth="sm">
+          <Typography variant="h4" >
+            Create a User
+          </Typography>
+          <FormRenderer
+              initialValues={{
+                'full_name': 'set by "initialValues"'
+              }}
+              schema={schema}
+              componentMapper={componentMapper}
+              FormTemplate={FormTemplate}
+              onSubmit={submitRegisterUser}
+              validatorMapper={validatorMapper}
+          />
+        </Container>
+      </Paper>
     </Grid>
     </>;
 }

@@ -30,6 +30,14 @@ let theme = createMuiTheme({
     primary: blueGrey,
     secondary: grey
   },
+  overrides: {
+    MuiPaper: {
+      root: {
+        padding: '20px',
+        marginBottom: '35px',
+      },
+    },
+  },
 });
 
 theme = responsiveFontSizes(theme);
@@ -74,10 +82,8 @@ export default function PersistentDrawerLeft() {
           >
             <div className={classes.drawerHeader} />
             <Switch>
-            <Route path={["/import-file/:fileID?"]} >
-              </Route>
-            <Route path="/list-file"  >
-              </Route>
+              <Route path="/import-file/:fileID?" />
+              <Route path="/list-file"  />
               <Route path="/register" component={RegisterUser} />
             </Switch>
         </main>
