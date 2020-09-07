@@ -73,6 +73,16 @@ public class GenerateApplicationTables implements ApplicationListener<Applicatio
                     "createIngestTables"
             );
 
+
+            _generatingTables(
+                    settings,
+                    Arrays.asList(
+                            ProgramRefEntity.class,
+                            SiteRefEntity.class,
+                            PublicDataExclusionEntity.class),
+                    "createExcludeDataTables"
+            );
+
         }
     }
 

@@ -7,8 +7,10 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Map;
 
 @Entity

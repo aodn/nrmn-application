@@ -49,10 +49,7 @@ public class SecUserEntity {
 
     @NotAudited
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-            schema = "nrmn",
-            catalog = "nrmn",
-            name = "sec_user_sec_role",
+    @JoinTable(name = "sec_user_sec_role",
             joinColumns = @JoinColumn(name = "sec_user_id",foreignKey=@ForeignKey(name="FK_USER_SEC_ROLE")),
             inverseJoinColumns = @JoinColumn(name = "sec_role_id", foreignKey=@ForeignKey(name="FK_ROLE_USER_SEC")))
      private Set<SecRoleEntity> roles = new HashSet<>();
