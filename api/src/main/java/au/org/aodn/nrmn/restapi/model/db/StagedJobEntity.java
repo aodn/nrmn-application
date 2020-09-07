@@ -2,8 +2,10 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.util.Map;
@@ -14,7 +16,8 @@ import java.util.Map;
 @Getter
 @Setter
 @EqualsAndHashCode
-@Table(name = "staged_file")
+@Table(name = "staged_job")
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class StagedJobEntity {
 
     @Id

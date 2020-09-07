@@ -46,8 +46,8 @@ public class GenerateApplicationTables implements ApplicationListener<Applicatio
             settings.put("hibernate.connection.username", username);
             settings.put("hibernate.connection.password", pwd);
             settings.put("hibernate.hbm2ddl.auto", "create");
-            settings.put("hibernate.default_schema","nrmn");
-            settings.put("hibernate.default_catalog","nrmn");
+            settings.put("hibernate.default_schema", "nrmn");
+            settings.put("hibernate.default_catalog", "nrmn");
             settings.put("show_sql", "true");
 
             _generatingTables(settings, Arrays.asList(SecRoleEntity.class, SecUserEntity.class), "createAuthTables");
@@ -63,7 +63,16 @@ public class GenerateApplicationTables implements ApplicationListener<Applicatio
                             SiteRefEntity.class,
                             LocationRefEntity.class
                     ),
-            "createAuditTable");
+                    "createAuditTable");
+            _generatingTables(
+                    settings,
+                    Arrays.asList(
+                            ErrorCheckEntity.class,
+                            StagedJobEntity.class,
+                            StagedSurveyEntity.class),
+                    "createIngestTables"
+            );
+
         }
     }
 

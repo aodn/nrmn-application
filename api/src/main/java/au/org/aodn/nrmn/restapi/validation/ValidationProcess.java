@@ -60,7 +60,7 @@ public class ValidationProcess {
             }).collect(Collectors.toList());
             val rawSurveys = rawSurveyRepo.saveAll(rawDataWithJob);
         val surveyWithError = rawSurveys.stream().map(raw -> {
-            raw.setErrors(processError(raw).toList());
+            //raw.setErrors(processError(raw).toList());
             return raw;
         }).collect(Collectors.toList());
         return new ValidationResult(surveyWithError, fileID);

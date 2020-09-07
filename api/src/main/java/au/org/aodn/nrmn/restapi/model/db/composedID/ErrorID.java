@@ -1,7 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db.composedID;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Embeddable;
 import java.io.Serializable;
@@ -10,8 +9,11 @@ import java.io.Serializable;
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
 public class ErrorID implements Serializable {
-    public long stageSurveyID;
-    public String FileID;
-    public String Message;
+    private long surveyId;
+    private String jobId;
+    private String Message;
 }

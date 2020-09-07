@@ -24,7 +24,7 @@ public class RawSurveyCRUD {
     ErrorCheckEntityRepository errorRepo;
 
     public Optional<StagedSurveyEntity> update(StagedSurveyEntity update) {
-        errorRepo.deleteAll(update.getErrors());
+       // errorRepo.deleteAll(update.getErrors());
         return Optional.of(rawRepo.save(update));
     }
 

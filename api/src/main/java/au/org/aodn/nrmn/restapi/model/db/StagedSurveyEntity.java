@@ -3,8 +3,10 @@ package au.org.aodn.nrmn.restapi.model.db;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.sql.Date;
@@ -19,6 +21,7 @@ import java.util.Map;
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name = "staged_survey")
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class StagedSurveyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY )
@@ -103,8 +106,9 @@ public class StagedSurveyEntity {
     private Map<String, Double> measureJson;
 
     @ManyToOne
+    @JoinTable(name ="staged_survey_job")
     private StagedJobEntity stagedJob;
-
-    @OneToMany
-    private List<ErrorCheckEntity> errors;
+//
+//    @OneToMany(orphanRemoval = true)
+//    private List<ErrorCheckEntity> errors;
 }

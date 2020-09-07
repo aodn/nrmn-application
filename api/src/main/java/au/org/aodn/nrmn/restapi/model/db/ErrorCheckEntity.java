@@ -30,5 +30,5 @@ public class ErrorCheckEntity {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-     private StagedSurveyEntity row;
+    private StagedSurveyEntity row;
 }
