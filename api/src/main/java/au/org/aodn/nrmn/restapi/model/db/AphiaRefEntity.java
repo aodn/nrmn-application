@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "aphia_ref", schema = "nrmn", catalog = "nrmn")
+@Table(name = "aphia_ref")
 public class AphiaRefEntity {
     private int aphiaId;
     private String url;

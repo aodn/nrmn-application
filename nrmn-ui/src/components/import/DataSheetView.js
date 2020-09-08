@@ -46,7 +46,6 @@ const DataSheetView = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        console.log(fileID)
         if (fileID) {
             dispatch(FileRequested(fileID));
         }
