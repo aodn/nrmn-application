@@ -5,6 +5,10 @@ alter table if exists nrmn.sec_user_aud
 alter table if exists nrmn.sec_user_sec_role
     drop constraint if exists FK_ROLE_USER_SEC;
 
+alter table if exists nrmn.sec_user
+    drop constraint if exists UNIQUE_EMAIL;
+
+
 alter table if exists nrmn.sec_user_sec_role
     drop constraint if exists FK_USER_SEC_ROLE;
 

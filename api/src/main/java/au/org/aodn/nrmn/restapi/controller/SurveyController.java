@@ -5,17 +5,15 @@ import au.org.aodn.nrmn.restapi.model.api.RawSurveyImport;
 import au.org.aodn.nrmn.restapi.model.api.UpdatedResult;
 import au.org.aodn.nrmn.restapi.model.api.ValidationResult;
 import au.org.aodn.nrmn.restapi.model.db.ErrorCheckEntity;
-import au.org.aodn.nrmn.restapi.model.db.RawSurveyEntity;
+import au.org.aodn.nrmn.restapi.model.db.StagedJobEntity;
+import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
 import au.org.aodn.nrmn.restapi.model.db.SurveyEntity;
 import au.org.aodn.nrmn.restapi.repository.SurveyEntityRepository;
 import au.org.aodn.nrmn.restapi.validation.ValidationProcess;
-import cyclops.data.Seq;
 import lombok.val;
-import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 @RestController
@@ -39,12 +37,12 @@ public class SurveyController {
 
 
     @GetMapping(path = "/raw-survey", produces = "application/json")
-    public List<String> getRawSurvey() {
+    public List<StagedJobEntity> getRawSurvey() {
         return rawSurveyCRUD.getSurveyFiles();
     }
 
     @GetMapping(path = "/raw-survey/{file_id}", produces = "application/json")
-    public List<RawSurveyEntity> getRawSurveyFile(@PathVariable("file_id") String file_id) {
+    public List<StagedSurveyEntity> getRawSurveyFile(@PathVariable("file_id") String file_id) {
         return rawSurveyCRUD.getRawSurveyFile(file_id);
     }
 
@@ -54,10 +52,10 @@ public class SurveyController {
     }
 
     @PutMapping(value = "/raw-survey", consumes = "application/json", produces = "application/json")
-    public UpdatedResult<RawSurveyEntity, ErrorCheckEntity> updateRawSurvey(@RequestBody RawSurveyEntity rawSurvey) {
+    public UpdatedResult<StagedSurveyEntity, ErrorCheckEntity> updateRawSurvey(@RequestBody StagedSurveyEntity rawSurvey) {
         val entity = rawSurveyCRUD.update(rawSurvey);
         val res = validation.processError(rawSurvey);
 
-        return new UpdatedResult<RawSurveyEntity, ErrorCheckEntity>(entity, res.toList());
+        return new UpdatedResult<StagedSurveyEntity, ErrorCheckEntity>(entity, res.toList());
     }
 }

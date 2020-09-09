@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.warning;
 
 import au.org.aodn.nrmn.restapi.model.db.ErrorCheckEntity;
-import au.org.aodn.nrmn.restapi.model.db.RawSurveyEntity;
+import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
 import au.org.aodn.nrmn.restapi.repository.DiverRefEntityRepository;
 import au.org.aodn.nrmn.restapi.repository.ErrorCheckEntityRepository;
 import au.org.aodn.nrmn.restapi.validation.BaseValidator;
@@ -23,8 +23,8 @@ public class DiverExists  extends BaseValidator {
     }
 
     @Override
-    public Validated<ErrorCheckEntity, String> valid(RawSurveyEntity target) {
-        val divers = diverRepo.findByInitials(target.Diver);
-       return warningNotFound(divers, target, target.Diver);
+    public Validated<ErrorCheckEntity, String> valid(StagedSurveyEntity target) {
+        val divers = diverRepo.findByInitials(target.getDiver());
+       return warningNotFound(divers, target, target.getDiver());
     }
 }

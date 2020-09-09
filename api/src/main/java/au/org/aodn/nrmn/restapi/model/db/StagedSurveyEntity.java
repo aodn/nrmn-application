@@ -1,15 +1,12 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.model.db.composedID.RawSurveyID;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import net.minidev.json.annotate.JsonIgnore;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import lombok.*;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.sql.Date;
@@ -19,91 +16,99 @@ import java.util.Map;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name = "raw_survey"  )
-public class RawSurveyEntity {
-    @EmbeddedId
-    @JsonUnwrapped
-    public RawSurveyID rid;
+@Table(name = "staged_survey")
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+public class StagedSurveyEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY )
+    private long id;
 
     @JsonProperty(value = "Site No")
     @Column(name = "site_no")
-    public String SiteNo;
+    private String siteNo;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @Column(name = "date")
-    public Date Date;
+    private Date date;
 
     @Column(name = "diver")
-    public String Diver;
+    private String diver;
 
     @Column(name = "depth")
-    public Double Depth;
+    private Double depth;
 
     @Column(name = "method")
-    public Integer Method;
+    private Integer method;
 
     @Column(name = "block")
-    public Integer Block;
+    private Integer block;
 
     @Column(name = "species")
-    public String Species;
+    private String species;
 
     @Column(name = "buddy")
-    public String Buddy;
+    private String buddy;
 
     @JsonProperty(value = "Site Name")
     @Column(name = "site_name")
-    public String SiteName;
+    private String siteName;
 
     @Column(name = "longitude")
-    public Double Longitude;
+    private Double longitude;
 
     @Column(name = "latitude")
-    public Double Latitude;
+    private Double latitude;
 
     @Column(name = "vis")
-    public Integer vis;
+    private Integer vis;
 
     @Column(name = "direction")
-    public String Direction;
+    private String direction;
 
     @Column(name = "time")
-    public Double Time;
+    private Double time;
 
     @JsonProperty(value = "P-Qs")
     @Column(name = "PQs")
-    public Integer PQs;
+    private Integer PQs;
 
     @Column(name = "code")
-    public String Code;
+    private String code;
 
     @JsonProperty(value = "Common name")
     @Column(name = "common_name")
-    public String CommonName;
+    private String CmmonName;
 
     @Column(name = "total")
-    public Integer Total;
+    private Integer total;
 
     @Column(name = "inverts")
-    public Integer Inverts;
+    private Integer inverts;
 
     @Column(name = "m2_invert_sizing_species")
-    public Boolean M2InvertSizingSpecies;
+    private Boolean m2InvertSizingSpecies;
 
     @Column(name = "L5")
-    public Integer L5;
+    private Integer L5;
 
     @Column(name = "L95")
-    public Integer L95;
+    private Integer L95;
 
     @Column(name = "is_invert_Sizing")
-    public Boolean IsInvertSizing;
+    private Boolean isInvertSizing;
 
     @Column(name = "measureValue", columnDefinition = "json")
     @Type(type = "jsonb")
-    public Map<String, Double> MeasureJson;
+    private Map<String, Double> measureJson;
 
-    @OneToMany
-    public List<ErrorCheckEntity> Errors;
+    @ManyToOne
+    @JoinTable(name ="staged_survey_job")
+    private StagedJobEntity stagedJob;
+//
+//    @OneToMany(orphanRemoval = true)
+//    private List<ErrorCheckEntity> errors;
 }

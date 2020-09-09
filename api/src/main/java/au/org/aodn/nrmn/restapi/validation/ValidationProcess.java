@@ -2,9 +2,13 @@ package au.org.aodn.nrmn.restapi.validation;
 
 import au.org.aodn.nrmn.restapi.model.api.ValidationResult;
 import au.org.aodn.nrmn.restapi.model.db.ErrorCheckEntity;
-import au.org.aodn.nrmn.restapi.model.db.RawSurveyEntity;
+import au.org.aodn.nrmn.restapi.model.db.StagedJobEntity;
+import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
+import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
+import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.ErrorCheckEntityRepository;
-import au.org.aodn.nrmn.restapi.repository.RawSurveyEntityRepository;
+import au.org.aodn.nrmn.restapi.repository.StagedJobEntityRepository;
+import au.org.aodn.nrmn.restapi.repository.StagedSurveyEntityRepository;
 import au.org.aodn.nrmn.restapi.validation.warning.DiverExists;
 import au.org.aodn.nrmn.restapi.validation.warning.SiteCodeExists;
 import cyclops.companion.Functions;
@@ -16,8 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class ValidationProcess {
@@ -28,34 +33,36 @@ public class ValidationProcess {
     SiteCodeExists siteCodeExists;
 
     @Autowired
-    RawSurveyEntityRepository rawSurveyRepo;
+    StagedSurveyEntityRepository rawSurveyRepo;
+
+    @Autowired
+    StagedJobEntityRepository jobRepo;
     @Autowired
     ErrorCheckEntityRepository errorRepo;
 
 
-    public Seq<ErrorCheckEntity> processError(RawSurveyEntity rawSurvey) {
+    public Seq<ErrorCheckEntity> processError(StagedSurveyEntity rawSurvey) {
         val res = diverExists.valid(rawSurvey).combine(
                 Semigroups.stringJoin(". "),
                 siteCodeExists.valid(rawSurvey));
         return res.bimap(Seq::of, Functions.identity()).foldInvalidLeft(Monoids.seqConcat());
     }
 
-    public ValidationResult processList(List<RawSurveyEntity> entities, String fileID) {
-        val currentFile =rawSurveyRepo.findRawSurveyByFileID(fileID);
-        if (!currentFile.isEmpty())
-            return new ValidationResult(currentFile, fileID);
-        errorRepo.deleteWithFileID(fileID);
-        Seq<RawSurveyEntity> rawDataWithFile = Seq.fromStream(entities.stream()).map(v -> {
-            v.rid.fileID = fileID;
-            return v;
-        });
-
-        val rawSurveys = rawSurveyRepo.saveAll(rawDataWithFile);
-        val surveySeq = Seq.fromStream(rawSurveys.stream());
-        val surveyWithError = surveySeq.map(raw -> {
-            raw.Errors  = processError(raw).toList();
+    public ValidationResult processList(List<StagedSurveyEntity> entities, String fileID) {
+        val currentFile = rawSurveyRepo.findRawSurveyByFileID(fileID);
+        val job = jobRepo
+                .findById(fileID)
+                .orElse(new StagedJobEntity(fileID, StatusJobType.FAILED, SourceJobType.FILE, Collections.EMPTY_MAP));
+            errorRepo.deleteWithFileID(job.getId());
+            val rawDataWithJob = entities.stream().map(v -> {
+                v.setStagedJob(job);
+                return v;
+            }).collect(Collectors.toList());
+            val rawSurveys = rawSurveyRepo.saveAll(rawDataWithJob);
+        val surveyWithError = rawSurveys.stream().map(raw -> {
+            //raw.setErrors(processError(raw).toList());
             return raw;
-        }).toList();
-        return new ValidationResult( surveyWithError, fileID);
+        }).collect(Collectors.toList());
+        return new ValidationResult(surveyWithError, fileID);
     }
 }
