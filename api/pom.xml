@@ -12,7 +12,7 @@
     <artifactId>nrmn</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>National Reef Monitoring Network</name>
-    <description>Project for NRMN data</description>
+    <description>Project for the NRMN database</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -93,19 +93,14 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-rest-hal-browser</artifactId>
-            <version>3.2.3.RELEASE</version>
-        </dependency>
-        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>3.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.oath.cyclops</groupId>

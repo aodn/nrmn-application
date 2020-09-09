@@ -12,10 +12,7 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "sec_user",
-        schema = "nrmn",
-        catalog = "nrmn",
-        uniqueConstraints ={@UniqueConstraint( name = "UNIQUE_EMAIL",columnNames = {"email_address"})} )
+@Table(name = "sec_user", uniqueConstraints ={@UniqueConstraint( name = "UNIQUE_EMAIL",columnNames = {"email_address"})} )
 @EqualsAndHashCode
 @Getter
 @Setter
@@ -49,7 +46,8 @@ public class SecUserEntity {
 
     @NotAudited
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "sec_user_sec_role",
+    @JoinTable(
+            name = "sec_user_sec_role",
             joinColumns = @JoinColumn(name = "sec_user_id",foreignKey=@ForeignKey(name="FK_USER_SEC_ROLE")),
             inverseJoinColumns = @JoinColumn(name = "sec_role_id", foreignKey=@ForeignKey(name="FK_ROLE_USER_SEC")))
      private Set<SecRoleEntity> roles = new HashSet<>();

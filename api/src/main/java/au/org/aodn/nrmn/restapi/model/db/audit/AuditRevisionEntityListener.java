@@ -19,7 +19,7 @@ public class AuditRevisionEntityListener implements RevisionListener {
         }
 
         // Find the id of the api call that caused this revision and add it to the revision
-        String fishTag = ThreadContext.get("fishtag");
-        revision.setApiRequestId(fishTag);
+        String requestId = ThreadContext.get("requestId");
+        revision.setApiRequestId(requestId);
     }
 }
