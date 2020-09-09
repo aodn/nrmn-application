@@ -12,7 +12,7 @@ export const TopbarButton = (props) => {
   const classes = useStyles();
   return <Button
       {...props}
-      color="secondary"
+      color="inherit"
       size="small"
       className={classes.root}>{props.children}</Button>;
 }

@@ -4,16 +4,17 @@ import {
   getDefaultMiddleware
 } from "@reduxjs/toolkit";
 
+import { themeReducer } from './import/reducers/theme-reducer';
 import { toggleReducer } from './layout/redux-layout';
 import { importReducer } from "./import/reducers/create-import";
+import { authReducer } from "./import/reducers/auth-reducer";
+import { listFileReducer } from "./import/reducers/list-import";
 import createSagaMiddleware from "redux-saga";
 import importMiddleware from './import/middleware/create-import';
-import { listFileReducer } from "./import/reducers/list-import";
 import ListFileMiddleware from './import/middleware/list-import';
 import FileMiddleware from './import/middleware/file-import';
 
 import { all } from "redux-saga/effects";
-import { authReducer } from "./import/reducers/auth-reducer";
 
 const initialiseSagaMiddleware = createSagaMiddleware();
 
@@ -25,6 +26,7 @@ const middleware = [
 
 const store = configureStore({
   reducer: {
+    theme: themeReducer,
     auth: authReducer,
     toggle: toggleReducer,
     import: importReducer,
