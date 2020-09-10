@@ -18,7 +18,6 @@ import java.util.*;
 
 @RestController
 @CrossOrigin
-@RequestMapping(path = "/api")
 public class SurveyController {
 
     @Autowired

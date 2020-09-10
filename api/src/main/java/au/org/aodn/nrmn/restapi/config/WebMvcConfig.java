@@ -9,33 +9,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
-
-    private final long MAX_AGE_SECS = 3600;
-
     @Autowired
     GlobalRequestInterceptor globalRequestInterceptor;
 
     @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("HEAD", "OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE")
-                .maxAge(MAX_AGE_SECS);
-    }
-
-    @Override
     public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(globalRequestInterceptor)
-//                .addPathPatterns("/api/**/");
-    }
-
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/{spring:\\w+}")
-                .setViewName("forward:/");
-        registry.addViewController("/**/{spring:\\w+}")
-                .setViewName("forward:/");
-        registry.addViewController("/{spring:\\w+}/**{spring:?!(\\.js|\\.css)$}")
-                .setViewName("forward:/");
+        registry.addInterceptor(globalRequestInterceptor)
+                .addPathPatterns("/api/**/");
     }
 }

@@ -8,8 +8,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Data
 @Audited(withModifiedFlag = true)
 @Table(name = "diver_ref")
 @EqualsAndHashCode
