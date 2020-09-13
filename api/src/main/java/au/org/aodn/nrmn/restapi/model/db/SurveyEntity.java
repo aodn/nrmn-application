@@ -7,6 +7,8 @@ import org.hibernate.annotations.TypeDef;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.Past;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.Map;
@@ -27,6 +29,7 @@ public class SurveyEntity {
 
     @Basic
     @Column(name = "survey_date")
+    @Future(message = "Can't be in the future")
     private Date surveyDate;
 
     @Basic
