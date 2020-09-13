@@ -24,7 +24,7 @@ import java.util.Map;
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class StagedSurveyEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY )
+    @GeneratedValue(strategy = GenerationType.AUTO )
     private long id;
 
     @JsonProperty(value = "Site No")

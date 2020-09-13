@@ -21,8 +21,8 @@ public class ErrorCheckEntity {
     @JsonUnwrapped
     private ErrorID id;
 
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "validation_type")
     private ValidationLevelType Type;
 
     @Column(name = "column_target")
@@ -30,5 +30,6 @@ public class ErrorCheckEntity {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("rowId")
     private StagedSurveyEntity row;
 }
