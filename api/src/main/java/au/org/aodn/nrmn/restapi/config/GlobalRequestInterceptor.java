@@ -56,7 +56,7 @@ public class GlobalRequestInterceptor extends HandlerInterceptorAdapter {
         long handlerDuration =  System.currentTimeMillis() - (Long)request.getAttribute("start-time");
 
         Map<String, String> valuesMap = new HashMap<String, String>();
-        valuesMap.put("id", ThreadContext.get("fishtag"));
+        valuesMap.put("id", ThreadContext.get("requestId"));
         valuesMap.put("handler-rendering-time", String.valueOf(handlerDuration));
 
         StringSubstitutor sub = new StringSubstitutor(valuesMap);

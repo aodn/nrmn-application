@@ -8,9 +8,7 @@ import {
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TopBar from './components/layout/TopBar';
 import SideMenu from './components/layout/SideMenu';
-
 import {blueGrey, grey} from '@material-ui/core/colors';
-
 import {
   BrowserRouter as Router,
   Switch,
@@ -19,18 +17,11 @@ import {
 
 import FileList from './components/import/FileList';
 import ImportPage from './components/import/Index';
+import { useSelector} from "react-redux";
+import green from "@material-ui/core/colors/green";
 
 
 const drawerWidth = 240;
-
-let theme = createMuiTheme({
-  palette: {
-    primary: blueGrey,
-    secondary: grey
-  },
-});
-
-theme = responsiveFontSizes(theme);
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -52,11 +43,27 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.enteringScreen,
     }),
     marginLeft: 0,
-  },
+  }
 }));
 
-export default function PersistentDrawerLeft() {
+export default function App()  {
   const classes = useStyles();
+
+  const themeState = useSelector(state =>  state.theme);
+
+  let theme = createMuiTheme({
+    palette: {
+      primary: blueGrey,
+      secondary: grey,
+      type: themeState.themeType ? "dark" : "light",
+    },
+    props: {
+      MuiTable: {
+        size: themeState.tableSize
+      }
+    }
+  });
+  theme = responsiveFontSizes(theme);
 
   return (
     <div className={classes.root}>
@@ -72,9 +79,9 @@ export default function PersistentDrawerLeft() {
           >
             <div className={classes.drawerHeader} />
             <Switch>
-              <Route path="/import-file/:fileID?" >
+            <Route path={["/import-file/:fileID?"]} component={ImportPage}>
               </Route>
-              <Route path="/list-file"  >
+            <Route path="/list-file" component={FileList} >
               </Route>
             </Switch>
         </main>
@@ -83,3 +90,4 @@ export default function PersistentDrawerLeft() {
     </div>
   );
 }
+

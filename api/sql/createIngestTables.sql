@@ -19,6 +19,7 @@
                                        primary key (job_id, message, row_id)
      );
 
+
      create table nrmn.staged_job (
                                       file_id varchar(255) not null,
                                       job_attributes uuid,
