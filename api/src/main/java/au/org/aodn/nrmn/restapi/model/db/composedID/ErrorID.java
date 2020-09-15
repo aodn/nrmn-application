@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.model.db.composedID;
 
 import lombok.*;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
@@ -13,7 +14,10 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 public class ErrorID implements Serializable {
-    private long surveyId;
+    @Column(name = "row_id")
+    private long rowId;
+    @Column(name = "job_id")
     private String jobId;
-    private String Message;
+    @Column(name = "message")
+    private String message;
 }

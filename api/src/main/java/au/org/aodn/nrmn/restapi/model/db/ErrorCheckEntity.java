@@ -21,14 +21,15 @@ public class ErrorCheckEntity {
     @JsonUnwrapped
     private ErrorID id;
 
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "type")
-    private ValidationLevelType Type;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "error_level")
+    private ValidationLevelType errorLevel;
 
     @Column(name = "column_target")
     private String ColunmTarget;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("rowId")
     private StagedSurveyEntity row;
 }
