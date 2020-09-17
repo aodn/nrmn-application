@@ -42,7 +42,7 @@ class AuthState extends React.Component {
                 <TopbarButton  variant="text"
                          color="secondary"
                          size="small"
-                         to="/register">Register</TopbarButton> |
+                         href="/register">Register</TopbarButton> |
                 <TopbarButton
                         color="secondary"
                         size="small"

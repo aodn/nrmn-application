@@ -4,6 +4,7 @@ import au.org.aodn.nrmn.restapi.model.db.enums.SecRoleName;
 import lombok.*;
 
 import javax.persistence.*;
+import java.nio.file.FileStore;
 
 @Entity
 @NoArgsConstructor
@@ -20,13 +21,12 @@ public class SecRoleEntity {
     @Column(name = "id", unique = true, updatable = false, nullable = false)
     private Long id;
 
-    @Version
-    @Column(name = "version", nullable = false)
-    private Integer version;
-
     @Column(name = "name", nullable = false)
     @Enumerated(EnumType.STRING)
     private SecRoleName name;
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private Integer version;
 
 }

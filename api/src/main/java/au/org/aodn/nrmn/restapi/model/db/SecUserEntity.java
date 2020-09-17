@@ -8,6 +8,7 @@ import org.hibernate.envers.NotAudited;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @NoArgsConstructor
@@ -22,26 +23,24 @@ public class SecUserEntity {
     @Id
     @SequenceGenerator(name="user_id_seq", allocationSize=1)
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "user_id_seq")
-    @Column(name="id", unique=true, updatable=false, nullable=false)
-   private int userId;
-
-    @Version
-    @Column(name = "version", nullable = false)
-    private Integer version;
-
+    @Column(name="user_id", unique=true, updatable=false, nullable=false)
+    private int userId;
+    public long getId() {
+        return userId;
+    }
 
     @Column(name = "full_name")
-    private String fullName;
+    private String username;
 
     @Column(name = "email_address", nullable = false)
-    private String email;
+    private String emailAddress;
 
     @Column(name = "hashed_password")
     private String hashedPassword;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable=false)
-    private UserSecStatus status;
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "is_active", nullable=false)
+//    private UserSecStatus status;
 
 
     @NotAudited
@@ -52,4 +51,21 @@ public class SecUserEntity {
             inverseJoinColumns = @JoinColumn(name = "sec_role_id", foreignKey=@ForeignKey(name="FK_ROLE_USER_SEC")))
      private Set<SecRoleEntity> roles = new HashSet<>();
 
+    // todo should be automatically  created
+    public void setPasswordHash(String passwordHash) {
+        this.hashedPassword = passwordHash;
+    }
+
+    @Transient
+    public Set<String> getRolesAsStringSet() {
+        return this.roles.stream().map(temp -> temp.getName().name()).collect(Collectors.toSet());
+    }
+
+    public void setName(String name) {
+        this.username = name;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
 }

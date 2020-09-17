@@ -14,12 +14,10 @@ import {
   Switch,
   Route
 } from "react-router-dom";
-
 import FileList from './components/import/FileList';
 import ImportPage from './components/import/Index';
 import { useSelector} from "react-redux";
-import green from "@material-ui/core/colors/green";
-
+import RegisterUser from "./components/reference/userAdmin/RegisterUser";
 
 const drawerWidth = 240;
 
@@ -79,10 +77,9 @@ export default function App()  {
           >
             <div className={classes.drawerHeader} />
             <Switch>
-            <Route path={["/import-file/:fileID?"]} component={ImportPage}>
-              </Route>
-            <Route path="/list-file" component={FileList} >
-              </Route>
+              <Route path={["/import-file/:fileID?"]} component={ImportPage} />
+              <Route path="/list-file" component={FileList} />
+              <Route path="/register" component={RegisterUser} />
             </Switch>
         </main>
         </Router>
