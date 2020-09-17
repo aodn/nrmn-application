@@ -56,6 +56,12 @@ export default function App()  {
       type: themeState.themeType ? "dark" : "light",
     },
     props: {
+      MuiTextField: {
+        variant: 'outlined',
+        margin: "dense",
+        notched: true,
+        color: "primary"
+      },
       MuiTable: {
         size: themeState.tableSize
       }
