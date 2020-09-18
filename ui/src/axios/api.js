@@ -79,3 +79,6 @@ export const rawSurvey = fileId => {
 export const rawSurveySave = params => {
   return  axiosInstance.post("/api/raw-survey", params).then(res => res );
 }
+
+export const definition  = () =>  axiosInstance.get("/v3/api-docs")
+export const entities = (entityID) => axiosInstance.get("/api/" + entityID)
