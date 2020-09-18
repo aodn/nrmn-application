@@ -19,6 +19,7 @@ import getEntitiesWatcher from './forms/middleware/entities';
 import { all } from "redux-saga/effects";
 import { formReducer } from "./forms/redux-form";
 import LoginWatcher from "./auth/auth-middleware";
+import { authReducer } from "./import/reducers/auth-reducer";
 
 const initialiseSagaMiddleware = createSagaMiddleware();
 
