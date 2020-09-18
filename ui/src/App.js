@@ -18,6 +18,7 @@ import {
 
 import FileList from './components/import/FileList';
 import ImportPage from './components/import/Index';
+import UserForm from './components/forms/UserForm';
 import { useSelector} from "react-redux";
 
 
@@ -90,6 +91,7 @@ export default function App()  {
               <Route path={["/import-file/:fileID?"]} component={ImportPage} />
               <Route path="/list-file" component={FileList} />
               <Route path="/login" component={Login} />
+              <Route path="/form/:entity?" component={UserForm}>
             </Switch>
         </main>
         </Router>
