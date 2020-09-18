@@ -15,11 +15,12 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "sec_user", uniqueConstraints ={@UniqueConstraint( name = "UNIQUE_EMAIL",columnNames = {"email_address"})} )
+@Table(name = "sec_user", uniqueConstraints = {@UniqueConstraint(name = "UNIQUE_EMAIL", columnNames = {"email_address"})})
 @EqualsAndHashCode
 @Getter
 @Setter
 @Audited(withModifiedFlag = true)
+@Schema(title="Add User")
 public class SecUserEntity {
 
     @Id
@@ -29,17 +30,26 @@ public class SecUserEntity {
    private Long userId;
 
     @Version
+    @Hidden
     @Column(name = "version", nullable = false)
     private Integer version;
 
 
     @Column(name = "full_name")
+    @Size(min = 2, max = 100)
+    @NotNull
     private String fullName;
 
     @Column(name = "email_address", nullable = false)
+  //  @Pattern(message = "wrong email format", regexp = "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$")
+    @NotNull
+    @NotBlank
+    @Schema(format = "email")
     private String email;
     @JsonIgnore
     @Column(name = "hashed_password")
+    @Size(min= 5, max = 100)
+    @Schema(title =  "password")
     private String hashedPassword;
 
     @JsonIgnore
@@ -58,6 +68,7 @@ public class SecUserEntity {
     @NotAudited
     @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Schema(type = "string")
     @JoinTable(
             name = "sec_user_roles",
             joinColumns = @JoinColumn(name = "sec_user_id",foreignKey=@ForeignKey(name="FK_USER_SEC_ROLE")),

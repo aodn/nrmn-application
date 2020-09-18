@@ -13,8 +13,12 @@ import createSagaMiddleware from "redux-saga";
 import importMiddleware from './import/middleware/create-import';
 import ListFileMiddleware from './import/middleware/list-import';
 import FileMiddleware from './import/middleware/file-import';
+import getDefinitionWatcher from './forms/middleware/definition';
+import getEntitiesWatcher from './forms/middleware/entities';
 
 import { all } from "redux-saga/effects";
+import { authReducer } from "./import/reducers/auth-reducer";
+import { formReducer } from "./forms/redux-form";
 
 const initialiseSagaMiddleware = createSagaMiddleware();
 
@@ -30,7 +34,8 @@ const store = configureStore({
     auth: authReducer,
     toggle: toggleReducer,
     import: importReducer,
-    fileList: listFileReducer
+    fileList: listFileReducer,
+    form : formReducer
   },
   middleware,
 });
@@ -39,8 +44,9 @@ const store = configureStore({
   yield all([
     ListFileMiddleware(),
     importMiddleware(),
-    FileMiddleware()
-    
+    FileMiddleware(),
+    getDefinitionWatcher(),
+    getEntitiesWatcher()
   ])
 }
 

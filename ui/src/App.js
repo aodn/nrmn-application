@@ -17,6 +17,7 @@ import {
 
 import FileList from './components/import/FileList';
 import ImportPage from './components/import/Index';
+import UserForm from './components/forms/UserForm';
 import { useSelector} from "react-redux";
 import green from "@material-ui/core/colors/green";
 
@@ -82,6 +83,7 @@ export default function App()  {
             <Route path={["/import-file/:fileID?"]} component={ImportPage}>
               </Route>
             <Route path="/list-file" component={FileList} >
+            <Route path="/form/:entity?" component={UserForm}>
               </Route>
             </Switch>
         </main>
