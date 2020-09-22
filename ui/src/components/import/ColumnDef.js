@@ -1,6 +1,6 @@
 
 function cell(params) {
-    if (params.data.Errors.length > 0) {
+    if (params.data.Errrors && params.data.Errors.length > 0) {
         const present = params.data.Errors.map(e => e.ColunmTarget)
         const inter = present.filter(e => e === params.colDef.field);
         if (inter.length > 0)
@@ -10,11 +10,6 @@ function cell(params) {
 }
 
 const ColunmDef = [
-    {
-        field: "ID",
-        editable: true,
-        width: 100,
-    },
     {
         field: "Diver",
         editable: true,
