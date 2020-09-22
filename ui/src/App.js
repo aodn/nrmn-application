@@ -18,9 +18,8 @@ import {
 
 import FileList from './components/import/FileList';
 import ImportPage from './components/import/Index';
-import UserForm from './components/forms/UserForm';
+import GenericForm from './components/forms/GenericForm';
 import { useSelector} from "react-redux";
-
 
 const drawerWidth = 240;
 
