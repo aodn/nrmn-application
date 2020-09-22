@@ -8,9 +8,7 @@ export default function* getEntitiesWatcher() {
 
 function* getEntities(action) {
     try {
-        console.log("call entities")
         const resp = yield call(entities, action.payload);
-        console.log("entites data", resp)
 
         yield put(entitiesLoaded(resp.data._embedded[action.payload]));
     } catch (e) {
