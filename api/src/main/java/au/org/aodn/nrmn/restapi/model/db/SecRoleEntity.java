@@ -17,18 +17,12 @@ import javax.persistence.*;
 public class SecRoleEntity {
 
     @Id
-    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
-    @SequenceGenerator(name="role_id_seq", allocationSize=1)
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "role_id_seq")
-    @Column(name="id", unique=true, updatable=false, nullable=false)
-  private Long id;
-
+    @Column(name="name", unique=true, updatable=false, nullable=false)
+    @Enumerated(EnumType.STRING)
+    private SecRoleName name;
     @Version
-    @Hidden
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     @Column(name = "version", nullable = false)
     private Integer version;
 
-    @Column(name = "name", nullable=false)
-    @Enumerated(EnumType.STRING)
-    private SecRoleName name;
 }

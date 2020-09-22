@@ -1,12 +1,11 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.envers.*;
-import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.data.rest.core.annotation.Description;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -14,10 +13,10 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Schema(title="Add Diver")
 @Audited(withModifiedFlag = true)
 @Table(name = "diver_ref")
 @EqualsAndHashCode
-@Description("Diver who performs survey")
 public class DiverRefEntity {
     @Id
     @Column(name = "diver_id")
@@ -32,6 +31,5 @@ public class DiverRefEntity {
     @NotNull
     @Size(min = 2, max= 10)
     @Description("fullname:test")
-
     private String fullName;
 }

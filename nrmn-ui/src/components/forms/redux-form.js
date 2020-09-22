@@ -6,8 +6,9 @@ import {
   
   const formState = {
       definition : {},
-      entities: []
-  }
+      entities: [],
+      editItem : {}
+  };
   
   
   const formSlice = createSlice({
@@ -25,13 +26,25 @@ import {
       },
       entitiesError: (state, action) => {
         console.error("error while getting the entities");
+      },
+      idLoaded: (state, action) => {
+        state.editItem = action.payload;
+      },
+      idError : (state, action) => {
+        console.error("error while requesting id");
       }
+      
     },
   });
   export const formReducer = formSlice.reducer;
-  export const { definitionLoaded, definitionError, entitiesLoaded, entitiesError } = formSlice.actions;
+  export const { definitionLoaded, definitionError,entitiesLoaded,entitiesError, idLoaded, idError } = formSlice.actions;
   export const  definitionRequested = createAction('DEFINITION_REQUESTED');    
   export const  selectRequested = createAction('select_REQUESTED', 
     function(entity){
-       return { payload : entity}
+       return { payload : entity};
   });    
+
+  export const  idRequested = createAction('select_REQUESTED', 
+    function(entity){
+       return { payload : entity};
+  });  

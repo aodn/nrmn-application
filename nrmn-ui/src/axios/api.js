@@ -75,4 +75,4 @@ export const rawSurveySave = params => {
 }
 
 export const definition  = () =>  axiosInstance.get("/v3/api-docs")
-export const entities = (entityID) => axiosInstance.get("/api/" + entityID)
+export const entities = (entity) => axiosInstance.get("/api/" + entity);

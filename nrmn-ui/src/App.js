@@ -19,7 +19,7 @@ import {
 
 import FileList from './components/import/FileList';
 import ImportPage from './components/import/Index';
-import UserForm from './components/forms/UserForm';
+import GenericForm from './components/forms/GenericForm';
 
 
 const drawerWidth = 240;
@@ -77,7 +77,7 @@ export default function PersistentDrawerLeft() {
               </Route>
               <Route path="/list-file"  >
               </Route>
-              <Route path="/form/:entity?" component={UserForm}>
+              <Route path="/form/:entity/:id?" component={GenericForm}>
               </Route>
             </Switch>
         </main>
