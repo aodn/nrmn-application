@@ -50,15 +50,24 @@ public class ValidationProcess {
 
     public ValidationResult processList(List<StagedSurveyEntity> entities, String fileID) {
         val currentFile = rawSurveyRepo.findRawSurveyByFileID(fileID);
-        val job = jobRepo
+        val currJob = jobRepo
                 .findById(fileID)
-                .orElse(new StagedJobEntity(fileID, StatusJobType.FAILED, SourceJobType.FILE, Collections.EMPTY_MAP));
-            errorRepo.deleteWithFileID(job.getId());
-            val rawDataWithJob = entities.stream().map(v -> {
-                v.setStagedJob(job);
-                return v;
-            }).collect(Collectors.toList());
-            val rawSurveys = rawSurveyRepo.saveAll(rawDataWithJob);
+                .orElseGet(() -> {
+                    StagedJobEntity newjob = jobRepo.save(
+                            new StagedJobEntity(
+                            fileID,
+                            StatusJobType.PENDING,
+                            SourceJobType.FILE));
+                    return newjob;
+                });
+
+
+        errorRepo.deleteWithFileID(currJob.getId());
+        val rawDataWithJob = entities.stream().map(v -> {
+            v.setStagedJob(currJob);
+            return v;
+        }).collect(Collectors.toList());
+        val rawSurveys = rawSurveyRepo.saveAll(rawDataWithJob);
         val surveyWithError = rawSurveys.stream().map(raw -> {
             //raw.setErrors(processError(raw).toList());
             return raw;

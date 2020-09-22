@@ -17,7 +17,6 @@ import java.util.Map;
 @Setter
 @EqualsAndHashCode
 @Table(name = "staged_job")
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class StagedJobEntity {
 
     @Id
@@ -31,8 +30,4 @@ public class StagedJobEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "source")
     private SourceJobType source;
-
-    @Column(name="job_attributes")
-    @Type(type = "jsonb")
-    private Map<String, String> jobAttributes;
 }

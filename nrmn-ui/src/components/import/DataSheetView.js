@@ -78,6 +78,7 @@ const DataSheetView = () => {
     }));
     const classes = useStyles();
     const size = useWindowSize();
+    console.log("sheet l0:", sheet[0])
     return (sheet && sheet.length && !isLoading) ? (
         <div style={{ height: size.height - 200, width: '100%', marginTop: 25 }} className="ag-theme-alpine">
             <AgGridReact
