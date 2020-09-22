@@ -18,15 +18,12 @@ public class SecRoleEntity {
     }
 
     @Id
-    @Column(name = "name", nullable = false)
+    @Column(name="name", unique=true, updatable=false, nullable=false)
     @Enumerated(EnumType.STRING)
     private SecRoleName name;
-
     @Version
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     @Column(name = "version", nullable = false)
     private Integer version;
-
-
-
 
 }
