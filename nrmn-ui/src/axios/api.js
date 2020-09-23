@@ -13,9 +13,7 @@ export const siteConfig = () => {
 };
 
 // siteConfig loaded into react-global-configuration
-export const apiConfig = () => {
-  return axiosInstance.get("/v3/api-docs");
-};
+export const apiConfig = () =>  axiosInstance.get("/v3/api-docs");
 
 // Authentication
 export const activate = params => {

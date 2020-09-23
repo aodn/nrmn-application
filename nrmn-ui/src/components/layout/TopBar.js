@@ -12,6 +12,7 @@ import { connect } from 'react-redux';
 import store from '../store';
 import AuthState from "./AuthState";
 import SettingsMenu from "./SettingsMenu";
+import {TopbarButton} from "./TopbarButton";
 
 const drawerWidth = 240;
 
@@ -81,6 +82,10 @@ const ReduxTopBar = ({ menuIsOpen }) => {
           </Grid>
         </Grid>
         <Grid item >
+          <TopbarButton  variant="text"
+                         color="secondary"
+                         size="small"
+                         href="/test-swagger">Test Swagger</TopbarButton> |
           <AuthState /> |
           <SettingsMenu />
         </Grid>

@@ -17,7 +17,7 @@ import {
 import FileList from './components/import/FileList';
 import ImportPage from './components/import/Index';
 import { useSelector} from "react-redux";
-import RegisterUser from "./components/reference/userAdmin/RegisterUser";
+import TestSwagger from "./components/reference/userAdmin/TestSwagger";
 
 const drawerWidth = 240;
 
@@ -85,7 +85,7 @@ export default function App()  {
             <Switch>
               <Route path={["/import-file/:fileID?"]} component={ImportPage} />
               <Route path="/list-file" component={FileList} />
-              <Route path="/register" component={RegisterUser} />
+              <Route path="/test-swagger/:pathParam1?/:pathParam2?/:pathParam3?" component={TestSwagger} />
             </Switch>
         </main>
         </Router>

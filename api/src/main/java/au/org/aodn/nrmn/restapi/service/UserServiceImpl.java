@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
         SecUserEntity newSecUserEntity = new SecUserEntity();
 
         newSecUserEntity.setPasswordHash(passwordEncoder().encode(signUpRequestDto.getPassword()));
-        newSecUserEntity.setName(signUpRequestDto.getName());
+        newSecUserEntity.setUsername(signUpRequestDto.getName());
         //newSecUserEntity.setStatus(SecUserStatus.PENDING);
         newSecUserEntity.setEmailAddress(signUpRequestDto.getEmailAddress());
         //newSecUserEntity.addRole(secRoleRepository.findByName(SecRoleName.ROLE_USER.toString()).get());

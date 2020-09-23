@@ -1,5 +1,6 @@
 import React from 'react';
 import Container from "@material-ui/core/Container";
+import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
@@ -24,15 +25,16 @@ const ReferenceForm = (params) => {
         style={{ minHeight: "70vh" }}
     >
       <Paper >
-        <Container  maxWidth="sm">
+        <Box mx="auto" bgcolor="background.paper"  pt={2} px={3} pb={3}>
           <Typography variant="h4" >
             {params.formTitle}
           </Typography>
           <Form
               schema={params.schema}
-              onSubmit={params.submitAction}
+              uiSchema={params.uiSchema}
+              //onSubmit={params.submitAction}
           />
-        </Container>
+        </Box>
       </Paper>
     </Grid>
   </>;
