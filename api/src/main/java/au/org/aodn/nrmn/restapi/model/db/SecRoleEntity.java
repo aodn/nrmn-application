@@ -11,7 +11,8 @@ import javax.persistence.*;
 @Setter
 @AllArgsConstructor
 @EqualsAndHashCode
-@Table(name = "sec_role")
+@Table(name = "sec_role"  )
+@Schema(title = "Add Role")
 public class SecRoleEntity {
     public SecRoleEntity(SecRoleName status) {
         this.name = status;
