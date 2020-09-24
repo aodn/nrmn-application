@@ -91,6 +91,13 @@ export default function App()  {
               <Route path="/list-file" component={FileList} />
               <Route path="/login" component={Login} />
               <Route path="/form/:entity?" component={UserForm}>
+              <Route path={["/import-file/:fileID?"]} component={ImportPage}/>
+              <Route path="/list-file" component={FileList} />
+              <Route path="/login" component={Login} />
+              <Route path="/form/:entity/:id?" component={GenericForm} />
+              <Route path="/collection/:entities" component={Collection} />
+
+              </Route>
             </Switch>
         </main>
         </Router>

@@ -112,7 +112,6 @@ const DataSheetView = () => {
                 }
                 onGridReady={agGridReady}
                 modules={AllModules}
-            //onGridReady={onGridReady}
             >
             </AgGridReact>
         </div>
