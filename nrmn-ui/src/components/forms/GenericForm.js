@@ -13,13 +13,13 @@ import pluralize from 'pluralize';
 const Form = withTheme(MaterialUITheme);
 
 const UserForm = () => {
-    const { entity, id } = useParams();
+    const { entities, id } = useParams();
     const definition = useSelector(state => state.form.definition)
     const editItem = useSelector(state => state.form.editItem)
 
     const dispatch = useDispatch();
-    const pluralEntity = pluralize(entity);
-    const entities =  pluralEntity.charAt(0).toLowerCase() + pluralEntity.slice(1)
+    const singular = pluralize.singular(entities)
+    const entity =  singular.charAt(0).toUpperCase() + singular.slice(1)
     useEffect(() => {
         if (Object.keys(definition).length === 0)
             dispatch(definitionRequested());
@@ -44,7 +44,7 @@ const UserForm = () => {
     }
 
     const { title, ...entityDef } = definition[entity]
-    const editSchema = (editItem) ? { title: title.replace("Add", "Edit"), ...entityDef } : definition[entity]
+    const editSchema = (id) ? { title: title.replace("Add", "Edit"), ...entityDef } : definition[entity]
     const JSSchema = { components: { schemas: definition }, ...editSchema };
    console.log("edit:", editItem);
     return (<Form

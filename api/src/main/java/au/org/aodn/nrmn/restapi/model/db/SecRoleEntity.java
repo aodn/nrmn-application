@@ -14,6 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Table(name = "sec_role"  )
+@Schema(title = "Add Role")
 public class SecRoleEntity {
     @Id
     @Column(name="name", unique=true, updatable=false, nullable=false)

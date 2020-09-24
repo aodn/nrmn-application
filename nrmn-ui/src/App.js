@@ -78,9 +78,9 @@ export default function PersistentDrawerLeft() {
               </Route>
               <Route path="/list-file" component={FileList} >
               </Route>
-              <Route path="/form/:entity/:id?" component={GenericForm}>
+              <Route path="/form/:entities/:id?" component={GenericForm}>
               </Route>
-              <Route path="/collection/:entity" component={Collection}>
+              <Route path="/collection/:entities" component={Collection}>
               </Route>
             </Switch>
         </main>

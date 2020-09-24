@@ -36,7 +36,7 @@ public class SecUserEntity {
 
     @Version
     @Column(name = "version", nullable = false)
-    @Schema(format = "hidden", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(hidden = true)
     private Integer version;
 
 

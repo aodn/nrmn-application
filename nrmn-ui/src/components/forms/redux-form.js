@@ -24,7 +24,6 @@ const formSlice = createSlice({
     },
     entitiesLoaded: (state, action) => {
       state.entities = action.payload;
-      console.log("entities loaded:", state.entities);
     },
     entitiesError: (state, action) => {
       console.error("error while getting the entities");
@@ -55,7 +54,13 @@ export const idRequested = createAction('ID_REQUESTED',
   function (entity) {
     return { payload: entity };
   });
+
 export const createEntityRequested = createAction('CREATE_ENTITY_REQUESTED',
   function (entity) {
     return { payload: entity };
-  });   
+  });
+
+  export const updateEntityRequested = createAction('UPDATE_ENTITY_REQUESTED',
+  function (entity) {
+    return { payload: entity };
+  });      
