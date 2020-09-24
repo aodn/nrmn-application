@@ -101,14 +101,10 @@ public class StagedSurveyEntity {
     @Column(name = "is_invert_Sizing")
     private Boolean isInvertSizing;
 
-    @Column(name = "measureValue", columnDefinition = "json")
+    @Column(name = "measure_value", columnDefinition = "json")
     @Type(type = "jsonb")
     private Map<String, Double> measureJson;
 
-    @ManyToOne
-    @JoinTable(name ="staged_survey_job")
+    @ManyToOne(fetch = FetchType.LAZY)
     private StagedJobEntity stagedJob;
-//
-//    @OneToMany(orphanRemoval = true)
-//    private List<ErrorCheckEntity> errors;
 }

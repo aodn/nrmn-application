@@ -22,8 +22,9 @@ public class ErrorCheckEntity {
     private ErrorID id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "validation_type")
-    private ValidationLevelType Type;
+
+    @Column(name = "error_level")
+    private ValidationLevelType errorLevel;
 
     @Column(name = "column_target")
     private String ColunmTarget;

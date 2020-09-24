@@ -2,7 +2,7 @@ import React from "react";
 import {  useDispatch, useSelector } from "react-redux";
 import { AgGridReact } from "ag-grid-react";
 import { AllModules } from "ag-grid-enterprise";
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { ImportLoaded, FileRequested } from './reducers/create-import';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -10,34 +10,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import { green } from '@material-ui/core/colors';
 import ColunmDef from "./ColumnDef";
 import { useParams } from "react-router-dom";
+import useWindowSize from "../utils/useWindowSize";
 
-function useWindowSize() {
-    const isClient = typeof window === 'object';
 
-    function getSize() {
-        return {
-            width: isClient ? window.innerWidth : undefined,
-            height: isClient ? window.innerHeight : undefined
-        };
-    }
-
-    const [windowSize, setWindowSize] = useState(getSize);
-
-    useEffect(() => {
-        if (!isClient) {
-            return false;
-        }
-
-        function handleResize() {
-            setWindowSize(getSize());
-        }
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []); // Empty array ensures that effect is only run on mount and unmount
-
-    return windowSize;
-}
 
 const DataSheetView = () => {
 
@@ -78,9 +53,10 @@ const DataSheetView = () => {
     }));
     const classes = useStyles();
     const size = useWindowSize();
-    console.log("sheet l0:", sheet[0])
+    const themeType = useSelector(state =>  state.theme.themeType);
+
     return (sheet && sheet.length && !isLoading) ? (
-        <div style={{ height: size.height - 200, width: '100%', marginTop: 25 }} className="ag-theme-alpine">
+        <div style={{ height: size.height - 200, width: '100%', marginTop: 25 }} className={ themeType ? "ag-theme-alpine-dark" : "ag-theme-alpine" } >
             <AgGridReact
                 pivotMode={true}
                 pivotColumnGroupTotals={"before"}

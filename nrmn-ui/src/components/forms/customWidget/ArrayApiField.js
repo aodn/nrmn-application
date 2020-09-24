@@ -10,16 +10,8 @@ import pluralize from 'pluralize';
 
 
 const handleMultiChanges = (event, props) => {
-  const { selection } = event.target;
-  console.log("event", event.target)
-  console.log("multi:", selection)
-  const values = [];
-  for (let i = 0; selection && i < selection.lenght; i += 1) {
-    if (selection[i].selected) {
-      values.push(selection[i].value);
-    }
-  }
-  props.onChange(values);
+  
+  console.log(event);
 }
 
 

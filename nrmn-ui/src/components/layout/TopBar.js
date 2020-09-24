@@ -1,19 +1,17 @@
-
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
-import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import {makeStyles, withStyles} from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import { toggleMenu } from './redux-layout';
 import { connect } from 'react-redux';
 import store from '../store';
 import AuthState from "./AuthState";
-import { TopbarButton } from './TopbarButton'
+import SettingsMenu from "./SettingsMenu";
 
 const drawerWidth = 240;
 
@@ -84,11 +82,7 @@ const ReduxTopBar = ({ menuIsOpen }) => {
         </Grid>
         <Grid item >
           <AuthState /> |
-          <TopbarButton
-              variant="text"
-              color="secondary"
-              size="small"
-              >Notifications</TopbarButton>
+          <SettingsMenu />
         </Grid>
       </Grid>
     </Toolbar>

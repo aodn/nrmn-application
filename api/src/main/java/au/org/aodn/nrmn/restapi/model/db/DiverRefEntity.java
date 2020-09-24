@@ -19,17 +19,17 @@ import javax.validation.constraints.Size;
 @EqualsAndHashCode
 public class DiverRefEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO )
     @Column(name = "diver_id")
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private int diverId;
 
     @Column(name = "initials")
-    @Description("test")
     @NotNull
     private String initials;
 
     @Column(name = "full_name")
     @NotNull
     @Size(min = 2, max= 10)
-    @Description("fullname:test")
     private String fullName;
 }

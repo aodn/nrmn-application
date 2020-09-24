@@ -8,8 +8,8 @@ const ImportPage = () => {
 
     return (
         <div>
-            <XlxsUpload></XlxsUpload>
-            <DataSheetView></DataSheetView>
+            <XlxsUpload/>
+            <DataSheetView/>
         </div>
     );
 }

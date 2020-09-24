@@ -4,19 +4,22 @@ import {
   getDefaultMiddleware
 } from "@reduxjs/toolkit";
 
+import { themeReducer } from './import/reducers/theme-reducer';
 import { toggleReducer } from './layout/redux-layout';
 import { importReducer } from "./import/reducers/create-import";
+import { authReducer } from "./import/reducers/auth-reducer";
+import { listFileReducer } from "./import/reducers/list-import";
 import createSagaMiddleware from "redux-saga";
 import importMiddleware from './import/middleware/create-import';
-import { listFileReducer } from "./import/reducers/list-import";
 import ListFileMiddleware from './import/middleware/list-import';
 import FileMiddleware from './import/middleware/file-import';
 import getDefinitionWatcher from './forms/middleware/definition';
 import getEntitiesWatcher from './forms/middleware/entities';
 
 import { all } from "redux-saga/effects";
-import { authReducer } from "./import/reducers/auth-reducer";
 import { formReducer } from "./forms/redux-form";
+import getEditWatcher from "./forms/middleware/edit";
+import getCreateEntitiesWatcher from "./forms/middleware/createEntity";
 
 const initialiseSagaMiddleware = createSagaMiddleware();
 
@@ -28,6 +31,7 @@ const middleware = [
 
 const store = configureStore({
   reducer: {
+    theme: themeReducer,
     auth: authReducer,
     toggle: toggleReducer,
     import: importReducer,
@@ -43,7 +47,9 @@ const store = configureStore({
     importMiddleware(),
     FileMiddleware(),
     getDefinitionWatcher(),
-    getEntitiesWatcher()
+    getEntitiesWatcher(),
+    getEditWatcher(),
+    getCreateEntitiesWatcher()
   ])
 }
 

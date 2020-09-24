@@ -8,9 +8,10 @@ export default function* getEditWatcher() {
 
 function* getEditItem(action) {
     try {
+        console.log("id req:", action.payload);
         const resp = yield call(entities, action.payload);
         console.log("id:", resp.data);
-        yield put(idLoaded(resp.data._embedded[action.payload]));
+        yield put(idLoaded(resp.data));
     } catch (e) {
         yield put(idError(e));
     }

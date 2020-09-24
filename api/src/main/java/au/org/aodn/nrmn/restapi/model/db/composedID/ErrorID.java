@@ -19,5 +19,7 @@ public class ErrorID implements Serializable {
 
     @Column(name = "job_id")
     private String jobId;
+
+    @Column(name = "message")
     private String message;
 }
