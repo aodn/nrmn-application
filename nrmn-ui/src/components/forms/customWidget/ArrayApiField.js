@@ -7,35 +7,27 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import pluralize from 'pluralize';
 
+const handleMultiChanges = (values, props, entities) => {
+  const baseApi = process.env.REACT_APP_LOCALDEV_API_HOST;
 
-
-const handleMultiChanges = (event, props) => {
-  const { selection } = event.target;
-  console.log("event", event.target)
-  console.log("multi:", selection)
-  const values = [];
-  for (let i = 0; selection && i < selection.lenght; i += 1) {
-    if (selection[i].selected) {
-      values.push(selection[i].value);
-    }
-  }
-  props.onChange(values);
+  const items = (values)? values.map(v =>  ({id: baseApi + "/api/" + entities + "/" + v})) : [];
+  props.onChange(items);
 }
-
 
 const ArrayApiField = (props) => {
 
-  const items = useSelector(state => state.form.entities)
+  const items = useSelector(state => state.form.entities);
   const dispatch = useDispatch();
+
   const entity = props.schema.items.$ref.split("/").pop() ;
   const pluralEntity = pluralize(entity);
-  const entities =  pluralEntity.charAt(0).toLowerCase() + pluralEntity.slice(1)
+  const entities =  pluralEntity.charAt(0).toLowerCase() + pluralEntity.slice(1);
 
   useEffect(() => {
     console.log("entity:", entities);
     if (entities != undefined)
-      dispatch(selectRequested(entities))
-  }, [])
+      dispatch(selectRequested(entities));
+  }, []);
 
   return (items) ? (
      <Autocomplete
@@ -44,10 +36,10 @@ const ArrayApiField = (props) => {
       options={items.map(it => it.name)}
       getOptionLabel={(option) => option}
       defaultValue={[]}
-      onChange={(event) => handleMultiChanges(event, props)}
+      onChange={(event, newValues) =>handleMultiChanges(newValues, props, entities)}
       renderInput={(params) => <TextField {...params} label={"enter " + props.name} variant="outlined" />}
     />) : (<></>)
-}
+};
 
 export default ArrayApiField;
 
