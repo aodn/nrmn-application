@@ -14,7 +14,6 @@ import javax.persistence.*;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Schema(title="Add Location")
-
 @Table(name = "location_ref"  )
 public class LocationRefEntity  {
     @Id

@@ -4,8 +4,8 @@ import { withTheme } from '@rjsf/core';
 import { Theme as MaterialUITheme } from '@rjsf/material-ui';
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from 'react';
-import { definitionRequested, idRequested, createEntityRequested } from "./redux-form";
-import { useParams } from "react-router-dom";
+import { definitionRequested,resetState, idRequested, createEntityRequested } from "./redux-form";
+import { useParams, Redirect } from "react-router-dom";
 import ArrayApiField from './customWidget/ArrayApiField';
 import pluralize from 'pluralize';
 
@@ -16,11 +16,14 @@ const UserForm = () => {
     const { entities, id } = useParams();
     const definition = useSelector(state => state.form.definition)
     const editItem = useSelector(state => state.form.editItem)
+    const createdEntity = useSelector(state => state.form.createdEntity)
+
 
     const dispatch = useDispatch();
     const singular = pluralize.singular(entities)
     const entity =  singular.charAt(0).toUpperCase() + singular.slice(1)
     useEffect(() => {
+     //   dispatch(resetState());
         if (Object.keys(definition).length === 0)
             dispatch(definitionRequested());
 
@@ -31,6 +34,14 @@ const UserForm = () => {
 
 
     }, []);
+    if (Object.keys(createdEntity).length !== 0) {
+        const redirectPath = "/collection/" + entities;
+        console.log('redirected:', redirectPath);
+        return (<Redirect to={redirectPath}></Redirect>)
+
+    }
+
+
 
     if (Object.keys(definition).length === 0 && typeof (definition[entity]) == 'undefined')
         return (<></>);

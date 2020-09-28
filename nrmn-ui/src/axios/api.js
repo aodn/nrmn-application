@@ -79,3 +79,12 @@ export const entities = (entity) => axiosInstance.get("/api/" + entity).then(res
 export const entitySave = (entity, params) => {
   return  axiosInstance.post("/api/" + entity, params).then(res => res );
 }
+
+export const entityRelation = (entity, urls) => {
+  const config = {
+    headers: {
+      "Content-Type": "text/uri-list"
+    }
+  }
+  return axiosInstance.put(entity, urls,config).then
+}
