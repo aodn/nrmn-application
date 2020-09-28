@@ -1,8 +1,10 @@
 import React from "react";
-import { Box, Typography, ButtonGroup, Button } from "@material-ui/core";
+import { Box, Typography, ButtonGroup, Button, Tooltip, Fab } from "@material-ui/core";
+import AddIcon from '@material-ui/icons/Add'
+
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from 'react';
-import { definitionRequested, selectRequested } from "./redux-form";
+import { definitionRequested, resetState, selectRequested } from "./redux-form";
 import { useParams, NavLink } from "react-router-dom";
 import pluralize from 'pluralize';
 import { AgGridReact } from "ag-grid-react/lib/agGridReact";
@@ -21,18 +23,19 @@ const schematoColDef = (schema, size) => {
     coldefs.push({
         field: "Edit",
         cellRenderer: function (params) {
-            console.log(params.data._links.self.href.split)
             const hrefSplit = params.data._links.self.href.split("/")
             const id = hrefSplit.pop();
             const entities = hrefSplit.pop();
             const link = "/form/" + entities + "/" + id
-            return '<a href="' + link + '" target="_blank" rel="noopener">Edit</a>'
+            console.log("link:" + link)
+            return '<a href="' + link + '">Edit</a>'
         }
 
 
     })
     return coldefs;
 }
+let agGridApi = {};
 
 const Colection = () => {
     const { entities } = useParams();
@@ -42,19 +45,24 @@ const Colection = () => {
     const items = useSelector(state => state.form.entities);
     const definition = useSelector(state => state.form.definition);
     const dispatch = useDispatch();
-
     const singular = pluralize.singular(entities);
     const entity = singular.charAt(0).toUpperCase() + singular.slice(1);
 
     const agGridReady = (agGrid) => {
         console.log("ready")
-        console.log(agGrid);
+        agGridApi = Object.create(agGrid.api);
+        agGridApi.setRowData(items);
+        Object.freeze(agGridApi);
 
     }
 
     useEffect(() => {
-        if (Object.keys(definition).length === 0 || definition[entity] == undefined)
+        dispatch(resetState());
+        console.log("resteState");
+        console.log("req: definition")
+        if (Object.keys(definition).length === 0)
             dispatch(definitionRequested());
+        console.log("Req:" + entities)
         if (entities != undefined)
             dispatch(selectRequested(entities))
     }, []);
@@ -65,19 +73,20 @@ const Colection = () => {
     const colDef = schematoColDef(definition[entity], size);
     console.log("def:", colDef);
     console.log("items:", items);
-
+    console.log("api grid:", agGridApi);
+    if (items && agGridApi.setRowData)
+        agGridApi.setRowData(items);
     return (colDef && items) ? (
         <Box>
             <Typography variant="h3" >{"List of " + entities}</Typography>
-            <ButtonGroup color="primary" aria-label="outlined primary button group">
-                <Button component={NavLink} to={"/form/"+ entities} >Add {entity}</Button>
-            </ButtonGroup>
+            <Tooltip title="Add" aria-label="Import Excel Data">
+                <Fab size="small" href={"/form/" + entities} color="primary" aria-label={"Add " + entity} to><AddIcon></AddIcon></Fab>
+            </Tooltip>
             <div style={{ height: size.height - 200, width: '100%', marginTop: 25 }} className={themeType ? "ag-theme-alpine-dark" : "ag-theme-alpine"} >
 
                 <AgGridReact
 
                     columnDefs={colDef}
-                    rowData={items}
                     rowSelection="multiple"
                     animateRows={true}
                     onGridReady={agGridReady}
