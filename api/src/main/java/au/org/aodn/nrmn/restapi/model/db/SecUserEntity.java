@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.model.db.enums.UserSecStatus;
+import au.org.aodn.nrmn.restapi.model.db.enums.SecUserStatus;
 import lombok.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
@@ -23,7 +23,7 @@ public class SecUserEntity {
     @SequenceGenerator(name="user_id_seq", allocationSize=1)
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "user_id_seq")
     @Column(name="id", unique=true, updatable=false, nullable=false)
-   private int userId;
+   private Long userId;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -41,7 +41,7 @@ public class SecUserEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable=false)
-    private UserSecStatus status;
+    private SecUserStatus status;
 
 
     @NotAudited
