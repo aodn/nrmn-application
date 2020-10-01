@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.restapi.crud.RawSurveyCRUD;
+import au.org.aodn.nrmn.restapi.service.StageSurveyService;
 import au.org.aodn.nrmn.restapi.model.api.RawSurveyImport;
 import au.org.aodn.nrmn.restapi.model.api.UpdatedResult;
 import au.org.aodn.nrmn.restapi.model.api.ValidationResult;
@@ -28,7 +28,7 @@ public class SurveyController {
     ValidationProcess validation;
 
     @Autowired
-    RawSurveyCRUD rawSurveyCRUD;
+    StageSurveyService rawSurveyCRUD;
 
     @GetMapping(path = "/survey", produces = "application/json")
     public List<SurveyEntity> getSurvey() {

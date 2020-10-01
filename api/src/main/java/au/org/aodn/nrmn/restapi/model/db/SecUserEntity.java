@@ -6,7 +6,9 @@ import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -43,7 +45,13 @@ public class SecUserEntity {
     @Column(name = "status", nullable=false)
     private SecUserStatus status;
 
-
+    public SecUserEntity(String fullName, String email, String password, SecUserStatus status, List<SecRoleEntity> roles ) {
+        this.fullName = fullName;
+        this.email = email;
+        this.hashedPassword = password;
+        this.status = status;
+        this.roles = new HashSet<>(roles); ;
+    }
     @NotAudited
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
