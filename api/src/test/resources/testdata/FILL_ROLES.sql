@@ -1,5 +1,5 @@
 
 INSERT INTO
  nrmn.sec_role
- (NAME)
-  VALUES ('ROLE_USER'), ('ROLE_ADMIN'), ('ROLE_AODN_ADMIN');
+ (NAME, version)
+  VALUES ('ROLE_USER',1), ('ROLE_ADMIN', 1), ('ROLE_AODN_ADMIN', 1);
