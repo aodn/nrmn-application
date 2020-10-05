@@ -12,10 +12,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
+import javax.swing.text.html.Option;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -67,6 +70,12 @@ public class JwtTokenProvider {
         return Long.parseLong(claims.getSubject());
     }
 
+    public Optional<String> getAuthorizationBearer(String headerAuth) {
+        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+            return Optional.ofNullable(headerAuth.substring(7));
+        }
+        return Optional.empty();
+    }
 
     public boolean validateToken(String token) {
         try {

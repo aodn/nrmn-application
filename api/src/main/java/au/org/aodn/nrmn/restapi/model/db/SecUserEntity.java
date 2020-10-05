@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.enums.SecUserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
@@ -28,6 +29,7 @@ public class SecUserEntity {
    private Long userId;
 
     @Version
+    @JsonIgnore
     @Column(name = "version", nullable = false)
     private Integer version;
 
@@ -37,10 +39,11 @@ public class SecUserEntity {
 
     @Column(name = "email_address", nullable = false)
     private String email;
-
+    @JsonIgnore
     @Column(name = "hashed_password")
     private String hashedPassword;
 
+    @JsonIgnore
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable=false)
     private SecUserStatus status;
@@ -52,7 +55,9 @@ public class SecUserEntity {
         this.status = status;
         this.roles = new HashSet<>(roles); ;
     }
+
     @NotAudited
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "sec_user_sec_role",

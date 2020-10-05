@@ -1,7 +1,9 @@
 package au.org.aodn.nrmn.restapi.it;
 
+
 import au.org.aodn.nrmn.restapi.RestApiApplication;
 import au.org.aodn.nrmn.restapi.model.db.SurveyEntity;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +22,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,9 +33,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SurveyEntityRepositoryIT {
 
     @Container
-    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer()
+    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("kartoza/postgis:9.6-2.4")
             .withPassword("inmemory")
-            .withUsername("inmemory");
+            .withUsername("inmemory").withDatabaseName("nrmn_dev");
 
     @Autowired
     public TestRestTemplate testRestTemplate;
@@ -46,14 +49,18 @@ public class SurveyEntityRepositoryIT {
             TestPropertyValues values = TestPropertyValues.of(
                     "spring.datasource.url=" + postgreSQLContainer.getJdbcUrl(),
                     "spring.datasource.password=" + postgreSQLContainer.getPassword(),
-                    "spring.datasource.username=" + postgreSQLContainer.getUsername()
+                    "spring.datasource.username=" + postgreSQLContainer .getUsername()
             );
             values.applyTo(configurableApplicationContext);
         }
     }
 
+    @Before
+    public void setup() throws SQLException {
+    }
+
     @Test
-    @Sql( {"/testdata/SURVEY_SCHEMA.sql", "/testdata/FILL_FOUR_SURVEY.sql"})
+    @Sql( {"/testdata/NRMN.sql","/testdata/FILL_FOUR_SURVEY.sql"})
     public void testGetSurvey() {
 
         ResponseEntity<List<SurveyEntity>> response  = testRestTemplate.exchange(_createUrl("/api/survey"),

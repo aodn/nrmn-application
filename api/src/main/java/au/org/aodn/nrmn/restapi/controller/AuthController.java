@@ -1,7 +1,9 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import au.org.aodn.nrmn.restapi.dto.auth.LoginRequest;
+import au.org.aodn.nrmn.restapi.dto.auth.LogoutRequest;
 import au.org.aodn.nrmn.restapi.dto.auth.SignUpRequest;
+import au.org.aodn.nrmn.restapi.repository.SecUserEntityRepository;
 import au.org.aodn.nrmn.restapi.service.UserService;
 import au.org.aodn.nrmn.restapi.util.LogInfo;
 import au.org.aodn.nrmn.restapi.dto.payload.JwtAuthenticationResponse;
@@ -9,6 +11,8 @@ import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAuditEntity;
 import au.org.aodn.nrmn.restapi.repository.SecRoleEntityRepository;
 import au.org.aodn.nrmn.restapi.repository.UserActionAuditEntityRepository;
 import au.org.aodn.nrmn.restapi.security.JwtTokenProvider;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.val;
 import org.apache.tomcat.util.buf.UriUtil;
@@ -51,6 +55,27 @@ public class AuthController {
 
     private static Logger logger = LoggerFactory.getLogger(AuthController.class);
 
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
+    @PostMapping(path = "/signout", consumes = "application/json", produces = "application/json")
+    public ResponseEntity logOutUser(
+            Authentication authentication,
+            @RequestHeader(name = "Authorization") String bearerToken) {
+        userAuditRepo.save(
+                new UserActionAuditEntity(
+                        "Logout",
+                        "logout attempt for username: " + authentication.getName()
+                                + " token: " + bearerToken));
+       return tokenProvider.getAuthorizationBearer(bearerToken).map(token -> {
+            if (!SecUserEntityRepository.blackListedTokenPresent(authentication.getName(), token)) {
+                SecUserEntityRepository.addBlackListedToken(authentication.getName(), token);
+                return ResponseEntity.ok().build();
+            }
+            return ResponseEntity.badRequest().build();
+        }).orElseGet(() ->  ResponseEntity.noContent().build());
+
+
+    }
+
     @PostMapping(path = "/signin", consumes = "application/json", produces = "application/json")
     public ResponseEntity authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         logger.info(LogInfo.withContext("login attempt"));
@@ -68,16 +93,18 @@ public class AuthController {
     }
 
     @PostMapping(path = "/signup", consumes = "application/json", produces = "application/json")
-    public ResponseEntity registerUser(@Valid @RequestBody SignUpRequest signUpRequestDto, HttpServletRequest request, ResponseEntity<?> resp) {
+    public ResponseEntity registerUser(@Valid @RequestBody SignUpRequest signUpRequestDto) {
 
-        userAuditRepo.save( new UserActionAuditEntity("registerUser", signUpRequestDto.toString()));
+        userAuditRepo.save(new UserActionAuditEntity("registerUser", signUpRequestDto.toString()));
 
         val validedUSer = userService.createUser(signUpRequestDto);
         ResponseEntity<?> response = validedUSer.fold(
                 (err) -> {
+                    logger.info("Error while signup");
                     return ResponseEntity.unprocessableEntity().body(err);
                 }
                 , (user) -> {
+                    logger.info("Successful signup");
                     URI location = ServletUriComponentsBuilder
                             .fromCurrentContextPath().path("/api/users/{id}")
                             .buildAndExpand(user.getUserId()).toUri();

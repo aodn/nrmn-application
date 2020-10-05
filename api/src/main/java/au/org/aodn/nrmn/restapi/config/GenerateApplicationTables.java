@@ -39,7 +39,7 @@ public class GenerateApplicationTables implements ApplicationListener<Applicatio
 
         val profiles = this.environment.getActiveProfiles();
         logger.info("profiles found : {}", Arrays.toString(profiles));
-        if (Arrays.stream(profiles).anyMatch("local"::equals)) {
+        if (false && Arrays.stream(profiles).anyMatch("local"::equals)) {
             Map<String, String> settings = new HashMap<>();
             settings.put("dialect", "org.hibernate.dialect.PostgreSQLDialect");
             settings.put("hibernate.connection.url", url);
