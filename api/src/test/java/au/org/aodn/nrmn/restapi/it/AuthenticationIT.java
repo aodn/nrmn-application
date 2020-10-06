@@ -4,6 +4,7 @@ import au.org.aodn.nrmn.restapi.RestApiApplication;
 import au.org.aodn.nrmn.restapi.dto.auth.LoginRequest;
 import au.org.aodn.nrmn.restapi.dto.auth.SignUpRequest;
 import au.org.aodn.nrmn.restapi.dto.payload.JwtAuthenticationResponse;
+import au.org.aodn.nrmn.restapi.it.utils.RequestWrapper;
 import au.org.aodn.nrmn.restapi.model.db.SecUserEntity;
 import au.org.aodn.nrmn.restapi.model.db.SurveyEntity;
 import lombok.val;
@@ -40,16 +41,18 @@ public class AuthenticationIT {
     @Sql({"/testdata/FILL_ROLES.sql", "/testdata/FILL_USER.sql", "/testdata/FILL_FOUR_SURVEY.sql"})
     public void signup() {
         try {
-            val uri = new URI(_createUrl("/api/auth/signup"));
-            val headers = new HttpHeaders();
-            headers.set("Content-type", "Application/json");
-            val signupReq = new SignUpRequest("test@hello.com", "FirstName TestName", "#12Trois", Collections.emptyList());
-            val httpSignupReq= new HttpEntity<>(signupReq, headers);
 
-            ResponseEntity<SecUserEntity> response = testRestTemplate.postForEntity(
-                    uri,
-                    httpSignupReq,
-                    SecUserEntity.class);
+            RequestWrapper<SignUpRequest, SecUserEntity> reqBuilder =  new RequestWrapper<SignUpRequest, SecUserEntity>();
+            val signupReq = new SignUpRequest("test@hello.com", "FirstName TestName", "#12Trois", Collections.emptyList());
+
+            ResponseEntity<SecUserEntity> response = reqBuilder
+                    .withAppJson()
+                    .withUri(_createUrl("/api/auth/signup"))
+                    .withMethod(HttpMethod.POST)
+                    .withEntity(signupReq)
+                    .withResponseType(SecUserEntity.class)
+                    .build(testRestTemplate);
+
 
             assertEquals(response.getStatusCode(), HttpStatus.CREATED);
             assertEquals(response.getBody().getEmail(), "test@hello.com");
@@ -61,22 +64,20 @@ public class AuthenticationIT {
     @Test
     public void login() {
         try {
-            val headers = new HttpHeaders();
-            headers.set("Content-type", "Application/json");
-            val signupReq = new SignUpRequest("test@hello.com", "FirstName TestName", "#12Trois", Collections.emptyList());
+            val logReq = new LoginRequest("test@hello.com","#12Trois");
+            val reqBuilder =  new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
 
-            val uriLogin = new URI(_createUrl("/api/auth/signin"));
-            val logReq = new LoginRequest(signupReq.getEmail(), signupReq.getPassword());
-            val httpLoginReq = new HttpEntity<>(logReq, headers);
+            ResponseEntity<JwtAuthenticationResponse> response = reqBuilder
+                    .withAppJson()
+                    .withUri(_createUrl("/api/auth/signin"))
+                    .withMethod(HttpMethod.POST)
+                    .withEntity(logReq)
+                    .withResponseType(JwtAuthenticationResponse.class)
+                    .build(testRestTemplate);
 
-            ResponseEntity<JwtAuthenticationResponse> loginResp = testRestTemplate.postForEntity(
-                    uriLogin,
-                    httpLoginReq,
-                    JwtAuthenticationResponse.class);
-
-            assertEquals(loginResp.getStatusCode(), HttpStatus.OK);
-            assertEquals(loginResp.getBody().getAccessToken().length() > 10, true);
-            assertEquals(loginResp.getBody().getTokenType(), "Bearer");
+            assertEquals(response.getStatusCode(), HttpStatus.OK);
+            assertEquals(response.getBody().getAccessToken().length() > 10, true);
+            assertEquals(response.getBody().getTokenType(), "Bearer");
 
         } catch (Exception e) {
             assertFalse(false, "Exception Found");
