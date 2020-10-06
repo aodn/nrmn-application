@@ -1,7 +1,5 @@
-package au.org.aodn.nrmn.restapi.it.utils;
+package au.org.aodn.nrmn.restapi.controller.utils;
 
-import au.org.aodn.nrmn.restapi.dto.payload.JwtAuthenticationResponse;
-import lombok.val;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 
@@ -11,7 +9,7 @@ public class RequestWrapper<E, R> {
 
     HttpHeaders headers = new HttpHeaders();
     E entity;
-    HttpMethod methdod;
+    HttpMethod method;
     URI url;
     Class<R> responseClass;
 
@@ -34,7 +32,7 @@ public class RequestWrapper<E, R> {
     }
 
     public RequestWrapper<E, R>  withMethod( HttpMethod method) {
-        this.methdod = method;
+        this.method = method;
         return this;
     }
 
@@ -46,7 +44,7 @@ public class RequestWrapper<E, R> {
     public ResponseEntity<R> build(TestRestTemplate testRestTemplate) throws Exception{
        return testRestTemplate.exchange(
                 url,
-                methdod,
+               method,
                 new HttpEntity<>(entity, headers),
                responseClass);
     }

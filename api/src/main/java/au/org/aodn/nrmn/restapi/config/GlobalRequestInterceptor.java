@@ -31,10 +31,10 @@ public class GlobalRequestInterceptor extends HandlerInterceptorAdapter {
         HttpServletRequest cachedRequest = new ContentCachingRequestWrapper(request);
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        String fishtag = UUID.randomUUID().toString();
+        String requestId = UUID.randomUUID().toString();
 
         Map<String, String> valuesMap = new HashMap<>();
-        valuesMap.put("id", fishtag);
+        valuesMap.put("id", requestId);
         valuesMap.put("username", username);
         valuesMap.put("path", cachedRequest.getRequestURI());
         valuesMap.put("query", cachedRequest.getQueryString() != null ? cachedRequest.getQueryString() : "None");
@@ -43,7 +43,7 @@ public class GlobalRequestInterceptor extends HandlerInterceptorAdapter {
         StringSubstitutor sub = new StringSubstitutor(valuesMap);
         logger.info(sub.replace(preHandleTemplate));
 
-        ThreadContext.put("fishtag", fishtag);
+        ThreadContext.put("requestId", requestId);
         ThreadContext.put("username", username);
         request.setAttribute("start-time", System.currentTimeMillis());
 
@@ -55,7 +55,7 @@ public class GlobalRequestInterceptor extends HandlerInterceptorAdapter {
 
         long handlerDuration =  System.currentTimeMillis() - (Long)request.getAttribute("start-time");
 
-        Map<String, String> valuesMap = new HashMap<String, String>();
+        Map<String, String> valuesMap = new HashMap<>();
         valuesMap.put("id", ThreadContext.get("requestId"));
         valuesMap.put("handler-rendering-time", String.valueOf(handlerDuration));
 
