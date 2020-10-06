@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 UserDetails userDetails = customUserDetailsService.loadUserById(userId);
 
-                if (!SecUserEntityRepository.blackListedTokenPresent(userDetails.getUsername(), jwt)) {
+                if (!SecUserEntityRepository.blackListedTokenPresent(jwt)) {
 
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

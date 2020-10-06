@@ -58,14 +58,15 @@ public class AuthController {
     public ResponseEntity logOutUser(
             Authentication authentication,
             @RequestHeader(name = "Authorization") String bearerToken) {
+        val timeStamp = System.currentTimeMillis();
         userAuditRepo.save(
                 new UserActionAuditEntity(
                         "Logout",
                         "logout attempt for username: " + authentication.getName()
                                 + " token: " + bearerToken));
        return tokenProvider.getAuthorizationBearer(bearerToken).map(token -> {
-            if (!SecUserEntityRepository.blackListedTokenPresent(authentication.getName(), token)) {
-                SecUserEntityRepository.addBlackListedToken(authentication.getName(), token);
+            if (!SecUserEntityRepository.blackListedTokenPresent(token)) {
+                SecUserEntityRepository.addBlackListedToken(timeStamp, token);
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().build();

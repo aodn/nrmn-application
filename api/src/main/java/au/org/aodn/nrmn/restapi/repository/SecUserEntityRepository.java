@@ -18,14 +18,14 @@ import java.util.stream.Stream;
 public interface SecUserEntityRepository extends JpaRepository<SecUserEntity, Long>, JpaSpecificationExecutor<SecUserEntity> {
     Optional<SecUserEntity> findByEmail(String Email);
 
-    ConcurrentHashMap<String, String> blackListedToken = new ConcurrentHashMap<String, String>();
+    ConcurrentHashMap<Long, String> blackListedToken = new ConcurrentHashMap<>();
 
-    static Optional<String> addBlackListedToken(String email, String token) {
-        return Optional.ofNullable(blackListedToken.putIfAbsent(email, token));
+    static Optional<String> addBlackListedToken(Long timestamp, String token) {
+        return Optional.ofNullable(blackListedToken.putIfAbsent(timestamp, token));
     }
 
-    static  boolean blackListedTokenPresent(String email, String token) {
-        return blackListedToken.getOrDefault(email, "").equals(token);
+    static  boolean blackListedTokenPresent( String token) {
+        return blackListedToken.containsValue(token);
     }
 
 }
