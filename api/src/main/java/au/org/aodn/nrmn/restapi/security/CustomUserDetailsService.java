@@ -20,7 +20,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {
-        SecUserEntity user = userRepo.findByEmail(email)
+        SecUserEntity user = userRepo
+                .findByEmail(email)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found with email: " + email)
                 );

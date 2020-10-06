@@ -12,11 +12,11 @@ public class BlackListedTokenService {
     @Autowired
     JwtTokenProvider tokenProvider;
 
-    @Scheduled(fixedRate = 43200000)
+    @Scheduled(fixedRate = 3600000)
     public void purgeBlacklisted() {
-        SecUserEntityRepository.blackListedToken.forEach((key, token) -> {
+        SecUserEntityRepository.blackListedToken.forEach((token, timestamp) -> {
             if (!tokenProvider.validateToken(token))
-                SecUserEntityRepository.blackListedToken.remove(key);
+                SecUserEntityRepository.blackListedToken.remove(token);
         });
 
     }
