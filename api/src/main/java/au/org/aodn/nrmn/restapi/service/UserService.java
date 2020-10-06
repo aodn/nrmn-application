@@ -38,7 +38,7 @@ public class UserService extends ValidatorHelpers {
 
     public Validated<ErrorInput, SecUserEntity> createUser(SignUpRequest signupReq) {
         val emailValid =
-                duplicateValid(userRepo.findByEmail(signupReq.getEmail()), "email");
+                uniqValid(userRepo.findByEmail(signupReq.getEmail()), "email");
         val errorList = toErrorList(emailValid);
         if (errorList.isEmpty()) {
             val userRole = roleRepo

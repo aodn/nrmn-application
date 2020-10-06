@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class ValidatorHelpers {
-    public<T> Validated<ErrorInput, String> duplicateValid(Optional<T> optionalValue , String fieldName) {
+    public<T> Validated<ErrorInput, String> uniqValid(Optional<T> optionalValue , String fieldName) {
         Validated<ErrorInput, String>  valid = Validated.valid(fieldName +" is valid");
         Validated<ErrorInput, String>  invalid =  Validated.invalid(
                         new ErrorInput(fieldName  + " already exists", fieldName)
