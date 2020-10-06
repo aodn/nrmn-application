@@ -29,7 +29,6 @@ public class SecUserEntity {
    private Long userId;
 
     @Version
-    @JsonIgnore
     @Column(name = "version", nullable = false)
     private Integer version;
 
