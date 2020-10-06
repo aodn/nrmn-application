@@ -33,7 +33,7 @@ public class GlobalRequestInterceptor extends HandlerInterceptorAdapter {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         String fishtag = UUID.randomUUID().toString();
 
-        Map<String, String> valuesMap = new HashMap<String, String>();
+        Map<String, String> valuesMap = new HashMap<>();
         valuesMap.put("id", fishtag);
         valuesMap.put("username", username);
         valuesMap.put("path", cachedRequest.getRequestURI());

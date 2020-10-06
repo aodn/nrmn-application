@@ -20,9 +20,13 @@ import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.shaded.com.google.common.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -42,7 +46,7 @@ public class AuthenticationIT {
     public void signup() {
         try {
 
-            RequestWrapper<SignUpRequest, SecUserEntity> reqBuilder =  new RequestWrapper<SignUpRequest, SecUserEntity>();
+            RequestWrapper<SignUpRequest, SecUserEntity> reqBuilder = new RequestWrapper<SignUpRequest, SecUserEntity>();
             val signupReq = new SignUpRequest("test@hello.com", "FirstName TestName", "#12Trois", Collections.emptyList());
 
             ResponseEntity<SecUserEntity> response = reqBuilder
@@ -62,10 +66,10 @@ public class AuthenticationIT {
     }
 
     @Test
-    public void login() {
+    public void loginLogout() {
         try {
-            val logReq = new LoginRequest("test@hello.com","#12Trois");
-            val reqBuilder =  new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
+            val logReq = new LoginRequest("test@hello.com", "#12Trois");
+            val reqBuilder = new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
 
             ResponseEntity<JwtAuthenticationResponse> response = reqBuilder
                     .withAppJson()
@@ -79,6 +83,29 @@ public class AuthenticationIT {
             assertEquals(response.getBody().getAccessToken().length() > 10, true);
             assertEquals(response.getBody().getTokenType(), "Bearer");
 
+            val token = response.getBody().getAccessToken();
+            val reqBuilderSurvey = new RequestWrapper<Void, List<SurveyEntity>>();
+            val surveyReadyReq = reqBuilderSurvey
+                    .withAppJson()
+                    .withResponseType((Class<List<SurveyEntity>>) (Class<?>) List.class)
+                    .withToken(token)
+                    .withUri(_createUrl("/api/survey"))
+                    .withMethod(HttpMethod.GET);
+
+            val surveyResp = surveyReadyReq.build(testRestTemplate);
+
+            assertEquals(surveyResp.getBody().size(), 4);
+
+            val logOutReq = new RequestWrapper<Void, Void>();
+            val resp = logOutReq
+                    .withAppJson()
+                    .withToken(token)
+                    .withUri(_createUrl("/api/auth/signout"))
+                    .build(testRestTemplate);
+            assertEquals(resp.getStatusCode(), HttpStatus.OK);
+
+            val secondSurVeyReq = surveyReadyReq.build(testRestTemplate);
+            assertEquals(secondSurVeyReq.getStatusCode(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             assertFalse(false, "Exception Found");
         }
