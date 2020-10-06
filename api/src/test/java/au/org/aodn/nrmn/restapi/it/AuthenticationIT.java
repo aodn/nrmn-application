@@ -111,6 +111,47 @@ public class AuthenticationIT {
         }
     }
 
+    @Test
+    public void badSignin() {
+        try {
+            val logReq = new LoginRequest("", "#12Trois");
+            val reqBuilder = new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
+
+            ResponseEntity<JwtAuthenticationResponse> response = reqBuilder
+                    .withAppJson()
+                    .withUri(_createUrl("/api/auth/signin"))
+                    .withMethod(HttpMethod.POST)
+                    .withEntity(logReq)
+                    .withResponseType(JwtAuthenticationResponse.class)
+                    .build(testRestTemplate);
+
+            assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+        }catch (Exception e) {
+            assertFalse(false, "Exception Found in badSignin");
+        }
+    }
+
+    @Test
+    public void badSignup() {
+        try {
+            RequestWrapper<SignUpRequest, SecUserEntity> reqBuilder = new RequestWrapper<SignUpRequest, SecUserEntity>();
+            val signupReq = new SignUpRequest("test_hello.com", "F", "#12Trois", Collections.emptyList());
+
+            ResponseEntity<SecUserEntity> response = reqBuilder
+                    .withAppJson()
+                    .withUri(_createUrl("/api/auth/signup"))
+                    .withMethod(HttpMethod.POST)
+                    .withEntity(signupReq)
+                    .withResponseType(SecUserEntity.class)
+                    .build(testRestTemplate);
+
+            assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            assertFalse(false, "Exception Found in badSignup");
+
+        }
+    }
+
     private String _createUrl(String uri) {
         return "http://localhost:" + randomServerPort + uri;
     }
