@@ -4,6 +4,7 @@ import au.org.aodn.nrmn.restapi.RestApiApplication;
 import lombok.val;
 import org.junit.Before;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ import org.testcontainers.jdbc.JdbcDatabaseDelegate;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import javax.activation.DataSource;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
@@ -37,9 +40,6 @@ class JwtTokenProviderIT {
     @Autowired
     JwtTokenProvider provider;
 
-    @Container
-    public PostgreSQLContainer db = new PostgreSQLContainer("mdillon/postgis:9.6");
-
     @Test
     @Sql({"/testdata/FILL_ROLES.sql", "/testdata/FILL_USER.sql"})
     @WithUserDetails("tj@gmail.com")
@@ -50,10 +50,5 @@ class JwtTokenProviderIT {
         assertTrue(token.length() > 20);
         assertEquals(provider.getUserIdFromJWT(token), 123456);
 
-    }
-
-    @AfterAll
-    public void cleanUp() {
-        ScriptUtils.runInitScript(new JdbcDatabaseDelegate(db, ""), "/testdata/DROP_NRMN.sql");
     }
 }

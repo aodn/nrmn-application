@@ -9,6 +9,7 @@ import au.org.aodn.nrmn.restapi.model.db.SecUserEntity;
 import au.org.aodn.nrmn.restapi.model.db.SurveyEntity;
 import lombok.val;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,9 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @SpringBootTest(classes = RestApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("cicd")
 public class AuthControllerIT {
-
-    @Container
-    public PostgreSQLContainer db = new PostgreSQLContainer("mdillon/postgis:9.6");
 
     @Autowired
     public TestRestTemplate testRestTemplate;
@@ -153,11 +151,6 @@ public class AuthControllerIT {
         }
     }
 
-    @AfterAll
-    public  void cleanUp(){
-        ScriptUtils.runInitScript(new JdbcDatabaseDelegate(db, ""), "/testdata/DROP_NRMN.sql");
-        System.out.println("After All cleanUp() method called");
-    }
     private String _createUrl(String uri) {
         return "http://localhost:" + randomServerPort + uri;
     }
