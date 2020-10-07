@@ -159,6 +159,7 @@ public class AuthControllerIT {
         System.out.println("After All cleanUp() method called");
     }
     private String _createUrl(String uri) {
+        return "http://localhost:" + randomServerPort + uri;
     }
 
 }
