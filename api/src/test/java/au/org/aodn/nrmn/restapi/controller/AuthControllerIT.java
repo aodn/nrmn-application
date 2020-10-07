@@ -8,6 +8,7 @@ import au.org.aodn.nrmn.restapi.controller.utils.RequestWrapper;
 import au.org.aodn.nrmn.restapi.model.db.SecUserEntity;
 import au.org.aodn.nrmn.restapi.model.db.SurveyEntity;
 import lombok.val;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +17,10 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.ext.ScriptUtils;
+import org.testcontainers.jdbc.JdbcDatabaseDelegate;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Collections;
@@ -28,6 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @SpringBootTest(classes = RestApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("cicd")
 public class AuthControllerIT {
+
+    @Container
+    public PostgreSQLContainer db = new PostgreSQLContainer("mdillon/postgis:9.6");
 
     @Autowired
     public TestRestTemplate testRestTemplate;
@@ -145,8 +153,12 @@ public class AuthControllerIT {
         }
     }
 
+    @AfterAll
+    public  void cleanUp(){
+        ScriptUtils.runInitScript(new JdbcDatabaseDelegate(db, ""), "/testdata/DROP_NRMN.sql");
+        System.out.println("After All cleanUp() method called");
+    }
     private String _createUrl(String uri) {
-        return "http://localhost:" + randomServerPort + uri;
     }
 
 }
