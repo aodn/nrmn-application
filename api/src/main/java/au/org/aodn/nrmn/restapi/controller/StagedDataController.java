@@ -13,6 +13,7 @@ import java.util.List;
 @CrossOrigin
 @RequestMapping(path = "/api/stage")
 public class StagedDataController {
+
     @PostMapping("/upload")
     public ResponseEntity<?> uploadFiles(@RequestParam("files") MultipartFile[] files) {
         try {
