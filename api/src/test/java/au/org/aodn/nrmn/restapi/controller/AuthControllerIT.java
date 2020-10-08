@@ -9,6 +9,7 @@ import au.org.aodn.nrmn.restapi.model.db.SecUserEntity;
 import au.org.aodn.nrmn.restapi.model.db.SurveyEntity;
 import lombok.val;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,31 +43,26 @@ public class AuthControllerIT {
 
     @Test
     @Sql({"/testdata/FILL_ROLES.sql", "/testdata/FILL_USER.sql", "/testdata/FILL_FOUR_SURVEY.sql"})
-    public void signup() {
-        try {
+    public void signup() throws Exception {
+        RequestWrapper<SignUpRequest, SecUserEntity> reqBuilder = new RequestWrapper<SignUpRequest, SecUserEntity>();
+        val signupReq = new SignUpRequest("test@hello.com", "FirstName TestName", "#12Trois", Collections.emptyList());
 
-            RequestWrapper<SignUpRequest, SecUserEntity> reqBuilder = new RequestWrapper<SignUpRequest, SecUserEntity>();
-            val signupReq = new SignUpRequest("test@hello.com", "FirstName TestName", "#12Trois", Collections.emptyList());
-
-            ResponseEntity<SecUserEntity> response = reqBuilder
-                    .withAppJson()
-                    .withUri(_createUrl("/api/auth/signup"))
-                    .withMethod(HttpMethod.POST)
-                    .withEntity(signupReq)
-                    .withResponseType(SecUserEntity.class)
-                    .build(testRestTemplate);
+        ResponseEntity<SecUserEntity> response = reqBuilder
+                .withAppJson()
+                .withUri(_createUrl("/api/auth/signup"))
+                .withMethod(HttpMethod.POST)
+                .withEntity(signupReq)
+                .withResponseType(SecUserEntity.class)
+                .build(testRestTemplate);
 
 
-            assertEquals(response.getStatusCode(), HttpStatus.CREATED);
-            assertEquals(response.getBody().getEmail(), "test@hello.com");
-        } catch (Exception e) {
-            assert (false);
-        }
+        assertEquals(response.getStatusCode(), HttpStatus.CREATED);
+        assertEquals(response.getBody().getEmail(), "test@hello.com");
     }
 
     @Test
     public void loginLogout() {
-        try {
+        Assertions.assertThrows(Exception.class, () -> {
             val logReq = new LoginRequest("test@hello.com", "#12Trois");
             val reqBuilder = new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
 
@@ -105,50 +101,41 @@ public class AuthControllerIT {
 
             val secondSurVeyReq = surveyReadyReq.build(testRestTemplate);
             assertEquals(secondSurVeyReq.getStatusCode(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            assertFalse(false, "Exception Found");
-        }
+        });
     }
 
     @Test
     public void badSignin() {
-        try {
+        Assertions.assertThrows(Exception.class, () -> {
             val logReq = new LoginRequest("", "#12Trois");
             val reqBuilder = new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
 
             ResponseEntity<JwtAuthenticationResponse> response = reqBuilder
-                    .withAppJson()
-                    .withUri(_createUrl("/api/auth/signin"))
-                    .withMethod(HttpMethod.POST)
-                    .withEntity(logReq)
-                    .withResponseType(JwtAuthenticationResponse.class)
-                    .build(testRestTemplate);
+                .withAppJson()
+                .withUri(_createUrl("/api/auth/signin"))
+                .withMethod(HttpMethod.POST)
+                .withEntity(logReq)
+                .withResponseType(JwtAuthenticationResponse.class)
+                .build(testRestTemplate);
 
             assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
-        }catch (Exception e) {
-            assertFalse(false, "Exception Found in badSignin");
-        }
+        });
     }
 
     @Test
-    public void badSignup() {
-        try {
-            RequestWrapper<SignUpRequest, SecUserEntity> reqBuilder = new RequestWrapper<SignUpRequest, SecUserEntity>();
-            val signupReq = new SignUpRequest("test_hello.com", "F", "#12Trois", Collections.emptyList());
+    public void badSignup() throws Exception {
+        RequestWrapper<SignUpRequest, SecUserEntity> reqBuilder = new RequestWrapper<SignUpRequest, SecUserEntity>();
+        val signupReq = new SignUpRequest("test_hello.com", "F", "#12Trois", Collections.emptyList());
 
-            ResponseEntity<SecUserEntity> response = reqBuilder
-                    .withAppJson()
-                    .withUri(_createUrl("/api/auth/signup"))
-                    .withMethod(HttpMethod.POST)
-                    .withEntity(signupReq)
-                    .withResponseType(SecUserEntity.class)
-                    .build(testRestTemplate);
+        ResponseEntity<SecUserEntity> response = reqBuilder
+            .withAppJson()
+            .withUri(_createUrl("/api/auth/signup"))
+            .withMethod(HttpMethod.POST)
+            .withEntity(signupReq)
+            .withResponseType(SecUserEntity.class)
+            .build(testRestTemplate);
 
-            assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            assertFalse(false, "Exception Found in badSignup");
-
-        }
+        assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
     }
 
     private String _createUrl(String uri) {
