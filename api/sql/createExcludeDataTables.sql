@@ -1,25 +1,20 @@
+ALTER TABLE IF EXISTS nrmn.public_data_exclusion
+    DROP CONSTRAINT IF EXISTS FK_DATA_EXCLUSION_PROGRAM;
 
-    alter table if exists nrmn.public_data_exclusion
-       drop constraint if exists FK_DATA_EXCLUSION_PROGRAM;
+ALTER TABLE IF EXISTS nrmn.public_data_exclusion
+    DROP CONSTRAINT IF EXISTS FK_DATA_EXCLUSION_SITE;
 
-    alter table if exists nrmn.public_data_exclusion
-       drop constraint if exists FK_DATA_EXCLUSION_SITE;
+DROP TABLE IF EXISTS nrmn.public_data_exclusion CASCADE;
 
-    drop table if exists nrmn.public_data_exclusion cascade;
+CREATE TABLE nrmn.public_data_exclusion (
+    program_program_id int4 NOT NULL,
+    site_site_id int4 NOT NULL,
+    PRIMARY KEY (program_program_id, site_site_id)
+);
 
-    create table nrmn.public_data_exclusion (
-       program_program_id int4 not null,
-        site_site_id int4 not null,
-        primary key (program_program_id, site_site_id)
-    );
+ALTER TABLE IF EXISTS nrmn.public_data_exclusion
+    ADD CONSTRAINT FK_DATA_EXCLUSION_PROGRAM FOREIGN KEY (program_program_id) REFERENCES nrmn.program_ref;
 
-    alter table if exists nrmn.public_data_exclusion
-       add constraint FK_DATA_EXCLUSION_PROGRAM
-       foreign key (program_program_id)
-       references nrmn.program_ref;
-
-    alter table if exists nrmn.public_data_exclusion
-       add constraint FK_DATA_EXCLUSION_SITE
-       foreign key (site_site_id)
-       references nrmn.site_ref;
+ALTER TABLE IF EXISTS nrmn.public_data_exclusion
+    ADD CONSTRAINT FK_DATA_EXCLUSION_SITE FOREIGN KEY (site_site_id) REFERENCES nrmn.site_ref;
 
