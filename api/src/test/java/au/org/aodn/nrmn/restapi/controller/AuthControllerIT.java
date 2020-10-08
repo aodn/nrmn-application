@@ -42,7 +42,8 @@ public class AuthControllerIT {
     int randomServerPort;
 
     @Test
-    @Sql({"/testdata/FILL_ROLES.sql", "/testdata/FILL_USER.sql", "/testdata/FILL_FOUR_SURVEY.sql"})
+    @Sql({"/testdata/FILL_ROLES.sql", "/testdata/FILL_USER.sql", "/testdata/FILL_LOCATION.sql",
+          "/testdata/FILL_SITE.sql", "/testdata/FILL_PROGRAM.sql", "/testdata/FILL_FOUR_SURVEY.sql"})
     public void signup() throws Exception {
         RequestWrapper<SignUpRequest, SecUserEntity> reqBuilder = new RequestWrapper<SignUpRequest, SecUserEntity>();
         val signupReq = new SignUpRequest("test@hello.com", "FirstName TestName", "#12Trois", Collections.emptyList());
