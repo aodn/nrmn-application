@@ -32,7 +32,7 @@ public class StagedJobEntity {
     @Column(name = "source")
     private SourceJobType source;
 
-    @Column(name="job_attributes")
+    @Column(name="job_attributes", columnDefinition = "jsonb")
     @Type(type = "jsonb")
     private Map<String, String> jobAttributes;
 }

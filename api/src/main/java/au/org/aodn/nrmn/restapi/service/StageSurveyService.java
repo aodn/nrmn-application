@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.crud;
+package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJobEntity;
 import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
@@ -8,12 +8,13 @@ import au.org.aodn.nrmn.restapi.repository.StagedSurveyEntityRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@Component
-public class RawSurveyCRUD {
+@Service
+public class StageSurveyService {
     @Autowired
     StagedSurveyEntityRepository rawRepo;
 

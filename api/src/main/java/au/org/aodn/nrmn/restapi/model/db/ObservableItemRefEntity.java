@@ -27,7 +27,7 @@ public class ObservableItemRefEntity  {
     @Column(name = "observable_item_name")
     private String observableItemName;
 
-    @Column(name = "obs_item_attribute")
+    @Column(name = "obs_item_attribute", columnDefinition = "jsonb")
     @Type(type = "jsonb")
     private Map<String,String> obsItemAttribute;
 }

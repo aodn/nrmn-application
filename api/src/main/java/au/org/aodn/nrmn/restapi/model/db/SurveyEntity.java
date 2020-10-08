@@ -19,7 +19,6 @@ import java.util.Map;
 @Table(name = "survey"  )
 @EqualsAndHashCode
 @Audited(withModifiedFlag = true)
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class SurveyEntity {
 
     @Id
@@ -51,8 +50,8 @@ public class SurveyEntity {
     private String direction;
 
     @Basic
-    @Column(name = "survey_attribute")
+    @Column(name = "survey_attribute", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    private Map<String,String> surveyAttribute;
+    private Map<String, String> surveyAttribute;
 
 }
