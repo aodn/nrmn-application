@@ -109,6 +109,6 @@ echo "Cleaning up..."
 docker stop migration_db  > /dev/null
 docker rm migration_db > /dev/null
 
-popd
+popd > /dev/null
 
 [ ! -z "$CHANGE_LOG_DIR" ] && rm -rf "$CHANGE_LOG_DIR"

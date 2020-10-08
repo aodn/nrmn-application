@@ -19,9 +19,11 @@ public class PublicDataExclusionEntity {
 
     @ManyToOne
     @MapsId("siteId")
+    @JoinColumn(name = "site_id")
     private SiteRefEntity site;
 
     @ManyToOne
     @MapsId("programId")
+    @JoinColumn(name = "program_id")
     private ProgramRefEntity program;
 }

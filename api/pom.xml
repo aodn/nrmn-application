@@ -225,6 +225,12 @@
                                     <file name="application.sql" />
                                 </filelist>
                             </concat>
+                            <concat destfile="${project.build.directory}/classes/sql/NRMN_MIGRATION.sql">
+                                <filelist dir="${project.basedir}/src/main/resources/sql">
+                                    <file name="drop_nrmn.sql" />
+                                    <file name="migration.sql" />
+                                </filelist>
+                            </concat>
                         </target>
                     </configuration>
                     <goals>
