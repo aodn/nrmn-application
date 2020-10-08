@@ -26,7 +26,7 @@ public class ObservationEntity {
     @Column(name = "measure_value")
     private Integer measureValue;
 
-    @Column(name = "observation_attribute")
+    @Column(name = "observation_attribute", columnDefinition = "jsonb")
     @Type(type = "jsonb")
     private Map<String, String> observationAttribute;
 }

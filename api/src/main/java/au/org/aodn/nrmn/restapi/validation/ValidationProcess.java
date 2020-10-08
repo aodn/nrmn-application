@@ -45,7 +45,7 @@ public class ValidationProcess {
         val res = diverExists.valid(rawSurvey).combine(
                 Semigroups.stringJoin(". "),
                 siteCodeExists.valid(rawSurvey));
-        return res.bimap(Seq::of, Functions.identity()).foldInvalidLeft(Monoids.seqConcat());
+        return res.bimap(Seq::of, (String successMsg) -> successMsg).foldInvalidLeft(Monoids.seqConcat());
     }
 
     public ValidationResult processList(List<StagedSurveyEntity> entities, String fileID) {

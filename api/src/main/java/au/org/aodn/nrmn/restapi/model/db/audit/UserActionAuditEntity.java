@@ -41,7 +41,23 @@ public class UserActionAuditEntity {
         auditTime = new Timestamp(System.currentTimeMillis());
         this.operation = operation;
         this.username = authentication.getName();
-        this.requestId = ThreadContext.get("fishtag");
+        this.requestId = ThreadContext.get("requestId");
+        this.details = details;
+    }
+
+    public UserActionAuditEntity(String operation, String details, String username) {
+        auditTime = new Timestamp(System.currentTimeMillis());
+        this.operation = operation;
+        this.username = username;
+        this.requestId = ThreadContext.get("requestId");
+        this.details = details;
+    }
+
+    public UserActionAuditEntity(String operation, String details) {
+        auditTime = new Timestamp(System.currentTimeMillis());
+        this.operation = operation;
+        this.username = null;
+        this.requestId = ThreadContext.get("requestId");
         this.details = details;
     }
 }

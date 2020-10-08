@@ -1,12 +1,15 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.model.db.enums.UserSecStatus;
+import au.org.aodn.nrmn.restapi.model.db.enums.SecUserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -23,7 +26,7 @@ public class SecUserEntity {
     @SequenceGenerator(name="user_id_seq", allocationSize=1)
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "user_id_seq")
     @Column(name="id", unique=true, updatable=false, nullable=false)
-   private int userId;
+   private Long userId;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -35,16 +38,25 @@ public class SecUserEntity {
 
     @Column(name = "email_address", nullable = false)
     private String email;
-
+    @JsonIgnore
     @Column(name = "hashed_password")
     private String hashedPassword;
 
+    @JsonIgnore
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable=false)
-    private UserSecStatus status;
+    private SecUserStatus status;
 
+    public SecUserEntity(String fullName, String email, String password, SecUserStatus status, List<SecRoleEntity> roles ) {
+        this.fullName = fullName;
+        this.email = email;
+        this.hashedPassword = password;
+        this.status = status;
+        this.roles = new HashSet<>(roles); ;
+    }
 
     @NotAudited
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "sec_user_sec_role",
