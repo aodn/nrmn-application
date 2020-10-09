@@ -5,7 +5,7 @@ import org.springframework.http.*;
 
 import java.net.URI;
 
-public class RequestWrapper<E, R> {
+public class      RequestWrapper<E, R> {
 
     HttpHeaders headers = new HttpHeaders();
     E entity;
@@ -24,6 +24,11 @@ public class RequestWrapper<E, R> {
 
     public RequestWrapper<E, R>  withEntity(E entity) {
         this.entity = entity;
+        return this;
+    }
+
+    public RequestWrapper<E, R> withContentType(MediaType mediaType) {
+        this.headers.setContentType(mediaType);
         return this;
     }
     public RequestWrapper<E, R> withToken(String token) {
@@ -45,7 +50,7 @@ public class RequestWrapper<E, R> {
        return testRestTemplate.exchange(
                 url,
                method,
-                new HttpEntity<>(entity, headers),
+                new HttpEntity<E>(entity, headers),
                responseClass);
     }
 
