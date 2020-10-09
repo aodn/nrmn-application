@@ -42,7 +42,8 @@ public class AuthControllerIT {
     int randomServerPort;
 
     @Test
-    @Sql({"/testdata/FILL_ROLES.sql", "/testdata/FILL_USER.sql", "/testdata/FILL_FOUR_SURVEY.sql"})
+    @Sql({"/testdata/FILL_ROLES.sql", "/testdata/FILL_USER.sql", "/testdata/FILL_LOCATION.sql",
+          "/testdata/FILL_SITE.sql", "/testdata/FILL_PROGRAM.sql", "/testdata/FILL_FOUR_SURVEY.sql"})
     public void signup() throws Exception {
         RequestWrapper<SignUpRequest, SecUserEntity> reqBuilder = new RequestWrapper<SignUpRequest, SecUserEntity>();
         val signupReq = new SignUpRequest("test@hello.com", "FirstName TestName", "#12Trois", Collections.emptyList());
@@ -105,21 +106,19 @@ public class AuthControllerIT {
     }
 
     @Test
-    public void badSignin() {
-        Assertions.assertThrows(Exception.class, () -> {
-            val logReq = new LoginRequest("", "#12Trois");
-            val reqBuilder = new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
+    public void badSignin() throws Exception {
+        val logReq = new LoginRequest("", "#12Trois");
+        val reqBuilder = new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
 
-            ResponseEntity<JwtAuthenticationResponse> response = reqBuilder
-                .withAppJson()
-                .withUri(_createUrl("/api/auth/signin"))
-                .withMethod(HttpMethod.POST)
-                .withEntity(logReq)
-                .withResponseType(JwtAuthenticationResponse.class)
-                .build(testRestTemplate);
+        ResponseEntity<JwtAuthenticationResponse> response = reqBuilder
+            .withAppJson()
+            .withUri(_createUrl("/api/auth/signin"))
+            .withMethod(HttpMethod.POST)
+            .withEntity(logReq)
+            .withResponseType(JwtAuthenticationResponse.class)
+            .build(testRestTemplate);
 
-            assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
-        });
+        assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
     }
 
     @Test
