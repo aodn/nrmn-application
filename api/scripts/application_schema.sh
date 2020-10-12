@@ -70,6 +70,8 @@ psql -h localhost -U postgres -p ${DOCKER_PORT} -d nrmn_migration -f "$PROJECT_D
  
 CHANGE_LOG_DIR=$(mktemp --directory --tmpdir --suffix '.xml' changelog_XXXXXX)
 
+pushd "$CHANGE_LOG_DIR"
+
 # Create changelog required to go from nrmn_migration to nrmn_update (nrmn_migration + hibernate updates)
 
 echo "Creating application object changelog..."
@@ -107,4 +109,6 @@ echo "Cleaning up..."
 docker stop migration_db  > /dev/null
 docker rm migration_db > /dev/null
 
-rm -rf "$CHANGE_LOG_DIR"
+popd > /dev/null
+
+[ ! -z "$CHANGE_LOG_DIR" ] && rm -rf "$CHANGE_LOG_DIR"

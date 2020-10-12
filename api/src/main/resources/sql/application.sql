@@ -90,12 +90,6 @@ CREATE TABLE nrmn.observation_aud (
     CONSTRAINT observation_aud_pkey PRIMARY KEY (observation_id, rev)
 );
 
-CREATE TABLE nrmn.public_data_exclusion (
-    program_program_id integer NOT NULL,
-    site_site_id integer NOT NULL,
-    CONSTRAINT public_data_exclusion_pkey PRIMARY KEY (program_program_id, site_site_id)
-);
-
 CREATE TABLE nrmn.survey_method_aud (
     survey_method_id integer NOT NULL,
     rev integer NOT NULL,
@@ -164,10 +158,10 @@ CREATE TABLE nrmn.sec_role (
     CONSTRAINT sec_role_pkey PRIMARY KEY (name)
 );
 
-CREATE TABLE nrmn.sec_user_sec_role (
+CREATE TABLE nrmn.sec_user_roles (
     sec_user_id bigint NOT NULL,
     sec_role_id varchar(255) NOT NULL,
-    CONSTRAINT sec_user_sec_role_pkey PRIMARY KEY (sec_user_id, sec_role_id)
+    CONSTRAINT sec_user_roles_pkey PRIMARY KEY (sec_user_id, sec_role_id)
 );
 
 CREATE TABLE nrmn.observable_item_ref_aud (
@@ -179,6 +173,12 @@ CREATE TABLE nrmn.observable_item_ref_aud (
     observable_item_name varchar(255),
     observable_item_name_mod boolean,
     CONSTRAINT observable_item_ref_aud_pkey PRIMARY KEY (observable_item_id, rev)
+);
+
+CREATE TABLE nrmn.public_data_exclusion (
+    program_id integer NOT NULL,
+    site_id integer NOT NULL,
+    CONSTRAINT public_data_exclusion_pkey PRIMARY KEY (program_id, site_id)
 );
 
 CREATE TABLE nrmn.sec_user (
@@ -210,9 +210,6 @@ ALTER TABLE nrmn.staged_survey
 ALTER TABLE nrmn.observation_aud
     ADD CONSTRAINT fkctpj5torreec5ut7jcsxjwxtd FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
-ALTER TABLE nrmn.public_data_exclusion
-    ADD CONSTRAINT fkh51awlt0f0jld3bb4hmh0ykrs FOREIGN KEY (program_program_id) REFERENCES nrmn.program_ref (program_id) ON UPDATE NO ACTION ON DELETE NO ACTION;
-
 ALTER TABLE nrmn.survey_method_aud
     ADD CONSTRAINT fkk0pl3e2pnxqsx8schxcqakf4p FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
@@ -225,11 +222,14 @@ ALTER TABLE nrmn.site_ref_aud
 ALTER TABLE nrmn.location_ref_aud
     ADD CONSTRAINT fkqcdhb4kma1glcjulq39i8hofn FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
-ALTER TABLE nrmn.sec_user_sec_role
+ALTER TABLE nrmn.sec_user_roles
     ADD CONSTRAINT fk_role_user_sec FOREIGN KEY (sec_role_id) REFERENCES nrmn.sec_role (name) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 ALTER TABLE nrmn.observable_item_ref_aud
     ADD CONSTRAINT fksehkdmw8opm6n0ytxsmtcjx9l FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE nrmn.public_data_exclusion
+    ADD CONSTRAINT fksq3vap0t8ruo7d5ghdt5imphh FOREIGN KEY (program_id) REFERENCES nrmn.program_ref (program_id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 CREATE UNIQUE INDEX unique_email ON nrmn.sec_user (email_address);
 
@@ -239,11 +239,11 @@ ALTER TABLE nrmn.diver_ref_aud
 ALTER TABLE nrmn.error_check
     ADD CONSTRAINT fkhmycainhljtnhm0ywwutb308w FOREIGN KEY (row_id) REFERENCES nrmn.staged_survey (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
-ALTER TABLE nrmn.public_data_exclusion
-    ADD CONSTRAINT fkq3j7bouanigjlvfim20yvd6qr FOREIGN KEY (site_site_id) REFERENCES nrmn.site_ref (site_id) ON UPDATE NO ACTION ON DELETE NO ACTION;
-
-ALTER TABLE nrmn.sec_user_sec_role
+ALTER TABLE nrmn.sec_user_roles
     ADD CONSTRAINT fk_user_sec_role FOREIGN KEY (sec_user_id) REFERENCES nrmn.sec_user (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE nrmn.public_data_exclusion
+    ADD CONSTRAINT fksya8iyraotp866qvhggmwgmkp FOREIGN KEY (site_id) REFERENCES nrmn.site_ref (site_id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 CREATE SEQUENCE IF NOT EXISTS nrmn.hibernate_sequence;
 
