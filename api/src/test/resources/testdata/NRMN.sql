@@ -392,6 +392,7 @@ CREATE TABLE nrmn.staged_survey (
     common_name character varying(255),
     l5 integer,
     l95 integer,
+    lmax integer,
     pqs integer,
     block integer,
     buddy character varying(255),

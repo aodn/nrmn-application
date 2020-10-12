@@ -19,7 +19,8 @@ class SpreadSheetServiceTest {
     public void correctShortheaderShouldBeValid() throws Exception {
         InputStream rottnestInput = getClass()
                 .getClassLoader().getResourceAsStream("sheets/correctShortHeader.xlsx");
-        val validSheet = sheetService.validExcelFile(new XSSFWorkbook(rottnestInput), false);
+        val validSheet =
+                sheetService.validExcelFile("idfile", new XSSFWorkbook(rottnestInput), false);
         assertTrue(validSheet.isValid());
     }
 
@@ -27,7 +28,8 @@ class SpreadSheetServiceTest {
     public void correctLongheaderShouldBeValid() throws Exception {
         InputStream rottnestInput = getClass()
                 .getClassLoader().getResourceAsStream("sheets/correctLongHeader.xlsx");
-        val validSheet = sheetService.validExcelFile(new XSSFWorkbook(rottnestInput), true);
+        val validSheet =
+                sheetService.validExcelFile("idfile",new XSSFWorkbook(rottnestInput), true);
         assertTrue(validSheet.isValid());
     }
 
@@ -35,7 +37,8 @@ class SpreadSheetServiceTest {
     public void missingDataSheethouldBeInvalid() throws Exception {
         InputStream rottnestInput = getClass()
                 .getClassLoader().getResourceAsStream("sheets/missingDataSheet.xlsx");
-        val validSheet = sheetService.validExcelFile(new XSSFWorkbook(rottnestInput), false);
+        val validSheet =
+                sheetService.validExcelFile("idfile", new XSSFWorkbook(rottnestInput), false);
         assertTrue(validSheet.isInvalid());
     }
 
@@ -43,7 +46,7 @@ class SpreadSheetServiceTest {
     public void missingColunmsSheethouldBeInvalid() throws Exception {
         InputStream rottnestInput = getClass()
                 .getClassLoader().getResourceAsStream("sheets/missingColumnsHeader.xlsx");
-        val validSheet = sheetService.validExcelFile(new XSSFWorkbook(rottnestInput), false);
+        val validSheet = sheetService.validExcelFile("idfile",new XSSFWorkbook(rottnestInput), false);
         assertTrue(validSheet.isInvalid());
     }
 }

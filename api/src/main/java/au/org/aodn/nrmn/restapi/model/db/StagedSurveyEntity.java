@@ -9,8 +9,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import java.sql.Date;
-import java.util.List;
+import java.util.Date;
 import java.util.Map;
 
 @Entity
@@ -100,6 +99,9 @@ public class StagedSurveyEntity {
 
     @Column(name = "is_invert_Sizing")
     private Boolean isInvertSizing;
+
+    @Column(name = "Lmax")
+    private Integer Lmax;
 
     @Column(name = "measure_value", columnDefinition = "json")
     @Type(type = "jsonb")
