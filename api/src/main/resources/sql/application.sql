@@ -138,27 +138,6 @@ CREATE TABLE nrmn.survey_aud (
     CONSTRAINT survey_aud_pkey PRIMARY KEY (survey_id, rev)
 );
 
-CREATE TABLE nrmn.site_ref_aud (
-    site_id integer NOT NULL,
-    rev integer NOT NULL,
-    revtype smallint,
-    is_active boolean,
-    is_active_mod boolean,
-    latitude float8,
-    latitude_mod boolean,
-    longitude float8,
-    longitude_mod boolean,
-    site_attribute jsonb,
-    site_attribute_mod boolean,
-    site_code varchar(255),
-    site_code_mod boolean,
-    site_name varchar(255),
-    site_name_mod boolean,
-    location_id integer,
-    location_mod boolean,
-    CONSTRAINT site_ref_aud_pkey PRIMARY KEY (site_id, rev)
-);
-
 CREATE TABLE nrmn.location_ref_aud (
     location_id integer NOT NULL,
     rev integer NOT NULL,
@@ -236,6 +215,29 @@ CREATE TABLE nrmn.user_action_aud (
     CONSTRAINT user_action_aud_pkey PRIMARY KEY (id)
 );
 
+CREATE TABLE nrmn.site_ref_aud (
+    site_id integer NOT NULL,
+    rev integer NOT NULL,
+    revtype smallint,
+    geom PUBLIC.GEOMETRY,
+    geom_mod boolean,
+    is_active boolean,
+    is_active_mod boolean,
+    latitude float8,
+    latitude_mod boolean,
+    longitude float8,
+    longitude_mod boolean,
+    site_attribute jsonb,
+    site_attribute_mod boolean,
+    site_code varchar(255),
+    site_code_mod boolean,
+    site_name varchar(255),
+    site_name_mod boolean,
+    location_id integer,
+    location_mod boolean,
+    CONSTRAINT site_ref_aud_pkey PRIMARY KEY (site_id, rev)
+);
+
 ALTER TABLE nrmn.sec_user_aud
     ADD CONSTRAINT fk1tqqojx2q75iy64166aehon7p FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
@@ -250,9 +252,6 @@ ALTER TABLE nrmn.survey_method_aud
 
 ALTER TABLE nrmn.survey_aud
     ADD CONSTRAINT fklqcbssyix1l4orhbnrvd9khta FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
-
-ALTER TABLE nrmn.site_ref_aud
-    ADD CONSTRAINT fkoj8hgo02f1vvoas72bogiv97t FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 ALTER TABLE nrmn.location_ref_aud
     ADD CONSTRAINT fkqcdhb4kma1glcjulq39i8hofn FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
@@ -270,6 +269,9 @@ CREATE UNIQUE INDEX unique_email ON nrmn.sec_user (email_address);
 
 ALTER TABLE nrmn.diver_ref_aud
     ADD CONSTRAINT fk1nahs3dov9lbpxnmeafoyl82i FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE nrmn.site_ref_aud
+    ADD CONSTRAINT fkoj8hgo02f1vvoas72bogiv97t FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 ALTER TABLE nrmn.error_check
     ADD CONSTRAINT fkhmycainhljtnhm0ywwutb308w FOREIGN KEY (row_id) REFERENCES nrmn.staged_survey (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
