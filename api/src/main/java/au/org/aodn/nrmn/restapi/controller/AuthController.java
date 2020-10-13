@@ -2,19 +2,18 @@ package au.org.aodn.nrmn.restapi.controller;
 
 import au.org.aodn.nrmn.restapi.dto.auth.LoginRequest;
 import au.org.aodn.nrmn.restapi.dto.auth.SignUpRequest;
-import au.org.aodn.nrmn.restapi.repository.SecUserEntityRepository;
+import au.org.aodn.nrmn.restapi.repository.SecUserRepository;
 import au.org.aodn.nrmn.restapi.service.UserService;
 import au.org.aodn.nrmn.restapi.util.LogInfo;
 import au.org.aodn.nrmn.restapi.dto.payload.JwtAuthenticationResponse;
-import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAuditEntity;
-import au.org.aodn.nrmn.restapi.repository.SecRoleEntityRepository;
-import au.org.aodn.nrmn.restapi.repository.UserActionAuditEntityRepository;
+import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
+import au.org.aodn.nrmn.restapi.repository.SecRoleRepository;
+import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.security.JwtTokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.val;
-import org.apache.tomcat.util.buf.UriUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +38,7 @@ public class AuthController {
     AuthenticationManager authenticationManager;
 
     @Autowired
-    SecRoleEntityRepository roleRepository;
+    SecRoleRepository roleRepository;
 
     @Autowired
     UserService userService;
@@ -49,7 +48,7 @@ public class AuthController {
     @Autowired
     JwtTokenProvider tokenProvider;
     @Autowired
-    UserActionAuditEntityRepository userAuditRepo;
+    UserActionAuditRepository userAuditRepo;
 
     private static Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -60,13 +59,13 @@ public class AuthController {
             @RequestHeader(name = "Authorization") String bearerToken) {
         val timeStamp = System.currentTimeMillis();
         userAuditRepo.save(
-                new UserActionAuditEntity(
+                new UserActionAudit(
                         "Logout",
                         "logout attempt for username: " + authentication.getName()
                                 + " token: " + bearerToken));
        return tokenProvider.getAuthorizationBearer(bearerToken).map(token -> {
-            if (!SecUserEntityRepository.blackListedTokenPresent(token)) {
-                SecUserEntityRepository.addBlackListedToken(timeStamp, token);
+            if (!SecUserRepository.blackListedTokenPresent(token)) {
+                SecUserRepository.addBlackListedToken(timeStamp, token);
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().build();
@@ -79,7 +78,7 @@ public class AuthController {
     public ResponseEntity authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         logger.info(LogInfo.withContext("login attempt"));
         userAuditRepo.save(
-                new UserActionAuditEntity("signin", "login attempt for username: " + loginRequest.getUsername()));
+                new UserActionAudit("signin", "login attempt for username: " + loginRequest.getUsername()));
         val authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
@@ -94,7 +93,7 @@ public class AuthController {
     @PostMapping(path = "/signup", consumes = "application/json", produces = "application/json")
     public ResponseEntity registerUser(@Valid @RequestBody SignUpRequest signUpRequestDto) {
 
-        userAuditRepo.save(new UserActionAuditEntity("registerUser", signUpRequestDto.toString()));
+        userAuditRepo.save(new UserActionAudit("registerUser", signUpRequestDto.toString()));
 
         val validedUSer = userService.createUser(signUpRequestDto);
         ResponseEntity<?> response = validedUSer.fold(

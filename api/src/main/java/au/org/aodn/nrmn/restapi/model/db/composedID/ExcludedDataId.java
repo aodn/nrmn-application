@@ -7,11 +7,7 @@ import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
+@Data
 public class ExcludedDataId  implements Serializable {
     private int programId;
     private int siteId;
