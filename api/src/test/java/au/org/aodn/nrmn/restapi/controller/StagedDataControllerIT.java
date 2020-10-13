@@ -82,4 +82,27 @@ class StagedDataControllerIT {
         assertEquals(resp.getBody().getFiles().get(0).getRowCount(), 34);
     }
 
+
+    @Test
+    public void UploadingMultipleCorrectFilesShouldBeOk() throws Exception{
+        val reqUpload = new RequestWrapper<LinkedMultiValueMap<String, Object>, UploadResponse>();
+        val file = new FileSystemResource("src/test/resources/sheets/correctShortHeader.xlsx");
+        val file2 = new FileSystemResource("src/test/resources/sheets/correctShortHeader2.xlsx");
+        val file3 = new FileSystemResource("src/test/resources/sheets/correctShortHeader3.xlsx");
+        LinkedMultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
+        parameters.add("file", file);
+        parameters.add("file", file2);
+        parameters.add("file", file3);
+        parameters.add("withInvertSize", false);
+
+        val resp = reqUpload
+                .withContentType(MediaType.MULTIPART_FORM_DATA)
+                .withEntity(parameters)
+                .withMethod(HttpMethod.POST)
+                .withResponseType(UploadResponse.class)
+                .withUri(_createUrl("/api/stage/upload"))
+                .build(testRestTemplate);
+        assertEquals(resp.getStatusCode(), HttpStatus.OK);
+        assertEquals(resp.getBody().getFiles().size(), 3);
+    }
 }
