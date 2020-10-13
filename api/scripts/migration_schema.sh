@@ -13,3 +13,7 @@ echo "Updating migration.sql from 17-nec-hob..."
 
 pg_dump -v -h 17-nec-hob.emii.org.au -p 5432 --no-acl --no-owner --schema nrmn \
   --schema-only nrmn_migration --disable-dollar-quoting > "$PROJECT_DIR/src/main/resources/sql/migration.sql"
+
+# remove line setting search_path to '' so that we can find postgis functions/tables/types
+# after running this script
+sed -i 's/SELECT pg_catalog.set_config.*//' "$PROJECT_DIR/src/main/resources/sql/migration.sql"
