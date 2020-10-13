@@ -68,12 +68,9 @@ public class StagedSurveyEntity {
     @Column(name = "direction")
     private String direction;
 
-    @Column(name = "time")
-    private Double time;
-
     @JsonProperty(value = "P-Qs")
     @Column(name = "PQs")
-    private Integer PQs;
+    private String PQs;
 
     @Column(name = "code")
     private String code;
@@ -105,7 +102,7 @@ public class StagedSurveyEntity {
 
     @Column(name = "measure_value", columnDefinition = "json")
     @Type(type = "jsonb")
-    private Map<String, Double> measureJson;
+    private Map<String, Integer> measureJson;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private StagedJobEntity stagedJob;

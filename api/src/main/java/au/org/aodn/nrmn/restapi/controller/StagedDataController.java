@@ -1,6 +1,8 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
+import au.org.aodn.nrmn.restapi.dto.stage.FileUpload;
+import au.org.aodn.nrmn.restapi.dto.stage.UploadResponse;
 import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
 import au.org.aodn.nrmn.restapi.repository.StagedSurveyEntityRepository;
 import au.org.aodn.nrmn.restapi.service.SpreadSheetService;
@@ -24,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,7 +42,7 @@ public class StagedDataController {
     StagedSurveyEntityRepository stagedSurveyRepo;
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploTadFiles(
+    public ResponseEntity<UploadResponse> uploTadFiles(
             @RequestParam("withInvertSize") Boolean withInvertSize,
             @RequestParam("file") MultipartFile[] files) {
         val validationHelper = new ValidatorHelpers();
@@ -47,13 +50,12 @@ public class StagedDataController {
         val validatedSheets = Stream.of(files)
                 .flatMap(file ->
                         Maybe.attempt(() -> {
-                        Validated<ErrorInput,Seq<SheetWithHeader>> valid =    sheetService.validExcelFile(
-                                    file.getName() + "-" + System.currentTimeMillis(),
+                            Validated<ErrorInput, Seq<SheetWithHeader>> valid = sheetService.validatedExcelFile(
+                                    file.getOriginalFilename() + "-" + System.currentTimeMillis(),
                                     new XSSFWorkbook(file.getInputStream()),
                                     withInvertSize).bimap(err -> err, Seq::of);
-                        return valid;
-                        })
-                                .stream()
+                            return valid;
+                        }).stream()
                 ).reduce((acc, validator) ->
                         acc.combine(Monoids.seqConcat(), validator))
                 .orElseGet(() ->
@@ -62,14 +64,17 @@ public class StagedDataController {
         List<ErrorInput> errors = validationHelper.toErrorList(validatedSheets);
 
         return validatedSheets.fold(
-                err -> ResponseEntity.unprocessableEntity().body(errors),
+                err -> ResponseEntity.unprocessableEntity().body(new UploadResponse(Collections.emptyList(), errors)),
                 sheets -> {
-                    //Todo process the sheets here
-                    List<StagedSurveyEntity> stagedSurveys = sheets.stream()
-                            .flatMap(sheet -> sheetService.sheets2Staged(sheet).stream())
+                    //sheets are valid
+                    val filesResult = sheets.stream()
+                            .map(sheet -> {
+                                val stagedSurveyToSave = sheetService.sheets2Staged(sheet);
+                                stagedSurveyRepo.saveAll(stagedSurveyToSave);
+                                return new FileUpload(sheet.getFileId(), stagedSurveyToSave.size());
+                            })
                             .collect(Collectors.toList());
-                    stagedSurveyRepo.saveAll(stagedSurveys);
-                    return ResponseEntity.status(HttpStatus.OK).build();
+                    return ResponseEntity.status(HttpStatus.OK).body(new UploadResponse(filesResult, Collections.emptyList()));
                 }
         );
     }

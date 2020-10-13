@@ -20,7 +20,7 @@ class SpreadSheetServiceTest {
         InputStream rottnestInput = getClass()
                 .getClassLoader().getResourceAsStream("sheets/correctShortHeader.xlsx");
         val validSheet =
-                sheetService.validExcelFile("idfile", new XSSFWorkbook(rottnestInput), false);
+                sheetService.validatedExcelFile("idfile", new XSSFWorkbook(rottnestInput), false);
         assertTrue(validSheet.isValid());
     }
 
@@ -29,7 +29,7 @@ class SpreadSheetServiceTest {
         InputStream rottnestInput = getClass()
                 .getClassLoader().getResourceAsStream("sheets/correctLongHeader.xlsx");
         val validSheet =
-                sheetService.validExcelFile("idfile",new XSSFWorkbook(rottnestInput), true);
+                sheetService.validatedExcelFile("idfile",new XSSFWorkbook(rottnestInput), true);
         assertTrue(validSheet.isValid());
     }
 
@@ -38,7 +38,7 @@ class SpreadSheetServiceTest {
         InputStream rottnestInput = getClass()
                 .getClassLoader().getResourceAsStream("sheets/missingDataSheet.xlsx");
         val validSheet =
-                sheetService.validExcelFile("idfile", new XSSFWorkbook(rottnestInput), false);
+                sheetService.validatedExcelFile("idfile", new XSSFWorkbook(rottnestInput), false);
         assertTrue(validSheet.isInvalid());
     }
 
@@ -46,7 +46,7 @@ class SpreadSheetServiceTest {
     public void missingColunmsSheethouldBeInvalid() throws Exception {
         InputStream rottnestInput = getClass()
                 .getClassLoader().getResourceAsStream("sheets/missingColumnsHeader.xlsx");
-        val validSheet = sheetService.validExcelFile("idfile",new XSSFWorkbook(rottnestInput), false);
+        val validSheet = sheetService.validatedExcelFile("idfile",new XSSFWorkbook(rottnestInput), false);
         assertTrue(validSheet.isInvalid());
     }
 }
