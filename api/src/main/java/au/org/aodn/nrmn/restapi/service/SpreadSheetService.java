@@ -8,6 +8,7 @@ import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.StagedJobEntityRepository;
 import au.org.aodn.nrmn.restapi.service.model.HeaderCellIndex;
 import au.org.aodn.nrmn.restapi.service.model.SheetWithHeader;
+import cyclops.control.Future;
 import cyclops.control.Maybe;
 import cyclops.control.Validated;
 import lombok.val;
@@ -17,6 +18,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -37,9 +40,15 @@ public class SpreadSheetService {
     @Autowired
     private StagedJobEntityRepository jobRepo;
 
+    @Autowired
+    private S3IO s3client;
+
     public Validated<ErrorInput, SheetWithHeader> validatedExcelFile(String fileId,
-                                                                     Workbook book,
-                                                                     Boolean withInvertedSize) {
+                                                                     MultipartFile excelFile,
+                                                                     Boolean withInvertedSize,
+                                                                     S3Client s3Client) throws Exception {
+        val book = new XSSFWorkbook(excelFile.getInputStream());
+        s3client.setClient(s3Client);
         val evaluator = new XSSFFormulaEvaluator((XSSFWorkbook) book);
         DataFormatter defaultFormat = new DataFormatter();
 
@@ -75,7 +84,7 @@ public class SpreadSheetService {
                     )
             );
         }
-
+        Future.of(() -> s3client.write(fileId, excelFile));
         return Validated.valid(new SheetWithHeader(fileId, headers, sheet));
     }
 
@@ -105,8 +114,8 @@ public class SpreadSheetService {
                 .filter(i ->
                         Maybe.attempt(() ->
                                 dataSheet.getSheet().getRow(i).isFormatted() &&
-                               ! _getCellValue(dataSheet.getSheet().getRow(i).getCell(headerMap.get("ID")), eval, fmt).equals("")
-                         ).orElseGet(() -> false)
+                                        !_getCellValue(dataSheet.getSheet().getRow(i).getCell(headerMap.get("ID")), eval, fmt).equals("")
+                        ).orElseGet(() -> false)
                 ).mapToObj(index -> {
                     val row = dataSheet.getSheet().getRow(index);
                     val stagedSurvey = new StagedSurveyEntity();
@@ -116,10 +125,10 @@ public class SpreadSheetService {
                     stagedSurvey.setSiteName(_getCellValue(row.getCell(headerMap.get("Site Name")), eval, fmt));
                     stagedSurvey.setLatitude(safeDouble(_getCellValue(row.getCell(headerMap.get("Latitude")), eval, fmt)));
                     stagedSurvey.setLongitude(safeDouble(_getCellValue(row.getCell(headerMap.get("Longitude")), eval, fmt)));
-                    val date = Maybe.attempt(() ->{
-                              val time =  _getCellValue(row.getCell(headerMap.get("Time")), eval, fmt);
-                              val dayMonthYear = _getCellValue(row.getCell(headerMap.get("Date")), eval, fmt);
-                              return  formatter.parse(dayMonthYear + " " + time);
+                    val date = Maybe.attempt(() -> {
+                        val time = _getCellValue(row.getCell(headerMap.get("Time")), eval, fmt);
+                        val dayMonthYear = _getCellValue(row.getCell(headerMap.get("Date")), eval, fmt);
+                        return formatter.parse(dayMonthYear + " " + time);
                     }).orElseGet(() -> null);
                     stagedSurvey.setDate(date);
                     stagedSurvey.setVis(safeInt(_getCellValue(row.getCell(headerMap.get("vis")), eval, fmt)));

@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,14 +47,15 @@ public class StagedDataController {
             @RequestParam("withInvertSize") Boolean withInvertSize,
             @RequestParam("file") MultipartFile[] files) {
         val validationHelper = new ValidatorHelpers();
-
+        val s3Client = S3Client.create();
         val validatedSheets = Stream.of(files)
                 .flatMap(file ->
                         Maybe.attempt(() -> {
                             Validated<ErrorInput, Seq<SheetWithHeader>> valid = sheetService.validatedExcelFile(
                                     file.getOriginalFilename() + "-" + System.currentTimeMillis(),
-                                    new XSSFWorkbook(file.getInputStream()),
-                                    withInvertSize).bimap(err -> err, Seq::of);
+                                    file,
+                                    withInvertSize,
+                                    s3Client).bimap(err -> err, Seq::of);
                             return valid;
                         }).stream()
                 ).reduce((acc, validator) ->

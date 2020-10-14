@@ -2,17 +2,26 @@ package au.org.aodn.nrmn.restapi.service;
 
 import lombok.val;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.multipart.MultipartFile;
+import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.testcontainers.containers.localstack.LocalStackContainer.Service.S3;
 
 @Testcontainers
 @SpringBootTest
@@ -21,12 +30,22 @@ class SpreadSheetServiceTest {
     @Autowired
     SpreadSheetService sheetService;
 
+    @Rule
+    public LocalStackContainer localstack = new LocalStackContainer()
+            .withServices(S3);
     @Test
     public void correctShortheaderShouldBeValid() throws Exception {
-        InputStream rottnestInput = getClass()
+        val S3Client = getClient();
+
+       val rottnestInput = getClass()
                 .getClassLoader().getResourceAsStream("sheets/correctShortHeader.xlsx");
-        val validSheet =
-                sheetService.validatedExcelFile("idfile", new XSSFWorkbook(rottnestInput), false);
+
+       val validSheet =
+                sheetService.validatedExcelFile(
+                        "idfileShortValid-1234",
+                        new MockMultipartFile("sheets/correctShortHeader.xsx",rottnestInput),
+                        false,
+                        S3Client);
         assertTrue(validSheet.isValid());
     }
 
@@ -35,7 +54,11 @@ class SpreadSheetServiceTest {
         InputStream rottnestInput = getClass()
                 .getClassLoader().getResourceAsStream("sheets/correctLongHeader.xlsx");
         val validSheet =
-                sheetService.validatedExcelFile("idfile",new XSSFWorkbook(rottnestInput), true);
+                sheetService.validatedExcelFile(
+                        "idfileLongValid-1234",
+                        new MockMultipartFile("sheets/correctLongHeader.xsx",rottnestInput),
+                        true,
+                        getClient());
         assertTrue(validSheet.isValid());
     }
 
@@ -44,7 +67,11 @@ class SpreadSheetServiceTest {
         InputStream rottnestInput = getClass()
                 .getClassLoader().getResourceAsStream("sheets/missingDataSheet.xlsx");
         val validSheet =
-                sheetService.validatedExcelFile("idfile", new XSSFWorkbook(rottnestInput), false);
+                sheetService.validatedExcelFile(
+                        "idfileMissingInvalid-123",
+                        new MockMultipartFile("sheets/missingDataSheet.xsx",rottnestInput),
+                        false,
+                        getClient());
         assertTrue(validSheet.isInvalid());
     }
 
@@ -52,14 +79,22 @@ class SpreadSheetServiceTest {
     public void missingColunmsSheethouldBeInvalid() throws Exception {
         InputStream rottnestInput = getClass()
                 .getClassLoader().getResourceAsStream("sheets/missingColumnsHeader.xlsx");
-        val validSheet = sheetService.validatedExcelFile("idfile",new XSSFWorkbook(rottnestInput), false);
+        val validSheet = sheetService.validatedExcelFile(
+                "idfileInvalid-1245",
+                new MockMultipartFile("sheets/missingColumnsHeader.xsx",rottnestInput),
+                false,
+                getClient());
         assertTrue(validSheet.isInvalid());
     }
 
 
     @Test void  validFileShouldBeCorrectlyTransformToStageSurvey() throws Exception {
         val file3 = new FileSystemResource("src/test/resources/sheets/correctShortHeader3.xlsx");
-        val sheetWithHeader = sheetService.validatedExcelFile("testFile-1234561",new XSSFWorkbook(file3.getInputStream()), false).orElseGet(() -> null);
+        val sheetWithHeader = sheetService.validatedExcelFile(
+                "testFile-1234561",
+                new MockMultipartFile("sheets/correctShortHeader3.xsx",file3.getInputStream()),
+                false,
+                getClient()).orElseGet(() -> null);
         val stageSurveys = sheetService.sheets2Staged(sheetWithHeader);
         assertEquals(stageSurveys.size(), 2);
          val obs1 = stageSurveys.get(0);
@@ -72,7 +107,16 @@ class SpreadSheetServiceTest {
         assertEquals(obs1.getMeasureJson().get("162.5"), 4);
         // test Macro
         assertEquals(obs1.getSpecies(), "Caesioperca rasor");
+    }
 
-
+    private S3Client getClient() {
+        return S3Client
+                .builder()
+                .endpointOverride(localstack.getEndpointOverride(LocalStackContainer.Service.S3))
+                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(
+                        localstack.getAccessKey(), localstack.getSecretKey()
+                )))
+                .region(Region.of(localstack.getRegion()))
+                .build();
     }
 }
