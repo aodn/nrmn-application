@@ -9,6 +9,7 @@ import {connect} from "react-redux";
 import store from "../store";
 import {logout} from "../import/reducers/auth-reducer";
 import {toggleLogoutMenuOpen} from "../import/reducers/redux-layout";
+import * as axios from "../../axios/api";
 
 
 const LogoutDialog = (props) => {
@@ -19,7 +20,13 @@ const LogoutDialog = (props) => {
   };
 
   const handleClose = () => {
-    store.dispatch(logout())
+    axios.userLogout().then( () =>
+        store.dispatch(logout())
+    ).catch(error => {
+      if (error.response) {
+        console.log(error.response)
+      }
+    });
     handleCancel();
   };
 
