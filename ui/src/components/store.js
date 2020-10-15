@@ -5,7 +5,7 @@ import {
 } from "@reduxjs/toolkit";
 
 import { themeReducer } from './import/reducers/theme-reducer';
-import { toggleReducer } from './layout/redux-layout';
+import { toggleReducer } from './import/reducers/redux-layout';
 import { importReducer } from "./import/reducers/create-import";
 import { authReducer } from "./import/reducers/auth-reducer";
 import { listFileReducer } from "./import/reducers/list-import";

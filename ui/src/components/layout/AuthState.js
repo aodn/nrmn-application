@@ -1,10 +1,11 @@
 import React from "react";
 import {connect} from "react-redux";
 import store from '../store';
-import { login, logout} from '../import/reducers/auth-reducer'
 import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import { TopbarButton } from './TopbarButton'
+import Logout from "../auth/logout";
+import {toggleLogoutMenuOpen} from "../import/reducers/redux-layout";
 
 const basicButton = {
   textTransform: 'none',
@@ -13,21 +14,18 @@ const basicButton = {
 
 class AuthState extends React.Component {
 
-  handleLogin = () => {
-    store.dispatch(login())
-  }
-
-  handleLogout = () => {
-    store.dispatch(logout())
+  openLogout = () => {
+    store.dispatch(toggleLogoutMenuOpen())
   }
 
   render(){
 
-    const { loggedIn, username } = this.props;
+    const { username } = this.props;
 
     return (
+
         <>
-          { (loggedIn) ?
+          { (username) ?
               <>
                 <TopbarButton
                     variant="text"
@@ -36,18 +34,15 @@ class AuthState extends React.Component {
                     title={"Log out"}
                     style={ basicButton}
                     startIcon={<VerifiedUserIcon />}
-                    onClick={this.handleLogout}> Logged in as '{ username }'</TopbarButton>
+                    onClick={this.openLogout}> Logged in as '{ username }'</TopbarButton>
+                <Logout />
               </> :
               <>
-                <TopbarButton  variant="text"
-                         color="secondary"
-                         size="small"
-                         to="/register">Register</TopbarButton> |
                 <TopbarButton
                         color="secondary"
                         size="small"
                         startIcon={<AccountCircle />}
-                        onClick={this.handleLogin}
+                        href="login"
                 >Login</TopbarButton>
               </>
           }
@@ -58,7 +53,6 @@ class AuthState extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    loggedIn: state.auth.loggedIn,
     username: state.auth.username
   };
 }

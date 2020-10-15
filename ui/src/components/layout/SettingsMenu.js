@@ -13,7 +13,7 @@ const handleToggleThemeChange = event => {
   store.dispatch(toggleTheme(event.target.checked))
 }
 
-const SettingsMenu = ({ }) => {
+const SettingsMenu = () => {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const handleSettingsClick = (event) => {
