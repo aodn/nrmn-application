@@ -2,23 +2,30 @@ import {
   createSlice
 } from "@reduxjs/toolkit";
 
-
-const initialState = {
-  loggedIn: false,
-  username: 'unknown'
-}
+const initialState = JSON.parse(localStorage.getItem('auth')) || {}
 
 const authSlice = createSlice({
   name: "auth",
   initialState: initialState,
   reducers: {
     login: (state, action) => {
-      state.loggedIn = !state.loggedIn;
-      state.username = 'trusted-person';
+
+      if (action.payload.status === 200) {
+        state = action.payload.data;
+        // TODO get username/role from API payload
+        state.username = JSON.parse(action.payload.config.data).username;
+        localStorage.setItem('auth', JSON.stringify(state));
+        state.errors = undefined;
+        window.location = "/"
+      }
+      else {
+        state.errors = "ERROR: " + action.payload.data.message;
+      }
     },
     logout: (state, action) => {
-      state.loggedIn = !state.loggedIn;
-      state.username = 'unknown';
+      state = {};
+      localStorage.clear();
+      window.location = "/"
     }
   },
 });
