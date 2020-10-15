@@ -1,10 +1,11 @@
 import axiosInstance from "./index.js";
-import axios from "axios"; // will be useful to access to axios.all and axios.spread
+import axios from "axios";
+import store from "../components/store"; // will be useful to access to axios.all and axios.spread
 
 function getToken() {
-  // const token = store.getState().user.accessToken;
-  // const tokenType = store.getState().user.tokenType;
-  // return `${tokenType} ${token}`;
+   const token = store.getState().auth.accessToken;
+   const tokenType = store.getState().auth.tokenType;
+   return `${tokenType} ${token}`;
 }
 
 // siteConfig loaded into react-global-configuration
@@ -22,11 +23,16 @@ export const resetPassword = data => {
 export const changePassword = data => {
   return axiosInstance.post("/api/auth/changePassword", data);
 };
+
 export const userLogin = params => {
   return axiosInstance.post("/api/auth/signin", {
     username: params.username,
     password: params.password
   });
+};
+export const userLogout = () => {
+  const headers = { Authorization: getToken()};
+  return axiosInstance.post("/api/auth/signout", {} , { headers });
 };
 
 // User
