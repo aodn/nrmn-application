@@ -11,6 +11,7 @@
     <groupId>au.org.aodn.nrmn</groupId>
     <artifactId>nrmn</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>war</packaging>
     <name>National Reef Monitoring Network</name>
     <description>Project for the NRMN database</description>
 

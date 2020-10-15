@@ -26,7 +26,7 @@ pipeline {
             post {
                 success {
                     dir('api/target/') {
-                        archiveArtifacts artifacts: 'nrmn-*.jar', fingerprint: true, onlyIfSuccessful: true
+                        archiveArtifacts artifacts: 'nrmn-*.war', fingerprint: true, onlyIfSuccessful: true
                     }
                 }
             }
