@@ -24,21 +24,24 @@ done
 
 WEBAPP_DIR=./nrmn-ui
 API_DIR=./api
+NETWORK_TIMEOUT=1000000
 
 # set caching folder
 #yarn config set cache-folder /home/builder/.cache/yarn
 
 # install node packages
-yarn --cwd $WEBAPP_DIR install
+yarn --cwd $WEBAPP_DIR --network-timeout $NETWORK_TIMEOUT --ignore-optional install
 
 # build storybook
 yarn --cwd $WEBAPP_DIR ci-build-storybook
 
 # build the react app
+export REACT_APP_VERSION=${BUILD_TAG-"no version"}
 if "$skip_ui_yarn"; then
   echo "Skipping yarn ui tests"
   yarn --cwd $WEBAPP_DIR build
 else
+  echo "Building version" $REACT_APP_VERSION
   yarn --cwd $WEBAPP_DIR test-build
 fi
 
