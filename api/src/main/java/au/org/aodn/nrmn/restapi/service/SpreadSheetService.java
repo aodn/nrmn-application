@@ -38,17 +38,13 @@ public class SpreadSheetService {
     private List<String> longHeadersRef;
 
     @Autowired
-    private StagedJobEntityRepository jobRepo;
-
-    @Autowired
     private S3IO s3client;
+
 
     public Validated<ErrorInput, SheetWithHeader> validatedExcelFile(String fileId,
                                                                      MultipartFile excelFile,
-                                                                     Boolean withInvertedSize,
-                                                                     S3Client s3Client) throws Exception {
+                                                                     Boolean withInvertedSize) throws Exception {
         val book = new XSSFWorkbook(excelFile.getInputStream());
-        s3client.setClient(s3Client);
         val evaluator = new XSSFFormulaEvaluator((XSSFWorkbook) book);
         DataFormatter defaultFormat = new DataFormatter();
 
@@ -84,7 +80,7 @@ public class SpreadSheetService {
                     )
             );
         }
-        Future.of(() -> s3client.write(fileId, excelFile));
+        Future.of(() -> s3client.write("/raw-survey/" + fileId + ".xlsx", excelFile));
         return Validated.valid(new SheetWithHeader(fileId, headers, sheet));
     }
 
@@ -102,12 +98,6 @@ public class SpreadSheetService {
                 Maybe.attempt(() -> Float.parseFloat(h.getName())).isPresent()
         ).collect(Collectors.toList());
 
-        val stagedJob = jobRepo.save(
-                new StagedJobEntity(
-                        dataSheet.getFileId(),
-                        StatusJobType.PENDING,
-                        SourceJobType.FILE, new HashMap<>()
-                ));
 
         List<StagedSurveyEntity> stagedSurveys = IntStream
                 .range(2, dataSheet.getSheet().getPhysicalNumberOfRows())
@@ -157,7 +147,6 @@ public class SpreadSheetService {
                             measureJson.put(header.getName(), cellValue);
                     });
                     stagedSurvey.setMeasureJson(measureJson);
-                    stagedSurvey.setStagedJob(stagedJob);
                     return stagedSurvey;
                 }).collect(Collectors.toList());
         return stagedSurveys;

@@ -5,10 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @AllArgsConstructor
 public class UploadResponse {
-    private List<FileUpload> files;
+    private Optional<FileUpload> file;
     private List<ErrorInput> errors;
 }
