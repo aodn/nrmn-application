@@ -55,7 +55,7 @@ public class StagedDataController {
 
     @PostMapping("/upload")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
-    public ResponseEntity<UploadResponse> uploTadFiles(
+    public ResponseEntity<UploadResponse> uploadFile(
             @RequestParam("withInvertSize") Boolean withInvertSize,
             @RequestParam("file") MultipartFile file, Authentication authentication) {
 
