@@ -9,8 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-
 @Repository
 public interface SecRoleRepository extends JpaRepository<SecRole, String>, JpaSpecificationExecutor<SecUser> {
-  Optional<SecRole>  findByName(SecRoleName name);
+    Optional<SecRole> findByName(SecRoleName name);
 }

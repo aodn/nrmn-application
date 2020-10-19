@@ -1,5 +1,7 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +13,8 @@ import javax.persistence.Table;
 
 @Entity
 @Data
+@AllArgsConstructor
+@Builder
 @NoArgsConstructor
 @Table(name = "aphia_rel_type_ref")
 public class AphiaRelType {

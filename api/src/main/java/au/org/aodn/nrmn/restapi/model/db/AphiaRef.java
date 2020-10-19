@@ -1,5 +1,7 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +17,9 @@ import java.sql.Timestamp;
 
 @Entity
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "aphia_ref")
 public class AphiaRef {
     @Id
@@ -100,23 +104,23 @@ public class AphiaRef {
 
     @Basic
     @Column(name = "is_marine")
-    private Boolean marine;
+    private Boolean isMarine;
 
     @Basic
     @Column(name = "is_brackish")
-    private Boolean brackish;
+    private Boolean isBrackish;
 
     @Basic
     @Column(name = "is_freshwater")
-    private Boolean freshwater;
+    private Boolean isFreshwater;
 
     @Basic
     @Column(name = "is_terrestrial")
-    private Boolean terrestrial;
+    private Boolean isTerrestrial;
 
     @Basic
     @Column(name = "is_extinct")
-    private Boolean extinct;
+    private Boolean isExtinct;
 
     @Basic
     @Column(name = "match_type")

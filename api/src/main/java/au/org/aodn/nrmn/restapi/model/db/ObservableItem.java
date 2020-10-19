@@ -1,6 +1,8 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
@@ -27,6 +29,8 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "observable_item_ref")
 @Audited(withModifiedFlag = true)
 public class ObservableItem {
@@ -45,25 +49,39 @@ public class ObservableItem {
     @Type(type = "jsonb")
     private Map<String, String> obsItemAttribute;
 
-    @OneToOne(cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
+    @OneToOne(mappedBy = "observableItem", cascade = CascadeType.ALL)
     private LengthWeight lengthWeight;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "obs_item_type_id", referencedColumnName = "obs_item_type_id", nullable = false)
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     @JsonIgnore
     private ObsItemType obsItemType;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aphia_id", referencedColumnName = "aphia_id")
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     @JsonIgnore
     private AphiaRef aphiaRef;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aphia_rel_type_id", referencedColumnName = "aphia_rel_type_id")
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     @JsonIgnore
     private AphiaRelType aphiaRelType;
+
+    // Override lengthWeight setter to ensure required updates to lengthWeight.observableItem 
+    // (new and old if any) are performed at the same time
+    public void setLengthWeight(LengthWeight lengthWeight) {
+        if (lengthWeight == null) {
+            if (this.lengthWeight != null) {
+                this.lengthWeight.setObservableItem(null);
+            }
+        } else {
+            lengthWeight.setObservableItem(this);
+        }
+        this.lengthWeight = lengthWeight;
+    }
+
 }

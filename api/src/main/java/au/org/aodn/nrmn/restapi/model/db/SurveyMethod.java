@@ -1,8 +1,12 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 
@@ -16,15 +20,19 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.util.Map;
+import java.util.Set;
 
 import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "survey_method")
 @Audited(withModifiedFlag = true)
 public class SurveyMethod {
@@ -47,12 +55,17 @@ public class SurveyMethod {
     @Type(type = "jsonb")
     private Map<String, String> surveyMethodAttribute;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "surveyMethod", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Observation> observations;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "survey_id", referencedColumnName = "survey_id", nullable = false)
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Survey survey;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "method_id", referencedColumnName = "method_id", nullable = false)
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     @JsonIgnore
