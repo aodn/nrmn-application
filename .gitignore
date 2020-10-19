@@ -32,5 +32,6 @@ yarn-error.log*
 .classpath*
 *.iml*
 node_modules
+node
 
 target
