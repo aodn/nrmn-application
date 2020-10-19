@@ -1,7 +1,11 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.Basic;
@@ -17,6 +21,8 @@ import javax.persistence.Table;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Audited(withModifiedFlag = true)
 @Table(name = "lengthweight_ref")
 public class LengthWeight {
@@ -42,6 +48,8 @@ public class LengthWeight {
 
     @OneToOne
     @MapsId
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @JoinColumn(name = "observable_item_id", foreignKey = @ForeignKey(name = "lengthweight_observable_item_fk"))
     private ObservableItem observableItem;
 }

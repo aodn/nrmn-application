@@ -93,6 +93,8 @@ CREATE TABLE nrmn.observation_aud (
     measure_mod boolean,
     observable_item_id integer,
     observable_item_mod boolean,
+    survey_method_id integer,
+    survey_method_mod boolean,
     CONSTRAINT observation_aud_pkey PRIMARY KEY (observation_id, rev)
 );
 
@@ -108,6 +110,7 @@ CREATE TABLE nrmn.survey_method_aud (
     survey_not_done_mod boolean,
     method_id integer,
     method_mod boolean,
+    observations_mod boolean,
     survey_id integer,
     survey_mod boolean,
     CONSTRAINT survey_method_aud_pkey PRIMARY KEY (survey_method_id, rev)
@@ -135,6 +138,7 @@ CREATE TABLE nrmn.survey_aud (
     program_mod boolean,
     site_id integer,
     site_mod boolean,
+    survey_methods_mod boolean,
     CONSTRAINT survey_aud_pkey PRIMARY KEY (survey_id, rev)
 );
 
