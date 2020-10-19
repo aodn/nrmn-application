@@ -66,7 +66,7 @@ class StagedDataControllerIT {
     int randomServerPort;
 
     @BeforeAll
-    static public void tearUp() {
+    static public void setup() {
         localstack.start();
         client = S3Client
                 .builder()
