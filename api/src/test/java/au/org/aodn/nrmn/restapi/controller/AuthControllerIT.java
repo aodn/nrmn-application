@@ -38,7 +38,7 @@ public class AuthControllerIT {
     public void signup() throws Exception {
 
         RequestWrapper<SignUpRequest, SecUserEntity> reqBuilder = new RequestWrapper<SignUpRequest, SecUserEntity>();
-        val signupReq = new SignUpRequest("test@hello.com", "FirstName TestName", "#12Trois", Collections.emptyList());
+        val signupReq = new SignUpRequest("tj@gmail.com", "FirstName TestName", "#12Trois", Collections.emptyList());
 
         ResponseEntity<SecUserEntity> response = reqBuilder
                 .withAppJson()
@@ -49,13 +49,13 @@ public class AuthControllerIT {
                 .build(testRestTemplate);
 
         assertEquals(response.getStatusCode(), HttpStatus.CREATED);
-        assertEquals(response.getBody().getEmail(), "test@hello.com");
+        assertEquals(response.getBody().getEmail(), "tj@gmail.com");
 
     }
 
     @Test
     public void loginLogout() throws Exception {
-        val logReq = new LoginRequest("test@hello.com", "#12Trois");
+        val logReq = new LoginRequest("test@gmail.com", "#12Trois");
         val reqBuilder = new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
 
         ResponseEntity<JwtAuthenticationResponse> response = reqBuilder
@@ -81,7 +81,7 @@ public class AuthControllerIT {
 
         val surveyResp = surveyReadyReq.build(testRestTemplate);
 
-        assertEquals(surveyResp.getBody().size(), 4);
+        assertEquals(surveyResp.getBody().size(), 5);
 
         val logOutReq = new RequestWrapper<Void, Void>();
         val resp = logOutReq
@@ -123,7 +123,7 @@ public class AuthControllerIT {
     @Test
     public void badSignup() throws Exception {
         RequestWrapper<SignUpRequest, SecUserEntity> reqBuilder = new RequestWrapper<SignUpRequest, SecUserEntity>();
-        val signupReq = new SignUpRequest("test_hello.com", "F", "#12Trois", Collections.emptyList());
+        val signupReq = new SignUpRequest("test@gmail.com", "F", "#12Trois", Collections.emptyList());
 
         ResponseEntity<SecUserEntity> response = reqBuilder
                 .withAppJson()

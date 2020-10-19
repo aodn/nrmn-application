@@ -89,7 +89,7 @@ class StagedDataControllerIT {
 
 
     @Test
-    @WithUserDetails("tj@gmail.com")
+    @WithUserDetails("test@gmail.com")
     public void UploadingShortCorrectIngestFileShouldbeOK() throws Exception {
         Mockito.when(provider.getClient()).thenReturn(client);
         val auth = getContext().getAuthentication();
@@ -119,7 +119,7 @@ class StagedDataControllerIT {
     }
 
     @Test
-    @WithUserDetails("tj@gmail.com")
+    @WithUserDetails("test@gmail.com")
     public void UploadingLongCorrectIngestFileShouldbeOK() throws Exception {
         Mockito.when(provider.getClient()).thenReturn(client);
         val auth = getContext().getAuthentication();
