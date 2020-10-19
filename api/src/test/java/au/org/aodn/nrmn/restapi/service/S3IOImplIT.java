@@ -26,7 +26,7 @@ import static org.testcontainers.containers.localstack.LocalStackContainer.Servi
 @Testcontainers
 @SpringBootTest
 @ActiveProfiles("cicd")
-class S3IOImplTest {
+class S3IOImplIT {
 
     public static S3Client client;
 

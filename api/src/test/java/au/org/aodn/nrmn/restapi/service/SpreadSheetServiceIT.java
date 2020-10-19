@@ -29,7 +29,7 @@ import static org.testcontainers.containers.localstack.LocalStackContainer.Servi
 @Testcontainers
 @SpringBootTest
 @ActiveProfiles("cicd")
-public class SpreadSheetServiceTest {
+public class SpreadSheetServiceIT {
 
     @Autowired
     SpreadSheetService sheetService;
