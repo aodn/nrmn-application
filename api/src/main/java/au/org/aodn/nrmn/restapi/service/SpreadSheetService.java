@@ -51,12 +51,12 @@ public class SpreadSheetService {
                         excelFile::getInputStream,
                         XSSFWorkbook::new
                 );
-        if(!attempt.isPresent()){
+        if (!attempt.isPresent()) {
             return Validated.invalid(
                     new ErrorInput("Error while opening the file, Excel 2007 or above required", "file")
             );
         }
-        val book =  attempt.get();
+        val book = attempt.get();
         val evaluator = new XSSFFormulaEvaluator((XSSFWorkbook) book);
         DataFormatter defaultFormat = new DataFormatter();
 

@@ -12,12 +12,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class InputStreamLenderTest {
     @Test
     public void testInputStreamLender() throws Exception {
-        val res = InputStreamLender.lend(() ->
+        val res = InputStreamLender.lend(
+                () ->
                         this.getClass().getClassLoader().getResourceAsStream("application.properties"),
                 (input) -> {
                     assertNotNull(input);
                     return 8;
-                });;
+                });
+        ;
         assertTrue(res.isPresent());
         assertEquals(res.get(), 8);
     }
@@ -32,9 +34,10 @@ class InputStreamLenderTest {
                 (input) -> {
                     assertNotNull(input);
                     return 8;
-                });;
-       val exception = assertThrows(IOException.class,() -> in.get().available());
-       assertEquals(exception.getMessage(), "Stream closed");
+                });
+        ;
+        val exception = assertThrows(IOException.class, () -> in.get().available());
+        assertEquals(exception.getMessage(), "Stream closed");
     }
 
 }
