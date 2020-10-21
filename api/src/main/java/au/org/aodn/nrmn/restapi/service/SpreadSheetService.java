@@ -4,15 +4,15 @@ import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
 import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
 import au.org.aodn.nrmn.restapi.service.model.HeaderCellIndex;
 import au.org.aodn.nrmn.restapi.service.model.SheetWithHeader;
-import au.org.aodn.nrmn.restapi.util.loan.InputStreamLender;
 import cyclops.control.Future;
 import cyclops.control.Maybe;
 import cyclops.control.Try;
 import cyclops.control.Validated;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +27,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@Slf4j
+
 @Service
 public class SpreadSheetService {
+
+    private Logger log = LoggerFactory.getLogger(SpreadSheetService.class);
 
     @Value("${app.excel.headers.short}")
     private List<String> shortHeadersRef;
@@ -49,7 +51,7 @@ public class SpreadSheetService {
 
         val bookOpt = Try.withResources(
                 excelFile::getInputStream, (in) -> {
-                    val res = new XSSFWorkbook(in);
+                    XSSFWorkbook res = new XSSFWorkbook(in);
                     in.close();
                     return res;
                 }).onFail(e ->
@@ -77,7 +79,7 @@ public class SpreadSheetService {
                 .range(firstRow.getFirstCellNum(), firstRow.getLastCellNum())
                 .mapToObj(i -> {
                     evaluator.evaluate(firstRow.getCell(i));
-                    val value = defaultFormat.formatCellValue(firstRow.getCell(i), evaluator);
+                    String value = defaultFormat.formatCellValue(firstRow.getCell(i), evaluator);
                     return new HeaderCellIndex(value, i);
                 }).filter(head -> !head.getName().equals(""))
                 .collect(Collectors.toList());
@@ -85,7 +87,7 @@ public class SpreadSheetService {
         List<String> headerByName = headers.stream()
                 .map(head -> head.getName()).collect(Collectors.toList());
 
-        val missingHeaders = refHeader.stream()
+        List<String> missingHeaders = refHeader.stream()
                 .filter(refHead -> headerByName.stream()
                         .noneMatch(name -> name.equals(refHead)))
                 .collect(Collectors.toList());
@@ -171,11 +173,11 @@ public class SpreadSheetService {
 
 
     private Double safeDouble(String target) {
-        return Maybe.attempt(() -> Double.parseDouble(target)).orElseGet(() -> 0D);
+        return Maybe.attempt(() -> Double.parseDouble(target)).orElseGet(() -> null);
     }
 
     private Integer safeInt(String target) {
-        return Maybe.attempt(() -> Integer.parseInt(target)).orElseGet(() -> 0);
+        return Maybe.attempt(() -> Integer.parseInt(target)).orElseGet(() -> null);
     }
 
     private String _getCellValue(Cell cell, XSSFFormulaEvaluator evaluator, DataFormatter formater) {
