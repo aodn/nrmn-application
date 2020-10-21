@@ -162,7 +162,7 @@ public class SpreadSheetService {
                     val measureJson = new HashMap<String, Integer>();
                     headerNum.forEach(header -> {
                         val cellValue = safeInt(_getCellValue(row.getCell(header.getIndex()), eval, fmt));
-                        if (cellValue > 0)
+                        if (cellValue != null && cellValue > 0)
                             measureJson.put(header.getName(), cellValue);
                     });
                     stagedSurvey.setMeasureJson(measureJson);
