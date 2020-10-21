@@ -32,11 +32,14 @@ public class S3IOImpl implements S3IO {
     public Try<String, Exception> write(String path, MultipartFile file) {
         return Try.withCatch(() -> {
 
+            val requestBody = Try.withResources(() -> file.getInputStream(), (in) -> {
+                val res = RequestBody.fromBytes(IOUtils.toByteArray(in));
+                in.close();
+                return res;
+            }).onFail(e ->
+                    log.error(String.format("Error while reading the file:" + e.getMessage()))
+            ).toOptional();
 
-            val requestBody = InputStreamLender.lend(
-                    file::getInputStream,
-                    (in) -> RequestBody.fromBytes(IOUtils.toByteArray(in))
-            );
             val client = provider.getClient();
             val response = client.
                     putObject(PutObjectRequest.builder().bucket(bucket).key(path)

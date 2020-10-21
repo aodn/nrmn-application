@@ -68,15 +68,11 @@ public class StagedDataController {
 
         val validationHelper = new ValidatorHelpers();
         val validatedSheet =
-                Maybe.attempt(() ->
                         sheetService
                                 .validatedExcelFile(
                                         file.getOriginalFilename() + "-" + System.currentTimeMillis(),
                                         file,
-                                        withInvertSize)
-                ).orElseGet(() ->
-                        Validated.invalid(new ErrorInput("No File provided", "upload"))
-                );
+                                        withInvertSize);
 
         List<ErrorInput> errors = validationHelper.toErrorList(validatedSheet);
 

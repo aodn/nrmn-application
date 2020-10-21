@@ -1,23 +1,21 @@
 package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
-import au.org.aodn.nrmn.restapi.model.db.StagedJobEntity;
 import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
-import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
-import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
-import au.org.aodn.nrmn.restapi.repository.StagedJobEntityRepository;
 import au.org.aodn.nrmn.restapi.service.model.HeaderCellIndex;
 import au.org.aodn.nrmn.restapi.service.model.SheetWithHeader;
 import au.org.aodn.nrmn.restapi.util.loan.InputStreamLender;
-import com.amazonaws.services.simpleworkflow.flow.WorkerBase;
 import cyclops.control.Future;
 import cyclops.control.Maybe;
 import cyclops.control.Try;
 import cyclops.control.Validated;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,10 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@Slf4j
 @Service
 public class SpreadSheetService {
 
@@ -43,20 +41,27 @@ public class SpreadSheetService {
     private S3IO s3client;
 
 
-    public Validated<ErrorInput, SheetWithHeader> validatedExcelFile(String fileId,
-                                                                     MultipartFile excelFile,
-                                                                     Boolean withInvertedSize) throws Exception {
-        val attempt =
-                InputStreamLender.<Workbook>lend(
-                        excelFile::getInputStream,
-                        XSSFWorkbook::new
-                );
-        if (!attempt.isPresent()) {
+    public Validated<ErrorInput, SheetWithHeader>
+    validatedExcelFile(String fileId,
+                       MultipartFile excelFile,
+                       Boolean withInvertedSize) {
+
+
+        val bookOpt = Try.withResources(
+                excelFile::getInputStream, (in) -> {
+                    val res = new XSSFWorkbook(in);
+                    in.close();
+                    return res;
+                }).onFail(e ->
+                log.error(String.format("Error while reading the excelFile:" + e.getMessage()))
+        ).toOptional();
+
+        if (!bookOpt.isPresent()) {
             return Validated.invalid(
                     new ErrorInput("Error while opening the file, Excel 2007 or above required", "file")
             );
         }
-        val book = attempt.get();
+        val book = bookOpt.get();
         val evaluator = new XSSFFormulaEvaluator((XSSFWorkbook) book);
         DataFormatter defaultFormat = new DataFormatter();
 
