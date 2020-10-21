@@ -7,7 +7,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
-import { toggleLeftSideMenu } from '../import/reducers/redux-layout';
+import { toggleLeftSideMenu } from './layout-reducer';
 import { connect } from 'react-redux';
 import store from '../store';
 import AuthState from "./AuthState";

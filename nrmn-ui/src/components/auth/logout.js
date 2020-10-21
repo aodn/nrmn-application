@@ -5,31 +5,25 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import {connect} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {logoutSubmitted} from "./auth-reducer";
+import {toggleLogoutMenuOpen} from "../layout/layout-reducer";
 import store from "../store";
-import {logout} from "../import/reducers/auth-reducer";
-import {toggleLogoutMenuOpen} from "../import/reducers/redux-layout";
-import * as axios from "../../axios/api";
 
 
-const LogoutDialog = (props) => {
-  const { logoutMenuOpen, username } = props;
+function Logout() {
+  const dispatch = useDispatch();
+  const logoutMenuOpen = useSelector(state => state.toggle.logoutMenuOpen);
+  const username = useSelector(state => state.auth.username);
 
   const handleCancel = () => {
     store.dispatch(toggleLogoutMenuOpen());
   };
 
-  const handleClose = () => {
-    axios.userLogout().then( () =>
-        store.dispatch(logout())
-    ).catch(error => {
-      if (error.response) {
-        console.log(error.response)
-      }
-    });
+  const handleClose = (form) => {
+    dispatch(logoutSubmitted(form.formData));
     handleCancel();
   };
-
 
   return (
       <>
@@ -56,12 +50,5 @@ const LogoutDialog = (props) => {
       </>
   );
 }
-const mapStateToProps = (state) => {
-  return {
-    logoutMenuOpen: state.toggle.logoutMenuOpen,
-    username: state.auth.username
-  };
-};
 
-const Logout = connect(mapStateToProps)(LogoutDialog);
 export default Logout;

@@ -5,7 +5,7 @@ import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import { TopbarButton } from './TopbarButton'
 import Logout from "../auth/logout";
-import {toggleLogoutMenuOpen} from "../import/reducers/redux-layout";
+import {toggleLogoutMenuOpen} from "./layout-reducer";
 
 const basicButton = {
   textTransform: 'none',

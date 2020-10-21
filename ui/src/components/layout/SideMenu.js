@@ -18,7 +18,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
 import StarBorder from '@material-ui/icons/StarBorder';
 import { connect } from 'react-redux';
-import { toggleLeftSideMenu } from '../import/reducers/redux-layout';
+import { toggleLeftSideMenu } from './layout-reducer';
 import store from '../store';
 import {
     NavLink
