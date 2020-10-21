@@ -8,8 +8,11 @@ import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.StagedJobEntityRepository;
 import au.org.aodn.nrmn.restapi.service.model.HeaderCellIndex;
 import au.org.aodn.nrmn.restapi.service.model.SheetWithHeader;
+import au.org.aodn.nrmn.restapi.util.loan.InputStreamLender;
+import com.amazonaws.services.simpleworkflow.flow.WorkerBase;
 import cyclops.control.Future;
 import cyclops.control.Maybe;
+import cyclops.control.Try;
 import cyclops.control.Validated;
 import lombok.val;
 import org.apache.poi.ss.usermodel.*;
@@ -19,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.services.s3.S3Client;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -44,7 +46,17 @@ public class SpreadSheetService {
     public Validated<ErrorInput, SheetWithHeader> validatedExcelFile(String fileId,
                                                                      MultipartFile excelFile,
                                                                      Boolean withInvertedSize) throws Exception {
-        val book = new XSSFWorkbook(excelFile.getInputStream());
+        val attempt =
+                InputStreamLender.<Workbook>lend(
+                        excelFile::getInputStream,
+                        XSSFWorkbook::new
+                );
+        if(!attempt.isPresent()){
+            return Validated.invalid(
+                    new ErrorInput("Error while opening the file, Excel 2007 or above required", "file")
+            );
+        }
+        val book =  attempt.get();
         val evaluator = new XSSFFormulaEvaluator((XSSFWorkbook) book);
         DataFormatter defaultFormat = new DataFormatter();
 
