@@ -37,7 +37,8 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 @Audited(withModifiedFlag = true)
 public class SurveyMethod {
     @Id
-    @SequenceGenerator(name = "survey_method_survey_method_id", sequenceName = "survey_method_survey_method_id", allocationSize = 1)
+    @SequenceGenerator(name = "survey_method_survey_method_id", sequenceName = "survey_method_survey_method_id",
+     allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "survey_method_id", unique = true, updatable = false, nullable = false)
     private int surveyMethodId;
@@ -57,7 +58,7 @@ public class SurveyMethod {
 
     @OneToMany(mappedBy = "surveyMethod", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Observation> observations;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "survey_id", referencedColumnName = "survey_id", nullable = false)
     @JsonIgnore
@@ -70,4 +71,13 @@ public class SurveyMethod {
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     @JsonIgnore
     private Method method;
+
+    public void setObservations(Set<Observation> observations) {
+        // set observations ensuring back references are updated as required
+        if (this.observations != null)
+            this.observations.stream().forEach(observation -> observation.setSurveyMethod(null));
+        this.observations = observations;
+        if (this.observations != null)
+            this.observations.stream().forEach(observation -> observation.setSurveyMethod(this));
+    }
 }
