@@ -60,12 +60,7 @@ public class SurveyTestData {
             .surveyMethodAttribute(surveyMethodAttributes)
             .build();
 
-        //TODO: change setter/builder methods to do this
         surveyMethod.setObservations(observations);
-        
-        for (Observation anObservation: observations) {
-            anObservation.setSurveyMethod(surveyMethod);
-        }
         
         val surveyMethods = ImmutableSet.<SurveyMethod>builder().add(surveyMethod).build();
 
@@ -85,13 +80,8 @@ public class SurveyTestData {
             .surveyAttribute(surveyAttributes)
             .build();
             
-        //TODO: change setter/builder methods to do this
         survey.setSurveyMethods(surveyMethods);
         
-        for (val aSurveyMethod: surveyMethods) {
-            aSurveyMethod.setSurvey(survey);
-        }
-
         surveyRepository.saveAndFlush(survey);
         return survey;
     }

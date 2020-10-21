@@ -71,17 +71,11 @@ public class ObservableItem {
     @JsonIgnore
     private AphiaRelType aphiaRelType;
 
-    // Override lengthWeight setter to ensure required updates to lengthWeight.observableItem 
-    // (new and old if any) are performed at the same time
     public void setLengthWeight(LengthWeight lengthWeight) {
-        if (lengthWeight == null) {
-            if (this.lengthWeight != null) {
-                this.lengthWeight.setObservableItem(null);
-            }
-        } else {
-            lengthWeight.setObservableItem(this);
-        }
+        // set lengthWeight ensuring backreferences are also updated as required
+        if (this.lengthWeight != null) this.lengthWeight.setObservableItem(null);
         this.lengthWeight = lengthWeight;
+        if (this.lengthWeight != null) this.lengthWeight.setObservableItem(this);
     }
 
 }

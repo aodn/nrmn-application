@@ -23,6 +23,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.sql.Date;
 import java.sql.Time;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -84,4 +85,11 @@ public class Survey {
 
     @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<SurveyMethod> surveyMethods;
+
+    public void setSurveyMethods(Set<SurveyMethod> surveyMethods) {
+        // set surveyMethods ensuring back references are updated as required
+        if (this.surveyMethods != null) this.surveyMethods.stream().forEach(surveyMethod -> surveyMethod.setSurvey(null));
+        this.surveyMethods = surveyMethods;
+        if (this.surveyMethods != null) this.surveyMethods.stream().forEach(surveyMethod -> surveyMethod.setSurvey(this));
+    }    
 }
