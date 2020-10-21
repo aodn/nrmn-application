@@ -15,11 +15,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function getErrors(errors) {
+  return errors.map((  item, key) => {
+    return <div key={key}>{item}</div>
+  })
+}
+
 const BaseForm = (params) => {
 
   const classes = useStyles();
 
-  let errorAlert = params.errors ? <Alert  severity="error" variant="outlined" >{params.errors}</Alert> : "";
+  let errorAlert = params.errors ? <Alert  severity="error" variant="filled" >{getErrors(params.errors)}
+  </Alert> : "";
 
   return <>
     <Grid

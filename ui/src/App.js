@@ -19,7 +19,6 @@ import {
 import FileList from './components/import/FileList';
 import ImportPage from './components/import/Index';
 import { useSelector} from "react-redux";
-import store from "./components/store";
 
 
 const drawerWidth = 240;

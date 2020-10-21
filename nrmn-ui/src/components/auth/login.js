@@ -1,67 +1,50 @@
-import React from "react";
-import {connect} from "react-redux";
-import store from '../store';
-import {login} from '../import/reducers/auth-reducer'
+import React from 'react';
+import {useDispatch, useSelector} from "react-redux";
 import BaseForm from "../BaseForm";
-import * as axios from "../../axios/api";
+import {loginSubmitted} from "./auth-reducer";
 
+function Login()  {
 
-const schema = {
-  "title": "Login",
-  "type": "object",
-  "required": [
+  const schema = {
+    "title": "Login",
+    "type": "object",
+    "required": [
       "username",
       "password"
-  ],
-  "properties": {
-    "username": {
-      "type": "string",
-      "title": "Email/Username",
-    },
-    "password": {
-      "type": "string",
-      "title": "Password",
+    ],
+    "properties": {
+      "username": {
+        "type": "string",
+        "title": "Email/Username"
+      },
+      "password": {
+        "type": "string",
+        "title": "Password",
+      }
     }
   }
-}
 
-const uiSchema = {
-  password: {
-    "ui:widget": "password"
-  }
-};
-
-
-class Login extends React.Component {
-
-  handleLogin = (form) => {
-    axios.userLogin(form.formData).then(response =>
-      store.dispatch(login(response))
-    ).catch(error => {
-      if (error.response) {
-        store.dispatch(login(error.response));
-      }
-    });
-  }
-
-  render(){
-    const { errors } = this.props;
-
-    return (
-        <BaseForm
-          schema={schema}
-          uiSchema={uiSchema}
-          errors={errors}
-          onSubmit={this.handleLogin}>
-        </BaseForm>
-    )
-  }
-}
-
-function mapStateToProps(state) {
-  return {
-    errors: state.auth.errors
+  const uiSchema = {
+    password: {
+      "ui:widget": "password"
+    }
   };
+
+  const dispatch = useDispatch();
+  const errors = useSelector(state => state.auth.errors);
+
+  const handleLogin = (form) => {
+     dispatch(loginSubmitted(form.formData));
+  }
+
+  return (
+      <BaseForm
+        schema={schema}
+        uiSchema={uiSchema}
+        errors={errors}
+        onSubmit={handleLogin}>
+      </BaseForm>
+  )
 }
 
-export default connect(mapStateToProps)(Login);
+export default Login;

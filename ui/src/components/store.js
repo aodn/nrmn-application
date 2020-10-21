@@ -4,10 +4,10 @@ import {
   getDefaultMiddleware
 } from "@reduxjs/toolkit";
 
-import { themeReducer } from './import/reducers/theme-reducer';
-import { toggleReducer } from './import/reducers/redux-layout';
+import { themeReducer } from './layout/theme-reducer';
+import { toggleReducer } from './layout/layout-reducer';
 import { importReducer } from "./import/reducers/create-import";
-import { authReducer } from "./import/reducers/auth-reducer";
+import { authReducer } from "./auth/auth-reducer";
 import { listFileReducer } from "./import/reducers/list-import";
 import createSagaMiddleware from "redux-saga";
 import importMiddleware from './import/middleware/create-import';
@@ -15,9 +15,9 @@ import ListFileMiddleware from './import/middleware/list-import';
 import FileMiddleware from './import/middleware/file-import';
 
 import { all } from "redux-saga/effects";
+import LoginWatcher from "./auth/auth-middleware";
 
 const initialiseSagaMiddleware = createSagaMiddleware();
-
 
 const middleware = [
   ...getDefaultMiddleware(),
@@ -39,8 +39,8 @@ const store = configureStore({
   yield all([
     ListFileMiddleware(),
     importMiddleware(),
-    FileMiddleware()
-    
+    FileMiddleware(),
+    LoginWatcher()
   ])
 }
 
