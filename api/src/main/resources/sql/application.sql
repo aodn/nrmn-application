@@ -53,6 +53,7 @@ CREATE TABLE nrmn.staged_survey (
     id bigserial NOT NULL,
     common_name varchar(255),
     l5 integer,
+    lmax integer,
     l95 integer,
     pqs integer,
     block integer,

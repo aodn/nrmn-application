@@ -1,3 +1,0 @@
-INSERT INTO nrmn.site_ref(
-	site_id, site_code, site_name, longitude, latitude, geom, location_id, site_attribute, is_active)
-	VALUES (551, 'EYR71', 'South East Slade Point', 154, -35, '0101000020E61000009F1F46088FC560408A592F86728640C0', 29, '{"MPA": "West Coast Bays MP", "Zone": "Habitat Protection Zone 1", "State": "South Australia", "Country": "Australia", "ProxCountry": "Australia", "OldSiteCodes": ["4117"], "Effectiveness2": "High", "ProtectionStatus": "Restricted take multizoned", "year_of_protection": "2012"}',True);
