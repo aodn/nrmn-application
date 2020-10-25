@@ -32,6 +32,7 @@ function Login()  {
 
   const dispatch = useDispatch();
   const errors = useSelector(state => state.auth.errors);
+  let loading = useSelector(state => state.auth.loading);
 
   const handleLogin = (form) => {
      dispatch(loginSubmitted(form.formData));
@@ -42,6 +43,7 @@ function Login()  {
         schema={schema}
         uiSchema={uiSchema}
         errors={errors}
+        loading={loading}
         onSubmit={handleLogin}>
       </BaseForm>
   )
