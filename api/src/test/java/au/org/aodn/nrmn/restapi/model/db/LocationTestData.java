@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import au.org.aodn.nrmn.restapi.model.db.Location.LocationBuilder;
 import au.org.aodn.nrmn.restapi.repository.LocationRepository;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +13,14 @@ public class LocationTestData {
     private LocationRepository locationRepository;
 
     public Location persistedLocation() {
-        val location = Location.builder()
-            .locationName("Central Caribbean")
-            .isActive(true)
-            .build();
+        val location = defaultBuilder().build();
         locationRepository.saveAndFlush(location);
         return location;
+    }
+
+    public LocationBuilder defaultBuilder() {
+        return Location.builder()
+            .locationName("Central Caribbean")
+            .isActive(true);
     }
 }

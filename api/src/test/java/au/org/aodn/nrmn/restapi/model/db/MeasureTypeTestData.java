@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import au.org.aodn.nrmn.restapi.model.db.MeasureType.MeasureTypeBuilder;
 import au.org.aodn.nrmn.restapi.repository.MeasureTypeRepository;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +13,14 @@ public class MeasureTypeTestData {
     private MeasureTypeRepository measureTypeRepository;
 
     public MeasureType persistedMeasureType() {
-        val measureType = MeasureType.builder()
-            .measureTypeName("Macrocystis Block")
-            .isActive(true)
-            .build();
+        val measureType = defaultBuilder().build();
         measureTypeRepository.saveAndFlush(measureType);
         return measureType;
+    }
+
+    public MeasureTypeBuilder defaultBuilder() {
+        return MeasureType.builder()
+            .measureTypeName("Macrocystis Block")
+            .isActive(true);
     }
 }

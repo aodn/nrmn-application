@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import au.org.aodn.nrmn.restapi.model.db.AphiaRef.AphiaRefBuilder;
 import au.org.aodn.nrmn.restapi.repository.AphiaRefRepository;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,13 @@ public class AphiaRefTestData {
     AphiaRefRepository aphiaRefRepository;
 
     public AphiaRef persistedAphiaRef() {
-        val aphiaRef = AphiaRef.builder()
+        val aphiaRef = defaultBuilder().build();
+        aphiaRefRepository.saveAndFlush(aphiaRef);
+        return aphiaRef;
+    }
+
+    public AphiaRefBuilder defaultBuilder() {
+        return AphiaRef.builder()
             .aphiaId(217950)
             .url("http://www.marinespecies.org/aphia.php?p=taxdetails&id=217950")
             .scientificName("Sargocentron spiniferum")
@@ -43,9 +50,6 @@ public class AphiaRefTestData {
             .isTerrestrial(false)
             .isExtinct(null)
             .matchType("exact")
-            .modified(Timestamp.valueOf("2008-01-15 17:27:08.177000"))
-            .build();
-        aphiaRefRepository.saveAndFlush(aphiaRef);
-        return aphiaRef;
+            .modified(Timestamp.valueOf("2008-01-15 17:27:08.177000"));
     }
 }

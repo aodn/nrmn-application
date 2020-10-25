@@ -19,7 +19,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.util.Map;
@@ -35,7 +34,8 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 @Audited(withModifiedFlag = true)
 public class ObservableItem {
     @Id
-    @SequenceGenerator(name = "observable_item_ref_observable_item_id", sequenceName = "observable_item_ref_observable_item_id", allocationSize = 1)
+    @SequenceGenerator(name = "observable_item_ref_observable_item_id", sequenceName =
+        "observable_item_ref_observable_item_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "observable_item_id", unique = true, updatable = false, nullable = false)
     private int observableItemId;
@@ -49,7 +49,6 @@ public class ObservableItem {
     @Type(type = "jsonb")
     private Map<String, String> obsItemAttribute;
 
-    @PrimaryKeyJoinColumn
     @OneToOne(mappedBy = "observableItem", cascade = CascadeType.ALL)
     private LengthWeight lengthWeight;
 
@@ -71,11 +70,23 @@ public class ObservableItem {
     @JsonIgnore
     private AphiaRelType aphiaRelType;
 
+    // Update observableItem back reference when specifying lengthWeight
+
     public void setLengthWeight(LengthWeight lengthWeight) {
-        // set lengthWeight ensuring backreferences are also updated as required
-        if (this.lengthWeight != null) this.lengthWeight.setObservableItem(null);
+        if (this.lengthWeight != null)
+            this.lengthWeight.setObservableItem(null);
         this.lengthWeight = lengthWeight;
-        if (this.lengthWeight != null) this.lengthWeight.setObservableItem(this);
+        if (this.lengthWeight != null)
+            this.lengthWeight.setObservableItem(this);
     }
 
+    public static class ObservableItemBuilder {
+        public ObservableItem build() {
+            ObservableItem observableItem = new ObservableItem(this.observableItemId, this.observableItemName,
+                this.obsItemAttribute, this.lengthWeight, this.obsItemType, this.aphiaRef, this.aphiaRelType);
+            if (observableItem.lengthWeight != null)
+                observableItem.lengthWeight.setObservableItem(observableItem);
+            return observableItem;
+        }
+    }
 }
