@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import au.org.aodn.nrmn.restapi.model.db.Site.SiteBuilder;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import com.google.common.collect.ImmutableMap;
 import lombok.val;
@@ -16,24 +17,24 @@ public class SiteTestData {
     LocationTestData locationTestData;
 
     public Site persistedSite() {
-        val siteAttributes = ImmutableMap.<String, String>builder()
-            .put("State", "Graham Land Antarctica")
-            .put("Country", "Antarctica")
-            .put("ProxCountry", "Antarctica")
-            .put("ProtectionStatus", "Fishing")
-            .build();
+        val site = defaultBuilder().build();
+        siteRepository.saveAndFlush(site);
+        return site;
+    }
 
-        val site = Site.builder()
+    public SiteBuilder defaultBuilder() {
+        return Site.builder()
             .siteCode("ANT1")
             .siteName("South Cove South of T310m")
             .longitude(-58.5)
             .latitude(-57.5)
             .location(locationTestData.persistedLocation())
-            .siteAttribute(siteAttributes)
-            .isActive(true)
-            .build();
-            
-        siteRepository.saveAndFlush(site);
-        return site;
+            .siteAttribute(ImmutableMap.<String, String>builder()
+                .put("State", "Graham Land Antarctica")
+                .put("Country", "Antarctica")
+                .put("ProxCountry", "Antarctica")
+                .put("ProtectionStatus", "Fishing")
+                .build())
+            .isActive(true);
     }
 }

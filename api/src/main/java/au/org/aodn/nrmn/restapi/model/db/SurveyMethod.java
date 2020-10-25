@@ -38,7 +38,7 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 public class SurveyMethod {
     @Id
     @SequenceGenerator(name = "survey_method_survey_method_id", sequenceName = "survey_method_survey_method_id",
-     allocationSize = 1)
+        allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "survey_method_id", unique = true, updatable = false, nullable = false)
     private int surveyMethodId;
@@ -72,12 +72,20 @@ public class SurveyMethod {
     @JsonIgnore
     private Method method;
 
+    // update observations back references when set/updated
+
     public void setObservations(Set<Observation> observations) {
-        // set observations ensuring back references are updated as required
-        if (this.observations != null)
-            this.observations.stream().forEach(observation -> observation.setSurveyMethod(null));
+        if (this.observations != null) this.observations.stream().forEach(observation -> observation.setSurveyMethod(null));
         this.observations = observations;
-        if (this.observations != null)
-            this.observations.stream().forEach(observation -> observation.setSurveyMethod(this));
+        if (this.observations != null) this.observations.stream().forEach(observation -> observation.setSurveyMethod(this));
+    }
+
+    public static class SurveyMethodBuilder {
+        public SurveyMethod build() {
+            SurveyMethod surveyMethod = new SurveyMethod(this.surveyMethodId, this.blockNum, this.surveyNotDone,
+                this.surveyMethodAttribute, this.observations, this.survey, this.method);
+            if (surveyMethod.observations != null) surveyMethod.observations.stream().forEach(observation -> observation.setSurveyMethod(surveyMethod));
+            return surveyMethod;
+        }
     }
 }

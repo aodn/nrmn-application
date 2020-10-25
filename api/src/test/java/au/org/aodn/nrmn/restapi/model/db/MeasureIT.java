@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
     pattern = ".*TestData"))
 @AutoConfigureTestDatabase(replace = Replace.NONE)
-@ActiveProfiles("cicd")
+@ActiveProfiles("emptydb")
 class MeasureIT {
 
     @Autowired

@@ -23,7 +23,6 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.sql.Date;
 import java.sql.Time;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -86,10 +85,26 @@ public class Survey {
     @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<SurveyMethod> surveyMethods;
 
+    // update surveyMethod back references when set/updated
+
     public void setSurveyMethods(Set<SurveyMethod> surveyMethods) {
-        // set surveyMethods ensuring back references are updated as required
-        if (this.surveyMethods != null) this.surveyMethods.stream().forEach(surveyMethod -> surveyMethod.setSurvey(null));
+        if (this.surveyMethods != null)
+            this.surveyMethods.stream()
+                .forEach(surveyMethod -> surveyMethod.setSurvey(null));
         this.surveyMethods = surveyMethods;
-        if (this.surveyMethods != null) this.surveyMethods.stream().forEach(surveyMethod -> surveyMethod.setSurvey(this));
-    }    
+        if (this.surveyMethods != null)
+            this.surveyMethods.stream()
+                .forEach(surveyMethod -> surveyMethod.setSurvey(this));
+    }
+
+    public static class SurveyBuilder {
+        public Survey build() {
+            Survey survey = new Survey(this.surveyId, this.surveyDate, this.surveyTime, this.depth, this.surveyNum,
+                this.visibility, this.direction, this.surveyAttribute, this.site, this.program, this.surveyMethods);
+            if (survey.surveyMethods != null)
+                survey.surveyMethods.stream()
+                    .forEach(surveyMethod -> surveyMethod.setSurvey(survey));
+            return survey;
+        }
+    }
 }

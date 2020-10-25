@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import au.org.aodn.nrmn.restapi.model.db.AphiaRelType.AphiaRelTypeBuilder;
 import au.org.aodn.nrmn.restapi.repository.AphiaRelTypeRepository;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +13,14 @@ public class AphiaRelTypeTestData {
     private AphiaRelTypeRepository aphiaRelTypeRepository;
 
     public AphiaRelType persistedAphiaRelType() {
-        val aphiaRelType = AphiaRelType.builder()
-            .aphiaRelTypeId(1)
-            .aphiaRelTypeName("is")
-            .build();
+        val aphiaRelType = defaultBuilder().build();
         aphiaRelTypeRepository.saveAndFlush(aphiaRelType);
         return aphiaRelType;
+    }
+
+    public AphiaRelTypeBuilder defaultBuilder() {
+        return AphiaRelType.builder()
+            .aphiaRelTypeId(1)
+            .aphiaRelTypeName("is");
     }
 }

@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import au.org.aodn.nrmn.restapi.model.db.Diver.DiverBuilder;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +13,14 @@ public class DiverTestData {
     private DiverRepository diverRepository;
 
     public Diver persistedDiver() {
-        val diver = Diver.builder()
-            .initials("RSS")
-            .fullName("Rick Stuart-Smith")
-            .build();
+        val diver = defaultBuilder().build();
         diverRepository.saveAndFlush(diver);
         return diver;
+    }
+
+    public DiverBuilder defaultBuilder() {
+        return Diver.builder()
+            .initials("RSS")
+            .fullName("Rick Stuart-Smith");
     }
 }
