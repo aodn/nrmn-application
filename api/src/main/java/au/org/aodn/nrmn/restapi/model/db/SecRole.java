@@ -22,9 +22,10 @@ public class SecRole {
     }
 
     @Id
-    @Column(name = "name", unique = true, updatable = false, nullable = false)
+    @Column(name = "name", nullable = false)
     @Enumerated(EnumType.STRING)
     private SecRoleName name;
+
     @Version
     @Column(name = "version", nullable = false)
     private Integer version;

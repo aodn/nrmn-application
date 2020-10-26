@@ -11,11 +11,11 @@ public class ExposeEntityIdRestMvcConfiguration extends RepositoryRestConfigurer
 
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
-        config.exposeIdsFor(SecRoleEntity.class);
-        config.exposeIdsFor(DiverRefEntity.class);
-        config.exposeIdsFor(SecUserEntity.class);
-        config.exposeIdsFor(LocationRefEntity.class);
-        config.exposeIdsFor(SiteRefEntity.class);
-        config.exposeIdsFor(ProgramRefEntity.class);
+        config.exposeIdsFor(SecRole.class);
+        config.exposeIdsFor(Diver.class);
+        config.exposeIdsFor(SecUser.class);
+        config.exposeIdsFor(Location.class);
+        config.exposeIdsFor(Site.class);
+        config.exposeIdsFor(Program.class);
     }
 }
