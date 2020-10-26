@@ -1,8 +1,12 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 
@@ -16,20 +20,25 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.util.Map;
+import java.util.Set;
 
 import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "survey_method")
 @Audited(withModifiedFlag = true)
 public class SurveyMethod {
     @Id
-    @SequenceGenerator(name = "survey_method_survey_method_id", sequenceName = "survey_method_survey_method_id", allocationSize = 1)
+    @SequenceGenerator(name = "survey_method_survey_method_id", sequenceName = "survey_method_survey_method_id",
+        allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "survey_method_id", unique = true, updatable = false, nullable = false)
     private int surveyMethodId;
@@ -47,14 +56,36 @@ public class SurveyMethod {
     @Type(type = "jsonb")
     private Map<String, String> surveyMethodAttribute;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "surveyMethod", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Observation> observations;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "survey_id", referencedColumnName = "survey_id", nullable = false)
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Survey survey;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "method_id", referencedColumnName = "method_id", nullable = false)
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     @JsonIgnore
     private Method method;
+
+    // update observations back references when set/updated
+
+    public void setObservations(Set<Observation> observations) {
+        if (this.observations != null) this.observations.stream().forEach(observation -> observation.setSurveyMethod(null));
+        this.observations = observations;
+        if (this.observations != null) this.observations.stream().forEach(observation -> observation.setSurveyMethod(this));
+    }
+
+    public static class SurveyMethodBuilder {
+        public SurveyMethod build() {
+            SurveyMethod surveyMethod = new SurveyMethod(this.surveyMethodId, this.blockNum, this.surveyNotDone,
+                this.surveyMethodAttribute, this.observations, this.survey, this.method);
+            if (surveyMethod.observations != null) surveyMethod.observations.stream().forEach(observation -> observation.setSurveyMethod(surveyMethod));
+            return surveyMethod;
+        }
+    }
 }

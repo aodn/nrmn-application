@@ -1,7 +1,10 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,6 +35,8 @@ import java.util.Map;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "site_ref")
 @Audited(withModifiedFlag = true)
 public class Site {
@@ -59,7 +64,6 @@ public class Site {
 
     @Basic
     @Column(name = "geom")
-    @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private Point geom;
 
@@ -71,7 +75,7 @@ public class Site {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", referencedColumnName = "location_id", nullable = false)
     private Location location;
 

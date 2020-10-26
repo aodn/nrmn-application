@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserActionAuditRepository extends JpaRepository<UserActionAudit, Long>, JpaSpecificationExecutor<UserActionAudit> {
+public interface UserActionAuditRepository extends JpaRepository<UserActionAudit, Long>,
+ JpaSpecificationExecutor<UserActionAudit> {
 }
 

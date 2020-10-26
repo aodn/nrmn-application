@@ -1,6 +1,9 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 
@@ -15,6 +18,8 @@ import javax.persistence.Table;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "diver_ref")
 @Audited(withModifiedFlag = true)
 public class Diver {
