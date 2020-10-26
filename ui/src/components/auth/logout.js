@@ -7,7 +7,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {useDispatch, useSelector} from "react-redux";
 import {logoutSubmitted} from "./auth-reducer";
-import {toggleLogoutMenuOpen} from "../layout/layout-reducer";
+import {toggleLogoutMenuOpen} from "../../../../nrmn-ui/src/components/layout/layout-reducer";
 import store from "../store";
 
 
