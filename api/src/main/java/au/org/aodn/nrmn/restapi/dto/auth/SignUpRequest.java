@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.dto.auth;
 
-import au.org.aodn.nrmn.restapi.model.db.SecRoleEntity;
+import au.org.aodn.nrmn.restapi.model.db.SecRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,6 +32,6 @@ public class SignUpRequest {
             message = "must be 8-20 characters, containing at least 1 letter, 1 number and 1 special character")
     private String password;
 
-    private List<SecRoleEntity> roles;
+    private List<SecRole> roles;
 
 }

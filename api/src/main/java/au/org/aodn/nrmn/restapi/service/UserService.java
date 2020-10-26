@@ -2,10 +2,8 @@ package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.dto.auth.SignUpRequest;
 import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
-import au.org.aodn.nrmn.restapi.model.db.SecRoleEntity;
-import au.org.aodn.nrmn.restapi.model.db.SecUserEntity;
-import au.org.aodn.nrmn.restapi.model.db.StagedJobEntity;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
+import au.org.aodn.nrmn.restapi.model.db.SecRole;
+import au.org.aodn.nrmn.restapi.model.db.SecUser;
 import au.org.aodn.nrmn.restapi.model.db.enums.SecRoleName;
 import au.org.aodn.nrmn.restapi.model.db.enums.SecUserStatus;
 import au.org.aodn.nrmn.restapi.repository.*;
@@ -17,10 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.lang.model.type.ErrorType;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService extends ValidatorHelpers {
@@ -28,15 +23,15 @@ public class UserService extends ValidatorHelpers {
     String passwordResetExpiryMinutes;
 
     @Autowired
-    SecRoleEntityRepository roleRepo;
+    SecRoleRepository roleRepo;
 
     @Autowired
     PasswordEncoder passwordEncoder;
 
     @Autowired
-    SecUserEntityRepository userRepo;
+    SecUserRepository userRepo;
 
-    public Validated<ErrorInput, SecUserEntity> createUser(SignUpRequest signupReq) {
+    public Validated<ErrorInput, SecUser> createUser(SignUpRequest signupReq) {
         val emailValid =
                 uniqValid(userRepo.findByEmail(signupReq.getEmail()), "email");
         val errorList = toErrorList(emailValid);
@@ -44,10 +39,10 @@ public class UserService extends ValidatorHelpers {
             val userRole = roleRepo
                     .findByName(SecRoleName.ROLE_USER)
                     .orElseGet(() -> {
-                        val role = new SecRoleEntity(SecRoleName.ROLE_USER);
+                        val role = new SecRole(SecRoleName.ROLE_USER);
                         return roleRepo.save(role);
                     });
-            val user = new SecUserEntity(
+            val user = new SecUser(
                     signupReq.getFullname(),
                     signupReq.getEmail(),
                     passwordEncoder.encode(signupReq.getPassword()),

@@ -219,6 +219,12 @@
             <artifactId>jackson-datatype-jts</artifactId>
             <version>2.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>30.0-jre</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -239,25 +245,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.cmeza</groupId>
-                <artifactId>spring-data-generator</artifactId>
-                <version>1.1.8</version>
-                <configuration>
-                    <entity-package>
-                        <param>au.org.aodn.nrmn.restapi.model</param>
-                    </entity-package>
-                    <repository-package>au.org.aodn.nrmn.restapi.repository</repository-package>
-                    <repository-postfix>Repository</repository-postfix>
-                    <manager-package>au.org.aodn.nrmn.restapi.managers</manager-package>
-                    <manager-postfix>Manager</manager-postfix>
-                    <only-annotations>false</only-annotations>
-                    <overwrite>false</overwrite>
-                    <!--					<additional-extends>-->
-                    <!--						<param>org.springframework.data.querydsl.QuerydslPredicateExecutor</param>-->
-                    <!--					</additional-extends>-->
-                </configuration>
             </plugin>
         </plugins>
     </build>
