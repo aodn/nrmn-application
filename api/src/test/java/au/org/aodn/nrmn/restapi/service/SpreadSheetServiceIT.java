@@ -55,7 +55,7 @@ public class SpreadSheetServiceIT {
                 )))
                 .region(Region.of(localstack.getRegion()))
                 .build();
-        client.createBucket(CreateBucketRequest.builder().bucket("bucket").build());
+        client.createBucket(CreateBucketRequest.builder().bucket("nrmn-dev").build());
 
     }
     @AfterAll
