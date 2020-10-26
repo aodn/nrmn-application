@@ -11,7 +11,6 @@ import au.org.aodn.nrmn.restapi.repository.StagedJobEntityRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedSurveyEntityRepository;
 import au.org.aodn.nrmn.restapi.validation.warning.DiverExists;
 import au.org.aodn.nrmn.restapi.validation.warning.SiteCodeExists;
-import cyclops.companion.Functions;
 import cyclops.companion.Monoids;
 import cyclops.companion.Semigroups;
 import cyclops.data.Seq;
@@ -19,7 +18,6 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,7 +55,8 @@ public class ValidationProcess {
                             new StagedJobEntity(
                             fileID,
                             StatusJobType.PENDING,
-                            SourceJobType.FILE));
+                            SourceJobType.FILE,
+                            Collections.EMPTY_MAP));
                     return newjob;
                 });
 

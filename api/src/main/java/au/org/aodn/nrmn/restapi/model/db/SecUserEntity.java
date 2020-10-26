@@ -2,15 +2,20 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.enums.SecUserStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Entity
 @NoArgsConstructor

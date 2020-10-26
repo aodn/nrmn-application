@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.enums.SecRoleName;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.persistence.*;
