@@ -9,6 +9,7 @@ import cyclops.control.Maybe;
 import cyclops.control.Try;
 import cyclops.control.Validated;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -104,7 +105,6 @@ public class SpreadSheetService {
     }
 
     public List<StagedSurveyEntity> sheets2Staged(SheetWithHeader dataSheet) {
-        val formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         val eval = new XSSFFormulaEvaluator((XSSFWorkbook) dataSheet.getSheet().getWorkbook());
         val fmt = new DataFormatter();
 
@@ -132,52 +132,39 @@ public class SpreadSheetService {
                     stagedSurvey.setBuddy(_getCellValue(row.getCell(headerMap.get("Buddy")), eval, fmt));
                     stagedSurvey.setSiteNo(_getCellValue(row.getCell(headerMap.get("Site No.")), eval, fmt));
                     stagedSurvey.setSiteName(_getCellValue(row.getCell(headerMap.get("Site Name")), eval, fmt));
-                    stagedSurvey.setLatitude(safeDouble(_getCellValue(row.getCell(headerMap.get("Latitude")), eval, fmt)));
-                    stagedSurvey.setLongitude(safeDouble(_getCellValue(row.getCell(headerMap.get("Longitude")), eval, fmt)));
-                    val date = Maybe.attempt(() -> {
-                        val time = _getCellValue(row.getCell(headerMap.get("Time")), eval, fmt);
-                        val dayMonthYear = _getCellValue(row.getCell(headerMap.get("Date")), eval, fmt);
-                        return formatter.parse(dayMonthYear + " " + time);
-                    }).orElseGet(() -> null);
-                    stagedSurvey.setDate(date);
-                    stagedSurvey.setVis(safeInt(_getCellValue(row.getCell(headerMap.get("vis")), eval, fmt)));
+                    stagedSurvey.setLatitude(_getCellValue(row.getCell(headerMap.get("Latitude")), eval, fmt));
+                    stagedSurvey.setLongitude(_getCellValue(row.getCell(headerMap.get("Longitude")), eval, fmt));
+                    stagedSurvey.setTime(_getCellValue(row.getCell(headerMap.get("Time")), eval, fmt));
+                    stagedSurvey.setDate(_getCellValue(row.getCell(headerMap.get("Date")), eval, fmt));
+                    stagedSurvey.setVis((_getCellValue(row.getCell(headerMap.get("vis")), eval, fmt)));
                     stagedSurvey.setDirection(_getCellValue(row.getCell(headerMap.get("Direction")), eval, fmt));
                     stagedSurvey.setPQs(_getCellValue(row.getCell(headerMap.get("P-Qs")), eval, fmt));
-                    stagedSurvey.setDepth(safeDouble(_getCellValue(row.getCell(headerMap.get("Depth")), eval, fmt)));
-                    stagedSurvey.setMethod(safeInt(_getCellValue(row.getCell(headerMap.get("Method")), eval, fmt)));
-                    stagedSurvey.setBlock(safeInt(_getCellValue(row.getCell(headerMap.get("Block")), eval, fmt)));
+                    stagedSurvey.setDepth(_getCellValue(row.getCell(headerMap.get("Depth")), eval, fmt));
+                    stagedSurvey.setMethod(_getCellValue(row.getCell(headerMap.get("Method")), eval, fmt));
+                    stagedSurvey.setBlock((_getCellValue(row.getCell(headerMap.get("Block")), eval, fmt)));
                     stagedSurvey.setCode(_getCellValue(row.getCell(headerMap.get("Code")), eval, fmt));
                     stagedSurvey.setSpecies(_getCellValue(row.getCell(headerMap.get("Species")), eval, fmt));
                     stagedSurvey.setCmmonName(_getCellValue(row.getCell(headerMap.get("Common name")), eval, fmt));
-                    stagedSurvey.setTotal(safeInt(_getCellValue(row.getCell(headerMap.get("Total")), eval, fmt)));
-                    stagedSurvey.setInverts(safeInt(_getCellValue(row.getCell(headerMap.get("Inverts")), eval, fmt)));
+                    stagedSurvey.setTotal(_getCellValue(row.getCell(headerMap.get("Total")), eval, fmt));
+                    stagedSurvey.setInverts(_getCellValue(row.getCell(headerMap.get("Inverts")), eval, fmt));
                     if (dataSheet.getHeader().size() == longHeadersRef.size()) {
                         stagedSurvey.setM2InvertSizingSpecies(_getCellValue(row.getCell(headerMap.get("M2 Invert Sizing Species")), eval, fmt).equals("Yes"));
-                        stagedSurvey.setL5(safeInt(_getCellValue(row.getCell(headerMap.get("L5")), eval, fmt)));
-                        stagedSurvey.setL95(safeInt(_getCellValue(row.getCell(headerMap.get("L95")), eval, fmt)));
+                        stagedSurvey.setL5(_getCellValue(row.getCell(headerMap.get("L5")), eval, fmt));
+                        stagedSurvey.setL95(_getCellValue(row.getCell(headerMap.get("L95")), eval, fmt));
                         stagedSurvey.setIsInvertSizing(_getCellValue(row.getCell(headerMap.get("Use InvertSizing")), eval, fmt).equals("Yes"));
-                        stagedSurvey.setLmax(safeInt(_getCellValue(row.getCell(headerMap.get("Lmax")), eval, fmt)));
+                        stagedSurvey.setLmax(_getCellValue(row.getCell(headerMap.get("Lmax")), eval, fmt));
                     }
 
-                    val measureJson = new HashMap<String, Integer>();
+                    val measureJson = new HashMap<String, String>();
                     headerNum.forEach(header -> {
-                        val cellValue = safeInt(_getCellValue(row.getCell(header.getIndex()), eval, fmt));
-                        if (cellValue != null && cellValue > 0)
+                        val cellValue = _getCellValue(row.getCell(header.getIndex()), eval, fmt);
+                        if (cellValue != null && !StringUtils.isEmpty(cellValue))
                             measureJson.put(header.getName(), cellValue);
                     });
                     stagedSurvey.setMeasureJson(measureJson);
                     return stagedSurvey;
                 }).collect(Collectors.toList());
         return stagedSurveys;
-    }
-
-
-    private Double safeDouble(String target) {
-        return Maybe.attempt(() -> Double.parseDouble(target)).orElseGet(() -> null);
-    }
-
-    private Integer safeInt(String target) {
-        return Maybe.attempt(() -> Integer.parseInt(target)).orElseGet(() -> null);
     }
 
     private String _getCellValue(Cell cell, XSSFFormulaEvaluator evaluator, DataFormatter formater) {
