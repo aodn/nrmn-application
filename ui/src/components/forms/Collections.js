@@ -37,7 +37,7 @@ const schematoColDef = (schema, size) => {
 }
 let agGridApi = {};
 
-const Colection = () => {
+const Collection = () => {
     const { entities } = useParams();
     const size = useWindowSize();
     const themeType = useSelector(state => state.theme.themeType);
@@ -105,4 +105,4 @@ const Colection = () => {
         </Box>)
 }
 
-export default Colection;
+export default Collection;
