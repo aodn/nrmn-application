@@ -108,5 +108,3 @@ export const entityRelation = (entity, urls) => {
   }
   return axiosInstance.put(entity, urls,config).then
 }
-export const definition  = () =>  axiosInstance.get("/v3/api-docs")
-export const entities = (entity) => axiosInstance.get("/api/" + entity);
