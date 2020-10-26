@@ -69,6 +69,7 @@
     "@storybook/preset-create-react-app": "^1.5.2",
     "@storybook/react": "^5.3.7",
     "chai": "^4.2.0",
+    "clsx": "^1.1.1",
     "flow-bin": "^0.130.0",
     "prettier": "1.19.1"
   }

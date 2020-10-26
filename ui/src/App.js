@@ -9,7 +9,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import TopBar from './components/layout/TopBar';
 import SideMenu from './components/layout/SideMenu';
 import Login from './components/auth/login'
-import {blueGrey, grey, red} from '@material-ui/core/colors';
+import {blueGrey, grey } from '@material-ui/core/colors';
 import {
   BrowserRouter as Router,
   Switch,
