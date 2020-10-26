@@ -30,21 +30,20 @@ public class StagedSurveyEntity {
     @Column(name = "site_no")
     private String siteNo;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @Column(name = "date")
-    private Date date;
+    private String date;
 
     @Column(name = "diver")
     private String diver;
 
     @Column(name = "depth")
-    private Double depth;
+    private String depth;
 
     @Column(name = "method")
-    private Integer method;
+    private String method;
 
     @Column(name = "block")
-    private Integer block;
+    private String block;
 
     @Column(name = "species")
     private String species;
@@ -57,13 +56,16 @@ public class StagedSurveyEntity {
     private String siteName;
 
     @Column(name = "longitude")
-    private Double longitude;
+    private String longitude;
 
     @Column(name = "latitude")
-    private Double latitude;
+    private String latitude;
 
     @Column(name = "vis")
-    private Integer vis;
+    private String vis;
+
+    @Column(name = "time")
+    private String time;
 
     @Column(name = "direction")
     private String direction;
@@ -80,29 +82,29 @@ public class StagedSurveyEntity {
     private String CmmonName;
 
     @Column(name = "total")
-    private Integer total;
+    private String total;
 
     @Column(name = "inverts")
-    private Integer inverts;
+    private String inverts;
 
     @Column(name = "m2_invert_sizing_species")
     private Boolean m2InvertSizingSpecies;
 
     @Column(name = "L5")
-    private Integer L5;
+    private String L5;
 
     @Column(name = "L95")
-    private Integer L95;
+    private String L95;
 
     @Column(name = "is_invert_Sizing")
     private Boolean isInvertSizing;
 
     @Column(name = "Lmax")
-    private Integer Lmax;
+    private String Lmax;
 
     @Column(name = "measure_value", columnDefinition = "json")
     @Type(type = "jsonb")
-    private Map<String, Integer> measureJson;
+    private Map<String, String> measureJson;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private StagedJobEntity stagedJob;
