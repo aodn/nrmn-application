@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
     pattern = ".*TestData"))
 @AutoConfigureTestDatabase(replace = Replace.NONE)
-@ActiveProfiles("emptydb")
 class DiverIT {
 
     @Autowired
