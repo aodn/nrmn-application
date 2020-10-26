@@ -7,9 +7,7 @@ import Form from "@rjsf/material-ui"
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
-import clsx from "clsx";
 import green from "@material-ui/core/colors/green";
-import {useSelector} from "react-redux";
 
 
 
