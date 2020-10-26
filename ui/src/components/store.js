@@ -17,7 +17,6 @@ import getDefinitionWatcher from './forms/middleware/definition';
 import getEntitiesWatcher from './forms/middleware/entities';
 
 import { all } from "redux-saga/effects";
-import { authReducer } from "./import/reducers/auth-reducer";
 import { formReducer } from "./forms/redux-form";
 import LoginWatcher from "./auth/auth-middleware";
 
