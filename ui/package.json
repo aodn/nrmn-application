@@ -30,7 +30,7 @@
   "scripts": {
     "flow": "flow",
     "start": "craco start",
-    "build": "craco build",
+    "build": "CI='' craco build",
     "test": "craco test",
     "test-build": "craco test --watchAll=false && craco build",
     "eject": "react-scripts eject",
