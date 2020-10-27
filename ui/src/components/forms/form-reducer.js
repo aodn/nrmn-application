@@ -20,17 +20,13 @@ const formSlice = createSlice({
       state = formState;
       console.log("state reset", state);
     },
-    definitionLoaded: (state, action) => {
-      state.definition = action.payload.components.schemas;
-    },
-    definitionError: (state, action) => {
-      console.error("error while getting the definition");
-    },
     entitiesLoaded: (state, action) => {
+      debugger
       state.entities = action.payload;
     },
     entitiesError: (state, action) => {
       console.error("error while getting the entities");
+      state.entities = [];
     },
     idLoaded: (state, action) => {
       state.editItem = action.payload;
@@ -46,17 +42,17 @@ const formSlice = createSlice({
 export const formReducer = formSlice.reducer;
 export const {
   resetState,
-  definitionLoaded,
-  definitionError,
   entitiesLoaded,
   entitiesError,
   entitiesCreated,
   idLoaded,
   idError
 } = formSlice.actions;
-export const definitionRequested = createAction('DEFINITION_REQUESTED');
+
+
 export const selectRequested = createAction('SELECT_REQUESTED',
     function (entity) {
+  console.log(entity);
       return {payload: entity};
     });
 

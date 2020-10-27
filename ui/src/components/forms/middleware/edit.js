@@ -1,6 +1,6 @@
 import { takeEvery, call, put } from "redux-saga/effects";
 import { idRequested, idLoaded, idError } from "../form-reducer";
-import { entities } from "../../../axios/api";
+import { getEntities } from "../../../axios/api";
 
 export default function* getEditWatcher() {
     yield takeEvery(idRequested, getEditItem);
@@ -8,7 +8,7 @@ export default function* getEditWatcher() {
 
 function* getEditItem(action) {
     try {
-        const resp = yield call(entities, action.payload);
+        const resp = yield call(getEntities, action.payload);
         console.log("id:", resp.data);
         yield put(idLoaded(resp.data._embedded[action.payload]));
     } catch (e) {

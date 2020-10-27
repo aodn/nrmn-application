@@ -1,15 +1,15 @@
 import { takeEvery, call, put } from "redux-saga/effects";
 import { selectRequested, entitiesLoaded, entitiesError } from "../form-reducer";
-import { entities } from "../../../axios/api";
+import { getEntities } from "../../../axios/api";
 
 export default function* getEntitiesWatcher() {
-    yield takeEvery(selectRequested, getEntities);
+    yield takeEvery(selectRequested, entities);
 }
 
-function* getEntities(action) {
+function* entities(action) {
     try {
-        const resp = yield call(entities, action.payload);
-
+        const resp = yield call(getEntities, action.payload);
+        debugger;
         yield put(entitiesLoaded(resp.data._embedded[action.payload]));
     } catch (e) {
         yield put(entitiesError(e));

@@ -80,8 +80,9 @@ export const rawSurveySave = params => {
   return  axiosInstance.post("/api/raw-survey", params).then(res => res );
 }
 
-export const definition  = () =>  axiosInstance.get("/v3/api-docs").then(res => res)
-export const entities = (entity) => axiosInstance.get("/api/" + entity).then(res=>res);
+export const apiDefinition  = () =>  axiosInstance.get("/v3/api-docs").then(res => res)
+
+export const getEntities = (entity) => axiosInstance.get("/api/" + entity).then(res=>res);
 export const entitySave = (entity, params) => {
   return  axiosInstance.post("/api/" + entity, params).then(res => res );
 }
