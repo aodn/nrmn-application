@@ -1,8 +1,8 @@
 package au.org.aodn.nrmn.restapi.security;
 
-import au.org.aodn.nrmn.restapi.model.db.SecUserEntity;
+import au.org.aodn.nrmn.restapi.model.db.SecUser;
 import au.org.aodn.nrmn.restapi.model.db.enums.SecUserStatus;
-import au.org.aodn.nrmn.restapi.repository.SecUserEntityRepository;
+import au.org.aodn.nrmn.restapi.repository.SecUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,13 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
-    SecUserEntityRepository userRepo;
+    SecUserRepository userRepo;
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {
-        SecUserEntity user = userRepo
+        SecUser user = userRepo
                 .findByEmail(email)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found with email: " + email)
@@ -35,7 +35,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Transactional
     public UserDetails loadUserById(Long id) {
-        SecUserEntity user = userRepo.findById(id).orElseThrow(
+        SecUser user = userRepo.findById(id).orElseThrow(
                 () -> new UsernameNotFoundException("User not found with id : " + id)
         );
         return UserPrincipal.create(user);

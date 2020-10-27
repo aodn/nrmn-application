@@ -2,7 +2,7 @@ package au.org.aodn.nrmn.restapi.config;
 
 import au.org.aodn.nrmn.restapi.model.db.*;
 
-import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAuditEntity;
+import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
 import lombok.val;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -50,26 +50,26 @@ public class GenerateApplicationTables implements ApplicationListener<Applicatio
             settings.put("hibernate.default_catalog", "nrmn");
             settings.put("show_sql", "true");
 
-            _generatingTables(settings, Arrays.asList(SecRoleEntity.class, SecUserEntity.class), "createAuthTables");
+            _generatingTables(settings, Arrays.asList(SecRole.class, SecUser.class), "createAuthTables");
             _generatingTables(
                     settings,
                     Arrays.asList(
-                            DiverRefEntity.class,
-                            UserActionAuditEntity.class,
-                            ObservableItemRefEntity.class,
-                            ObservationEntity.class,
-                            SurveyEntity.class,
-                            SurveyMethodEntity.class,
-                            SiteRefEntity.class,
-                            LocationRefEntity.class
+                            Diver.class,
+                            UserActionAudit.class,
+                            ObservableItem.class,
+                            Observation.class,
+                            Survey.class,
+                            SurveyMethod.class,
+                            Site.class,
+                            Location.class
                     ),
                     "createAuditTable");
             _generatingTables(
                     settings,
                     Arrays.asList(
-                            ErrorCheckEntity.class,
-                            StagedJobEntity.class,
-                            StagedSurveyEntity.class),
+                            ErrorCheck.class,
+                            StagedJob.class,
+                            StagedSurvey.class),
                     "createIngestTables"
             );
 
@@ -77,9 +77,8 @@ public class GenerateApplicationTables implements ApplicationListener<Applicatio
             _generatingTables(
                     settings,
                     Arrays.asList(
-                            ProgramRefEntity.class,
-                            SiteRefEntity.class,
-                            PublicDataExclusionEntity.class),
+                            Program.class,
+                            Site.class),
                     "createExcludeDataTables"
             );
 

@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.security;
 
-import au.org.aodn.nrmn.restapi.model.db.SecUserEntity;
+import au.org.aodn.nrmn.restapi.model.db.SecUser;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -53,7 +53,7 @@ public class UserPrincipal implements UserDetails {
     }
 
 
-    public static UserPrincipal create(SecUserEntity user) {
+    public static UserPrincipal create(SecUser user) {
         List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
                 new SimpleGrantedAuthority(role.getName().name())
         ).collect(Collectors.toList());
