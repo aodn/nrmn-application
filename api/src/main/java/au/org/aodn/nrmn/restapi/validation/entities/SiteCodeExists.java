@@ -1,25 +1,22 @@
-package au.org.aodn.nrmn.restapi.validation.warning;
+package au.org.aodn.nrmn.restapi.validation.entities;
 
 import au.org.aodn.nrmn.restapi.model.db.ErrorCheckEntity;
 import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
-import au.org.aodn.nrmn.restapi.repository.ErrorCheckEntityRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRefEntityRepository;
-import au.org.aodn.nrmn.restapi.validation.BaseValidator;
 import cyclops.control.Validated;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SiteCodeExists extends BaseValidator {
+public class SiteCodeExists extends BaseExistingEntity {
 
     SiteRefEntityRepository siteRepo;
 
     @Autowired
-    public SiteCodeExists(ErrorCheckEntityRepository errorRepo,SiteRefEntityRepository siteRepo) {
-        super(errorRepo);
+    public SiteCodeExists(SiteRefEntityRepository siteRepo) {
         this.siteRepo = siteRepo;
-        this.colunmTagert = "Site No";
+        this.columnTarget = "Site No";
     }
 
     @Override

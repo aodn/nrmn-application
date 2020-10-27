@@ -11,27 +11,9 @@ import java.util.List;
 
 public abstract class BaseValidator {
 
-    protected String colunmTagert;
-    protected ErrorCheckEntityRepository errorRepo;
-
-    public BaseValidator(ErrorCheckEntityRepository errorRepo) {
-        this.errorRepo = errorRepo;
-    }
+    public String columnTarget;
 
     abstract public Validated<ErrorCheckEntity, String> valid(StagedSurveyEntity target);
 
-    protected <T> Validated<ErrorCheckEntity, String> warningNotFound(List<T> entitiesFound, StagedSurveyEntity target, String msg) {
-        if (entitiesFound.isEmpty()) {
-            val error = new ErrorCheckEntity(
-                    new ErrorID(target.getId(),
-                            target.getStagedJob().getId(),
-                            msg + " Couldn't be found"),
-                    ValidationLevelType.WARNING,
-                    colunmTagert,
-                    target);
-            val persistedError = errorRepo.save(error);
-            return Validated.invalid(persistedError);
-        }
-        return Validated.valid(msg + " was found!");
-    }
+
 }
