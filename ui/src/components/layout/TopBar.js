@@ -7,7 +7,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
-import { toggleMenu } from './redux-layout';
+import { toggleLeftSideMenu } from './layout-reducer';
 import { connect } from 'react-redux';
 import store from '../store';
 import AuthState from "./AuthState";
@@ -39,21 +39,21 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const mapStateToProps = state => {
-  return { menuIsOpen: state.toggle.menuIsOpen };
+  return { leftSideMenuIsOpen: state.toggle.leftSideMenuIsOpen };
 };
 
 const handleClick = () => {
-  store.dispatch(toggleMenu())
+  store.dispatch(toggleLeftSideMenu())
 }
 
-const ReduxTopBar = ({ menuIsOpen }) => {
+const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
   const classes = useStyles();
 
   return (
   <AppBar
     position="fixed"
     className={clsx(classes.appBar, {
-      [classes.appBarShift]: menuIsOpen,
+      [classes.appBarShift]: leftSideMenuIsOpen,
     })}
   >
     <Toolbar position="static">
@@ -66,7 +66,7 @@ const ReduxTopBar = ({ menuIsOpen }) => {
                 aria-label="open drawer"
                 onClick={handleClick}
                 edge="start"
-                className={clsx(classes.menuButton, menuIsOpen && classes.hide)} >
+                className={clsx(classes.menuButton, leftSideMenuIsOpen && classes.hide)} >
                 <MenuIcon />
               </IconButton>
             </Grid>
