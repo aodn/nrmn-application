@@ -10,7 +10,7 @@ import cyclops.control.Try;
 import cyclops.control.Validated;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
+
 
 public abstract class BaseValidationFormat extends BaseValidator {
 
