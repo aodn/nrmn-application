@@ -1,5 +1,5 @@
 import { takeEvery, call, put } from "redux-saga/effects";
-import { idRequested, idLoaded, idError } from "../redux-form";
+import { idRequested, idLoaded, idError } from "../form-reducer";
 import { entities } from "../../../axios/api";
 
 export default function* getEditWatcher() {

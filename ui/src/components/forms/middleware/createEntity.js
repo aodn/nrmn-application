@@ -1,5 +1,5 @@
 import { takeEvery, call, put } from "redux-saga/effects";
-import { createEntityRequested, entitiesCreated, entitiesError } from "../redux-form";
+import { createEntityRequested, entitiesCreated, entitiesError } from "../form-reducer";
 import { entitySave } from "../../../axios/api";
 
 export default function* getCreateEntitiesWatcher() {
