@@ -1,5 +1,5 @@
 import { takeEvery, call, put } from "redux-saga/effects";
-import { definitionRequested, definitionLoaded, definitionError } from "../redux-form";
+import { definitionRequested, definitionLoaded, definitionError } from "../form-reducer";
 import { rawSurveySave, definition } from "../../../axios/api";
 
 export default function* getDefinitionWatcher() {

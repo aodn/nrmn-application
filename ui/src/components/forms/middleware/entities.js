@@ -1,5 +1,5 @@
 import { takeEvery, call, put } from "redux-saga/effects";
-import { selectRequested, entitiesLoaded, entitiesError } from "../redux-form";
+import { selectRequested, entitiesLoaded, entitiesError } from "../form-reducer";
 import { entities } from "../../../axios/api";
 
 export default function* getEntitiesWatcher() {

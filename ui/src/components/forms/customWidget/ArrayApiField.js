@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from 'react';
-import { selectRequested } from "../redux-form";
+import { selectRequested } from "../form-reducer";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import pluralize from 'pluralize';

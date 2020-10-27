@@ -4,7 +4,7 @@ import AddIcon from '@material-ui/icons/Add'
 
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from 'react';
-import { definitionRequested, resetState, selectRequested } from "./redux-form";
+import { definitionRequested, resetState, selectRequested } from "./form-reducer";
 import { useParams, NavLink } from "react-router-dom";
 import pluralize from 'pluralize';
 import { AgGridReact } from "ag-grid-react/lib/agGridReact";
@@ -67,6 +67,7 @@ const Collection = () => {
             dispatch(selectRequested(entities))
     }, []);
 
+    console.log(definition);
     if (Object.keys(definition).length === 0)
         return (<></>);
 
