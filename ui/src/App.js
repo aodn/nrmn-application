@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import clsx from 'clsx';
 import {
   ThemeProvider ,
@@ -15,13 +15,12 @@ import {
   Switch,
   Route
 } from "react-router-dom";
-
 import FileList from './components/import/FileList';
 import ImportPage from './components/import/Index';
 import GenericForm from './components/forms/GenericForm';
 import UserForm from './components/forms/UserForm';
-import { useSelector} from "react-redux";
-import Collection from "./components/forms/Collections";
+import {useDispatch, useSelector} from "react-redux";
+import ApiEntityList from "./components/forms/ApiEntityList";
 
 const drawerWidth = 240;
 
@@ -50,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function App()  {
   const classes = useStyles();
-
+  const dispatch = useDispatch();
   const themeState = useSelector(state =>  state.theme);
 
 

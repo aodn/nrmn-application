@@ -1,4 +1,3 @@
-
 import {
   configureStore,
   getDefaultMiddleware
@@ -13,7 +12,6 @@ import createSagaMiddleware from "redux-saga";
 import importMiddleware from './import/middleware/create-import';
 import ListFileMiddleware from './import/middleware/list-import';
 import FileMiddleware from './import/middleware/file-import';
-import getDefinitionWatcher from './forms/middleware/definition';
 import getEntitiesWatcher from './forms/middleware/entities';
 
 import { all } from "redux-saga/effects";
