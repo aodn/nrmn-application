@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.format;
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheckEntity;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
+import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
+import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
 import cyclops.control.Validated;
 
 import java.time.LocalTime;
@@ -15,9 +15,9 @@ public final class TimeFormat extends BaseValidationFormat {
     }
 
     @Override
-    public Validated<ErrorCheckEntity, String> valid(StagedSurveyEntity target) {
+    public Validated<ErrorCheck, String> valid(StagedSurvey target) {
         return validFormat(
-                StagedSurveyEntity::getTime,
+                StagedSurvey::getTime,
                 timeString -> {
                     LocalTime localTime = LocalTime.parse(timeString, DateTimeFormatter.ofPattern(format));
                     localTime.get(ChronoField.CLOCK_HOUR_OF_DAY);

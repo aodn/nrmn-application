@@ -1,7 +1,7 @@
 import React from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import store from '../store';
-import {toggleTheme} from "../import/reducers/theme-reducer";
+import {toggleTheme} from "./theme-reducer";
 import {Settings} from "@material-ui/icons";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -13,7 +13,7 @@ const handleToggleThemeChange = event => {
   store.dispatch(toggleTheme(event.target.checked))
 }
 
-const SettingsMenu = ({ }) => {
+const SettingsMenu = () => {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const handleSettingsClick = (event) => {

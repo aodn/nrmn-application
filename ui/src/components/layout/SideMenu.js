@@ -18,7 +18,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
 import StarBorder from '@material-ui/icons/StarBorder';
 import { connect } from 'react-redux';
-import { toggleMenu } from './redux-layout';
+import { toggleLeftSideMenu } from './layout-reducer';
 import store from '../store';
 import {
     NavLink
@@ -46,14 +46,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const mapStateToProps = state => {
-    return { menuIsOpen: state.toggle.menuIsOpen };
+    return { leftSideMenuIsOpen: state.toggle.leftSideMenuIsOpen };
   };
 
 const handleMainMenu = () => {
-    store.dispatch(toggleMenu())
+    store.dispatch(toggleLeftSideMenu())
 }
 
-const ReduxSideMenu = ({menuIsOpen}) => {
+const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
     const [openSub, setOpenSub] = React.useState(true);
     const classes = useStyles();
     const theme = useTheme();
@@ -66,7 +66,7 @@ const ReduxSideMenu = ({menuIsOpen}) => {
         <Drawer className={classes.drawer}
             variant="persistent"
             anchor="left"
-            open={menuIsOpen}
+            open={leftSideMenuIsOpen}
             classes={{
                 paper: classes.drawerPaper,
             }}

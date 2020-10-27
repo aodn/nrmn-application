@@ -1,7 +1,5 @@
 package au.org.aodn.nrmn.restapi.model.api;
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheckEntity;
-import cyclops.data.Seq;
 import lombok.AllArgsConstructor;
 
 import java.util.List;

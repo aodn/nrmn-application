@@ -53,13 +53,13 @@ CREATE TABLE nrmn.staged_survey (
     id bigserial NOT NULL,
     common_name varchar(255),
     l5 integer,
-    lmax integer,
     l95 integer,
-    pqs integer,
+    lmax integer,
+    pqs varchar(255),
     block integer,
     buddy varchar(255),
     code varchar(255),
-    date date,
+    date timestamp without time zone,
     depth float8,
     direction varchar(255),
     diver varchar(255),
@@ -73,7 +73,6 @@ CREATE TABLE nrmn.staged_survey (
     site_name varchar(255),
     site_no varchar(255),
     species varchar(255),
-    time float8,
     total integer,
     vis integer,
     staged_job_file_id varchar(255),
@@ -88,6 +87,14 @@ CREATE TABLE nrmn.observation_aud (
     measure_value_mod boolean,
     observation_attribute jsonb,
     observation_attribute_mod boolean,
+    diver_id integer,
+    diver_mod boolean,
+    measure_id integer,
+    measure_mod boolean,
+    observable_item_id integer,
+    observable_item_mod boolean,
+    survey_method_id integer,
+    survey_method_mod boolean,
     CONSTRAINT observation_aud_pkey PRIMARY KEY (observation_id, rev)
 );
 
@@ -97,8 +104,15 @@ CREATE TABLE nrmn.survey_method_aud (
     revtype smallint,
     block_num integer,
     block_num_mod boolean,
+    survey_method_attribute jsonb,
+    survey_method_attribute_mod boolean,
     survey_not_done boolean,
     survey_not_done_mod boolean,
+    method_id integer,
+    method_mod boolean,
+    observations_mod boolean,
+    survey_id integer,
+    survey_mod boolean,
     CONSTRAINT survey_method_aud_pkey PRIMARY KEY (survey_method_id, rev)
 );
 
@@ -120,26 +134,12 @@ CREATE TABLE nrmn.survey_aud (
     survey_time_mod boolean,
     visibility integer,
     visibility_mod boolean,
+    program_id integer,
+    program_mod boolean,
+    site_id integer,
+    site_mod boolean,
+    survey_methods_mod boolean,
     CONSTRAINT survey_aud_pkey PRIMARY KEY (survey_id, rev)
-);
-
-CREATE TABLE nrmn.site_ref_aud (
-    site_id integer NOT NULL,
-    rev integer NOT NULL,
-    revtype smallint,
-    is_active boolean,
-    is_active_mod boolean,
-    latitude float8,
-    latitude_mod boolean,
-    longitude float8,
-    longitude_mod boolean,
-    site_attribute jsonb,
-    site_attribute_mod boolean,
-    site_code varchar(255),
-    site_code_mod boolean,
-    site_name varchar(255),
-    site_name_mod boolean,
-    CONSTRAINT site_ref_aud_pkey PRIMARY KEY (site_id, rev)
 );
 
 CREATE TABLE nrmn.location_ref_aud (
@@ -173,13 +173,30 @@ CREATE TABLE nrmn.observable_item_ref_aud (
     obs_item_attribute_mod boolean,
     observable_item_name varchar(255),
     observable_item_name_mod boolean,
+    aphia_id integer,
+    aphia_ref_mod boolean,
+    aphia_rel_type_id integer,
+    aphia_rel_type_mod boolean,
+    obs_item_type_id integer,
+    obs_item_type_mod boolean,
+    length_weight_mod boolean,
     CONSTRAINT observable_item_ref_aud_pkey PRIMARY KEY (observable_item_id, rev)
 );
 
-CREATE TABLE nrmn.public_data_exclusion (
-    program_id integer NOT NULL,
-    site_id integer NOT NULL,
-    CONSTRAINT public_data_exclusion_pkey PRIMARY KEY (program_id, site_id)
+CREATE TABLE nrmn.lengthweight_ref_aud (
+    observable_item_id integer NOT NULL,
+    rev integer NOT NULL,
+    revtype smallint,
+    a float8,
+    a_mod boolean,
+    b float8,
+    b_mod boolean,
+    cf float8,
+    cf_mod boolean,
+    sgfgu varchar(255),
+    sgfgu_mod boolean,
+    observable_item_mod boolean,
+    CONSTRAINT lengthweight_ref_aud_pkey PRIMARY KEY (observable_item_id, rev)
 );
 
 CREATE TABLE nrmn.sec_user (
@@ -202,6 +219,29 @@ CREATE TABLE nrmn.user_action_aud (
     CONSTRAINT user_action_aud_pkey PRIMARY KEY (id)
 );
 
+CREATE TABLE nrmn.site_ref_aud (
+    site_id integer NOT NULL,
+    rev integer NOT NULL,
+    revtype smallint,
+    geom PUBLIC.GEOMETRY,
+    geom_mod boolean,
+    is_active boolean,
+    is_active_mod boolean,
+    latitude float8,
+    latitude_mod boolean,
+    longitude float8,
+    longitude_mod boolean,
+    site_attribute jsonb,
+    site_attribute_mod boolean,
+    site_code varchar(255),
+    site_code_mod boolean,
+    site_name varchar(255),
+    site_name_mod boolean,
+    location_id integer,
+    location_mod boolean,
+    CONSTRAINT site_ref_aud_pkey PRIMARY KEY (site_id, rev)
+);
+
 ALTER TABLE nrmn.sec_user_aud
     ADD CONSTRAINT fk1tqqojx2q75iy64166aehon7p FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
@@ -217,9 +257,6 @@ ALTER TABLE nrmn.survey_method_aud
 ALTER TABLE nrmn.survey_aud
     ADD CONSTRAINT fklqcbssyix1l4orhbnrvd9khta FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
-ALTER TABLE nrmn.site_ref_aud
-    ADD CONSTRAINT fkoj8hgo02f1vvoas72bogiv97t FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
-
 ALTER TABLE nrmn.location_ref_aud
     ADD CONSTRAINT fkqcdhb4kma1glcjulq39i8hofn FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
@@ -229,22 +266,22 @@ ALTER TABLE nrmn.sec_user_roles
 ALTER TABLE nrmn.observable_item_ref_aud
     ADD CONSTRAINT fksehkdmw8opm6n0ytxsmtcjx9l FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
-ALTER TABLE nrmn.public_data_exclusion
-    ADD CONSTRAINT fksq3vap0t8ruo7d5ghdt5imphh FOREIGN KEY (program_id) REFERENCES nrmn.program_ref (program_id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE nrmn.lengthweight_ref_aud
+    ADD CONSTRAINT fktopm2rqqongr4i502p963xjbe FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 CREATE UNIQUE INDEX unique_email ON nrmn.sec_user (email_address);
 
 ALTER TABLE nrmn.diver_ref_aud
     ADD CONSTRAINT fk1nahs3dov9lbpxnmeafoyl82i FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
+ALTER TABLE nrmn.site_ref_aud
+    ADD CONSTRAINT fkoj8hgo02f1vvoas72bogiv97t FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
 ALTER TABLE nrmn.error_check
     ADD CONSTRAINT fkhmycainhljtnhm0ywwutb308w FOREIGN KEY (row_id) REFERENCES nrmn.staged_survey (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 ALTER TABLE nrmn.sec_user_roles
     ADD CONSTRAINT fk_user_sec_role FOREIGN KEY (sec_user_id) REFERENCES nrmn.sec_user (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
-
-ALTER TABLE nrmn.public_data_exclusion
-    ADD CONSTRAINT fksya8iyraotp866qvhggmwgmkp FOREIGN KEY (site_id) REFERENCES nrmn.site_ref (site_id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 CREATE SEQUENCE IF NOT EXISTS nrmn.hibernate_sequence;
 

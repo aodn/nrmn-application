@@ -1,28 +1,28 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import au.org.aodn.nrmn.restapi.RestApiApplication;
+import au.org.aodn.nrmn.restapi.controller.utils.RequestWrapper;
 import au.org.aodn.nrmn.restapi.dto.auth.LoginRequest;
 import au.org.aodn.nrmn.restapi.dto.auth.SignUpRequest;
 import au.org.aodn.nrmn.restapi.dto.payload.JwtAuthenticationResponse;
-import au.org.aodn.nrmn.restapi.controller.utils.RequestWrapper;
-import au.org.aodn.nrmn.restapi.model.db.SecUserEntity;
-import au.org.aodn.nrmn.restapi.model.db.SurveyEntity;
+import au.org.aodn.nrmn.restapi.model.db.SecUser;
+import au.org.aodn.nrmn.restapi.model.db.Survey;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.*;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @Testcontainers
 @SpringBootTest(classes = RestApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -37,15 +37,15 @@ public class AuthControllerIT {
     @Test
     public void signup() throws Exception {
 
-        RequestWrapper<SignUpRequest, SecUserEntity> reqBuilder = new RequestWrapper<SignUpRequest, SecUserEntity>();
+        RequestWrapper<SignUpRequest, SecUser> reqBuilder = new RequestWrapper<SignUpRequest, SecUser>();
         val signupReq = new SignUpRequest("tj@gmail.com", "FirstName TestName", "#12Trois", Collections.emptyList());
 
-        ResponseEntity<SecUserEntity> response = reqBuilder
+        ResponseEntity<SecUser> response = reqBuilder
                 .withAppJson()
                 .withUri(_createUrl("/api/auth/signup"))
                 .withMethod(HttpMethod.POST)
                 .withEntity(signupReq)
-                .withResponseType(SecUserEntity.class)
+                .withResponseType(SecUser.class)
                 .build(testRestTemplate);
 
         assertEquals(response.getStatusCode(), HttpStatus.CREATED);
@@ -71,10 +71,10 @@ public class AuthControllerIT {
         assertEquals(response.getBody().getTokenType(), "Bearer");
 
         val token = response.getBody().getAccessToken();
-        val reqBuilderSurvey = new RequestWrapper<Void, List<SurveyEntity>>();
+        val reqBuilderSurvey = new RequestWrapper<Void, List<Survey>>();
         val surveyReadyReq = reqBuilderSurvey
                 .withAppJson()
-                .withResponseType((Class<List<SurveyEntity>>) (Class<?>) List.class)
+                .withResponseType((Class<List<Survey>>) (Class<?>) List.class)
                 .withToken(token)
                 .withUri(_createUrl("/api/survey"))
                 .withMethod(HttpMethod.GET);
@@ -122,17 +122,16 @@ public class AuthControllerIT {
 
     @Test
     public void badSignup() throws Exception {
-        RequestWrapper<SignUpRequest, SecUserEntity> reqBuilder = new RequestWrapper<SignUpRequest, SecUserEntity>();
+        RequestWrapper<SignUpRequest, SecUser> reqBuilder = new RequestWrapper<SignUpRequest, SecUser>();
         val signupReq = new SignUpRequest("test@gmail.com", "F", "#12Trois", Collections.emptyList());
 
-        ResponseEntity<SecUserEntity> response = reqBuilder
+        ResponseEntity<SecUser> response = reqBuilder
                 .withAppJson()
                 .withUri(_createUrl("/api/auth/signup"))
                 .withMethod(HttpMethod.POST)
                 .withEntity(signupReq)
-                .withResponseType(SecUserEntity.class)
+                .withResponseType(SecUser.class)
                 .build(testRestTemplate);
-
         assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
     }
 

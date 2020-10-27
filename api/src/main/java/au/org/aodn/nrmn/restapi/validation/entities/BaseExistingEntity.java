@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.entities;
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheckEntity;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
+import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
+import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.validation.ValidationLevelType;
 import au.org.aodn.nrmn.restapi.validation.format.BaseValidationFormat;
@@ -12,7 +12,7 @@ import java.util.List;
 
 public abstract class BaseExistingEntity extends BaseValidationFormat {
 
-    protected <T> Validated<ErrorCheckEntity, String> warningNotFound(List<T> entitiesFound, StagedSurveyEntity target, String fieldValue) {
+    protected <T> Validated<ErrorCheck, String> warningNotFound(List<T> entitiesFound, StagedSurvey target, String fieldValue) {
         val errorID = new ErrorID(
                 target.getId(),
                 target.getStagedJob().getId(),
@@ -23,7 +23,7 @@ public abstract class BaseExistingEntity extends BaseValidationFormat {
             errorID.setMessage(columnTarget + "is empty");
 
         if (entitiesFound.isEmpty())
-            return Validated.invalid(new ErrorCheckEntity(errorID, ValidationLevelType.WARNING, columnTarget, target));
+            return Validated.invalid(new ErrorCheck(errorID, ValidationLevelType.WARNING, columnTarget, target));
 
         return Validated.valid(fieldValue + " was found!");
     }

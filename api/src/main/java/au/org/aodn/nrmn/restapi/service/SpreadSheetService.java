@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
+import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
 import au.org.aodn.nrmn.restapi.service.model.HeaderCellIndex;
 import au.org.aodn.nrmn.restapi.service.model.SheetWithHeader;
 import cyclops.control.Future;
@@ -10,10 +10,9 @@ import cyclops.control.Try;
 import cyclops.control.Validated;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -104,7 +102,7 @@ public class SpreadSheetService {
         return Validated.valid(new SheetWithHeader(fileId, headers, sheet));
     }
 
-    public List<StagedSurveyEntity> sheets2Staged(SheetWithHeader dataSheet) {
+    public List<StagedSurvey> sheets2Staged(SheetWithHeader dataSheet) {
         val eval = new XSSFFormulaEvaluator((XSSFWorkbook) dataSheet.getSheet().getWorkbook());
         val fmt = new DataFormatter();
 
@@ -118,7 +116,7 @@ public class SpreadSheetService {
         ).collect(Collectors.toList());
 
 
-        List<StagedSurveyEntity> stagedSurveys = IntStream
+        List<StagedSurvey> stagedSurveys = IntStream
                 .range(2, dataSheet.getSheet().getPhysicalNumberOfRows())
                 .filter(i ->
                         Maybe.attempt(() ->
@@ -127,7 +125,7 @@ public class SpreadSheetService {
                         ).orElseGet(() -> false)
                 ).mapToObj(index -> {
                     val row = dataSheet.getSheet().getRow(index);
-                    val stagedSurvey = new StagedSurveyEntity();
+                    val stagedSurvey = new StagedSurvey();
                     stagedSurvey.setDiver(_getCellValue(row.getCell(headerMap.get("Diver")), eval, fmt));
                     stagedSurvey.setBuddy(_getCellValue(row.getCell(headerMap.get("Buddy")), eval, fmt));
                     stagedSurvey.setSiteNo(_getCellValue(row.getCell(headerMap.get("Site No.")), eval, fmt));

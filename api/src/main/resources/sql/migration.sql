@@ -3,16 +3,16 @@
 --
 
 -- Dumped from database version 9.6.15
--- Dumped by pg_dump version 9.6.19
+-- Dumped by pg_dump version 13.0 (Ubuntu 13.0-1.pgdg20.04+1)
 
--- Started on 2020-10-08 15:15:34 AEDT
+-- Started on 2020-10-14 16:03:48 AEDT
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
+
 SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
@@ -100,8 +100,6 @@ end; ';
 
 
 SET default_tablespace = '';
-
-SET default_with_oids = false;
 
 --
 -- TOC entry 207 (class 1259 OID 78214)
@@ -2977,7 +2975,7 @@ ALTER TABLE ONLY nrmn.survey
     ADD CONSTRAINT survey_site_fk FOREIGN KEY (site_id) REFERENCES nrmn.site_ref(site_id);
 
 
--- Completed on 2020-10-08 15:15:40 AEDT
+-- Completed on 2020-10-14 16:03:52 AEDT
 
 --
 -- PostgreSQL database dump complete

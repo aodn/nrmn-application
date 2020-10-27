@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.format;
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheckEntity;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurveyEntity;
+import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
+import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
 import cyclops.control.Validated;
 
 
@@ -15,9 +15,9 @@ public final class DateFormat extends BaseValidationFormat {
     }
 
     @Override
-    public Validated<ErrorCheckEntity, String> valid(StagedSurveyEntity target) {
+    public Validated<ErrorCheck, String> valid(StagedSurvey target) {
         return validFormat(
-                StagedSurveyEntity::getDate,
+                StagedSurvey::getDate,
                 dateString -> {
                     SimpleDateFormat formatter = new SimpleDateFormat(format);
                     formatter.parse(dateString);

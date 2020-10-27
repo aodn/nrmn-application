@@ -8,7 +8,8 @@ import {
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TopBar from './components/layout/TopBar';
 import SideMenu from './components/layout/SideMenu';
-import {blueGrey, grey} from '@material-ui/core/colors';
+import Login from './components/auth/login'
+import {blueGrey, grey } from '@material-ui/core/colors';
 import {
   BrowserRouter as Router,
   Switch,
@@ -18,7 +19,6 @@ import {
 import FileList from './components/import/FileList';
 import ImportPage from './components/import/Index';
 import { useSelector} from "react-redux";
-import green from "@material-ui/core/colors/green";
 
 
 const drawerWidth = 240;
@@ -51,15 +51,23 @@ export default function App()  {
 
   const themeState = useSelector(state =>  state.theme);
 
+
   let theme = createMuiTheme({
     palette: {
+      text: {
+        primary: themeState.themeType ? '#eee' :'#607d8b',
+        secondary: themeState.themeType ? '#999' :"#555"
+      },
       primary: blueGrey,
       secondary: grey,
       type: themeState.themeType ? "dark" : "light",
     },
     props: {
-      MuiTable: {
-        size: themeState.tableSize
+      MuiTextField: {
+        variant: 'outlined',
+        margin: "dense",
+        notched: "true",
+        color: "primary"
       }
     }
   });
@@ -79,10 +87,9 @@ export default function App()  {
           >
             <div className={classes.drawerHeader} />
             <Switch>
-            <Route path={["/import-file/:fileID?"]} component={ImportPage}>
-              </Route>
-            <Route path="/list-file" component={FileList} >
-              </Route>
+              <Route path={["/import-file/:fileID?"]} component={ImportPage} />
+              <Route path="/list-file" component={FileList} />
+              <Route path="/login" component={Login} />
             </Switch>
         </main>
         </Router>
