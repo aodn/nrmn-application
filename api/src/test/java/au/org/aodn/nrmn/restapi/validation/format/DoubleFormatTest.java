@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.format;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -11,11 +11,11 @@ class DoubleFormatTest {
     @Test
     void nanShouldFail() {
         val job = new StagedJob();
-        job.setId("idJob");
-        val stage = new StagedSurvey();
+        job.setId(1);
+        val stage = new StagedRow();
         stage.setLongitude("Not a number");
         stage.setStagedJob(job);
-        val res = new DoubleFormat(StagedSurvey::getLongitude, "Longitude").valid(stage);
+        val res = new DoubleFormat(StagedRow::getLongitude, "Longitude").valid(stage);
         assertTrue(res.isInvalid());
 
     }
@@ -23,11 +23,11 @@ class DoubleFormatTest {
     @Test
     void minusValueShouldBeOK(){
         val job = new StagedJob();
-        job.setId("idJob");
-        val stage = new StagedSurvey();
+        job.setId(1);
+        val stage = new StagedRow();
         stage.setLongitude("-67.192519");
         stage.setStagedJob(job);
-        val res = new DoubleFormat(StagedSurvey::getLongitude, "Longitude").valid(stage);
+        val res = new DoubleFormat(StagedRow::getLongitude, "Longitude").valid(stage);
         assertTrue(res.isValid());
 
 

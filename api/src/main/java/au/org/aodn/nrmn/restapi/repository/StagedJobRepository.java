@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface StagedJobRepository extends JpaRepository<StagedJob, String> {
-    Optional<StagedJob> findById(String jobID);
+public interface StagedJobRepository extends JpaRepository<StagedJob, Long> {
+    Optional<StagedJob> findByReference(String reference);
 }

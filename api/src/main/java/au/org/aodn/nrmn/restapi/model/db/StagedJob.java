@@ -3,34 +3,44 @@ package au.org.aodn.nrmn.restapi.model.db;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import java.sql.Timestamp;
 import java.util.Map;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "staged_job")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class StagedJob {
-
     @Id
-    @Column(name = "file_id")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "staged_job_id_seq")
+    @SequenceGenerator(name = "staged_job_id_seq", sequenceName = "staged_job_id_seq", allocationSize = 1)
+    private long id;
+
+    @Column(name = "reference")
+    private String reference;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
@@ -39,6 +49,16 @@ public class StagedJob {
     @Enumerated(EnumType.STRING)
     @Column(name = "source")
     private SourceJobType source;
+
+    @Column(name = "created", columnDefinition = "timestamp with time zone")
+    @CreationTimestamp
+    @Setter(AccessLevel.NONE)
+    private Timestamp created;
+    
+    @Column(name = "last_updated", columnDefinition = "timestamp with time zone")
+    @UpdateTimestamp
+    @Setter(AccessLevel.NONE)
+    private Timestamp lastUpdated;
 
     @Column(name = "job_attributes", columnDefinition = "jsonb")
     @Type(type = "jsonb")

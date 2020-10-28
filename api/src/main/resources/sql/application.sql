@@ -9,15 +9,6 @@ CREATE TABLE nrmn.diver_ref_aud (
     CONSTRAINT diver_ref_aud_pkey PRIMARY KEY (diver_id, rev)
 );
 
-CREATE TABLE nrmn.error_check (
-    job_id varchar(255) NOT NULL,
-    message varchar(255) NOT NULL,
-    column_target varchar(255),
-    error_level varchar(255),
-    row_id bigint NOT NULL,
-    CONSTRAINT error_check_pkey PRIMARY KEY (job_id, message, row_id)
-);
-
 CREATE TABLE nrmn.revinfo (
     id integer NOT NULL,
     timestamp bigint NOT NULL,
@@ -39,45 +30,6 @@ CREATE TABLE nrmn.sec_user_aud (
     status varchar(255),
     status_mod boolean,
     CONSTRAINT sec_user_aud_pkey PRIMARY KEY (id, rev)
-);
-
-CREATE TABLE nrmn.staged_job (
-    file_id varchar(255) NOT NULL,
-    job_attributes jsonb,
-    source varchar(255),
-    status varchar(255),
-    CONSTRAINT staged_job_pkey PRIMARY KEY (file_id)
-);
-
-CREATE TABLE nrmn.staged_survey (
-    id bigserial NOT NULL,
-    common_name varchar(255),
-    l5  varchar(255),
-    l95  varchar(255),
-    lmax  varchar(255),
-    pqs varchar(255),
-    block  varchar(255),
-    buddy varchar(255),
-    code varchar(255),
-    date  varchar(255),
-    time  varchar(255),
-    depth  varchar(255),
-    direction varchar(255),
-    diver varchar(255),
-    inverts  varchar(255),
-    is_invert_sizing  varchar(255),
-    latitude  varchar(255),
-    longitude  varchar(255),
-    m2_invert_sizing_species   varchar(255),
-    measure_value  varchar(255),
-    method  varchar(255),
-    site_name varchar(255),
-    site_no varchar(255),
-    species varchar(255),
-    total  varchar(255),
-    vis  varchar(255),
-    staged_job_file_id varchar(255),
-    CONSTRAINT staged_survey_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE nrmn.observation_aud (
@@ -210,6 +162,68 @@ CREATE TABLE nrmn.sec_user (
     CONSTRAINT sec_user_pkey PRIMARY KEY (id)
 );
 
+CREATE TABLE nrmn.staged_job_log (
+    id bigserial NOT NULL,
+    details text,
+    event_time timestamp with time zone NOT NULL,
+    event_type varchar(255) NOT NULL,
+    staged_job_id bigint NOT NULL,
+    CONSTRAINT staged_job_log_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE nrmn.staged_row (
+    id bigserial NOT NULL,
+    common_name varchar(255),
+    l5 varchar(255),
+    l95 varchar(255),
+    lmax varchar(255),
+    pqs varchar(255),
+    block varchar(255),
+    buddy varchar(255),
+    code varchar(255),
+    created timestamp with time zone NOT NULL,
+    date varchar(255),
+    depth varchar(255),
+    direction varchar(255),
+    diver varchar(255),
+    inverts varchar(255),
+    is_invert_sizing boolean,
+    last_updated timestamp with time zone NOT NULL,
+    latitude varchar(255),
+    longitude varchar(255),
+    m2_invert_sizing_species boolean,
+    measure_value json,
+    method varchar(255),
+    site_name varchar(255),
+    site_no varchar(255),
+    species varchar(255),
+    time varchar(255),
+    total varchar(255),
+    vis varchar(255),
+    staged_job_id bigint,
+    CONSTRAINT staged_row_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE nrmn.staged_job (
+    id bigint NOT NULL,
+    created timestamp with time zone,
+    job_attributes jsonb,
+    last_updated timestamp with time zone,
+    reference varchar(255),
+    source varchar(255),
+    status varchar(255),
+    CONSTRAINT staged_job_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE nrmn.staged_row_error (
+    job_id bigint NOT NULL,
+    message varchar(255) NOT NULL,
+    column_target varchar(255),
+    error_level varchar(255),
+    row_id bigint NOT NULL,
+    CONSTRAINT staged_row_error_pkey PRIMARY KEY (job_id, message, row_id)
+);
+
 CREATE TABLE nrmn.user_action_aud (
     id bigint NOT NULL,
     audit_time timestamp with time zone,
@@ -246,9 +260,6 @@ CREATE TABLE nrmn.site_ref_aud (
 ALTER TABLE nrmn.sec_user_aud
     ADD CONSTRAINT fk1tqqojx2q75iy64166aehon7p FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
-ALTER TABLE nrmn.staged_survey
-    ADD CONSTRAINT fkc53smpawan288nu3oqugn8b06 FOREIGN KEY (staged_job_file_id) REFERENCES nrmn.staged_job (file_id) ON UPDATE NO ACTION ON DELETE NO ACTION;
-
 ALTER TABLE nrmn.observation_aud
     ADD CONSTRAINT fkctpj5torreec5ut7jcsxjwxtd FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
@@ -272,19 +283,27 @@ ALTER TABLE nrmn.lengthweight_ref_aud
 
 CREATE UNIQUE INDEX unique_email ON nrmn.sec_user (email_address);
 
+ALTER TABLE nrmn.staged_row
+    ADD CONSTRAINT staged_row_staged_job_id_fkey FOREIGN KEY (staged_job_id) REFERENCES nrmn.staged_job (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE nrmn.staged_row_error
+    ADD CONSTRAINT staged_row_error_staged_row_id_fkey FOREIGN KEY (row_id) REFERENCES nrmn.staged_row (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
 ALTER TABLE nrmn.diver_ref_aud
     ADD CONSTRAINT fk1nahs3dov9lbpxnmeafoyl82i FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 ALTER TABLE nrmn.site_ref_aud
     ADD CONSTRAINT fkoj8hgo02f1vvoas72bogiv97t FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
-ALTER TABLE nrmn.error_check
-    ADD CONSTRAINT fkhmycainhljtnhm0ywwutb308w FOREIGN KEY (row_id) REFERENCES nrmn.staged_survey (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
-
 ALTER TABLE nrmn.sec_user_roles
     ADD CONSTRAINT fk_user_sec_role FOREIGN KEY (sec_user_id) REFERENCES nrmn.sec_user (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
+ALTER TABLE nrmn.staged_job_log
+    ADD CONSTRAINT staged_job_log_staged_job_id_fkey FOREIGN KEY (staged_job_id) REFERENCES nrmn.staged_job (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
 CREATE SEQUENCE IF NOT EXISTS nrmn.hibernate_sequence;
+
+CREATE SEQUENCE IF NOT EXISTS nrmn.staged_job_id_seq;
 
 CREATE SEQUENCE IF NOT EXISTS nrmn.user_id_seq;
 

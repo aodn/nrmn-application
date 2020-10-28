@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.entities;
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.validation.BaseValidator;
 import au.org.aodn.nrmn.restapi.validation.ValidationLevelType;
@@ -18,7 +18,7 @@ public abstract class BaseExistingEntity extends BaseValidator {
         super(columnTarget);
     }
 
-    protected <T> Validated<ErrorCheck, String> warningNotFound(List<T> entitiesFound, StagedSurvey target, String fieldValue) {
+    protected <T> Validated<StagedRowError, String> warningNotFound(List<T> entitiesFound, StagedRow target, String fieldValue) {
         val errorID = new ErrorID(
                 target.getId(),
                 target.getStagedJob().getId(),
@@ -29,7 +29,7 @@ public abstract class BaseExistingEntity extends BaseValidator {
             errorID.setMessage(columnTarget + "is empty");
 
         if (entitiesFound.isEmpty())
-            return Validated.invalid(new ErrorCheck(errorID, ValidationLevelType.WARNING, columnTarget, target));
+            return Validated.invalid(new StagedRowError(errorID, ValidationLevelType.WARNING, columnTarget, target));
 
         return Validated.valid(fieldValue + " was found!");
     }

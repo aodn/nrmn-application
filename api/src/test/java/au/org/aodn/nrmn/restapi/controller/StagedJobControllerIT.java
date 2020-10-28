@@ -42,7 +42,7 @@ import static org.testcontainers.containers.localstack.LocalStackContainer.Servi
 @Testcontainers
 @SpringBootTest(classes = RestApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("cicd")
-class StagedDataControllerIT {
+class StagedJobControllerIT {
 
     @Container
     static public LocalStackContainer localstack = new LocalStackContainer()

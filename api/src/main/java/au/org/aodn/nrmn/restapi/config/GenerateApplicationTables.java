@@ -67,9 +67,9 @@ public class GenerateApplicationTables implements ApplicationListener<Applicatio
             _generatingTables(
                     settings,
                     Arrays.asList(
-                            ErrorCheck.class,
+                            StagedRowError.class,
                             StagedJob.class,
-                            StagedSurvey.class),
+                            StagedRow.class),
                     "createIngestTables"
             );
 

@@ -1,11 +1,10 @@
 package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
-import au.org.aodn.nrmn.restapi.repository.ErrorCheckRepository;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedSurveyRepository;
-
+import au.org.aodn.nrmn.restapi.repository.StagedRowErrorRepository;
+import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,15 +14,15 @@ import java.util.Optional;
 @Service
 public class StageSurveyService {
     @Autowired
-    StagedSurveyRepository rawRepo;
+    StagedRowRepository rawRepo;
 
     @Autowired
     StagedJobRepository jobRepo;
 
     @Autowired
-    ErrorCheckRepository errorRepo;
+    StagedRowErrorRepository errorRepo;
 
-    public Optional<StagedSurvey> update(StagedSurvey update) {
+    public Optional<StagedRow> update(StagedRow update) {
        // errorRepo.deleteAll(update.getErrors());
         return Optional.of(rawRepo.save(update));
     }
@@ -34,7 +33,7 @@ public class StageSurveyService {
 
     }
 
-    public List<StagedSurvey> getRawSurveyFile(String fileID) {
+    public List<StagedRow> getRawSurveyFile(String fileID) {
         return rawRepo.findRawSurveyByFileID(fileID);
     }
 }
