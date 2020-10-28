@@ -15,9 +15,9 @@ public class DiverExists extends BaseExistingEntity {
     DiverRepository diverRepo;
 
     @Autowired
-    DiverExists(ErrorCheckRepository errorRepo, DiverRepository diverRepo){
+    DiverExists(ErrorCheckRepository errorRepo, DiverRepository diverRepo) {
+        super("Diver");
         this.diverRepo = diverRepo;
-        this.columnTarget = "Diver";
     }
 
     @Override

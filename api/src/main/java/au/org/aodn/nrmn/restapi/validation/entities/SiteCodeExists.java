@@ -17,8 +17,8 @@ public class SiteCodeExists extends BaseExistingEntity {
 
     @Autowired
     public SiteCodeExists(ErrorCheckRepository errorRepo, SiteRepository siteRepo) {
+        super("Site No");
         this.siteRepo = siteRepo;
-        this.columnTarget = "Site No";
     }
 
     @Override

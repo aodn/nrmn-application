@@ -10,8 +10,7 @@ import java.time.temporal.ChronoField;
 
 public final class TimeFormat extends BaseValidationFormat {
     TimeFormat() {
-        this.format = "HH:mm";
-        this.columnTarget = "Time";
+        super("Time", "HH:mm");
     }
 
     @Override

@@ -10,8 +10,7 @@ import java.text.SimpleDateFormat;
 public final class DateFormat extends BaseValidationFormat {
 
     DateFormat() {
-        this.format = "dd/MM/yyyy";
-        this.columnTarget = "Date";
+        super("Date", "dd/MM/yyyy");
     }
 
     @Override

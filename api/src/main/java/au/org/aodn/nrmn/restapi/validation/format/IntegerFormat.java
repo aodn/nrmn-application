@@ -14,8 +14,7 @@ public class IntegerFormat extends BaseValidationFormat {
     private Function<StagedSurvey, String> getField;
 
     IntegerFormat(Function<StagedSurvey, String> getField, String colunmTarget) {
-        this.format = "Numerical";
-        this.columnTarget = colunmTarget;
+        super(colunmTarget, "Numerical");
         this.getField = getField;
     }
 

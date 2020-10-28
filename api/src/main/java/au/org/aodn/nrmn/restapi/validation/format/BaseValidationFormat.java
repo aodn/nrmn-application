@@ -16,6 +16,12 @@ public abstract class BaseValidationFormat extends BaseValidator {
 
     protected String format;
 
+
+    public BaseValidationFormat(String columnTarget, String format) {
+        super(columnTarget);
+        this.format = format;
+    }
+
     protected Validated<ErrorCheck, String> validFormat(
             Function<StagedSurvey, String> entry,
             ConsumerThrowable<String, Exception> formatCheck,

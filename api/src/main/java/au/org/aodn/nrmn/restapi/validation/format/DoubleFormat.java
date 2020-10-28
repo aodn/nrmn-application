@@ -10,9 +10,8 @@ public class DoubleFormat extends BaseValidationFormat {
     protected Function<StagedSurvey, String> getField;
 
     DoubleFormat(Function<StagedSurvey, String> getField, String colunmTarget) {
-        this.format = "Numerical";
+        super(colunmTarget, "Numerical");
         this.getField = getField;
-        this.columnTarget = colunmTarget;
     }
 
     @Override

@@ -13,24 +13,10 @@ public abstract class BaseValidator {
 
 
     protected String columnTarget;
-    protected ErrorCheckRepository errorRepo;
 
-
+    public BaseValidator(String columnTarget){
+        this.columnTarget = columnTarget;
+    }
     abstract public Validated<ErrorCheck, String> valid(StagedSurvey target);
 
-
-    protected <T> Validated<ErrorCheck, String> warningNotFound(List<T> entitiesFound, StagedSurvey target, String msg) {
-        if (entitiesFound.isEmpty()) {
-            val error = new ErrorCheck(
-                new ErrorID(target.getId(),
-                    target.getStagedJob().getId(),
-                    msg + " Couldn't be found"),
-                ValidationLevelType.WARNING,
-                    columnTarget,
-                target);
-            val persistedError = errorRepo.save(error);
-            return Validated.invalid(persistedError);
-        }
-        return Validated.valid(msg + " was found!");
-    }
 }
