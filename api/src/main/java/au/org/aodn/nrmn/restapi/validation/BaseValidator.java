@@ -11,27 +11,12 @@ import java.util.List;
 
 public abstract class BaseValidator {
 
-    protected String colunmTagert;
-    protected ErrorCheckRepository errorRepo;
 
-    public BaseValidator(ErrorCheckRepository errorRepo) {
-        this.errorRepo = errorRepo;
+    protected String columnTarget;
+
+    public BaseValidator(String columnTarget){
+        this.columnTarget = columnTarget;
     }
-
     abstract public Validated<ErrorCheck, String> valid(StagedSurvey target);
 
-    protected <T> Validated<ErrorCheck, String> warningNotFound(List<T> entitiesFound, StagedSurvey target, String msg) {
-        if (entitiesFound.isEmpty()) {
-            val error = new ErrorCheck(
-                new ErrorID(target.getId(),
-                    target.getStagedJob().getId(),
-                    msg + " Couldn't be found"),
-                ValidationLevelType.WARNING,
-                colunmTagert,
-                target);
-            val persistedError = errorRepo.save(error);
-            return Validated.invalid(persistedError);
-        }
-        return Validated.valid(msg + " was found!");
-    }
 }

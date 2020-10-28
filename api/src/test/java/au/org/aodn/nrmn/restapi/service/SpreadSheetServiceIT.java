@@ -55,7 +55,7 @@ public class SpreadSheetServiceIT {
                 )))
                 .region(Region.of(localstack.getRegion()))
                 .build();
-        client.createBucket(CreateBucketRequest.builder().bucket("bucket").build());
+        client.createBucket(CreateBucketRequest.builder().bucket("nrmn-dev").build());
 
     }
     @AfterAll
@@ -133,11 +133,11 @@ public class SpreadSheetServiceIT {
         val obs1 = stageSurveys.get(0);
 
         //test Double
-        assertEquals(obs1.getLatitude(), -41.253706);
-        assertEquals(obs1.getLongitude(), 148.339749);
+        assertEquals(obs1.getLatitude(), "-41.253706");
+        assertEquals(obs1.getLongitude(), "148.339749");
         //test Map filling
         assertEquals(obs1.getMeasureJson().size(), 4);
-        assertEquals(obs1.getMeasureJson().get("162.5"), 4);
+        assertEquals(obs1.getMeasureJson().get("162.5"), "4");
         // test Macro
         assertEquals(obs1.getSpecies(), "Caesioperca rasor");
     }

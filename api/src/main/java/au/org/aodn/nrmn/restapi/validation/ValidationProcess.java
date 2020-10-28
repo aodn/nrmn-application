@@ -6,11 +6,12 @@ import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
+
+import au.org.aodn.nrmn.restapi.validation.entities.DiverExists;
+import au.org.aodn.nrmn.restapi.validation.entities.SiteCodeExists;
 import au.org.aodn.nrmn.restapi.repository.ErrorCheckRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedSurveyRepository;
-import au.org.aodn.nrmn.restapi.validation.warning.DiverExists;
-import au.org.aodn.nrmn.restapi.validation.warning.SiteCodeExists;
 import cyclops.companion.Monoids;
 import cyclops.companion.Semigroups;
 import cyclops.data.Seq;
@@ -57,10 +58,6 @@ public class ValidationProcess {
             return v;
         }).collect(Collectors.toList());
         val rawSurveys = rawSurveyRepo.saveAll(rawDataWithJob);
-        val surveyWithError = rawSurveys.stream().map(raw -> {
-            //raw.setErrors(processError(raw).toList());
-            return raw;
-        }).collect(Collectors.toList());
-        return new ValidationResult(surveyWithError, fileID);
+        return new ValidationResult(rawSurveys, fileID);
     }
 }
