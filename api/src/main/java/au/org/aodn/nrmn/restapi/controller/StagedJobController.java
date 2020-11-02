@@ -49,45 +49,48 @@ public class StagedJobController {
     @PostMapping("/upload")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity<UploadResponse> uploadFile(
-            @RequestParam("withInvertSize") Boolean withInvertSize,
-            @RequestParam("file") MultipartFile file, Authentication authentication) {
+        @RequestParam("withInvertSize") Boolean withInvertSize,
+        @RequestParam("file") MultipartFile file, Authentication authentication) {
 
         userAuditRepo.save(
-                new UserActionAudit(
-                        "stage/upload",
-                        "upload excel file attempt for username: " + authentication.getName()
-                                + " token: " + file.getOriginalFilename())
+            new UserActionAudit(
+                "stage/upload",
+                "upload excel file attempt for username: " + authentication.getName()
+                    + " token: " + file.getOriginalFilename())
         );
 
         val validationHelper = new ValidatorHelpers();
         val validatedSheet =
-                        sheetService
-                                .validatedExcelFile(
-                                        file.getOriginalFilename(),
-                                        file,
-                                        withInvertSize);
+            sheetService
+                .validatedExcelFile(
+                    file.getOriginalFilename(),
+                    file,
+                    withInvertSize);
 
         List<ErrorInput> errors = validationHelper.toErrorList(validatedSheet);
 
         return validatedSheet.fold(
-                err -> ResponseEntity.unprocessableEntity().body(new UploadResponse(Optional.empty(), errors)),
-                sheet -> {
-                    val stagedRowToSave = sheetService.sheets2Staged(sheet);
-                    val stagedJob = jobRepo.save(
-                            StagedJob.builder()
-                                .source(SourceJobType.FILE)
-                                .reference(sheet.getFileId())
-                                .status(StatusJobType.PENDING)
-                                .build()
-                            );
-                    stagedRowRepo.saveAll(stagedRowToSave.stream().map(s -> {
+            err -> ResponseEntity.unprocessableEntity()
+                .body(new UploadResponse(Optional.empty(), errors)),
+            sheet -> {
+                val stagedRowToSave = sheetService.sheets2Staged(sheet);
+                val stagedJob = jobRepo.save(
+                    StagedJob.builder()
+                        .source(SourceJobType.FILE)
+                        .reference(sheet.getFileId())
+                        .status(StatusJobType.PENDING)
+                        .build()
+                );
+                stagedRowRepo.saveAll(stagedRowToSave.stream()
+                    .map(s -> {
                         s.setStagedJob(stagedJob);
                         return s;
-                    }).collect(Collectors.toList()));
-                    val filesResult = new FileUpload(sheet.getFileId(), stagedRowToSave.size());
-                    return ResponseEntity
-                            .status(HttpStatus.OK)
-                            .body(new UploadResponse(Optional.of(filesResult), Collections.emptyList()));
-                });
+                    })
+                    .collect(Collectors.toList()));
+                val filesResult = new FileUpload(sheet.getFileId(), stagedRowToSave.size());
+                return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new UploadResponse(Optional.of(filesResult), Collections.emptyList()));
+            });
     }
 }
