@@ -82,14 +82,14 @@ public class StagedRow {
 
     @JsonProperty(value = "P-Qs")
     @Column(name = "PQs")
-    private String PQs;
+    private String pqs;
 
     @Column(name = "code")
     private String code;
 
     @JsonProperty(value = "Common name")
     @Column(name = "common_name")
-    private String CmmonName;
+    private String commonName;
 
     @Column(name = "total")
     private String total;
@@ -101,16 +101,16 @@ public class StagedRow {
     private Boolean m2InvertSizingSpecies;
 
     @Column(name = "L5")
-    private String L5;
+    private String l5;
 
     @Column(name = "L95")
-    private String L95;
+    private String l95;
 
     @Column(name = "is_invert_Sizing")
     private Boolean isInvertSizing;
 
     @Column(name = "Lmax")
-    private String Lmax;
+    private String lMax;
 
     @Column(name = "measure_value", columnDefinition = "json")
     @Type(type = "jsonb")

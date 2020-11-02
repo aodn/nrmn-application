@@ -136,13 +136,13 @@ public class SpreadSheetService {
                     stagedRow.setDate(_getCellValue(row.getCell(headerMap.get("Date")), eval, fmt));
                     stagedRow.setVis((_getCellValue(row.getCell(headerMap.get("vis")), eval, fmt)));
                     stagedRow.setDirection(_getCellValue(row.getCell(headerMap.get("Direction")), eval, fmt));
-                    stagedRow.setPQs(_getCellValue(row.getCell(headerMap.get("P-Qs")), eval, fmt));
+                    stagedRow.setPqs(_getCellValue(row.getCell(headerMap.get("P-Qs")), eval, fmt));
                     stagedRow.setDepth(_getCellValue(row.getCell(headerMap.get("Depth")), eval, fmt));
                     stagedRow.setMethod(_getCellValue(row.getCell(headerMap.get("Method")), eval, fmt));
                     stagedRow.setBlock((_getCellValue(row.getCell(headerMap.get("Block")), eval, fmt)));
                     stagedRow.setCode(_getCellValue(row.getCell(headerMap.get("Code")), eval, fmt));
                     stagedRow.setSpecies(_getCellValue(row.getCell(headerMap.get("Species")), eval, fmt));
-                    stagedRow.setCmmonName(_getCellValue(row.getCell(headerMap.get("Common name")), eval, fmt));
+                    stagedRow.setCommonName(_getCellValue(row.getCell(headerMap.get("Common name")), eval, fmt));
                     stagedRow.setTotal(_getCellValue(row.getCell(headerMap.get("Total")), eval, fmt));
                     stagedRow.setInverts(_getCellValue(row.getCell(headerMap.get("Inverts")), eval, fmt));
                     if (dataSheet.getHeader().size() == longHeadersRef.size()) {
@@ -150,7 +150,7 @@ public class SpreadSheetService {
                         stagedRow.setL5(_getCellValue(row.getCell(headerMap.get("L5")), eval, fmt));
                         stagedRow.setL95(_getCellValue(row.getCell(headerMap.get("L95")), eval, fmt));
                         stagedRow.setIsInvertSizing(_getCellValue(row.getCell(headerMap.get("Use InvertSizing")), eval, fmt).equals("Yes"));
-                        stagedRow.setLmax(_getCellValue(row.getCell(headerMap.get("Lmax")), eval, fmt));
+                        stagedRow.setLMax(_getCellValue(row.getCell(headerMap.get("Lmax")), eval, fmt));
                     }
 
                     val measureJson = new HashMap<String, String>();
