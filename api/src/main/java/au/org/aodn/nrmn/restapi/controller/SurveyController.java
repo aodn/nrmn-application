@@ -3,9 +3,9 @@ package au.org.aodn.nrmn.restapi.controller;
 import au.org.aodn.nrmn.restapi.model.api.RawSurveyImport;
 import au.org.aodn.nrmn.restapi.model.api.UpdatedResult;
 import au.org.aodn.nrmn.restapi.model.api.ValidationResult;
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.service.StageSurveyService;
@@ -58,20 +58,20 @@ public class SurveyController {
     }
 
     @GetMapping(path = "/raw-survey/{file_id}", produces = "application/json")
-    public List<StagedSurvey> getRawSurveyFile(@PathVariable("file_id") String file_id) {
+    public List<StagedRow> getRawSurveyFile(@PathVariable("file_id") String file_id) {
         return rawSurveyCRUD.getRawSurveyFile(file_id);
     }
 
     @PostMapping(value = "/raw-survey", consumes = "application/json", produces = "application/json")
     public ValidationResult importRawSurvey(@RequestBody RawSurveyImport dataFile) {
-        return validation.processList(dataFile.Rows, dataFile.fileID);
+        return validation.processList(dataFile.rows, dataFile.fileID);
     }
 
     @PutMapping(value = "/raw-survey", consumes = "application/json", produces = "application/json")
-    public UpdatedResult<StagedSurvey, ErrorCheck> updateRawSurvey(@RequestBody StagedSurvey rawSurvey) {
+    public UpdatedResult<StagedRow, StagedRowError> updateRawSurvey(@RequestBody StagedRow rawSurvey) {
         val entity = rawSurveyCRUD.update(rawSurvey);
         val res = validation.processError(rawSurvey);
 
-        return new UpdatedResult<StagedSurvey, ErrorCheck>(entity, res.toList());
+        return new UpdatedResult<StagedRow, StagedRowError>(entity, res.toList());
     }
 }

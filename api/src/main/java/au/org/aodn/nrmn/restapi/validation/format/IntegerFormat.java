@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.format;
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import cyclops.control.Validated;
 
 import java.util.function.Function;
@@ -11,15 +11,15 @@ import java.util.function.Function;
  */
 
 public class IntegerFormat extends BaseValidationFormat {
-    private Function<StagedSurvey, String> getField;
+    private Function<StagedRow, String> getField;
 
-    IntegerFormat(Function<StagedSurvey, String> getField, String colunmTarget) {
+    IntegerFormat(Function<StagedRow, String> getField, String colunmTarget) {
         super(colunmTarget, "Numerical");
         this.getField = getField;
     }
 
     @Override
-    public Validated<ErrorCheck, String> valid(StagedSurvey target) {
+    public Validated<StagedRowError, String> valid(StagedRow target) {
         return validFormat(getField, Integer::parseInt, target);
     }
 }

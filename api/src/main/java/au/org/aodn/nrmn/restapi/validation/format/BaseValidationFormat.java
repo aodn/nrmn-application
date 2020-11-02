@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.format;
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.util.ConsumerThrowable;
 import au.org.aodn.nrmn.restapi.validation.BaseValidator;
@@ -22,17 +22,17 @@ public abstract class BaseValidationFormat extends BaseValidator {
         this.format = format;
     }
 
-    protected Validated<ErrorCheck, String> validFormat(
-            Function<StagedSurvey, String> entry,
+    protected Validated<StagedRowError, String> validFormat(
+            Function<StagedRow, String> entry,
             ConsumerThrowable<String, Exception> formatCheck,
-            StagedSurvey target
+            StagedRow target
     ) {
         return Try.withCatch(() -> {
                     formatCheck.apply(entry.apply(target));
-                    return Validated.<ErrorCheck, String>valid(this.columnTarget + "is valid");
+                    return Validated.<StagedRowError, String>valid(this.columnTarget + "is valid");
                 }
         ).orElseGet(() ->
-                Validated.invalid(new ErrorCheck(
+                Validated.invalid(new StagedRowError(
                         new ErrorID(target.getId(),
                                 target.getStagedJob().getId(),
                                 this.columnTarget + " format is invalid," + "expected format: " + this.format),

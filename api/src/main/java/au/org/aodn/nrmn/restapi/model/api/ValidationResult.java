@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.api;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -8,7 +8,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ValidationResult {
-    public List<StagedSurvey> Rows;
-    public String FileID;
+    public List<StagedRow> rows;
+    public String fileID;
 
 }

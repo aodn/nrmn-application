@@ -8,7 +8,7 @@ import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedSurveyRepository;
+import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.service.SpreadSheetService;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,12 +34,12 @@ import java.util.stream.Collectors;
 @RestController
 @CrossOrigin
 @RequestMapping(path = "/api/stage")
-public class StagedDataController {
+public class StagedJobController {
 
     @Autowired
     SpreadSheetService sheetService;
     @Autowired
-    StagedSurveyRepository stagedSurveyRepo;
+    StagedRowRepository stagedRowRepo;
     @Autowired
     UserActionAuditRepository userAuditRepo;
 
@@ -50,44 +49,48 @@ public class StagedDataController {
     @PostMapping("/upload")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity<UploadResponse> uploadFile(
-            @RequestParam("withInvertSize") Boolean withInvertSize,
-            @RequestParam("file") MultipartFile file, Authentication authentication) {
+        @RequestParam("withInvertSize") Boolean withInvertSize,
+        @RequestParam("file") MultipartFile file, Authentication authentication) {
 
         userAuditRepo.save(
-                new UserActionAudit(
-                        "stage/upload",
-                        "upload excel file attempt for username: " + authentication.getName()
-                                + " token: " + file.getOriginalFilename())
+            new UserActionAudit(
+                "stage/upload",
+                "upload excel file attempt for username: " + authentication.getName()
+                    + " token: " + file.getOriginalFilename())
         );
 
         val validationHelper = new ValidatorHelpers();
         val validatedSheet =
-                        sheetService
-                                .validatedExcelFile(
-                                        file.getOriginalFilename() + "-" + System.currentTimeMillis(),
-                                        file,
-                                        withInvertSize);
+            sheetService
+                .validatedExcelFile(
+                    file.getOriginalFilename(),
+                    file,
+                    withInvertSize);
 
         List<ErrorInput> errors = validationHelper.toErrorList(validatedSheet);
 
         return validatedSheet.fold(
-                err -> ResponseEntity.unprocessableEntity().body(new UploadResponse(Optional.empty(), errors)),
-                sheet -> {
-                    val stagedSurveyToSave = sheetService.sheets2Staged(sheet);
-                    val stagedJob = jobRepo.save(
-                            new StagedJob(
-                                    sheet.getFileId(),
-                                    StatusJobType.PENDING,
-                                    SourceJobType.FILE, new HashMap<>()
-                            ));
-                    stagedSurveyRepo.saveAll(stagedSurveyToSave.stream().map(s -> {
+            err -> ResponseEntity.unprocessableEntity()
+                .body(new UploadResponse(Optional.empty(), errors)),
+            sheet -> {
+                val stagedRowToSave = sheetService.sheets2Staged(sheet);
+                val stagedJob = jobRepo.save(
+                    StagedJob.builder()
+                        .source(SourceJobType.FILE)
+                        .reference(sheet.getFileId())
+                        .status(StatusJobType.PENDING)
+                        .build()
+                );
+                stagedRowRepo.saveAll(stagedRowToSave.stream()
+                    .map(s -> {
                         s.setStagedJob(stagedJob);
                         return s;
-                    }).collect(Collectors.toList()));
-                    val filesResult = new FileUpload(sheet.getFileId(), stagedSurveyToSave.size());
-                    return ResponseEntity
-                            .status(HttpStatus.OK)
-                            .body(new UploadResponse(Optional.of(filesResult), Collections.emptyList()));
-                });
+                    })
+                    .collect(Collectors.toList()));
+                val filesResult = new FileUpload(sheet.getFileId(), stagedRowToSave.size());
+                return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new UploadResponse(Optional.of(filesResult), Collections.emptyList()));
+            });
     }
 }

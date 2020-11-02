@@ -14,6 +14,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.Table;
@@ -22,8 +24,8 @@ import javax.persistence.Table;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "error_check")
-public class ErrorCheck {
+@Table(name = "staged_row_error")
+public class StagedRowError {
 
     @EmbeddedId
     @JsonUnwrapped
@@ -34,10 +36,11 @@ public class ErrorCheck {
     private ValidationLevelType errorLevel;
 
     @Column(name = "column_target")
-    private String ColunmTarget;
+    private String columnTarget;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("rowId")
-    private StagedSurvey row;
+    @JoinColumn(foreignKey = @ForeignKey(name = "staged_row_error_staged_row_id_fkey"))
+    private StagedRow row;
 }
