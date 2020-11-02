@@ -30,9 +30,8 @@ import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
-@CrossOrigin
 @RequestMapping(path = "/api/auth")
-@Tag(name = "auth")
+@Tag(name = "authorisation")
 public class AuthController {
     @Autowired
     AuthenticationManager authenticationManager;

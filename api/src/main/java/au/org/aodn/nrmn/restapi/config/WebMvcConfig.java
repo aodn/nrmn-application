@@ -18,24 +18,29 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("HEAD", "OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE")
-                .maxAge(MAX_AGE_SECS);
+            .allowedOrigins("*")
+            .allowedMethods("HEAD", "OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE")
+            .maxAge(MAX_AGE_SECS);
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(globalRequestInterceptor)
-//                .addPathPatterns("/api/**/");
+        registry.addInterceptor(globalRequestInterceptor)
+            .addPathPatterns("/api/**/");
     }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
+        /* Fallback mapping - forward to index.html - refer to
+         * https://docs.spring.io/spring-framework/docs/3.0.0.M3/reference/html/ch16s04.html
+         * for ordering of handler mappings - we want this one last */
+        registry.setOrder(Integer.MAX_VALUE);
+
         registry.addViewController("/{spring:\\w+}")
-                .setViewName("forward:/");
+            .setViewName("forward:/");
         registry.addViewController("/**/{spring:\\w+}")
-                .setViewName("forward:/");
+            .setViewName("forward:/");
         registry.addViewController("/{spring:\\w+}/**{spring:?!(\\.js|\\.css)$}")
-                .setViewName("forward:/");
+            .setViewName("forward:/");
     }
 }
