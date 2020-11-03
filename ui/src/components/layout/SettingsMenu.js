@@ -48,9 +48,6 @@ const SettingsMenu = () => {
         /></MenuItem>
       </Menu>
       </>
-
-
-
 )
 
 }

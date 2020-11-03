@@ -25,6 +25,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
+    "react-global-configuration": "^1.4.0",
     "react-redux": "^7.1.3",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.1.2",
@@ -32,8 +33,8 @@
     "react-scripts": "^3.4.1",
     "redux-saga": "^1.1.3",
     "xlsx": "^0.16.7",
-    "universal-cookie": "^4.0.4",
-    "react-global-configuration": "^1.4.0"
+    "title-case": "^3.0.2",
+    "universal-cookie": "^4.0.4"
   },
   "scripts": {
     "flow": "flow",

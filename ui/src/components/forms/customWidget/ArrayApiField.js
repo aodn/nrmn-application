@@ -16,9 +16,9 @@ const handleMultiChanges = (values, props, entities) => {
 
 const ArrayApiField = (props) => {
 
+  // TODO does this need to load again??
   const items = useSelector(state => state.form.entities);
   const dispatch = useDispatch();
-
   const entity = props.schema.items.$ref.split("/").pop() ;
   const pluralEntity = pluralize(entity);
   const entities =  pluralEntity.charAt(0).toLowerCase() + pluralEntity.slice(1);

@@ -12,6 +12,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use((response) => {
   return response;
 }, (error) => {
+
   if (401 === error.response?.status && error.config.url !== "/api/auth/signin") {
     const persist = JSON.parse(localStorage.getItem("persist:root"));
     const user = JSON.parse(persist.user);
@@ -26,7 +27,14 @@ axiosInstance.interceptors.response.use((response) => {
       window.location = `/login?redirect=${window.location.pathname}`;
     }
   } else if (404 === error.response?.status && error.config.url !== "/api/auth/resetPassword") {
-    window.location = `/notfound?resource=${window.location.pathname}`;
+    if (process.env.NODE_ENV !== 'development')  {
+      window.location = `/notfound?resource=${window.location.pathname}`;
+    }
+    else {
+      console.log("DEBUG: ",
+          error.response.config.baseURL + error.response.data.path,
+          error.response.data.error)
+    }
   } else {
     return Promise.reject(error);
   }
