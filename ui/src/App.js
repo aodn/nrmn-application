@@ -9,7 +9,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import TopBar from './components/layout/TopBar';
 import SideMenu from './components/layout/SideMenu';
 import Login from './components/auth/login'
-import {blueGrey, grey } from '@material-ui/core/colors';
+import {blueGrey, deepPurple } from '@material-ui/core/colors';
 import {
   BrowserRouter as Router,
   Switch,
@@ -18,9 +18,8 @@ import {
 import FileList from './components/import/FileList';
 import ImportPage from './components/import/Index';
 import GenericForm from './components/forms/GenericForm';
-import UserForm from './components/forms/UserForm';
 import {useDispatch, useSelector} from "react-redux";
-import ApiEntityList from "./components/forms/ApiEntityList";
+import EntityList from "./components/forms/EntityList";
 
 const drawerWidth = 240;
 
@@ -60,7 +59,9 @@ export default function App()  {
         secondary: themeState.themeType ? '#999' :"#555"
       },
       primary: blueGrey,
-      secondary: grey,
+      secondary: {
+        main: deepPurple[300]
+      },
       type: themeState.themeType ? "dark" : "light",
     },
     props: {
@@ -91,14 +92,8 @@ export default function App()  {
               <Route path={["/import-file/:fileID?"]} component={ImportPage} />
               <Route path="/list-file" component={FileList} />
               <Route path="/login" component={Login} />
-              <Route path="/form/:entity?" component={UserForm}>
-              <Route path={["/import-file/:fileID?"]} component={ImportPage}/>
-              <Route path="/list-file" component={FileList} />
-              <Route path="/login" component={Login} />
-              <Route path="/form/:entity/:id?" component={GenericForm} />
-              <Route path="/collection/:entities" component={Collection} />
-
-              </Route>
+              <Route path="/form/:entityName/:id?" component={GenericForm} />
+              <Route path="/entity/:entityName" component={EntityList} />
             </Switch>
         </main>
         </Router>

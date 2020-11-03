@@ -13,6 +13,7 @@ import { connect } from 'react-redux';
 import store from '../store';
 import AuthState from "./AuthState";
 import { TopbarButton } from './TopbarButton'
+import SettingsMenu from "./SettingsMenu";
 
 const drawerWidth = 240;
 
@@ -83,11 +84,7 @@ const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
         </Grid>
         <Grid item >
           <AuthState /> |
-          <TopbarButton
-              variant="text"
-              color="secondary"
-              size="small"
-              >Notifications</TopbarButton>
+          <SettingsMenu />
         </Grid>
       </Grid>
     </Toolbar>
