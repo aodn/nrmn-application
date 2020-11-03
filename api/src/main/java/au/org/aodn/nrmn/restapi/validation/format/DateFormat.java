@@ -7,7 +7,7 @@ import cyclops.control.Validated;
 
 import java.text.SimpleDateFormat;
 
-public final class DateFormat extends BaseValidationFormat {
+public final class DateFormat extends BaseRowValidationFormat {
 
     DateFormat() {
         super("Date", "dd/MM/yyyy");
@@ -19,7 +19,7 @@ public final class DateFormat extends BaseValidationFormat {
                 StagedSurvey::getDate,
                 dateString -> {
                     SimpleDateFormat formatter = new SimpleDateFormat(format);
-                    formatter.parse(dateString);
+                    return Validated.valid(formatter.parse(dateString));
                 }, target);
     }
 }

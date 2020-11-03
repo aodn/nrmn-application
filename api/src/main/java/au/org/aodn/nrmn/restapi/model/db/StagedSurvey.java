@@ -19,6 +19,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name = "staged_survey")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-public class StagedSurvey {
+public class StagedSurvey implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -104,7 +105,7 @@ public class StagedSurvey {
     private String L95;
 
     @Column(name = "is_invert_Sizing")
-    private Boolean isInvertSizing;
+    private String isInvertSizing;
 
     @Column(name = "Lmax")
     private String Lmax;

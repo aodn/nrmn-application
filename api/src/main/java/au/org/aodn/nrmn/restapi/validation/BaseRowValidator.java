@@ -9,12 +9,12 @@ import lombok.val;
 
 import java.util.List;
 
-public abstract class BaseValidator {
+public abstract class BaseRowValidator {
 
 
     protected String columnTarget;
 
-    public BaseValidator(String columnTarget){
+    public BaseRowValidator(String columnTarget){
         this.columnTarget = columnTarget;
     }
     abstract public Validated<ErrorCheck, String> valid(StagedSurvey target);

@@ -43,9 +43,9 @@ CREATE TABLE nrmn.sec_user_aud (
 
 CREATE TABLE nrmn.staged_job (
     file_id varchar(255) NOT NULL,
-    job_attributes jsonb,
     source varchar(255),
     status varchar(255),
+    program_id integer,
     CONSTRAINT staged_job_pkey PRIMARY KEY (file_id)
 );
 
@@ -284,7 +284,10 @@ ALTER TABLE nrmn.error_check
 ALTER TABLE nrmn.sec_user_roles
     ADD CONSTRAINT fk_user_sec_role FOREIGN KEY (sec_user_id) REFERENCES nrmn.sec_user (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
-CREATE SEQUENCE IF NOT EXISTS nrmn.hibernate_sequence;
+ALTER TABLE nrmn.staged_job
+    ADD CONSTRAINT fk_staged_job_program FOREIGN KEY (program_id) REFERENCES nrmn.program_ref (program_id) ON UPDATE  NO ACTION ON DELETE NO ACTION;
+CREATE
+    SEQUENCE IF NOT EXISTS nrmn.hibernate_sequence;
 
 CREATE SEQUENCE IF NOT EXISTS nrmn.user_id_seq;
 

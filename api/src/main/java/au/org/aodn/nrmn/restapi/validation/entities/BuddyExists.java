@@ -1,28 +1,26 @@
 package au.org.aodn.nrmn.restapi.validation.entities;
 
-
 import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
 import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import cyclops.control.Validated;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SiteCodeExists extends BaseRowExistingEntity {
-
-    SiteRepository siteRepo;
+public class BuddyExists extends BaseRowExistingEntity {
+    DiverRepository diverRepo;
 
     @Autowired
-    public SiteCodeExists(SiteRepository siteRepo) {
-        super("Site No");
-        this.siteRepo = siteRepo;
+    BuddyExists(DiverRepository diverRepo) {
+        super("Buddy");
+        this.diverRepo = diverRepo;
     }
 
     @Override
     public Validated<ErrorCheck, String> valid(StagedSurvey target) {
-        val sites = siteRepo.findBySiteCode(target.getSiteNo());
-        return warningNotFound(sites, target, target.getSiteNo());
+        val divers = diverRepo.findByInitials(target.getBuddy());
+        return warningNotFound(divers, target, target.getBuddy());
     }
 }

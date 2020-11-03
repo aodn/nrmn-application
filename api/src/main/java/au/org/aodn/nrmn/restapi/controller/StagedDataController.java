@@ -7,6 +7,7 @@ import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
+import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedSurveyRepository;
 import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @CrossOrigin
@@ -39,10 +41,15 @@ public class StagedDataController {
 
     @Autowired
     SpreadSheetService sheetService;
+
     @Autowired
     StagedSurveyRepository stagedSurveyRepo;
+
     @Autowired
     UserActionAuditRepository userAuditRepo;
+
+    @Autowired
+    ProgramRepository programRepo;
 
     @Autowired
     private StagedJobRepository jobRepo;
@@ -51,7 +58,9 @@ public class StagedDataController {
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity<UploadResponse> uploadFile(
             @RequestParam("withInvertSize") Boolean withInvertSize,
-            @RequestParam("file") MultipartFile file, Authentication authentication) {
+            @RequestParam("pid") Integer programId,
+            @RequestParam("file") MultipartFile file,
+            Authentication authentication) {
 
         userAuditRepo.save(
                 new UserActionAudit(
@@ -62,23 +71,34 @@ public class StagedDataController {
 
         val validationHelper = new ValidatorHelpers();
         val validatedSheet =
-                        sheetService
-                                .validatedExcelFile(
-                                        file.getOriginalFilename() + "-" + System.currentTimeMillis(),
-                                        file,
-                                        withInvertSize);
+                sheetService
+                        .validatedExcelFile(
+                                file.getOriginalFilename() + "-" + System.currentTimeMillis(),
+                                file,
+                                withInvertSize);
 
         List<ErrorInput> errors = validationHelper.toErrorList(validatedSheet);
+        val programOpt = programRepo.findById(programId);
+        if (programOpt.isPresent())
+            return ResponseEntity
+                    .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .body(new UploadResponse(Optional.empty(),
+                            Stream.of(new ErrorInput("Program Not found","program")).collect(Collectors.toList())));
 
         return validatedSheet.fold(
-                err -> ResponseEntity.unprocessableEntity().body(new UploadResponse(Optional.empty(), errors)),
-                sheet -> {
+                err -> ResponseEntity.unprocessableEntity().
+
+                        body(new UploadResponse(Optional.empty(), errors)),
+                sheet ->
+
+                {
                     val stagedSurveyToSave = sheetService.sheets2Staged(sheet);
                     val stagedJob = jobRepo.save(
                             new StagedJob(
                                     sheet.getFileId(),
                                     StatusJobType.PENDING,
-                                    SourceJobType.FILE, new HashMap<>()
+                                    SourceJobType.FILE,
+                                    programOpt.get()
                             ));
                     stagedSurveyRepo.saveAll(stagedSurveyToSave.stream().map(s -> {
                         s.setStagedJob(stagedJob);

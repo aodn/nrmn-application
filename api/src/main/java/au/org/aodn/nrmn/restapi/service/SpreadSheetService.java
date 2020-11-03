@@ -149,7 +149,7 @@ public class SpreadSheetService {
                         stagedSurvey.setM2InvertSizingSpecies(_getCellValue(row.getCell(headerMap.get("M2 Invert Sizing Species")), eval, fmt).equals("Yes"));
                         stagedSurvey.setL5(_getCellValue(row.getCell(headerMap.get("L5")), eval, fmt));
                         stagedSurvey.setL95(_getCellValue(row.getCell(headerMap.get("L95")), eval, fmt));
-                        stagedSurvey.setIsInvertSizing(_getCellValue(row.getCell(headerMap.get("Use InvertSizing")), eval, fmt).equals("Yes"));
+                        stagedSurvey.setIsInvertSizing(_getCellValue(row.getCell(headerMap.get("Use InvertSizing")), eval, fmt));
                         stagedSurvey.setLmax(_getCellValue(row.getCell(headerMap.get("Lmax")), eval, fmt));
                     }
 

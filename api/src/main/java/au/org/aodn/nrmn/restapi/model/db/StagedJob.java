@@ -12,12 +12,8 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Map;
 
 @Entity
@@ -26,7 +22,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Table(name = "staged_job")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-public class StagedJob {
+public class StagedJob implements Serializable {
 
     @Id
     @Column(name = "file_id")
@@ -40,7 +36,8 @@ public class StagedJob {
     @Column(name = "source")
     private SourceJobType source;
 
-    @Column(name = "job_attributes", columnDefinition = "jsonb")
-    @Type(type = "jsonb")
-    private Map<String, String> jobAttributes;
+    @ManyToOne()
+    @JoinColumn(name = "program_id", referencedColumnName = "program_id", nullable = false)
+    private Program program;
+
 }

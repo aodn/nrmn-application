@@ -8,7 +8,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 
-public final class TimeFormat extends BaseValidationFormat {
+public final class TimeFormat extends BaseRowValidationFormat {
     TimeFormat() {
         super("Time", "HH:mm");
     }
@@ -21,6 +21,7 @@ public final class TimeFormat extends BaseValidationFormat {
                     LocalTime localTime = LocalTime.parse(timeString, DateTimeFormatter.ofPattern(format));
                     localTime.get(ChronoField.CLOCK_HOUR_OF_DAY);
                     localTime.get(ChronoField.MINUTE_OF_HOUR);
+                    return Validated.valid(localTime);
                 }, target);
     }
 
