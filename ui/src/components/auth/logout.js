@@ -21,6 +21,7 @@ function Logout() {
   };
 
   const handleClose = (form) => {
+    localStorage.clear();
     dispatch(logoutSubmitted(form.formData));
     handleCancel();
   };
