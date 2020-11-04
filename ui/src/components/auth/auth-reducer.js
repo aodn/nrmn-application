@@ -27,8 +27,8 @@ const authSlice = createSlice({
         state.errors = state.errors.concat(action.payload.response.data.errors.map(error =>
             `${error.field.toUpperCase()}: ${error.defaultMessage}`
         ));
-        state.loading = false;
       }
+      state.loading = false;
     },
     logout: (state, action) => {
       localStorage.clear();
