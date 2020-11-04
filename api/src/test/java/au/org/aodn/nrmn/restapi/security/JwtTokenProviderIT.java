@@ -1,7 +1,9 @@
 package au.org.aodn.nrmn.restapi.security;
 
+import au.org.aodn.nrmn.test.PostgresqlContainerExtension;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -16,6 +18,7 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 @Testcontainers
 @SpringBootTest
 @ActiveProfiles("cicd")
+@ExtendWith(PostgresqlContainerExtension.class)
 class JwtTokenProviderIT {
 
     @Autowired

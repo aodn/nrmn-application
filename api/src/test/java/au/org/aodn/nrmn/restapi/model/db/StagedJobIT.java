@@ -2,8 +2,10 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
+import au.org.aodn.nrmn.test.PostgresqlContainerExtension;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
@@ -24,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
     pattern = ".*TestData"))
 @AutoConfigureTestDatabase(replace = Replace.NONE)
+@ExtendWith(PostgresqlContainerExtension.class)
 class StagedJobIT {
 
     @Autowired

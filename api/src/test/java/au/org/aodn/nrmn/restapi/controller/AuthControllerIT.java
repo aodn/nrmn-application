@@ -7,8 +7,10 @@ import au.org.aodn.nrmn.restapi.dto.auth.SignUpRequest;
 import au.org.aodn.nrmn.restapi.dto.payload.JwtAuthenticationResponse;
 import au.org.aodn.nrmn.restapi.model.db.SecUser;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
+import au.org.aodn.nrmn.test.PostgresqlContainerExtension;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -27,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Testcontainers
 @SpringBootTest(classes = RestApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("cicd")
+@ExtendWith(PostgresqlContainerExtension.class)
 public class AuthControllerIT {
 
     @Autowired
