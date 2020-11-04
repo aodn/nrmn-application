@@ -41,6 +41,6 @@ class SiteCodeExistsIT {
         stage.setSiteNo("EYR71");
         stage.setStagedJob(job);
         val codeFound = siteCodeExists.valid(stage);
-        Assertions.assertTrue(codeFound.isInvalid());
+        Assertions.assertTrue(codeFound.isValid());
     }
 }

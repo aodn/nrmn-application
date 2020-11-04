@@ -100,6 +100,8 @@ class StagedDataControllerIT {
         LinkedMultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
         parameters.add("file", file);
         parameters.add("withInvertSize", false);
+        parameters.add("pid", 55);
+
 
         val resp = reqUpload
                 .withContentType(MediaType.MULTIPART_FORM_DATA)
@@ -129,6 +131,8 @@ class StagedDataControllerIT {
         LinkedMultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
         parameters.add("file", file);
         parameters.add("withInvertSize", true);
+        parameters.add("pid", 55);
+
 
         val resp = reqUpload
                 .withContentType(MediaType.MULTIPART_FORM_DATA)

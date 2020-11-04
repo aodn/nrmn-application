@@ -20,7 +20,7 @@ public class ProgramTestData {
 
     public ProgramBuilder defaultBuilder() {
         return Program.builder()
-            .programName("RLS")
+            .programName("PV")
             .isActive(true);
     }
 }

@@ -46,16 +46,6 @@ class IntegerFormatTest {
         assertTrue(res.isValid());
     }
 
-    @Test
-    void outsideCategoryShouldFail() {
-        val job = new StagedJob();
-        job.setId("idJob");
-        val stage = new StagedSurvey();
-        stage.setMethod("5");
-        stage.setStagedJob(job);
-        val res = new IntegerFormat(StagedSurvey::getMethod, "Lmax", Stream.of(1,2,3,4,7,8).collect(Collectors.toList())).valid(stage);
-        assertTrue(res.isInvalid());
-    }
 
 
 }

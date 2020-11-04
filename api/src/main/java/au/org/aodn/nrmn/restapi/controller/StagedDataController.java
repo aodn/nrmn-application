@@ -79,7 +79,7 @@ public class StagedDataController {
 
         List<ErrorInput> errors = validationHelper.toErrorList(validatedSheet);
         val programOpt = programRepo.findById(programId);
-        if (programOpt.isPresent())
+        if (!programOpt.isPresent())
             return ResponseEntity
                     .status(HttpStatus.UNPROCESSABLE_ENTITY)
                     .body(new UploadResponse(Optional.empty(),
