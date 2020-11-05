@@ -44,8 +44,13 @@ const schematoColDef = (schema, size) => {
 
 let agGridApi = {};
 
-const renderError = (msg) => {
-  return <Box><Alert  severity="error" variant="filled" >{msg}</Alert></Box>
+const renderError = (msgArray) => {
+  return <Box>
+    <Alert style={{ height: 'auto', lineHeight: '28px', whiteSpace: 'pre-line' }}
+          severity="error"
+          variant="filled"
+    >{msgArray.join('\r\n ')}
+    </Alert></Box>
 }
 
 const EntityList = () => {
@@ -60,7 +65,8 @@ const EntityList = () => {
   const themeType = useSelector(state => state.theme.themeType);
   const dispatch = useDispatch();
   const entities = useSelector(state => state.form.entities);
-  const items =  (entities._embedded) ? entities._embedded[entityNamePlural] : undefined;
+  const errors = useSelector(state => state.form.errors);
+  const items =  (entities?._embedded) ? entities._embedded[entityNamePlural] : undefined;
   // TODO handle paging from entities.
 
   const agGridReady = (agGrid) => {
@@ -77,7 +83,10 @@ const EntityList = () => {
   }, []);
 
   if (typeof schemaDefinition === "undefined") {
-    return (renderError("Error: API not yet loaded"));
+    return (renderError(["Error: API not yet loaded"]));
+  }
+  else if (errors.length > 0) {
+    return (renderError(errors));
   }
   else {
     const colDef = (schemaDefinition[entityName]) ?
@@ -128,7 +137,7 @@ const EntityList = () => {
         </Box>) :
 
         (colDef) ? <LoadingBanner variant={"h4"} msg={"Listing " + titleCase(entityNamePlural)} />:
-            renderError("Entity '" + entityName + "' can not be found!");
+            renderError(["Entity '" + entityName + "' can not be found!"]);
 
   }
 }

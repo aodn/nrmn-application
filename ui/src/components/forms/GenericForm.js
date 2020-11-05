@@ -3,7 +3,7 @@ import React from "react";
 import Form from "@rjsf/material-ui"
 import {useDispatch, useSelector} from "react-redux";
 import {useEffect} from 'react';
-import {resetState, idRequested, createEntityRequested} from "./form-reducer";
+import {resetState, itemRequested, createEntityRequested, updateEntityRequested} from "./form-reducer";
 import {useParams, Redirect} from "react-router-dom";
 import ArrayApiField from './customWidget/ArrayApiField';
 import pluralize from 'pluralize';
@@ -15,8 +15,8 @@ import Grid from "@material-ui/core/Grid";
 import {titleCase} from "title-case";
 import {LoadingBanner} from "../layout/loadingBanner";
 
-const renderError = (msg) => {
-  return <Box><Alert severity="error" variant="filled">{msg}</Alert></Box>
+const renderError = (msgArray) => {
+  return (msgArray.length > 0) ? <><Box><Alert severity="error" variant="filled">{msgArray}</Alert></Box></> : <></>;
 }
 
 const GenericForm = () => {
@@ -33,7 +33,7 @@ const GenericForm = () => {
 
   useEffect(() => {
     if (id !== undefined) {
-      dispatch(idRequested(entityName + "/" + id));
+      dispatch(itemRequested(entityName + "/" + id));
     }
   }, []);
 
@@ -46,50 +46,50 @@ const GenericForm = () => {
   if (Object.keys(schemaDefinition).length === 0 && typeof (schemaDefinition[entityTitle]) == 'undefined')
     return renderError("ERROR: API Schema not found");
 
-  const getErrors = () => {
-    if (errors) {
-debugger;
-      //return  renderError(errors);
-    }
-  }
-
   const fields = {ArrayField: ArrayApiField}
 
   const handleSubmit = (form) => {
-    console.info("submited:", entityName, id, form.formData);
-    dispatch(createEntityRequested({path: entityName, id: id, data: form.formData}));
+
+    const data = {path: entityName, id: id, data: form.formData}
+    console.info("submited:", data);
+    (Object.keys(editItem).length === 0) ?
+      dispatch(createEntityRequested(data)) :
+      dispatch(updateEntityRequested(data));
   }
 
   const {title, ...entityDef} = schemaDefinition[entityTitle]
-  const editSchema = (id) ? {title: title.replace("Add", "Edit"), ...entityDef} : schemaDefinition[entityTitle]
-  const JSSchema = {components: {schemas: schemaDefinition}, ...editSchema};
+  let fullTitle = (title) ? title.replace("Add", "Edit") : "Edit " + entityTitle + " '" + id + "'";
+  const entitySchema = (id) ? {title: fullTitle, ...entityDef} : schemaDefinition[entityTitle]
+  const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
 
-  return ((id && Object.keys(editItem).length === 0) ?
-      <LoadingBanner variant={"h5"} msg={"Loading edit form for " + titleCase(title)}/>  :
-      <>
+  if (errors.length > 0) {
+    return renderError(errors)
+  }
+  else {
+    return (id && Object.keys(editItem).length === 0) ?
+      <LoadingBanner variant={"h5"} msg={"Loading edit form for " + titleCase(fullTitle)}/>  :
+
         <Grid
           container
           spacing={0}
           alignItems="center"
           justify="center"
           style={{minHeight: "70vh"}}
-      >
-        <Paper>
-          <Box mx="auto" bgcolor="background.paper" pt={2} px={3} pb={3}>
-            <Form
-                schema={JSSchema}
-                onSubmit={handleSubmit}
-                fields={fields}
-                formData={editItem}
-            />
-          </Box>
-        </Paper>
-      </Grid>
+        >
+          <Paper>
+            <Box mx="auto" bgcolor="background.paper" pt={2} px={3} pb={3}>
+              <Form
+                  schema={JSSchema}
+                  onSubmit={handleSubmit}
+                  fields={fields}
+                  formData={editItem}
+              />
+            </Box>
+          </Paper>
+        </Grid>
 
-        {getErrors()}
+  }
 
-        </>
-)
 }
 
 export default GenericForm;
