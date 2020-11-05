@@ -40,6 +40,9 @@
                             <goal>yarn</goal>
                         </goals>
                         <phase>generate-resources</phase>
+                        <configuration>
+                            <arguments>install --network-timeout 1000000</arguments>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>yarn test</id>
@@ -50,7 +53,7 @@
                         <configuration>
                             <arguments>test</arguments>
                             <environmentVariables>
-                                <CI>true</CI>
+                                <CI>false</CI>
                             </environmentVariables>
                         </configuration>
                     </execution>
