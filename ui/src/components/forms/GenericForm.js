@@ -24,7 +24,7 @@ const GenericForm = () => {
   const {entityName, id} = useParams();
   const schemaDefinition = config.get('api');
   const editItem = useSelector(state => state.form.editItem);
-  const createdEntity = useSelector(state => state.form.createdEntity);
+  const newlyCreatedEntity = useSelector(state => state.form.newlyCreatedEntity);
   const errors = useSelector(state => state.form.errors);
 
   const dispatch = useDispatch();
@@ -37,7 +37,7 @@ const GenericForm = () => {
     }
   }, []);
 
-  if (Object.keys(createdEntity).length !== 0) {
+  if (Object.keys(newlyCreatedEntity).length !== 0) {
     const redirectPath = "/entity/" + entityTitle;
     console.log('redirected:', redirectPath);
     return (<Redirect to={redirectPath}></Redirect>);
