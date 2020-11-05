@@ -78,13 +78,18 @@ const EntityList = () => {
     dispatch(selectRequested(entityNamePlural));
   }, [entityName]); // reset when new or entityName prop changes
 
+  const getEntitySchema = () => {
+    return (schemaDefinition[titleCase(entityName)]) ? (schemaDefinition[titleCase(entityName)]) :
+        (schemaDefinition[entityName]);
+  }
 
   if (typeof schemaDefinition === "undefined") {
     return (renderError(["Error: API not yet loaded"]));
   }
   else {
-    const colDef = (schemaDefinition[entityName]) ?
-        schematoColDef(schemaDefinition[entityName], size) : undefined;
+
+    const colDef = getEntitySchema() ?
+        schematoColDef(getEntitySchema(), size) : undefined;
 
     if (items !== undefined && agGridApi.setRowData) {
       agGridApi.setRowData(items);
