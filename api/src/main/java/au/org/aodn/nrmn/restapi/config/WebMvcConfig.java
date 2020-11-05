@@ -8,8 +8,14 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
+
+    @Value("${frontend.pages.whitelist}")
+    private List<String> frontendPagesWhitelist;
 
     @Value("${app.cors.max_age_secs}")
     private long MAX_AGE_SECS;
@@ -33,16 +39,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        /* Fallback mapping - forward to index.html - refer to
-         * https://docs.spring.io/spring-framework/docs/3.0.0.M3/reference/html/ch16s04.html
-         * for ordering of handler mappings - we want this one last */
-        registry.setOrder(Integer.MAX_VALUE);
-
-        registry.addViewController("/{spring:\\w+}")
-            .setViewName("forward:/");
-        registry.addViewController("/**/{spring:\\w+}")
-            .setViewName("forward:/");
-        registry.addViewController("/{spring:\\w+}/**{spring:?!(\\.js|\\.css)$}")
-            .setViewName("forward:/");
+        /* forward incoming front end page requests to react */
+        frontendPagesWhitelist.stream()
+            .forEach(frontEndPage -> registry.addViewController(frontEndPage).setViewName("forward:/"));
     }
 }
