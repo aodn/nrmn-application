@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.data;
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
@@ -16,11 +16,11 @@ public class DirectionDataCheck extends BaseRowValidator {
     }
 
     @Override
-    public Validated<ErrorCheck, String> valid(StagedSurvey target) {
+    public Validated<StagedRowError, String> valid(StagedRow target) {
         if (EnumUtils.isValidEnum(Directions.class, target.getDirection()))
             return Validated.valid("Direction format is valid");
         return Validated.invalid(
-                new ErrorCheck(
+                new StagedRowError(
                         new ErrorID(target.getId(),
                                 target.getStagedJob().getId(),
                                 columnTarget + "format should be a valid direction: N,NE,E,SE,S,SW,W,NW"),

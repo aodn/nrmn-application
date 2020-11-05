@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.data;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -13,8 +13,8 @@ class CoordinatesDataCheckTest extends ValidatorHelpers {
     @Test
     void latLongCorrectShouldBeOk() {
         val job = new StagedJob();
-        job.setId("idJob");
-        val stage = new StagedSurvey();
+        job.setId(1);
+        val stage = new StagedRow();
         stage.setStagedJob(job);
         stage.setLatitude("48.8566");
         stage.setLongitude("2.3522");
@@ -27,8 +27,8 @@ class CoordinatesDataCheckTest extends ValidatorHelpers {
     @Test
     void latIncorrectShouldFail() {
         val job = new StagedJob();
-        job.setId("idJob");
-        val stage = new StagedSurvey();
+        job.setId(1);
+        val stage = new StagedRow();
         stage.setStagedJob(job);
         stage.setLatitude("90.8566");
         stage.setLongitude("2.3522");
@@ -41,8 +41,8 @@ class CoordinatesDataCheckTest extends ValidatorHelpers {
     @Test
     void longIncorrectShouldFail() {
         val job = new StagedJob();
-        job.setId("idJob");
-        val stage = new StagedSurvey();
+        job.setId(1);
+        val stage = new StagedRow();
         stage.setStagedJob(job);
         stage.setLatitude("50.8566");
         stage.setLongitude("-192.3522");
@@ -54,8 +54,8 @@ class CoordinatesDataCheckTest extends ValidatorHelpers {
     @Test
     void BothIncorrectShouldFail() {
         val job = new StagedJob();
-        job.setId("idJob");
-        val stage = new StagedSurvey();
+        job.setId(1);
+        val stage = new StagedRow();
         stage.setStagedJob(job);
         stage.setLatitude("-90.8566");
         stage.setLongitude("-192.3522");

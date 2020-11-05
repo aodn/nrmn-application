@@ -1,10 +1,10 @@
 package au.org.aodn.nrmn.restapi.validation.global;
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
-import au.org.aodn.nrmn.restapi.repository.StagedSurveyRepository;
-import au.org.aodn.nrmn.restapi.repository.model.SurveyMethodBlock;
+import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
+import au.org.aodn.nrmn.restapi.repository.model.RowMethodBlock;
 import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import cyclops.companion.Monoids;
@@ -21,18 +21,18 @@ import java.util.stream.Collectors;
 public class BlockMethodAssociationCheck extends BaseGlobalValidator {
 
     @Autowired
-    StagedSurveyRepository stagesSurveyRepo;
+    StagedRowRepository stageRowRepo;
 
     public BlockMethodAssociationCheck() {
         super("Method Block check");
     }
 
     @Override
-    public Validated<ErrorCheck, String> valid(StagedJob job) {
+    public Validated<StagedRowError, String> valid(StagedJob job) {
 
 
-        Function<String, ErrorCheck> getGlobalError = (String msg) -> {
-            return new ErrorCheck(
+        Function<String, StagedRowError> getGlobalError = (String msg) -> {
+            return new StagedRowError(
                     new ErrorID(
                             null,
                             job.getId(),
@@ -42,22 +42,22 @@ public class BlockMethodAssociationCheck extends BaseGlobalValidator {
                     null
             );
         };
-        val aggregatedBlocks = stagesSurveyRepo.findBlockMethods12(job.getId());
+        val aggregatedBlocks = stageRowRepo.findBlockMethods12(job.getReference());
         val groupById = aggregatedBlocks.stream().collect(Collectors.groupingBy(
-                SurveyMethodBlock::getId));
+                RowMethodBlock::getId));
         val methodExclude = Arrays.asList("3", "4", "5");
         return groupById.entrySet().stream()
                 .map(item -> {
                     val blockSum = item.getValue().stream()
-                            .map(SurveyMethodBlock::getBlock)
+                            .map(RowMethodBlock::getBlock)
                             .distinct()
                             .sorted()
                             .reduce("", (e1 , e2) -> e1 + e2);
 
                     if (!blockSum.startsWith("12"))
-                        return Validated.<ErrorCheck, String>invalid(getGlobalError.apply(item.getKey() + "invalid block combination"));
+                        return Validated.<StagedRowError, String>invalid(getGlobalError.apply(item.getKey() + "invalid block combination"));
 
-                    return Validated.<ErrorCheck, String>valid(item.getKey() + " has valid method/block");
+                    return Validated.<StagedRowError, String>valid(item.getKey() + " has valid method/block");
                 })
                 .reduce(
                         Validated.valid("No element found in " + ruleName),

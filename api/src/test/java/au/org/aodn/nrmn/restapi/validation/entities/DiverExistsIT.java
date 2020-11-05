@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.entities;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,8 @@ class DiverExistsIT {
     @Test
     void notFoundDiverShouldFail() {
         val job = new StagedJob();
-        job.setId("idJob");
-        val stage = new StagedSurvey();
+        job.setId(1);
+        val stage = new StagedRow();
         stage.setDiver("NOP");
         stage.setStagedJob(job);
         val diverFound = diverExists.valid(stage);
@@ -32,8 +32,8 @@ class DiverExistsIT {
     @Test
     void existingDiverShouldBeOk() {
         val job = new StagedJob();
-        job.setId("idJob");
-        val stage = new StagedSurvey();
+        job.setId(1);
+        val stage = new StagedRow();
         stage.setStagedJob(job);
         stage.setDiver("TJR");
         val diverFound = diverExists.valid(stage);

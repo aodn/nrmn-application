@@ -60,17 +60,29 @@ VALUES (123456, 'test@gmail.com', 'Tanjona R', '$2a$10$URwhRiv5533pail2XSHzA.VEy
 INSERT INTO nrmn.sec_user_roles (sec_user_id, sec_role_id)
 VALUES (123456, 'ROLE_USER');
 
+/*
+   id bigint NOT NULL,
+    created timestamp with time zone,
+    program_id integer,
+    last_updated timestamp with time zone,
+ */
 
-INSERT INTO nrmn.staged_job (file_id,
+INSERT INTO nrmn.staged_job (id,
+                             created,
+                             last_updated,
+                             reference,
                              source,
                              status,
                              program_id)
-VALUES ('jobid-rls', 'FILE', 'PENDING', 55);
+VALUES (109, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'jobid-rls', 'FILE', 'PENDING', 55);
 
-INSERT INTO nrmn.staged_job (file_id,
+INSERT INTO nrmn.staged_job (id,
+                             created,
+                             last_updated,
+                             reference,
                              source,
                              status,
                              program_id)
-VALUES ('jobid-atrc', 'FILE', 'PENDING', 56);
+VALUES (119, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP , 'jobid-atrc', 'FILE', 'PENDING', 56);
 
 

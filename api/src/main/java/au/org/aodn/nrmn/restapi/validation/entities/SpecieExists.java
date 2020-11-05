@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.entities;
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.repository.ObsItemTypeRepository;
 import cyclops.control.Validated;
 import lombok.val;
@@ -19,7 +19,7 @@ public class SpecieExists extends BaseRowExistingEntity {
     }
 
     @Override
-    public Validated<ErrorCheck, String> valid(StagedSurvey target) {
+    public Validated<StagedRowError, String> valid(StagedRow target) {
         val items = obsItemRepo.findByObsItemTypeName(target.getSpecies());
         return warningNotFound(items, target, target.getBuddy());
     }

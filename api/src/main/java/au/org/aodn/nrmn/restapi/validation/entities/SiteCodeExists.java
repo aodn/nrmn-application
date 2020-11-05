@@ -1,8 +1,8 @@
 package au.org.aodn.nrmn.restapi.validation.entities;
 
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import cyclops.control.Validated;
 import lombok.val;
@@ -21,7 +21,7 @@ public class SiteCodeExists extends BaseRowExistingEntity {
     }
 
     @Override
-    public Validated<ErrorCheck, String> valid(StagedSurvey target) {
+    public Validated<StagedRowError, String> valid(StagedRow target) {
         val sites = siteRepo.findBySiteCode(target.getSiteNo());
         return warningNotFound(sites, target, target.getSiteNo());
     }

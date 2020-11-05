@@ -1,13 +1,10 @@
 package au.org.aodn.nrmn.restapi.validation;
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
-import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
-import au.org.aodn.nrmn.restapi.repository.ErrorCheckRepository;
-import cyclops.control.Validated;
-import lombok.val;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 
-import java.util.List;
+import cyclops.control.Validated;
+
 
 public abstract class BaseRowValidator {
 
@@ -17,6 +14,6 @@ public abstract class BaseRowValidator {
     public BaseRowValidator(String columnTarget){
         this.columnTarget = columnTarget;
     }
-    abstract public Validated<ErrorCheck, String> valid(StagedSurvey target);
+    abstract public Validated<StagedRowError, String> valid(StagedRow target);
 
 }

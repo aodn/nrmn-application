@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.data;
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
@@ -33,7 +33,7 @@ public class CoordinatesDataCheck extends BaseRowValidator {
 
 
     @Override
-    public Validated<ErrorCheck, String> valid(StagedSurvey target) {
+    public Validated<StagedRowError, String> valid(StagedRow target) {
         val validatedLat = checkAngle("Latitude", target.getLatitude(), 90D, -90D);
 
         val validatedLong = checkAngle("Longitude", target.getLongitude(), 180D, -180D);
@@ -41,7 +41,7 @@ public class CoordinatesDataCheck extends BaseRowValidator {
         return Stream.of(validatedLat, validatedLong)
                 .map(validator ->
                         validator.bimap(error ->
-                                        new ErrorCheck(
+                                        new StagedRowError(
                                                 new ErrorID(
                                                         target.getId(),
                                                         target.getStagedJob().getId(),

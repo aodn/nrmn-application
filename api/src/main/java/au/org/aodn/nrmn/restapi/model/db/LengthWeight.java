@@ -50,6 +50,7 @@ public class LengthWeight {
     @MapsId
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @JoinColumn(name = "observable_item_id", foreignKey = @ForeignKey(name = "lengthweight_observable_item_fk"))
+    @JoinColumn(name = "observable_item_id", foreignKey = @ForeignKey(name =
+        "lengthweight_ref_observable_item_id_fkey"))
     private ObservableItem observableItem;
 }

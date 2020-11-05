@@ -1,35 +1,37 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.Map;
 
 @Entity
 @Data
+@Getter
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name = "staged_survey")
+@Table(name = "staged_row")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-public class StagedSurvey implements Serializable {
+public class StagedRow implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -80,14 +82,14 @@ public class StagedSurvey implements Serializable {
 
     @JsonProperty(value = "P-Qs")
     @Column(name = "PQs")
-    private String PQs;
+    private String pqs;
 
     @Column(name = "code")
     private String code;
 
     @JsonProperty(value = "Common name")
     @Column(name = "common_name")
-    private String CmmonName;
+    private String commonName;
 
     @Column(name = "total")
     private String total;
@@ -115,5 +117,17 @@ public class StagedSurvey implements Serializable {
     private Map<String, String> measureJson;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(foreignKey = @ForeignKey(name = "staged_row_staged_job_id_fkey"))
     private StagedJob stagedJob;
+
+    @Column(name = "created", columnDefinition = "timestamp with time zone", nullable = false)
+    @CreationTimestamp
+    @Setter(AccessLevel.NONE)
+    private Timestamp created;
+
+    @Column(name = "last_updated", columnDefinition = "timestamp with time zone", nullable = false)
+    @UpdateTimestamp
+    @Setter(AccessLevel.NONE)
+    private Timestamp lastUpdated;
+
 }

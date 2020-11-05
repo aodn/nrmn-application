@@ -1,23 +1,22 @@
 package au.org.aodn.nrmn.restapi.validation.entities;
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import cyclops.control.Validated;
 import lombok.val;
-import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public abstract class BaseRowExistingEntity< T extends CrudRepository>  extends BaseRowValidator {
+public abstract class BaseRowExistingEntity extends BaseRowValidator {
 
     public BaseRowExistingEntity(String columnTarget) {
         super(columnTarget);
     }
 
-    protected <T> Validated<ErrorCheck, String> warningNotFound(List<T> entitiesFound, StagedSurvey target, String fieldValue) {
+    protected <T> Validated<StagedRowError, String> warningNotFound(List<T> entitiesFound, StagedRow target, String fieldValue) {
         val errorID = new ErrorID(
                 target.getId(),
                 target.getStagedJob().getId(),
@@ -28,7 +27,7 @@ public abstract class BaseRowExistingEntity< T extends CrudRepository>  extends 
             errorID.setMessage(columnTarget + "is empty");
 
         if (entitiesFound.isEmpty())
-            return Validated.invalid(new ErrorCheck(errorID, ValidationCategory.ENTITY, columnTarget, target));
+            return Validated.invalid(new StagedRowError(errorID, ValidationCategory.ENTITY, columnTarget, target));
 
         return Validated.valid(fieldValue + " was found!");
     }

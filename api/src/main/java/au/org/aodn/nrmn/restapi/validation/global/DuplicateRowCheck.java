@@ -1,9 +1,9 @@
 package au.org.aodn.nrmn.restapi.validation.global;
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
-import au.org.aodn.nrmn.restapi.repository.StagedSurveyRepository;
+import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import cyclops.companion.Monoids;
@@ -12,20 +12,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DuplicateSurveyCheck extends BaseGlobalValidator {
+public class DuplicateRowCheck extends BaseGlobalValidator {
     @Autowired
-    StagedSurveyRepository stagedSurveyRepo;
+    StagedRowRepository stagedRowRepo;
 
-    public DuplicateSurveyCheck() {
+    public DuplicateRowCheck() {
         super("Depth Duplicates");
     }
 
     @Override
-    public Validated<ErrorCheck, String> valid(StagedJob job) {
-      return  stagedSurveyRepo.findRawSurveyByFileID(job.getId()).stream()
+    public Validated<StagedRowError, String> valid(StagedJob job) {
+      return  stagedRowRepo.findRawRowByReference(job.getReference()).stream()
                 .map(duplicate ->
-                        Validated.<ErrorCheck, String>invalid(
-                                new ErrorCheck(
+                        Validated.<StagedRowError, String>invalid(
+                                new StagedRowError(
                                         new ErrorID(
                                                 duplicate.getId(),
                                                 job.getId(),

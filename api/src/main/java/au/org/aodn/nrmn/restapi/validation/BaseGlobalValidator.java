@@ -1,8 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation;
 
-import au.org.aodn.nrmn.restapi.model.db.ErrorCheck;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import cyclops.control.Validated;
 
 public abstract class BaseGlobalValidator {
@@ -14,6 +13,6 @@ public abstract class BaseGlobalValidator {
         this.ruleName = ruleName;
     }
 
-    abstract public Validated<ErrorCheck, String> valid(StagedJob job);
+    abstract public Validated<StagedRowError, String> valid(StagedJob job);
 
 }

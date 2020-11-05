@@ -1,8 +1,7 @@
 package au.org.aodn.nrmn.restapi.repository.model;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedSurvey;
 
-public interface SurveyMethodBlock {
+public interface RowMethodBlock {
     String getId();
     String getMethod();
     String getBlock();

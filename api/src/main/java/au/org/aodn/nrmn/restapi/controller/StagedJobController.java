@@ -9,7 +9,7 @@ import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedSurveyRepository;
+import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.service.SpreadSheetService;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,13 +36,14 @@ import java.util.stream.Stream;
 @RestController
 @CrossOrigin
 @RequestMapping(path = "/api/stage")
-public class StagedDataController {
+public class StagedJobController {
 
     @Autowired
     SpreadSheetService sheetService;
 
     @Autowired
-    StagedSurveyRepository stagedSurveyRepo;
+
+    StagedRowRepository stagedRowRepo;
 
     @Autowired
     UserActionAuditRepository userAuditRepo;
@@ -61,12 +61,11 @@ public class StagedDataController {
             @RequestParam("pid") Integer programId,
             @RequestParam("file") MultipartFile file,
             Authentication authentication) {
-
-        userAuditRepo.save(
-                new UserActionAudit(
-                        "stage/upload",
-                        "upload excel file attempt for username: " + authentication.getName()
-                                + " token: " + file.getOriginalFilename())
+       userAuditRepo.save(
+            new UserActionAudit(
+                "stage/upload",
+                "upload excel file attempt for username: " + authentication.getName()
+                    + " token: " + file.getOriginalFilename())
         );
 
         val validationHelper = new ValidatorHelpers();
@@ -92,22 +91,23 @@ public class StagedDataController {
                 sheet ->
 
                 {
-                    val stagedSurveyToSave = sheetService.sheets2Staged(sheet);
+                    val stagedRowToSave = sheetService.sheets2Staged(sheet);
                     val stagedJob = jobRepo.save(
-                            new StagedJob(
-                                    sheet.getFileId(),
-                                    StatusJobType.PENDING,
-                                    SourceJobType.FILE,
-                                    programOpt.get()
-                            ));
-                    stagedSurveyRepo.saveAll(stagedSurveyToSave.stream().map(s -> {
-                        s.setStagedJob(stagedJob);
+                            StagedJob.builder()
+                                    .source(SourceJobType.FILE)
+                                    .reference(sheet.getFileId())
+                                    .status(StatusJobType.PENDING)
+                                    .program(programOpt.get())
+                                    .build());
+                    stagedRowRepo.saveAll(stagedRowToSave.stream().map(s -> {
+                      s.setStagedJob(stagedJob);
                         return s;
-                    }).collect(Collectors.toList()));
-                    val filesResult = new FileUpload(sheet.getFileId(), stagedSurveyToSave.size());
-                    return ResponseEntity
-                            .status(HttpStatus.OK)
-                            .body(new UploadResponse(Optional.of(filesResult), Collections.emptyList()));
-                });
+                    })
+                    .collect(Collectors.toList()));
+                val filesResult = new FileUpload(sheet.getFileId(), stagedRowToSave.size());
+                return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new UploadResponse(Optional.of(filesResult), Collections.emptyList()));
+            });
     }
 }
