@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -50,6 +51,7 @@ public class ObservableItem {
     private Map<String, String> obsItemAttribute;
 
     @OneToOne(mappedBy = "observableItem", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private LengthWeight lengthWeight;
 
     @ManyToOne(fetch = FetchType.LAZY)

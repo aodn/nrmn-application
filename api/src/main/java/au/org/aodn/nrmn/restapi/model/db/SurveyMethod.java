@@ -1,6 +1,8 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -57,11 +59,12 @@ public class SurveyMethod {
     private Map<String, String> surveyMethodAttribute;
 
     @OneToMany(mappedBy = "surveyMethod", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private Set<Observation> observations;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "survey_id", referencedColumnName = "survey_id", nullable = false)
-    @JsonIgnore
+    @JsonBackReference
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Survey survey;
