@@ -12,7 +12,6 @@ import Alert from "@material-ui/lab/Alert";
 import config from "react-global-configuration";
 import {titleCase} from "title-case";
 import Grid from "@material-ui/core/Grid";
-import {LoadingBanner} from "../layout/loadingBanner";
 
 const schematoColDef = (schema, size) => {
 
@@ -76,10 +75,9 @@ const EntityList = () => {
 
   useEffect(() => {
     dispatch(resetState());
-    console.log("entityName is: " + entityName);
-    console.log("Requesting data for: " + entityNamePlural);
     dispatch(selectRequested(entityNamePlural));
-  }, []);
+  }, [entityName]); // reset when new or entityName prop changes
+
 
   if (typeof schemaDefinition === "undefined") {
     return (renderError(["Error: API not yet loaded"]));
@@ -116,7 +114,6 @@ const EntityList = () => {
           <div style={{height: size.height - 200, width: '100%', marginTop: 25}}
                className={themeType ? "ag-theme-alpine-dark" : "ag-theme-alpine"}>
             <AgGridReact
-
                 columnDefs={colDef}
                 rowSelection="multiple"
                 animateRows={true}
@@ -131,9 +128,10 @@ const EntityList = () => {
                   }
                 }}/>
           </div>
-        </Box>
           { (!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : "" }
           { (errors.length > 0) ? renderError(errors) : "" }
+        </Box>
+
       </>
     )
 
