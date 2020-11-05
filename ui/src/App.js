@@ -93,7 +93,7 @@ export default function App()  {
               <Route path="/list-file" component={FileList} />
               <Route path="/login" component={Login} />
               <Route path="/form/:entityName/:id?" component={GenericForm} />
-              <Route path="/entity/:entityName" component={EntityList} />
+              <Route path="/list/:entityName" component={EntityList} />
             </Switch>
         </main>
         </Router>
