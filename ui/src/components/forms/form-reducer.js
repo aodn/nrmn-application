@@ -6,10 +6,10 @@ import {
 
 const formState = {
   definition: {},
-  entities: {},
+  entities: [],
   editItem: {},
   createdEntity: {},
-  errors: {}
+  errors: []
 };
 
 
@@ -22,13 +22,15 @@ const formSlice = createSlice({
     },
     entitiesLoaded: (state, action) => {
       state.entities = action.payload;
+      state.errors = [];
     },
     entitiesError: (state, action) => {
-      console.log("Error while getting the entity data" + action);
+      debugger
+      const error = "Error while getting the entity data"
       state.entities = [];
-      state.errors = action.payload.message;
+      state.errors = [error];
     },
-    idLoaded: (state, action) => {
+    itemLoaded: (state, action) => {
       state.editItem = action.payload;
     },
     entitiesCreated: (state, action) => {
@@ -42,7 +44,7 @@ export const {
   entitiesLoaded,
   entitiesError,
   entitiesCreated,
-  idLoaded
+  itemLoaded
 } = formSlice.actions;
 
 
@@ -51,7 +53,7 @@ export const selectRequested = createAction('SELECT_REQUESTED',
       return {payload: entity};
     });
 
-export const idRequested = createAction('ID_REQUESTED',
+export const itemRequested = createAction('ID_REQUESTED',
     function (entity) {
       return {payload: entity};
     });

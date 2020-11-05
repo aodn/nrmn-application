@@ -1,12 +1,22 @@
 import axiosInstance from "./index.js";
 import axios from "axios";
 import store from "../components/store"; // will be useful to access to axios.all and axios.spread
+import qs from 'qs'
 
 function getToken() {
    const token = store.getState().auth.accessToken;
    const tokenType = store.getState().auth.tokenType;
    return `${tokenType} ${token}`;
 }
+
+// todo fix https://stackoverflow.com/questions/47227047/redux-saga-network-error-options-request
+axiosInstance.interceptors.request.use(
+    config => {
+      config.headers.authorization = getToken();
+      return config;
+    },
+    error => Promise.reject(error)
+);
 
 // siteConfig loaded into react-global-configuration
 export const siteConfig = () => {
@@ -31,19 +41,16 @@ export const userLogin = params => {
   });
 };
 export const userLogout = () => {
-  const headers = { Authorization: getToken()};
-  return axiosInstance.post("/api/auth/signout", {} , { headers });
+  return axiosInstance.post("/api/auth/signout", {} );
 };
 
 // User
 export const me = () => {
-  const headers = { Authorization: getToken() };
-  return axiosInstance.get("/api/user/me", { headers });
+  return axiosInstance.get("/api/user/me");
 };
 export const meUpdate = userDetails => {
-  const headers = { Authorization: getToken() };
   delete userDetails.password;
-  return axiosInstance.put("/api/user/me", userDetails, { headers });
+  return axiosInstance.put("/api/user/me", userDetails );
 };
 export const userRegistration = userDetails => {
   return axiosInstance.post("/api/auth/signup", userDetails);
@@ -52,15 +59,11 @@ export const userRegistration = userDetails => {
 
 // Admin users only
 export const userById = id => {
-  const headers = { Authorization: getToken() };
-  return axiosInstance.get(`/api/user/${id}`, { headers });
+  return axiosInstance.get(`/api/user/${id}`);
 };
 export const userUpdate = userDetails => {
-  const headers = { Authorization: getToken() };
   delete userDetails.password;
-  return axiosInstance.put(`/api/user/${userDetails.id}`, userDetails, {
-    headers
-  });
+  return axiosInstance.put(`/api/user/${userDetails.id}`, userDetails);
 };
 
 export const user = params => {
@@ -85,10 +88,12 @@ export const apiDefinition = () =>  axiosInstance.get("/v3/api-docs").then(res =
 export const getReferenceEntities = (entity) => axiosInstance.get("/api/" + entity).then(res=>res);
 
 export const entitySave = (entity, params) => {
-  return  axiosInstance.post("/api/" + entity, params).then(res => res );
+  return  axiosInstance.post("/api/" + entity, params ).then(res => res );
 }
+
 export const entityEdit = (path, params) => {
-  return  axiosInstance.put( path , params).then(res => res );
+  console.log("doing the put method");
+  return  axiosInstance.put( path , params ).then(res => res );
 }
 
 export const entityRelation = (entity, urls) => {
