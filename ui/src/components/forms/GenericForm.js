@@ -31,11 +31,12 @@ const GenericForm = () => {
   const singular = pluralize.singular(entityName);
   const entityTitle = singular.charAt(0).toUpperCase() + singular.slice(1)
 
+
   useEffect(() => {
     if (id !== undefined) {
       dispatch(itemRequested(entityName + "/" + id));
     }
-  }, []);
+  }, [newlyCreatedEntity]);
 
   if (Object.keys(newlyCreatedEntity).length !== 0) {
     const redirectPath = "/entity/" + entityTitle;

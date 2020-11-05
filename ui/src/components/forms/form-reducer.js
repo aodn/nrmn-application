@@ -22,6 +22,7 @@ const formSlice = createSlice({
     },
     entitiesLoaded: (state, action) => {
       state.newlyCreatedEntity = {};
+      state.editItem = {};
       state.entities = action.payload;
       state.errors = [];
     },
