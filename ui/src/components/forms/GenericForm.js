@@ -39,7 +39,7 @@ const GenericForm = () => {
   }, [newlyCreatedEntity]);
 
   if (Object.keys(newlyCreatedEntity).length !== 0) {
-    const redirectPath = "/entity/" + entityTitle;
+    const redirectPath = "/list/" + entityTitle;
     console.log('redirected:', redirectPath);
     return (<Redirect to={redirectPath}></Redirect>);
   }
