@@ -37,7 +37,7 @@ class StagedJobLogIT {
     @Autowired
     private StagedJobLogTestData stagedJobLogTestData;
 
-    @Test 
+    @Test
     public void testMapping() {
         val startTime = LocalDateTime.now();
         val stagedJobLog = stagedJobLogTestData.persistedStagedJobLog();

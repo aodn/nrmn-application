@@ -55,7 +55,6 @@ class StagedJobIT {
         val stagedJob = stagedJobTestData.persistedStagedJob();
         stagedJob.setStatus(StatusJobType.FAILED);
         stagedJobRepository.saveAndFlush(stagedJob);
-        entityManager.clear();
         val retrievedStagedJob = stagedJobRepository.findById(stagedJob.getId()).get();
         assertThat(retrievedStagedJob.getLastUpdated().toLocalDateTime(),
             is(both(greaterThan(stagedJob.getCreated().toLocalDateTime())).and(lessThan(LocalDateTime.now()))));

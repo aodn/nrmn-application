@@ -3,10 +3,12 @@ package au.org.aodn.nrmn.restapi.validation.global;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
+import au.org.aodn.nrmn.test.PostgresqlContainerExtension;
 import lombok.val;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 @SpringBootTest
+@ExtendWith(PostgresqlContainerExtension.class)
 @ActiveProfiles("cicd")
 class BlockMethodAssociationCheckIT {
 
