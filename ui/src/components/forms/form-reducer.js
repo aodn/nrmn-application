@@ -8,7 +8,7 @@ const formState = {
   definition: {},
   entities: [],
   editItem: {},
-  createdEntity: {},
+  newlyCreatedEntity: {},
   errors: []
 };
 
@@ -21,11 +21,11 @@ const formSlice = createSlice({
       state = formState;
     },
     entitiesLoaded: (state, action) => {
+      state.newlyCreatedEntity = {};
       state.entities = action.payload;
       state.errors = [];
     },
     entitiesError: (state, action) => {
-      debugger
       const error = "Error while getting the entity data"
       state.entities = [];
       state.errors = [error];
@@ -34,7 +34,7 @@ const formSlice = createSlice({
       state.editItem = action.payload;
     },
     entitiesCreated: (state, action) => {
-      state.createdEntity = action.payload;
+      state.newlyCreatedEntity = action.payload;
     }
   },
 });

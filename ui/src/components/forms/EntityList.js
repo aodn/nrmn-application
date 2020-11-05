@@ -12,7 +12,6 @@ import Alert from "@material-ui/lab/Alert";
 import config from "react-global-configuration";
 import {titleCase} from "title-case";
 import Grid from "@material-ui/core/Grid";
-import {LoadingSpinner} from "../layout/loadingSpinner";
 import {LoadingBanner} from "../layout/loadingBanner";
 
 const schematoColDef = (schema, size) => {
@@ -85,19 +84,16 @@ const EntityList = () => {
   if (typeof schemaDefinition === "undefined") {
     return (renderError(["Error: API not yet loaded"]));
   }
-  else if (errors.length > 0) {
-    return (renderError(errors));
-  }
   else {
     const colDef = (schemaDefinition[entityName]) ?
         schematoColDef(schemaDefinition[entityName], size) : undefined;
 
     if (items !== undefined && agGridApi.setRowData) {
-
       agGridApi.setRowData(items);
     }
 
-    return (colDef && items !== undefined) ? (
+    return (
+        <>
         <Box>
           <Grid
               container
@@ -105,15 +101,16 @@ const EntityList = () => {
               justify="space-between"
               alignItems="center"
           >
-          <Typography variant="h4">{titleCase(entityName)}</Typography>
-          <Button title={"Add new " + titleCase(entityName)}
-                  href={"/form/" + entityNamePlural}
-                  color="secondary"
-                  aria-label={"Add " + entityName}
-                  variant={"contained"}
-          >New {titleCase(entityName)}
+            <Typography variant="h4">{titleCase(entityName)}</Typography>
+            <Button title={"Add new " + titleCase(entityName)}
+                    component={NavLink}
+                    to={"/form/" + entityNamePlural}
+                    color="secondary"
+                    aria-label={"Add " + entityName}
+                    variant={"contained"}
+            >New {titleCase(entityName)}
 
-          </Button>
+            </Button>
           </Grid>
 
           <div style={{height: size.height - 200, width: '100%', marginTop: 25}}
@@ -134,10 +131,11 @@ const EntityList = () => {
                   }
                 }}/>
           </div>
-        </Box>) :
-
-        (colDef) ? <LoadingBanner variant={"h4"} msg={"Listing " + titleCase(entityNamePlural)} />:
-            renderError(["Entity '" + entityName + "' can not be found!"]);
+        </Box>
+          { (!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : "" }
+          { (errors.length > 0) ? renderError(errors) : "" }
+      </>
+    )
 
   }
 }
