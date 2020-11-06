@@ -1,5 +1,6 @@
 import React from "react";
 import {connect} from "react-redux";
+import { Link } from 'react-router-dom'
 import store from '../store';
 import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
 import AccountCircle from '@material-ui/icons/AccountCircle';
@@ -42,7 +43,8 @@ class AuthState extends React.Component {
                         color="secondary"
                         size="small"
                         startIcon={<AccountCircle />}
-                        href="login"
+                        component={Link}
+                        to="/login"
                 >Login</TopbarButton>
               </>
           }
