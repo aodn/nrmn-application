@@ -5,6 +5,8 @@ import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +18,8 @@ import java.util.Map;
 @Data
 @Getter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class StagedRowFormatted {
     private long id;
 

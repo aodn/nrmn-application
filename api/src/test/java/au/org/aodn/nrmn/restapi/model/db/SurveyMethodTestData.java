@@ -23,10 +23,6 @@ public class SurveyMethodTestData {
             .surveyMethodAttribute(
                 ImmutableMap.<String, String>builder()
                     .put("NonStandardData", "Site sampled due to oil spill")
-                    .build())
-            .observations(
-                ImmutableSet.<Observation>builder()
-                    .add(observationTestData.defaultBuilder().build())
                     .build());
     }
 }

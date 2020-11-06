@@ -53,11 +53,11 @@ public class Survey {
 
     @Basic
     @Column(name = "depth")
-    private int depth;
+    private Integer depth;
 
     @Basic
     @Column(name = "survey_num")
-    private int surveyNum;
+    private Integer surveyNum;
 
     @Basic
     @Column(name = "visibility")
@@ -82,31 +82,4 @@ public class Survey {
     @JsonIgnore
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     private Program program;
-
-    @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private Set<SurveyMethod> surveyMethods;
-
-    // update surveyMethod back references when set/updated
-
-    public void setSurveyMethods(Set<SurveyMethod> surveyMethods) {
-        if (this.surveyMethods != null)
-            this.surveyMethods.stream()
-                .forEach(surveyMethod -> surveyMethod.setSurvey(null));
-        this.surveyMethods = surveyMethods;
-        if (this.surveyMethods != null)
-            this.surveyMethods.stream()
-                .forEach(surveyMethod -> surveyMethod.setSurvey(this));
-    }
-
-    public static class SurveyBuilder {
-        public Survey build() {
-            Survey survey = new Survey(this.surveyId, this.surveyDate, this.surveyTime, this.depth, this.surveyNum,
-                this.visibility, this.direction, this.surveyAttribute, this.site, this.program, this.surveyMethods);
-            if (survey.surveyMethods != null)
-                survey.surveyMethods.stream()
-                    .forEach(surveyMethod -> surveyMethod.setSurvey(survey));
-            return survey;
-        }
-    }
 }
