@@ -86,3 +86,8 @@ INSERT INTO nrmn.staged_job (id,
 VALUES (119, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP , 'jobid-atrc', 'FILE', 'PENDING', 56);
 
 
+INSERT INTO  nrmn.obs_item_type_ref (
+    obs_item_type_id,
+    obs_item_type_name,
+    is_active
+) VALUES ( 102, 'Specie 56', false)
