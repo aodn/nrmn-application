@@ -16,7 +16,6 @@ const handleMultiChanges = (values, props, entities) => {
 
 const ArrayApiField = (props) => {
 
-  // TODO does this need to load again??
   const items = useSelector(state => state.form.entities);
   const dispatch = useDispatch();
   const entity = props.schema.items.$ref.split("/").pop() ;
@@ -31,7 +30,6 @@ const ArrayApiField = (props) => {
 
   return (items) ? (
      <Autocomplete
-     multiple
       id={"select-auto-"+ entity}
       options={items.map(it => it.name)}
       getOptionLabel={(option) => option}

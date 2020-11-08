@@ -32,25 +32,13 @@ function* getEntityData(action) {
 
 function* saveEditEntities(action) {
   try {
-
-    let resp;
     const href = (action.payload.data?._links?.self?.href) ?
         action.payload.data._links.self.href :
         action.payload.path;
     delete action.payload.data._links;
 
-    if (action.type == 'CREATE_ENTITY_REQUESTED') {
-      resp = yield call(entitySave, href, action.payload.data);
-    } else {
-      resp = yield call(entityEdit, href, action.payload.data);
-    }
-
-    // const arrayfields = Object.keys(action.payload.data).filter(field => Array.isArray(action.payload.data[field]));
-    // arrayfields.map(arrayField => {
-    //   const relationsShirpUrl = resp.data._links[arrayField];
-    //   console.log(relationsShirpUrl)
-    // })
-
+    const entity = (action.type == 'CREATE_ENTITY_REQUESTED') ? entitySave: entityEdit;
+    const resp = yield call(entity, href, action.payload.data);
     yield put(entitiesCreated(resp));
 
   } catch (e) {
