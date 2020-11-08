@@ -53,10 +53,6 @@ const handleMainMenu = () => {
     store.dispatch(toggleLeftSideMenu())
 }
 
-const handleReferenceClick = (thing) => {
-    debugger
-}
-
 const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
     const [openSub, setOpenSub] = React.useState(true);
     const classes = useStyles();

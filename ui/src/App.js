@@ -17,9 +17,9 @@ import {
 } from "react-router-dom";
 import FileList from './components/import/FileList';
 import ImportPage from './components/import/Index';
-import GenericForm from './components/forms/GenericForm';
-import {useDispatch, useSelector} from "react-redux";
-import EntityList from "./components/forms/EntityList";
+import GenericForm from './components/data-entities/GenericForm';
+import {useSelector} from "react-redux";
+import EntityList from "./components/data-entities/EntityList";
 
 const drawerWidth = 240;
 
@@ -48,7 +48,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function App()  {
   const classes = useStyles();
-  const dispatch = useDispatch();
   const themeState = useSelector(state =>  state.theme);
 
 

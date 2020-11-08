@@ -58,7 +58,7 @@ const GenericForm = () => {
       dispatch(updateEntityRequested(data));
   }
 
-  const {title, ...entityDef} = schemaDefinition[entityTitle]
+  const {title, ...entityDef} = schemaDefinition[entityTitle] || {}
   let fullTitle = (title) ? title.replace("Add", "Edit") : "Edit " + entityTitle + " '" + id + "'";
   const entitySchema = (id) ? {title: fullTitle, ...entityDef} : schemaDefinition[entityTitle]
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
@@ -67,27 +67,33 @@ const GenericForm = () => {
     return renderError(errors)
   }
   else {
-    return (id && Object.keys(editItem).length === 0) ?
-      <LoadingBanner variant={"h5"} msg={"Loading edit form for " + titleCase(fullTitle)}/>  :
+    if (schemaDefinition[entityTitle] === undefined) {
+      return renderError(["Entity '" + entityName + "' cannot be found"]);
+    }
+    else {
+      return (id && Object.keys(editItem).length === 0) ?
+          <LoadingBanner variant={"h5"} msg={"Loading edit form for " + titleCase(fullTitle)}/> :
 
-        <Grid
-          container
-          spacing={0}
-          alignItems="center"
-          justify="center"
-          style={{minHeight: "70vh"}}
-        >
-          <Paper>
-            <Box mx="auto" bgcolor="background.paper" pt={2} px={3} pb={3}>
-              <Form
-                  schema={JSSchema}
-                  onSubmit={handleSubmit}
-                  fields={fields}
-                  formData={editItem}
-              />
-            </Box>
-          </Paper>
-        </Grid>
+          <Grid
+              container
+              spacing={0}
+              alignItems="center"
+              justify="center"
+              style={{minHeight: "70vh"}}
+          >
+            <Paper>
+              <Box mx="auto" bgcolor="background.paper" pt={2} px={3} pb={3}>
+                <Form
+                    schema={JSSchema}
+                    onSubmit={handleSubmit}
+                    fields={fields}
+                    formData={editItem}
+                />
+              </Box>
+            </Paper>
+          </Grid>
+    }
+
 
   }
 
