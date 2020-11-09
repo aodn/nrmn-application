@@ -1,11 +1,10 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.val;
@@ -17,7 +16,6 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -65,6 +63,7 @@ public class Site {
     @Basic
     @Column(name = "geom")
     @Setter(AccessLevel.NONE)
+    @Schema(hidden = true)
     private Point geom;
 
     @Column(name = "site_attribute", columnDefinition = "jsonb")
