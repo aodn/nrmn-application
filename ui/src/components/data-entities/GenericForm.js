@@ -58,9 +58,10 @@ const GenericForm = () => {
       dispatch(updateEntityRequested(data));
   }
 
-  const {title, ...entityDef} = schemaDefinition[entityTitle] || {}
-  let fullTitle = (title) ? title.replace("Add", "Edit") : "Edit " + entityTitle + " '" + id + "'";
-  const entitySchema = (id) ? {title: fullTitle, ...entityDef} : schemaDefinition[entityTitle]
+  const entityDef = schemaDefinition[entityTitle];
+
+  let fullTitle = (id) ?  "Edit " + entityTitle + " '" + id + "'" : "Add '" + entityTitle + "'" ;
+  const entitySchema = {title: fullTitle, ...entityDef}
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
 
   if (errors.length > 0) {
@@ -72,7 +73,7 @@ const GenericForm = () => {
     }
     else {
       return (id && Object.keys(editItem).length === 0) ?
-          <LoadingBanner variant={"h5"} msg={"Loading edit form for " + titleCase(fullTitle)}/> :
+          <LoadingBanner variant={"h5"} msg={"Loading '" + titleCase(entityName) + "' form"  } /> :
 
           <Grid
               container
@@ -83,6 +84,7 @@ const GenericForm = () => {
           >
             <Paper>
               <Box mx="auto" bgcolor="background.paper" pt={2} px={3} pb={3}>
+
                 <Form
                     schema={JSSchema}
                     onSubmit={handleSubmit}
