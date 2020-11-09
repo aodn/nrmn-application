@@ -7,6 +7,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import { TopbarButton } from './TopbarButton'
 import Logout from "../auth/logout";
 import {toggleLogoutMenuOpen} from "./layout-reducer";
+import {Link} from 'react-router-dom'
 
 const basicButton = {
   textTransform: 'none',
