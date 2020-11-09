@@ -39,7 +39,7 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 public class Survey {
     @Id
     @SequenceGenerator(name = "survey_survey_id", sequenceName = "survey_survey_id", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="survey_survey_id")
     @Column(name = "survey_id", unique = true, updatable = false, nullable = false)
     private int surveyId;
 

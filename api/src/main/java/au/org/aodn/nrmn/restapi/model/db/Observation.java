@@ -37,7 +37,7 @@ public class Observation {
     @Id
     @SequenceGenerator(name = "observation_observation_id", sequenceName = "observation_observation_id",
      allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="observation_observation_id")
     @Column(name = "observation_id", unique = true, updatable = false, nullable = false)
     private int observationId;
 

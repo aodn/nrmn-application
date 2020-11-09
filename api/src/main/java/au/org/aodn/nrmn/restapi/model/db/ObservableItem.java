@@ -37,7 +37,7 @@ public class ObservableItem {
     @Id
     @SequenceGenerator(name = "observable_item_ref_observable_item_id", sequenceName =
         "observable_item_ref_observable_item_id", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="observable_item_ref_observable_item_id")
     @Column(name = "observable_item_id", unique = true, updatable = false, nullable = false)
     private int observableItemId;
 
