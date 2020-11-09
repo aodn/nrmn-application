@@ -65,7 +65,6 @@ const EntityList = () => {
   const entities = useSelector(state => state.form.entities);
   const errors = useSelector(state => state.form.errors);
   const items =  (entities?._embedded) ? entities._embedded[entityNamePlural] : undefined;
-  // TODO handle paging from entities.
 
   const agGridReady = (agGrid) => {
     agGridApi = Object.create(agGrid.api);
@@ -104,7 +103,7 @@ const EntityList = () => {
               justify="space-between"
               alignItems="center"
           >
-            <Typography variant="h4">{titleCase(entityName)}</Typography>
+            <Typography variant="h4">{titleCase(entityNamePlural)}</Typography>
             <Button title={"Add new " + titleCase(entityName)}
                     component={NavLink}
                     to={"/form/" + entityNamePlural}
@@ -116,11 +115,12 @@ const EntityList = () => {
             </Button>
           </Grid>
 
-          <div style={{height: size.height - 200, width: '100%', marginTop: 25}}
+          <div style={{ width: '100%', marginTop: 25}}
                className={themeType ? "ag-theme-alpine-dark" : "ag-theme-alpine"}>
             <AgGridReact
                 columnDefs={colDef}
                 rowSelection="multiple"
+                domLayout='autoHeight'
                 animateRows={true}
                 onGridReady={agGridReady}
 
