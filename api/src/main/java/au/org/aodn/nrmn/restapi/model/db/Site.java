@@ -40,7 +40,7 @@ import java.util.Map;
 public class Site {
     @Id
     @SequenceGenerator(name = "site_ref_site_id", sequenceName = "site_ref_site_id", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="site_ref_site_id")
     @Column(name = "site_id", unique = true, updatable = false, nullable = false)
     private int siteId;
 

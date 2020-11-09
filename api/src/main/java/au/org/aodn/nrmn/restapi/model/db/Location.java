@@ -24,7 +24,7 @@ import javax.persistence.Table;
 public class Location {
     @Id
     @SequenceGenerator(name = "location_ref_location_id", sequenceName = "location_ref_location_id", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="location_ref_location_id")
     @Column(name = "location_id", unique = true, updatable = false, nullable = false)
     private int locationId;
 

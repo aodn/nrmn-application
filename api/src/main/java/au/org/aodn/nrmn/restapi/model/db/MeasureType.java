@@ -23,7 +23,7 @@ import javax.persistence.Table;
 public class MeasureType {
     @Id
     @SequenceGenerator(name = "measure_type_ref_measure_id", sequenceName = "measure_type_ref_measure_id", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="measure_type_ref_measure_id")
     @Column(name = "measure_type_id", unique = true, updatable = false, nullable = false)
     private int measureTypeId;
 
