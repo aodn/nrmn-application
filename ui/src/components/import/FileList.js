@@ -21,11 +21,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const fileName2ListItem = (fileName) => {
-    const split = fileName.id.split("-");
+    const split = fileName.split("-");
     const timeStamp = split.slice(-1);
     const timeString = new Date(parseInt(timeStamp)).toUTCString();
     const cleanName = split.slice(0, split.length -1);
-    return (<ListItem key={fileName.id} component={NavLink} to={"/import-file/" + fileName.id}>
+    return (<ListItem key={fileName} component={NavLink} to={"/import-file/" + fileName}>
     <ListItemAvatar>
         <Avatar>
             <DescriptionIcon />
