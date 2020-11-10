@@ -39,9 +39,7 @@ function Login()  {
   console.log(location);
 
   const handleLogin = (form) => {
-    debugger
     if (location) {
-      debugger
       form.formData.redirect = location;
     }
     dispatch(loginSubmitted(form.formData));
