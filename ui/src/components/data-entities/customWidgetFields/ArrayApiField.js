@@ -8,7 +8,7 @@ import TextField from '@material-ui/core/TextField';
 import pluralize from 'pluralize';
 
 const handleMultiChanges = (values, props, entities) => {
-  const baseApi = process.env.REACT_APP_LOCALDEV_API_HOST;
+  const baseApi = process.env.NODE_ENV === 'development' ? process.env.REACT_APP_LOCALDEV_API_HOST : ""
 
   const items = (values)? values.map(v =>  ({id: baseApi + "/api/" + entities + "/" + v})) : [];
   props.onChange(items);
@@ -24,7 +24,7 @@ const ArrayApiField = (props) => {
 
   useEffect(() => {
     console.log("entity:", entities);
-    if (entities != undefined)
+    if (entities !== undefined)
       dispatch(selectRequested(entities));
   }, []);
 

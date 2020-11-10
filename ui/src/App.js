@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import {
   ThemeProvider ,
@@ -20,6 +20,9 @@ import ImportPage from './components/import/Index';
 import GenericForm from './components/data-entities/GenericForm';
 import {useSelector} from "react-redux";
 import EntityList from "./components/data-entities/EntityList";
+import Alert from "@material-ui/lab/Alert";
+import {getFullPath} from "./components/utils/helpers";
+import AlertTitle from "@material-ui/lab/AlertTitle";
 
 const drawerWidth = 240;
 
@@ -93,6 +96,18 @@ export default function App()  {
               <Route path="/login" component={Login} />
               <Route path="/form/:entityName/:id?" component={GenericForm} />
               <Route path="/list/:entityName" component={EntityList} />
+              <Route path="/notfound" render={(props) =>
+                  <Alert severity="error"  >
+                    <AlertTitle>API Resource Not Found</AlertTitle>
+                    {`The requested resource ${getFullPath(props.location)} is not available`}
+                  </Alert>}
+              />
+              <Route render={(props) =>
+                  <Alert severity="error"  >
+                    <AlertTitle>Path Not Found</AlertTitle>
+                    The requested resource <strong>{getFullPath(props.location)}</strong> is not available
+                  </Alert>}
+              />
             </Switch>
         </main>
         </Router>
