@@ -19,7 +19,7 @@ const authSlice = createSlice({
         localStorage.setItem('auth', JSON.stringify(state));
         state.errors = undefined;
         state.loading = false;
-        window.location = "/"
+        window.location = (action.payload.redirect) ? action.payload.redirect : "/"
     },
     authError: (state, action) => {
       state.errors = ["ERROR: " + action.payload.response.data.error];

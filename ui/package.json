@@ -34,7 +34,8 @@
     "redux-saga": "^1.1.3",
     "title-case": "^3.0.2",
     "universal-cookie": "^4.0.4",
-    "xlsx": "^0.16.7"
+    "xlsx": "^0.16.7",
+    "moment-timezone": "^0.5.31"
   },
   "scripts": {
     "flow": "flow",

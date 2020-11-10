@@ -11,6 +11,7 @@ function* apiLogin(loginSubmitted) {
   try {
     yield put(loginAttempted());
     const payload = yield call(userLogin, loginSubmitted.payload);
+    payload.redirect = loginSubmitted.payload.redirect;
     yield put(login(payload));
   } catch (e) {
     yield put(authError(e));

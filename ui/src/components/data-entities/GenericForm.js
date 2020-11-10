@@ -3,9 +3,9 @@ import React from "react";
 import Form from "@rjsf/material-ui"
 import {useDispatch, useSelector} from "react-redux";
 import {useEffect} from 'react';
-import {resetState, itemRequested, createEntityRequested, updateEntityRequested} from "./form-reducer";
+import {itemRequested, createEntityRequested, updateEntityRequested} from "./form-reducer";
 import {useParams, Redirect} from "react-router-dom";
-import ArrayApiField from './customWidget/ArrayApiField';
+import ArrayApiField from './customWidgetFields/ArrayApiField';
 import pluralize from 'pluralize';
 import config from "react-global-configuration";
 import {Box} from "@material-ui/core";
@@ -40,7 +40,6 @@ const GenericForm = () => {
 
   if (Object.keys(newlyCreatedEntity).length !== 0) {
     const redirectPath = "/list/" + entityTitle;
-    console.log('redirected:', redirectPath);
     return (<Redirect to={redirectPath}></Redirect>);
   }
 
@@ -95,8 +94,6 @@ const GenericForm = () => {
             </Paper>
           </Grid>
     }
-
-
   }
 
 }
