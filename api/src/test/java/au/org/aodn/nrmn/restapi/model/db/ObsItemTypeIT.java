@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.repository.ObsItemTypeRepository;
-import au.org.aodn.nrmn.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +12,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

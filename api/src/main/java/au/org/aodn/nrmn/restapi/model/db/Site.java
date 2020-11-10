@@ -95,7 +95,7 @@ public class Site {
             if (entry.getKey().equals("OldSiteCodes")) {
                 return String.join(",", (Collection)entry.getValue());
             } else {
-                return entry.getValue().toString();
+                return entry.getValue() == null ? null : entry.getValue().toString();
             }
         };
         

@@ -6,8 +6,7 @@ import au.org.aodn.nrmn.restapi.dto.auth.LoginRequest;
 import au.org.aodn.nrmn.restapi.dto.auth.SignUpRequest;
 import au.org.aodn.nrmn.restapi.dto.payload.JwtAuthenticationResponse;
 import au.org.aodn.nrmn.restapi.model.db.SecUser;
-import au.org.aodn.nrmn.restapi.model.db.Survey;
-import au.org.aodn.nrmn.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +21,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Collections;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
