@@ -150,17 +150,17 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.4.6</version>
+            <version>1.4.8</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-data-rest</artifactId>
-            <version>1.4.6</version>
+            <version>1.4.8</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webmvc-core</artifactId>
-            <version>1.4.6</version>
+            <version>1.4.8</version>
         </dependency>
         <!-- For Working with Json Web Tokens (JWT) see: https://github.com/jwtk-->
         <dependency>
