@@ -9,7 +9,6 @@ function getToken() {
    return `${tokenType} ${token}`;
 }
 
-// todo fix https://stackoverflow.com/questions/47227047/redux-saga-network-error-options-request
 axiosInstance.interceptors.request.use(
     config => {
       config.headers.authorization = getToken();
