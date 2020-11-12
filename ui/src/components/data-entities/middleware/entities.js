@@ -37,7 +37,7 @@ function* saveEditEntities(action) {
         action.payload.path;
     delete action.payload.data._links;
 
-    const entity = (action.type == 'CREATE_ENTITY_REQUESTED') ? entitySave: entityEdit;
+    const entity = (action.type === 'CREATE_ENTITY_REQUESTED') ? entitySave: entityEdit;
     const resp = yield call(entity, href, action.payload.data);
     yield put(entitiesCreated(resp));
 

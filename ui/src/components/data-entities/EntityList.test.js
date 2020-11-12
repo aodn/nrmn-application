@@ -1,14 +1,12 @@
 /* eslint-disable no-unused-expressions */
 
 import React from "react";
-import {AgGridReact} from "ag-grid-react/lib/agGridReact";
 import { Route } from "react-router-dom";
 import {renderWithProviders} from "../utils/test-utils";
 import "@testing-library/jest-dom/extend-expect";
 import config from "react-global-configuration";
 import {useSelector} from "react-redux";
 import EntityList from "./EntityList";
-import {getByText} from "@testing-library/dom";
 
 const testSchema = {
   TestEntity: {
@@ -29,7 +27,7 @@ const testSchema = {
 }
 
 config.set({api: testSchema});
-jest.mock('ag-grid-react/lib/agGridReact')
+jest.mock('ag-grid-react/lib/agGridReact');
 
 
 const mockState = {
