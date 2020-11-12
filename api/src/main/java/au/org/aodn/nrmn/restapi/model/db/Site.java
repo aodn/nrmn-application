@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -64,11 +65,12 @@ public class Site {
     @Column(name = "geom")
     @Setter(AccessLevel.NONE)
     @Schema(hidden = true)
+    @JsonIgnore
     private Point geom;
 
     @Column(name = "site_attribute", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    private Map<String, String> siteAttribute;
+    private Map<String, Object> siteAttribute;
 
     @Basic
     @Column(name = "is_active")
