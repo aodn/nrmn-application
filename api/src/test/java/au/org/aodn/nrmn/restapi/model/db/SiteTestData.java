@@ -29,7 +29,7 @@ public class SiteTestData {
             .longitude(-58.5)
             .latitude(-57.5)
             .location(locationTestData.persistedLocation())
-            .siteAttribute(ImmutableMap.<String, String>builder()
+            .siteAttribute(ImmutableMap.<String, Object>builder()
                 .put("State", "Graham Land Antarctica")
                 .put("Country", "Antarctica")
                 .put("ProxCountry", "Antarctica")
