@@ -1,11 +1,10 @@
 
 import React from "react";
-import { expect, assert } from "chai";
+import { assert } from "chai";
 import { unmountComponentAtNode } from "react-dom";
 import { render } from "../../setupTests";
 import { act } from "@testing-library/react";
 import Login from "./login";
-import {useLocation} from "react-router-dom";
 
 let container;
 
