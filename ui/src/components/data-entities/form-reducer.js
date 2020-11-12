@@ -5,7 +5,6 @@ import {
 
 
 const formState = {
-  definition: {},
   entities: [],
   editItem: {},
   newlyCreatedEntity: {},

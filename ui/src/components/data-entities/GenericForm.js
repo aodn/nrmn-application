@@ -22,7 +22,8 @@ const renderError = (msgArray) => {
 const GenericForm = () => {
 
   const {entityName, id} = useParams();
-  const schemaDefinition = config.get('api');
+  const schemaDefinition = config.get('api') || {};
+
   const editItem = useSelector(state => state.form.editItem);
   const newlyCreatedEntity = useSelector(state => state.form.newlyCreatedEntity);
   const errors = useSelector(state => state.form.errors);
@@ -42,9 +43,12 @@ const GenericForm = () => {
     const redirectPath = "/list/" + entityTitle;
     return (<Redirect to={redirectPath}></Redirect>);
   }
-
-  if (Object.keys(schemaDefinition).length === 0 && typeof (schemaDefinition[entityTitle]) == 'undefined')
+  if (Object.keys(schemaDefinition).length === 0) {
     return renderError("ERROR: API Schema not found");
+  }
+  if ( typeof (schemaDefinition[entityTitle]) == 'undefined') {
+    return renderError("ERROR: Entity '" + entityTitle + "' missing from API Schema");
+  }
 
   const fields = {ArrayField: ArrayApiField}
 
