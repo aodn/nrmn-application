@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
   },
-  content: {
+  mainContent: {
     marginTop: 50,
     flexGrow: 1,
     padding: theme.spacing(3),
@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    marginLeft: -drawerWidth,
+    marginLeft: -drawerWidth
   },
   contentShift: {
     transition: theme.transitions.create('margin', {
@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
 export default function App()  {
   const classes = useStyles();
   const themeState = useSelector(state =>  state.theme);
-
+  const leftSideMenuIsOpen = useSelector(state =>  state.toggle.leftSideMenuIsOpen);
 
   let theme = createMuiTheme({
     palette: {
@@ -85,11 +85,10 @@ export default function App()  {
           <TopBar></TopBar>
           <SideMenu></SideMenu>
           <main
-            className={clsx(classes.content, {
-              [classes.contentShift]: false,
+            className={clsx(classes.mainContent, {
+              [classes.contentShift]: leftSideMenuIsOpen
             })}
           >
-            <div className={classes.drawerHeader} />
             <Switch>
               <Route path={["/import-file/:fileID?"]} component={ImportPage} />
               <Route path="/list-file" component={FileList} />
@@ -109,7 +108,7 @@ export default function App()  {
                   </Alert>}
               />
             </Switch>
-        </main>
+          </main>
         </Router>
       </ThemeProvider>
     </div>
