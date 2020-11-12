@@ -1,12 +1,14 @@
 /* eslint-disable no-unused-expressions */
 
 import React from "react";
-import GenericForm from "./GenericForm";
+import {AgGridReact} from "ag-grid-react/lib/agGridReact";
 import { Route } from "react-router-dom";
 import {renderWithProviders} from "../utils/test-utils";
 import "@testing-library/jest-dom/extend-expect";
 import config from "react-global-configuration";
 import {useSelector} from "react-redux";
+import EntityList from "./EntityList";
+import {getByText} from "@testing-library/dom";
 
 const testSchema = {
   TestEntity: {
@@ -27,9 +29,11 @@ const testSchema = {
 }
 
 config.set({api: testSchema});
+jest.mock('ag-grid-react/lib/agGridReact')
 
 
 const mockState = {
+  theme: {themeType: false},
   form: {
     entities: [],
     editItem: {},
@@ -55,7 +59,7 @@ jest.mock('react-redux', () => {
 });
 
 
-describe("GenericForm.js Component", () => {
+describe("EntityList Component", () => {
 
   beforeEach(() => {
     useSelector.mockImplementation(callback => {
@@ -66,30 +70,30 @@ describe("GenericForm.js Component", () => {
     useSelector.mockClear();
   });
 
-  test("Test GenericForm.js exists", async () => {
+  test("Test EntityList.js exists", async () => {
     const {findByText} = renderWithProviders(
-        <Route path="/form/:entityName">
-          <GenericForm/>
+        <Route path="/list/:entityName">
+          <EntityList />
         </Route>,
         {
-          route: "/form/munt"
+          route: "/list/munt"
         }
     );
     await findByText("ERROR: Entity 'Munt' missing from API Schema");
   });
 
 
-  test("Test GenericForm.js TestEntity renders form submit button", async () => {
+  test("Test EntityList.js New Entity button exists", async () => {
 
-    const {findByText} = renderWithProviders(
-        <Route path="/form/:entityName">
-          <GenericForm/>
+    const {findByTitle, findByText} = renderWithProviders(
+        <Route path="/list/:entityName">
+          <EntityList/>
         </Route>,
         {
-          route: "/form/TestEntity"
+          route: "/list/TestEntity"
         }
     );
-    await findByText("Submit");
+    await findByTitle("Add new TestEntity");
   });
 
 });

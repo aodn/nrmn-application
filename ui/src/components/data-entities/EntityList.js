@@ -88,7 +88,7 @@ const EntityList = () => {
   else {
 
     if (!getEntitySchema()) {
-      return renderError(["ERROR: Entity '" + entityName + "' missing from API Schema"]);
+      return renderError(["ERROR: Entity '" + titleCase(entityName) + "' missing from API Schema"]);
     }
 
     const colDef = schematoColDef(getEntitySchema(), size);
@@ -96,7 +96,6 @@ const EntityList = () => {
     if (items !== undefined && agGridApi.setRowData) {
       agGridApi.setRowData(items);
     }
-
     return (
         <>
         <Box>
