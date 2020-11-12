@@ -12,7 +12,6 @@ import { toggleLeftSideMenu } from './layout-reducer';
 import { connect } from 'react-redux';
 import store from '../store';
 import AuthState from "./AuthState";
-import { TopbarButton } from './TopbarButton'
 import SettingsMenu from "./SettingsMenu";
 
 const drawerWidth = 240;

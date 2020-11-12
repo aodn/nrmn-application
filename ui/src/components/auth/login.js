@@ -36,7 +36,6 @@ function Login()  {
   const errors = useSelector(state => state.auth.errors);
   let loading = useSelector(state => state.auth.loading);
   const location = new URLSearchParams(useLocation().search).get('redirect');
-  console.log(location);
 
   const handleLogin = (form) => {
     if (location) {

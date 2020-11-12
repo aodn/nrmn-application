@@ -82,13 +82,16 @@ const EntityList = () => {
         (schemaDefinition[entityName]);
   }
 
-  if (typeof schemaDefinition === "undefined") {
+  if (Object.keys(schemaDefinition).length === 0) {
     return (renderError(["Error: API not yet loaded"]));
   }
   else {
 
-    const colDef = getEntitySchema() ?
-        schematoColDef(getEntitySchema(), size) : undefined;
+    if (!getEntitySchema()) {
+      return renderError(["ERROR: Entity '" + entityName + "' missing from API Schema"]);
+    }
+
+    const colDef = schematoColDef(getEntitySchema(), size);
 
     if (items !== undefined && agGridApi.setRowData) {
       agGridApi.setRowData(items);
