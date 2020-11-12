@@ -11,7 +11,7 @@
     </parent>
     <groupId>au.org.aodn.nrmn</groupId>
     <artifactId>nrmn</artifactId>
-    <version>0.0.11</version>
+    <version>0.0.12</version>
     <packaging>pom</packaging>
     <name>nrmn</name>
     <description>Project for the NRMN database</description>
