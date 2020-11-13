@@ -12,7 +12,7 @@ class TimeFormatTest {
     @Test
     void incorrectTimeFormatShouldFail() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setTime("ti:me");
         stage.setStagedJob(job);
@@ -24,7 +24,7 @@ class TimeFormatTest {
     @Test
     void quarterPastTenShouldBeOk() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setTime("10:15");
         stage.setStagedJob(job);
@@ -36,7 +36,7 @@ class TimeFormatTest {
     @Test
     void beyoundBoundaryShouldFail() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setTime("40:15");
         stage.setStagedJob(job);

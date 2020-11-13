@@ -39,7 +39,7 @@ public class Observation {
      allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="observation_observation_id")
     @Column(name = "observation_id", unique = true, updatable = false, nullable = false)
-    private int observationId;
+    private Integer observationId;
 
     @Basic
     @Column(name = "measure_value")

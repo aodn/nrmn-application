@@ -27,7 +27,7 @@ public class Diver {
     @SequenceGenerator(name = "diver_ref_diver_id", sequenceName = "diver_ref_diver_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="diver_ref_diver_id")
     @Column(name = "diver_id", unique = true, updatable = false, nullable = false)
-    private int diverId;
+    private Integer diverId;
 
     @Column(name = "initials")
     private String initials;

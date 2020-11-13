@@ -43,7 +43,7 @@ public class Site {
     @SequenceGenerator(name = "site_ref_site_id", sequenceName = "site_ref_site_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="site_ref_site_id")
     @Column(name = "site_id", unique = true, updatable = false, nullable = false)
-    private int siteId;
+    private Integer siteId;
 
     @Basic
     @Column(name = "site_code")

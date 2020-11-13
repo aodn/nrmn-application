@@ -11,7 +11,7 @@ class DateFormatTest {
     @Test
     void incorrectDateFormatShouldFail() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setDate("not /at /date");
         stage.setStagedJob(job);
@@ -23,7 +23,7 @@ class DateFormatTest {
     @Test
     void quarterPastTenShouldBeOk() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setDate("11/09/2018");
         stage.setStagedJob(job);

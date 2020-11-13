@@ -35,7 +35,7 @@ public class StagedJobLog {
     @SequenceGenerator(name = "staged_job_log_id_seq", sequenceName = "staged_job_log_id_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "staged_job_log_id_seq")
     @Column(columnDefinition = "BIGSERIAL")
-    private long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "staged_job_id", referencedColumnName = "id", nullable = false,

@@ -41,7 +41,7 @@ public class Survey {
     @SequenceGenerator(name = "survey_survey_id", sequenceName = "survey_survey_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="survey_survey_id")
     @Column(name = "survey_id", unique = true, updatable = false, nullable = false)
-    private int surveyId;
+    private Integer surveyId;
 
     @Basic
     @Column(name = "survey_date")

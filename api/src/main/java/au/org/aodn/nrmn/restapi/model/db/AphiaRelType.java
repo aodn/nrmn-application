@@ -20,7 +20,7 @@ import javax.persistence.Table;
 public class AphiaRelType {
     @Id
     @Column(name = "aphia_rel_type_id", unique = true, nullable = false)
-    private int aphiaRelTypeId;
+    private Integer aphiaRelTypeId;
 
     @Basic
     @Column(name = "aphia_rel_type_name")
