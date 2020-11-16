@@ -43,6 +43,10 @@ public class StagedJob implements Serializable {
     @Column(name = "reference")
     private String reference;
 
+    @Column(name = "is_extended_size")
+    private Boolean isExtendedSize;
+
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private StatusJobType status;

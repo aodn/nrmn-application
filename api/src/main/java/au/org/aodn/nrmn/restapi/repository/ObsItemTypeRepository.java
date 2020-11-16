@@ -10,11 +10,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ObsItemTypeRepository extends JpaRepository<ObsItemType, Integer>, JpaSpecificationExecutor<ObsItemType>, EntityCriteria<ObsItemType> {
 
     @Override
     @Query("SELECT o FROM  ObsItemType  o WHERE o.obsItemTypeName = :obsItemName")
-    List<ObsItemType> findByCriteria(@Param("obsItemName")String obsItemName);
+    Optional<ObsItemType> findByCriteria(@Param("obsItemName")String obsItemName);
 }

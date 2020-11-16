@@ -193,7 +193,7 @@ CREATE TABLE nrmn.staged_row (
     last_updated timestamp with time zone NOT NULL,
     latitude varchar(255),
     longitude varchar(255),
-    m2_invert_sizing_species boolean,
+    m2_invert_sizing_species varchar(255),
     measure_value json,
     method varchar(255),
     site_name varchar(255),
@@ -212,6 +212,7 @@ CREATE TABLE nrmn.staged_job (
     program_id integer,
     last_updated timestamp with time zone,
     reference varchar(255),
+    is_extended_size boolean,
     source varchar(255),
     status varchar(255),
     CONSTRAINT staged_job_pkey PRIMARY KEY (id)

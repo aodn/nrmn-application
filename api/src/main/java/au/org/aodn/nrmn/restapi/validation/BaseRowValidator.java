@@ -14,6 +14,6 @@ public abstract class BaseRowValidator {
     public BaseRowValidator(String columnTarget){
         this.columnTarget = columnTarget;
     }
-    abstract public Validated<StagedRowError, String> valid(StagedRow target);
+    abstract public<T> Validated<StagedRowError, T> valid(StagedRow target);
 
 }

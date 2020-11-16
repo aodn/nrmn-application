@@ -36,6 +36,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @Builder
 @Table(name = "site_ref")
 @Audited(withModifiedFlag = true)
@@ -75,7 +76,7 @@ public class Site {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "location_id", referencedColumnName = "location_id", nullable = false)
     private Location location;
 

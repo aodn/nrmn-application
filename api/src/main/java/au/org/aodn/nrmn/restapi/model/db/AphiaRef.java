@@ -1,9 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -20,6 +17,7 @@ import java.sql.Timestamp;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @Table(name = "aphia_ref")
 public class AphiaRef {
     @Id

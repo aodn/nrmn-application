@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,4 +19,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
 
     @Query("SELECT t FROM #{#entityName} t WHERE t.id IN :ids")
     List<Survey> findByIdsIn(@Param("ids") List<Integer> ids);
+
+
+
 }

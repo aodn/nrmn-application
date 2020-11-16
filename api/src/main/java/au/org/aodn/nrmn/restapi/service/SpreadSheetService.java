@@ -147,7 +147,7 @@ public class SpreadSheetService {
                         stagedRow.setTotal(_getCellValue(row.getCell(headerMap.get("Total")), eval, fmt));
                         stagedRow.setInverts(_getCellValue(row.getCell(headerMap.get("Inverts")), eval, fmt));
                         if (dataSheet.getHeader().size() == longHeadersRef.size()) {
-                            stagedRow.setM2InvertSizingSpecies(_getCellValue(row.getCell(headerMap.get("M2 Invert Sizing Species")), eval, fmt).equals("Yes"));
+                            stagedRow.setM2InvertSizingSpecies(_getCellValue(row.getCell(headerMap.get("M2 Invert Sizing Species")), eval, fmt));
                             stagedRow.setL5(_getCellValue(row.getCell(headerMap.get("L5")), eval, fmt));
                             stagedRow.setL95(_getCellValue(row.getCell(headerMap.get("L95")), eval, fmt));
                             stagedRow.setIsInvertSizing(_getCellValue(row.getCell(headerMap.get("Use InvertSizing")), eval, fmt));

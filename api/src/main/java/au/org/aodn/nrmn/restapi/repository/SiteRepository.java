@@ -9,12 +9,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecificationExecutor<Site>, EntityCriteria<Site> {
 
     @Override
     @Query("SELECT s FROM Site s WHERE s.siteCode = :code")
-    List<Site> findByCriteria(@Param("code")String siteCode);
+    Optional<Site> findByCriteria(@Param("code")String siteCode);
 
 }

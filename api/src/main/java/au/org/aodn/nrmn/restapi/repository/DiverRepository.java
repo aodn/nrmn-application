@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DiverRepository extends JpaRepository<Diver, Integer>, JpaSpecificationExecutor<Diver>, EntityCriteria<Diver> {
@@ -16,5 +17,5 @@ public interface DiverRepository extends JpaRepository<Diver, Integer>, JpaSpeci
 
     @Override
     @Query("SELECT d FROM  Diver  d WHERE d.initials = :initials")
-    List<Diver> findByCriteria(@Param("initials")String initials);
+    Optional<Diver> findByCriteria(@Param("initials")String initials);
 }
