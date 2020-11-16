@@ -29,7 +29,7 @@ public class Measure {
     @SequenceGenerator(name = "measure_ref_measure_id", sequenceName = "measure_ref_measure_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="measure_ref_measure_id")
     @Column(name = "measure_id", unique = true, updatable = false, nullable = false)
-    private int measureId;
+    private Integer measureId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "measure_type_id", referencedColumnName = "measure_type_id")

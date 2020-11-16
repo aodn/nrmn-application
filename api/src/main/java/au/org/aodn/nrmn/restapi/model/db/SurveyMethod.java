@@ -43,7 +43,7 @@ public class SurveyMethod {
         allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="survey_method_survey_method_id")
     @Column(name = "survey_method_id", unique = true, updatable = false, nullable = false)
-    private int surveyMethodId;
+    private Integer surveyMethodId;
 
     @Basic
     @Column(name = "block_num")

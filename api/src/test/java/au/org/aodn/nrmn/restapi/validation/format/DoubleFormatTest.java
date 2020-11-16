@@ -11,7 +11,7 @@ class DoubleFormatTest {
     @Test
     void nanShouldFail() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setLongitude("Not a number");
         stage.setStagedJob(job);
@@ -23,7 +23,7 @@ class DoubleFormatTest {
     @Test
     void minusValueShouldBeOK(){
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setLongitude("-67.192519");
         stage.setStagedJob(job);

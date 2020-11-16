@@ -24,7 +24,7 @@ import java.sql.Timestamp;
 public class AphiaRef {
     @Id
     @Column(name = "aphia_id", unique = true, nullable = false)
-    private int aphiaId;
+    private Integer aphiaId;
 
     @Basic
     @Column(name = "url")

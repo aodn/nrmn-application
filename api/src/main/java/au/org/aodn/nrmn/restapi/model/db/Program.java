@@ -24,7 +24,7 @@ public class Program {
     @SequenceGenerator(name = "program_ref_program_id", sequenceName = "program_ref_program_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="program_ref_program_id")
     @Column(name = "program_id", unique = true, updatable = false, nullable = false)
-    private int programId;
+    private Integer programId;
 
     @Column(name = "program_name")
     private String programName;

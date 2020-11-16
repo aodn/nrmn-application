@@ -25,7 +25,7 @@ public class ObsItemType {
     @SequenceGenerator(name = "obs_item_type_ref_obs_item_type_id", sequenceName = "obs_item_type_ref_obs_item_type_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="obs_item_type_ref_obs_item_type_id")
     @Column(name = "obs_item_type_id", unique = true, updatable = false, nullable = false)
-    private int obsItemTypeId;
+    private Integer obsItemTypeId;
 
     @Basic
     @Column(name = "obs_item_type_name")

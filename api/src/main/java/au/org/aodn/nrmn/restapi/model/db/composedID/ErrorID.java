@@ -15,9 +15,9 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public class ErrorID implements Serializable {
     @Column(name = "row_id")
-    private long rowId;
+    private Long rowId;
     @Column(name = "job_id")
-    private long jobId;
+    private Long jobId;
     @Column(name = "message")
     private String message;
 }

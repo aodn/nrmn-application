@@ -29,7 +29,7 @@ import javax.persistence.Table;
 public class LengthWeight {
     @Id
     @Column(name = "observable_item_id", unique = true, updatable = false, nullable = false)
-    private int observableItemId;
+    private Integer observableItemId;
 
     @Basic
     @Column(name = "a")
