@@ -25,7 +25,7 @@ class DiverExistsIT {
     @Test
     void notFoundDiverShouldFail() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setDiver("NOP");
         stage.setStagedJob(job);
@@ -36,7 +36,7 @@ class DiverExistsIT {
     @Test
     void existingDiverShouldBeOk() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setStagedJob(job);
         stage.setDiver("TJR");

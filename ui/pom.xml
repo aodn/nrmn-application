@@ -6,7 +6,7 @@
     <parent>
         <artifactId>nrmn</artifactId>
         <groupId>au.org.aodn.nrmn</groupId>
-        <version>0.0.7</version>
+        <version>0.0.13</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>nrmn-ui</artifactId>
@@ -40,6 +40,9 @@
                             <goal>yarn</goal>
                         </goals>
                         <phase>generate-resources</phase>
+                        <configuration>
+                            <arguments>install --network-timeout 1000000</arguments>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>yarn test</id>
@@ -50,7 +53,7 @@
                         <configuration>
                             <arguments>test</arguments>
                             <environmentVariables>
-                                <CI>true</CI>
+                                <CI>false</CI>
                             </environmentVariables>
                         </configuration>
                     </execution>

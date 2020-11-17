@@ -23,7 +23,7 @@ class SpeciesExistsIT {
     @Test
     void notFoundSpecieCodeShouldFail() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setSpecies("Species 20");
         stage.setStagedJob(job);
@@ -34,7 +34,7 @@ class SpeciesExistsIT {
     @Test
     void existingSiteCodeShouldBeOk() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setSpecies("Specie 56");
         stage.setStagedJob(job);

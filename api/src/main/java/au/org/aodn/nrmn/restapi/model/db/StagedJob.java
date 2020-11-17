@@ -38,7 +38,7 @@ public class StagedJob implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "staged_job_id_seq")
     @SequenceGenerator(name = "staged_job_id_seq", sequenceName = "staged_job_id_seq", allocationSize = 1)
-    private long id;
+    private Long id;
 
     @Column(name = "reference")
     private String reference;

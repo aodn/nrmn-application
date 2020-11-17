@@ -7,15 +7,24 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.annotation.RestResource;
 
-import java.util.List;
 import java.util.Optional;
 
-@Repository
-public interface ObsItemTypeRepository extends JpaRepository<ObsItemType, Integer>, JpaSpecificationExecutor<ObsItemType>, EntityCriteria<ObsItemType> {
+@RepositoryRestResource
+@Tag(name = "observable item types")
+public interface ObsItemTypeRepository extends JpaRepository<ObsItemType, Integer>, JpaSpecificationExecutor<ObsItemType> {
+
 
     @Override
-    @Query("SELECT o FROM  ObsItemType  o WHERE o.obsItemTypeName = :obsItemName")
-    Optional<ObsItemType> findByCriteria(@Param("obsItemName")String obsItemName);
+    @RestResource
+    Optional<ObsItemType> findById(Integer integer);
+
+    @Override
+    @RestResource
+    Page<ObsItemType> findAll(Pageable pageable);
 }

@@ -17,7 +17,7 @@ class BeforeDateCheckTest {
     void beforeDateShouldSuccess() throws Exception{
         val beforeDate = sdf.parse("11/02/1993");
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setDate("01/01/1994");
         stage.setStagedJob(job);
@@ -29,7 +29,7 @@ class BeforeDateCheckTest {
     void afterDateShouldFail() throws Exception {
         val beforeDate = sdf.parse("02/01/1994");
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setDate("01/01/1994");
         stage.setStagedJob(job);

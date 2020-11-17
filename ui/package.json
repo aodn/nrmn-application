@@ -35,7 +35,7 @@
   "scripts": {
     "flow": "flow",
     "start": "craco start",
-    "build": "CI='' craco build",
+    "build": "craco build",
     "test": "craco test",
     "test-build": "craco test --watchAll=false && craco build",
     "eject": "react-scripts eject",

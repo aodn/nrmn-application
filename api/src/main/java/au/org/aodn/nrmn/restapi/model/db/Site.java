@@ -1,14 +1,8 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.val;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.locationtech.jts.geom.Coordinate;
@@ -17,7 +11,6 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -43,9 +36,9 @@ import java.util.Map;
 public class Site {
     @Id
     @SequenceGenerator(name = "site_ref_site_id", sequenceName = "site_ref_site_id", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="site_ref_site_id")
     @Column(name = "site_id", unique = true, updatable = false, nullable = false)
-    private int siteId;
+    private Integer siteId;
 
     @Basic
     @Column(name = "site_code")
@@ -66,11 +59,13 @@ public class Site {
     @Basic
     @Column(name = "geom")
     @Setter(AccessLevel.NONE)
+    @Schema(hidden = true)
+    @JsonIgnore
     private Point geom;
 
     @Column(name = "site_attribute", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    private Map<String, String> siteAttribute;
+    private Map<String, Object> siteAttribute;
 
     @Basic
     @Column(name = "is_active")

@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,9 +39,9 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 public class Survey {
     @Id
     @SequenceGenerator(name = "survey_survey_id", sequenceName = "survey_survey_id", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="survey_survey_id")
     @Column(name = "survey_id", unique = true, updatable = false, nullable = false)
-    private int surveyId;
+    private Integer surveyId;
 
     @Basic
     @Column(name = "survey_date")
@@ -83,6 +84,7 @@ public class Survey {
     private Program program;
 
     @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private Set<SurveyMethod> surveyMethods;
 
     // update surveyMethod back references when set/updated

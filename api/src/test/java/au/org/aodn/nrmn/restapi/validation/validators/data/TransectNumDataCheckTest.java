@@ -13,7 +13,7 @@ class TransectNumDataCheckTest {
     @Test
     void depthWithoutTransectShouldFail() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setDepth("8,3");
         stage.setStagedJob(job);
@@ -24,7 +24,7 @@ class TransectNumDataCheckTest {
     @Test
     void depthWithTransectOutOfRangeShouldFail() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setDepth("10.9");
         stage.setStagedJob(job);
@@ -36,7 +36,7 @@ class TransectNumDataCheckTest {
     @Test
     void depthWithTransectInRangeShouldSuccess() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setDepth("7.3");
         stage.setStagedJob(job);

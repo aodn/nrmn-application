@@ -34,7 +34,7 @@ import java.util.Map;
 public class StagedRow implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @JsonProperty(value = "Site No")
     @Column(name = "site_no")

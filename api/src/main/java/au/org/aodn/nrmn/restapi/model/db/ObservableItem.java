@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,9 +37,9 @@ public class ObservableItem {
     @Id
     @SequenceGenerator(name = "observable_item_ref_observable_item_id", sequenceName =
         "observable_item_ref_observable_item_id", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="observable_item_ref_observable_item_id")
     @Column(name = "observable_item_id", unique = true, updatable = false, nullable = false)
-    private int observableItemId;
+    private Integer observableItemId;
 
     @Basic
     @Column(name = "observable_item_name")
@@ -50,6 +51,7 @@ public class ObservableItem {
     private Map<String, String> obsItemAttribute;
 
     @OneToOne(mappedBy = "observableItem", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private LengthWeight lengthWeight;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,9 +37,9 @@ public class Observation {
     @Id
     @SequenceGenerator(name = "observation_observation_id", sequenceName = "observation_observation_id",
      allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="observation_observation_id")
     @Column(name = "observation_id", unique = true, updatable = false, nullable = false)
-    private int observationId;
+    private Integer observationId;
 
     @Basic
     @Column(name = "measure_value")
@@ -52,6 +53,7 @@ public class Observation {
     @JoinColumn(name = "survey_method_id", referencedColumnName = "survey_method_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonBackReference
     private SurveyMethod surveyMethod;
 
     @ManyToOne(fetch = FetchType.LAZY)

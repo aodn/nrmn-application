@@ -17,7 +17,7 @@ class IntegerFormatTest {
     @Test
     void nanShouldFail() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
                 stage.setLmax("Not a number");
                 stage.setStagedJob(job);
@@ -28,7 +28,7 @@ class IntegerFormatTest {
     @Test
     void tenShouldSuccess() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setLmax("10");
         stage.setStagedJob(job);
@@ -39,7 +39,7 @@ class IntegerFormatTest {
     @Test
     void withinCategoryShouldSuccess() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setMethod("7");
         stage.setStagedJob(job);

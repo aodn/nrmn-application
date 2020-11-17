@@ -20,7 +20,7 @@ import javax.persistence.Table;
 public class Method {
     @Id
     @Column(name = "method_id", unique = true, nullable = false)
-    private int methodId;
+    private Integer methodId;
 
     @Basic
     @Column(name = "method_name")

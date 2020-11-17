@@ -19,7 +19,7 @@ public class ErrorID implements Serializable {
     private Long rowId;
 
     @Column(name = "job_id")
-    private long jobId;
+    private Long jobId;
     @Column(name = "message")
     private String message;
 }

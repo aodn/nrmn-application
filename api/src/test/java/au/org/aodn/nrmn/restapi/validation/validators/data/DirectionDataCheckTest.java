@@ -12,7 +12,7 @@ class DirectionDataCheckTest {
     @Test
     void invalidDirectionShouldFail() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setStagedJob(job);
         stage.setDirection("ED");
@@ -25,7 +25,7 @@ class DirectionDataCheckTest {
     @Test
     void directionShouldFail() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setStagedJob(job);
         stage.setDirection("NE");

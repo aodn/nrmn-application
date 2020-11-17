@@ -13,7 +13,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,7 +28,7 @@ class PreValidationProcessIT {
     @Test
     void inputRespectingFormatShouldSuccess() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         job.setIsExtendedSize(false);
         val stage = new StagedRow();
         stage.setSiteNo("EYR71");

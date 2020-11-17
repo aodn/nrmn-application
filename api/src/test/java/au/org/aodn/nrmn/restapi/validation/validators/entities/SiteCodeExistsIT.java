@@ -27,7 +27,7 @@ class SiteCodeExistsIT {
     @Test
     void notFoundSiteCodeShouldFail() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setSiteNo("xyz");
         stage.setStagedJob(job);
@@ -39,7 +39,7 @@ class SiteCodeExistsIT {
     @Test
     void existingSiteCodeShouldBeOk() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setSiteNo("EYR71");
         stage.setStagedJob(job);

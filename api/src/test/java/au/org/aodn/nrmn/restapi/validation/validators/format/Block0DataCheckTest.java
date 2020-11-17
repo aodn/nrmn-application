@@ -13,7 +13,7 @@ class Block0DataCheckTest {
     @Test
     void blockDifferent0ShouldSuccess() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setBlock("1");
         stage.setMethod("3");
@@ -25,7 +25,7 @@ class Block0DataCheckTest {
     @Test
     void block0MethodOutOfRangeShouldFail() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setBlock("0");
         stage.setMethod("2");
@@ -37,7 +37,7 @@ class Block0DataCheckTest {
     @Test
     void block0MethodInRangeShouldSuccess() {
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setBlock("0");
         stage.setMethod("5");

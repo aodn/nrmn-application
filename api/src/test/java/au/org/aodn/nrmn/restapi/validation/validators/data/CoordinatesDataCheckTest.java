@@ -18,7 +18,7 @@ class CoordinatesDataCheckTest extends ValidatorHelpers {
         site.setLongitude(2.3522);
         site.calcGeom();
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setStagedJob(job);
         stage.setLatitude("48.8566");
@@ -37,7 +37,7 @@ class CoordinatesDataCheckTest extends ValidatorHelpers {
         site.calcGeom();
 
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setStagedJob(job);
         stage.setLatitude("90.8566");
@@ -55,7 +55,7 @@ class CoordinatesDataCheckTest extends ValidatorHelpers {
         site.setLongitude(2.3522);
         site.calcGeom();
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setStagedJob(job);
         stage.setLatitude("50.8566");
@@ -72,7 +72,7 @@ class CoordinatesDataCheckTest extends ValidatorHelpers {
         site.setLongitude(2.3522);
         site.calcGeom();
         val job = new StagedJob();
-        job.setId(1);
+        job.setId(1L);
         val stage = new StagedRow();
         stage.setStagedJob(job);
         stage.setLatitude("-90.8566");

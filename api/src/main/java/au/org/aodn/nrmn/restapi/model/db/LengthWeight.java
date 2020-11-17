@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,7 +29,7 @@ import javax.persistence.Table;
 public class LengthWeight {
     @Id
     @Column(name = "observable_item_id", unique = true, updatable = false, nullable = false)
-    private int observableItemId;
+    private Integer observableItemId;
 
     @Basic
     @Column(name = "a")
@@ -52,5 +53,6 @@ public class LengthWeight {
     @ToString.Exclude
     @JoinColumn(name = "observable_item_id", foreignKey = @ForeignKey(name =
         "lengthweight_ref_observable_item_id_fkey"))
+    @JsonBackReference
     private ObservableItem observableItem;
 }

@@ -20,6 +20,7 @@ public class MethodTestData {
 
     public MethodBuilder defaultBuilder() {
         return Method.builder()
+            .methodId(0)
             .methodName("Macrocystis count")
             .isActive(true);
     }
