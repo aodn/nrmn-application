@@ -11,6 +11,7 @@ function* apiLogin(loginSubmitted) {
   try {
     yield put(loginAttempted());
     const payload = yield call(userLogin, loginSubmitted.payload);
+    payload.redirect = loginSubmitted.payload.redirect;
     yield put(login(payload));
   } catch (e) {
     yield put(authError(e));
@@ -22,6 +23,6 @@ function* apiLogout(logoutSubmitted) {
     const payload = yield call(userLogout, logoutSubmitted.payload);
     yield put(logout(payload));
   } catch (e) {
-    yield put(authError(e));
+    console.log("ERROR: Logout failed", e)
   }
 }

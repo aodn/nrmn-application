@@ -19,7 +19,7 @@ const authSlice = createSlice({
         localStorage.setItem('auth', JSON.stringify(state));
         state.errors = undefined;
         state.loading = false;
-        window.location = "/"
+        window.location = (action.payload.redirect) ? action.payload.redirect : "/"
     },
     authError: (state, action) => {
       state.errors = ["ERROR: " + action.payload.response.data.error];
@@ -27,11 +27,12 @@ const authSlice = createSlice({
         state.errors = state.errors.concat(action.payload.response.data.errors.map(error =>
             `${error.field.toUpperCase()}: ${error.defaultMessage}`
         ));
-        state.loading = false;
       }
+      state.loading = false;
     },
     logout: (state, action) => {
       localStorage.clear();
+      state = initialState;
       window.location = "/login"
     }
   },
