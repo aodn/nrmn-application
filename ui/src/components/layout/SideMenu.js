@@ -23,6 +23,7 @@ import store from '../store';
 import {
     NavLink
   } from "react-router-dom";
+import {ArrowRight} from "@material-ui/icons";
 
 
 const drawerWidth = 240;
@@ -111,9 +112,9 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
             <Divider />
             <List>
                 <ListSubheader>REFERENCES</ListSubheader>
-                {['Location', 'Sites', 'Divers', 'Observables Items'].map((text, index) => (
-                    <ListItem button key={text}>
-                        <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
+                {['Location', 'Site', 'Diver', 'Observables Items', 'Program'].map((text, index) => (
+                    <ListItem button key={text} component={NavLink} to={"/list/" + text} >
+                        <ListItemIcon> <ArrowRight /></ListItemIcon>
                         <ListItemText primary={text} />
                     </ListItem>
                 ))}

@@ -5,15 +5,20 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux';
 import store from './components/store';
-//import config from 'react-global-configuration';
+import {apiDefinition} from "./axios/api";
+import config from 'react-global-configuration';
 
 
-ReactDOM.render(
-    <React.StrictMode>
+apiDefinition().then((result) => {
+  config.set({api: result.data.components.schemas});
+  ReactDOM.render(
+      <React.StrictMode>
         <Provider store={store}>
-            <App />
+          <App/>
         </Provider>
-    </React.StrictMode>, document.getElementById('root'));
+      </React.StrictMode>, document.getElementById('root')
+  );
+});
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
