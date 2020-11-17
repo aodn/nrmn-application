@@ -18,7 +18,7 @@ public abstract class BaseRowExistingEntity<E, R extends EntityCriteria<E>> exte
         this.repo = repo;
     }
 
-    protected Validated<StagedRowError, E> warningNotFound(StagedRow target, String criteria) {
+    protected Validated<StagedRowError, E> checkExists(StagedRow target, String criteria) {
         val errorID = new ErrorID(
                 target.getId(),
                 target.getStagedJob().getId(),

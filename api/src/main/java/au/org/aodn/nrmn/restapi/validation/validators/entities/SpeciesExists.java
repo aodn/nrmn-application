@@ -14,11 +14,11 @@ public class SpeciesExists extends BaseRowExistingEntity<AphiaRef, AphiaRefRepos
 
     @Autowired
     SpeciesExists(AphiaRefRepository aphiaRepo) {
-        super("Specie", aphiaRepo);
+        super("Species", aphiaRepo);
     }
 
     @Override
     public Validated<StagedRowError, AphiaRef> valid(StagedRow target) {
-        return warningNotFound(target, target.getSpecies());
+        return checkExists(target, target.getSpecies());
     }
 }

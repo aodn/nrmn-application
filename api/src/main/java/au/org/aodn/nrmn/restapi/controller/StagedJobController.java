@@ -58,7 +58,7 @@ public class StagedJobController {
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity<UploadResponse> uploadFile(
             @RequestParam("withInvertSize") Boolean withInvertSize,
-            @RequestParam("pid") Integer programId,
+            @RequestParam("programiId") Integer programId,
             @RequestParam("file") MultipartFile file,
             Authentication authentication) {
        userAuditRepo.save(

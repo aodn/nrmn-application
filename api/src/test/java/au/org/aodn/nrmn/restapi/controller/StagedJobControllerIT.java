@@ -103,7 +103,7 @@ class StagedJobControllerIT {
         LinkedMultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
         parameters.add("file", file);
         parameters.add("withInvertSize", false);
-        parameters.add("pid", 55);
+        parameters.add("programiId", 55);
 
 
         val resp = reqUpload
@@ -134,7 +134,7 @@ class StagedJobControllerIT {
         LinkedMultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
         parameters.add("file", file);
         parameters.add("withInvertSize", true);
-        parameters.add("pid", 55);
+        parameters.add("programiId", 55);
 
 
         val resp = reqUpload

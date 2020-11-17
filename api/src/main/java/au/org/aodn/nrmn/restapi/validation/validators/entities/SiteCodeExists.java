@@ -20,6 +20,6 @@ public class SiteCodeExists extends BaseRowExistingEntity<Site, SiteRepository> 
 
     @Override
     public Validated<StagedRowError, Site> valid(StagedRow target) {
-        return warningNotFound(target, target.getSiteNo());
+        return checkExists(target, target.getSiteNo());
     }
 }

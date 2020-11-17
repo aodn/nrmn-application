@@ -18,6 +18,6 @@ public class DiverExists extends BaseRowExistingEntity<Diver, DiverRepository> {
 
     @Override
     public Validated<StagedRowError, Diver> valid(StagedRow target) {
-        return warningNotFound(target, getField.apply(target));
+        return checkExists(target, getField.apply(target));
     }
 }
