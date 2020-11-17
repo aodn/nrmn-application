@@ -53,7 +53,6 @@ class PreValidationProcessIT {
             put("6.5", "1");
             put("10.5", "1");
         }});
-
        val res =  preProcess.preValidated(stage);
        assertTrue(res.isPresent());
        val row = res.orElseGet(null);

@@ -28,6 +28,7 @@ import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Component
@@ -96,11 +97,12 @@ public class PreValidationProcess implements ValidatorProvider {
         );
     }
 
-    public Maybe<StagedRowFormatted> preValidated(StagedRow target) {
 
-        val mergeValidation = validate(target);
+    public Optional<StagedRowFormatted> preValidated(StagedRow target) {
 
-        return mergeValidation.toMaybe().filter(seq -> {
+        val mergeValidators = validate(target);
+
+        return mergeValidators.toOptional().filter(seq -> {
             val site = (Site) seq.get(0).orElseGet(null);
             site.calcGeom();
             return new CoordinatesDataCheck(site).valid(target).isValid();
@@ -143,12 +145,13 @@ public class PreValidationProcess implements ValidatorProvider {
 
             if (target.getStagedJob().getIsExtendedSize()) {
                 val inverts = (Integer) seq.get(13).orElseGet(null);
-                val M2InvertSizingSpecies = (Integer) seq.get(14).orElseGet(null);
+                val m2InvertSizingSpecies = (Integer) seq.get(14).orElseGet(null);
                 val l5 = (Integer) seq.get(15).orElseGet(null);
                 val l95 = (Integer) seq.get(16).orElseGet(null);
                 val lmax = (Integer) seq.get(17).orElseGet(null);
                 val isInvertSizing = (Boolean) seq.get(18).orElseGet(null);
                 rowFormatted.setInverts(inverts);
+                rowFormatted.setM2InvertSizingSpecies(m2InvertSizingSpecies);
                 rowFormatted.setL5(l5);
                 rowFormatted.setL95(l95);
                 rowFormatted.setLmax(lmax);
