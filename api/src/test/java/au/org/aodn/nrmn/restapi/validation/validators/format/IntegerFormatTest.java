@@ -44,7 +44,6 @@ class IntegerFormatTest {
         stage.setMethod("7");
         stage.setStagedJob(job);
         val res = new IntegerFormat(StagedRow::getMethod, "Lmax", Stream.of(1,2,3,4,7,8).collect(Collectors.toList())).valid(stage);
-
         assertTrue(res.isValid());
     }
 }

@@ -31,7 +31,6 @@ class TimeFormatTest {
         stage.setStagedJob(job);
         val res = new TimeFormat().valid(stage);
         assertTrue(res.isValid());
-
     }
 
     @Test

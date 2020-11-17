@@ -79,8 +79,8 @@ class StagedJobControllerIT {
                 )))
                 .region(Region.of(localstack.getRegion()))
                 .build();
-       CreateBucketResponse bucketResp =  client.createBucket(CreateBucketRequest.builder().bucket("nrmn-dev").build());
-         assertTrue(bucketResp.sdkHttpResponse().isSuccessful());
+        CreateBucketResponse bucketResp = client.createBucket(CreateBucketRequest.builder().bucket("nrmn-dev").build());
+        assertTrue(bucketResp.sdkHttpResponse().isSuccessful());
     }
 
     @AfterAll
@@ -155,4 +155,3 @@ class StagedJobControllerIT {
 
     }
 }
-

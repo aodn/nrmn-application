@@ -91,5 +91,4 @@ class RLSMethodBlockAssociationIT {
         val res = blockMethodCheck.valid(job);
         assertTrue(res.isInvalid());
     }
-
 }

@@ -9,7 +9,6 @@ import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
 import cyclops.control.Validated;
 import org.apache.commons.lang3.EnumUtils;
 
-
 public class DirectionDataCheck extends BaseRowValidator {
     public DirectionDataCheck() {
         super("Direction");

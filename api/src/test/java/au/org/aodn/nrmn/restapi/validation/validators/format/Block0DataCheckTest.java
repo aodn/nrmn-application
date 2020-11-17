@@ -45,6 +45,4 @@ class Block0DataCheckTest {
         val res =  new Block0DataCheck().valid(stage);
         assertTrue(res.isValid());
     }
-
-
 }

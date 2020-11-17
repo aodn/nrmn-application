@@ -74,13 +74,13 @@ public class CoordinatesDataCheck extends BaseRowValidator {
             return anglesResult.bimap(Function.identity(), seq -> site);
 
         Seq<Double> latLong = anglesResult.fold(err -> Seq.empty(), Function.identity());
-        Coordinate coords = new Coordinate(latLong.getOrElse(1,0D), latLong.getOrElse(0,0D));
+        Coordinate coords = new Coordinate(latLong.getOrElse(1, 0D), latLong.getOrElse(0, 0D));
         val point = geometryFactory.createPoint(coords);
 
-        if(site.getGeom().equalsExact(point,0.001))
+        if (site.getGeom().equalsExact(point, 0.001))
             return Validated.valid(site);
 
-        return   Validated.invalid(new  StagedRowError(
+        return Validated.invalid(new StagedRowError(
                 new ErrorID(
                         target.getId(),
                         target.getStagedJob().getId(),

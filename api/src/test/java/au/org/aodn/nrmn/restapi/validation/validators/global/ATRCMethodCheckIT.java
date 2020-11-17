@@ -125,6 +125,5 @@ class ATRCMethodCheckIT {
         val res = atrcMethodCheck.valid(job);
 
         assertTrue(res.isInvalid());
-
     }
 }

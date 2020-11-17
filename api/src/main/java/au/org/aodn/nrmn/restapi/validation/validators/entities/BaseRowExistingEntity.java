@@ -29,14 +29,14 @@ public abstract class BaseRowExistingEntity<E, R extends EntityCriteria<E>> exte
             errorID.setMessage(columnTarget + "is empty");
 
         return repo.findByCriteria(criteria)
-                .map( Validated::<StagedRowError, E>valid)
+                .map(Validated::<StagedRowError, E>valid)
                 .orElseGet(() ->
-             Validated.<StagedRowError, E>invalid(
-                     new StagedRowError(
-                             errorID,
-                             ValidationCategory.ENTITY,
-                             columnTarget,
-                             target))
-        );
+                        Validated.<StagedRowError, E>invalid(
+                                new StagedRowError(
+                                        errorID,
+                                        ValidationCategory.ENTITY,
+                                        columnTarget,
+                                        target))
+                );
     }
 }

@@ -20,5 +20,4 @@ class BooleanFormatTest {
         val res = new BooleanFormat(StagedRow::getIsInvertSizing, "sInvertSizing").valid(stage);
         assertTrue(res.isValid());
     }
-
 }

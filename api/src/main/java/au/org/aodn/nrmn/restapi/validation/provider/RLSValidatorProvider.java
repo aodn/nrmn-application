@@ -25,5 +25,4 @@ public class RLSValidatorProvider implements ValidatorProvider {
     public Seq<BaseGlobalValidator> getExtendedValidators() {
         return Seq.of(rslBlockAssoc);
     }
-
 }

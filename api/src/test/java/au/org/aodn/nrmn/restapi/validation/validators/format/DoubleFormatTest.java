@@ -34,5 +34,4 @@ class DoubleFormatTest {
         val res = new DoubleFormat(StagedRow::getLongitude, "Longitude").valid(stage);
         assertTrue(res.isValid());
     }
-
 }

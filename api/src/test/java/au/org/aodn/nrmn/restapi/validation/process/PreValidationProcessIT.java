@@ -61,9 +61,6 @@ class PreValidationProcessIT {
        assertEquals(row.getDirection(), Directions.NE);
        assertEquals(row.getDiver().getFullName(), "Tanjona Julien Rafidison");
         assertEquals(row.getSpecies().getAphiaId(), 102);
-
-
-
     }
 
 }

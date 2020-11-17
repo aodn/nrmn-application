@@ -43,7 +43,4 @@ class DiverExistsIT {
         val diverFound = new DiverExists(StagedRow::getDiver, "Diver", diverRepo).valid(stage);
         assertTrue(diverFound.isValid());
     }
-
-
-
 }
