@@ -26,7 +26,7 @@ class DuplicateRowCheckIT {
 
 
     @Test
-    void noduplicateSurveyGroupShouldSuccess() {
+    void noduplicateSurveyGroupShouldSucceed() {
         val job = jobRepo.findByReference("jobid-atrc").get();
         val date = "11/09/2020";
         val depth = "7.9";

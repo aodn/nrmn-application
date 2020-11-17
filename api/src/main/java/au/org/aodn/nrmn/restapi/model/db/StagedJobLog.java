@@ -42,7 +42,7 @@ public class StagedJobLog {
         foreignKey = @ForeignKey(name = "staged_job_log_staged_job_id_fkey"))
     private StagedJob stagedJob;
 
-    @Column(name = "event_time", columnDefinition = "timestamp with tim    @CreationTimestamp\ne zone", nullable = false)
+    @Column(name = "event_time", columnDefinition = "timestamp with time zone", nullable = false)
     @CreationTimestamp
     @Setter(AccessLevel.NONE)
     private Timestamp eventTime;

@@ -13,12 +13,12 @@ import cyclops.control.Validated;
 import java.util.function.Function;
 
 
-public abstract class BaseRowValidationFormat<T> extends BaseRowValidator {
+public abstract class BaseRowFormatValidation<T> extends BaseRowValidator {
 
     protected String format;
 
 
-    public BaseRowValidationFormat(String columnTarget, String format) {
+    public BaseRowFormatValidation(String columnTarget, String format) {
         super(columnTarget);
         this.format = format;
     }

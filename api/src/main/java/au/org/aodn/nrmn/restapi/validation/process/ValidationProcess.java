@@ -2,17 +2,12 @@ package au.org.aodn.nrmn.restapi.validation.process;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowErrorRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
-import au.org.aodn.nrmn.restapi.validation.validators.entities.DiverExists;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.SiteCodeExists;
-import cyclops.companion.Monoids;
-import cyclops.companion.Semigroups;
-import cyclops.data.Seq;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,7 +32,7 @@ public class ValidationProcess {
 
 
     public void processList(List<StagedRow> entities, String fileID) {
-        val currentFile = rawSurveyRepo.findRawRowByReference(fileID);
+        val currentFile = rawSurveyRepo.findRowByReference(fileID);
         val job = jobRepo
             .findByReference(fileID)
             .orElse(StagedJob.builder()

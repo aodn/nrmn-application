@@ -31,7 +31,7 @@ class ATRCMethodCheckIT {
     ATRCMethodCheck atrcMethodCheck;
 
     @Test
-    void only12methodShouldSuccess() {
+    void only12methodShouldSucceed() {
         val job = jobRepo.findByReference("jobid-atrc").get();
         val date = "11/09/2020";
         val depth = "7";
@@ -65,7 +65,7 @@ class ATRCMethodCheckIT {
 
 
     @Test
-    void onlyMethod0345ShouldSuccess() {
+    void onlyMethod0345ShouldSucceed() {
         val job = jobRepo.findByReference("jobid-atrc").get();
         val date = "11/09/2020";
         val depth = "7";

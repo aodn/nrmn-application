@@ -11,7 +11,7 @@ class Block0DataCheckTest {
 
     //the block0 check only apply if it's the block is 0
     @Test
-    void blockDifferent0ShouldSuccess() {
+    void blockDifferent0ShouldSucceed() {
         val job = new StagedJob();
         job.setId(1L);
         val stage = new StagedRow();
@@ -35,7 +35,7 @@ class Block0DataCheckTest {
     }
 
     @Test
-    void block0MethodInRangeShouldSuccess() {
+    void block0MethodInRangeShouldSucceed() {
         val job = new StagedJob();
         job.setId(1L);
         val stage = new StagedRow();

@@ -3,7 +3,6 @@ package au.org.aodn.nrmn.restapi.validation.process;
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
-import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.validators.data.CoordinatesDataCheck;
@@ -13,14 +12,10 @@ import au.org.aodn.nrmn.restapi.validation.validators.entities.DiverExists;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.SiteCodeExists;
 import au.org.aodn.nrmn.restapi.validation.validators.format.*;
 import au.org.aodn.nrmn.restapi.validation.provider.ValidatorProvider;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import cyclops.companion.Functions;
 import cyclops.companion.Monoids;
-import cyclops.control.Maybe;
 import cyclops.control.Validated;
 import cyclops.data.Seq;
 import lombok.val;
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,48 +39,48 @@ public class PreValidationProcess implements ValidatorProvider {
     @Override
     public Seq<BaseRowValidator> getExtendedValidators() {
         return Seq.of(
-                new IntegerFormat(StagedRow::getInverts, "Inverts", Collections.emptyList()),
-                new IntegerFormat(StagedRow::getM2InvertSizingSpecies, "M2InvertSizingSpecies,", Collections.emptyList()),
-                new IntegerFormat(StagedRow::getL5, "L5,", Collections.emptyList()),
-                new IntegerFormat(StagedRow::getLmax, "L95,", Collections.emptyList()),
-                new IntegerFormat(StagedRow::getLmax, "Lmax,", Collections.emptyList()),
-                new BooleanFormat(StagedRow::getIsInvertSizing, "IsInvertSizing")
+                new IntegerFormatValidation(StagedRow::getInverts, "Inverts", Collections.emptyList()),
+                new IntegerFormatValidation(StagedRow::getM2InvertSizingSpecies, "M2InvertSizingSpecies,", Collections.emptyList()),
+                new IntegerFormatValidation(StagedRow::getL5, "L5,", Collections.emptyList()),
+                new IntegerFormatValidation(StagedRow::getLMax, "L95,", Collections.emptyList()),
+                new IntegerFormatValidation(StagedRow::getLMax, "Lmax,", Collections.emptyList()),
+                new BooleanFormatValidation(StagedRow::getIsInvertSizing, "IsInvertSizing")
         );
     }
 
 
     @Override
-    public Seq<BaseRowValidator> getRowValidators() {
+    public  Seq<BaseRowValidator> getRowValidators() {
         return Seq.of(
                 siteCodeExists,
-                new DateFormat(),
-                new TimeFormat(),
+                new DateFormatValidation(),
+                new TimeFormatValidation(),
 
                 new DiverExists(StagedRow::getDiver, "Diver", diverRepo),
                 new DiverExists(StagedRow::getBuddy, "Buddy", diverRepo),
                 new DiverExists(StagedRow::getPqs, "P-Qs", diverRepo),
 
-                new DoubleFormat(StagedRow::getDepth, "Depth"),
-                new IntegerFormat(StagedRow::getMethod, "Method", Arrays.asList(0, 1, 2, 3, 4, 5, 7, 10)),
-                new IntegerFormat(StagedRow::getBlock, "Block", Arrays.asList(0, 1, 2)),
+                new DoubleFormatValidation(StagedRow::getDepth, "Depth"),
+                new IntegerFormatValidation(StagedRow::getMethod, "Method", Arrays.asList(0, 1, 2, 3, 4, 5, 7, 10)),
+                new IntegerFormatValidation(StagedRow::getBlock, "Block", Arrays.asList(0, 1, 2)),
 
                 speciesExists,
 
-                new IntegerFormat(StagedRow::getVis, "Vis", Collections.emptyList()),
+                new IntegerFormatValidation(StagedRow::getVis, "Vis", Collections.emptyList()),
 
 
-                new IntegerFormat(StagedRow::getCode, "Code", Collections.emptyList()),
-                new IntegerFormat(StagedRow::getTotal, "Total", Collections.emptyList()),
+                new IntegerFormatValidation(StagedRow::getCode, "Code", Collections.emptyList()),
+                new IntegerFormatValidation(StagedRow::getTotal, "Total", Collections.emptyList()),
 
-                new DoubleFormat(StagedRow::getLatitude, "Latitude"),
-                new DoubleFormat(StagedRow::getLongitude, "Longitude"),
+                new DoubleFormatValidation(StagedRow::getLatitude, "Latitude"),
+                new DoubleFormatValidation(StagedRow::getLongitude, "Longitude"),
                 new DirectionDataCheck()
 
                 );
     }
 
 
-    public Validated<StagedRowError, Seq<Object>> validate(StagedRow target) {
+    private Validated<StagedRowError, Seq<Object>> validate(StagedRow target) {
         val baseValidators = getRowValidators();
         val validators = (target.getStagedJob().getIsExtendedSize()) ? baseValidators.appendAll(getExtendedValidators()) : baseValidators;
 
@@ -154,7 +149,7 @@ public class PreValidationProcess implements ValidatorProvider {
                 rowFormatted.setM2InvertSizingSpecies(m2InvertSizingSpecies);
                 rowFormatted.setL5(l5);
                 rowFormatted.setL95(l95);
-                rowFormatted.setLmax(lmax);
+                rowFormatted.setLMax(lmax);
                 rowFormatted.setIsInvertSizing(isInvertSizing);
             }
             return rowFormatted;

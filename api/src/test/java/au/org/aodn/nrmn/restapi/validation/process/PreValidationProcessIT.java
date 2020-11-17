@@ -26,7 +26,7 @@ class PreValidationProcessIT {
     PreValidationProcess preProcess;
 
     @Test
-    void inputRespectingFormatShouldSuccess() {
+    void inputRespectingFormatShouldSucceed() {
         val job = new StagedJob();
         job.setId(1L);
         job.setIsExtendedSize(false);
@@ -53,12 +53,12 @@ class PreValidationProcessIT {
             put("6.5", "1");
             put("10.5", "1");
         }});
-       val res =  preProcess.preValidated(stage);
-       assertTrue(res.isPresent());
-       val row = res.orElseGet(null);
-       assertEquals(row.getBlock(), 1);
-       assertEquals(row.getDirection(), Directions.NE);
-       assertEquals(row.getDiver().getFullName(), "Tanjona Julien Rafidison");
+        val res = preProcess.preValidated(stage);
+        assertTrue(res.isPresent());
+        val row = res.orElseGet(null);
+        assertEquals(row.getBlock(), 1);
+        assertEquals(row.getDirection(), Directions.NE);
+        assertEquals(row.getDiver().getFullName(), "Tanjona Julien Rafidison");
         assertEquals(row.getSpecies().getAphiaId(), 102);
     }
 

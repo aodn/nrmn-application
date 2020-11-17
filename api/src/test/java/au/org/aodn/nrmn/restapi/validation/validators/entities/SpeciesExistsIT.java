@@ -21,7 +21,7 @@ class SpeciesExistsIT {
     SpeciesExists speciesExists;
 
     @Test
-    void notFoundSpecieCodeShouldFail() {
+    void notFoundSpeciesCodeShouldFail() {
         val job = new StagedJob();
         job.setId(1L);
         val stage = new StagedRow();

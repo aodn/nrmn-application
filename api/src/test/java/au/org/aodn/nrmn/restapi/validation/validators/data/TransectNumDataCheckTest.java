@@ -34,7 +34,7 @@ class TransectNumDataCheckTest {
     }
 
     @Test
-    void depthWithTransectInRangeShouldSuccess() {
+    void depthWithTransectInRangeShouldSucceed() {
         val job = new StagedJob();
         job.setId(1L);
         val stage = new StagedRow();

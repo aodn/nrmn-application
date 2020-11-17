@@ -9,8 +9,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 
-public final class TimeFormat extends BaseRowValidationFormat<LocalTime> {
-    public TimeFormat() {
+public final class TimeFormatValidation extends BaseRowFormatValidation<LocalTime> {
+    public TimeFormatValidation() {
         super("Time", "HH:mm");
     }
 

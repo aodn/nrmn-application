@@ -15,7 +15,7 @@ class DateFormatTest {
         val stage = new StagedRow();
         stage.setDate("not /at /date");
         stage.setStagedJob(job);
-        val res = new DateFormat().valid(stage);
+        val res = new DateFormatValidation().valid(stage);
         assertTrue(res.isInvalid());
 
     }
@@ -27,7 +27,7 @@ class DateFormatTest {
         val stage = new StagedRow();
         stage.setDate("11/09/2018");
         stage.setStagedJob(job);
-        val res = new DateFormat().valid(stage);
+        val res = new DateFormatValidation().valid(stage);
         assertTrue(res.isValid());
 
     }

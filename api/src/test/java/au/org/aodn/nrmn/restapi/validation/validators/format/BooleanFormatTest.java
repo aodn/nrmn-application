@@ -17,7 +17,7 @@ class BooleanFormatTest {
         val stage = new StagedRow();
         stage.setIsInvertSizing("True");
         stage.setStagedJob(job);
-        val res = new BooleanFormat(StagedRow::getIsInvertSizing, "sInvertSizing").valid(stage);
+        val res = new BooleanFormatValidation(StagedRow::getIsInvertSizing, "sInvertSizing").valid(stage);
         assertTrue(res.isValid());
     }
 }

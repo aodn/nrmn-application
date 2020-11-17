@@ -33,7 +33,7 @@ class RLSMethodBlockAssociationIT {
     RLSMethodBlockAssociation blockMethodCheck;
 
     @Test
-    void expectedAssociationShouldSuccess() {
+    void expectedAssociationShouldSucceed() {
         stagedRowRepo.deleteAll();
         val job = jobRepo.findByReference("jobid-atrc").get();
         val date = "11/09/2020";

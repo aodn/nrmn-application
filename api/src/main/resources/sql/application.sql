@@ -165,7 +165,7 @@ CREATE TABLE nrmn.sec_user (
 );
 
 CREATE TABLE nrmn.staged_job_log (
-    id bigint NOT NULL,
+    id bigserial NOT NULL,
     details text,
     event_time timestamp with time zone NOT NULL,
     event_type varchar(255) NOT NULL,
@@ -285,6 +285,9 @@ ALTER TABLE nrmn.lengthweight_ref_aud
     ADD CONSTRAINT fktopm2rqqongr4i502p963xjbe FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 CREATE UNIQUE INDEX unique_email ON nrmn.sec_user (email_address);
+
+ALTER TABLE nrmn.staged_row
+    ADD CONSTRAINT staged_row_staged_job_id_fkey FOREIGN KEY (staged_job_id) REFERENCES nrmn.staged_job (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 ALTER TABLE nrmn.diver_ref_aud
     ADD CONSTRAINT fk1nahs3dov9lbpxnmeafoyl82i FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;

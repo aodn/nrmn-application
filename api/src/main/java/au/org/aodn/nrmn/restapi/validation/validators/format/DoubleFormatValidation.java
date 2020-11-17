@@ -6,10 +6,10 @@ import cyclops.control.Validated;
 
 import java.util.function.Function;
 
-public class DoubleFormat extends BaseRowValidationFormat<Double> {
+public class DoubleFormatValidation extends BaseRowFormatValidation<Double> {
     protected Function<StagedRow, String> getField;
 
-    public  DoubleFormat(Function<StagedRow, String> getField, String colunmTarget) {
+    public DoubleFormatValidation(Function<StagedRow, String> getField, String colunmTarget) {
          super(colunmTarget, "Numerical");
         this.getField = getField;
     }

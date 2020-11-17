@@ -20,7 +20,4 @@ import java.util.Optional;
 public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpecificationExecutor<Survey> {
     @Query("SELECT t FROM #{#entityName} t WHERE t.id IN :ids")
     List<Survey> findByIdsIn(@Param("ids") List<Integer> ids);
-
-
-
 }

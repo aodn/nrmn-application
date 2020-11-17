@@ -6,10 +6,10 @@ import cyclops.control.Validated;
 
 import java.util.function.Function;
 
-public class BooleanFormat extends BaseRowValidationFormat<Boolean> {
+public class BooleanFormatValidation extends BaseRowFormatValidation<Boolean> {
     protected Function<StagedRow, String> getField;
 
-    public BooleanFormat(Function<StagedRow, String> getField, String colunmTarget) {
+    public BooleanFormatValidation(Function<StagedRow, String> getField, String colunmTarget) {
         super(colunmTarget, "Boolean");
         this.getField = getField;
     }

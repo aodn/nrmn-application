@@ -45,7 +45,6 @@ public class RLSMethodBlockAssociation extends BaseGlobalValidator {
         val aggregatedBlocks = stageRowRepo.findBlockMethods12(job.getId());
         val groupById = aggregatedBlocks.stream().collect(Collectors.groupingBy(
                 RowMethodBlock::getId));
-        val methodExclude = Arrays.asList("3", "4", "5");
         return groupById.entrySet().stream()
                 .map(item -> {
                     val blockSum = item.getValue().stream()

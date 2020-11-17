@@ -110,7 +110,7 @@ public class StagedRow implements Serializable {
     private String isInvertSizing;
 
     @Column(name = "Lmax")
-    private String lmax;
+    private String lMax;
 
     @Column(name = "measure_value", columnDefinition = "json")
     @Type(type = "jsonb")

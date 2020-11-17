@@ -55,7 +55,7 @@ public class StagedRowFormatted {
 
     private Boolean isInvertSizing;
 
-    private Integer lmax;
+    private Integer lMax;
 
     private Map<String, Integer> measureJson;
 }

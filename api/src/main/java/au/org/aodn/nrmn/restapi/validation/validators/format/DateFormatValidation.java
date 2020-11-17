@@ -8,9 +8,9 @@ import cyclops.control.Validated;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public final class DateFormat extends BaseRowValidationFormat<Date> {
+public final class DateFormatValidation extends BaseRowFormatValidation<Date> {
 
-    public DateFormat() {
+    public DateFormatValidation() {
         super("Date", "dd/MM/yyyy");
     }
 

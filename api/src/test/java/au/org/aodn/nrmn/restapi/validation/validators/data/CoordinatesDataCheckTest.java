@@ -30,6 +30,24 @@ class CoordinatesDataCheckTest extends ValidatorHelpers {
 
 
     @Test
+    void notMatchingSiteShouldFail() {
+        Site site = new Site();
+        site.setLatitude(48.9566);
+        site.setLongitude(2.3522);
+        site.calcGeom();
+        val job = new StagedJob();
+        job.setId(1L);
+        val stage = new StagedRow();
+        stage.setStagedJob(job);
+        stage.setLatitude("48.8566");
+        stage.setLongitude("2.3522");
+        val res = new CoordinatesDataCheck(site).valid(stage);
+        assertTrue(res.isInvalid());
+
+    }
+
+
+    @Test
     void latIncorrectShouldFail() {
         Site site = new Site();
         site.setLatitude(48.8566);

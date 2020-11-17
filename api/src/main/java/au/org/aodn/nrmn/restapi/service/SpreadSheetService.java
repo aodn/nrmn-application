@@ -151,7 +151,7 @@ public class SpreadSheetService {
                             stagedRow.setL5(_getCellValue(row.getCell(headerMap.get("L5")), eval, fmt));
                             stagedRow.setL95(_getCellValue(row.getCell(headerMap.get("L95")), eval, fmt));
                             stagedRow.setIsInvertSizing(_getCellValue(row.getCell(headerMap.get("Use InvertSizing")), eval, fmt));
-                            stagedRow.setLmax(_getCellValue(row.getCell(headerMap.get("Lmax")), eval, fmt));
+                            stagedRow.setLMax(_getCellValue(row.getCell(headerMap.get("Lmax")), eval, fmt));
                         }
 
                         val measureJson = new HashMap<String, String>();

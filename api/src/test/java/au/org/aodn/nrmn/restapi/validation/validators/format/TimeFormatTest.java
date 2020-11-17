@@ -17,7 +17,7 @@ class TimeFormatTest {
         val stage = new StagedRow();
         stage.setTime("ti:me");
         stage.setStagedJob(job);
-        val res = new TimeFormat().valid(stage);
+        val res = new TimeFormatValidation().valid(stage);
         assertTrue(res.isInvalid());
 
     }
@@ -29,7 +29,7 @@ class TimeFormatTest {
         val stage = new StagedRow();
         stage.setTime("10:15");
         stage.setStagedJob(job);
-        val res = new TimeFormat().valid(stage);
+        val res = new TimeFormatValidation().valid(stage);
         assertTrue(res.isValid());
     }
 
@@ -40,7 +40,7 @@ class TimeFormatTest {
         val stage = new StagedRow();
         stage.setTime("40:15");
         stage.setStagedJob(job);
-        val res = new TimeFormat().valid(stage);
+        val res = new TimeFormatValidation().valid(stage);
         assertTrue(res.isInvalid());
     }
 }
