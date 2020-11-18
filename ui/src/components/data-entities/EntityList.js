@@ -1,6 +1,5 @@
 import React from "react";
-import {Box, Typography, Button,} from "@material-ui/core";
-
+import {Box, Typography, Button} from "@material-ui/core";
 import {useSelector, useDispatch} from "react-redux";
 import {useEffect} from 'react';
 import { resetState, selectRequested} from "./form-reducer";
@@ -14,19 +13,32 @@ import {titleCase} from "title-case";
 import Grid from "@material-ui/core/Grid";
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
+import CustomTooltip from "./customTooltip";
 
+
+const cellRenderer = (params) => {
+  if (typeof params.value === 'object') {
+    return (
+        JSON.stringify(params.value)?.replaceAll(/["\{\}]/g,'')
+            .replaceAll(',',', ').trim()
+    );
+  };
+  return params.value;
+}
 const schematoColDef = (schema, size) => {
 
   const fields = Object.keys(schema.properties);
   const widthSize = size.width / (fields.length + 1 );
-
   const coldefs = fields.map(field => {
+
     return {
       field: field,
-      width: widthSize
+      width: widthSize,
+      tooltipField: field,
+      cellRenderer: cellRenderer
     }
-
   });
+
   coldefs.push({
     field: "Edit",
     cellRenderer: function (params) {
@@ -98,54 +110,59 @@ const EntityList = () => {
     if (items !== undefined && agGridApi.setRowData) {
       agGridApi.setRowData(items);
     }
+
     return (
         <>
-        <Box>
-          <Grid
-              container
-              direction="row"
-              justify="space-between"
-              alignItems="center"
-          >
-            <Typography variant="h4">{titleCase(entityNamePlural)}</Typography>
-            <Button title={"Add new " + titleCase(entityName)}
-                    component={NavLink}
-                    to={"/form/" + entityNamePlural}
-                    color="secondary"
-                    aria-label={"Add " + entityName}
-                    variant={"contained"}
-            >New {titleCase(entityName)}
+          <Box>
+            <Grid
+                container
+                direction="row"
+                justify="space-between"
+                alignItems="center"
+            >
+              <Typography variant="h4">{entityNamePlural.charAt(0).toUpperCase() + entityNamePlural.slice(1)} </Typography>
+              <Button title={"Add new " + titleCase(entityName)}
+                      component={NavLink}
+                      to={"/form/" + entityNamePlural}
+                      color="secondary"
+                      aria-label={"Add " + entityName}
+                      variant={"contained"}
+              >New {titleCase(entityName)}
 
-            </Button>
-          </Grid>
+              </Button>
+            </Grid>
 
-          <div style={{ width: '100%', marginTop: 25}}
-               class="ag-theme-material"
-               >
-            <AgGridReact
-                columnDefs={colDef}
-                rowSelection="multiple"
-                domLayout='autoHeight'
-                animateRows={true}
-                onGridReady={agGridReady}
+            <div style={{width: '100%', marginTop: 25}}
+                 class="ag-theme-material"
+            >
+              <AgGridReact
+                  columnDefs={colDef}
+                  rowSelection="multiple"
+                  domLayout='autoHeight'
+                  animateRows={true}
+                  onGridReady={agGridReady}
 
-                defaultColDef={{
-                  filter: true,
-                  sortable: true,
-                  resizable: true,
-                  headerComponentParams: {
-                    menuIcon: 'fa-bars'
-                  }
-                }}/>
-          </div>
-          { (!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : "" }
-          { (errors.length > 0) ? renderError(errors) : "" }
-        </Box>
-
-      </>
+                  defaultColDef={{
+                    sortable: true,
+                    resizable: true,
+                    // make every column use 'text' filter by default
+                    filter: 'agTextColumnFilter',
+                    tooltipComponent: 'customTooltip',
+                    floatingFilter: true,
+                    headerComponentParams: {
+                      menuIcon: 'fa-bars'
+                    }
+                  }}/>
+            </div>
+            {(!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : ""}
+            {(errors.length > 0) ? renderError(errors) : ""}
+          </Box>
+        </>
     )
-
   }
 }
 
 export default EntityList;
+
+
+
