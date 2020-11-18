@@ -111,10 +111,10 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
             </List>
             <Divider />
             <List>
-                <ListSubheader>REFERENCES</ListSubheader>
-                {['Location', 'Site', 'Diver', 'Observables Items', 'Program'].map((text, index) => (
+                <ListSubheader>REFERENCE DATA</ListSubheader>
+                {['Location', 'Site', 'Diver', 'ObservableItem', 'Program'].map((text, index) => (
                     <ListItem button key={text} component={NavLink} to={"/list/" + text} >
-                        <ListItemIcon> <ArrowRight /></ListItemIcon>
+                        <ListItemIcon><ArrowRight /></ListItemIcon>
                         <ListItemText primary={text} />
                     </ListItem>
                 ))}
@@ -125,7 +125,7 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
 
                 {['Extract', 'Templates'].map((text, index) => (
                     <ListItem button key={text}>
-                        <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
+                        <ListItemIcon><ArrowRight /></ListItemIcon>
                         <ListItemText primary={text} />
                     </ListItem>
                 ))}

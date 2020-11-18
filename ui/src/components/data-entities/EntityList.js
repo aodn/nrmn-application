@@ -35,6 +35,8 @@ const schematoColDef = (schema, size) => {
       field: field,
       width: widthSize,
       tooltipField: field,
+      // make every column use 'text' filter by default
+      filter: 'agTextColumnFilter',
       cellRenderer: cellRenderer
     }
   });
@@ -145,8 +147,6 @@ const EntityList = () => {
                   defaultColDef={{
                     sortable: true,
                     resizable: true,
-                    // make every column use 'text' filter by default
-                    filter: 'agTextColumnFilter',
                     tooltipComponent: 'customTooltip',
                     floatingFilter: true,
                     headerComponentParams: {
