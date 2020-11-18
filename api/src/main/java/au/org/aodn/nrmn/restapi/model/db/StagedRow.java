@@ -3,10 +3,7 @@ package au.org.aodn.nrmn.restapi.model.db;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -22,16 +19,19 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Map;
 
 @Entity
 @Data
+@Getter
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name = "staged_row")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-public class StagedRow {
+public class StagedRow implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -98,7 +98,7 @@ public class StagedRow {
     private String inverts;
 
     @Column(name = "m2_invert_sizing_species")
-    private Boolean m2InvertSizingSpecies;
+    private String m2InvertSizingSpecies;
 
     @Column(name = "L5")
     private String l5;
@@ -107,7 +107,7 @@ public class StagedRow {
     private String l95;
 
     @Column(name = "is_invert_Sizing")
-    private Boolean isInvertSizing;
+    private String isInvertSizing;
 
     @Column(name = "Lmax")
     private String lMax;

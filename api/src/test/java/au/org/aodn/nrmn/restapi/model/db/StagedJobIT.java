@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.lessThan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
-    pattern = ".*TestData"))
+        pattern = ".*TestData"))
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @ExtendWith(PostgresqlContainerExtension.class)
 class StagedJobIT {
@@ -46,19 +46,19 @@ class StagedJobIT {
         val retrievedStagedJob = stagedJobRepository.findById(stagedJob.getId()).get();
         assertEquals(stagedJob, retrievedStagedJob);
         assertThat(retrievedStagedJob.getCreated().toLocalDateTime(),
-            is(both(greaterThan(startTime)).and(lessThan(LocalDateTime.now()))));
+                is(both(greaterThan(startTime)).and(lessThan(LocalDateTime.now()))));
         assertThat(retrievedStagedJob.getLastUpdated().toLocalDateTime(),
-            is(both(greaterThan(startTime)).and(lessThan(LocalDateTime.now()))));
+                is(both(greaterThan(startTime)).and(lessThan(LocalDateTime.now()))));
     }
 
     @Test
     public void testLastUpdated() {
         val stagedJob = stagedJobTestData.persistedStagedJob();
         stagedJob.setStatus(StatusJobType.FAILED);
-        stagedJobRepository.saveAndFlush(stagedJob);
         entityManager.clear();
+        stagedJobRepository.saveAndFlush(stagedJob);
         val retrievedStagedJob = stagedJobRepository.findById(stagedJob.getId()).get();
         assertThat(retrievedStagedJob.getLastUpdated().toLocalDateTime(),
-            is(both(greaterThan(stagedJob.getCreated().toLocalDateTime())).and(lessThan(LocalDateTime.now()))));
+                is(both(greaterThan(stagedJob.getCreated().toLocalDateTime())).and(lessThan(LocalDateTime.now()))));
     }
 }

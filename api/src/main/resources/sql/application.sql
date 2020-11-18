@@ -32,6 +32,8 @@ CREATE TABLE nrmn.sec_user_aud (
     CONSTRAINT sec_user_aud_pkey PRIMARY KEY (id, rev)
 );
 
+
+
 CREATE TABLE nrmn.observation_aud (
     observation_id integer NOT NULL,
     rev integer NOT NULL,
@@ -187,11 +189,11 @@ CREATE TABLE nrmn.staged_row (
     direction varchar(255),
     diver varchar(255),
     inverts varchar(255),
-    is_invert_sizing boolean,
+    is_invert_sizing varchar(255),
     last_updated timestamp with time zone NOT NULL,
     latitude varchar(255),
     longitude varchar(255),
-    m2_invert_sizing_species boolean,
+    m2_invert_sizing_species varchar(255),
     measure_value json,
     method varchar(255),
     site_name varchar(255),
@@ -207,9 +209,10 @@ CREATE TABLE nrmn.staged_row (
 CREATE TABLE nrmn.staged_job (
     id bigint NOT NULL,
     created timestamp with time zone,
-    job_attributes jsonb,
+    program_id integer,
     last_updated timestamp with time zone,
     reference varchar(255),
+    is_extended_size boolean,
     source varchar(255),
     status varchar(255),
     CONSTRAINT staged_job_pkey PRIMARY KEY (id)
@@ -286,9 +289,6 @@ CREATE UNIQUE INDEX unique_email ON nrmn.sec_user (email_address);
 ALTER TABLE nrmn.staged_row
     ADD CONSTRAINT staged_row_staged_job_id_fkey FOREIGN KEY (staged_job_id) REFERENCES nrmn.staged_job (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
-ALTER TABLE nrmn.staged_row_error
-    ADD CONSTRAINT staged_row_error_staged_row_id_fkey FOREIGN KEY (row_id) REFERENCES nrmn.staged_row (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
-
 ALTER TABLE nrmn.diver_ref_aud
     ADD CONSTRAINT fk1nahs3dov9lbpxnmeafoyl82i FOREIGN KEY (rev) REFERENCES nrmn.revinfo (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
@@ -297,6 +297,9 @@ ALTER TABLE nrmn.site_ref_aud
 
 ALTER TABLE nrmn.sec_user_roles
     ADD CONSTRAINT fk_user_sec_role FOREIGN KEY (sec_user_id) REFERENCES nrmn.sec_user (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE nrmn.staged_job
+    ADD CONSTRAINT fk_staged_job_program FOREIGN KEY (program_id) REFERENCES nrmn.program_ref (program_id) ON UPDATE  NO ACTION ON DELETE NO ACTION;
 
 ALTER TABLE nrmn.staged_job_log
     ADD CONSTRAINT staged_job_log_staged_job_id_fkey FOREIGN KEY (staged_job_id) REFERENCES nrmn.staged_job (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
@@ -307,3 +310,4 @@ CREATE SEQUENCE IF NOT EXISTS nrmn.staged_job_id_seq;
 
 CREATE SEQUENCE IF NOT EXISTS nrmn.user_id_seq;
 
+CREATE SEQUENCE IF NOT EXISTS nrmn.staged_job_log_id_seq;

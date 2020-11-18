@@ -79,8 +79,8 @@ class StagedJobControllerIT {
                 )))
                 .region(Region.of(localstack.getRegion()))
                 .build();
-       CreateBucketResponse bucketResp =  client.createBucket(CreateBucketRequest.builder().bucket("nrmn-dev").build());
-         assertTrue(bucketResp.sdkHttpResponse().isSuccessful());
+        CreateBucketResponse bucketResp = client.createBucket(CreateBucketRequest.builder().bucket("nrmn-dev").build());
+        assertTrue(bucketResp.sdkHttpResponse().isSuccessful());
     }
 
     @AfterAll
@@ -103,6 +103,8 @@ class StagedJobControllerIT {
         LinkedMultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
         parameters.add("file", file);
         parameters.add("withInvertSize", false);
+        parameters.add("programiId", 55);
+
 
         val resp = reqUpload
                 .withContentType(MediaType.MULTIPART_FORM_DATA)
@@ -132,6 +134,8 @@ class StagedJobControllerIT {
         LinkedMultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
         parameters.add("file", file);
         parameters.add("withInvertSize", true);
+        parameters.add("programiId", 55);
+
 
         val resp = reqUpload
                 .withContentType(MediaType.MULTIPART_FORM_DATA)
@@ -151,4 +155,3 @@ class StagedJobControllerIT {
 
     }
 }
-

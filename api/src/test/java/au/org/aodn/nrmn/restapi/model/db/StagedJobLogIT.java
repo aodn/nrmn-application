@@ -42,6 +42,7 @@ class StagedJobLogIT {
         val startTime = LocalDateTime.now();
         val stagedJobLog = stagedJobLogTestData.persistedStagedJobLog();
         entityManager.clear();
+
         val retrievedStagedJobLog = stagedJobLogRepository.findById(stagedJobLog.getId()).get();
         assertEquals(stagedJobLog, retrievedStagedJobLog);
         assertThat(retrievedStagedJobLog.getEventTime().toLocalDateTime(),

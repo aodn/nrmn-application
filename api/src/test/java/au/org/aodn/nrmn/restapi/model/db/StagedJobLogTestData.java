@@ -18,8 +18,7 @@ public class StagedJobLogTestData {
 
     public StagedJobLog persistedStagedJobLog() {
         val stagedJobLog = defaultBuilder().build();
-        stagedJobLogRepository.saveAndFlush(stagedJobLog);
-        return stagedJobLog;
+       return stagedJobLogRepository.saveAndFlush(stagedJobLog);
     }
 
     public StagedJobLogBuilder defaultBuilder() {

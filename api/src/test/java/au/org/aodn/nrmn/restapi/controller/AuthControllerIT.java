@@ -74,17 +74,9 @@ public class AuthControllerIT {
         assertEquals(response.getBody().getTokenType(), "Bearer");
 
         val token = response.getBody().getAccessToken();
-        val reqBuilderSurvey = new RequestWrapper<Void, List<Survey>>();
-        val surveyReadyReq = reqBuilderSurvey
-                .withAppJson()
-                .withResponseType((Class<List<Survey>>) (Class<?>) List.class)
-                .withToken(token)
-                .withUri(_createUrl("/api/survey"))
-                .withMethod(HttpMethod.GET);
 
-        val surveyResp = surveyReadyReq.build(testRestTemplate);
 
-        assertEquals(surveyResp.getBody().size(), 5);
+
 
         val logOutReq = new RequestWrapper<Void, Void>();
         val resp = logOutReq
@@ -94,16 +86,6 @@ public class AuthControllerIT {
                 .withUri(_createUrl("/api/auth/signout"))
                 .build(testRestTemplate);
         assertEquals(resp.getStatusCode(), HttpStatus.OK);
-
-        val reqSignupAgain = new RequestWrapper<SignUpRequest, Void>();
-        val respSignupAgain = reqSignupAgain
-                .withMethod(HttpMethod.POST)
-                .withAppJson()
-                .withToken(token)
-                .withUri(_createUrl("/api/auth/signup"))
-                .build(testRestTemplate);
-
-        assertEquals(respSignupAgain.getStatusCode(), HttpStatus.BAD_REQUEST);
 
     }
 

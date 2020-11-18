@@ -37,7 +37,7 @@ public class StagedJobLog {
     @Column(columnDefinition = "BIGSERIAL")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "staged_job_id", referencedColumnName = "id", nullable = false,
         foreignKey = @ForeignKey(name = "staged_job_log_staged_job_id_fkey"))
     private StagedJob stagedJob;

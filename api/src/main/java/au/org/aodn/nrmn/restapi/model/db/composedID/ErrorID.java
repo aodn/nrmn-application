@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.model.db.composedID;
 
 import lombok.*;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -16,6 +17,7 @@ import java.io.Serializable;
 public class ErrorID implements Serializable {
     @Column(name = "row_id")
     private Long rowId;
+
     @Column(name = "job_id")
     private Long jobId;
     @Column(name = "message")

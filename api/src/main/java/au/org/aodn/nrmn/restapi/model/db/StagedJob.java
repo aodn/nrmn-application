@@ -10,10 +10,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -24,7 +25,6 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.sql.Timestamp;
-import java.util.Map;
 
 @Entity
 @Data
@@ -33,7 +33,8 @@ import java.util.Map;
 @Builder
 @Table(name = "staged_job")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-public class StagedJob {
+public class StagedJob implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "staged_job_id_seq")
     @SequenceGenerator(name = "staged_job_id_seq", sequenceName = "staged_job_id_seq", allocationSize = 1)
@@ -42,6 +43,10 @@ public class StagedJob {
     @Column(name = "reference")
     private String reference;
 
+    @Column(name = "is_extended_size")
+    private Boolean isExtendedSize;
+
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private StatusJobType status;
@@ -49,6 +54,10 @@ public class StagedJob {
     @Enumerated(EnumType.STRING)
     @Column(name = "source")
     private SourceJobType source;
+
+    @ManyToOne(fetch=FetchType.EAGER)
+    @JoinColumn(name = "program_id", referencedColumnName = "program_id", nullable = false)
+    private Program program;
 
     @Column(name = "created", columnDefinition = "timestamp with time zone")
     @CreationTimestamp
@@ -60,7 +69,4 @@ public class StagedJob {
     @Setter(AccessLevel.NONE)
     private Timestamp lastUpdated;
 
-    @Column(name = "job_attributes", columnDefinition = "jsonb")
-    @Type(type = "jsonb")
-    private Map<String, String> jobAttributes;
 }

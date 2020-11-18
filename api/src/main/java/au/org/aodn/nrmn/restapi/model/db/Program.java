@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Data
@@ -19,7 +20,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @Builder
 @Table(name = "program_ref")
-public class Program {
+public class Program  implements Serializable {
     @Id
     @SequenceGenerator(name = "program_ref_program_id", sequenceName = "program_ref_program_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="program_ref_program_id")

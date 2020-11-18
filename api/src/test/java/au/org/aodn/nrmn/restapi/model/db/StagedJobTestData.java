@@ -13,17 +13,20 @@ public class StagedJobTestData {
 
     @Autowired
     private StagedJobRepository stagedJobRepository;
-    
+
+    @Autowired
+    private ProgramTestData programTestData;
     public StagedJob persistedStagedJob() {
         val stagedJob = defaultBuilder().build();
-        stagedJobRepository.saveAndFlush(stagedJob);
-        return stagedJob;    
+        return stagedJobRepository.saveAndFlush(stagedJob);
     }
-    
+
     public StagedJobBuilder defaultBuilder() {
+        val program = programTestData.persistedProgram();
         return StagedJob.builder()
-            .reference("survey.xls")
-            .source(SourceJobType.FILE)
-            .status(StatusJobType.STAGED);
+                .program(program)
+                .reference("survey.xls")
+                .source(SourceJobType.FILE)
+                .status(StatusJobType.STAGED);
     }
 }
