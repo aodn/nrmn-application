@@ -19,6 +19,7 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -103,7 +104,7 @@ public class PreValidationProcess implements ValidatorProvider {
             return new CoordinatesDataCheck(site).valid(target).isValid();
         }).map(seq -> {
             val site = (Site) seq.get(0).orElseGet(null);
-            val date = (Date) seq.get(1).orElseGet(null);
+            val date = (LocalDate) seq.get(1).orElseGet(null);
             val time = (LocalTime) seq.get(2).orElseGet(null);
 
             val diver = (Diver) seq.get(3).orElseGet(null);
@@ -122,9 +123,9 @@ public class PreValidationProcess implements ValidatorProvider {
             val direction = (Directions) seq.get(15).orElseGet(null);
 
 
-            val dateTime = new Date(date.getTime() + time.toNanoOfDay());
             val rowFormatted = new StagedRowFormatted();
-            rowFormatted.setDate(dateTime);
+            rowFormatted.setDate(date);
+            rowFormatted.setTime(time);
             rowFormatted.setSite(site);
             rowFormatted.setDiver(diver);
             rowFormatted.setBuddy(buddy);
