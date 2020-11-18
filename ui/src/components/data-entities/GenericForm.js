@@ -6,6 +6,7 @@ import {useEffect} from 'react';
 import {itemRequested, createEntityRequested, updateEntityRequested} from "./form-reducer";
 import {useParams, Redirect} from "react-router-dom";
 import ArrayApiField from './customWidgetFields/ArrayApiField';
+import ObjectApiField from './customWidgetFields/ObjectApiField';
 import pluralize from 'pluralize';
 import config from "react-global-configuration";
 import {Box} from "@material-ui/core";
@@ -33,6 +34,7 @@ const GenericForm = () => {
   const entityTitle = singular.charAt(0).toUpperCase() + singular.slice(1)
 
 
+
   useEffect(() => {
     if (id !== undefined) {
       dispatch(itemRequested(entityName + "/" + id));
@@ -50,7 +52,10 @@ const GenericForm = () => {
     return renderError("ERROR: Entity '" + entityTitle + "' missing from API Schema");
   }
 
-  const fields = {ArrayField: ArrayApiField}
+  const fields = {
+    ArrayField: ArrayApiField//,
+    //ObjectField: ObjectApiField
+  }
 
   const handleSubmit = (form) => {
 
@@ -63,7 +68,7 @@ const GenericForm = () => {
 
   const entityDef = schemaDefinition[entityTitle];
 
-  let fullTitle = (id) ?  "Edit " + entityTitle + " '" + id + "'" : "Add '" + entityTitle + "'" ;
+    let fullTitle = (id) ?  "Edit " + entityTitle + " '" + id + "'" : "Add '" + entityTitle + "'" ;
   const entitySchema = {title: fullTitle, ...entityDef}
 
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
