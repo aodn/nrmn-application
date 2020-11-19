@@ -42,9 +42,9 @@ public class PreValidationProcess implements ValidatorProvider {
         return Seq.of(
                 new IntegerFormatValidation(StagedRow::getInverts, "Inverts", Collections.emptyList()),
                 new IntegerFormatValidation(StagedRow::getM2InvertSizingSpecies, "M2InvertSizingSpecies,", Collections.emptyList()),
-                new IntegerFormatValidation(StagedRow::getL5, "L5,", Collections.emptyList()),
-                new IntegerFormatValidation(StagedRow::getLMax, "L95,", Collections.emptyList()),
-                new IntegerFormatValidation(StagedRow::getLMax, "Lmax,", Collections.emptyList()),
+                new DoubleFormatValidation(StagedRow::getL5, "L5,"),
+                new DoubleFormatValidation(StagedRow::getL95, "L95,"),
+                new DoubleFormatValidation(StagedRow::getLMax, "Lmax,"),
                 new BooleanFormatValidation(StagedRow::getIsInvertSizing, "IsInvertSizing")
         );
     }
@@ -142,9 +142,9 @@ public class PreValidationProcess implements ValidatorProvider {
             if (target.getStagedJob().getIsExtendedSize()) {
                 val inverts = (Integer) seq.get(13).orElseGet(null);
                 val m2InvertSizingSpecies = (Integer) seq.get(14).orElseGet(null);
-                val l5 = (Integer) seq.get(15).orElseGet(null);
-                val l95 = (Integer) seq.get(16).orElseGet(null);
-                val lmax = (Integer) seq.get(17).orElseGet(null);
+                val l5 = (Double) seq.get(15).orElseGet(null);
+                val l95 = (Double) seq.get(16).orElseGet(null);
+                val lmax = (Double) seq.get(17).orElseGet(null);
                 val isInvertSizing = (Boolean) seq.get(18).orElseGet(null);
                 rowFormatted.setInverts(inverts);
                 rowFormatted.setM2InvertSizingSpecies(m2InvertSizingSpecies);
