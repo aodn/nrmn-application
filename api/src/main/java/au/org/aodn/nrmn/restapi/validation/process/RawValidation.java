@@ -55,7 +55,7 @@ public class RawValidation {
     public Seq<Tuple2<String, BaseRowValidator>> getRowValidators() {
         return
                 Seq.of(
-                        Tuple2.of("site", siteCodeExists),
+                        Tuple2.of("Site", siteCodeExists),
                         Tuple2.of("Date", new DateFormatValidation()),
                         Tuple2.of("Time", new TimeFormatValidation()),
                         Tuple2.of("Diver", new DiverExists(StagedRow::getDiver, "Diver", diverRepo)),
