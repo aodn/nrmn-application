@@ -9,19 +9,22 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 
 
-const handleToggleThemeChange = event => {
-  store.dispatch(toggleTheme(event.target.checked))
-}
-
 const SettingsMenu = () => {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
+
   const handleSettingsClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleToggleThemeChange = event => {
+    store.dispatch(toggleTheme(event.target.checked));
+    handleClose();
+  }
 
   return (
       <>
