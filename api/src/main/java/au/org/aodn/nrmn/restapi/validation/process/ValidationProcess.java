@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class ValidationProcess extends ValidatorHelpers {
@@ -34,7 +33,7 @@ public class ValidationProcess extends ValidatorHelpers {
 
 
     public List<StagedRowError> process(StagedJob job){
-        val stagedRows = rowRepo.findRowByReference(job.getReference());
+        val stagedRows = rowRepo.findRowsByReference(job.getReference());
         val program = job.getProgram();
         val preCheck =
                 stagedRows.stream().map(row ->  preProcess.validate(row)).reduce(
