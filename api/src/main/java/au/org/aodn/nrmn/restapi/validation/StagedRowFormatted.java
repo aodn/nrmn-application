@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.validation;
 import au.org.aodn.nrmn.restapi.model.db.AphiaRef;
 import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.Site;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import lombok.Data;
 import lombok.Getter;
@@ -41,7 +42,7 @@ public class StagedRowFormatted {
     private Directions direction;
 
 
-    private Integer code;
+    private String code;
 
     private Integer total;
 
@@ -56,6 +57,8 @@ public class StagedRowFormatted {
     private Boolean isInvertSizing;
 
     private Integer lMax;
+
+    private StagedRow ref;
 
     private Map<String, Integer> measureJson;
 }

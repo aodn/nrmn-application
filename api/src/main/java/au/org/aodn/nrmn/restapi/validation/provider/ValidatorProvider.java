@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.validation.provider;
 import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
 import com.amazonaws.services.dynamodbv2.xspec.B;
+import cyclops.data.HashMap;
 import cyclops.data.Seq;
 
 

@@ -10,8 +10,8 @@ import lombok.val;
 
 import java.util.Arrays;
 
-public class Block0DataCheck extends BaseRowValidator {
-    public Block0DataCheck() {
+public class Block0DataValidation extends BaseRowValidator {
+    public Block0DataValidation() {
         super("Block");
     }
 

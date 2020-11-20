@@ -73,7 +73,7 @@ public class CoordinatesDataCheck extends BaseRowValidator {
         if (anglesResult.isInvalid())
             return anglesResult.bimap(Function.identity(), seq -> site);
 
-        Seq<Double> latLong = anglesResult.fold(err -> Seq.empty(), Function.identity());
+        Seq<Double> latLong = anglesResult.orElseGet(Seq::empty);
         Coordinate coords = new Coordinate(latLong.getOrElse(1, 0D), latLong.getOrElse(0, 0D));
         val point = geometryFactory.createPoint(coords);
 

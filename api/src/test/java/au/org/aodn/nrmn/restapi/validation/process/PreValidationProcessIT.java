@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class PreValidationProcessIT {
 
     @Autowired
-    PreValidationProcess preProcess;
+    RawValidation preProcess;
 
     @Test
     void inputRespectingFormatShouldSucceed() {
@@ -53,7 +53,8 @@ class PreValidationProcessIT {
             put("6.5", "1");
             put("10.5", "1");
         }});
-        val res = preProcess.preValidated(stage);
+        val valid = preProcess.validate(stage);
+        val res = preProcess.preValidated(stage, valid);
         assertTrue(res.isPresent());
         val row = res.orElseGet(null);
         assertEquals(row.getBlock(), 1);

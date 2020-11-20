@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class Block0DataCheckTest {
+class Block0DataValidationTest {
 
     //the block0 check only apply if it's the block is 0
     @Test
@@ -18,7 +18,7 @@ class Block0DataCheckTest {
         stage.setBlock("1");
         stage.setMethod("3");
         stage.setStagedJob(job);
-        val res =  new Block0DataCheck().valid(stage);
+        val res =  new Block0DataValidation().valid(stage);
         assertTrue(res.isValid());
     }
 
@@ -30,7 +30,7 @@ class Block0DataCheckTest {
         stage.setBlock("0");
         stage.setMethod("2");
         stage.setStagedJob(job);
-        val res =  new Block0DataCheck().valid(stage);
+        val res =  new Block0DataValidation().valid(stage);
         assertTrue(res.isInvalid());
     }
 
@@ -42,7 +42,7 @@ class Block0DataCheckTest {
         stage.setBlock("0");
         stage.setMethod("5");
         stage.setStagedJob(job);
-        val res =  new Block0DataCheck().valid(stage);
+        val res =  new Block0DataValidation().valid(stage);
         assertTrue(res.isValid());
     }
 }

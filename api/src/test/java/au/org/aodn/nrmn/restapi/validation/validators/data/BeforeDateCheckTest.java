@@ -2,9 +2,12 @@ package au.org.aodn.nrmn.restapi.validation.validators.data;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.validators.data.BeforeDateCheck;
+import com.amazonaws.services.medialive.model.AacRawFormat;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
 
@@ -16,11 +19,8 @@ class BeforeDateCheckTest {
     @Test
     void beforeDateShouldSucceed() throws Exception {
         val beforeDate = sdf.parse("11/02/1993");
-        val job = new StagedJob();
-        job.setId(1L);
-        val stage = new StagedRow();
-        stage.setDate("01/01/1994");
-        stage.setStagedJob(job);
+        val stage = new StagedRowFormatted();
+        stage.setDate(sdf.parse("01/01/1994"));
         val res = new BeforeDateCheck(beforeDate).valid(stage);
         assertTrue(res.isValid());
     }
@@ -28,11 +28,8 @@ class BeforeDateCheckTest {
     @Test
     void afterDateShouldFail() throws Exception {
         val beforeDate = sdf.parse("02/01/1994");
-        val job = new StagedJob();
-        job.setId(1L);
-        val stage = new StagedRow();
-        stage.setDate("01/01/1994");
-        stage.setStagedJob(job);
+        val stage = new StagedRowFormatted();
+        stage.setDate(sdf.parse("01/01/1994"));
         val res = new BeforeDateCheck(beforeDate).valid(stage);
         assertTrue(res.isInvalid());
     }
