@@ -21,6 +21,7 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Function;
@@ -110,7 +111,7 @@ public class RawValidation {
                     return new CoordinatesDataCheck(site).valid(target).isValid();
                 }).map(hMap -> {
                     val site = (Site) hMap.get("Site").orElseGet(null);
-                    val date = (Date) hMap.get("Date").orElseGet(null);
+                    val date = (LocalDate) hMap.get("Date").orElseGet(null);
                     val time = (LocalTime) hMap.get("Time").orElseGet(null);
 
                     val diver = (Diver) hMap.get("Diver").orElseGet(null);
@@ -127,9 +128,10 @@ public class RawValidation {
                     val total = (Integer) hMap.get("Total").orElseGet(null);
                     val direction = (Directions) hMap.get("Direction").orElseGet(null);
 
-                    val dateTime = new Date(date.getTime() + time.toNanoOfDay());
+
                     val rowFormatted = new StagedRowFormatted();
-                    rowFormatted.setDate(dateTime);
+                    rowFormatted.setDate(date);
+                    rowFormatted.setTime(time);
                     rowFormatted.setSite(site);
                     rowFormatted.setDiver(diver);
                     rowFormatted.setBuddy(buddy);

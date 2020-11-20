@@ -6,21 +6,23 @@ import cyclops.control.Validated;
 
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-public final class DateFormatValidation extends BaseRowFormatValidation<Date> {
+public final class DateFormatValidation extends BaseRowFormatValidation<LocalDate> {
 
     public DateFormatValidation() {
         super("Date", "dd/MM/yyyy");
     }
 
     @Override
-    public  Validated<StagedRowError, Date> valid(StagedRow target) {
+    public  Validated<StagedRowError, LocalDate> valid(StagedRow target) {
         return validFormat(
                 StagedRow::getDate,
                 dateString -> {
-                    SimpleDateFormat formatter = new SimpleDateFormat(format);
-                    return Validated.valid(formatter.parse(dateString));
+                    DateTimeFormatter  dtf =  DateTimeFormatter.ofPattern(format);
+                    return Validated.valid(LocalDate.parse(dateString, dtf));
 
                 }, target);
     }

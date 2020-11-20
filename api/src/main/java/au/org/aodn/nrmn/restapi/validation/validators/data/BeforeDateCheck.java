@@ -5,18 +5,19 @@ import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+
 import cyclops.control.Try;
 import cyclops.control.Validated;
 import lombok.val;
 
-import java.util.Date;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.function.Function;
+import java.time.format.DateTimeFormatter;
 
 public class BeforeDateCheck extends BaseFormattedValidator {
-    private final Date beforeDate;
+    private final LocalDate beforeDate;
 
-    public BeforeDateCheck(Date beforeDate) {
+    public BeforeDateCheck(LocalDate beforeDate) {
         super("Date");
         this.beforeDate = beforeDate;
     }
@@ -24,8 +25,8 @@ public class BeforeDateCheck extends BaseFormattedValidator {
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
         return Try.withCatch(() -> {
-            val sdf = new SimpleDateFormat("dd/MM/yyyy");
-            val beforeDateStr = sdf.format(beforeDate);
+            val dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            val beforeDateStr = dtf.format(beforeDate);
             if (target.getDate().compareTo(beforeDate) < 0)
                 return Validated.<String, String>invalid("date shouldn't be before " + beforeDateStr);
             return Validated.<String, String>valid("Date is after " + beforeDateStr);

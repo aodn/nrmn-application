@@ -9,7 +9,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Map;
 
 @Data
@@ -20,7 +21,9 @@ public class StagedRowFormatted {
 
     private Site site;
 
-    private Date date;
+    private LocalDate date;
+
+    private LocalTime time;
 
     private Diver diver;
 
