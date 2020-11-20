@@ -53,13 +53,13 @@ public class StagedRowFormatted {
 
     private Integer m2InvertSizingSpecies;
 
-    private Integer l5;
+    private Double l5;
 
-    private Integer l95;
+    private Double l95;
 
     private Boolean isInvertSizing;
 
-    private Integer lMax;
+    private Double lMax;
 
     private StagedRow ref;
 

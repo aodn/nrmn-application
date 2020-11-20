@@ -43,9 +43,9 @@ public class RawValidation {
                 Stream.of(
                         Tuple2.of("Inverts", new IntegerFormatValidation(StagedRow::getInverts, "Inverts", Collections.emptyList())),
                         Tuple2.of("M2InvertSizingSpecies", new IntegerFormatValidation(StagedRow::getM2InvertSizingSpecies, "M2InvertSizingSpecies,", Collections.emptyList())),
-                        Tuple2.of("L5", new IntegerFormatValidation(StagedRow::getL5, "L5,", Collections.emptyList())),
-                        Tuple2.of("L95", new IntegerFormatValidation(StagedRow::getLMax, "L95,", Collections.emptyList())),
-                        Tuple2.of("Lmax", new IntegerFormatValidation(StagedRow::getLMax, "Lmax,", Collections.emptyList())),
+                        Tuple2.of("L5", new DoubleFormatValidation(StagedRow::getL5, "L5,")),
+                        Tuple2.of("L95", new DoubleFormatValidation(StagedRow::getLMax, "L95,")),
+                        Tuple2.of("Lmax", new DoubleFormatValidation(StagedRow::getLMax, "Lmax,")),
                         Tuple2.of("IsInvertSizing", new BooleanFormatValidation(StagedRow::getIsInvertSizing, "IsInvertSizing"))
                 )
         );
@@ -148,9 +148,9 @@ public class RawValidation {
                     if (target.getStagedJob().getIsExtendedSize()) {
                         val inverts = (Integer) hMap.get("Inverts").orElseGet(null);
                         val m2InvertSizingSpecies = (Integer) hMap.get("M2InvertSizingSpecies").orElseGet(null);
-                        val l5 = (Integer) hMap.get("L5").orElseGet(null);
-                        val l95 = (Integer) hMap.get("L95").orElseGet(null);
-                        val lmax = (Integer) hMap.get("Lmax").orElseGet(null);
+                        val l5 = (Double) hMap.get("L5").orElseGet(null);
+                        val l95 = (Double) hMap.get("L95").orElseGet(null);
+                        val lmax = (Double) hMap.get("Lmax").orElseGet(null);
                         val isInvertSizing = (Boolean) hMap.get("IsInvertSizing").orElseGet(null);
                         rowFormatted.setInverts(inverts);
                         rowFormatted.setM2InvertSizingSpecies(m2InvertSizingSpecies);
