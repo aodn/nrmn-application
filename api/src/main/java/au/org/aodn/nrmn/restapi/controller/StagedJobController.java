@@ -123,7 +123,7 @@ public class StagedJobController {
                 new UserActionAudit(
                         "stage/validate",
                         "validate job attempt for username " + authentication.getName()
-                                + " token: " + jobId)
+                                + " file: " + jobId)
         );
 
         return jobRepo.findById(jobId).map(job -> {
@@ -132,7 +132,7 @@ public class StagedJobController {
         }).orElseGet(() -> ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(new ValidationResponse(Collections.emptyList(),
-                        Arrays.asList(new ErrorInput("StagedJob Not found", "StagedJob")))));
+                        Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob")))));
     }
 
 }
