@@ -5,14 +5,14 @@ import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
-import au.org.aodn.nrmn.restapi.validation.validators.data.CoordinatesDataCheck;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.SpeciesExists;
 import au.org.aodn.nrmn.restapi.validation.validators.data.DirectionDataCheck;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.DiverExists;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.SiteCodeExists;
 import au.org.aodn.nrmn.restapi.validation.validators.format.*;
+import au.org.aodn.nrmn.restapi.validation.validators.passThu.PassThruRef;
+import au.org.aodn.nrmn.restapi.validation.validators.passThu.PassThruString;
 import cyclops.companion.Monoids;
-import cyclops.control.Maybe;
 import cyclops.control.Validated;
 import cyclops.data.HashMap;
 import cyclops.data.Seq;
@@ -41,8 +41,8 @@ public class RawValidation {
     public HashMap<String, BaseRowValidator> getExtendedValidators() {
         return HashMap.fromStream(
                 Stream.of(
-                        Tuple2.of("Inverts", new IntegerFormatValidation(StagedRow::getInverts, "Inverts", Collections.emptyList())),
-                        Tuple2.of("M2InvertSizingSpecies", new IntegerFormatValidation(StagedRow::getM2InvertSizingSpecies, "M2InvertSizingSpecies,", Collections.emptyList())),
+                        Tuple2.of("Inverts", new PassThruString(StagedRow::getInverts, "Inverts")),
+                        Tuple2.of("M2InvertSizingSpecies", new PassThruString(StagedRow::getM2InvertSizingSpecies, "M2InvertSizingSpecies")),
                         Tuple2.of("L5", new DoubleFormatValidation(StagedRow::getL5, "L5,")),
                         Tuple2.of("L95", new DoubleFormatValidation(StagedRow::getL95, "L95,")),
                         Tuple2.of("Lmax", new DoubleFormatValidation(StagedRow::getLMax, "Lmax,")),
@@ -65,7 +65,7 @@ public class RawValidation {
                         Tuple2.of("Depth", new DoubleFormatValidation(StagedRow::getDepth, "Depth")),
                         Tuple2.of("Method", new IntegerFormatValidation(StagedRow::getMethod, "Method", Arrays.asList(0, 1, 2, 3, 4, 5, 7, 10))),
                         Tuple2.of("Block", new IntegerFormatValidation(StagedRow::getBlock, "Block", Arrays.asList(0, 1, 2))),
-
+                        Tuple2.of("Code", new PassThruString(StagedRow::getCode, "Code")),
                         Tuple2.of("Species", speciesExists),
 
                         Tuple2.of("Vis", new IntegerFormatValidation(StagedRow::getVis, "Vis", Collections.emptyList())),
@@ -74,7 +74,8 @@ public class RawValidation {
 
                         Tuple2.of("Latitude", new DoubleFormatValidation(StagedRow::getLatitude, "Latitude")),
                         Tuple2.of("Longitude", new DoubleFormatValidation(StagedRow::getLongitude, "Longitude")),
-                        Tuple2.of("Direction", new DirectionDataCheck())
+                        Tuple2.of("Direction", new DirectionDataCheck()),
+                        Tuple2.of("Ref", new PassThruRef())
                 );
     }
 
@@ -97,70 +98,59 @@ public class RawValidation {
     }
 
 
-    public Maybe<StagedRowFormatted> preValidated(
-            StagedRow target,
-            Validated<StagedRowError, Seq<Tuple2<String, Object>>> mergeValidators) {
-        val validatorsWithMap =
-                mergeValidators
-                        .map(seq -> seq.stream()
-                                .toHashMap(key -> key._1(), value -> value._2()));
-        return validatorsWithMap.toMaybe()
-                .filter(hMap -> {
-                    val site = (Site) hMap.get("Site").orElseGet(null);
-                    site.calcGeom();
-                    return new CoordinatesDataCheck(site).valid(target).isValid();
-                }).map(hMap -> {
-                    val site = (Site) hMap.get("Site").orElseGet(null);
-                    val date = (LocalDate) hMap.get("Date").orElseGet(null);
-                    val time = (LocalTime) hMap.get("Time").orElseGet(null);
+    public StagedRowFormatted toFormat(HashMap<String, Object> values) {
+        val site = (Site) values.get("Site").orElseGet(null);
+        val date = (LocalDate) values.get("Date").orElseGet(null);
+        val time = (LocalTime) values.get("Time").orElseGet(null);
 
-                    val diver = (Diver) hMap.get("Diver").orElseGet(null);
-                    val buddy = (Diver) hMap.get("Buddy").orElseGet(null);
-                    val pqs = (Diver) hMap.get("P-Qs").orElseGet(null);
+        val diver = (Diver) values.get("Diver").orElseGet(null);
+        val buddy = (Diver) values.get("Buddy").orElseGet(null);
+        val pqs = (Diver) values.get("P-Qs").orElseGet(null);
 
-                    val depth = (Double) hMap.get("Depth").orElseGet(null);
-                    val method = (Integer) hMap.get("Method").orElseGet(null);
-                    val block = (Integer) hMap.get("Block").orElseGet(null);
+        val depth = (Double) values.get("Depth").orElseGet(null);
+        val method = (Integer) values.get("Method").orElseGet(null);
+        val block = (Integer) values.get("Block").orElseGet(null);
 
-                    val species = (AphiaRef) hMap.get("Species").orElseGet(null);
+        val species = (AphiaRef) values.get("Species").orElseGet(null);
+        val code = (String) values.get("Code").orElseGet(null);
 
-                    val vis = (Integer) hMap.get("Vis").orElseGet(null);
-                    val total = (Integer) hMap.get("Total").orElseGet(null);
-                    val direction = (Directions) hMap.get("Direction").orElseGet(null);
+        val vis = (Integer) values.get("Vis").orElseGet(null);
+        val total = (Integer) values.get("Total").orElseGet(null);
+        val direction = (Directions) values.get("Direction").orElseGet(null);
+        val ref = (StagedRow) values.get("Ref").orElseGet(null);
 
+        val rowFormatted = new StagedRowFormatted();
+        rowFormatted.setDate(date);
+        rowFormatted.setTime(time);
+        rowFormatted.setSite(site);
+        rowFormatted.setDiver(diver);
+        rowFormatted.setBuddy(buddy);
+        rowFormatted.setPqs(pqs);
+        rowFormatted.setDepth(depth);
+        rowFormatted.setMethod(method);
+        rowFormatted.setBlock(block);
+        rowFormatted.setSpecies(species);
+        rowFormatted.setVis(vis);
+        rowFormatted.setCode(code);
+        rowFormatted.setDirection(direction);
+        rowFormatted.setTotal(total);
+        rowFormatted.setRef(ref );
 
-                    val rowFormatted = new StagedRowFormatted();
-                    rowFormatted.setDate(date);
-                    rowFormatted.setTime(time);
-                    rowFormatted.setSite(site);
-                    rowFormatted.setDiver(diver);
-                    rowFormatted.setBuddy(buddy);
-                    rowFormatted.setPqs(pqs);
-                    rowFormatted.setDepth(depth);
-                    rowFormatted.setMethod(method);
-                    rowFormatted.setBlock(block);
-                    rowFormatted.setSpecies(species);
-                    rowFormatted.setVis(vis);
-                    rowFormatted.setCode(target.getCode());
-                    rowFormatted.setDirection(direction);
-                    rowFormatted.setTotal(total);
-
-                    if (target.getStagedJob().getIsExtendedSize()) {
-                        val inverts = (Integer) hMap.get("Inverts").orElseGet(null);
-                        val m2InvertSizingSpecies = (Integer) hMap.get("M2InvertSizingSpecies").orElseGet(null);
-                        val l5 = (Double) hMap.get("L5").orElseGet(null);
-                        val l95 = (Double) hMap.get("L95").orElseGet(null);
-                        val lmax = (Double) hMap.get("Lmax").orElseGet(null);
-                        val isInvertSizing = (Boolean) hMap.get("IsInvertSizing").orElseGet(null);
-                        rowFormatted.setInverts(inverts);
-                        rowFormatted.setM2InvertSizingSpecies(m2InvertSizingSpecies);
-                        rowFormatted.setL5(l5);
-                        rowFormatted.setL95(l95);
-                        rowFormatted.setLMax(lmax);
-                        rowFormatted.setIsInvertSizing(isInvertSizing);
-                    }
-                    return rowFormatted;
-                });
+        if (values.containsKey("Inverts") && values.containsKey("IsInvertSizing") ) {
+            val inverts = (Integer) values.get("Inverts").orElseGet(null);
+            val m2InvertSizingSpecies = (Integer) values.get("M2InvertSizingSpecies").orElseGet(null);
+            val l5 = (Double) values.get("L5").orElseGet(null);
+            val l95 = (Double) values.get("L95").orElseGet(null);
+            val lmax = (Double) values.get("Lmax").orElseGet(null);
+            val isInvertSizing = (Boolean) values.get("IsInvertSizing").orElseGet(null);
+            rowFormatted.setInverts(inverts);
+            rowFormatted.setM2InvertSizingSpecies(m2InvertSizingSpecies);
+            rowFormatted.setL5(l5);
+            rowFormatted.setL95(l95);
+            rowFormatted.setLMax(lmax);
+            rowFormatted.setIsInvertSizing(isInvertSizing);
+        }
+        return rowFormatted;
     }
 
 
@@ -169,7 +159,10 @@ public class RawValidation {
                 .stream()
                 .flatMap(row -> {
                     val validatedRow = validate(row);
-                    return preValidated(row, validatedRow).stream();
+                    val validatorsWithMap =
+                            validatedRow.map(seq ->
+                                    seq.toHashMap(key -> key._1(), value -> value._2()));
+                    return validatorsWithMap.toMaybe().map(this::toFormat).stream();
                 }).collect(Collectors.toList());
     }
 }

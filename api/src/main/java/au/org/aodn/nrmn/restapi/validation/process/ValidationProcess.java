@@ -9,6 +9,7 @@ import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import cyclops.data.Seq;
+import cyclops.data.tuple.Tuple2;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,18 +33,27 @@ public class ValidationProcess extends ValidatorHelpers {
     RawValidation preProcess;
 
 
-    public List<StagedRowError> process(StagedJob job){
+    public List<StagedRowError> process(StagedJob job) {
         val stagedRows = rowRepo.findRowsByReference(job.getReference());
         val program = job.getProgram();
         val preCheck =
-                stagedRows.stream().map(row ->  preProcess.validate(row)).reduce(
-                Validated.valid(Seq.empty()),
-                (v1, v2) -> v1.combine(Monoids.firstNonNull(), v2));
+                stagedRows.stream()
+                        .map(row -> preProcess.validate(row).bimap(err -> err, value -> Seq.of(value)))
+                        .reduce(
+                                Validated.valid(Seq.empty()),
+                                (v1, v2) -> v1.combine(Monoids.seqConcat(), v2));
         if (preCheck.isInvalid()) {
             return toErrorList(preCheck);
         }
-        val stagedRowFormatteds = preProcess.preValidated(stagedRows);
-        return Collections.emptyList();
 
+        val rowValidations = preCheck.orElseGet(Seq::empty);
+
+        val rowValidationHMap =
+                rowValidations.map(seq -> seq.toHashMap(Tuple2::_1, Tuple2::_2));
+
+        val formattedRows = rowValidationHMap.map(preProcess::toFormat).toList();
+        //Todo adding formatted validation here;
+
+        return Collections.emptyList();
     }
 }
