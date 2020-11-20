@@ -44,7 +44,7 @@ public class RawValidation {
                         Tuple2.of("Inverts", new IntegerFormatValidation(StagedRow::getInverts, "Inverts", Collections.emptyList())),
                         Tuple2.of("M2InvertSizingSpecies", new IntegerFormatValidation(StagedRow::getM2InvertSizingSpecies, "M2InvertSizingSpecies,", Collections.emptyList())),
                         Tuple2.of("L5", new DoubleFormatValidation(StagedRow::getL5, "L5,")),
-                        Tuple2.of("L95", new DoubleFormatValidation(StagedRow::getLMax, "L95,")),
+                        Tuple2.of("L95", new DoubleFormatValidation(StagedRow::getL95, "L95,")),
                         Tuple2.of("Lmax", new DoubleFormatValidation(StagedRow::getLMax, "Lmax,")),
                         Tuple2.of("IsInvertSizing", new BooleanFormatValidation(StagedRow::getIsInvertSizing, "IsInvertSizing"))
                 )
