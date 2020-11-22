@@ -49,9 +49,9 @@ class PreValidationProcessIT {
         stage.setCode("1");
         stage.setTotal("2");
         stage.setStagedJob(job);
-        stage.setMeasureJson(new HashMap<String, String>() {{
-            put("6.5", "1");
-            put("10.5", "1");
+        stage.setMeasureJson(new HashMap<Integer, String>() {{
+            put(13, "1");
+            put(21, "1");
         }});
         val res = preProcess.preValidated(stage);
         assertTrue(res.isPresent());

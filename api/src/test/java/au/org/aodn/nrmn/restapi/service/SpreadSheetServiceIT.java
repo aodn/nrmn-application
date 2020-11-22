@@ -137,7 +137,7 @@ public class SpreadSheetServiceIT {
         assertEquals(obs1.getLongitude(), "148.339749");
         //test Map filling
         assertEquals(obs1.getMeasureJson().size(), 4);
-        assertEquals(obs1.getMeasureJson().get("162.5"), "4");
+        assertEquals(obs1.getMeasureJson().get(21), "4");
         // test Macro
         assertEquals(obs1.getSpecies(), "Caesioperca rasor");
     }

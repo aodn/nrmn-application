@@ -114,7 +114,7 @@ public class StagedRow implements Serializable {
 
     @Column(name = "measure_value", columnDefinition = "json")
     @Type(type = "jsonb")
-    private Map<String, String> measureJson;
+    private Map<Integer, String> measureJson;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(foreignKey = @ForeignKey(name = "staged_row_staged_job_id_fkey"))
