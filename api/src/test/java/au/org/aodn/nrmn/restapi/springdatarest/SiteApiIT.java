@@ -60,11 +60,6 @@ public class SiteApiIT {
             .build();
     }
 
-    @AfterEach
-    public void tearDown() {
-
-    }
-
     @Test
     @WithUserDetails("test@gmail.com")
     public void testPostSite() {
