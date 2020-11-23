@@ -21,10 +21,8 @@ public final class DateFormatValidation extends BaseRowFormatValidation<LocalDat
         return validFormat(
                 StagedRow::getDate,
                 dateString -> {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-
-                    return Validated.valid(LocalDate.parse(dateString, formatter));
-
+                    DateTimeFormatter  dtf =  DateTimeFormatter.ofPattern(format);
+                    return Validated.valid(LocalDate.parse(dateString, dtf));
 
                 }, target);
     }

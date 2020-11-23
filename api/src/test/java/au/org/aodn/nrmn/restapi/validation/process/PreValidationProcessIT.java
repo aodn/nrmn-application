@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.Collections;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class PreValidationProcessIT {
 
     @Autowired
-    PreValidationProcess preProcess;
+    RawValidation preProcess;
 
     @Test
     void inputRespectingFormatShouldSucceed() {
@@ -53,9 +54,9 @@ class PreValidationProcessIT {
             put("6.5", "1");
             put("10.5", "1");
         }});
-        val res = preProcess.preValidated(stage);
-        assertTrue(res.isPresent());
-        val row = res.orElseGet(null);
+        val res = preProcess.preValidated(Collections.singletonList(stage));
+        assertFalse(res.isEmpty());
+        val row = res.get(0);
         assertEquals(row.getBlock(), 1);
         assertEquals(row.getDirection(), Directions.NE);
         assertEquals(row.getDiver().getFullName(), "Tanjona Julien Rafidison");
