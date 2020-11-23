@@ -46,36 +46,36 @@ public class AphiaRefApiIT {
     @BeforeEach
     public void setup() {
         spec = new RequestSpecBuilder()
-            .setBaseUri(String.format("http://localhost:%s", port))
-            .setBasePath("/api/aphiaRefs")
-            .setContentType("application/json")
-            .addFilter(new ResponseLoggingFilter())
-            .addFilter(new RequestLoggingFilter())
-            .build();
+                .setBaseUri(String.format("http://localhost:%s", port))
+                .setBasePath("/api/aphiaRefs")
+                .setContentType("application/json")
+                .addFilter(new ResponseLoggingFilter())
+                .addFilter(new RequestLoggingFilter())
+                .build();
     }
 
     @Test
     @WithUserDetails("test@gmail.com")
     public void testPostAphiaRefNotAllowed() {
         given()
-            .spec(spec)
-            .auth()
-            .oauth2(jwtToken.get())
-            .body("{" +
-                "  \"aphiaId\": 1," +
-                "  \"url\": \"string\"," +
-                "  \"scientificName\": \"string\"," +
-                "  \"authority\": \"string\"," +
-                "  \"status\": \"string\"," +
-                "  \"isFreshwater\": true," +
-                "  \"isTerrestrial\": true," +
-                "  \"isExtinct\": true," +
-                "  \"modified\": \"2020-11-18T00:14:35.217Z\"" +
-                "}")
-            .post()
-            .then()
-            .assertThat()
-            .statusCode(405);
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body("{" +
+                        "  \"aphiaId\": 1," +
+                        "  \"url\": \"string\"," +
+                        "  \"scientificName\": \"string\"," +
+                        "  \"authority\": \"string\"," +
+                        "  \"status\": \"string\"," +
+                        "  \"isFreshwater\": true," +
+                        "  \"isTerrestrial\": true," +
+                        "  \"isExtinct\": true," +
+                        "  \"modified\": \"2020-11-18T00:14:35.217Z\"" +
+                        "}")
+                .post()
+                .then()
+                .assertThat()
+                .statusCode(405);
     }
 
     @Test
@@ -84,15 +84,15 @@ public class AphiaRefApiIT {
         val aphiaRef = aphiaRefTestData.persistedAphiaRef();
 
         given()
-            .spec(spec)
-            .auth()
-            .oauth2(jwtToken.get())
-            .get("/" + aphiaRef.getAphiaId())
-            .then()
-            .assertThat()
-            .statusCode(200)
-            .body("aphiaId", equalTo(aphiaRef.getAphiaId()))
-            .body("scientificName", equalTo(aphiaRef.getScientificName()));
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .get("/" + aphiaRef.getAphiaId())
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .body("aphiaId", equalTo(aphiaRef.getAphiaId()))
+                .body("scientificName", equalTo(aphiaRef.getScientificName()));
     }
 
     @Test
@@ -100,21 +100,21 @@ public class AphiaRefApiIT {
     public void testGetAphiaRefs() {
         val aphiaRef1 = aphiaRefTestData.persistedAphiaRef();
         val aphiaRef2 = aphiaRefTestData.defaultBuilder()
-            .aphiaId(19999)
-            .scientificName("species 2")
-            .build();
+                .aphiaId(19999)
+                .scientificName("species 2")
+                .build();
         aphiaRefRepository.saveAndFlush(aphiaRef2);
 
         given()
-            .spec(spec)
-            .auth()
-            .oauth2(jwtToken.get())
-            .get()
-            .then()
-            .assertThat()
-            .statusCode(200)
-            .body("_embedded.aphiaRefs.aphiaId", hasItems(aphiaRef1.getAphiaId(), aphiaRef2.getAphiaId()))
-            .body("_embedded.aphiaRefs.scientificName", hasItems(aphiaRef1.getScientificName(),
-                aphiaRef2.getScientificName()));
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .get()
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .body("_embedded.aphiaRefs.aphiaId", hasItems(aphiaRef1.getAphiaId(), aphiaRef2.getAphiaId()))
+                .body("_embedded.aphiaRefs.scientificName", hasItems(aphiaRef1.getScientificName(),
+                        aphiaRef2.getScientificName()));
     }
 }

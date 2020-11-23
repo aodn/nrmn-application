@@ -52,12 +52,12 @@ public class SiteApiIT {
     @BeforeEach
     public void setup() {
         spec = new RequestSpecBuilder()
-            .setBaseUri(String.format("http://localhost:%s", port))
-            .setBasePath("/api/sites")
-            .setContentType("application/json")
-            .addFilter(new ResponseLoggingFilter())
-            .addFilter(new RequestLoggingFilter())
-            .build();
+                .setBaseUri(String.format("http://localhost:%s", port))
+                .setBasePath("/api/sites")
+                .setContentType("application/json")
+                .addFilter(new ResponseLoggingFilter())
+                .addFilter(new RequestLoggingFilter())
+                .build();
     }
 
     @Test
@@ -66,36 +66,37 @@ public class SiteApiIT {
         val location = locationTestData.persistedLocation();
 
         Integer siteId = given()
-            .spec(spec)
-            .auth()
-            .oauth2(jwtToken.get())
-            .body("{" +
-                "\"siteCode\": \"TAS377\"," +
-                "\"siteName\": \"Low Islets\"," +
-                "\"longitude\": 147.7243," +
-                "\"latitude\": -40.13547," +
-                "\"location\": \"http://localhost:" + port + "/api/locations/" + location.getLocationId() + "\"," +
-                "\"siteAttribute\": {" +
-                "    \"OldSiteCodes\": \"2102,7617\"," +
-                "    \"State\": \"Tasmania\"," +
-                "    \"Country\": \"Australia\"," +
-                "    \"ProtectionStatus\": \"Fishing\"," +
-                "    \"ProxCountry\": \"Australia\"" +
-                "}," +
-                "\"isActive\": true}")
-            .post()
-            .then()
-            .assertThat()
-            .statusCode(201)
-            .extract()
-            .path("siteId");
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body("{" +
+                        "\"siteCode\": \"TAS377\"," +
+                        "\"siteName\": \"Low Islets\"," +
+                        "\"longitude\": 147.7243," +
+                        "\"latitude\": -40.13547," +
+                        "\"location\": \"http://localhost:" + port + "/api/locations/" + location.getLocationId() + 
+                        "\"," +
+                        "\"siteAttribute\": {" +
+                        "    \"OldSiteCodes\": \"2102,7617\"," +
+                        "    \"State\": \"Tasmania\"," +
+                        "    \"Country\": \"Australia\"," +
+                        "    \"ProtectionStatus\": \"Fishing\"," +
+                        "    \"ProxCountry\": \"Australia\"" +
+                        "}," +
+                        "\"isActive\": true}")
+                .post()
+                .then()
+                .assertThat()
+                .statusCode(201)
+                .extract()
+                .path("siteId");
 
         val persistedSite = siteRepository.findById(siteId)
-            .get();
+                .get();
 
         assertThat(persistedSite.getSiteCode(), is(equalTo("TAS377")));
         assertThat(persistedSite.getSiteAttribute()
-            .get("OldSiteCodes"), is(equalTo("2102,7617")));
+                .get("OldSiteCodes"), is(equalTo("2102,7617")));
     }
 
     @Test
@@ -104,14 +105,14 @@ public class SiteApiIT {
         val site = siteTestData.persistedSite();
 
         given()
-            .spec(spec)
-            .auth()
-            .oauth2(jwtToken.get())
-            .delete(site.getSiteId()
-                .toString())
-            .then()
-            .assertThat()
-            .statusCode(204);
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .delete(site.getSiteId()
+                        .toString())
+                .then()
+                .assertThat()
+                .statusCode(204);
 
         val persistedSite = siteRepository.findById(site.getSiteId());
 
