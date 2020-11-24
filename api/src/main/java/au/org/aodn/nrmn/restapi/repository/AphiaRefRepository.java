@@ -16,7 +16,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
+@RepositoryRestResource
+@Tag(name = "aphia refs")
 public interface AphiaRefRepository extends JpaRepository<AphiaRef, Integer>, JpaSpecificationExecutor<AphiaRef>, EntityCriteria<AphiaRef> {
 
     @Override

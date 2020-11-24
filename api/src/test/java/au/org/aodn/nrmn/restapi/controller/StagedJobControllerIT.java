@@ -5,7 +5,7 @@ import au.org.aodn.nrmn.restapi.controller.utils.RequestWrapper;
 import au.org.aodn.nrmn.restapi.dto.stage.UploadResponse;
 import au.org.aodn.nrmn.restapi.security.JwtTokenProvider;
 import au.org.aodn.nrmn.restapi.service.S3ClientProvider;
-import au.org.aodn.nrmn.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import lombok.val;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

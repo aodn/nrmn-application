@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RepositoryRestResource
-@Tag(name = "Diver")
+@Tag(name = "divers")
 public interface DiverRepository extends JpaRepository<Diver, Integer>, JpaSpecificationExecutor<Diver>, EntityCriteria<Diver> {
 
     @Override
