@@ -157,7 +157,11 @@ public class Site {
     @PrePersist
     public void calcGeom() {
         // Calculate geom field when persisting to the db
-        val factory = new GeometryFactory(new PrecisionModel(), 4326);
-        geom = factory.createPoint(new Coordinate(longitude, latitude));
+        if (longitude == null || latitude == null) {
+            geom = null;
+        } else {
+            val factory = new GeometryFactory(new PrecisionModel(), 4326);
+            geom = factory.createPoint(new Coordinate(longitude, latitude));
+        }
     }
 }
