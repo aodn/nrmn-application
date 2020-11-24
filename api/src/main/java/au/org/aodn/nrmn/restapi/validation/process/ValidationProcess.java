@@ -26,8 +26,12 @@ public class ValidationProcess extends ValidatorHelpers {
 
     @Autowired
     StagedJobRepository jobRepo;
+
     @Autowired
     StagedRowErrorRepository errorRepo;
+
+    @Autowired
+    FormattedValidation postProcess;
 
     @Autowired
     RawValidation preProcess;
@@ -36,9 +40,10 @@ public class ValidationProcess extends ValidatorHelpers {
     public List<StagedRowError> process(StagedJob job) {
         val stagedRows = rowRepo.findRowsByReference(job.getReference());
         val program = job.getProgram();
+        val rawValidtors = preProcess.getRawValidators(job);
         val preCheck =
                 stagedRows.stream()
-                        .map(row -> preProcess.validate(row).bimap(err -> err, value -> Seq.of(value)))
+                        .map(row -> preProcess.validate(row,rawValidtors).bimap(err -> err, Seq::of))
                         .reduce(
                                 Validated.valid(Seq.empty()),
                                 (v1, v2) -> v1.combine(Monoids.seqConcat(), v2));
@@ -54,6 +59,7 @@ public class ValidationProcess extends ValidatorHelpers {
         val formattedRows = rowValidationHMap.map(preProcess::toFormat).toList();
         //Todo adding formatted validation here;
 
+        //Todo run global validation in Future
         return Collections.emptyList();
     }
 }

@@ -153,6 +153,7 @@ public class SpreadSheetService {
                             stagedRow.setIsInvertSizing(_getCellValue(row.getCell(headerMap.get("Use InvertSizing")), eval, fmt));
                             stagedRow.setLMax(_getCellValue(row.getCell(headerMap.get("Lmax")), eval, fmt));
                         }
+                        val inverts = _getCellValue(row.getCell(headerMap.get("Inverts")), eval, fmt);
 
                         val measureJson = new HashMap<String, String>();
                         headerNum.forEach(header -> {

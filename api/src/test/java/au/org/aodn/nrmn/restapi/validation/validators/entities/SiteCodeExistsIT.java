@@ -45,5 +45,9 @@ class SiteCodeExistsIT {
         stage.setStagedJob(job);
         val codeFound = siteCodeExists.valid(stage);
         Assertions.assertTrue(codeFound.isValid());
+        val site = codeFound.orElseGet( () -> null);
+
+        Assertions.assertEquals(site.getSiteName(), "South East Slade Point");
+
     }
 }
