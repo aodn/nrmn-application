@@ -59,11 +59,8 @@ class PreValidationProcessIT {
             put(13, "1");
             put(21, "1");
         }});
-<<<<<<< HEAD
         val res = preProcess.preValidated(Collections.singletonList(stage), job);
-=======
-        val res = preProcess.preValidated(Collections.singletonList(stage));
->>>>>>> cc27eeae76977de476cd68cdd71086f820872479
+
         assertFalse(res.isEmpty());
         val row = res.get(0);
         assertEquals(row.getBlock(), 1);
