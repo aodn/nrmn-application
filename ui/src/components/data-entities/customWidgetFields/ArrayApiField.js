@@ -30,13 +30,12 @@ const ArrayApiField = (props) => {
 
   return (items) ? (
      <Autocomplete
-         multiple=
       id={"select-auto-"+ entity}
       options={items.map(it => it.name)}
       getOptionLabel={(option) => option}
       defaultValue={[]}
       onChange={(event, newValues) =>handleMultiChanges(newValues, props, entities)}
-      renderInput={(params) => <TextField {...handleMultiChangesparams} label={"enter " + props.name} variant="outlined" />}
+      renderInput={(params) => <TextField {...params} label={"enter " + props.name} variant="outlined" />}
     />) : (<></>)
 };
 
