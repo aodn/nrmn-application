@@ -27,6 +27,7 @@ const formSlice = createSlice({
       state.errors = [];
     },
     entitiesError: (state, action) => {
+      debugger
       const error = "Error while getting the entity data"
       state.entities = [];
       state.errors = [error];

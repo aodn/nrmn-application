@@ -60,26 +60,19 @@ const GenericForm = () => {
 
   const entityDef = schemaDefinition[entityTitle];
 
-    let fullTitle = (id) ?  "Edit " + entityTitle + " '" + id + "'" : "Add '" + entityTitle + "'" ;
+  let fullTitle = (id) ?  "Edit " + entityTitle + " '" + id + "'" : "Add '" + entityTitle + "'" ;
   const entitySchema = {title: fullTitle, ...entityDef}
-
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
 
 
-/////////////////////////////////
-// A nasty hack to be replaced
-/////////////////////////////////
-  const uiSchema = { location: {
-      'ui:field': "relationship"
-    }
-  }
+  const uiSchemaHacks = Object.keys(entitySchema.properties).filter( key => Object.keys(entitySchema.properties[key]).includes("$ref") )
+  const uiSchema = {};
+  uiSchemaHacks.map( key => {
+    uiSchema[key] = {'ui:field': "relationship"}
+  });
   const fields = {
     relationship: NestedApiField
   }
-/////////////////////////////////
-// End nasty hack to be replaced
-/////////////////////////////////
-
 
   const onSubmit = ({formData}, e) => {
     console.log("Data submitted: ",  formData);
