@@ -13,6 +13,6 @@ public interface ValidatorProvider<
         F extends BaseFormattedValidator,
         G extends  BaseGlobalValidator> {
   Seq<Tuple2<String, R>> getRowValidators();
-  Seq<F> getFormattedValidators();
+  Seq< F> getFormattedValidators();
   Seq<G> getGlobalValidators();
 }

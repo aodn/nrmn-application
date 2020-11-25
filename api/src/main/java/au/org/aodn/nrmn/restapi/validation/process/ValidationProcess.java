@@ -6,7 +6,9 @@ import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowErrorRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
+import com.oath.cyclops.hkt.DataWitness;
 import cyclops.companion.Monoids;
+import cyclops.control.Future;
 import cyclops.control.Validated;
 import cyclops.data.Seq;
 import cyclops.data.tuple.Tuple2;
@@ -32,6 +34,8 @@ public class ValidationProcess extends ValidatorHelpers {
 
     @Autowired
     FormattedValidation postProcess;
+    @Autowired
+    GlobalValidation globalProcess;
 
     @Autowired
     RawValidation preProcess;
@@ -39,11 +43,10 @@ public class ValidationProcess extends ValidatorHelpers {
 
     public List<StagedRowError> process(StagedJob job) {
         val stagedRows = rowRepo.findRowsByReference(job.getReference());
-        val program = job.getProgram();
-        val rawValidtors = preProcess.getRawValidators(job);
+        val rawValidators = preProcess.getRawValidators(job);
         val preCheck =
                 stagedRows.stream()
-                        .map(row -> preProcess.validate(row,rawValidtors).bimap(err -> err, Seq::of))
+                        .map(row -> preProcess.validate(row,rawValidators).bimap(err -> err, Seq::of))
 
                         .reduce(
                                 Validated.valid(Seq.empty()),
@@ -60,8 +63,11 @@ public class ValidationProcess extends ValidatorHelpers {
         val formattedRows = rowValidationHMap.map(preProcess::toFormat).toList();
         //Todo adding formatted validation here;
 
-        //Todo run global validation in Future
+        val postProcessResult = postProcess.process(formattedRows, job);
 
+       val futureFormattedResult = Future.of(() ->postProcess.process(formattedRows, job));
+        val futureGlobalResult = Future.of(() ->globalProcess.process(job))
+        //Todo run global validation in Future
         return Collections.emptyList();
     }
 }

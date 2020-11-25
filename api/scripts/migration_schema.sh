@@ -5,7 +5,7 @@
 # Uses external configuration to connect i.e. .pgpass or PGUSER/PGPASSWORD environment 
 # variables - will prompt for password if not supplied through config
 # 
-PGUSER=tanjonar
+#   PGUSER=craigj ./migration_ddl.sql
 
 PROJECT_DIR="$(cd "$(dirname "$0")"/..; pwd -P)"
 
