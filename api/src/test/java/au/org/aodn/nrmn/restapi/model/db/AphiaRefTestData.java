@@ -14,6 +14,8 @@ public class AphiaRefTestData {
     @Autowired
     AphiaRefRepository aphiaRefRepository;
 
+    private int aphiaRefNo = 0;
+
     public AphiaRef persistedAphiaRef() {
         val aphiaRef = defaultBuilder().build();
         aphiaRefRepository.saveAndFlush(aphiaRef);
@@ -22,7 +24,7 @@ public class AphiaRefTestData {
 
     public AphiaRefBuilder defaultBuilder() {
         return AphiaRef.builder()
-            .aphiaId(217950)
+            .aphiaId(++aphiaRefNo)
             .url("http://www.marinespecies.org/aphia.php?p=taxdetails&id=217950")
             .scientificName("Sargocentron spiniferum")
             .authority("(Forsskål, 1775)")

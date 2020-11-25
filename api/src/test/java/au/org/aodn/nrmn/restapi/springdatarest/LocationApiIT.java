@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.springdatarest;
 
-import au.org.aodn.nrmn.restapi.model.db.DiverTestData;
+import au.org.aodn.nrmn.restapi.model.db.LocationTestData;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import io.restassured.builder.RequestSpecBuilder;
@@ -13,26 +13,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.IsEqual.equalTo;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(PostgresqlContainerExtension.class)
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
-public class DiverApiIT {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+public class LocationApiIT {
 
     @LocalServerPort
     private int port;
 
     @Autowired
-    private DiverTestData diverTestData;
+    private LocationTestData locationTestData;
 
     @Autowired
     private JwtToken jwtToken;
@@ -43,7 +41,7 @@ public class DiverApiIT {
     public void setup() {
         spec = new RequestSpecBuilder()
                 .setBaseUri(String.format("http://localhost:%s", port))
-                .setBasePath("/api/divers")
+                .setBasePath("/api/locations")
                 .setContentType("application/json")
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter())
@@ -52,59 +50,58 @@ public class DiverApiIT {
 
     @Test
     @WithUserDetails("test@gmail.com")
-    public void testCreateDiver() {
+    public void testCreateLocation() {
         given()
                 .spec(spec)
                 .auth()
                 .oauth2(jwtToken.get())
                 .body("{" +
-                        "\"initials\": \"AVD\"," +
-                        "\"fullName\": \"Avid Diver\"}")
+                        "\"locationName\": \"Hawaii\"," +
+                        "\"isActive\": true}")
                 .post()
                 .then()
                 .assertThat()
                 .statusCode(201)
-                .body("initials", is(equalTo("AVD")))
-                .body("fullName", is(equalTo("Avid Diver")));
+                .body("locationName", is(equalTo("Hawaii")))
+                .body("isActive", is(equalTo(true)));
     }
 
     @Test
     @WithUserDetails("test@gmail.com")
     public void testCreateUsingExistingInitials() {
-        val existingDiver = diverTestData.persistedDiver();
+        val existingDiver = locationTestData.persistedLocation();
 
         given()
                 .spec(spec)
                 .auth()
                 .oauth2(jwtToken.get())
                 .body("{" +
-                        "\"initials\": \"" + existingDiver.getInitials() + "\"," +
-                        "\"fullName\": \"Avid Diver\"}")
+                        "\"locationName\": \"" + existingDiver.getLocationName() + "\"," +
+                        "\"isActive\": true}")
                 .post()
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("a diver with those initials already exists")));
+                .body("errors[0].message", is(equalTo("a location with that name already exists")));
     }
 
     @Test
     @WithUserDetails("test@gmail.com")
     public void testUpdateUsingExistingInitials() {
-        val diver = diverTestData.persistedDiver();
-        val existingDiver = diverTestData.persistedDiver();
+        val diver = locationTestData.persistedLocation();
+        val existingDiver = locationTestData.persistedLocation();
 
         given()
                 .spec(spec)
                 .auth()
                 .oauth2(jwtToken.get())
                 .body("{" +
-                        "\"initials\": \"" + existingDiver.getInitials() + "\"," +
-                        "\"fullName\": \"Avid Diver\"}")
-                .put(diver.getDiverId().toString())
+                        "\"locationName\": \"" + existingDiver.getLocationName() + "\"," +
+                        "\"isActive\": " + diver.getIsActive() + "}")
+                .put(diver.getLocationId().toString())
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("a diver with those initials already exists")));
+                .body("errors[0].message", is(equalTo("a location with that name already exists")));
     }
-
 }

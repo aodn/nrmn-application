@@ -12,6 +12,8 @@ public class ObsItemTypeTestData {
     @Autowired
     private ObsItemTypeRepository obsItemTypeRepository;
 
+    private int obsItemTypeNo = 0;
+
     public ObsItemType persistedObsItemType() {
         val obsItemType = defaultBuilder().build();
         obsItemTypeRepository.saveAndFlush(obsItemType);
@@ -20,7 +22,7 @@ public class ObsItemTypeTestData {
 
     public ObsItemTypeBuilder defaultBuilder() {
         return ObsItemType.builder()
-            .obsItemTypeName("Species")
-            .isActive(true);
+                          .obsItemTypeName("Type " + ++obsItemTypeNo)
+                          .isActive(true);
     }
 }

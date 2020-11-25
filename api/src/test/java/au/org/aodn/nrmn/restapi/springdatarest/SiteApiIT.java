@@ -21,12 +21,11 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
+import static au.org.aodn.nrmn.restapi.test.ApiUrl.entityRef;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -76,8 +75,7 @@ public class SiteApiIT {
                         "\"siteName\": \"Low Islets\"," +
                         "\"longitude\": 147.7243," +
                         "\"latitude\": -40.13547," +
-                        "\"location\": \"http://localhost:" + port + "/api/locations/" + location.getLocationId() +
-                        "\"," +
+                        "\"location\": \"" + entityRef(port, "locations", location.getLocationId()) + "\"," +
                         "\"siteAttribute\": {" +
                         "    \"OldSiteCodes\": \"2102,7617\"," +
                         "    \"State\": \"Tasmania\"," +
@@ -94,33 +92,28 @@ public class SiteApiIT {
                 .path("siteId");
 
         val persistedSite = siteRepository.findById(siteId)
-                .get();
+                                          .get();
 
         assertThat(persistedSite.getSiteCode(), is(equalTo("TAS377")));
         assertThat(persistedSite.getSiteAttribute()
-                .get("OldSiteCodes"), is(equalTo("2102,7617")));
+                                .get("OldSiteCodes"), is(equalTo("2102,7617")));
     }
 
     @Test
     @WithUserDetails("test@gmail.com")
     public void testCreateWithExistingSite() {
-        val existingSite = siteTestData.defaultBuilder()
-                .siteCode("TES001")
-                .build();
-        siteRepository.save(existingSite);
+        val existingSite = siteTestData.persistedSite();
 
         given()
                 .spec(spec)
                 .auth()
                 .oauth2(jwtToken.get())
                 .body("{" +
-                        "\"siteCode\": \"TAS377\"," +
+                        "\"siteCode\": \"" + existingSite.getSiteCode() + "\"," +
                         "\"siteName\": \"Low Islets\"," +
                         "\"longitude\": 147.7243," +
                         "\"latitude\": -40.13547," +
-                        "\"location\": \"http://localhost:" + port + "/api/locations/" + existingSite.getLocation()
-                        .getLocationId() +
-                        "\"," +
+                        "\"location\": \"" + entityRef(port, "locations", existingSite.getLocation().getLocationId()) + "\"," +
                         "\"siteAttribute\": {" +
                         "    \"OldSiteCodes\": \"2102,7617\"," +
                         "    \"State\": \"Tasmania\"," +
@@ -132,34 +125,26 @@ public class SiteApiIT {
                 .post()
                 .then()
                 .assertThat()
-                .statusCode(201)
-                .extract()
-                .path("siteId");
+                .statusCode(400)
+                .body("errors[0].message", is(equalTo("a site with that code already exists")));
     }
 
     @Test
     @WithUserDetails("test@gmail.com")
     public void testUpdateWithExistingSite() {
         val site = siteTestData.persistedSite();
-        val location = locationTestData.persistedLocation();
-        
-        val existingSite = siteTestData.defaultBuilder()
-                .siteCode("TES001")
-                .location(location)
-                .build();
-        siteRepository.save(existingSite);
+        val anotherSite = siteTestData.persistedSite();
 
         given()
                 .spec(spec)
                 .auth()
                 .oauth2(jwtToken.get())
                 .body("{" +
-                        "\"siteCode\": \"TES001\"," +
+                        "\"siteCode\": \"" + anotherSite.getSiteCode() + "\"," +
                         "\"siteName\": \"" + site.getSiteName() + "\"," +
                         "\"longitude\": " + site.getLongitude() + "," +
                         "\"latitude\": " + site.getLatitude() + "," +
-                        "\"location\": \"http://localhost:" + port + "/api/locations/" +
-                        site.getLocation().getLocationId() + "\"," +
+                        "\"location\": \"" + entityRef(port, "locations", site.getLocation().getLocationId()) + "\"," +
                         "\"isActive\": " + site.getIsActive() + "}")
                 .put(site.getSiteId().toString())
                 .then()
@@ -171,11 +156,6 @@ public class SiteApiIT {
     @Test
     @WithUserDetails("test@gmail.com")
     public void testCreateWithMissingValues() {
-        val existingSite = siteTestData.defaultBuilder()
-                .siteCode("TES001")
-                .build();
-        siteRepository.save(existingSite);
-
         given()
                 .spec(spec)
                 .auth()
@@ -200,7 +180,7 @@ public class SiteApiIT {
                 .auth()
                 .oauth2(jwtToken.get())
                 .delete(site.getSiteId()
-                        .toString())
+                            .toString())
                 .then()
                 .assertThat()
                 .statusCode(204);

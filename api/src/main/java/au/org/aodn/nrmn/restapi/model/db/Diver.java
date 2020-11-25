@@ -29,7 +29,7 @@ public class Diver {
     @SequenceGenerator(name = "diver_ref_diver_id", sequenceName = "diver_ref_diver_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="diver_ref_diver_id")
     @Column(name = "diver_id", unique = true, updatable = false, nullable = false)
-    @Schema(title = "Diver id", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(title = "Id", accessMode = Schema.AccessMode.READ_ONLY)
     private Integer diverId;
 
     @Column(name = "initials")

@@ -26,4 +26,6 @@ public interface LocationRepository extends JpaRepository<Location, Integer>, Jp
     @Override
     @RestResource
     Optional<Location> findById(Integer integer);
+
+    Optional<Location> findByLocationName(String locationName);
 }
