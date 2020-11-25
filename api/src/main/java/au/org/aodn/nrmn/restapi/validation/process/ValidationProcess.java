@@ -44,6 +44,7 @@ public class ValidationProcess extends ValidatorHelpers {
         val preCheck =
                 stagedRows.stream()
                         .map(row -> preProcess.validate(row,rawValidtors).bimap(err -> err, Seq::of))
+
                         .reduce(
                                 Validated.valid(Seq.empty()),
                                 (v1, v2) -> v1.combine(Monoids.seqConcat(), v2));
@@ -60,6 +61,7 @@ public class ValidationProcess extends ValidatorHelpers {
         //Todo adding formatted validation here;
 
         //Todo run global validation in Future
+
         return Collections.emptyList();
     }
 }

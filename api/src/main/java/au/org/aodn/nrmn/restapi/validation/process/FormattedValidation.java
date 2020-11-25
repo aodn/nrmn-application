@@ -7,6 +7,7 @@ import au.org.aodn.nrmn.restapi.validation.provider.ValidatorProvider;
 import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import cyclops.data.Seq;
+
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,7 @@ public class FormattedValidation {
     public Validated<StagedRowError, Object> process(StagedRowFormatted rowFormatted, String programName) {
         provider = beanFactory.getBean(programName, ValidatorProvider.class);
         Seq<BaseFormattedValidator> validators = provider.getRowValidators().appendAll(provider.getGlobalValidators());
+
 
         return validators.map(v -> v.valid(rowFormatted)).stream().reduce(
                 Validated.valid(""), (v1, v2) -> v1.combine(Monoids.firstNonNull(), v2)

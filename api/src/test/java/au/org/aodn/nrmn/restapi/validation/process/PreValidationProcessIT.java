@@ -4,7 +4,7 @@ import au.org.aodn.nrmn.restapi.model.db.Program;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
-import au.org.aodn.nrmn.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,11 +55,15 @@ class PreValidationProcessIT {
         stage.setCode("1");
         stage.setTotal("2");
         stage.setStagedJob(job);
-        stage.setMeasureJson(new HashMap<String, String>() {{
-            put("6.5", "1");
-            put("10.5", "1");
+        stage.setMeasureJson(new HashMap<Integer, String>() {{
+            put(13, "1");
+            put(21, "1");
         }});
+<<<<<<< HEAD
         val res = preProcess.preValidated(Collections.singletonList(stage), job);
+=======
+        val res = preProcess.preValidated(Collections.singletonList(stage));
+>>>>>>> cc27eeae76977de476cd68cdd71086f820872479
         assertFalse(res.isEmpty());
         val row = res.get(0);
         assertEquals(row.getBlock(), 1);

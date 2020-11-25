@@ -4,22 +4,19 @@ package au.org.aodn.nrmn.restapi.validation.provider;
 import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
-import au.org.aodn.nrmn.restapi.validation.validators.entities.SpeciesExists;
-import au.org.aodn.nrmn.restapi.validation.validators.format.BaseRowFormatValidation;
 import au.org.aodn.nrmn.restapi.validation.validators.format.SurveyNumValidation;
 import au.org.aodn.nrmn.restapi.validation.validators.global.RLSMethodBlockAssociation;
 import cyclops.data.Seq;
 import cyclops.data.tuple.Tuple2;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 @Service("RLS")
 public class RLSValidators implements ValidatorProvider {
+
 
     @Autowired
     RLSMethodBlockAssociation rslBlockAssoc;
@@ -37,6 +34,7 @@ public class RLSValidators implements ValidatorProvider {
 
     @Override
     public Seq<BaseGlobalValidator> getGlobalValidators() {
+
         return Seq.of(rslBlockAssoc);
     }
 }

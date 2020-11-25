@@ -2,7 +2,14 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.val;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
@@ -24,6 +31,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -43,23 +51,32 @@ public class Site {
     @Id
     @SequenceGenerator(name = "site_ref_site_id", sequenceName = "site_ref_site_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "site_ref_site_id")
+    @Schema(title = "Site id", accessMode = Schema.AccessMode.READ_ONLY)
     @Column(name = "site_id", unique = true, updatable = false, nullable = false)
     private Integer siteId;
 
     @Basic
+    @NotNull
     @Column(name = "site_code")
+    @Schema(title = "Site code")
     private String siteCode;
 
     @Basic
+    @NotNull
     @Column(name = "site_name")
+    @Schema(title = "Site name")
     private String siteName;
 
     @Basic
+    @NotNull
     @Column(name = "longitude")
+    @Schema(title = "Longitude")
     private Double longitude;
 
     @Basic
+    @NotNull
     @Column(name = "latitude")
+    @Schema(title = "Latitude")
     private Double latitude;
 
     @Basic
@@ -71,13 +88,17 @@ public class Site {
 
     @Column(name = "site_attribute", columnDefinition = "jsonb")
     @Type(type = "jsonb")
+    @Schema(title = "Site attributes")
     private Map<String, Object> siteAttribute;
 
     @Basic
     @Column(name = "is_active")
+    @Schema(title = "Active")
     private Boolean isActive;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotNull
+    @Schema(title = "Location")
     @JoinColumn(name = "location_id", referencedColumnName = "location_id", nullable = false)
     private Location location;
 
@@ -95,7 +116,7 @@ public class Site {
             if (entry.getKey().equals("OldSiteCodes")) {
                 return String.join(",", (Collection)entry.getValue());
             } else {
-                return entry.getValue().toString();
+                return entry.getValue() == null ? null : entry.getValue().toString();
             }
         };
         

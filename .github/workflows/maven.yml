@@ -27,3 +27,4 @@ jobs:
       run: mvn -B clean verify
       env:
         CI: false
+    timeout-minutes: 45

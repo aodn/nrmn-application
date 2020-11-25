@@ -112,11 +112,6 @@ public class SpreadSheetService {
                     .stream()
                     .collect(Collectors.toMap(HeaderCellIndex::getName, HeaderCellIndex::getIndex));
 
-            val headerNum = dataSheet.getHeader().stream().filter(h ->
-                    Maybe.attempt(() -> Float.parseFloat(h.getName())).isPresent()
-            ).collect(Collectors.toList());
-
-
             List<StagedRow> stagedRows = IntStream
                     .range(2, dataSheet.getSheet().getPhysicalNumberOfRows())
                     .filter(i ->
@@ -145,7 +140,6 @@ public class SpreadSheetService {
                         stagedRow.setSpecies(_getCellValue(row.getCell(headerMap.get("Species")), eval, fmt));
                         stagedRow.setCommonName(_getCellValue(row.getCell(headerMap.get("Common name")), eval, fmt));
                         stagedRow.setTotal(_getCellValue(row.getCell(headerMap.get("Total")), eval, fmt));
-                        stagedRow.setInverts(_getCellValue(row.getCell(headerMap.get("Inverts")), eval, fmt));
                         if (dataSheet.getHeader().size() == longHeadersRef.size()) {
                             stagedRow.setM2InvertSizingSpecies(_getCellValue(row.getCell(headerMap.get("M2 Invert Sizing Species")), eval, fmt));
                             stagedRow.setL5(_getCellValue(row.getCell(headerMap.get("L5")), eval, fmt));
@@ -153,14 +147,24 @@ public class SpreadSheetService {
                             stagedRow.setIsInvertSizing(_getCellValue(row.getCell(headerMap.get("Use InvertSizing")), eval, fmt));
                             stagedRow.setLMax(_getCellValue(row.getCell(headerMap.get("Lmax")), eval, fmt));
                         }
-                        val inverts = _getCellValue(row.getCell(headerMap.get("Inverts")), eval, fmt);
 
-                        val measureJson = new HashMap<String, String>();
-                        headerNum.forEach(header -> {
-                            val cellValue = _getCellValue(row.getCell(header.getIndex()), eval, fmt);
+                        val headerNum = dataSheet.getHeader().stream().filter(h ->
+                                Maybe.attempt(() -> Float.parseFloat(h.getName())).isPresent()
+                        ).collect(Collectors.toList());
+                        val measureJson = new HashMap<Integer, String>();
+
+                        val inverts = _getCellValue(row.getCell(headerMap.get("Inverts")), eval, fmt);
+                        stagedRow.setInverts(inverts);
+                        if(inverts != null) {
+                            measureJson.put(0, inverts);
+                        }
+                        for(int i = 0; i < headerNum.size(); i++) {
+                            val cellValue = _getCellValue(row.getCell(headerNum.get(i).getIndex()), eval, fmt);
                             if (cellValue != null && !StringUtils.isEmpty(cellValue))
-                                measureJson.put(header.getName(), cellValue);
-                        });
+                                measureJson.put(i+1, cellValue);
+                        }
+
+
                         stagedRow.setMeasureJson(measureJson);
                         return stagedRow;
                     }).collect(Collectors.toList());

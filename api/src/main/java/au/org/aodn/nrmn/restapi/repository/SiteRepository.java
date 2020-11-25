@@ -36,4 +36,9 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
     @Override
     @RestResource
     Optional<Site> findById(Integer integer);
+
+    @Override
+    @RestResource
+    void delete(Site site);
+
 }

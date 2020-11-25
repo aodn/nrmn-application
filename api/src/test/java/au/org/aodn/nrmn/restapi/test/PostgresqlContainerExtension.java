@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.test;
+package au.org.aodn.nrmn.restapi.test;
 
 import org.junit.jupiter.api.extension.Extension;
 import org.testcontainers.containers.PostgreSQLContainer;

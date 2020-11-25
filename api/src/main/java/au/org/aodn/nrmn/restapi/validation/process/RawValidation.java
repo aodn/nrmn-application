@@ -46,6 +46,7 @@ public class RawValidation {
     @Autowired
     ATRCValidators atrcValidators;
 
+
     public HashMap<String, BaseRowValidator> getExtendedValidators() {
         return HashMap.fromStream(
                 Stream.of(
@@ -69,8 +70,6 @@ public class RawValidation {
                         Tuple2.of("Diver", new DiverExists(StagedRow::getDiver, "Diver", diverRepo)),
                         Tuple2.of("Buddy", new DiverExists(StagedRow::getBuddy, "Buddy", diverRepo)),
                         Tuple2.of("P-Qs", new DiverExists(StagedRow::getPqs, "P-Qs", diverRepo)),
-                        //   Tuple2.of("SurveyNum",new  SurveyNumValidation("")),
-
                         Tuple2.of("Depth", new DoubleFormatValidation(StagedRow::getDepth, "Depth")),
                         Tuple2.of("Method", new IntegerFormatValidation(StagedRow::getMethod, "Method", Arrays.asList(0, 1, 2, 3, 4, 5, 7, 10))),
                         Tuple2.of("Block", new IntegerFormatValidation(StagedRow::getBlock, "Block", Arrays.asList(0, 1, 2))),
@@ -171,7 +170,6 @@ public class RawValidation {
         return rowFormatted;
     }
 
-
     public List<StagedRowFormatted> preValidated(List<StagedRow> targets, StagedJob job) {
 
         val validators = getRawValidators(job);
@@ -186,6 +184,7 @@ public class RawValidation {
                     return validatorsWithMap
                             .map(this::toFormat)
                             .stream();
+
                 }).collect(Collectors.toList());
     }
 }
