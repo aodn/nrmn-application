@@ -12,5 +12,5 @@ public abstract class BaseFormattedValidator {
         this.columnTarget = columnTarget;
     }
 
-    abstract public <T> Validated<StagedRowError, T> valid(StagedRowFormatted target);
+    abstract public  Validated<StagedRowError, String> valid(StagedRowFormatted target);
 }

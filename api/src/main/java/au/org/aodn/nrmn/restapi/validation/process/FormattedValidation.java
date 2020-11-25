@@ -34,12 +34,12 @@ public class FormattedValidation {
     }
 
     private Seq<BaseFormattedValidator> getValidators(StagedJob job) {
-        val  provider = beanFactory.getBean(job.getProgram().getProgramName(), ValidatorProvider.class);
-        val validators =getCommonValidators().appendAll(provider.getFormattedValidators());
+        val provider = beanFactory.getBean(job.getProgram().getProgramName(), ValidatorProvider.class);
+        val validators = getCommonValidators().appendAll(provider.getFormattedValidators());
         return validators;
     }
 
-    public Validated<StagedRowError, Object> process(List<StagedRowFormatted> formattedList, StagedJob job) {
+    public Validated<StagedRowError, String> process(List<StagedRowFormatted> formattedList, StagedJob job) {
         val validators = getValidators(job);
         return formattedList.stream().map(rowFormatted ->
                 validators
@@ -51,6 +51,6 @@ public class FormattedValidation {
                         )
         ).reduce(
                 Validated.valid(""),
-                (v1, v2) -> v1.combine(Monoids.firstNonNull(), v2));
+                (v1, v2) -> v1.combine(Monoids.stringConcat, v2));
     }
 }

@@ -37,11 +37,11 @@ public class GlobalValidation {
 
 
     public Validated<StagedRowError, String> process(StagedJob job) {
-      return  getRawValidators(job)
+        return getRawValidators(job)
                 .map(validator -> validator.valid(job))
                 .stream().reduce(
-                Validated.valid(""),
-                (v1, v2) -> v1.combine(Monoids.firstNonNull(), v2));
+                        Validated.valid(""),
+                        (v1, v2) -> v1.combine(Monoids.stringConcat, v2));
     }
 
 }
