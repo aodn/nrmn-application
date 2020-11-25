@@ -2,7 +2,6 @@ import React from "react";
 import {Box, Typography, Button} from "@material-ui/core";
 import {useSelector, useDispatch} from "react-redux";
 import {useEffect} from 'react';
-import { resetState, selectRequested} from "./form-reducer";
 import {useParams, NavLink} from "react-router-dom";
 import pluralize from 'pluralize';
 import {AgGridReact} from "ag-grid-react/lib/agGridReact";
@@ -12,6 +11,8 @@ import config from "react-global-configuration";
 import {titleCase} from "title-case";
 import Grid from "@material-ui/core/Grid";
 import CustomTooltip from "./customTooltip";
+import {selectRequested} from "./middleware/entities";
+import {resetState} from "./form-reducer";
 
 
 const cellRenderer = (params) => {

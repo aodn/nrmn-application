@@ -3,10 +3,8 @@ import React from "react";
 import Form from "@rjsf/material-ui"
 import {useDispatch, useSelector} from "react-redux";
 import {useEffect} from 'react';
-import {itemRequested, createEntityRequested, updateEntityRequested} from "./form-reducer";
 import {useParams, Redirect} from "react-router-dom";
-import ArrayApiField from './customWidgetFields/ArrayApiField';
-import ObjectApiField from './customWidgetFields/ObjectApiField';
+import NestedApiField from './customWidgetFields/NestedApiField';
 import pluralize from 'pluralize';
 import config from "react-global-configuration";
 import {Box} from "@material-ui/core";
@@ -15,6 +13,7 @@ import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import {titleCase} from "title-case";
 import {LoadingBanner} from "../layout/loadingBanner";
+import {createEntityRequested, itemRequested, updateEntityRequested} from "./middleware/entities";
 
 const renderError = (msgArray) => {
   return (msgArray.length > 0) ? <><Box><Alert severity="error" variant="filled">{msgArray}</Alert></Box></> : <></>;
@@ -34,14 +33,13 @@ const GenericForm = () => {
   const entityTitle = singular.charAt(0).toUpperCase() + singular.slice(1)
 
 
-
   useEffect(() => {
     if (id !== undefined) {
       dispatch(itemRequested(entityName + "/" + id));
     }
   }, [newlyCreatedEntity]);
 
-  if (Object.keys(newlyCreatedEntity).length !== 0) {
+  if (newlyCreatedEntity && Object.keys(newlyCreatedEntity).length !== 0) {
     const redirectPath = "/list/" + entityTitle;
     return (<Redirect to={redirectPath}></Redirect>);
   }
@@ -52,18 +50,12 @@ const GenericForm = () => {
     return renderError("ERROR: Entity '" + entityTitle + "' missing from API Schema");
   }
 
-  const fields = {
-    ArrayField: ArrayApiField//,
-    //ObjectField: ObjectApiField
-  }
-
   const handleSubmit = (form) => {
 
-    const data = {path: entityName, id: id, data: form.formData}
-    console.info("submited:", data);
-    (Object.keys(editItem).length === 0) ?
-      dispatch(createEntityRequested(data)) :
-      dispatch(updateEntityRequested(data));
+    const data = {path: entityName, id: id, data: form.formData};
+    (id) ?
+      dispatch(updateEntityRequested(data)) :
+      dispatch(createEntityRequested(data)) ;
   }
 
   const entityDef = schemaDefinition[entityTitle];
@@ -72,6 +64,26 @@ const GenericForm = () => {
   const entitySchema = {title: fullTitle, ...entityDef}
 
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
+
+
+/////////////////////////////////
+// A nasty hack to be replaced
+/////////////////////////////////
+  const uiSchema = { location: {
+      'ui:field': "relationship"
+    }
+  }
+  const fields = {
+    relationship: NestedApiField
+  }
+/////////////////////////////////
+// End nasty hack to be replaced
+/////////////////////////////////
+
+
+  const onSubmit = ({formData}, e) => {
+    console.log("Data submitted: ",  formData);
+  }
 
   if (errors.length > 0) {
     return renderError(errors)
@@ -93,12 +105,13 @@ const GenericForm = () => {
           >
             <Paper>
               <Box mx="auto" bgcolor="background.paper" pt={2} px={3} pb={3}>
-
                 <Form
                     schema={JSSchema}
+                    uiSchema={uiSchema}
                     onSubmit={handleSubmit}
                     fields={fields}
                     formData={editItem}
+                    //onSubmit={onSubmit}
                 />
               </Box>
             </Paper>

@@ -2,10 +2,11 @@ import {
   createSlice,
   createAction
 } from "@reduxjs/toolkit";
+import pluralize from "pluralize";
 
 
 const formState = {
-  entities: [],
+  entities: undefined,
   editItem: {},
   newlyCreatedEntity: {},
   errors: []
@@ -33,6 +34,16 @@ const formSlice = createSlice({
     itemLoaded: (state, action) => {
       state.editItem = action.payload;
     },
+    setSelectedFormData: (state, action) => {
+      state.editItem = {...state.editItem, ...action.payload};
+    },
+    selectedItemsLoaded: (state, action) => {
+      let resp = {};
+      const key = Object.keys(action.payload._embedded)[0];
+      resp[key] = action.payload._embedded;
+      resp[pluralize.singular(key)] = action.payload.selected;
+      state.editItem = {...state.editItem, ...resp};
+    },
     entitiesCreated: (state, action) => {
       state.newlyCreatedEntity = action.payload;
     }
@@ -44,26 +55,9 @@ export const {
   entitiesLoaded,
   entitiesError,
   entitiesCreated,
-  itemLoaded
+  itemLoaded,
+  selectedItemsLoaded,
+  setSelectedFormData
 } = formSlice.actions;
 
 
-export const selectRequested = createAction('SELECT_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
-
-export const itemRequested = createAction('ID_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
-
-export const createEntityRequested = createAction('CREATE_ENTITY_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
-
-export const updateEntityRequested = createAction('UPDATE_ENTITY_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });

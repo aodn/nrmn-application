@@ -82,9 +82,22 @@ export const rawSurveySave = params => {
   return  axiosInstance.post("/api/raw-survey", params).then(res => res );
 }
 
-export const apiDefinition = () =>  axiosInstance.get("/v3/api-docs").then(res => res)
+export const apiDefinition = () =>  axiosInstance.get("/v3/api-docs").then(res => res);
 
-export const getReferenceEntities = (entity) => axiosInstance.get("/api/" + entity).then(res=>res);
+export const getEntity = (entity) => axiosInstance.get("/api/" + entity).then(res=>res);
+
+export const getResource = (url) => axiosInstance.get(url).then(res=>res);
+
+
+export const getSelectedEntityItems = (paths) => axios.all([
+    axiosInstance.get("/api/" + paths[0]),
+    (paths[1]) ? axiosInstance.get(paths[1]) : null,
+  ]).then(resp => {
+    let response = resp[0].data;
+    response.selected = (resp[1]) ? resp[1].data : null;
+    return response;
+  })
+
 
 export const entitySave = (entity, params) => {
   return  axiosInstance.post("/api/" + entity, params ).then(res => res );

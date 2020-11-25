@@ -14,6 +14,13 @@ $grid-size: 4px;
 }
 
 .ag-theme-alpine-dark {
+
+  a {
+    color: #26b0bf;
+  }
+  a:visited {
+    color: #2a5b73;;
+  }
   @include ag-theme-alpine-dark((
     // use theme parameters where possible
     // references colors from material-ui createMuiTheme() in App.js
