@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
+import au.org.aodn.nrmn.restapi.model.db.Program;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
@@ -31,6 +32,10 @@ class PreValidationProcessIT {
         val job = new StagedJob();
         job.setId(1L);
         job.setIsExtendedSize(false);
+        val program = new Program();
+        program.setProgramId(1);
+        program.setProgramName("RLS");
+        job.setProgram(program);
         val stage = new StagedRow();
         stage.setSiteNo("EYR71");
         stage.setSiteName("South East Slade Point");
@@ -54,7 +59,8 @@ class PreValidationProcessIT {
             put(13, "1");
             put(21, "1");
         }});
-        val res = preProcess.preValidated(Collections.singletonList(stage));
+        val res = preProcess.preValidated(Collections.singletonList(stage), job);
+
         assertFalse(res.isEmpty());
         val row = res.get(0);
         assertEquals(row.getBlock(), 1);

@@ -33,6 +33,8 @@ public class StagedRowFormatted {
 
     private Double depth;
 
+    private  Integer surveyNum;
+
     private Integer method;
 
     private Integer block;

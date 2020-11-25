@@ -1,14 +1,15 @@
-package au.org.aodn.nrmn.restapi.validation.validators.data;
+package au.org.aodn.nrmn.restapi.validation.validators.format;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.validation.validators.data.TransectNumDataCheck;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-class TransectNumDataCheckTest {
+class SurveyNumValidationTest {
 
     @Test
     void depthWithoutTransectShouldFail() {
@@ -17,10 +18,12 @@ class TransectNumDataCheckTest {
         val stage = new StagedRow();
         stage.setDepth("8,3");
         stage.setStagedJob(job);
-        val res = new TransectNumDataCheck().valid(stage);
+        val res =
+                new SurveyNumValidation(Arrays.asList(1, 2)).valid(stage);
         assertTrue(res.isInvalid());
 
     }
+
     @Test
     void depthWithTransectOutOfRangeShouldFail() {
         val job = new StagedJob();
@@ -28,7 +31,8 @@ class TransectNumDataCheckTest {
         val stage = new StagedRow();
         stage.setDepth("10.9");
         stage.setStagedJob(job);
-        val res = new TransectNumDataCheck().valid(stage);
+        val res =
+                new SurveyNumValidation(Arrays.asList(1, 2)).valid(stage);
         assertTrue(res.isInvalid());
 
     }
@@ -41,7 +45,9 @@ class TransectNumDataCheckTest {
         stage.setDepth("7.3");
         stage.setStagedJob(job);
 
-        val res = new TransectNumDataCheck().valid(stage);
+        val res =
+                new SurveyNumValidation(Arrays.asList(1, 2, 3)).valid(stage);
         assertTrue(res.isValid());
     }
+
 }

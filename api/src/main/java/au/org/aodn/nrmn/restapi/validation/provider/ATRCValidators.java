@@ -1,34 +1,42 @@
 package au.org.aodn.nrmn.restapi.validation.provider;
 
+import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
-import au.org.aodn.nrmn.restapi.validation.validators.data.TransectNumDataCheck;
+import au.org.aodn.nrmn.restapi.validation.validators.format.BaseRowFormatValidation;
+import au.org.aodn.nrmn.restapi.validation.validators.format.SurveyNumValidation;
 import au.org.aodn.nrmn.restapi.validation.validators.global.ATRCMethodCheck;
 import cyclops.data.Seq;
+import cyclops.data.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 
 @Service("ATRC")
-public class ATRCValidators<E extends BaseRowValidator> implements ValidatorProvider {
+public class ATRCValidators implements ValidatorProvider {
+
+
     @Autowired
     ATRCMethodCheck atrcMethodCheck;
 
 
     @Override
-    public Seq<BaseRowValidator> getRowValidators() {
-        return
-                Seq.of(
-                        new TransectNumDataCheck()
-                );
+    public Seq<Tuple2<String, BaseRowValidator>> getRowValidators() {
+        return Seq.of(Tuple2.of("SurveyNum", new SurveyNumValidation(Arrays.asList(1, 2, 3, 4))));
     }
 
     @Override
-    public Seq getExtendedValidators() {
-        return Seq.of(atrcMethodCheck);
+    public Seq<BaseFormattedValidator> getFormattedValidators() {
+        return Seq.empty();
+    }
+
+    @Override
+    public Seq<BaseGlobalValidator> getGlobalValidators() {
+        return Seq.empty();
     }
 }
+
+
 

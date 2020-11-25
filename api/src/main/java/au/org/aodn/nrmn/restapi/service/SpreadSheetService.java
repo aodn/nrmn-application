@@ -147,6 +147,7 @@ public class SpreadSheetService {
                             stagedRow.setIsInvertSizing(_getCellValue(row.getCell(headerMap.get("Use InvertSizing")), eval, fmt));
                             stagedRow.setLMax(_getCellValue(row.getCell(headerMap.get("Lmax")), eval, fmt));
                         }
+
                         val headerNum = dataSheet.getHeader().stream().filter(h ->
                                 Maybe.attempt(() -> Float.parseFloat(h.getName())).isPresent()
                         ).collect(Collectors.toList());
