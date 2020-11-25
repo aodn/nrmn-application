@@ -65,6 +65,7 @@ const GenericForm = () => {
 
   let fullTitle = (id) ?  "Edit " + entityTitle + " '" + id + "'" : "Add '" + entityTitle + "'" ;
   const entitySchema = {title: fullTitle, ...entityDef}
+
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
 
   if (errors.length > 0) {
