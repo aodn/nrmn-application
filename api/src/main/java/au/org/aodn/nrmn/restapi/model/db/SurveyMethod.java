@@ -58,10 +58,6 @@ public class SurveyMethod {
     @Type(type = "jsonb")
     private Map<String, String> surveyMethodAttribute;
 
-    @OneToMany(mappedBy = "surveyMethod", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private Set<Observation> observations;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "survey_id", referencedColumnName = "survey_id", nullable = false)
     @JsonBackReference
@@ -75,20 +71,4 @@ public class SurveyMethod {
     @JsonIgnore
     private Method method;
 
-    // update observations back references when set/updated
-
-    public void setObservations(Set<Observation> observations) {
-        if (this.observations != null) this.observations.stream().forEach(observation -> observation.setSurveyMethod(null));
-        this.observations = observations;
-        if (this.observations != null) this.observations.stream().forEach(observation -> observation.setSurveyMethod(this));
-    }
-
-    public static class SurveyMethodBuilder {
-        public SurveyMethod build() {
-            SurveyMethod surveyMethod = new SurveyMethod(this.surveyMethodId, this.blockNum, this.surveyNotDone,
-                this.surveyMethodAttribute, this.observations, this.survey, this.method);
-            if (surveyMethod.observations != null) surveyMethod.observations.stream().forEach(observation -> observation.setSurveyMethod(surveyMethod));
-            return surveyMethod;
-        }
-    }
 }

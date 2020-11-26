@@ -28,6 +28,8 @@ import java.util.Map;
 @Data
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name = "staged_row")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
