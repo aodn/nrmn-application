@@ -91,12 +91,66 @@ public class SiteApiIT {
                 .extract()
                 .path("siteId");
 
-        val persistedSite = siteRepository.findById(siteId)
-                                          .get();
+        val updatedSite = siteRepository.findById(siteId).get();
 
-        assertThat(persistedSite.getSiteCode(), is(equalTo("TAS377")));
-        assertThat(persistedSite.getSiteAttribute()
-                                .get("OldSiteCodes"), is(equalTo("2102,7617")));
+        assertThat(updatedSite.getSiteCode(), is(equalTo("TAS377")));
+        assertThat(updatedSite.getSiteAttribute().get("OldSiteCodes"), is(equalTo("2102,7617")));
+        assertThat(updatedSite.getLocation().getLocationId(), is(equalTo(location.getLocationId())));
+    }
+
+    @Test
+    @WithUserDetails("test@gmail.com")
+    public void testPutSite() {
+        val site = siteTestData.persistedSite();
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body("{" +
+                        "\"siteCode\": \"TAS377\"," +
+                        "\"siteName\": \"Low Islets\"," +
+                        "\"longitude\": 147.7243," +
+                        "\"latitude\": -40.13547," +
+                        "\"siteAttribute\": {" +
+                        "    \"OldSiteCodes\": \"2102,7617\"," +
+                        "    \"State\": \"Tasmania\"," +
+                        "    \"Country\": \"Australia\"," +
+                        "    \"ProtectionStatus\": \"Fishing\"," +
+                        "    \"ProxCountry\": \"Australia\"" +
+                        "}," +
+                        "\"isActive\": true}")
+                .put(site.getSiteId().toString())
+                .then()
+                .assertThat()
+                .statusCode(200);
+
+        val updatedSite = siteRepository.findById(site.getSiteId()).get();
+
+        assertThat(updatedSite.getSiteCode(), is(equalTo("TAS377")));
+        assertThat(updatedSite.getSiteAttribute().get("OldSiteCodes"), is(equalTo("2102,7617")));
+    }
+
+    @Test
+    @WithUserDetails("test@gmail.com")
+    public void testPutSiteLocation() {
+        val site = siteTestData.persistedSite();
+        val newLocation = locationTestData.persistedLocation();
+
+        given()
+                .spec(spec)
+                .contentType("text/uri-list")
+                .auth()
+                .oauth2(jwtToken.get())
+                .body(entityRef(port, "locations", newLocation.getLocationId()))
+                .put(site.getSiteId().toString() + "/location")
+                .then()
+                .assertThat()
+                .statusCode(204);
+
+        val updatedSite = siteRepository.findById(site.getSiteId()).get();
+
+        assertThat(updatedSite.getLocation().getLocationId(), is(equalTo(newLocation.getLocationId())));
     }
 
     @Test
