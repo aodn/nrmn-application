@@ -12,6 +12,8 @@ public class AphiaRelTypeTestData {
     @Autowired
     private AphiaRelTypeRepository aphiaRelTypeRepository;
 
+    private int aphiaRelTypeNo = 0;
+
     public AphiaRelType persistedAphiaRelType() {
         val aphiaRelType = defaultBuilder().build();
         aphiaRelTypeRepository.saveAndFlush(aphiaRelType);
@@ -21,6 +23,6 @@ public class AphiaRelTypeTestData {
     public AphiaRelTypeBuilder defaultBuilder() {
         return AphiaRelType.builder()
             .aphiaRelTypeId(1)
-            .aphiaRelTypeName("is");
+            .aphiaRelTypeName("Type " + ++aphiaRelTypeNo);
     }
 }

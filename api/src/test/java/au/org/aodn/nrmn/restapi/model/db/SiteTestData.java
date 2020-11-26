@@ -16,6 +16,8 @@ public class SiteTestData {
     @Autowired
     LocationTestData locationTestData;
 
+    private int siteNo = 0;
+
     public Site persistedSite() {
         val site = defaultBuilder().build();
         siteRepository.saveAndFlush(site);
@@ -24,7 +26,7 @@ public class SiteTestData {
 
     public SiteBuilder defaultBuilder() {
         return Site.builder()
-            .siteCode("ANT1")
+            .siteCode("Site " + ++siteNo)
             .siteName("South Cove South of T310m")
             .longitude(-58.5)
             .latitude(-57.5)

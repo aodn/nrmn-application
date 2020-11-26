@@ -45,10 +45,6 @@ public class SurveyTestData {
             .surveyAttribute(
                 ImmutableMap.<String, String>builder()
                     .put("BlockAbundanceSimulated", "True")
-                    .build())
-            .surveyMethods(
-                ImmutableSet.<SurveyMethod>builder()
-                    .add(surveyMethodTestData.defaultBuilder().build())
                     .build());
     }
 

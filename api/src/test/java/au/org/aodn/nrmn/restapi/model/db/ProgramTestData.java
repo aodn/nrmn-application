@@ -12,6 +12,8 @@ public class ProgramTestData {
     @Autowired
     private ProgramRepository programRepository;
 
+    private int programNo = 0;
+
     public Program persistedProgram() {
         val program = defaultBuilder().build();
         programRepository.saveAndFlush(program);
@@ -20,7 +22,7 @@ public class ProgramTestData {
 
     public ProgramBuilder defaultBuilder() {
         return Program.builder()
-            .programName("PV")
-            .isActive(true);
+                      .programName("P" + ++programNo)
+                      .isActive(true);
     }
 }

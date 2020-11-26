@@ -11,6 +11,8 @@ public class DiverTestData {
 
     @Autowired
     private DiverRepository diverRepository;
+    
+    private int diverNo = 0;
 
     public Diver persistedDiver() {
         val diver = defaultBuilder().build();
@@ -20,7 +22,7 @@ public class DiverTestData {
 
     public DiverBuilder defaultBuilder() {
         return Diver.builder()
-            .initials("RSS")
+            .initials("I" + ++diverNo)
             .fullName("Rick Stuart-Smith");
     }
 }

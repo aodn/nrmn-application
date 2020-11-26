@@ -11,5 +11,6 @@ public enum StagedJobEventType {
     INGESTED,
     CORRECTED,
     DELETED,
-    ABANDONED
+    ABANDONED,
+    ERROR
 }

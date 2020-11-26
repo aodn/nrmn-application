@@ -12,6 +12,8 @@ public class MethodTestData {
     @Autowired
     private MethodRepository methodRepository;
 
+    private int method = 0;
+
     public Method persistedMethod() {
         val method = defaultBuilder().build();
         methodRepository.saveAndFlush(method);
@@ -20,8 +22,8 @@ public class MethodTestData {
 
     public MethodBuilder defaultBuilder() {
         return Method.builder()
-            .methodId(0)
-            .methodName("Macrocystis count")
-            .isActive(true);
+                     .methodId(0)
+                     .methodName("Method " + ++method)
+                     .isActive(true);
     }
 }

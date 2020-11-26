@@ -11,6 +11,8 @@ public class LocationTestData {
 
     @Autowired
     private LocationRepository locationRepository;
+    
+    private int locationNo = 0;
 
     public Location persistedLocation() {
         val location = defaultBuilder().build();
@@ -20,7 +22,7 @@ public class LocationTestData {
 
     public LocationBuilder defaultBuilder() {
         return Location.builder()
-            .locationName("Central Caribbean")
+            .locationName("Location " + ++locationNo)
             .isActive(true);
     }
 }

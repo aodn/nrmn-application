@@ -2,18 +2,24 @@ package au.org.aodn.nrmn.restapi.validation.process;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
+import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowErrorRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
+import com.oath.cyclops.hkt.DataWitness;
 import cyclops.companion.Monoids;
+import cyclops.control.Future;
 import cyclops.control.Validated;
 import cyclops.data.Seq;
 import cyclops.data.tuple.Tuple2;
 import lombok.val;
+import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,6 +38,8 @@ public class ValidationProcess extends ValidatorHelpers {
 
     @Autowired
     FormattedValidation postProcess;
+    @Autowired
+    GlobalValidation globalProcess;
 
     @Autowired
     RawValidation preProcess;
@@ -39,11 +47,10 @@ public class ValidationProcess extends ValidatorHelpers {
 
     public List<StagedRowError> process(StagedJob job) {
         val stagedRows = rowRepo.findRowsByReference(job.getReference());
-        val program = job.getProgram();
-        val rawValidtors = preProcess.getRawValidators(job);
+        val rawValidators = preProcess.getRawValidators(job);
         val preCheck =
                 stagedRows.stream()
-                        .map(row -> preProcess.validate(row,rawValidtors).bimap(err -> err, Seq::of))
+                        .map(row -> preProcess.validate(row, rawValidators).bimap(err -> err, Seq::of))
 
                         .reduce(
                                 Validated.valid(Seq.empty()),
@@ -58,10 +65,23 @@ public class ValidationProcess extends ValidatorHelpers {
                 rowValidations.map(seq -> seq.toHashMap(Tuple2::_1, Tuple2::_2));
 
         val formattedRows = rowValidationHMap.map(preProcess::toFormat).toList();
-        //Todo adding formatted validation here;
 
-        //Todo run global validation in Future
+        val futureFormattedResult = Future.of(() -> postProcess.process(formattedRows, job));
+        val futureGlobalResult = Future.of(() -> globalProcess.process(job));
 
-        return Collections.emptyList();
+        val combineResult = futureFormattedResult
+                .zip(futureGlobalResult, (v1, v2) -> v1.combine(Monoids.stringConcat, v2));
+        return combineResult.fold(
+                this::toErrorList,
+                err -> Collections.singletonList(
+                        new StagedRowError(
+                                new ErrorID(
+                                        null,
+                                        job.getId(),
+                                        err.getMessage()),
+                                ValidationCategory.RUNTIME,
+                                "Process",
+                                null
+                        )));
     }
 }
