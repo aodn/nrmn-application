@@ -5,6 +5,7 @@ import au.org.aodn.nrmn.restapi.dto.stage.FileUpload;
 import au.org.aodn.nrmn.restapi.dto.stage.UploadResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
@@ -61,7 +62,7 @@ public class StagedJobController {
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity<UploadResponse> uploadFile(
             @RequestParam("withInvertSize") Boolean withInvertSize,
-            @RequestParam("programiId") Integer programId,
+            @RequestParam("programId") Integer programId,
             @RequestParam("file") MultipartFile file,
             Authentication authentication) {
         userAuditRepo.save(
@@ -134,6 +135,14 @@ public class StagedJobController {
                 .body(new ValidationResponse(Collections.emptyList(),
                         Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob")))));
     }
+
+    @GetMapping("/job")
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
+    public List<StagedRow> getJob(@RequestParam("reference") String reference) {
+        return stagedRowRepo.findRowsByReference("reference");
+    }
+
+
 
 }
 
