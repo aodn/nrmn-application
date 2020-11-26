@@ -189,4 +189,41 @@ public class SiteApiIT {
 
         assertFalse(persistedSite.isPresent());
     }
+
+    @Test
+    @WithUserDetails("power_user@gmail.com")
+    public void testPowerUserCanGetSite() {
+        val site = siteTestData.persistedSite();
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .get(site.getSiteId().toString())
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
+    @Test
+    @WithUserDetails("power_user@gmail.com")
+    public void testPowerUserCantCreateSite() {
+        val location = locationTestData.persistedLocation();
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body("{" +
+                        "\"siteCode\": \"TAS377\"," +
+                        "\"siteName\": \"Low Islets\"," +
+                        "\"longitude\": 147.7243," +
+                        "\"latitude\": -40.13547," +
+                        "\"location\": \"" + entityRef(port, "locations", location.getLocationId()) + "\"," +
+                        "\"isActive\": true}")
+                .post()
+                .then()
+                .assertThat()
+                .statusCode(403);
+    }
 }

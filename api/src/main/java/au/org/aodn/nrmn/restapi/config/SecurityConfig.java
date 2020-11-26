@@ -94,8 +94,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers(HttpMethod.GET, frontendPagesWhitelist)
                 .permitAll()
+                .antMatchers(HttpMethod.GET, "/api/**")
+                .hasAnyRole("POWER_USER", "ADMIN", "DATA_OFFICER")
                 .anyRequest()
-                .authenticated();
+                .hasAnyRole("ADMIN", "DATA_OFFICER");
 
         // Add our custom JWT security filter
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
