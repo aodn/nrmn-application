@@ -1,10 +1,10 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 
@@ -53,20 +53,20 @@ public class ObservableItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "obs_item_type_id", referencedColumnName = "obs_item_type_id", nullable = false)
-    @Schema(title = "Type")
+    @Schema(title = "Type", implementation = String.class, format = "uri")
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     @NotNull
     private ObsItemType obsItemType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aphia_id", referencedColumnName = "aphia_id")
-    @Schema(title = "Aphia id")
+    @Schema(title = "Aphia id", implementation = String.class, format = "uri")
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     private AphiaRef aphiaRef;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aphia_rel_type_id", referencedColumnName = "aphia_rel_type_id")
-    @Schema(title = "Aphia relation type")
+    @Schema(title = "Aphia relation type", implementation = String.class, format = "uri")
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     private AphiaRelType aphiaRelType;
 }

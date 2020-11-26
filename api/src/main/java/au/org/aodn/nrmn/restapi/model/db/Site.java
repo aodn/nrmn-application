@@ -2,14 +2,7 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.val;
+import lombok.*;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
@@ -18,19 +11,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.Collection;
@@ -98,7 +79,7 @@ public class Site {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @NotNull
-    @Schema(title = "Location")
+    @Schema(title = "Location", implementation = String.class, format = "uri")
     @JoinColumn(name = "location_id", referencedColumnName = "location_id", nullable = false)
     private Location location;
 
