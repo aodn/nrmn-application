@@ -4,6 +4,7 @@ import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -22,9 +23,10 @@ public class BeforeCreateSiteValidator implements Validator {
     @Override
     public void validate(Object object, Errors errors) {
         val site = (Site) object;
+        val siteWithCodeExample = Example.of(Site.builder().siteCode(site.getSiteCode()).build());
+        val existingSiteWithCode = siteRepository.findOne(siteWithCodeExample);
 
-        if (siteRepository.findByCriteria(site.getSiteCode())
-                .isPresent()) {
+        if (existingSiteWithCode.isPresent()) {
             errors.rejectValue("siteCode", "site.siteCode.exists", "a site with that code already exists");
         }
     }

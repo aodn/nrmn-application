@@ -4,6 +4,7 @@ import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -22,9 +23,10 @@ public class BeforeCreateDiverValidator implements Validator {
     @Override
     public void validate(Object object, Errors errors) {
         val diver = (Diver) object;
+        val diverWithInitialsExample = Example.of(Diver.builder().initials(diver.getInitials()).build());
+        val existingDiverWithInitials = diverRepository.findOne(diverWithInitialsExample);
 
-        if (diverRepository.findByCriteria(diver.getInitials())
-                .isPresent()) {
+        if (existingDiverWithInitials.isPresent()) {
             errors.rejectValue("initials", "diver.initials.exists", "a diver with those initials already exists");
         }
     }
