@@ -41,7 +41,7 @@ const GenericForm = () => {
 
   if (newlyCreatedEntity && Object.keys(newlyCreatedEntity).length !== 0) {
     const redirectPath = "/list/" + entityTitle;
-    return (<Redirect to={redirectPath}></Redirect>);
+    //return (<Redirect to={redirectPath}></Redirect>);
   }
   if (Object.keys(schemaDefinition).length === 0) {
     return renderError("ERROR: API Schema not found");
@@ -65,17 +65,20 @@ const GenericForm = () => {
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
 
 
-  const uiSchemaHacks = Object.keys(entitySchema.properties).filter( key => Object.keys(entitySchema.properties[key]).includes("$ref") )
+  const uiSchemaHacks = Object.keys(entitySchema.properties).filter( key => {
+    return entitySchema.properties[key].type === "string" && entitySchema.properties[key].format === "uri"
+  } )
   const uiSchema = {};
   uiSchemaHacks.map( key => {
     uiSchema[key] = {'ui:field': "relationship"}
   });
+
   const fields = {
     relationship: NestedApiField
   }
 
   const onSubmit = ({formData}, e) => {
-    console.log("Data submitted: ",  formData);
+    console.log(formData);
   }
 
   if (errors.length > 0) {

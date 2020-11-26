@@ -7,41 +7,26 @@ import TextField from '@material-ui/core/TextField';
 import pluralize from 'pluralize';
 import {Typography} from "@material-ui/core";
 import {selectedItemsRequested, setNestedField} from "../middleware/entities";
+import {markupProjectionQuery} from "../../utils/helpers";
 
 
 const NestedApiField = (props) => {
 
   let editItemValues = useSelector(state => state.form.editItem);
-  let form = useSelector(state => state.form);
   const dispatch = useDispatch();
-
-  console.log(form);
 
   const entity = props.name ;
   const pluralEntity = pluralize(entity);
   //const entities =  pluralEntity.charAt(0).toLowerCase() + pluralEntity.slice(1);
 
-// todo all entities human readable label ?
   let itemsList = (editItemValues[pluralEntity]) ?editItemValues[pluralEntity][pluralEntity] : [];
-  if (itemsList.length > 0) {
-    itemsList = itemsList.map((item) => ({
-      ...item,
-      label: item[entity + "Name"]
-    }));
-  }
+  let selectedItems = (editItemValues[entity + "Selected"]) ? [editItemValues[entity + "Selected"]].filter(Boolean) : [];
 
-  let selectedItems = (editItemValues[entity]) ? [editItemValues[entity]].filter(Boolean) : [];
-  if (selectedItems.length > 0) {
-    selectedItems = selectedItems.map( (item) => ({
-      ...item,
-      label: item[entity + "Name"]
-    }));
-  }
 
   useEffect(() => {
-    let urls = [pluralEntity];
+    let urls = [pluralEntity + "?projection=selection"];
     if (editItemValues._links) {
-      urls.push(editItemValues._links[entity].href);
+      urls.push(markupProjectionQuery(editItemValues._links[entity].href));
     }
     dispatch(selectedItemsRequested(urls));
 

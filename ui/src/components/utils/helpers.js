@@ -4,6 +4,24 @@ export const preventSpaces = value => {
   return value.replace(/ /g, "");
 };
 
+// strip URL's of parameters markup from spring rest @Projection. iE: curly braces
+export const stripCurlyBraces = value => {
+  return value.replace(/[{}]+/g,'')
+};
+
+export const markupProjectionQuery = (url) => {
+
+  let cleanedUrl = stripCurlyBraces(url);
+
+  if (cleanedUrl.endsWith('?projection')) {
+    return cleanedUrl + "=selection"
+  }
+  else {
+    console.error("ERROR: expected 'projection' not found in querystring. " + url);
+    return cleanedUrl
+  }
+};
+
 export const getSearchParams = (location) => {
   return new URLSearchParams(location.search);
 }

@@ -35,13 +35,18 @@ const formSlice = createSlice({
       state.editItem = action.payload;
     },
     setSelectedFormData: (state, action) => {
-      state.editItem = {...state.editItem, ...action.payload};
+      let resp = {};
+      const key = Object.keys(action.payload)[0];
+      resp[key + "Selected"] = action.payload;
+      resp[key] = action.payload[key]._links.self.href;
+      state.editItem = {...state.editItem, ...resp};
     },
     selectedItemsLoaded: (state, action) => {
       let resp = {};
       const key = Object.keys(action.payload._embedded)[0];
       resp[key] = action.payload._embedded;
-      resp[pluralize.singular(key)] = action.payload.selected;
+      resp[pluralize.singular(key) + "Selected"] = action.payload.selected;
+      resp[pluralize.singular(key)] = action.payload.selected._links.self.href;
       state.editItem = {...state.editItem, ...resp};
     },
     entitiesCreated: (state, action) => {

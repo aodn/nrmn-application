@@ -17,7 +17,7 @@ export default function* getEntitiesWatcher() {
   yield takeEvery(selectedItemsRequested, getSelectedItemsData);
   yield takeEvery(createEntityRequested, saveEditEntities);
   yield takeEvery(updateEntityRequested, saveEditEntities);
-  yield takeEvery(setNestedField, setFormData);
+  yield takeEvery(setNestedField, setNestedFormData);
 }
 
 function* entities(action) {
@@ -29,7 +29,7 @@ function* entities(action) {
   }
 }
 
-function* setFormData(action) {
+function* setNestedFormData(action) {
   try {
     const resp = {}
     resp[action.payload.entity] = action.payload.newValues;
