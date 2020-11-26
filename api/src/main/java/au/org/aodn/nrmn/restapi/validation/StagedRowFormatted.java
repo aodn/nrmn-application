@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -65,5 +66,5 @@ public class StagedRowFormatted {
 
     private StagedRow ref;
 
-    private Map<String, Integer> measureJson;
+    private HashMap<Integer, Integer> measureJson;
 }

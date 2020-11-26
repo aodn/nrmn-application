@@ -79,7 +79,7 @@ public class RawValidation {
                         Tuple2.of("Vis", new IntegerFormatValidation(StagedRow::getVis, "Vis", Collections.emptyList())),
 
                         Tuple2.of("Total", new IntegerFormatValidation(StagedRow::getTotal, "Total", Collections.emptyList())),
-
+                        Tuple2.of("MeasureJson", new MeasureJsonValidation()),
                         Tuple2.of("Latitude", new DoubleFormatValidation(StagedRow::getLatitude, "Latitude")),
                         Tuple2.of("Longitude", new DoubleFormatValidation(StagedRow::getLongitude, "Longitude")),
                         Tuple2.of("Direction", new DirectionDataCheck()),
@@ -134,6 +134,8 @@ public class RawValidation {
         val vis = (Integer) values.get("Vis").orElseGet(null);
         val total = (Integer) values.get("Total").orElseGet(null);
         val direction = (Directions) values.get("Direction").orElseGet(null);
+        val measureJson = (java.util.HashMap<Integer, Integer>) values.get("MeasureJson").orElseGet(null);
+
         val ref = (StagedRow) values.get("Ref").orElseGet(null);
 
         val rowFormatted = new StagedRowFormatted();
@@ -151,6 +153,7 @@ public class RawValidation {
         rowFormatted.setCode(code);
         rowFormatted.setDirection(direction);
         rowFormatted.setTotal(total);
+        rowFormatted.setMeasureJson(measureJson);
         rowFormatted.setRef(ref);
 
         if (values.containsKey("Inverts") && values.containsKey("IsInvertSizing")) {
