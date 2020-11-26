@@ -25,9 +25,8 @@ public class BeforeCreateLocationValidator implements Validator {
     public void validate(Object object, Errors errors) {
         val location = (Location) object;
         val locationWithNameExample = Example.of(Location.builder().locationName(location.getLocationName()).build());
-        val existingLocationWithName = locationRepository.findOne(locationWithNameExample);
 
-        if (existingLocationWithName.isPresent()) {
+        if (locationRepository.exists(locationWithNameExample)) {
             errors.rejectValue("locationName", "location.locationName.exists",
                     "a location with that name already exists");
         }

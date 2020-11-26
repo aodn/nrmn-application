@@ -24,9 +24,8 @@ public class BeforeCreateDiverValidator implements Validator {
     public void validate(Object object, Errors errors) {
         val diver = (Diver) object;
         val diverWithInitialsExample = Example.of(Diver.builder().initials(diver.getInitials()).build());
-        val existingDiverWithInitials = diverRepository.findOne(diverWithInitialsExample);
 
-        if (existingDiverWithInitials.isPresent()) {
+        if (diverRepository.exists(diverWithInitialsExample)) {
             errors.rejectValue("initials", "diver.initials.exists", "a diver with those initials already exists");
         }
     }

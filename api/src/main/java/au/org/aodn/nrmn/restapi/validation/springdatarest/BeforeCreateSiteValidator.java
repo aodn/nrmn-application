@@ -24,9 +24,8 @@ public class BeforeCreateSiteValidator implements Validator {
     public void validate(Object object, Errors errors) {
         val site = (Site) object;
         val siteWithCodeExample = Example.of(Site.builder().siteCode(site.getSiteCode()).build());
-        val existingSiteWithCode = siteRepository.findOne(siteWithCodeExample);
 
-        if (existingSiteWithCode.isPresent()) {
+        if (siteRepository.exists(siteWithCodeExample)) {
             errors.rejectValue("siteCode", "site.siteCode.exists", "a site with that code already exists");
         }
     }
