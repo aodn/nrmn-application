@@ -12,6 +12,8 @@ public class MeasureTypeTestData {
     @Autowired
     private MeasureTypeRepository measureTypeRepository;
 
+    private int measureTypeNo = 0;
+
     public MeasureType persistedMeasureType() {
         val measureType = defaultBuilder().build();
         measureTypeRepository.saveAndFlush(measureType);
@@ -20,7 +22,7 @@ public class MeasureTypeTestData {
 
     public MeasureTypeBuilder defaultBuilder() {
         return MeasureType.builder()
-            .measureTypeName("Macrocystis Block")
-            .isActive(true);
+                          .measureTypeName("Measure type " + ++measureTypeNo)
+                          .isActive(true);
     }
 }

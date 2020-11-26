@@ -51,20 +51,20 @@ public class Site {
     @Id
     @SequenceGenerator(name = "site_ref_site_id", sequenceName = "site_ref_site_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "site_ref_site_id")
-    @Schema(title = "Site id", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(title = "Id", accessMode = Schema.AccessMode.READ_ONLY)
     @Column(name = "site_id", unique = true, updatable = false, nullable = false)
     private Integer siteId;
 
     @Basic
     @NotNull
     @Column(name = "site_code")
-    @Schema(title = "Site code")
+    @Schema(title = "Code")
     private String siteCode;
 
     @Basic
     @NotNull
     @Column(name = "site_name")
-    @Schema(title = "Site name")
+    @Schema(title = "Name")
     private String siteName;
 
     @Basic
@@ -88,7 +88,7 @@ public class Site {
 
     @Column(name = "site_attribute", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    @Schema(title = "Site attributes")
+    @Schema(title = "Attributes")
     private Map<String, Object> siteAttribute;
 
     @Basic
@@ -157,7 +157,11 @@ public class Site {
     @PrePersist
     public void calcGeom() {
         // Calculate geom field when persisting to the db
-        val factory = new GeometryFactory(new PrecisionModel(), 4326);
-        geom = factory.createPoint(new Coordinate(longitude, latitude));
+        if (longitude == null || latitude == null) {
+            geom = null;
+        } else {
+            val factory = new GeometryFactory(new PrecisionModel(), 4326);
+            geom = factory.createPoint(new Coordinate(longitude, latitude));
+        }
     }
 }

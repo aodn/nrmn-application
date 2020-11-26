@@ -25,6 +25,8 @@ public class ObservableItemTestData {
     @Autowired
     private AphiaRelTypeTestData aphiaRelTypeTestData;
 
+    private int observableItemNo = 0;
+
     public ObservableItem persistedObservableItem() {
         val observableItem = defaultBuilder().build();
         observableItemRepository.saveAndFlush(observableItem);
@@ -33,7 +35,7 @@ public class ObservableItemTestData {
 
     public ObservableItemBuilder defaultBuilder() {
         return ObservableItem.builder()
-            .observableItemName("Trimma sp. [sanguinellus]")
+            .observableItemName("Observable item " + ++observableItemNo)
             .lengthWeight(lengthWeightTestData.defaultBuilder().build())
             .obsItemType(obsItemTypeTestData.persistedObsItemType())
             .aphiaRef(aphiaRefTestData.persistedAphiaRef())

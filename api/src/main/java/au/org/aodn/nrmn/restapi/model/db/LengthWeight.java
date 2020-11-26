@@ -1,58 +1,40 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.Embeddable;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
-@Entity
+@Embeddable
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Audited(withModifiedFlag = true)
-@Table(name = "lengthweight_ref")
 public class LengthWeight {
-    @Id
-    @Column(name = "observable_item_id", unique = true, updatable = false, nullable = false)
-    private Integer observableItemId;
-
     @Basic
-    @Column(name = "a")
+    @Column(name = "a", table ="lengthweight_ref")
+    @NotNull
     private Double a;
 
     @Basic
-    @Column(name = "b")
+    @Column(name = "b", table ="lengthweight_ref")
+    @NotNull
     private Double b;
 
     @Basic
-    @Column(name = "cf")
+    @Column(name = "cf", table ="lengthweight_ref")
+    @NotNull
     private Double cf;
 
     @Basic
-    @Column(name = "sgfgu")
+    @Column(name = "sgfgu", table ="lengthweight_ref")
     private String sgfgu;
-
-    @OneToOne
-    @MapsId
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    @JoinColumn(name = "observable_item_id", foreignKey = @ForeignKey(name =
-        "lengthweight_ref_observable_item_id_fkey"))
-    @JsonBackReference
-    private ObservableItem observableItem;
 }
