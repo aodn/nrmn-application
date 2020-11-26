@@ -11,8 +11,10 @@ import cyclops.data.tuple.Tuple2;
 public interface ValidatorProvider<
         R extends BaseRowFormatValidation,
         F extends BaseFormattedValidator,
-        G extends  BaseGlobalValidator> {
-  Seq<Tuple2<String, R>> getRowValidators();
-  Seq< F> getFormattedValidators();
-  Seq<G> getGlobalValidators();
+        G extends BaseGlobalValidator> {
+    Seq<Tuple2<String, R>> getRowValidators();
+
+    Seq<F> getFormattedValidators();
+
+    Seq<G> getGlobalValidators();
 }
