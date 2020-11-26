@@ -30,6 +30,13 @@ class MeasureJsonValidationTest {
         val res = new MeasureJsonValidation().valid(stage);
 
         assertTrue(res.isValid());
+
+        val hashMap = res.orElseGet( null);
+        assertEquals(hashMap.get(2), 5);
+        assertEquals(hashMap.get(7), 10);
+        assertEquals(hashMap.get(9), 39);
+
+
     }
 
     @Test
