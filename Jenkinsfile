@@ -1,6 +1,10 @@
 pipeline {
     agent none
 
+    options {
+        disableConcurrentBuilds()
+    }
+
     stages {
         stage('container') {
             agent {
