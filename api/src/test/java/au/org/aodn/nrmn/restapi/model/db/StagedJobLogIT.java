@@ -16,10 +16,7 @@ import org.springframework.context.annotation.FilterType;
 import java.time.LocalDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
@@ -46,6 +43,6 @@ class StagedJobLogIT {
         val retrievedStagedJobLog = stagedJobLogRepository.findById(stagedJobLog.getId()).get();
         assertEquals(stagedJobLog, retrievedStagedJobLog);
         assertThat(retrievedStagedJobLog.getEventTime().toLocalDateTime(),
-            is(both(greaterThan(startTime)).and(lessThan(LocalDateTime.now()))));
+            is(both(greaterThanOrEqualTo(startTime)).and(lessThanOrEqualTo(LocalDateTime.now()))));
     }
 }
