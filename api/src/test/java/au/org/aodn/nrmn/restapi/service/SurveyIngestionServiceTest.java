@@ -73,7 +73,7 @@ public class SurveyIngestionServiceTest {
                 .l95(7.2)
                 .lMax(50.5)
                 .code("AAA")
-                .measureJson(ImmutableMap.<String, Integer>builder().put("1", 4).put("3", 7).build())
+                .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build())
                 .ref(ref)
         ;
     }
@@ -105,7 +105,7 @@ public class SurveyIngestionServiceTest {
         StagedRowFormatted row2 = rowBuilder
                 .block(2)
                 .method(1)
-                .measureJson(ImmutableMap.<String, Integer>builder().put("2.5", 4).put("25", 7).build())
+                .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build())
                 .build();
 
         Survey survey2 = surveyIngestionService.getSurvey(row2);
@@ -146,7 +146,7 @@ public class SurveyIngestionServiceTest {
 
         StagedRowFormatted row = rowBuilder.build();
         StagedRowFormatted rowFromSameSurvey = rowBuilder
-            .measureJson(ImmutableMap.<String, Integer>builder().put("1", 10).put("3", 11).build()).build();
+            .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 10).put(3, 11).build()).build();
 
         List<Observation> observations = surveyIngestionService.getObservations(row);
         List<Observation> observationsFromSameSurvey = surveyIngestionService.getObservations(rowFromSameSurvey);
@@ -173,7 +173,7 @@ public class SurveyIngestionServiceTest {
         StagedRowFormatted row = rowBuilder.build();
         StagedRowFormatted rowWithDifferentDepth = rowBuilder
                 .depth(5.3)
-                .measureJson(ImmutableMap.<String, Integer>builder().put("1", 10).put("3", 11).build())
+                .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 10).put(3, 11).build())
                 .build();
 
         List<Observation> observations = surveyIngestionService.getObservations(row);
@@ -199,7 +199,7 @@ public class SurveyIngestionServiceTest {
         StagedRowFormatted row = rowBuilder.build();
         StagedRowFormatted rowWithDifferentDate = rowBuilder
                 .date(LocalDate.of(1999, 9, 9))
-                .measureJson(ImmutableMap.<String, Integer>builder().put("1", 10).put("3", 11).build())
+                .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 10).put(3, 11).build())
                 .build();
 
         List<Observation> observations = surveyIngestionService.getObservations(row);
@@ -225,7 +225,7 @@ public class SurveyIngestionServiceTest {
         StagedRowFormatted row = rowBuilder.build();
         StagedRowFormatted rowWithDifferentSite = rowBuilder
                 .site(Site.builder().siteName("A DIFFERENT SITE").build())
-                .measureJson(ImmutableMap.<String, Integer>builder().put("1", 10).put("3", 11).build())
+                .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 10).put(3, 11).build())
                 .build();
 
         List<Observation> observations = surveyIngestionService.getObservations(row);

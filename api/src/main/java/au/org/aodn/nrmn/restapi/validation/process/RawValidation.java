@@ -134,7 +134,7 @@ public class RawValidation {
         val vis = (Integer) values.get("Vis").orElseGet(null);
         val total = (Integer) values.get("Total").orElseGet(null);
         val direction = (Directions) values.get("Direction").orElseGet(null);
-        val measureJson = (java.util.HashMap<Integer, Integer>) values.get("MeasureJson").orElseGet(null);
+        val measureJson = (java.util.Map<Integer, Integer>) values.get("MeasureJson").orElseGet(null);
 
         val ref = (StagedRow) values.get("Ref").orElseGet(null);
 

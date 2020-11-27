@@ -12,6 +12,8 @@ import Alert from "@material-ui/lab/Alert";
 import config from "react-global-configuration";
 import {titleCase} from "title-case";
 import Grid from "@material-ui/core/Grid";
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-material.css';
 
 const schematoColDef = (schema, size) => {
 
@@ -118,7 +120,8 @@ const EntityList = () => {
           </Grid>
 
           <div style={{ width: '100%', marginTop: 25}}
-               className={themeType ? "ag-theme-alpine-dark" : "ag-theme-alpine"}>
+               class="ag-theme-material"
+               >
             <AgGridReact
                 columnDefs={colDef}
                 rowSelection="multiple"

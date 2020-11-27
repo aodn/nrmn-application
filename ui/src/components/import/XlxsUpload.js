@@ -44,6 +44,7 @@ const XlxsUpload = () => {
                 <Fab size="small" color="primary" aria-label='Import Excel Data' onClick={handleOpen}><AddIcon></AddIcon></Fab>
             </Tooltip>
             <DropzoneDialog
+                filesLimit={1}
                 open={openPopup}
                 onSave={onAddFile}
                 showPreviews={true}

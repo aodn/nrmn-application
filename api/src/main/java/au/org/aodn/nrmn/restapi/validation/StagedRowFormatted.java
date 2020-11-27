@@ -70,5 +70,5 @@ public class StagedRowFormatted {
 
     private StagedRow ref;
 
-    private HashMap<Integer, Integer> measureJson;
+    private Map<Integer, Integer> measureJson;
 }

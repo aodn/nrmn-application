@@ -87,7 +87,7 @@ public class SurveyIngestionService {
     public List<Observation> getObservations(StagedRowFormatted stagedRow) {
         SurveyMethod surveyMethod = surveyMethodRepository.save(getSurveyMethod(stagedRow));
         Diver diver = stagedRow.getDiver();
-        Map<String, Integer> measures = stagedRow.getMeasureJson();
+        Map<Integer, Integer> measures = stagedRow.getMeasureJson();
         ObservableItem observableItem = observableItemRepository.findOne(
                 Example.of(ObservableItem.builder()
                         .aphiaRef(stagedRow.getSpecies())
@@ -111,11 +111,11 @@ public class SurveyIngestionService {
         return observations;
     }
 
-    private Optional<Measure> getMeasure(String sequenceNumber, int measureId) {
+    private Optional<Measure> getMeasure(Integer sequenceNumber, int measureId) {
         MeasureType measureType = MeasureType.builder().measureTypeId(measureId).build();
 
         Example<Measure> exampleMeasure = Example.of(Measure.builder()
-                .seqNo(Integer.parseInt(sequenceNumber))
+                .seqNo(sequenceNumber)
                 .measureType(measureType)
                 .build());
 

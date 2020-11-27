@@ -57,7 +57,7 @@ class PreValidationProcessIT {
         stage.setStagedJob(job);
         stage.setMeasureJson(new HashMap<Integer, String>() {{
             put(13, "1");
-            put(21, "1");
+            put(21, "12");
         }});
         val res = preProcess.preValidated(Collections.singletonList(stage), job);
 
@@ -67,6 +67,8 @@ class PreValidationProcessIT {
         assertEquals(row.getDirection(), Directions.NE);
         assertEquals(row.getDiver().getFullName(), "Tanjona Julien Rafidison");
         assertEquals(row.getSpecies().getAphiaId(), 102);
+        assertEquals(row.getMeasureJson().get(13), 1);
+
     }
 
 }
