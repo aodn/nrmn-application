@@ -25,9 +25,11 @@ public class SiteTestData {
     }
 
     public SiteBuilder defaultBuilder() {
+        siteNo++;
+        
         return Site.builder()
-            .siteCode("Site " + ++siteNo)
-            .siteName("South Cove South of T310m")
+            .siteCode("Site " + siteNo)
+            .siteName("Site name" + siteNo)
             .longitude(-58.5)
             .latitude(-57.5)
             .location(locationTestData.persistedLocation())

@@ -139,35 +139,6 @@ public class ObservableItemApiIT {
 
     @Test
     @WithUserDetails("test@gmail.com")
-    public void testCreateObservableItemMissingLengthWeightAttributes() {
-        val obsItemType = obsItemTypeTestData.persistedObsItemType();
-        val aphiaRef = aphiaRefTestData.persistedAphiaRef();
-        val aphiaRelType = aphiaRelTypeTestData.persistedAphiaRelType();
-
-        given()
-                .spec(spec)
-                .auth()
-                .oauth2(jwtToken.get())
-                .body("{" +
-                        "\"observableItemName\": \"Lotella rhacina\"," +
-                        "\"obsItemType\": \"" + entityRef(port, "obsItemTypes", obsItemType.getObsItemTypeId()) +
-                        "\"," +
-                        "\"lengthWeight\": {" +
-                        "    \"sgfgu\": \"Gu\"}," +
-                        "\"aphiaRef\": \"" + entityRef(port, "aphiaRefs", aphiaRef.getAphiaId()) + "\"," +
-                        "\"aphiaRefType\": \"" + entityRef(port, "aphiaRefTypes", aphiaRelType.getAphiaRelTypeId()) +
-                        "\"" +
-                        "}")
-                .post()
-                .then()
-                .assertThat()
-                .statusCode(400)
-                .body("errors.property", hasItems("lengthWeight.a", "lengthWeight.cf", "lengthWeight.b"))
-                .body("errors.message", contains("must not be null", "must not be null", "must not be null"));
-    }
-
-    @Test
-    @WithUserDetails("test@gmail.com")
     public void testUpdateObservableItemLengthWeight() {
         val observableItem = observableItemRepository.save(
                 observableItemTestData.defaultBuilder()

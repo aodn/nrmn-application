@@ -49,13 +49,11 @@ public class Site {
     private String siteName;
 
     @Basic
-    @NotNull
     @Column(name = "longitude")
     @Schema(title = "Longitude")
     private Double longitude;
 
     @Basic
-    @NotNull
     @Column(name = "latitude")
     @Schema(title = "Latitude")
     private Double latitude;
