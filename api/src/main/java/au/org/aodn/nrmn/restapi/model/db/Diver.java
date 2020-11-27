@@ -39,6 +39,5 @@ public class Diver {
 
     @Column(name = "full_name")
     @Schema(title = "Full name")
-    @NotNull
     private String fullName;
 }
