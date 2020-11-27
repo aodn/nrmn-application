@@ -51,7 +51,6 @@ public class ValidationProcess extends ValidatorHelpers {
         val preCheck =
                 stagedRows.stream()
                         .map(row -> preProcess.validate(row, rawValidators).bimap(err -> err, Seq::of))
-
                         .reduce(
                                 Validated.valid(Seq.empty()),
                                 (v1, v2) -> v1.combine(Monoids.seqConcat(), v2));

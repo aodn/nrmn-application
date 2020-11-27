@@ -2,13 +2,17 @@ package au.org.aodn.nrmn.restapi.validation.process;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
+import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.validation.model.MonoidRowValidation;
+import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
 import au.org.aodn.nrmn.restapi.validation.provider.ValidatorProvider;
 import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import cyclops.data.Seq;
 
+import cyclops.data.tuple.Tuple2;
 import lombok.val;
 
 import org.springframework.beans.factory.BeanFactory;
@@ -16,9 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
-public class FormattedValidation {
+public class FormattedValidation extends ValidatorHelpers {
     private final BeanFactory beanFactory;
 
     @Autowired
@@ -38,19 +43,23 @@ public class FormattedValidation {
         return validators;
     }
 
+    // is the process Valid & return list of stagedRow
 
-    public Validated<StagedRowError, String> process(List<StagedRowFormatted> formattedList, StagedJob job) {
+    public RowWithValidation<String> process(List<StagedRowFormatted> formattedList, StagedJob job) {
         val validators = getValidators(job);
-        return formattedList.stream().map(rowFormatted ->
-                validators
-                        .map(v -> v.valid(rowFormatted))
-                        .stream()
-                        .reduce(
-                                Validated.valid(""),
-                                (v1, v2) -> v1.combine(Monoids.firstNonNull(), v2)
-                        )
-        ).reduce(
-                Validated.valid(""),
-                (v1, v2) -> v1.combine(Monoids.stringConcat, v2));
+        val mono = new MonoidRowValidation();
+        return formattedList.stream().map(rowFormatted -> {
+            val formattedResult = validators
+                    .map(v -> v.valid(rowFormatted))
+                    .stream()
+                    .reduce(
+                            Validated.valid(""),
+                            (v1, v2) -> v1.combine(Monoids.stringConcat, v2)
+                    );
+            val errors = toErrorList(formattedResult);
+            val stagedRow = rowFormatted.getRef();
+            stagedRow.setErrors(errors);
+            return new RowWithValidation(Seq.of(stagedRow), formattedResult);
+        }).reduce(mono.zero(), mono::apply);
     }
 }
