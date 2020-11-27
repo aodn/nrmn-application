@@ -16,6 +16,8 @@ import au.org.aodn.nrmn.restapi.validation.process.RawValidation;
 import cyclops.control.Validated;
 import cyclops.data.Seq;
 import cyclops.data.tuple.Tuple2;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -46,6 +48,7 @@ public class IngestionController {
     UserActionAuditRepository userActionAuditRepository;
 
     @GetMapping(path = "ingest/{job_id}")
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity ingest(@PathVariable("job_id") Long jobId) {
         userActionAuditRepository.save(
                 new UserActionAudit(
