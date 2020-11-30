@@ -41,7 +41,7 @@
                         </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <arguments>install --network-timeout 1000000</arguments>
+                            <arguments>install --network-timeout 1000000 --modules-folder ${yarn.modules-folder}</arguments>
                         </configuration>
                     </execution>
                     <execution>
