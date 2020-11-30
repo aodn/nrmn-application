@@ -53,7 +53,6 @@ public class CorrectionService {
         );
 
         builder.measureJson(observations.stream()
-                .filter(obs -> obs.getMeasure().getSeqNo() != 0)
                 .collect(Collectors.toMap(
                         obs -> obs.getMeasure().getSeqNo(),
                         obs -> obs.getMeasureValue().toString())));

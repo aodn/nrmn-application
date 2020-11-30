@@ -86,8 +86,9 @@ public class CorrectionServiceTest {
         assertEquals(1, rows.size());
 
         StagedRow row = rows.get(0);
-        assertEquals(2, row.getMeasureJson().size());
+        assertEquals(3, row.getMeasureJson().size());
         assertEquals("333", row.getInverts());
+        assertEquals("333", row.getMeasureJson().get(0));
         assertEquals("666", row.getMeasureJson().get(1));
         assertEquals("999", row.getMeasureJson().get(2));
     }
