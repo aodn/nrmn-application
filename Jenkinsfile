@@ -2,24 +2,34 @@ pipeline {
     agent none
 
     options {
+        skipDefaultCheckout()
         disableConcurrentBuilds()
     }
 
     stages {
+        stage('workspace') {
+            agent any
+            stages {
+                stage('clean') {
+                    steps {
+                        cleanWs()
+                    }
+                }
+                stage('checkout') {
+                    steps {
+                        checkout scm
+                    }
+                }
+            }
+        }
         stage('container') {
             agent {
                 dockerfile {
-                    args '-v ${HOME}/.m2:/home/builder/.m2 -v ${HOME}/bin:${HOME}/bin'
+                    args '-v ${HOME}/.m2:/home/builder/.m2 -v ${HOME}/.cache:/home/builder/.cache -v ${HOME}/bin:${HOME}/bin'
                     additionalBuildArgs '--build-arg BUILDER_UID=$(id -u)'
                 }
             }
             stages {
-                stage('clean') {
-                    steps {
-                        sh 'git reset --hard'
-                        sh 'git clean -xffd'
-                    }
-                }
                 stage('set_version_build') {
                     when { not { branch "master" } }
                     steps {
