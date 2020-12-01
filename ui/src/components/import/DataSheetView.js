@@ -10,8 +10,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import { green } from '@material-ui/core/colors';
 import ColunmDef from "./ColumnDef";
 import { useParams } from "react-router-dom";
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-material.css';
 
 function useWindowSize() {
     const isClient = typeof window === 'object';
@@ -83,7 +81,7 @@ const DataSheetView = () => {
     const themeType = useSelector(state =>  state.theme.themeType);
 
     return (sheet && sheet.length && !isLoading) ? (
-        <div style={{ height: size.height - 200, width: '100%', marginTop: 25 }} className={ themeType ? "ag-theme-material-dark" : "ag-theme-material" } >
+        <div style={{ height: size.height - 200, width: '100%', marginTop: 25 }} className={ themeType ? "ag-theme-alpine-dark" : "ag-theme-alpine" } >
             <AgGridReact
                 pivotMode={true}
                 pivotColumnGroupTotals={"before"}
