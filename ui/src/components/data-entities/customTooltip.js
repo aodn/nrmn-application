@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import _ from 'lodash';
 
 export default class CustomTooltip extends Component {
 
@@ -21,9 +22,12 @@ export default class CustomTooltip extends Component {
       data = JSON.stringify(this.props.value)?.replaceAll(/["\{\}]/g,'').trim();
 
       if (data.length > 0) {
-        return (<div className={"custom-tooltip"} >
+        return (
+              <div className={"custom-tooltip"} >
               <span>
-                <div className={"body"}>{data.split(",").map(item => <p>{item}</p>)}</div>
+                <div className={"body"}>
+                  {data.split(",").map( item => <p key={ _.uniqueId('tooltipItem-')} >{item}</p>)}
+                </div>
               </span>
             </div>
         );

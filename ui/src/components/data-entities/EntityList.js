@@ -11,8 +11,6 @@ import Alert from "@material-ui/lab/Alert";
 import config from "react-global-configuration";
 import {titleCase} from "title-case";
 import Grid from "@material-ui/core/Grid";
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import CustomTooltip from "./customTooltip";
 
 
@@ -135,15 +133,15 @@ const EntityList = () => {
             </Grid>
 
             <div style={{width: '100%', marginTop: 25}}
-                 class="ag-theme-material"
-            >
+                 className={themeType ? "ag-theme-alpine-dark" : "ag-theme-alpine"}>
               <AgGridReact
                   columnDefs={colDef}
                   rowSelection="multiple"
                   domLayout='autoHeight'
                   animateRows={true}
                   onGridReady={agGridReady}
-
+                  frameworkComponents={{customTooltip: CustomTooltip}}
+                  tooltipShowDelay={0}
                   defaultColDef={{
                     sortable: true,
                     resizable: true,
