@@ -9,15 +9,16 @@ pipeline {
         stage('container') {
             agent {
                 dockerfile {
-                    args '-v ${HOME}/.m2:/home/builder/.m2 -v ${HOME}/bin:${HOME}/bin'
+                    args '-v ${HOME}/.m2:/home/builder/.m2 -v ${HOME}/.cache:/home/builder/.cache -v ${HOME}/bin:${HOME}/bin'
                     additionalBuildArgs '--build-arg BUILDER_UID=$(id -u)'
                 }
             }
             stages {
                 stage('clean') {
                     steps {
+                        sh 'rm -rf ui/node api/target'
                         sh 'git reset --hard'
-                        sh 'git clean -xffd'
+                        sh 'git clean -xffd -e ui/node_modules'
                     }
                 }
                 stage('set_version_build') {
