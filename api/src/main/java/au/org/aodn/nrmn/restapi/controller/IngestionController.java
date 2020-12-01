@@ -32,7 +32,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/api/ingestion")
-@Tag(name = "Ingestion")
+@Tag(name = "ingestion")
 public class IngestionController {
     @Autowired
     RawValidation validation;
