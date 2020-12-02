@@ -3,20 +3,20 @@ import {takeEvery, call, put} from "redux-saga/effects";
 import {entityEdit, entitySave, getEntity, getSelectedEntityItems} from "../../../axios/api";
 import {createAction} from "@reduxjs/toolkit";
 import {
-  entitiesCreated,
+  entitiesSaved,
   entitiesError,
   entitiesLoaded,
   itemLoaded,
   selectedItemsLoaded,
-  setSelectedFormData
+  selectedItemsEdited
 } from "../form-reducer";
 
 export default function* getEntitiesWatcher() {
   yield takeEvery(selectRequested, entities);
   yield takeEvery(itemRequested, getEntityData);
   yield takeEvery(selectedItemsRequested, getSelectedItemsData);
-  yield takeEvery(createEntityRequested, saveEditEntities);
-  yield takeEvery(updateEntityRequested, saveEditEntities);
+  yield takeEvery(createEntityRequested, saveEntities);
+  yield takeEvery(updateEntityRequested, updateEntities);
   yield takeEvery(setNestedField, setNestedFormData);
 }
 
@@ -33,7 +33,7 @@ function* setNestedFormData(action) {
   try {
     const resp = {}
     resp[action.payload.entity] = action.payload.newValues;
-    yield put(setSelectedFormData(resp));
+    yield put(selectedItemsEdited(resp));
   } catch (e) {
     yield put(entitiesError({e}));
   }
@@ -57,17 +57,25 @@ function* getSelectedItemsData(action) {
   }
 }
 
-function* saveEditEntities(action) {
+function* saveEntities(action) {
   try {
     const href = (action.payload.data?._links?.self?.href) ?
         action.payload.data._links.self.href :
         action.payload.path;
     delete action.payload.data._links;
 
-    const entity = (action.type === 'CREATE_ENTITY_REQUESTED') ? entitySave: entityEdit;
-    const resp = yield call(entity, href, action.payload.data);
-    yield put(entitiesCreated(resp));
+    const resp = yield call(entitySave, href, action.payload.data);
+    yield put(entitiesSaved(resp));
 
+  } catch (e) {
+    yield put(entitiesError({e}));
+  }
+}
+
+function* updateEntities(action) {
+  try {
+    const resp = yield call(entityEdit, action.payload.data._links.self.href, action.payload.data);
+    yield put(entitiesSaved(resp));
   } catch (e) {
     yield put(entitiesError({e}));
   }

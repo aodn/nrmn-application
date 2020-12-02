@@ -11,20 +11,18 @@ import {markupProjectionQuery} from "../../utils/helpers";
 
 
 const NestedApiField = (props) => {
-
   let editItemValues = useSelector(state => state.form.editItem);
   const dispatch = useDispatch();
 
   const entity = props.name ;
   const pluralEntity = pluralize(entity);
-  //const entities =  pluralEntity.charAt(0).toLowerCase() + pluralEntity.slice(1);
 
   let itemsList = (editItemValues[pluralEntity]) ?editItemValues[pluralEntity][pluralEntity] : [];
   let selectedItems = (editItemValues[entity + "Selected"]) ? [editItemValues[entity + "Selected"]].filter(Boolean) : [];
 
 
   useEffect(() => {
-    let urls = [pluralEntity + "?projection=selection"];
+    let urls = [markupProjectionQuery(pluralEntity)];
     if (editItemValues._links) {
       urls.push(markupProjectionQuery(editItemValues._links[entity].href));
     }

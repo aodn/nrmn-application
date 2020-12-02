@@ -8,7 +8,7 @@ import pluralize from "pluralize";
 const formState = {
   entities: undefined,
   editItem: {},
-  newlyCreatedEntity: {},
+  entitySaved: {},
   errors: []
 };
 
@@ -21,36 +21,37 @@ const formSlice = createSlice({
       state = formState;
     },
     entitiesLoaded: (state, action) => {
-      state.newlyCreatedEntity = {};
+      state.entityEdited = {};
       state.editItem = {};
       state.entities = action.payload;
       state.errors = [];
     },
     entitiesError: (state, action) => {
-      const error = "Error while getting the entity data"
+      const error = (action.payload.e.response.data.error) ? action.payload.e.response.data.error : "Error while getting the entity data"
       state.entities = [];
       state.errors = [error];
     },
     itemLoaded: (state, action) => {
       state.editItem = action.payload;
     },
-    setSelectedFormData: (state, action) => {
+    selectedItemsEdited: (state, action) => {
       let resp = {};
       const key = Object.keys(action.payload)[0];
-      resp[key + "Selected"] = action.payload;
+      resp[key + "Selected"] = action.payload[key];
       resp[key] = action.payload[key]._links.self.href;
       state.editItem = {...state.editItem, ...resp};
     },
     selectedItemsLoaded: (state, action) => {
       let resp = {};
       const key = Object.keys(action.payload._embedded)[0];
+      const singularKey = pluralize.singular(key);
       resp[key] = action.payload._embedded;
-      resp[pluralize.singular(key) + "Selected"] = action.payload.selected;
-      resp[pluralize.singular(key)] = action.payload.selected._links.self.href;
+      resp[singularKey + "Selected"] = action.payload.selected;
+      resp[singularKey] = (action.payload.selected) ? action.payload.selected._links.self.href: undefined;
       state.editItem = {...state.editItem, ...resp};
     },
-    entitiesCreated: (state, action) => {
-      state.newlyCreatedEntity = action.payload;
+    entitiesSaved: (state, action) => {
+      state.entitySaved = action.payload;
     }
   },
 });
@@ -59,10 +60,10 @@ export const {
   resetState,
   entitiesLoaded,
   entitiesError,
-  entitiesCreated,
+  entitiesSaved,
   itemLoaded,
   selectedItemsLoaded,
-  setSelectedFormData
+  selectedItemsEdited
 } = formSlice.actions;
 
 

@@ -9,6 +9,15 @@ function getToken() {
    return `${tokenType} ${token}`;
 }
 
+function getAxiosPromise(method, path, params, contentType) {
+  return axiosInstance({
+    headers: { "Content-Type": (contentType) ? contentType: "application/json" },
+    method: method,
+    url: path,
+    data: params
+  })
+}
+
 axiosInstance.interceptors.request.use(
     config => {
       config.headers.authorization = getToken();
@@ -104,8 +113,16 @@ export const entitySave = (entity, params) => {
 }
 
 export const entityEdit = (path, params) => {
-  console.log("doing the put method");
-  return  axiosInstance.put( path , params ).then(res => res );
+
+  let axiosPromises = [getAxiosPromise('put', path ,params)];
+
+  Object.keys(params).filter( key => {
+    if (key.endsWith("Selected")) {
+      const thisnestedEntity = key.replace("Selected", "");
+      axiosPromises.push(getAxiosPromise('put', path + "/" + thisnestedEntity, params[key]._links.self.href, "text/uri-list"));
+    }
+  });
+  return axiosInstance.all(axiosPromises).then(res => res );
 }
 
 export const entityRelation = (entity, urls) => {

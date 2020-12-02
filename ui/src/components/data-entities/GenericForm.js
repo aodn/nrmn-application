@@ -25,7 +25,7 @@ const GenericForm = () => {
   const schemaDefinition = config.get('api') || {};
 
   const editItem = useSelector(state => state.form.editItem);
-  const newlyCreatedEntity = useSelector(state => state.form.newlyCreatedEntity);
+  const entitySaved = useSelector(state => state.form.entitySaved);
   const errors = useSelector(state => state.form.errors);
 
   const dispatch = useDispatch();
@@ -37,11 +37,12 @@ const GenericForm = () => {
     if (id !== undefined) {
       dispatch(itemRequested(entityName + "/" + id));
     }
-  }, [newlyCreatedEntity]);
+  }, [entitySaved]);
 
-  if (newlyCreatedEntity && Object.keys(newlyCreatedEntity).length !== 0) {
+  if (entitySaved && Object.keys(entitySaved).length !== 0) {
     const redirectPath = "/list/" + entityTitle;
-    //return (<Redirect to={redirectPath}></Redirect>);
+
+    return (<Redirect to={redirectPath}></Redirect>);
   }
   if (Object.keys(schemaDefinition).length === 0) {
     return renderError("ERROR: API Schema not found");
@@ -63,7 +64,6 @@ const GenericForm = () => {
   let fullTitle = (id) ?  "Edit " + entityTitle + " '" + id + "'" : "Add '" + entityTitle + "'" ;
   const entitySchema = {title: fullTitle, ...entityDef}
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
-
 
   const uiSchemaHacks = Object.keys(entitySchema.properties).filter( key => {
     return entitySchema.properties[key].type === "string" && entitySchema.properties[key].format === "uri"
@@ -114,7 +114,6 @@ const GenericForm = () => {
           </Grid>
     }
   }
-
 }
 
 export default GenericForm;

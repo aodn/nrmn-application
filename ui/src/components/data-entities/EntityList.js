@@ -145,32 +145,7 @@ const EntityList = () => {
                   tooltipShowDelay={0}
                   defaultColDef={{
                     sortable: true,
-                    resizable: true,
-                    tooltipComponent: 'customTooltip',
-                    floatingFilter: true,
-                    headerComponentParams: {
-                      menuIcon: 'fa-bars'
-                    }
-                  }}/>
-            </div>
-            {(!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : ""}
-            {(errors.length > 0) ? renderError(errors) : ""}
-          </Box>
-        </>
-            <div style={{width: '100%', marginTop: 25}}
-                 className={themeType ? "ag-theme-alpine-dark" : "ag-theme-alpine"}>
-              <AgGridReact
-                  columnDefs={colDef}
-                  rowSelection="multiple"
-                  domLayout='autoHeight'
-                  animateRows={true}
-                  onGridReady={agGridReady}
-                  frameworkComponents={{customTooltip: CustomTooltip}}
-                  tooltipShowDelay={0}
-                  defaultColDef={{
-                    sortable: true,
-                    resizable: true,
-                    // make every column use 'text' filter by default
+                    resizable: true,// make every column use 'text' filter by default
                     filter: 'agTextColumnFilter',
                     tooltipComponent: 'customTooltip',
                     floatingFilter: true,

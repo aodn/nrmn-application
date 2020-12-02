@@ -33,7 +33,7 @@ const mockState = {
   form: {
     entities: [],
     editItem: {},
-    newlyCreatedEntity: {},
+    entitySaved: {},
     errors: []
   }
 };

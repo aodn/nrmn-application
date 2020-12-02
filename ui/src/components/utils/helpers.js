@@ -17,8 +17,7 @@ export const markupProjectionQuery = (url) => {
     return cleanedUrl + "=selection"
   }
   else {
-    console.error("ERROR: expected 'projection' not found in querystring. " + url);
-    return cleanedUrl
+    return cleanedUrl + "?projection=selection"
   }
 };
 
