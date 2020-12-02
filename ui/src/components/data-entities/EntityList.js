@@ -42,6 +42,7 @@ const schematoColDef = (schema, size) => {
 
   coldefs.push({
     field: "Edit",
+    filter: undefined,
     cellRenderer: function (params) {
       if (params.data._links) {
         const hrefSplit = params.data._links.self.href.split("/");
