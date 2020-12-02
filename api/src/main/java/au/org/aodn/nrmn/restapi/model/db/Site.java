@@ -77,7 +77,7 @@ public class Site {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @NotNull
-    @Schema(title = "Location")
+    @Schema(title = "Location", implementation = String.class, format = "uri")
     @JoinColumn(name = "location_id", referencedColumnName = "location_id", nullable = false)
     private Location location;
 

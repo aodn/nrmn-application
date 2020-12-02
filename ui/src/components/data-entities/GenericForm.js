@@ -2,6 +2,7 @@ import React from "react";
 
 import Form from "@rjsf/material-ui"
 import {useDispatch, useSelector} from "react-redux";
+import { Link } from 'react-router-dom'
 import {useEffect} from 'react';
 import {useParams, Redirect} from "react-router-dom";
 import NestedApiField from './customWidgetFields/NestedApiField';
@@ -14,6 +15,8 @@ import Grid from "@material-ui/core/Grid";
 import {titleCase} from "title-case";
 import {LoadingBanner} from "../layout/loadingBanner";
 import {createEntityRequested, itemRequested, updateEntityRequested} from "./middleware/entities";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
 
 const renderError = (msgArray) => {
   return (msgArray.length > 0) ? <><Box><Alert severity="error" variant="filled">{msgArray}</Alert></Box></> : <></>;
@@ -39,11 +42,6 @@ const GenericForm = () => {
     }
   }, [entitySaved]);
 
-  if (entitySaved && Object.keys(entitySaved).length !== 0) {
-    const redirectPath = "/list/" + entityTitle;
-
-    return (<Redirect to={redirectPath}></Redirect>);
-  }
   if (Object.keys(schemaDefinition).length === 0) {
     return renderError("ERROR: API Schema not found");
   }
@@ -81,6 +79,41 @@ const GenericForm = () => {
     console.log(formData);
   }
 
+  const formContent = ()=>{
+    if (entitySaved && Object.keys(entitySaved).length === 0) {
+      return <Form
+          schema={JSSchema}
+          uiSchema={uiSchema}
+          onSubmit={handleSubmit}
+          fields={fields}
+          formData={editItem}
+          //onSubmit={onSubmit}
+      />
+    }
+    else {
+      const redirectPath = "/list/" + entityTitle;
+      return <>
+        <Typography variant="h4" >Entity saved successfully!</Typography>
+        <ul>
+          {
+            entitySaved.map(ent => {
+              return <li>{ent.config.url}</li>
+            })
+          }
+        </ul>
+        <Button
+            component={Link}
+            to={redirectPath}
+            color="secondary"
+            aria-label={"List " + entityTitle}
+            variant={"contained"}>
+          List {entityName}
+        </Button>
+        </>
+
+    }
+  }
+
   if (errors.length > 0) {
     return renderError(errors)
   }
@@ -91,7 +124,6 @@ const GenericForm = () => {
     else {
       return (id && Object.keys(editItem).length === 0) ?
           <LoadingBanner variant={"h5"} msg={"Loading '" + titleCase(entityName) + "' form"  } /> :
-
           <Grid
               container
               spacing={0}
@@ -101,14 +133,7 @@ const GenericForm = () => {
           >
             <Paper>
               <Box mx="auto" bgcolor="background.paper" pt={2} px={3} pb={3}>
-                <Form
-                    schema={JSSchema}
-                    uiSchema={uiSchema}
-                    onSubmit={handleSubmit}
-                    fields={fields}
-                    formData={editItem}
-                    //onSubmit={onSubmit}
-                />
+                {formContent()}
               </Box>
             </Paper>
           </Grid>
