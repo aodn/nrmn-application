@@ -2,8 +2,11 @@ package au.org.aodn.nrmn.restapi.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
+import org.springframework.data.web.HateoasPageableHandlerMethodArgumentResolver;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
@@ -36,5 +39,15 @@ public class RepositoryRestConfig extends RepositoryRestConfigurerAdapter {
             .allowedOrigins("*")
             .allowedMethods("HEAD", "OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE")
             .maxAge(MAX_AGE_SECS);
+    }
+    
+    @Bean
+    public HateoasPageableHandlerMethodArgumentResolver customResolver(
+        /* default to all records for listing reference data if paging parameters not specified */
+        HateoasPageableHandlerMethodArgumentResolver pageableResolver) {
+        pageableResolver.setOneIndexedParameters(true);
+        pageableResolver.setFallbackPageable(PageRequest.of(0, Integer.MAX_VALUE));
+        pageableResolver.setMaxPageSize(Integer.MAX_VALUE);
+        return pageableResolver;
     }
 } 
