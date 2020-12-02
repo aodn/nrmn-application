@@ -37,17 +37,7 @@ pipeline {
                 }
                 stage('build') {
                     steps {
-                        sh 'mvn -B -DskipTests clean compile'
-                    }
-                }
-                stage('test') {
-                    steps {
-                        sh 'mvn -B test'
-                    }
-                }
-                stage('package') {
-                    steps {
-                        sh 'mvn -B -DskipTests package'
+                        sh 'mvn -B clean package'
                     }
                 }
             }
