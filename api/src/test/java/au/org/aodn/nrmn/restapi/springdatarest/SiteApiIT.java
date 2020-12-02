@@ -155,7 +155,7 @@ public class SiteApiIT {
 
     @Test
     @WithUserDetails("test@gmail.com")
-    public void testCreateWithExistingSite() {
+    public void testCreateUsingExistingSiteCodeAndName() {
         val existingSite = siteTestData.persistedSite();
 
         given()
@@ -164,7 +164,7 @@ public class SiteApiIT {
                 .oauth2(jwtToken.get())
                 .body("{" +
                         "\"siteCode\": \"" + existingSite.getSiteCode() + "\"," +
-                        "\"siteName\": \"Low Islets\"," +
+                        "\"siteName\": \"" + existingSite.getSiteName() + "\"," +
                         "\"longitude\": 147.7243," +
                         "\"latitude\": -40.13547," +
                         "\"location\": \"" + entityRef(port, "locations", existingSite.getLocation().getLocationId()) + "\"," +
@@ -180,12 +180,12 @@ public class SiteApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("a site with that code already exists")));
+                .body("errors[0].message", is(equalTo("a site with that code and name already exists")));
     }
 
     @Test
     @WithUserDetails("test@gmail.com")
-    public void testUpdateWithExistingSite() {
+    public void testUpdateWithExistingSiteCodeAndName() {
         val site = siteTestData.persistedSite();
         val anotherSite = siteTestData.persistedSite();
 
@@ -195,7 +195,7 @@ public class SiteApiIT {
                 .oauth2(jwtToken.get())
                 .body("{" +
                         "\"siteCode\": \"" + anotherSite.getSiteCode() + "\"," +
-                        "\"siteName\": \"" + site.getSiteName() + "\"," +
+                        "\"siteName\": \"" + anotherSite.getSiteName() + "\"," +
                         "\"longitude\": " + site.getLongitude() + "," +
                         "\"latitude\": " + site.getLatitude() + "," +
                         "\"location\": \"" + entityRef(port, "locations", site.getLocation().getLocationId()) + "\"," +
@@ -204,7 +204,7 @@ public class SiteApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("a site with that code already exists")));
+                .body("errors[0].message", is(equalTo("a site with that code and name already exists")));
     }
 
     @Test
@@ -219,9 +219,8 @@ public class SiteApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors.property", hasItems("siteCode", "siteName", "longitude", "latitude", "location"))
-                .body("errors.message", contains("must not be null", "must not be null", "must not be null",
-                        "must not be null", "must not be null"));
+                .body("errors.property", hasItems("siteCode", "siteName", "location"))
+                .body("errors.message", contains("must not be null", "must not be null", "must not be null"));
     }
 
     @Test
@@ -242,5 +241,42 @@ public class SiteApiIT {
         val persistedSite = siteRepository.findById(site.getSiteId());
 
         assertFalse(persistedSite.isPresent());
+    }
+
+    @Test
+    @WithUserDetails("power_user@gmail.com")
+    public void testPowerUserCanGetSite() {
+        val site = siteTestData.persistedSite();
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .get(site.getSiteId().toString())
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
+    @Test
+    @WithUserDetails("power_user@gmail.com")
+    public void testPowerUserCantCreateSite() {
+        val location = locationTestData.persistedLocation();
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body("{" +
+                        "\"siteCode\": \"TAS377\"," +
+                        "\"siteName\": \"Low Islets\"," +
+                        "\"longitude\": 147.7243," +
+                        "\"latitude\": -40.13547," +
+                        "\"location\": \"" + entityRef(port, "locations", location.getLocationId()) + "\"," +
+                        "\"isActive\": true}")
+                .post()
+                .then()
+                .assertThat()
+                .statusCode(403);
     }
 }

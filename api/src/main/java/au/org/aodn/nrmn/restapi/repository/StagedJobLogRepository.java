@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.util.Optional;
 
@@ -13,8 +14,10 @@ import java.util.Optional;
 @Tag(name = "staged job log")
 public interface StagedJobLogRepository extends JpaRepository<StagedJobLog, Long> {
     @Override
+    @RestResource
     Page<StagedJobLog> findAll(Pageable pageable);
 
     @Override
+    @RestResource
     Optional<StagedJobLog> findById(Long aLong);
 }

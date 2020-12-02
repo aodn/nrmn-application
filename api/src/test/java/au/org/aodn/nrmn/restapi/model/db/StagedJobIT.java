@@ -17,10 +17,7 @@ import org.springframework.context.annotation.FilterType;
 import java.time.LocalDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
@@ -46,9 +43,9 @@ class StagedJobIT {
         val retrievedStagedJob = stagedJobRepository.findById(stagedJob.getId()).get();
         assertEquals(stagedJob, retrievedStagedJob);
         assertThat(retrievedStagedJob.getCreated().toLocalDateTime(),
-                is(both(greaterThan(startTime)).and(lessThan(LocalDateTime.now()))));
+                is(both(greaterThanOrEqualTo(startTime)).and(lessThanOrEqualTo(LocalDateTime.now()))));
         assertThat(retrievedStagedJob.getLastUpdated().toLocalDateTime(),
-                is(both(greaterThan(startTime)).and(lessThan(LocalDateTime.now()))));
+                is(both(greaterThanOrEqualTo(startTime)).and(lessThanOrEqualTo(LocalDateTime.now()))));
     }
 
     @Test
@@ -59,6 +56,6 @@ class StagedJobIT {
         stagedJobRepository.saveAndFlush(stagedJob);
         val retrievedStagedJob = stagedJobRepository.findById(stagedJob.getId()).get();
         assertThat(retrievedStagedJob.getLastUpdated().toLocalDateTime(),
-                is(both(greaterThan(stagedJob.getCreated().toLocalDateTime())).and(lessThan(LocalDateTime.now()))));
+                is(both(greaterThanOrEqualTo(stagedJob.getCreated().toLocalDateTime())).and(lessThanOrEqualTo(LocalDateTime.now()))));
     }
 }

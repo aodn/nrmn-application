@@ -6,14 +6,14 @@
     <parent>
         <artifactId>nrmn</artifactId>
         <groupId>au.org.aodn.nrmn</groupId>
-        <version>0.0.23</version>
+        <version>0.0.31</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>nrmn-ui</artifactId>
 
     <properties>
         <node.version>v12.18.3</node.version>
-        <yarn.version>v1.12.1</yarn.version>
+        <yarn.version>v1.22.10</yarn.version>
         <frontend-maven-plugin.version>1.10.0</frontend-maven-plugin.version>
     </properties>
 

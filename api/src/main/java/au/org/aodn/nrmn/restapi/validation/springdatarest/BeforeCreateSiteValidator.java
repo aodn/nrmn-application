@@ -23,10 +23,16 @@ public class BeforeCreateSiteValidator implements Validator {
     @Override
     public void validate(Object object, Errors errors) {
         val site = (Site) object;
-        val siteWithCodeExample = Example.of(Site.builder().siteCode(site.getSiteCode()).build());
 
-        if (siteRepository.exists(siteWithCodeExample)) {
-            errors.rejectValue("siteCode", "site.siteCode.exists", "a site with that code already exists");
+        val siteWithCodeAndNameExample = Example.of(
+                Site.builder()
+                    .siteCode(site.getSiteCode())
+                    .siteName(site.getSiteName())
+                    .build());
+
+        if (siteRepository.exists(siteWithCodeAndNameExample)) {
+            errors.rejectValue("siteName", "site.exists",
+                    "a site with that code and name already exists");
         }
     }
 }

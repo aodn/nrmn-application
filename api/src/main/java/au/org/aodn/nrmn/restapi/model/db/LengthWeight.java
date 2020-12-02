@@ -21,17 +21,14 @@ import javax.validation.constraints.NotNull;
 public class LengthWeight {
     @Basic
     @Column(name = "a", table ="lengthweight_ref")
-    @NotNull
     private Double a;
 
     @Basic
     @Column(name = "b", table ="lengthweight_ref")
-    @NotNull
     private Double b;
 
     @Basic
     @Column(name = "cf", table ="lengthweight_ref")
-    @NotNull
     private Double cf;
 
     @Basic
