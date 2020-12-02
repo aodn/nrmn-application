@@ -47,7 +47,7 @@ public class FormattedValidation extends ValidatorHelpers {
 
     public RowWithValidation<String> process(List<StagedRowFormatted> formattedList, StagedJob job) {
         val validators = getValidators(job);
-        val mono = new MonoidRowValidation();
+        val mono = new MonoidRowValidation("", Monoids.stringConcat);
         return formattedList.stream().map(rowFormatted -> {
             val formattedResult = validators
                     .map(v -> v.valid(rowFormatted))
@@ -60,6 +60,6 @@ public class FormattedValidation extends ValidatorHelpers {
             val stagedRow = rowFormatted.getRef();
             stagedRow.setErrors(errors);
             return new RowWithValidation(Seq.of(stagedRow), formattedResult);
-        }).reduce(mono.zero(), mono::apply);
+        }).reduce(mono.zero(), mono);
     }
 }

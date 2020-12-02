@@ -11,6 +11,8 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class ValidationResponse {
-    List<StagedRowError> errorsRow;
+    List<StagedRow> errorsRow;
+    List<StagedRowError> errorGlobal;
+
     List<ErrorInput> errorInputs;
 }

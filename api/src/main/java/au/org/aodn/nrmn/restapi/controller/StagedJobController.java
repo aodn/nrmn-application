@@ -128,11 +128,13 @@ public class StagedJobController {
         );
 
         return jobRepo.findById(jobId).map(job -> {
-            val list = validation.process(job);
-            return ResponseEntity.ok().body(new ValidationResponse(list, Collections.emptyList()));
+            val validationResponse = validation.process(job);
+            return ResponseEntity.ok().body(validationResponse);
         }).orElseGet(() -> ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new ValidationResponse(Collections.emptyList(),
+                .body(new ValidationResponse(
+                        Collections.emptyList(),
+                        Collections.emptyList(),
                         Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob")))));
     }
 
@@ -141,7 +143,6 @@ public class StagedJobController {
     public List<StagedRow> getJob(@RequestParam("reference") String reference) {
         return stagedRowRepo.findRowsByReference("reference");
     }
-
 
 
 }
