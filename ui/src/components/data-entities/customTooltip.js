@@ -7,12 +7,6 @@ export default class CustomTooltip extends Component {
     return ['custom-tooltip'];
   }
 
-  stringToHTML = (str) => {
-    let parser = new DOMParser();
-    let doc = parser.parseFromString(str, 'text/html');
-    return doc.body;
-  };
-
   render() {
 
     let data;

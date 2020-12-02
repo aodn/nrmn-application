@@ -17,6 +17,7 @@ import {LoadingBanner} from "../layout/loadingBanner";
 import {createEntityRequested, itemRequested, updateEntityRequested} from "./middleware/entities";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
+import _ from 'lodash';
 
 const renderError = (msgArray) => {
   return (msgArray.length > 0) ? <><Box><Alert severity="error" variant="filled">{msgArray}</Alert></Box></> : <></>;
@@ -50,7 +51,6 @@ const GenericForm = () => {
   }
 
   const handleSubmit = (form) => {
-
     const data = {path: entityName, id: id, data: form.formData};
     (id) ?
       dispatch(updateEntityRequested(data)) :
@@ -75,10 +75,6 @@ const GenericForm = () => {
     relationship: NestedApiField
   }
 
-  const onSubmit = ({formData}, e) => {
-    console.log(formData);
-  }
-
   const formContent = ()=>{
     if (entitySaved && Object.keys(entitySaved).length === 0) {
       return <Form
@@ -87,7 +83,6 @@ const GenericForm = () => {
           onSubmit={handleSubmit}
           fields={fields}
           formData={editItem}
-          //onSubmit={onSubmit}
       />
     }
     else {
@@ -97,7 +92,7 @@ const GenericForm = () => {
         <ul>
           {
             entitySaved.map(ent => {
-              return <li>{ent.config.url}</li>
+              return <li key={ _.uniqueId('entitySaved-')}>{ent.config.url}</li>
             })
           }
         </ul>

@@ -114,7 +114,7 @@ const EntityList = () => {
 
     return (
         <>
-          <Box>
+          <Box >
             <Grid
                 container
                 direction="row"
@@ -133,12 +133,11 @@ const EntityList = () => {
               </Button>
             </Grid>
 
-            <div style={{width: '100%', marginTop: 25}}
+            <div style={{width: '100%', height: size.height - 170, marginTop: 25}}
                  className={themeType ? "ag-theme-alpine-dark" : "ag-theme-alpine"}>
               <AgGridReact
                   columnDefs={colDef}
                   rowSelection="multiple"
-                  domLayout='autoHeight'
                   animateRows={true}
                   onGridReady={agGridReady}
                   frameworkComponents={{customTooltip: CustomTooltip}}
