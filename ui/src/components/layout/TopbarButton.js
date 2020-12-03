@@ -15,4 +15,4 @@ export const TopbarButton = (props) => {
       color="inherit"
       size="small"
       className={classes.root}>{props.children}</Button>;
-}
+};

@@ -10,8 +10,8 @@ import clsx from 'clsx';
 import { toggleLeftSideMenu } from './layout-reducer';
 import { connect } from 'react-redux';
 import store from '../store';
-import AuthState from "./AuthState";
-import SettingsMenu from "./SettingsMenu";
+import AuthState from './AuthState';
+import SettingsMenu from './SettingsMenu';
 
 const drawerWidth = 240;
 
@@ -43,8 +43,8 @@ const mapStateToProps = state => {
 };
 
 const handleClick = () => {
-  store.dispatch(toggleLeftSideMenu())
-}
+  store.dispatch(toggleLeftSideMenu());
+};
 
 const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
   const classes = useStyles();
@@ -87,7 +87,7 @@ const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
       </Grid>
     </Toolbar>
   </AppBar>
-  )
+  );
 };
 
 const TopBar = connect(mapStateToProps)(ReduxTopBar);

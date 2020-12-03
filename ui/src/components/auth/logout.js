@@ -5,10 +5,10 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import {useDispatch, useSelector} from "react-redux";
-import {logoutSubmitted} from "./auth-reducer";
-import {toggleLogoutMenuOpen} from "../../../../ui/src/components/layout/layout-reducer";
-import store from "../store";
+import {useDispatch, useSelector} from 'react-redux';
+import {logoutSubmitted} from './auth-reducer';
+import {toggleLogoutMenuOpen} from '../../../../ui/src/components/layout/layout-reducer';
+import store from '../store';
 
 
 function Logout() {
@@ -30,20 +30,20 @@ function Logout() {
       <>
         <Dialog
             open={logoutMenuOpen}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
+            aria-labelledby='alert-dialog-title'
+            aria-describedby='alert-dialog-description'
         >
-          <DialogTitle id="alert-dialog-title">Logout</DialogTitle>
+          <DialogTitle id='alert-dialog-title'>Logout</DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              Do you really want to log out as '{username}'?
+            <DialogContentText id='alert-dialog-description'>
+              Do you really want to log out as {username}?
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCancel} color="primary">
+            <Button onClick={handleCancel} color='primary'>
               Cancel
             </Button>
-            <Button onClick={handleClose} color="primary" autoFocus>
+            <Button onClick={handleClose} color='primary' autoFocus>
               Logout
             </Button>
           </DialogActions>

@@ -1,7 +1,7 @@
 import {
     createSlice,
     createAction
-} from "@reduxjs/toolkit";
+} from '@reduxjs/toolkit';
 
 const ListState = {
     isLoading: false,
@@ -9,7 +9,7 @@ const ListState = {
 };
 
 const listSlice = createSlice({
-    name: "fileList",
+    name: 'fileList',
     initialState: ListState,
     reducers: {
         fileListReady: (state, action) => {
@@ -35,4 +35,4 @@ export const {
     fileListStarted,
     fileListLoaded,
     fileListFailed } = listSlice.actions;
-export const fileListRequested = createAction('FILE_LIST_REQURESTED');    
+export const fileListRequested = createAction('FILE_LIST_REQURESTED');

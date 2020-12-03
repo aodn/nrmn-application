@@ -1,7 +1,5 @@
-import axiosInstance from "./index.js";
-import axios from "axios";
-import store from "../components/store"; // will be useful to access to axios.all and axios.spread
-import qs from 'qs'
+import axiosInstance from './index.js';
+import store from '../components/store'; // will be useful to access to axios.all and axios.spread
 
 function getToken() {
    const token = store.getState().auth.accessToken;
@@ -19,40 +17,40 @@ axiosInstance.interceptors.request.use(
 
 // siteConfig loaded into react-global-configuration
 export const siteConfig = () => {
-  return axiosInstance.get("/api/utils/siteconfig");
+  return axiosInstance.get('/api/utils/siteconfig');
 };
 
 // Authentication
 export const activate = params => {
-  return axiosInstance.post("/api/auth/activate", params);
+  return axiosInstance.post('/api/auth/activate', params);
 };
 export const resetPassword = data => {
-  return axiosInstance.post("/api/auth/resetPassword", data);
+  return axiosInstance.post('/api/auth/resetPassword', data);
 };
 export const changePassword = data => {
-  return axiosInstance.post("/api/auth/changePassword", data);
+  return axiosInstance.post('/api/auth/changePassword', data);
 };
 
 export const userLogin = params => {
-  return axiosInstance.post("/api/auth/signin", {
+  return axiosInstance.post('/api/auth/signin', {
     username: params.username,
     password: params.password
   });
 };
 export const userLogout = () => {
-  return axiosInstance.post("/api/auth/signout", {} );
+  return axiosInstance.post('/api/auth/signout', {} );
 };
 
 // User
 export const me = () => {
-  return axiosInstance.get("/api/user/me");
+  return axiosInstance.get('/api/user/me');
 };
 export const meUpdate = userDetails => {
   delete userDetails.password;
-  return axiosInstance.put("/api/user/me", userDetails );
+  return axiosInstance.put('/api/user/me', userDetails );
 };
 export const userRegistration = userDetails => {
-  return axiosInstance.post("/api/auth/signup", userDetails);
+  return axiosInstance.post('/api/auth/signup', userDetails);
 };
 
 
@@ -70,36 +68,32 @@ export const user = params => {
     headers: { Authorization: getToken() },
     params: params
   };
-  return axiosInstance.get(`/api/user`, config);
+  return axiosInstance.get('/api/user', config);
 };
 
-// Ingest
-export const rawSurvey = fileId => {
-  return  axiosInstance.get(`/api/raw-survey/${fileId ? fileId: ""}`).then(res => res );
-}
 
 export const rawSurveySave = params => {
-  return  axiosInstance.post("/api/raw-survey", params).then(res => res );
-}
+  return  axiosInstance.post('/api/raw-survey', params).then(res => res );
+};
 
-export const apiDefinition = () =>  axiosInstance.get("/v3/api-docs").then(res => res)
+export const apiDefinition = () =>  axiosInstance.get('/v3/api-docs').then(res => res);
 
-export const getReferenceEntities = (entity) => axiosInstance.get("/api/" + entity).then(res=>res);
+export const getReferenceEntities = (entity) => axiosInstance.get('/api/' + entity).then(res=>res);
 
 export const entitySave = (entity, params) => {
-  return  axiosInstance.post("/api/" + entity, params ).then(res => res );
-}
+  return  axiosInstance.post('/api/' + entity, params ).then(res => res );
+};
 
 export const entityEdit = (path, params) => {
-  console.log("doing the put method");
+  console.debug('doing the put method');
   return  axiosInstance.put( path , params ).then(res => res );
-}
+};
 
 export const entityRelation = (entity, urls) => {
   const config = {
     headers: {
-      "Content-Type": "text/uri-list"
+      'Content-Type': 'text/uri-list'
     }
-  }
-  return axiosInstance.put(entity, urls,config).then
-}
+  };
+  return axiosInstance.put(entity, urls,config).then;
+};

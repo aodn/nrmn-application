@@ -1,7 +1,7 @@
 import React from 'react';
-import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
-import {LoadingSpinner} from "./loadingSpinner";
+import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
+import {LoadingSpinner} from './loadingSpinner';
 
 
 export const LoadingBanner = (props) => {
@@ -13,6 +13,6 @@ export const LoadingBanner = (props) => {
       alignItems="center"
   >
     <Typography variant={props.variant}>{props.msg} &nbsp; </Typography>
-    <LoadingSpinner color={"primary"} />
-  </Grid>
-}
+    <LoadingSpinner color={'primary'} />
+  </Grid>;
+};

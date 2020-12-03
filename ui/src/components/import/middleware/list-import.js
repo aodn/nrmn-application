@@ -1,6 +1,6 @@
-import { takeEvery, call, put } from "redux-saga/effects";
-import { fileListRequested, fileListReady, fileListFailed } from "../reducers/list-import";
-import { rawSurvey } from "../../../axios/api";
+import { takeEvery, put } from 'redux-saga/effects';
+
+import { fileListRequested, fileListReady, fileListFailed } from '../reducers/list-import';
 
 export default function* ListImportWatcher() {
     yield takeEvery(fileListRequested, listImport);
@@ -8,7 +8,8 @@ export default function* ListImportWatcher() {
 
 function* listImport() {
     try {
-        const payload = yield call(rawSurvey);
+        //TODO update callBack
+        const payload = { data: {}};
         yield put(fileListReady(payload.data));
     } catch (e) {
         yield put(fileListFailed(e));

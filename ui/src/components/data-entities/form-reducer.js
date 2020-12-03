@@ -1,7 +1,7 @@
 import {
   createSlice,
   createAction
-} from "@reduxjs/toolkit";
+} from '@reduxjs/toolkit';
 
 
 const formState = {
@@ -13,7 +13,7 @@ const formState = {
 
 
 const formSlice = createSlice({
-  name: "form",
+  name: 'form',
   initialState: formState,
   reducers: {
     resetState: (state, action) => {
@@ -26,7 +26,7 @@ const formSlice = createSlice({
       state.errors = [];
     },
     entitiesError: (state, action) => {
-      const error = "Error while getting the entity data"
+      const error = 'Error while getting the entity data';
       state.entities = [];
       state.errors = [error];
     },

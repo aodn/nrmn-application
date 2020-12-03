@@ -1,0 +1,55 @@
+{
+    "env": {
+        "node": true,
+        "jest": true,
+        "es6": true,
+        "browser" : true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "prettier"
+    ],
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly",
+        "ReactClass": false
+    },
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react",
+        "react-hooks",
+        "no-console-log"
+
+    ],
+    "rules": {
+        "no-process-env": "off",
+        "react/prop-types": [
+            1
+        ],
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "off",
+        "semi": [
+            "error",
+            "always"
+        ],
+        "quotes": [
+            2,
+            "single",
+            {
+                "avoidEscape": true,
+                "allowTemplateLiterals": true
+            }
+        ],
+        "no-console-log/no-console-log": "error",
+        "no-empty": "error",
+        "no-trailing-spaces": "error",
+        "no-unused-vars": "off"
+    }
+}

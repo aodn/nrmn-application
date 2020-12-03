@@ -1,34 +1,34 @@
 import React from 'react';
-import {useDispatch, useSelector} from "react-redux";
-import BaseForm from "../../../../ui/src/components/BaseForm";
-import {loginSubmitted} from "./auth-reducer";
-import {useLocation}  from "react-router-dom";
+import {useDispatch, useSelector} from 'react-redux';
+import BaseForm from '../../../../ui/src/components/BaseForm';
+import {loginSubmitted} from './auth-reducer';
+import {useLocation}  from 'react-router-dom';
 
 
 function Login()  {
 
   const schema = {
-    "title": "Login",
-    "type": "object",
-    "required": [
-      "username",
-      "password"
+    'title': 'Login',
+    'type': 'object',
+    'required': [
+      'username',
+      'password'
     ],
-    "properties": {
-      "username": {
-        "type": "string",
-        "title": "Email/Username"
+    'properties': {
+      'username': {
+        'type': 'string',
+        'title': 'Email/Username'
       },
-      "password": {
-        "type": "string",
-        "title": "Password",
+      'password': {
+        'type': 'string',
+        'title': 'Password',
       }
     }
-  }
+  };
 
   const uiSchema = {
     password: {
-      "ui:widget": "password"
+      'ui:widget': 'password'
     }
   };
 
@@ -42,7 +42,7 @@ function Login()  {
       form.formData.redirect = location;
     }
     dispatch(loginSubmitted(form.formData));
-  }
+  };
 
   return (
       <BaseForm
@@ -52,7 +52,7 @@ function Login()  {
         loading={loading}
         onSubmit={handleLogin}>
       </BaseForm>
-  )
+  );
 }
 
 export default Login;

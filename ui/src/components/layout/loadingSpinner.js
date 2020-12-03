@@ -1,5 +1,5 @@
 import React from 'react';
-import CircularProgress from "@material-ui/core/CircularProgress";
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 export const LoadingSpinner = (props) => {
@@ -9,5 +9,5 @@ export const LoadingSpinner = (props) => {
 
   return <CircularProgress
       {...props}
-      color={"secondary"} size={size} thickness={thickness} />
-}
+      color={'secondary'} size={size} thickness={thickness} />;
+};

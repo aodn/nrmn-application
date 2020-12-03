@@ -1,11 +1,11 @@
-import {createSlice} from "@reduxjs/toolkit";
+import {createSlice} from '@reduxjs/toolkit';
 
 const themeState =  JSON.parse(localStorage.getItem('theme')) || {
   themeType: false
 };
 
 const toggleThemeSlice = createSlice({
-  name: "themeSelection",
+  name: 'themeSelection',
   initialState: themeState,
   reducers: {
     toggleTheme: (state, action) => {

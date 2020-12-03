@@ -1,15 +1,15 @@
 import {
   createSlice
-} from "@reduxjs/toolkit";
+} from '@reduxjs/toolkit';
 
 
 const toggleState = {
   leftSideMenuIsOpen: false,
   logoutMenuOpen: false
-}
+};
 
 const toggleSlice = createSlice({
-  name: "toggle",
+  name: 'toggle',
   initialState: toggleState,
   reducers: {
     toggleLeftSideMenu: (state, action) => {

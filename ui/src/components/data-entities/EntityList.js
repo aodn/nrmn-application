@@ -1,17 +1,17 @@
-import React from "react";
-import {Box, Typography, Button,} from "@material-ui/core";
+import React from 'react';
+import {Box, Typography, Button,} from '@material-ui/core';
 
-import {useSelector, useDispatch} from "react-redux";
+import {useSelector, useDispatch} from 'react-redux';
 import {useEffect} from 'react';
-import { resetState, selectRequested} from "./form-reducer";
-import {useParams, NavLink} from "react-router-dom";
+import { resetState, selectRequested} from './form-reducer';
+import {useParams, NavLink} from 'react-router-dom';
 import pluralize from 'pluralize';
-import {AgGridReact} from "ag-grid-react/lib/agGridReact";
-import useWindowSize from "../utils/useWindowSize";
-import Alert from "@material-ui/lab/Alert";
-import config from "react-global-configuration";
-import {titleCase} from "title-case";
-import Grid from "@material-ui/core/Grid";
+import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
+import useWindowSize from '../utils/useWindowSize';
+import Alert from '@material-ui/lab/Alert';
+import config from 'react-global-configuration';
+import {titleCase} from 'title-case';
+import Grid from '@material-ui/core/Grid';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 
@@ -24,23 +24,23 @@ const schematoColDef = (schema, size) => {
     return {
       field: field,
       width: widthSize
-    }
+    };
 
   });
   coldefs.push({
-    field: "Edit",
+    field: 'Edit',
     cellRenderer: function (params) {
       if (params.data._links) {
-        const hrefSplit = params.data._links.self.href.split("/");
+        const hrefSplit = params.data._links.self.href.split('/');
         const id = hrefSplit.pop();
         const ent = hrefSplit.pop();
-        const link = "/form/" + ent + "/" + id;
+        const link = '/form/' + ent + '/' + id;
         return '<a href="' + link + '">Edit</a>';
       }
     }
-  })
+  });
   return coldefs;
-}
+};
 
 let agGridApi = {};
 
@@ -50,8 +50,8 @@ const renderError = (msgArray) => {
           severity="error"
           variant="filled"
     >{msgArray.join('\r\n ')}
-    </Alert></Box>
-}
+    </Alert></Box>;
+};
 
 const EntityList = () => {
 
@@ -62,17 +62,16 @@ const EntityList = () => {
   const schemaDefinition = config.get('api');
   const size = useWindowSize();
 
-  const themeType = useSelector(state => state.theme.themeType);
   const dispatch = useDispatch();
   const entities = useSelector(state => state.form.entities);
   const errors = useSelector(state => state.form.errors);
-  const items =  (entities?._embedded) ? entities._embedded[entityNamePlural] : undefined;
+  const items =  (entities._embedded) ? entities._embedded[entityNamePlural] : undefined;
 
   const agGridReady = (agGrid) => {
     agGridApi = Object.create(agGrid.api);
     agGridApi.setRowData(items);
     Object.freeze(agGridApi);
-  }
+  };
 
   useEffect(() => {
     dispatch(resetState());
@@ -82,10 +81,10 @@ const EntityList = () => {
   const getEntitySchema = () => {
     return (schemaDefinition[titleCase(entityName)]) ? (schemaDefinition[titleCase(entityName)]) :
         (schemaDefinition[entityName]);
-  }
+  };
 
   if (Object.keys(schemaDefinition).length === 0) {
-    return (renderError(["Error: API not yet loaded"]));
+    return (renderError(['Error: API not yet loaded']));
   }
   else {
 
@@ -108,19 +107,19 @@ const EntityList = () => {
               alignItems="center"
           >
             <Typography variant="h4">{titleCase(entityNamePlural)}</Typography>
-            <Button title={"Add new " + titleCase(entityName)}
+            <Button title={'Add new ' + titleCase(entityName)}
                     component={NavLink}
-                    to={"/form/" + entityNamePlural}
+                    to={'/form/' + entityNamePlural}
                     color="secondary"
-                    aria-label={"Add " + entityName}
-                    variant={"contained"}
+                    aria-label={'Add ' + entityName}
+                    variant={'contained'}
             >New {titleCase(entityName)}
 
             </Button>
           </Grid>
 
           <div style={{ width: '100%', marginTop: 25}}
-               class="ag-theme-material"
+               className={'ag-theme-material'}
                >
             <AgGridReact
                 columnDefs={colDef}
@@ -138,14 +137,14 @@ const EntityList = () => {
                   }
                 }}/>
           </div>
-          { (!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : "" }
-          { (errors.length > 0) ? renderError(errors) : "" }
+          { (!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : '' }
+          { (errors.length > 0) ? renderError(errors) : '' }
         </Box>
 
       </>
-    )
+    );
 
   }
-}
+};
 
 export default EntityList;
