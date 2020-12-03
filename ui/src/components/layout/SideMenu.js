@@ -112,7 +112,7 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
             <Divider />
             <List>
                 <ListSubheader>REFERENCE DATA</ListSubheader>
-                {['Location', 'Site', 'Diver', 'ObservableItem', 'Program'].map((text, index) => (
+                {['Diver', 'Location', 'ObservableItem', 'Program', 'Site', 'Survey'].map((text, index) => (
                     <ListItem button key={text} component={NavLink} to={"/list/" + text} >
                         <ListItemIcon><ArrowRight /></ListItemIcon>
                         <ListItemText primary={text} />

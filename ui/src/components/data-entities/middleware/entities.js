@@ -23,7 +23,9 @@ export default function* getEntitiesWatcher() {
 function* entities(action) {
   try {
     const resp = yield call(getEntity, action.payload);
-    yield put(entitiesLoaded(resp.data));
+    if (resp?.data) {
+      yield put(entitiesLoaded(resp.data));
+    }
   } catch (e) {
     yield put(entitiesError({e}));
   }
@@ -66,7 +68,6 @@ function* saveEntities(action) {
 
     const resp = yield call(entitySave, href, action.payload.data);
     yield put(entitiesSaved(resp));
-
   } catch (e) {
     yield put(entitiesError({e}));
   }
