@@ -1,9 +1,10 @@
 {
+    "parser": "babel-eslint",
     "env": {
         "node": true,
         "jest": true,
         "es6": true,
-        "browser" : true
+        "browser": true
     },
     "extends": [
         "eslint:recommended",
@@ -26,12 +27,24 @@
         "react",
         "react-hooks",
         "no-console-log"
-
     ],
+    "settings": {
+        "react": {
+            "createClass": "createReactClass",
+            "pragma": "React",
+            "version": "detect"
+        }
+    },
     "rules": {
         "no-process-env": "off",
         "react/prop-types": [
             1
+        ],
+        "react/function-component-definition": [
+            "error",
+            {
+                "namedComponents": "arrow-function"
+            }
         ],
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": "off",

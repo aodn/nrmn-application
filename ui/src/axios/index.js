@@ -12,12 +12,12 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use((response) => {
   return response;
 }, (error) => {
-  if (401 === error.response.status && error.config.url !== '/api/auth/signin') {
+  if (401 === error.response?.status && error.config.url !== '/api/auth/signin') {
     localStorage.clear();
     window.location = `/login?redirect=${window.location.pathname}`;
   }
   else {
-    if ( 404 === error.response.status) {
+    if ( 404 === error.response?.status) {
       if (process.env.NODE_ENV !== 'development') {
         window.location = `/notfound?resource=${window.location.pathname}`;
       }

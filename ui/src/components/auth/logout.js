@@ -11,7 +11,7 @@ import {toggleLogoutMenuOpen} from '../../../../ui/src/components/layout/layout-
 import store from '../store';
 
 
-function Logout() {
+var Logout = () => {
   const dispatch = useDispatch();
   const logoutMenuOpen = useSelector(state => state.toggle.logoutMenuOpen);
   const username = useSelector(state => state.auth.username);
@@ -50,6 +50,6 @@ function Logout() {
         </Dialog>
       </>
   );
-}
+};
 
 export default Logout;

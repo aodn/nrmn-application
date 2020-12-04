@@ -5,7 +5,7 @@ import {loginSubmitted} from './auth-reducer';
 import {useLocation}  from 'react-router-dom';
 
 
-function Login()  {
+var Login = () => {
 
   const schema = {
     'title': 'Login',
@@ -53,6 +53,6 @@ function Login()  {
         onSubmit={handleLogin}>
       </BaseForm>
   );
-}
+};
 
 export default Login;

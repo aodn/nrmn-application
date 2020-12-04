@@ -1,9 +1,9 @@
-import {takeEvery, call, put} from "redux-saga/effects";
+import {takeEvery, call, put} from 'redux-saga/effects';
 import {
   selectRequested, entitiesLoaded, entitiesError, itemRequested, itemLoaded,
   createEntityRequested, entitiesCreated, updateEntityRequested
-} from "../form-reducer";
-import {entityEdit, entitySave, getReferenceEntities} from "../../../axios/api";
+} from '../form-reducer';
+import {entityEdit, entitySave, getReferenceEntities} from '../../../axios/api';
 
 export default function* getEntitiesWatcher() {
   yield takeEvery(selectRequested, entities);

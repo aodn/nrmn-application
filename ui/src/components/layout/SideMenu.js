@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import Divider from '@material-ui/core/Divider';
@@ -17,7 +17,7 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
 import StarBorder from '@material-ui/icons/StarBorder';
-import { connect } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { toggleLeftSideMenu } from './layout-reducer';
 import store from '../store';
 import {
@@ -46,21 +46,23 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const mapStateToProps = state => {
-    return { leftSideMenuIsOpen: state.toggle.leftSideMenuIsOpen };
-  };
+;
 
-const handleMainMenu = () => {
-    store.dispatch(toggleLeftSideMenu());
-};
 
-const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
-    const [openSub, setOpenSub] = React.useState(true);
+
+const SideMenu = () => {
+    const [openSub, setOpenSub] = useState(true);
     const classes = useStyles();
     const theme = useTheme();
+    const leftSideMenuIsOpen = useSelector(state =>  state.toggle.leftSideMenuIsOpen);
+    const dispatch = useDispatch();
 
     const handleClick = () => {
         setOpenSub(!openSub);
+    };
+
+    const handleMainMenu = (dis) => {
+        dis(toggleLeftSideMenu());
     };
 
     return (
@@ -89,13 +91,13 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
                 </ListItem>
                 <Collapse in={openSub} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                        <ListItem button  onClick={handleMainMenu}  className={classes.nested} component={NavLink} to="/list-file">
+                        <ListItem button  onClick={() => handleMainMenu(dispatch)}  className={classes.nested} component={NavLink} to="/list-file">
                             <ListItemIcon>
                                 <StarBorder />
                             </ListItemIcon>
                             <ListItemText primary="List"   />
                         </ListItem>
-                        <ListItem button  onClick={handleMainMenu} className={classes.nested} component={NavLink} to="/import-file">
+                        <ListItem button  onClick={() => handleMainMenu(dispatch)} className={classes.nested} component={NavLink} to="/import-file">
                             <ListItemIcon>
                                 <StarBorder />
                             </ListItemIcon>
@@ -132,5 +134,5 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
             </List>
         </Drawer>);
 };
-const SideMenu = connect(mapStateToProps)(ReduxSideMenu);
+
 export default SideMenu;

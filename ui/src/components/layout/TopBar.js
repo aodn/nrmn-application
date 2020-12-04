@@ -5,11 +5,10 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import {makeStyles} from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import { toggleLeftSideMenu } from './layout-reducer';
-import { connect } from 'react-redux';
-import store from '../store';
+import { useDispatch, useSelector } from 'react-redux';
 import AuthState from './AuthState';
 import SettingsMenu from './SettingsMenu';
 
@@ -38,57 +37,57 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const mapStateToProps = state => {
-  return { leftSideMenuIsOpen: state.toggle.leftSideMenuIsOpen };
-};
 
-const handleClick = () => {
-  store.dispatch(toggleLeftSideMenu());
-};
 
-const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
+
+const TopBar = () => {
   const classes = useStyles();
+  const leftSideMenuIsOpen = useSelector(state => state.toggle.leftSideMenuIsOpen);
+  const dispatch = useDispatch();
+
+  const handleClick = (dis) => {
+    dis(toggleLeftSideMenu());
+  };
 
   return (
-  <AppBar
-    position="fixed"
-    className={clsx(classes.appBar, {
-      [classes.appBarShift]: leftSideMenuIsOpen,
-    })}
-  >
-    <Toolbar position="static">
-      <Grid container alignItems={'center'} justify="space-between" >
-        <Grid item >
-          <Grid container alignItems={'center'} justify="space-between" >
-            <Grid item >
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleClick}
-                edge="start"
-                className={clsx(classes.menuButton, leftSideMenuIsOpen && classes.hide)} >
-                <MenuIcon />
-              </IconButton>
-            </Grid>
-            <Grid item >
-              <Typography
+    <AppBar
+      position="fixed"
+      className={clsx(classes.appBar, {
+        [classes.appBarShift]: leftSideMenuIsOpen,
+      })}
+    >
+      <Toolbar position="static">
+        <Grid container alignItems={'center'} justify="space-between" >
+          <Grid item >
+            <Grid container alignItems={'center'} justify="space-between" >
+              <Grid item >
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  onClick={() => handleClick(dispatch)}
+                  edge="start"
+                  className={clsx(classes.menuButton, leftSideMenuIsOpen && classes.hide)} >
+                  <MenuIcon />
+                </IconButton>
+              </Grid>
+              <Grid item >
+                <Typography
                   variant="h5"
                   className={clsx(classes.header)}
                   noWrap>
-                {process.env.REACT_APP_SITE_TITLE}
-              </Typography>
+                  {process.env.REACT_APP_SITE_TITLE}
+                </Typography>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-        <Grid item >
-          <AuthState /> |
+          <Grid item >
+            <AuthState /> |
           <SettingsMenu />
+          </Grid>
         </Grid>
-      </Grid>
-    </Toolbar>
-  </AppBar>
+      </Toolbar>
+    </AppBar>
   );
 };
 
-const TopBar = connect(mapStateToProps)(ReduxTopBar);
 export default TopBar;

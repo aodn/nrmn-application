@@ -13,7 +13,7 @@ import Alert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import {titleCase} from 'title-case';
-import {LoadingBanner} from '../layout/loadingBanner';
+import LoadingBanner from '../layout/loadingBanner';
 
 const renderError = (msgArray) => {
   return (msgArray.length > 0) ? <><Box><Alert severity='error' variant='filled'>{msgArray}</Alert></Box></> : <></>;

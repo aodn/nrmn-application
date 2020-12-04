@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function App() {
+const App = () => {
   const classes = useStyles();
   const themeState = useSelector(state => state.theme);
   const leftSideMenuIsOpen = useSelector(state => state.toggle.leftSideMenuIsOpen);
@@ -114,5 +114,7 @@ export default function App() {
       </ThemeProvider>
     </div>
   );
-}
+};
+
+export default App;
 

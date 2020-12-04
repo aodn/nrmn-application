@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
@@ -15,6 +16,7 @@ const handleMultiChanges = (values, props, entities) => {
 };
 
 const ArrayApiField = (props) => {
+
   const dispatch = useDispatch();
 
   const items = useSelector(state => state.form.entities);
@@ -38,6 +40,16 @@ const ArrayApiField = (props) => {
       onChange={(event, newValues) => handleMultiChanges(newValues, props, entities)}
       renderInput={(params) => <TextField {...params} label={'enter ' + props.name} variant="outlined" />}
     />) : (<></>);
+};
+
+
+ ArrayApiField.propTypes = {
+  name: PropTypes.string,
+  schema : {
+    items : {
+      $ref : PropTypes.string
+    }
+  }
 };
 
 export default ArrayApiField;
