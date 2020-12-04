@@ -47,7 +47,7 @@ const GenericForm = () => {
     return renderError('ERROR: API Schema not found');
   }
   if ( typeof (schemaDefinition[entityTitle]) == 'undefined') {
-    return renderError('ERROR: Entity ' + entityTitle + ' missing from API Schema');
+    return renderError('ERROR: Entity \'' + entityTitle + '\' missing from API Schema');
   }
 
   const fields = {ArrayField: ArrayApiField};
