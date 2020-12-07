@@ -75,7 +75,7 @@ const SideMenu = () => {
             }}
         >
             <div className={classes.drawerHeader}>
-                <IconButton onClick={handleMainMenu}>
+                <IconButton onClick={() => handleMainMenu(dispatch)}>
                     {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
                 </IconButton>
             </div>
