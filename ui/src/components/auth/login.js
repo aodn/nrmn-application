@@ -1,9 +1,9 @@
 import React from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import BaseForm from '../../../../ui/src/components/BaseForm';
-import {loginSubmitted} from './auth-reducer';
-import {useLocation}  from 'react-router-dom';
-
+import { loginSubmitted } from './auth-reducer';
+import { useLocation } from 'react-router-dom';
+import CircularIntegration from '../layout/CircularIntegration';
 
 var Login = () => {
 
@@ -45,6 +45,7 @@ var Login = () => {
   };
 
   return (
+    <>
       <BaseForm
         schema={schema}
         uiSchema={uiSchema}
@@ -52,6 +53,8 @@ var Login = () => {
         loading={loading}
         onSubmit={handleLogin}>
       </BaseForm>
+      <CircularIntegration></CircularIntegration>
+    </>
   );
 };
 

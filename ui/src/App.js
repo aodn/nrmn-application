@@ -58,8 +58,9 @@ const App = () => {
   let theme = createMuiTheme({
     palette: {
       text: {
-        primary: themeState.themeType ? '#eee' : '#607d8b',
-        secondary: themeState.themeType ? '#999' : '#555'
+    //    primary: themeState.themeType ? '#eee' : '#607d8b',
+   //     contrastText: themeState.themeType ? '#333' : '#fff',
+    //    secondary: themeState.themeType ? '#999' : '#555'
       },
       primary: blueGrey,
       secondary: {

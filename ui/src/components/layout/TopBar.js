@@ -81,8 +81,8 @@ const TopBar = () => {
             </Grid>
           </Grid>
           <Grid item >
-            <AuthState /> |
-          <SettingsMenu />
+            <AuthState />
+            <SettingsMenu />
           </Grid>
         </Grid>
       </Toolbar>

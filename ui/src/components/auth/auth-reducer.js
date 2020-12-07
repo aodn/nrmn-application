@@ -3,7 +3,11 @@ import {
   createSlice
 } from '@reduxjs/toolkit';
 
-const initialState = JSON.parse(localStorage.getItem('auth')) || {};
+const initialState = JSON.parse(localStorage.getItem('auth')) || {
+  loading: false,
+  success: false,
+  username: ''
+};
 
 const authSlice = createSlice({
   name: 'auth',
@@ -18,6 +22,7 @@ const authSlice = createSlice({
         state.username = JSON.parse(action.payload.config.data).username;
         localStorage.setItem('auth', JSON.stringify(state));
         state.errors = undefined;
+        state.success = true;
         state.loading = false;
         window.location = (action.payload.redirect) ? action.payload.redirect : '/';
     },
@@ -28,6 +33,7 @@ const authSlice = createSlice({
             `${error.field.toUpperCase()}: ${error.defaultMessage}`
         ));
       }
+      state.success = false;
       state.loading = false;
     },
     logout: (state) => {

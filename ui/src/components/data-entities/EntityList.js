@@ -127,7 +127,7 @@ const EntityList = () => {
                 domLayout='autoHeight'
                 animateRows={true}
                 onGridReady={agGridReady}
-
+                style={{minHeight: 300}}
                 defaultColDef={{
                   filter: true,
                   sortable: true,
