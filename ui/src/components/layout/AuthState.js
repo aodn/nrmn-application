@@ -1,10 +1,6 @@
 import React from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import store from '../store';
+import { useDispatch, useSelector } from 'react-redux';
 import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import TopbarButton from './TopbarButton';
 import Logout from '../auth/logout';
 import { toggleLogoutMenuOpen } from './layout-reducer';
 import { Button } from '@material-ui/core';
