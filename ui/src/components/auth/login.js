@@ -3,9 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import BaseForm from '../../../../ui/src/components/BaseForm';
 import { loginSubmitted } from './auth-reducer';
 import { useLocation } from 'react-router-dom';
-import CircularIntegration from '../layout/CircularIntegration';
 
-var Login = () => {
+const Login = () => {
 
   const schema = {
     'title': 'Login',
@@ -53,7 +52,6 @@ var Login = () => {
         loading={loading}
         onSubmit={handleLogin}>
       </BaseForm>
-      <CircularIntegration></CircularIntegration>
     </>
   );
 };
