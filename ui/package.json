@@ -22,6 +22,7 @@
     "chai": "^4.2.0",
     "eslint": "^7.14.0",
     "global": "^4.4.0",
+    "jss-plugin-global": "^10.5.0",
     "material-ui-dropzone": "^3.3.0",
     "moment-timezone": "^0.5.31",
     "pluralize": "^8.0.0",
