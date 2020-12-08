@@ -18,7 +18,7 @@ import {resetState} from "./form-reducer";
 const cellRenderer = (params) => {
   if (typeof params.value === 'object') {
     return (
-        JSON.stringify(params.value)?.replaceAll(/["\{\}]/g,'')
+        JSON.stringify(params.value)?.replaceAll(/["{}]/g,'')
             .replaceAll(',',', ').trim()
     );
   };

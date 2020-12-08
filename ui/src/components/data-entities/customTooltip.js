@@ -13,7 +13,7 @@ export default class CustomTooltip extends Component {
 
     if (typeof this.props.value === 'object') {
 
-      data = JSON.stringify(this.props.value)?.replaceAll(/["\{\}]/g,'').trim();
+      data = JSON.stringify(this.props.value)?.replaceAll(/["{}]/g,'').trim();
 
       if (data.length > 0) {
         return (

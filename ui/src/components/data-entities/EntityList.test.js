@@ -35,7 +35,7 @@ const mockState = {
   form: {
     entities: [],
     editItem: {},
-    entitySaved: {},
+    entitySaved: false,
     errors: []
   }
 };

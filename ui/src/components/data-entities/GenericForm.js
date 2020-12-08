@@ -76,7 +76,24 @@ const GenericForm = () => {
   }
 
   const formContent = ()=>{
-    if (entitySaved && Object.keys(entitySaved).length === 0) {
+    if (entitySaved) {
+      const redirectPath = "/list/" + entityTitle;
+      return <>
+        <Typography variant="h4"  >Entity saved successfully!</Typography>
+        <Box paddingY={4}>
+          <Button
+              component={Link}
+              to={redirectPath}
+              color="secondary"
+              aria-label={"List " + entityTitle}
+              variant={"contained"}>
+            List {entityName}
+          </Button>
+        </Box>
+      </>
+
+    }
+    else {
       return <Form
           schema={JSSchema}
           uiSchema={uiSchema}
@@ -84,28 +101,6 @@ const GenericForm = () => {
           fields={fields}
           formData={editItem}
       />
-    }
-    else {
-      const redirectPath = "/list/" + entityTitle;
-      return <>
-        <Typography variant="h4" >Entity saved successfully!</Typography>
-        <ul>
-          {
-            entitySaved.map(ent => {
-              return <li key={ _.uniqueId('entitySaved-')}>{ent.config.url}</li>
-            })
-          }
-        </ul>
-        <Button
-            component={Link}
-            to={redirectPath}
-            color="secondary"
-            aria-label={"List " + entityTitle}
-            variant={"contained"}>
-          List {entityName}
-        </Button>
-        </>
-
     }
   }
 

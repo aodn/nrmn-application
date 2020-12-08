@@ -1,6 +1,5 @@
 import {
-  createSlice,
-  createAction
+  createSlice
 } from "@reduxjs/toolkit";
 import pluralize from "pluralize";
 
@@ -8,7 +7,7 @@ import pluralize from "pluralize";
 const formState = {
   entities: undefined,
   editItem: {},
-  entitySaved: {},
+  entitySaved: false,
   errors: []
 };
 
@@ -23,6 +22,7 @@ const formSlice = createSlice({
     entitiesLoaded: (state, action) => {
       state.entityEdited = {};
       state.editItem = {};
+      state.entitySaved = false;
       state.entities = action.payload;
       state.errors = [];
     },
@@ -51,6 +51,7 @@ const formSlice = createSlice({
       state.editItem = {...state.editItem, ...resp};
     },
     entitiesSaved: (state, action) => {
+      debugger
       state.entitySaved = action.payload;
     }
   },
