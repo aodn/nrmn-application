@@ -3,22 +3,17 @@ package au.org.aodn.nrmn.restapi.validation.validators.entities;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 import lombok.val;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.junit.Assert.assertTrue;
-
-
-@Testcontainers
 @SpringBootTest
 @ExtendWith(PostgresqlContainerExtension.class)
-@ActiveProfiles("cicd")
+@WithTestData
 class SiteCodeExistsIT {
 
     @Autowired
@@ -45,7 +40,7 @@ class SiteCodeExistsIT {
         stage.setStagedJob(job);
         val codeFound = siteCodeExists.valid(stage);
         Assertions.assertTrue(codeFound.isValid());
-        val site = codeFound.orElseGet( () -> null);
+        val site = codeFound.orElseGet(() -> null);
 
         Assertions.assertEquals(site.getSiteName(), "South East Slade Point");
 

@@ -17,7 +17,6 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Audited(withModifiedFlag = true)
 public class LengthWeight {
     @Basic
     @Column(name = "a", table ="lengthweight_ref")

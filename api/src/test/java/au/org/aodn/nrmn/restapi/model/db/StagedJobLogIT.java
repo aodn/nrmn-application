@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
     pattern = ".*TestData"))
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @ExtendWith(PostgresqlContainerExtension.class)
+@WithNoData
 class StagedJobLogIT {
 
     @Autowired
