@@ -47,21 +47,16 @@ public class SurveyIngestionService {
 
     public Survey getSurvey(StagedRowFormatted stagedRow) {
 
-        String[] splitDepth = stagedRow.getDepth().toString().split("\\.");
-
-        int depth = Integer.parseInt(splitDepth[0]);
-        int survey_num = Integer.parseInt(splitDepth[1]);
-
         Optional<Survey> existingSurvey = surveyRepository.findOne(Example.of(Survey.builder()
-                .depth(depth)
-                .surveyNum(survey_num)
+                .depth(stagedRow.getDepth())
+                .surveyNum(stagedRow.getSurveyNum())
                 .site(stagedRow.getSite())
                 .surveyDate(Date.valueOf(stagedRow.getDate()))
                 .build()));
 
         return existingSurvey.orElseGet(() -> surveyRepository.save(Survey.builder()
-                .depth(depth)
-                .surveyNum(survey_num)
+                .depth(stagedRow.getDepth())
+                .surveyNum(stagedRow.getSurveyNum())
                 .direction(stagedRow.getDirection().toString())
                 .site(stagedRow.getSite())
                 .surveyDate(Date.valueOf(stagedRow.getDate()))
