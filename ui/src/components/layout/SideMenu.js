@@ -12,7 +12,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
@@ -89,23 +88,16 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
                 </ListItem>
                 <Collapse in={openSub} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                        <ListItem button  onClick={handleMainMenu}  className={classes.nested} component={NavLink} to="/list-file">
-                            <ListItemIcon>
-                                <StarBorder />
-                            </ListItemIcon>
-                            <ListItemText primary="List"   />
+                        <ListItem button  onClick={handleMainMenu}  className={classes.nested} component={NavLink} aweirdprop="true" to="/list/StagedJob">
+                            <ListItemText primary="List Jobs"   />
                         </ListItem>
                         <ListItem button  onClick={handleMainMenu} className={classes.nested} component={NavLink} to="/import-file">
-                            <ListItemIcon>
-                                <StarBorder />
-                            </ListItemIcon>
-                            <ListItemText primary="Add" />
+                            <ListItemText primary="Add Job" />
                         </ListItem>
                     </List>
                 </Collapse>
 
                 <ListItem button key={'Survey'}>
-                    <ListItemIcon> <MailIcon /></ListItemIcon>
                     <ListItemText primary={'Survey'} />
                 </ListItem>
             </List>
@@ -114,7 +106,6 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
                 <ListSubheader>REFERENCE DATA</ListSubheader>
                 {['Diver', 'Location', 'ObservableItem', 'Program', 'Site', 'Survey'].map((text, index) => (
                     <ListItem button key={text} component={NavLink} to={"/list/" + text} >
-                        <ListItemIcon><ArrowRight /></ListItemIcon>
                         <ListItemText primary={text} />
                     </ListItem>
                 ))}
@@ -125,7 +116,6 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
 
                 {['Extract', 'Templates'].map((text, index) => (
                     <ListItem button key={text}>
-                        <ListItemIcon><ArrowRight /></ListItemIcon>
                         <ListItemText primary={text} />
                     </ListItem>
                 ))}
