@@ -7,39 +7,43 @@ VALUES (55, 'RLS', True);
 INSERT INTO nrmn.program_ref(program_id, program_name, is_active)
 VALUES (56, 'ATRC', True);
 
-INSERT INTO nrmn.site_ref(site_id, site_code, site_name, longitude, latitude, location_id, site_attribute, is_active)
-VALUES (551, 'EYR71', 'South East Slade Point', 154, -35, 29,
-        '{"MPA": "West Coast Bays MP", "Zone": "Habitat Protection Zone 1", "State": "South Australia", "Country": "Australia", "ProxCountry": "Australia", "OldSiteCodes": "4117", "Effectiveness2": "High", "ProtectionStatus": "Restricted take multizoned", "year_of_protection": "2012"}',
+INSERT INTO nrmn.site_ref(site_id, site_code, site_name, longitude, latitude, location_id, state, country, old_site_code, mpa, protection_status, site_attribute, is_active)
+VALUES (551, 'EYR71', 'South East Slade Point', 154, -35, 29, 'South Australia', 'Australia', '{"4117"}', 'West Coast Bays MP', 'Restricted take multizoned',
+        '{"Zone": "Habitat Protection Zone 1", "ProxCountry": "Australia", "Effectiveness2": "High", "year_of_protection": "2012"}',
         True);
 
-INSERT INTO nrmn.site_ref(site_id, site_code, site_name, longitude, latitude, location_id, site_attribute, is_active)
-VALUES (1783, 'CEU4', 'Castillo', -5, 35, 29,
-        '{"State": "Ceuta", "Country": "Spain", "ProxCountry": "Spain", "ProtectionStatus": "Fishing"}',true);
+INSERT INTO nrmn.site_ref(site_id, site_code, site_name, longitude, latitude, location_id, state, country, protection_status, site_attribute, is_active)
+VALUES (1783, 'CEU4', 'Castillo', -5, 35, 29, 'Ceuta', 'Spain', 'Fishing',
+        '{"ProxCountry": "Spain"}',true);
 
 INSERT INTO nrmn.survey (program_id, site_id, survey_id, survey_date, survey_time, depth, survey_num, visibility,
-                         direction, survey_attribute)
+                         direction, notes, project_title, inside_marine_park, block_abundance_simulated)
 VALUES (55, 551, 812300132, '2006-12-04', '00:00:00', 5, 2, 7, 'SW',
-        '{"Notes": "Surveyed with a BACI design as baseline for a proposed Marine Park with at least a draft zoning plan-As opposed to general biodiversity surveys of general areas, potential MPAs or proposed MPA without draft zoning plans.", "ProjectTitle": "Baseline survey of Batemans Marine park prior to protection", "InsideMarinePark": "No", "BlockAbundanceSimulated": true}');
+        'Surveyed with a BACI design as baseline for a proposed Marine Park with at least a draft zoning plan-As opposed to general biodiversity surveys of general areas, potential MPAs or proposed MPA without draft zoning plans.',
+        'Baseline survey of Batemans Marine park prior to protection', 'No', true);
 
 INSERT INTO nrmn.survey (program_id, site_id, survey_id, survey_date, survey_time, depth, survey_num, visibility,
-                         direction, survey_attribute)
+                         direction, notes, project_title, inside_marine_park, block_abundance_simulated)
 VALUES (55, 551, 812300134, '2006-12-04', '00:00:00', 10, 2, 7, 'SW',
-        '{"Notes": "Surveyed with a BACI design as baseline for a proposed Marine Park with at least a draft zoning plan-As opposed to general biodiversity surveys of general areas, potential MPAs or proposed MPA without draft zoning plans.", "ProjectTitle": "Baseline survey of Batemans Marine park prior to protection", "InsideMarinePark": "No", "BlockAbundanceSimulated": true}');
+        'Surveyed with a BACI design as baseline for a proposed Marine Park with at least a draft zoning plan-As opposed to general biodiversity surveys of general areas, potential MPAs or proposed MPA without draft zoning plans.',
+        'Baseline survey of Batemans Marine park prior to protection', 'No', true);
 
 INSERT INTO nrmn.survey (program_id, site_id, survey_id, survey_date, survey_time, depth, survey_num, visibility,
-                         direction, survey_attribute)
+                         direction, notes, project_title, inside_marine_park, block_abundance_simulated)
 VALUES (55, 551, 812300133, '2006-12-04', '00:00:00', 15, 3, 7, 'SW',
-        '{"Notes": "Surveyed with a BACI design as baseline for a proposed Marine Park with at least a draft zoning plan-As opposed to general biodiversity surveys of general areas, potential MPAs or proposed MPA without draft zoning plans.", "ProjectTitle": "Baseline survey of Batemans Marine park prior to protection", "InsideMarinePark": "No", "BlockAbundanceSimulated": true}');
+        'Surveyed with a BACI design as baseline for a proposed Marine Park with at least a draft zoning plan-As opposed to general biodiversity surveys of general areas, potential MPAs or proposed MPA without draft zoning plans.',
+        'Baseline survey of Batemans Marine park prior to protection', 'No', true);
 
 INSERT INTO nrmn.survey (program_id, site_id, survey_id, survey_date, survey_time, depth, survey_num, visibility,
-                         direction, survey_attribute)
+                         direction, notes, project_title, inside_marine_park, block_abundance_simulated)
 VALUES (55, 551, 812300131, '2006-12-04', '00:00:00', 20, 1, 7, 'E',
-        '{"Notes": "Surveyed with a BACI design as baseline for a proposed Marine Park with at least a draft zoning plan-As opposed to general biodiversity surveys of general areas, potential MPAs or proposed MPA without draft zoning plans.", "ProjectTitle": "Baseline survey of Batemans Marine park prior to protection", "InsideMarinePark": "No", "BlockAbundanceSimulated": true}');
+        'Surveyed with a BACI design as baseline for a proposed Marine Park with at least a draft zoning plan-As opposed to general biodiversity surveys of general areas, potential MPAs or proposed MPA without draft zoning plans.',
+        'Baseline survey of Batemans Marine park prior to protection', 'No', true);
 
 INSERT INTO nrmn.survey (program_id, site_id, survey_id, survey_date, survey_time, depth, survey_num, visibility,
-                         direction, survey_attribute)
+                         direction, notes, project_title, inside_marine_park, block_abundance_simulated)
 VALUES (55, 551, 812331345, '2017-11-28', '00:00:00', 25, 1, 10, 'N',
-        '{"InsideMarinePark": "Unsure", "BlockAbundanceSimulated": true}');
+        null, null, 'Unsure', true);
 
 
 

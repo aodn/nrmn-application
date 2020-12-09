@@ -7,6 +7,7 @@ import au.org.aodn.nrmn.restapi.dto.auth.SignUpRequest;
 import au.org.aodn.nrmn.restapi.dto.payload.JwtAuthenticationResponse;
 import au.org.aodn.nrmn.restapi.model.db.SecUser;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +18,6 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Collections;
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers
 @SpringBootTest(classes = RestApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("cicd")
+@WithTestData
 @ExtendWith(PostgresqlContainerExtension.class)
 public class AuthControllerIT {
 

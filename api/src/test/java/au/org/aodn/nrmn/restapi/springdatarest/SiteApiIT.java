@@ -5,6 +5,7 @@ import au.org.aodn.nrmn.restapi.model.db.SiteTestData;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -18,8 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 import static au.org.aodn.nrmn.restapi.test.ApiUrl.entityRef;
 import static io.restassured.RestAssured.given;
@@ -30,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ExtendWith(PostgresqlContainerExtension.class)
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@WithNoData
 public class SiteApiIT {
 
     @LocalServerPort
@@ -76,6 +75,7 @@ public class SiteApiIT {
                         "\"longitude\": 147.7243," +
                         "\"latitude\": -40.13547," +
                         "\"location\": \"" + entityRef(port, "locations", location.getLocationId()) + "\"," +
+                        "\"oldSiteCodes\": [\"SIT01\", \"SIT02\"]," +
                         "\"siteAttribute\": {" +
                         "    \"OldSiteCodes\": \"2102,7617\"," +
                         "    \"State\": \"Tasmania\"," +
@@ -96,6 +96,7 @@ public class SiteApiIT {
         assertThat(updatedSite.getSiteCode(), is(equalTo("TAS377")));
         assertThat(updatedSite.getSiteAttribute().get("OldSiteCodes"), is(equalTo("2102,7617")));
         assertThat(updatedSite.getLocation().getLocationId(), is(equalTo(location.getLocationId())));
+        assertThat(updatedSite.getOldSiteCodes(), hasItems("SIT01", "SIT02"));
     }
 
     @Test

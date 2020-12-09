@@ -40,8 +40,64 @@ public class ObservableItem {
     private String observableItemName;
 
     @Basic
+    @Column(name = "common_name")
+    @Schema(title = "Common name")
+    private String commonName;
+
+    @Basic
+    @Column(name = "superseded_by")
+    @Schema(title = "Superseded by")
+    private String supersededBy;
+
+    @Basic
+    @Column(name = "phylum")
+    @Schema(title = "Phylum")
+    private String phylum;
+
+    @Basic
+    @Column(name = "class")
+    @Audited(withModifiedFlag = true, modifiedColumnName = "class_mod")
+    @Schema(title = "Class")
+    private String clazz;
+
+    @Basic
+    @Column(name = "\"order\"")
+    @Schema(title = "Order")
+    private String order;
+
+    @Basic
+    @Column(name = "family")
+    @Schema(title = "Family")
+    private String family;
+
+    @Basic
+    @Column(name = "genus")
+    @Schema(title = "Genus")
+    private String genus;
+
+    @Basic
+    @Column(name = "report_group")
+    @Schema(title = "Report group")
+    private String reportGroup;
+
+    @Basic
+    @Column(name = "habitat_groups")
+    @Schema(title = "Habitat groups")
+    private String habitatGroups;
+
+    @Basic
+    @Column(name = "template_code")
+    @Schema(title = "Template code")
+    private String templatecode;
+
+    @Basic
+    @Column(name = "letter_code")
+    @Schema(title = "Letter code")
+    private String letterCode;
+
+    @Basic
     @Column(name = "obs_item_attribute", columnDefinition = "jsonb")
-    @Schema(title = "Attributes")
+    @Schema(title = "Attributes", accessMode = Schema.AccessMode.READ_ONLY)
     @Type(type = "jsonb")
     private Map<String, String> obsItemAttribute;
 

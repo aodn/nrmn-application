@@ -1,9 +1,9 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.locationtech.jts.geom.Coordinate;
@@ -13,12 +13,8 @@ import org.locationtech.jts.geom.PrecisionModel;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Entity
 @Data
@@ -65,9 +61,45 @@ public class Site {
     @JsonIgnore
     private Point geom;
 
+    @Basic
+    @Column(name = "state")
+    @Schema(title = "State")
+    private String state;
+
+    @Basic
+    @Column(name = "country")
+    @Schema(title = "Country")
+    private String country;
+
+    @Basic
+    @Column(name = "old_site_code", columnDefinition = "varchar(50)[]")
+    @Type(type = "list-array")
+    @ArraySchema(arraySchema = @Schema(title = "Old Site codes"))
+    private List<String> oldSiteCodes;
+
+    @Basic
+    @Column(name = "mpa")
+    @Schema(title = "MPA")
+    private String mpa;
+
+    @Basic
+    @Column(name = "protection_status")
+    @Schema(title = "Protection status")
+    private String protectionStatus;
+
+    @Basic
+    @Column(name = "relief")
+    @Schema(title = "Relief")
+    private Integer relief;
+
+    @Basic
+    @Column(name = "currents")
+    @Schema(title = "Currents")
+    private Integer currents;
+
     @Column(name = "site_attribute", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    @Schema(title = "Attributes")
+    @Schema(title = "Attributes", accessMode = Schema.AccessMode.READ_ONLY)
     private Map<String, Object> siteAttribute;
 
     @Basic
@@ -81,54 +113,6 @@ public class Site {
     @JoinColumn(name = "location_id", referencedColumnName = "location_id", nullable = false)
     private Location location;
 
-    /* We need a json schema for Map<String, String> for siteAttribute for the react json-schema form as it can't 
-    /* handle Map<String, Object> */
-    
-    /* Requires a custom site_attribute mapping performed here as customising Hibernate JSON type mappings is */ 
-    /* horrible.  Hopefully a short term workaround only as pulling editable attributes out into fields is preferable */
-    /* and in the pipeline */
-    
-    /* Map OldSiteCodes to a comma separated String when getting siteAttribute */
-
-    public Map<String, String> getSiteAttribute() {
-        Function<Entry<String, Object>, String> asString = entry -> {
-            if (entry.getKey().equals("OldSiteCodes")) {
-                return String.join(",", (Collection)entry.getValue());
-            } else {
-                return entry.getValue() == null ? null : entry.getValue().toString();
-            }
-        };
-        
-        return siteAttribute == null ? null : siteAttribute.entrySet()
-            .stream()
-            .collect(Collectors.toMap(
-                e -> e.getKey(),
-                e -> asString.apply(e)
-            ));
-    }
-    
-    /* Map OldSiteCodes as a comma separated string to a List of strings and strings parsable as numbers to numbers  */
-    /* when setting siteAttribute */
-    
-    public void setSiteAttribute(Map<String, String> value) {
-        Function<Entry<String, String>, Object> asObject = entry -> {
-            if (entry.getKey().equals("OldSiteCodes")) {
-                return Arrays.asList((entry.getValue()).split(","));
-            } else if (NumberUtils.isParsable(entry.getValue())) {
-                return NumberUtils.createNumber(entry.getValue());
-            } else {
-                return entry.getValue();
-            }
-        };
-        
-        siteAttribute = value == null ? null : value.entrySet()
-            .stream()
-            .collect(Collectors.toMap(
-                e -> e.getKey(),
-                e -> asObject.apply(e)
-            ));
-    }
-    
     /* Calculate geom from lat/lon when persisting to the db.  Ideally, we would just use geom in the db and */
     /* map to lat/long fields here */
 
