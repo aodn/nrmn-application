@@ -10133,6 +10133,13 @@ parse-asn1@^5.0.0, parse-asn1@^5.1.5:
     pbkdf2 "^3.0.3"
     safe-buffer "^5.1.1"
 
+parse-data-url@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/parse-data-url/-/parse-data-url-3.0.0.tgz#a7eae0a8a035e972b3f05bb23a06a9bc82b8616a"
+  integrity sha512-U72k3mbLzeTiPgVbMIJKG+LROejvsniSMwAgz8EM+DhP0C2HYAmXu65uq2IWjYLffgZndFa42E9TCOHJCi37uA==
+  dependencies:
+    valid-data-url "^3.0.1"
+
 parse-entities@^1.1.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/parse-entities/-/parse-entities-1.2.2.tgz#c31bf0f653b6661354f8973559cb86dd1d5edf50"
@@ -13792,6 +13799,11 @@ v8-compile-cache@^2.0.3:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/v8-compile-cache/-/v8-compile-cache-2.2.0.tgz#9471efa3ef9128d2f7c6a7ca39c4dd6b5055b132"
   integrity sha512-gTpR5XQNKFwOd4clxfnhaqvfqMpqEwr4tOtCyz4MtYZX2JYhfr1JvBFKdS+7K/9rfpZR3VLX+YWBbKoxCgS43Q==
+
+valid-data-url@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/valid-data-url/-/valid-data-url-3.0.1.tgz#826c1744e71b5632e847dd15dbd45b9fb38aa34f"
+  integrity sha512-jOWVmzVceKlVVdwjNSenT4PbGghU0SBIizAev8ofZVgivk/TVHXSbNL8LP6M3spZvkR9/QolkyJavGSX5Cs0UA==
 
 validate-npm-package-license@^3.0.1:
   version "3.0.4"

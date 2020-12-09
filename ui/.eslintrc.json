@@ -60,7 +60,7 @@
                 "allowTemplateLiterals": true
             }
         ],
-        "no-console-log/no-console-log": "error",
+        "no-console-log/no-console-log": "off",
         "no-empty": "error",
         "no-trailing-spaces": "error",
         "no-unused-vars": "off"

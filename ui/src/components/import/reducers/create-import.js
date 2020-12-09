@@ -5,6 +5,7 @@ import {
 
 
 const importState = {
+    success: false,
     isLoading: false,
     sheet: [],
     fileID: ''
@@ -58,10 +59,11 @@ const importSlice = createSlice({
         },
         ImportLoaded: (state, action) => {
             console.debug('loaded');
-
+            state.success = true;
             state.isLoading  = false;
         },
         ImportFailed: (state, action) => {
+            state.success = false;
             state.isLoading  = false;
             console.debug('data import falied:', action);
         }

@@ -1,61 +1,79 @@
 import React from 'react';
-import { DropzoneDialog } from 'material-ui-dropzone';
-import XLSX from 'xlsx';
-import store from '../store';
 import { ImportRequested, ImportStarted } from './reducers/create-import';
-import { Fab } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
-import Tooltip from '@material-ui/core/Tooltip';
+import { useDispatch, useSelector } from 'react-redux';
+import BaseForm from '../BaseForm';
 
 
 const XlxsUpload = () => {
 
 
+    const schema = {
+        'title': 'Add Excel Document',
+        'type': 'object',
+        'required': [
+            'file',
+            'programId'
+        ],
+        'properties': {
+            'file': {
+                'type': 'string',
+                'title': 'Excel File',
+                format: 'data-url'
 
+            },
+            'programId': {
+                title: 'Program File',
+                type: 'number',
+                enum: [1, 2],
+                enumNames: ['RLS', 'ATRC']
 
-    const [openPopup, setOpenPopup] = React.useState(false);
-
-    const handleClose = () => {
-        setOpenPopup(false);
+            },
+            'withInvertSize': {
+                'title': 'Extended size?',
+                'type': 'boolean'
+            }
+        }
     };
 
-    const handleOpen = () => {
-        setOpenPopup(true);
+
+    const uiSchema = {
+        'file': {
+            'ui: widget': 'file'
+        },
+        'program': {
+            'ui:widget': 'file',
+            'ui:options': {
+                addable: false
+            }
+        }
     };
 
-    const onAddFile = (fileObjs) => {
-        store.dispatch(ImportStarted);
-        setOpenPopup(false);
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const workbook = XLSX.read(event.target.result, { type: 'binary' });
-            console.debug(workbook);
-            const dataSheet = XLSX.utils.sheet_to_json(workbook.Sheets['DATA'], { header: 1 });
-            store.dispatch(ImportRequested({ sheet: dataSheet, fileID: fileObjs[0].name + '-' + fileObjs[0].lastModified }));
+    const dispatch = useDispatch();
+    const isLoading = useSelector(state => state.import.isLoading);
+    const success = useSelector(state => state.import.success);
+
+    const handleSubmit = (form) => {
+        console.log(form.formData.file);
+        dispatch(ImportStarted());
+        const data = {
+            file: form.formData.file,
+            programId: form.formData.programId,
+            withInvertSize: form.formData.withInvertSize || false
         };
-        console.debug(fileObjs);
-        reader.readAsBinaryString(fileObjs[0]);
+        console.log(data);
+        dispatch(ImportRequested(data));
 
     };
 
     return (
-        <div style={{ marginTop: 50 }}>
-            <Tooltip title="Import Excel Data" aria-label="Import Excel Data">
-                <Fab size="small" color="primary" aria-label='Import Excel Data' onClick={handleOpen}><AddIcon></AddIcon></Fab>
-            </Tooltip>
-            <DropzoneDialog
-                filesLimit={1}
-                open={openPopup}
-                onSave={onAddFile}
-                showPreviews={true}
-                acceptedFiles={
-                    ['text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
-                }
-                maxFileSize={50000000000000000000000000000000}
-                onClose={handleClose}
-            />
-        </div>
-    );
+        <BaseForm
+            schema={schema}
+            uiSchema={uiSchema}
+            //      errors={errors}
+            loading={isLoading}
+            success={success}
+            onSubmit={handleSubmit}>
+        </BaseForm>);
 };
 
 export default XlxsUpload;
