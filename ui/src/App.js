@@ -23,6 +23,7 @@ import EntityList from "./components/data-entities/EntityList";
 import Alert from "@material-ui/lab/Alert";
 import {getFullPath} from "./components/utils/helpers";
 import AlertTitle from "@material-ui/lab/AlertTitle";
+import './ag-grid.scss'
 
 const drawerWidth = 240;
 

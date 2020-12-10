@@ -2,10 +2,10 @@ import React from "react";
 
 import Form from "@rjsf/material-ui"
 import {useDispatch, useSelector} from "react-redux";
+import { Link } from 'react-router-dom'
 import {useEffect} from 'react';
-import {itemRequested, createEntityRequested, updateEntityRequested} from "./form-reducer";
 import {useParams, Redirect} from "react-router-dom";
-import ArrayApiField from './customWidgetFields/ArrayApiField';
+import NestedApiField from './customWidgetFields/NestedApiField';
 import pluralize from 'pluralize';
 import config from "react-global-configuration";
 import {Box} from "@material-ui/core";
@@ -14,6 +14,10 @@ import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import {titleCase} from "title-case";
 import {LoadingBanner} from "../layout/loadingBanner";
+import {createEntityRequested, itemRequested, updateEntityRequested} from "./middleware/entities";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import _ from 'lodash';
 
 const renderError = (msgArray) => {
   return (msgArray.length > 0) ? <><Box><Alert severity="error" variant="filled">{msgArray}</Alert></Box></> : <></>;
@@ -25,7 +29,7 @@ const GenericForm = () => {
   const schemaDefinition = config.get('api') || {};
 
   const editItem = useSelector(state => state.form.editItem);
-  const newlyCreatedEntity = useSelector(state => state.form.newlyCreatedEntity);
+  const entitySaved = useSelector(state => state.form.entitySaved);
   const errors = useSelector(state => state.form.errors);
 
   const dispatch = useDispatch();
@@ -37,12 +41,8 @@ const GenericForm = () => {
     if (id !== undefined) {
       dispatch(itemRequested(entityName + "/" + id));
     }
-  }, [newlyCreatedEntity]);
+  }, [entitySaved]);
 
-  if (Object.keys(newlyCreatedEntity).length !== 0) {
-    const redirectPath = "/list/" + entityTitle;
-    return (<Redirect to={redirectPath}></Redirect>);
-  }
   if (Object.keys(schemaDefinition).length === 0) {
     return renderError("ERROR: API Schema not found");
   }
@@ -50,23 +50,59 @@ const GenericForm = () => {
     return renderError("ERROR: Entity '" + entityTitle + "' missing from API Schema");
   }
 
-  const fields = {ArrayField: ArrayApiField}
-
   const handleSubmit = (form) => {
-
-    const data = {path: entityName, id: id, data: form.formData}
-    console.info("submited:", data);
-    (Object.keys(editItem).length === 0) ?
-      dispatch(createEntityRequested(data)) :
-      dispatch(updateEntityRequested(data));
+    const data = {path: entityName, id: id, data: form.formData};
+    (id) ?
+      dispatch(updateEntityRequested(data)) :
+      dispatch(createEntityRequested(data)) ;
   }
 
   const entityDef = schemaDefinition[entityTitle];
 
   let fullTitle = (id) ?  "Edit " + entityTitle + " '" + id + "'" : "Add '" + entityTitle + "'" ;
   const entitySchema = {title: fullTitle, ...entityDef}
-
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
+
+  const uiSchemaHacks = Object.keys(entitySchema.properties).filter( key => {
+    return entitySchema.properties[key].type === "string" && entitySchema.properties[key].format === "uri"
+  } )
+  const uiSchema = {};
+  uiSchemaHacks.map( key => {
+    uiSchema[key] = {'ui:field': "relationship"}
+  });
+
+  const fields = {
+    relationship: NestedApiField
+  }
+
+  const formContent = ()=>{
+    if (entitySaved) {
+      const redirectPath = "/list/" + entityTitle;
+      return <>
+        <Typography variant="h4"  >Entity saved successfully!</Typography>
+        <Box paddingY={4}>
+          <Button
+              component={Link}
+              to={redirectPath}
+              color="secondary"
+              aria-label={"List " + entityTitle}
+              variant={"contained"}>
+            List {entityName}
+          </Button>
+        </Box>
+      </>
+
+    }
+    else {
+      return <Form
+          schema={JSSchema}
+          uiSchema={uiSchema}
+          onSubmit={handleSubmit}
+          fields={fields}
+          formData={editItem}
+      />
+    }
+  }
 
   if (errors.length > 0) {
     return renderError(errors)
@@ -78,7 +114,6 @@ const GenericForm = () => {
     else {
       return (id && Object.keys(editItem).length === 0) ?
           <LoadingBanner variant={"h5"} msg={"Loading '" + titleCase(entityName) + "' form"  } /> :
-
           <Grid
               container
               spacing={0}
@@ -88,19 +123,12 @@ const GenericForm = () => {
           >
             <Paper>
               <Box mx="auto" bgcolor="background.paper" pt={2} px={3} pb={3}>
-
-                <Form
-                    schema={JSSchema}
-                    onSubmit={handleSubmit}
-                    fields={fields}
-                    formData={editItem}
-                />
+                {formContent()}
               </Box>
             </Paper>
           </Grid>
     }
   }
-
 }
 
 export default GenericForm;

@@ -9,6 +9,10 @@ const axiosInstance = axios.create({
   headers: { "Content-Type": "application/json" }
 });
 
+axiosInstance.all = function all(promises) {
+  return Promise.all(promises);
+};
+
 axiosInstance.interceptors.response.use((response) => {
 
   return response;

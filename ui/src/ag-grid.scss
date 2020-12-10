@@ -1,0 +1,56 @@
+@import "~ag-grid-community/src/styles/ag-grid.scss";
+@import "~ag-grid-community/src/styles/ag-theme-alpine/sass/ag-theme-alpine-mixin";
+@import "~ag-grid-community/src/styles/ag-theme-alpine-dark/sass/ag-theme-alpine-dark-mixin";
+
+$grid-size: 4px;
+
+.ag-theme-alpine {
+  @include ag-theme-alpine((
+    // use theme parameters where possible
+    // references colors from material-ui createMuiTheme() in App.js
+    grid-size: $grid-size,
+    alpine-active-color: slategray
+  ));
+}
+
+.ag-theme-alpine-dark {
+
+  a {
+    color: #26b0bf;
+  }
+  a:visited {
+    color: #2a5b73;;
+  }
+  @include ag-theme-alpine-dark((
+    // use theme parameters where possible
+    // references colors from material-ui createMuiTheme() in App.js
+    grid-size: $grid-size,
+    alpine-active-color: slategray,
+    background-color: #2f2f2f
+  ));
+  .custom-tooltip .body {
+    color:slategray
+  }
+}
+
+.custom-tooltip {
+  position: absolute;
+  height: auto;
+  width: auto;
+  pointer-events: none;
+  transition: opacity 1s;
+}
+
+.custom-tooltip.ag-tooltip-hiding {
+  opacity: 0;
+  display:none;
+}
+
+.custom-tooltip .body {
+  margin-left: 10px;
+  padding: 5px;
+  white-space: nowrap;
+  border: 2px solid grey;
+  background-color: white;
+  border-radius: 4px;
+}

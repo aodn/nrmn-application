@@ -4,6 +4,29 @@ export const preventSpaces = value => {
   return value.replace(/ /g, "");
 };
 
+export const isSuccessful200Response = value => {
+  const min=200;
+  const max=300;
+  return value >= min && value <= max;
+}
+
+// strip URL's of parameters markup from spring rest @Projection. iE: curly braces
+export const stripCurlyBraces = value => {
+  return value.replace(/[{}]+/g,'')
+};
+
+export const markupProjectionQuery = (url) => {
+
+  let cleanedUrl = stripCurlyBraces(url);
+
+  if (cleanedUrl.endsWith('?projection')) {
+    return cleanedUrl + "=selection"
+  }
+  else {
+    return cleanedUrl + "?projection=selection"
+  }
+};
+
 export const getSearchParams = (location) => {
   return new URLSearchParams(location.search);
 }
