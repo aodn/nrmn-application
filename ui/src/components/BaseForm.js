@@ -62,7 +62,7 @@ const BaseForm = (params) => {
     });
   }
 
-  const errorAlert = params.errors ? <Alert severity='error' variant='filled' >{getErrors(params.errors)}
+  const errorAlert = params.errors?.length > 0 ? <Alert severity='error' variant='filled' >{getErrors(params.errors)}
   </Alert> : '';
 
   return <>

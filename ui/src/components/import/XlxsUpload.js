@@ -50,6 +50,7 @@ const XlxsUpload = () => {
     const success = useSelector(state => state.import.success);
     const percentCompleted = useSelector(state => state.import.percentCompleted);
     const jobId = useSelector(state => state.import.jobId);
+    const errors = useSelector(state => state.import.errors);
 
     const handleSubmit = (form) => {
         dispatch(ImportStarted());
@@ -62,18 +63,20 @@ const XlxsUpload = () => {
 
     };
 
-    if (jobId !== ''){
+    if (jobId !== '') {
         return (<Redirect component='link' to={'/validation/' + jobId} ></Redirect>);
     }
     return (
         <Box>
-            {isLoading && <LinearProgress variant='determinate' value={percentCompleted} />}
+            {isLoading && percentCompleted >= 0 && <LinearProgress variant='determinate' value={percentCompleted} />}
             <BaseForm
                 schema={schema}
                 uiSchema={uiSchema}
                 loading={isLoading}
                 success={success}
+                errors={errors.map(e => e.message)}
                 onSubmit={handleSubmit}>
+
             </BaseForm>
         </Box>);
 };

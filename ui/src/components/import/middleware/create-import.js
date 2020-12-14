@@ -12,7 +12,8 @@ function* createImport(params) {
         console.log(payload);
         yield put(ImportLoaded(payload.data));
     } catch (e) {
-        yield put(ImportFailed(e));
+        console.log(e);
+        yield put(ImportFailed(e.response.data));
     }
 }
 
