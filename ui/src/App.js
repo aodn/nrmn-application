@@ -14,10 +14,11 @@ import { blueGrey, deepPurple } from '@material-ui/core/colors';
 import {
   BrowserRouter as Router,
   Switch,
-  Route
+  Route,
+  Redirect
 } from 'react-router-dom';
-import FileList from './components/import/FileList';
-import ImportPage from './components/import/Index';
+import XlxsUpload from './components/import/XlxsUpload';
+import ValidationPage from './components/import/ValidationJob';
 import GenericForm from './components/data-entities/GenericForm';
 import { useSelector } from 'react-redux';
 import EntityList from './components/data-entities/EntityList';
@@ -57,11 +58,6 @@ const App = () => {
 
   let theme = createMuiTheme({
     palette: {
-      text: {
-        //    primary: themeState.themeType ? '#eee' : '#607d8b',
-        //     contrastText: themeState.themeType ? '#333' : '#fff',
-        //    secondary: themeState.themeType ? '#999' : '#555'
-      },
       primary: blueGrey,
       secondary: {
         main: deepPurple[300]
@@ -102,8 +98,11 @@ const App = () => {
             })}
           >
             <Switch>
-              <Route path={['/import-file/:fileID?']} component={ImportPage} />
-              <Route path='/list-file' component={FileList} />
+              <Route exact path='/' render={() => (
+                <Redirect to='/upload' />
+              )} />
+              <Route path='/validation/:jobId' component={ValidationPage} />
+              <Route path='/upload'component={XlxsUpload} />
               <Route path='/login' component={Login} />
               <Route path='/form/:entityName/:id?' component={GenericForm} />
               <Route path='/list/:entityName' component={EntityList} />

@@ -9,6 +9,8 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -54,10 +56,6 @@ public class UserActionAudit {
     }
 
     public UserActionAudit(String operation, String details) {
-        auditTime = new Timestamp(System.currentTimeMillis());
-        this.operation = operation;
-        this.username = null;
-        this.requestId = ThreadContext.get("requestId");
-        this.details = details;
+        this(operation, details, getContext().getAuthentication());
     }
 }

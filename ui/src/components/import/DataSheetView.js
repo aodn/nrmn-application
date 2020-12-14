@@ -84,7 +84,7 @@ const DataSheetView = () => {
     const condition = sheet && sheet.length && !isLoading;
     return (<Box>
         {condition &&
-            <div style={{ height: size.height - 200, width: '100%', marginTop: 25 }} className={themeType ? 'ag-theme-material-dark' : 'ag-theme-material'} >
+            <div style={{ height: size. height - 200, width: '100%', marginTop: 25 }} className={themeType ? 'ag-theme-material-dark' : 'ag-theme-material'} >
                 <AgGridReact
                     pivotMode={true}
                     pivotColumnGroupTotals={'before'}

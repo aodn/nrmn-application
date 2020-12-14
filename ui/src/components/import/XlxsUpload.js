@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import BaseForm from '../BaseForm';
 import { Box } from '@material-ui/core';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import { Redirect } from 'react-router';
 
 
 const XlxsUpload = () => {
@@ -30,7 +31,7 @@ const XlxsUpload = () => {
                 'title': 'Extended size?',
                 'type': 'boolean'
             }
-       }
+        }
     };
 
     const uiSchema = {
@@ -48,7 +49,7 @@ const XlxsUpload = () => {
     const isLoading = useSelector(state => state.import.isLoading);
     const success = useSelector(state => state.import.success);
     const percentCompleted = useSelector(state => state.import.percentCompleted);
-
+    const jobId = useSelector(state => state.import.jobId);
 
     const handleSubmit = (form) => {
         dispatch(ImportStarted());
@@ -57,14 +58,16 @@ const XlxsUpload = () => {
             programId: form.formData.programId,
             withInvertSize: form.formData.withInvertSize || false
         };
-        console.log('data', data);
         dispatch(ImportRequested(data));
 
     };
 
+    if (jobId !== ''){
+        return (<Redirect component='link' to={'/validation/' + jobId} ></Redirect>);
+    }
     return (
         <Box>
-            {isLoading && <LinearProgress variant="determinate" value={percentCompleted} />}
+            {isLoading && <LinearProgress variant='determinate' value={percentCompleted} />}
             <BaseForm
                 schema={schema}
                 uiSchema={uiSchema}

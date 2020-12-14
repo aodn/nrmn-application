@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.service;
 
 
+import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 import lombok.val;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,7 +29,7 @@ import static org.testcontainers.containers.localstack.LocalStackContainer.Servi
 
 @Testcontainers
 @SpringBootTest
-@ActiveProfiles("cicd")
+@WithTestData
 public class SpreadSheetServiceIT {
 
     @Autowired

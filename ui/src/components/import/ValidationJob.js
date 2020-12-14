@@ -1,16 +1,12 @@
 import React from 'react';
-import XlxsUpload from './XlxsUpload';
 import DataSheetView from './DataSheetView';
 
-
-const ImportPage = () => {
-
+const ValidationJob = () => {
     return (
         <div>
-            <XlxsUpload></XlxsUpload>
             <DataSheetView></DataSheetView>
         </div>
     );
 };
 
-export default ImportPage;
+export default ValidationJob;

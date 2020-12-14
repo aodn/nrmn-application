@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.15
--- Dumped by pg_dump version 13.0 (Ubuntu 13.0-1.pgdg20.04+1)
+-- Dumped from database version 9.6.20
+-- Dumped by pg_dump version 13.1 (Ubuntu 13.1-1.pgdg20.04+1)
 
--- Started on 2020-10-14 16:03:48 AEDT
+-- Started on 2020-12-08 11:26:48 AEDT
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -19,7 +19,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 13 (class 2615 OID 17868)
+-- TOC entry 6 (class 2615 OID 121010)
 -- Name: nrmn; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -27,82 +27,31 @@ CREATE SCHEMA nrmn;
 
 
 --
--- TOC entry 430 (class 1255 OID 78212)
+-- TOC entry 1507 (class 1255 OID 124033)
 -- Name: obs_biomass(double precision, double precision, double precision, double precision, integer, boolean); Type: FUNCTION; Schema: nrmn; Owner: -
 --
 
 CREATE FUNCTION nrmn.obs_biomass(a double precision, b double precision, cf double precision, sizeclass double precision, num integer, use_sizeclass_correction boolean DEFAULT false) RETURNS double precision
     LANGUAGE plpgsql
     SET search_path TO 'nrmn', 'public'
-    AS '
-
-begin
-
-sizeclass = case
- when sizeclass = 0 then null
- when not use_sizeclass_correction then sizeclass
- when sizeclass <= 15.0 then 1.2 * sizeclass
- when sizeclass <= 35.0 then 0.712 * sizeclass  + 9.02
- when sizeclass > 35.0 then 0.9244 * sizeclass - 0.2624
-end;
-
-sizeclass = cast(sizeclass as numeric(5,1));
-
-return (a * (cf * sizeclass)^b * num);
-
-end; ';
+    AS ' begin sizeclass = case 	when sizeclass = 0 then null 	when not use_sizeclass_correction then sizeclass 	when sizeclass <= 15.0 then 1.2 * sizeclass 	when sizeclass <= 35.0 then 0.712 * sizeclass + 9.02 	when sizeclass > 35.0 then 0.9244 * sizeclass - 0.2624 end; sizeclass = cast(sizeclass as numeric(5,1)); return (a * (cf * sizeclass)^b * num); end; ';
 
 
 --
--- TOC entry 433 (class 1255 OID 78213)
+-- TOC entry 1508 (class 1255 OID 124034)
 -- Name: taxonomic_name(character varying, boolean); Type: FUNCTION; Schema: nrmn; Owner: -
 --
 
 CREATE FUNCTION nrmn.taxonomic_name(obs_item_name character varying, allow_square_brackets boolean DEFAULT true) RETURNS character varying
     LANGUAGE plpgsql
     SET search_path TO 'nrmn', 'public'
-    AS '
-declare taxonomic_name   varchar(100);
-begin
-
- select
-  case
-   when oi.obs_item_attribute::jsonb ->> ''Phylum''=''Substrate''
-     then oi.observable_item_name
-   when observable_item_name ~ ''[\[\]]'' and allow_square_brackets
-     then oi.observable_item_name
-   when oi.obs_item_attribute::jsonb ? ''SpeciesEpithet'' and oi.obs_item_attribute::jsonb ? ''Genus''
-     then concat(oi.obs_item_attribute::jsonb ->> ''Genus'', '' '', oi.obs_item_attribute::jsonb ->> ''SpeciesEpithet'')
-   when not oi.obs_item_attribute::jsonb ? ''SpeciesEpithet'' and oi.obs_item_attribute::jsonb ? ''Genus''
-     then concat(oi.obs_item_attribute::jsonb ->> ''Genus'', '' spp.'')
-   when not oi.obs_item_attribute::jsonb ? ''SpeciesEpithet'' and not oi.obs_item_attribute::jsonb ? ''Genus''
-     and oi.obs_item_attribute::jsonb ? ''Family''
-     then concat(replace(oi.obs_item_attribute::jsonb ->> ''Family'', ''idae'', ''id''), '' spp.'')
-   when not oi.obs_item_attribute::jsonb ? ''SpeciesEpithet'' and not oi.obs_item_attribute::jsonb ? ''Genus''
-     and not oi.obs_item_attribute::jsonb ? ''Family'' and oi.obs_item_attribute::jsonb ? ''Order''
-     then concat(oi.obs_item_attribute::jsonb ->> ''Order'', '' spp.'')
-   when not oi.obs_item_attribute::jsonb ? ''SpeciesEpithet'' and not oi.obs_item_attribute::jsonb ? ''Genus''
-     and not oi.obs_item_attribute::jsonb ? ''Family'' and not oi.obs_item_attribute::jsonb ? ''Order''
-     and oi.obs_item_attribute::jsonb ? ''Class''
-     then concat(oi.obs_item_attribute::jsonb ->> ''Class'', '' spp.'')
-   when not oi.obs_item_attribute::jsonb ? ''SpeciesEpithet'' and not oi.obs_item_attribute::jsonb ? ''Genus''
-     and not oi.obs_item_attribute::jsonb ? ''Family'' and not oi.obs_item_attribute::jsonb ? ''Order''
-     and not oi.obs_item_attribute::jsonb ? ''Class'' and oi.obs_item_attribute::jsonb ? ''Phylum''
-     then concat(oi.obs_item_attribute::jsonb ->> ''Phylum'', '' spp.'')
-  end taxonomic_name
-  into taxonomic_name
-from observable_item_ref oi
-where oi.observable_item_name = obs_item_name;
-
-return taxonomic_name;
-
-end; ';
+    AS ' declare taxonomic_name varchar(100); begin 	select 		case 			when oi.phylum=''Substrate'' 				 then oi.observable_item_name 			when observable_item_name ~ ''[\[\]]'' and allow_square_brackets 				 then oi.observable_item_name 			when oi.obs_item_attribute::jsonb ? ''SpeciesEpithet'' and oi.genus is not null 				 then concat(oi.genus, '' '', oi.obs_item_attribute::jsonb ->> ''SpeciesEpithet'') 			when not oi.obs_item_attribute::jsonb ? ''SpeciesEpithet'' and oi.genus is not null 				 then concat(oi.genus, '' spp.'') 			when not oi.obs_item_attribute::jsonb ? ''SpeciesEpithet'' and oi.genus is null 				 and oi.family is not null 				 then concat(replace(oi.family, ''idae'', ''id''), '' spp.'') 			when not oi.obs_item_attribute::jsonb ? ''SpeciesEpithet'' and oi.genus is null 				 and oi.family is null and oi."order" is not null 				 then concat(oi."order", '' spp.'') 			when not oi.obs_item_attribute::jsonb ? ''SpeciesEpithet'' and oi.genus is null 				 and oi.family is null and oi."order" is null 				 and oi.class is not null 				 then concat(oi.class, '' spp.'') 			when not oi.obs_item_attribute::jsonb ? ''SpeciesEpithet'' and oi.genus is null 				 and oi.family is null and oi."order" is null 				 and oi.class is null and oi.phylum is not null 				 then concat(oi.phylum, '' spp.'') 		end	taxonomic_name 		into taxonomic_name from observable_item_ref oi where oi.observable_item_name = obs_item_name; return taxonomic_name; end; ';
 
 
 SET default_tablespace = '';
 
 --
--- TOC entry 207 (class 1259 OID 78214)
+-- TOC entry 221 (class 1259 OID 123797)
 -- Name: aphia_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -138,7 +87,7 @@ CREATE TABLE nrmn.aphia_ref (
 
 
 --
--- TOC entry 208 (class 1259 OID 78220)
+-- TOC entry 215 (class 1259 OID 123758)
 -- Name: aphia_rel_type_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -149,7 +98,7 @@ CREATE TABLE nrmn.aphia_rel_type_ref (
 
 
 --
--- TOC entry 209 (class 1259 OID 78223)
+-- TOC entry 223 (class 1259 OID 123810)
 -- Name: atrc_rugosity; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -160,7 +109,7 @@ CREATE TABLE nrmn.atrc_rugosity (
 
 
 --
--- TOC entry 210 (class 1259 OID 78226)
+-- TOC entry 202 (class 1259 OID 123687)
 -- Name: diver_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -172,7 +121,7 @@ CREATE TABLE nrmn.diver_ref (
 
 
 --
--- TOC entry 211 (class 1259 OID 78229)
+-- TOC entry 230 (class 1259 OID 123851)
 -- Name: diver_ref_diver_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -185,8 +134,8 @@ CREATE SEQUENCE nrmn.diver_ref_diver_id
 
 
 --
--- TOC entry 4031 (class 0 OID 0)
--- Dependencies: 211
+-- TOC entry 4022 (class 0 OID 0)
+-- Dependencies: 230
 -- Name: diver_ref_diver_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -194,7 +143,7 @@ ALTER SEQUENCE nrmn.diver_ref_diver_id OWNED BY nrmn.diver_ref.diver_id;
 
 
 --
--- TOC entry 212 (class 1259 OID 78231)
+-- TOC entry 214 (class 1259 OID 123753)
 -- Name: obs_item_type_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -206,7 +155,7 @@ CREATE TABLE nrmn.obs_item_type_ref (
 
 
 --
--- TOC entry 213 (class 1259 OID 78234)
+-- TOC entry 216 (class 1259 OID 123763)
 -- Name: observable_item_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -216,12 +165,23 @@ CREATE TABLE nrmn.observable_item_ref (
     obs_item_type_id integer NOT NULL,
     aphia_id integer,
     aphia_rel_type_id integer,
+    common_name character varying(100),
+    superseded_by character varying(100),
+    phylum character varying(50),
+    class character varying(50),
+    "order" character varying(50),
+    family character varying(50),
+    genus character varying(50),
+    report_group character varying(50),
+    habitat_groups character varying(50),
+    template_code character varying(10),
+    letter_code character varying(20),
     obs_item_attribute jsonb
 );
 
 
 --
--- TOC entry 214 (class 1259 OID 78240)
+-- TOC entry 205 (class 1259 OID 123702)
 -- Name: observation; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -237,7 +197,7 @@ CREATE TABLE nrmn.observation (
 
 
 --
--- TOC entry 215 (class 1259 OID 78246)
+-- TOC entry 212 (class 1259 OID 123740)
 -- Name: survey; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -251,12 +211,19 @@ CREATE TABLE nrmn.survey (
     survey_num integer NOT NULL,
     visibility integer,
     direction character varying(10),
-    survey_attribute jsonb
+    longitude double precision,
+    latitude double precision,
+    protection_status character varying(100),
+    inside_marine_park character varying(50),
+    notes character varying(1000),
+    pq_catalogued boolean,
+    block_abundance_simulated boolean,
+    project_title character varying(100)
 );
 
 
 --
--- TOC entry 216 (class 1259 OID 78252)
+-- TOC entry 218 (class 1259 OID 123779)
 -- Name: survey_method; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -271,17 +238,17 @@ CREATE TABLE nrmn.survey_method (
 
 
 --
--- TOC entry 217 (class 1259 OID 78258)
+-- TOC entry 246 (class 1259 OID 124051)
 -- Name: ep_rarity_abundance; Type: MATERIALIZED VIEW; Schema: nrmn; Owner: -
 --
 
 CREATE MATERIALIZED VIEW nrmn.ep_rarity_abundance AS
  WITH taxa AS (
          SELECT oi.observable_item_id,
-            nrmn.taxonomic_name((COALESCE((oi.obs_item_attribute ->> 'SupersededBy'::text), (oi.observable_item_name)::text))::character varying) AS taxon
+            nrmn.taxonomic_name(COALESCE(oi.superseded_by, oi.observable_item_name)) AS taxon
            FROM (nrmn.observable_item_ref oi
              JOIN nrmn.obs_item_type_ref oit ON ((oit.obs_item_type_id = oi.obs_item_type_id)))
-          WHERE (((oit.obs_item_type_name)::text = 'Species'::text) AND (NOT ((nrmn.taxonomic_name((COALESCE((oi.obs_item_attribute ->> 'SupersededBy'::text), (oi.observable_item_name)::text))::character varying))::text ~ 'spp.$'::text)))
+          WHERE (((oit.obs_item_type_name)::text = 'Species'::text) AND (NOT ((nrmn.taxonomic_name(COALESCE(oi.superseded_by, oi.observable_item_name)))::text ~ 'spp.$'::text)))
         ), stage2 AS (
          SELECT oi.taxon,
             sm.survey_id,
@@ -305,7 +272,7 @@ CREATE MATERIALIZED VIEW nrmn.ep_rarity_abundance AS
 
 
 --
--- TOC entry 218 (class 1259 OID 78266)
+-- TOC entry 217 (class 1259 OID 123771)
 -- Name: site_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -317,23 +284,30 @@ CREATE TABLE nrmn.site_ref (
     latitude double precision,
     geom public.geometry,
     location_id integer NOT NULL,
+    state character varying(100),
+    country character varying(100),
+    old_site_code character varying(50)[],
+    mpa character varying(200),
+    protection_status character varying(100),
+    relief integer,
+    currents integer,
     site_attribute jsonb,
     is_active boolean
 );
 
 
 --
--- TOC entry 219 (class 1259 OID 78272)
+-- TOC entry 247 (class 1259 OID 124059)
 -- Name: ep_rarity_extents; Type: MATERIALIZED VIEW; Schema: nrmn; Owner: -
 --
 
 CREATE MATERIALIZED VIEW nrmn.ep_rarity_extents AS
  WITH taxa AS (
          SELECT oi.observable_item_id,
-            nrmn.taxonomic_name((COALESCE((oi.obs_item_attribute ->> 'SupersededBy'::text), (oi.observable_item_name)::text))::character varying) AS taxon
+            nrmn.taxonomic_name(COALESCE(oi.superseded_by, oi.observable_item_name)) AS taxon
            FROM (nrmn.observable_item_ref oi
              JOIN nrmn.obs_item_type_ref oit ON ((oit.obs_item_type_id = oi.obs_item_type_id)))
-          WHERE (((oit.obs_item_type_name)::text = ANY (ARRAY[('Species'::character varying)::text, ('Undescribed Species'::character varying)::text])) AND (NOT ((nrmn.taxonomic_name((COALESCE((oi.obs_item_attribute ->> 'SupersededBy'::text), (oi.observable_item_name)::text))::character varying))::text ~ 'spp.$'::text)))
+          WHERE (((oit.obs_item_type_name)::text = ANY ((ARRAY['Species'::character varying, 'Undescribed Species'::character varying])::text[])) AND (NOT ((nrmn.taxonomic_name(COALESCE(oi.superseded_by, oi.observable_item_name)))::text ~ 'spp.$'::text)))
         ), taxon_at_site AS (
          SELECT DISTINCT taxa.taxon,
             sit.site_id,
@@ -420,7 +394,7 @@ CREATE MATERIALIZED VIEW nrmn.ep_rarity_extents AS
 
 
 --
--- TOC entry 220 (class 1259 OID 78280)
+-- TOC entry 249 (class 1259 OID 124075)
 -- Name: ep_rarity_frequency; Type: MATERIALIZED VIEW; Schema: nrmn; Owner: -
 --
 
@@ -436,17 +410,17 @@ CREATE MATERIALIZED VIEW nrmn.ep_rarity_frequency AS
 
 
 --
--- TOC entry 221 (class 1259 OID 78288)
+-- TOC entry 248 (class 1259 OID 124067)
 -- Name: ep_rarity_range; Type: MATERIALIZED VIEW; Schema: nrmn; Owner: -
 --
 
 CREATE MATERIALIZED VIEW nrmn.ep_rarity_range AS
  WITH taxa AS (
          SELECT oi.observable_item_id,
-            nrmn.taxonomic_name((COALESCE((oi.obs_item_attribute ->> 'SupersededBy'::text), (oi.observable_item_name)::text))::character varying) AS taxon
+            nrmn.taxonomic_name(COALESCE(oi.superseded_by, oi.observable_item_name)) AS taxon
            FROM (nrmn.observable_item_ref oi
              JOIN nrmn.obs_item_type_ref oit ON ((oit.obs_item_type_id = oi.obs_item_type_id)))
-          WHERE (((oit.obs_item_type_name)::text = ANY (ARRAY[('Species'::character varying)::text, ('Undescribed Species'::character varying)::text])) AND (NOT ((nrmn.taxonomic_name((COALESCE((oi.obs_item_attribute ->> 'SupersededBy'::text), (oi.observable_item_name)::text))::character varying))::text ~ 'spp.$'::text)))
+          WHERE (((oit.obs_item_type_name)::text = ANY ((ARRAY['Species'::character varying, 'Undescribed Species'::character varying])::text[])) AND (NOT ((nrmn.taxonomic_name(COALESCE(oi.superseded_by, oi.observable_item_name)))::text ~ 'spp.$'::text)))
         ), taxon_at_site_with_ext AS (
          SELECT DISTINCT taxa.taxon,
             sit.site_id,
@@ -481,7 +455,7 @@ CREATE MATERIALIZED VIEW nrmn.ep_rarity_range AS
 
 
 --
--- TOC entry 222 (class 1259 OID 78296)
+-- TOC entry 224 (class 1259 OID 123813)
 -- Name: legacy_common_names; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -493,7 +467,7 @@ CREATE TABLE nrmn.legacy_common_names (
 
 
 --
--- TOC entry 223 (class 1259 OID 78299)
+-- TOC entry 222 (class 1259 OID 123805)
 -- Name: lengthweight_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -507,28 +481,28 @@ CREATE TABLE nrmn.lengthweight_ref (
 
 
 --
--- TOC entry 224 (class 1259 OID 78302)
+-- TOC entry 250 (class 1259 OID 124083)
 -- Name: ep_observable_items; Type: MATERIALIZED VIEW; Schema: nrmn; Owner: -
 --
 
 CREATE MATERIALIZED VIEW nrmn.ep_observable_items AS
  WITH supersedings AS (
-         SELECT (oi_1.obs_item_attribute ->> 'SupersededBy'::text) AS currentname,
+         SELECT oi_1.superseded_by AS currentname,
             string_agg((oi_1.observable_item_name)::text, ', '::text ORDER BY (oi_1.observable_item_name)::text) AS names,
             string_agg(((oi_1.observable_item_id)::character varying(5))::text, ', '::text ORDER BY oi_1.observable_item_name) AS ids
            FROM nrmn.observable_item_ref oi_1
-          WHERE (oi_1.obs_item_attribute ? 'SupersededBy'::text)
-          GROUP BY (oi_1.obs_item_attribute ->> 'SupersededBy'::text)
+          WHERE (oi_1.superseded_by IS NOT NULL)
+          GROUP BY oi_1.superseded_by
         )
  SELECT oi.observable_item_id,
     oi.observable_item_name,
     oit.obs_item_type_name,
-    (oi.obs_item_attribute ->> 'Phylum'::text) AS phylum,
-    (oi.obs_item_attribute ->> 'Class'::text) AS class,
-    (oi.obs_item_attribute ->> 'Order'::text) AS "order",
-    (oi.obs_item_attribute ->> 'Family'::text) AS family,
-    (oi.obs_item_attribute ->> 'Genus'::text) AS genus,
-    replace((oi.obs_item_attribute ->> 'CommonName'::text), ''''::text, ''::text) AS common_name,
+    oi.phylum,
+    oi.class,
+    oi."order",
+    oi.family,
+    oi.genus,
+    replace((oi.common_name)::text, ''''::text, ''::text) AS common_name,
     rran.range,
     rfreq.frequency,
     rabu.abundance,
@@ -536,7 +510,7 @@ CREATE MATERIALIZED VIEW nrmn.ep_observable_items AS
     cfam.common_name AS common_family_name,
     ccla.common_name AS common_class_name,
     cphy.common_name AS common_phylum_name,
-    (oi.obs_item_attribute ->> 'SupersededBy'::text) AS superseded_by,
+    oi.superseded_by,
     supersedings.ids AS superseded_ids,
     supersedings.names AS superseded_names,
     lw.a,
@@ -547,17 +521,17 @@ CREATE MATERIALIZED VIEW nrmn.ep_observable_items AS
     aph.scientificname,
     aph.status,
     aph.unacceptreason,
-    nrmn.taxonomic_name((COALESCE((oi.obs_item_attribute ->> 'SupersededBy'::text), (oi.observable_item_name)::text))::character varying) AS taxon,
-    nrmn.taxonomic_name((COALESCE((oi.obs_item_attribute ->> 'SupersededBy'::text), (oi.observable_item_name)::text))::character varying, false) AS reporting_name,
-    (oi.obs_item_attribute ->> 'ReportGroup'::text) AS report_group,
-    (oi.obs_item_attribute ->> 'HabitatGroups'::text) AS habitat_groups,
+    nrmn.taxonomic_name(COALESCE(oi.superseded_by, oi.observable_item_name)) AS taxon,
+    nrmn.taxonomic_name(COALESCE(oi.superseded_by, oi.observable_item_name), false) AS reporting_name,
+    oi.report_group,
+    oi.habitat_groups,
     (oi.obs_item_attribute ->> 'OtherGroups'::text) AS other_groups
    FROM (((((((((((nrmn.observable_item_ref oi
      JOIN nrmn.obs_item_type_ref oit ON ((oit.obs_item_type_id = oi.obs_item_type_id)))
-     LEFT JOIN supersedings ON (((oi.observable_item_name)::text = supersedings.currentname)))
-     LEFT JOIN nrmn.legacy_common_names cfam ON ((((oi.obs_item_attribute ->> 'Family'::text) = (cfam.name)::text) AND ((cfam.rank)::text = 'Family'::text))))
-     LEFT JOIN nrmn.legacy_common_names ccla ON ((((oi.obs_item_attribute ->> 'Class'::text) = (ccla.name)::text) AND ((ccla.rank)::text = 'Class'::text))))
-     LEFT JOIN nrmn.legacy_common_names cphy ON ((((oi.obs_item_attribute ->> 'Phylum'::text) = (cphy.name)::text) AND ((cphy.rank)::text = 'Phylum'::text))))
+     LEFT JOIN supersedings ON (((oi.observable_item_name)::text = (supersedings.currentname)::text)))
+     LEFT JOIN nrmn.legacy_common_names cfam ON ((((oi.family)::text = (cfam.name)::text) AND ((cfam.rank)::text = 'Family'::text))))
+     LEFT JOIN nrmn.legacy_common_names ccla ON ((((oi.class)::text = (ccla.name)::text) AND ((ccla.rank)::text = 'Class'::text))))
+     LEFT JOIN nrmn.legacy_common_names cphy ON ((((oi.phylum)::text = (cphy.name)::text) AND ((cphy.rank)::text = 'Phylum'::text))))
      LEFT JOIN nrmn.lengthweight_ref lw ON ((lw.observable_item_id = oi.observable_item_id)))
      LEFT JOIN nrmn.aphia_ref aph ON ((aph.aphia_id = oi.aphia_id)))
      LEFT JOIN nrmn.aphia_rel_type_ref art ON ((art.aphia_rel_type_id = oi.aphia_rel_type_id)))
@@ -568,7 +542,7 @@ CREATE MATERIALIZED VIEW nrmn.ep_observable_items AS
 
 
 --
--- TOC entry 225 (class 1259 OID 78310)
+-- TOC entry 203 (class 1259 OID 123692)
 -- Name: location_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -580,7 +554,7 @@ CREATE TABLE nrmn.location_ref (
 
 
 --
--- TOC entry 226 (class 1259 OID 78313)
+-- TOC entry 225 (class 1259 OID 123818)
 -- Name: meow_ecoregions; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -595,7 +569,7 @@ CREATE TABLE nrmn.meow_ecoregions (
 
 
 --
--- TOC entry 227 (class 1259 OID 78319)
+-- TOC entry 207 (class 1259 OID 123715)
 -- Name: program_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -607,42 +581,42 @@ CREATE TABLE nrmn.program_ref (
 
 
 --
--- TOC entry 228 (class 1259 OID 78322)
+-- TOC entry 244 (class 1259 OID 124035)
 -- Name: ep_site_list; Type: MATERIALIZED VIEW; Schema: nrmn; Owner: -
 --
 
 CREATE MATERIALIZED VIEW nrmn.ep_site_list AS
- SELECT (sit.site_attribute ->> 'Country'::text) AS country,
-    (sit.site_attribute ->> 'State'::text) AS area,
+ SELECT sit.country,
+    sit.state AS area,
     loc.location_name AS location,
-    (sit.site_attribute ->> 'MPA'::text) AS mpa,
+    sit.mpa,
     sit.site_code,
     sit.site_name,
-    regexp_replace((sit.site_attribute ->> 'OldSiteCodes'::text), '["\[\]]'::text, ''::text, 'gi'::text) AS old_site_codes,
+    array_to_string(sit.old_site_code, ','::text) AS old_site_codes,
     sit.latitude,
     sit.longitude,
-    ((sit.site_attribute ->> 'WaveExposure1'::text))::integer AS wave_exposure,
-    ((sit.site_attribute ->> 'Relief'::text))::integer AS relief,
+    ((sit.site_attribute ->> 'WaveExposure'::text))::integer AS wave_exposure,
+    sit.relief,
     ((sit.site_attribute ->> 'Slope'::text))::integer AS slope,
-    ((sit.site_attribute ->> 'Currents'::text))::integer AS currents,
+    sit.currents,
     meo.realm,
     meo.province,
     meo.ecoregion,
     meo.lat_zone,
     sit.geom,
     string_agg(DISTINCT (pro.program_name)::text, ', '::text ORDER BY (pro.program_name)::text) AS programs,
-    (sit.site_attribute ->> 'ProtectionStatus'::text) AS protection_status
+    sit.protection_status
    FROM ((((nrmn.site_ref sit
      JOIN nrmn.location_ref loc ON ((loc.location_id = sit.location_id)))
      JOIN nrmn.meow_ecoregions meo ON (public.st_contains(meo.geom, sit.geom)))
      LEFT JOIN nrmn.survey sur ON ((sur.site_id = sit.site_id)))
      LEFT JOIN nrmn.program_ref pro ON ((sur.program_id = pro.program_id)))
-  GROUP BY (sit.site_attribute ->> 'Country'::text), (sit.site_attribute ->> 'State'::text), loc.location_name, (sit.site_attribute ->> 'MPA'::text), sit.site_code, sit.site_name, (regexp_replace((sit.site_attribute ->> 'OldSiteCodes'::text), '["\[\]]'::text, ''::text, 'gi'::text)), sit.latitude, sit.longitude, ((sit.site_attribute ->> 'WaveExposure1'::text))::integer, ((sit.site_attribute ->> 'Relief'::text))::integer, ((sit.site_attribute ->> 'Slope'::text))::integer, ((sit.site_attribute ->> 'Currents'::text))::integer, meo.realm, meo.province, meo.ecoregion, meo.lat_zone, sit.geom, (sit.site_attribute ->> 'ProtectionStatus'::text)
+  GROUP BY sit.country, sit.state, loc.location_name, sit.mpa, sit.site_code, sit.site_name, (array_to_string(sit.old_site_code, ','::text)), sit.latitude, sit.longitude, ((sit.site_attribute ->> 'WaveExposure'::text))::integer, sit.relief, ((sit.site_attribute ->> 'Slope'::text))::integer, sit.currents, meo.realm, meo.province, meo.ecoregion, meo.lat_zone, sit.geom, sit.protection_status
   WITH NO DATA;
 
 
 --
--- TOC entry 229 (class 1259 OID 78330)
+-- TOC entry 213 (class 1259 OID 123748)
 -- Name: rugosity; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -656,7 +630,7 @@ CREATE TABLE nrmn.rugosity (
 
 
 --
--- TOC entry 230 (class 1259 OID 78333)
+-- TOC entry 204 (class 1259 OID 123697)
 -- Name: surface_type_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -667,7 +641,7 @@ CREATE TABLE nrmn.surface_type_ref (
 
 
 --
--- TOC entry 231 (class 1259 OID 78336)
+-- TOC entry 245 (class 1259 OID 124043)
 -- Name: ep_survey_list; Type: MATERIALIZED VIEW; Schema: nrmn; Owner: -
 --
 
@@ -694,29 +668,29 @@ CREATE MATERIALIZED VIEW nrmn.ep_survey_list AS
     (sur.survey_date = max(sur.survey_date) OVER (PARTITION BY sit.site_code)) AS "latest surveydate for site",
     (sm13.survey_id IS NOT NULL) AS "has pq scores in db",
     (sm6.survey_id IS NOT NULL) AS "has rugosity scores in db",
-    (sur.survey_attribute ? 'pq_catalogued'::text) AS "has pqs catalogued in db",
+    (sur.pq_catalogued IS NOT NULL) AS "has pqs catalogued in db",
     div.full_names AS divers,
     sur.visibility,
     sur.survey_time AS hour,
     sur.direction,
-    (sur.survey_attribute ->> 'SurveyLatitude'::text) AS survey_latitude,
-    (sur.survey_attribute ->> 'SurveyLongitude'::text) AS survey_longitude,
+    sur.latitude AS survey_latitude,
+    sur.longitude AS survey_longitude,
     rug.avg_rugosity,
     rug.max_rugosity,
     st.surface_type_name AS surface,
     sit.geom,
     pro.program_name AS program,
         CASE
-            WHEN (sur.survey_attribute ? 'pq_catalogued'::text) THEN concat('http://rls.tpac.org.au/pq/', (sur.survey_id)::character varying(10), '/zip')
+            WHEN (sur.pq_catalogued IS NOT NULL) THEN concat('http://rls.tpac.org.au/pq/', (sur.survey_id)::character varying(10), '/zip')
             ELSE NULL::text
         END AS pq_zip_url,
-    (sur.survey_attribute ->> 'SurveyProtectionStatus'::text) AS protection_status,
+    sur.protection_status,
     sit.old_site_codes,
     ( SELECT string_agg(DISTINCT ((sm1.method_id)::character varying(3))::text, ', '::text ORDER BY ((sm1.method_id)::character varying(3))::text) AS string_agg
            FROM nrmn.survey_method sm1
           WHERE (sm1.survey_id = sur.survey_id)
           GROUP BY sm1.survey_id) AS methods,
-    (sur.survey_attribute ->> 'Notes'::text) AS survey_notes
+    sur.notes AS survey_notes
    FROM ((((((((nrmn.survey sur
      JOIN nrmn.site_ref sit1 ON ((sit1.site_id = sur.site_id)))
      JOIN nrmn.ep_site_list sit ON (((sit.site_code)::text = (sit1.site_code)::text)))
@@ -730,7 +704,7 @@ CREATE MATERIALIZED VIEW nrmn.ep_survey_list AS
 
 
 --
--- TOC entry 232 (class 1259 OID 78344)
+-- TOC entry 219 (class 1259 OID 123787)
 -- Name: measure_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -744,7 +718,7 @@ CREATE TABLE nrmn.measure_ref (
 
 
 --
--- TOC entry 233 (class 1259 OID 78347)
+-- TOC entry 265 (class 1259 OID 124170)
 -- Name: ep_lobster_haliotis; Type: VIEW; Schema: nrmn; Owner: -
 --
 
@@ -755,6 +729,7 @@ CREATE VIEW nrmn.ep_lobster_haliotis AS
             sur.area,
             sit.ecoregion,
             sit.realm,
+            sur.location,
             sur.site_code,
             sur.site_name,
             sur.latitude,
@@ -765,20 +740,20 @@ CREATE VIEW nrmn.ep_lobster_haliotis AS
             sur.program,
             sur.visibility,
             sur.hour,
-            sur.location,
             sur.survey_latitude,
             sur.survey_longitude,
             div.full_name AS diver,
             sm.block_num AS block,
             oi.phylum,
             oi.class,
+            oi."order",
             oi.family,
             oi.observable_item_name AS recorded_species_name,
-            COALESCE(oi.superseded_by, (oi.observable_item_name)::text) AS species_name,
+            COALESCE(oi.superseded_by, oi.observable_item_name) AS species_name,
             oi.taxon,
             oi.reporting_name,
                 CASE
-                    WHEN ((meas.measure_name)::text = ANY (ARRAY[('Unsized'::character varying)::text, ('No specimen found'::character varying)::text])) THEN (0)::numeric
+                    WHEN ((meas.measure_name)::text = ANY ((ARRAY['Unsized'::character varying, 'No specimen found'::character varying])::text[])) THEN (0)::numeric
                     ELSE (replace((meas.measure_name)::text, 'cm'::text, ''::text))::numeric
                 END AS size_class,
             sum(obs.measure_value) AS total
@@ -789,10 +764,10 @@ CREATE VIEW nrmn.ep_lobster_haliotis AS
              JOIN nrmn.diver_ref div ON ((div.diver_id = obs.diver_id)))
              JOIN nrmn.ep_observable_items oi ON ((oi.observable_item_id = obs.observable_item_id)))
              JOIN nrmn.measure_ref meas ON ((meas.measure_id = obs.measure_id)))
-          WHERE ((sm.method_id = 2) AND ((oi.family = 'Palinuridae'::text) OR (oi.family = 'Haliotidae'::text)))
-          GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.location, sur.survey_latitude, sur.survey_longitude, div.full_name, sm.block_num, oi.phylum, oi.class, oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, (oi.observable_item_name)::text), oi.taxon, oi.reporting_name,
+          WHERE ((sm.method_id = 2) AND (((oi.family)::text = 'Palinuridae'::text) OR ((oi.family)::text = 'Haliotidae'::text)))
+          GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.location, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.survey_latitude, sur.survey_longitude, div.full_name, sm.block_num, oi.phylum, oi.class, oi."order", oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, oi.observable_item_name), oi.taxon, oi.reporting_name,
                 CASE
-                    WHEN ((meas.measure_name)::text = ANY (ARRAY[('Unsized'::character varying)::text, ('No specimen found'::character varying)::text])) THEN (0)::numeric
+                    WHEN ((meas.measure_name)::text = ANY ((ARRAY['Unsized'::character varying, 'No specimen found'::character varying])::text[])) THEN (0)::numeric
                     ELSE (replace((meas.measure_name)::text, 'cm'::text, ''::text))::numeric
                 END
         )
@@ -801,6 +776,7 @@ CREATE VIEW nrmn.ep_lobster_haliotis AS
     cte_to_force_joins_evaluated_first.area,
     cte_to_force_joins_evaluated_first.ecoregion,
     cte_to_force_joins_evaluated_first.realm,
+    cte_to_force_joins_evaluated_first.location,
     cte_to_force_joins_evaluated_first.site_code,
     cte_to_force_joins_evaluated_first.site_name,
     cte_to_force_joins_evaluated_first.latitude,
@@ -811,13 +787,13 @@ CREATE VIEW nrmn.ep_lobster_haliotis AS
     cte_to_force_joins_evaluated_first.program,
     cte_to_force_joins_evaluated_first.visibility,
     cte_to_force_joins_evaluated_first.hour,
-    cte_to_force_joins_evaluated_first.location,
     cte_to_force_joins_evaluated_first.survey_latitude,
     cte_to_force_joins_evaluated_first.survey_longitude,
     cte_to_force_joins_evaluated_first.diver,
     cte_to_force_joins_evaluated_first.block,
     cte_to_force_joins_evaluated_first.phylum,
     cte_to_force_joins_evaluated_first.class,
+    cte_to_force_joins_evaluated_first."order",
     cte_to_force_joins_evaluated_first.family,
     cte_to_force_joins_evaluated_first.recorded_species_name,
     cte_to_force_joins_evaluated_first.species_name,
@@ -829,7 +805,7 @@ CREATE VIEW nrmn.ep_lobster_haliotis AS
 
 
 --
--- TOC entry 234 (class 1259 OID 78352)
+-- TOC entry 255 (class 1259 OID 124120)
 -- Name: ep_m0_off_transect_sighting; Type: VIEW; Schema: nrmn; Owner: -
 --
 
@@ -839,6 +815,7 @@ CREATE VIEW nrmn.ep_m0_off_transect_sighting AS
     sur.area,
     sit.ecoregion,
     sit.realm,
+    sur.location,
     sur.site_code,
     sur.site_name,
     sur.latitude,
@@ -849,16 +826,16 @@ CREATE VIEW nrmn.ep_m0_off_transect_sighting AS
     sur.program,
     sur.visibility,
     sur.hour,
-    sur.location,
     sur.survey_latitude,
     sur.survey_longitude,
     div.full_name AS diver,
     sm.block_num AS block,
     oi.phylum,
     oi.class,
+    oi."order",
     oi.family,
     oi.observable_item_name AS recorded_species_name,
-    COALESCE(oi.superseded_by, (oi.observable_item_name)::text) AS species_name,
+    COALESCE(oi.superseded_by, oi.observable_item_name) AS species_name,
     oi.taxon,
     oi.reporting_name,
     sum(obs.measure_value) AS total
@@ -869,11 +846,11 @@ CREATE VIEW nrmn.ep_m0_off_transect_sighting AS
      JOIN nrmn.diver_ref div ON ((div.diver_id = obs.diver_id)))
      JOIN nrmn.ep_observable_items oi ON ((oi.observable_item_id = obs.observable_item_id)))
   WHERE (sm.method_id = 0)
-  GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.location, sur.survey_latitude, sur.survey_longitude, div.full_name, sm.block_num, oi.phylum, oi.class, oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, (oi.observable_item_name)::text), oi.taxon, oi.reporting_name;
+  GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.site_code, sur.location, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.survey_latitude, sur.survey_longitude, div.full_name, sm.block_num, oi.phylum, oi.class, oi."order", oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, oi.observable_item_name), oi.taxon, oi.reporting_name;
 
 
 --
--- TOC entry 235 (class 1259 OID 78357)
+-- TOC entry 251 (class 1259 OID 124091)
 -- Name: ep_m1; Type: MATERIALIZED VIEW; Schema: nrmn; Owner: -
 --
 
@@ -884,6 +861,7 @@ CREATE MATERIALIZED VIEW nrmn.ep_m1 AS
             sur.area,
             sit.ecoregion,
             sit.realm,
+            sur.location,
             sur.site_code,
             sur.site_name,
             sur.latitude,
@@ -894,7 +872,6 @@ CREATE MATERIALIZED VIEW nrmn.ep_m1 AS
             sur.program,
             sur.visibility,
             sur.hour,
-            sur.location,
             sur.survey_latitude,
             sur.survey_longitude,
             div.full_name AS diver,
@@ -902,13 +879,14 @@ CREATE MATERIALIZED VIEW nrmn.ep_m1 AS
             sm.block_num AS block,
             oi.phylum,
             oi.class,
+            oi."order",
             oi.family,
             oi.observable_item_name AS recorded_species_name,
-            COALESCE(oi.superseded_by, (oi.observable_item_name)::text) AS species_name,
+            COALESCE(oi.superseded_by, oi.observable_item_name) AS species_name,
             oi.taxon,
             oi.reporting_name,
                 CASE
-                    WHEN ((meas.measure_name)::text = ANY (ARRAY[('Unsized'::character varying)::text, ('No specimen found'::character varying)::text])) THEN (0)::numeric
+                    WHEN ((meas.measure_name)::text = ANY ((ARRAY['Unsized'::character varying, 'No specimen found'::character varying])::text[])) THEN (0)::numeric
                     ELSE (replace((meas.measure_name)::text, 'cm'::text, ''::text))::numeric
                 END AS size_class,
             sum(obs.measure_value) AS total,
@@ -925,9 +903,9 @@ CREATE MATERIALIZED VIEW nrmn.ep_m1 AS
              JOIN nrmn.ep_observable_items oi ON ((oi.observable_item_id = obs.observable_item_id)))
              JOIN nrmn.measure_ref meas ON ((meas.measure_id = obs.measure_id)))
           WHERE (sm.method_id = ANY (ARRAY[1, 8, 9, 10]))
-          GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sur.geom, sur.program, sur.visibility, sur.hour, sur.location, sur.survey_latitude, sur.survey_longitude, div.full_name, sm.block_num, oi.phylum, oi.class, oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, (oi.observable_item_name)::text), oi.taxon, oi.reporting_name,
+          GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.location, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sur.geom, sur.program, sur.visibility, sur.hour, sur.survey_latitude, sur.survey_longitude, div.full_name, sm.block_num, oi.phylum, oi.class, oi."order", oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, oi.observable_item_name), oi.taxon, oi.reporting_name,
                 CASE
-                    WHEN ((meas.measure_name)::text = ANY (ARRAY[('Unsized'::character varying)::text, ('No specimen found'::character varying)::text])) THEN (0)::numeric
+                    WHEN ((meas.measure_name)::text = ANY ((ARRAY['Unsized'::character varying, 'No specimen found'::character varying])::text[])) THEN (0)::numeric
                     ELSE (replace((meas.measure_name)::text, 'cm'::text, ''::text))::numeric
                 END, sm.method_id
         )
@@ -936,6 +914,7 @@ CREATE MATERIALIZED VIEW nrmn.ep_m1 AS
     cte_to_force_joins_evaluated_first.area,
     cte_to_force_joins_evaluated_first.ecoregion,
     cte_to_force_joins_evaluated_first.realm,
+    cte_to_force_joins_evaluated_first.location,
     cte_to_force_joins_evaluated_first.site_code,
     cte_to_force_joins_evaluated_first.site_name,
     cte_to_force_joins_evaluated_first.latitude,
@@ -946,7 +925,6 @@ CREATE MATERIALIZED VIEW nrmn.ep_m1 AS
     cte_to_force_joins_evaluated_first.program,
     cte_to_force_joins_evaluated_first.visibility,
     cte_to_force_joins_evaluated_first.hour,
-    cte_to_force_joins_evaluated_first.location,
     cte_to_force_joins_evaluated_first.survey_latitude,
     cte_to_force_joins_evaluated_first.survey_longitude,
     cte_to_force_joins_evaluated_first.diver,
@@ -954,6 +932,7 @@ CREATE MATERIALIZED VIEW nrmn.ep_m1 AS
     cte_to_force_joins_evaluated_first.block,
     cte_to_force_joins_evaluated_first.phylum,
     cte_to_force_joins_evaluated_first.class,
+    cte_to_force_joins_evaluated_first."order",
     cte_to_force_joins_evaluated_first.family,
     cte_to_force_joins_evaluated_first.recorded_species_name,
     cte_to_force_joins_evaluated_first.species_name,
@@ -967,7 +946,7 @@ CREATE MATERIALIZED VIEW nrmn.ep_m1 AS
 
 
 --
--- TOC entry 236 (class 1259 OID 78365)
+-- TOC entry 261 (class 1259 OID 124150)
 -- Name: ep_m11_off_transect_measurement; Type: VIEW; Schema: nrmn; Owner: -
 --
 
@@ -977,6 +956,7 @@ CREATE VIEW nrmn.ep_m11_off_transect_measurement AS
     sur.area,
     sit.ecoregion,
     sit.realm,
+    sur.location,
     sur.site_code,
     sur.site_name,
     sur.latitude,
@@ -987,30 +967,35 @@ CREATE VIEW nrmn.ep_m11_off_transect_measurement AS
     sur.program,
     sur.visibility,
     sur.hour,
-    sur.location,
     sur.survey_latitude,
     sur.survey_longitude,
     div.full_name AS diver,
     sm.block_num AS block,
     oi.phylum,
     oi.class,
+    oi."order",
     oi.family,
     oi.observable_item_name AS recorded_species_name,
-    COALESCE(oi.superseded_by, (oi.observable_item_name)::text) AS species_name,
+    COALESCE(oi.superseded_by, oi.observable_item_name) AS species_name,
     oi.taxon,
     oi.reporting_name,
+        CASE
+            WHEN ((meas.measure_name)::text = ANY ((ARRAY['Unsized'::character varying, 'No specimen found'::character varying])::text[])) THEN (0)::numeric
+            ELSE (replace((meas.measure_name)::text, 'cm'::text, ''::text))::numeric
+        END AS size_class,
     obs.measure_value AS total
-   FROM (((((nrmn.observation obs
+   FROM ((((((nrmn.observation obs
      JOIN nrmn.survey_method sm ON ((sm.survey_method_id = obs.survey_method_id)))
      JOIN nrmn.ep_survey_list sur ON ((sur.survey_id = sm.survey_id)))
      JOIN nrmn.ep_site_list sit ON (((sit.site_code)::text = (sur.site_code)::text)))
      JOIN nrmn.diver_ref div ON ((div.diver_id = obs.diver_id)))
      JOIN nrmn.ep_observable_items oi ON ((oi.observable_item_id = obs.observable_item_id)))
+     JOIN nrmn.measure_ref meas ON ((meas.measure_id = obs.measure_id)))
   WHERE (sm.method_id = 11);
 
 
 --
--- TOC entry 237 (class 1259 OID 78370)
+-- TOC entry 254 (class 1259 OID 124115)
 -- Name: ep_m12_debris; Type: VIEW; Schema: nrmn; Owner: -
 --
 
@@ -1020,6 +1005,7 @@ CREATE VIEW nrmn.ep_m12_debris AS
     sur.area,
     sit.ecoregion,
     sit.realm,
+    sur.location,
     sur.site_code,
     sur.site_name,
     sur.latitude,
@@ -1030,7 +1016,6 @@ CREATE VIEW nrmn.ep_m12_debris AS
     sur.program,
     sur.visibility,
     sur.hour,
-    sur.location,
     sur.survey_latitude,
     sur.survey_longitude,
     div.full_name AS diver,
@@ -1047,7 +1032,7 @@ CREATE VIEW nrmn.ep_m12_debris AS
 
 
 --
--- TOC entry 238 (class 1259 OID 78375)
+-- TOC entry 209 (class 1259 OID 123725)
 -- Name: pq_cat_res_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -1059,7 +1044,7 @@ CREATE TABLE nrmn.pq_cat_res_ref (
 
 
 --
--- TOC entry 239 (class 1259 OID 78378)
+-- TOC entry 220 (class 1259 OID 123792)
 -- Name: pq_category_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -1071,7 +1056,7 @@ CREATE TABLE nrmn.pq_category_ref (
 
 
 --
--- TOC entry 240 (class 1259 OID 78381)
+-- TOC entry 208 (class 1259 OID 123720)
 -- Name: pq_resolution_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -1082,7 +1067,7 @@ CREATE TABLE nrmn.pq_resolution_ref (
 
 
 --
--- TOC entry 241 (class 1259 OID 78384)
+-- TOC entry 211 (class 1259 OID 123735)
 -- Name: pq_score; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -1096,7 +1081,7 @@ CREATE TABLE nrmn.pq_score (
 
 
 --
--- TOC entry 242 (class 1259 OID 78387)
+-- TOC entry 260 (class 1259 OID 124145)
 -- Name: ep_m13_pq_scores; Type: VIEW; Schema: nrmn; Owner: -
 --
 
@@ -1106,6 +1091,7 @@ CREATE VIEW nrmn.ep_m13_pq_scores AS
     sur.area,
     sit.ecoregion,
     sit.realm,
+    sur.location,
     sur.site_code,
     sur.site_name,
     sur.latitude,
@@ -1116,7 +1102,6 @@ CREATE VIEW nrmn.ep_m13_pq_scores AS
     sur.program,
     sur.visibility,
     sur.hour,
-    sur.location,
     sur.survey_latitude,
     sur.survey_longitude,
     res.resolution_name AS resolution,
@@ -1135,7 +1120,7 @@ CREATE VIEW nrmn.ep_m13_pq_scores AS
 
 
 --
--- TOC entry 243 (class 1259 OID 78392)
+-- TOC entry 252 (class 1259 OID 124099)
 -- Name: ep_m2_cryptic_fish; Type: MATERIALIZED VIEW; Schema: nrmn; Owner: -
 --
 
@@ -1146,6 +1131,7 @@ CREATE MATERIALIZED VIEW nrmn.ep_m2_cryptic_fish AS
             sur.area,
             sit.ecoregion,
             sit.realm,
+            sur.location,
             sur.site_code,
             sur.site_name,
             sur.latitude,
@@ -1156,20 +1142,21 @@ CREATE MATERIALIZED VIEW nrmn.ep_m2_cryptic_fish AS
             sur.program,
             sur.visibility,
             sur.hour,
-            sur.location,
             sur.survey_latitude,
             sur.survey_longitude,
             div.full_name AS diver,
+            sm.method_id AS method,
             sm.block_num AS block,
             oi.phylum,
             oi.class,
+            oi."order",
             oi.family,
             oi.observable_item_name AS recorded_species_name,
-            COALESCE(oi.superseded_by, (oi.observable_item_name)::text) AS species_name,
+            COALESCE(oi.superseded_by, oi.observable_item_name) AS species_name,
             oi.taxon,
             oi.reporting_name,
                 CASE
-                    WHEN ((meas.measure_name)::text = ANY (ARRAY[('Unsized'::character varying)::text, ('No specimen found'::character varying)::text])) THEN (0)::numeric
+                    WHEN ((meas.measure_name)::text = ANY ((ARRAY['Unsized'::character varying, 'No specimen found'::character varying])::text[])) THEN (0)::numeric
                     ELSE (replace((meas.measure_name)::text, 'cm'::text, ''::text))::numeric
                 END AS size_class,
             sum(obs.measure_value) AS total,
@@ -1185,18 +1172,19 @@ CREATE MATERIALIZED VIEW nrmn.ep_m2_cryptic_fish AS
              JOIN nrmn.diver_ref div ON ((div.diver_id = obs.diver_id)))
              JOIN nrmn.ep_observable_items oi ON ((oi.observable_item_id = obs.observable_item_id)))
              JOIN nrmn.measure_ref meas ON ((meas.measure_id = obs.measure_id)))
-          WHERE ((sm.method_id = 2) AND ((oi.class = ANY (ARRAY['Actinopterygii'::text, 'Elasmobranchii'::text])) OR ((oi.observable_item_name)::text = 'No species found'::text)))
-          GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.location, sur.survey_latitude, sur.survey_longitude, div.full_name, sm.block_num, oi.phylum, oi.class, oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, (oi.observable_item_name)::text), oi.taxon, oi.reporting_name,
+          WHERE ((sm.method_id = 2) AND (((oi.class)::text = ANY ((ARRAY['Actinopterygii'::character varying, 'Elasmobranchii'::character varying])::text[])) OR ((oi.observable_item_name)::text = 'No species found'::text)))
+          GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.location, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.survey_latitude, sur.survey_longitude, div.full_name, sm.block_num, oi.phylum, oi.class, oi."order", oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, oi.observable_item_name), oi.taxon, oi.reporting_name,
                 CASE
-                    WHEN ((meas.measure_name)::text = ANY (ARRAY[('Unsized'::character varying)::text, ('No specimen found'::character varying)::text])) THEN (0)::numeric
+                    WHEN ((meas.measure_name)::text = ANY ((ARRAY['Unsized'::character varying, 'No specimen found'::character varying])::text[])) THEN (0)::numeric
                     ELSE (replace((meas.measure_name)::text, 'cm'::text, ''::text))::numeric
-                END
+                END, sm.method_id
         )
  SELECT cte_to_force_joins_evaluated_first.survey_id,
     cte_to_force_joins_evaluated_first.country,
     cte_to_force_joins_evaluated_first.area,
     cte_to_force_joins_evaluated_first.ecoregion,
     cte_to_force_joins_evaluated_first.realm,
+    cte_to_force_joins_evaluated_first.location,
     cte_to_force_joins_evaluated_first.site_code,
     cte_to_force_joins_evaluated_first.site_name,
     cte_to_force_joins_evaluated_first.latitude,
@@ -1207,13 +1195,14 @@ CREATE MATERIALIZED VIEW nrmn.ep_m2_cryptic_fish AS
     cte_to_force_joins_evaluated_first.program,
     cte_to_force_joins_evaluated_first.visibility,
     cte_to_force_joins_evaluated_first.hour,
-    cte_to_force_joins_evaluated_first.location,
     cte_to_force_joins_evaluated_first.survey_latitude,
     cte_to_force_joins_evaluated_first.survey_longitude,
     cte_to_force_joins_evaluated_first.diver,
+    cte_to_force_joins_evaluated_first.method,
     cte_to_force_joins_evaluated_first.block,
     cte_to_force_joins_evaluated_first.phylum,
     cte_to_force_joins_evaluated_first.class,
+    cte_to_force_joins_evaluated_first."order",
     cte_to_force_joins_evaluated_first.family,
     cte_to_force_joins_evaluated_first.recorded_species_name,
     cte_to_force_joins_evaluated_first.species_name,
@@ -1227,7 +1216,7 @@ CREATE MATERIALIZED VIEW nrmn.ep_m2_cryptic_fish AS
 
 
 --
--- TOC entry 244 (class 1259 OID 78400)
+-- TOC entry 210 (class 1259 OID 123730)
 -- Name: measure_type_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -1239,7 +1228,7 @@ CREATE TABLE nrmn.measure_type_ref (
 
 
 --
--- TOC entry 245 (class 1259 OID 78403)
+-- TOC entry 253 (class 1259 OID 124107)
 -- Name: ep_m2_inverts; Type: MATERIALIZED VIEW; Schema: nrmn; Owner: -
 --
 
@@ -1247,7 +1236,7 @@ CREATE MATERIALIZED VIEW nrmn.ep_m2_inverts AS
  WITH fish_classes AS (
          SELECT
                 CASE
-                    WHEN ((mea.measure_name)::text = ANY (ARRAY[('Unsized'::character varying)::text, ('No specimen found'::character varying)::text])) THEN (0)::numeric
+                    WHEN ((mea.measure_name)::text = ANY ((ARRAY['Unsized'::character varying, 'No specimen found'::character varying])::text[])) THEN (0)::numeric
                     ELSE (replace((mea.measure_name)::text, 'cm'::text, ''::text))::numeric
                 END AS size_class
            FROM (nrmn.measure_ref mea
@@ -1267,6 +1256,7 @@ CREATE MATERIALIZED VIEW nrmn.ep_m2_inverts AS
             sur.area,
             sit.ecoregion,
             sit.realm,
+            sur.location,
             sur.site_code,
             sur.site_name,
             sur.latitude,
@@ -1277,23 +1267,29 @@ CREATE MATERIALIZED VIEW nrmn.ep_m2_inverts AS
             sur.program,
             sur.visibility,
             sur.hour,
-            sur.location,
             sur.survey_latitude,
             sur.survey_longitude,
             div.full_name AS diver,
+            sm.method_id AS method,
             sm.block_num AS block,
             oi.phylum,
             oi.class,
+            oi."order",
             oi.family,
             oi.observable_item_name AS recorded_species_name,
-            COALESCE(oi.superseded_by, (oi.observable_item_name)::text) AS species_name,
+            COALESCE(oi.superseded_by, oi.observable_item_name) AS species_name,
             oi.taxon,
             oi.reporting_name,
                 CASE
-                    WHEN ((meas.measure_name)::text = ANY (ARRAY[('Unsized'::character varying)::text, ('No specimen found'::character varying)::text])) THEN (0)::numeric
+                    WHEN ((meas.measure_name)::text = ANY ((ARRAY['Unsized'::character varying, 'No specimen found'::character varying])::text[])) THEN (0)::numeric
                     ELSE (replace((meas.measure_name)::text, 'cm'::text, ''::text))::numeric
                 END AS size_class,
-            sum(obs.measure_value) AS total
+            sum(obs.measure_value) AS total,
+            sum(nrmn.obs_biomass(oi.a, oi.b, oi.cf, (
+                CASE
+                    WHEN ((meas.measure_name)::text ~ 'cm$'::text) THEN replace((meas.measure_name)::text, 'cm'::text, ''::text)
+                    ELSE '0'::text
+                END)::double precision, obs.measure_value)) AS biomass
            FROM ((((((nrmn.observation obs
              JOIN nrmn.survey_method sm ON ((sm.survey_method_id = obs.survey_method_id)))
              JOIN nrmn.ep_survey_list sur ON ((sur.survey_id = sm.survey_id)))
@@ -1301,18 +1297,19 @@ CREATE MATERIALIZED VIEW nrmn.ep_m2_inverts AS
              JOIN nrmn.diver_ref div ON ((div.diver_id = obs.diver_id)))
              JOIN nrmn.ep_observable_items oi ON ((oi.observable_item_id = obs.observable_item_id)))
              JOIN nrmn.measure_ref meas ON ((meas.measure_id = obs.measure_id)))
-          WHERE ((sm.method_id = 2) AND (((oi.phylum = 'Arthropoda'::text) AND (oi.class = 'Malacostraca'::text)) OR ((oi.phylum = 'Mollusca'::text) AND (oi.class = ANY (ARRAY['Gastropoda'::text, 'Cephalopoda'::text]))) OR ((oi.phylum = 'Echinodermata'::text) AND (COALESCE(oi.class, ''::text) <> 'Ophiuroidea'::text)) OR (oi.phylum = 'Platyhelminthes'::text) OR ((oi.observable_item_name)::text = 'No species found'::text)))
-          GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.location, sur.survey_latitude, sur.survey_longitude, div.full_name, sm.block_num, oi.phylum, oi.class, oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, (oi.observable_item_name)::text), oi.taxon, oi.reporting_name,
+          WHERE ((sm.method_id = 2) AND ((((oi.phylum)::text = 'Arthropoda'::text) AND ((oi.class)::text = 'Malacostraca'::text) AND ((oi.family)::text <> 'Palaemonidae'::text)) OR (((oi.phylum)::text = 'Mollusca'::text) AND ((oi.class)::text = ANY ((ARRAY['Gastropoda'::character varying, 'Cephalopoda'::character varying])::text[]))) OR (((oi.phylum)::text = 'Echinodermata'::text) AND (((oi.class)::text = ANY ((ARRAY['Asteroidea'::character varying, 'Holuthuria'::character varying, 'Echinoidea'::character varying])::text[])) OR (((oi.class)::text = 'Ophiuroidea'::text) AND ((oi."order")::text = 'Phrynophiurida'::text)))) OR ((oi.phylum)::text = 'Platyhelminthes'::text) OR (((oi.phylum)::text = 'Cnidaria'::text) AND ((COALESCE(oi.superseded_by, oi.observable_item_name))::text = 'Phlyctenactis tuberculosa'::text)) OR (((oi.phylum)::text = 'Chordata'::text) AND ((oi.family)::text <> 'Pyuridae'::text)) OR ((oi.observable_item_name)::text = 'No species found'::text)))
+          GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.location, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.survey_latitude, sur.survey_longitude, div.full_name, sm.block_num, oi.phylum, oi.class, oi."order", oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, oi.observable_item_name), oi.taxon, oi.reporting_name,
                 CASE
-                    WHEN ((meas.measure_name)::text = ANY (ARRAY[('Unsized'::character varying)::text, ('No specimen found'::character varying)::text])) THEN (0)::numeric
+                    WHEN ((meas.measure_name)::text = ANY ((ARRAY['Unsized'::character varying, 'No specimen found'::character varying])::text[])) THEN (0)::numeric
                     ELSE (replace((meas.measure_name)::text, 'cm'::text, ''::text))::numeric
-                END
+                END, sm.method_id
         )
  SELECT m2.survey_id,
     m2.country,
     m2.area,
     m2.ecoregion,
     m2.realm,
+    m2.location,
     m2.site_code,
     m2.site_name,
     m2.latitude,
@@ -1323,27 +1320,29 @@ CREATE MATERIALIZED VIEW nrmn.ep_m2_inverts AS
     m2.program,
     m2.visibility,
     m2.hour,
-    m2.location,
     m2.survey_latitude,
     m2.survey_longitude,
     m2.diver,
+    m2.method,
     m2.block,
     m2.phylum,
     m2.class,
+    m2."order",
     m2.family,
     m2.recorded_species_name,
     m2.species_name,
     m2.taxon,
     m2.reporting_name,
     bfc.nominal AS size_class,
-    m2.total
+    m2.total,
+    m2.biomass
    FROM (invert_sized m2
      JOIN bounded_fish_classes bfc ON (((m2.size_class > bfc.lower_bound) AND (m2.size_class <= bfc.upper_bound))))
   WITH NO DATA;
 
 
 --
--- TOC entry 246 (class 1259 OID 78411)
+-- TOC entry 256 (class 1259 OID 124125)
 -- Name: ep_m3_isq; Type: VIEW; Schema: nrmn; Owner: -
 --
 
@@ -1353,6 +1352,7 @@ CREATE VIEW nrmn.ep_m3_isq AS
     sur.area,
     sit.ecoregion,
     sit.realm,
+    sur.location,
     sur.site_code,
     sur.site_name,
     sur.latitude,
@@ -1363,15 +1363,15 @@ CREATE VIEW nrmn.ep_m3_isq AS
     sur.program,
     sur.visibility,
     sur.hour,
-    sur.location,
     sur.survey_latitude,
     sur.survey_longitude,
     div.full_name AS diver,
     oi.phylum,
     oi.class,
+    oi."order",
     oi.family,
     oi.observable_item_name AS recorded_species_name,
-    COALESCE(oi.superseded_by, (oi.observable_item_name)::text) AS species_name,
+    COALESCE(oi.superseded_by, oi.observable_item_name) AS species_name,
     oi.taxon,
     oi.reporting_name,
     mr.measure_name AS quadrat,
@@ -1384,11 +1384,11 @@ CREATE VIEW nrmn.ep_m3_isq AS
      JOIN nrmn.ep_observable_items oi ON ((oi.observable_item_id = obs.observable_item_id)))
      JOIN nrmn.measure_ref mr ON ((mr.measure_id = obs.measure_id)))
   WHERE (sm.method_id = 3)
-  GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.location, sur.survey_latitude, sur.survey_longitude, div.full_name, mr.measure_name, oi.phylum, oi.class, oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, (oi.observable_item_name)::text), oi.taxon, oi.reporting_name;
+  GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.location, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.survey_latitude, sur.survey_longitude, div.full_name, mr.measure_name, oi.phylum, oi.class, oi."order", oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, oi.observable_item_name), oi.taxon, oi.reporting_name;
 
 
 --
--- TOC entry 247 (class 1259 OID 78416)
+-- TOC entry 262 (class 1259 OID 124155)
 -- Name: ep_m4_macrocystis_count; Type: VIEW; Schema: nrmn; Owner: -
 --
 
@@ -1398,6 +1398,7 @@ CREATE VIEW nrmn.ep_m4_macrocystis_count AS
     sur.area,
     sit.ecoregion,
     sit.realm,
+    sur.location,
     sur.site_code,
     sur.site_name,
     sur.latitude,
@@ -1408,15 +1409,15 @@ CREATE VIEW nrmn.ep_m4_macrocystis_count AS
     sur.program,
     sur.visibility,
     sur.hour,
-    sur.location,
     sur.survey_latitude,
     sur.survey_longitude,
     div.full_name AS diver,
     oi.phylum,
     oi.class,
+    oi."order",
     oi.family,
     oi.observable_item_name AS recorded_species_name,
-    COALESCE(oi.superseded_by, (oi.observable_item_name)::text) AS species_name,
+    COALESCE(oi.superseded_by, oi.observable_item_name) AS species_name,
     oi.taxon,
     oi.reporting_name,
     mr.measure_name AS block,
@@ -1429,11 +1430,11 @@ CREATE VIEW nrmn.ep_m4_macrocystis_count AS
      JOIN nrmn.ep_observable_items oi ON ((oi.observable_item_id = obs.observable_item_id)))
      JOIN nrmn.measure_ref mr ON ((mr.measure_id = obs.measure_id)))
   WHERE (sm.method_id = 4)
-  GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.location, sur.survey_latitude, sur.survey_longitude, div.full_name, mr.measure_name, oi.phylum, oi.class, oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, (oi.observable_item_name)::text), oi.taxon, oi.reporting_name;
+  GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.location, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.survey_latitude, sur.survey_longitude, div.full_name, mr.measure_name, oi.phylum, oi.class, oi."order", oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, oi.observable_item_name), oi.taxon, oi.reporting_name;
 
 
 --
--- TOC entry 248 (class 1259 OID 78421)
+-- TOC entry 263 (class 1259 OID 124160)
 -- Name: ep_m5_limpet_quadrats; Type: VIEW; Schema: nrmn; Owner: -
 --
 
@@ -1443,6 +1444,7 @@ CREATE VIEW nrmn.ep_m5_limpet_quadrats AS
     sur.area,
     sit.ecoregion,
     sit.realm,
+    sur.location,
     sur.site_code,
     sur.site_name,
     sur.latitude,
@@ -1453,15 +1455,15 @@ CREATE VIEW nrmn.ep_m5_limpet_quadrats AS
     sur.program,
     sur.visibility,
     sur.hour,
-    sur.location,
     sur.survey_latitude,
     sur.survey_longitude,
     div.full_name AS diver,
     oi.phylum,
     oi.class,
+    oi."order",
     oi.family,
     oi.observable_item_name AS recorded_species_name,
-    COALESCE(oi.superseded_by, (oi.observable_item_name)::text) AS species_name,
+    COALESCE(oi.superseded_by, oi.observable_item_name) AS species_name,
     oi.taxon,
     oi.reporting_name,
     mr.measure_name AS quadrat,
@@ -1474,11 +1476,11 @@ CREATE VIEW nrmn.ep_m5_limpet_quadrats AS
      JOIN nrmn.ep_observable_items oi ON ((oi.observable_item_id = obs.observable_item_id)))
      JOIN nrmn.measure_ref mr ON ((mr.measure_id = obs.measure_id)))
   WHERE (sm.method_id = 5)
-  GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.location, sur.survey_latitude, sur.survey_longitude, div.full_name, mr.measure_name, oi.phylum, oi.class, oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, (oi.observable_item_name)::text), oi.taxon, oi.reporting_name;
+  GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.location, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.survey_latitude, sur.survey_longitude, div.full_name, mr.measure_name, oi.phylum, oi.class, oi."order", oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, oi.observable_item_name), oi.taxon, oi.reporting_name;
 
 
 --
--- TOC entry 249 (class 1259 OID 78426)
+-- TOC entry 264 (class 1259 OID 124165)
 -- Name: ep_m7_lobster_count; Type: VIEW; Schema: nrmn; Owner: -
 --
 
@@ -1488,6 +1490,7 @@ CREATE VIEW nrmn.ep_m7_lobster_count AS
     sur.area,
     sit.ecoregion,
     sit.realm,
+    sur.location,
     sur.site_code,
     sur.site_name,
     sur.latitude,
@@ -1498,20 +1501,20 @@ CREATE VIEW nrmn.ep_m7_lobster_count AS
     sur.program,
     sur.visibility,
     sur.hour,
-    sur.location,
     sur.survey_latitude,
     sur.survey_longitude,
     div.full_name AS diver,
     sm.block_num AS block,
     oi.phylum,
     oi.class,
+    oi."order",
     oi.family,
     oi.observable_item_name AS recorded_species_name,
-    COALESCE(oi.superseded_by, (oi.observable_item_name)::text) AS species_name,
+    COALESCE(oi.superseded_by, oi.observable_item_name) AS species_name,
     oi.taxon,
     oi.reporting_name,
         CASE
-            WHEN ((meas.measure_name)::text = ANY (ARRAY[('Unsized'::character varying)::text, ('No specimen found'::character varying)::text])) THEN (0)::numeric
+            WHEN ((meas.measure_name)::text = ANY ((ARRAY['Unsized'::character varying, 'No specimen found'::character varying])::text[])) THEN (0)::numeric
             ELSE (replace((meas.measure_name)::text, 'cm'::text, ''::text))::numeric
         END AS size_class,
     sum(obs.measure_value) AS total
@@ -1523,26 +1526,27 @@ CREATE VIEW nrmn.ep_m7_lobster_count AS
      JOIN nrmn.ep_observable_items oi ON ((oi.observable_item_id = obs.observable_item_id)))
      JOIN nrmn.measure_ref meas ON ((meas.measure_id = obs.measure_id)))
   WHERE (sm.method_id = 7)
-  GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.location, sur.survey_latitude, sur.survey_longitude, div.full_name, sm.block_num, oi.phylum, oi.class, oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, (oi.observable_item_name)::text), oi.taxon, oi.reporting_name,
+  GROUP BY sm.survey_id, sur.country, sur.area, sit.ecoregion, sit.realm, sur.location, sur.site_code, sur.site_name, sur.latitude, sur.longitude, sur.survey_date, sur.depth, sit.geom, sur.program, sur.visibility, sur.hour, sur.survey_latitude, sur.survey_longitude, div.full_name, sm.block_num, oi.phylum, oi.class, oi."order", oi.family, oi.observable_item_name, COALESCE(oi.superseded_by, oi.observable_item_name), oi.taxon, oi.reporting_name,
         CASE
-            WHEN ((meas.measure_name)::text = ANY (ARRAY[('Unsized'::character varying)::text, ('No specimen found'::character varying)::text])) THEN (0)::numeric
+            WHEN ((meas.measure_name)::text = ANY ((ARRAY['Unsized'::character varying, 'No specimen found'::character varying])::text[])) THEN (0)::numeric
             ELSE (replace((meas.measure_name)::text, 'cm'::text, ''::text))::numeric
         END;
 
 
 --
--- TOC entry 250 (class 1259 OID 78431)
+-- TOC entry 257 (class 1259 OID 124130)
 -- Name: ep_species_list; Type: VIEW; Schema: nrmn; Owner: -
 --
 
 CREATE VIEW nrmn.ep_species_list AS
  SELECT oi.observable_item_id AS species_id,
     oi.observable_item_name AS recorded_species_name,
-    COALESCE(oi.superseded_by, (oi.observable_item_name)::text) AS species_name,
+    COALESCE(oi.superseded_by, oi.observable_item_name) AS species_name,
     oi.taxon,
     oi.reporting_name,
     oi.phylum,
     oi.class,
+    oi."order",
     oi.family,
     oi.genus,
     oi.common_name,
@@ -1557,13 +1561,13 @@ CREATE VIEW nrmn.ep_species_list AS
     oi.superseded_ids,
     oi.superseded_names
    FROM nrmn.ep_observable_items oi
-  WHERE (((oi.obs_item_type_name)::text = ANY (ARRAY[('Species'::character varying)::text, ('Undescribed Species'::character varying)::text])) AND (EXISTS ( SELECT 1
+  WHERE (((oi.obs_item_type_name)::text = ANY ((ARRAY['Species'::character varying, 'Undescribed Species'::character varying])::text[])) AND (EXISTS ( SELECT 1
            FROM nrmn.observation obs
-          WHERE (obs.observable_item_id = oi.observable_item_id))) AND (oi.superseded_by IS NULL) AND (NOT (oi.phylum = ANY (ARRAY['Cnidaria'::text, 'Echiura'::text, 'Heterokontophyta'::text]))) AND (NOT (oi.class = ANY (ARRAY['Anthozoa'::text, 'Ascidiacea'::text, 'Echiuroidea'::text, 'Phaeophyceae'::text, 'Aves'::text]))) AND (NOT ((oi.observable_item_name)::text ~ 'spp.$'::text)));
+          WHERE (obs.observable_item_id = oi.observable_item_id))) AND (oi.superseded_by IS NULL) AND (NOT ((oi.phylum)::text = ANY ((ARRAY['Cnidaria'::character varying, 'Echiura'::character varying, 'Heterokontophyta'::character varying])::text[]))) AND (NOT ((oi.class)::text = ANY ((ARRAY['Anthozoa'::character varying, 'Ascidiacea'::character varying, 'Echiuroidea'::character varying, 'Phaeophyceae'::character varying, 'Aves'::character varying])::text[]))) AND (NOT ((oi.observable_item_name)::text ~ 'spp.$'::text)));
 
 
 --
--- TOC entry 251 (class 1259 OID 78436)
+-- TOC entry 258 (class 1259 OID 124135)
 -- Name: ep_species_survey; Type: VIEW; Schema: nrmn; Owner: -
 --
 
@@ -1582,11 +1586,11 @@ CREATE VIEW nrmn.ep_species_survey AS
      JOIN nrmn.observation obs ON ((obs.survey_method_id = sm.survey_method_id)))
      JOIN nrmn.ep_observable_items oi ON ((oi.observable_item_id = obs.observable_item_id)))
      JOIN nrmn.ep_site_list sit ON (((sur.site_code)::text = (sit.site_code)::text)))
-  WHERE ((oi.obs_item_type_name)::text = ANY (ARRAY[('Species'::character varying)::text, ('Undescribed Species'::character varying)::text]));
+  WHERE ((oi.obs_item_type_name)::text = ANY ((ARRAY['Species'::character varying, 'Undescribed Species'::character varying])::text[]));
 
 
 --
--- TOC entry 252 (class 1259 OID 78441)
+-- TOC entry 259 (class 1259 OID 124140)
 -- Name: ep_species_survey_observation; Type: VIEW; Schema: nrmn; Owner: -
 --
 
@@ -1624,11 +1628,11 @@ CREATE VIEW nrmn.ep_species_survey_observation AS
      JOIN nrmn.measure_ref meas ON ((obs.measure_id = meas.measure_id)))
      JOIN nrmn.diver_ref div ON ((div.diver_id = obs.diver_id)))
      JOIN nrmn.ep_observable_items oi ON ((obs.observable_item_id = oi.observable_item_id)))
-  WHERE ((sm.method_id = ANY (ARRAY[0, 1, 2, 7, 8, 9, 10])) AND (NOT ((oi.observable_item_name)::text ~ 'spp.$'::text)) AND (NOT (oi.phylum = ANY (ARRAY['Cnidaria'::text, 'Echiura'::text, 'Heterokontophyta'::text]))) AND (NOT (oi.class = ANY (ARRAY['Anthozoa'::text, 'Ascidiacea'::text, 'Echiuroidea'::text, 'Phaeophyceae'::text, 'Aves'::text]))));
+  WHERE ((sm.method_id = ANY (ARRAY[0, 1, 2, 7, 8, 9, 10])) AND (NOT ((oi.observable_item_name)::text ~ 'spp.$'::text)) AND (NOT ((oi.phylum)::text = ANY ((ARRAY['Cnidaria'::character varying, 'Echiura'::character varying, 'Heterokontophyta'::character varying])::text[]))) AND (NOT ((oi.class)::text = ANY ((ARRAY['Anthozoa'::character varying, 'Ascidiacea'::character varying, 'Echiuroidea'::character varying, 'Phaeophyceae'::character varying, 'Aves'::character varying])::text[]))));
 
 
 --
--- TOC entry 253 (class 1259 OID 78446)
+-- TOC entry 227 (class 1259 OID 123831)
 -- Name: location_ref_location_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -1641,8 +1645,8 @@ CREATE SEQUENCE nrmn.location_ref_location_id
 
 
 --
--- TOC entry 4032 (class 0 OID 0)
--- Dependencies: 253
+-- TOC entry 4023 (class 0 OID 0)
+-- Dependencies: 227
 -- Name: location_ref_location_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -1650,7 +1654,7 @@ ALTER SEQUENCE nrmn.location_ref_location_id OWNED BY nrmn.location_ref.location
 
 
 --
--- TOC entry 254 (class 1259 OID 78448)
+-- TOC entry 235 (class 1259 OID 123918)
 -- Name: measure_ref_measure_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -1663,8 +1667,8 @@ CREATE SEQUENCE nrmn.measure_ref_measure_id
 
 
 --
--- TOC entry 4033 (class 0 OID 0)
--- Dependencies: 254
+-- TOC entry 4024 (class 0 OID 0)
+-- Dependencies: 235
 -- Name: measure_ref_measure_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -1672,7 +1676,7 @@ ALTER SEQUENCE nrmn.measure_ref_measure_id OWNED BY nrmn.measure_ref.measure_id;
 
 
 --
--- TOC entry 255 (class 1259 OID 78450)
+-- TOC entry 234 (class 1259 OID 123913)
 -- Name: measure_type_ref_measure_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -1685,8 +1689,8 @@ CREATE SEQUENCE nrmn.measure_type_ref_measure_id
 
 
 --
--- TOC entry 4034 (class 0 OID 0)
--- Dependencies: 255
+-- TOC entry 4025 (class 0 OID 0)
+-- Dependencies: 234
 -- Name: measure_type_ref_measure_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -1694,7 +1698,7 @@ ALTER SEQUENCE nrmn.measure_type_ref_measure_id OWNED BY nrmn.measure_type_ref.m
 
 
 --
--- TOC entry 256 (class 1259 OID 78452)
+-- TOC entry 206 (class 1259 OID 123710)
 -- Name: method_ref; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -1706,7 +1710,7 @@ CREATE TABLE nrmn.method_ref (
 
 
 --
--- TOC entry 257 (class 1259 OID 78455)
+-- TOC entry 236 (class 1259 OID 123928)
 -- Name: obs_item_type_ref_obs_item_type_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -1719,8 +1723,8 @@ CREATE SEQUENCE nrmn.obs_item_type_ref_obs_item_type_id
 
 
 --
--- TOC entry 4035 (class 0 OID 0)
--- Dependencies: 257
+-- TOC entry 4026 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: obs_item_type_ref_obs_item_type_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -1728,7 +1732,7 @@ ALTER SEQUENCE nrmn.obs_item_type_ref_obs_item_type_id OWNED BY nrmn.obs_item_ty
 
 
 --
--- TOC entry 258 (class 1259 OID 78457)
+-- TOC entry 237 (class 1259 OID 123933)
 -- Name: observable_item_ref_observable_item_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -1741,8 +1745,8 @@ CREATE SEQUENCE nrmn.observable_item_ref_observable_item_id
 
 
 --
--- TOC entry 4036 (class 0 OID 0)
--- Dependencies: 258
+-- TOC entry 4027 (class 0 OID 0)
+-- Dependencies: 237
 -- Name: observable_item_ref_observable_item_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -1750,7 +1754,7 @@ ALTER SEQUENCE nrmn.observable_item_ref_observable_item_id OWNED BY nrmn.observa
 
 
 --
--- TOC entry 259 (class 1259 OID 78459)
+-- TOC entry 233 (class 1259 OID 123886)
 -- Name: observation_observation_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -1763,8 +1767,8 @@ CREATE SEQUENCE nrmn.observation_observation_id
 
 
 --
--- TOC entry 4037 (class 0 OID 0)
--- Dependencies: 259
+-- TOC entry 4028 (class 0 OID 0)
+-- Dependencies: 233
 -- Name: observation_observation_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -1772,7 +1776,7 @@ ALTER SEQUENCE nrmn.observation_observation_id OWNED BY nrmn.observation.observa
 
 
 --
--- TOC entry 260 (class 1259 OID 78461)
+-- TOC entry 240 (class 1259 OID 123963)
 -- Name: pq_cat_res_ref_cat_res_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -1785,8 +1789,8 @@ CREATE SEQUENCE nrmn.pq_cat_res_ref_cat_res_id
 
 
 --
--- TOC entry 4038 (class 0 OID 0)
--- Dependencies: 260
+-- TOC entry 4029 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: pq_cat_res_ref_cat_res_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -1794,7 +1798,7 @@ ALTER SEQUENCE nrmn.pq_cat_res_ref_cat_res_id OWNED BY nrmn.pq_cat_res_ref.cat_r
 
 
 --
--- TOC entry 261 (class 1259 OID 78463)
+-- TOC entry 239 (class 1259 OID 123958)
 -- Name: pq_category_ref_category_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -1807,8 +1811,8 @@ CREATE SEQUENCE nrmn.pq_category_ref_category_id
 
 
 --
--- TOC entry 4039 (class 0 OID 0)
--- Dependencies: 261
+-- TOC entry 4030 (class 0 OID 0)
+-- Dependencies: 239
 -- Name: pq_category_ref_category_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -1816,7 +1820,7 @@ ALTER SEQUENCE nrmn.pq_category_ref_category_id OWNED BY nrmn.pq_category_ref.ca
 
 
 --
--- TOC entry 262 (class 1259 OID 78465)
+-- TOC entry 238 (class 1259 OID 123953)
 -- Name: pq_resolution_ref_resolution_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -1829,8 +1833,8 @@ CREATE SEQUENCE nrmn.pq_resolution_ref_resolution_id
 
 
 --
--- TOC entry 4040 (class 0 OID 0)
--- Dependencies: 262
+-- TOC entry 4031 (class 0 OID 0)
+-- Dependencies: 238
 -- Name: pq_resolution_ref_resolution_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -1838,7 +1842,7 @@ ALTER SEQUENCE nrmn.pq_resolution_ref_resolution_id OWNED BY nrmn.pq_resolution_
 
 
 --
--- TOC entry 263 (class 1259 OID 78467)
+-- TOC entry 241 (class 1259 OID 123978)
 -- Name: pq_score_score_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -1851,8 +1855,8 @@ CREATE SEQUENCE nrmn.pq_score_score_id
 
 
 --
--- TOC entry 4041 (class 0 OID 0)
--- Dependencies: 263
+-- TOC entry 4032 (class 0 OID 0)
+-- Dependencies: 241
 -- Name: pq_score_score_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -1860,7 +1864,7 @@ ALTER SEQUENCE nrmn.pq_score_score_id OWNED BY nrmn.pq_score.score_id;
 
 
 --
--- TOC entry 264 (class 1259 OID 78469)
+-- TOC entry 229 (class 1259 OID 123846)
 -- Name: program_ref_program_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -1873,8 +1877,8 @@ CREATE SEQUENCE nrmn.program_ref_program_id
 
 
 --
--- TOC entry 4042 (class 0 OID 0)
--- Dependencies: 264
+-- TOC entry 4033 (class 0 OID 0)
+-- Dependencies: 229
 -- Name: program_ref_program_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -1882,7 +1886,18 @@ ALTER SEQUENCE nrmn.program_ref_program_id OWNED BY nrmn.program_ref.program_id;
 
 
 --
--- TOC entry 265 (class 1259 OID 78471)
+-- TOC entry 226 (class 1259 OID 123826)
+-- Name: public_data_exclusion; Type: TABLE; Schema: nrmn; Owner: -
+--
+
+CREATE TABLE nrmn.public_data_exclusion (
+    program_id integer NOT NULL,
+    site_id integer NOT NULL
+);
+
+
+--
+-- TOC entry 268 (class 1259 OID 124779)
 -- Name: pv_debris; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -1912,7 +1927,7 @@ CREATE TABLE nrmn.pv_debris (
 
 
 --
--- TOC entry 266 (class 1259 OID 78477)
+-- TOC entry 267 (class 1259 OID 124773)
 -- Name: pv_fishes; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -1943,7 +1958,7 @@ CREATE TABLE nrmn.pv_fishes (
 
 
 --
--- TOC entry 267 (class 1259 OID 78483)
+-- TOC entry 270 (class 1259 OID 124791)
 -- Name: pv_inverts1; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -1974,7 +1989,7 @@ CREATE TABLE nrmn.pv_inverts1 (
 
 
 --
--- TOC entry 268 (class 1259 OID 78489)
+-- TOC entry 266 (class 1259 OID 124767)
 -- Name: pv_inverts2; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -2004,7 +2019,7 @@ CREATE TABLE nrmn.pv_inverts2 (
 
 
 --
--- TOC entry 269 (class 1259 OID 78495)
+-- TOC entry 272 (class 1259 OID 124803)
 -- Name: pv_inverts3; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -2034,7 +2049,7 @@ CREATE TABLE nrmn.pv_inverts3 (
 
 
 --
--- TOC entry 270 (class 1259 OID 78501)
+-- TOC entry 269 (class 1259 OID 124785)
 -- Name: pv_macrocystis; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -2063,7 +2078,7 @@ CREATE TABLE nrmn.pv_macrocystis (
 
 
 --
--- TOC entry 271 (class 1259 OID 78507)
+-- TOC entry 271 (class 1259 OID 124797)
 -- Name: pv_macrophytes; Type: TABLE; Schema: nrmn; Owner: -
 --
 
@@ -2092,7 +2107,7 @@ CREATE TABLE nrmn.pv_macrophytes (
 
 
 --
--- TOC entry 272 (class 1259 OID 78513)
+-- TOC entry 243 (class 1259 OID 123998)
 -- Name: rugosity_rugosity_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -2105,8 +2120,8 @@ CREATE SEQUENCE nrmn.rugosity_rugosity_id
 
 
 --
--- TOC entry 4043 (class 0 OID 0)
--- Dependencies: 272
+-- TOC entry 4034 (class 0 OID 0)
+-- Dependencies: 243
 -- Name: rugosity_rugosity_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -2114,7 +2129,7 @@ ALTER SEQUENCE nrmn.rugosity_rugosity_id OWNED BY nrmn.rugosity.rugosity_id;
 
 
 --
--- TOC entry 273 (class 1259 OID 78515)
+-- TOC entry 228 (class 1259 OID 123836)
 -- Name: site_ref_site_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -2127,8 +2142,8 @@ CREATE SEQUENCE nrmn.site_ref_site_id
 
 
 --
--- TOC entry 4044 (class 0 OID 0)
--- Dependencies: 273
+-- TOC entry 4035 (class 0 OID 0)
+-- Dependencies: 228
 -- Name: site_ref_site_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -2136,7 +2151,7 @@ ALTER SEQUENCE nrmn.site_ref_site_id OWNED BY nrmn.site_ref.site_id;
 
 
 --
--- TOC entry 274 (class 1259 OID 78517)
+-- TOC entry 242 (class 1259 OID 123993)
 -- Name: surface_type_ref_surface_type_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -2149,8 +2164,8 @@ CREATE SEQUENCE nrmn.surface_type_ref_surface_type_id
 
 
 --
--- TOC entry 4045 (class 0 OID 0)
--- Dependencies: 274
+-- TOC entry 4036 (class 0 OID 0)
+-- Dependencies: 242
 -- Name: surface_type_ref_surface_type_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -2158,7 +2173,7 @@ ALTER SEQUENCE nrmn.surface_type_ref_surface_type_id OWNED BY nrmn.surface_type_
 
 
 --
--- TOC entry 275 (class 1259 OID 78519)
+-- TOC entry 232 (class 1259 OID 123871)
 -- Name: survey_method_survey_method_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -2171,8 +2186,8 @@ CREATE SEQUENCE nrmn.survey_method_survey_method_id
 
 
 --
--- TOC entry 4046 (class 0 OID 0)
--- Dependencies: 275
+-- TOC entry 4037 (class 0 OID 0)
+-- Dependencies: 232
 -- Name: survey_method_survey_method_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -2180,7 +2195,7 @@ ALTER SEQUENCE nrmn.survey_method_survey_method_id OWNED BY nrmn.survey_method.s
 
 
 --
--- TOC entry 276 (class 1259 OID 78521)
+-- TOC entry 231 (class 1259 OID 123856)
 -- Name: survey_survey_id; Type: SEQUENCE; Schema: nrmn; Owner: -
 --
 
@@ -2193,8 +2208,8 @@ CREATE SEQUENCE nrmn.survey_survey_id
 
 
 --
--- TOC entry 4047 (class 0 OID 0)
--- Dependencies: 276
+-- TOC entry 4038 (class 0 OID 0)
+-- Dependencies: 231
 -- Name: survey_survey_id; Type: SEQUENCE OWNED BY; Schema: nrmn; Owner: -
 --
 
@@ -2202,7 +2217,7 @@ ALTER SEQUENCE nrmn.survey_survey_id OWNED BY nrmn.survey.survey_id;
 
 
 --
--- TOC entry 3750 (class 2604 OID 78523)
+-- TOC entry 3737 (class 2604 OID 123855)
 -- Name: diver_ref diver_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2210,7 +2225,7 @@ ALTER TABLE ONLY nrmn.diver_ref ALTER COLUMN diver_id SET DEFAULT nextval('nrmn.
 
 
 --
--- TOC entry 3757 (class 2604 OID 78524)
+-- TOC entry 3738 (class 2604 OID 123835)
 -- Name: location_ref location_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2218,7 +2233,7 @@ ALTER TABLE ONLY nrmn.location_ref ALTER COLUMN location_id SET DEFAULT nextval(
 
 
 --
--- TOC entry 3761 (class 2604 OID 78525)
+-- TOC entry 3752 (class 2604 OID 123922)
 -- Name: measure_ref measure_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2226,7 +2241,7 @@ ALTER TABLE ONLY nrmn.measure_ref ALTER COLUMN measure_id SET DEFAULT nextval('n
 
 
 --
--- TOC entry 3766 (class 2604 OID 78526)
+-- TOC entry 3744 (class 2604 OID 123917)
 -- Name: measure_type_ref measure_type_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2234,7 +2249,7 @@ ALTER TABLE ONLY nrmn.measure_type_ref ALTER COLUMN measure_type_id SET DEFAULT 
 
 
 --
--- TOC entry 3751 (class 2604 OID 78527)
+-- TOC entry 3748 (class 2604 OID 123932)
 -- Name: obs_item_type_ref obs_item_type_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2242,7 +2257,7 @@ ALTER TABLE ONLY nrmn.obs_item_type_ref ALTER COLUMN obs_item_type_id SET DEFAUL
 
 
 --
--- TOC entry 3752 (class 2604 OID 78528)
+-- TOC entry 3749 (class 2604 OID 123937)
 -- Name: observable_item_ref observable_item_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2250,7 +2265,7 @@ ALTER TABLE ONLY nrmn.observable_item_ref ALTER COLUMN observable_item_id SET DE
 
 
 --
--- TOC entry 3753 (class 2604 OID 78529)
+-- TOC entry 3740 (class 2604 OID 123890)
 -- Name: observation observation_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2258,7 +2273,7 @@ ALTER TABLE ONLY nrmn.observation ALTER COLUMN observation_id SET DEFAULT nextva
 
 
 --
--- TOC entry 3762 (class 2604 OID 78530)
+-- TOC entry 3743 (class 2604 OID 123967)
 -- Name: pq_cat_res_ref cat_res_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2266,7 +2281,7 @@ ALTER TABLE ONLY nrmn.pq_cat_res_ref ALTER COLUMN cat_res_id SET DEFAULT nextval
 
 
 --
--- TOC entry 3763 (class 2604 OID 78531)
+-- TOC entry 3753 (class 2604 OID 123962)
 -- Name: pq_category_ref category_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2274,7 +2289,7 @@ ALTER TABLE ONLY nrmn.pq_category_ref ALTER COLUMN category_id SET DEFAULT nextv
 
 
 --
--- TOC entry 3764 (class 2604 OID 78532)
+-- TOC entry 3742 (class 2604 OID 123957)
 -- Name: pq_resolution_ref resolution_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2282,7 +2297,7 @@ ALTER TABLE ONLY nrmn.pq_resolution_ref ALTER COLUMN resolution_id SET DEFAULT n
 
 
 --
--- TOC entry 3765 (class 2604 OID 78533)
+-- TOC entry 3745 (class 2604 OID 123982)
 -- Name: pq_score score_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2290,7 +2305,7 @@ ALTER TABLE ONLY nrmn.pq_score ALTER COLUMN score_id SET DEFAULT nextval('nrmn.p
 
 
 --
--- TOC entry 3758 (class 2604 OID 78534)
+-- TOC entry 3741 (class 2604 OID 123850)
 -- Name: program_ref program_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2298,7 +2313,7 @@ ALTER TABLE ONLY nrmn.program_ref ALTER COLUMN program_id SET DEFAULT nextval('n
 
 
 --
--- TOC entry 3759 (class 2604 OID 78535)
+-- TOC entry 3747 (class 2604 OID 124002)
 -- Name: rugosity rugosity_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2306,7 +2321,7 @@ ALTER TABLE ONLY nrmn.rugosity ALTER COLUMN rugosity_id SET DEFAULT nextval('nrm
 
 
 --
--- TOC entry 3756 (class 2604 OID 78536)
+-- TOC entry 3750 (class 2604 OID 123840)
 -- Name: site_ref site_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2314,7 +2329,7 @@ ALTER TABLE ONLY nrmn.site_ref ALTER COLUMN site_id SET DEFAULT nextval('nrmn.si
 
 
 --
--- TOC entry 3760 (class 2604 OID 78537)
+-- TOC entry 3739 (class 2604 OID 123997)
 -- Name: surface_type_ref surface_type_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2322,7 +2337,7 @@ ALTER TABLE ONLY nrmn.surface_type_ref ALTER COLUMN surface_type_id SET DEFAULT 
 
 
 --
--- TOC entry 3754 (class 2604 OID 78538)
+-- TOC entry 3746 (class 2604 OID 123860)
 -- Name: survey survey_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2330,7 +2345,7 @@ ALTER TABLE ONLY nrmn.survey ALTER COLUMN survey_id SET DEFAULT nextval('nrmn.su
 
 
 --
--- TOC entry 3755 (class 2604 OID 78539)
+-- TOC entry 3751 (class 2604 OID 123875)
 -- Name: survey_method survey_method_id; Type: DEFAULT; Schema: nrmn; Owner: -
 --
 
@@ -2338,7 +2353,7 @@ ALTER TABLE ONLY nrmn.survey_method ALTER COLUMN survey_method_id SET DEFAULT ne
 
 
 --
--- TOC entry 3768 (class 2606 OID 78617)
+-- TOC entry 3839 (class 2606 OID 123804)
 -- Name: aphia_ref aphia_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2347,7 +2362,7 @@ ALTER TABLE ONLY nrmn.aphia_ref
 
 
 --
--- TOC entry 3770 (class 2606 OID 78619)
+-- TOC entry 3815 (class 2606 OID 123762)
 -- Name: aphia_rel_type_ref aphia_rel_type_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2356,7 +2371,7 @@ ALTER TABLE ONLY nrmn.aphia_rel_type_ref
 
 
 --
--- TOC entry 3772 (class 2606 OID 78621)
+-- TOC entry 3755 (class 2606 OID 123691)
 -- Name: diver_ref diver_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2365,7 +2380,7 @@ ALTER TABLE ONLY nrmn.diver_ref
 
 
 --
--- TOC entry 3774 (class 2606 OID 78623)
+-- TOC entry 3757 (class 2606 OID 123854)
 -- Name: diver_ref diver_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2374,7 +2389,7 @@ ALTER TABLE ONLY nrmn.diver_ref
 
 
 --
--- TOC entry 3807 (class 2606 OID 78625)
+-- TOC entry 3843 (class 2606 OID 123817)
 -- Name: legacy_common_names legacy_common_names_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2383,7 +2398,7 @@ ALTER TABLE ONLY nrmn.legacy_common_names
 
 
 --
--- TOC entry 3809 (class 2606 OID 78627)
+-- TOC entry 3841 (class 2606 OID 123809)
 -- Name: lengthweight_ref lengthweight_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2392,7 +2407,7 @@ ALTER TABLE ONLY nrmn.lengthweight_ref
 
 
 --
--- TOC entry 3811 (class 2606 OID 78629)
+-- TOC entry 3759 (class 2606 OID 123696)
 -- Name: location_ref location_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2401,7 +2416,7 @@ ALTER TABLE ONLY nrmn.location_ref
 
 
 --
--- TOC entry 3813 (class 2606 OID 78631)
+-- TOC entry 3761 (class 2606 OID 123834)
 -- Name: location_ref location_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2410,7 +2425,7 @@ ALTER TABLE ONLY nrmn.location_ref
 
 
 --
--- TOC entry 3829 (class 2606 OID 78633)
+-- TOC entry 3831 (class 2606 OID 123791)
 -- Name: measure_ref measure_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2419,7 +2434,7 @@ ALTER TABLE ONLY nrmn.measure_ref
 
 
 --
--- TOC entry 3852 (class 2606 OID 78635)
+-- TOC entry 3792 (class 2606 OID 123734)
 -- Name: measure_type_ref measure_type_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2428,7 +2443,7 @@ ALTER TABLE ONLY nrmn.measure_type_ref
 
 
 --
--- TOC entry 3854 (class 2606 OID 78637)
+-- TOC entry 3794 (class 2606 OID 123916)
 -- Name: measure_type_ref measure_type_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2437,7 +2452,7 @@ ALTER TABLE ONLY nrmn.measure_type_ref
 
 
 --
--- TOC entry 3831 (class 2606 OID 78639)
+-- TOC entry 3833 (class 2606 OID 123921)
 -- Name: measure_ref measure_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2446,7 +2461,7 @@ ALTER TABLE ONLY nrmn.measure_ref
 
 
 --
--- TOC entry 3815 (class 2606 OID 78641)
+-- TOC entry 3845 (class 2606 OID 123825)
 -- Name: meow_ecoregions meow_ecoregions_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2455,7 +2470,7 @@ ALTER TABLE ONLY nrmn.meow_ecoregions
 
 
 --
--- TOC entry 3856 (class 2606 OID 78643)
+-- TOC entry 3775 (class 2606 OID 123714)
 -- Name: method_ref method_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2464,7 +2479,7 @@ ALTER TABLE ONLY nrmn.method_ref
 
 
 --
--- TOC entry 3858 (class 2606 OID 78645)
+-- TOC entry 3777 (class 2606 OID 123912)
 -- Name: method_ref method_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2473,7 +2488,7 @@ ALTER TABLE ONLY nrmn.method_ref
 
 
 --
--- TOC entry 3776 (class 2606 OID 78647)
+-- TOC entry 3811 (class 2606 OID 123757)
 -- Name: obs_item_type_ref obs_item_type_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2482,7 +2497,7 @@ ALTER TABLE ONLY nrmn.obs_item_type_ref
 
 
 --
--- TOC entry 3778 (class 2606 OID 78649)
+-- TOC entry 3813 (class 2606 OID 123931)
 -- Name: obs_item_type_ref obs_item_type_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2491,7 +2506,7 @@ ALTER TABLE ONLY nrmn.obs_item_type_ref
 
 
 --
--- TOC entry 3780 (class 2606 OID 78651)
+-- TOC entry 3817 (class 2606 OID 123770)
 -- Name: observable_item_ref observable_item_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2500,7 +2515,7 @@ ALTER TABLE ONLY nrmn.observable_item_ref
 
 
 --
--- TOC entry 3782 (class 2606 OID 78653)
+-- TOC entry 3819 (class 2606 OID 123936)
 -- Name: observable_item_ref observable_item_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2509,7 +2524,7 @@ ALTER TABLE ONLY nrmn.observable_item_ref
 
 
 --
--- TOC entry 3788 (class 2606 OID 78655)
+-- TOC entry 3771 (class 2606 OID 123709)
 -- Name: observation observation_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2518,7 +2533,7 @@ ALTER TABLE ONLY nrmn.observation
 
 
 --
--- TOC entry 3790 (class 2606 OID 78657)
+-- TOC entry 3773 (class 2606 OID 123889)
 -- Name: observation observation_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2527,7 +2542,7 @@ ALTER TABLE ONLY nrmn.observation
 
 
 --
--- TOC entry 3834 (class 2606 OID 78659)
+-- TOC entry 3788 (class 2606 OID 123729)
 -- Name: pq_cat_res_ref pq_cat_res_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2536,7 +2551,7 @@ ALTER TABLE ONLY nrmn.pq_cat_res_ref
 
 
 --
--- TOC entry 3836 (class 2606 OID 78661)
+-- TOC entry 3790 (class 2606 OID 123966)
 -- Name: pq_cat_res_ref pq_cat_res_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2545,7 +2560,7 @@ ALTER TABLE ONLY nrmn.pq_cat_res_ref
 
 
 --
--- TOC entry 3838 (class 2606 OID 78663)
+-- TOC entry 3835 (class 2606 OID 123796)
 -- Name: pq_category_ref pq_category_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2554,7 +2569,7 @@ ALTER TABLE ONLY nrmn.pq_category_ref
 
 
 --
--- TOC entry 3840 (class 2606 OID 78665)
+-- TOC entry 3837 (class 2606 OID 123961)
 -- Name: pq_category_ref pq_category_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2563,7 +2578,7 @@ ALTER TABLE ONLY nrmn.pq_category_ref
 
 
 --
--- TOC entry 3842 (class 2606 OID 78667)
+-- TOC entry 3783 (class 2606 OID 123724)
 -- Name: pq_resolution_ref pq_resolution_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2572,7 +2587,7 @@ ALTER TABLE ONLY nrmn.pq_resolution_ref
 
 
 --
--- TOC entry 3844 (class 2606 OID 78669)
+-- TOC entry 3785 (class 2606 OID 123956)
 -- Name: pq_resolution_ref pq_resolution_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2581,7 +2596,7 @@ ALTER TABLE ONLY nrmn.pq_resolution_ref
 
 
 --
--- TOC entry 3848 (class 2606 OID 78671)
+-- TOC entry 3798 (class 2606 OID 123739)
 -- Name: pq_score pq_score_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2590,7 +2605,7 @@ ALTER TABLE ONLY nrmn.pq_score
 
 
 --
--- TOC entry 3850 (class 2606 OID 78673)
+-- TOC entry 3800 (class 2606 OID 123981)
 -- Name: pq_score pq_score_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2599,7 +2614,7 @@ ALTER TABLE ONLY nrmn.pq_score
 
 
 --
--- TOC entry 3817 (class 2606 OID 78675)
+-- TOC entry 3779 (class 2606 OID 123719)
 -- Name: program_ref program_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2608,7 +2623,7 @@ ALTER TABLE ONLY nrmn.program_ref
 
 
 --
--- TOC entry 3819 (class 2606 OID 78677)
+-- TOC entry 3781 (class 2606 OID 123849)
 -- Name: program_ref program_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2617,7 +2632,16 @@ ALTER TABLE ONLY nrmn.program_ref
 
 
 --
--- TOC entry 3821 (class 2606 OID 78679)
+-- TOC entry 3847 (class 2606 OID 123830)
+-- Name: public_data_exclusion public_data_exclusion_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
+--
+
+ALTER TABLE ONLY nrmn.public_data_exclusion
+    ADD CONSTRAINT public_data_exclusion_pkey PRIMARY KEY (program_id, site_id);
+
+
+--
+-- TOC entry 3807 (class 2606 OID 123752)
 -- Name: rugosity rugosity_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2626,7 +2650,7 @@ ALTER TABLE ONLY nrmn.rugosity
 
 
 --
--- TOC entry 3823 (class 2606 OID 78681)
+-- TOC entry 3809 (class 2606 OID 124001)
 -- Name: rugosity rugosity_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2635,7 +2659,7 @@ ALTER TABLE ONLY nrmn.rugosity
 
 
 --
--- TOC entry 3803 (class 2606 OID 78683)
+-- TOC entry 3822 (class 2606 OID 123778)
 -- Name: site_ref site_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2644,7 +2668,7 @@ ALTER TABLE ONLY nrmn.site_ref
 
 
 --
--- TOC entry 3805 (class 2606 OID 78685)
+-- TOC entry 3824 (class 2606 OID 123839)
 -- Name: site_ref site_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2653,7 +2677,7 @@ ALTER TABLE ONLY nrmn.site_ref
 
 
 --
--- TOC entry 3825 (class 2606 OID 78687)
+-- TOC entry 3763 (class 2606 OID 123701)
 -- Name: surface_type_ref surface_type_ref_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2662,7 +2686,7 @@ ALTER TABLE ONLY nrmn.surface_type_ref
 
 
 --
--- TOC entry 3827 (class 2606 OID 78689)
+-- TOC entry 3765 (class 2606 OID 123996)
 -- Name: surface_type_ref surface_type_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2671,7 +2695,7 @@ ALTER TABLE ONLY nrmn.surface_type_ref
 
 
 --
--- TOC entry 3798 (class 2606 OID 78691)
+-- TOC entry 3827 (class 2606 OID 123786)
 -- Name: survey_method survey_method_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2680,7 +2704,7 @@ ALTER TABLE ONLY nrmn.survey_method
 
 
 --
--- TOC entry 3800 (class 2606 OID 78693)
+-- TOC entry 3829 (class 2606 OID 123874)
 -- Name: survey_method survey_method_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2689,7 +2713,7 @@ ALTER TABLE ONLY nrmn.survey_method
 
 
 --
--- TOC entry 3793 (class 2606 OID 78695)
+-- TOC entry 3803 (class 2606 OID 123747)
 -- Name: survey survey_pkey; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2698,7 +2722,7 @@ ALTER TABLE ONLY nrmn.survey
 
 
 --
--- TOC entry 3795 (class 2606 OID 78697)
+-- TOC entry 3805 (class 2606 OID 123859)
 -- Name: survey survey_unique; Type: CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2707,7 +2731,7 @@ ALTER TABLE ONLY nrmn.survey
 
 
 --
--- TOC entry 3783 (class 1259 OID 78698)
+-- TOC entry 3766 (class 1259 OID 125202)
 -- Name: ix_obs_1; Type: INDEX; Schema: nrmn; Owner: -
 --
 
@@ -2715,7 +2739,7 @@ CREATE INDEX ix_obs_1 ON nrmn.observation USING btree (survey_method_id);
 
 
 --
--- TOC entry 3784 (class 1259 OID 78699)
+-- TOC entry 3767 (class 1259 OID 125203)
 -- Name: ix_obs_2; Type: INDEX; Schema: nrmn; Owner: -
 --
 
@@ -2723,7 +2747,7 @@ CREATE INDEX ix_obs_2 ON nrmn.observation USING btree (diver_id);
 
 
 --
--- TOC entry 3785 (class 1259 OID 78700)
+-- TOC entry 3768 (class 1259 OID 125205)
 -- Name: ix_obs_3; Type: INDEX; Schema: nrmn; Owner: -
 --
 
@@ -2731,7 +2755,7 @@ CREATE INDEX ix_obs_3 ON nrmn.observation USING btree (observable_item_id);
 
 
 --
--- TOC entry 3786 (class 1259 OID 78701)
+-- TOC entry 3769 (class 1259 OID 125206)
 -- Name: ix_obs_4; Type: INDEX; Schema: nrmn; Owner: -
 --
 
@@ -2739,7 +2763,7 @@ CREATE INDEX ix_obs_4 ON nrmn.observation USING btree (measure_id);
 
 
 --
--- TOC entry 3832 (class 1259 OID 78702)
+-- TOC entry 3786 (class 1259 OID 125210)
 -- Name: ix_pqcr_1; Type: INDEX; Schema: nrmn; Owner: -
 --
 
@@ -2747,7 +2771,7 @@ CREATE INDEX ix_pqcr_1 ON nrmn.pq_cat_res_ref USING btree (resolution_id, catego
 
 
 --
--- TOC entry 3845 (class 1259 OID 78703)
+-- TOC entry 3795 (class 1259 OID 125208)
 -- Name: ix_pqs_1; Type: INDEX; Schema: nrmn; Owner: -
 --
 
@@ -2755,7 +2779,7 @@ CREATE INDEX ix_pqs_1 ON nrmn.pq_score USING btree (cat_res_id);
 
 
 --
--- TOC entry 3846 (class 1259 OID 78704)
+-- TOC entry 3796 (class 1259 OID 125209)
 -- Name: ix_pqs_2; Type: INDEX; Schema: nrmn; Owner: -
 --
 
@@ -2763,7 +2787,7 @@ CREATE INDEX ix_pqs_2 ON nrmn.pq_score USING btree (survey_method_id);
 
 
 --
--- TOC entry 3801 (class 1259 OID 78705)
+-- TOC entry 3820 (class 1259 OID 125201)
 -- Name: ix_sit_1; Type: INDEX; Schema: nrmn; Owner: -
 --
 
@@ -2771,7 +2795,7 @@ CREATE INDEX ix_sit_1 ON nrmn.site_ref USING btree (location_id);
 
 
 --
--- TOC entry 3796 (class 1259 OID 78706)
+-- TOC entry 3825 (class 1259 OID 125207)
 -- Name: ix_sm_1; Type: INDEX; Schema: nrmn; Owner: -
 --
 
@@ -2779,7 +2803,7 @@ CREATE INDEX ix_sm_1 ON nrmn.survey_method USING btree (survey_id);
 
 
 --
--- TOC entry 3791 (class 1259 OID 78707)
+-- TOC entry 3801 (class 1259 OID 125204)
 -- Name: ix_sur_1; Type: INDEX; Schema: nrmn; Owner: -
 --
 
@@ -2787,7 +2811,7 @@ CREATE INDEX ix_sur_1 ON nrmn.survey USING btree (site_id, survey_date, depth);
 
 
 --
--- TOC entry 3876 (class 2606 OID 78708)
+-- TOC entry 3852 (class 2606 OID 123968)
 -- Name: pq_cat_res_ref cat_res_category_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2796,7 +2820,7 @@ ALTER TABLE ONLY nrmn.pq_cat_res_ref
 
 
 --
--- TOC entry 3877 (class 2606 OID 78713)
+-- TOC entry 3853 (class 2606 OID 123973)
 -- Name: pq_cat_res_ref cat_res_resolution_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2805,7 +2829,7 @@ ALTER TABLE ONLY nrmn.pq_cat_res_ref
 
 
 --
--- TOC entry 3872 (class 2606 OID 78718)
+-- TOC entry 3867 (class 2606 OID 124013)
 -- Name: lengthweight_ref lengthweight_observable_item_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2814,7 +2838,7 @@ ALTER TABLE ONLY nrmn.lengthweight_ref
 
 
 --
--- TOC entry 3875 (class 2606 OID 78723)
+-- TOC entry 3866 (class 2606 OID 123923)
 -- Name: measure_ref measure_measure_type_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2823,7 +2847,7 @@ ALTER TABLE ONLY nrmn.measure_ref
 
 
 --
--- TOC entry 3860 (class 2606 OID 78728)
+-- TOC entry 3861 (class 2606 OID 123943)
 -- Name: observable_item_ref obs_item_aphia_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2832,7 +2856,7 @@ ALTER TABLE ONLY nrmn.observable_item_ref
 
 
 --
--- TOC entry 3861 (class 2606 OID 78733)
+-- TOC entry 3862 (class 2606 OID 123948)
 -- Name: observable_item_ref obs_item_aphia_rel_type_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2841,7 +2865,7 @@ ALTER TABLE ONLY nrmn.observable_item_ref
 
 
 --
--- TOC entry 3862 (class 2606 OID 78738)
+-- TOC entry 3860 (class 2606 OID 123938)
 -- Name: observable_item_ref obs_item_obs_item_type_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2850,7 +2874,7 @@ ALTER TABLE ONLY nrmn.observable_item_ref
 
 
 --
--- TOC entry 3863 (class 2606 OID 78743)
+-- TOC entry 3851 (class 2606 OID 123906)
 -- Name: observation observation_diver_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2859,7 +2883,7 @@ ALTER TABLE ONLY nrmn.observation
 
 
 --
--- TOC entry 3864 (class 2606 OID 78749)
+-- TOC entry 3850 (class 2606 OID 123901)
 -- Name: observation observation_measure_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2868,7 +2892,7 @@ ALTER TABLE ONLY nrmn.observation
 
 
 --
--- TOC entry 3865 (class 2606 OID 78764)
+-- TOC entry 3849 (class 2606 OID 123896)
 -- Name: observation observation_observable_item_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2877,7 +2901,7 @@ ALTER TABLE ONLY nrmn.observation
 
 
 --
--- TOC entry 3866 (class 2606 OID 78776)
+-- TOC entry 3848 (class 2606 OID 123891)
 -- Name: observation observation_survey_method_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2886,7 +2910,25 @@ ALTER TABLE ONLY nrmn.observation
 
 
 --
--- TOC entry 3873 (class 2606 OID 78781)
+-- TOC entry 3869 (class 2606 OID 124023)
+-- Name: public_data_exclusion public_data_exclusion_program_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
+--
+
+ALTER TABLE ONLY nrmn.public_data_exclusion
+    ADD CONSTRAINT public_data_exclusion_program_fk FOREIGN KEY (program_id) REFERENCES nrmn.program_ref(program_id);
+
+
+--
+-- TOC entry 3870 (class 2606 OID 124028)
+-- Name: public_data_exclusion public_data_exclusion_site_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
+--
+
+ALTER TABLE ONLY nrmn.public_data_exclusion
+    ADD CONSTRAINT public_data_exclusion_site_fk FOREIGN KEY (site_id) REFERENCES nrmn.site_ref(site_id);
+
+
+--
+-- TOC entry 3859 (class 2606 OID 124008)
 -- Name: rugosity rugosity_surface_type_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2895,7 +2937,7 @@ ALTER TABLE ONLY nrmn.rugosity
 
 
 --
--- TOC entry 3874 (class 2606 OID 78786)
+-- TOC entry 3858 (class 2606 OID 124003)
 -- Name: rugosity rugosity_survey_method_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2904,7 +2946,7 @@ ALTER TABLE ONLY nrmn.rugosity
 
 
 --
--- TOC entry 3878 (class 2606 OID 78791)
+-- TOC entry 3855 (class 2606 OID 123988)
 -- Name: pq_score score_cat_res_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2913,7 +2955,7 @@ ALTER TABLE ONLY nrmn.pq_score
 
 
 --
--- TOC entry 3879 (class 2606 OID 78796)
+-- TOC entry 3854 (class 2606 OID 123983)
 -- Name: pq_score score_survey_method_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2922,7 +2964,7 @@ ALTER TABLE ONLY nrmn.pq_score
 
 
 --
--- TOC entry 3871 (class 2606 OID 78801)
+-- TOC entry 3863 (class 2606 OID 123841)
 -- Name: site_ref site_location_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2931,7 +2973,7 @@ ALTER TABLE ONLY nrmn.site_ref
 
 
 --
--- TOC entry 3859 (class 2606 OID 78806)
+-- TOC entry 3868 (class 2606 OID 124018)
 -- Name: atrc_rugosity survey_atrc_rugosity_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2940,7 +2982,7 @@ ALTER TABLE ONLY nrmn.atrc_rugosity
 
 
 --
--- TOC entry 3869 (class 2606 OID 78811)
+-- TOC entry 3865 (class 2606 OID 123881)
 -- Name: survey_method survey_method_method_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2949,7 +2991,7 @@ ALTER TABLE ONLY nrmn.survey_method
 
 
 --
--- TOC entry 3870 (class 2606 OID 78816)
+-- TOC entry 3864 (class 2606 OID 123876)
 -- Name: survey_method survey_method_survey_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2958,7 +3000,7 @@ ALTER TABLE ONLY nrmn.survey_method
 
 
 --
--- TOC entry 3867 (class 2606 OID 78821)
+-- TOC entry 3857 (class 2606 OID 123866)
 -- Name: survey survey_program_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2967,7 +3009,7 @@ ALTER TABLE ONLY nrmn.survey
 
 
 --
--- TOC entry 3868 (class 2606 OID 78826)
+-- TOC entry 3856 (class 2606 OID 123861)
 -- Name: survey survey_site_fk; Type: FK CONSTRAINT; Schema: nrmn; Owner: -
 --
 
@@ -2975,7 +3017,7 @@ ALTER TABLE ONLY nrmn.survey
     ADD CONSTRAINT survey_site_fk FOREIGN KEY (site_id) REFERENCES nrmn.site_ref(site_id);
 
 
--- Completed on 2020-10-14 16:03:52 AEDT
+-- Completed on 2020-12-08 11:26:52 AEDT
 
 --
 -- PostgreSQL database dump complete

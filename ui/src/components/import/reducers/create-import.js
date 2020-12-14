@@ -8,6 +8,7 @@ const importState = {
     success: false,
     isLoading: false,
     percentCompleted: 0,
+    jobId: '',
     sheet: [],
     fileID: ''
 };
@@ -41,7 +42,7 @@ const importSlice = createSlice({
             console.debug('loaded');
             state.success = true;
             state.isLoading = false;
-            state.jobID = action.file.jobId;
+            state.jobId = action.payload.file.jobId;
         },
         ImportProgress:(state, action) => {
             state.percentCompleted = action.payload.percentCompleted;
