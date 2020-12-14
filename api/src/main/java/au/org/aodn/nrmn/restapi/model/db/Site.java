@@ -99,8 +99,8 @@ public class Site {
 
     @Column(name = "site_attribute", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    @Schema(title = "Attributes", accessMode = Schema.AccessMode.READ_ONLY)
-    private Map<String, Object> siteAttribute;
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    private Map<String, String> siteAttribute;
 
     @Basic
     @Column(name = "is_active")

@@ -97,7 +97,7 @@ public class ObservableItem {
 
     @Basic
     @Column(name = "obs_item_attribute", columnDefinition = "jsonb")
-    @Schema(title = "Attributes", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     @Type(type = "jsonb")
     private Map<String, String> obsItemAttribute;
 
