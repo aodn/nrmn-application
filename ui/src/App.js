@@ -79,9 +79,6 @@ const App = () => {
     overrides: {
       MuiCssBaseline: {
         '@global': {
-          html: {
-
-          },
           '.ag-root-wrapper-body': {
             minHeight: 400
           }

@@ -1,6 +1,7 @@
 import axiosInstance from './index.js';
 import store from '../components/store'; // will be useful to access to axios.all and axios.spread
 import parseDataUrl from 'parse-data-url';
+import { ImportProgress } from '../components/import/reducers/create-import.js';
 function getToken() {
   const token = store.getState().auth.accessToken;
   const tokenType = store.getState().auth.tokenType;
@@ -15,6 +16,14 @@ axiosInstance.interceptors.request.use(
   error => Promise.reject(error)
 );
 
+const dataURLtoBlob = (dataurl) => {
+  var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+    bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
+};
 
 export const userLogin = params => {
   return axiosInstance.post('/api/auth/signin', {
@@ -71,17 +80,24 @@ export const submitJobFile = (params) => {
   const data = new FormData();
 
   const fileParsed = parseDataUrl(params.file);
-   data.append('file',new Blob([fileParsed.data]), fileParsed.name);
+  data.append('file', dataURLtoBlob(params.file), fileParsed.name);
   data.append('programId', params.programId);
   data.append('withInvertSize', params.withInvertSize);
 
   const config = {
- //   'Content-Type': 'multipart/form-data',
+    'Content-Type': 'multipart/form-data; boundary=' + data._boundary,
     Authorization: getToken(),
+    onUploadProgress: (progressEvent) => {
+      const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+      store.dispatch(ImportProgress(percentCompleted));
+    }
+
   };
   return axiosInstance.post(
+
     '/api/stage/upload',
     data,
     config
   ).then(res => res);
 };
+

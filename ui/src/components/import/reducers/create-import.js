@@ -7,26 +7,10 @@ import {
 const importState = {
     success: false,
     isLoading: false,
+    percentCompleted: 0,
     sheet: [],
     fileID: ''
 };
-
-const array2obj = (header, rowArr) => {
-    const obj = {};
-    header.forEach((key, i) => {
-        obj[key] = rowArr[i];
-    });
-    return obj;
-};
-
-export const arrray2JSON = (sheet) => {
-    const header = sheet.shift();
-    sheet.shift();
-    return sheet.map(rowArr => {
-        return array2obj(header, rowArr);
-    });
-};
-
 
 export const exportRow = (row) => {
     const jsonRow = { ...row, MeasureJson: {} };
@@ -38,41 +22,41 @@ export const exportRow = (row) => {
 };
 
 export const flatten = (row) => {
-   const measures = row.MeasureJson;
-   if (measures) {
-    delete row.MeasureJson;
-     return Object.assign(row, measures);
-   }
-   return row;
+    const measures = row.MeasureJson;
+    if (measures) {
+        delete row.MeasureJson;
+        return Object.assign(row, measures);
+    }
+    return row;
 };
 const importSlice = createSlice({
     name: 'import',
     initialState: importState,
     reducers: {
-        rawSurveyReady: (state, action) => {
-            state.fileID = action.payload.fileID;
-            state.sheet = action.payload.Rows;
-        },
-        ImportStarted: (state, action) =>  {
+        ImportStarted: (state, action) => {
             console.debug('started');
             state.isLoading = true;
         },
         ImportLoaded: (state, action) => {
             console.debug('loaded');
             state.success = true;
-            state.isLoading  = false;
+            state.isLoading = false;
+            state.jobID = action.file.jobId;
+        },
+        ImportProgress:(state, action) => {
+            state.percentCompleted = action.payload.percentCompleted;
         },
         ImportFailed: (state, action) => {
             state.success = false;
-            state.isLoading  = false;
+            state.isLoading = false;
             console.debug('data import falied:', action);
         }
     }
 });
 
 export const importReducer = importSlice.reducer;
-export const { rawSurveyReady,ImportStarted, ImportLoaded, ImportFailed } = importSlice.actions;
+export const { ImportProgress, ImportStarted, ImportLoaded, ImportFailed } = importSlice.actions;
 export const ImportRequested = createAction('IMPORT_REQUESTED', function (xlsFile) { return { payload: xlsFile }; });
-export const FileRequested = createAction('FILE_REQUESTED', function(fileID) { return {payload: fileID};});
+export const FileRequested = createAction('FILE_REQUESTED', function (fileID) { return { payload: fileID }; });
 
 

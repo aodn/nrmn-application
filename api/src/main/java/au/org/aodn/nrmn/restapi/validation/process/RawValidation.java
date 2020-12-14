@@ -74,7 +74,7 @@ public class RawValidation extends ValidatorHelpers {
                         Tuple2.of("P-Qs", new DiverExists(StagedRow::getPqs, "P-Qs", diverRepo)),
                         Tuple2.of("Depth", new DoubleFormatValidation(StagedRow::getDepth, "Depth")),
                         Tuple2.of("Method", new IntegerFormatValidation(StagedRow::getMethod, "Method", Arrays.asList(0, 1, 2, 3, 4, 5, 7, 10))),
-                        Tuple2.of("Block", new IntegerFormatValidation(StagedRow::getBlock, "Block", Arrays.asList(0, 1, 2))),
+                        Tuple2.of("Block", new IntegerFormatValidation(StagedRow::getBlock, "Block", Arrays.asList(0, 1, 2, 10))),
                         Tuple2.of("Code", new PassThruString(StagedRow::getCode, "Code")),
                         Tuple2.of("Species", speciesExists),
 

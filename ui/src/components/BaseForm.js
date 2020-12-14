@@ -46,7 +46,6 @@ const BaseForm = (params) => {
   const classes = useStyles();
 
   const loading = params.loading;
-
   const success = params.success;
 
   const buttonClassname = clsx({

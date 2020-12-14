@@ -44,15 +44,14 @@ const Login = () => {
   };
 
   return (
-    <>
-      <BaseForm
-        schema={schema}
-        uiSchema={uiSchema}
-        errors={errors}
-        loading={loading}
-        onSubmit={handleLogin}>
-      </BaseForm>
-    </>
+    <BaseForm
+      schema={schema}
+      uiSchema={uiSchema}
+      errors={errors}
+      loading={loading}
+      onSubmit={handleLogin}>
+    </BaseForm>
+
   );
 };
 
