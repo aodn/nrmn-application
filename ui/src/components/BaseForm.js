@@ -67,7 +67,6 @@ const BaseForm = (params) => {
         justify="center"
         style={{ minHeight: "70vh" }}
     >
-      <Paper elevation={0}>
         <Box pt={4} px={6} pb={6} className={classes.root} >
           <Form
               schema={params.schema}
@@ -89,7 +88,6 @@ const BaseForm = (params) => {
             </div>
           </Form>
         </Box>
-      </Paper>
     </Grid>
   </>;
 }
