@@ -104,6 +104,9 @@ export const entityRelation = (entity, urls) => {
   return axiosInstance.put(entity, urls, config).then;
 };
 
+export const getDataJob = (jobId) => (
+  axiosInstance.get('/api/stage/job?reference=' + jobId).then(res => res)
+);
 
 export const submitJobFile = (params) => {
 
@@ -116,7 +119,6 @@ export const submitJobFile = (params) => {
 
   const config = {
     'Content-Type': 'multipart/form-data; boundary=' + data._boundary,
-    Authorization: getToken(),
     onUploadProgress: (progressEvent) => {
       const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
       store.dispatch(ImportProgress(percentCompleted));

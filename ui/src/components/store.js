@@ -12,7 +12,7 @@ import { formReducer } from './data-entities/form-reducer';
 import createSagaMiddleware from 'redux-saga';
 import importMiddleware from './import/middleware/create-import';
 import ListFileMiddleware from './import/middleware/list-import';
-import FileMiddleware from './import/middleware/file-import';
+import FileMiddleware from './import/middleware/validation-job';
 import getEntitiesWatcher from './data-entities/middleware/entities';
 import { all } from 'redux-saga/effects';
 import LoginWatcher from './auth/auth-middleware';

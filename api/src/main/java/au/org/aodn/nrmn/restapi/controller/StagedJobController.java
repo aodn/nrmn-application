@@ -133,6 +133,7 @@ public class StagedJobController {
         }).orElseGet(() -> ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(new ValidationResponse(
+                        null,
                         Collections.emptyList(),
                         Collections.emptyList(),
                         Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob")))));
@@ -140,9 +141,20 @@ public class StagedJobController {
 
     @GetMapping("/job")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
-    public List<StagedRow> getJob(@RequestParam("reference") String reference) {
-        return stagedRowRepo.findRowsByReference("reference");
-    }
+    public ValidationResponse getJob(@RequestParam("reference") String reference) {
+        val rows = stagedRowRepo.findRowsByReference(reference);
+        if (rows.isEmpty())
+         return new ValidationResponse(
+                    null,
+                    Collections.emptyList(),
+                    Collections.emptyList(),
+                    Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob")));
+
+        val job = rows.get(0).getStagedJob();
+        return new ValidationResponse(
+                job, rows, Collections.emptyList(),Collections.emptyList()
+        );
+     }
 
 
 }

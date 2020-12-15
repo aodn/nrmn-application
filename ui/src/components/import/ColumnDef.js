@@ -1,6 +1,6 @@
 
 function cell(params) {
-    if (params.data.Errors.length > 0) {
+    if (params.data?.Errors?.length > 0) {
         const present = params.data.Errors.map(e => e.ColunmTarget);
         const inter = present.filter(e => e === params.colDef.field);
         if (inter.length > 0)
@@ -11,12 +11,12 @@ function cell(params) {
 
 const ColunmDef = [
     {
-        field: 'ID',
+        field: 'id',
         editable: true,
         width: 100,
     },
     {
-        field: 'Diver',
+        field: 'diver',
         editable: true,
         width: 100,
         pivot: true,
@@ -25,7 +25,7 @@ const ColunmDef = [
 
     },
     {
-        field: 'Buddy',
+        field: 'buddy',
         editable: true,
         width: 100
     },
@@ -45,21 +45,21 @@ const ColunmDef = [
         width: 100
     },
     {
-        field: 'Latitude',
+        field: 'latitude',
         editable: true,
         width: 100,
         cellStyle: cell
 
     },
     {
-        field: 'Longitude',
+        field: 'longitude',
         editable: true,
         width: 100,
         cellStyle: cell
 
     },
     {
-        field: 'Date',
+        field: 'date',
         editable: true,
         width: 100
     },
@@ -69,12 +69,12 @@ const ColunmDef = [
         width: 100
     },
     {
-        field: 'Direction',
+        field: 'direction',
         editable: true,
         width: 100
     },
     {
-        field: 'Time',
+        field: 'time',
         editable: true,
         width: 100
     },
@@ -84,7 +84,7 @@ const ColunmDef = [
         width: 100
     },
     {
-        field: 'Depth',
+        field: 'depth',
         editable: true,
         width: 100,
         hide: true,
@@ -92,7 +92,7 @@ const ColunmDef = [
         enableRowGroup: true,
     },
     {
-        field: 'Method',
+        field: 'method',
         editable: true,
         width: 100,
         hide: true,
@@ -100,7 +100,7 @@ const ColunmDef = [
         enableRowGroup: true,
     },
     {
-        field: 'Block',
+        field: 'block',
         editable: true,
         width: 100,
         hide: true,
@@ -108,12 +108,12 @@ const ColunmDef = [
         enableRowGroup: true,
     },
     {
-        field: 'Code',
+        field: 'code',
         editable: true,
         width: 100
     },
     {
-        field: 'Species',
+        field: 'species',
         editable: true,
         width: 100,
         'aggFunc': 'count'
@@ -124,12 +124,12 @@ const ColunmDef = [
         width: 100
     },
     {
-        field: 'Total',
+        field: 'total',
         editable: true,
         width: 100
     },
     {
-        field: 'Inverts',
+        field: 'inverts',
         editable: true,
         width: 100
     },

@@ -2,8 +2,8 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AgGridReact } from 'ag-grid-react';
 import { AllModules } from 'ag-grid-enterprise';
-import { useState, useEffect } from 'react';
-import { ImportLoaded, FileRequested } from './reducers/create-import';
+import { useEffect } from 'react';
+import { JobFinished, JobRequested } from './reducers/create-import';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { green } from '@material-ui/core/colors';
@@ -12,51 +12,24 @@ import { useParams } from 'react-router-dom';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import { Box } from '@material-ui/core';
+import useWindowSize from '../utils/useWindowSize';
 
-function useWindowSize() {
-    const isClient = typeof window === 'object';
-
-    function getSize() {
-        return {
-            width: isClient ? window.innerWidth : undefined,
-            height: isClient ? window.innerHeight : undefined
-        };
-    }
-
-    const [windowSize, setWindowSize] = useState(getSize);
-
-    useEffect(() => {
-        if (!isClient) {
-            return false;
-        }
-
-        function handleResize() {
-            setWindowSize(getSize());
-        }
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []); // Empty array ensures that effect is only run on mount and unmount
-
-    return windowSize;
-}
 
 const DataSheetView = () => {
-
-
-    const { fileID } = useParams();
+    const { jobId } = useParams();
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (fileID) {
-            dispatch(FileRequested(fileID));
+        if (jobId) {
+            dispatch(JobRequested(jobId));
         }
     }, []);
-    const sheet = useSelector(state => state.import.sheet);
+
+    const rows = useSelector(state => state.import.rows);
     const isLoading = useSelector(state => state.import.isLoading);
 
     const agGridReady = () => {
-        dispatch(ImportLoaded());
+        dispatch(JobFinished());
     };
     const useStyles = makeStyles((theme) => ({
         wrapper: {
@@ -81,10 +54,10 @@ const DataSheetView = () => {
     const classes = useStyles();
     const size = useWindowSize();
     const themeType = useSelector(state => state.theme.themeType);
-    const condition = sheet && sheet.length && !isLoading;
+    const condition = rows && rows.length && !isLoading;
     return (<Box>
         {condition &&
-            <div style={{ height: size. height - 200, width: '100%', marginTop: 25 }} className={themeType ? 'ag-theme-material-dark' : 'ag-theme-material'} >
+            <div style={{ height: size.height - 100, width: '100%', marginTop: 25 }} className={themeType ? 'ag-theme-material-dark' : 'ag-theme-material'} >
                 <AgGridReact
                     pivotMode={true}
                     pivotColumnGroupTotals={'before'}
@@ -98,7 +71,7 @@ const DataSheetView = () => {
                     }}
                     columnDefs={ColunmDef}
                     groupDefaultExpanded={4}
-                    rowData={sheet}
+                    rowData={rows}
                     animateRows={true}
                     groupMultiAutoColumn={true}
                     groupHideOpenParents={true}

@@ -50,7 +50,7 @@ public class ValidationProcess extends ValidatorHelpers {
         val preCheck = rowChecks.stream().reduce(reducer.zero(), reducer::apply);
 
         if (preCheck.getValid().isInvalid()) {
-            return new ValidationResponse(preCheck.getRows().toList(), Collections.emptyList(), Collections.emptyList());
+            return new ValidationResponse(job, preCheck.getRows().toList(), Collections.emptyList(), Collections.emptyList());
         }
 
         val rowWithHasMap = rowChecks
@@ -66,6 +66,7 @@ public class ValidationProcess extends ValidatorHelpers {
         val formattedResult = postProcess.process(formattedRows, job);
         val globalResult = globalProcess.process(job);
         return new ValidationResponse(
+                job,
                 formattedResult.getRows().toList(),
                 toErrorList(globalResult),
                 Collections.emptyList());

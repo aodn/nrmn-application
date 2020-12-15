@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
@@ -30,7 +31,7 @@ public class StagedRow implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonProperty(value = "Site No")
+    @JsonProperty(value = "site #")
     @Column(name = "site_no")
     private String siteNo;
 
@@ -55,7 +56,7 @@ public class StagedRow implements Serializable {
     @Column(name = "buddy")
     private String buddy;
 
-    @JsonProperty(value = "Site Name")
+    @JsonProperty(value = "site name")
     @Column(name = "site_name")
     private String siteName;
 
@@ -81,7 +82,7 @@ public class StagedRow implements Serializable {
     @Column(name = "code")
     private String code;
 
-    @JsonProperty(value = "Common name")
+    @JsonProperty(value = "common name")
     @Column(name = "common_name")
     private String commonName;
 
@@ -110,6 +111,7 @@ public class StagedRow implements Serializable {
     @Type(type = "jsonb")
     private Map<Integer, String> measureJson;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(foreignKey = @ForeignKey(name = "staged_row_staged_job_id_fkey"))
     private StagedJob stagedJob;

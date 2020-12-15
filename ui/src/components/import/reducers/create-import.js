@@ -8,19 +8,21 @@ const importState = {
     success: false,
     isLoading: false,
     percentCompleted: 0,
-    errors : [],
+    errors: [],
+    rows: [],
     jobId: '',
     sheet: [],
     fileID: ''
 };
 
 export const exportRow = (row) => {
-    const jsonRow = { ...row, MeasureJson: {} };
-    Object.getOwnPropertyNames(jsonRow).filter(key => !isNaN(key)).forEach(numKey => {
-        jsonRow.MeasureJson[numKey] = jsonRow[numKey];
-        delete jsonRow[numKey];
+    const {measureJson} = { ...row};
+    Object.getOwnPropertyNames(measureJson)
+    .forEach(numKey => {
+        row[numKey] = measureJson[numKey];
     });
-    return jsonRow;
+    delete row.measureJson;
+    return row;
 };
 
 export const flatten = (row) => {
@@ -43,23 +45,32 @@ const importSlice = createSlice({
             console.debug('loaded');
             state.success = action.payload.errors.length == 0;
             state.isLoading = false;
-            state.errors =  action.payload.errors;
+            state.errors = action.payload.errors;
             state.jobId = action.payload.file.jobId;
         },
-        ImportProgress:(state, action) => {
+        ImportProgress: (state, action) => {
             state.percentCompleted = action.payload.percentCompleted;
         },
         ImportFailed: (state, action) => {
             state.success = false;
             state.isLoading = false;
             state.errors = action.payload.errors;
+        },
+        JobReady: (state, action) => {
+            state.rows = action.payload.Rows.map(row => exportRow(row));
+        },
+        JobStarting: (state) => {
+            state.isLoading = true;
+        },
+        JobFinished: (state) => {
+            state.isLoading = false;
         }
     }
 });
 
 export const importReducer = importSlice.reducer;
-export const { ImportProgress, ImportStarted, ImportLoaded, ImportFailed } = importSlice.actions;
+export const { ImportProgress, JobStarting, JobFinished, JobReady, ImportStarted, ImportLoaded, ImportFailed } = importSlice.actions;
 export const ImportRequested = createAction('IMPORT_REQUESTED', function (xlsFile) { return { payload: xlsFile }; });
-export const FileRequested = createAction('FILE_REQUESTED', function (fileID) { return { payload: fileID }; });
+export const JobRequested = createAction('JOB_REQUESTED', function (fileID) { return { payload: fileID }; });
 
 
