@@ -1,6 +1,5 @@
 import React from "react";
 
-import Form from "@rjsf/material-ui"
 import {useDispatch, useSelector} from "react-redux";
 import { Link } from 'react-router-dom'
 import {useEffect} from 'react';
@@ -10,14 +9,13 @@ import pluralize from 'pluralize';
 import config from "react-global-configuration";
 import {Box} from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
-import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import {titleCase} from "title-case";
 import {LoadingBanner} from "../layout/loadingBanner";
 import {createEntityRequested, itemRequested, updateEntityRequested} from "./middleware/entities";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
-import _ from 'lodash';
+import BaseForm from "../BaseForm";
 
 const renderError = (msgArray) => {
   return (msgArray.length > 0) ? <><Box><Alert severity="error" variant="filled">{msgArray}</Alert></Box></> : <></>;
@@ -66,7 +64,9 @@ const GenericForm = () => {
   const uiSchemaHacks = Object.keys(entitySchema.properties).filter( key => {
     return entitySchema.properties[key].type === "string" && entitySchema.properties[key].format === "uri"
   } )
+
   const uiSchema = {};
+
   uiSchemaHacks.map( key => {
     uiSchema[key] = {'ui:field': "relationship"}
   });
@@ -94,7 +94,7 @@ const GenericForm = () => {
 
     }
     else {
-      return <Form
+      return <BaseForm
           schema={JSSchema}
           uiSchema={uiSchema}
           onSubmit={handleSubmit}
@@ -121,11 +121,7 @@ const GenericForm = () => {
               justify="center"
               style={{minHeight: "70vh"}}
           >
-            <Paper>
-              <Box mx="auto" bgcolor="background.paper" pt={2} px={3} pb={3}>
-                {formContent()}
-              </Box>
-            </Paper>
+          {formContent()}
           </Grid>
     }
   }
