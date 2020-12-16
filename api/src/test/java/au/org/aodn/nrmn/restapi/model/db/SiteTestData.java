@@ -37,7 +37,7 @@ public class SiteTestData {
                    .latitude(-57.5)
                    .location(locationTestData.persistedLocation())
                    .oldSiteCodes(Arrays.asList(new String[] {"SIT01", "SIT02"}))
-                   .siteAttribute(ImmutableMap.<String, Object>builder()
+                   .siteAttribute(ImmutableMap.<String, String>builder()
                            .put("State", "Graham Land Antarctica")
                            .put("Country", "Antarctica")
                            .put("ProxCountry", "Antarctica")
