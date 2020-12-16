@@ -11,8 +11,7 @@ const importState = {
     errors: [],
     rows: [],
     jobId: '',
-    sheet: [],
-    fileID: ''
+    job : {}
 };
 
 export const exportRow = (row) => {
@@ -57,7 +56,9 @@ const importSlice = createSlice({
             state.errors = action.payload.errors;
         },
         JobReady: (state, action) => {
-            state.rows = action.payload.Rows.map(row => exportRow(row));
+            state.rows = action.payload.rows.map(row => exportRow(row));
+            state.job = action.payload.job;
+            console.log(state.job);
         },
         JobStarting: (state) => {
             state.isLoading = true;

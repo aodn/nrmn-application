@@ -11,11 +11,6 @@ function cell(params) {
 
 const ColunmDef = [
     {
-        field: 'id',
-        editable: true,
-        width: 100,
-    },
-    {
         field: 'diver',
         editable: true,
         width: 100,
@@ -30,9 +25,9 @@ const ColunmDef = [
         width: 100
     },
     {
-        field: 'Site No',
+        field: 'site #',
         editable: true,
-        width: 100,
+        width: 200,
         hide: true,
         rowGroup: true,
         enableRowGroup: true,
@@ -40,9 +35,9 @@ const ColunmDef = [
 
     },
     {
-        field: 'Site Name',
+        field: 'site name',
         editable: true,
-        width: 100
+        width: 200
     },
     {
         field: 'latitude',
@@ -86,7 +81,7 @@ const ColunmDef = [
     {
         field: 'depth',
         editable: true,
-        width: 100,
+        width: 50,
         hide: true,
         rowGroup: true,
         enableRowGroup: true,
@@ -94,7 +89,7 @@ const ColunmDef = [
     {
         field: 'method',
         editable: true,
-        width: 100,
+        width: 50,
         hide: true,
         rowGroup: true,
         enableRowGroup: true,
@@ -102,7 +97,7 @@ const ColunmDef = [
     {
         field: 'block',
         editable: true,
-        width: 100,
+        width: 50,
         hide: true,
         rowGroup: true,
         enableRowGroup: true,
@@ -110,7 +105,7 @@ const ColunmDef = [
     {
         field: 'code',
         editable: true,
-        width: 100
+        width: 75
     },
     {
         field: 'species',
@@ -119,7 +114,7 @@ const ColunmDef = [
         'aggFunc': 'count'
     },
     {
-        field: 'Common name',
+        field: 'common name',
         editable: true,
         width: 100
     },

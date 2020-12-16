@@ -16,42 +16,14 @@ import useWindowSize from '../utils/useWindowSize';
 
 
 const DataSheetView = () => {
-    const { jobId } = useParams();
     const dispatch = useDispatch();
-
-    useEffect(() => {
-        if (jobId) {
-            dispatch(JobRequested(jobId));
-        }
-    }, []);
-
     const rows = useSelector(state => state.import.rows);
     const isLoading = useSelector(state => state.import.isLoading);
 
     const agGridReady = () => {
         dispatch(JobFinished());
     };
-    const useStyles = makeStyles((theme) => ({
-        wrapper: {
-            margin: theme.spacing(1),
-            position: 'relative',
-        },
-        buttonSuccess: {
-            backgroundColor: green[500],
-            '&:hover': {
-                backgroundColor: green[700],
-            },
-        },
-        buttonProgress: {
-            color: green[500],
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            marginTop: -12,
-            marginLeft: -12,
-        }
-    }));
-    const classes = useStyles();
+
     const size = useWindowSize();
     const themeType = useSelector(state => state.theme.themeType);
     const condition = rows && rows.length && !isLoading;
@@ -69,6 +41,7 @@ const DataSheetView = () => {
                             innerRenderer: 'nameCellRenderer'
                         }
                     }}
+
                     columnDefs={ColunmDef}
                     groupDefaultExpanded={4}
                     rowData={rows}

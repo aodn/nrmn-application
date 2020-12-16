@@ -8,7 +8,7 @@ export default function* Watcher() {
 function* loadDataJob(action) {
     try {
         const payload = yield call(getDataJob, action.payload);
-     yield put(JobReady({FileID: action.payload, Rows:payload.data}));
+     yield put(JobReady(payload.data));
     } catch (e) {
         yield put(ImportFailed(e));
     }

@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ValidationResponse {
     StagedJob job;
-    List<StagedRow> errorsRow;
+    List<StagedRow> rows;
     List<StagedRowError> errorGlobal;
 
     List<ErrorInput> errorInputs;

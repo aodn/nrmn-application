@@ -143,19 +143,19 @@ public class StagedJobController {
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ValidationResponse getJob(@RequestParam("reference") String reference) {
         val rows = stagedRowRepo.findRowsByReference(reference);
-        if (rows.isEmpty())
-         return new ValidationResponse(
-                    null,
-                    Collections.emptyList(),
-                    Collections.emptyList(),
-                    Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob")));
+        return jobRepo.findByReference(reference)
+                .map(job ->
+                        new ValidationResponse(
+                                job, rows, Collections.emptyList(), Collections.emptyList()
+                        )
+                ).orElseGet(() ->
+                        new ValidationResponse(
+                                null,
+                                Collections.emptyList(),
+                                Collections.emptyList(),
+                                Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob"))
+                        ));
 
-        val job = rows.get(0).getStagedJob();
-        return new ValidationResponse(
-                job, rows, Collections.emptyList(),Collections.emptyList()
-        );
-     }
-
-
+    }
 }
 
