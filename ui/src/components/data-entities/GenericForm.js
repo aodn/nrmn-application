@@ -16,12 +16,25 @@ import {createEntityRequested, itemRequested, updateEntityRequested} from "./mid
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import BaseForm from "../BaseForm";
+import {makeStyles} from "@material-ui/core/styles";
+
+
+const useStyles = makeStyles(theme => ({
+  buttons: {
+    "& > *": {
+      marginTop: 20,
+      marginBottom: 40
+    }
+  }
+}));
 
 const renderError = (msgArray) => {
   return (msgArray.length > 0) ? <><Box><Alert severity="error" variant="filled">{msgArray}</Alert></Box></> : <></>;
 }
 
 const GenericForm = () => {
+
+  const classes = useStyles();
 
   const {entityName, id} = useParams();
   const schemaDefinition = config.get('api') || {};
@@ -77,19 +90,8 @@ const GenericForm = () => {
 
   const formContent = ()=>{
     if (entitySaved) {
-      const redirectPath = "/list/" + entityTitle;
       return <>
         <Typography variant="h4"  >Entity saved successfully!</Typography>
-        <Box paddingY={4}>
-          <Button
-              component={Link}
-              to={redirectPath}
-              color="secondary"
-              aria-label={"List " + entityTitle}
-              variant={"contained"}>
-            List {entityName}
-          </Button>
-        </Box>
       </>
 
     }
@@ -116,12 +118,36 @@ const GenericForm = () => {
           <LoadingBanner variant={"h5"} msg={"Loading '" + titleCase(entityName) + "' form"  } /> :
           <Grid
               container
-              spacing={0}
-              alignItems="center"
+              direction="row"
               justify="center"
+              alignItems="center"
               style={{minHeight: "70vh"}}
           >
-          {formContent()}
+            <Grid item >
+              <Grid
+                  container
+                  alignItems="flex-end"
+                  justify="space-around"
+                  direction="column"
+              >
+                <Grid item >
+                  <div className={classes.buttons}>
+                    <Button
+                        component={Link}
+                        size="small"
+                        to={"/list/" + entityTitle}
+                        color="secondary"
+                        aria-label={"List " + entityTitle}
+                        variant={"contained"}>
+                      List {entityName}
+                    </Button>
+                  </div>
+                </Grid>
+                <Grid item >
+                  {formContent()}
+                </Grid>
+              </Grid>
+            </Grid>
           </Grid>
     }
   }

@@ -42,7 +42,7 @@ const schematoColDef = (schema, size, entityName) => {
   });
 
   coldefs.push({
-    field: "Edit",
+    field: "Links",
     filter: undefined,
     cellRenderer: function (params) {
       const editPath = nonGenericEntities[entityName]?.editPath;
@@ -51,13 +51,15 @@ const schematoColDef = (schema, size, entityName) => {
         const hrefSplit = params.data._links.self.href.split("/");
         const id = hrefSplit.pop();
         const ent = hrefSplit.pop();
+        let linkLabel = "Edit";
         if ((entityName in nonGenericEntities) && editPath) {
-          link =  "/" + editPath.replace(/{(.*?)}/, id) ;
+          link =  "/" + editPath.replace(/{(.*?)}/, id);
         }
         else {
-          link = "/form/" + ent + "/" + id;
+          link = "/detailed/" + ent + "/" + id;
+          linkLabel = "view"
         }
-        return '<a href="' + link + '">Edit</a>';
+        return '<a href="' + link + '">' + linkLabel + '</a>';
       }
     }
   })
@@ -172,7 +174,7 @@ const EntityList = () => {
                  className={themeType ? "ag-theme-alpine-dark" : "ag-theme-alpine"}>
               <AgGridReact
                   columnDefs={colDef}
-                  rowSelection="multiple"
+                  rowSelection="single"
                   animateRows={true}
                   onGridReady={agGridReady}
                   frameworkComponents={{customTooltip: CustomTooltip}}

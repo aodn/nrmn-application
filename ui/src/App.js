@@ -24,6 +24,7 @@ import Alert from "@material-ui/lab/Alert";
 import {getFullPath} from "./components/utils/helpers";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 import './ag-grid.scss'
+import GenericDetailsView from "./components/data-entities/GenericDetailsView";
 
 const drawerWidth = 240;
 
@@ -95,6 +96,7 @@ export default function App()  {
               <Route path="/list-file" component={FileList} />
               <Route path="/login" component={Login} />
               <Route path="/form/:entityName/:id?" component={GenericForm} />
+              <Route path="/detailed/:entityName/:id?" component={GenericDetailsView} />
               <Route path="/list/:entityName" component={EntityList} />
               <Route path="/notfound" render={(props) =>
                   <Alert severity="error"  >
