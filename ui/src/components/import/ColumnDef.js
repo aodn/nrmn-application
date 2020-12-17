@@ -131,27 +131,27 @@ const ColunmDef = [
     {
         field: '2.5',
         editable: true,
-        width: 100
+        width: 50
     },
     {
         field: '5',
         editable: true,
-        width: 100
+        width: 50
     },
     {
         field: '7.5',
         editable: true,
-        width: 100
+        width: 50
     },
     {
         field: '10',
         editable: true,
-        width: 100
+        width: 50
     },
     {
         field: '12.5',
         editable: true,
-        width: 100
+        width: 50
     },
     {
         field: '15',
@@ -161,47 +161,47 @@ const ColunmDef = [
     {
         field: '20',
         editable: true,
-        width: 100
+        width: 50
     },
     {
         field: '25',
         editable: true,
-        width: 100
+        width: 50
     },
     {
         field: '30',
         editable: true,
-        width: 100
+        width: 50
     },
     {
         field: '35',
         editable: true,
-        width: 100
+        width: 50
     },
     {
         field: '40',
         editable: true,
-        width: 100
+        width: 50
     },
     {
         field: '50',
         editable: true,
-        width: 100
+        width: 50
     },
     {
         field: '62.5',
-        editable: true,
-        width: 100
+        50: true,
+        width: 50
     },
     {
         field: '75',
         editable: true,
-        width: 100
+        width: 50
     },
     {
         field: '87.5',
         editable: true,
-        width: 100
+        width: 50
     },
     {
         field: '100',
@@ -211,11 +211,11 @@ const ColunmDef = [
     {
         field: '112.5',
         editable: true,
-        width: 100
+        width: 50
     },
     {
         field: '125',
-        editable: true,
+        editable: 50,
         width: 100
     },
     {
