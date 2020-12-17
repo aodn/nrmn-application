@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @Table(name = "location_ref")
 @Audited(withModifiedFlag = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Location {
     @Id
     @SequenceGenerator(name = "location_ref_location_id", sequenceName = "location_ref_location_id", allocationSize = 1)

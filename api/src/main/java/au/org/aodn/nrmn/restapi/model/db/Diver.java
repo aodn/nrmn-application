@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +25,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @Table(name = "diver_ref")
 @Audited(withModifiedFlag = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Diver {
     @Id
     @SequenceGenerator(name = "diver_ref_diver_id", sequenceName = "diver_ref_diver_id", allocationSize = 1)
