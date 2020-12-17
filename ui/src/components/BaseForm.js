@@ -76,13 +76,15 @@ const BaseForm = (params) => {
               formData={params.formData}
           >
             {errorAlert}
+
             <div className={classes.rootFlex}>
               <div className={classes.wrapper}>
+                {(params.submitButton) ? params.submitButton :
                 <Button type="submit"
                         variant="contained"
-                        color="primary"
+                        color="secondary"
                         disabled={loading}
-                >Submit</Button>
+                >Submit</Button>}
                 {loading && <CircularProgress size={20} className={classes.buttonProgress} />}
               </div>
             </div>

@@ -85,9 +85,23 @@ const GenericDetailsView = () => {
     relationship: NestedApiFieldDetails,
     ArrayField: inputDisplay,
     BooleanField: inputDisplay,
-    DescriptionField: inputDisplay,
     NumberField: inputDisplay,
     StringField: inputDisplay
+  }
+
+  const submitButton = () => {
+    return  <div className={classes.buttons}>
+      <Button
+          type={"submit"}
+          component={Link}
+          to={"/form/" + entityName + "/" + id}
+          color="secondary"
+          aria-label={"Edit " + entityTitle + " " + id }
+          variant={"contained"}
+      >
+        Edit {entityTitle} '{id}'
+      </Button>
+    </div>
   }
 
   const formContent = () => {
@@ -96,20 +110,8 @@ const GenericDetailsView = () => {
             uiSchema={uiSchema}
             fields={fields}
             formData={editItem}
-        >
-          <div className={classes.buttons}>
-            <Button
-                type={"submit"}
-                component={Link}
-                to={"/form/" + entityName + "/" + id}
-                color="secondary"
-                aria-label={"Edit " + entityTitle + " " + id }
-                variant={"contained"}
-            >
-              Edit {entityTitle} '{id}'
-            </Button>
-          </div>
-        </BaseForm>
+            submitButton={submitButton()}
+        />
   }
 
   return <Grid

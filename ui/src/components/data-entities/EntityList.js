@@ -45,19 +45,21 @@ const schematoColDef = (schema, size, entityName) => {
     field: "Links",
     filter: undefined,
     cellRenderer: function (params) {
-      const editPath = nonGenericEntities[entityName]?.editPath;
+      const linkPath = nonGenericEntities[entityName]?.linkPath;
+      let linkLabel = "Edit";
       let link = "/";
       if (params.data._links) {
         const hrefSplit = params.data._links.self.href.split("/");
         const id = hrefSplit.pop();
         const ent = hrefSplit.pop();
-        let linkLabel = "Edit";
-        if ((entityName in nonGenericEntities) && editPath) {
-          link =  "/" + editPath.replace(/{(.*?)}/, id);
+
+        if ((entityName in nonGenericEntities) && linkPath) {
+          link =  "/" + linkPath.replace(/{(.*?)}/, id);
+          linkLabel = (nonGenericEntities[entityName]?.linkLabel) ? nonGenericEntities[entityName]?.linkLabel : linkLabel;
         }
         else {
           link = "/detailed/" + ent + "/" + id;
-          linkLabel = "view"
+          linkLabel = "View";
         }
         return '<a href="' + link + '">' + linkLabel + '</a>';
       }
@@ -81,8 +83,7 @@ const nonGenericEntities = {
   'StagedJob': {
     title: "Jobs",
     createButtonPath: "/import-file", // createButtonPath absence means no create button will show
-    editPath: "editPath/{}",
-    detailedView: "listPath/{}"
+    linkPath: "linkToSomewherePath/{}"
   }
 };
 
