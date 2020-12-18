@@ -4,9 +4,9 @@ function cell(params) {
         const present = params.data.Errors.map(e => e.ColunmTarget);
         const inter = present.filter(e => e === params.colDef.field);
         if (inter.length > 0)
-            return {backgroundColor: 'red'};
+            return { backgroundColor: 'red' };
     }
-    return  null;
+    return null;
 }
 
 const ColunmDef = [

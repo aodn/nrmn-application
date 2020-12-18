@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AgGridReact } from 'ag-grid-react';
 import { AllModules } from 'ag-grid-enterprise';
@@ -19,8 +19,15 @@ const DataSheetView = () => {
     const dispatch = useDispatch();
     const rows = useSelector(state => state.import.rows);
     const isLoading = useSelector(state => state.import.isLoading);
+    const [gridColumnApi, setGridColumnApi] = useState(null);
+    const [gridApi, setGridApi] = useState(null);
 
     const agGridReady = () => {
+        const onGridReady = (params) => {
+            setGridApi(params.api);
+            setGridColumnApi(params.columnApi);
+        };
+
         dispatch(JobFinished());
     };
 

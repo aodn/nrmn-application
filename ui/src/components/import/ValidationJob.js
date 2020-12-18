@@ -20,8 +20,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import List from '@material-ui/core/List';
-
-
+import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
+import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -73,12 +73,14 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
         padding: theme.spacing(3),
     },
+    errorItem: {
+        color: theme.palette.error
+    },
 }));
 
 const ValidationJob = () => {
     const { jobId } = useParams();
     const dispatch = useDispatch();
-    const theme = useTheme();
     const classes = useStyles();
     const job = useSelector(state => state.import.job);
     const [open, setOpen] = useState(false);
@@ -99,7 +101,7 @@ const ValidationJob = () => {
     const jobReady = job && Object.keys(job).length > 0;
     console.log(job);
     return (jobReady) ? (
-        <Box>
+        <Box style={{ paddingRight: 40 }}>
             <Drawer
                 anchor="right"
                 variant="permanent"
@@ -115,28 +117,17 @@ const ValidationJob = () => {
                 }}
             >
                 <div className={classes.toolbar}>
-                    <IconButton onClick={handleDrawerClose}>
-                        {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                    </IconButton>
                 </div>
                 <Divider />
                 <List>
-                    {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                        <ListItem button key={text}>
-                            <ListItemIcon>{index % 2 === 0 ? <InboxIcon onClick={() => setOpen(!open)} /> : <MailIcon />}</ListItemIcon>
-                            <ListItemText primary={text} />
+                    {['buddy not found', 'Site Not found', 'Species missing', 'Drafts'].map((text, index) => (
+                        <ListItem className={classes.errorItem} button key={text}>
+                            <ListItemIcon >{index % 2 === 0 ? <ReportProblemOutlinedIcon color="warning" onClick={() => setOpen(!open)} /> : <ErrorOutlineOutlinedIcon color="danger" />}</ListItemIcon>
+                            <ListItemText color="warning" primary={text} />
                         </ListItem>
                     ))}
                 </List>
-                <Divider />
-                <List>
-                    {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                        <ListItem button key={text}>
-                            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                            <ListItemText primary={text} />
-                        </ListItem>
-                    ))}
-                </List>
+
             </Drawer>
             <Grid container >
                 <Grid item lg={10} md={10} >
