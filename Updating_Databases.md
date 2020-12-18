@@ -2,8 +2,8 @@
 
 The ddl for the new NRMN database is currently maintained in two places
 
-* [NRMN/db-migrate/dd](https://github.com/aodn/NRMN/tree/master/db-migrate) - amalgamated ATRC/RLS
-  database ddl
+* [NRMN/db-migrate](https://github.com/aodn/NRMN/tree/master/db-migrate) - amalgamated ATRC/RLS
+  database ddl/migration code
 * [application.sql](api/src/main/resources/sql/application.sql) - ddl
   to support nrmn-application functionality
 
@@ -22,6 +22,6 @@ nrmn_systest | 13-aws-syd | nrmn_migration + application.sql + TEST_USER.sql for
 ### Updating nrmn-application migration.sql
 
 To allow databases to be created from scratch when running tests we maintain a copy of the nrmn_migration database ddl
-in [nrmn-application application.sql](api/src/main/resources/sql/migration.sql).  To update this script
+in [migration.sql](api/src/main/resources/sql/migration.sql).  To update this script
 we currently run run [migration_schema.sh](api/scripts/migration_schema.sh) to dump the nrmn_migration
 after rerunning the migration.
