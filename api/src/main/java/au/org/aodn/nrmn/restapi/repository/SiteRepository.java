@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
+import java.util.Collection;
 import java.util.Optional;
 
 @RepositoryRestResource(excerptProjection = SiteList.class)
@@ -38,5 +39,8 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
     @Override
     @RestResource
     void delete(Site site);
+
+    @Query(nativeQuery = true, value = "SELECT site_code FROM {h-schema}ep_site_list WHERE province = ?1")
+    Collection<String> findSiteCodesByProvince(String province);
 
 }
