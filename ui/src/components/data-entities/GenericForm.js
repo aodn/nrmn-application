@@ -22,8 +22,7 @@ import {makeStyles} from "@material-ui/core/styles";
 const useStyles = makeStyles(theme => ({
   buttons: {
     "& > *": {
-      marginTop: 20,
-      marginBottom: 40
+      marginTop: 20
     }
   }
 }));

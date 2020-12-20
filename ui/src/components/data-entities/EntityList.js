@@ -58,8 +58,8 @@ const schematoColDef = (schema, size, entityName) => {
           linkLabel = (nonGenericEntities[entityName]?.linkLabel) ? nonGenericEntities[entityName]?.linkLabel : linkLabel;
         }
         else {
-          link = "/detailed/" + ent + "/" + id;
-          linkLabel = "View";
+          link = "/edit/" + ent + "/" + id;
+          linkLabel = "Edit";
         }
         return '<a href="' + link + '">' + linkLabel + '</a>';
       }
