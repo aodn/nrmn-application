@@ -14,13 +14,13 @@ import {itemRequested} from "./middleware/entities";
 import Button from "@material-ui/core/Button";
 import {makeStyles} from "@material-ui/core/styles";
 import BaseForm from "../BaseForm";
+import ObjectListViewTemplate from "./ObjectListViewTemplate";
 
 
 const useStyles = makeStyles(theme => ({
   buttons: {
     "& > *": {
-      marginTop: 20,
-      marginBottom: 40
+      marginTop: 20
     }
   }
 }));
@@ -62,28 +62,59 @@ const GenericDetailsView = () => {
   const entitySchema = {title: fullTitle, ...entityDef}
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
 
-  const uiSchemaHacks = Object.keys(entitySchema.properties).filter( key => {
+  const uiSchemaRelationships = Object.keys(entitySchema.properties).filter( key => {
     return entitySchema.properties[key].type === "string" && entitySchema.properties[key].format === "uri"
+  });
+  const uiSchemaObjects = Object.keys(entitySchema.properties).filter( key => {
+    return entitySchema.properties[key].type === "object";
   });
 
   const inputDisplay = (props) => {
+
     const value = (typeof props.formData === "boolean") ? props.formData.toString() : props.formData
-    return (
-        <span><b>{props.name}:</b> {(value) ? value: " - "}</span>
-    );
+    return (<span><b>{props.name}: </b> {(value) ? value: " -- "}</span>);
+  };
+
+  const objectDisplay = (props) => {
+    let items = [];
+    if (props.formData) {
+
+      if (!Array.isArray(props.formData)) {
+        if (props.formData.label) {
+          items.push(<Grid item>{props.formData.label}</Grid>);
+        } else {
+          for (let key of Object.keys(props.formData)) {
+            items.push(<Grid item><b>{key}: </b>{props.formData[key]}</Grid>);
+          }
+        }
+      } else {
+        props.formData.map(item => items.push(<Grid item>{item}</Grid>))
+      }
+    }
+    else {
+      items.push(<Grid item>--</Grid>)
+    }
+
+    return ObjectListViewTemplate({name: props.name, items:items});
+
   };
 
   const uiSchema = {
     "ui:widget": "string"
   };
 
-  uiSchemaHacks.map( key => {
+  uiSchemaRelationships.map( key => {
     uiSchema[key] = {'ui:field': "relationship"}
+  });
+
+  uiSchemaObjects.map( key => {
+    uiSchema[key] = {'ui:field': "objects"}
   });
 
   const fields = {
     relationship: NestedApiFieldDetails,
-    ArrayField: inputDisplay,
+    objects: objectDisplay,
+    ArrayField: objectDisplay,
     BooleanField: inputDisplay,
     NumberField: inputDisplay,
     StringField: inputDisplay
