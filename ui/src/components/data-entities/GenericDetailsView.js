@@ -45,6 +45,7 @@ const GenericDetailsView = () => {
 
   useEffect(() => {
     if (id !== undefined) {
+      // Todo: make this request the specific list view api
       dispatch(itemRequested(entityName + "/" + id));
     }
   }, []);
