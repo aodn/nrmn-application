@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Builder
 @Table(name = "program_ref")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Program  implements Serializable {
     @Id
     @SequenceGenerator(name = "program_ref_program_id", sequenceName = "program_ref_program_id", allocationSize = 1)
