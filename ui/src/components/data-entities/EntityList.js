@@ -11,6 +11,7 @@ import config from "react-global-configuration";
 import {titleCase} from "title-case";
 import Grid from "@material-ui/core/Grid";
 import CustomTooltip from "./customTooltip";
+import CustomLoadingOverlay from "./customLoadingOverlay";
 import {selectRequested} from "./middleware/entities";
 import {resetState} from "./form-reducer";
 
@@ -178,7 +179,11 @@ const EntityList = () => {
                   rowSelection="single"
                   animateRows={true}
                   onGridReady={agGridReady}
-                  frameworkComponents={{customTooltip: CustomTooltip}}
+                  frameworkComponents={{
+                    customTooltip: CustomTooltip,
+                    customLoadingOverlay: CustomLoadingOverlay
+                  }}
+                  loadingOverlayComponent={'customLoadingOverlay'}
                   tooltipShowDelay={0}
                   defaultColDef={{
                     sortable: true,

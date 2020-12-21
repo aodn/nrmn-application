@@ -1,0 +1,30 @@
+import React, { Component } from 'react';
+import {LoadingBanner} from "../layout/loadingBanner";
+import {Box} from "@material-ui/core";
+import { withStyles } from '@material-ui/styles';
+
+const styles = () => ({
+  main: {
+    "& > *": {
+      margin: 20
+    }
+  }
+});
+
+class CustomLoadingOverlay extends Component {
+
+  render() {
+
+    const { classes } = this.props;
+
+    return (
+        <div className="ag-custom-loading-cell" >
+          <Box component="div" ml={2} className={classes.main}>
+          <LoadingBanner variant={"h5"} msg={"Loading data..  "  } />
+          </Box>
+        </div>
+    )
+  }
+}
+
+export default withStyles(styles)(CustomLoadingOverlay)
