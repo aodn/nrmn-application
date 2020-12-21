@@ -6,7 +6,7 @@ import { withStyles } from '@material-ui/styles';
 const styles = () => ({
   main: {
     "& > *": {
-      margin: 20
+      margin: 10
     }
   }
 });
