@@ -131,7 +131,7 @@ const EntityList = () => {
   const newEntityButton = () => {
     let createButtonPath = nonGenericEntities[entityName]?.createButtonPath;
     if (!(entityName in nonGenericEntities) || createButtonPath) {
-      const to = (createButtonPath) ? createButtonPath : "/form/" + entityNamePlural;
+      const to = (createButtonPath) ? createButtonPath : "/edit/" + entityNamePlural;
       return <Button title={"Add new " + getTitle()}
                      component={NavLink}
                      to={to}
