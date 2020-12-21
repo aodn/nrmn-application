@@ -114,7 +114,14 @@ const GenericForm = () => {
     }
     else {
       return (id && Object.keys(editItem).length === 0) ?
-          <LoadingBanner variant={'h5'} msg={"Loading '" + titleCase(entityName) + "' form"  } /> :
+          <Grid
+              container
+              direction="row"
+              justify="flex-start"
+              alignItems="center"
+          >
+          <LoadingBanner variant={"h5"} msg={"Loading '" + titleCase(entityName) + "' form"  } />
+          </Grid> :
           <Grid
               container
               direction="row"
