@@ -50,42 +50,42 @@ const useStyles = makeStyles(theme => ({
 const logoData = [
   {
     img: '/logos/500x130-UTAS.png',
-    url: "http://www.utas.edu.au/",
+    href: "http://www.utas.edu.au/",
     title: "University of Tasmania home page"
   },
   {
     img: 'https://static.emii.org.au/images/logo/AODN_logo_fullText.png',
-    url: "https://portal.aodn.org.au/",
+    href: "https://portal.aodn.org.au/",
     title: "Australian Ocean Data Network"
   },
   {
     img: 'https://static.emii.org.au/images/logo/IMOS-Ocean-Portal-logo.png',
-    url: "https://imos.org.au/",
+    href: "https://imos.org.au/",
     title: "Integrated Marine Observation System"
   },
   {
     img: 'https://static.emii.org.au/images/logo/NCRIS_2017_110.png',
     title: "National Collaborative Research Infrastructure Strategy",
-    url: "https://www.ncris-network.org.au/"
+    href: "https://www.ncris-network.org.au/"
   },
   {
     img: '/logos/500x400-waratah-nsw-government.png',
-    url: "http://www.nsw.gov.au/",
+    href: "https://www.nsw.gov.au/",
     title: "NSW Government"
   },
   {
     img: '/logos/500x400-South-Australia-white-on-transparent.png',
-    url: "http://www.sa.gov.au/",
+    href: "https://www.sa.gov.au/",
     title: "Government of South Australia"
   },
   {
     img: '/logos/500x400-Tasmanian-Parks-white-on-transparent.png',
-    url: "http://parks.tas.gov.au/",
+    href: "https://parks.tas.gov.au/",
     title: "Tasmania Parks and Wildlife Service"
   },
   {
     img: '/logos/500x400-Victoria-Parks-white-on-transparent.png',
-    url: "http://parks.vic.gov.au/",
+    href: "https://www.parks.vic.gov.au/",
     title: "Parks Victoria"
   }
 ]
@@ -203,11 +203,11 @@ const Homepage = () => {
                   width={150}
                   key={tile.title + "-logo"}
                 >
-                  <img
+                  <a href={tile.href} ><img
                       width={140}
                       src={process.env.PUBLIC_URL + tile.img}
                       alt={tile.title}
-                  />
+                  /></a>
                 </Box>
             ))}
           </Box>
