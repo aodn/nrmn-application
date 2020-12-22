@@ -132,23 +132,25 @@ const Homepage = () => {
                   international) scale, for shallow reefs
                 </li>
               </ul>
-            </Box>
-          </Grid>
-          <Grid item>
-
-            <Box className={classes.boxes}>
-              <Typography variant={"h4"}>
-                Public data from the NRMN is available via the <a title="AODN Portal" target="_blank" href="https://portal.aodn.org.au/" >AODN Portal</a>.
-              </Typography>
-
               <p>
-                Australia’s Integrated Marine Observing System (IMOS) is enabled by the National Collaborative
+                <b>Australia’s Integrated Marine Observing System (IMOS)</b> is enabled by the National Collaborative
                 Research Infrastructure Strategy (NCRIS).
                 It is operated by a consortium of institutions as an unincorporated joint venture, with the
                 <a title="UTAS home page"
                    href="http://www.utas.edu.au/"> University
                   of Tasmania</a> as Lead Agent.
               </p>
+            </Box>
+
+          </Grid>
+          <Grid item>
+
+            <Box className={classes.boxes}>
+
+
+              <Typography variant={"h4"}>
+                Public data from the NRMN is available via the <a title="AODN Portal" target="_blank" href="https://portal.aodn.org.au/" >AODN Portal</a>.
+              </Typography>
 
               <p>
                 <a title="Email us for help in using this site"
@@ -184,7 +186,7 @@ const Homepage = () => {
           <Box className={classes.spacer}>
             <span>
               <Typography className={classes.white} variant={"h1"} >Our Partners</Typography>
-              <Typography className={classes.white} variant={"P"} > We acknowledge the generous support of our partners</Typography>
+              <Typography className={classes.white} > We acknowledge the generous support of our partners</Typography>
             </span>
           </Box>
           <Box

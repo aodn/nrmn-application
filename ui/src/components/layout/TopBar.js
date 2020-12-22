@@ -12,10 +12,25 @@ import { connect } from 'react-redux';
 import store from '../store';
 import AuthState from "./AuthState";
 import SettingsMenu from "./SettingsMenu";
+import Button from "@material-ui/core/Button";
+import Link from "@material-ui/core/Link";
 
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
+  header: {
+    fontFamily: [
+      'Lora'
+    ].join(','),
+    color: "#FFF",
+    fontSize: "x-large",
+    textTransform: "initial",
+    paddingRight: 25,
+    paddingLeft: 25,
+    '&:hover': {
+      color: '#FFF'
+    }
+  },
   appBar: {
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.sharp,
@@ -71,12 +86,13 @@ const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
               </IconButton>
             </Grid>
             <Grid item >
-              <Typography
-                  variant="h5"
+              <Button
                   className={clsx(classes.header)}
-                  noWrap>
-                {process.env.REACT_APP_SITE_TITLE}
-              </Typography>
+                  nowrap="true"
+                  href="/"
+              >{process.env.REACT_APP_SITE_TITLE}
+              </Button>
+
             </Grid>
           </Grid>
         </Grid>

@@ -25,7 +25,6 @@ import {getFullPath} from "./components/utils/helpers";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 import './ag-grid.scss'
 import Homepage from "./components/layout/Homepage";
-import lightGreen from "@material-ui/core/colors/lightGreen";
 
 const drawerWidth = 240;
 
