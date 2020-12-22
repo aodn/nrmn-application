@@ -12,3 +12,12 @@ code {
     monospace;
 }
 
+a  {
+  color: #26b0bf;
+}
+
+a:hover  {
+   color: #1d838e;
+ }
+
+
