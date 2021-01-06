@@ -1,10 +1,9 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import au.org.aodn.nrmn.restapi.model.db.Diver;
-import au.org.aodn.nrmn.restapi.model.db.Location;
-import au.org.aodn.nrmn.restapi.model.db.Site;
+import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.repository.SpeciesWithAttributesRepository;
 import cyclops.companion.Streams;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -31,12 +30,16 @@ import static java.util.stream.Collectors.toList;
 public class TemplateService {
     private static final CSVFormat DIVERS_FORMAT = CSVFormat.DEFAULT.withHeader("INITIALS", "FULL NAME");
     private static final CSVFormat SITES_FORMAT = CSVFormat.DEFAULT.withHeader("SITE", "Site Name", "Latitude", "Longitude", "Region");
+    private static final CSVFormat SPECIES_FORMAT = CSVFormat.DEFAULT.withHeader("Species_name", "Common_name", "SpeciesInvertSizing", "L5", "L95", "LMax");
 
     @Autowired
     DiverRepository diverRepository;
 
     @Autowired
     SiteRepository siteRepository;
+
+    @Autowired
+    private SpeciesWithAttributesRepository speciesWithAttributesRepository;
 
     public void writeZip(OutputStream outputStream,
                          Collection<Integer> locations,
@@ -53,7 +56,14 @@ public class TemplateService {
         zipOutputStream.closeEntry();
 
         zipOutputStream.putNextEntry(new ZipEntry("sites.csv"));
-        writeSitesCsv(writer, getSitesForTemplate(locations, provinces, states, siteCodes));
+        List<Site> sites = getSitesForTemplate(locations, provinces, states, siteCodes);
+        writeSitesCsv(writer, sites);
+        writer.flush();
+        zipOutputStream.closeEntry();
+
+        //TODO: make sure debris and "no species found" are included
+        zipOutputStream.putNextEntry(new ZipEntry("m1species.csv"));
+        writeSpeciesCsv(writer, getM1SpeciesForTemplate(sites));
         writer.flush();
         zipOutputStream.closeEntry();
 
@@ -102,9 +112,9 @@ public class TemplateService {
     }
 
     public List<Site> getSitesForTemplate(Collection<Integer> locations,
-                                Collection<String> provinces,
-                                Collection<String> states,
-                                Collection<String> siteCodes) {
+                                          Collection<String> provinces,
+                                          Collection<String> states,
+                                          Collection<String> siteCodes) {
 
         Stream<String> siteCodesFromProvinces = provinces == null ? Stream.empty() : provinces.stream()
                 .flatMap(p -> siteRepository.findSiteCodesByProvince(p).stream());
@@ -114,19 +124,47 @@ public class TemplateService {
                 : Streams.concat(siteCodesFromProvinces, siteCodes.stream()))
                 .flatMap(sc -> siteRepository.findAll(Example.of(Site.builder().siteCode(sc).build())).stream());
 
-        if(locations != null) {
+        if (locations != null) {
             sites = Stream.concat(sites, locations.stream()
                     .flatMap(l -> siteRepository.findAll(
                             Example.of(Site.builder()
                                     .location(Location.builder().locationId(l).build()).build())).stream()));
         }
 
-        if(states != null) {
+        if (states != null) {
             sites = Stream.concat(sites, states.stream()
                     .flatMap(s -> siteRepository.findAll(Example.of(Site.builder().state(s).build())).stream()));
         }
 
         return sites.distinct().collect(toList());
+    }
+
+    public void writeSpeciesCsv(Writer writer, Collection<SpeciesWithAttributes> species) throws IOException {
+        CSVPrinter csvPrinter = SPECIES_FORMAT.print(writer);
+        List<List<String>> records = species.stream()
+                .distinct()
+                .sorted(Comparator.comparing(SpeciesWithAttributes::getObservableItemName))
+                .map(this::getSpeciesAsCsvRecord).collect(toList());
+        csvPrinter.printRecords(records);
+    }
+
+    private List<String> getSpeciesAsCsvRecord(SpeciesWithAttributes species) {
+        return Arrays.asList(
+                species.getObservableItemName(),
+                species.getCommonName(),
+                null,
+                toString(species.getL5()),
+                toString(species.getL95()),
+                toString(species.getLMax()));
+    }
+
+    public List<SpeciesWithAttributes> getM1SpeciesForTemplate(Collection<Site> sites) {
+        List<Integer> speciesIds = siteRepository.findSpeciesBySites(sites.stream()
+                .map(Site::getSiteCode).collect(toList()));
+
+        return speciesWithAttributesRepository.findAllById(speciesIds);
+
+
     }
 
     private String toString(Object couldBeNull) {
