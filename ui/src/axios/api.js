@@ -68,7 +68,7 @@ export const getEntity = (entity) => axiosInstance.get('/api/' + entity).then(re
 export const getResource = (url) => axiosInstance.get(url).then(res=>res);
 
 
-export const getSelectedEntityItems = (paths) => window.axios.all([
+export const getSelectedEntityItems = (paths) => axiosInstance.all([
     axiosInstance.get('/api/' + paths[0]),
     (paths[1]) ? axiosInstance.get(paths[1]) : null,
   ]).then(resp => {
@@ -106,6 +106,13 @@ export const entityRelation = (entity, urls) => {
 
 export const getDataJob = (jobId) => (
   axiosInstance.get('/api/stage/job?reference=' + jobId).then(res => res)
+);
+
+export const postJobValidation = (jobId) => (
+  axiosInstance.post('api/stage/validate/'+ jobId).then(res => res)
+);
+export const updateRow = (id, row) => (
+  axiosInstance.put('api/stage/update/'+ id, row).then(res => res)
 );
 
 export const submitJobFile = (params) => {

@@ -11,15 +11,15 @@ const importState = {
     errors: [],
     rows: [],
     jobId: '',
-    job : {}
+    job: {}
 };
 
 export const exportRow = (row) => {
-    const {measureJson} = { ...row};
+    const { measureJson } = { ...row };
     Object.getOwnPropertyNames(measureJson)
-    .forEach(numKey => {
-        row[numKey] = measureJson[numKey];
-    });
+        .forEach(numKey => {
+            row[numKey] = measureJson[numKey];
+        });
     delete row.measureJson;
     return row;
 };
@@ -60,6 +60,11 @@ const importSlice = createSlice({
             state.job = action.payload.job;
             console.log(state.job);
         },
+        validationReady: (state, action) => {
+            state.rows = action.payload.rows.map(row => exportRow(row));
+            state.isLoading = false;
+
+        },
         JobStarting: (state) => {
             state.isLoading = true;
         },
@@ -70,8 +75,9 @@ const importSlice = createSlice({
 });
 
 export const importReducer = importSlice.reducer;
-export const { ImportProgress, JobStarting, JobFinished, JobReady, ImportStarted, ImportLoaded, ImportFailed } = importSlice.actions;
+export const { ImportProgress, JobStarting, validationReady, JobFinished, JobReady, ImportStarted, ImportLoaded, ImportFailed } = importSlice.actions;
 export const ImportRequested = createAction('IMPORT_REQUESTED', function (xlsFile) { return { payload: xlsFile }; });
-export const JobRequested = createAction('JOB_REQUESTED', function (fileID) { return { payload: fileID }; });
-
+export const JobRequested = createAction('JOB_REQUESTED', function (jobId) { return { payload: jobId }; });
+export const ValidationRequested = createAction('VALIDATION_REQUESTED', function (jobId) { return { payload: jobId }; });
+export const RowUpdateRequested = createAction('ROW_UDPDATE_REQUESTED', function (id, row) { return { payload: { id: id, row: row } }; });
 

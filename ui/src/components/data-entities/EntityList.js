@@ -79,7 +79,7 @@ const EntityList = () => {
   const dispatch = useDispatch();
   const entities = useSelector(state => state.form.entities);
   const errors = useSelector(state => state.form.errors);
-  const items = (entities._embedded) ? entities._embedded[entityNamePlural] : undefined;
+  const items = (entities?._embedded) ? entities._embedded[entityNamePlural] : undefined;
 
   const agGridReady = (agGrid) => {
     agGridApi = Object.create(agGrid.api);

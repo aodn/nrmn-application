@@ -14,6 +14,7 @@ import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.service.SpreadSheetService;
+import au.org.aodn.nrmn.restapi.service.model.StagedRowService;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.process.ValidationProcess;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,6 +42,9 @@ public class StagedJobController {
 
     @Autowired
     SpreadSheetService sheetService;
+
+    @Autowired
+    StagedRowService rowService;
 
     @Autowired
 
@@ -114,10 +118,23 @@ public class StagedJobController {
                 });
     }
 
-    @PostMapping("/validate")
+    @PutMapping("/update/{rowId}")
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
+    public ResponseEntity updateRow(@PathVariable Long rowId,
+                                    Authentication authentication,
+                                    @RequestBody StagedRow newRow) {
+        return rowService.update(rowId, newRow).fold(err ->
+                        ResponseEntity
+                                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                                .body(err)
+                , success -> ResponseEntity.ok().build());
+    }
+
+
+    @PostMapping("/validate/{jobId}")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity validateJob(
-            @RequestParam("jobId") Long jobId,
+            @PathVariable Long jobId,
             Authentication authentication) {
 
         userAuditRepo.save(

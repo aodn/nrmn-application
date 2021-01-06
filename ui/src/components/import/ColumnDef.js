@@ -1,10 +1,10 @@
 
 function cell(params) {
-    if (params.data?.Errors?.length > 0) {
-        const present = params.data.Errors.map(e => e.ColunmTarget);
-        const inter = present.filter(e => e === params.colDef.field);
+    if (params.data?.errors?.length > 0) {
+        const fields = params.data.errors.map(e => e.columnTarget.toLowerCase());
+        const inter = fields.filter(e => e === params.colDef.field);
         if (inter.length > 0)
-            return { backgroundColor: 'red' };
+            return { color: 'red !important' };
     }
     return null;
 }
@@ -15,21 +15,22 @@ const ColunmDef = [
         editable: true,
         width: 100,
         pivot: true,
-        enablePivot: true,
+        enablePivot: false,
         cellStyle: cell
 
     },
     {
         field: 'buddy',
         editable: true,
-        width: 100
+        width: 100,
+        cellStyle: cell
+
     },
     {
         field: 'site #',
         editable: true,
         width: 200,
-        hide: true,
-        rowGroup: true,
+        rowGroup: false,
         enableRowGroup: true,
         cellStyle: cell
 
@@ -56,7 +57,9 @@ const ColunmDef = [
     {
         field: 'date',
         editable: true,
-        width: 100
+        width: 100,
+        cellStyle: cell
+
     },
     {
         field: 'vis',
@@ -66,52 +69,65 @@ const ColunmDef = [
     {
         field: 'direction',
         editable: true,
-        width: 100
+        width: 100,
+        cellStyle: cell
     },
     {
         field: 'time',
         editable: true,
-        width: 100
+        width: 100,
+        cellStyle: cell
     },
     {
         field: 'P-Qs',
         editable: true,
-        width: 100
+        width: 100,
+        cellStyle: cell
     },
     {
         field: 'depth',
         editable: true,
         width: 50,
-        hide: true,
-        rowGroup: true,
+        rowGroup: false,
         enableRowGroup: true,
+        cellStyle: cell
     },
     {
         field: 'method',
         editable: true,
         width: 50,
-        hide: true,
-        rowGroup: true,
+        rowGroup: false,
         enableRowGroup: true,
     },
     {
         field: 'block',
         editable: true,
         width: 50,
-        hide: true,
-        rowGroup: true,
+        rowGroup: false,
         enableRowGroup: true,
+        cellStyle: cell
     },
     {
         field: 'code',
         editable: true,
-        width: 75
+        width: 75,
+        cellStyle: cell
     },
     {
         field: 'species',
         editable: true,
         width: 100,
-        'aggFunc': 'count'
+        hide: true,
+        'aggFunc': 'count',
+        cellStyle: cell
+
+    },
+    {
+        field: 'species',
+        editable: true,
+        width: 100,
+        cellStyle: cell
+
     },
     {
         field: 'common name',

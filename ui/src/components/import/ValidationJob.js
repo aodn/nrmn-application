@@ -3,19 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import DataSheetView from './DataSheetView';
 import PlaylistAddCheckOutlinedIcon from '@material-ui/icons/PlaylistAddCheckOutlined';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router';
-import { JobRequested } from './reducers/create-import';
+import { JobRequested, JobStarting, ValidationRequested } from './reducers/create-import';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutlined';
 import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import clsx from 'clsx';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -83,6 +77,8 @@ const ValidationJob = () => {
     const dispatch = useDispatch();
     const classes = useStyles();
     const job = useSelector(state => state.import.job);
+    const isLoading = useSelector(state => state.import.isLoading);
+
     const [open, setOpen] = useState(false);
 
     const handleDrawerOpen = () => {
@@ -93,13 +89,19 @@ const ValidationJob = () => {
         setOpen(false);
     };
 
+    const handleValidate = () => {
+        if (job.id) {
+            dispatch(JobStarting());
+            dispatch(ValidationRequested(job.id));
+        }
+    };
+
     useEffect(() => {
         if (jobId) {
             dispatch(JobRequested(jobId));
         }
     }, []);
     const jobReady = job && Object.keys(job).length > 0;
-    console.log(job);
     return (jobReady) ? (
         <Box style={{ paddingRight: 40 }}>
             <Drawer
@@ -122,8 +124,8 @@ const ValidationJob = () => {
                 <List>
                     {['buddy not found', 'Site Not found', 'Species missing', 'Drafts'].map((text, index) => (
                         <ListItem className={classes.errorItem} button key={text}>
-                            <ListItemIcon >{index % 2 === 0 ? <ReportProblemOutlinedIcon color="warning" onClick={() => setOpen(!open)} /> : <ErrorOutlineOutlinedIcon color="danger" />}</ListItemIcon>
-                            <ListItemText color="warning" primary={text} />
+                            <ListItemIcon >{index % 2 === 0 ? <ReportProblemOutlinedIcon color="action" onClick={() => setOpen(!open)} /> : <ErrorOutlineOutlinedIcon color="error" />}</ListItemIcon>
+                            <ListItemText color="secondary" primary={text} />
                         </ListItem>
                     ))}
                 </List>
@@ -138,6 +140,8 @@ const ValidationJob = () => {
                     <Grid container justify="space-between" spacing={1} >
                         <Grid item>
                             <Fab variant="extended"
+                                disabled={isLoading}
+                                onClick={() => handleValidate()}
                                 size="small" label="Validate" color="secondary">
                                 <PlaylistAddCheckOutlinedIcon className={classes.extendedIcon} />
                         Validate

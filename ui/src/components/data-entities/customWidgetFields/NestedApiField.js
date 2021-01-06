@@ -37,7 +37,7 @@ const NestedApiField = (props) => {
        <Autocomplete
         id={'select-auto-'+ entity}
         options={itemsList}
-        multiple={props.multiple}
+        multiple={props.multiple || false}
         getOptionLabel={(option) => option.label}
         defaultValue={(props.multiple) ? selectedItems : selectedItems[0]}
         filterSelectedOptions
@@ -52,7 +52,7 @@ const NestedApiField = (props) => {
 };
 
 NestedApiField.propTypes  ={
-  multiple : PropTypes.Boolean,
+  multiple : PropTypes.func,
   name: PropTypes.string
 };
 

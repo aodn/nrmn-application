@@ -14,7 +14,8 @@
     "globals": {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly",
-        "ReactClass": false
+        "ReactClass": false,
+        "axios" : true
     },
     "parserOptions": {
         "ecmaFeatures": {

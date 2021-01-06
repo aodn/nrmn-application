@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AgGridReact } from 'ag-grid-react';
 import { AllModules } from 'ag-grid-enterprise';
 import { useEffect } from 'react';
-import { JobFinished, JobRequested } from './reducers/create-import';
+import { JobFinished, JobRequested, RowUpdateRequested } from './reducers/create-import';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { green } from '@material-ui/core/colors';
@@ -14,13 +14,29 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import { Box } from '@material-ui/core';
 import useWindowSize from '../utils/useWindowSize';
 
+Object.unfreeze = function (o) {
+    var oo = undefined;
+    if (o instanceof Array) {
+        oo = []; var clone = function (v) { oo.push(v); };
+        o.forEach(clone);
+    } else if (o instanceof String) {
+        oo = new String(o).toString();
+    } else if (typeof o == 'object') {
+        oo = {};
+        for (var property in o) { oo[property] = o[property]; }
+    }
+    return oo;
+};
 
 const DataSheetView = () => {
     const dispatch = useDispatch();
-    const rows = useSelector(state => state.import.rows);
+    const immutableRows = useSelector(state => state.import.rows);
     const isLoading = useSelector(state => state.import.isLoading);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const [gridApi, setGridApi] = useState(null);
+    var rows = immutableRows.map(Object.unfreeze);
+
+
 
     const agGridReady = () => {
         const onGridReady = (params) => {
@@ -31,6 +47,12 @@ const DataSheetView = () => {
         dispatch(JobFinished());
     };
 
+    const onCellChanged = (input) => {
+        const row = rows[input.rowIndex];
+        dispatch(RowUpdateRequested(row.id, row));
+        //dispatch  updateBackend
+    };
+
     const size = useWindowSize();
     const themeType = useSelector(state => state.theme.themeType);
     const condition = rows && rows.length && !isLoading;
@@ -38,7 +60,7 @@ const DataSheetView = () => {
         {condition &&
             <div style={{ height: size.height - 165, width: '100%', marginTop: 25 }} className={themeType ? 'ag-theme-material-dark' : 'ag-theme-material'} >
                 <AgGridReact
-                    pivotMode={true}
+                    pivotMode={false}
                     pivotColumnGroupTotals={'before'}
                     sideBar={true}
                     autoGroupColumnDef={{
@@ -48,7 +70,7 @@ const DataSheetView = () => {
                             innerRenderer: 'nameCellRenderer'
                         }
                     }}
-
+                    onCellValueChanged={onCellChanged}
                     columnDefs={ColunmDef}
                     groupDefaultExpanded={4}
                     rowData={rows}
@@ -66,7 +88,6 @@ const DataSheetView = () => {
                     }}
                     onGridReady={agGridReady}
                     modules={AllModules}
-                //onGridReady={onGridReady}
                 >
                 </AgGridReact>
             </div>}
