@@ -12,10 +12,34 @@ import { connect } from 'react-redux';
 import store from '../store';
 import AuthState from "./AuthState";
 import SettingsMenu from "./SettingsMenu";
+import Button from "@material-ui/core/Button";
+import Link from "@material-ui/core/Link";
+import {blueGrey} from "@material-ui/core/colors";
 
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
+  header: {
+    fontFamily: [
+      'Lora'
+    ].join(','),
+    color: "#FFF",
+    fontSize: "x-large",
+    textTransform: "initial",
+    paddingRight: 15,
+    paddingLeft: 15,
+    '&:hover': {
+      color: '#FFF',
+      backgroundColor: blueGrey[400]
+    }
+  },
+  spacer: {
+    "& > *": {
+      marginLeft: 10,
+      marginRight: 10,
+      padding: 10
+    }
+  },
   appBar: {
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.sharp,
@@ -70,13 +94,27 @@ const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
                 <MenuIcon />
               </IconButton>
             </Grid>
-            <Grid item >
-              <Typography
-                  variant="h5"
-                  className={clsx(classes.header)}
-                  noWrap>
-                {process.env.REACT_APP_SITE_TITLE}
-              </Typography>
+            <Grid item>
+              <Grid container
+                  justify="flex-start"
+                  alignItems="center">
+                <Grid item className={classes.spacer}>
+                  <img
+                      width={100}
+                      src={'https://static.emii.org.au/images/logo/IMOS-Ocean-Portal-logo.png'}
+                      alt={"IMOS Logo"}
+                  />
+                </Grid>
+                <Grid item>
+                  <Button
+                      className={clsx(classes.header)}
+                      nowrap="true"
+                      href="/"
+                  >{process.env.REACT_APP_SITE_TITLE}
+                  </Button>
+                </Grid>
+              </Grid>
+
             </Grid>
           </Grid>
         </Grid>

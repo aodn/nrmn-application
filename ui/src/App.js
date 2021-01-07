@@ -25,6 +25,7 @@ import {getFullPath} from "./components/utils/helpers";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 import './ag-grid.scss'
 import GenericDetailsView from "./components/data-entities/GenericDetailsView";
+import Homepage from "./components/layout/Homepage";
 
 const drawerWidth = 240;
 
@@ -73,7 +74,6 @@ export default function App()  {
         variant: 'outlined',
         margin: "dense",
         notched: "true",
-        color: "primary"
       }
     }
   });
@@ -104,6 +104,7 @@ export default function App()  {
                     {`The requested resource ${getFullPath(props.location)} is not available`}
                   </Alert>}
               />
+              <Route path={"/"} component={Homepage} />
               <Route render={(props) =>
                   <Alert severity="error"  >
                     <AlertTitle>Path Not Found</AlertTitle>

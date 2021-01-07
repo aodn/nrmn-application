@@ -14,12 +14,11 @@ $grid-size: 4px;
 }
 
 .ag-theme-alpine-dark {
-
   a {
     color: #26b0bf;
   }
   a:visited {
-    color: #2a5b73;;
+    color: #93c1c5;
   }
   @include ag-theme-alpine-dark((
     // use theme parameters where possible
