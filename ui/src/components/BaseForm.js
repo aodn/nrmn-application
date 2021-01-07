@@ -2,13 +2,11 @@ import React from 'react';
 import Box from "@material-ui/core/Box";
 import Alert from '@material-ui/lab/Alert';
 import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
 import Form from "@rjsf/material-ui"
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
 import green from "@material-ui/core/colors/green";
-
 
 
 const useStyles = makeStyles((theme) => ({
@@ -67,7 +65,6 @@ const BaseForm = (params) => {
         justify="center"
         style={{ minHeight: "70vh" }}
     >
-      <Paper elevation={0}>
         <Box pt={4} px={6} pb={6} className={classes.root} >
           <Form
               schema={params.schema}
@@ -75,21 +72,24 @@ const BaseForm = (params) => {
               onSubmit={submitForm}
               gutterBottom={true}
               showErrorList={true}
+              fields={params.fields}
+              formData={params.formData}
           >
             {errorAlert}
+
             <div className={classes.rootFlex}>
               <div className={classes.wrapper}>
+                {(params.submitButton) ? params.submitButton :
                 <Button type="submit"
                         variant="contained"
-                        color="primary"
+                        color="secondary"
                         disabled={loading}
-                >Submit</Button>
+                >Submit</Button>}
                 {loading && <CircularProgress size={20} className={classes.buttonProgress} />}
               </div>
             </div>
           </Form>
         </Box>
-      </Paper>
     </Grid>
   </>;
 }

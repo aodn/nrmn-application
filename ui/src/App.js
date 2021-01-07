@@ -94,7 +94,8 @@ export default function App()  {
               <Route path={["/import-file/:fileID?"]} component={ImportPage} />
               <Route path="/list-file" component={FileList} />
               <Route path="/login" component={Login} />
-              <Route path="/form/:entityName/:id?" component={GenericForm} />
+              <Route path="/edit/:entityName/:id?" component={GenericForm} />
+              <Route path="/view/:entityName/:id?" component={GenericDetailsView} />
               <Route path="/list/:entityName" component={EntityList} />
               <Route path="/notfound" render={(props) =>
                   <Alert severity="error"  >
