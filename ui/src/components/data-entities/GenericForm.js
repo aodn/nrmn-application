@@ -1,6 +1,5 @@
 import React from "react";
 
-import Form from "@rjsf/material-ui"
 import {useDispatch, useSelector} from "react-redux";
 import { Link } from 'react-router-dom'
 import {useEffect} from 'react';
@@ -10,20 +9,31 @@ import pluralize from 'pluralize';
 import config from "react-global-configuration";
 import {Box} from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
-import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import {titleCase} from "title-case";
 import {LoadingBanner} from "../layout/loadingBanner";
 import {createEntityRequested, itemRequested, updateEntityRequested} from "./middleware/entities";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
-import _ from 'lodash';
+import BaseForm from "../BaseForm";
+import {makeStyles} from "@material-ui/core/styles";
+
+
+const useStyles = makeStyles(theme => ({
+  buttons: {
+    "& > *": {
+      marginTop: 20
+    }
+  }
+}));
 
 const renderError = (msgArray) => {
   return (msgArray.length > 0) ? <><Box><Alert severity="error" variant="filled">{msgArray}</Alert></Box></> : <></>;
 }
 
 const GenericForm = () => {
+
+  const classes = useStyles();
 
   const {entityName, id} = useParams();
   const schemaDefinition = config.get('api') || {};
@@ -66,7 +76,9 @@ const GenericForm = () => {
   const uiSchemaHacks = Object.keys(entitySchema.properties).filter( key => {
     return entitySchema.properties[key].type === "string" && entitySchema.properties[key].format === "uri"
   } )
+
   const uiSchema = {};
+
   uiSchemaHacks.map( key => {
     uiSchema[key] = {'ui:field': "relationship"}
   });
@@ -77,24 +89,13 @@ const GenericForm = () => {
 
   const formContent = ()=>{
     if (entitySaved) {
-      const redirectPath = "/list/" + entityTitle;
       return <>
         <Typography variant="h4"  >Entity saved successfully!</Typography>
-        <Box paddingY={4}>
-          <Button
-              component={Link}
-              to={redirectPath}
-              color="secondary"
-              aria-label={"List " + entityTitle}
-              variant={"contained"}>
-            List {entityName}
-          </Button>
-        </Box>
       </>
 
     }
     else {
-      return <Form
+      return <BaseForm
           schema={JSSchema}
           uiSchema={uiSchema}
           onSubmit={handleSubmit}
@@ -116,16 +117,36 @@ const GenericForm = () => {
           <LoadingBanner variant={"h5"} msg={"Loading '" + titleCase(entityName) + "' form"  } /> :
           <Grid
               container
-              spacing={0}
-              alignItems="center"
+              direction="row"
               justify="center"
+              alignItems="center"
               style={{minHeight: "70vh"}}
           >
-            <Paper>
-              <Box mx="auto" bgcolor="background.paper" pt={2} px={3} pb={3}>
-                {formContent()}
-              </Box>
-            </Paper>
+            <Grid item >
+              <Grid
+                  container
+                  alignItems="flex-end"
+                  justify="space-around"
+                  direction="column"
+              >
+                <Grid item >
+                  <div className={classes.buttons}>
+                    <Button
+                        component={Link}
+                        size="small"
+                        to={"/list/" + entityTitle}
+                        color="secondary"
+                        aria-label={"List " + entityTitle}
+                        variant={"contained"}>
+                      List {entityName}
+                    </Button>
+                  </div>
+                </Grid>
+                <Grid item >
+                  {formContent()}
+                </Grid>
+              </Grid>
+            </Grid>
           </Grid>
     }
   }
