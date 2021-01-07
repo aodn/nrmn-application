@@ -48,6 +48,6 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
             "SELECT DISTINCT oi.observable_item_id from {h-schema}ep_m1 m1 " +
                     "JOIN {h-schema}ep_observable_items oi ON oi.observable_item_name = m1.species_name " +
                     "WHERE site_code IN ?1 ")
-    List<Integer> findSpeciesBySites(Collection<String> siteCodes);
+    List<Long> findM1SpeciesBySites(Collection<String> siteCodes);
 
 }

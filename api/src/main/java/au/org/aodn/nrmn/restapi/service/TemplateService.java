@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.repository.SpeciesWithAttributesRepository;
 import cyclops.companion.Streams;
@@ -31,12 +32,16 @@ public class TemplateService {
     private static final CSVFormat DIVERS_FORMAT = CSVFormat.DEFAULT.withHeader("INITIALS", "FULL NAME");
     private static final CSVFormat SITES_FORMAT = CSVFormat.DEFAULT.withHeader("SITE", "Site Name", "Latitude", "Longitude", "Region");
     private static final CSVFormat SPECIES_FORMAT = CSVFormat.DEFAULT.withHeader("Species_name", "Common_name", "SpeciesInvertSizing", "L5", "L95", "LMax");
+    private static final CSVFormat M3_FORMAT = CSVFormat.DEFAULT.withHeader("Letter_code", "Species_name", "Common_name");
 
     @Autowired
     DiverRepository diverRepository;
 
     @Autowired
     SiteRepository siteRepository;
+
+    @Autowired
+    ObservableItemRepository observableItemRepository;
 
     @Autowired
     private SpeciesWithAttributesRepository speciesWithAttributesRepository;
@@ -67,8 +72,31 @@ public class TemplateService {
         writer.flush();
         zipOutputStream.closeEntry();
 
+        zipOutputStream.putNextEntry(new ZipEntry("m3species.csv"));
+        List<ObservableItem> observableItems = observableItemRepository.getAllM3ObservableItems(sites);
+        writeM3SpeciesCsv(writer, observableItems);
+        writer.flush();
+        zipOutputStream.closeEntry();
+
         zipOutputStream.flush();
         zipOutputStream.close();
+    }
+
+    private void writeM3SpeciesCsv(Writer writer, List<ObservableItem> observableItems) throws IOException {
+        CSVPrinter csvPrinter = M3_FORMAT.print(writer);
+        List<List<String>> records = observableItems.stream()
+                .distinct()
+                .sorted(Comparator.comparing(ObservableItem::getObservableItemName))
+                .map(this::getSpeciesAsM3Record).collect(toList());
+        csvPrinter.printRecords(records);
+
+    }
+
+    private List<String> getSpeciesAsM3Record(ObservableItem observableItem) {
+        return Arrays.asList(
+                observableItem.getLetterCode(),
+                observableItem.getObservableItemName(),
+                observableItem.getCommonName());
     }
 
     public void writeDiversCsv(Writer writer, Collection<Diver> divers) throws IOException {
@@ -159,12 +187,17 @@ public class TemplateService {
     }
 
     public List<SpeciesWithAttributes> getM1SpeciesForTemplate(Collection<Site> sites) {
-        List<Integer> speciesIds = siteRepository.findSpeciesBySites(sites.stream()
+        List<Long> speciesIds = siteRepository.findM1SpeciesBySites(sites.stream()
                 .map(Site::getSiteCode).collect(toList()));
 
         return speciesWithAttributesRepository.findAllById(speciesIds);
+    }
 
+    public List<SpeciesWithAttributes> getM2SpeciesForTemplate(Collection<Site> sites) {
+        List<Long> speciesIds = siteRepository.findM1SpeciesBySites(sites.stream()
+                .map(Site::getSiteCode).collect(toList()));
 
+        return speciesWithAttributesRepository.findAllById(speciesIds);
     }
 
     private String toString(Object couldBeNull) {
