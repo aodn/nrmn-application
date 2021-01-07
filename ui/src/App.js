@@ -24,6 +24,7 @@ import Alert from "@material-ui/lab/Alert";
 import {getFullPath} from "./components/utils/helpers";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 import './ag-grid.scss'
+import GenericDetailsView from "./components/data-entities/GenericDetailsView";
 import Homepage from "./components/layout/Homepage";
 
 const drawerWidth = 240;
