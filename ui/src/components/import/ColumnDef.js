@@ -11,6 +11,11 @@ function cell(params) {
 
 const ColunmDef = [
     {
+        field: 'id',
+        editable: false,
+        width: 75
+    },
+    {
         field: 'diver',
         editable: true,
         width: 100,

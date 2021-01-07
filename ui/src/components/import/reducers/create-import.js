@@ -10,6 +10,8 @@ const importState = {
     percentCompleted: 0,
     errors: [],
     rows: [],
+    errorsByMsg: [],
+    filterIds: [],
     jobId: '',
     job: {}
 };
@@ -32,6 +34,29 @@ export const flatten = (row) => {
     }
     return row;
 };
+
+const mergeErrors = (rows) => {
+    if (rows && rows.length > 0)
+        return rows.map(row => row.errors).reduce((acc, err) => acc.concat(err));
+
+    return [];
+};
+
+const groupBy = (list, keyGetter) => {
+    const map = new Map();
+    list.forEach((item) => {
+        const key = keyGetter(item);
+        const collection = map.get(key);
+        if (!collection) {
+            map.set(key, [item]);
+        } else {
+            collection.push(item);
+        }
+    });
+    return map;
+};
+
+
 const importSlice = createSlice({
     name: 'import',
     initialState: importState,
@@ -58,10 +83,24 @@ const importSlice = createSlice({
         JobReady: (state, action) => {
             state.rows = action.payload.rows.map(row => exportRow(row));
             state.job = action.payload.job;
-            console.log(state.job);
+        },
+        validationFilter: (state, action) => {
+            console.log(action);
+            state.filterIds = action.payload;
         },
         validationReady: (state, action) => {
-            state.rows = action.payload.rows.map(row => exportRow(row));
+            if (action.payload.rows.length > 0) {
+                state.rows = action.payload.rows.map(row => exportRow(row));
+                const validationErrors = mergeErrors(state.rows);
+                const errorsGrouped = groupBy(validationErrors, (row) => row.message);
+                console.log(errorsGrouped);
+                state.errorsByMsg = [...errorsGrouped.keys()].map(key => {
+                    const length = errorsGrouped.get(key).length;
+                    const ids = errorsGrouped.get(key).map(err => err.rowId);
+                    return { msg: key, count: errorsGrouped.get(key).length, ids: ids };
+                });
+                console.log(state.errorsByMsg);
+            }
             state.isLoading = false;
 
         },
@@ -75,7 +114,7 @@ const importSlice = createSlice({
 });
 
 export const importReducer = importSlice.reducer;
-export const { ImportProgress, JobStarting, validationReady, JobFinished, JobReady, ImportStarted, ImportLoaded, ImportFailed } = importSlice.actions;
+export const { ImportProgress, JobStarting, validationFilter, validationReady, JobFinished, JobReady, ImportStarted, ImportLoaded, ImportFailed } = importSlice.actions;
 export const ImportRequested = createAction('IMPORT_REQUESTED', function (xlsFile) { return { payload: xlsFile }; });
 export const JobRequested = createAction('JOB_REQUESTED', function (jobId) { return { payload: jobId }; });
 export const ValidationRequested = createAction('VALIDATION_REQUESTED', function (jobId) { return { payload: jobId }; });

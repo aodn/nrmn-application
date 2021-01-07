@@ -32,18 +32,16 @@ const DataSheetView = () => {
     const dispatch = useDispatch();
     const immutableRows = useSelector(state => state.import.rows);
     const isLoading = useSelector(state => state.import.isLoading);
+    const filterIds = useSelector(state => state.import.filterIds);
+
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const [gridApi, setGridApi] = useState(null);
     var rows = immutableRows.map(Object.unfreeze);
 
 
-
-    const agGridReady = () => {
-        const onGridReady = (params) => {
-            setGridApi(params.api);
-            setGridColumnApi(params.columnApi);
-        };
-
+    const agGridReady = (params) => {
+        setGridApi(params.api);
+        setGridColumnApi(params.columnApi);
         dispatch(JobFinished());
     };
 
@@ -52,10 +50,19 @@ const DataSheetView = () => {
         dispatch(RowUpdateRequested(row.id, row));
         //dispatch  updateBackend
     };
+    useEffect(() => {
+        if (gridApi && filterIds.length > 0) {
+            console.log('filterIDs:', filterIds);
+            const instance = gridApi.getFilterInstance('id');
+            instance.setModel({ values: filterIds });
+            gridApi.onFilterChanged();
+        }
+    }, filterIds);
 
     const size = useWindowSize();
     const themeType = useSelector(state => state.theme.themeType);
     const condition = rows && rows.length && !isLoading;
+
     return (<Box>
         {condition &&
             <div style={{ height: size.height - 165, width: '100%', marginTop: 25 }} className={themeType ? 'ag-theme-material-dark' : 'ag-theme-material'} >

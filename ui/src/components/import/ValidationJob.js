@@ -1,11 +1,11 @@
-import { Box, Chip, Drawer, Fab, Grid, Typography } from '@material-ui/core';
+import { Badge, Box, Chip, Drawer, Fab, Grid, Typography } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import DataSheetView from './DataSheetView';
 import PlaylistAddCheckOutlinedIcon from '@material-ui/icons/PlaylistAddCheckOutlined';
 import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router';
-import { JobRequested, JobStarting, ValidationRequested } from './reducers/create-import';
+import { JobRequested, JobStarting, validationFilter, ValidationRequested } from './reducers/create-import';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutlined';
 import Divider from '@material-ui/core/Divider';
@@ -16,7 +16,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import List from '@material-ui/core/List';
 import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
-const drawerWidth = 240;
+const drawerWidth = 500;
 
 const useStyles = makeStyles((theme) => ({
 
@@ -50,9 +50,9 @@ const useStyles = makeStyles((theme) => ({
             duration: theme.transitions.duration.leavingScreen,
         }),
         overflowX: 'hidden',
-        width: theme.spacing(5) + 1,
+        width: theme.spacing(8) + 1,
         [theme.breakpoints.up('sm')]: {
-            width: theme.spacing(6) + 1,
+            width: theme.spacing(9) + 1,
         },
     },
     toolbar: {
@@ -72,11 +72,15 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+
+
 const ValidationJob = () => {
     const { jobId } = useParams();
     const dispatch = useDispatch();
     const classes = useStyles();
     const job = useSelector(state => state.import.job);
+    const errorsByMsg = useSelector(state => state.import.errorsByMsg);
+
     const isLoading = useSelector(state => state.import.isLoading);
 
     const [open, setOpen] = useState(false);
@@ -85,7 +89,12 @@ const ValidationJob = () => {
         setOpen(true);
     };
 
-    const handleDrawerClose = () => {
+    const handleFilter = (err) => {
+
+        dispatch(validationFilter(err.ids));
+    };
+
+    const handleDrawerClose = (err) => {
         setOpen(false);
     };
 
@@ -104,33 +113,37 @@ const ValidationJob = () => {
     const jobReady = job && Object.keys(job).length > 0;
     return (jobReady) ? (
         <Box style={{ paddingRight: 40 }}>
-            <Drawer
-                anchor="right"
-                variant="permanent"
-                className={clsx(classes.drawer, {
-                    [classes.drawerOpen]: open,
-                    [classes.drawerClose]: !open,
-                })}
-                classes={{
-                    paper: clsx({
+            {errorsByMsg && (
+                <Drawer
+                    anchor="right"
+                    variant="permanent"
+                    className={clsx(classes.drawer, {
                         [classes.drawerOpen]: open,
                         [classes.drawerClose]: !open,
-                    }),
-                }}
-            >
-                <div className={classes.toolbar}>
-                </div>
-                <Divider />
-                <List>
-                    {['buddy not found', 'Site Not found', 'Species missing', 'Drafts'].map((text, index) => (
-                        <ListItem className={classes.errorItem} button key={text}>
-                            <ListItemIcon >{index % 2 === 0 ? <ReportProblemOutlinedIcon color="action" onClick={() => setOpen(!open)} /> : <ErrorOutlineOutlinedIcon color="error" />}</ListItemIcon>
-                            <ListItemText color="secondary" primary={text} />
-                        </ListItem>
-                    ))}
-                </List>
-
-            </Drawer>
+                    })}
+                    classes={{
+                        paper: clsx({
+                            [classes.drawerOpen]: open,
+                            [classes.drawerClose]: !open,
+                        }),
+                    }}
+                >
+                    <div className={classes.toolbar}>
+                    </div>
+                    <Divider />
+                    <List>
+                        {errorsByMsg.map((err, index) => (
+                            <ListItem className={classes.errorItem} button key={err.msg}>
+                                <ListItemIcon >
+                                    <Badge badgeContent={err.count} color="primary">
+                                        <ReportProblemOutlinedIcon color="error" onClick={() => setOpen(!open)} />
+                                    </Badge>
+                                </ListItemIcon>
+                                <ListItemText onClick={() => handleFilter(err)} color="secondary" primary={err.msg} />
+                            </ListItem>
+                        ))}
+                    </List>
+                </Drawer>)}
             <Grid container >
                 <Grid item lg={10} md={10} >
                     <Typography variant="h4" color="primary">{job.reference}</Typography>
