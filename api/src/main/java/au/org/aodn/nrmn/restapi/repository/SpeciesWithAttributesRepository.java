@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SpeciesWithAttributesRepository extends JpaRepository<SpeciesWithAttributes, Long>, JpaSpecificationExecutor<SpeciesWithAttributes> {
+public interface SpeciesWithAttributesRepository extends JpaRepository<SpeciesWithAttributes, Integer>, JpaSpecificationExecutor<SpeciesWithAttributes> {
 }

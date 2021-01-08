@@ -19,7 +19,7 @@ public class SpeciesWithAttributes {
 
     @Id
     @Column(name = "observable_item_id")
-    private Long id;
+    private Integer id;
 
     @Basic
     @Column(name = "observable_item_name")

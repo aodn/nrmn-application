@@ -19,6 +19,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -152,7 +153,7 @@ public class TemplateServiceTest {
         when(siteRepository.findAll(Example.of(Site.builder().state("Victoria").build())))
                 .thenReturn(Arrays.asList(testSite336));
 
-        List<Site> sites = templateService.getSitesForTemplate(
+        Set<Site> sites = templateService.getSitesForTemplate(
                 Arrays.asList(335),
                 Arrays.asList("Antipodes"),
                 Arrays.asList("Victoria"),

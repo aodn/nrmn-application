@@ -16,6 +16,7 @@ import org.springframework.data.rest.core.annotation.RestResource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RepositoryRestResource(excerptProjection = SiteList.class)
 @Tag(name = "sites")
@@ -48,6 +49,6 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
             "SELECT DISTINCT oi.observable_item_id from {h-schema}ep_m1 m1 " +
                     "JOIN {h-schema}ep_observable_items oi ON oi.observable_item_name = m1.species_name " +
                     "WHERE site_code IN ?1 ")
-    List<Long> findM1SpeciesBySites(Collection<String> siteCodes);
+    Set<Integer> findM1SpeciesBySites(Collection<String> siteCodes);
 
 }

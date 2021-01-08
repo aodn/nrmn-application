@@ -14,6 +14,7 @@ import org.springframework.data.rest.core.annotation.RestResource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RepositoryRestResource
 @Tag(name="observable items")
@@ -37,5 +38,13 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             "LEFT JOIN Observation o ON (o.observableItem = oi) " +
             "WHERE oi.letterCode IS NOT NULL " +
             "AND o.surveyMethod.survey.site IN :sites")
-    List<ObservableItem> getAllM3ObservableItems(Collection<Site> sites);
+    Set<ObservableItem> getAllM3ObservableItems(Collection<Site> sites);
+
+    @Query("SELECT DISTINCT oi FROM ObservableItem oi " +
+            "LEFT JOIN Observation o ON (o.observableItem = oi) " +
+            "WHERE (oi.clazz NOT IN ('Ophiuroidea', 'Polyplacophora') " +
+            "AND o.surveyMethod.method.methodId = 2 " +
+            "AND o.surveyMethod.survey.site IN :sites) " +
+            "OR oi.obsItemType.obsItemTypeId = 5 OR oi.obsItemType.obsItemTypeId = 6")
+    Set<ObservableItem> getAllM2ObservableItems(Collection<Site> sites);
 }

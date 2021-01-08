@@ -16,16 +16,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Service
 public class TemplateService {
@@ -61,7 +59,7 @@ public class TemplateService {
         zipOutputStream.closeEntry();
 
         zipOutputStream.putNextEntry(new ZipEntry("sites.csv"));
-        List<Site> sites = getSitesForTemplate(locations, provinces, states, siteCodes);
+        Set<Site> sites = getSitesForTemplate(locations, provinces, states, siteCodes);
         writeSitesCsv(writer, sites);
         writer.flush();
         zipOutputStream.closeEntry();
@@ -72,8 +70,13 @@ public class TemplateService {
         writer.flush();
         zipOutputStream.closeEntry();
 
+        zipOutputStream.putNextEntry(new ZipEntry("m2species.csv"));
+        writeSpeciesCsv(writer, getM2SpeciesForTemplate(sites));
+        writer.flush();
+        zipOutputStream.closeEntry();
+
         zipOutputStream.putNextEntry(new ZipEntry("m3species.csv"));
-        List<ObservableItem> observableItems = observableItemRepository.getAllM3ObservableItems(sites);
+        Set<ObservableItem> observableItems = observableItemRepository.getAllM3ObservableItems(sites);
         writeM3SpeciesCsv(writer, observableItems);
         writer.flush();
         zipOutputStream.closeEntry();
@@ -82,7 +85,7 @@ public class TemplateService {
         zipOutputStream.close();
     }
 
-    private void writeM3SpeciesCsv(Writer writer, List<ObservableItem> observableItems) throws IOException {
+    private void writeM3SpeciesCsv(Writer writer, Collection<ObservableItem> observableItems) throws IOException {
         CSVPrinter csvPrinter = M3_FORMAT.print(writer);
         List<List<String>> records = observableItems.stream()
                 .distinct()
@@ -95,7 +98,7 @@ public class TemplateService {
     private List<String> getSpeciesAsM3Record(ObservableItem observableItem) {
         return Arrays.asList(
                 observableItem.getLetterCode(),
-                observableItem.getObservableItemName(),
+                observableItem.getSupersededBy() != null ? observableItem.getSupersededBy() : observableItem.getObservableItemName(),
                 observableItem.getCommonName());
     }
 
@@ -139,10 +142,10 @@ public class TemplateService {
                 site.getLocation().getLocationName());
     }
 
-    public List<Site> getSitesForTemplate(Collection<Integer> locations,
-                                          Collection<String> provinces,
-                                          Collection<String> states,
-                                          Collection<String> siteCodes) {
+    public Set<Site> getSitesForTemplate(Collection<Integer> locations,
+                                         Collection<String> provinces,
+                                         Collection<String> states,
+                                         Collection<String> siteCodes) {
 
         Stream<String> siteCodesFromProvinces = provinces == null ? Stream.empty() : provinces.stream()
                 .flatMap(p -> siteRepository.findSiteCodesByProvince(p).stream());
@@ -164,7 +167,7 @@ public class TemplateService {
                     .flatMap(s -> siteRepository.findAll(Example.of(Site.builder().state(s).build())).stream()));
         }
 
-        return sites.distinct().collect(toList());
+        return sites.collect(toSet());
     }
 
     public void writeSpeciesCsv(Writer writer, Collection<SpeciesWithAttributes> species) throws IOException {
@@ -187,17 +190,17 @@ public class TemplateService {
     }
 
     public List<SpeciesWithAttributes> getM1SpeciesForTemplate(Collection<Site> sites) {
-        List<Long> speciesIds = siteRepository.findM1SpeciesBySites(sites.stream()
-                .map(Site::getSiteCode).collect(toList()));
+        Set<Integer> speciesIds = siteRepository.findM1SpeciesBySites(sites.stream()
+                .map(Site::getSiteCode).collect(toSet()));
 
         return speciesWithAttributesRepository.findAllById(speciesIds);
     }
 
     public List<SpeciesWithAttributes> getM2SpeciesForTemplate(Collection<Site> sites) {
-        List<Long> speciesIds = siteRepository.findM1SpeciesBySites(sites.stream()
-                .map(Site::getSiteCode).collect(toList()));
+        Set<ObservableItem> observableItems = observableItemRepository.getAllM2ObservableItems(sites);
 
-        return speciesWithAttributesRepository.findAllById(speciesIds);
+        return speciesWithAttributesRepository.findAllById(
+                observableItems.stream().map(ObservableItem::getObservableItemId).collect(toList()));
     }
 
     private String toString(Object couldBeNull) {
