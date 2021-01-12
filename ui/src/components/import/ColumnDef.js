@@ -9,7 +9,7 @@ function cell(params) {
     return null;
 }
 
-const ColunmDef = [
+export const ColumnDef = [
     {
         field: 'id',
         editable: false,
@@ -92,7 +92,7 @@ const ColunmDef = [
     {
         field: 'depth',
         editable: true,
-        width: 50,
+        width: 75,
         rowGroup: false,
         enableRowGroup: true,
         cellStyle: cell
@@ -100,14 +100,14 @@ const ColunmDef = [
     {
         field: 'method',
         editable: true,
-        width: 50,
+        width: 75,
         rowGroup: false,
         enableRowGroup: true,
     },
     {
         field: 'block',
         editable: true,
-        width: 50,
+        width: 75,
         rowGroup: false,
         enableRowGroup: true,
         cellStyle: cell
@@ -152,27 +152,27 @@ const ColunmDef = [
     {
         field: '2.5',
         editable: true,
-        width: 50
+        width: 75
     },
     {
         field: '5',
         editable: true,
-        width: 50
+        width: 75
     },
     {
         field: '7.5',
         editable: true,
-        width: 50
+        width: 75
     },
     {
         field: '10',
         editable: true,
-        width: 50
+        width: 75
     },
     {
         field: '12.5',
         editable: true,
-        width: 50
+        width: 75
     },
     {
         field: '15',
@@ -182,47 +182,47 @@ const ColunmDef = [
     {
         field: '20',
         editable: true,
-        width: 50
+        width: 75
     },
     {
         field: '25',
         editable: true,
-        width: 50
+        width: 75
     },
     {
         field: '30',
         editable: true,
-        width: 50
+        width: 75
     },
     {
         field: '35',
         editable: true,
-        width: 50
+        width: 75
     },
     {
         field: '40',
         editable: true,
-        width: 50
+        width: 75
     },
     {
         field: '50',
         editable: true,
-        width: 50
+        width: 75
     },
     {
         field: '62.5',
-        50: true,
-        width: 50
+        75: true,
+        width: 75
     },
     {
         field: '75',
         editable: true,
-        width: 50
+        width: 75
     },
     {
         field: '87.5',
         editable: true,
-        width: 50
+        width: 75
     },
     {
         field: '100',
@@ -232,11 +232,11 @@ const ColunmDef = [
     {
         field: '112.5',
         editable: true,
-        width: 50
+        width: 75
     },
     {
         field: '125',
-        editable: 50,
+        editable: 75,
         width: 100
     },
     {
@@ -286,6 +286,39 @@ const ColunmDef = [
     },
     {
         field: '400',
+        editable: true,
+        width: 100
+    },
+
+];
+
+export const ExtendedSize = [
+    {
+        field: 'l5',
+        editable: true,
+        width: 100
+    },
+    {
+        field: 'l95',
+        editable: true,
+        width: 100
+    },
+    {
+        field: 'inverts',
+        editable: true,
+        width: 100
+    },
+    {
+        field: 'm2InvertSizingSpecies',
+        editable: true,
+        width: 100
+    }, {
+        field: 'isInvertSizing',
+        editable: true,
+        width: 100
+    },
+    {
+        field: 'lmax',
         editable: true,
         width: 100
     },
@@ -350,5 +383,3 @@ const ColunmDef = [
         width: 100
     }
 ];
-
-export default ColunmDef;

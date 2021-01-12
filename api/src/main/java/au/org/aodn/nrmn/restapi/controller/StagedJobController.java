@@ -127,7 +127,7 @@ public class StagedJobController {
                         ResponseEntity
                                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
                                 .body(err)
-                , success -> ResponseEntity.ok().build());
+                , rowUpdate -> ResponseEntity.ok().body(rowUpdate));
     }
 
 

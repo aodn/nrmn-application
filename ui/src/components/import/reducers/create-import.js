@@ -7,18 +7,19 @@ import {
 const importState = {
     success: false,
     isLoading: false,
+    editLoading: false,
     percentCompleted: 0,
     errors: [],
     rows: [],
     errorsByMsg: [],
-    filterIds: [],
+    errSelected: [],
     jobId: '',
     job: {}
 };
 
 export const exportRow = (row) => {
     const { measureJson } = { ...row };
-    Object.getOwnPropertyNames(measureJson)
+    Object.getOwnPropertyNames(measureJson || {})
         .forEach(numKey => {
             row[numKey] = measureJson[numKey];
         });
@@ -86,7 +87,7 @@ const importSlice = createSlice({
         },
         validationFilter: (state, action) => {
             console.log(action);
-            state.filterIds = action.payload;
+            state.errSelected = action.payload;
         },
         validationReady: (state, action) => {
             if (action.payload.rows.length > 0) {
@@ -95,14 +96,31 @@ const importSlice = createSlice({
                 const errorsGrouped = groupBy(validationErrors, (row) => row.message);
                 console.log(errorsGrouped);
                 state.errorsByMsg = [...errorsGrouped.keys()].map(key => {
-                    const length = errorsGrouped.get(key).length;
+                    const elems = errorsGrouped.get(key);
                     const ids = errorsGrouped.get(key).map(err => err.rowId);
-                    return { msg: key, count: errorsGrouped.get(key).length, ids: ids };
+                    return {
+                        msg: key,
+                        count: elems.length,
+                        ids: ids,
+                        columnTarget: elems[0].columnTarget,
+                        level: elems[0].errorLevel
+                    };
+                }).sort((err1, err2) => {
+                    if (err1.level == err2.level) {
+                        return err2.count - err1.count;
+                    }
+                    return err1.level === 'BLOCKING' ? -1 : 1;
                 });
                 console.log(state.errorsByMsg);
             }
             state.isLoading = false;
 
+        },
+        EditRowStarting: (state) => {
+            state.editLoading = true;
+        },
+        EditRowFinished: (state) => {
+            state.editLoading = false;
         },
         JobStarting: (state) => {
             state.isLoading = true;
@@ -114,7 +132,18 @@ const importSlice = createSlice({
 });
 
 export const importReducer = importSlice.reducer;
-export const { ImportProgress, JobStarting, validationFilter, validationReady, JobFinished, JobReady, ImportStarted, ImportLoaded, ImportFailed } = importSlice.actions;
+export const {
+    ImportProgress,
+    JobStarting,
+    validationFilter,
+    validationReady,
+    EditRowStarting,
+    EditRowFinished,
+    JobFinished,
+    JobReady,
+    ImportStarted,
+    ImportLoaded,
+    ImportFailed } = importSlice.actions;
 export const ImportRequested = createAction('IMPORT_REQUESTED', function (xlsFile) { return { payload: xlsFile }; });
 export const JobRequested = createAction('JOB_REQUESTED', function (jobId) { return { payload: jobId }; });
 export const ValidationRequested = createAction('VALIDATION_REQUESTED', function (jobId) { return { payload: jobId }; });

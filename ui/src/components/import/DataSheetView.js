@@ -3,12 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AgGridReact } from 'ag-grid-react';
 import { AllModules } from 'ag-grid-enterprise';
 import { useEffect } from 'react';
-import { JobFinished, JobRequested, RowUpdateRequested } from './reducers/create-import';
-
-import { makeStyles } from '@material-ui/core/styles';
-import { green } from '@material-ui/core/colors';
-import ColunmDef from './ColumnDef';
-import { useParams } from 'react-router-dom';
+import { EditRowStarting, JobFinished, RowUpdateRequested } from './reducers/create-import';
+import {ColumnDef, ExtendedSize} from './ColumnDef';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import { Box } from '@material-ui/core';
@@ -32,12 +28,15 @@ const DataSheetView = () => {
     const dispatch = useDispatch();
     const immutableRows = useSelector(state => state.import.rows);
     const isLoading = useSelector(state => state.import.isLoading);
-    const filterIds = useSelector(state => state.import.filterIds);
+    const editLoading = useSelector(state => state.import.editLoading);
 
+    const errSelected = useSelector(state => state.import.errSelected);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const [gridApi, setGridApi] = useState(null);
     var rows = immutableRows.map(Object.unfreeze);
+    const job = useSelector(state => state.import.job);
 
+    const colDefinition = (job && job.isExtendedSize)? ColumnDef.concat(ExtendedSize): ColumnDef;
 
     const agGridReady = (params) => {
         setGridApi(params.api);
@@ -46,18 +45,34 @@ const DataSheetView = () => {
     };
 
     const onCellChanged = (input) => {
-        const row = rows[input.rowIndex];
-        dispatch(RowUpdateRequested(row.id, row));
-        //dispatch  updateBackend
+        dispatch(RowUpdateRequested(input.data.id, input.data));
+        dispatch(EditRowStarting());
     };
+
     useEffect(() => {
-        if (gridApi && filterIds.length > 0) {
-            console.log('filterIDs:', filterIds);
+        if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
             const instance = gridApi.getFilterInstance('id');
-            instance.setModel({ values: filterIds });
-            gridApi.onFilterChanged();
+            instance.setModel({ values: errSelected.ids.map(id => id.toString()) }).then(() =>
+                gridApi.onFilterChanged()
+            );
+
         }
-    }, filterIds);
+
+        if (errSelected.ids === null) {
+            const instance = gridApi.getFilterInstance('id');
+            instance.setModel(null).then(() =>
+                gridApi.onFilterChanged()
+            );
+
+        }
+    });
+
+    useEffect(() => {
+        console.log('edit load', editLoading);
+        colDefinition.forEach(def => {
+            def.editable = !editLoading;
+        });
+    }, [editLoading]);
 
     const size = useWindowSize();
     const themeType = useSelector(state => state.theme.themeType);
@@ -78,7 +93,7 @@ const DataSheetView = () => {
                         }
                     }}
                     onCellValueChanged={onCellChanged}
-                    columnDefs={ColunmDef}
+                    columnDefs={colDefinition}
                     groupDefaultExpanded={4}
                     rowData={rows}
                     animateRows={true}

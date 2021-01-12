@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.validation.process;
 
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
@@ -69,9 +70,9 @@ public class RawValidation extends ValidatorHelpers {
                         Tuple2.of("Site", siteCodeExists),
                         Tuple2.of("Date", new DateFormatValidation()),
                         Tuple2.of("Time", new TimeFormatValidation()),
-                        Tuple2.of("Diver", new DiverExists(StagedRow::getDiver, "Diver", diverRepo)),
-                        Tuple2.of("Buddy", new DiverExists(StagedRow::getBuddy, "Buddy", diverRepo)),
-                        Tuple2.of("P-Qs", new DiverExists(StagedRow::getPqs, "P-Qs", diverRepo)),
+                        Tuple2.of("Diver", new DiverExists(StagedRow::getDiver, "Diver", diverRepo, ValidationLevel.BLOCKING)),
+                        Tuple2.of("Buddy", new DiverExists(StagedRow::getBuddy, "Buddy", diverRepo, ValidationLevel.WARNING)),
+                        Tuple2.of("P-Qs", new DiverExists(StagedRow::getPqs, "P-Qs", diverRepo, ValidationLevel.BLOCKING)),
                         Tuple2.of("Depth", new DoubleFormatValidation(StagedRow::getDepth, "Depth")),
                         Tuple2.of("Method", new IntegerFormatValidation(StagedRow::getMethod, "Method", Arrays.asList(0, 1, 2, 3, 4, 5, 7, 10))),
                         Tuple2.of("Block", new IntegerFormatValidation(StagedRow::getBlock, "Block", Arrays.asList(0, 1, 2, 10))),

@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.validation.validators.format;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.util.ConsumerThrowable;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
@@ -28,6 +29,7 @@ public abstract class BaseRowFormatValidation<T> extends BaseRowValidator {
                 new ErrorID(target.getId(),
                         target.getStagedJob().getId(), msg),
                 ValidationCategory.FORMAT,
+                ValidationLevel.BLOCKING,
                 columnTarget,
                 target);
     }

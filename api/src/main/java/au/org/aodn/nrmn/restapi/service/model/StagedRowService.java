@@ -13,7 +13,7 @@ public class StagedRowService {
     @Autowired
     StagedRowRepository rowRepo;
 
-    public Validated<ErrorInput, String> update(Long id, StagedRow provider) {
+    public Validated<ErrorInput, StagedRow> update(Long id, StagedRow provider) {
        return  rowRepo.findById(id).map(found -> {
             found.setDiver(provider.getDiver());
             found.setBuddy(provider.getBuddy());
@@ -39,8 +39,9 @@ public class StagedRowService {
             found.setIsInvertSizing(provider.getIsInvertSizing());
             found.setM2InvertSizingSpecies(provider.getM2InvertSizingSpecies());
             found.setTotal(provider.getTotal());
+            found.setMeasureJson(provider.getMeasureJson());
             rowRepo.save(found);
-            return Validated.<ErrorInput, String>valid("Ok");
+            return Validated.<ErrorInput, StagedRow>valid(found);
         }).orElseGet(() -> Validated.invalid(new ErrorInput("Couldn't find row " + id, "id")));
     }
 
