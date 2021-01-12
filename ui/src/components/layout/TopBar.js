@@ -16,12 +16,13 @@ import Button from "@material-ui/core/Button";
 import Link from "@material-ui/core/Link";
 import {blueGrey} from "@material-ui/core/colors";
 
-const drawerWidth = 240;
+const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ?
+    process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
 const useStyles = makeStyles((theme) => ({
   header: {
     fontFamily: [
-      'Lora'
+      'Roboto'
     ].join(','),
     color: "#FFF",
     fontSize: "x-large",
@@ -48,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
   },
   appBarShift: {
     width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
+    marginLeft: `${drawerWidth}px`,
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
