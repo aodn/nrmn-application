@@ -12,11 +12,10 @@ import config from 'react-global-configuration';
 apiDefinition().then((result) => {
   config.set({api: result.data.components.schemas});
   ReactDOM.render(
-      <React.StrictMode>
         <Provider store={store}>
           <App/>
         </Provider>
-      </React.StrictMode>, document.getElementById('root')
+      , document.getElementById('root')
   );
 });
 

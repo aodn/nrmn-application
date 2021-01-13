@@ -17,6 +17,7 @@ import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import BaseForm from "../BaseForm";
 import {makeStyles} from "@material-ui/core/styles";
+import Backdrop from "@material-ui/core/Backdrop";
 
 
 const useStyles = makeStyles(theme => ({
@@ -44,8 +45,13 @@ const GenericForm = () => {
 
   const dispatch = useDispatch();
   const singular = pluralize.singular(entityName);
-  const entityTitle = singular.charAt(0).toUpperCase() + singular.slice(1)
+  const entityTitle = singular.charAt(0).toUpperCase() + singular.slice(1);
 
+  const backdropChildren = () => {
+    return <>
+      <LoadingBanner color={"white"} variant={"h5"} msg={"Loading '" + titleCase(entityName) + "' form"  } />
+    </>
+  }
 
   useEffect(() => {
     if (id !== undefined) {
@@ -87,12 +93,11 @@ const GenericForm = () => {
     relationship: NestedApiField
   }
 
-  const formContent = ()=>{
+  const formContent = () => {
     if (entitySaved) {
       return <>
         <Typography variant="h4"  >Entity saved successfully!</Typography>
       </>
-
     }
     else {
       return <BaseForm
@@ -113,15 +118,12 @@ const GenericForm = () => {
       return renderError(["Entity '" + entityName + "' cannot be found"]);
     }
     else {
-      return (id && Object.keys(editItem).length === 0) ?
-          <Grid
-              container
-              direction="row"
-              justify="flex-start"
-              alignItems="center"
-          >
-          <LoadingBanner variant={"h5"} msg={"Loading '" + titleCase(entityName) + "' form"  } />
-          </Grid> :
+      return <>
+      <Backdrop
+              open={(id && Object.keys(editItem).length === 0)}
+              children={backdropChildren()}
+              transitionDuration={{ appear: 500, enter: 2000, exit: 500 }}
+          />
           <Grid
               container
               direction="row"
@@ -155,6 +157,7 @@ const GenericForm = () => {
               </Grid>
             </Grid>
           </Grid>
+        </>
     }
   }
 }

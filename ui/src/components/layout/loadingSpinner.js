@@ -9,5 +9,5 @@ export const LoadingSpinner = (props) => {
 
   return <CircularProgress
       {...props}
-      color={"secondary"} size={size} thickness={thickness} />
+      color={props.color} size={size} thickness={thickness} />
 }
