@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +25,7 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 @SecondaryTable(name = "lengthweight_ref", pkJoinColumns = @PrimaryKeyJoinColumn(name = "observable_item_id"),
  foreignKey = @ForeignKey(name = "lengthweight_ref_observable_item_id_fkey"))
 @Audited(withModifiedFlag = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ObservableItem {
     @Id
     @SequenceGenerator(name = "observable_item_ref_observable_item_id", sequenceName =
@@ -97,7 +99,7 @@ public class ObservableItem {
 
     @Basic
     @Column(name = "obs_item_attribute", columnDefinition = "jsonb")
-    @Schema(title = "Attributes", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     @Type(type = "jsonb")
     private Map<String, String> obsItemAttribute;
 

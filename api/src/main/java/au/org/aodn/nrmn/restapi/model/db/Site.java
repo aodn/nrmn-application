@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -24,6 +25,7 @@ import java.util.Map;
 @Builder
 @Table(name = "site_ref")
 @Audited(withModifiedFlag = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Site {
     @Id
     @SequenceGenerator(name = "site_ref_site_id", sequenceName = "site_ref_site_id", allocationSize = 1)
@@ -99,8 +101,8 @@ public class Site {
 
     @Column(name = "site_attribute", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    @Schema(title = "Attributes", accessMode = Schema.AccessMode.READ_ONLY)
-    private Map<String, Object> siteAttribute;
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    private Map<String, String> siteAttribute;
 
     @Basic
     @Column(name = "is_active")

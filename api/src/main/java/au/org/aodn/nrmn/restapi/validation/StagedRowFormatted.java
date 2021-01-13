@@ -36,7 +36,7 @@ public class StagedRowFormatted {
 
     private Diver pqs;
 
-    private Double depth;
+    private Integer depth;
 
     private  Integer surveyNum;
 

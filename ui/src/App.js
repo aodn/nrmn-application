@@ -20,11 +20,13 @@ import {
 import XlxsUpload from './components/import/XlxsUpload';
 import ValidationPage from './components/import/ValidationJob';
 import GenericForm from './components/data-entities/GenericForm';
-import { useSelector } from 'react-redux';
 import EntityList from './components/data-entities/EntityList';
-import Alert from '@material-ui/lab/Alert';
 import { getFullPath } from './components/utils/helpers';
 import AlertTitle from '@material-ui/lab/AlertTitle';
+import {useSelector} from 'react-redux';
+import Alert from '@material-ui/lab/Alert';
+import GenericDetailsView from './components/data-entities/GenericDetailsView';
+import Homepage from './components/layout/Homepage';
 
 const drawerWidth = 240;
 
@@ -69,7 +71,6 @@ const App = () => {
         variant: 'outlined',
         margin: 'dense',
         notched: 'true',
-        color: 'primary'
       }
     },
     overrides: {
@@ -98,13 +99,14 @@ const App = () => {
             })}
           >
             <Switch>
-              <Route exact path='/' render={() => (
+              {/* <Route exact path='/' render={() => (
                 <Redirect to='/upload' />
-              )} />
+              )} /> */}
               <Route path='/validation/:jobId' component={ValidationPage} />
               <Route path='/upload'component={XlxsUpload} />
               <Route path='/login' component={Login} />
               <Route path='/form/:entityName/:id?' component={GenericForm} />
+              <Route path="/view/:entityName/:id?" component={GenericDetailsView} />
               <Route path='/list/:entityName' component={EntityList} />
               <Route path='/notfound' render={(props) =>
                 <Alert severity='error'  >
@@ -112,6 +114,7 @@ const App = () => {
                   {`The requested resource ${getFullPath(props.location)} is not available`}
                 </Alert>}
               />
+              <Route path={'/'} component={Homepage} />
               <Route render={(props) =>
                 <Alert severity='error'  >
                   <AlertTitle>Path Not Found</AlertTitle>

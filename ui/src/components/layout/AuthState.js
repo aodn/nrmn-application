@@ -20,7 +20,7 @@ const AuthState = () => {
       size="small"
       title={'Log out'}
       startIcon={<VerifiedUserIcon />}
-      onClick={() => openLogout(dispatch)}> Logged in as {userName}</Button>
+      onClick={() => openLogout(dispatch)}>{userName}</Button>
     <Logout /> |
   </>);
 

@@ -24,7 +24,8 @@ const cellRenderer = (params) => {
   };
   return params.value;
 };
-const schematoColDef = (schema, size) => {
+
+const schematoColDef = (schema, size, entityName) => {
 
   const fields = Object.keys(schema.properties);
   const widthSize = size.width / (fields.length + 1);
@@ -41,15 +42,26 @@ const schematoColDef = (schema, size) => {
   });
 
   coldefs.push({
-    field: 'Edit',
+    field: 'Links',
     filter: undefined,
     cellRenderer: function (params) {
+      const linkPath = nonGenericEntities[entityName]?.linkPath;
+      let linkLabel = 'Edit';
+      let link = '/';
       if (params.data._links) {
         const hrefSplit = params.data._links.self.href.split('/');
         const id = hrefSplit.pop();
         const ent = hrefSplit.pop();
-        const link = '/form/' + ent + '/' + id;
-        return '<a href="' + link + '">Edit</a>';
+
+        if ((entityName in nonGenericEntities) && linkPath) {
+          link =  '/' + linkPath.replace(/{(.*?)}/, id);
+          linkLabel = (nonGenericEntities[entityName]?.linkLabel) ? nonGenericEntities[entityName]?.linkLabel : linkLabel;
+        }
+        else {
+          link = '/edit/' + ent + '/' + id;
+          linkLabel = 'Edit';
+        }
+        return '<a href="' + link + '">' + linkLabel + '</a>';
       }
     }
   });
@@ -65,6 +77,14 @@ const renderError = (msgArray) => {
       variant="filled"
     >{msgArray.join('\r\n ')}
     </Alert></Box>;
+};
+
+const nonGenericEntities = {
+  'StagedJob': {
+    title: 'Jobs',
+    createButtonPath: '/import-file', // createButtonPath absence means no create button will show
+    linkPath: 'linkToSomewherePath/{}'
+  }
 };
 
 const EntityList = () => {
@@ -97,6 +117,31 @@ const EntityList = () => {
       (schemaDefinition[entityName]);
   };
 
+  const getTitle =  () => {
+    let thisTitle = nonGenericEntities[entityName]?.title;
+    if ((entityName in nonGenericEntities) && thisTitle) {
+      return thisTitle;
+    }
+    else {
+      return entityName;
+    }
+  };
+
+  const newEntityButton = () => {
+    let createButtonPath = nonGenericEntities[entityName]?.createButtonPath;
+    if (!(entityName in nonGenericEntities) || createButtonPath) {
+      const to = (createButtonPath) ? createButtonPath : '/edit/' + entityNamePlural;
+      return <Button title={'Add new ' + getTitle()}
+                     component={NavLink}
+                     to={to}
+                     color="secondary"
+                     aria-label={'Add ' + getTitle()}
+                     variant={'contained'}
+      >New {titleCase(getTitle())}
+      </Button>;
+    }
+  };
+
   if (Object.keys(schemaDefinition).length === 0) {
     return (renderError(['Error: API not yet loaded']));
   }
@@ -106,57 +151,49 @@ const EntityList = () => {
       return renderError(["ERROR: Entity '" + titleCase(entityName) + "' missing from API Schema"]);
     }
 
-    const colDef = schematoColDef(getEntitySchema(), size);
+    const colDef = schematoColDef(getEntitySchema(), size, entityName );
 
     if (items !== undefined && agGridApi.setRowData) {
       agGridApi.setRowData(items);
     }
 
     return (
-      <>
-        <Box >
-          <Grid
-            container
-            direction="row"
-            justify="space-between"
-            alignItems="center"
-          >
-            <Typography variant="h4">{entityNamePlural.charAt(0).toUpperCase() + entityNamePlural.slice(1)} </Typography>
-            <Button title={'Add new ' + titleCase(entityName)}
-              component={NavLink}
-              to={'/form/' + entityNamePlural}
-              color="secondary"
-              aria-label={'Add ' + entityName}
-              variant={'contained'}
-            >New {titleCase(entityName)}
+        <>
+          <Box >
+            <Grid
+                container
+                direction="row"
+                justify="space-between"
+                alignItems="center"
+            >
+              <Typography variant="h4">{getTitle()}</Typography>
+              {newEntityButton()}
+            </Grid>
 
-            </Button>
-          </Grid>
-
-          <div style={{ width: '100%', height: size.height - 170, marginTop: 25 }}
-            className={'ag-theme-material'}>
-            <AgGridReact
-              columnDefs={colDef}
-              rowSelection="multiple"
-              animateRows={true}
-              onGridReady={agGridReady}
-              frameworkComponents={{ customTooltip: CustomTooltip }}
-              tooltipShowDelay={0}
-              defaultColDef={{
-                sortable: true,
-                resizable: true,// make every column use 'text' filter by default
-                filter: 'agTextColumnFilter',
-                tooltipComponent: 'customTooltip',
-                floatingFilter: true,
-                headerComponentParams: {
-                  menuIcon: 'fa-bars'
-                }
-              }} />
-          </div>
-          {(!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : ''}
-          {(errors.length > 0) ? renderError(errors) : ''}
-        </Box>
-      </>
+            <div style={{width: '100%', height: size.height - 170, marginTop: 25}}
+                 className={'ag-theme-material'}>
+              <AgGridReact
+                  columnDefs={colDef}
+                  rowSelection="single"
+                  animateRows={true}
+                  onGridReady={agGridReady}
+                  frameworkComponents={{customTooltip: CustomTooltip}}
+                  tooltipShowDelay={0}
+                  defaultColDef={{
+                    sortable: true,
+                    resizable: true,// make every column use 'text' filter by default
+                    filter: 'agTextColumnFilter',
+                    tooltipComponent: 'customTooltip',
+                    floatingFilter: true,
+                    headerComponentParams: {
+                      menuIcon: 'fa-bars'
+                    }
+                  }}/>
+            </div>
+            {(!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : ''}
+            {(errors.length > 0) ? renderError(errors) : ''}
+          </Box>
+        </>
     );
   }
 };

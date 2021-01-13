@@ -68,11 +68,11 @@ describe('GenericForm.js Component', () => {
 
   test('Test GenericForm.js exists', async () => {
     const {findByText} = renderWithProviders(
-        <Route path="/form/:entityName">
+        <Route path="/edit/:entityName">
           <GenericForm/>
         </Route>,
         {
-          route: '/form/munt'
+          route: '/edit/munt'
         }
     );
     await findByText("ERROR: Entity 'Munt' missing from API Schema");
@@ -82,11 +82,11 @@ describe('GenericForm.js Component', () => {
   test('Test GenericForm.js TestEntity renders form submit button', async () => {
 
     const {findByText} = renderWithProviders(
-        <Route path="/form/:entityName">
+        <Route path="/edit/:entityName">
           <GenericForm/>
         </Route>,
         {
-          route: '/form/TestEntity'
+          route: '/edit/TestEntity'
         }
     );
     await findByText('Submit');
