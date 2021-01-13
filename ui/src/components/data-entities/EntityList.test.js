@@ -1,30 +1,30 @@
 /* eslint-disable no-unused-expressions */
 
-import React from "react";
-import { Route } from "react-router-dom";
-import {renderWithProviders} from "../utils/test-utils";
-import "@testing-library/jest-dom/extend-expect";
-import config from "react-global-configuration";
-import {useSelector} from "react-redux";
-import EntityList from "./EntityList";
+import React from 'react';
+import { Route } from 'react-router-dom';
+import {renderWithProviders} from '../utils/test-utils';
+import '@testing-library/jest-dom/extend-expect';
+import config from 'react-global-configuration';
+import {useSelector} from 'react-redux';
+import EntityList from './EntityList';
 
 const testSchema = {
   TestEntity: {
     required: [
-      "password",
-      "username"
+      'password',
+      'username'
     ],
-    type: "object",
+    type: 'object',
     properties: {
       username: {
-        type: "string"
+        type: 'string'
       },
       password: {
-        type: "string"
+        type: 'string'
       }
     }
   }
-}
+};
 
 config.set({api: testSchema});
 jest.mock('ag-grid-react/lib/agGridReact');
@@ -45,19 +45,19 @@ jest.mock('react-redux', () => {
   return {
     ...ActualReactRedux,
     useSelector: jest.fn().mockImplementation(() => {
-      return function(){ return {}};
+      return function(){ return {};};
     }),
     useDispatch: jest.fn().mockImplementation(() => {
-      return function(){ return {}};
+      return function(){ return {};};
     }),
     useEffect: jest.fn().mockImplementation(() => {
-      return function(){ return {}};
+      return function(){ return {};};
     }),
   };
 });
 
 
-describe("EntityList Component", () => {
+describe('EntityList Component', () => {
 
   beforeEach(() => {
     useSelector.mockImplementation(callback => {
@@ -68,30 +68,30 @@ describe("EntityList Component", () => {
     useSelector.mockClear();
   });
 
-  test("Test EntityList.js exists", async () => {
+  test('Test EntityList.js exists', async () => {
     const {findByText} = renderWithProviders(
         <Route path="/list/:entityName">
           <EntityList />
         </Route>,
         {
-          route: "/list/munt"
+          route: '/list/munt'
         }
     );
     await findByText("ERROR: Entity 'Munt' missing from API Schema");
   });
 
 
-  test("Test EntityList.js New Entity button exists", async () => {
+  test('Test EntityList.js New Entity button exists', async () => {
 
     const {findByTitle, findByText} = renderWithProviders(
         <Route path="/list/:entityName">
           <EntityList/>
         </Route>,
         {
-          route: "/list/TestEntity"
+          route: '/list/TestEntity'
         }
     );
-    await findByTitle("Add new TestEntity");
+    await findByTitle('Add new TestEntity');
   });
 
 });

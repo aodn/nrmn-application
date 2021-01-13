@@ -1,11 +1,11 @@
-import React from "react";
-import {Typography} from "@material-ui/core";
-import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
-import ThemeProvider from "@material-ui/styles/ThemeProvider";
-import responsiveFontSizes from "@material-ui/core/styles/responsiveFontSizes";
-import Grid from "@material-ui/core/Grid";
-import makeStyles from "@material-ui/core/styles/makeStyles";
-import Box from "@material-ui/core/Box";
+import React from 'react';
+import {Typography} from '@material-ui/core';
+import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
+import ThemeProvider from '@material-ui/styles/ThemeProvider';
+import responsiveFontSizes from '@material-ui/core/styles/responsiveFontSizes';
+import Grid from '@material-ui/core/Grid';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import Box from '@material-ui/core/Box';
 
 const maxContentWidth = 700;
 
@@ -29,7 +29,7 @@ theme = responsiveFontSizes(theme);
 
 const useStyles = makeStyles(theme => ({
   spacer: {
-    "& > *": {
+    '& > *': {
       marginTop: 20,
       marginBottom: 20,
       padding: 10
@@ -41,54 +41,54 @@ const useStyles = makeStyles(theme => ({
     maxWidth: 700
   },
   supporters: {
-    backgroundColor: "#546e7aab"
+    backgroundColor: '#546e7aab'
   },
-  grey: { color: "#999"},
-  white: { color: "#FFF"}
+  grey: { color: '#999'},
+  white: { color: '#FFF'}
 }));
 
 const logoData = [
   {
     img: '/logos/500x130-UTAS.png',
-    href: "http://www.utas.edu.au/",
-    title: "University of Tasmania home page"
+    href: 'http://www.utas.edu.au/',
+    title: 'University of Tasmania home page'
   },
   {
     img: 'https://static.emii.org.au/images/logo/AODN_logo_fullText.png',
-    href: "https://portal.aodn.org.au/",
-    title: "Australian Ocean Data Network"
+    href: 'https://portal.aodn.org.au/',
+    title: 'Australian Ocean Data Network'
   },
   {
     img: 'https://static.emii.org.au/images/logo/IMOS-Ocean-Portal-logo.png',
-    href: "https://imos.org.au/",
-    title: "Integrated Marine Observation System"
+    href: 'https://imos.org.au/',
+    title: 'Integrated Marine Observation System'
   },
   {
     img: 'https://static.emii.org.au/images/logo/NCRIS_2017_110.png',
-    title: "National Collaborative Research Infrastructure Strategy",
-    href: "https://www.ncris-network.org.au/"
+    title: 'National Collaborative Research Infrastructure Strategy',
+    href: 'https://www.ncris-network.org.au/'
   },
   {
     img: '/logos/500x400-waratah-nsw-government.png',
-    href: "https://www.nsw.gov.au/",
-    title: "NSW Government"
+    href: 'https://www.nsw.gov.au/',
+    title: 'NSW Government'
   },
   {
     img: '/logos/500x400-South-Australia-white-on-transparent.png',
-    href: "https://www.sa.gov.au/",
-    title: "Government of South Australia"
+    href: 'https://www.sa.gov.au/',
+    title: 'Government of South Australia'
   },
   {
     img: '/logos/500x400-Tasmanian-Parks-white-on-transparent.png',
-    href: "https://parks.tas.gov.au/",
-    title: "Tasmania Parks and Wildlife Service"
+    href: 'https://parks.tas.gov.au/',
+    title: 'Tasmania Parks and Wildlife Service'
   },
   {
     img: '/logos/500x400-Victoria-Parks-white-on-transparent.png',
-    href: "https://www.parks.vic.gov.au/",
-    title: "Parks Victoria"
+    href: 'https://www.parks.vic.gov.au/',
+    title: 'Parks Victoria'
   }
-]
+];
 
 const Homepage = () => {
 
@@ -114,12 +114,12 @@ const Homepage = () => {
         >
           <Grid item>
 
-            <Typography variant={"h1"}>NRMN - Data Portal</Typography>
-            <Typography variant={"h3"} className={classes.grey}>Underwater visual census data on shallow reefs</Typography>
+            <Typography variant={'h1'}>NRMN - Data Portal</Typography>
+            <Typography variant={'h3'} className={classes.grey}>Underwater visual census data on shallow reefs</Typography>
           </Grid>
           <Grid item>
             <Box className={classes.boxes}>
-              <Typography variant={"h4"}>NRMN is an IMOS sub-facility. It's roles:</Typography>
+              <Typography variant={'h4'}>NRMN is an IMOS sub-facility. Its roles:</Typography>
               <ul>
                 <li>Collate, clean, store and make rapidly available, all data obtained
                   during shallow reef surveys conducted by the National Reef
@@ -148,8 +148,8 @@ const Homepage = () => {
             <Box className={classes.boxes}>
 
 
-              <Typography variant={"h4"}>
-                Public data from the NRMN is available via the <a title="AODN Portal" target="_blank" href="https://portal.aodn.org.au/" >AODN Portal</a>.
+              <Typography variant={'h4'}>
+                Public data from the NRMN is available via the <a title="AODN Portal"  rel="noreferrer"  target="_blank" href="https://portal.aodn.org.au/" >AODN Portal</a>.
               </Typography>
 
               <p>
@@ -162,7 +162,8 @@ const Homepage = () => {
                 <a  title="Disclaimer information"
                       href="https://help.aodn.org.au/user-guide-introduction/aodn-portal/disclaimer">Disclaimer</a>
                 <b> | </b>
-                <a title="Australian Ocean Data Network" target="_blank"
+
+                <a title="Australian Ocean Data Network" rel="noreferrer"  target="_blank"
                       href="http://imos.org.au/aodn.html">AODN</a>
                 <b> | </b>
                 <a title="Integrated Marine Observing System"
@@ -185,7 +186,7 @@ const Homepage = () => {
         <Grid item>
           <Box className={classes.spacer}>
             <span>
-              <Typography className={classes.white} variant={"h1"} >Our Partners</Typography>
+              <Typography className={classes.white} variant={'h1'} >Our Partners</Typography>
               <Typography className={classes.white} > We acknowledge the generous support of our partners</Typography>
             </span>
           </Box>
@@ -201,7 +202,7 @@ const Homepage = () => {
                      pb={2}
                      mr={1}
                   width={150}
-                  key={tile.title + "-logo"}
+                  key={tile.title + '-logo'}
                 >
                   <a href={tile.href} ><img
                       width={140}
@@ -215,8 +216,8 @@ const Homepage = () => {
       </Grid>
     </Box>
   </ThemeProvider>
-</>
+</>;
 
-}
+};
 
 export default Homepage;

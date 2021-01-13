@@ -1,25 +1,25 @@
-import React from "react";
+import React from 'react';
 
-import {useDispatch, useSelector} from "react-redux";
-import { Link } from 'react-router-dom'
+import {useDispatch, useSelector} from 'react-redux';
+import { Link } from 'react-router-dom';
 import {useEffect} from 'react';
-import {useParams} from "react-router-dom";
+import {useParams} from 'react-router-dom';
 import NestedApiFieldDetails from './customWidgetFields/NestedApiFieldDetails';
 import pluralize from 'pluralize';
-import config from "react-global-configuration";
-import {Box} from "@material-ui/core";
-import Alert from "@material-ui/lab/Alert";
-import Grid from "@material-ui/core/Grid";
-import {itemRequested} from "./middleware/entities";
-import Button from "@material-ui/core/Button";
-import {makeStyles} from "@material-ui/core/styles";
-import BaseForm from "../BaseForm";
-import ObjectListViewTemplate from "./ObjectListViewTemplate";
+import config from 'react-global-configuration';
+import {Box} from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
+import Grid from '@material-ui/core/Grid';
+import {itemRequested} from './middleware/entities';
+import Button from '@material-ui/core/Button';
+import {makeStyles} from '@material-ui/core/styles';
+import BaseForm from '../BaseForm';
+import ObjectListViewTemplate from './ObjectListViewTemplate';
 
 
 const useStyles = makeStyles(theme => ({
   buttons: {
-    "& > *": {
+    '& > *': {
       marginTop: 20
     }
   }
@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
 
 const renderError = (msgArray) => {
   return (msgArray.length > 0) ? <><Box><Alert severity="error" variant="filled">{msgArray}</Alert></Box></> : <></>;
-}
+};
 
 const GenericDetailsView = () => {
 
@@ -40,18 +40,18 @@ const GenericDetailsView = () => {
 
   const dispatch = useDispatch();
   const singular = pluralize.singular(entityName);
-  const entityTitle = singular.charAt(0).toUpperCase() + singular.slice(1)
+  const entityTitle = singular.charAt(0).toUpperCase() + singular.slice(1);
 
 
   useEffect(() => {
     if (id !== undefined) {
       // Todo: make this request the specific list view api
-      dispatch(itemRequested(entityName + "/" + id));
+      dispatch(itemRequested(entityName + '/' + id));
     }
   }, []);
 
   if (Object.keys(schemaDefinition).length === 0) {
-    return renderError("ERROR: API Schema not found");
+    return renderError('ERROR: API Schema not found');
   }
   if ( typeof (schemaDefinition[entityTitle]) == 'undefined') {
     return renderError("ERROR: Entity '" + entityTitle + "' missing from API Schema");
@@ -59,21 +59,21 @@ const GenericDetailsView = () => {
 
   const entityDef = schemaDefinition[entityTitle];
 
-  let fullTitle = "Details for " + entityTitle + " '" + id + "'"  ;
-  const entitySchema = {title: fullTitle, ...entityDef}
+  let fullTitle = 'Details for ' + entityTitle + " '" + id + "'"  ;
+  const entitySchema = {title: fullTitle, ...entityDef};
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
 
   const uiSchemaRelationships = Object.keys(entitySchema.properties).filter( key => {
-    return entitySchema.properties[key].type === "string" && entitySchema.properties[key].format === "uri"
+    return entitySchema.properties[key].type === 'string' && entitySchema.properties[key].format === 'uri';
   });
   const uiSchemaObjects = Object.keys(entitySchema.properties).filter( key => {
-    return entitySchema.properties[key].type === "object";
+    return entitySchema.properties[key].type === 'object';
   });
 
   const inputDisplay = (props) => {
 
-    const value = (typeof props.formData === "boolean") ? props.formData.toString() : props.formData
-    return (<span><b>{props.name}: </b> {(value) ? value: " -- "}</span>);
+    const value = (typeof props.formData === 'boolean') ? props.formData.toString() : props.formData;
+    return (<span><b>{props.name}: </b> {(value) ? value: ' -- '}</span>);
   };
 
   const objectDisplay = (props) => {
@@ -89,11 +89,11 @@ const GenericDetailsView = () => {
           }
         }
       } else {
-        props.formData.map(item => items.push(<Grid item>{item}</Grid>))
+        props.formData.map(item => items.push(<Grid item>{item}</Grid>));
       }
     }
     else {
-      items.push(<Grid item>--</Grid>)
+      items.push(<Grid item>--</Grid>);
     }
 
     return ObjectListViewTemplate({name: props.name, items:items});
@@ -101,15 +101,15 @@ const GenericDetailsView = () => {
   };
 
   const uiSchema = {
-    "ui:widget": "string"
+    'ui:widget': 'string'
   };
 
   uiSchemaRelationships.map( key => {
-    uiSchema[key] = {'ui:field': "relationship"}
+    uiSchema[key] = {'ui:field': 'relationship'};
   });
 
   uiSchemaObjects.map( key => {
-    uiSchema[key] = {'ui:field': "objects"}
+    uiSchema[key] = {'ui:field': 'objects'};
   });
 
   const fields = {
@@ -119,22 +119,22 @@ const GenericDetailsView = () => {
     BooleanField: inputDisplay,
     NumberField: inputDisplay,
     StringField: inputDisplay
-  }
+  };
 
   const submitButton = () => {
     return  <div className={classes.buttons}>
       <Button
-          type={"submit"}
+          type={'submit'}
           component={Link}
-          to={"/form/" + entityName + "/" + id}
+          to={'/form/' + entityName + '/' + id}
           color="secondary"
-          aria-label={"Edit " + entityTitle + " " + id }
-          variant={"contained"}
+          aria-label={'Edit ' + entityTitle + ' ' + id }
+          variant={'contained'}
       >
-        Edit {entityTitle} '{id}'
+        Edit {entityTitle} &squo;{id}&squo;
       </Button>
-    </div>
-  }
+    </div>;
+  };
 
   const formContent = () => {
       return <BaseForm
@@ -143,8 +143,8 @@ const GenericDetailsView = () => {
             fields={fields}
             formData={editItem}
             submitButton={submitButton()}
-        />
-  }
+        />;
+  };
 
   return <Grid
       container
@@ -164,10 +164,10 @@ const GenericDetailsView = () => {
             <Button
                 size="small"
                 component={Link}
-                to={"/list/" + entityTitle}
+                to={'/list/' + entityTitle}
                 color="secondary"
-                aria-label={"List " + entityTitle}
-                variant={"contained"}
+                aria-label={'List ' + entityTitle}
+                variant={'contained'}
             >
               List {entityName}
             </Button>
@@ -178,7 +178,7 @@ const GenericDetailsView = () => {
           </Grid>
         </Grid>
       </Grid>
-  </Grid>
-}
+  </Grid>;
+};
 
 export default GenericDetailsView;

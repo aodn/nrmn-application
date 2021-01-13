@@ -1,7 +1,7 @@
 
 function cell(params) {
     if (params.data.Errors.length > 0) {
-        const present = params.data.Errors.map(e => e.ColunmTarget)
+        const present = params.data.Errors.map(e => e.ColunmTarget);
         const inter = present.filter(e => e === params.colDef.field);
         if (inter.length > 0)
             return {backgroundColor: 'red'};
@@ -11,12 +11,12 @@ function cell(params) {
 
 const ColunmDef = [
     {
-        field: "ID",
+        field: 'ID',
         editable: true,
         width: 100,
     },
     {
-        field: "Diver",
+        field: 'Diver',
         editable: true,
         width: 100,
         pivot: true,
@@ -25,12 +25,12 @@ const ColunmDef = [
 
     },
     {
-        field: "Buddy",
+        field: 'Buddy',
         editable: true,
         width: 100
     },
     {
-        field: "Site No",
+        field: 'Site No',
         editable: true,
         width: 100,
         hide: true,
@@ -40,51 +40,51 @@ const ColunmDef = [
 
     },
     {
-        field: "Site Name",
+        field: 'Site Name',
         editable: true,
         width: 100
     },
     {
-        field: "Latitude",
+        field: 'Latitude',
         editable: true,
         width: 100,
         cellStyle: cell
 
     },
     {
-        field: "Longitude",
+        field: 'Longitude',
         editable: true,
         width: 100,
         cellStyle: cell
 
     },
     {
-        field: "Date",
+        field: 'Date',
         editable: true,
         width: 100
     },
     {
-        field: "vis",
+        field: 'vis',
         editable: true,
         width: 100
     },
     {
-        field: "Direction",
+        field: 'Direction',
         editable: true,
         width: 100
     },
     {
-        field: "Time",
+        field: 'Time',
         editable: true,
         width: 100
     },
     {
-        field: "P-Qs",
+        field: 'P-Qs',
         editable: true,
         width: 100
     },
     {
-        field: "Depth",
+        field: 'Depth',
         editable: true,
         width: 100,
         hide: true,
@@ -92,7 +92,7 @@ const ColunmDef = [
         enableRowGroup: true,
     },
     {
-        field: "Method",
+        field: 'Method',
         editable: true,
         width: 100,
         hide: true,
@@ -100,7 +100,7 @@ const ColunmDef = [
         enableRowGroup: true,
     },
     {
-        field: "Block",
+        field: 'Block',
         editable: true,
         width: 100,
         hide: true,
@@ -108,228 +108,228 @@ const ColunmDef = [
         enableRowGroup: true,
     },
     {
-        field: "Code",
+        field: 'Code',
         editable: true,
         width: 100
     },
     {
-        field: "Species",
+        field: 'Species',
         editable: true,
         width: 100,
-        "aggFunc": "count"
+        'aggFunc': 'count'
     },
     {
-        field: "Common name",
+        field: 'Common name',
         editable: true,
         width: 100
     },
     {
-        field: "Total",
+        field: 'Total',
         editable: true,
         width: 100
     },
     {
-        field: "Inverts",
+        field: 'Inverts',
         editable: true,
         width: 100
     },
     {
-        field: "2.5",
+        field: '2.5',
         editable: true,
         width: 100
     },
     {
-        field: "5",
+        field: '5',
         editable: true,
         width: 100
     },
     {
-        field: "7.5",
+        field: '7.5',
         editable: true,
         width: 100
     },
     {
-        field: "10",
+        field: '10',
         editable: true,
         width: 100
     },
     {
-        field: "12.5",
+        field: '12.5',
         editable: true,
         width: 100
     },
     {
-        field: "15",
+        field: '15',
         editable: true,
         width: 100
     },
     {
-        field: "20",
+        field: '20',
         editable: true,
         width: 100
     },
     {
-        field: "25",
+        field: '25',
         editable: true,
         width: 100
     },
     {
-        field: "30",
+        field: '30',
         editable: true,
         width: 100
     },
     {
-        field: "35",
+        field: '35',
         editable: true,
         width: 100
     },
     {
-        field: "40",
+        field: '40',
         editable: true,
         width: 100
     },
     {
-        field: "50",
+        field: '50',
         editable: true,
         width: 100
     },
     {
-        field: "62.5",
+        field: '62.5',
         editable: true,
         width: 100
     },
     {
-        field: "75",
+        field: '75',
         editable: true,
         width: 100
     },
     {
-        field: "87.5",
+        field: '87.5',
         editable: true,
         width: 100
     },
     {
-        field: "100",
+        field: '100',
         editable: true,
         width: 100
     },
     {
-        field: "112.5",
+        field: '112.5',
         editable: true,
         width: 100
     },
     {
-        field: "125",
+        field: '125',
         editable: true,
         width: 100
     },
     {
-        field: "137.5",
+        field: '137.5',
         editable: true,
         width: 100
     },
     {
-        field: "150",
+        field: '150',
         editable: true,
         width: 100
     },
     {
-        field: "162.5",
+        field: '162.5',
         editable: true,
         width: 100
     },
     {
-        field: "175",
+        field: '175',
         editable: true,
         width: 100
     },
     {
-        field: "187.5",
+        field: '187.5',
         editable: true,
         width: 100
     },
     {
-        field: "200",
+        field: '200',
         editable: true,
         width: 100
     },
     {
-        field: "250",
+        field: '250',
         editable: true,
         width: 100
     },
     {
-        field: "300",
+        field: '300',
         editable: true,
         width: 100
     },
     {
-        field: "350",
+        field: '350',
         editable: true,
         width: 100
     },
     {
-        field: "400",
+        field: '400',
         editable: true,
         width: 100
     },
     {
-        field: "450",
+        field: '450',
         editable: true,
         width: 100
     },
     {
-        field: "500",
+        field: '500',
         editable: true,
         width: 100
     },
     {
-        field: "550",
+        field: '550',
         editable: true,
         width: 100
     },
     {
-        field: "600",
+        field: '600',
         editable: true,
         width: 100
     },
     {
-        field: "650",
+        field: '650',
         editable: true,
         width: 100
     },
     {
-        field: "700",
+        field: '700',
         editable: true,
         width: 100
     },
     {
-        field: "750",
+        field: '750',
         editable: true,
         width: 100
     },
     {
-        field: "800",
+        field: '800',
         editable: true,
         width: 100
     },
     {
-        field: "850",
+        field: '850',
         editable: true,
         width: 100
     },
     {
-        field: "900",
+        field: '900',
         editable: true,
         width: 100
     },
     {
-        field: "950",
+        field: '950',
         editable: true,
         width: 100
     },
     {
-        field: "1000",
+        field: '1000',
         editable: true,
         width: 100
     }

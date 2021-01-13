@@ -1,18 +1,18 @@
-import React from "react";
-import {Box, Typography, Button} from "@material-ui/core";
-import {useSelector, useDispatch} from "react-redux";
+import React from 'react';
+import {Box, Typography, Button} from '@material-ui/core';
+import {useSelector, useDispatch} from 'react-redux';
 import {useEffect} from 'react';
-import {useParams, NavLink} from "react-router-dom";
+import {useParams, NavLink} from 'react-router-dom';
 import pluralize from 'pluralize';
-import {AgGridReact} from "ag-grid-react/lib/agGridReact";
-import useWindowSize from "../utils/useWindowSize";
-import Alert from "@material-ui/lab/Alert";
-import config from "react-global-configuration";
-import {titleCase} from "title-case";
-import Grid from "@material-ui/core/Grid";
-import CustomTooltip from "./customTooltip";
-import {selectRequested} from "./middleware/entities";
-import {resetState} from "./form-reducer";
+import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
+import useWindowSize from '../utils/useWindowSize';
+import Alert from '@material-ui/lab/Alert';
+import config from 'react-global-configuration';
+import {titleCase} from 'title-case';
+import Grid from '@material-ui/core/Grid';
+import CustomTooltip from './customTooltip';
+import {selectRequested} from './middleware/entities';
+import {resetState} from './form-reducer';
 
 
 const cellRenderer = (params) => {
@@ -23,7 +23,7 @@ const cellRenderer = (params) => {
     );
   };
   return params.value;
-}
+};
 
 const schematoColDef = (schema, size, entityName) => {
 
@@ -38,35 +38,35 @@ const schematoColDef = (schema, size, entityName) => {
       // make every column use 'text' filter by default
       filter: 'agTextColumnFilter',
       cellRenderer: cellRenderer
-    }
+    };
   });
 
   coldefs.push({
-    field: "Links",
+    field: 'Links',
     filter: undefined,
     cellRenderer: function (params) {
       const linkPath = nonGenericEntities[entityName]?.linkPath;
-      let linkLabel = "Edit";
-      let link = "/";
+      let linkLabel = 'Edit';
+      let link = '/';
       if (params.data._links) {
-        const hrefSplit = params.data._links.self.href.split("/");
+        const hrefSplit = params.data._links.self.href.split('/');
         const id = hrefSplit.pop();
         const ent = hrefSplit.pop();
 
         if ((entityName in nonGenericEntities) && linkPath) {
-          link =  "/" + linkPath.replace(/{(.*?)}/, id);
+          link =  '/' + linkPath.replace(/{(.*?)}/, id);
           linkLabel = (nonGenericEntities[entityName]?.linkLabel) ? nonGenericEntities[entityName]?.linkLabel : linkLabel;
         }
         else {
-          link = "/edit/" + ent + "/" + id;
-          linkLabel = "Edit";
+          link = '/edit/' + ent + '/' + id;
+          linkLabel = 'Edit';
         }
         return '<a href="' + link + '">' + linkLabel + '</a>';
       }
     }
-  })
+  });
   return coldefs;
-}
+};
 
 let agGridApi = {};
 
@@ -76,14 +76,14 @@ const renderError = (msgArray) => {
           severity="error"
           variant="filled"
     >{msgArray.join('\r\n ')}
-    </Alert></Box>
-}
+    </Alert></Box>;
+};
 
 const nonGenericEntities = {
   'StagedJob': {
-    title: "Jobs",
-    createButtonPath: "/import-file", // createButtonPath absence means no create button will show
-    linkPath: "linkToSomewherePath/{}"
+    title: 'Jobs',
+    createButtonPath: '/import-file', // createButtonPath absence means no create button will show
+    linkPath: 'linkToSomewherePath/{}'
   }
 };
 
@@ -106,7 +106,7 @@ const EntityList = () => {
     agGridApi = Object.create(agGrid.api);
     agGridApi.setRowData(items);
     Object.freeze(agGridApi);
-  }
+  };
 
   useEffect(() => {
     dispatch(resetState());
@@ -116,7 +116,7 @@ const EntityList = () => {
   const getEntitySchema = () => {
     return (schemaDefinition[titleCase(entityName)]) ? (schemaDefinition[titleCase(entityName)]) :
         (schemaDefinition[entityName]);
-  }
+  };
 
   const getTitle =  () => {
     let thisTitle = nonGenericEntities[entityName]?.title;
@@ -124,27 +124,27 @@ const EntityList = () => {
       return thisTitle;
     }
     else {
-      return entityName
+      return entityName;
     }
-  }
+  };
 
   const newEntityButton = () => {
     let createButtonPath = nonGenericEntities[entityName]?.createButtonPath;
     if (!(entityName in nonGenericEntities) || createButtonPath) {
-      const to = (createButtonPath) ? createButtonPath : "/edit/" + entityNamePlural;
-      return <Button title={"Add new " + getTitle()}
+      const to = (createButtonPath) ? createButtonPath : '/edit/' + entityNamePlural;
+      return <Button title={'Add new ' + getTitle()}
                      component={NavLink}
                      to={to}
                      color="secondary"
-                     aria-label={"Add " + getTitle()}
-                     variant={"contained"}
+                     aria-label={'Add ' + getTitle()}
+                     variant={'contained'}
       >New {titleCase(getTitle())}
-      </Button>
+      </Button>;
     }
-  }
+  };
 
   if (Object.keys(schemaDefinition).length === 0) {
-    return (renderError(["Error: API not yet loaded"]));
+    return (renderError(['Error: API not yet loaded']));
   }
   else {
 
@@ -172,7 +172,7 @@ const EntityList = () => {
             </Grid>
 
             <div style={{width: '100%', height: size.height - 170, marginTop: 25}}
-                 className={themeType ? "ag-theme-alpine-dark" : "ag-theme-alpine"}>
+                 className={themeType ? 'ag-theme-alpine-dark' : 'ag-theme-alpine'}>
               <AgGridReact
                   columnDefs={colDef}
                   rowSelection="single"
@@ -191,13 +191,13 @@ const EntityList = () => {
                     }
                   }}/>
             </div>
-            {(!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : ""}
-            {(errors.length > 0) ? renderError(errors) : ""}
+            {(!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : ''}
+            {(errors.length > 0) ? renderError(errors) : ''}
           </Box>
         </>
-    )
+    );
   }
-}
+};
 
 export default EntityList;
 

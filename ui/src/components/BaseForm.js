@@ -1,12 +1,12 @@
 import React from 'react';
-import Box from "@material-ui/core/Box";
+import Box from '@material-ui/core/Box';
 import Alert from '@material-ui/lab/Alert';
-import Grid from "@material-ui/core/Grid";
-import Form from "@rjsf/material-ui"
-import makeStyles from "@material-ui/core/styles/makeStyles";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import Button from "@material-ui/core/Button";
-import green from "@material-ui/core/colors/green";
+import Grid from '@material-ui/core/Grid';
+import Form from '@rjsf/material-ui';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Button from '@material-ui/core/Button';
+import green from '@material-ui/core/colors/green';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -50,12 +50,12 @@ const BaseForm = (params) => {
 
   function getErrors(errors) {
     return errors.map((  item, key) => {
-      return <div key={key}>{item}</div>
-    })
+      return <div key={key}>{item}</div>;
+    });
   }
 
   let errorAlert = params.errors ? <Alert  severity="error" variant="filled" >{getErrors(params.errors)}
-  </Alert> : "";
+  </Alert> : '';
 
   return <>
     <Grid
@@ -63,7 +63,7 @@ const BaseForm = (params) => {
         spacing={0}
         alignItems="center"
         justify="center"
-        style={{ minHeight: "70vh" }}
+        style={{ minHeight: '70vh' }}
     >
         <Box pt={4} px={6} pb={6} className={classes.root} >
           <Form
@@ -92,7 +92,7 @@ const BaseForm = (params) => {
         </Box>
     </Grid>
   </>;
-}
+};
 
 export default BaseForm;
 

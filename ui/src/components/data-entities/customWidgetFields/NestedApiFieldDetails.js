@@ -1,12 +1,12 @@
-import React from "react";
+import React from 'react';
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import pluralize from 'pluralize';
-import {selectedItemsRequested} from "../middleware/entities";
-import {markupProjectionQuery} from "../../utils/helpers";
-import Grid from "@material-ui/core/Grid";
-import ObjectListViewTemplate from "../ObjectListViewTemplate";
+import {selectedItemsRequested} from '../middleware/entities';
+import {markupProjectionQuery} from '../../utils/helpers';
+import Grid from '@material-ui/core/Grid';
+import ObjectListViewTemplate from '../ObjectListViewTemplate';
 
 
 const NestedApiFieldDetails = (props) => {
@@ -16,7 +16,7 @@ const NestedApiFieldDetails = (props) => {
   const entity = props.name ;
   const pluralEntity = pluralize(entity);
 
-  let selectedItems = (editItemValues[entity + "Selected"]) ? [editItemValues[entity + "Selected"]].filter(Boolean) : [];
+  let selectedItems = (editItemValues[entity + 'Selected']) ? [editItemValues[entity + 'Selected']].filter(Boolean) : [];
 
   useEffect(() => {
     if (selectedItems.length === 0 && editItemValues._links) {

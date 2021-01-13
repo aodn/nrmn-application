@@ -1,13 +1,13 @@
-import React from "react";
+import React from 'react';
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import pluralize from 'pluralize';
-import {Typography} from "@material-ui/core";
-import {selectedItemsRequested, setNestedField} from "../middleware/entities";
-import {markupProjectionQuery} from "../../utils/helpers";
+import {Typography} from '@material-ui/core';
+import {selectedItemsRequested, setNestedField} from '../middleware/entities';
+import {markupProjectionQuery} from '../../utils/helpers';
 
 
 const NestedApiField = (props) => {
@@ -18,7 +18,7 @@ const NestedApiField = (props) => {
   const pluralEntity = pluralize(entity);
 
   let itemsList = (editItemValues[pluralEntity]) ?editItemValues[pluralEntity][pluralEntity] : [];
-  let selectedItems = (editItemValues[entity + "Selected"]) ? [editItemValues[entity + "Selected"]].filter(Boolean) : [];
+  let selectedItems = (editItemValues[entity + 'Selected']) ? [editItemValues[entity + 'Selected']].filter(Boolean) : [];
 
 
   useEffect(() => {
@@ -32,21 +32,21 @@ const NestedApiField = (props) => {
 
   return (itemsList.length > 0) ? (
     <>
-       <Typography variant={"h5"}>{entity}</Typography>
+       <Typography variant={'h5'}>{entity}</Typography>
        <Autocomplete
-        id={"select-auto-"+ entity}
+        id={'select-auto-'+ entity}
         options={itemsList}
         multiple={props.multiple}
         getOptionLabel={(option) => option.label}
         defaultValue={(props.multiple) ? selectedItems : selectedItems[0]}
         filterSelectedOptions
         onChange={(event, newValues) => dispatch(setNestedField({newValues, entity}))}
-        renderInput={(params) => <TextField {...params} label={"Select " + entity} variant="outlined" />}
+        renderInput={(params) => <TextField {...params} label={'Select ' + entity} variant="outlined" />}
       />
     </>
   ) : (<>
-    <Typography variant={"h5"}>{pluralEntity}</Typography>
-    <div>add item</div></>)
+    <Typography variant={'h5'}>{pluralEntity}</Typography>
+    <div>add item</div></>);
 
 };
 
