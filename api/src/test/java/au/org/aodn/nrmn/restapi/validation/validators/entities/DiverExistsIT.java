@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.validation.validators.entities;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
@@ -29,7 +30,7 @@ class DiverExistsIT {
         val stage = new StagedRow();
         stage.setDiver("NOP");
         stage.setStagedJob(job);
-        val diverFound = new DiverExists(StagedRow::getDiver, "Diver", diverRepo).valid(stage);
+        val diverFound = new DiverExists(StagedRow::getDiver, "Diver", diverRepo, ValidationLevel.BLOCKING).valid(stage);
         assertTrue(diverFound.isInvalid());
     }
 
@@ -40,7 +41,7 @@ class DiverExistsIT {
         val stage = new StagedRow();
         stage.setStagedJob(job);
         stage.setDiver("TJR");
-        val diverFound = new DiverExists(StagedRow::getDiver, "Diver", diverRepo).valid(stage);
+        val diverFound = new DiverExists(StagedRow::getDiver, "Diver", diverRepo, ValidationLevel.BLOCKING).valid(stage);
         assertTrue(diverFound.isValid());
     }
 }

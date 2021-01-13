@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.validation.validators.data;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
@@ -39,6 +40,7 @@ public class BeforeDateCheck extends BaseFormattedValidator {
                         errMsg
                 ),
                 ValidationCategory.DATA,
+                ValidationLevel.BLOCKING,
                 columnTarget,
                 target.getRef()
         ), Function.identity());
