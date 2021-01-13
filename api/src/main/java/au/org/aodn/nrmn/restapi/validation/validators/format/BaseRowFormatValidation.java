@@ -48,7 +48,7 @@ public abstract class BaseRowFormatValidation<T> extends BaseRowValidator {
         ).orElseGet(() ->
                 Validated.invalid(
                         getError(target,
-                                this.columnTarget + " format is invalid," + "expected format: " + this.format)
+                                this.columnTarget + " is invalid, expected : " + this.format)
                 )
         );
     }

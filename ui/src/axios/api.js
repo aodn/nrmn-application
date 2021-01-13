@@ -10,7 +10,7 @@ function getToken() {
 
 function getAxiosPromise(method, path, params, contentType) {
   return axiosInstance({
-    headers: { 'Content-Type': (contentType) ? contentType: 'application/json' },
+    headers: { 'Content-Type': (contentType) ? contentType : 'application/json' },
     method: method,
     url: path,
     data: params
@@ -61,21 +61,21 @@ export const user = params => {
 
 
 
-export const apiDefinition = () =>  axiosInstance.get('/v3/api-docs').then(res => res);
+export const apiDefinition = () => axiosInstance.get('/v3/api-docs').then(res => res);
 
-export const getEntity = (entity) => axiosInstance.get('/api/' + entity).then(res=>res);
+export const getEntity = (entity) => axiosInstance.get('/api/' + entity).then(res => res);
 
-export const getResource = (url) => axiosInstance.get(url).then(res=>res);
+export const getResource = (url) => axiosInstance.get(url).then(res => res);
 
 
 export const getSelectedEntityItems = (paths) => axiosInstance.all([
-    axiosInstance.get('/api/' + paths[0]),
-    (paths[1]) ? axiosInstance.get(paths[1]) : null,
-  ]).then(resp => {
-    let response = resp[0].data;
-    response.selected = (resp[1]) ? resp[1].data : null;
-    return response;
-  });
+  axiosInstance.get('/api/' + paths[0]),
+  (paths[1]) ? axiosInstance.get(paths[1]) : null,
+]).then(resp => {
+  let response = resp[0].data;
+  response.selected = (resp[1]) ? resp[1].data : null;
+  return response;
+});
 
 
 export const entitySave = (entity, params) => {
@@ -84,15 +84,15 @@ export const entitySave = (entity, params) => {
 
 export const entityEdit = (path, params) => {
 
-  let axiosPromises = [getAxiosPromise('put', path ,params)];
+  let axiosPromises = [getAxiosPromise('put', path, params)];
 
-  Object.keys(params).filter( key => {
+  Object.keys(params).filter(key => {
     if (key.endsWith('Selected')) {
       const thisnestedEntity = key.replace('Selected', '');
       axiosPromises.push(getAxiosPromise('put', path + '/' + thisnestedEntity, params[key]._links.self.href, 'text/uri-list'));
     }
   });
-  return axiosInstance.all(axiosPromises).then(res => res );
+  return axiosInstance.all(axiosPromises).then(res => res);
 };
 
 export const entityRelation = (entity, urls) => {
@@ -109,10 +109,10 @@ export const getDataJob = (jobId) => (
 );
 
 export const postJobValidation = (jobId) => (
-  axiosInstance.post('api/stage/validate/'+ jobId).then(res => res)
+  axiosInstance.post('api/stage/validate/' + jobId).then(res => res)
 );
 export const updateRow = (id, row) => (
-  axiosInstance.put('api/stage/update/'+ id, row).then(res => res)
+  axiosInstance.put('api/stage/update/' + id, row).then(res => res)
 );
 
 export const submitJobFile = (params) => {
@@ -138,5 +138,9 @@ export const submitJobFile = (params) => {
     data,
     config
   ).then(res => res);
+};
+
+export const  submitingest = (jobId) => {
+  return axiosInstance.post('/api/ingest/' + jobId).then(res => res);
 };
 

@@ -1,13 +1,14 @@
-import { Badge, Box, Chip, Fab, Grid, Typography } from '@material-ui/core';
+import { Badge, Box, Chip, CircularProgress, Fab, Grid, Typography } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import DataSheetView from './DataSheetView';
 import PlaylistAddCheckOutlinedIcon from '@material-ui/icons/PlaylistAddCheckOutlined';
 import { makeStyles } from '@material-ui/core/styles';
-import { useParams } from 'react-router';
-import { JobRequested, JobStarting, validationFilter, ValidationRequested } from './reducers/create-import';
+import { Redirect, useParams } from 'react-router';
+import { ingestStarting, JobRequested, JobStarting, SubmitingestRequested, validationFilter, ValidationRequested } from './reducers/create-import';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutlined';
+import { Backdrop } from '@material-ui/core';
 
 import ValidationDrawer from './ValidationDrawer';
 
@@ -37,11 +38,23 @@ const ValidationJob = () => {
 
     const isLoading = useSelector(state => state.import.isLoading);
     const editLoading = useSelector(state => state.import.editLoading);
+    const enableSubmit = useSelector(state => state.import.enableSubmit);
+    const submitLoading = useSelector(state => state.import.submitLoading);
+    const ingestSuccess = useSelector(state => state.import.ingestSuccess);
+
+
 
     const handleValidate = () => {
         if (job.id) {
             dispatch(JobStarting());
             dispatch(ValidationRequested(job.id));
+        }
+    };
+
+    const handleSubmit = () => {
+        if (job.id) {
+            dispatch(ingestStarting());
+            dispatch(SubmitingestRequested(job.id));
         }
     };
 
@@ -51,6 +64,9 @@ const ValidationJob = () => {
         }
     }, []);
 
+    if (ingestSuccess) {
+        return (<Redirect to="/"></Redirect>);
+    }
     const jobReady = job && Object.keys(job).length > 0;
     return (jobReady) ? (
         <Box style={{ paddingRight: 60 }}>
@@ -73,7 +89,7 @@ const ValidationJob = () => {
                         </Grid>
                         <Grid item>
 
-                            <Fab variant="extended" size="small" label="Submit" disabled={true} color="primary">
+                            <Fab variant="extended" size="small" onClick={handleSubmit} label="Submit" disabled={!enableSubmit} color="primary">
                                 <CloudUploadIcon className={classes.extendedIcon} />
                          Submit
                      </Fab>
@@ -110,6 +126,15 @@ const ValidationJob = () => {
                     </Grid>}
             </Grid>
             <DataSheetView></DataSheetView>
+            <Backdrop open={submitLoading}>
+                <Typography variant="h2" >Ingesting...</Typography>
+                <CircularProgress color="inherit" ></CircularProgress>
+
+            </Backdrop>
+            <Backdrop open={isLoading}>
+                <Typography variant="h2" >Validating... </Typography>
+                <CircularProgress color="inherit" ></CircularProgress>
+            </Backdrop>
         </Box>
     ) : (<></>);
 };

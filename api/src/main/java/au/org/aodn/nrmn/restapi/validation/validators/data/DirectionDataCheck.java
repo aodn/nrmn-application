@@ -23,7 +23,7 @@ public class DirectionDataCheck extends BaseRowValidator {
                 new StagedRowError(
                         new ErrorID(target.getId(),
                                 target.getStagedJob().getId(),
-                                columnTarget + "format should be a valid direction: N,NE,E,SE,S,SW,W,NW"),
+                                target.getDirection() + " is invalid, expected: N,NE,E,SE,S,SW,W,NW"),
                         ValidationCategory.DATA,
                         ValidationLevel.WARNING,
                         columnTarget,

@@ -142,11 +142,12 @@ const ValidationDrawer = () => {
     };
 
     var errList = errorsByMsg;
-    if (filter !== '') {
-        errList = errorsByMsg.filter(err => err.msg.toLowerCase().indexOf(filter) >= 0);
+    if (errList && errList.length > 0 && filter !== '') {
+        errList = errList.filter(err => err.msg.toLowerCase().indexOf(filter) >= 0);
     }
 
-    return (errorsByMsg) ? (
+
+    return (errorsByMsg && errorsByMsg.length > 0) ? (
         <Drawer anchor="right"
             variant="permanent"
             className={clsx(classes.drawer, {
@@ -161,7 +162,6 @@ const ValidationDrawer = () => {
             }}
         >
             <div className={classes.toolbar}>
-
             </div>
             <Divider />
             <Box>

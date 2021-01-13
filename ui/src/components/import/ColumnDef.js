@@ -8,12 +8,16 @@ function cell(params) {
     }
     return null;
 }
+const hashValueGetter = (params) => {
+    return params.node.rowIndex;
+};
 
 export const ColumnDef = [
     {
         field: 'id',
         editable: false,
-        width: 75
+        width: 75,
+        hashValueGetter: hashValueGetter
     },
     {
         field: 'diver',
@@ -21,7 +25,8 @@ export const ColumnDef = [
         width: 100,
         pivot: true,
         enablePivot: false,
-        cellStyle: cell
+        cellStyle: cell,
+        hashValueGetter: hashValueGetter
 
     },
     {

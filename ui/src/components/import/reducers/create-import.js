@@ -8,6 +8,9 @@ const importState = {
     success: false,
     isLoading: false,
     editLoading: false,
+    ingestLoading: false,
+    submitReady: false,
+    ingestSuccess : false,
     percentCompleted: 0,
     errors: [],
     rows: [],
@@ -93,6 +96,7 @@ const importSlice = createSlice({
             if (action.payload.rows.length > 0) {
                 state.rows = action.payload.rows.map(row => exportRow(row));
                 const validationErrors = mergeErrors(state.rows);
+               state.EnableSubmit = validationErrors.filter(err => err.level === 'BLOCKING').length === 0;
                 const errorsGrouped = groupBy(validationErrors, (row) => row.message);
                 console.log(errorsGrouped);
                 state.errorsByMsg = [...errorsGrouped.keys()].map(key => {
@@ -112,6 +116,8 @@ const importSlice = createSlice({
                     return err1.level === 'BLOCKING' ? -1 : 1;
                 });
                 console.log(state.errorsByMsg);
+            } else {
+                state.EnableSubmit = true;
             }
             state.isLoading = false;
 
@@ -127,6 +133,16 @@ const importSlice = createSlice({
         },
         JobFinished: (state) => {
             state.isLoading = false;
+        },
+        ingestStarting: (state, action) => {
+            state.ingestLoading = true;
+        },
+        ingestFinished: (state, action) => {
+            state.ingestLoading = false;
+            state.ingestSuccess = true;
+        },
+        EnableSubmit: (state, action) => {
+            state.submitReady = action.payload;
         }
     }
 });
@@ -143,9 +159,12 @@ export const {
     JobReady,
     ImportStarted,
     ImportLoaded,
+    ingestStarting,
+    ingestFinished,
+    EnableSubmit,
     ImportFailed } = importSlice.actions;
 export const ImportRequested = createAction('IMPORT_REQUESTED', function (xlsFile) { return { payload: xlsFile }; });
 export const JobRequested = createAction('JOB_REQUESTED', function (jobId) { return { payload: jobId }; });
 export const ValidationRequested = createAction('VALIDATION_REQUESTED', function (jobId) { return { payload: jobId }; });
 export const RowUpdateRequested = createAction('ROW_UDPDATE_REQUESTED', function (id, row) { return { payload: { id: id, row: row } }; });
-
+export const SubmitingestRequested = createAction('SUBMIT_ingest_REQUESTED', function (jobId) { return { payload: jobId }; });
