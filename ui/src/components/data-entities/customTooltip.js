@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 
 export default class CustomTooltip extends Component {
 
@@ -17,19 +18,20 @@ export default class CustomTooltip extends Component {
 
       if (data.length > 0) {
         return (
-              <div className={"custom-tooltip"} >
+              <div className={'custom-tooltip'} >
               <span>
-                <div className={"body"}>
-                  {data.split(",").map( item => <p key={ _.uniqueId('tooltipItem-')} >{item}</p>)}
+                <div className={'body'}>
+                  {data.split(',').map( item => <p key={ _.uniqueId('tooltipItem-')} >{item}</p>)}
                 </div>
               </span>
             </div>
         );
       }
     }
-
-    return (<div className={"custom-tooltip ag-tooltip-hiding"} ></div>)
-
-
+    return (<div className={'custom-tooltip ag-tooltip-hiding'} ></div>);
   }
 }
+
+CustomTooltip.propTypes = {
+  value: PropTypes.any,
+};

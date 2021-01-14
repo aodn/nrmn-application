@@ -1,31 +1,31 @@
 import {
     createSlice,
     createAction
-} from "@reduxjs/toolkit";
-import { FilledInput } from "@material-ui/core";
+} from '@reduxjs/toolkit';
+import { FilledInput } from '@material-ui/core';
 
 
 const importState = {
     isLoading: false,
     sheet: [],
-    fileID: ""
-}
+    fileID: ''
+};
 
 const array2obj = (header, rowArr) => {
     const obj = {};
     header.forEach((key, i) => {
-        obj[key] = rowArr[i]
-    })
+        obj[key] = rowArr[i];
+    });
     return obj;
-}
+};
 
 export const arrray2JSON = (sheet) => {
     const header = sheet.shift();
     sheet.shift();
     return sheet.map(rowArr => {
-        return array2obj(header, rowArr)
+        return array2obj(header, rowArr);
     });
-}
+};
 
 
 export const exportRow = (row) => {
@@ -41,12 +41,12 @@ export const flatten = (row) => {
    const measures = row.MeasureJson;
    if (measures) {
     delete row.MeasureJson;
-     return Object.assign(row, measures)
+     return Object.assign(row, measures);
    }
    return row;
-}
+};
 const importSlice = createSlice({
-    name: "import",
+    name: 'import',
     initialState: importState,
     reducers: {
         rawSurveyReady: (state, action) => {
@@ -54,24 +54,24 @@ const importSlice = createSlice({
             state.sheet = action.payload.Rows;
         },
         ImportStarted: (state, action) =>  {
-            console.log("started")
+            console.log('started');
             state.isLoading = true;
         },
         ImportLoaded: (state, action) => {
-            console.log("loaded")
+            console.log('loaded');
 
             state.isLoading  = false;
         },
         ImportFailed: (state, action) => {
             state.isLoading  = false;
-            console.log("data import falied:", action)
+            console.log('data import falied:', action);
         }
     }
 });
 
 export const importReducer = importSlice.reducer;
 export const { rawSurveyReady,ImportStarted, ImportLoaded, ImportFailed } = importSlice.actions;
-export const ImportRequested = createAction('IMPORT_REQUESTED', function (xlsFile) { return { payload: xlsFile } });
-export const FileRequested = createAction('FILE_REQUESTED', function(fileID) { return {payload: fileID}});
+export const ImportRequested = createAction('IMPORT_REQUESTED', function (xlsFile) { return { payload: xlsFile }; });
+export const FileRequested = createAction('FILE_REQUESTED', function(fileID) { return {payload: fileID};});
 
 

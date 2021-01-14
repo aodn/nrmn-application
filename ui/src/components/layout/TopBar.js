@@ -9,9 +9,10 @@ import clsx from 'clsx';
 import { toggleLeftSideMenu } from './layout-reducer';
 import { connect } from 'react-redux';
 import store from '../store';
-import AuthState from "./AuthState";
+import AuthState from './AuthState';
+import Button from '@material-ui/core/Button';
 import SettingsMenu from "./SettingsMenu";
-import Button from "@material-ui/core/Button";
+import {PropTypes} from 'prop-types';
 
 const drawerWidth = 240;
 
@@ -20,9 +21,9 @@ const useStyles = makeStyles((theme) => ({
     fontFamily: [
       'Lora'
     ].join(','),
-    color: "#FFF",
-    fontSize: "x-large",
-    textTransform: "initial",
+    color: '#FFF',
+    fontSize: 'x-large',
+    textTransform: 'initial',
     paddingRight: 15,
     paddingLeft: 15,
     '&:hover': {
@@ -31,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   spacer: {
-    "& > *": {
+    '& > *': {
       marginLeft: 10,
       marginRight: 10,
       padding: 10
@@ -64,8 +65,8 @@ const mapStateToProps = state => {
 };
 
 const handleClick = () => {
-  store.dispatch(toggleLeftSideMenu())
-}
+  store.dispatch(toggleLeftSideMenu());
+};
 
 const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
   const classes = useStyles();
@@ -99,7 +100,7 @@ const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
                   <img
                       width={100}
                       src={'https://static.emii.org.au/images/logo/IMOS-Ocean-Portal-logo.png'}
-                      alt={"IMOS Logo"}
+                      alt={'IMOS Logo'}
                   />
                 </Grid>
                 <Grid item>
@@ -122,8 +123,10 @@ const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
       </Grid>
     </Toolbar>
   </AppBar>
-  )
+  );
 };
-
+ReduxTopBar.propTypes = {
+  leftSideMenuIsOpen : PropTypes.bool
+};
 const TopBar = connect(mapStateToProps)(ReduxTopBar);
 export default TopBar;

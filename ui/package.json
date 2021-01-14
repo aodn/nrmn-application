@@ -21,6 +21,7 @@
     "ag-grid-react": "^23.2.1",
     "axios": "^0.19.2",
     "chai": "^4.2.0",
+    "eslint": "^7.14.0",
     "lodash": "^4.17.20",
     "material-ui-dropzone": "^3.3.0",
     "moment-timezone": "^0.5.31",
@@ -52,9 +53,6 @@
     "build-storybook": "build-storybook -s public",
     "ci-build-storybook": "build-storybook -c .storybook -o public/storybook"
   },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -76,7 +74,15 @@
     "@storybook/addons": "^5.3.7",
     "@storybook/preset-create-react-app": "^1.5.2",
     "@storybook/react": "^5.3.7",
+    "babel-eslint": "^10.1.0",
     "clsx": "^1.1.1",
+    "craco-eslint-webpack-plugin": "^1.0.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-babel": "^5.3.1",
+    "eslint-plugin-no-console-log": "^2.0.0",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "eslint-webpack-plugin": "^2.4.1",
     "flow-bin": "^0.130.0",
     "history": "^5.0.0",
     "prettier": "1.19.1"

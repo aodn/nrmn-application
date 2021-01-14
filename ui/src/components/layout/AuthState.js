@@ -1,13 +1,13 @@
-import React from "react";
-import {connect} from "react-redux";
-import { Link } from 'react-router-dom'
+import React from 'react';
+import {connect} from 'react-redux';
+import { Link } from 'react-router-dom';
 import store from '../store';
 import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import { TopbarButton } from './TopbarButton'
-import Logout from "../auth/logout";
-import {toggleLogoutMenuOpen} from "./layout-reducer";
-
+import { TopbarButton } from './TopbarButton';
+import Logout from '../auth/logout';
+import {toggleLogoutMenuOpen} from './layout-reducer';
+import {PropTypes} from 'prop-types';
 const basicButton = {
   textTransform: 'none',
   fontWeight: 300
@@ -16,7 +16,7 @@ const basicButton = {
 class AuthState extends React.Component {
 
   openLogout = () => {
-    store.dispatch(toggleLogoutMenuOpen())
+    store.dispatch(toggleLogoutMenuOpen());
   }
 
   render(){
@@ -32,10 +32,10 @@ class AuthState extends React.Component {
                     variant="text"
                     color="secondary"
                     size="small"
-                    title={"Log out"}
+                    title={'Log out'}
                     style={ basicButton}
                     startIcon={<VerifiedUserIcon />}
-                    onClick={this.openLogout}> Logged in as '{ username }'</TopbarButton>
+                    onClick={this.openLogout}> { username }</TopbarButton>
                 <Logout />
               </> :
               <>
@@ -49,7 +49,7 @@ class AuthState extends React.Component {
               </>
           }
         </>
-    )
+    );
   }
 }
 
@@ -58,5 +58,7 @@ function mapStateToProps(state) {
     username: state.auth.username
   };
 }
-
+AuthState.propTypes = {
+  username: PropTypes.string
+};
 export default connect(mapStateToProps)(AuthState);

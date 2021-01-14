@@ -5,7 +5,7 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux';
 import store from './components/store';
-import {apiDefinition} from "./axios/api";
+import {apiDefinition} from './axios/api';
 import config from 'react-global-configuration';
 
 

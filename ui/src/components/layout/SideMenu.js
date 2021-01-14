@@ -21,8 +21,10 @@ import { toggleLeftSideMenu } from './layout-reducer';
 import store from '../store';
 import {
     NavLink
-  } from "react-router-dom";
-import {ArrowRight} from "@material-ui/icons";
+  } from 'react-router-dom';
+import {ArrowRight} from '@material-ui/icons';
+import {PropTypes} from 'prop-types';
+
 
 
 const drawerWidth = 240;
@@ -50,18 +52,18 @@ const mapStateToProps = state => {
   };
 
 const handleMainMenu = () => {
-    store.dispatch(toggleLeftSideMenu())
-}
+    store.dispatch(toggleLeftSideMenu());
+};
 
 const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
     const [openSub, setOpenSub] = React.useState(true);
     const classes = useStyles();
     const theme = useTheme();
-    
+
     const handleClick = () => {
         setOpenSub(!openSub);
     };
-    
+
     return (
         <Drawer className={classes.drawer}
             variant="persistent"
@@ -105,7 +107,7 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
             <List>
                 <ListSubheader>REFERENCE DATA</ListSubheader>
                 {['Diver', 'Location', 'ObservableItem', 'Program', 'Site', 'Survey'].map((text, index) => (
-                    <ListItem button key={text} component={NavLink} to={"/list/" + text} >
+                    <ListItem button key={text} component={NavLink} to={'/list/' + text} >
                         <ListItemText primary={text} />
                     </ListItem>
                 ))}
@@ -121,6 +123,10 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
                 ))}
             </List>
         </Drawer>);
-}
+};
+
+ReduxSideMenu.propTypes = {
+    leftSideMenuIsOpen : PropTypes.bool
+};
 const SideMenu = connect(mapStateToProps)(ReduxSideMenu);
 export default SideMenu;

@@ -1,7 +1,7 @@
 import {
   createSlice
-} from "@reduxjs/toolkit";
-import pluralize from "pluralize";
+} from '@reduxjs/toolkit';
+import pluralize from 'pluralize';
 
 
 const formState = {
@@ -13,7 +13,7 @@ const formState = {
 
 
 const formSlice = createSlice({
-  name: "form",
+  name: 'form',
   initialState: formState,
   reducers: {
     resetState: (state, action) => {
@@ -27,7 +27,7 @@ const formSlice = createSlice({
       state.errors = [];
     },
     entitiesError: (state, action) => {
-      const error = (action.payload.e.response?.data?.error) ? action.payload.e.response.data.error : "Error while getting the entity data"
+      const error = (action.payload.e.response?.data?.error) ? action.payload.e.response.data.error : 'Error while getting the entity data';
       state.entities = [];
       state.errors = [error];
     },
@@ -37,7 +37,7 @@ const formSlice = createSlice({
     selectedItemsEdited: (state, action) => {
       let resp = {};
       const key = Object.keys(action.payload)[0];
-      resp[key + "Selected"] = action.payload[key];
+      resp[key + 'Selected'] = action.payload[key];
       resp[key] = action.payload[key]._links.self.href;
       state.editItem = {...state.editItem, ...resp};
     },
@@ -46,12 +46,11 @@ const formSlice = createSlice({
       const key = Object.keys(action.payload._embedded)[0];
       const singularKey = pluralize.singular(key);
       resp[key] = action.payload._embedded;
-      resp[singularKey + "Selected"] = action.payload.selected;
+      resp[singularKey + 'Selected'] = action.payload.selected;
       resp[singularKey] = (action.payload.selected) ? action.payload.selected._links.self.href: undefined;
       state.editItem = {...state.editItem, ...resp};
     },
     entitiesSaved: (state, action) => {
-      debugger
       state.entitySaved = action.payload;
     }
   },
