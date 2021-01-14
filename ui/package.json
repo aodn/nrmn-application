@@ -24,6 +24,7 @@
     "eslint": "^7.14.0",
     "global": "^4.4.0",
     "jss-plugin-global": "^10.5.0",
+    "lodash": "^4.17.20",
     "material-ui-dropzone": "^3.3.0",
     "moment-timezone": "^0.5.31",
     "parse-data-url": "^3.0.0",
@@ -53,9 +54,6 @@
     "storybook": "start-storybook -p 9009 -s public",
     "build-storybook": "build-storybook -s public",
     "ci-build-storybook": "build-storybook -c .storybook -o public/storybook"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "browserslist": {
     "production": [

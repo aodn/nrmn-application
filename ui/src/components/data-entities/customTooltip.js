@@ -35,5 +35,5 @@ export default class CustomTooltip extends Component {
 }
 
 CustomTooltip.propTypes = {
-  value: PropTypes.object
+  value: PropTypes.any,
 };

@@ -20,18 +20,14 @@ axiosInstance.interceptors.response.use((response) => {
     localStorage.clear();
     window.location = `/login?redirect=${window.location.pathname}`;
   }
-  else {
-    if ( 404 === error.response?.status) {
-      if (process.env.NODE_ENV !== 'development') {
-        window.location = `/notfound?resource=${window.location.pathname}`;
-      }
-      else {
-        console.debug('DEBUG: ',
+  else if (404 === error.response?.status) {
+    if (process.env.NODE_ENV !== 'development')  {
+      window.location = `/notfound?resource=${window.location.pathname}`;
+    }
+    else {
+      console.log('DEBUG: ',
           error.response.config.baseURL + error.response.data.path,
           error.response.data.error);
-      }
-    } else {
-      return Promise.reject(error);
     }
   }
 });

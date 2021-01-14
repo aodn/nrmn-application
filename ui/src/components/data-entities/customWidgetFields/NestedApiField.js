@@ -5,20 +5,19 @@ import { useEffect } from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import pluralize from 'pluralize';
-import {Typography} from '@material-ui/core';
-import {selectedItemsRequested, setNestedField} from '../middleware/entities';
-import {markupProjectionQuery} from '../../utils/helpers';
-import PropTypes from 'prop-types';
-
+import { Typography } from '@material-ui/core';
+import { selectedItemsRequested, setNestedField } from '../middleware/entities';
+import { markupProjectionQuery } from '../../utils/helpers';
+import { PropTypes } from 'prop-types';
 
 const NestedApiField = (props) => {
   let editItemValues = useSelector(state => state.form.editItem);
   const dispatch = useDispatch();
 
-  const entity = props.name ;
+  const entity = props.name;
   const pluralEntity = pluralize(entity);
 
-  let itemsList = (editItemValues[pluralEntity]) ?editItemValues[pluralEntity][pluralEntity] : [];
+  let itemsList = (editItemValues[pluralEntity]) ? editItemValues[pluralEntity][pluralEntity] : [];
   let selectedItems = (editItemValues[entity + 'Selected']) ? [editItemValues[entity + 'Selected']].filter(Boolean) : [];
 
 
@@ -33,15 +32,15 @@ const NestedApiField = (props) => {
 
   return (itemsList.length > 0) ? (
     <>
-       <Typography variant={'h5'}>{entity}</Typography>
-       <Autocomplete
-        id={'select-auto-'+ entity}
+      <Typography variant={'h5'}>{entity}</Typography>
+      <Autocomplete
+        id={'select-auto-' + entity}
         options={itemsList}
         multiple={props.multiple || false}
         getOptionLabel={(option) => option.label}
         defaultValue={(props.multiple) ? selectedItems : selectedItems[0]}
         filterSelectedOptions
-        onChange={(event, newValues) => dispatch(setNestedField({newValues, entity}))}
+        onChange={(event, newValues) => dispatch(setNestedField({ newValues, entity }))}
         renderInput={(params) => <TextField {...params} label={'Select ' + entity} variant="outlined" />}
       />
     </>
@@ -51,9 +50,9 @@ const NestedApiField = (props) => {
 
 };
 
-NestedApiField.propTypes  ={
-  multiple : PropTypes.func,
-  name: PropTypes.string
+NestedApiField.propTypes = {
+  name: PropTypes.string,
+  multiple: PropTypes.bool
 };
 
 export default NestedApiField;

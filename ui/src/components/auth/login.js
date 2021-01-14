@@ -1,10 +1,11 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import BaseForm from '../../../../ui/src/components/BaseForm';
-import { loginSubmitted } from './auth-reducer';
-import { useLocation } from 'react-router-dom';
+import {loginSubmitted} from './auth-reducer';
+import {useLocation}  from 'react-router-dom';
 
-const Login = () => {
+
+var Login = () => {
 
   const schema = {
     'title': 'Login',
@@ -44,14 +45,13 @@ const Login = () => {
   };
 
   return (
-    <BaseForm
-      schema={schema}
-      uiSchema={uiSchema}
-      errors={errors}
-      loading={loading}
-      onSubmit={handleLogin}>
-    </BaseForm>
-
+      <BaseForm
+        schema={schema}
+        uiSchema={uiSchema}
+        errors={errors}
+        loading={loading}
+        onSubmit={handleLogin}>
+      </BaseForm>
   );
 };
 

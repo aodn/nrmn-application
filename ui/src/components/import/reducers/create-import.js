@@ -60,7 +60,6 @@ const groupBy = (list, keyGetter) => {
     return map;
 };
 
-
 const importSlice = createSlice({
     name: 'import',
     initialState: importState,

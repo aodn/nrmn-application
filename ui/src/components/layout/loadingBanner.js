@@ -1,8 +1,8 @@
 import React from 'react';
-import PropTypes, { checkPropTypes } from 'prop-types';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import LoadingSpinner from './loadingSpinner';
+import {PropTypes} from 'prop-types';
 
 
 const LoadingBanner = (props) => {

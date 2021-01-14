@@ -149,7 +149,7 @@ const Homepage = () => {
 
 
               <Typography variant={'h4'}>
-                Public data from the NRMN is available via the <a title="AODN Portal" rel="noreferrer" target="_blank" href="https://portal.aodn.org.au/" >AODN Portal</a>.
+                Public data from the NRMN is available via the <a title="AODN Portal"  rel="noreferrer"  target="_blank" href="https://portal.aodn.org.au/" >AODN Portal</a>.
               </Typography>
 
               <p>
@@ -162,7 +162,8 @@ const Homepage = () => {
                 <a  title="Disclaimer information"
                       href="https://help.aodn.org.au/user-guide-introduction/aodn-portal/disclaimer">Disclaimer</a>
                 <b> | </b>
-                <a title="Australian Ocean Data Network" rel="noreferrer" target="_blank"
+
+                <a title="Australian Ocean Data Network" rel="noreferrer"  target="_blank"
                       href="http://imos.org.au/aodn.html">AODN</a>
                 <b> | </b>
                 <a title="Integrated Marine Observing System"

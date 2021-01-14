@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Box from '@material-ui/core/Box';
 import Alert from '@material-ui/lab/Alert';
 import Grid from '@material-ui/core/Grid';
@@ -55,21 +55,21 @@ const BaseForm = (params) => {
   }
 
   function getErrors(errors) {
-    return errors.map((item, key) => {
+    return errors.map((  item, key) => {
       return <div key={key}>{item}</div>;
     });
   }
 
-  const errorAlert = params.errors?.length > 0 ? <Alert severity='error' variant='filled' >{getErrors(params.errors)}
+  let errorAlert = params.errors ? <Alert  severity="error" variant="filled" >{getErrors(params.errors)}
   </Alert> : '';
 
   return <>
     <Grid
-      container
-      spacing={0}
-      alignItems='center'
-      justify='center'
-      style={{ minHeight: '70vh' }}
+        container
+        spacing={0}
+        alignItems="center"
+        justify="center"
+        style={{ minHeight: '70vh' }}
     >
         <Box pt={4} px={6} pb={6} className={classes.root} >
           {errorAlert}

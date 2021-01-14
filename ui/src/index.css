@@ -17,7 +17,12 @@ a  {
 }
 
 a:hover  {
-   color: #1d838e;
- }
+  color: #1d838e;
+}
+
+header a:hover {
+  color: inherit;
+}
+
 
 

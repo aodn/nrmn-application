@@ -114,7 +114,7 @@ const EntityList = () => {
 
   const getEntitySchema = () => {
     return (schemaDefinition[titleCase(entityName)]) ? (schemaDefinition[titleCase(entityName)]) :
-      (schemaDefinition[entityName]);
+        (schemaDefinition[entityName]);
   };
 
   const getTitle =  () => {

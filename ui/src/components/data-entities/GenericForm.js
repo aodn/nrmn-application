@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const renderError = (msgArray) => {
-  return (msgArray.length > 0) ? <><Box><Alert severity='error' variant='filled'>{msgArray}</Alert></Box></> : <></>;
+  return (msgArray.length > 0) ? <><Box><Alert severity="error" variant="filled">{msgArray}</Alert></Box></> : <></>;
 };
 
 const GenericForm = () => {

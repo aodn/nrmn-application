@@ -7,11 +7,9 @@ import { themeReducer } from './layout/theme-reducer';
 import { toggleReducer } from './layout/layout-reducer';
 import { importReducer } from './import/reducers/create-import';
 import { authReducer } from './auth/auth-reducer';
-import { listFileReducer } from './import/reducers/list-import';
 import { formReducer } from './data-entities/form-reducer';
 import createSagaMiddleware from 'redux-saga';
 import importMiddleware from './import/middleware/create-import';
-import ListFileMiddleware from './import/middleware/list-import';
 import FileMiddleware from './import/middleware/validation-job';
 import getEntitiesWatcher from './data-entities/middleware/entities';
 import { all } from 'redux-saga/effects';
@@ -30,7 +28,6 @@ const store = configureStore({
     auth: authReducer,
     toggle: toggleReducer,
     import: importReducer,
-    fileList: listFileReducer,
     form : formReducer
   },
   middleware,
@@ -38,7 +35,6 @@ const store = configureStore({
 
  function* rootSaga() {
   yield all([
-    ListFileMiddleware(),
     importMiddleware(),
     FileMiddleware(),
     LoginWatcher(),

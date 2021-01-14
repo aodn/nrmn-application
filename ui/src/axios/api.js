@@ -140,7 +140,7 @@ export const submitJobFile = (params) => {
   ).then(res => res);
 };
 
-export const  submitingest = (jobId) => {
+export const submitingest = (jobId) => {
   return axiosInstance.post('/api/ingest/' + jobId).then(res => res);
 };
 

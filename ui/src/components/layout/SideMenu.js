@@ -16,9 +16,8 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
 import StarBorder from '@material-ui/icons/StarBorder';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector } from 'react-redux';
 import { toggleLeftSideMenu } from './layout-reducer';
-import store from '../store';
 import {
     NavLink
   } from 'react-router-dom';
@@ -44,10 +43,6 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'flex-end',
     }
 }));
-
-;
-
-
 
 const SideMenu = () => {
     const [openSub, setOpenSub] = useState(true);
