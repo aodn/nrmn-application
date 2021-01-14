@@ -36,7 +36,7 @@ var Logout = () => {
           <DialogTitle id="alert-dialog-title">Logout</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              Do you really want to log out as &squo;{username}&squo;?
+              {`Do you really want to log out as '` + username + `' ?`}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
