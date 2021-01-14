@@ -29,6 +29,13 @@ const renderError = (msgArray) => {
   return (msgArray.length > 0) ? <><Box><Alert severity="error" variant="filled">{msgArray}</Alert></Box></> : <></>;
 };
 
+const nonGenericEntities = {
+  'stagedJobs': {
+    linkLabel: 'Edit Job  ',
+    linkPath: 'PATHTOBECONFIRMED/stagedJobs/{}'
+  }
+};
+
 const GenericDetailsView = () => {
 
   const classes = useStyles();
@@ -41,7 +48,6 @@ const GenericDetailsView = () => {
   const dispatch = useDispatch();
   const singular = pluralize.singular(entityName);
   const entityTitle = singular.charAt(0).toUpperCase() + singular.slice(1);
-
 
   useEffect(() => {
     if (id !== undefined) {
@@ -71,7 +77,7 @@ const GenericDetailsView = () => {
   });
 
   const inputDisplay = (elem) => {
-    const value = (typeof elem.formData === 'boolean') ? elem.formData.toString() : elem.formData;
+    const value = elem.formData?.toString();
     return (<span><b>{elem.name}: </b> {(value) ? value : ' -- '}</span>);
   };
 
@@ -99,8 +105,6 @@ const GenericDetailsView = () => {
 
   };
 
-
-
   const uiSchema = {
     'ui:widget': 'string'
   };
@@ -123,16 +127,27 @@ const GenericDetailsView = () => {
   };
 
   const submitButton = () => {
+    const linkPath = nonGenericEntities[entityName]?.linkPath;
+    let linkLabel = `Edit ` + entityTitle + ` '` + id + `'`;
+    let link = '/';
+    if ((entityName in nonGenericEntities) && linkPath) {
+      link =  '/' + linkPath.replace(/{(.*?)}/, id);
+      linkLabel = (nonGenericEntities[entityName]?.linkLabel) ? nonGenericEntities[entityName]?.linkLabel : linkLabel;
+    }
+    else {
+      link = '/form/' + entityName + '/' + id;
+    }
+
     return <div className={classes.buttons}>
       <Button
         type={'submit'}
         component={Link}
-        to={'/form/' + entityName + '/' + id}
+        to={link}
         color="secondary"
-        aria-label={'Edit ' + entityTitle + ' ' + id}
+        aria-label={linkLabel}
         variant={'contained'}
       >
-        {`Edit ` + entityTitle + ` '` + id + `'`}
+        {linkLabel}
       </Button>
     </div>;
   };
