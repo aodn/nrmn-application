@@ -26,7 +26,7 @@ public class MonoidRowValidation<T> implements Monoid<RowWithValidation<T>> {
     public RowWithValidation<T> apply(RowWithValidation rowValid1, RowWithValidation rowValid2) {
         return new RowWithValidation(
                 rowValid1.getRows().appendAll(rowValid2.getRows()),
-                rowValid1.valid.combine(merger, rowValid2.getValid())
+                rowValid1.getValid().combine(merger, rowValid2.getValid())
         );
     }
 }
