@@ -45,7 +45,7 @@ class RLSMethodBlockAssociationIT {
         m1b1.setBlock("1");
         m1b1.setDate(date);
         m1b1.setDepth(depth);
-        m1b1.setSiteNo(siteNo);
+        m1b1.setSiteCode(siteNo);
         m1b1.setStagedJob(job);
 
         val m1b2 = (StagedRow) SerializationUtils.clone(m1b1);
@@ -77,7 +77,7 @@ class RLSMethodBlockAssociationIT {
         m1b1.setBlock("1");
         m1b1.setDate(date);
         m1b1.setDepth(depth);
-        m1b1.setSiteNo(siteNo);
+        m1b1.setSiteCode(siteNo);
         m1b1.setStagedJob(job);
 
         val m1b2 = (StagedRow) SerializationUtils.clone(m1b1);
