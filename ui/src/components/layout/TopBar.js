@@ -2,7 +2,6 @@ import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import {makeStyles} from '@material-ui/core/styles';
@@ -13,8 +12,6 @@ import store from '../store';
 import AuthState from "./AuthState";
 import SettingsMenu from "./SettingsMenu";
 import Button from "@material-ui/core/Button";
-import Link from "@material-ui/core/Link";
-import {blueGrey} from "@material-ui/core/colors";
 
 const drawerWidth = 240;
 
@@ -30,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: 15,
     '&:hover': {
       color: '#FFF',
-      backgroundColor: blueGrey[400]
+      backgroundColor:  "rgba(0, 0, 0, 0.04)"
     }
   },
   spacer: {
