@@ -4,6 +4,7 @@ import { render as rtlRender } from '@testing-library/react';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import store  from './components/store';
+import {PropTypes} from 'prop-types';
 
 function render(
     ui,
@@ -14,8 +15,8 @@ function render(
     } = {}
 ) {
 
-  var Wrapper = ({ children }) => {
-    return <Provider store={store}>{children}</Provider>;
+  var Wrapper = (elem) => {
+    return <Provider store={store}>{elem.children}</Provider>;
   };
   return rtlRender(ui, { wrapper: Wrapper, ...renderOptions });
 }

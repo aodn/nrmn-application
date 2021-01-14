@@ -23,6 +23,8 @@ import {
     NavLink
   } from 'react-router-dom';
 import {ArrowRight} from '@material-ui/icons';
+import {PropTypes} from 'prop-types';
+
 
 
 const drawerWidth = 240;
@@ -121,6 +123,10 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
                 ))}
             </List>
         </Drawer>);
+};
+
+ReduxSideMenu.propTypes = {
+    leftSideMenuIsOpen : PropTypes.bool
 };
 const SideMenu = connect(mapStateToProps)(ReduxSideMenu);
 export default SideMenu;

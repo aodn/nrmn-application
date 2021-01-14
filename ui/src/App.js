@@ -99,17 +99,17 @@ const App = () => {
               <Route path="/edit/:entityName/:id?" component={GenericForm} />
               <Route path="/view/:entityName/:id?" component={GenericDetailsView} />
               <Route path="/list/:entityName" component={EntityList} />
-              <Route path="/notfound" render={(props) =>
+              <Route path="/notfound" render={(route) =>
                 <Alert severity="error"  >
                   <AlertTitle>API Resource Not Found</AlertTitle>
-                  {`The requested resource ${getFullPath(props.location)} is not available`}
+                  {`The requested resource ${getFullPath(route.location)} is not available`}
                 </Alert>}
               />
               <Route path={'/'} component={Homepage} />
-              <Route render={(props) =>
+              <Route render={(route) =>
                 <Alert severity="error"  >
                   <AlertTitle>Path Not Found</AlertTitle>
-                    The requested resource <strong>{getFullPath(props.location)}</strong> is not available
+                    The requested resource <strong>{getFullPath(route.location)}</strong> is not available
                   </Alert>}
               />
             </Switch>

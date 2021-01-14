@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 
 export default class CustomTooltip extends Component {
 
@@ -27,9 +28,10 @@ export default class CustomTooltip extends Component {
         );
       }
     }
-
     return (<div className={'custom-tooltip ag-tooltip-hiding'} ></div>);
-
-
   }
 }
+
+CustomTooltip.propTypes = {
+  value: PropTypes.any,
+};

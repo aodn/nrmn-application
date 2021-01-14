@@ -7,7 +7,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import { TopbarButton } from './TopbarButton';
 import Logout from '../auth/logout';
 import {toggleLogoutMenuOpen} from './layout-reducer';
-
+import {PropTypes} from 'prop-types';
 const basicButton = {
   textTransform: 'none',
   fontWeight: 300
@@ -58,5 +58,7 @@ function mapStateToProps(state) {
     username: state.auth.username
   };
 }
-
+AuthState.propTypes = {
+  username: PropTypes.string
+};
 export default connect(mapStateToProps)(AuthState);

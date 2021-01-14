@@ -15,6 +15,7 @@ import SettingsMenu from './SettingsMenu';
 import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
 import {blueGrey} from '@material-ui/core/colors';
+import {PropTypes} from 'prop-types';
 
 const drawerWidth = 240;
 
@@ -127,6 +128,8 @@ const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
   </AppBar>
   );
 };
-
+ReduxTopBar.propTypes = {
+  leftSideMenuIsOpen : PropTypes.bool
+};
 const TopBar = connect(mapStateToProps)(ReduxTopBar);
 export default TopBar;
