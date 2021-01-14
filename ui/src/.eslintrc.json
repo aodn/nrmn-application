@@ -39,7 +39,7 @@
     "rules": {
         "no-process-env": "off",
         "react/prop-types": [
-            1
+            2
         ],
         "react/function-component-definition": [
             "error",
