@@ -2,9 +2,12 @@ package au.org.aodn.nrmn.restapi.validation.process;
 
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
 import au.org.aodn.nrmn.restapi.validation.provider.ATRCValidators;
 import au.org.aodn.nrmn.restapi.validation.provider.RLSValidators;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.SpeciesExists;
@@ -31,7 +34,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
-public class RawValidation {
+public class RawValidation extends ValidatorHelpers {
     @Autowired
     DiverRepository diverRepo;
     @Autowired
@@ -67,12 +70,12 @@ public class RawValidation {
                         Tuple2.of("Site", siteCodeExists),
                         Tuple2.of("Date", new DateFormatValidation()),
                         Tuple2.of("Time", new TimeFormatValidation()),
-                        Tuple2.of("Diver", new DiverExists(StagedRow::getDiver, "Diver", diverRepo)),
-                        Tuple2.of("Buddy", new DiverExists(StagedRow::getBuddy, "Buddy", diverRepo)),
-                        Tuple2.of("P-Qs", new DiverExists(StagedRow::getPqs, "P-Qs", diverRepo)),
+                        Tuple2.of("Diver", new DiverExists(StagedRow::getDiver, "Diver", diverRepo, ValidationLevel.BLOCKING)),
+                        Tuple2.of("Buddy", new DiverExists(StagedRow::getBuddy, "Buddy", diverRepo, ValidationLevel.WARNING)),
+                        Tuple2.of("P-Qs", new DiverExists(StagedRow::getPqs, "P-Qs", diverRepo, ValidationLevel.BLOCKING)),
                         Tuple2.of("Depth", new DoubleFormatValidation(StagedRow::getDepth, "Depth")),
                         Tuple2.of("Method", new IntegerFormatValidation(StagedRow::getMethod, "Method", Arrays.asList(0, 1, 2, 3, 4, 5, 7, 10))),
-                        Tuple2.of("Block", new IntegerFormatValidation(StagedRow::getBlock, "Block", Arrays.asList(0, 1, 2))),
+                        Tuple2.of("Block", new IntegerFormatValidation(StagedRow::getBlock, "Block", Arrays.asList(0, 1, 2, 10))),
                         Tuple2.of("Code", new PassThruString(StagedRow::getCode, "Code")),
                         Tuple2.of("Species", speciesExists),
 
@@ -102,9 +105,9 @@ public class RawValidation {
     }
 
 
-    public Validated<StagedRowError, Seq<Tuple2<String, Object>>> validate(StagedRow target,
-                                                                           Seq<Tuple2<String, BaseRowValidator>> validators) {
-        return validators.map(tuple ->
+    public RowWithValidation<Seq<Tuple2<String, Object>>> validate(StagedRow target,
+                                                                   Seq<Tuple2<String, BaseRowValidator>> validators) {
+        val validation = validators.map(tuple ->
                 tuple._2().valid(target)
                         .bimap(Function.identity(),
                                 content -> Seq.of(Tuple2.of(tuple._1(), content)))
@@ -112,8 +115,10 @@ public class RawValidation {
                 Validated.valid(Seq.empty()),
                 (v1, v2) -> v1.combine(Monoids.seqConcat(), v2)
         );
+        val errors = toErrorList(validation);
+        target.setErrors(errors);
+        return new RowWithValidation(Seq.of(target), validation);
     }
-
 
     public StagedRowFormatted toFormat(HashMap<String, Object> values) {
         val site = (Site) values.get("Site").orElseGet(null);
@@ -185,13 +190,10 @@ public class RawValidation {
                 .stream()
                 .flatMap(row -> {
                     val validatedRow = validate(row, validators);
+                    val validated = validatedRow.getValid();
                     val validatorsWithMap =
-                            validatedRow.map(seq ->
-                                    seq.toHashMap(Tuple2::_1, Tuple2::_2));
-                    return validatorsWithMap
-                            .map(this::toFormat)
-                            .stream();
-
+                            validated.map(seq -> toFormat(seq.toHashMap(Tuple2::_1, Tuple2::_2)));
+                    return validatorsWithMap.stream();
                 }).collect(Collectors.toList());
     }
 }

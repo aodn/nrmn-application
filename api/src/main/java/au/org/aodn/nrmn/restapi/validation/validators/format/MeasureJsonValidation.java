@@ -11,6 +11,7 @@ import lombok.val;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class MeasureJsonValidation extends BaseRowValidator {
@@ -20,6 +21,9 @@ public class MeasureJsonValidation extends BaseRowValidator {
 
     @Override
     public Validated<StagedRowError, HashMap<Integer, Integer>> valid(StagedRow target) {
+        if (!Optional.ofNullable(target.getMeasureJson()).isPresent()){
+            return Validated.valid(new HashMap<>());
+        }
         Validated<StagedRowError, Seq<Tuple2<Integer, Integer>>> mapValidators = target.getMeasureJson()
                 .entrySet()
                 .stream().map(entry -> {

@@ -124,7 +124,7 @@ public class SpreadSheetService {
                         val stagedRow = new StagedRow();
                         stagedRow.setDiver(_getCellValue(row.getCell(headerMap.get("Diver")), eval, fmt));
                         stagedRow.setBuddy(_getCellValue(row.getCell(headerMap.get("Buddy")), eval, fmt));
-                        stagedRow.setSiteNo(_getCellValue(row.getCell(headerMap.get("Site No.")), eval, fmt));
+                        stagedRow.setSiteCode(_getCellValue(row.getCell(headerMap.get("Site No.")), eval, fmt));
                         stagedRow.setSiteName(_getCellValue(row.getCell(headerMap.get("Site Name")), eval, fmt));
                         stagedRow.setLatitude(_getCellValue(row.getCell(headerMap.get("Latitude")), eval, fmt));
                         stagedRow.setLongitude(_getCellValue(row.getCell(headerMap.get("Longitude")), eval, fmt));

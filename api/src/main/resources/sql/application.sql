@@ -248,6 +248,7 @@ CREATE TABLE nrmn.staged_row_error (
     message varchar(255) NOT NULL,
     column_target varchar(255),
     error_type varchar(255),
+    error_level varchar(255),
     row_id bigint NOT NULL,
     CONSTRAINT staged_row_error_pkey PRIMARY KEY (job_id, message, row_id)
 );

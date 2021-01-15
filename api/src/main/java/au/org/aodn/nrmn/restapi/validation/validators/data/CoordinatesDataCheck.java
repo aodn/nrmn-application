@@ -4,6 +4,7 @@ import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import com.graphbuilder.geom.Point2d;
@@ -54,6 +55,7 @@ public class CoordinatesDataCheck extends BaseRowValidator {
                                                         error._2().toString()
                                                 ),
                                                 ValidationCategory.DATA,
+                                                ValidationLevel.BLOCKING,
                                                 error._1().toString(),
                                                 target
                                         ),
@@ -86,7 +88,10 @@ public class CoordinatesDataCheck extends BaseRowValidator {
                         target.getStagedJob().getId(),
                         "Lat and Long didn't match with the Site"
                 ),
-                ValidationCategory.DATA, "longitude, Lattitude",
+                ValidationCategory.DATA,
+                ValidationLevel.BLOCKING,
+                "longitude, Lattitude",
+
                 target
         ));
     }
