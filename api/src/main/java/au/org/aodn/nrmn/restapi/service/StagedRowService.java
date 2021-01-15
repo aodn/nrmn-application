@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.service.model;
+package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
@@ -17,7 +17,7 @@ public class StagedRowService {
        return  rowRepo.findById(id).map(found -> {
             found.setDiver(provider.getDiver());
             found.setBuddy(provider.getBuddy());
-            found.setSiteNo(provider.getSiteNo());
+            found.setSiteCode(provider.getSiteCode());
             found.setSiteName(provider.getSiteName());
             found.setDate(provider.getDate());
             found.setTime(provider.getTime());

@@ -31,9 +31,8 @@ public class StagedRow implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonProperty(value = "site #")
     @Column(name = "site_no")
-    private String siteNo;
+    private String siteCode;
 
     @Column(name = "date")
     private String date;
@@ -56,7 +55,7 @@ public class StagedRow implements Serializable {
     @Column(name = "buddy")
     private String buddy;
 
-    @JsonProperty(value = "site name")
+
     @Column(name = "site_name")
     private String siteName;
 
@@ -82,7 +81,7 @@ public class StagedRow implements Serializable {
     @Column(name = "code")
     private String code;
 
-    @JsonProperty(value = "common name")
+
     @Column(name = "common_name")
     private String commonName;
 

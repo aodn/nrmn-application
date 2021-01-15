@@ -24,7 +24,7 @@ class SiteCodeExistsIT {
         val job = new StagedJob();
         job.setId(1L);
         val stage = new StagedRow();
-        stage.setSiteNo("xyz");
+        stage.setSiteCode("xyz");
         stage.setStagedJob(job);
         val codeFound = siteCodeExists.valid(stage);
         Assertions.assertTrue(codeFound.isInvalid());
@@ -36,7 +36,7 @@ class SiteCodeExistsIT {
         val job = new StagedJob();
         job.setId(1L);
         val stage = new StagedRow();
-        stage.setSiteNo("EYR71");
+        stage.setSiteCode("EYR71");
         stage.setStagedJob(job);
         val codeFound = siteCodeExists.valid(stage);
         Assertions.assertTrue(codeFound.isValid());

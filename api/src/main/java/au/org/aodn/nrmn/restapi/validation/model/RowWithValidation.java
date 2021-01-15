@@ -12,6 +12,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class RowWithValidation<T> {
-    Seq<StagedRow> rows;
-    Validated<StagedRowError, T> valid;
+   private Seq<StagedRow> rows;
+   private  Validated<StagedRowError, T> valid;
 }

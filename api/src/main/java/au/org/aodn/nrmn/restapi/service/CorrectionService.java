@@ -31,7 +31,7 @@ public class CorrectionService {
         Survey survey = surveyMethod.getSurvey();
         StagedRow.StagedRowBuilder builder = StagedRow.builder()
                 .depth(getStagedDepth(survey.getDepth(), survey.getSurveyNum()))
-                .siteNo(survey.getSite().getSiteCode())
+                .siteCode(survey.getSite().getSiteCode())
                 .siteName(survey.getSite().getSiteName())
                 .date(getDateString(survey.getSurveyDate()))
                 .time(getTimeString(survey.getSurveyTime()))
