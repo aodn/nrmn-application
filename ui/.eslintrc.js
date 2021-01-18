@@ -1,4 +1,6 @@
-{
+const currentEnv = process.env.NODE_ENV;
+ const onlyDuringDev =  (currentEnv == 'development') ? 0 : 2
+module.exports = exports = {
     "parser": "babel-eslint",
     "env": {
         "node": true,
@@ -37,20 +39,20 @@
         }
     },
     "rules": {
-        "no-process-env": "off",
+        "no-process-env": 0,
         "react/prop-types": [
             2
         ],
         "react/function-component-definition": [
-            "error",
+            2,
             {
                 "namedComponents": "arrow-function"
             }
         ],
-        "react-hooks/rules-of-hooks": "error",
-        "react-hooks/exhaustive-deps": "off",
+        "react-hooks/rules-of-hooks": 2,
+        "react-hooks/exhaustive-deps": 0,
         "semi": [
-            "error",
+            2,
             "always"
         ],
         "quotes": [
@@ -61,9 +63,10 @@
                 "allowTemplateLiterals": true
             }
         ],
-        "no-console-log/no-console-log": "off",
-        "no-empty": "error",
-        "no-trailing-spaces": "error",
-        "no-unused-vars": "off"
+        "no-console-log/no-console-log": onlyDuringDev,
+        "no-empty": 2,
+        "no-debbuger": onlyDuringDev, 
+        "no-trailing-spaces": 2,
+        "no-unused-vars": 0
     }
 }
