@@ -29,11 +29,9 @@ const XlxsUpload = () => {
         const reader = new FileReader();
         reader.onload = (event) => {
             const workbook = XLSX.read(event.target.result, { type: 'binary' });
-            console.log(workbook);
             const dataSheet = XLSX.utils.sheet_to_json(workbook.Sheets['DATA'], { header: 1 });
             store.dispatch(ImportRequested({ sheet: dataSheet, fileID: fileObjs[0].name + '-' + fileObjs[0].lastModified }));
         };
-        console.log(fileObjs);
         reader.readAsBinaryString(fileObjs[0]);
 
     };

@@ -65,8 +65,9 @@ module.exports = exports = {
         ],
         "no-console-log/no-console-log": onlyDuringDev,
         "no-empty": 2,
-        "no-debbuger": onlyDuringDev, 
         "no-trailing-spaces": 2,
-        "no-unused-vars": 0
+        "no-unused-vars": 0,
+        "no-alert": 2,
+        "no-debugger": onlyDuringDev
     }
 }

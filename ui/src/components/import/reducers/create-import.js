@@ -54,17 +54,14 @@ const importSlice = createSlice({
             state.sheet = action.payload.Rows;
         },
         ImportStarted: (state, action) =>  {
-            console.log('started');
             state.isLoading = true;
         },
         ImportLoaded: (state, action) => {
-            console.log('loaded');
 
             state.isLoading  = false;
         },
         ImportFailed: (state, action) => {
             state.isLoading  = false;
-            console.log('data import falied:', action);
         }
     }
 });
