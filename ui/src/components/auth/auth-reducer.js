@@ -30,10 +30,10 @@ const authSlice = createSlice({
       }
       state.loading = false;
     },
-    logout: (state, action) => {
+    logout: () => {
       localStorage.clear();
-      state = initialState;
       window.location = '/login';
+      return initialState;
     }
   },
 });

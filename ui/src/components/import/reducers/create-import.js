@@ -2,7 +2,6 @@ import {
     createSlice,
     createAction
 } from '@reduxjs/toolkit';
-import { FilledInput } from '@material-ui/core';
 
 
 const importState = {
@@ -53,14 +52,14 @@ const importSlice = createSlice({
             state.fileID = action.payload.fileID;
             state.sheet = action.payload.Rows;
         },
-        ImportStarted: (state, action) =>  {
+        ImportStarted: (state) =>  {
             state.isLoading = true;
         },
-        ImportLoaded: (state, action) => {
+        ImportLoaded: (state) => {
 
             state.isLoading  = false;
         },
-        ImportFailed: (state, action) => {
+        ImportFailed: (state) => {
             state.isLoading  = false;
         }
     }

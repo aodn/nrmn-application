@@ -19,6 +19,11 @@ class AuthState extends React.Component {
     store.dispatch(toggleLogoutMenuOpen());
   }
 
+
+  hello = () => {
+    return (<></>);
+  };
+
   render(){
 
     const { username } = this.props;

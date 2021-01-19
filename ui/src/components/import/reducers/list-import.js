@@ -15,10 +15,10 @@ const listSlice = createSlice({
         fileListReady: (state, action) => {
             state.fileIDs = action.payload;
         },
-        fileListStarted: (state, action) => {
+        fileListStarted: (state) => {
             state.isLoading = true;
         },
-        fileListLoaded: (state, action) => {
+        fileListLoaded: (state ) => {
             state.isLoading = false;
         },
         fileListFailed: (state, action) => {

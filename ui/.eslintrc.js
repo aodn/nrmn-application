@@ -1,5 +1,5 @@
 const currentEnv = process.env.NODE_ENV;
- const onlyDuringDev =  (currentEnv == 'development') ? 0 : 2
+const onlyDuringDev = (currentEnv == 'development') ? 0 : 2
 module.exports = exports = {
     "parser": "babel-eslint",
     "env": {
@@ -17,7 +17,7 @@ module.exports = exports = {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly",
         "ReactClass": false,
-        "axios" : true
+        "axios": true
     },
     "parserOptions": {
         "ecmaFeatures": {
@@ -49,6 +49,7 @@ module.exports = exports = {
                 "namedComponents": "arrow-function"
             }
         ],
+        "react/prefer-stateless-function": [2, { "ignorePureComponents": true }],
         "react-hooks/rules-of-hooks": 2,
         "react-hooks/exhaustive-deps": 0,
         "semi": [
@@ -66,7 +67,7 @@ module.exports = exports = {
         "no-console-log/no-console-log": onlyDuringDev,
         "no-empty": 2,
         "no-trailing-spaces": 2,
-        "no-unused-vars": 0,
+        "no-unused-vars": 2,
         "no-alert": 2,
         "no-debugger": onlyDuringDev
     }

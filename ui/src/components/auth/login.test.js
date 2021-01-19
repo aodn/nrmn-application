@@ -32,11 +32,10 @@ afterEach(() => {
 describe('login test', () => {
   it('renders form', () => {
     act(() => {
-      const { debug } = render(
+    render(
           <Login />,
           container
       );
-      //debug()
     });
 
     const inputs = document.getElementsByTagName('input');

@@ -15,15 +15,13 @@ import InboxIcon from '@material-ui/icons/MoveToInbox';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
-import StarBorder from '@material-ui/icons/StarBorder';
 import { connect } from 'react-redux';
 import { toggleLeftSideMenu } from './layout-reducer';
 import store from '../store';
 import {
     NavLink
-  } from 'react-router-dom';
-import {ArrowRight} from '@material-ui/icons';
-import {PropTypes} from 'prop-types';
+} from 'react-router-dom';
+import { PropTypes } from 'prop-types';
 
 
 
@@ -49,13 +47,13 @@ const useStyles = makeStyles((theme) => ({
 
 const mapStateToProps = state => {
     return { leftSideMenuIsOpen: state.toggle.leftSideMenuIsOpen };
-  };
+};
 
 const handleMainMenu = () => {
     store.dispatch(toggleLeftSideMenu());
 };
 
-const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
+const ReduxSideMenu = ({ leftSideMenuIsOpen }) => {
     const [openSub, setOpenSub] = React.useState(true);
     const classes = useStyles();
     const theme = useTheme();
@@ -90,10 +88,10 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
                 </ListItem>
                 <Collapse in={openSub} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                        <ListItem button  onClick={handleMainMenu}  className={classes.nested} component={NavLink} aweirdprop="true" to="/list/StagedJob">
-                            <ListItemText primary="List Jobs"   />
+                        <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} aweirdprop="true" to="/list/StagedJob">
+                            <ListItemText primary="List Jobs" />
                         </ListItem>
-                        <ListItem button  onClick={handleMainMenu} className={classes.nested} component={NavLink} to="/import-file">
+                        <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} to="/import-file">
                             <ListItemText primary="Add Job" />
                         </ListItem>
                     </List>
@@ -106,7 +104,7 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
             <Divider />
             <List>
                 <ListSubheader>REFERENCE DATA</ListSubheader>
-                {['Diver', 'Location', 'ObservableItem', 'Program', 'Site', 'Survey'].map((text, index) => (
+                {['Diver', 'Location', 'ObservableItem', 'Program', 'Site', 'Survey'].map((text) => (
                     <ListItem button key={text} component={NavLink} to={'/list/' + text} >
                         <ListItemText primary={text} />
                     </ListItem>
@@ -116,7 +114,7 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
             <List>
                 <ListSubheader>ACTIONS</ListSubheader>
 
-                {['Extract', 'Templates'].map((text, index) => (
+                {['Extract', 'Templates'].map((text) => (
                     <ListItem button key={text}>
                         <ListItemText primary={text} />
                     </ListItem>
@@ -126,7 +124,7 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
 };
 
 ReduxSideMenu.propTypes = {
-    leftSideMenuIsOpen : PropTypes.bool
+    leftSideMenuIsOpen: PropTypes.bool
 };
 const SideMenu = connect(mapStateToProps)(ReduxSideMenu);
 export default SideMenu;
