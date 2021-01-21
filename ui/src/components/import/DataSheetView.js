@@ -42,11 +42,21 @@ const DataSheetView = () => {
         setGridApi(params.api);
         setGridColumnApi(params.columnApi);
         dispatch(JobFinished());
+
+        var allColumnIds = [];
+        params.columnApi.getAllColumns().forEach(function (column) {
+          allColumnIds.push(column.colId);
+        });
+        console.log(allColumnIds);
+        params.columnApi.autoSizeColumns(allColumnIds, false);
+
+        params.api.ensureIndexVisible(20, 20);
     };
 
     const onCellChanged = (input) => {
         dispatch(RowUpdateRequested(input.data.id, input.data));
         dispatch(EditRowStarting());
+        console.log('stop');
         dispatch(EnableSubmit(false));
     };
 
@@ -87,7 +97,7 @@ const DataSheetView = () => {
                     pivotColumnGroupTotals={'before'}
                     sideBar={true}
                     autoGroupColumnDef={{
-                        width: 100,
+                        width: 20,
                         cellRendererParams: {
                             suppressCount: true,
                             innerRenderer: 'nameCellRenderer'
@@ -106,6 +116,7 @@ const DataSheetView = () => {
                     undoRedoCellEditing={true}
                     ensureDomOrder={true}
                     defaultColDef={{
+                        minWidth: 85,
                         filter: true,
                         sortable: true,
                         resizable: true,

@@ -16,7 +16,7 @@ public class SiteCodeExists extends BaseRowExistingEntity<Site, SiteRepository> 
 
     @Autowired
     public SiteCodeExists(SiteRepository siteRepo) {
-        super("Site #", siteRepo);
+        super("siteCode", siteRepo);
     }
 
     @Override

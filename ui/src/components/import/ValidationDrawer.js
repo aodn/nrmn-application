@@ -12,18 +12,20 @@ import {
     Box,
     IconButton,
     Toolbar,
-    InputBase
+    InputBase,
+    Fab
 } from '@material-ui/core';
-import { ReportProblemOutlined, SearchOutlined } from '@material-ui/icons';
+import { PlaylistAddCheckOutlined, ReportProblemOutlined, SearchOutlined } from '@material-ui/icons';
 import BlockOutlinedIcon from '@material-ui/icons/BlockOutlined';
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { validationFilter } from './reducers/create-import';
+import { JobStarting, validationFilter, ValidationRequested } from './reducers/create-import';
 import { orange } from '@material-ui/core/colors';
 import MenuIcon from '@material-ui/icons/Menu';
 import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
-
+import ArrowBackIosOutlinedIcon from '@material-ui/icons/ArrowBackIosOutlined';
+import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
 const drawerWidth = 500;
 
 const useStyles = makeStyles((theme) => ({
@@ -122,12 +124,22 @@ const ValidationDrawer = () => {
     const classes = useStyles();
     const errorsByMsg = useSelector(state => state.import.errorsByMsg);
     const errSelected = useSelector(state => state.import.errSelected);
+    const isLoading = useSelector(state => state.import.isLoading);
+    const editLoading = useSelector(state => state.import.editLoading);
+    const job = useSelector(state => state.import.job);
 
     const [open, setOpen] = useState(false);
     const [filter, setFilter] = useState('');
 
     const handleFilter = (err) => {
         dispatch(validationFilter(err));
+    };
+
+    const handleValidate = () => {
+        if (job.id) {
+            dispatch(JobStarting());
+            dispatch(ValidationRequested(job.id));
+        }
     };
 
     const removeFilter = () => {
@@ -170,8 +182,18 @@ const ValidationDrawer = () => {
                         color="inherit"
                         aria-label="open drawer"
                         onClick={() => setOpen(!open)}
-                        edge="start">
-                        <MenuIcon />
+                        edge="start"
+                        title={open? 'Close': 'Open'}>
+                        {open ? (<ArrowForwardIosOutlinedIcon/>): (<ArrowBackIosOutlinedIcon/>)}
+                    </IconButton>
+                    <IconButton variant="extended"
+                        disabled={editLoading || isLoading}
+                        onClick={() => handleValidate()}
+                        color="inherit"
+                        title={'Validate'}
+                        >
+                       <Fab size="small" color="secondary"> <PlaylistAddCheckOutlined /></Fab>
+
                     </IconButton>
                     <div className={classes.search}>
                         <div className={classes.searchIcon}>
