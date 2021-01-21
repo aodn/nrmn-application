@@ -66,6 +66,10 @@ const XlxsUpload = () => {
     if (jobId !== '') {
         return (<Redirect component='link' to={'/validation/' + jobId} ></Redirect>);
     }
+    var displayErros = [];
+    if(errors && errors.length > 0) {
+        displayErros = errors.map(e => e.message);
+    }
     return (
         <Box>
             {isLoading && percentCompleted >= 0 && <LinearProgress variant='determinate' value={percentCompleted} />}
@@ -74,7 +78,7 @@ const XlxsUpload = () => {
                 uiSchema={uiSchema}
                 loading={isLoading}
                 success={success}
-                errors={errors.map(e => e.message)}
+                errors={displayErros}
                 onSubmit={handleSubmit}>
 
             </BaseForm>

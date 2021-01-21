@@ -8,12 +8,29 @@ export default function* createImportWatcher() {
 
 function* createImport(params) {
     try {
-        const payload = yield call(submitJobFile, params.payload);
-        console.log(payload);
-        yield put(ImportLoaded(payload.data));
+        //  const {response, err} =  yield call(submitJobFile, params.payload);
+        const { response} = yield call(submitJobFile, params.payload);
+        const data = response.data || {};
+        var errors = data.errors || [];
+        if (data.error) {
+            errors = [{ message: data.error }];
+        }
+        console.debug('data', data);
+        console.debug('errors', errors);
+        if (errors.length > 0) {
+            yield put(ImportFailed(errors));
+
+        } else {
+            if (data)
+                yield put(ImportLoaded(data));
+            else {
+                yield put(ImportFailed([{ message: 'Service unavailbe.' }]));
+            }
+
+        }
     } catch (e) {
-        console.log(e);
-        yield put(ImportFailed(e.response.data));
+        console.log('bad', e);
+        yield put(ImportFailed([e.message]));
     }
 }
 

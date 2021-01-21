@@ -60,7 +60,7 @@ const BaseForm = (params) => {
     });
   }
 
-  let errorAlert = params.errors ? <Alert  severity="error" variant="filled" >{getErrors(params.errors)}
+  let errorAlert = params.errors && params.errors.length > 0 ? <Alert  severity="error" variant="filled" >{getErrors(params.errors)}
   </Alert> : '';
 
   return <>
@@ -82,7 +82,6 @@ const BaseForm = (params) => {
               fields={params.fields}
               formData={params.formData}
           >
-            {errorAlert}
 
             <div className={classes.rootFlex}>
               <div className={classes.wrapper}>

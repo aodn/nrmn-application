@@ -116,7 +116,6 @@ export const updateRow = (id, row) => (
 );
 
 export const submitJobFile = (params) => {
-
   const data = new FormData();
 
   const fileParsed = parseDataUrl(params.file);
@@ -125,6 +124,7 @@ export const submitJobFile = (params) => {
   data.append('withInvertSize', params.withInvertSize);
 
   const config = {
+    validateStatus: () => true,
     'Content-Type': 'multipart/form-data; boundary=' + data._boundary,
     onUploadProgress: (progressEvent) => {
       const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -133,11 +133,11 @@ export const submitJobFile = (params) => {
 
   };
   return axiosInstance.post(
-
     '/api/stage/upload',
     data,
     config
-  ).then(res => res);
+  ).then(response => ({ response }))
+    .catch(err => ({ err }));;
 };
 
 export const submitingest = (jobId) => {

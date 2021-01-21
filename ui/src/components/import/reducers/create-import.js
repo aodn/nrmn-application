@@ -10,7 +10,7 @@ const importState = {
     editLoading: false,
     ingestLoading: false,
     submitReady: false,
-    ingestSuccess : false,
+    ingestSuccess: false,
     percentCompleted: 0,
     errors: [],
     rows: [],
@@ -81,7 +81,9 @@ const importSlice = createSlice({
         ImportFailed: (state, action) => {
             state.success = false;
             state.isLoading = false;
-            state.errors = action.payload.errors;
+            if (action.payload) {
+                state.errors = action.payload;
+            }
         },
         JobReady: (state, action) => {
             state.rows = action.payload.rows.map(row => exportRow(row));
@@ -95,7 +97,7 @@ const importSlice = createSlice({
             if (action.payload.rows.length > 0) {
                 state.rows = action.payload.rows.map(row => exportRow(row));
                 const validationErrors = mergeErrors(state.rows);
-               state.EnableSubmit = validationErrors.filter(err => err.level === 'BLOCKING').length === 0;
+                state.EnableSubmit = validationErrors.filter(err => err.level === 'BLOCKING').length === 0;
                 const errorsGrouped = groupBy(validationErrors, (row) => row.message);
                 console.log(errorsGrouped);
                 state.errorsByMsg = [...errorsGrouped.keys()].map(key => {
