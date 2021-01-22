@@ -24,5 +24,9 @@ header a:hover {
   color: inherit;
 }
 
+.redBoldFont {
+  color: #f44336;
+  font-weight: bold;
+}
 
 

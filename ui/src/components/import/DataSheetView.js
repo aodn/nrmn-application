@@ -4,7 +4,7 @@ import { AgGridReact } from 'ag-grid-react';
 import { AllModules } from 'ag-grid-enterprise';
 import { useEffect } from 'react';
 import { EditRowStarting, EnableSubmit, JobFinished, RowUpdateRequested } from './reducers/create-import';
-import {ColumnDef, ExtendedSize} from './ColumnDef';
+import { ColumnDef, ExtendedSize } from './ColumnDef';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import { Box } from '@material-ui/core';
@@ -36,7 +36,7 @@ const DataSheetView = () => {
     var rows = immutableRows.map(Object.unfreeze);
     const job = useSelector(state => state.import.job);
 
-    const colDefinition = (job && job.isExtendedSize)? ColumnDef.concat(ExtendedSize): ColumnDef;
+    const colDefinition = (job && job.isExtendedSize) ? ColumnDef.concat(ExtendedSize) : ColumnDef;
 
     const agGridReady = (params) => {
         setGridApi(params.api);
@@ -45,12 +45,12 @@ const DataSheetView = () => {
 
         var allColumnIds = [];
         params.columnApi.getAllColumns().forEach(function (column) {
-          allColumnIds.push(column.colId);
+            allColumnIds.push(column.colId);
         });
         console.log(allColumnIds);
         params.columnApi.autoSizeColumns(allColumnIds, false);
 
-        params.api.ensureIndexVisible(20, 20);
+        params.api.ensureIndexVisible(25, 49);
     };
 
     const onCellChanged = (input) => {
@@ -58,6 +58,19 @@ const DataSheetView = () => {
         dispatch(EditRowStarting());
         console.log('stop');
         dispatch(EnableSubmit(false));
+    };
+
+    const getContextMenuItems = (params) => {
+        return [{
+            name: 'Delete selected Row(s)',
+            action: () => {
+                const selectedRows = params.api.getSelectedRows();
+                params.api.applyTransaction({ remove: selectedRows });
+
+            },
+            cssClasses: ['redBoldFont']
+
+        }];
     };
 
     useEffect(() => {
@@ -126,6 +139,7 @@ const DataSheetView = () => {
                     }}
                     onGridReady={agGridReady}
                     modules={AllModules}
+                    getContextMenuItems={getContextMenuItems}
                 >
                 </AgGridReact>
             </div>}
