@@ -28,7 +28,8 @@ import './ag-grid.scss';
 import GenericDetailsView from './components/data-entities/GenericDetailsView';
 import Homepage from './components/layout/Homepage';
 
-const drawerWidth = 240;
+const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ?
+    process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    marginLeft: -drawerWidth
+    marginLeft: `-${drawerWidth}px`
   },
   contentShift: {
     transition: theme.transitions.create('margin', {

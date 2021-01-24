@@ -14,12 +14,13 @@ import Button from '@material-ui/core/Button';
 import SettingsMenu from './SettingsMenu';
 import {PropTypes} from 'prop-types';
 
-const drawerWidth = 240;
+const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ?
+    process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
 const useStyles = makeStyles((theme) => ({
   header: {
     fontFamily: [
-      'Lora'
+      'Roboto'
     ].join(','),
     color: '#FFF',
     fontSize: 'x-large',
@@ -28,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: 15,
     '&:hover': {
       color: '#FFF',
-      backgroundColor:  'rgba(0, 0, 0, 0.04)'
+      backgroundColor: 'rgba(0, 0, 0, 0.04)'
     }
   },
   spacer: {
@@ -46,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
   },
   appBarShift: {
     width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
+    marginLeft: `${drawerWidth}px`,
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
