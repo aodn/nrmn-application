@@ -83,7 +83,8 @@ const nonGenericEntities = {
   'StagedJob': {
     title: 'Jobs',
     createButtonPath: '/import-file', // createButtonPath absence means no create button will show
-    linkPath: 'linkToSomewherePath/{}'
+    linkLabel: 'Details',
+    linkPath: 'view/stagedJobs/{}'
   }
 };
 
