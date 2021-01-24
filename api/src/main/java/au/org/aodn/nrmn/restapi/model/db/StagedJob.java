@@ -2,6 +2,8 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -32,7 +34,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Builder
 @Table(name = "staged_job")
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"hibernateLazyInitializer"})
 public class StagedJob implements Serializable {
 
     @Id
@@ -55,7 +57,8 @@ public class StagedJob implements Serializable {
     @Column(name = "source")
     private SourceJobType source;
 
-    @ManyToOne(fetch=FetchType.EAGER)
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "program_id", referencedColumnName = "program_id", nullable = false)
     private Program program;
 
@@ -63,7 +66,7 @@ public class StagedJob implements Serializable {
     @CreationTimestamp
     @Setter(AccessLevel.NONE)
     private Timestamp created;
-    
+
     @Column(name = "last_updated", columnDefinition = "timestamp with time zone")
     @UpdateTimestamp
     @Setter(AccessLevel.NONE)

@@ -1,30 +1,30 @@
 /* eslint-disable no-unused-expressions */
 
-import React from "react";
-import GenericForm from "./GenericForm";
-import { Route } from "react-router-dom";
-import {renderWithProviders} from "../utils/test-utils";
-import "@testing-library/jest-dom/extend-expect";
-import config from "react-global-configuration";
-import {useSelector} from "react-redux";
+import React from 'react';
+import GenericForm from './GenericForm';
+import { Route } from 'react-router-dom';
+import {renderWithProviders} from '../utils/test-utils';
+import '@testing-library/jest-dom/extend-expect';
+import config from 'react-global-configuration';
+import {useSelector} from 'react-redux';
 
 const testSchema = {
   TestEntity: {
     required: [
-      "password",
-      "username"
+      'password',
+      'username'
     ],
-    type: "object",
+    type: 'object',
     properties: {
       username: {
-        type: "string"
+        type: 'string'
       },
       password: {
-        type: "string"
+        type: 'string'
       }
     }
   }
-}
+};
 
 config.set({api: testSchema});
 
@@ -43,19 +43,19 @@ jest.mock('react-redux', () => {
   return {
     ...ActualReactRedux,
     useSelector: jest.fn().mockImplementation(() => {
-      return function(){ return {}};
+      return function(){ return {};};
     }),
     useDispatch: jest.fn().mockImplementation(() => {
-      return function(){ return {}};
+      return function(){ return {};};
     }),
     useEffect: jest.fn().mockImplementation(() => {
-      return function(){ return {}};
+      return function(){ return {};};
     }),
   };
 });
 
 
-describe("GenericForm.js Component", () => {
+describe('GenericForm.js Component', () => {
 
   beforeEach(() => {
     useSelector.mockImplementation(callback => {
@@ -66,30 +66,30 @@ describe("GenericForm.js Component", () => {
     useSelector.mockClear();
   });
 
-  test("Test GenericForm.js exists", async () => {
+  test('Test GenericForm.js exists', async () => {
     const {findByText} = renderWithProviders(
         <Route path="/edit/:entityName">
           <GenericForm/>
         </Route>,
         {
-          route: "/edit/munt"
+          route: '/edit/munt'
         }
     );
     await findByText("ERROR: Entity 'Munt' missing from API Schema");
   });
 
 
-  test("Test GenericForm.js TestEntity renders form submit button", async () => {
+  test('Test GenericForm.js TestEntity renders form submit button', async () => {
 
     const {findByText} = renderWithProviders(
         <Route path="/edit/:entityName">
           <GenericForm/>
         </Route>,
         {
-          route: "/edit/TestEntity"
+          route: '/edit/TestEntity'
         }
     );
-    await findByText("Submit");
+    await findByText('Submit');
   });
 
 });

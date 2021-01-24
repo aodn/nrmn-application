@@ -4,6 +4,7 @@ import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.model.RowMethodBlock;
 import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
@@ -48,6 +49,7 @@ public class ATRCMethodCheck extends BaseGlobalValidator {
                                     job.getId(),
                                     entry.getKey() + "has incorrect set of methods:" + methodStr),
                             ValidationCategory.GLOBAL,
+                            ValidationLevel.BLOCKING,
                             ruleName,
                             null
                     ));

@@ -2,7 +2,6 @@ import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import {makeStyles} from '@material-ui/core/styles';
@@ -10,11 +9,10 @@ import clsx from 'clsx';
 import { toggleLeftSideMenu } from './layout-reducer';
 import { connect } from 'react-redux';
 import store from '../store';
-import AuthState from "./AuthState";
+import AuthState from './AuthState';
+import Button from '@material-ui/core/Button';
 import SettingsMenu from "./SettingsMenu";
-import Button from "@material-ui/core/Button";
-import Link from "@material-ui/core/Link";
-import {blueGrey} from "@material-ui/core/colors";
+import {PropTypes} from 'prop-types';
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ?
     process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
@@ -24,18 +22,18 @@ const useStyles = makeStyles((theme) => ({
     fontFamily: [
       'Roboto'
     ].join(','),
-    color: "#FFF",
-    fontSize: "x-large",
-    textTransform: "initial",
+    color: '#FFF',
+    fontSize: 'x-large',
+    textTransform: 'initial',
     paddingRight: 15,
     paddingLeft: 15,
     '&:hover': {
       color: '#FFF',
-      backgroundColor: blueGrey[400]
+      backgroundColor:  "rgba(0, 0, 0, 0.04)"
     }
   },
   spacer: {
-    "& > *": {
+    '& > *': {
       marginLeft: 10,
       marginRight: 10,
       padding: 10
@@ -68,8 +66,8 @@ const mapStateToProps = state => {
 };
 
 const handleClick = () => {
-  store.dispatch(toggleLeftSideMenu())
-}
+  store.dispatch(toggleLeftSideMenu());
+};
 
 const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
   const classes = useStyles();
@@ -103,7 +101,7 @@ const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
                   <img
                       width={100}
                       src={'https://static.emii.org.au/images/logo/IMOS-Ocean-Portal-logo.png'}
-                      alt={"IMOS Logo"}
+                      alt={'IMOS Logo'}
                   />
                 </Grid>
                 <Grid item>
@@ -126,8 +124,10 @@ const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
       </Grid>
     </Toolbar>
   </AppBar>
-  )
+  );
 };
-
+ReduxTopBar.propTypes = {
+  leftSideMenuIsOpen : PropTypes.bool
+};
 const TopBar = connect(mapStateToProps)(ReduxTopBar);
 export default TopBar;

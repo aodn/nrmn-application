@@ -1,6 +1,6 @@
-import { takeEvery, call, put } from "redux-saga/effects";
-import { rawSurveyReady, ImportFailed, FileRequested } from "../reducers/create-import";
-import {rawSurvey} from "../../../axios/api";
+import { takeEvery, call, put } from 'redux-saga/effects';
+import { rawSurveyReady, ImportFailed, FileRequested } from '../reducers/create-import';
+import {rawSurvey} from '../../../axios/api';
 
 export default function* FileImportWatcher() {
     yield takeEvery(FileRequested, fileImport);

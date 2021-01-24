@@ -16,7 +16,9 @@ import { toggleLeftSideMenu } from './layout-reducer';
 import store from '../store';
 import {
     NavLink
-  } from "react-router-dom";
+  } from 'react-router-dom';
+import {ArrowRight} from '@material-ui/icons';
+import {PropTypes} from 'prop-types';
 
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ?
@@ -45,13 +47,17 @@ const mapStateToProps = state => {
   };
 
 const handleMainMenu = () => {
-    store.dispatch(toggleLeftSideMenu())
-}
+    store.dispatch(toggleLeftSideMenu());
+};
 
 const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
     const [openSub, setOpenSub] = React.useState(true);
     const classes = useStyles();
     const theme = useTheme();
+
+    const handleClick = () => {
+        setOpenSub(!openSub);
+    };
 
     return (
         <Drawer className={classes.drawer}
@@ -100,6 +106,10 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
             {/*    ))}*/}
             {/*</List>*/}
         </Drawer>);
-}
+};
+
+ReduxSideMenu.propTypes = {
+    leftSideMenuIsOpen : PropTypes.bool
+};
 const SideMenu = connect(mapStateToProps)(ReduxSideMenu);
 export default SideMenu;

@@ -1,6 +1,6 @@
 import React from 'react';
-import CircularProgress from "@material-ui/core/CircularProgress";
-
+import CircularProgress from '@material-ui/core/CircularProgress';
+import {PropTypes} from 'prop-types';
 
 export const LoadingSpinner = (props) => {
   const size = (props.size) ? props.size : 21;
@@ -9,5 +9,11 @@ export const LoadingSpinner = (props) => {
 
   return <CircularProgress
       {...props}
-      color={"secondary"} size={size} thickness={thickness} />
-}
+      color={'secondary'} size={size} thickness={thickness} />;
+};
+
+LoadingSpinner.propTypes = {
+  size: PropTypes.number,
+  thickness: PropTypes.number
+
+};

@@ -1,12 +1,12 @@
 import React from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import store from '../store';
-import {toggleTheme} from "./theme-reducer";
-import {Settings} from "@material-ui/icons";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
+import {toggleTheme} from './theme-reducer';
+import {Settings} from '@material-ui/icons';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 
 
 const SettingsMenu = () => {
@@ -24,7 +24,7 @@ const SettingsMenu = () => {
   const handleToggleThemeChange = event => {
     store.dispatch(toggleTheme(event.target.checked));
     handleClose();
-  }
+  };
 
   return (
       <>
@@ -51,8 +51,8 @@ const SettingsMenu = () => {
         /></MenuItem>
       </Menu>
       </>
-)
+);
 
-}
+};
 
 export default SettingsMenu;

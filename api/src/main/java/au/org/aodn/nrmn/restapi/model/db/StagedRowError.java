@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,11 @@ public class StagedRowError {
     @Enumerated(EnumType.STRING)
     @Column(name = "error_type")
     private ValidationCategory errorType;
+
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "error_level")
+    private ValidationLevel errorLevel;
 
     @Column(name = "column_target")
     private String columnTarget;

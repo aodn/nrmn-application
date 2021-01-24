@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.validation.validators.entities;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.model.EntityCriteria;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
@@ -18,7 +19,7 @@ public abstract class BaseRowExistingEntity<E, R extends EntityCriteria<E>> exte
         this.repo = repo;
     }
 
-    protected Validated<StagedRowError, E> checkExists(StagedRow target, String criteria) {
+    protected Validated<StagedRowError, E> checkExists(StagedRow target, String criteria, ValidationLevel errorLevel) {
         val errorID = new ErrorID(
                 target.getId(),
                 target.getStagedJob().getId(),
@@ -35,6 +36,7 @@ public abstract class BaseRowExistingEntity<E, R extends EntityCriteria<E>> exte
                                 new StagedRowError(
                                         errorID,
                                         ValidationCategory.ENTITY,
+                                        errorLevel,
                                         columnTarget,
                                         target))
                 );

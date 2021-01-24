@@ -11,6 +11,6 @@ const ImportPage = () => {
             <DataSheetView></DataSheetView>
         </div>
     );
-}
+};
 
 export default ImportPage;

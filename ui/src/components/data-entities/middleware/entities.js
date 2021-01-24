@@ -1,7 +1,7 @@
-import {takeEvery, call, put} from "redux-saga/effects";
+import {takeEvery, call, put} from 'redux-saga/effects';
 
-import {entityEdit, entitySave, getEntity, getSelectedEntityItems} from "../../../axios/api";
-import {createAction} from "@reduxjs/toolkit";
+import {entityEdit, entitySave, getEntity, getSelectedEntityItems} from '../../../axios/api';
+import {createAction} from '@reduxjs/toolkit';
 import {
   entitiesSaved,
   entitiesError,
@@ -9,8 +9,8 @@ import {
   itemLoaded,
   selectedItemsLoaded,
   selectedItemsEdited
-} from "../form-reducer";
-import {isSuccessful200Response} from "../../utils/helpers";
+} from '../form-reducer';
+import {isSuccessful200Response} from '../../utils/helpers';
 
 export default function* getEntitiesWatcher() {
   yield takeEvery(selectRequested, entities);
@@ -34,7 +34,7 @@ function* entities(action) {
 
 function* setNestedFormData(action) {
   try {
-    const resp = {}
+    const resp = {};
     resp[action.payload.entity] = action.payload.newValues;
     yield put(selectedItemsEdited(resp));
   } catch (e) {

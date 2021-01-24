@@ -11,7 +11,7 @@ import java.time.temporal.ChronoField;
 
 public final class TimeFormatValidation extends BaseRowFormatValidation<LocalTime> {
     public TimeFormatValidation() {
-        super("Time", "HH:mm");
+        super("Time", "H:mm");
     }
 
     @Override
