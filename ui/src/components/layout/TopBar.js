@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import AuthState from './AuthState';
 import SettingsMenu from './SettingsMenu';
 
+
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ?
     process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: 15,
     '&:hover': {
       color: '#FFF',
-      backgroundColor: 'rgba(0, 0, 0, 0.04)'
+      backgroundColor:  'rgba(0, 0, 0, 0.04)'
     }
   },
   spacer: {

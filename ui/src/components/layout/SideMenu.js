@@ -11,6 +11,8 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
+import StarBorder from '@material-ui/icons/StarBorder';
+import {useDispatch, useSelector, connect } from 'react-redux';
 import { toggleLeftSideMenu } from './layout-reducer';
 import {
     NavLink
@@ -70,10 +72,17 @@ const SideMenu = () => {
             <Divider />
             <List>
                 <ListSubheader>DATA</ListSubheader>
-                <Collapse in={openSub} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                        <ListItem button  onClick={handleMainMenu}  className={classes.nested} component={NavLink} aweirdprop="true" to="/list/StagedJob">
-                            <ListItemText primary="List Jobs"   />
+                <ListItem button onClick={handleClick}>
+                    <ListItemIcon>
+                        <InboxIcon />
+                    </ListItemIcon>
+                    <ListItemText primary=' Uploads' />
+                    {openSub ? <ExpandLess /> : <ExpandMore />}
+                </ListItem>
+                <Collapse in={openSub} timeout='auto' unmountOnExit>
+                    <List component='div' disablePadding>
+                        <ListItem button  onClick={handleMainMenu}  className={classes.nested} component={NavLink} aweirdprop='true' to='/list/StagedJob'>
+                            <ListItemText primary='List Jobs'   />
                         </ListItem>
                         <ListItem button  onClick={handleMainMenu} className={classes.nested} component={NavLink} to='/upload'>
                             <ListItemText primary='Add Job' />
