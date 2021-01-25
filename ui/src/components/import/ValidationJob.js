@@ -1,11 +1,11 @@
-import { Badge, Box, Chip, CircularProgress, Fab, Grid, Typography } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+import { Box, Chip, CircularProgress, Fab, Grid, Typography } from '@material-ui/core';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import DataSheetView from './DataSheetView';
 import PlaylistAddCheckOutlinedIcon from '@material-ui/icons/PlaylistAddCheckOutlined';
 import { makeStyles } from '@material-ui/core/styles';
 import { Redirect, useParams } from 'react-router';
-import { ingestStarting, JobRequested, JobStarting, SubmitingestRequested, validationFilter, ValidationRequested } from './reducers/create-import';
+import { ingestStarting, JobRequested, JobStarting, SubmitingestRequested, ValidationRequested } from './reducers/create-import';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutlined';
 import { Backdrop } from '@material-ui/core';

@@ -25,7 +25,7 @@ axiosInstance.interceptors.response.use((response) => {
       window.location = `/notfound?resource=${window.location.pathname}`;
     }
     else {
-      console.log('DEBUG: ',
+      console.debug('DEBUG: ',
           error.response.config.baseURL + error.response.data.path,
           error.response.data.error);
     }

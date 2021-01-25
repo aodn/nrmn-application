@@ -5,11 +5,12 @@ import Logout from '../auth/logout';
 import { toggleLogoutMenuOpen } from './layout-reducer';
 import { Button } from '@material-ui/core';
 
-
 const AuthState = () => {
   const userName = useSelector(state => state.auth.username);
   const dispatch = useDispatch();
-  const openLogout = (dis) => dis(toggleLogoutMenuOpen());
+
+  const openLogout = () => dispatch(toggleLogoutMenuOpen());
+
   if (!userName || userName === '')
     return (<></>);
 
@@ -20,8 +21,8 @@ const AuthState = () => {
       size="small"
       title={'Log out'}
       startIcon={<VerifiedUserIcon />}
-      onClick={() => openLogout(dispatch)}>{userName}</Button>
-    <Logout /> |
+      onClick={openLogout}>{userName}</Button>
+    <Logout />
   </>);
 
 };

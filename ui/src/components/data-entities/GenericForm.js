@@ -3,7 +3,7 @@ import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import { Link } from 'react-router-dom';
 import {useEffect} from 'react';
-import {useParams, Redirect} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import NestedApiField from './customWidgetFields/NestedApiField';
 import pluralize from 'pluralize';
 import config from 'react-global-configuration';
@@ -19,7 +19,7 @@ import BaseForm from '../BaseForm';
 import {makeStyles} from '@material-ui/core/styles';
 
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   buttons: {
     '& > *': {
       marginTop: 20

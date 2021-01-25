@@ -10,15 +10,11 @@ import List from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import Collapse from '@material-ui/core/Collapse';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import {  useDispatch, useSelector } from 'react-redux';
 import { toggleLeftSideMenu } from './layout-reducer';
-import store from '../store';
 import {
     NavLink
 } from 'react-router-dom';
-import { ArrowRight, ExpandLess, ExpandMore } from '@material-ui/icons';
-import { PropTypes } from 'prop-types';
 
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ?
@@ -84,7 +80,7 @@ const handleMainMenu = () => {
             <Divider />
             <List>
                 <ListSubheader>REFERENCE DATA</ListSubheader>
-                {['Diver', 'Location', 'ObservableItem', 'Program', 'Site'].map((text, index) => (
+                {['Diver', 'Location', 'ObservableItem', 'Program', 'Site'].map(text => (
                     <ListItem button key={text} component={NavLink} to={'/list/' + text} >
                         <ListItemText primary={text} />
                     </ListItem>

@@ -8,7 +8,6 @@ import {
     ListItemText,
     fade,
     makeStyles,
-    Button,
     Box,
     IconButton,
     Toolbar,
@@ -18,11 +17,10 @@ import {
 import { PlaylistAddCheckOutlined, ReportProblemOutlined, SearchOutlined } from '@material-ui/icons';
 import BlockOutlinedIcon from '@material-ui/icons/BlockOutlined';
 import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+import React,{ useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JobStarting, validationFilter, ValidationRequested } from './reducers/create-import';
 import { orange } from '@material-ui/core/colors';
-import MenuIcon from '@material-ui/icons/Menu';
 import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
 import ArrowBackIosOutlinedIcon from '@material-ui/icons/ArrowBackIosOutlined';
 import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
@@ -219,7 +217,7 @@ const ValidationDrawer = () => {
                 </Toolbar>
             </Box>
             <List>
-                {errList.map((err, index) => (
+                {errList.map((err) => (
                     <ListItem onClick={() => handleFilter(err)} className={(err.msg === errSelected.msg) ? classes.selected : classes.errorItem} button key={err.msg}>
                         <ListItemIcon>
                             <Badge badgeContent={err.count} color="primary">

@@ -7,7 +7,6 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
 import green from '@material-ui/core/colors/green';
-import clsx from 'clsx';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -44,11 +43,7 @@ const BaseForm = (params) => {
   const classes = useStyles();
 
   const loading = params.loading;
-  const success = params.success;
 
-  const buttonClassname = clsx({
-    [classes.buttonSuccess]: success,
-  });
   function submitForm(formData) {
     console.warn(formData);
     params.onSubmit(formData);

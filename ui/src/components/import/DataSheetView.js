@@ -31,7 +31,6 @@ const DataSheetView = () => {
     const editLoading = useSelector(state => state.import.editLoading);
 
     const errSelected = useSelector(state => state.import.errSelected);
-    const [gridColumnApi, setGridColumnApi] = useState(null);
     const [gridApi, setGridApi] = useState(null);
     var rows = immutableRows.map(Object.unfreeze);
     const job = useSelector(state => state.import.job);
@@ -40,7 +39,6 @@ const DataSheetView = () => {
 
     const agGridReady = (params) => {
         setGridApi(params.api);
-        setGridColumnApi(params.columnApi);
         dispatch(JobFinished());
 
         var allColumnIds = [];

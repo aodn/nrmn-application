@@ -15,10 +15,9 @@ import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 import BaseForm from '../BaseForm';
 import ObjectListViewTemplate from './ObjectListViewTemplate';
-import PropTypes from 'prop-types';
 
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   buttons: {
     '& > *': {
       marginTop: 20

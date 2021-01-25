@@ -1,5 +1,5 @@
 import { takeEvery, call, put } from 'redux-saga/effects';
-import {JobReady, validationReady , RowUpdateRequested, ImportFailed, JobRequested, ValidationRequested, EditRowFinished, SubmitingestRequested } from '../reducers/create-import';
+import {JobReady, validationReady , RowUpdateRequested, ImportFailed, JobRequested, ValidationRequested, EditRowFinished, SubmitingestRequested, ingestFinished } from '../reducers/create-import';
 import {getDataJob, postJobValidation, updateRow, submitingest} from '../../../axios/api';
 
 export default function* Watcher() {
@@ -43,7 +43,7 @@ function* update(action) {
 function* submit(action) {
     try {
         const payload = yield  call(submitingest, action.payload);
-        yield put();
+        yield put(ingestFinished(payload.data));
     } catch (error) {
         yield put(ImportFailed(error));
 

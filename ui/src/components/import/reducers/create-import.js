@@ -64,7 +64,7 @@ const importSlice = createSlice({
     name: 'import',
     initialState: importState,
     reducers: {
-        ImportStarted: (state, action) => {
+        ImportStarted: (state) => {
             console.debug('started');
             state.isLoading = true;
         },
@@ -135,10 +135,10 @@ const importSlice = createSlice({
         JobFinished: (state) => {
             state.isLoading = false;
         },
-        ingestStarting: (state, action) => {
+        ingestStarting: (state) => {
             state.ingestLoading = true;
         },
-        ingestFinished: (state, action) => {
+        ingestFinished: (state) => {
             state.ingestLoading = false;
             state.ingestSuccess = true;
         },
