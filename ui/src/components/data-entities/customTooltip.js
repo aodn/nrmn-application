@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 
 export default class CustomTooltip extends Component {
 
+
+
   getReactContainerClasses() {
     return ['custom-tooltip'];
   }

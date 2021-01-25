@@ -132,7 +132,7 @@ const GenericDetailsView = () => {
         aria-label={'Edit ' + entityTitle + ' ' + id}
         variant={'contained'}
       >
-        Edit {entityTitle} &squo;{id}&squo;
+        {`Edit ` + entityTitle + ` '` + id + `'`}
       </Button>
     </div>;
   };

@@ -9,12 +9,9 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
-import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
-import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
+import au.org.aodn.nrmn.restapi.repository.*;
 import au.org.aodn.nrmn.restapi.service.SpreadSheetService;
-import au.org.aodn.nrmn.restapi.service.model.StagedRowService;
+import au.org.aodn.nrmn.restapi.service.StagedRowService;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.process.ValidationProcess;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +25,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -62,6 +58,10 @@ public class StagedJobController {
     @Autowired
     private ValidationProcess validation;
 
+    @Autowired
+    private SecUserRepository userRepo;
+
+
     @PostMapping("/upload")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity<UploadResponse> uploadFile(
@@ -75,6 +75,13 @@ public class StagedJobController {
                         "upload excel file attempt for username: " + authentication.getName()
                                 + "file: " + file.getOriginalFilename())
         );
+        val programOpt = programRepo.findById(programId);
+        if (!programOpt.isPresent())
+            return ResponseEntity
+                    .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .body(new UploadResponse(Optional.empty(),
+                            Stream.of(new ErrorInput("Program Not found", "program")).collect(Collectors.toList())));
+
 
         val validationHelper = new ValidatorHelpers();
         val validatedSheet =
@@ -84,30 +91,32 @@ public class StagedJobController {
                                 file,
                                 withInvertSize);
 
+        val user = userRepo.findByEmail(authentication.getName());
+
+        val job = StagedJob.builder()
+                .isExtendedSize(withInvertSize)
+                .source(SourceJobType.FILE)
+                .reference(file.getOriginalFilename())
+                .status(StatusJobType.PENDING)
+                .program(programOpt.get())
+                .creator(user.get())
+                .build();
+
         List<ErrorInput> errors = validationHelper.toErrorList(validatedSheet);
-        val programOpt = programRepo.findById(programId);
-        if (!programOpt.isPresent())
-            return ResponseEntity
-                    .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                    .body(new UploadResponse(Optional.empty(),
-                            Stream.of(new ErrorInput("Program Not found", "program")).collect(Collectors.toList())));
 
         return validatedSheet.fold(
-                err -> ResponseEntity.unprocessableEntity().
-
-                        body(new UploadResponse(Optional.empty(), errors)),
+                err -> {
+                    job.setStatus(StatusJobType.FAILED);
+                    jobRepo.save(job);
+                  return  ResponseEntity.unprocessableEntity().
+                            body(new UploadResponse(Optional.empty(), errors));
+                },
                 sheet -> {
                     val stagedRowToSave = sheetService.sheets2Staged(sheet);
-                    val stagedJob = jobRepo.save(
-                            StagedJob.builder()
-                                    .isExtendedSize(withInvertSize)
-                                    .source(SourceJobType.FILE)
-                                    .reference(sheet.getFileId())
-                                    .status(StatusJobType.PENDING)
-                                    .program(programOpt.get())
-                                    .build());
+                    job.setStatus(StatusJobType.STAGED);
+                    jobRepo.save(job);
                     stagedRowRepo.saveAll(stagedRowToSave.stream().map(s -> {
-                        s.setStagedJob(stagedJob);
+                        s.setStagedJob(job);
                         return s;
                     })
                             .collect(Collectors.toList()));

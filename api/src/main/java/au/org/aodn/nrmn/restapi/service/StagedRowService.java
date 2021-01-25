@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.service.model;
+package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;

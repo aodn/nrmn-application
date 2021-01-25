@@ -1,25 +1,25 @@
 import React from 'react';
-import {Box, Typography, Button} from '@material-ui/core';
-import {useSelector, useDispatch} from 'react-redux';
-import {useEffect} from 'react';
-import {useParams, NavLink} from 'react-router-dom';
+import { Box, Typography, Button } from '@material-ui/core';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { useParams, NavLink } from 'react-router-dom';
 import pluralize from 'pluralize';
-import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
+import { AgGridReact } from 'ag-grid-react/lib/agGridReact';
 import useWindowSize from '../utils/useWindowSize';
 import Alert from '@material-ui/lab/Alert';
 import config from 'react-global-configuration';
-import {titleCase} from 'title-case';
+import { titleCase } from 'title-case';
 import Grid from '@material-ui/core/Grid';
 import CustomTooltip from './customTooltip';
-import {selectRequested} from './middleware/entities';
-import {resetState} from './form-reducer';
+import { selectRequested } from './middleware/entities';
+import { resetState } from './form-reducer';
 
 
 const cellRenderer = (params) => {
   if (typeof params.value === 'object') {
     return (
-        JSON.stringify(params.value)?.replaceAll(/["{}]/g,'')
-            .replaceAll(',',', ').trim()
+      JSON.stringify(params.value)?.replaceAll(/["{}]/g, '')
+        .replaceAll(',', ', ').trim()
     );
   };
   return params.value;
@@ -28,7 +28,7 @@ const cellRenderer = (params) => {
 const schematoColDef = (schema, size, entityName) => {
 
   const fields = Object.keys(schema.properties);
-  const widthSize = size.width / (fields.length + 1 );
+  const widthSize = size.width / (fields.length + 1);
   const coldefs = fields.map(field => {
 
     return {
@@ -73,8 +73,8 @@ let agGridApi = {};
 const renderError = (msgArray) => {
   return <Box>
     <Alert style={{ height: 'auto', lineHeight: '28px', whiteSpace: 'pre-line' }}
-          severity="error"
-          variant="filled"
+      severity="error"
+      variant="filled"
     >{msgArray.join('\r\n ')}
     </Alert></Box>;
 };
@@ -83,24 +83,24 @@ const nonGenericEntities = {
   'StagedJob': {
     title: 'Jobs',
     createButtonPath: '/import-file', // createButtonPath absence means no create button will show
-    linkPath: 'linkToSomewherePath/{}'
+    linkLabel: 'Details',
+    linkPath: 'view/stagedJobs/{}'
   }
 };
 
 const EntityList = () => {
 
-  const {entityName} = useParams();
+  const { entityName } = useParams();
   const plural = pluralize.plural(entityName);
   const entityNamePlural = plural.charAt(0).toLowerCase() + plural.slice(1);
 
   const schemaDefinition = config.get('api');
   const size = useWindowSize();
 
-  const themeType = useSelector(state => state.theme.themeType);
   const dispatch = useDispatch();
   const entities = useSelector(state => state.form.entities);
   const errors = useSelector(state => state.form.errors);
-  const items =  (entities?._embedded) ? entities._embedded[entityNamePlural] : undefined;
+  const items = (entities?._embedded) ? entities._embedded[entityNamePlural] : undefined;
 
   const agGridReady = (agGrid) => {
     agGridApi = Object.create(agGrid.api);
@@ -172,7 +172,7 @@ const EntityList = () => {
             </Grid>
 
             <div style={{width: '100%', height: size.height - 170, marginTop: 25}}
-                 className={themeType ? 'ag-theme-alpine-dark' : 'ag-theme-alpine'}>
+                 className={'ag-theme-material'}>
               <AgGridReact
                   columnDefs={colDef}
                   rowSelection="single"

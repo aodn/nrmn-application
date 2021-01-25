@@ -5,10 +5,7 @@ import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
-import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
-import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
-import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
+import au.org.aodn.nrmn.restapi.repository.*;
 import au.org.aodn.nrmn.restapi.service.CorrectionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -18,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,6 +43,9 @@ public class CorrectionController {
     @Autowired
     private CorrectionService correctionService;
 
+    @Autowired
+    private SecUserRepository userRepo;
+
     @PostMapping("/correct")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity correctSurvey(
@@ -58,10 +59,13 @@ public class CorrectionController {
                                 + " survey id list: " + surveyIdList)
         );
 
+
+        val user = userRepo.findByEmail(authentication.getName());
         val stagedJob = stagedJobRepository.save(
                 StagedJob.builder()
                         .source(SourceJobType.CORRECTION)
                         .status(StatusJobType.STAGED)
+                        .creator(user.get())
                         .build());
 
         List<Survey> surveys = surveyRepository.findByIdsIn(surveyIdList);

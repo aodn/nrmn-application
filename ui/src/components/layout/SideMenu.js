@@ -9,31 +9,24 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import List from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import Collapse from '@material-ui/core/Collapse';
-import { connect } from 'react-redux';
+import {  useDispatch, useSelector } from 'react-redux';
 import { toggleLeftSideMenu } from './layout-reducer';
-import store from '../store';
 import {
     NavLink
 } from 'react-router-dom';
-import { PropTypes } from 'prop-types';
 
 
-
-const drawerWidth = 240;
+const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ?
+    process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
 const useStyles = makeStyles((theme) => ({
     drawer: {
-        width: drawerWidth,
+        width: `${drawerWidth}px`,
         flexShrink: 0,
     },
     drawerPaper: {
-        width: drawerWidth,
+        width: `${drawerWidth}px`,
     },
     drawerHeader: {
         display: 'flex',
@@ -45,22 +38,18 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const mapStateToProps = state => {
-    return { leftSideMenuIsOpen: state.toggle.leftSideMenuIsOpen };
-};
 
-const handleMainMenu = () => {
-    store.dispatch(toggleLeftSideMenu());
-};
 
-const ReduxSideMenu = ({ leftSideMenuIsOpen }) => {
-    const [openSub, setOpenSub] = React.useState(true);
+const SideMenu = () => {
     const classes = useStyles();
     const theme = useTheme();
+    const leftSideMenuIsOpen = useSelector(state =>  state.toggle.leftSideMenuIsOpen);
+    const dispatch = useDispatch();
 
-    const handleClick = () => {
-        setOpenSub(!openSub);
-    };
+
+const handleMainMenu = () => {
+    dispatch(toggleLeftSideMenu());
+};
 
     return (
         <Drawer className={classes.drawer}
@@ -79,43 +68,20 @@ const ReduxSideMenu = ({ leftSideMenuIsOpen }) => {
             <Divider />
             <List>
                 <ListSubheader>DATA</ListSubheader>
-                <ListItem button onClick={handleClick}>
-                    <ListItemIcon>
-                        <InboxIcon />
-                    </ListItemIcon>
-                    <ListItemText primary=" Uploads" />
-                    {openSub ? <ExpandLess /> : <ExpandMore />}
-                </ListItem>
-                <Collapse in={openSub} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                        <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} aweirdprop="true" to="/list/StagedJob">
-                            <ListItemText primary="List Jobs" />
-                        </ListItem>
-                        <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} to="/import-file">
-                            <ListItemText primary="Add Job" />
-                        </ListItem>
-                    </List>
-                </Collapse>
-
-                <ListItem button key={'Survey'}>
-                    <ListItemText primary={'Survey'} />
-                </ListItem>
+                <List component='div' disablePadding>
+                    <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} aweirdprop='true' to='/list/StagedJob'>
+                        <ListItemText primary='List Jobs' />
+                    </ListItem>
+                    <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} to='/upload'>
+                        <ListItemText primary='Add Job' />
+                    </ListItem>
+                </List>
             </List>
             <Divider />
             <List>
                 <ListSubheader>REFERENCE DATA</ListSubheader>
-                {['Diver', 'Location', 'ObservableItem', 'Program', 'Site', 'Survey'].map((text) => (
+                {['Diver', 'Location', 'ObservableItem', 'Program', 'Site'].map(text => (
                     <ListItem button key={text} component={NavLink} to={'/list/' + text} >
-                        <ListItemText primary={text} />
-                    </ListItem>
-                ))}
-            </List>
-            <Divider />
-            <List>
-                <ListSubheader>ACTIONS</ListSubheader>
-
-                {['Extract', 'Templates'].map((text) => (
-                    <ListItem button key={text}>
                         <ListItemText primary={text} />
                     </ListItem>
                 ))}
@@ -123,8 +89,4 @@ const ReduxSideMenu = ({ leftSideMenuIsOpen }) => {
         </Drawer>);
 };
 
-ReduxSideMenu.propTypes = {
-    leftSideMenuIsOpen: PropTypes.bool
-};
-const SideMenu = connect(mapStateToProps)(ReduxSideMenu);
 export default SideMenu;

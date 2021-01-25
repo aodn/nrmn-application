@@ -14,7 +14,6 @@ axiosInstance.all = function all(promises) {
 };
 
 axiosInstance.interceptors.response.use((response) => {
-
   return response;
 }, (error) => {
   if (401 === error.response?.status && error.config.url !== '/api/auth/signin') {
@@ -30,9 +29,6 @@ axiosInstance.interceptors.response.use((response) => {
           error.response.config.baseURL + error.response.data.path,
           error.response.data.error);
     }
-  } else {
-
-    return Promise.reject(error);
   }
 });
 

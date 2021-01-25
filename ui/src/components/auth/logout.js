@@ -30,20 +30,20 @@ var Logout = () => {
       <>
         <Dialog
             open={logoutMenuOpen}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
+            aria-labelledby='alert-dialog-title'
+            aria-describedby='alert-dialog-description'
         >
-          <DialogTitle id="alert-dialog-title">Logout</DialogTitle>
+          <DialogTitle id='alert-dialog-title'>Logout</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              Do you really want to log out as &squo;{username}&squo;?
+              {`Do you really want to log out as '` + username + `' ?`}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCancel} color="primary">
+            <Button onClick={handleCancel} color='primary'>
               Cancel
             </Button>
-            <Button onClick={handleClose} color="primary" autoFocus>
+            <Button onClick={handleClose} color='primary' autoFocus>
               Logout
             </Button>
           </DialogActions>
