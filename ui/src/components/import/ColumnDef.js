@@ -1,338 +1,332 @@
 
 function cell(params) {
-    if (params.data.Errors.length > 0) {
-        const present = params.data.Errors.map(e => e.ColunmTarget);
-        const inter = present.filter(e => e === params.colDef.field);
-        if (inter.length > 0)
-            return {backgroundColor: 'red'};
+    if (params.data?.errors?.length > 0) {
+        const fields = params.data.errors.map(e =>
+            ({ field: e.columnTarget.toLowerCase(), errorLevel: e.errorLevel }));
+        const target = params.colDef.field.toLowerCase();
+        const inter = fields.filter(e => e.field === target);
+        if (inter.length > 0) {
+            const color = (inter[0].errorLevel == 'BLOCKING')? '#f44336': '#ff9800';
+            return { color:  color +' !important' };
+        }
     }
-    return  null;
+    return null;
 }
+const hashValueGetter = (params) => {
+    return params.node.rowIndex;
+};
 
-const ColunmDef = [
+export const ColumnDef = [
     {
-        field: 'ID',
-        editable: true,
-        width: 100,
+        field: 'id',
+        editable: false,
+        hashValueGetter: hashValueGetter
     },
     {
-        field: 'Diver',
+        field: 'diver',
         editable: true,
-        width: 100,
         pivot: true,
-        enablePivot: true,
+        enablePivot: false,
+        cellStyle: cell,
+        hashValueGetter: hashValueGetter
+
+    },
+    {
+        field: 'buddy',
+        editable: true,
         cellStyle: cell
 
     },
     {
-        field: 'Buddy',
+        field: 'siteCode',
+        title: 'Site Code',
         editable: true,
-        width: 100
-    },
-    {
-        field: 'Site No',
-        editable: true,
-        width: 100,
-        hide: true,
-        rowGroup: true,
+        rowGroup: false,
         enableRowGroup: true,
         cellStyle: cell
 
     },
     {
-        field: 'Site Name',
+        field: 'siteName',
+        title: 'Site Name',
         editable: true,
-        width: 100
     },
     {
-        field: 'Latitude',
+        field: 'latitude',
+        title: 'Lat',
         editable: true,
-        width: 100,
         cellStyle: cell
 
     },
     {
-        field: 'Longitude',
+        field: 'longitude',
+        title: 'Long',
         editable: true,
-        width: 100,
         cellStyle: cell
 
     },
     {
-        field: 'Date',
+        field: 'date',
         editable: true,
-        width: 100
+        cellStyle: cell
+
     },
     {
         field: 'vis',
         editable: true,
-        width: 100
     },
     {
-        field: 'Direction',
+        field: 'direction',
         editable: true,
-        width: 100
+        cellStyle: cell
     },
     {
-        field: 'Time',
+        field: 'time',
         editable: true,
-        width: 100
+        cellStyle: cell
     },
     {
         field: 'P-Qs',
         editable: true,
-        width: 100
+        cellStyle: cell
     },
     {
-        field: 'Depth',
+        field: 'depth',
         editable: true,
-        width: 100,
-        hide: true,
-        rowGroup: true,
+        rowGroup: false,
+        enableRowGroup: true,
+        cellStyle: cell
+    },
+    {
+        field: 'method',
+        editable: true,
+        rowGroup: false,
         enableRowGroup: true,
     },
     {
-        field: 'Method',
+        field: 'block',
         editable: true,
-        width: 100,
-        hide: true,
-        rowGroup: true,
+        rowGroup: false,
         enableRowGroup: true,
+        cellStyle: cell
     },
     {
-        field: 'Block',
+        field: 'code',
         editable: true,
-        width: 100,
+        cellStyle: cell
+    },
+    {
+        field: 'species',
+        editable: true,
         hide: true,
-        rowGroup: true,
-        enableRowGroup: true,
+        'aggFunc': 'count',
+        cellStyle: cell
+
     },
     {
-        field: 'Code',
+        field: 'species',
         editable: true,
-        width: 100
+        cellStyle: cell
+
     },
     {
-        field: 'Species',
+        field: 'commonName',
+        title: 'Common Name',
         editable: true,
-        width: 100,
-        'aggFunc': 'count'
     },
     {
-        field: 'Common name',
+        field: 'total',
         editable: true,
-        width: 100
     },
     {
-        field: 'Total',
+        field: 'inverts',
         editable: true,
-        width: 100
-    },
-    {
-        field: 'Inverts',
-        editable: true,
-        width: 100
     },
     {
         field: '2.5',
         editable: true,
-        width: 100
     },
     {
         field: '5',
         editable: true,
-        width: 100
     },
     {
         field: '7.5',
         editable: true,
-        width: 100
     },
     {
         field: '10',
         editable: true,
-        width: 100
     },
     {
         field: '12.5',
         editable: true,
-        width: 100
     },
     {
         field: '15',
         editable: true,
-        width: 100
     },
     {
         field: '20',
         editable: true,
-        width: 100
     },
     {
         field: '25',
         editable: true,
-        width: 100
     },
     {
         field: '30',
         editable: true,
-        width: 100
     },
     {
         field: '35',
         editable: true,
-        width: 100
     },
     {
         field: '40',
         editable: true,
-        width: 100
     },
     {
         field: '50',
         editable: true,
-        width: 100
     },
     {
         field: '62.5',
-        editable: true,
-        width: 100
+        75: true,
     },
     {
         field: '75',
         editable: true,
-        width: 100
     },
     {
         field: '87.5',
         editable: true,
-        width: 100
     },
     {
         field: '100',
         editable: true,
-        width: 100
     },
     {
         field: '112.5',
         editable: true,
-        width: 100
     },
     {
         field: '125',
-        editable: true,
-        width: 100
+        editable: 75,
     },
     {
         field: '137.5',
         editable: true,
-        width: 100
     },
     {
         field: '150',
         editable: true,
-        width: 100
     },
     {
         field: '162.5',
         editable: true,
-        width: 100
     },
     {
         field: '175',
         editable: true,
-        width: 100
     },
     {
         field: '187.5',
         editable: true,
-        width: 100
     },
     {
         field: '200',
         editable: true,
-        width: 100
     },
     {
         field: '250',
         editable: true,
-        width: 100
     },
     {
         field: '300',
         editable: true,
-        width: 100
     },
     {
         field: '350',
         editable: true,
-        width: 100
     },
     {
         field: '400',
         editable: true,
-        width: 100
+    },
+
+];
+
+export const ExtendedSize = [
+    {
+        field: 'l5',
+        editable: true,
+    },
+    {
+        field: 'l95',
+        editable: true,
+    },
+    {
+        field: 'inverts',
+        editable: true,
+    },
+    {
+        field: 'm2InvertSizingSpecies',
+        editable: true,
+    }, {
+        field: 'isInvertSizing',
+        editable: true,
+    },
+    {
+        field: 'lmax',
+        editable: true,
     },
     {
         field: '450',
         editable: true,
-        width: 100
     },
     {
         field: '500',
         editable: true,
-        width: 100
     },
     {
         field: '550',
         editable: true,
-        width: 100
     },
     {
         field: '600',
         editable: true,
-        width: 100
     },
     {
         field: '650',
         editable: true,
-        width: 100
     },
     {
         field: '700',
         editable: true,
-        width: 100
     },
     {
         field: '750',
         editable: true,
-        width: 100
     },
     {
         field: '800',
         editable: true,
-        width: 100
     },
     {
         field: '850',
         editable: true,
-        width: 100
     },
     {
         field: '900',
         editable: true,
-        width: 100
     },
     {
         field: '950',
         editable: true,
-        width: 100
     },
     {
         field: '1000',
         editable: true,
-        width: 100
     }
 ];
-
-export default ColunmDef;

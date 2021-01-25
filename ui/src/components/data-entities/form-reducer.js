@@ -16,9 +16,7 @@ const formSlice = createSlice({
   name: 'form',
   initialState: formState,
   reducers: {
-    resetState: (state, action) => {
-      state = formState;
-    },
+    resetState: () => formState,
     entitiesLoaded: (state, action) => {
       state.entityEdited = {};
       state.editItem = {};

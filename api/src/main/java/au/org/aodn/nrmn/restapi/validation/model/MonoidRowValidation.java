@@ -1,6 +1,5 @@
 package au.org.aodn.nrmn.restapi.validation.model;
 
-import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import cyclops.data.Seq;
 import cyclops.function.Monoid;

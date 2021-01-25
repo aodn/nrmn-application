@@ -72,4 +72,8 @@ public class StagedJob implements Serializable {
     @Setter(AccessLevel.NONE)
     private Timestamp lastUpdated;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "sec_user_id", referencedColumnName = "id", nullable = false)
+    SecUser creator;
+
 }

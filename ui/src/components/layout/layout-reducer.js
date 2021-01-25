@@ -12,10 +12,10 @@ const toggleSlice = createSlice({
   name: 'toggle',
   initialState: toggleState,
   reducers: {
-    toggleLeftSideMenu: (state, action) => {
+    toggleLeftSideMenu: (state) => {
       state.leftSideMenuIsOpen = !state.leftSideMenuIsOpen;
     },
-    toggleLogoutMenuOpen: (state, action) => {
+    toggleLogoutMenuOpen: (state) => {
       state.logoutMenuOpen = !state.logoutMenuOpen;
     }
   },

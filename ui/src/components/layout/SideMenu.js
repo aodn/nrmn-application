@@ -10,15 +10,11 @@ import List from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import Collapse from '@material-ui/core/Collapse';
-import { connect } from 'react-redux';
+import {  useDispatch, useSelector } from 'react-redux';
 import { toggleLeftSideMenu } from './layout-reducer';
-import store from '../store';
 import {
     NavLink
-  } from 'react-router-dom';
-import {ArrowRight} from '@material-ui/icons';
-import {PropTypes} from 'prop-types';
+} from 'react-router-dom';
 
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ?
@@ -42,22 +38,18 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const mapStateToProps = state => {
-    return { leftSideMenuIsOpen: state.toggle.leftSideMenuIsOpen };
-  };
 
-const handleMainMenu = () => {
-    store.dispatch(toggleLeftSideMenu());
-};
 
-const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
-    const [openSub, setOpenSub] = React.useState(true);
+const SideMenu = () => {
     const classes = useStyles();
     const theme = useTheme();
+    const leftSideMenuIsOpen = useSelector(state =>  state.toggle.leftSideMenuIsOpen);
+    const dispatch = useDispatch();
 
-    const handleClick = () => {
-        setOpenSub(!openSub);
-    };
+
+const handleMainMenu = () => {
+    dispatch(toggleLeftSideMenu());
+};
 
     return (
         <Drawer className={classes.drawer}
@@ -76,40 +68,25 @@ const ReduxSideMenu = ({leftSideMenuIsOpen}) => {
             <Divider />
             <List>
                 <ListSubheader>DATA</ListSubheader>
-                <Collapse in={openSub} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                        <ListItem button  onClick={handleMainMenu}  className={classes.nested} component={NavLink} aweirdprop="true" to="/list/StagedJob">
-                            <ListItemText primary="List Jobs"   />
-                        </ListItem>
-                        <ListItem button  onClick={handleMainMenu} className={classes.nested} component={NavLink} to="/import-file">
-                            <ListItemText primary="Add Job" />
-                        </ListItem>
-                    </List>
-                </Collapse>
+                <List component='div' disablePadding>
+                    <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} aweirdprop='true' to='/list/StagedJob'>
+                        <ListItemText primary='List Jobs' />
+                    </ListItem>
+                    <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} to='/upload'>
+                        <ListItemText primary='Add Job' />
+                    </ListItem>
+                </List>
             </List>
             <Divider />
             <List>
                 <ListSubheader>REFERENCE DATA</ListSubheader>
-                {['Diver', 'Location', 'ObservableItem', 'Program', 'Site'].map((text, index) => (
-                    <ListItem button key={text} component={NavLink} to={"/list/" + text} >
+                {['Diver', 'Location', 'ObservableItem', 'Program', 'Site'].map(text => (
+                    <ListItem button key={text} component={NavLink} to={'/list/' + text} >
                         <ListItemText primary={text} />
                     </ListItem>
                 ))}
             </List>
-            {/*<Divider />*/}
-            {/*<List>*/}
-            {/*    <ListSubheader>ACTIONS</ListSubheader>*/}
-            {/*    {['Templates'].map((text, index) => (*/}
-            {/*        <ListItem button key={text}>*/}
-            {/*            <ListItemText primary={text} />*/}
-            {/*        </ListItem>*/}
-            {/*    ))}*/}
-            {/*</List>*/}
         </Drawer>);
 };
 
-ReduxSideMenu.propTypes = {
-    leftSideMenuIsOpen : PropTypes.bool
-};
-const SideMenu = connect(mapStateToProps)(ReduxSideMenu);
 export default SideMenu;

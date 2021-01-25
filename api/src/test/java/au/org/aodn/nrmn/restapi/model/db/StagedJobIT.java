@@ -43,7 +43,7 @@ class StagedJobIT {
         val stagedJob = stagedJobTestData.persistedStagedJob();
         entityManager.clear();
         val retrievedStagedJob = stagedJobRepository.findById(stagedJob.getId()).get();
-        assertEquals(stagedJob, retrievedStagedJob);
+         assertEquals(stagedJob, retrievedStagedJob);
         assertThat(retrievedStagedJob.getCreated().toLocalDateTime(),
                 is(both(greaterThanOrEqualTo(startTime)).and(lessThanOrEqualTo(LocalDateTime.now()))));
         assertThat(retrievedStagedJob.getLastUpdated().toLocalDateTime(),

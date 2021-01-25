@@ -83,7 +83,7 @@ describe('EntityList Component', () => {
 
   test('Test EntityList.js New Entity button exists', async () => {
 
-    const {findByTitle, findByText} = renderWithProviders(
+    const {findByTitle} = renderWithProviders(
         <Route path="/list/:entityName">
           <EntityList/>
         </Route>,

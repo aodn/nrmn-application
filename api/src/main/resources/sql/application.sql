@@ -188,6 +188,7 @@ CREATE TABLE nrmn.staged_job (
     source varchar(255),
     status varchar(255),
     program_id integer NOT NULL,
+    sec_user_id bigint NOT NULL,
     CONSTRAINT staged_job_pkey PRIMARY KEY (id)
 );
 
@@ -323,6 +324,10 @@ ALTER TABLE nrmn.sec_user_roles
 
 ALTER TABLE nrmn.staged_job
     ADD CONSTRAINT fkstvpeikdu4c83xc9tmpfb4spq FOREIGN KEY (program_id) REFERENCES nrmn.program_ref (program_id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE nrmn.staged_job
+    ADD CONSTRAINT fk_staged_job_sec_user FOREIGN KEY (sec_user_id) REFERENCES nrmn.sec_user (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
 
 ALTER TABLE nrmn.staged_row
     ADD CONSTRAINT staged_row_staged_job_id_fkey FOREIGN KEY (staged_job_id) REFERENCES nrmn.staged_job (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
