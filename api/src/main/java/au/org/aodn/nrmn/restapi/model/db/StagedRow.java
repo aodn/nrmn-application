@@ -55,6 +55,7 @@ public class StagedRow implements Serializable {
     @Column(name = "buddy")
     private String buddy;
 
+
     @Column(name = "site_name")
     private String siteName;
 
@@ -79,6 +80,7 @@ public class StagedRow implements Serializable {
 
     @Column(name = "code")
     private String code;
+
 
     @Column(name = "common_name")
     private String commonName;

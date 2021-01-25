@@ -7,6 +7,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
 import green from '@material-ui/core/colors/green';
+import clsx from 'clsx';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -43,8 +44,13 @@ const BaseForm = (params) => {
   const classes = useStyles();
 
   const loading = params.loading;
+  const success = params.success;
 
+  const buttonClassname = clsx({
+    [classes.buttonSuccess]: success,
+  });
   function submitForm(formData) {
+    console.warn(formData);
     params.onSubmit(formData);
   }
 
@@ -54,7 +60,7 @@ const BaseForm = (params) => {
     });
   }
 
-  let errorAlert = params.errors ? <Alert  severity="error" variant="filled" >{getErrors(params.errors)}
+  let errorAlert = params.errors && params.errors.length > 0 ? <Alert  severity="error" variant="filled" >{getErrors(params.errors)}
   </Alert> : '';
 
   return <>
@@ -66,6 +72,7 @@ const BaseForm = (params) => {
         style={{ minHeight: '70vh' }}
     >
         <Box pt={4} px={6} pb={6} className={classes.root} >
+          {errorAlert}
           <Form
               schema={params.schema}
               uiSchema={params.uiSchema}
@@ -75,7 +82,6 @@ const BaseForm = (params) => {
               fields={params.fields}
               formData={params.formData}
           >
-            {errorAlert}
 
             <div className={classes.rootFlex}>
               <div className={classes.wrapper}>

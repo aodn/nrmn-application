@@ -18,6 +18,7 @@ const authSlice = createSlice({
         state.username = JSON.parse(action.payload.config.data).username;
         localStorage.setItem('auth', JSON.stringify(state));
         state.errors = undefined;
+        state.success = true;
         state.loading = false;
         window.location = (action.payload.redirect) ? action.payload.redirect : '/';
     },
@@ -28,9 +29,10 @@ const authSlice = createSlice({
             `${error.field.toUpperCase()}: ${error.defaultMessage}`
         ));
       }
+      state.success = false;
       state.loading = false;
     },
-    logout: (state, action) => {
+    logout: (state) => {
       localStorage.clear();
       state = initialState;
       window.location = '/login';

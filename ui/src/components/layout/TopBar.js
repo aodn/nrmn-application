@@ -4,15 +4,14 @@ import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import {makeStyles} from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import { toggleLeftSideMenu } from './layout-reducer';
-import { connect } from 'react-redux';
-import store from '../store';
-import AuthState from './AuthState';
 import Button from '@material-ui/core/Button';
+import { useDispatch, useSelector } from 'react-redux';
+import AuthState from './AuthState';
 import SettingsMenu from './SettingsMenu';
-import {PropTypes} from 'prop-types';
+
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ?
     process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
@@ -29,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: 15,
     '&:hover': {
       color: '#FFF',
-      backgroundColor: 'rgba(0, 0, 0, 0.04)'
+      backgroundColor:  'rgba(0, 0, 0, 0.04)'
     }
   },
   spacer: {
@@ -40,6 +39,7 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   appBar: {
+    zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -54,80 +54,72 @@ const useStyles = makeStyles((theme) => ({
     })
   },
   menuButton: {
-    marginRight: theme.spacing(2),
   },
   hide: {
     display: 'none',
   },
 }));
 
-const mapStateToProps = state => {
-  return { leftSideMenuIsOpen: state.toggle.leftSideMenuIsOpen };
-};
 
-const handleClick = () => {
-  store.dispatch(toggleLeftSideMenu());
-};
 
-const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
+
+const TopBar = () => {
   const classes = useStyles();
+  const leftSideMenuIsOpen = useSelector(state => state.toggle.leftSideMenuIsOpen);
+  const dispatch = useDispatch();
+
+  const handleClick = () => {
+    dispatch(toggleLeftSideMenu());
+  };
 
   return (
-  <AppBar
-    position="fixed"
-    className={clsx(classes.appBar, {
-      [classes.appBarShift]: leftSideMenuIsOpen,
-    })}
-  >
-    <Toolbar position="static">
-      <Grid container alignItems={'center'} justify="space-between" >
-        <Grid item >
-          <Grid container alignItems={'center'} justify="space-between" >
-            <Grid item >
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleClick}
-                edge="start"
-                className={clsx(classes.menuButton, leftSideMenuIsOpen && classes.hide)} >
-                <MenuIcon />
-              </IconButton>
-            </Grid>
-            <Grid item>
-              <Grid container
-                  justify="flex-start"
-                  alignItems="center">
-                <Grid item className={classes.spacer}>
-                  <img
-                      width={100}
-                      src={'https://static.emii.org.au/images/logo/IMOS-Ocean-Portal-logo.png'}
-                      alt={'IMOS Logo'}
-                  />
-                </Grid>
-                <Grid item>
-                  <Button
-                      className={clsx(classes.header)}
-                      nowrap="true"
-                      href="/"
-                  >{process.env.REACT_APP_SITE_TITLE}
-                  </Button>
-                </Grid>
-              </Grid>
-
-            </Grid>
+    <AppBar
+      position="fixed"
+      className={clsx(classes.appBar, {
+        [classes.appBarShift]: leftSideMenuIsOpen,
+      })}
+    >
+      <Toolbar position="static">
+        <IconButton
+          color="inherit"
+          aria-label="open drawer"
+          onClick={handleClick}
+          edge="start"
+          className={clsx(classes.menuButton, leftSideMenuIsOpen && classes.hide)} >
+          <MenuIcon />
+        </IconButton>
+        <Grid container
+          justify="flex-start"
+          alignItems="center">
+          <Grid item className={classes.spacer}>
+            <img
+              width={100}
+              src={'https://static.emii.org.au/images/logo/IMOS-Ocean-Portal-logo.png'}
+              alt={'IMOS Logo'}
+            />
+          </Grid>
+          <Grid item>
+            <Button
+              className={clsx(classes.header)}
+              nowrap="true"
+              href="/"
+            >{process.env.REACT_APP_SITE_TITLE}
+            </Button>
           </Grid>
         </Grid>
-        <Grid item >
-          <AuthState /> |
-          <SettingsMenu />
+        <Grid container   justify="flex-end"
+          alignItems="center">
+          <Grid item>
+            <AuthState />
+          </Grid>
+          <Grid item>
+
+            <SettingsMenu />
+          </Grid>
         </Grid>
-      </Grid>
-    </Toolbar>
-  </AppBar>
+      </Toolbar>
+    </AppBar>
   );
 };
-ReduxTopBar.propTypes = {
-  leftSideMenuIsOpen : PropTypes.bool
-};
-const TopBar = connect(mapStateToProps)(ReduxTopBar);
+
 export default TopBar;

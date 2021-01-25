@@ -14,17 +14,16 @@ import { blueGrey, deepPurple } from '@material-ui/core/colors';
 import {
   BrowserRouter as Router,
   Switch,
-  Route
+  Route,
 } from 'react-router-dom';
-import FileList from './components/import/FileList';
-import ImportPage from './components/import/Index';
+import XlxsUpload from './components/import/XlxsUpload';
+import ValidationPage from './components/import/ValidationJob';
 import GenericForm from './components/data-entities/GenericForm';
 import { useSelector } from 'react-redux';
 import EntityList from './components/data-entities/EntityList';
 import Alert from '@material-ui/lab/Alert';
 import { getFullPath } from './components/utils/helpers';
 import AlertTitle from '@material-ui/lab/AlertTitle';
-import './ag-grid.scss';
 import GenericDetailsView from './components/data-entities/GenericDetailsView';
 import Homepage from './components/layout/Homepage';
 
@@ -77,7 +76,17 @@ const App = () => {
         margin: 'dense',
         notched: 'true',
       }
-    }
+    },
+    overrides: {
+      MuiCssBaseline: {
+        '@global': {
+          '.ag-root-wrapper-body': {
+            minHeight: 400
+          }
+
+        },
+      },
+    },
   });
   theme = responsiveFontSizes(theme);
 
@@ -94,8 +103,8 @@ const App = () => {
             })}
           >
             <Switch>
-              <Route path={['/import-file/:fileID?']} component={ImportPage} />
-              <Route path="/list-file" component={FileList} />
+              <Route path='/validation/:jobId' component={ValidationPage} />
+              <Route path='/upload' component={XlxsUpload} />
               <Route path="/login" component={Login} />
               <Route path="/edit/:entityName/:id?" component={GenericForm} />
               <Route path="/view/:entityName/:id?" component={GenericDetailsView} />

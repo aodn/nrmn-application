@@ -11,7 +11,7 @@ import {Box} from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import Grid from '@material-ui/core/Grid';
 import {titleCase} from 'title-case';
-import {LoadingBanner} from '../layout/loadingBanner';
+import LoadingBanner from '../layout/loadingBanner';
 import {createEntityRequested, itemRequested, updateEntityRequested} from './middleware/entities';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
@@ -57,7 +57,7 @@ const GenericForm = () => {
     return renderError('ERROR: API Schema not found');
   }
   if ( typeof (schemaDefinition[entityTitle]) == 'undefined') {
-    return renderError("ERROR: Entity '" + entityTitle + "' missing from API Schema");
+    return renderError('ERROR: Entity \'' + entityTitle + '\' missing from API Schema');
   }
 
   const handleSubmit = (form) => {
@@ -110,7 +110,7 @@ const GenericForm = () => {
   }
   else {
     if (schemaDefinition[entityTitle] === undefined) {
-      return renderError(["Entity '" + entityName + "' cannot be found"]);
+      return renderError(['Entity '+ entityName + ' cannot be found']);
     }
     else {
       return (id && Object.keys(editItem).length === 0) ?

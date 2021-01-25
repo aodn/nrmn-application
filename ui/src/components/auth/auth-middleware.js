@@ -23,6 +23,6 @@ function* apiLogout(logoutSubmitted) {
     const payload = yield call(userLogout, logoutSubmitted.payload);
     yield put(logout(payload));
   } catch (e) {
-    console.log('ERROR: Logout failed', e);
+    console.error('ERROR: Logout failed', e);
   }
 }
