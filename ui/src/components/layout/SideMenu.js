@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import Divider from '@material-ui/core/Divider';
@@ -11,13 +11,15 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
-import StarBorder from '@material-ui/icons/StarBorder';
-import {useDispatch, useSelector, connect } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { toggleLeftSideMenu } from './layout-reducer';
+import store from '../store';
 import {
     NavLink
-  } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+} from 'react-router-dom';
+import { ArrowRight, ExpandLess, ExpandMore } from '@material-ui/icons';
+import { PropTypes } from 'prop-types';
+
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ?
     process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
@@ -40,55 +42,44 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+
+
 const SideMenu = () => {
-    const [openSub, setOpenSub] = useState(true);
     const classes = useStyles();
     const theme = useTheme();
     const leftSideMenuIsOpen = useSelector(state =>  state.toggle.leftSideMenuIsOpen);
     const dispatch = useDispatch();
 
-    const handleClick = () => {
-        setOpenSub(!openSub);
-    };
 
-    const handleMainMenu = () => {
-        dispatch(toggleLeftSideMenu());
-    };
+const handleMainMenu = () => {
+    dispatch(toggleLeftSideMenu());
+};
 
     return (
         <Drawer className={classes.drawer}
-            variant='persistent'
-            anchor='left'
+            variant="persistent"
+            anchor="left"
             open={leftSideMenuIsOpen}
             classes={{
                 paper: classes.drawerPaper,
             }}
         >
             <div className={classes.drawerHeader}>
-                <IconButton onClick={() => handleMainMenu(dispatch)}>
+                <IconButton onClick={handleMainMenu}>
                     {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
                 </IconButton>
             </div>
             <Divider />
             <List>
                 <ListSubheader>DATA</ListSubheader>
-                <ListItem button onClick={handleClick}>
-                    <ListItemIcon>
-                        <InboxIcon />
-                    </ListItemIcon>
-                    <ListItemText primary=' Uploads' />
-                    {openSub ? <ExpandLess /> : <ExpandMore />}
-                </ListItem>
-                <Collapse in={openSub} timeout='auto' unmountOnExit>
-                    <List component='div' disablePadding>
-                        <ListItem button  onClick={handleMainMenu}  className={classes.nested} component={NavLink} aweirdprop='true' to='/list/StagedJob'>
-                            <ListItemText primary='List Jobs'   />
-                        </ListItem>
-                        <ListItem button  onClick={handleMainMenu} className={classes.nested} component={NavLink} to='/upload'>
-                            <ListItemText primary='Add Job' />
-                        </ListItem>
-                    </List>
-                </Collapse>
+                <List component='div' disablePadding>
+                    <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} aweirdprop='true' to='/list/StagedJob'>
+                        <ListItemText primary='List Jobs' />
+                    </ListItem>
+                    <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} to='/upload'>
+                        <ListItemText primary='Add Job' />
+                    </ListItem>
+                </List>
             </List>
             <Divider />
             <List>
