@@ -23,8 +23,6 @@ const authSlice = createSlice({
       state.success = true;
       state.loading = false;
       localStorage.setItem('auth', JSON.stringify(state));
-      console.log(state);
-
       state.redirect = (action.payload.redirect) ? action.payload.redirect : '/';
     },
     loginFailed: (state) => {

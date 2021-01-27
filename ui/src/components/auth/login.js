@@ -46,10 +46,6 @@ var Login = () => {
     }
     dispatch(loginSubmitted(form.formData));
   };
-  console.log('succ', success);
-  console.log('load', loading);
-  console.log('redirect', redirect);
-
   if (success) {
     return (<Redirect  component='link' to={redirect}></Redirect>);
   }
