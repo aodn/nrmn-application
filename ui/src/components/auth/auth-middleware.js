@@ -1,5 +1,5 @@
 import { takeEvery, call, put } from 'redux-saga/effects';
-import {login, loginAttempted, logout, authError, loginSubmitted, logoutSubmitted} from './auth-reducer';
+import { login, loginAttempted, logout, loginFailed, authError, loginSubmitted, logoutSubmitted } from './auth-reducer';
 import { userLogin, userLogout } from '../../axios/api';
 
 export default function* LoginWatcher() {
@@ -11,10 +11,22 @@ function* apiLogin(loginSubmitted) {
   try {
     yield put(loginAttempted());
     const payload = yield call(userLogin, loginSubmitted.payload);
-    payload.redirect = loginSubmitted.payload.redirect;
-    yield put(login(payload));
+    if (payload.status == 401 || payload.status == 400){
+      yield put (loginFailed());
+      return;
+    }
+    if (payload.status > 401) {
+      yield put (authError());
+    } else {
+      const username = JSON.parse(payload.config.data).username;
+      var data = {...payload.data};
+       data.username = username;
+       data.redirect = loginSubmitted.payload.redirect;
+      yield put(login(data));
+
+    }
   } catch (e) {
-    yield put(authError(e));
+    yield put(authError(e.message));
   }
 }
 
