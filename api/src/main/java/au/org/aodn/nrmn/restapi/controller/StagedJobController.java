@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 @RestController
 @RequestMapping(path = "/api/stage")
 @Tag(name = "staged jobs")
+@CrossOrigin
 public class StagedJobController {
 
     @Autowired
@@ -120,7 +121,7 @@ public class StagedJobController {
                         return s;
                     })
                             .collect(Collectors.toList()));
-                    val filesResult = new FileUpload(sheet.getFileId(), stagedRowToSave.size());
+                    val filesResult = new FileUpload(job.getId(), stagedRowToSave.size());
                     return ResponseEntity
                             .status(HttpStatus.OK)
                             .body(new UploadResponse(Optional.of(filesResult), Collections.emptyList()));
@@ -165,11 +166,11 @@ public class StagedJobController {
                         Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob")))));
     }
 
-    @GetMapping("/job")
+    @GetMapping("/job/{jobId}")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
-    public ValidationResponse getJob(@RequestParam("reference") String reference) {
-        val rows = stagedRowRepo.findRowsByReference(reference);
-        return jobRepo.findByReference(reference)
+    public ValidationResponse getJob(@PathVariable  Long jobId) {
+        val rows = stagedRowRepo.findRowsByJobId(jobId);
+        return jobRepo.findById(jobId)
                 .map(job ->
                         new ValidationResponse(
                                 job, rows, Collections.emptyList(), Collections.emptyList()

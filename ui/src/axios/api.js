@@ -105,7 +105,10 @@ export const entityRelation = (entity, urls) => {
 };
 
 export const getDataJob = (jobId) => (
-  axiosInstance.get('/api/stage/job?reference=' + jobId).then(res => res)
+  axiosInstance.get('api/stage/job/' + jobId, {
+    validateStatus: () => true
+  }).then(res => res)
+  .catch(err => err)
 );
 
 export const postJobValidation = (jobId) => (

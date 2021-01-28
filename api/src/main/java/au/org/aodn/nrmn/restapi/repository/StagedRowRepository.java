@@ -20,6 +20,9 @@ public interface StagedRowRepository extends JpaRepository<StagedRow, Long>, Jpa
     @Query("SELECT r FROM StagedRow r WHERE  r.stagedJob.reference = :reference")
     List<StagedRow> findRowsByReference(@Param("reference") String ref);
 
+    @Query("SELECT r FROM StagedRow r WHERE  r.stagedJob.id = :jobId")
+    List<StagedRow> findRowsByJobId(@Param("jobId") Long jobId);
+
     @Query("SELECT r FROM StagedRow r  WHERE  r.stagedJob.id = :id GROUP BY r.siteCode, r.date, r.depth HAVING COUNT(r) > 1")
     List<StagedRow> findDuplicatesByReference(@Param("id") Long id);
 
