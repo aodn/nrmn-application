@@ -25,18 +25,28 @@ const cellRenderer = (params) => {
   return params.value;
 };
 
+const getCellFilter = (format) => {
+
+  const filterTypes = {
+    int64: 'agNumberColumnFilter',
+    'date-time': 'agDateColumnFilter'
+  };
+  return filterTypes[format] ? filterTypes[format] : 'agTextColumnFilter';
+
+};
+
 const schematoColDef = (schema, size, entityName) => {
 
   const fields = Object.keys(schema.properties);
   const widthSize = size.width / (fields.length + 1);
   const coldefs = fields.map(field => {
 
+    let type = schema.properties[field] ? schema.properties[field]?.format : 'string';
     return {
       field: field,
       width: widthSize,
       tooltipField: field,
-      // make every column use 'text' filter by default
-      filter: 'agTextColumnFilter',
+      filter: getCellFilter(type),
       cellRenderer: cellRenderer
     };
   });
@@ -80,9 +90,10 @@ const renderError = (msgArray) => {
 };
 
 const nonGenericEntities = {
+  // createButtonPath attribute required or no create button will show
   'StagedJob': {
     title: 'Jobs',
-    createButtonPath: '/import-file', // createButtonPath absence means no create button will show
+    createButtonPath: '/upload',
     linkLabel: 'Details',
     linkPath: 'view/stagedJobs/{}'
   }
@@ -182,8 +193,7 @@ const EntityList = () => {
                   tooltipShowDelay={0}
                   defaultColDef={{
                     sortable: true,
-                    resizable: true,// make every column use 'text' filter by default
-                    filter: 'agTextColumnFilter',
+                    resizable: true,
                     tooltipComponent: 'customTooltip',
                     floatingFilter: true,
                     headerComponentParams: {
