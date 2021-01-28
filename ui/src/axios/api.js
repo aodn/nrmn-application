@@ -38,7 +38,10 @@ export const userLogin = params => {
   return axiosInstance.post('/api/auth/signin', {
     username: params.username,
     password: params.password
+  }, {
+    validateStatus: () => true
   });
+
 };
 
 export const userLogout = () => {
@@ -130,7 +133,6 @@ export const submitJobFile = (params) => {
       const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
       store.dispatch(ImportProgress(percentCompleted));
     }
-
   };
   return axiosInstance.post(
     '/api/stage/upload',

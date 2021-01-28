@@ -3,32 +3,35 @@ import {
   createSlice
 } from '@reduxjs/toolkit';
 
-const initialState = JSON.parse(localStorage.getItem('auth')) || {};
+const initialState = JSON.parse(localStorage.getItem('auth')) ||
+  { errors: [], succes: false, loading: false, redirect: '/' };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState: initialState,
   reducers: {
     loginAttempted: (state) => {
+      localStorage.clear();
       state.loading = true;
     },
     login: (state, action) => {
-        state = action.payload.data;
-        // TODO get username/role from API payload
-        state.username = JSON.parse(action.payload.config.data).username;
-        localStorage.setItem('auth', JSON.stringify(state));
-        state.errors = undefined;
-        state.success = true;
-        state.loading = false;
-        window.location = (action.payload.redirect) ? action.payload.redirect : '/';
+      state.errors = [];
+      state.username = action.payload.username;
+      state.redirect = action.payload.redirect;
+      state.accessToken = action.payload.accessToken;
+      state.tokenType = action.payload.tokenType;
+      state.success = true;
+      state.loading = false;
+      localStorage.setItem('auth', JSON.stringify(state));
+      state.redirect = (action.payload.redirect) ? action.payload.redirect : '/';
     },
-    authError: (state, action) => {
-      state.errors = ['ERROR: ' + action.payload.response.data.error];
-      if (typeof action.payload.response.data.errors !== 'undefined') {
-        state.errors = state.errors.concat(action.payload.response.data.errors.map(error =>
-            `${error.field.toUpperCase()}: ${error.defaultMessage}`
-        ));
-      }
+    loginFailed: (state) => {
+      state.errors = ['Login failed: invalid username or password.'];
+      state.success = false;
+      state.loading = false;
+    },
+    authError: (state) => {
+      state.errors = ['Service unavailable'];
       state.success = false;
       state.loading = false;
     },
@@ -41,7 +44,7 @@ const authSlice = createSlice({
 });
 
 export const authReducer = authSlice.reducer;
-export const { login, loginAttempted, logout, authError } = authSlice.actions;
+export const { login, loginFailed, loginAttempted, logout, authError } = authSlice.actions;
 export const loginSubmitted = createAction('LOGIN_SUBMITTED', function (formData) { return { payload: formData }; });
 export const logoutSubmitted = createAction('LOGOUT_SUBMITTED', function (formData) { return { payload: formData }; });
 
