@@ -34,7 +34,6 @@ import java.util.stream.Stream;
 @RestController
 @RequestMapping(path = "/api/stage")
 @Tag(name = "staged jobs")
-@CrossOrigin
 public class StagedJobController {
 
     @Autowired
@@ -92,13 +91,14 @@ public class StagedJobController {
                 .program(programOpt.get())
                 .creator(user.get())
                 .build();
-       val persitedJob = jobRepo.save(job);
+
+        jobRepo.save(job);
 
         val validationHelper = new ValidatorHelpers();
         val validatedSheet =
                 sheetService
                         .validatedExcelFile(
-                                file.getOriginalFilename() + "-" + persitedJob.getId(),
+                                file.getOriginalFilename() + "-" + job.getId(),
                                 file,
                                 withInvertSize);
 
