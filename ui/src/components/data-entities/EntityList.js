@@ -90,9 +90,10 @@ const renderError = (msgArray) => {
 };
 
 const nonGenericEntities = {
+  // createButtonPath attribute required or no create button will show
   'StagedJob': {
     title: 'Jobs',
-    createButtonPath: '/import-file', // createButtonPath absence means no create button will show
+    createButtonPath: '/upload',
     linkLabel: 'Details',
     linkPath: 'view/stagedJobs/{}'
   }
