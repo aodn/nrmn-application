@@ -147,25 +147,19 @@ public class TemplateService {
                                          Collection<String> states,
                                          Collection<String> siteCodes) {
 
-        Stream<String> siteCodesFromProvinces = provinces == null ? Stream.empty() : provinces.stream()
+        Stream<String> siteCodesFromProvinces = provinces.stream()
                 .flatMap(p -> siteRepository.findSiteCodesByProvince(p).stream());
 
-        Stream<Site> sites = (siteCodes == null
-                ? siteCodesFromProvinces
-                : Streams.concat(siteCodesFromProvinces, siteCodes.stream()))
+        Stream<Site> sites = Streams.concat(siteCodesFromProvinces, siteCodes.stream())
                 .flatMap(sc -> siteRepository.findAll(Example.of(Site.builder().siteCode(sc).build())).stream());
 
-        if (locations != null) {
-            sites = Stream.concat(sites, locations.stream()
-                    .flatMap(l -> siteRepository.findAll(
-                            Example.of(Site.builder()
-                                    .location(Location.builder().locationId(l).build()).build())).stream()));
-        }
+        sites = Stream.concat(sites, locations.stream()
+                .flatMap(l -> siteRepository.findAll(
+                        Example.of(Site.builder()
+                                .location(Location.builder().locationId(l).build()).build())).stream()));
 
-        if (states != null) {
-            sites = Stream.concat(sites, states.stream()
-                    .flatMap(s -> siteRepository.findAll(Example.of(Site.builder().state(s).build())).stream()));
-        }
+        sites = Stream.concat(sites, states.stream()
+                .flatMap(s -> siteRepository.findAll(Example.of(Site.builder().state(s).build())).stream()));
 
         return sites.collect(toSet());
     }
