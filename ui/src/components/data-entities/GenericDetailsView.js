@@ -31,6 +31,13 @@ const renderError = (msgArray) => {
 
 const GenericDetailsView = () => {
 
+  const nonGenericEntities = {
+    'stagedJobs': {
+      linkLabel: 'Edit Job  ',
+      linkPath: 'PATHTOBECONFIRMED/stagedJobs/{}'
+    }
+  };
+
   const classes = useStyles();
 
   const { entityName, id } = useParams();
@@ -71,7 +78,7 @@ const GenericDetailsView = () => {
   });
 
   const inputDisplay = (elem) => {
-    const value = (typeof elem.formData === 'boolean') ? elem.formData.toString() : elem.formData;
+    const value = elem.formData?.toString();
     return (<span><b>{elem.name}: </b> {(value) ? value : ' -- '}</span>);
   };
 
@@ -123,16 +130,27 @@ const GenericDetailsView = () => {
   };
 
   const submitButton = () => {
+
+    const linkPath = nonGenericEntities[entityName]?.linkPath;
+    let linkLabel = `Edit ` + entityTitle + ` '` + id + `'`;
+    let link = '/';
+    if ((entityName in nonGenericEntities) && linkPath) {
+      link =  '/' + linkPath.replace(/{(.*?)}/, id);
+      linkLabel = (nonGenericEntities[entityName]?.linkLabel) ? nonGenericEntities[entityName]?.linkLabel : linkLabel;
+    }
+    else {
+      link = '/form/' + entityName + '/' + id;
+    }
     return <div className={classes.buttons}>
       <Button
         type={'submit'}
         component={Link}
-        to={'/form/' + entityName + '/' + id}
+        to={link}
         color="secondary"
-        aria-label={'Edit ' + entityTitle + ' ' + id}
+        aria-label={linkLabel}
         variant={'contained'}
       >
-        {`Edit ` + entityTitle + ` '` + id + `'`}
+        {linkLabel}
       </Button>
     </div>;
   };
