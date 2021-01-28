@@ -11,10 +11,10 @@ import Button from '@material-ui/core/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import AuthState from './AuthState';
 import SettingsMenu from './SettingsMenu';
-
+import { useMediaQuery } from '@material-ui/core';
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ?
-    process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
+  process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: 15,
     '&:hover': {
       color: '#FFF',
-      backgroundColor:  'rgba(0, 0, 0, 0.04)'
+      backgroundColor: 'rgba(0, 0, 0, 0.04)'
     }
   },
   spacer: {
@@ -67,6 +67,8 @@ const TopBar = () => {
   const classes = useStyles();
   const leftSideMenuIsOpen = useSelector(state => state.toggle.leftSideMenuIsOpen);
   const dispatch = useDispatch();
+  const matches = useMediaQuery(theme => theme.breakpoints.up('lg'));
+
 
   const handleClick = () => {
     dispatch(toggleLeftSideMenu());
@@ -103,11 +105,11 @@ const TopBar = () => {
               className={clsx(classes.header)}
               nowrap="true"
               href="/"
-            >{process.env.REACT_APP_SITE_TITLE}
+            >{ (matches) ? process.env.REACT_APP_SITE_TITLE : 'NRMN'}
             </Button>
           </Grid>
         </Grid>
-        <Grid container   justify="flex-end"
+        <Grid container justify="flex-end"
           alignItems="center">
           <Grid item>
             <AuthState />

@@ -15,20 +15,18 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  Redirect,
 } from 'react-router-dom';
 import XlxsUpload from './components/import/XlxsUpload';
 import ValidationPage from './components/import/ValidationJob';
 import GenericForm from './components/data-entities/GenericForm';
 import { useSelector } from 'react-redux';
 import EntityList from './components/data-entities/EntityList';
-import Alert from '@material-ui/lab/Alert';
-import { getFullPath } from './components/utils/helpers';
-import AlertTitle from '@material-ui/lab/AlertTitle';
 import GenericDetailsView from './components/data-entities/GenericDetailsView';
 import Homepage from './components/layout/Homepage';
-
+import FourOFour from './components/layout/FourOFour';
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ?
-    process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
+  process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -103,25 +101,17 @@ const App = () => {
             })}
           >
             <Switch>
-              <Route path='/validation/:jobId' component={ValidationPage} />
-              <Route path='/upload' component={XlxsUpload} />
-              <Route path="/login" component={Login} />
-              <Route path="/edit/:entityName/:id?" component={GenericForm} />
-              <Route path="/view/:entityName/:id?" component={GenericDetailsView} />
-              <Route path="/list/:entityName" component={EntityList} />
-              <Route path="/notfound" render={(route) =>
-                <Alert severity="error"  >
-                  <AlertTitle>API Resource Not Found</AlertTitle>
-                  {`The requested resource ${getFullPath(route.location)} is not available`}
-                </Alert>}
-              />
-              <Route path={'/'} component={Homepage} />
-              <Route render={(route) =>
-                <Alert severity="error"  >
-                  <AlertTitle>Path Not Found</AlertTitle>
-                    The requested resource <strong>{getFullPath(route.location)}</strong> is not available
-                  </Alert>}
-              />
+              <Route exact path='/home' component={Homepage} />
+              <Route exact path='/validation/:jobId' component={ValidationPage} />
+              <Route exact path='/upload' component={XlxsUpload} />
+              <Route exact path="/login" component={Login} />
+              <Route exact path="/edit/:entityName/:id?" component={GenericForm} />
+              <Route exact path="/view/:entityName/:id?" component={GenericDetailsView} />
+              <Route exact path="/list/:entityName" component={EntityList} />
+              <Route path='/404' component={FourOFour}></Route>
+              <Redirect exact from="/" to="/home" />
+              <Route path='*' component={FourOFour}></Route>
+
             </Switch>
           </main>
         </Router>
