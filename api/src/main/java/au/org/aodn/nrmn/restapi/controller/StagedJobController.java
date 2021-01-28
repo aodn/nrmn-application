@@ -82,16 +82,6 @@ public class StagedJobController {
                     .status(HttpStatus.UNPROCESSABLE_ENTITY)
                     .body(new UploadResponse(Optional.empty(),
                             Stream.of(new ErrorInput("Program Not found", "program")).collect(Collectors.toList())));
-
-
-        val validationHelper = new ValidatorHelpers();
-        val validatedSheet =
-                sheetService
-                        .validatedExcelFile(
-                                file.getOriginalFilename() + "-" + System.currentTimeMillis(),
-                                file,
-                                withInvertSize);
-
         val user = userRepo.findByEmail(authentication.getName());
 
         val job = StagedJob.builder()
@@ -102,6 +92,17 @@ public class StagedJobController {
                 .program(programOpt.get())
                 .creator(user.get())
                 .build();
+       val persitedJob = jobRepo.save(job);
+
+        val validationHelper = new ValidatorHelpers();
+        val validatedSheet =
+                sheetService
+                        .validatedExcelFile(
+                                file.getOriginalFilename() + "-" + persitedJob.getId(),
+                                file,
+                                withInvertSize);
+
+
 
         List<ErrorInput> errors = validationHelper.toErrorList(validatedSheet);
 

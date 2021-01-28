@@ -7,6 +7,7 @@ import au.org.aodn.nrmn.restapi.security.JwtTokenProvider;
 import au.org.aodn.nrmn.restapi.service.S3ClientProvider;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import lombok.val;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,6 +36,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.CreateBucketResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -145,13 +147,16 @@ class StagedJobControllerIT {
                 .withResponseType(UploadResponse.class)
                 .withUri(_createUrl("/api/stage/upload"))
                 .build(testRestTemplate);
-        val path = "/raw-survey/" + resp.getBody().getFile().get().getJobId() + ".xlsx";
+
+        assertEquals(resp.getStatusCode(), HttpStatus.OK);
+        assertEquals(resp.getBody().getFile().get().getRowCount(), 34);
+        val path = "/raw-survey/correctLongHeader.xlsx-" + resp.getBody().getFile().get().getJobId() + ".xlsx";
+        
         val s3resp = client
                 .getObject(GetObjectRequest.builder().bucket(bucket).key(path).build())
                 .response();
 
-        assertEquals(resp.getStatusCode(), HttpStatus.OK);
-        assertEquals(resp.getBody().getFile().get().getRowCount(), 34);
+
 
     }
 }
