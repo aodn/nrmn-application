@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class FileUpload {
-    private String jobId;
+    private Long jobId;
     private Integer rowCount;
 }
