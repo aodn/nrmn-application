@@ -13,6 +13,7 @@ import Grid from '@material-ui/core/Grid';
 import CustomTooltip from './customTooltip';
 import { selectRequested } from './middleware/entities';
 import { resetState } from './form-reducer';
+import LinkCell from './customWidgetFields/LinkCell';
 
 
 const cellRenderer = (params) => {
@@ -54,7 +55,8 @@ const schematoColDef = (schema, size, entityName) => {
   coldefs.push({
     field: 'Links',
     filter: undefined,
-    cellRenderer: function (params) {
+    cellRendererFramework: function (params) {
+
       const linkPath = nonGenericEntities[entityName]?.linkPath;
       let linkLabel = 'Edit';
       let link = '/';
@@ -64,14 +66,14 @@ const schematoColDef = (schema, size, entityName) => {
         const ent = hrefSplit.pop();
 
         if ((entityName in nonGenericEntities) && linkPath) {
-          link =  '/' + linkPath.replace(/{(.*?)}/, id);
+          link = '/' + linkPath.replace(/{(.*?)}/, id);
           linkLabel = (nonGenericEntities[entityName]?.linkLabel) ? nonGenericEntities[entityName]?.linkLabel : linkLabel;
         }
         else {
           link = '/edit/' + ent + '/' + id;
           linkLabel = 'Edit';
         }
-        return '<a href="' + link + '">' + linkLabel + '</a>';
+        return (<LinkCell label={linkLabel} link={link}></LinkCell>);
       }
     }
   });
@@ -126,10 +128,10 @@ const EntityList = () => {
 
   const getEntitySchema = () => {
     return (schemaDefinition[titleCase(entityName)]) ? (schemaDefinition[titleCase(entityName)]) :
-        (schemaDefinition[entityName]);
+      (schemaDefinition[entityName]);
   };
 
-  const getTitle =  () => {
+  const getTitle = () => {
     let thisTitle = nonGenericEntities[entityName]?.title;
     if ((entityName in nonGenericEntities) && thisTitle) {
       return thisTitle;
@@ -144,11 +146,11 @@ const EntityList = () => {
     if (!(entityName in nonGenericEntities) || createButtonPath) {
       const to = (createButtonPath) ? createButtonPath : '/edit/' + entityNamePlural;
       return <Button title={'Add new ' + getTitle()}
-                     component={NavLink}
-                     to={to}
-                     color="secondary"
-                     aria-label={'Add ' + getTitle()}
-                     variant={'contained'}
+        component={NavLink}
+        to={to}
+        color="secondary"
+        aria-label={'Add ' + getTitle()}
+        variant={'contained'}
       >New {titleCase(getTitle())}
       </Button>;
     }
@@ -163,48 +165,48 @@ const EntityList = () => {
       return renderError(["ERROR: Entity '" + titleCase(entityName) + "' missing from API Schema"]);
     }
 
-    const colDef = schematoColDef(getEntitySchema(), size, entityName );
+    const colDef = schematoColDef(getEntitySchema(), size, entityName);
 
     if (items !== undefined && agGridApi.setRowData) {
       agGridApi.setRowData(items);
     }
 
     return (
-        <>
-          <Box >
-            <Grid
-                container
-                direction="row"
-                justify="space-between"
-                alignItems="center"
-            >
-              <Typography variant="h4">{getTitle()}</Typography>
-              {newEntityButton()}
-            </Grid>
+      <>
+        <Box >
+          <Grid
+            container
+            direction="row"
+            justify="space-between"
+            alignItems="center"
+          >
+            <Typography variant="h4">{getTitle()}</Typography>
+            {newEntityButton()}
+          </Grid>
 
-            <div style={{width: '100%', height: size.height - 170, marginTop: 25}}
-                 className={'ag-theme-material'}>
-              <AgGridReact
-                  columnDefs={colDef}
-                  rowSelection="single"
-                  animateRows={true}
-                  onGridReady={agGridReady}
-                  frameworkComponents={{customTooltip: CustomTooltip}}
-                  tooltipShowDelay={0}
-                  defaultColDef={{
-                    sortable: true,
-                    resizable: true,
-                    tooltipComponent: 'customTooltip',
-                    floatingFilter: true,
-                    headerComponentParams: {
-                      menuIcon: 'fa-bars'
-                    }
-                  }}/>
-            </div>
-            {(!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : ''}
-            {(errors.length > 0) ? renderError(errors) : ''}
-          </Box>
-        </>
+          <div style={{ width: '100%', height: size.height - 170, marginTop: 25 }}
+            className={'ag-theme-material'}>
+            <AgGridReact
+              columnDefs={colDef}
+              rowSelection="single"
+              animateRows={true}
+              onGridReady={agGridReady}
+              frameworkComponents={{ customTooltip: CustomTooltip }}
+              tooltipShowDelay={0}
+              defaultColDef={{
+                sortable: true,
+                resizable: true,
+                tooltipComponent: 'customTooltip',
+                floatingFilter: true,
+                headerComponentParams: {
+                  menuIcon: 'fa-bars'
+                }
+              }} />
+          </div>
+          {(!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : ''}
+          {(errors.length > 0) ? renderError(errors) : ''}
+        </Box>
+      </>
     );
   }
 };
