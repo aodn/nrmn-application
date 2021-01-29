@@ -108,17 +108,17 @@ export const entityRelation = (entity, urls) => {
 };
 
 export const getDataJob = (jobId) => (
-  axiosInstance.get('api/stage/job/' + jobId, {
+  axiosInstance.get('/api/stage/job/' + jobId, {
     validateStatus: () => true
   }).then(res => res)
   .catch(err => err)
 );
 
 export const postJobValidation = (jobId) => (
-  axiosInstance.post('api/stage/validate/' + jobId).then(res => res)
+  axiosInstance.post('/api/stage/validate/' + jobId).then(res => res)
 );
 export const updateRow = (id, row) => (
-  axiosInstance.put('api/stage/update/' + id, row).then(res => res)
+  axiosInstance.put('/api/stage/update/' + id, row).then(res => res)
 );
 
 export const submitJobFile = (params) => {
