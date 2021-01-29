@@ -45,10 +45,4 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
     @Query(nativeQuery = true, value = "SELECT site_code FROM {h-schema}ep_site_list WHERE province = ?1")
     Collection<String> findSiteCodesByProvince(String province);
 
-    @Query(nativeQuery = true, value =
-            "SELECT DISTINCT oi.observable_item_id from {h-schema}ep_m1 m1 " +
-                    "JOIN {h-schema}ep_observable_items oi ON oi.observable_item_name = m1.species_name " +
-                    "WHERE site_code IN ?1 ")
-    Set<Integer> findM1SpeciesBySites(Collection<String> siteCodes);
-
 }

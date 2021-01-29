@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
@@ -38,7 +39,7 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             "LEFT JOIN Observation o ON (o.observableItem = oi) " +
             "WHERE oi.letterCode IS NOT NULL " +
             "AND o.surveyMethod.survey.site IN :sites")
-    Set<ObservableItem> getAllM3ObservableItems(Collection<Site> sites);
+    Set<ObservableItem> getAllM3ObservableItems(@Param("sites") Collection<Site> sites);
 
     @Query("SELECT DISTINCT oi FROM ObservableItem oi " +
             "LEFT JOIN Observation o ON (o.observableItem = oi) " +
@@ -46,5 +47,13 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             "AND o.surveyMethod.method.methodId = 2 " +
             "AND o.surveyMethod.survey.site IN :sites) " +
             "OR oi.obsItemType.obsItemTypeId = 5 OR oi.obsItemType.obsItemTypeId = 6")
-    Set<ObservableItem> getAllM2ObservableItems(Collection<Site> sites);
+    Set<ObservableItem> getAllM2ObservableItems(@Param("sites") Collection<Site> sites);
+
+    @Query("SELECT DISTINCT oi FROM ObservableItem oi " +
+            "LEFT JOIN Observation o ON (o.observableItem = oi) " +
+            "WHERE (oi.clazz NOT IN ('Ophiuroidea', 'Polyplacophora') " +
+            "AND o.surveyMethod.method.methodId = 1 " +
+            "AND o.surveyMethod.survey.site IN :sites) " +
+            "OR oi.obsItemType.obsItemTypeId = 5 OR oi.obsItemType.obsItemTypeId = 6")
+    Set<ObservableItem> getAllM1ObservableItems(@Param("sites") Collection<Site> sites);
 }

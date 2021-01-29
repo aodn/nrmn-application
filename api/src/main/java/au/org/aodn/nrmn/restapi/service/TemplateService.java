@@ -184,10 +184,10 @@ public class TemplateService {
     }
 
     public List<SpeciesWithAttributes> getM1SpeciesForTemplate(Collection<Site> sites) {
-        Set<Integer> speciesIds = siteRepository.findM1SpeciesBySites(sites.stream()
-                .map(Site::getSiteCode).collect(toSet()));
+        Set<ObservableItem> observableItems = observableItemRepository.getAllM1ObservableItems(sites);
 
-        return speciesWithAttributesRepository.findAllById(speciesIds);
+        return speciesWithAttributesRepository.findAllById(
+                observableItems.stream().map(ObservableItem::getObservableItemId).collect(toList()));
     }
 
     public List<SpeciesWithAttributes> getM2SpeciesForTemplate(Collection<Site> sites) {
