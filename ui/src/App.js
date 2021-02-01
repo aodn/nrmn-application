@@ -107,6 +107,7 @@ const App = () => {
               <Route exact path='/validation/:jobId' component={ValidationPage} />
               <Route exact path='/upload' component={XlxsUpload} />
               <Route exact path="/login" component={Login} />
+              <Redirect exact from="/list/stagedJob" to="/jobs" />
               <Route exact path="/edit/:entityName/:id?" component={GenericForm} />
               <Route exact path="/view/:entityName/:id?" component={GenericDetailsView} />
               <Route exact path="/list/:entityName" component={EntityList} />
