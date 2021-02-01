@@ -69,7 +69,7 @@ const handleMainMenu = () => {
             <List>
                 <ListSubheader>DATA</ListSubheader>
                 <List component='div' disablePadding>
-                    <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} aweirdprop='true' to='/list/StagedJob'>
+                    <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} aweirdprop='true' to='/jobs'>
                         <ListItemText primary='List Jobs' />
                     </ListItem>
                     <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} to='/upload'>

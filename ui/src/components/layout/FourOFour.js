@@ -20,7 +20,7 @@ const FourOFour = () => {
                     <Typography align="center" style={{ fontSize: 125 }} variant='h1'>404</Typography>
                     <Typography align="center" style={{ fontSize: 125 }} variant='h3'>Page not found.</Typography>
                     <Typography align="center" style={{ fontSize: 20 }} variant='h5'>
-                        <Link  component={NavLink} className={classes.link} to="/list/StagedJob" color='secondary'> Jobs </Link> or
+                        <Link  component={NavLink} className={classes.link} to="/jobs" color='secondary'> Jobs </Link> or
                         <Link component={NavLink} className={classes.link} color='secondary' to="/home"> Home </Link>
                     </Typography>
 
