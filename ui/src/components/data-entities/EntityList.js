@@ -11,7 +11,7 @@ import config from 'react-global-configuration';
 import { titleCase } from 'title-case';
 import Grid from '@material-ui/core/Grid';
 import CustomTooltip from './customTooltip';
-import CustomLoadingOverlay from './customLoadingOverlay';
+import CustomLoadingOverlay from './CustomLoadingOverlay';
 import { selectRequested } from './middleware/entities';
 import { resetState } from './form-reducer';
 import LinkCell from './customWidgetFields/LinkCell';

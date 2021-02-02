@@ -28,7 +28,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const renderError = (msgArray) => {
-  return (msgArray.length > 0) ? <><Box><Alert severity="error" variant="filled">{msgArray}</Alert></Box></> : <></>;
+  return (msgArray.length > 0) ? <><Box><Alert severity='error' variant='filled'>{msgArray}</Alert></Box></> : <></>;
 };
 
 const GenericForm = () => {
@@ -57,7 +57,7 @@ const GenericForm = () => {
     return renderError('ERROR: API Schema not found');
   }
   if ( typeof (schemaDefinition[entityTitle]) == 'undefined') {
-    return renderError('ERROR: Entity \'' + entityTitle + '\' missing from API Schema');
+    return renderError(`ERROR: Entity '` + entityTitle + `' missing from API Schema`);
   }
 
   const handleSubmit = (form) => {
@@ -69,7 +69,7 @@ const GenericForm = () => {
 
   const entityDef = schemaDefinition[entityTitle];
 
-  let fullTitle = (id) ?  'Edit ' + entityTitle + " '" + id + "'" : "Add '" + entityTitle + "'" ;
+  let fullTitle = (id) ?  'Edit ' + entityTitle + ` '` + id + `'` : `Add '` + entityTitle + `'` ;
   const entitySchema = {title: fullTitle, ...entityDef};
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
 
@@ -90,9 +90,8 @@ const GenericForm = () => {
   const formContent = ()=>{
     if (entitySaved) {
       return <>
-        <Typography variant="h4"  >Entity saved successfully!</Typography>
+        <Typography variant={'h4'} >Entity saved successfully!</Typography>
       </>;
-
     }
     else {
       return <BaseForm
@@ -116,33 +115,33 @@ const GenericForm = () => {
       return (id && Object.keys(editItem).length === 0) ?
           <Grid
               container
-              direction="row"
-              justify="flex-start"
-              alignItems="center"
+              direction='row'
+              justify='flex-start'
+              alignItems='center'
           >
-          <LoadingBanner variant={"h5"} msg={"Loading '" + titleCase(entityName) + "' form"  } />
+          <LoadingBanner variant={'h5'} msg={`Loading '` + titleCase(entityName) + `' form`} />
           </Grid> :
           <Grid
               container
-              direction="row"
-              justify="center"
-              alignItems="center"
+              direction='row'
+              justify='center'
+              alignItems='center'
               style={{minHeight: '70vh'}}
           >
             <Grid item >
               <Grid
                   container
-                  alignItems="flex-end"
-                  justify="space-around"
-                  direction="column"
+                  alignItems='flex-end'
+                  justify='space-around'
+                  direction='column'
               >
                 <Grid item >
                   <div className={classes.buttons}>
                     <Button
                         component={Link}
-                        size="small"
+                        size='small'
                         to={'/list/' + entityTitle}
-                        color="secondary"
+                        color='secondary'
                         aria-label={'List ' + entityTitle}
                         variant={'contained'}>
                       List {entityName}
