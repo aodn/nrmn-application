@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
+import org.springframework.beans.factory.annotation.Required;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,7 +32,7 @@ public class Diver {
     @SequenceGenerator(name = "diver_ref_diver_id", sequenceName = "diver_ref_diver_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="diver_ref_diver_id")
     @Column(name = "diver_id", unique = true, updatable = false, nullable = false)
-    @Schema(title = "Id", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(title = "Id", accessMode = Schema.AccessMode.READ_ONLY, hidden = true)
     private Integer diverId;
 
     @Column(name = "initials")
@@ -41,5 +42,6 @@ public class Diver {
 
     @Column(name = "full_name")
     @Schema(title = "Full name")
+    @NotNull
     private String fullName;
 }

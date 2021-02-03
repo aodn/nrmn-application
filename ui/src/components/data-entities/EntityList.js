@@ -1,8 +1,8 @@
 import React from 'react';
-import { Box, Typography, Button } from '@material-ui/core';
+import { Box, Typography } from '@material-ui/core';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
-import { useParams, NavLink } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import pluralize from 'pluralize';
 import { AgGridReact } from 'ag-grid-react/lib/agGridReact';
 import useWindowSize from '../utils/useWindowSize';
@@ -15,6 +15,7 @@ import CustomLoadingOverlay from './CustomLoadingOverlay';
 import { selectRequested } from './middleware/entities';
 import { resetState } from './form-reducer';
 import LinkCell from './customWidgetFields/LinkCell';
+import LinkButton from './LinkButton';
 
 const cellRenderer = (params) => {
   if (typeof params.value === 'object') {
@@ -57,7 +58,7 @@ const schematoColDef = (schema, size, entityName) => {
     filter: undefined,
     cellRendererFramework: function (params) {
 
-      const linkPath = nonGenericEntities[entityName]?.linkPath;
+      const linkPath = nonGenericEntities[entityName]?.entityLinkPath;
       let linkLabel = 'Edit';
       let link = '/';
       if (params.data._links) {
@@ -67,7 +68,7 @@ const schematoColDef = (schema, size, entityName) => {
 
         if ((entityName in nonGenericEntities) && linkPath) {
           link = '/' + linkPath.replace(/{(.*?)}/, id);
-          linkLabel = (nonGenericEntities[entityName]?.linkLabel) ? nonGenericEntities[entityName]?.linkLabel : linkLabel;
+          linkLabel = (nonGenericEntities[entityName]?.entityLinkLabel) ? nonGenericEntities[entityName]?.entityLinkLabel : linkLabel;
         }
         else {
           link = '/edit/' + ent + '/' + id;
@@ -94,10 +95,16 @@ const renderError = (msgArray) => {
 const nonGenericEntities = {
   // createButtonPath attribute required or no create button will show
   'StagedJob': {
-    title: 'Jobs',
+    title: 'Job',
     createButtonPath: '/upload',
-    linkLabel: 'Details',
-    linkPath: 'view/stagedJobs/{}'
+    entityLinkLabel: 'Details',
+    entityLinkPath: 'view/stagedJobs/{}',
+    // additionalPageLinks: [
+    //   {
+    //     label: 'New Corrections',
+    //     link: 'corrections'
+    //   }
+    // ]
   }
 };
 
@@ -141,18 +148,29 @@ const EntityList = () => {
     }
   };
 
+
+  const additionalPageLinks = () => {
+    let links = nonGenericEntities[entityName]?.additionalPageLinks;
+    return links?.map((item) => {
+      return <LinkButton
+          key={getTitle() + item.label}
+          title={item.label}
+          label={item.label}
+          to={item.link}
+        />;
+    });
+  };
+
   const newEntityButton = () => {
     let createButtonPath = nonGenericEntities[entityName]?.createButtonPath;
     if (!(entityName in nonGenericEntities) || createButtonPath) {
       const to = (createButtonPath) ? createButtonPath : '/edit/' + entityNamePlural;
-      return <Button title={'Add new ' + getTitle()}
-        component={NavLink}
-        to={to}
-        color="secondary"
-        aria-label={'Add ' + getTitle()}
-        variant={'contained'}
-      >New {titleCase(getTitle())}
-      </Button>;
+      return <LinkButton
+          key={getTitle() + to}
+          title={'New ' + getTitle()}
+          label={'New ' + getTitle()}
+          to={to}
+      />;
     }
   };
 
@@ -180,8 +198,15 @@ const EntityList = () => {
             justify="space-between"
             alignItems="center"
           >
-            <Typography variant="h4">{getTitle()}</Typography>
-            {newEntityButton()}
+            <Grid item>
+              <Typography variant="h4">{getTitle()}</Typography>
+            </Grid>
+            <Grid item>
+              <Grid container  spacing={2}>
+                {additionalPageLinks()}
+                {newEntityButton()}
+              </Grid>
+            </Grid>
           </Grid>
 
             <div style={{width: '100%', height: size.height - 170, marginTop: 25}}

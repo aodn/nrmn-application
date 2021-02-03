@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
-import { Link } from 'react-router-dom';
 import {useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import NestedApiField from './customWidgetFields/NestedApiField';
@@ -14,26 +13,16 @@ import {titleCase} from 'title-case';
 import LoadingBanner from '../layout/loadingBanner';
 import {createEntityRequested, itemRequested, updateEntityRequested} from './middleware/entities';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import BaseForm from '../BaseForm';
-import {makeStyles} from '@material-ui/core/styles';
+import LinkButton from './LinkButton';
 
 
-const useStyles = makeStyles(() => ({
-  buttons: {
-    '& > *': {
-      marginTop: 20
-    }
-  }
-}));
 
 const renderError = (msgArray) => {
   return (msgArray.length > 0) ? <><Box><Alert severity='error' variant='filled'>{msgArray}</Alert></Box></> : <></>;
 };
 
 const GenericForm = () => {
-
-  const classes = useStyles();
 
   const {entityName, id} = useParams();
   const schemaDefinition = config.get('api') || {};
@@ -70,6 +59,7 @@ const GenericForm = () => {
   const entityDef = schemaDefinition[entityTitle];
 
   let fullTitle = (id) ?  'Edit ' + entityTitle + ` '` + id + `'` : `Add '` + entityTitle + `'` ;
+
   const entitySchema = {title: fullTitle, ...entityDef};
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
 

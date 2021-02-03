@@ -9,7 +9,8 @@ module.exports = {
         skipPreflightCheck: true,
         eslintOptions: {
           files: 'src/**/*.{js,jsx,ts,tsx}',
-          lintDirtyModulesOnly: true,
+          lintDirtyModulesOnly: false,
+          failOnWarning: true
           // ...
         },
       },

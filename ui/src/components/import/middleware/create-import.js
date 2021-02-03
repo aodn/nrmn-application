@@ -29,7 +29,6 @@ function* createImport(params) {
 
         }
     } catch (e) {
-        console.log('bad', e);
         yield put(ImportFailed([e.message]));
     }
 }
