@@ -45,7 +45,6 @@ const DataSheetView = () => {
         params.columnApi.getAllColumns().forEach(function (column) {
             allColumnIds.push(column.colId);
         });
-        console.log(allColumnIds);
         params.columnApi.autoSizeColumns(allColumnIds, false);
 
         params.api.ensureIndexVisible(25, 49);
@@ -54,7 +53,6 @@ const DataSheetView = () => {
     const onCellChanged = (input) => {
         dispatch(RowUpdateRequested(input.data.id, input.data));
         dispatch(EditRowStarting());
-        console.log('stop');
         dispatch(EnableSubmit(false));
     };
 
@@ -90,7 +88,6 @@ const DataSheetView = () => {
     });
 
     useEffect(() => {
-        console.log('edit load', editLoading);
         colDefinition.forEach(def => {
             def.editable = !editLoading;
         });
