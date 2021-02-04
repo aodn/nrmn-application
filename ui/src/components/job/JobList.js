@@ -47,20 +47,34 @@ const colunmDef = [
         field: 'Program',
         cellRenderer: (params) => {
             return params.data.program.programName;
-        }
+        },
+        filterValueGetter: (params) => {
+            return params.data.program.programName;
+        },
+        valueGetter: (params) => {
+            return params.data.program.programName;
+        },
     },
     {
         field: 'source',
         headerName: 'Type'
     }, {
         field: 'Initiator',
-        cellRenderer: (params) => { return params.data.creator.email; },
-        filter: 'agTextColumnFilter'
 
+        cellRenderer: (params) => { return params.data.creator.email; },
+        filter: 'agTextColumnFilter',
+        filterValueGetter: (params) => { return params.data.creator.email; },
+        valueGetter: (params) => {
+            return params.data.creator.email;
+        },
     },
+
     {
         field: 'last updated',
         cellRenderer: (params) => {
+            return new Date(params.data.lastUpdated).toLocaleString();
+        },
+        valueGetter: (params) => {
             return new Date(params.data.lastUpdated).toLocaleString();
         },
         filter: 'agDateColumnFilter'
@@ -69,6 +83,9 @@ const colunmDef = [
     {
         field: 'created date',
         cellRenderer: (params) => {
+            return new Date(params.data.created).toLocaleString();
+        },
+        valueGetter: (params) => {
             return new Date(params.data.created).toLocaleString();
         },
         filter: 'agDateColumnFilter'
