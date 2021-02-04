@@ -56,7 +56,7 @@ const schematoColDef = (schema, size, entityName) => {
   coldefs.push({
     field: 'Links',
     filter: undefined,
-    cellRendererFramework: function (params) {
+    cellRendererFramework: function(params) {
 
       const linkPath = nonGenericEntities[entityName]?.entityLinkPath;
       let linkLabel = 'Edit';
@@ -66,7 +66,7 @@ const schematoColDef = (schema, size, entityName) => {
         const id = hrefSplit.pop();
         const ent = hrefSplit.pop();
 
-        if ((entityName in nonGenericEntities) && linkPath) {
+        if (linkPath) {
           link = '/' + linkPath.replace(/{(.*?)}/, id);
           linkLabel = (nonGenericEntities[entityName]?.entityLinkLabel) ? nonGenericEntities[entityName]?.entityLinkLabel : linkLabel;
         }
@@ -85,9 +85,9 @@ let agGridApi = {};
 
 const renderError = (msgArray) => {
   return <Box>
-    <Alert style={{ height: 'auto', lineHeight: '28px', whiteSpace: 'pre-line' }}
-      severity="error"
-      variant="filled"
+    <Alert style={{height: 'auto', lineHeight: '28px', whiteSpace: 'pre-line'}}
+           severity="error"
+           variant="filled"
     >{msgArray.join('\r\n ')}
     </Alert></Box>;
 };
@@ -98,21 +98,40 @@ const nonGenericEntities = {
     title: 'Job',
     createButtonPath: '/upload',
     entityLinkLabel: 'Details',
-    entityLinkPath: 'view/stagedJobs/{}',
+    entityLinkPath: 'view/stagedJobs/{}'
     // additionalPageLinks: [
     //   {
     //     label: 'New Corrections',
     //     link: 'corrections'
     //   }
     // ]
+  },
+  'Site': {
+    entityListName: 'SiteListItem',
+    createButtonPath: '/edit/sites',
+    entityLinkLabel: 'Details',
+    entityLinkPath: 'view/sites/{}'
   }
 };
 
 const EntityList = () => {
 
-  const { entityName } = useParams();
-  const plural = pluralize.plural(entityName);
-  const entityNamePlural = plural.charAt(0).toLowerCase() + plural.slice(1);
+  const {entityName} = useParams();
+
+  const entityPluralise = (thisEntityName) => {
+    const plural = pluralize.plural(thisEntityName);
+    return plural.charAt(0).toLowerCase() + plural.slice(1);
+  };
+
+  const getListEntity = () => {
+    let entityListName = nonGenericEntities[entityName]?.entityListName;
+    if (entityListName) {
+      return entityListName;
+    } else {
+      return (schemaDefinition[titleCase(entityName)]) ? titleCase(entityName) :
+        entityName;
+    }
+  };
 
   const schemaDefinition = config.get('api');
   const size = useWindowSize();
@@ -120,7 +139,7 @@ const EntityList = () => {
   const dispatch = useDispatch();
   const entities = useSelector(state => state.form.entities);
   const errors = useSelector(state => state.form.errors);
-  const items = (entities?._embedded) ? entities._embedded[entityNamePlural] : undefined;
+  const items = (entities?._embedded) ? entities._embedded[entityPluralise(getListEntity())] : undefined;
 
   const agGridReady = (agGrid) => {
     agGridApi = Object.create(agGrid.api);
@@ -134,22 +153,13 @@ const EntityList = () => {
       agGridApi.setRowData([]);
       agGridApi.showLoadingOverlay();
     }
-    dispatch(selectRequested(entityNamePlural));
+    const entityListName = (nonGenericEntities[entityName]?.entityListName) ?
+      nonGenericEntities[entityName]?.entityListName : entityName;
+    dispatch(selectRequested(entityPluralise(entityListName)));
   }, [entityName]); // reset when new or entityName prop changes
 
-  const getEntitySchema = () => {
-    return (schemaDefinition[titleCase(entityName)]) ? (schemaDefinition[titleCase(entityName)]) :
-      (schemaDefinition[entityName]);
-  };
-
   const getTitle = () => {
-    let thisTitle = nonGenericEntities[entityName]?.title;
-    if ((entityName in nonGenericEntities) && thisTitle) {
-      return thisTitle;
-    }
-    else {
-      return entityName;
-    }
+    return (nonGenericEntities[entityName]?.title) ? nonGenericEntities[entityName]?.title : entityName;
   };
 
 
@@ -157,37 +167,35 @@ const EntityList = () => {
     let links = nonGenericEntities[entityName]?.additionalPageLinks;
     return links?.map((item) => {
       return <LinkButton
-          key={getTitle() + item.label}
-          title={item.label}
-          label={item.label}
-          to={item.link}
-        />;
+        key={getTitle() + item.label}
+        title={item.label}
+        label={item.label}
+        to={item.link}
+      />;
     });
   };
 
   const newEntityButton = () => {
     let createButtonPath = nonGenericEntities[entityName]?.createButtonPath;
     if (!(entityName in nonGenericEntities) || createButtonPath) {
-      const to = (createButtonPath) ? createButtonPath : '/edit/' + entityNamePlural;
+      const to = (createButtonPath) ? createButtonPath : '/edit/' + entityPluralise(entityName);
       return <LinkButton
-          key={getTitle() + to}
-          title={'New ' + getTitle()}
-          label={'New ' + getTitle()}
-          to={to}
+        key={getTitle() + to}
+        title={'New ' + getTitle()}
+        label={'New ' + getTitle()}
+        to={to}
       />;
     }
   };
 
   if (Object.keys(schemaDefinition).length === 0) {
     return (renderError(['Error: API not yet loaded']));
-  }
-  else {
-
-    if (!getEntitySchema()) {
-      return renderError(["ERROR: Entity '" + titleCase(entityName) + "' missing from API Schema"]);
+  } else {
+    if (!schemaDefinition[getListEntity()]) {
+      return renderError(['ERROR: Entity \'' + titleCase(entityName) + '\' missing from API Schema']);
     }
 
-    const colDef = schematoColDef(getEntitySchema(), size, entityName);
+    const colDef = schematoColDef(schemaDefinition[getListEntity()], size, entityName);
 
     if (items !== undefined && agGridApi.setRowData) {
       agGridApi.setRowData(items);
@@ -195,7 +203,7 @@ const EntityList = () => {
 
     return (
       <>
-        <Box >
+        <Box>
           <Grid
             container
             direction="row"
@@ -206,7 +214,7 @@ const EntityList = () => {
               <Typography variant="h4">{getTitle()}</Typography>
             </Grid>
             <Grid item>
-              <Grid container  spacing={2}>
+              <Grid container spacing={2}>
                 {additionalPageLinks()}
                 {newEntityButton()}
               </Grid>
@@ -236,7 +244,7 @@ const EntityList = () => {
                     }
                   }}/>
             </div>
-            {(!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : ''}
+          {(!colDef) ? renderError(['Entity \'' + entityName + '\' can not be found!']) : ''}
             {(errors.length > 0) ? renderError(errors) : ''}
           </Box>
         </>
