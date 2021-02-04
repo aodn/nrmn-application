@@ -79,7 +79,6 @@ const JobList = () => {
     const jobs = useSelector(state => state.job.jobs);
     const size = useWindowSize();
     const classes = useStyles();
-    console.log('jobs', jobs);
     useEffect(() => {
         dispatch(jobsRequested());
     }, []);
@@ -90,7 +89,6 @@ const JobList = () => {
         params.columnApi.getAllColumns().forEach(function (column) {
             allColumnIds.push(column.colId);
         });
-        console.log(allColumnIds);
         params.columnApi.autoSizeColumns(allColumnIds, false);
     };
 
