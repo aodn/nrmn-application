@@ -18,7 +18,7 @@ function* getJobs() {
 
 
     } catch (e) {
-        console.log('bad', e);
+        console.error('bad', e);
         yield put(jobsError([e.message]));
     }
 }
