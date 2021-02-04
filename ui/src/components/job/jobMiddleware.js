@@ -13,7 +13,7 @@ function* getJobs() {
         if (data)
             yield put(jobsFinished(data));
         else {
-            yield put(jobsError([{ message: 'Service unavailbe.' }]));
+            yield put(jobsError([{ message: 'Service unavailable.' }]));
         }
 
 
