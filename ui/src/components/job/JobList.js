@@ -10,6 +10,27 @@ import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined'
 import CloudUploadOutlinedIcon from '@material-ui/icons/CloudUploadOutlined';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
+
+
+
+// const dateComparator = (filterLocalDate, cellValue) => {
+//     filterLocalDate.setMilliseconds(0);
+//     cellValue.setMilliseconds(0);
+//     let filterBy = filterLocalDate.getTime();
+//     let filterMe = cellValue.getTime();
+//     if (filterBy == filterMe) {
+//         return 0;
+//     }
+
+//     if (filterMe < filterBy) {
+//         return -1;
+//     }
+
+//     if (filterMe > filterBy) {
+//         return 1;
+//     }
+// };
+
 const colunmDef = [
     {
         field: 'id',
@@ -75,7 +96,7 @@ const colunmDef = [
             return new Date(params.data.lastUpdated).toLocaleString();
         },
         valueGetter: (params) => {
-            return new Date(params.data.lastUpdated).toLocaleString();
+            return new Date(params.data.lastUpdated);
         },
         filter: 'agDateColumnFilter'
 
@@ -86,7 +107,7 @@ const colunmDef = [
             return new Date(params.data.created).toLocaleString();
         },
         valueGetter: (params) => {
-            return new Date(params.data.created).toLocaleString();
+            return new Date(params.data.created);
         },
         filter: 'agDateColumnFilter'
 

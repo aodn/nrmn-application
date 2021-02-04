@@ -86,7 +86,10 @@ const importSlice = createSlice({
             }
         },
         JobReady: (state, action) => {
-            state.rows = action.payload.rows.map(row => exportRow(row));
+            if (action.payload.rows && action.payload.rows.length > 0) {
+                state.rows = action.payload.rows.map(row => exportRow(row));
+
+            }
             state.job = action.payload.job;
         },
         validationFilter: (state, action) => {

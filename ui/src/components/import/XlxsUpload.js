@@ -60,6 +60,11 @@ const XlxsUpload = () => {
             withInvertSize: form.formData.withInvertSize || false
         };
         dispatch(ImportRequested(data));
+        delete form.formData.file;
+        delete form.formData.programId;
+        delete form.formData.withInvertSize;
+
+
 
     };
 
@@ -80,7 +85,6 @@ const XlxsUpload = () => {
                 success={success}
                 errors={displayErros}
                 onSubmit={handleSubmit}>
-
             </BaseForm>
         </Box>);
 };
