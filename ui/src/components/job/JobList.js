@@ -75,7 +75,7 @@ const colunmDef = [
             return new Date(params.data.lastUpdated).toLocaleString();
         },
         valueGetter: (params) => {
-            return new Date(params.data.lastUpdated).toLocaleString();
+            return new Date(params.data.lastUpdated);
         },
         filter: 'agDateColumnFilter'
 
@@ -86,7 +86,7 @@ const colunmDef = [
             return new Date(params.data.created).toLocaleString();
         },
         valueGetter: (params) => {
-            return new Date(params.data.created).toLocaleString();
+            return new Date(params.data.created);
         },
         filter: 'agDateColumnFilter'
 
