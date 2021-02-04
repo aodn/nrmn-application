@@ -1,4 +1,4 @@
-import { Box, Grid, Fab,Button, Typography, makeStyles } from '@material-ui/core';
+import { Box, Grid, Fab, Button, Typography, makeStyles } from '@material-ui/core';
 import { AgGridReact } from 'ag-grid-react';
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -15,10 +15,12 @@ const colunmDef = [
         field: 'id',
         cellRendererFramework: function stagedRender(params) {
             return (<LinkCell link={'/view/stagedJobs/' + params.data.id} label={params.data.id}></LinkCell>);
-        }
+        },
+        filter: 'agNumberColumnFilter'
     },
     {
         field: 'reference',
+        filter: 'agTextColumnFilter'
 
     },
     {
@@ -35,14 +37,18 @@ const colunmDef = [
                 to={'/validation/' + params.data.id}>
                 {params.data.status}
             </Button>);
-        }
+        },
+        filter: 'agTextColumnFilter'
+
 
     },
     {
         field: 'Program',
         cellRenderer: (params) => {
             return params.data.program.programName;
-        }
+        },
+        filter: 'agTextColumnFilter'
+
 
     },
     {
@@ -50,19 +56,25 @@ const colunmDef = [
         headerName: 'type'
     }, {
         field: 'Initiator',
-        cellRenderer: (params) => { return params.data.creator.email; }
+        cellRenderer: (params) => { return params.data.creator.email; },
+        filter: 'agTextColumnFilter'
+
     },
     {
         field: 'last updated',
         cellRenderer: (params) => {
             return new Date(params.data.lastUpdated).toLocaleString();
-        }
+        },
+        filter: 'agDateColumnFilter'
+
     },
     {
         field: 'created date',
         cellRenderer: (params) => {
             return new Date(params.data.created).toLocaleString();
-        }
+        },
+        filter: 'agDateColumnFilter'
+
     }
 
 ];
