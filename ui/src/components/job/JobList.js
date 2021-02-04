@@ -16,7 +16,7 @@ const colunmDef = [
         cellRendererFramework: function stagedRender(params) {
             return (<LinkCell link={'/view/stagedJobs/' + params.data.id} label={params.data.id}></LinkCell>);
         },
-        filter: 'agNumberColumnFilter'
+        filter: false
     },
     {
         field: 'reference',
@@ -25,7 +25,8 @@ const colunmDef = [
     },
     {
         field: 'isExtendedSize',
-        headerName: 'Extended'
+        headerName: 'Extended',
+        filter: false
     },
     {
         field: 'status',
@@ -46,14 +47,11 @@ const colunmDef = [
         field: 'Program',
         cellRenderer: (params) => {
             return params.data.program.programName;
-        },
-        filter: 'agTextColumnFilter'
-
-
+        }
     },
     {
         field: 'source',
-        headerName: 'type'
+        headerName: 'Type'
     }, {
         field: 'Initiator',
         cellRenderer: (params) => { return params.data.creator.email; },
