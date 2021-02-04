@@ -25,6 +25,7 @@ import EntityList from './components/data-entities/EntityList';
 import GenericDetailsView from './components/data-entities/GenericDetailsView';
 import Homepage from './components/layout/Homepage';
 import FourOFour from './components/layout/FourOFour';
+import JobList from './components/job/JobList';
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ?
   process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
@@ -102,16 +103,17 @@ const App = () => {
           >
             <Switch>
               <Route exact path='/home' component={Homepage} />
+              <Route exact path='/jobs' component={JobList} />
               <Route exact path='/validation/:jobId' component={ValidationPage} />
               <Route exact path='/upload' component={XlxsUpload} />
               <Route exact path="/login" component={Login} />
+              <Redirect exact from="/list/stagedJob" to="/jobs" />
               <Route exact path="/edit/:entityName/:id?" component={GenericForm} />
               <Route exact path="/view/:entityName/:id?" component={GenericDetailsView} />
               <Route exact path="/list/:entityName" component={EntityList} />
               <Route path='/404' component={FourOFour}></Route>
               <Redirect exact from="/" to="/home" />
               <Route path='*' component={FourOFour}></Route>
-
             </Switch>
           </main>
         </Router>

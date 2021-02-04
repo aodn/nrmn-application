@@ -14,6 +14,8 @@ import FileMiddleware from './import/middleware/validation-job';
 import getEntitiesWatcher from './data-entities/middleware/entities';
 import { all } from 'redux-saga/effects';
 import LoginWatcher from './auth/auth-middleware';
+import { jobReducer } from './job/jobReducer';
+import jobWatcher from './job/jobMiddleware';
 
 const initialiseSagaMiddleware = createSagaMiddleware();
 
@@ -28,17 +30,20 @@ const store = configureStore({
     auth: authReducer,
     toggle: toggleReducer,
     import: importReducer,
-    form : formReducer
+    form: formReducer,
+    job: jobReducer
   },
   middleware,
 });
 
- function* rootSaga() {
+function* rootSaga() {
   yield all([
     importMiddleware(),
     FileMiddleware(),
     LoginWatcher(),
-    getEntitiesWatcher()
+    getEntitiesWatcher(),
+    jobWatcher()
+
   ]);
 }
 

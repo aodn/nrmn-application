@@ -35,7 +35,7 @@ const GenericDetailsView = () => {
   const nonGenericEntities = {
     'stagedJobs': {
       linkLabel: 'Edit Job  ',
-      linkPath: 'PATHTOBECONFIRMED/stagedJobs/{}'
+      linkPath: '/validation/{}'
     }
   };
 

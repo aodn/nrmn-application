@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom';
 import {PropTypes} from 'prop-types';
 
 const LinkCell = (props) => (
-     <Button component={NavLink} to={props.link}>{props.label}</Button>
+     <Button color='primary'  component={NavLink} to={props.link}>{props.label}</Button>
 );
 
 LinkCell.propTypes = {
