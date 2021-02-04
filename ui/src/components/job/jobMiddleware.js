@@ -13,10 +13,13 @@ function* getJobs() {
         const data = response.data?._embedded.stagedJobs || [];
         if (data)
             yield put(jobsFinished(data));
-        else
-            yield put(jobsError([{ message: 'Service unavailbe.' }]));
+        else {
+            yield put(jobsError([{ message: 'Service unavailable.' }]));
+        }
+
 
     } catch (e) {
+        console.error('bad', e);
         yield put(jobsError([e.message]));
     }
 }

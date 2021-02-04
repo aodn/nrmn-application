@@ -1,4 +1,4 @@
-import { Box, Grid, Fab, Typography, makeStyles } from '@material-ui/core';
+import { Box, Grid, Fab, Button, Typography, makeStyles } from '@material-ui/core';
 import { AgGridReact } from 'ag-grid-react';
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -15,50 +15,81 @@ const colunmDef = [
         field: 'id',
         cellRendererFramework: function stagedRender(params) {
             return (<LinkCell link={'/view/stagedJobs/' + params.data.id} label={params.data.id}></LinkCell>);
-        }
+        },
+        filter: false
     },
     {
         field: 'reference',
+        filter: 'agTextColumnFilter'
 
     },
     {
         field: 'isExtendedSize',
-        headerName: 'Extended'
+        headerName: 'Extended',
+        filter: false
     },
     {
         field: 'status',
         cellRendererFramework: function stagedRender(params) {
-            return (params.data.status == 'STAGED') ?
-                (<LinkCell link={'/validation/' + params.data.id} label={params.data.status}></LinkCell>) :
-                (<Typography color="secondary">{params.data.status}</Typography>);
 
-        }
+            return (<Button
+                disabled={params.data.status != 'STAGED'}
+                component={NavLink}
+                to={'/validation/' + params.data.id}>
+                {params.data.status}
+            </Button>);
+        },
+        filter: 'agTextColumnFilter'
+
 
     },
     {
         field: 'Program',
         cellRenderer: (params) => {
             return params.data.program.programName;
-        }
-
+        },
+        filterValueGetter: (params) => {
+            return params.data.program.programName;
+        },
+        valueGetter: (params) => {
+            return params.data.program.programName;
+        },
     },
     {
-        field: 'source'
+        field: 'source',
+        headerName: 'Type'
     }, {
         field: 'Initiator',
-        cellRenderer: (params) => { return params.data.creator.email; }
+
+        cellRenderer: (params) => { return params.data.creator.email; },
+        filter: 'agTextColumnFilter',
+        filterValueGetter: (params) => { return params.data.creator.email; },
+        valueGetter: (params) => {
+            return params.data.creator.email;
+        },
     },
+
     {
         field: 'last updated',
         cellRenderer: (params) => {
             return new Date(params.data.lastUpdated).toLocaleString();
-        }
+        },
+        valueGetter: (params) => {
+            return new Date(params.data.lastUpdated).toLocaleString();
+        },
+        filter: 'agDateColumnFilter'
+
     },
     {
         field: 'created date',
         cellRenderer: (params) => {
             return new Date(params.data.created).toLocaleString();
-        }
+        },
+        valueGetter: (params) => {
+            return new Date(params.data.created).toLocaleString();
+        },
+        filter: 'agDateColumnFilter'
+
     }
 
 ];
@@ -75,7 +106,6 @@ const JobList = () => {
     const jobs = useSelector(state => state.job.jobs);
     const size = useWindowSize();
     const classes = useStyles();
-    console.log('jobs', jobs);
     useEffect(() => {
         dispatch(jobsRequested());
     }, []);
@@ -86,7 +116,6 @@ const JobList = () => {
         params.columnApi.getAllColumns().forEach(function (column) {
             allColumnIds.push(column.colId);
         });
-        console.log(allColumnIds);
         params.columnApi.autoSizeColumns(allColumnIds, false);
     };
 
@@ -119,6 +148,7 @@ const JobList = () => {
         {jobs && jobs.length > 0 && (<div style={{ width: '100%', height: size.height - 170, marginTop: 25 }}
             className={'ag-theme-material'}>
             <AgGridReact
+                sideBar={'filters'}
                 columnDefs={colunmDef}
                 rowSelection="single"
                 animateRows={true}
@@ -127,6 +157,7 @@ const JobList = () => {
                 defaultColDef={{
                     sortable: true,
                     resizable: true,
+                    filter: true,
                     headerComponentParams: {
                         menuIcon: 'fa-bars'
                     }

@@ -31,7 +31,7 @@ public class StagedJobTestData {
         return StagedJob.builder()
                 .program(program)
                 .reference("survey.xls")
-                .source(SourceJobType.FILE)
+                .source(SourceJobType.INGEST)
                 .creator(user)
                 .status(StatusJobType.STAGED);
     }

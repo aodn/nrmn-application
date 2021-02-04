@@ -90,7 +90,7 @@ public class StagedJobController {
 
         val job = StagedJob.builder()
                 .isExtendedSize(withInvertSize)
-                .source(SourceJobType.FILE)
+                .source(SourceJobType.INGEST)
                 .reference(file.getOriginalFilename())
                 .status(StatusJobType.PENDING)
                 .program(programOpt.get())
