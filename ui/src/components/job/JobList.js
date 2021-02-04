@@ -1,4 +1,4 @@
-import { Box, Grid, Fab, Typography, makeStyles } from '@material-ui/core';
+import { Box, Grid, Fab,Button, Typography, makeStyles } from '@material-ui/core';
 import { AgGridReact } from 'ag-grid-react';
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -28,10 +28,13 @@ const colunmDef = [
     {
         field: 'status',
         cellRendererFramework: function stagedRender(params) {
-            return (params.data.status == 'STAGED') ?
-                (<LinkCell link={'/validation/' + params.data.id} label={params.data.status}></LinkCell>) :
-                (<Typography color="secondary">{params.data.status}</Typography>);
 
+            return (<Button
+                disabled={params.data.status != 'STAGED'}
+                component={NavLink}
+                to={'/validation/' + params.data.id}>
+                {params.data.status}
+            </Button>);
         }
 
     },
@@ -43,7 +46,8 @@ const colunmDef = [
 
     },
     {
-        field: 'source'
+        field: 'source',
+        headerName: 'type'
     }, {
         field: 'Initiator',
         cellRenderer: (params) => { return params.data.creator.email; }
@@ -119,6 +123,7 @@ const JobList = () => {
         {jobs && jobs.length > 0 && (<div style={{ width: '100%', height: size.height - 170, marginTop: 25 }}
             className={'ag-theme-material'}>
             <AgGridReact
+                sideBar={'filters'}
                 columnDefs={colunmDef}
                 rowSelection="single"
                 animateRows={true}
@@ -127,6 +132,7 @@ const JobList = () => {
                 defaultColDef={{
                     sortable: true,
                     resizable: true,
+                    filter: true,
                     headerComponentParams: {
                         menuIcon: 'fa-bars'
                     }
