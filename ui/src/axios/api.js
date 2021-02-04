@@ -1,6 +1,5 @@
 import axiosInstance from './index.js';
 import store from '../components/store'; // will be useful to access to axios.all and axios.spread
-import parseDataUrl from 'parse-data-url';
 import { ImportProgress } from '../components/import/reducers/create-import.js';
 function getToken() {
   const token = store.getState().auth.accessToken;
@@ -71,6 +70,26 @@ export const getEntity = (entity) => axiosInstance.get('/api/' + entity).then(re
 export const getResource = (url) => axiosInstance.get(url).then(res => res);
 
 
+export const getFullJob = (id) => {
+  const jobReq = axiosInstance.get('/api/stagedJobs/' + id);
+  const logsReq = axiosInstance.get('/api/stagedJobs/' + id + '/logs');
+  const programReq = axiosInstance.get('/api/stagedJobs/' + id + '/program');
+  console.log('running aklkl');
+
+  axiosInstance.all([jobReq, logsReq, programReq])
+    .then(axiosInstance.spread((...responses) => {
+      const job = responses[0].data || {};
+      const logs = responses[1]?._embedded.data.stageJobLogs || [];
+      const program = responses[2].data || {};
+      const fullJob = { ...job, program: program, logs: logs };
+      console.log(fullJob);
+      return fullJob;
+    })).catch(err => {
+      console.log('err', err);
+      return { error: err };
+    });
+};
+
 export const getSelectedEntityItems = (paths) => axiosInstance.all([
   axiosInstance.get('/api/' + paths[0]),
   (paths[1]) ? axiosInstance.get(paths[1]) : null,
@@ -111,7 +130,7 @@ export const getDataJob = (jobId) => (
   axiosInstance.get('/api/stage/job/' + jobId, {
     validateStatus: () => true
   }).then(res => res)
-  .catch(err => err)
+    .catch(err => err)
 );
 
 export const postJobValidation = (jobId) => (
@@ -123,9 +142,9 @@ export const updateRow = (id, row) => (
 
 export const submitJobFile = (params) => {
   const data = new FormData();
-
-  const fileParsed = parseDataUrl(params.file);
-  data.append('file', dataURLtoBlob(params.file), fileParsed.name);
+  const splited = params.file.split(';');
+  const filename =  splited[1].split('=')[1];
+  data.append('file', dataURLtoBlob(params.file), filename);
   data.append('programId', params.programId);
   data.append('withInvertSize', params.withInvertSize);
 
