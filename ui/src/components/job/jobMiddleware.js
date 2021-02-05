@@ -28,7 +28,6 @@ function* getJob(param) {
     try {
         const job = yield call(getFullJob, param.payload.id);
 
-        console.log(job);
         if (job)
             yield put(jobFinished(job));
         else

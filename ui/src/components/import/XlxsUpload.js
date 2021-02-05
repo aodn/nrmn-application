@@ -1,18 +1,24 @@
-import React from 'react';
-import { ImportRequested, ImportStarted } from './reducers/create-import';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { ImportRequested, ImportReset } from './reducers/upload';
+import { useDispatch, useSelector, } from 'react-redux';
 import BaseForm from '../BaseForm';
-import { Box } from '@material-ui/core';
+import { Box, useMediaQuery, useTheme } from '@material-ui/core';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import { Redirect } from 'react-router';
-
+import { useHistory } from 'react-router';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 const XlxsUpload = () => {
     const schema = {
         'title': 'Add Excel Document',
         'type': 'object',
         'required': [
-            'programId'
+            'programId',
+            'file'
         ],
         'properties': {
             'file': {
@@ -46,33 +52,48 @@ const XlxsUpload = () => {
     };
 
     const dispatch = useDispatch();
-    const isLoading = useSelector(state => state.import.isLoading);
-    const success = useSelector(state => state.import.success);
-    const percentCompleted = useSelector(state => state.import.percentCompleted);
-    const jobId = useSelector(state => state.import.jobId);
-    const errors = useSelector(state => state.import.errors);
+    const isLoading = useSelector(state => state.upload.isLoading);
+    const success = useSelector(state => state.upload.success);
+    const percentCompleted = useSelector(state => state.upload.percentCompleted);
+    const jobId = useSelector(state => state.upload.jobId);
+    const errors = useSelector(state => state.upload.errors);
+    const formData = useSelector(state => state.upload.formData);
+
+    const history = useHistory();
+
+    const [open, setOpen] = useState(false);
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     const handleSubmit = (form) => {
-        dispatch(ImportStarted());
         const data = {
             file: form.formData.file,
             programId: form.formData.programId,
             withInvertSize: form.formData.withInvertSize || false
         };
         dispatch(ImportRequested(data));
-        delete form.formData.file;
-        delete form.formData.programId;
-        delete form.formData.withInvertSize;
+    };
 
 
+    useEffect(() => {
+        if (jobId != '') {
+            setOpen(true);
+        }
+    });
+
+    const goToEdit = () => {
+        history.push('/validation/' + jobId);
+        dispatch(ImportReset());
+    };
+
+    const handleResetAndClose = () => {
+        setOpen(false);
+        dispatch(ImportReset());
 
     };
 
-    if (jobId !== '') {
-        return (<Redirect component='link' to={'/validation/' + jobId} ></Redirect>);
-    }
     var displayErros = [];
-    if(errors && errors.length > 0) {
+    if (errors && errors.length > 0) {
         displayErros = errors.map(e => e.message);
     }
     return (
@@ -84,8 +105,31 @@ const XlxsUpload = () => {
                 loading={isLoading}
                 success={success}
                 errors={displayErros}
+                formData={formData}
                 onSubmit={handleSubmit}>
             </BaseForm>
+
+            <Dialog
+                fullScreen={fullScreen}
+                open={open}
+                onClose={()  => setOpen(false)}
+                aria-labelledby="Confirmation-upload"
+            >
+                <DialogTitle color="primary" id="Confirmation-upload">{'Success!'}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        The file has been staged.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button autoFocus onClick={handleResetAndClose} color="secondary">
+                        Add another file
+                    </Button>
+                    <Button color="secondary" onClick={goToEdit}  autoFocus>
+                        View File
+                     </Button>
+                </DialogActions>
+            </Dialog>
         </Box>);
 };
 

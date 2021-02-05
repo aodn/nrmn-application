@@ -1,6 +1,6 @@
 import axiosInstance from './index.js';
 import store from '../components/store'; // will be useful to access to axios.all and axios.spread
-import { ImportProgress } from '../components/import/reducers/create-import.js';
+import { ImportProgress } from '../components/import/reducers/upload';
 function getToken() {
   const token = store.getState().auth.accessToken;
   const tokenType = store.getState().auth.tokenType;
@@ -74,7 +74,6 @@ export const getFullJob = (id) => {
   const jobReq = axiosInstance.get('/api/stagedJobs/' + id);
   const logsReq = axiosInstance.get('/api/stagedJobs/' + id + '/logs');
   const programReq = axiosInstance.get('/api/stagedJobs/' + id + '/program');
-  console.log('running aklkl');
 
   axiosInstance.all([jobReq, logsReq, programReq])
     .then(axiosInstance.spread((...responses) => {
@@ -82,10 +81,8 @@ export const getFullJob = (id) => {
       const logs = responses[1]?._embedded.data.stageJobLogs || [];
       const program = responses[2].data || {};
       const fullJob = { ...job, program: program, logs: logs };
-      console.log(fullJob);
       return fullJob;
     })).catch(err => {
-      console.log('err', err);
       return { error: err };
     });
 };

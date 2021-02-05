@@ -20,7 +20,6 @@ const jobSlice = createSlice({
         jobFinished:(state, action) => {
             state.isLoading = false;
             state.currentJob = action.payload;
-            console.log('curent', state.currentJob);
         },
         jobsFinished: (state, action) => {
             state.isLoading = false;
