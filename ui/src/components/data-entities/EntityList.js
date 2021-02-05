@@ -11,11 +11,11 @@ import config from 'react-global-configuration';
 import { titleCase } from 'title-case';
 import Grid from '@material-ui/core/Grid';
 import CustomTooltip from './customTooltip';
+import CustomLoadingOverlay from './CustomLoadingOverlay';
 import { selectRequested } from './middleware/entities';
 import { resetState } from './form-reducer';
 import LinkCell from './customWidgetFields/LinkCell';
 import LinkButton from './LinkButton';
-
 
 const cellRenderer = (params) => {
   if (typeof params.value === 'object') {
@@ -209,29 +209,33 @@ const EntityList = () => {
             </Grid>
           </Grid>
 
-          <div style={{ width: '100%', height: size.height - 170, marginTop: 25 }}
-            className={'ag-theme-material'}>
-            <AgGridReact
-              columnDefs={colDef}
-              rowSelection="single"
-              animateRows={true}
-              onGridReady={agGridReady}
-              frameworkComponents={{ customTooltip: CustomTooltip }}
-              tooltipShowDelay={0}
-              defaultColDef={{
-                sortable: true,
-                resizable: true,
-                tooltipComponent: 'customTooltip',
-                floatingFilter: true,
-                headerComponentParams: {
-                  menuIcon: 'fa-bars'
-                }
-              }} />
-          </div>
-          {(!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : ''}
-          {(errors.length > 0) ? renderError(errors) : ''}
-        </Box>
-      </>
+            <div style={{width: '100%', height: size.height - 170, marginTop: 25}}
+                 className={'ag-theme-material'}>
+              <AgGridReact
+                  columnDefs={colDef}
+                  rowSelection="single"
+                  animateRows={true}
+                  onGridReady={agGridReady}
+                  frameworkComponents={{
+                    customTooltip: CustomTooltip,
+                    customLoadingOverlay: CustomLoadingOverlay
+                  }}
+                  loadingOverlayComponent={'customLoadingOverlay'}
+                  tooltipShowDelay={0}
+                  defaultColDef={{
+                    sortable: true,
+                    resizable: true,
+                    tooltipComponent: 'customTooltip',
+                    floatingFilter: true,
+                    headerComponentParams: {
+                      menuIcon: 'fa-bars'
+                    }
+                  }}/>
+            </div>
+            {(!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : ''}
+            {(errors.length > 0) ? renderError(errors) : ''}
+          </Box>
+        </>
     );
   }
 };

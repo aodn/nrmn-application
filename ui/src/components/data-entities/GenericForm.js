@@ -6,20 +6,26 @@ import {useParams} from 'react-router-dom';
 import NestedApiField from './customWidgetFields/NestedApiField';
 import pluralize from 'pluralize';
 import config from 'react-global-configuration';
-import {Box} from '@material-ui/core';
+import {Box, Button, Link} from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import Grid from '@material-ui/core/Grid';
+import {makeStyles} from '@material-ui/core/styles';
 import {titleCase} from 'title-case';
 import LoadingBanner from '../layout/loadingBanner';
 import {createEntityRequested, itemRequested, updateEntityRequested} from './middleware/entities';
 import Typography from '@material-ui/core/Typography';
 import BaseForm from '../BaseForm';
-import LinkButton from './LinkButton';
 
-
+const useStyles = makeStyles(() => ({
+  buttons: {
+    '& > *': {
+      marginTop: 10
+    }
+  }
+}));
 
 const renderError = (msgArray) => {
-  return (msgArray.length > 0) ? <><Box><Alert severity="error" variant="filled">{msgArray}</Alert></Box></> : <></>;
+  return (msgArray.length > 0) ? <><Box><Alert severity='error' variant='filled'>{msgArray}</Alert></Box></> : <></>;
 };
 
 const GenericForm = () => {
@@ -32,6 +38,8 @@ const GenericForm = () => {
   const errors = useSelector(state => state.form.errors);
 
   const dispatch = useDispatch();
+  const classes = useStyles();
+
   const singular = pluralize.singular(entityName);
   const entityTitle = singular.charAt(0).toUpperCase() + singular.slice(1);
 
@@ -46,7 +54,7 @@ const GenericForm = () => {
     return renderError('ERROR: API Schema not found');
   }
   if ( typeof (schemaDefinition[entityTitle]) == 'undefined') {
-    return renderError('ERROR: Entity \'' + entityTitle + '\' missing from API Schema');
+    return renderError(`ERROR: Entity '` + entityTitle + `' missing from API Schema`);
   }
 
   const handleSubmit = (form) => {
@@ -58,7 +66,8 @@ const GenericForm = () => {
 
   const entityDef = schemaDefinition[entityTitle];
 
-  let fullTitle = (id) ?  `Edit ${entityTitle}` : `Add ${entityTitle}` ;
+  let fullTitle = (id) ?  'Edit ' + entityTitle + ` '` + id + `'` : `Add '` + entityTitle + `'` ;
+
   const entitySchema = {title: fullTitle, ...entityDef};
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
 
@@ -79,9 +88,8 @@ const GenericForm = () => {
   const formContent = ()=>{
     if (entitySaved) {
       return <>
-        <Typography variant="h4"  >Entity saved successfully!</Typography>
+        <Typography variant={'h4'} >Entity saved successfully!</Typography>
       </>;
-
     }
     else {
       return <BaseForm
@@ -103,26 +111,41 @@ const GenericForm = () => {
     }
     else {
       return (id && Object.keys(editItem).length === 0) ?
-          <LoadingBanner variant={'h5'} msg={"Loading '" + titleCase(entityName) + "' form"  } /> :
           <Grid
               container
-              direction="row"
-              justify="center"
-              alignItems="center"
+              direction='row'
+              justify='flex-start'
+              alignItems='center'
+          >
+          <LoadingBanner variant={'h5'} msg={`Loading '` + titleCase(entityName) + `' form`} />
+          </Grid> :
+          <Grid
+              container
+              direction='row'
+              justify='center'
+              alignItems='center'
               style={{minHeight: '70vh'}}
           >
             <Grid item >
               <Grid
                   container
-                  alignItems="flex-end"
-                  justify="space-around"
-                  direction="column"
+                  alignItems='flex-end'
+                  justify='space-around'
+                  direction='column'
               >
-                <LinkButton
-                    to={'/list/' + entityTitle}
-                    title={'List ' + entityName}
-                    size={'small'}
-                />
+                <Grid item >
+                  <div className={classes.buttons}>
+                    <Button
+                        component={Link}
+                        size='small'
+                        to={'/list/' + entityTitle}
+                        color='secondary'
+                        aria-label={'List ' + entityTitle}
+                        variant={'contained'}>
+                      List {entityName}
+                    </Button>
+                  </div>
+                </Grid>
                 <Grid item >
                   {formContent()}
                 </Grid>
