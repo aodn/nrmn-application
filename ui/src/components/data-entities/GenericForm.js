@@ -6,17 +6,23 @@ import {useParams} from 'react-router-dom';
 import NestedApiField from './customWidgetFields/NestedApiField';
 import pluralize from 'pluralize';
 import config from 'react-global-configuration';
-import {Box} from '@material-ui/core';
+import {Box, Button, Link} from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import Grid from '@material-ui/core/Grid';
+import {makeStyles} from '@material-ui/core/styles';
 import {titleCase} from 'title-case';
 import LoadingBanner from '../layout/loadingBanner';
 import {createEntityRequested, itemRequested, updateEntityRequested} from './middleware/entities';
 import Typography from '@material-ui/core/Typography';
 import BaseForm from '../BaseForm';
-import LinkButton from './LinkButton';
 
-
+const useStyles = makeStyles(() => ({
+  buttons: {
+    '& > *': {
+      marginTop: 10
+    }
+  }
+}));
 
 const renderError = (msgArray) => {
   return (msgArray.length > 0) ? <><Box><Alert severity='error' variant='filled'>{msgArray}</Alert></Box></> : <></>;
@@ -32,6 +38,8 @@ const GenericForm = () => {
   const errors = useSelector(state => state.form.errors);
 
   const dispatch = useDispatch();
+  const classes = useStyles();
+
   const singular = pluralize.singular(entityName);
   const entityTitle = singular.charAt(0).toUpperCase() + singular.slice(1);
 
