@@ -15,6 +15,7 @@ import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 import BaseForm from '../BaseForm';
 import ObjectListViewTemplate from './ObjectListViewTemplate';
+import LinkButton from './LinkButton';
 
 
 const useStyles = makeStyles(() => ({
@@ -178,20 +179,11 @@ const GenericDetailsView = () => {
         justify="space-around"
         direction="column"
       >
-        <Grid item >
-          <div className={classes.buttons}>
-            <Button
-              size="small"
-              component={Link}
-              to={'/list/' + entityTitle}
-              color="secondary"
-              aria-label={'List ' + entityTitle}
-              variant={'contained'}
-            >
-              List {entityName}
-            </Button>
-          </div>
-        </Grid>
+        <LinkButton
+            to={'/list/' + entityTitle}
+            title={'List ' + entityName}
+            size={'small'}
+        />
         <Grid item >
           {formContent()}
         </Grid>

@@ -91,7 +91,7 @@ describe('EntityList Component', () => {
           route: '/list/TestEntity'
         }
     );
-    await findByTitle('Add new TestEntity');
+    await findByTitle('New TestEntity');
   });
 
 });

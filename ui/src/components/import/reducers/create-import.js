@@ -93,7 +93,6 @@ const importSlice = createSlice({
             state.job = action.payload.job;
         },
         validationFilter: (state, action) => {
-            console.log(action);
             state.errSelected = action.payload;
         },
         validationReady: (state, action) => {
@@ -102,7 +101,6 @@ const importSlice = createSlice({
                 const validationErrors = mergeErrors(state.rows);
                 state.EnableSubmit = validationErrors.filter(err => err.level === 'BLOCKING').length === 0;
                 const errorsGrouped = groupBy(validationErrors, (row) => row.message);
-                console.log(errorsGrouped);
                 state.errorsByMsg = [...errorsGrouped.keys()].map(key => {
                     const elems = errorsGrouped.get(key);
                     const ids = errorsGrouped.get(key).map(err => err.rowId);
@@ -119,7 +117,6 @@ const importSlice = createSlice({
                     }
                     return err1.level === 'BLOCKING' ? -1 : 1;
                 });
-                console.log(state.errorsByMsg);
             } else {
                 state.EnableSubmit = true;
             }
