@@ -14,6 +14,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @RepositoryRestResource(excerptProjection = SiteList.class)
@@ -22,7 +23,7 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
 
     @Override
     @Query("SELECT s FROM Site s WHERE s.siteCode = :code")
-    Optional<Site> findByCriteria(@Param("code") String siteCode);
+    List<Site> findByCriteria(@Param("code") String siteCode);
 
     @Override
     @RestResource

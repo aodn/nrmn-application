@@ -21,7 +21,7 @@ public interface DiverRepository extends JpaRepository<Diver, Integer>, JpaSpeci
 
     @Override
     @Query("SELECT d FROM  Diver  d WHERE d.initials = :initials")
-    Optional<Diver> findByCriteria(@Param("initials")String initials);
+    List<Diver> findByCriteria(@Param("initials")String initials);
 
 
     @Override
