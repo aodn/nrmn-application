@@ -5,9 +5,11 @@ import au.org.aodn.nrmn.restapi.dto.stage.FileUpload;
 import au.org.aodn.nrmn.restapi.dto.stage.UploadResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
+import au.org.aodn.nrmn.restapi.model.db.StagedJobLog;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
+import au.org.aodn.nrmn.restapi.model.db.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.*;
 import au.org.aodn.nrmn.restapi.service.SpreadSheetService;
@@ -25,6 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +64,8 @@ public class StagedJobController {
     @Autowired
     private SecUserRepository userRepo;
 
+    @Autowired
+    private StagedJobLogRepository logRepo;
 
     @PostMapping("/upload")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
@@ -91,10 +96,16 @@ public class StagedJobController {
                 .program(programOpt.get())
                 .creator(user.get())
                 .build();
-
         jobRepo.save(job);
 
-        val validationHelper = new ValidatorHelpers();
+        val jobLog = StagedJobLog.builder()
+                .eventTime(new Timestamp(System.currentTimeMillis()))
+                .eventType(StagedJobEventType.UPLOADED)
+                .stagedJob(job)
+                .details(file.getOriginalFilename() + " uploaded by:" + authentication.getName())
+                .build();
+        logRepo.save(jobLog);
+
         val validatedSheet =
                 sheetService
                         .validatedExcelFile(
@@ -102,26 +113,36 @@ public class StagedJobController {
                                 file,
                                 withInvertSize);
 
-
-
-        List<ErrorInput> errors = validationHelper.toErrorList(validatedSheet);
-
         return validatedSheet.fold(
                 err -> {
                     job.setStatus(StatusJobType.FAILED);
                     jobRepo.save(job);
-                  return  ResponseEntity.unprocessableEntity().
-                            body(new UploadResponse(Optional.empty(), errors));
+                    val errorLog = StagedJobLog.builder()
+                            .eventTime(new Timestamp(System.currentTimeMillis()))
+                            .eventType(StagedJobEventType.ERROR)
+                            .stagedJob(job)
+                            .details(err.stream().map(ErrorInput::getMessage).collect(Collectors.joining(";")))
+                            .build();
+                    logRepo.save(errorLog);
+                    return ResponseEntity.unprocessableEntity().
+                            body(new UploadResponse(Optional.empty(), err.stream().toList()));
                 },
                 sheet -> {
                     val stagedRowToSave = sheetService.sheets2Staged(sheet);
                     job.setStatus(StatusJobType.STAGED);
                     jobRepo.save(job);
+
+                    val stagedLog = StagedJobLog.builder()
+                            .eventTime(new Timestamp(System.currentTimeMillis()))
+                            .eventType(StagedJobEventType.STAGED)
+                            .stagedJob(job)
+                            .details("Staged with " + stagedRowToSave.size() + " row(s).")
+                            .build();
+                    logRepo.save(stagedLog);
                     stagedRowRepo.saveAll(stagedRowToSave.stream().map(s -> {
                         s.setStagedJob(job);
                         return s;
-                    })
-                            .collect(Collectors.toList()));
+                    }).collect(Collectors.toList()));
                     val filesResult = new FileUpload(job.getId(), stagedRowToSave.size());
                     return ResponseEntity
                             .status(HttpStatus.OK)
@@ -156,6 +177,14 @@ public class StagedJobController {
         );
 
         return jobRepo.findById(jobId).map(job -> {
+            val validatingLog = StagedJobLog.builder()
+                    .eventTime(new Timestamp(System.currentTimeMillis()))
+                    .eventType(StagedJobEventType.VALIDATING)
+                    .stagedJob(job)
+                    .details("requested by:" + authentication.getName())
+                    .build();
+            logRepo.save(validatingLog);
+
             val validationResponse = validation.process(job);
             return ResponseEntity.ok().body(validationResponse);
         }).orElseGet(() -> ResponseEntity
@@ -169,20 +198,22 @@ public class StagedJobController {
 
     @GetMapping("/job/{jobId}")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
-    public ValidationResponse getJob(@PathVariable  Long jobId) {
+    public ResponseEntity<ValidationResponse> getJob(@PathVariable Long jobId) {
         val rows = stagedRowRepo.findRowsByJobId(jobId);
         return jobRepo.findById(jobId)
                 .map(job ->
-                        new ValidationResponse(
+                        ResponseEntity.ok().body(
+                                new ValidationResponse(
                                 job, rows, Collections.emptyList(), Collections.emptyList()
-                        )
+                        ))
                 ).orElseGet(() ->
+                        ResponseEntity.badRequest().body(
                         new ValidationResponse(
                                 null,
                                 Collections.emptyList(),
                                 Collections.emptyList(),
                                 Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob"))
-                        ));
+                        )));
 
     }
 }

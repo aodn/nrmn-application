@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.enums.StagedJobEventType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,6 +38,7 @@ public class StagedJobLog {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "staged_job_id", referencedColumnName = "id", nullable = false,
         foreignKey = @ForeignKey(name = "staged_job_log_staged_job_id_fkey"))
     private StagedJob stagedJob;
