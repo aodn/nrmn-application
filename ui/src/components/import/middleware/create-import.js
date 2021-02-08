@@ -1,5 +1,5 @@
 import { takeEvery, call, put } from 'redux-saga/effects';
-import { ImportRequested, ImportLoaded, ImportFailed } from '../reducers/create-import';
+import { ImportRequested, ImportLoaded, ImportFailed } from '../reducers/upload';
 import { submitJobFile } from '../../../axios/api';
 
 export default function* createImportWatcher() {
@@ -21,15 +21,15 @@ function* createImport(params) {
             yield put(ImportFailed(errors));
 
         } else {
-            if (data)
+            if (data) {
                 yield put(ImportLoaded(data));
-            else {
+            } else {
                 yield put(ImportFailed([{ message: 'Service unavailbe.' }]));
             }
 
         }
     } catch (e) {
-        yield put(ImportFailed([e.message]));
+        yield put(ImportFailed([e]));
     }
 }
 

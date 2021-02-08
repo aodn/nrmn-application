@@ -27,6 +27,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Data
@@ -74,6 +75,9 @@ public class StagedJob implements Serializable {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sec_user_id", referencedColumnName = "id", nullable = false)
-    SecUser creator;
+    private SecUser creator;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "stagedJob")
+    private List<StagedJobLog> logs;
 
 }

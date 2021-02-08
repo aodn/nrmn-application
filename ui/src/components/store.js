@@ -6,6 +6,7 @@ import {
 import { themeReducer } from './layout/theme-reducer';
 import { toggleReducer } from './layout/layout-reducer';
 import { importReducer } from './import/reducers/create-import';
+import { uploadReducer } from './import/reducers/upload';
 import { authReducer } from './auth/auth-reducer';
 import { formReducer } from './data-entities/form-reducer';
 import createSagaMiddleware from 'redux-saga';
@@ -31,7 +32,8 @@ const store = configureStore({
     toggle: toggleReducer,
     import: importReducer,
     form: formReducer,
-    job: jobReducer
+    job: jobReducer,
+    upload: uploadReducer
   },
   middleware,
 });

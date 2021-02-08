@@ -5,25 +5,34 @@ import {
 const jobSlice = createSlice({
     name: 'job',
     initialState: {
-        jobs : [],
+        jobs: [],
         errors: [],
-        isLoading: false
+        isLoading: false,
+        currentJob: null
     },
     reducers: {
-        jobsRequested : (state) => {
+        jobsRequested: (state) => {
             state.isLoading = true;
         },
-        jobsFinished : (state, action) => {
+        jobRequested: (state) => {
+            state.isLoading = true;
+        },
+        jobFinished:(state, action) => {
+            state.isLoading = false;
+            state.currentJob = action.payload;
+        },
+        jobsFinished: (state, action) => {
+            state.isLoading = false;
+
             state.jobs = action.payload;
         },
-        jobsError : (state, action) => {
+        jobsError: (state, action) => {
             state.isLoading = false;
             state.errors = action.paylaod;
-
         },
     }
 });
 
 
-export const {jobsRequested , jobsFinished,jobsError} = jobSlice.actions;
+export const { jobsRequested, jobFinished,jobsFinished, jobRequested, jobsError } = jobSlice.actions;
 export const jobReducer = jobSlice.reducer;
