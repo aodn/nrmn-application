@@ -47,7 +47,6 @@ const JobView = () => {
     const dispatch = useDispatch();
     const { id } = useParams();
     const job = useSelector(state => state.job.currentJob);
-    console.log(job);
     const isLoading = useSelector(state => state.job.isLoading);
     const classes = useStyles();
     useEffect(() => {
@@ -63,7 +62,7 @@ const JobView = () => {
                             <Grid item lg={10} md={10} >
                                 <Typography variant="h5" color="primary">{job.reference}</Typography>
                             </Grid>
-                            <Grid container spacing={1} justify="flex-start">
+         a                   <Grid container spacing={1} justify="flex-start">
                                 <Grid item>
                                     <Chip
                                         size="small"
