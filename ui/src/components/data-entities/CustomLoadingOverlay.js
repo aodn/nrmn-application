@@ -1,14 +1,15 @@
 import React from 'react';
 import LoadingBanner from '../layout/loadingBanner';
 import {Box} from '@material-ui/core';
+import {makeStyles} from '@material-ui/core/styles';
 
-const useStyles = () => ({
+const useStyles = makeStyles(() => ({
   main: {
     '& > *': {
       margin: 10
     }
   }
-});
+}));
 
 const CustomLoadingOverlay = () => {
 
