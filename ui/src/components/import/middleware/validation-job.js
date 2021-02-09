@@ -1,6 +1,6 @@
 import { takeEvery, call, put } from 'redux-saga/effects';
-import {JobReady, validationReady , RowUpdateRequested, jobFailed, JobRequested, ValidationRequested, EditRowFinished, SubmitingestRequested, ingestFinished } from '../reducers/create-import';
-import {getDataJob, postJobValidation, submitingest} from '../../../axios/api';
+import { JobReady, validationReady, RowUpdateRequested, jobFailed, JobRequested, ValidationRequested, EditRowFinished, SubmitingestRequested, ingestFinished } from '../reducers/create-import';
+import {updateRow, getDataJob, postJobValidation, submitingest } from '../../../axios/api';
 
 export default function* Watcher() {
     yield takeEvery(JobRequested, loadJob);
@@ -13,7 +13,7 @@ export default function* Watcher() {
 function* loadJob(action) {
     try {
         const payload = yield call(getDataJob, action.payload);
-     yield put(JobReady(payload.data));
+        yield put(JobReady(payload.data));
     } catch (e) {
         yield put(jobFailed(e));
     }
@@ -22,15 +22,16 @@ function* loadJob(action) {
 function* validateJob(action) {
     try {
         const payload = yield call(postJobValidation, action.payload);
-     yield put(validationReady(payload.data));
+        yield put(validationReady(payload.data));
     } catch (e) {
         yield put(jobFailed(e));
     }
 }
 
-function* update() {
+function* update(action) {
     try {
-     yield put(EditRowFinished());
+        yield call(updateRow, action.payload.id, action.payload.row);
+        yield put(EditRowFinished());
     } catch (e) {
         yield put(jobFailed(e));
     }
@@ -39,7 +40,7 @@ function* update() {
 
 function* submit(action) {
     try {
-        const payload = yield  call(submitingest, action.payload);
+        const payload = yield call(submitingest, action.payload);
         yield put(ingestFinished(payload.data));
     } catch (error) {
         yield put(jobFailed(error));
