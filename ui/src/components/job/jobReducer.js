@@ -24,7 +24,7 @@ const jobSlice = createSlice({
         jobsFinished: (state, action) => {
             state.isLoading = false;
 
-            state.jobs = action.payload;
+            state.jobs = action.payload.reverse();
         },
         jobsError: (state, action) => {
             state.isLoading = false;

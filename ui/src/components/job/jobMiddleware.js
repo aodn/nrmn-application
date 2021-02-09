@@ -33,7 +33,8 @@ function* getJob(param) {
         else
             yield put(jobsError([{ message: 'Service unavailbe.' }]));
     } catch (e) {
-        yield put(jobsError([e.message]));
+        console.error(e);
+        yield put(jobsError([e]));
 
     }
 }
