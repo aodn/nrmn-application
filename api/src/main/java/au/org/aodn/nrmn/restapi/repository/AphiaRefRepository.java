@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Repository;
 
 
+import java.util.List;
 import java.util.Optional;
 
 @RepositoryRestResource
@@ -22,7 +23,7 @@ public interface AphiaRefRepository extends JpaRepository<AphiaRef, Integer>, Jp
 
     @Override
     @Query("SELECT a from AphiaRef  a WHERE a.validName = :name")
-    Optional<AphiaRef> findByCriteria(@Param("name") String name);
+    List<AphiaRef> findByCriteria(@Param("name") String name);
 
     @Override
     @RestResource

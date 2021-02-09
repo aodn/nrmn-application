@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.repository.model;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface EntityCriteria<T> {
-  Optional<T> findByCriteria(String crit);
+  List<T> findByCriteria(String crit);
 }

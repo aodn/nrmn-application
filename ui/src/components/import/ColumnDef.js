@@ -6,21 +6,18 @@ function cell(params) {
         const target = params.colDef.field.toLowerCase();
         const inter = fields.filter(e => e.field === target);
         if (inter.length > 0) {
-            const color = (inter[0].errorLevel == 'BLOCKING')? '#f44336': '#ff9800';
-            return { color:  color +' !important' };
+            const color = (inter[0].errorLevel == 'BLOCKING') ? '#f44336' : '#ff9800';
+            return { color: color + ' !important' };
         }
     }
     return null;
 }
-const hashValueGetter = (params) => {
-    return params.node.rowIndex;
-};
+
 
 export const ColumnDef = [
     {
         field: 'id',
         editable: false,
-        hashValueGetter: hashValueGetter
     },
     {
         field: 'diver',
@@ -28,7 +25,6 @@ export const ColumnDef = [
         pivot: true,
         enablePivot: false,
         cellStyle: cell,
-        hashValueGetter: hashValueGetter
 
     },
     {
@@ -39,7 +35,7 @@ export const ColumnDef = [
     },
     {
         field: 'siteCode',
-        title: 'Site Code',
+        headerName: 'Site Code',
         editable: true,
         rowGroup: false,
         enableRowGroup: true,
@@ -48,19 +44,19 @@ export const ColumnDef = [
     },
     {
         field: 'siteName',
-        title: 'Site Name',
+        headerName: 'Site Name',
         editable: true,
     },
     {
         field: 'latitude',
-        title: 'Lat',
+        headerName: 'Lat',
         editable: true,
         cellStyle: cell
 
     },
     {
         field: 'longitude',
-        title: 'Long',
+        headerName: 'Long',
         editable: true,
         cellStyle: cell
 
@@ -68,7 +64,8 @@ export const ColumnDef = [
     {
         field: 'date',
         editable: true,
-        cellStyle: cell
+        cellStyle: cell,
+        minWidth: 105
 
     },
     {
@@ -102,18 +99,22 @@ export const ColumnDef = [
         editable: true,
         rowGroup: false,
         enableRowGroup: true,
+        width: 105
     },
     {
         field: 'block',
         editable: true,
         rowGroup: false,
         enableRowGroup: true,
-        cellStyle: cell
+        cellStyle: cell,
+        width: 80
     },
     {
         field: 'code',
         editable: true,
-        cellStyle: cell
+        cellStyle: cell,
+        width: 105,
+        minWidth: 50
     },
     {
         field: 'species',
@@ -131,128 +132,182 @@ export const ColumnDef = [
     },
     {
         field: 'commonName',
-        title: 'Common Name',
+        headerName: 'Common Name',
         editable: true,
     },
     {
         field: 'total',
         editable: true,
+        width: 80
     },
     {
         field: 'inverts',
         editable: true,
+        width: 80
+
     },
     {
         field: '2.5',
         editable: true,
+        width: 105,
+
     },
     {
         field: '5',
         editable: true,
+        width: 105,
     },
     {
         field: '7.5',
         editable: true,
+        width: 105,
+
     },
     {
         field: '10',
         editable: true,
+        width: 105,
+
     },
     {
         field: '12.5',
         editable: true,
+        width: 105,
+
     },
     {
         field: '15',
         editable: true,
+        width: 105,
     },
     {
         field: '20',
         editable: true,
+        width: 105,
+
     },
     {
         field: '25',
         editable: true,
+        width: 105,
+
     },
     {
         field: '30',
         editable: true,
+        width: 105,
+
     },
     {
         field: '35',
         editable: true,
+        width: 105,
+
     },
     {
         field: '40',
         editable: true,
+        width: 105,
+
     },
     {
         field: '50',
         editable: true,
+        width: 105,
+
     },
     {
         field: '62.5',
-        75: true,
+        editable: true,
+        width: 105,
+
     },
     {
         field: '75',
         editable: true,
+        width: 105,
+
     },
     {
         field: '87.5',
         editable: true,
+        width: 105,
+
     },
     {
         field: '100',
         editable: true,
+        width: 105,
     },
     {
         field: '112.5',
         editable: true,
+        width: 105,
     },
     {
         field: '125',
         editable: 75,
+        width: 105,
+
     },
     {
         field: '137.5',
         editable: true,
+        width: 105,
+
     },
     {
         field: '150',
         editable: true,
+        width: 105,
+
     },
     {
         field: '162.5',
         editable: true,
+        width: 105,
+
     },
     {
         field: '175',
         editable: true,
+        width: 105,
+
     },
     {
         field: '187.5',
         editable: true,
+        width: 105,
+
     },
     {
         field: '200',
         editable: true,
+        width: 105,
+
     },
     {
         field: '250',
         editable: true,
+        width: 105,
+
     },
     {
         field: '300',
         editable: true,
+        width: 105,
+
     },
     {
         field: '350',
         editable: true,
+        width: 105,
     },
     {
         field: '400',
         editable: true,
+        width: 105,
+
     },
 
 ];
@@ -261,10 +316,14 @@ export const ExtendedSize = [
     {
         field: 'l5',
         editable: true,
+        width: 105,
+
     },
     {
         field: 'l95',
         editable: true,
+        width: 105,
+
     },
     {
         field: 'inverts',
@@ -284,49 +343,73 @@ export const ExtendedSize = [
     {
         field: '450',
         editable: true,
+        width: 105,
+
     },
     {
         field: '500',
         editable: true,
+        width: 105,
+
     },
     {
         field: '550',
         editable: true,
+        width: 105,
+
     },
     {
         field: '600',
         editable: true,
+        width: 105,
+
     },
     {
         field: '650',
         editable: true,
+        width: 105,
+
     },
     {
         field: '700',
         editable: true,
+        width: 105,
+
     },
     {
         field: '750',
         editable: true,
+        width: 105,
+
     },
     {
         field: '800',
         editable: true,
+        width: 105,
+
     },
     {
         field: '850',
         editable: true,
+        width: 105,
+
     },
     {
         field: '900',
         editable: true,
+        width: 105,
+
     },
     {
         field: '950',
         editable: true,
+        width: 105,
+
     },
     {
         field: '1000',
         editable: true,
+        width: 105,
+
     }
 ];

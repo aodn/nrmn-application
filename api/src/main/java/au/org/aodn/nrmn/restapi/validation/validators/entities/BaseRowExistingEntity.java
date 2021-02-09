@@ -30,6 +30,8 @@ public abstract class BaseRowExistingEntity<E, R extends EntityCriteria<E>> exte
             errorID.setMessage(columnTarget + "is empty");
 
         return repo.findByCriteria(criteria)
+                .stream()
+                .findFirst()
                 .map(Validated::<StagedRowError, E>valid)
                 .orElseGet(() ->
                         Validated.<StagedRowError, E>invalid(
