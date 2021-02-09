@@ -19,7 +19,7 @@ import BlockOutlinedIcon from '@material-ui/icons/BlockOutlined';
 import clsx from 'clsx';
 import React,{ useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { JobStarting, validationFilter, ValidationRequested } from './reducers/create-import';
+import { validationFilter, ValidationRequested } from './reducers/create-import';
 import { orange } from '@material-ui/core/colors';
 import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
 import ArrowBackIosOutlinedIcon from '@material-ui/icons/ArrowBackIosOutlined';
@@ -135,7 +135,6 @@ const ValidationDrawer = () => {
 
     const handleValidate = () => {
         if (job.id) {
-            dispatch(JobStarting());
             dispatch(ValidationRequested(job.id));
         }
     };

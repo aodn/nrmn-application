@@ -45,9 +45,7 @@ const DataSheetView = () => {
         params.columnApi.getAllColumns().forEach(function (column) {
             allColumnIds.push(column.colId);
         });
-        params.columnApi.autoSizeColumns(allColumnIds, false);
-
-        params.api.ensureIndexVisible(25, 49);
+        params.columnApi.autoSizeColumns(allColumnIds, true);
     };
 
     const onCellChanged = (input) => {
@@ -115,6 +113,7 @@ const DataSheetView = () => {
                     columnDefs={colDefinition}
                     groupDefaultExpanded={4}
                     rowData={rows}
+                    rowHeight={18}
                     animateRows={true}
                     groupMultiAutoColumn={true}
                     groupHideOpenParents={true}
@@ -124,13 +123,10 @@ const DataSheetView = () => {
                     undoRedoCellEditing={true}
                     ensureDomOrder={true}
                     defaultColDef={{
-                        minWidth: 85,
+                        minWidth: 80,
                         filter: true,
                         sortable: true,
                         resizable: true,
-                        headerComponentParams: {
-                            menuIcon: 'fa-bars'
-                        }
                     }}
                     onGridReady={agGridReady}
                     modules={AllModules}

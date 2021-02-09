@@ -5,7 +5,7 @@ import DataSheetView from './DataSheetView';
 import PlaylistAddCheckOutlinedIcon from '@material-ui/icons/PlaylistAddCheckOutlined';
 import { makeStyles } from '@material-ui/core/styles';
 import { Redirect, useParams } from 'react-router';
-import { ingestStarting, JobRequested, JobStarting, SubmitingestRequested, ValidationRequested } from './reducers/create-import';
+import {JobStarting, ingestStarting, JobRequested, SubmitingestRequested, ValidationRequested } from './reducers/create-import';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutlined';
 import { Backdrop } from '@material-ui/core';
@@ -60,6 +60,7 @@ const ValidationJob = () => {
 
     useEffect(() => {
         if (jobId) {
+            dispatch(JobStarting());
             dispatch(JobRequested(jobId));
         }
     }, []);
@@ -126,15 +127,13 @@ const ValidationJob = () => {
                     </Grid>}
             </Grid>
             <DataSheetView></DataSheetView>
-            <Backdrop open={submitLoading}>
+            {submitLoading && (<Backdrop open={submitLoading}>
                 <Typography variant="h2" >Ingesting...</Typography>
-                <CircularProgress color="inherit" ></CircularProgress>
-
-            </Backdrop>
-            <Backdrop open={isLoading}>
-                <Typography variant="h2" >Validating... </Typography>
-                <CircularProgress color="inherit" ></CircularProgress>
-            </Backdrop>
+                <CircularProgress size={200} style={{color: '#ccc'}}></CircularProgress>
+            </Backdrop>)}
+            {isLoading && (<Backdrop open={isLoading}>
+                <CircularProgress size={200} style={{color: '#ccc'}}></CircularProgress>
+            </Backdrop>)}
         </Box>
     ) : (<></>);
 };

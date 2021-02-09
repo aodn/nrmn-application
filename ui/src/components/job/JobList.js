@@ -1,4 +1,4 @@
-import { Box, Grid, Fab, Button, Typography, makeStyles } from '@material-ui/core';
+import { Box, Grid, Fab, Button, Typography, makeStyles, CircularProgress } from '@material-ui/core';
 import { AgGridReact } from 'ag-grid-react';
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -6,8 +6,9 @@ import useWindowSize from '../utils/useWindowSize';
 import { jobsRequested } from './jobReducer';
 import LinkCell from '../data-entities/customWidgetFields/LinkCell';
 import { NavLink } from 'react-router-dom';
-import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
 import CloudUploadOutlinedIcon from '@material-ui/icons/CloudUploadOutlined';
+import { Backdrop } from '@material-ui/core';
+
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 
@@ -107,6 +108,7 @@ const JobList = () => {
     const jobs = useSelector(state => state.job.jobs);
     const size = useWindowSize();
     const classes = useStyles();
+    const isLoading = useSelector(state => state.job.isLoading);
     useEffect(() => {
         dispatch(jobsRequested());
     }, []);
@@ -139,13 +141,14 @@ const JobList = () => {
                         <Fab variant="extended" size="small" color="secondary" component={NavLink} to='/upload'>
                             <CloudUploadOutlinedIcon className={classes.extendedIcon} />Upload File</Fab>
                     </Grid>
-                    <Grid item>
-                        <Fab variant="extended" size="small" color="secondary" component={NavLink} to="/jobs" disabled={true}>
-                            <CloudDownloadOutlinedIcon className={classes.extendedIcon} />Pull Correction</Fab>
-                    </Grid>
+
                 </Grid>
             </Grid>
         </Grid>
+        {isLoading && (
+            <Backdrop open={isLoading}>
+                <CircularProgress size={200} style={{color: '#ccc'}}></CircularProgress>
+            </Backdrop>)}
         {jobs && jobs.length > 0 && (<div style={{ width: '100%', height: size.height - 170, marginTop: 25 }}
             className={'ag-theme-material'}>
             <AgGridReact

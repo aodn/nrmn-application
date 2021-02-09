@@ -70,6 +70,7 @@ const importSlice = createSlice({
 
             }
             state.job = action.payload.job;
+            state.isLoading = false;
         },
         validationFilter: (state, action) => {
             state.errSelected = action.payload;
