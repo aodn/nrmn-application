@@ -359,7 +359,7 @@ export const ExtendedSize = [
 
     },
     {
-        field: '800',
+        field: '600',
         editable: true,
         width: 105,
 
