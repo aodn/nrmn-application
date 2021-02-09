@@ -16,7 +16,7 @@ const colunmDef = [
     {
         field: 'id',
         cellRendererFramework: function stagedRender(params) {
-            return (<LinkCell link={'/view/stagedJobs/' + params.data.id} label={params.data.id}></LinkCell>);
+            return (<LinkCell link={'/jobs/' + params.data.id + '/view'} label={params.data.id}></LinkCell>);
         },
         filter: false
     },

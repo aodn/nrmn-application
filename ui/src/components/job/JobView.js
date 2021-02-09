@@ -58,7 +58,7 @@ const JobView = () => {
         <Box>
             {!isLoading && job && (
                 <Grid container >
-                    <Grid item sm={12} md={4} lg={4}>
+                    <Grid item sm={12} md={12} lg={4}>
                         <Paper elevation={3} style={{ padding: 15 }}>
                             <Grid item lg={10} md={10} >
                                 <Typography variant="h5" color="primary">{job.reference}</Typography>
@@ -101,7 +101,7 @@ const JobView = () => {
                             </Grid>
                         </Paper>
                     </Grid>
-                    <Grid item sm={12} md={8} lg={8}>
+                    <Grid item sm={12} md={12} lg={8}>
                         {job.logs && (<Timeline align="alternate">
                             { job.logs.map((log) => (
                                 <TimelineItem key={log.id}>
