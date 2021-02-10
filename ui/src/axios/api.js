@@ -1,4 +1,5 @@
 import axiosInstance from './index.js';
+import axios from 'axios';
 import store from '../components/store'; // will be useful to access to axios.all and axios.spread
 import { ImportProgress } from '../components/import/reducers/upload';
 function getToken() {
@@ -74,15 +75,15 @@ export const getFullJob = (id) => {
   const jobReq = axiosInstance.get('/api/stagedJobs/' + id);
   const logsReq = axiosInstance.get('/api/stagedJobs/' + id + '/logs');
   const programReq = axiosInstance.get('/api/stagedJobs/' + id + '/program');
-
-  axiosInstance.all([jobReq, logsReq, programReq])
-    .then(axiosInstance.spread((...responses) => {
+  return axios.all([jobReq, logsReq, programReq])
+    .then(axios.spread((...responses) => {
       const job = responses[0].data || {};
-      const logs = responses[1]?._embedded.data.stageJobLogs || [];
+      const logs = responses[1]?.data._embedded.stagedJobLogs || [];
       const program = responses[2].data || {};
       const fullJob = { ...job, program: program, logs: logs };
       return fullJob;
     })).catch(err => {
+      console.error(err);
       return { error: err };
     });
 };
@@ -140,7 +141,7 @@ export const updateRow = (id, row) => (
 export const submitJobFile = (params) => {
   const data = new FormData();
   const splited = params.file.split(';');
-  const filename =  splited[1].split('=')[1];
+  const filename = splited[1].split('=')[1];
   data.append('file', dataURLtoBlob(params.file), filename);
   data.append('programId', params.programId);
   data.append('withInvertSize', params.withInvertSize);
