@@ -140,7 +140,7 @@ const GenericDetailsView = () => {
       linkLabel = (nonGenericEntities[entityName]?.linkLabel) ? nonGenericEntities[entityName]?.linkLabel : linkLabel;
     }
     else {
-      link = '/form/' + entityName + '/' + id;
+      link = '/edit/' + entityName + '/' + id;
     }
     return <div className={classes.buttons}>
       <Button
