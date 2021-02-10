@@ -130,6 +130,10 @@ const EntityList = () => {
 
   useEffect(() => {
     dispatch(resetState());
+    if (agGridApi.setRowData) {
+      agGridApi.setRowData([]);
+      agGridApi.showLoadingOverlay();
+    }
     dispatch(selectRequested(entityNamePlural));
   }, [entityName]); // reset when new or entityName prop changes
 
