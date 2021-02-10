@@ -29,18 +29,18 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const event2icon = {
-    'UPLOADED': function display() { return (<PublishIcon />);},
-    'VALIDATING': function display() { return (<CheckCircleOutlineIcon />);},
-    'STAGING': function display() { return (<CheckCircleOutlineIcon />);},
-    'STAGED': function display() { return (<SaveIcon />);},
-    'EDITING':function display() { return(<EditIcon />);},
-    'INGESTING':function display() { return (<BackupIcon />);},
-    'CORRECTING':function display() { return (<CheckCircleOutlineIcon />);},
-    'INGESTED': function display() { return (<CheckCircleOutlineIcon />);},
-    'CORRECTED': function display() { return(<CheckCircleOutlineIcon />);},
-    'DELETED': function display() { return (<HighlightOffIcon />);},
-    'ABANDONED': function display() { return (<CheckCircleOutlineIcon />);},
-    'ERROR': function display() { return (<ErrorOutlineIcon />);}
+    'UPLOADED': function display() { return (<PublishIcon />); },
+    'VALIDATING': function display() { return (<CheckCircleOutlineIcon />); },
+    'STAGING': function display() { return (<CheckCircleOutlineIcon />); },
+    'STAGED': function display() { return (<SaveIcon />); },
+    'EDITING': function display() { return (<EditIcon />); },
+    'INGESTING': function display() { return (<BackupIcon />); },
+    'CORRECTING': function display() { return (<CheckCircleOutlineIcon />); },
+    'INGESTED': function display() { return (<CheckCircleOutlineIcon />); },
+    'CORRECTED': function display() { return (<CheckCircleOutlineIcon />); },
+    'DELETED': function display() { return (<HighlightOffIcon />); },
+    'ABANDONED': function display() { return (<CheckCircleOutlineIcon />); },
+    'ERROR': function display() { return (<ErrorOutlineIcon />); }
 };
 
 const JobView = () => {
@@ -62,7 +62,7 @@ const JobView = () => {
                             <Grid item lg={10} md={10} >
                                 <Typography variant="h5" color="primary">{job.reference}</Typography>
                             </Grid>
-         a                   <Grid container spacing={1} justify="flex-start">
+                            <Grid container spacing={1} justify="flex-start">
                                 <Grid item>
                                     <Chip
                                         size="small"
