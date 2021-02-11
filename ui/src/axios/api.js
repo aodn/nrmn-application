@@ -135,7 +135,6 @@ export const postJobValidation = (jobId) => (
   axiosInstance.post('/api/stage/validate/' + jobId).then(res => res)
 );
 export const updateRow = (jobId, rows) => {
-  console.log('rows',rows);
  return axiosInstance.put('/api/stage/updates/' + jobId, rows).then(res => res);
 };
 
