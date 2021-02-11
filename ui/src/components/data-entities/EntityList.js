@@ -111,6 +111,12 @@ const nonGenericEntities = {
     createButtonPath: '/edit/sites',
     entityLinkLabel: 'Details',
     entityLinkPath: 'view/sites/{}'
+  },
+  'ObservableItem': {
+    entityListName: 'ObservableItemListItem',
+    createButtonPath: '/edit/observableItems',
+    entityLinkLabel: 'Details',
+    entityLinkPath: 'view/observableItems/{}'
   }
 };
 
