@@ -1,16 +1,14 @@
-import {
-  createSlice
-} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
 import pluralize from 'pluralize';
-
 
 const formState = {
   entities: undefined,
   editItem: {},
   entitySaved: false,
-  errors: []
+  errors: [],
+  wormsForm: {},
+  isLoading: false
 };
-
 
 const formSlice = createSlice({
   name: 'form',
@@ -25,12 +23,29 @@ const formSlice = createSlice({
       state.errors = [];
     },
     entitiesError: (state, action) => {
-      const error = (action.payload.e.response?.data?.error) ? action.payload.e.response.data.error : 'Error while getting the entity data';
+      const error = action.payload.e.response?.data?.error ? action.payload.e.response.data.error : 'Error while getting the entity data';
       state.entities = [];
       state.errors = [error];
     },
     itemLoaded: (state, action) => {
       state.editItem = action.payload;
+    },
+    wormsSearchRequested: (state) => {
+      state.isLoading = true;
+    },
+    wormsSearchFailed: (state, action) => {
+      state.isLoading = false;
+      state.errors = action.payload;
+    },
+    wormsSearchFound: (state, action) => {
+      state.isLoading = false;
+      state.wormsForm = {
+        genus: action.payload.rankGenus,
+        phylum: action.payload.rankPhylum,
+        order: action.payload.rankOrder,
+        clazz: action.payload.rankClass,
+        family: action.payload.rankFamily
+      };
     },
     selectedItemsEdited: (state, action) => {
       let resp = {};
@@ -45,17 +60,20 @@ const formSlice = createSlice({
       const singularKey = pluralize.singular(key);
       resp[key] = action.payload._embedded;
       resp[singularKey + 'Selected'] = action.payload.selected;
-      resp[singularKey] = (action.payload.selected) ? action.payload.selected._links.self.href: undefined;
+      resp[singularKey] = action.payload.selected ? action.payload.selected._links.self.href : undefined;
       state.editItem = {...state.editItem, ...resp};
     },
     entitiesSaved: (state, action) => {
       state.entitySaved = action.payload;
     }
-  },
+  }
 });
 export const formReducer = formSlice.reducer;
 export const {
   resetState,
+  wormsSearchRequested,
+  wormsSearchFailed,
+  wormsSearchFound,
   entitiesLoaded,
   entitiesError,
   entitiesSaved,
@@ -63,5 +81,3 @@ export const {
   selectedItemsLoaded,
   selectedItemsEdited
 } = formSlice.actions;
-
-

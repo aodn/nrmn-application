@@ -4,7 +4,7 @@ import {
 } from '@reduxjs/toolkit';
 
 const initialState = JSON.parse(localStorage.getItem('auth')) ||
-  { errors: [], succes: false, loading: false, redirect: '/' };
+  { errors: [], success: false, loading: false, redirect: '/' };
 
 const authSlice = createSlice({
   name: 'auth',

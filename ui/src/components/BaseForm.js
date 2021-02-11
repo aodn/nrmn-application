@@ -8,12 +8,11 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
 import green from '@material-ui/core/colors/green';
 
-
 const useStyles = makeStyles((theme) => ({
   root: {
     '& > * + *': {
       marginTop: theme.spacing(2)
-    },
+    }
   },
   rootFlex: {
     display: 'flex',
@@ -21,25 +20,24 @@ const useStyles = makeStyles((theme) => ({
   },
   wrapper: {
     marginTop: theme.spacing(3),
-    position: 'relative',
+    position: 'relative'
   },
   buttonSuccess: {
     backgroundColor: green[500],
     '&:hover': {
-      backgroundColor: green[700],
-    },
+      backgroundColor: green[700]
+    }
   },
   buttonProgress: {
     position: 'absolute',
     top: '50%',
     left: '50%',
     marginTop: -12,
-    marginLeft: -12,
+    marginLeft: -12
   }
 }));
 
 const BaseForm = (params) => {
-
   const classes = useStyles();
 
   const loading = params.loading;
@@ -69,7 +67,6 @@ const BaseForm = (params) => {
       <Box pt={4} px={6} pb={6} className={classes.root} >
         {errorAlert}
         <Form
-
           onError={params.onError}
           schema={params.schema}
           uiSchema={params.uiSchema}
@@ -78,6 +75,7 @@ const BaseForm = (params) => {
           showErrorList={true}
           fields={params.fields}
           formData={params.formData}
+          ObjectFieldTemplate={params.template}
         >
 
           <div className={classes.rootFlex}>
@@ -98,4 +96,3 @@ const BaseForm = (params) => {
 };
 
 export default BaseForm;
-
