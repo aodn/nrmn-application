@@ -120,6 +120,19 @@ const nonGenericEntities = {
   }
 };
 
+
+const gotoDetailsView = (event) => {
+  if (event.node.isSelected() &&
+    event.colDef.field !== 'Links' &&
+    event.node.data._links )
+  {
+    const hrefSplit = event.node.data._links.self.href.split('/');
+    const id = hrefSplit.pop();
+    const ent = hrefSplit.pop();
+    window.location = '/view/' + ent + '/' + id;
+  }
+};
+
 const EntityList = () => {
 
   const {entityName} = useParams();
@@ -234,6 +247,18 @@ const EntityList = () => {
                   rowSelection="single"
                   animateRows={true}
                   onGridReady={agGridReady}
+                  // onCellFocused={e => {
+                  //   if (e.column ) {
+                  //     // && this.disableClickSelectionRenderers.includes(e.column.colDef.cellRenderer)
+                  //     debugger;
+                  //     e.api.gridOptionsWrapper.gridOptions.suppressRowClickSelection = true;
+                  //   }
+                  //   else {
+                  //     e.api.gridOptionsWrapper.gridOptions.suppressRowClickSelection = false;
+                  //   }
+                  //
+                  // }}
+                  onCellClicked={gotoDetailsView}
                   frameworkComponents={{
                     customTooltip: CustomTooltip,
                     customLoadingOverlay: CustomLoadingOverlay
