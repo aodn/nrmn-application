@@ -134,9 +134,9 @@ export const getDataJob = (jobId) => (
 export const postJobValidation = (jobId) => (
   axiosInstance.post('/api/stage/validate/' + jobId).then(res => res)
 );
-export const updateRow = (rows) => {
+export const updateRow = (jobId, rows) => {
   console.log('rows',rows);
- return axiosInstance.put('/api/stage/updates', rows).then(res => res);
+ return axiosInstance.put('/api/stage/updates/' + jobId, rows).then(res => res);
 };
 
 export const submitJobFile = (params) => {

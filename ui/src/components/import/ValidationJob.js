@@ -58,7 +58,7 @@ const ValidationJob = () => {
     };
 
     const handleSave = () => {
-        dispatch(RowUpdateRequested({jobId: jobId,rows: indexMap}));
+        dispatch(RowUpdateRequested({jobId: jobId, rows: indexMap}));
     };
 
     useEffect(() => {

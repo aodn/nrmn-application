@@ -47,7 +47,6 @@ const DataSheetView = () => {
     };
 
     const onCellChanged = (input) => {
-        console.log(input.data);
         dispatch(AddRowIndex({id:input.data.id,row: input.data}));
         dispatch(EnableSubmit(false));
     };
