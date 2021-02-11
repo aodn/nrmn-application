@@ -135,7 +135,9 @@ export const getDataJob = (jobId) =>
     .catch((err) => err);
 
 export const postJobValidation = (jobId) => axiosInstance.post('/api/stage/validate/' + jobId).then((res) => res);
-export const updateRow = (id, row) => axiosInstance.put('/api/stage/update/' + id, row).then((res) => res);
+export const updateRow = (jobId, rows) => {
+  return axiosInstance.put('/api/stage/updates/' + jobId, rows).then((res) => res);
+};
 
 export const submitJobFile = (params) => {
   const data = new FormData();
