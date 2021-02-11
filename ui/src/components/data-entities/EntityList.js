@@ -53,21 +53,27 @@ const schematoColDef = (schema, size, entityName) => {
     cellRendererFramework: function(params) {
 
       const linkPath = nonGenericEntities[entityName]?.entityLinkPath;
-      let linkLabel = 'Edit';
-      let link = '/';
+
       if (params.data._links) {
         const hrefSplit = params.data._links.self.href.split('/');
         const id = hrefSplit.pop();
         const ent = hrefSplit.pop();
 
+        let link = '/edit/' + ent + '/' + id;
+        const cloneLink = '/edit/' + ent + '/clone/' + id;
+        const deleteLink = '/delete/' + ent + '/' + id;
+        let linkLabel = 'Edit';
+
         if (linkPath) {
           link = '/' + linkPath.replace(/{(.*?)}/, id);
-          linkLabel = nonGenericEntities[entityName]?.entityLinkLabel ? nonGenericEntities[entityName]?.entityLinkLabel : linkLabel;
-        } else {
-          link = '/edit/' + ent + '/' + id;
-          linkLabel = 'Edit';
+          linkLabel = (nonGenericEntities[entityName]?.entityLinkLabel) ? nonGenericEntities[entityName]?.entityLinkLabel : linkLabel;
         }
-        return <LinkCell label={linkLabel} link={link}></LinkCell>;
+
+        return (<>
+          <LinkCell label={linkLabel} link={link}></LinkCell>
+          { nonGenericEntities[entityName]?.cloneButton ?  (<LinkCell label={'Clone'} link={cloneLink}></LinkCell>) : null }
+          { nonGenericEntities[entityName]?.hideDeleteButton ? null : (<LinkCell label={'Delete'} link={deleteLink}></LinkCell>)}
+        </>);
       }
     }
   });
@@ -85,8 +91,20 @@ const renderError = (msgArray) => {
     </Alert></Box>;
 };
 
+// nonGenericEntities parameters
+//
+// title: 'Job',
+// createButtonPath:  - attribute required if entity defined, or no create button will show
+// hideDeleteButton - delete button shown by default
+// cloneButton: true - show a clone link button
+// entityLinkLabel: 'Details', - defaults to be the main edit button per item
+// entityLinkPath: 'view/stagedJobs/{}',
+// additionalPageLinks: {label, link} - additional links for the page
 const nonGenericEntities = {
-  // createButtonPath attribute required or no create button will show
+  'Diver': {
+    cloneButton: true,
+    hideDeleteButton: false
+  },
   StagedJob: {
     title: 'Job',
     createButtonPath: '/upload',
