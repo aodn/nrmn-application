@@ -1,6 +1,5 @@
 import {
     createSlice,
-    createAction
 } from '@reduxjs/toolkit';
 
 
@@ -12,6 +11,7 @@ const importState = {
     submitReady: false,
     ingestSuccess: false,
     percentCompleted: 0,
+    indexChanged: {},
     errors: [],
     rows: [],
     errorsByMsg: [],
@@ -103,20 +103,31 @@ const importSlice = createSlice({
             state.isLoading = false;
 
         },
-        EditRowStarting: (state) => {
+        AddRowIndex: (state, action) => {
+            state.indexChanged[action.payload.id] = action.payload.row;
+        },
+        RowUpdateRequested: (state) => {
             state.editLoading = true;
         },
         EditRowFinished: (state) => {
             state.editLoading = false;
+            state.indexChanged  = {};
+
         },
         JobStarting: (state) => {
             state.isLoading = true;
         },
+        JobRequested:(state) => {
+            state.isLoading = true;
+        },
+        SubmitingestRequested: (state) => {
+            state.ingestLoading = true;
+        },
+        ValidationRequested: (state) => {
+            state.isLoading = true;
+        },
         JobFinished: (state) => {
             state.isLoading = false;
-        },
-        ingestStarting: (state) => {
-            state.ingestLoading = true;
         },
         ingestFinished: (state) => {
             state.ingestLoading = false;
@@ -146,11 +157,12 @@ export const {
     EditRowFinished,
     JobFinished,
     JobReady,
-    ingestStarting,
     ingestFinished,
     EnableSubmit,
-     } = importSlice.actions;
-export const JobRequested = createAction('JOB_REQUESTED', function (jobId) { return { payload: jobId }; });
-export const ValidationRequested = createAction('VALIDATION_REQUESTED', function (jobId) { return { payload: jobId }; });
-export const RowUpdateRequested = createAction('ROW_UDPDATE_REQUESTED', function (id, row) { return { payload: { id: id, row: row } }; });
-export const SubmitingestRequested = createAction('SUBMIT_ingest_REQUESTED', function (jobId) { return { payload: jobId }; });
+    RowUpdateRequested,
+    ResetRowIndex,
+    ValidationRequested,
+    SubmitingestRequested,
+    JobRequested,
+    AddRowIndex
+} = importSlice.actions;

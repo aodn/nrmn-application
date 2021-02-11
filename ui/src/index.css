@@ -1,32 +1,49 @@
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-a  {
-  color: #26b0bf;
+a {
+    color: #26b0bf;
 }
 
-a:hover  {
-  color: #1d838e;
+a:hover {
+    color: #1d838e;
 }
 
 header a:hover {
-  color: inherit;
+    color: inherit;
 }
 
 .redBoldFont {
-  color: #f44336;
-  font-weight: bold;
+    color: #f44336;
+    font-weight: bold;
 }
 
+.ag-center-cols-container .ag-cell {
+    border-right: 1px solid #ccc !important;
+}
 
+.ag-center-cols-container:first-child {
+    border-left: 1px solid #ccc !important;
+}
+
+.ag-header-container {
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+}
+
+.ag-header-container .ag-header-cell {
+    border-right: 1px solid #ccc !important;
+}
+
+#validation-grid .ag-cell {
+    height: 18px;
+    line-height: 18px;
+}
