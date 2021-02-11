@@ -133,6 +133,19 @@ const gotoDetailsView = (event) => {
   }
 };
 
+
+const gotoDetailsView = (event) => {
+  if (event.node.isSelected() &&
+    event.colDef.field !== 'Links' &&
+    event.node.data._links )
+  {
+    const hrefSplit = event.node.data._links.self.href.split('/');
+    const id = hrefSplit.pop();
+    const ent = hrefSplit.pop();
+    window.location = '/view/' + ent + '/' + id;
+  }
+};
+
 const EntityList = () => {
 
   const {entityName} = useParams();
