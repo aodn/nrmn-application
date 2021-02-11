@@ -13,6 +13,9 @@ import {useDispatch, useSelector} from 'react-redux';
 import {toggleLeftSideMenu} from './layout-reducer';
 import {NavLink} from 'react-router-dom';
 import store from '../store';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
+import {toggleTheme} from './theme-reducer';
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ? process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
@@ -58,28 +61,46 @@ const SideMenu = () => {
       <div className={classes.drawerHeader}>
         <IconButton onClick={handleMainMenu}>{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}</IconButton>
       </div>
+      {auth.success && (
+        <>
+          <Divider />
+          <List>
+            <ListSubheader>DATA</ListSubheader>
+            <List component="div" disablePadding>
+              <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} aweirdprop="true" to="/jobs">
+                <ListItemText primary="List Jobs" />
+              </ListItem>
+              <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} to="/upload">
+                <ListItemText primary="Add Job" />
+              </ListItem>
+            </List>
+          </List>
+          <Divider />
+          <List>
+            <ListSubheader>REFERENCE DATA</ListSubheader>
+            {['Diver', 'Location', 'ObservableItem', 'Program', 'Site'].map((text) => (
+              <ListItem button key={text} component={NavLink} to={'/list/' + text}>
+                <ListItemText primary={text} />
+              </ListItem>
+            ))}
+          </List>
+        </>
+      )}
       <Divider />
       <List>
-        <ListSubheader>DATA</ListSubheader>
-        <List component="div" disablePadding>
-          <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} aweirdprop="true" to="/jobs">
-            <ListItemText primary="List Jobs" />
-          </ListItem>
-          <ListItem button onClick={handleMainMenu} className={classes.nested} component={NavLink} to="/upload">
-            <ListItemText primary="Add Job" />
-          </ListItem>
-        </List>
-      </List>
-      <Divider />
-      <List>
-        <ListSubheader>REFERENCE DATA</ListSubheader>
-        {['Diver', 'Location', 'ObservableItem', 'Program', 'Site'].map((text) =>
-          auth.success === true ? (
-            <ListItem button key={text} component={NavLink} to={'/list/' + text}>
-              <ListItemText primary={text} />
-            </ListItem>
-          ) : null
-        )}
+        <FormControlLabel
+          label="Theme"
+          labelPlacement="start"
+          control={
+            <Switch
+              title="Dark/Light theme toggle"
+              onChange={(e) => {
+                store.dispatch(toggleTheme(e.target.checked));
+              }}
+              checked={store.getState().theme.themeType}
+            />
+          }
+        />
       </List>
     </Drawer>
   );
