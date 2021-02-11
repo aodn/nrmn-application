@@ -42,3 +42,8 @@ header a:hover {
 .ag-header-container .ag-header-cell {
     border-right: 1px solid #ccc !important;
 }
+
+#validation-grid .ag-cell {
+    height: 18px;
+    line-height: 18px;
+}

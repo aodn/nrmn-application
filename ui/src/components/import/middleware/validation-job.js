@@ -30,7 +30,9 @@ function* validateJob(action) {
 
 function* update(action) {
     try {
-        yield call(updateRow, action.payload.id, action.payload.row);
+        debugger;
+        const rows = Object.values(action.payload.rows);
+        yield call(updateRow,action.payload.jobId, rows);
         yield put(EditRowFinished());
     } catch (e) {
         yield put(jobFailed(e));

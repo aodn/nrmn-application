@@ -150,12 +150,12 @@ public class StagedJobController {
                 });
     }
 
-    @PutMapping("/update/{rowId}")
+    @PutMapping("/updates/{jobId}")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
-    public ResponseEntity updateRow(@PathVariable Long rowId,
+    public ResponseEntity updateRow(@PathVariable Long jobId,
                                     Authentication authentication,
-                                    @RequestBody StagedRow newRow) {
-        return rowService.update(rowId, newRow).fold(err ->
+                                    @RequestBody List<StagedRow> newRows) {
+        return rowService.update(jobId, newRows).fold(err ->
                         ResponseEntity
                                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
                                 .body(err)
@@ -204,16 +204,16 @@ public class StagedJobController {
                 .map(job ->
                         ResponseEntity.ok().body(
                                 new ValidationResponse(
-                                job, rows, Collections.emptyList(), Collections.emptyList()
-                        ))
+                                        job, rows, Collections.emptyList(), Collections.emptyList()
+                                ))
                 ).orElseGet(() ->
                         ResponseEntity.badRequest().body(
-                        new ValidationResponse(
-                                null,
-                                Collections.emptyList(),
-                                Collections.emptyList(),
-                                Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob"))
-                        )));
+                                new ValidationResponse(
+                                        null,
+                                        Collections.emptyList(),
+                                        Collections.emptyList(),
+                                        Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob"))
+                                )));
 
     }
 }
