@@ -67,7 +67,7 @@ const GenericDetailsView = () => {
 
   const entityDef = schemaDefinition[entityTitle];
 
-  let fullTitle = 'Details for ' + entityTitle + " '" + id + "'";
+  let fullTitle = 'Details for ' + entityTitle;
   const entitySchema = { title: fullTitle, ...entityDef };
   const JSSchema = { components: { schemas: schemaDefinition }, ...entitySchema };
 
@@ -133,14 +133,14 @@ const GenericDetailsView = () => {
   const submitButton = () => {
 
     const linkPath = nonGenericEntities[entityName]?.linkPath;
-    let linkLabel = `Edit ` + entityTitle + ` '` + id + `'`;
+    let linkLabel = `Edit ` + entityTitle;
     let link = '/';
     if ((entityName in nonGenericEntities) && linkPath) {
       link =  '/' + linkPath.replace(/{(.*?)}/, id);
       linkLabel = (nonGenericEntities[entityName]?.linkLabel) ? nonGenericEntities[entityName]?.linkLabel : linkLabel;
     }
     else {
-      link = '/form/' + entityName + '/' + id;
+      link = '/edit/' + entityName + '/' + id;
     }
     return <div className={classes.buttons}>
       <Button
