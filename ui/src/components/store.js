@@ -19,9 +19,9 @@ import { jobReducer } from './job/jobReducer';
 import jobWatcher from './job/jobMiddleware';
 
 const initialiseSagaMiddleware = createSagaMiddleware();
+const isDev = (process.env.NODE_ENV == 'development');
 
-const middleware = [
-  ...getDefaultMiddleware(),
+const middleware = (isDev) ? [...getDefaultMiddleware(), initialiseSagaMiddleware] : [
   initialiseSagaMiddleware
 ];
 

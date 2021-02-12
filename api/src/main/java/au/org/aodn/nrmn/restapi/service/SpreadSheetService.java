@@ -115,12 +115,12 @@ public class SpreadSheetService {
 
             List<StagedRow> stagedRows = IntStream
                     .range(2, dataSheet.getSheet().getPhysicalNumberOfRows())
-//                    .filter(i ->
-//                            Maybe.attempt(() ->
-//                                    dataSheet.getSheet().getRow(i).isFormatted() &&
-//                                            !_getCellValue(dataSheet.getSheet().getRow(i).getCell(headerMap.get("ID")), eval, fmt).equals("")
-//                            ).orElseGet(() -> false)
-//                    )
+                    .filter(i ->
+                            Maybe.attempt(() ->
+                                //    dataSheet.getSheet().getRow(i).isFormatted() &&
+                                    !_getCellValue(dataSheet.getSheet().getRow(i).getCell(headerMap.get("ID")), eval, fmt).trim().equals("")
+                            ).orElseGet(() -> false)
+                    )
                     .mapToObj(index -> {
                         val row = dataSheet.getSheet().getRow(index);
                         val stagedRow = new StagedRow();

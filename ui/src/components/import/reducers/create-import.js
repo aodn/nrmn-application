@@ -64,6 +64,7 @@ const importSlice = createSlice({
     name: 'import',
     initialState: importState,
     reducers: {
+        ResetState: () => importState,
         JobReady: (state, action) => {
             if (action.payload.rows && action.payload.rows.length > 0) {
                 state.rows = action.payload.rows.map(row => exportRow(row));
@@ -149,6 +150,7 @@ const importSlice = createSlice({
 
 export const importReducer = importSlice.reducer;
 export const {
+    ResetState,
     jobFailed,
     JobStarting,
     validationFilter,
