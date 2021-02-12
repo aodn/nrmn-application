@@ -128,12 +128,21 @@ const GenericForm = () => {
           <LoadingBanner variant={'h5'} msg={`Loading '` + titleCase(entityName) + `' form`} />
         </Grid>
       ) : (
-        <Grid container direction="row" justify="center" alignItems="center" style={{minHeight: '70vh'}}>
-          <Grid item>
-            <LinkButton key={submitButtonLabel} title={submitButtonLabel} label={submitButtonLabel} to={'/list/' + entityTitle} />
+        <>
+          <Grid container direction="row" justify="space-between" alignItems="center" style={{padding: '20px'}}>
+            <Grid item>
+              <Typography variant="h4"></Typography>
+            </Grid>
+            <Grid item>
+              <Grid container spacing={2}>
+                <LinkButton key={submitButtonLabel} title={submitButtonLabel} label={submitButtonLabel} to={'/list/' + entityTitle} />
+              </Grid>
+            </Grid>
           </Grid>
-          <Grid item>{formContent()}</Grid>
-        </Grid>
+          <Grid container direction="row" justify="center" alignItems="center" style={{minHeight: '70vh'}}>
+            <Grid item>{formContent()}</Grid>
+          </Grid>
+        </>
       );
     }
   }
