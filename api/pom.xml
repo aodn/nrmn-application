@@ -5,7 +5,7 @@
     <parent>
         <artifactId>nrmn</artifactId>
         <groupId>au.org.aodn.nrmn</groupId>
-        <version>0.0.73</version>
+        <version>0.0.74</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>au.org.aodn.nrmn</groupId>
