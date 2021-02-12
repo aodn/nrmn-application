@@ -1,44 +1,38 @@
 import React from 'react';
-import { Box, Typography } from '@material-ui/core';
-import { useSelector, useDispatch } from 'react-redux';
-import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import {Box, Typography} from '@material-ui/core';
+import {useSelector, useDispatch} from 'react-redux';
+import {useEffect} from 'react';
+import {useParams, useHistory} from 'react-router-dom';
 import pluralize from 'pluralize';
-import { AgGridReact } from 'ag-grid-react/lib/agGridReact';
+import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
 import useWindowSize from '../utils/useWindowSize';
 import Alert from '@material-ui/lab/Alert';
 import config from 'react-global-configuration';
-import { titleCase } from 'title-case';
+import {titleCase} from 'title-case';
 import Grid from '@material-ui/core/Grid';
 import CustomTooltip from './customTooltip';
 import CustomLoadingOverlay from './CustomLoadingOverlay';
-import { selectRequested } from './middleware/entities';
-import { resetState } from './form-reducer';
+import {selectRequested} from './middleware/entities';
+import {resetState} from './form-reducer';
 import LinkCell from './customWidgetFields/LinkCell';
 import LinkButton from './LinkButton';
 
 const cellRenderer = (params) => {
   if (typeof params.value === 'object') {
-    return (
-      JSON.stringify(params.value)?.replaceAll(/["{}]/g, '')
-        .replaceAll(',', ', ').trim()
-    );
-  };
+    return JSON.stringify(params.value)?.replaceAll(/["{}]/g, '').replaceAll(',', ', ').trim();
+  }
   return params.value;
 };
 
 const getCellFilter = (format) => {
-
   const filterTypes = {
     int64: 'agNumberColumnFilter',
     'date-time': 'agDateColumnFilter'
   };
   return filterTypes[format] ? filterTypes[format] : 'agTextColumnFilter';
-
 };
 
 const schematoColDef = (schema, size, entityName) => {
-
   const fields = Object.keys(schema.properties);
   const widthSize = size.width / (fields.length + 1);
   const coldefs = fields.map(field => {
@@ -68,13 +62,12 @@ const schematoColDef = (schema, size, entityName) => {
 
         if (linkPath) {
           link = '/' + linkPath.replace(/{(.*?)}/, id);
-          linkLabel = (nonGenericEntities[entityName]?.entityLinkLabel) ? nonGenericEntities[entityName]?.entityLinkLabel : linkLabel;
-        }
-        else {
+          linkLabel = nonGenericEntities[entityName]?.entityLinkLabel ? nonGenericEntities[entityName]?.entityLinkLabel : linkLabel;
+        } else {
           link = '/edit/' + ent + '/' + id;
           linkLabel = 'Edit';
         }
-        return (<LinkCell label={linkLabel} link={link}></LinkCell>);
+        return <LinkCell label={linkLabel} link={link}></LinkCell>;
       }
     }
   });
@@ -133,20 +126,21 @@ const gotoDetailsView = (event) => {
   }
 };
 
-
-const gotoDetailsView = (event) => {
-  if (event.node.isSelected() &&
-    event.colDef.field !== 'Links' &&
-    event.node.data._links )
-  {
+const gotoDetailsView = (event, history) => {
+  if (event.node.isSelected() && event.colDef.field !== 'Links' && event.node.data._links) {
     const hrefSplit = event.node.data._links.self.href.split('/');
     const id = hrefSplit.pop();
     const ent = hrefSplit.pop();
-    window.location = '/view/' + ent + '/' + id;
+    history.push('/view/' + ent + '/' + id);
   }
 };
 
 const EntityList = () => {
+  const {entityName} = useParams();
+  const history = useHistory();
+
+  const plural = pluralize.plural(entityName);
+  const entityNamePlural = plural.charAt(0).toLowerCase() + plural.slice(1);
 
   const {entityName} = useParams();
 
@@ -190,10 +184,13 @@ const EntityList = () => {
     dispatch(selectRequested(entityPluralise(entityListName)));
   }, [entityName]); // reset when new or entityName prop changes
 
+  const getEntitySchema = () => {
+    return schemaDefinition[titleCase(entityName)] ? schemaDefinition[titleCase(entityName)] : schemaDefinition[entityName];
+  };
+
   const getTitle = () => {
     return (nonGenericEntities[entityName]?.title) ? nonGenericEntities[entityName]?.title : entityName;
   };
-
 
   const additionalPageLinks = () => {
     let links = nonGenericEntities[entityName]?.additionalPageLinks;
@@ -222,7 +219,8 @@ const EntityList = () => {
 
   if (Object.keys(schemaDefinition).length === 0) {
     return (renderError(['Error: API not yet loaded']));
-  } else {
+  }
+  else {
     if (!schemaDefinition[getListEntity()]) {
       return renderError(['ERROR: Entity \'' + titleCase(entityName) + '\' missing from API Schema']);
     }
@@ -260,18 +258,9 @@ const EntityList = () => {
                   rowSelection="single"
                   animateRows={true}
                   onGridReady={agGridReady}
-                  // onCellFocused={e => {
-                  //   if (e.column ) {
-                  //     // && this.disableClickSelectionRenderers.includes(e.column.colDef.cellRenderer)
-                  //     debugger;
-                  //     e.api.gridOptionsWrapper.gridOptions.suppressRowClickSelection = true;
-                  //   }
-                  //   else {
-                  //     e.api.gridOptionsWrapper.gridOptions.suppressRowClickSelection = false;
-                  //   }
-                  //
-                  // }}
-                  onCellClicked={gotoDetailsView}
+                  onCellClicked={(e) => {
+                    gotoDetailsView(e, history);
+                  }}
                   frameworkComponents={{
                     customTooltip: CustomTooltip,
                     customLoadingOverlay: CustomLoadingOverlay
@@ -297,6 +286,3 @@ const EntityList = () => {
 };
 
 export default EntityList;
-
-
-
