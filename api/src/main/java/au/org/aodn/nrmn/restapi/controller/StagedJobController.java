@@ -216,5 +216,15 @@ public class StagedJobController {
                                 )));
 
     }
-}
+
+    @DeleteMapping("/delete/{jobId}")
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
+    public ResponseEntity deleteJob(@PathVariable Long jobId) {
+        jobRepo.deleteById(jobId);
+        return ResponseEntity.ok().build();
+
+    }
+
+
+    }
 

@@ -17,9 +17,16 @@ const jobSlice = createSlice({
         jobRequested: (state) => {
             state.isLoading = true;
         },
-        jobFinished:(state, action) => {
+        jobFinished: (state, action) => {
             state.isLoading = false;
             state.currentJob = action.payload;
+        },
+        DeleteJobRequested: (state) => {
+            state.isLoading = true;
+
+        },
+        DeleteFinished: (state) => {
+            state.isLoading = false;
         },
         jobsFinished: (state, action) => {
             state.isLoading = false;
@@ -34,5 +41,5 @@ const jobSlice = createSlice({
 });
 
 
-export const { jobsRequested, jobFinished,jobsFinished, jobRequested, jobsError } = jobSlice.actions;
+export const { DeleteJobRequested, DeleteFinished, jobsRequested, jobFinished, jobsFinished, jobRequested, jobsError } = jobSlice.actions;
 export const jobReducer = jobSlice.reducer;

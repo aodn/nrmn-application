@@ -88,6 +88,11 @@ export const getFullJob = (id) => {
     });
 };
 
+
+export const deleteJobAPI = (jobId) => {
+  axiosInstance.delete('/api/stage/delete/'+jobId);
+};
+
 export const getSelectedEntityItems = (paths) => axiosInstance.all([
   axiosInstance.get('/api/' + paths[0]),
   (paths[1]) ? axiosInstance.get(paths[1]) : null,

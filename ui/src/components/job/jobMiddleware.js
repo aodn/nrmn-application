@@ -1,10 +1,11 @@
 import { takeEvery, call, put } from 'redux-saga/effects';
-import { getEntity, getFullJob } from '../../axios/api';
-import { jobsError, jobsFinished, jobsRequested, jobRequested, jobFinished } from './jobReducer';
+import { getEntity, getFullJob, deleteJobAPI } from '../../axios/api';
+import { jobsError, DeleteJobRequested, DeleteFinished, jobsFinished, jobsRequested, jobRequested, jobFinished } from './jobReducer';
 
 export default function* createJobsWatcher() {
     yield takeEvery(jobsRequested, getJobs);
     yield takeEvery(jobRequested, getJob);
+    yield takeEvery(DeleteJobRequested, deleteJob);
 }
 
 function* getJobs() {
@@ -37,4 +38,16 @@ function* getJob(param) {
         yield put(jobsError([e]));
 
     }
+}
+
+function* deleteJob(param) {
+    try {
+        yield call(deleteJobAPI, param.payload);
+        yield put(DeleteFinished());
+    } catch (e) {
+        console.error(e);
+        yield put(jobsError([e]));
+    }
+
+
 }
