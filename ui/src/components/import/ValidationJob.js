@@ -141,7 +141,7 @@ const ValidationJob = () => {
                 <Typography variant="h2" >Ingesting...</Typography>
                 <CircularProgress size={200} style={{ color: '#ccc' }}></CircularProgress>
             </Backdrop>)}
-            {true && (<Backdrop open={true}>
+            {isLoading && (<Backdrop open={isLoading}>
                 <CircularProgress size={200} style={{ color: '#ccc' }}></CircularProgress>
             </Backdrop>)}
         </Box>

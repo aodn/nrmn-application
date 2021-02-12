@@ -25,7 +25,6 @@ Object.unfreeze = function (o) {
 const DataSheetView = () => {
     const dispatch = useDispatch();
     const immutableRows = useSelector(state => state.import.rows);
-    const isLoading = useSelector(state => state.import.isLoading);
 
     const errSelected = useSelector(state => state.import.errSelected);
     const [gridApi, setGridApi] = useState(null);
@@ -86,7 +85,7 @@ const DataSheetView = () => {
 
     const size = useWindowSize();
     const themeType = useSelector(state => state.theme.themeType);
-    const condition = rows && rows.length && !isLoading;
+    const condition = rows && rows.length;
 
     return (<Box>
         {condition &&

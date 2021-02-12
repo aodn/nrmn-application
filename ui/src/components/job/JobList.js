@@ -3,7 +3,7 @@ import { AgGridReact } from 'ag-grid-react';
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import useWindowSize from '../utils/useWindowSize';
-import { jobsRequested } from './jobReducer';
+import { jobsRequested, ResetState } from './jobReducer';
 import LinkCell from '../data-entities/customWidgetFields/LinkCell';
 import { NavLink } from 'react-router-dom';
 import CloudUploadOutlinedIcon from '@material-ui/icons/CloudUploadOutlined';
@@ -62,7 +62,7 @@ const colunmDef = [
         headerName: 'Type'
     }, {
         field: 'Initiator',
-
+        headerName: 'Creator',
         cellRenderer: (params) => { return params.data.creator.email; },
         filter: 'agTextColumnFilter',
         filterValueGetter: (params) => { return params.data.creator.email; },
@@ -111,6 +111,9 @@ const JobList = () => {
     const isLoading = useSelector(state => state.job.isLoading);
     useEffect(() => {
         dispatch(jobsRequested());
+        return function clean() {
+            dispatch(ResetState());
+        };
     }, []);
 
     const onReady = (params) => {
@@ -147,7 +150,7 @@ const JobList = () => {
         </Grid>
         {isLoading && (
             <Backdrop open={isLoading}>
-                <CircularProgress size={200} style={{color: '#ccc'}}></CircularProgress>
+                <CircularProgress size={200} style={{ color: '#ccc' }}></CircularProgress>
             </Backdrop>)}
         {jobs && jobs.length > 0 && (<div style={{ width: '100%', height: size.height - 170, marginTop: 25 }}
             className={'ag-theme-material'}>
