@@ -1,11 +1,11 @@
 import {configureStore, getDefaultMiddleware} from '@reduxjs/toolkit';
 
-import { themeReducer } from './layout/theme-reducer';
-import { toggleReducer } from './layout/layout-reducer';
-import { importReducer } from './import/reducers/create-import';
-import { uploadReducer } from './import/reducers/upload';
-import { authReducer } from './auth/auth-reducer';
-import { formReducer } from './data-entities/form-reducer';
+import {themeReducer} from './layout/theme-reducer';
+import {toggleReducer} from './layout/layout-reducer';
+import {importReducer} from './import/reducers/create-import';
+import {uploadReducer} from './import/reducers/upload';
+import {authReducer} from './auth/auth-reducer';
+import {formReducer} from './data-entities/form-reducer';
 import createSagaMiddleware from 'redux-saga';
 import importMiddleware from './import/middleware/create-import';
 import FileMiddleware from './import/middleware/validation-job';

@@ -3,8 +3,9 @@ import axios from 'axios';
 import store from '../components/store'; // will be useful to access to axios.all and axios.spread
 import {ImportProgress} from '../components/import/reducers/upload';
 function getToken() {
-  const token = store.getState().auth.accessToken;
-  const tokenType = store.getState().auth.tokenType;
+  const auth = store.getState().auth;
+  const token = auth.accessToken;
+  const tokenType = auth.tokenType;
   return `${tokenType} ${token}`;
 }
 
@@ -76,16 +77,20 @@ export const getFullJob = (id) => {
   const jobReq = axiosInstance.get('/api/stagedJobs/' + id);
   const logsReq = axiosInstance.get('/api/stagedJobs/' + id + '/logs');
   const programReq = axiosInstance.get('/api/stagedJobs/' + id + '/program');
-  return axios.all([jobReq, logsReq, programReq])
-    .then(axios.spread((...responses) => {
-      const job = responses[0].data || {};
-      const logs = responses[1]?.data._embedded.stagedJobLogs || [];
-      const program = responses[2].data || {};
-      const fullJob = { ...job, program: program, logs: logs };
-      return fullJob;
-    })).catch(err => {
+  return axios
+    .all([jobReq, logsReq, programReq])
+    .then(
+      axios.spread((...responses) => {
+        const job = responses[0].data || {};
+        const logs = responses[1]?.data._embedded.stagedJobLogs || [];
+        const program = responses[2].data || {};
+        const fullJob = {...job, program: program, logs: logs};
+        return fullJob;
+      })
+    )
+    .catch((err) => {
       console.error(err);
-      return { error: err };
+      return {error: err};
     });
 };
 
@@ -130,7 +135,9 @@ export const getDataJob = (jobId) =>
     .catch((err) => err);
 
 export const postJobValidation = (jobId) => axiosInstance.post('/api/stage/validate/' + jobId).then((res) => res);
-export const updateRow = (jobId, rows) => axiosInstance.put('/api/stage/updates/' + jobId, rows).then((res) => res);
+export const updateRow = (jobId, rows) => {
+  return axiosInstance.put('/api/stage/updates/' + jobId, rows).then((res) => res);
+};
 
 export const submitJobFile = (params) => {
   const data = new FormData();

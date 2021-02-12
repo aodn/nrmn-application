@@ -53,46 +53,48 @@ const BaseForm = (params) => {
     });
   }
 
-  let errorAlert = params.errors && params.errors.length > 0 ? <Alert severity="error" variant="filled" >{getErrors(params.errors)}
-  </Alert> : '';
+  let errorAlert =
+    params.errors && params.errors.length > 0 ? (
+      <Alert severity="error" variant="filled">
+        {getErrors(params.errors)}
+      </Alert>
+    ) : (
+      ''
+    );
 
-  return <>
-    <Grid
-      container
-      spacing={0}
-      alignItems="center"
-      justify="center"
-      style={{ minHeight: '70vh' }}
-    >
-      <Box pt={4} px={6} pb={6} className={classes.root} >
-        {errorAlert}
-        <Form
-          onError={params.onError}
-          schema={params.schema}
-          uiSchema={params.uiSchema}
-          onSubmit={submitForm}
-          gutterBottom={true}
-          showErrorList={true}
-          fields={params.fields}
-          formData={params.formData}
-          ObjectFieldTemplate={params.template}
-        >
-
-          <div className={classes.rootFlex}>
-            <div className={classes.wrapper}>
-              {(params.submitButton) ? params.submitButton :
-                <Button type="submit"
-                  variant="contained"
-                  color="secondary"
-                  disabled={loading}
-                >Submit</Button>}
-              {loading && <CircularProgress size={20} className={classes.buttonProgress} />}
+  return (
+    <>
+      <Grid container spacing={0} alignItems="center" justify="center" style={{minHeight: '70vh'}}>
+        <Box pt={4} px={6} pb={6} className={classes.root}>
+          {errorAlert}
+          <Form
+            onError={params.onError}
+            schema={params.schema}
+            uiSchema={params.uiSchema}
+            onSubmit={submitForm}
+            gutterBottom={true}
+            showErrorList={true}
+            fields={params.fields}
+            formData={params.formData}
+            ObjectFieldTemplate={params.template}
+          >
+            <div className={classes.rootFlex}>
+              <div className={classes.wrapper}>
+                {params.submitButton ? (
+                  params.submitButton
+                ) : (
+                  <Button type="submit" variant="contained" color="secondary" disabled={loading}>
+                    Submit
+                  </Button>
+                )}
+                {loading && <CircularProgress size={20} className={classes.buttonProgress} />}
+              </div>
             </div>
-          </div>
-        </Form>
-      </Box>
-    </Grid>
-  </>;
+          </Form>
+        </Box>
+      </Grid>
+    </>
+  );
 };
 
 export default BaseForm;
