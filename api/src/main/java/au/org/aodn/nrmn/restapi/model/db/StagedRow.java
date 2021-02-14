@@ -112,7 +112,7 @@ public class StagedRow implements Serializable {
     private Map<Integer, String> measureJson;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(foreignKey = @ForeignKey(name = "staged_row_staged_job_id_fkey"))
     private StagedJob stagedJob;
 

@@ -25,7 +25,7 @@ public class StagedJobLog {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "staged_job_log_id_seq")
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JsonIgnore
     @JoinColumn(name = "staged_job_id", referencedColumnName = "id", nullable = false,
         foreignKey = @ForeignKey(name = "staged_job_log_staged_job_id_fkey"))
