@@ -94,7 +94,7 @@ const renderError = (msgArray) => {
 
 const nonGenericEntities = {
   // createButtonPath attribute required or no create button will show
-  'StagedJob': {
+  StagedJob: {
     title: 'Job',
     createButtonPath: '/upload',
     entityLinkLabel: 'Details',
@@ -106,13 +106,13 @@ const nonGenericEntities = {
     //   }
     // ]
   },
-  'Site': {
+  Site: {
     entityListName: 'SiteListItem',
     createButtonPath: '/edit/sites',
     entityLinkLabel: 'Details',
     entityLinkPath: 'view/sites/{}'
   },
-  'ObservableItem': {
+  ObservableItem: {
     entityListName: 'ObservableItemListItem',
     createButtonPath: '/edit/observableItems',
     entityLinkLabel: 'Details',
