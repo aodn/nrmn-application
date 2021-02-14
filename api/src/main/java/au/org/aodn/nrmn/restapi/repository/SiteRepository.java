@@ -1,7 +1,6 @@
 package au.org.aodn.nrmn.restapi.repository;
 
 import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.model.db.projections.SiteList;
 import au.org.aodn.nrmn.restapi.repository.model.EntityCriteria;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
@@ -17,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-@RepositoryRestResource(excerptProjection = SiteList.class)
+@RepositoryRestResource
 @Tag(name = "sites")
 public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecificationExecutor<Site>, EntityCriteria<Site> {
 
