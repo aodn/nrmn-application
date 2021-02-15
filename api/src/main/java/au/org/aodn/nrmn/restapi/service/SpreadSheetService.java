@@ -115,15 +115,22 @@ public class SpreadSheetService {
 
             List<StagedRow> stagedRows = IntStream
                     .range(2, dataSheet.getSheet().getPhysicalNumberOfRows())
-//                    .filter(i ->
-//                            Maybe.attempt(() ->
-//                                    dataSheet.getSheet().getRow(i).isFormatted() &&
-//                                            !_getCellValue(dataSheet.getSheet().getRow(i).getCell(headerMap.get("ID")), eval, fmt).equals("")
-//                            ).orElseGet(() -> false)
-//                    )
+                    .filter(i ->
+                            Maybe.attempt(() ->
+                                    dataSheet.getSheet().getRow(i).isFormatted() &&
+                                            !_getCellValue(dataSheet.getSheet().getRow(i).getCell(headerMap.get("ID")), eval, fmt).trim().equals("")
+                            ).orElseGet(() -> false)
+                    )
                     .mapToObj(index -> {
                         val row = dataSheet.getSheet().getRow(index);
                         val stagedRow = new StagedRow();
+                        val diverIndex = headerMap.get("Diver");
+                        log.warn("diver pos: " + diverIndex );
+
+                        val diverCell =row.getCell(diverIndex);
+                        log.warn("diver cell: " + diverCell.getStringCellValue() );
+
+                        val diver =  _getCellValue(diverCell, eval, fmt);
                         stagedRow.setDiver(_getCellValue(row.getCell(headerMap.get("Diver")), eval, fmt));
                         stagedRow.setBuddy(_getCellValue(row.getCell(headerMap.get("Buddy")), eval, fmt));
                         stagedRow.setSiteCode(_getCellValue(row.getCell(headerMap.get("Site No.")), eval, fmt));
