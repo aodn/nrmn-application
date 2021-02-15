@@ -43,11 +43,12 @@ const schematoColDef = (schema, size, entityName) => {
   const widthSize = size.width / (fields.length + 1);
   const coldefs = fields.map(field => {
 
+    let type = schema.properties[field] ? schema.properties[field]?.type : 'string';
     return {
-      field: schema.properties[field]?.title || field,
+      field: field,
       width: widthSize,
       tooltipField: field,
-      filter: getCellFilter(schema.properties[field]?.type || 'string'),
+      filter: getCellFilter(type),
       cellRenderer: cellRenderer
     };
   });
