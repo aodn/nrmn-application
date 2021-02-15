@@ -16,6 +16,7 @@ import Typography from '@material-ui/core/Typography';
 import BaseForm from '../BaseForm';
 import LinkButton from './LinkButton';
 import ObjectListViewTemplate from './ObjectListViewTemplate';
+import _ from 'lodash';
 
 
 const renderError = (msgArray) => {
@@ -66,15 +67,15 @@ const GenericForm = () => {
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
   const uiSchema = {};
 
-  Object.keys(entitySchema.properties).filter( key => {
-    if (entitySchema.properties[key].type === 'string' && entitySchema.properties[key].format === 'uri') {
+  for (const key in entitySchema.properties) {
+    const item = entitySchema.properties[key];
+    if (item.type === 'string' && item.format === 'uri') {
       uiSchema[key] = {'ui:field': 'relationship'};
     }
-
-    if (entitySchema.properties[key].type === 'object' && entitySchema.properties[key].readOnly === true) {
+    if (item.type === 'object' && item.readOnly === true) {
       uiSchema[key] = {'ui:field': 'readonlyObject'};
     }
-  });
+  }
 
   const objectDisplay = (elem) => {
     let items = [];
@@ -82,14 +83,14 @@ const GenericForm = () => {
 
       if (!Array.isArray(elem.formData)) {
         for (let key of Object.keys(elem.formData)) {
-          items.push(<Grid item><b>{key}: </b>{elem.formData[key]}</Grid>);
+          items.push(<Grid key={_.uniqueId('dataObject-')} item><b>{key}: </b>{elem.formData[key]}</Grid>);
         }
       } else {
         elem.formData.map(item => items.push(<Grid item>{item}</Grid>));
       }
     }
     else {
-      items.push(<Grid item>--</Grid>);
+      items.push(<Grid key={_.uniqueId('dataObject-')} item>--</Grid>);
     }
     return ObjectListViewTemplate({ name: elem.name + ' (Readonly)', items: items });
   };
