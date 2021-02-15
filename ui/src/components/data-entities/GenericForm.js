@@ -15,6 +15,7 @@ import {createEntityRequested, itemRequested, updateEntityRequested} from './mid
 import Typography from '@material-ui/core/Typography';
 import BaseForm from '../BaseForm';
 import LinkButton from './LinkButton';
+import ObjectListViewTemplate from './ObjectListViewTemplate';
 
 
 const renderError = (msgArray) => {
@@ -63,19 +64,39 @@ const GenericForm = () => {
 
   const entitySchema = {title: fullTitle, ...entityDef};
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
-
-  const uiSchemaHacks = Object.keys(entitySchema.properties).filter( key => {
-    return entitySchema.properties[key].type === 'string' && entitySchema.properties[key].format === 'uri';
-  } );
-
   const uiSchema = {};
 
-  uiSchemaHacks.map( key => {
-    uiSchema[key] = {'ui:field': 'relationship'};
+  Object.keys(entitySchema.properties).filter( key => {
+    if (entitySchema.properties[key].type === 'string' && entitySchema.properties[key].format === 'uri') {
+      uiSchema[key] = {'ui:field': 'relationship'};
+    }
+
+    if (entitySchema.properties[key].type === 'object' && entitySchema.properties[key].readOnly === true) {
+      uiSchema[key] = {'ui:field': 'readonlyObject'};
+    }
   });
 
+  const objectDisplay = (elem) => {
+    let items = [];
+    if (elem.formData) {
+
+      if (!Array.isArray(elem.formData)) {
+        for (let key of Object.keys(elem.formData)) {
+          items.push(<Grid item><b>{key}: </b>{elem.formData[key]}</Grid>);
+        }
+      } else {
+        elem.formData.map(item => items.push(<Grid item>{item}</Grid>));
+      }
+    }
+    else {
+      items.push(<Grid item>--</Grid>);
+    }
+    return ObjectListViewTemplate({ name: elem.name + ' (Readonly)', items: items });
+  };
+
   const fields = {
-    relationship: NestedApiField
+    relationship: NestedApiField,
+    readonlyObject: objectDisplay
   };
 
   const formContent = ()=>{
