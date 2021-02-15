@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {Backdrop, Box, Chip, CircularProgress, Divider, Grid, Paper, Typography} from '@material-ui/core';
 import {useDispatch, useSelector} from 'react-redux';
-import {jobRequested} from './jobReducer';
+import {jobRequested, ResetState} from './jobReducer';
 import {useParams} from 'react-router';
 import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutlined';
 import Timeline from '@material-ui/lab/Timeline';
@@ -75,6 +75,9 @@ const JobView = () => {
   const classes = useStyles();
   useEffect(() => {
     dispatch(jobRequested({id}));
+    return function clean() {
+      dispatch(ResetState());
+    };
   }, []);
 
   return (
@@ -98,9 +101,11 @@ const JobView = () => {
                     mt={1}
                   ></Chip>
                 </Grid>
-
                 <Grid item>
-                  <Chip size="small" color="secondary" label={job.source} variant="outlined"></Chip>
+                  <Chip size="small" color="seprimarycondary" label={job.source} variant="outlined"></Chip>
+                </Grid>
+                <Grid item>
+                  <Chip size="small" color="secondary" label={job.status} variant="outlined"></Chip>
                 </Grid>
 
                 {job.isExtendedSize && (
@@ -113,7 +118,7 @@ const JobView = () => {
               <Grid>
                 <Grid item>
                   <Typography>
-                    created by: {job.creator.email} at {job.created}{' '}
+                    Created by: {job.creator.email} at {job.created}{' '}
                   </Typography>
                 </Grid>
               </Grid>

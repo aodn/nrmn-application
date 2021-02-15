@@ -3,7 +3,7 @@ import {AgGridReact} from 'ag-grid-react';
 import React, {useEffect, useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import useWindowSize from '../utils/useWindowSize';
-import {jobsRequested, DeleteJobRequested} from './jobReducer';
+import {jobsRequested, DeleteJobRequested, ResetState} from './jobReducer';
 import LinkCell from '../data-entities/customWidgetFields/LinkCell';
 import {NavLink} from 'react-router-dom';
 import CloudUploadOutlinedIcon from '@material-ui/icons/CloudUploadOutlined';
@@ -35,7 +35,11 @@ const JobList = () => {
 
   useEffect(() => {
     dispatch(jobsRequested());
+    return function clean() {
+      dispatch(ResetState());
+    };
   }, []);
+
   const defaultPopup = {isOpen: false, jobId: 0, index: 0};
   const [deletePopup, setDeletePopup] = useState(defaultPopup);
   const [gridApi, setGridApi] = useState(null);
@@ -90,6 +94,7 @@ const JobList = () => {
     },
     {
       field: 'Initiator',
+      headerName: 'Creator',
       cellRenderer: (params) => {
         return params.data.creator.email;
       },

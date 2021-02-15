@@ -47,3 +47,11 @@ header a:hover {
     height: 18px;
     line-height: 18px;
 }
+
+.MuiBackdrop-root {
+    z-index: 200 !important;
+}
+
+.MuiDialog-paper {
+    z-index: 201 !important;;
+}
