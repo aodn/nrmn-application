@@ -113,20 +113,8 @@ const nonGenericEntities = {
   }
 };
 
-
-const gotoDetailsView = (event) => {
-  if (event.node.isSelected() &&
-    event.colDef.field !== 'Links' &&
-    event.node.data._links )
-  {
-    const hrefSplit = event.node.data._links.self.href.split('/');
-    const id = hrefSplit.pop();
-    const ent = hrefSplit.pop();
-    window.location = '/view/' + ent + '/' + id;
-  }
-};
-
 const gotoDetailsView = (event, history) => {
+
   if (event.node.isSelected() && event.colDef.field !== 'Links' && event.node.data._links) {
     const hrefSplit = event.node.data._links.self.href.split('/');
     const id = hrefSplit.pop();
@@ -138,11 +126,6 @@ const gotoDetailsView = (event, history) => {
 const EntityList = () => {
   const {entityName} = useParams();
   const history = useHistory();
-
-  const plural = pluralize.plural(entityName);
-  const entityNamePlural = plural.charAt(0).toLowerCase() + plural.slice(1);
-
-  const {entityName} = useParams();
 
   const entityPluralise = (thisEntityName) => {
     const plural = pluralize.plural(thisEntityName);
@@ -183,10 +166,6 @@ const EntityList = () => {
       nonGenericEntities[entityName]?.entityListName : entityName;
     dispatch(selectRequested(entityPluralise(entityListName)));
   }, [entityName]); // reset when new or entityName prop changes
-
-  const getEntitySchema = () => {
-    return schemaDefinition[titleCase(entityName)] ? schemaDefinition[titleCase(entityName)] : schemaDefinition[entityName];
-  };
 
   const getTitle = () => {
     return (nonGenericEntities[entityName]?.title) ? nonGenericEntities[entityName]?.title : entityName;
