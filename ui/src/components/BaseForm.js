@@ -19,6 +19,10 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     alignItems: 'center'
   },
+  button: {
+    marginRight: '10px',
+    marginBottom: '5px'
+  },
   wrapper: {
     marginTop: theme.spacing(3),
     position: 'relative',
@@ -83,11 +87,21 @@ const BaseForm = (params) => {
           <div className={classes.rootFlex}>
             <div className={classes.wrapper}>
               {(params.submitButton) ? params.submitButton :
-                <Button type="submit"
+                <><Button
+                  type="submit"
+                  className={classes.button}
                   variant="contained"
                   color="secondary"
                   disabled={loading}
-                >Submit</Button>}
+                >Save</Button>
+                <Button
+                  className={classes.button}
+                  variant="contained"
+                  href={params.onCancel}
+                >Cancel
+                </Button>
+                </>
+              }
               {loading && <CircularProgress size={20} className={classes.buttonProgress} />}
             </div>
           </div>
