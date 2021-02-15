@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.dto.observableitem;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -27,6 +28,7 @@ public class ObservableItemListItem extends RepresentationModel<ObservableItemLi
     private String phylum;
 
     @Schema(title = "Class")
+    @JsonProperty("class")
     private String clazz;
 
     @Schema(title = "Order")
