@@ -14,6 +14,7 @@ import javax.persistence.*;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -111,7 +112,7 @@ public class StagedRow implements Serializable {
     private Map<Integer, String> measureJson;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(foreignKey = @ForeignKey(name = "staged_row_staged_job_id_fkey"))
     private StagedJob stagedJob;
 
@@ -126,5 +127,5 @@ public class StagedRow implements Serializable {
     private Timestamp lastUpdated;
 
     @Transient
-    private List<StagedRowError> errors;
+    private List<StagedRowError> errors = new ArrayList<>();
 }

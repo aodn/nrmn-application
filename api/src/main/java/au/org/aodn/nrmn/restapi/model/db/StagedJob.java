@@ -77,7 +77,11 @@ public class StagedJob implements Serializable {
     @JoinColumn(name = "sec_user_id", referencedColumnName = "id", nullable = false)
     private SecUser creator;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "stagedJob")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "stagedJob", cascade = CascadeType.ALL)
     private List<StagedJobLog> logs;
+
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "stagedJob", cascade = CascadeType.ALL)
+    private List<StagedRow> rows;
 
 }
