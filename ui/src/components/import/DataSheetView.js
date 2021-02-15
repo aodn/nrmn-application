@@ -3,10 +3,12 @@ import {useDispatch, useSelector} from 'react-redux';
 import {AgGridReact} from 'ag-grid-react';
 import {AllModules} from 'ag-grid-enterprise';
 import {useEffect} from 'react';
-import {AddRowIndex, EnableSubmit, JobFinished} from './reducers/create-import';
+import {JobFinished} from './reducers/create-import';
+import {makeStyles} from '@material-ui/core/styles';
 import {ColumnDef, ExtendedSize} from './ColumnDef';
-import {Box} from '@material-ui/core';
+import {Box, Fab} from '@material-ui/core';
 import useWindowSize from '../utils/useWindowSize';
+import SaveOutlinedIcon from '@material-ui/icons/SaveOutlined';
 
 Object.unfreeze = function (o) {
   var oo = undefined;
@@ -27,22 +29,31 @@ Object.unfreeze = function (o) {
   return oo;
 };
 
+const useStyles = makeStyles((theme) => ({
+  fab: {
+    position: 'absolute',
+    bottom: theme.spacing(2),
+    right: theme.spacing(20)
+  }
+}));
+
 const DataSheetView = () => {
+  const classes = useStyles();
   const dispatch = useDispatch();
   const immutableRows = useSelector((state) => state.import.rows);
-
   const errSelected = useSelector((state) => state.import.errSelected);
   const [gridApi, setGridApi] = useState(null);
-
+  const [rowsChanged, setRowsChanged] = useState({});
+  const validationLoading = useSelector((state) => state.import.validationLoading);
   var rows = immutableRows.map(Object.unfreeze);
   const job = useSelector((state) => state.import.job);
-
+  rows.secret = 'mutable';
   const colDefinition = job && job.isExtendedSize ? ColumnDef.concat(ExtendedSize) : ColumnDef;
 
   const agGridReady = (params) => {
     setGridApi(params.api);
     dispatch(JobFinished());
-
+    params.api.setRowData(rows);
     var allColumnIds = [];
     params.columnApi.getAllColumns().forEach(function (column) {
       allColumnIds.push(column.colId);
@@ -51,8 +62,12 @@ const DataSheetView = () => {
   };
 
   const onCellChanged = (input) => {
-    dispatch(AddRowIndex({id: input.data.id, row: input.data}));
-    dispatch(EnableSubmit(false));
+    if (input.newValue != input.OldValue) {
+      var toAdd = {};
+      toAdd[input.data.id] = input.data;
+      setRowsChanged(Object.assign(toAdd, rowsChanged));
+    }
+    console.log(rowsChanged);
   };
 
   const getContextMenuItems = (params) => {
@@ -69,6 +84,12 @@ const DataSheetView = () => {
   };
 
   useEffect(() => {
+    if (gridApi && rows) {
+      gridApi.setRowData(rows);
+    }
+  }, [validationLoading]);
+
+  useEffect(() => {
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
       const instance = gridApi.getFilterInstance('id');
       instance.setModel({values: errSelected.ids.map((id) => id.toString())}).then(() => gridApi.onFilterChanged());
@@ -82,17 +103,19 @@ const DataSheetView = () => {
 
   const size = useWindowSize();
   const themeType = useSelector((state) => state.theme.themeType);
-  const condition = rows && rows.length;
+  // const condition = rows && rows.length > 0 && isLoading;
 
   return (
     <Box>
-      {condition && (
+      {rows && (
         <div
           id="validation-grid"
           style={{height: size.height - 165, width: '100%', marginTop: 25}}
           className={themeType ? 'ag-theme-material-dark' : 'ag-theme-material'}
         >
           <AgGridReact
+            immutableRows={false}
+            getRowNodeId={(data) => data.id}
             pivotMode={false}
             pivotColumnGroupTotals={'before'}
             sideBar={true}
@@ -106,7 +129,6 @@ const DataSheetView = () => {
             onCellValueChanged={onCellChanged}
             columnDefs={colDefinition}
             groupDefaultExpanded={4}
-            rowData={rows}
             rowHeight={18}
             animateRows={true}
             groupMultiAutoColumn={true}
@@ -121,6 +143,13 @@ const DataSheetView = () => {
               filter: true,
               sortable: true,
               resizable: true
+              // valueSetter: (params) => {
+              //   dispatch(setCell({
+              //     index: params.node.childIndex,
+              //      field: params.colDef.field,
+              //       newValue: params.newValue}));
+              //   return true;
+              // }
             }}
             onGridReady={agGridReady}
             modules={AllModules}
@@ -128,6 +157,9 @@ const DataSheetView = () => {
           ></AgGridReact>
         </div>
       )}
+      <Fab className={classes.fab} color="primary">
+        <SaveOutlinedIcon></SaveOutlinedIcon>
+      </Fab>
     </Box>
   );
 };

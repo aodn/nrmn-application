@@ -3,6 +3,7 @@ import {createSlice} from '@reduxjs/toolkit';
 const importState = {
   success: false,
   isLoading: false,
+  validationLoading: false,
   editLoading: false,
   ingestLoading: false,
   submitReady: false,
@@ -67,6 +68,9 @@ const importSlice = createSlice({
       state.job = action.payload.job;
       state.isLoading = false;
     },
+    setCell:(state, action) => {
+      state.rows[action.payload.index][action.payload.field] = action.payload.newvalue;
+    },
     validationFilter: (state, action) => {
       state.errSelected = action.payload;
     },
@@ -97,7 +101,7 @@ const importSlice = createSlice({
       } else {
         state.EnableSubmit = true;
       }
-      state.isLoading = false;
+      state.validationLoading = false;
     },
     AddRowIndex: (state, action) => {
       state.indexChanged[action.payload.id] = action.payload.row;
@@ -119,7 +123,7 @@ const importSlice = createSlice({
       state.ingestLoading = true;
     },
     ValidationRequested: (state) => {
-      state.isLoading = true;
+      state.validationLoading = true;
     },
     JobFinished: (state) => {
       state.isLoading = false;
@@ -148,6 +152,7 @@ export const {
   JobStarting,
   validationFilter,
   validationReady,
+  setCell,
   EditRowStarting,
   EditRowFinished,
   JobFinished,
