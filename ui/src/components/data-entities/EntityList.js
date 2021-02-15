@@ -43,7 +43,7 @@ const schematoColDef = (schema, size, entityName) => {
   const widthSize = size.width / (fields.length + 1);
   const coldefs = fields.map(field => {
 
-    let type = schema.properties[field] ? schema.properties[field]?.format : 'string';
+    let type = schema.properties[field] ? schema.properties[field]?.type : 'string';
     return {
       field: field,
       width: widthSize,
@@ -94,7 +94,7 @@ const renderError = (msgArray) => {
 
 const nonGenericEntities = {
   // createButtonPath attribute required or no create button will show
-  'StagedJob': {
+  StagedJob: {
     title: 'Job',
     createButtonPath: '/upload',
     entityLinkLabel: 'Details',
@@ -106,11 +106,17 @@ const nonGenericEntities = {
     //   }
     // ]
   },
-  'Site': {
+  Site: {
     entityListName: 'SiteListItem',
     createButtonPath: '/edit/sites',
     entityLinkLabel: 'Details',
     entityLinkPath: 'view/sites/{}'
+  },
+  ObservableItem: {
+    entityListName: 'ObservableItemListItem',
+    createButtonPath: '/edit/observableItems',
+    entityLinkLabel: 'Details',
+    entityLinkPath: 'view/observableItems/{}'
   }
 };
 
