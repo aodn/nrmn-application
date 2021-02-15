@@ -104,14 +104,14 @@ public class SpreadSheetService {
     }
 
 
-        public List<StagedRow> sheets2Staged (SheetWithHeader dataSheet){
-            val eval = new XSSFFormulaEvaluator((XSSFWorkbook) dataSheet.getSheet().getWorkbook());
-            val fmt = new DataFormatter();
+    public List<StagedRow> sheets2Staged(SheetWithHeader dataSheet) {
+        val eval = new XSSFFormulaEvaluator((XSSFWorkbook) dataSheet.getSheet().getWorkbook());
+        val fmt = new DataFormatter();
 
-            val headerMap = dataSheet
-                    .getHeader()
-                    .stream()
-                    .collect(Collectors.toMap(HeaderCellIndex::getName, HeaderCellIndex::getIndex));
+        val headerMap = dataSheet
+                .getHeader()
+                .stream()
+                .collect(Collectors.toMap(HeaderCellIndex::getName, HeaderCellIndex::getIndex));
 
             List<StagedRow> stagedRows = IntStream
                     .range(2, dataSheet.getSheet().getPhysicalNumberOfRows())
@@ -150,32 +150,32 @@ public class SpreadSheetService {
                             stagedRow.setLMax(_getCellValue(row.getCell(headerMap.get("Lmax")), eval, fmt));
                         }
 
-                        val headerNum = dataSheet.getHeader().stream().filter(h ->
-                                Maybe.attempt(() -> Float.parseFloat(h.getName())).isPresent()
-                        ).collect(Collectors.toList());
-                        val measureJson = new HashMap<Integer, String>();
+                    val headerNum = dataSheet.getHeader().stream().filter(h ->
+                            Maybe.attempt(() -> Float.parseFloat(h.getName())).isPresent()
+                    ).collect(Collectors.toList());
+                    val measureJson = new HashMap<Integer, String>();
 
-                        val inverts = _getCellValue(row.getCell(headerMap.get("Inverts")), eval, fmt);
-                        stagedRow.setInverts(inverts);
-                        if(inverts != null) {
-                            measureJson.put(0, inverts);
-                        }
-                        for(int i = 0; i < headerNum.size(); i++) {
-                            val cellValue = _getCellValue(row.getCell(headerNum.get(i).getIndex()), eval, fmt);
-                            if (cellValue != null && !StringUtils.isEmpty(cellValue))
-                                measureJson.put(i+1, cellValue);
-                        }
+                    val inverts = _getCellValue(row.getCell(headerMap.get("Inverts")), eval, fmt);
+                    stagedRow.setInverts(inverts);
+                    if (inverts != null) {
+                        measureJson.put(0, inverts);
+                    }
+                    for (int i = 0; i < headerNum.size(); i++) {
+                        val cellValue = _getCellValue(row.getCell(headerNum.get(i).getIndex()), eval, fmt);
+                        if (cellValue != null && !StringUtils.isEmpty(cellValue))
+                            measureJson.put(i + 1, cellValue);
+                    }
 
 
-                        stagedRow.setMeasureJson(measureJson);
-                        return stagedRow;
-                    }).collect(Collectors.toList());
+                    stagedRow.setMeasureJson(measureJson);
+                    return stagedRow;
+                }).collect(Collectors.toList());
 
-            return stagedRows;
-        }
-
-        private String _getCellValue (Cell cell, XSSFFormulaEvaluator evaluator, DataFormatter formater){
-            evaluator.evaluate(cell);
-            return formater.formatCellValue(cell, evaluator);
-        }
+        return stagedRows;
     }
+
+    private String _getCellValue(Cell cell, XSSFFormulaEvaluator evaluator, DataFormatter formater) {
+        evaluator.evaluate(cell);
+        return formater.formatCellValue(cell, evaluator);
+    }
+}
