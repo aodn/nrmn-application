@@ -1,4 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
+import produce from 'immer';
 
 const importState = {
   success: false,
@@ -68,9 +69,6 @@ const importSlice = createSlice({
       state.job = action.payload.job;
       state.isLoading = false;
     },
-    setCell:(state, action) => {
-      state.rows[action.payload.index][action.payload.field] = action.payload.newvalue;
-    },
     validationFilter: (state, action) => {
       state.errSelected = action.payload;
     },
@@ -104,7 +102,11 @@ const importSlice = createSlice({
       state.validationLoading = false;
     },
     AddRowIndex: (state, action) => {
-      state.indexChanged[action.payload.id] = action.payload.row;
+      return produce(state, (draft) => {
+        draft.indexChanged[action.payload.id] = action.payload.row;
+        draft.rows[action.payload.id] = action.payload.row;
+        draft.EnableSubmit = false;
+      });
     },
     RowUpdateRequested: (state) => {
       state.editLoading = true;
@@ -152,7 +154,6 @@ export const {
   JobStarting,
   validationFilter,
   validationReady,
-  setCell,
   EditRowStarting,
   EditRowFinished,
   JobFinished,
