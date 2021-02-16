@@ -40,11 +40,10 @@ public class ValidationProcess extends ValidatorHelpers {
 
 
     public ValidationResponse process(StagedJob job) {
-        val stagedRows = rowRepo.findRowsByReference(job.getReference());
         val rawValidators = preProcess.getRawValidators(job);
         val reducer = new MonoidRowValidation<Seq<Tuple2<String, Object>>>(Seq.empty(), Monoids.<Tuple2<String, Object>>seqConcat());
         val rowChecks =
-                stagedRows.stream()
+                job.getRows().stream()
                         .map(row -> preProcess.validate(row, rawValidators))
                         .collect(Collectors.toList());
         val preCheck = rowChecks.stream().reduce(reducer.zero(), reducer::apply);

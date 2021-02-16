@@ -114,6 +114,7 @@ public class StagedRow implements Serializable {
     @JsonIgnore
     @ManyToOne()
     @JoinColumn(foreignKey = @ForeignKey(name = "staged_row_staged_job_id_fkey"))
+    @ToString.Exclude
     private StagedJob stagedJob;
 
     @Column(name = "created", columnDefinition = "timestamp with time zone", nullable = false)
