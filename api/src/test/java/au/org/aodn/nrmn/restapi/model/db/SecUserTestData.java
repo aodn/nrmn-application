@@ -25,6 +25,8 @@ public class SecUserTestData {
     @Autowired
     SecRoleRepository roleRepo;
 
+    private int userNo = 0;
+
     public SecUser persistedUser() {
         val user = defaultBuilder().build();
         return userRepo.saveAndFlush(user);
@@ -34,8 +36,8 @@ public class SecUserTestData {
         val role = roleTestData.persistedRole();
 
         return SecUser.builder()
-                .email("builder@test.com")
-                .fullName("IT-user")
+                .email("builder" + ++userNo + "@test.com")
+                .fullName("IT-user" + userNo)
                 .hashedPassword("pwdhashed123")
                 .roles(new HashSet<>(Collections.singletonList(role)))
                 .status(SecUserStatus.ACTIVE);

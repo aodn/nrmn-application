@@ -16,6 +16,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -43,7 +44,7 @@ class StagedJobIT {
         val stagedJob = stagedJobTestData.persistedStagedJob();
         entityManager.clear();
         val retrievedStagedJob = stagedJobRepository.findById(stagedJob.getId()).get();
-         assertEquals(stagedJob, retrievedStagedJob);
+        assertEquals(stagedJob.toString(), retrievedStagedJob.toString());
         assertThat(retrievedStagedJob.getCreated().toLocalDateTime(),
                 is(both(greaterThanOrEqualTo(startTime)).and(lessThanOrEqualTo(LocalDateTime.now()))));
         assertThat(retrievedStagedJob.getLastUpdated().toLocalDateTime(),

@@ -73,7 +73,7 @@ public class  SecUser implements Serializable {
 
     @NotAudited
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "sec_user_roles",
         joinColumns = @JoinColumn(name = "sec_user_id", foreignKey = @ForeignKey(name = "FK_USER_SEC_ROLE")),
