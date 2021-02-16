@@ -34,11 +34,11 @@ const DataSheetView = () => {
   const [gridApi, setGridApi] = useState(null);
   const job = useSelector((state) => state.import.job);
   const colDefinition = job && job.isExtendedSize ? ColumnDef.concat(ExtendedSize) : ColumnDef;
-
+  const validationLoading = useSelector(state => state.import.validationLoading);
   const agGridReady = (params) => {
     setGridApi(params.api);
     dispatch(JobFinished());
-  //  params.api.setRowData(rows);
+   params.api.setRowData(rows);
     var allColumnIds = [];
     params.columnApi.getAllColumns().forEach(function (column) {
       allColumnIds.push(column.colId);
@@ -66,11 +66,11 @@ const DataSheetView = () => {
     ];
   };
 
-  // useEffect(() => {
-  //   if (!validationLoading && gridApi && rows) {
-  //   //  gridApi.setRowData(rows);
-  //   }
-  // }, [validationLoading]);
+  useEffect(() => {
+    if (!validationLoading && gridApi && rows) {
+      gridApi.setRowData(rows);
+    }
+  }, [validationLoading]);
 
   useEffect(() => {
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
@@ -121,7 +121,6 @@ const DataSheetView = () => {
             undoRedoCellEditing={true}
             undoRedoCellEditingLimit={1000}
             ensureDomOrder={true}
-            rowData={rows}
             defaultColDef={{
               minWidth: 80,
               filter: true,
