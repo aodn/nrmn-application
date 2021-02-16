@@ -129,7 +129,7 @@ const DataSheetView = () => {
               sortable: true,
               resizable: true,
               valueSetter: (params) => {
-                params.rowIndex;
+                params.node.setDataValue(params.colDef.field, params.newValue);
                 return true;
               }
             }}
