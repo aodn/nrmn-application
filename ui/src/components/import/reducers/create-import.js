@@ -103,8 +103,10 @@ const importSlice = createSlice({
     },
     AddRowIndex: (state, action) => {
       return produce(state, (draft) => {
-        draft.indexChanged[action.payload.id] = action.payload.row;
-        draft.rows[action.payload.id] = action.payload.row;
+        draft.rows[action.payload.id][action.payload.field] = action.payload.value;
+        const row = draft.rows[action.payload.id];
+        draft.indexChanged[row.id] = row;
+
         draft.EnableSubmit = false;
       });
     },
