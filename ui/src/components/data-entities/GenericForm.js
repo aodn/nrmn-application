@@ -91,6 +91,7 @@ const GenericForm = () => {
           onSubmit={handleSubmit}
           fields={fields}
           formData={editItem}
+          onCancel={'/list/' + entityTitle}
       />;
     }
   };
