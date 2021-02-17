@@ -16,6 +16,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import BaseForm from '../BaseForm';
 import ObjectListViewTemplate from './ObjectListViewTemplate';
 import LinkButton from './LinkButton';
+import _ from 'lodash';
 
 
 const useStyles = makeStyles(() => ({
@@ -70,13 +71,19 @@ const GenericDetailsView = () => {
   let fullTitle = 'Details for ' + entityTitle;
   const entitySchema = { title: fullTitle, ...entityDef };
   const JSSchema = { components: { schemas: schemaDefinition }, ...entitySchema };
+  const uiSchema = {
+    'ui:widget': 'string'
+  };
 
-  const uiSchemaRelationships = Object.keys(entitySchema.properties).filter(key => {
-    return entitySchema.properties[key].type === 'string' && entitySchema.properties[key].format === 'uri';
-  });
-  const uiSchemaObjects = Object.keys(entitySchema.properties).filter(key => {
-    return entitySchema.properties[key].type === 'object';
-  });
+  for (const key in entitySchema.properties) {
+    const item = entitySchema.properties[key];
+    if (item.type === 'string' && item.format === 'uri') {
+      uiSchema[key] = { 'ui:field': 'relationship' };
+    }
+    if (item.type === 'object') {
+      uiSchema[key] = { 'ui:field': 'objects' };
+    }
+  }
 
   const inputDisplay = (elem) => {
     const value = elem.formData?.toString();
@@ -92,7 +99,7 @@ const GenericDetailsView = () => {
           items.push(<Grid item>{elem.formData.label}</Grid>);
         } else {
           for (let key of Object.keys(elem.formData)) {
-            items.push(<Grid item><b>{key}: </b>{elem.formData[key]}</Grid>);
+            items.push(<Grid key={_.uniqueId('dataObjectDetails-')} item><b>{key}: </b>{elem.formData[key]}</Grid>);
           }
         }
       } else {
@@ -100,26 +107,10 @@ const GenericDetailsView = () => {
       }
     }
     else {
-      items.push(<Grid item>--</Grid>);
+      items.push(<Grid key={_.uniqueId('dataObjectDetails-')} item>--</Grid>);
     }
-
     return ObjectListViewTemplate({ name: elem.name, items: items });
-
   };
-
-
-
-  const uiSchema = {
-    'ui:widget': 'string'
-  };
-
-  uiSchemaRelationships.map(key => {
-    uiSchema[key] = { 'ui:field': 'relationship' };
-  });
-
-  uiSchemaObjects.map(key => {
-    uiSchema[key] = { 'ui:field': 'objects' };
-  });
 
   const fields = {
     relationship: NestedApiFieldDetails,

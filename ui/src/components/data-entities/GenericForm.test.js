@@ -89,7 +89,7 @@ describe('GenericForm.js Component', () => {
           route: '/edit/TestEntity'
         }
     );
-    await findByText('Submit');
+    await findByText('Save');
   });
 
 });

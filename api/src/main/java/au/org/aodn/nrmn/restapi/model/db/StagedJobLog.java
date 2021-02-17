@@ -2,12 +2,7 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.enums.StagedJobEventType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -29,6 +24,7 @@ public class StagedJobLog {
     @JsonIgnore
     @JoinColumn(name = "staged_job_id", referencedColumnName = "id", nullable = false,
         foreignKey = @ForeignKey(name = "staged_job_log_staged_job_id_fkey"))
+    @ToString.Exclude
     private StagedJob stagedJob;
 
     @Column(name = "event_time", columnDefinition = "timestamp with time zone", nullable = false)

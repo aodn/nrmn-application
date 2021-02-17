@@ -31,6 +31,7 @@ public class ObservableItemListItemAssembler {
                 .genus(observableItem.getGenus())
                 .build();
 
-        return observableItemListItem.add(entityLinks.linkToItemResource(Site.class, observableItemListItem.getObservableItemId()).withSelfRel());
+        return observableItemListItem.add(entityLinks.linkToItemResource(ObservableItem.class,
+         observableItemListItem.getObservableItemId()).withSelfRel());
     }
 }
