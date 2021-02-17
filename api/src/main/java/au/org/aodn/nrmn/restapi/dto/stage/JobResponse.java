@@ -8,13 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
-
 @Getter
 @AllArgsConstructor
-public class ValidationResponse {
-    StagedJob job;
-    List<RowErrors> errors;
-    List<ErrorMsgSummary> summaries;
-    List<StagedRowError> errorGlobal;
-    List<ErrorInput> errorInputs;
+public class JobResponse {
+    private StagedJob job;
+    private  List<StagedRow> rows;
+    private  List<ErrorInput> errorInputs;
 }

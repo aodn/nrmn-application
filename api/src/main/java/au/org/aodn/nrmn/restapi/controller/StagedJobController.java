@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.controller;
 
 import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
 import au.org.aodn.nrmn.restapi.dto.stage.FileUpload;
+import au.org.aodn.nrmn.restapi.dto.stage.JobResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.UploadResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
@@ -193,24 +194,24 @@ public class StagedJobController {
                         null,
                         Collections.emptyList(),
                         Collections.emptyList(),
+                        Collections.emptyList(),
                         Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob")))));
     }
 
     @GetMapping("/job/{jobId}")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
-    public ResponseEntity<ValidationResponse> getJob(@PathVariable Long jobId) {
+    public ResponseEntity<JobResponse> getJob(@PathVariable Long jobId) {
         val rows = stagedRowRepo.findRowsByJobId(jobId);
         return jobRepo.findById(jobId)
                 .map(job ->
                         ResponseEntity.ok().body(
-                                new ValidationResponse(
-                                        job, rows, Collections.emptyList(), Collections.emptyList()
+                                new JobResponse(
+                                        job, rows, Collections.emptyList()
                                 ))
                 ).orElseGet(() ->
                         ResponseEntity.badRequest().body(
-                                new ValidationResponse(
+                                new JobResponse(
                                         null,
-                                        Collections.emptyList(),
                                         Collections.emptyList(),
                                         Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob"))
                                 )));

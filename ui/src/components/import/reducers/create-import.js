@@ -38,8 +38,10 @@ export const flatten = (row) => {
 };
 
 const mergeErrors = (rows) => {
-  if (rows && rows.length > 0) return rows.map((row) => row.errors).reduce((acc, err) => acc.concat(err));
-
+  if (rows && rows.length > 0) return rows.map((row) =>
+   row.errors | []).reduce((acc, err) => {
+    return acc.concat(err);
+   },[]);
   return [];
 };
 
@@ -79,15 +81,19 @@ const importSlice = createSlice({
             acc[row.id] = row.errors;
             return acc;
           });
+
           draft.rows = draft.rows.map((row) => {
+            const err = errors[row.id] || [];
             return {
               ...row,
-              errors: errors[row.id]
+              errors: err
             };
           });
+          debugger;
+
           const validationErrors = mergeErrors(draft.rows);
           draft.EnableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
-          const errorsGrouped = groupBy(validationErrors, (row) => row.message);
+          const errorsGrouped = groupBy(validationErrors, (error) => error.message);
           draft.errorsByMsg = [...errorsGrouped.keys()]
             .map((key) => {
               const elems = errorsGrouped.get(key);

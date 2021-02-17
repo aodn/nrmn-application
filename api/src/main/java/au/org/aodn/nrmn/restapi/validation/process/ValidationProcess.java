@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
+import au.org.aodn.nrmn.restapi.dto.stage.RowErrors;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
@@ -49,7 +50,16 @@ public class ValidationProcess extends ValidatorHelpers {
         val preCheck = rowChecks.stream().reduce(reducer.zero(), reducer::apply);
 
         if (preCheck.getValid().isInvalid()) {
-            return new ValidationResponse(job, preCheck.getRows().toList(), Collections.emptyList(), Collections.emptyList());
+            //get sumarry
+            val errors = toErrorList(preCheck.getValid());
+            val grouped = errors.stream().collect(Collectors.groupingBy(err -> err.getId().getMessage()));
+            //todo string, list error to SummaryErrMessage;
+            return new ValidationResponse(
+                    job,
+                    preCheck.getRows().map(row -> new RowErrors(row.getId(), row.getErrors())).toList(),
+                    Collections.emptyList(),
+                    Collections.emptyList(),
+                    Collections.emptyList());
         }
 
         val rowWithHasMap = rowChecks
@@ -66,7 +76,8 @@ public class ValidationProcess extends ValidatorHelpers {
         val globalResult = globalProcess.process(job);
         return new ValidationResponse(
                 job,
-                formattedResult.getRows().toList(),
+                Collections.emptyList(),
+                Collections.emptyList(),
                 toErrorList(globalResult),
                 Collections.emptyList());
     }
