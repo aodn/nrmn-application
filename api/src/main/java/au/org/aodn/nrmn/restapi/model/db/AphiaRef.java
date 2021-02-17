@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import org.hibernate.annotations.Cache;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -13,7 +14,10 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 
+import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
+
 @Entity
+@Cache(region = "entities", usage = READ_WRITE)
 @Data
 @Builder
 @NoArgsConstructor
