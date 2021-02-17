@@ -32,7 +32,7 @@ public class ValidationProcessIT {
         val response = validationProcess.process(stagedJob2);
 
         assertEquals("Validation rows size does not equal job rows size", stagedJob2.getRows().size(),
-                response.getRows().size());
+                response.getErrors().size());
 
     }
 

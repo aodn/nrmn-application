@@ -8,6 +8,7 @@ import au.org.aodn.nrmn.restapi.repository.StagedRowErrorRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.model.MonoidRowValidation;
+import au.org.aodn.nrmn.restapi.validation.summary.DefaultSummary;
 import cyclops.companion.Monoids;
 import cyclops.data.Seq;
 import cyclops.data.tuple.Tuple2;
@@ -39,6 +40,8 @@ public class ValidationProcess extends ValidatorHelpers {
     @Autowired
     RawValidation preProcess;
 
+    @Autowired
+    DefaultSummary summary;
 
     public ValidationResponse process(StagedJob job) {
         val rawValidators = preProcess.getRawValidators(job);
@@ -52,12 +55,11 @@ public class ValidationProcess extends ValidatorHelpers {
         if (preCheck.getValid().isInvalid()) {
             //get sumarry
             val errors = toErrorList(preCheck.getValid());
-            val grouped = errors.stream().collect(Collectors.groupingBy(err -> err.getId().getMessage()));
-            //todo string, list error to SummaryErrMessage;
+            val msgSummary = summary.aggregate(errors);
             return new ValidationResponse(
                     job,
-                    preCheck.getRows().map(row -> new RowErrors(row.getId(), row.getErrors())).toList(),
-                    Collections.emptyList(),
+                    preCheck.getRows().map(row -> new RowErrors(row.getId(),row.getErrors())).toList(),
+                    msgSummary,
                     Collections.emptyList(),
                     Collections.emptyList());
         }
