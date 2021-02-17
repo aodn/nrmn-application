@@ -7,6 +7,7 @@ import {JobFinished, AddRowIndex} from './reducers/create-import';
 import {ColumnDef, ExtendedSize} from './ColumnDef';
 import {Box} from '@material-ui/core';
 import useWindowSize from '../utils/useWindowSize';
+import { ChangeDetectionStrategyType } from 'ag-grid-react/lib/changeDetectionService';
 
 Object.unfreeze = function (o) {
   var oo = undefined;
@@ -34,24 +35,16 @@ const DataSheetView = () => {
   const [gridApi, setGridApi] = useState(null);
   const job = useSelector((state) => state.import.job);
   const colDefinition = job && job.isExtendedSize ? ColumnDef.concat(ExtendedSize) : ColumnDef;
-  const validationLoading = useSelector(state => state.import.validationLoading);
   const agGridReady = (params) => {
     setGridApi(params.api);
     dispatch(JobFinished());
-   params.api.setRowData(rows);
+    params.api.setRowData(rows);
     var allColumnIds = [];
     params.columnApi.getAllColumns().forEach(function (column) {
       allColumnIds.push(column.colId);
     });
     params.columnApi.autoSizeColumns(allColumnIds, true);
   };
-
-  // const onCellChanged = (input) => {
-  //   if (input.newValue !== input.oldValue) {
-  //     console.log('cell');
-  //     dispatch(AddRowIndex({id: input.rowIndex, field: input.colDef.field, value: input.newValue}));
-  //   }
-  // };
 
   const getContextMenuItems = (params) => {
     return [
@@ -65,12 +58,6 @@ const DataSheetView = () => {
       }
     ];
   };
-
-  useEffect(() => {
-    if (!validationLoading && gridApi && rows) {
-      gridApi.setRowData(rows);
-    }
-  }, [validationLoading]);
 
   useEffect(() => {
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
@@ -99,6 +86,7 @@ const DataSheetView = () => {
             reactNext
             immutableRows={true}
             getRowNodeId={(data) => data.id}
+            rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.IdentityCheck}
             pivotMode={false}
             pivotColumnGroupTotals={'before'}
             sideBar={true}
@@ -109,7 +97,6 @@ const DataSheetView = () => {
                 innerRenderer: 'nameCellRenderer'
               }
             }}
-          //  onCellValueChanged={onCellChanged}
             columnDefs={colDefinition}
             groupDefaultExpanded={4}
             rowHeight={18}
@@ -121,6 +108,7 @@ const DataSheetView = () => {
             undoRedoCellEditing={true}
             undoRedoCellEditingLimit={1000}
             ensureDomOrder={true}
+            rowData={rows}
             defaultColDef={{
               minWidth: 80,
               filter: true,
