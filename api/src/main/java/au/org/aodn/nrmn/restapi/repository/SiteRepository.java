@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.repository;
 
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.repository.model.EntityCriteria;
+import au.org.aodn.nrmn.restapi.requestcache.RequestCache;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,7 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
 
     @Override
     @Query("SELECT s FROM Site s WHERE s.siteCode = :code")
+    @RequestCache
     List<Site> findByCriteria(@Param("code") String siteCode);
 
     @Override
