@@ -1,21 +1,22 @@
 import React from 'react';
-import {Box, Typography} from '@material-ui/core';
-import {useSelector, useDispatch} from 'react-redux';
-import {useEffect} from 'react';
-import {useParams, useHistory} from 'react-router-dom';
+import { Box, Typography } from '@material-ui/core';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import pluralize from 'pluralize';
-import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
+import { AgGridReact } from 'ag-grid-react/lib/agGridReact';
 import useWindowSize from '../utils/useWindowSize';
 import Alert from '@material-ui/lab/Alert';
 import config from 'react-global-configuration';
-import {titleCase} from 'title-case';
+import { titleCase } from 'title-case';
 import Grid from '@material-ui/core/Grid';
 import CustomTooltip from './customTooltip';
 import CustomLoadingOverlay from './CustomLoadingOverlay';
-import {selectRequested} from './middleware/entities';
-import {resetState} from './form-reducer';
+import { selectRequested } from './middleware/entities';
+import { resetState } from './form-reducer';
 import LinkCell from './customWidgetFields/LinkCell';
 import LinkButton from './LinkButton';
+import {useHistory} from 'react-router';
 
 const cellRenderer = (params) => {
   if (typeof params.value === 'object') {
@@ -34,23 +35,28 @@ const getCellFilter = (format) => {
 
 const schematoColDef = (schema, size, entityName) => {
   const fields = Object.keys(schema.properties);
-  const widthSize = size.width / (fields.length + 1);
   const coldefs = fields.map(field => {
 
     let type = schema.properties[field] ? schema.properties[field]?.type : 'string';
     return {
       field: field,
-      width: widthSize,
       tooltipField: field,
       filter: getCellFilter(type),
       cellRenderer: cellRenderer
     };
   });
 
+  const widthUnit = 100;
+  const cloneButtonWidth = (nonGenericEntities[entityName]?.cloneButton) ? widthUnit : 0;
+  const deleteButtonWidth = (nonGenericEntities[entityName]?.hideDeleteButton) ? 0 : widthUnit;
+  const linksWidth = widthUnit + cloneButtonWidth + deleteButtonWidth;
+
   coldefs.push({
     field: 'Links',
+    maxWidth: linksWidth,
+    minWidth: linksWidth,
     filter: undefined,
-    cellRendererFramework: function(params) {
+    cellRendererFramework: function (params) {
 
       const linkPath = nonGenericEntities[entityName]?.entityLinkPath;
 
@@ -81,12 +87,13 @@ const schematoColDef = (schema, size, entityName) => {
 };
 
 let agGridApi = {};
+let agGridColumnApi = {};
 
 const renderError = (msgArray) => {
   return <Box>
-    <Alert style={{height: 'auto', lineHeight: '28px', whiteSpace: 'pre-line'}}
-           severity="error"
-           variant="filled"
+    <Alert style={{ height: 'auto', lineHeight: '28px', whiteSpace: 'pre-line' }}
+      severity="error"
+      variant="filled"
     >{msgArray.join('\r\n ')}
     </Alert></Box>;
 };
@@ -162,7 +169,8 @@ const EntityList = () => {
 
   const schemaDefinition = config.get('api');
   const size = useWindowSize();
-
+  const themeType = useSelector((state) => state.theme.themeType);
+  const columnFit = useSelector((state) => state.theme.columnFit);
   const dispatch = useDispatch();
   const entities = useSelector(state => state.form.entities);
   const errors = useSelector(state => state.form.errors);
@@ -170,14 +178,33 @@ const EntityList = () => {
 
   const agGridReady = (agGrid) => {
     agGridApi = Object.create(agGrid.api);
+    agGridColumnApi = agGrid.columnApi;
     agGridApi.setRowData(items);
     Object.freeze(agGridApi);
   };
+
+  const onGridSizeChanged = () => {
+    if (columnFit) {
+      autoSizeAll();
+    }
+    else {
+      agGridApi.sizeColumnsToFit();
+    }
+  };
+
+  function autoSizeAll() {
+    let allColumnIds = [];
+    agGridColumnApi.getAllColumns().forEach(function (column) {
+      allColumnIds.push(column.colId);
+    });
+    agGridColumnApi.autoSizeColumns(allColumnIds, false);
+  }
 
   useEffect(() => {
     dispatch(resetState());
     if (agGridApi.setRowData) {
       agGridApi.setRowData([]);
+      onGridSizeChanged();
       agGridApi.showLoadingOverlay();
     }
     const entityListName = (nonGenericEntities[entityName]?.entityListName) ?
@@ -223,6 +250,7 @@ const EntityList = () => {
     }
 
     const colDef = schematoColDef(schemaDefinition[getListEntity()], size, entityName);
+    const agGridParentWidth = (columnFit) ? '100%' : '99%'; // triggers agGrid layout
 
     if (items !== undefined && agGridApi.setRowData) {
       agGridApi.setRowData(items);
@@ -248,13 +276,15 @@ const EntityList = () => {
             </Grid>
           </Grid>
 
-            <div style={{width: '100%', height: size.height - 170, marginTop: 25}}
-                 className={'ag-theme-material'}>
+            <div style={{width: agGridParentWidth, height: size.height - 170, marginTop: 25}}
+                 className={themeType ? 'ag-theme-material-dark' : 'ag-theme-material'}>
               <AgGridReact
                   columnDefs={colDef}
                   rowSelection="single"
                   animateRows={true}
                   onGridReady={agGridReady}
+                  onFirstDataRendered={onGridSizeChanged}
+                  onGridSizeChanged={onGridSizeChanged}
                   onCellClicked={(e) => {
                     gotoDetailsView(e, history);
                   }}

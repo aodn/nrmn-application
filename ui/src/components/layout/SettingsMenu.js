@@ -1,7 +1,7 @@
 import React from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import store from '../store';
-import {toggleTheme} from './theme-reducer';
+import {toggleColumnFit, toggleTheme} from './theme-reducer';
 import {Settings} from '@material-ui/icons';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -23,6 +23,11 @@ const SettingsMenu = () => {
 
   const handleToggleThemeChange = event => {
     store.dispatch(toggleTheme(event.target.checked));
+    handleClose();
+  };
+
+  const handleColumnFitMethod = event => {
+    store.dispatch(toggleColumnFit(event.target.checked));
     handleClose();
   };
 
@@ -48,7 +53,18 @@ const SettingsMenu = () => {
                       size="small"
                       checked={store.getState().theme.themeType} />
             }
-        /></MenuItem>
+          /></MenuItem>
+        <MenuItem>
+          <FormControlLabel
+            label="Fit to Content"
+            labelPlacement="start"
+            control={
+              <Switch title="Fit all columns in table"
+                      onChange={handleColumnFitMethod}
+                      size="small"
+                      checked={store.getState().theme.columnFit} />
+            }
+          /></MenuItem>
       </Menu>
       </>
 );
