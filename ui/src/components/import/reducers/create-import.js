@@ -1,8 +1,10 @@
 import {createSlice} from '@reduxjs/toolkit';
+import produce from 'immer';
 
 const importState = {
   success: false,
   isLoading: false,
+  validationLoading: false,
   editLoading: false,
   ingestLoading: false,
   submitReady: false,
@@ -71,36 +73,53 @@ const importSlice = createSlice({
       state.errSelected = action.payload;
     },
     validationReady: (state, action) => {
-      if (action.payload.rows.length > 0) {
-        state.rows = action.payload.rows.map((row) => exportRow(row));
-        const validationErrors = mergeErrors(state.rows);
-        state.EnableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
-        const errorsGrouped = groupBy(validationErrors, (row) => row.message);
-        state.errorsByMsg = [...errorsGrouped.keys()]
-          .map((key) => {
-            const elems = errorsGrouped.get(key);
-            const ids = errorsGrouped.get(key).map((err) => err.rowId);
-            return {
-              msg: key,
-              count: elems.length,
-              ids: ids,
-              columnTarget: elems[0].columnTarget,
-              level: elems[0].errorLevel
-            };
-          })
-          .sort((err1, err2) => {
-            if (err1.level == err2.level) {
-              return err2.count - err1.count;
-            }
-            return err1.level === 'BLOCKING' ? -1 : 1;
+      return produce(state, (draft) => {
+        if (action.payload.rows.length > 0) {
+          const errors = action.payload.rows.reduce((acc, row) => {
+            acc[row.id] = row.errors;
+            return acc;
           });
-      } else {
-        state.EnableSubmit = true;
-      }
-      state.isLoading = false;
+          draft.rows = draft.rows.map((row) => {
+            return {
+              ...row,
+              errors: errors[row.id]
+            };
+          });
+          const validationErrors = mergeErrors(draft.rows);
+          draft.EnableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
+          const errorsGrouped = groupBy(validationErrors, (row) => row.message);
+          draft.errorsByMsg = [...errorsGrouped.keys()]
+            .map((key) => {
+              const elems = errorsGrouped.get(key);
+              const ids = errorsGrouped.get(key).map((err) => err.rowId);
+              return {
+                msg: key,
+                count: elems.length,
+                ids: ids,
+                columnTarget: elems[0].columnTarget,
+                level: elems[0].errorLevel
+              };
+            })
+            .sort((err1, err2) => {
+              if (err1.level == err2.level) {
+                return err2.count - err1.count;
+              }
+              return err1.level === 'BLOCKING' ? -1 : 1;
+            });
+        } else {
+          draft.EnableSubmit = true;
+        }
+        draft.validationLoading = false;
+      });
     },
     AddRowIndex: (state, action) => {
-      state.indexChanged[action.payload.id] = action.payload.row;
+      return produce(state, (draft) => {
+        draft.rows[action.payload.id][action.payload.field] = action.payload.value;
+        const row = draft.rows[action.payload.id];
+        draft.indexChanged[row.id] = row;
+
+        draft.EnableSubmit = false;
+      });
     },
     RowUpdateRequested: (state) => {
       state.editLoading = true;
@@ -119,7 +138,7 @@ const importSlice = createSlice({
       state.ingestLoading = true;
     },
     ValidationRequested: (state) => {
-      state.isLoading = true;
+      state.validationLoading = true;
     },
     JobFinished: (state) => {
       state.isLoading = false;
