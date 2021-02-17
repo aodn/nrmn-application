@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.repository;
 
 import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.repository.model.EntityCriteria;
+import au.org.aodn.nrmn.restapi.requestcache.RequestCache;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -21,6 +22,7 @@ public interface DiverRepository extends JpaRepository<Diver, Integer>, JpaSpeci
 
     @Override
     @Query("SELECT d FROM  Diver  d WHERE d.initials = :initials")
+    @RequestCache
     List<Diver> findByCriteria(@Param("initials")String initials);
 
 
