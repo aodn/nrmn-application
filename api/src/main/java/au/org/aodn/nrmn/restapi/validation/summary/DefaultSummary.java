@@ -23,7 +23,7 @@ public class DefaultSummary {
             val maybeFirst = errors.stream().findFirst();
             return new ErrorMsgSummary(
                     key,
-                    errors.size() + 1L,
+                    errors.size(),
                     ids,
                     maybeFirst.map(StagedRowError::getColumnTarget).orElseGet(() -> ""),
                     maybeFirst.map(StagedRowError::getErrorLevel).orElseGet(() -> ValidationLevel.BLOCKING));

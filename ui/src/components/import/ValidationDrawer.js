@@ -223,7 +223,7 @@ const ValidationDrawer = () => {
                                 {(err.level == 'WARNING') ? (<ReportProblemOutlined style={{ color: orange[500] }} />) : (<BlockOutlinedIcon color="error" />)}
                             </Badge>
                         </ListItemIcon>
-                        <ListItemText color="secondary" primary={err.msg} secondary={err.columnTarget} />
+                        <ListItemText color="secondary" primary={err.message} secondary={err.columnTarget} />
                     </ListItem>
                 ))}
             </List>

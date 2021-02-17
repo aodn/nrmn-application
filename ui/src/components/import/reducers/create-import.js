@@ -37,26 +37,14 @@ export const flatten = (row) => {
   return row;
 };
 
-const mergeErrors = (rows) => {
-  if (rows && rows.length > 0) return rows.map((row) =>
-   row.errors | []).reduce((acc, err) => {
-    return acc.concat(err);
-   },[]);
+const mergeErrors = (errors) => {
+  if (errors && errors.length > 0)
+    return errors
+      .map((err) => err.errors | [])
+      .reduce((acc, err) => {
+        return acc.concat(err);
+      }, []);
   return [];
-};
-
-const groupBy = (list, keyGetter) => {
-  const map = new Map();
-  list.forEach((item) => {
-    const key = keyGetter(item);
-    const collection = map.get(key);
-    if (!collection) {
-      map.set(key, [item]);
-    } else {
-      collection.push(item);
-    }
-  });
-  return map;
 };
 
 const importSlice = createSlice({
@@ -76,11 +64,11 @@ const importSlice = createSlice({
     },
     validationReady: (state, action) => {
       return produce(state, (draft) => {
-        if (action.payload.rows.length > 0) {
-          const errors = action.payload.rows.reduce((acc, row) => {
-            acc[row.id] = row.errors;
+        if (action.payload.errors.length > 0) {
+          const errors = action.payload.errors.reduce((acc, err) => {
+            acc[err.id] = err.errors;
             return acc;
-          });
+          }, {});
 
           draft.rows = draft.rows.map((row) => {
             const err = errors[row.id] || [];
@@ -89,33 +77,12 @@ const importSlice = createSlice({
               errors: err
             };
           });
-          debugger;
 
-          const validationErrors = mergeErrors(draft.rows);
+          const validationErrors = mergeErrors(action.payload.errors);
           draft.EnableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
-          const errorsGrouped = groupBy(validationErrors, (error) => error.message);
-          draft.errorsByMsg = [...errorsGrouped.keys()]
-            .map((key) => {
-              const elems = errorsGrouped.get(key);
-              const ids = errorsGrouped.get(key).map((err) => err.rowId);
-              return {
-                msg: key,
-                count: elems.length,
-                ids: ids,
-                columnTarget: elems[0].columnTarget,
-                level: elems[0].errorLevel
-              };
-            })
-            .sort((err1, err2) => {
-              if (err1.level == err2.level) {
-                return err2.count - err1.count;
-              }
-              return err1.level === 'BLOCKING' ? -1 : 1;
-            });
-        } else {
-          draft.EnableSubmit = true;
+          draft.errorsByMsg = action.payload.summaries.sort((sum1, sum2) => sum2.count - sum1.count);
+          draft.validationLoading = false;
         }
-        draft.validationLoading = false;
       });
     },
     AddRowIndex: (state, action) => {
@@ -159,6 +126,7 @@ const importSlice = createSlice({
     jobFailed: (state, action) => {
       state.success = false;
       state.isLoading = false;
+      state.validationLoading = false;
       if (action.payload) {
         state.errors = action.payload;
       }

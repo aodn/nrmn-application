@@ -10,9 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ErrorMsgSummary {
     private String message;
-    // Msg count
-    private Long count;
-    // rowIds
+    private Integer count;
     private List<Long> ids;
     private String columnTarget;
     private ValidationLevel errorLeve;
