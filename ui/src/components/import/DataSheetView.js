@@ -7,7 +7,7 @@ import {JobFinished, AddRowIndex} from './reducers/create-import';
 import {ColumnDef, ExtendedSize} from './ColumnDef';
 import {Box} from '@material-ui/core';
 import useWindowSize from '../utils/useWindowSize';
-import { ChangeDetectionStrategyType } from 'ag-grid-react/lib/changeDetectionService';
+import {ChangeDetectionStrategyType} from 'ag-grid-react/lib/changeDetectionService';
 
 Object.unfreeze = function (o) {
   var oo = undefined;

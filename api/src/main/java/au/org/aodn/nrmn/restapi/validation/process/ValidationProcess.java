@@ -1,13 +1,17 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
+import au.org.aodn.nrmn.restapi.dto.stage.RowErrors;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowErrorRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.model.MonoidRowValidation;
+import au.org.aodn.nrmn.restapi.validation.summary.DefaultSummary;
 import cyclops.companion.Monoids;
+import cyclops.data.ImmutableList;
 import cyclops.data.Seq;
 import cyclops.data.tuple.Tuple2;
 import lombok.val;
@@ -15,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -38,6 +43,8 @@ public class ValidationProcess extends ValidatorHelpers {
     @Autowired
     RawValidation preProcess;
 
+    @Autowired
+    DefaultSummary summary;
 
     public ValidationResponse process(StagedJob job) {
         val rawValidators = preProcess.getRawValidators(job);
@@ -49,7 +56,20 @@ public class ValidationProcess extends ValidatorHelpers {
         val preCheck = rowChecks.stream().reduce(reducer.zero(), reducer::apply);
 
         if (preCheck.getValid().isInvalid()) {
-            return new ValidationResponse(job, preCheck.getRows().toList(), Collections.emptyList(), Collections.emptyList());
+            val errors =
+                    preCheck
+                            .getRows()
+                            .flatMap(row ->
+                                    Seq.fromIterable(row.getErrors())
+                            ).toList();
+
+            val msgSummary = summary.aggregate(errors);
+            return new ValidationResponse(
+                    job,
+                    preCheck.getRows().map(row -> new RowErrors(row.getId(),row.getErrors())).toList(),
+                    msgSummary,
+                    Collections.emptyList(),
+                    Collections.emptyList());
         }
 
         val rowWithHasMap = rowChecks
@@ -66,7 +86,8 @@ public class ValidationProcess extends ValidatorHelpers {
         val globalResult = globalProcess.process(job);
         return new ValidationResponse(
                 job,
-                formattedResult.getRows().toList(),
+                Collections.emptyList(),
+                Collections.emptyList(),
                 toErrorList(globalResult),
                 Collections.emptyList());
     }
