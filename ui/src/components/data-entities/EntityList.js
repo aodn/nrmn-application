@@ -109,7 +109,6 @@ const renderError = (msgArray) => {
 // additionalPageLinks: {label, link} - additional links for the page
 const nonGenericEntities = {
   'Diver': {
-    cloneButton: true,
     hideDeleteButton: false
   },
   StagedJob: {
