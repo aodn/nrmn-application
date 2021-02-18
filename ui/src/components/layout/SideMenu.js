@@ -80,7 +80,7 @@ const handleMainMenu = () => {
             <Divider />
             <List>
                 <ListSubheader>REFERENCE DATA</ListSubheader>
-                {['Diver', 'Location', 'ObservableItem', 'Program', 'Site'].map(text => (
+                {['Diver', 'Location', 'ObservableItem', 'Site'].map(text => (
                     <ListItem button key={text} component={NavLink} to={'/list/' + text} >
                         <ListItemText primary={text} />
                     </ListItem>
