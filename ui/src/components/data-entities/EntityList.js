@@ -116,12 +116,6 @@ const nonGenericEntities = {
     createButtonPath: '/upload',
     entityLinkLabel: 'Details',
     entityLinkPath: 'view/stagedJobs/{}'
-    // additionalPageLinks: [
-    //   {
-    //     label: 'New Corrections',
-    //     link: 'corrections'
-    //   }
-    // ]
   },
   Site: {
     entityListName: 'SiteListItem',
