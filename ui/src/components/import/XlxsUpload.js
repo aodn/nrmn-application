@@ -93,7 +93,6 @@ const XlxsUpload = () => {
   return (
     <Box>
       {isLoading && percentCompleted >= 0 && <LinearProgress variant="determinate" value={percentCompleted} />}
-      <Typography>{percentCompleted}%</Typography>
       <BaseForm
         schema={schema}
         uiSchema={uiSchema}
