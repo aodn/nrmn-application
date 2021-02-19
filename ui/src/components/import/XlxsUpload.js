@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {ImportRequested, ImportReset} from './reducers/upload';
 import {useDispatch, useSelector} from 'react-redux';
 import BaseForm from '../BaseForm';
-import {Box, useMediaQuery, useTheme} from '@material-ui/core';
+import {Box, useMediaQuery, useTheme, Typography} from '@material-ui/core';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import {useHistory} from 'react-router';
 import Button from '@material-ui/core/Button';
@@ -20,8 +20,7 @@ const XlxsUpload = () => {
     properties: {
       file: {
         title: 'Upload',
-        type: 'string',
-        format: 'data-url'
+        type: 'string'
       },
       programId: {
         title: 'Program File',
@@ -90,9 +89,11 @@ const XlxsUpload = () => {
   if (errors && errors.length > 0) {
     displayErros = errors.map((e) => e.message);
   }
+
   return (
     <Box>
       {isLoading && percentCompleted >= 0 && <LinearProgress variant="determinate" value={percentCompleted} />}
+      <Typography>{percentCompleted}%</Typography>
       <BaseForm
         schema={schema}
         uiSchema={uiSchema}
