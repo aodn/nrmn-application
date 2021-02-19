@@ -2,14 +2,7 @@ import {takeEvery, call, put} from 'redux-saga/effects';
 
 import {entityEdit, entitySave, getEntity, getSelectedEntityItems} from '../../../axios/api';
 import {createAction} from '@reduxjs/toolkit';
-import {
-  entitiesSaved,
-  entitiesError,
-  entitiesLoaded,
-  itemLoaded,
-  selectedItemsLoaded,
-  selectedItemsEdited
-} from '../form-reducer';
+import {entitiesSaved, entitiesError, entitiesLoaded, itemLoaded, selectedItemsLoaded, selectedItemsEdited} from '../form-reducer';
 import {isSuccessful200Response} from '../../utils/helpers';
 
 export default function* getEntitiesWatcher() {
@@ -62,9 +55,7 @@ function* getSelectedItemsData(action) {
 
 function* saveEntities(action) {
   try {
-    const href = (action.payload.data?._links?.self?.href) ?
-        action.payload.data._links.self.href :
-        action.payload.path;
+    const href = action.payload.data?._links?.self?.href ? action.payload.data._links.self.href : action.payload.path;
     delete action.payload.data._links;
 
     const resp = yield call(entitySave, href, action.payload.data);
@@ -84,32 +75,26 @@ function* updateEntities(action) {
   }
 }
 
-export const selectRequested = createAction('SELECT_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
+export const selectRequested = createAction('SELECT_REQUESTED', function (entity) {
+  return {payload: entity};
+});
 
-export const itemRequested = createAction('ID_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
+export const itemRequested = createAction('ID_REQUESTED', function (entity) {
+  return {payload: entity};
+});
 
-export const setNestedField = createAction('SELECTED_NESTED_ENTITY',
-    function (entity) {
-      return {payload: entity};
-    });
+export const setNestedField = createAction('SELECTED_NESTED_ENTITY', function (entity) {
+  return {payload: entity};
+});
 
-export const selectedItemsRequested = createAction('SELECTED_ENTITY_ITEMS_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
+export const selectedItemsRequested = createAction('SELECTED_ENTITY_ITEMS_REQUESTED', function (entity) {
+  return {payload: entity};
+});
 
-export const createEntityRequested = createAction('CREATE_ENTITY_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
+export const createEntityRequested = createAction('CREATE_ENTITY_REQUESTED', function (entity) {
+  return {payload: entity};
+});
 
-export const updateEntityRequested = createAction('UPDATE_ENTITY_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
+export const updateEntityRequested = createAction('UPDATE_ENTITY_REQUESTED', function (entity) {
+  return {payload: entity};
+});
