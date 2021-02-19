@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {ImportRequested, ImportReset} from './reducers/upload';
 import {useDispatch, useSelector} from 'react-redux';
 import BaseForm from '../BaseForm';
-import {Box, useMediaQuery, useTheme, Typography} from '@material-ui/core';
+import {Box, useMediaQuery, useTheme} from '@material-ui/core';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import {useHistory} from 'react-router';
 import Button from '@material-ui/core/Button';
