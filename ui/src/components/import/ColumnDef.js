@@ -57,6 +57,8 @@ export const ColumnDef = [
     field: 'date',
     editable: true,
     cellStyle: cell,
+    rowGroup: false,
+    enableRowGroup: true,
     minWidth: 105
   },
   {
