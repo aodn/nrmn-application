@@ -6,7 +6,6 @@ import Button from '@material-ui/core/Button';
 import {makeStyles} from '@material-ui/core/styles';
 import {PropTypes} from 'prop-types';
 
-
 const useStyles = makeStyles(() => ({
   buttons: {
     '& > *': {
@@ -15,25 +14,19 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-
 const LinkButton = (props) => {
-
   const classes = useStyles();
-  return <>
-    <Grid item key={props.title}>
-      <div className={classes.buttons}>
-        <Button
-            {...props}
-            to={props.to}
-            component={NavLink}
-            color='secondary'
-            aria-label={props.title}
-            variant={'contained'}
-          >{props.title}
+  return (
+    <>
+      <Grid item key={props.title}>
+        <div className={classes.buttons}>
+          <Button {...props} to={props.to} component={NavLink} color="secondary" aria-label={props.title} variant={'contained'}>
+            {props.title}
           </Button>
-      </div>
-    </Grid>
-    </>;
+        </div>
+      </Grid>
+    </>
+  );
 };
 
 LinkButton.propTypes = {

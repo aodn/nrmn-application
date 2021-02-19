@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
@@ -47,6 +48,7 @@ public class StagedRowError {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("rowId")
+    @EqualsAndHashCode.Exclude
     @JoinColumn(foreignKey = @ForeignKey(name = "staged_row_error_staged_row_id_fkey"))
     private StagedRow row;
 }

@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import org.hibernate.annotations.Cache;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.Column;
@@ -18,7 +19,10 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
+
 @Entity
+@Cache(region = "entities", usage = READ_WRITE)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

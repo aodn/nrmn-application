@@ -17,9 +17,6 @@ import java.util.Optional;
 public interface StagedRowRepository extends JpaRepository<StagedRow, Long>, JpaSpecificationExecutor<StagedRow> {
     Optional<StagedRow> findById(Long id);
 
-    @Query("SELECT r FROM StagedRow r WHERE  r.stagedJob.reference = :reference")
-    List<StagedRow> findRowsByReference(@Param("reference") String ref);
-
     @Query("SELECT r FROM StagedRow r WHERE  r.stagedJob.id = :jobId")
     List<StagedRow> findRowsByJobId(@Param("jobId") Long jobId);
 

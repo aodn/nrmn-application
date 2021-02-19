@@ -38,6 +38,7 @@ const ValidationJob = () => {
   const isLoading = useSelector((state) => state.import.isLoading);
   const editLoading = useSelector((state) => state.import.editLoading);
   const enableSubmit = useSelector((state) => state.import.enableSubmit);
+  const validationLoading = useSelector((state) => state.import.validationLoading);
   const submitLoading = useSelector((state) => state.import.submitLoading);
   const ingestSuccess = useSelector((state) => state.import.ingestSuccess);
 
@@ -138,6 +139,11 @@ const ValidationJob = () => {
       )}
       {isLoading && (
         <Backdrop open={isLoading}>
+          <CircularProgress size={200} style={{color: '#ccc'}}></CircularProgress>
+        </Backdrop>
+      )}
+      {validationLoading && (
+        <Backdrop open={validationLoading}>
           <CircularProgress size={200} style={{color: '#ccc'}}></CircularProgress>
         </Backdrop>
       )}

@@ -3,10 +3,11 @@ import {useDispatch, useSelector} from 'react-redux';
 import {AgGridReact} from 'ag-grid-react';
 import {AllModules} from 'ag-grid-enterprise';
 import {useEffect} from 'react';
-import {AddRowIndex, EnableSubmit, JobFinished} from './reducers/create-import';
+import {JobFinished, AddRowIndex} from './reducers/create-import';
 import {ColumnDef, ExtendedSize} from './ColumnDef';
 import {Box} from '@material-ui/core';
 import useWindowSize from '../utils/useWindowSize';
+import {ChangeDetectionStrategyType} from 'ag-grid-react/lib/changeDetectionService';
 
 Object.unfreeze = function (o) {
   var oo = undefined;
@@ -29,30 +30,20 @@ Object.unfreeze = function (o) {
 
 const DataSheetView = () => {
   const dispatch = useDispatch();
-  const immutableRows = useSelector((state) => state.import.rows);
-
+  const rows = useSelector((state) => state.import.rows);
   const errSelected = useSelector((state) => state.import.errSelected);
   const [gridApi, setGridApi] = useState(null);
-
-  var rows = immutableRows.map(Object.unfreeze);
   const job = useSelector((state) => state.import.job);
-
   const colDefinition = job && job.isExtendedSize ? ColumnDef.concat(ExtendedSize) : ColumnDef;
-
   const agGridReady = (params) => {
     setGridApi(params.api);
     dispatch(JobFinished());
-
+    params.api.setRowData(rows);
     var allColumnIds = [];
     params.columnApi.getAllColumns().forEach(function (column) {
       allColumnIds.push(column.colId);
     });
     params.columnApi.autoSizeColumns(allColumnIds, true);
-  };
-
-  const onCellChanged = (input) => {
-    dispatch(AddRowIndex({id: input.data.id, row: input.data}));
-    dispatch(EnableSubmit(false));
   };
 
   const getContextMenuItems = (params) => {
@@ -81,18 +72,16 @@ const DataSheetView = () => {
   });
 
   const size = useWindowSize();
-  const themeType = useSelector((state) => state.theme.themeType);
-  const condition = rows && rows.length;
 
   return (
     <Box>
-      {condition && (
-        <div
-          id="validation-grid"
-          style={{height: size.height - 165, width: '100%', marginTop: 25}}
-          className={themeType ? 'ag-theme-material-dark' : 'ag-theme-material'}
-        >
+      {rows && (
+        <div id="validation-grid" style={{height: size.height - 165, width: '100%', marginTop: 25}} className={'ag-theme-material'}>
           <AgGridReact
+            reactNext
+            immutableRows={true}
+            getRowNodeId={(data) => data.id}
+            rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.IdentityCheck}
             pivotMode={false}
             pivotColumnGroupTotals={'before'}
             sideBar={true}
@@ -103,24 +92,27 @@ const DataSheetView = () => {
                 innerRenderer: 'nameCellRenderer'
               }
             }}
-            onCellValueChanged={onCellChanged}
             columnDefs={colDefinition}
             groupDefaultExpanded={4}
-            rowData={rows}
             rowHeight={18}
             animateRows={true}
             groupMultiAutoColumn={true}
             groupHideOpenParents={true}
-            rowSelection={'multiple'}
+            rowSelection="multiple"
             enableRangeSelection={true}
             undoRedoCellEditing={true}
             undoRedoCellEditingLimit={1000}
             ensureDomOrder={true}
+            rowData={rows}
             defaultColDef={{
               minWidth: 80,
               filter: true,
               sortable: true,
-              resizable: true
+              resizable: true,
+              valueSetter: (params) => {
+                dispatch(AddRowIndex({id: params.node.childIndex, field: params.colDef.field, value: params.newValue}));
+                return false;
+              }
             }}
             onGridReady={agGridReady}
             modules={AllModules}

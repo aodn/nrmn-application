@@ -1,8 +1,10 @@
 import {createSlice} from '@reduxjs/toolkit';
+import produce from 'immer';
 
 const importState = {
   success: false,
   isLoading: false,
+  validationLoading: false,
   editLoading: false,
   ingestLoading: false,
   submitReady: false,
@@ -79,24 +81,14 @@ export const flatten = (row) => {
   return row;
 };
 
-const mergeErrors = (rows) => {
-  if (rows && rows.length > 0) return rows.map((row) => row.errors).reduce((acc, err) => acc.concat(err));
-
+const mergeErrors = (errors) => {
+  if (errors && errors.length > 0)
+    return errors
+      .map((err) => err.errors | [])
+      .reduce((acc, err) => {
+        return acc.concat(err);
+      }, []);
   return [];
-};
-
-const groupBy = (list, keyGetter) => {
-  const map = new Map();
-  list.forEach((item) => {
-    const key = keyGetter(item);
-    const collection = map.get(key);
-    if (!collection) {
-      map.set(key, [item]);
-    } else {
-      collection.push(item);
-    }
-  });
-  return map;
 };
 
 const importSlice = createSlice({
@@ -115,36 +107,36 @@ const importSlice = createSlice({
       state.errSelected = action.payload;
     },
     validationReady: (state, action) => {
-      if (action.payload.rows.length > 0) {
-        state.rows = action.payload.rows.map((row) => exportRow(row));
-        const validationErrors = mergeErrors(state.rows);
-        state.EnableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
-        const errorsGrouped = groupBy(validationErrors, (row) => row.message);
-        state.errorsByMsg = [...errorsGrouped.keys()]
-          .map((key) => {
-            const elems = errorsGrouped.get(key);
-            const ids = errorsGrouped.get(key).map((err) => err.rowId);
+      return produce(state, (draft) => {
+        if (action.payload.errors.length > 0) {
+          const errors = action.payload.errors.reduce((acc, err) => {
+            acc[err.id] = err.errors;
+            return acc;
+          }, {});
+
+          draft.rows = draft.rows.map((row) => {
+            const err = errors[row.id] || [];
             return {
-              msg: key,
-              count: elems.length,
-              ids: ids,
-              columnTarget: elems[0].columnTarget,
-              level: elems[0].errorLevel
+              ...row,
+              errors: err
             };
-          })
-          .sort((err1, err2) => {
-            if (err1.level == err2.level) {
-              return err2.count - err1.count;
-            }
-            return err1.level === 'BLOCKING' ? -1 : 1;
           });
-      } else {
-        state.EnableSubmit = true;
-      }
-      state.isLoading = false;
+
+          const validationErrors = mergeErrors(action.payload.errors);
+          draft.EnableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
+          draft.errorsByMsg = action.payload.summaries.sort((sum1, sum2) => sum2.count - sum1.count);
+          draft.validationLoading = false;
+        }
+      });
     },
     AddRowIndex: (state, action) => {
-      state.indexChanged[action.payload.id] = action.payload.row;
+      return produce(state, (draft) => {
+        draft.rows[action.payload.id][action.payload.field] = action.payload.value;
+        const row = draft.rows[action.payload.id];
+        draft.indexChanged[row.id] = row;
+
+        draft.EnableSubmit = false;
+      });
     },
     RowUpdateRequested: (state) => {
       state.editLoading = true;
@@ -163,7 +155,7 @@ const importSlice = createSlice({
       state.ingestLoading = true;
     },
     ValidationRequested: (state) => {
-      state.isLoading = true;
+      state.validationLoading = true;
     },
     JobFinished: (state) => {
       state.isLoading = false;
@@ -178,6 +170,7 @@ const importSlice = createSlice({
     jobFailed: (state, action) => {
       state.success = false;
       state.isLoading = false;
+      state.validationLoading = false;
       if (action.payload) {
         state.errors = action.payload;
       }
