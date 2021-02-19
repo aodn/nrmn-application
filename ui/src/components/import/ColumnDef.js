@@ -137,7 +137,8 @@ export const ColumnDef = [
     width: 80
   },
   {
-    field: '2.5',
+    field: '2-5',
+    headerName: '2.5',
     editable: true,
     width: 105
   },
@@ -147,7 +148,8 @@ export const ColumnDef = [
     width: 105
   },
   {
-    field: '7.5',
+    field: '7-5',
+    headerName: '7.5',
     editable: true,
     width: 105
   },
@@ -157,7 +159,8 @@ export const ColumnDef = [
     width: 105
   },
   {
-    field: '12.5',
+    field: '12-5',
+    headerName: '12.5',
     editable: true,
     width: 105
   },
@@ -197,7 +200,8 @@ export const ColumnDef = [
     width: 105
   },
   {
-    field: '62.5',
+    field: '62-5',
+    headerName: '62.5',
     editable: true,
     width: 105
   },
@@ -207,7 +211,8 @@ export const ColumnDef = [
     width: 105
   },
   {
-    field: '87.5',
+    field: '87-5',
+    headerName: '87.5',
     editable: true,
     width: 105
   },
@@ -217,7 +222,8 @@ export const ColumnDef = [
     width: 105
   },
   {
-    field: '112.5',
+    field: '112-5',
+    headerName: '112.5',
     editable: true,
     width: 105
   },
@@ -227,7 +233,8 @@ export const ColumnDef = [
     width: 105
   },
   {
-    field: '137.5',
+    field: '137-5',
+    headerName: '137.5',
     editable: true,
     width: 105
   },
@@ -237,7 +244,8 @@ export const ColumnDef = [
     width: 105
   },
   {
-    field: '162.5',
+    field: '162-5',
+    headerName: '162.5',
     editable: true,
     width: 105
   },
@@ -247,7 +255,8 @@ export const ColumnDef = [
     width: 105
   },
   {
-    field: '187.5',
+    field: '187-5',
+    headerName: '187.5',
     editable: true,
     width: 105
   },
@@ -279,32 +288,6 @@ export const ColumnDef = [
 ];
 
 export const ExtendedSize = [
-  {
-    field: 'l5',
-    editable: true,
-    width: 105
-  },
-  {
-    field: 'l95',
-    editable: true,
-    width: 105
-  },
-  {
-    field: 'inverts',
-    editable: true
-  },
-  {
-    field: 'm2InvertSizingSpecies',
-    editable: true
-  },
-  {
-    field: 'isInvertSizing',
-    editable: true
-  },
-  {
-    field: 'lmax',
-    editable: true
-  },
   {
     field: '450',
     editable: true,
@@ -364,5 +347,31 @@ export const ExtendedSize = [
     field: '1000',
     editable: true,
     width: 105
+  },
+  {
+    field: 'l5',
+    editable: true,
+    width: 105
+  },
+  {
+    field: 'l95',
+    editable: true,
+    width: 105
+  },
+  {
+    field: 'inverts',
+    editable: true
+  },
+  {
+    field: 'm2InvertSizingSpecies',
+    editable: true
+  },
+  {
+    field: 'isInvertSizing',
+    editable: true
+  },
+  {
+    field: 'lmax',
+    editable: true
   }
 ];

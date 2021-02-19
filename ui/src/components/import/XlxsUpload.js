@@ -20,8 +20,7 @@ const XlxsUpload = () => {
     properties: {
       file: {
         title: 'Upload',
-        type: 'string',
-        format: 'data-url'
+        type: 'string'
       },
       programId: {
         title: 'Program File',
@@ -90,6 +89,7 @@ const XlxsUpload = () => {
   if (errors && errors.length > 0) {
     displayErros = errors.map((e) => e.message);
   }
+
   return (
     <Box>
       {isLoading && percentCompleted >= 0 && <LinearProgress variant="determinate" value={percentCompleted} />}
