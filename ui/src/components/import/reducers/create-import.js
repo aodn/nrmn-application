@@ -66,7 +66,6 @@ export const exportRow = (row) => {
   const {measureJson} = {...row};
   Object.getOwnPropertyNames(measureJson || {}).forEach((numKey) => {
     row[measureKey[numKey]] = measureJson[numKey];
-    console.log(measureKey[numKey] + '- ' + measureJson[numKey]);
   });
   delete row.measureJson;
   return row;
