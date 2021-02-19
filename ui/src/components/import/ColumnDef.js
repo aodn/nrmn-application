@@ -147,7 +147,8 @@ export const ColumnDef = [
 
     },
     {
-        field: '2.5',
+        field: '2-5',
+        headerName: '2.5',
         editable: true,
         width: 105,
 
@@ -158,7 +159,8 @@ export const ColumnDef = [
         width: 105,
     },
     {
-        field: '7.5',
+        field: '7-5',
+        headerName: '7.5',
         editable: true,
         width: 105,
 
@@ -170,7 +172,8 @@ export const ColumnDef = [
 
     },
     {
-        field: '12.5',
+        field: '12-5',
+        headerName: '12.5',
         editable: true,
         width: 105,
 
@@ -217,10 +220,10 @@ export const ColumnDef = [
 
     },
     {
-        field: '62.5',
+        field: '62-5',
+        headerName: '62.5',
         editable: true,
         width: 105,
-
     },
     {
         field: '75',
@@ -229,7 +232,8 @@ export const ColumnDef = [
 
     },
     {
-        field: '87.5',
+        field: '87-5',
+        headerName: '87.5',
         editable: true,
         width: 105,
 
@@ -240,7 +244,8 @@ export const ColumnDef = [
         width: 105,
     },
     {
-        field: '112.5',
+        field: '112-5',
+        headerName: '112.5',
         editable: true,
         width: 105,
     },
@@ -251,10 +256,10 @@ export const ColumnDef = [
 
     },
     {
-        field: '137.5',
+        field: '137-5',
+        headerName: '137.5',
         editable: true,
         width: 105,
-
     },
     {
         field: '150',
@@ -263,7 +268,8 @@ export const ColumnDef = [
 
     },
     {
-        field: '162.5',
+        field: '162-5',
+        headerName: '162.5',
         editable: true,
         width: 105,
 
@@ -275,7 +281,8 @@ export const ColumnDef = [
 
     },
     {
-        field: '187.5',
+        field: '187-5',
+        headerName: '187.5',
         editable: true,
         width: 105,
 
@@ -296,7 +303,6 @@ export const ColumnDef = [
         field: '300',
         editable: true,
         width: 105,
-
     },
     {
         field: '350',
@@ -307,7 +313,6 @@ export const ColumnDef = [
         field: '400',
         editable: true,
         width: 105,
-
     },
 
 ];
