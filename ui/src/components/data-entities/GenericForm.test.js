@@ -2,7 +2,7 @@
 
 import React from 'react';
 import GenericForm from './GenericForm';
-import { Route } from 'react-router-dom';
+import {Route} from 'react-router-dom';
 import {renderWithProviders} from '../utils/test-utils';
 import '@testing-library/jest-dom/extend-expect';
 import config from 'react-global-configuration';
@@ -10,10 +10,7 @@ import {useSelector} from 'react-redux';
 
 const testSchema = {
   TestEntity: {
-    required: [
-      'password',
-      'username'
-    ],
+    required: ['password', 'username'],
     type: 'object',
     properties: {
       username: {
@@ -28,8 +25,8 @@ const testSchema = {
 
 config.set({api: testSchema});
 
-
 const mockState = {
+  theme: {themeType: false},
   form: {
     entities: [],
     editItem: {},
@@ -43,22 +40,26 @@ jest.mock('react-redux', () => {
   return {
     ...ActualReactRedux,
     useSelector: jest.fn().mockImplementation(() => {
-      return function(){ return {};};
+      return function () {
+        return {};
+      };
     }),
     useDispatch: jest.fn().mockImplementation(() => {
-      return function(){ return {};};
+      return function () {
+        return {};
+      };
     }),
     useEffect: jest.fn().mockImplementation(() => {
-      return function(){ return {};};
-    }),
+      return function () {
+        return {};
+      };
+    })
   };
 });
 
-
 describe('GenericForm.js Component', () => {
-
   beforeEach(() => {
-    useSelector.mockImplementation(callback => {
+    useSelector.mockImplementation((callback) => {
       return callback(mockState);
     });
   });
@@ -68,31 +69,25 @@ describe('GenericForm.js Component', () => {
 
   test('Test GenericForm.js exists', async () => {
     const {findByText} = renderWithProviders(
-        <Route path="/edit/:entityName">
-          <GenericForm/>
-        </Route>,
-        {
-          route: '/edit/munt'
-        }
+      <Route path="/edit/:entityName">
+        <GenericForm />
+      </Route>,
+      {
+        route: '/edit/munt'
+      }
     );
     await findByText("ERROR: Entity 'Munt' missing from API Schema");
   });
 
-
   test('Test GenericForm.js TestEntity renders form submit button', async () => {
-
     const {findByText} = renderWithProviders(
-        <Route path="/edit/:entityName">
-          <GenericForm/>
-        </Route>,
-        {
-          route: '/edit/TestEntity'
-        }
+      <Route path="/edit/:entityName">
+        <GenericForm />
+      </Route>,
+      {
+        route: '/edit/TestEntity'
+      }
     );
     await findByText('Save');
   });
-
 });
-
-
-
