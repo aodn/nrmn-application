@@ -1,5 +1,5 @@
 const CracoEslintWebpackPlugin = require('craco-eslint-webpack-plugin');
- 
+
 module.exports = {
   plugins: [
     {
@@ -12,8 +12,8 @@ module.exports = {
           lintDirtyModulesOnly: false,
           failOnWarning: true
           // ...
-        },
-      },
-    },
-  ],
+        }
+      }
+    }
+  ]
 };

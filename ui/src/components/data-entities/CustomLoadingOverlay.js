@@ -12,15 +12,14 @@ const useStyles = makeStyles(() => ({
 }));
 
 const CustomLoadingOverlay = () => {
-
   const classes = useStyles();
 
   return (
-      <div className='ag-custom-loading-cell' >
-        <Box component="div" ml={2} className={classes.main}>
-        <LoadingBanner variant={'h5'} msg={'Loading data..  ' } />
-        </Box>
-      </div>
+    <div className="ag-custom-loading-cell">
+      <Box component="div" ml={2} className={classes.main}>
+        <LoadingBanner variant={'h5'} msg={'Loading data..  '} />
+      </Box>
+    </div>
   );
 };
 

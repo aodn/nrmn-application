@@ -39,8 +39,7 @@ export const ColumnDef = [
   {
     field: 'siteName',
     headerName: 'Site Name',
-    editable: true,
-
+    editable: true
   },
   {
     field: 'latitude',

@@ -1,9 +1,8 @@
-
 import React from 'react';
-import { assert } from 'chai';
-import { unmountComponentAtNode } from 'react-dom';
-import { render } from '../../setupTests';
-import { act } from '@testing-library/react';
+import {assert} from 'chai';
+import {unmountComponentAtNode} from 'react-dom';
+import {render} from '../../setupTests';
+import {act} from '@testing-library/react';
 import Login from './login';
 
 let container;
@@ -13,7 +12,9 @@ jest.mock('react-router-dom', () => {
   return {
     ...ActualReactRedux,
     useLocation: jest.fn().mockImplementation(() => {
-      return function(){ return {};};
+      return function () {
+        return {};
+      };
     })
   };
 });
@@ -32,14 +33,10 @@ afterEach(() => {
 describe('login test', () => {
   it('renders form', () => {
     act(() => {
-    render(
-          <Login />,
-          container
-      );
+      render(<Login />, container);
     });
 
     const inputs = document.getElementsByTagName('input');
     assert.lengthOf(inputs, 2, 'Should be two input fields');
-
   });
 });
