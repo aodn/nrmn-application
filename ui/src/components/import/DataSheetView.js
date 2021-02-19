@@ -72,16 +72,11 @@ const DataSheetView = () => {
   });
 
   const size = useWindowSize();
-  const themeType = useSelector((state) => state.theme.themeType);
 
   return (
     <Box>
       {rows && (
-        <div
-          id="validation-grid"
-          style={{height: size.height - 165, width: '100%', marginTop: 25}}
-          className={themeType ? 'ag-theme-material-dark' : 'ag-theme-material'}
-        >
+        <div id="validation-grid" style={{height: size.height - 165, width: '100%', marginTop: 25}} className={'ag-theme-material'}>
           <AgGridReact
             reactNext
             immutableRows={true}
