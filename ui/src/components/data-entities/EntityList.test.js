@@ -27,6 +27,7 @@ config.set({api: testSchema});
 jest.mock('ag-grid-react/lib/agGridReact');
 
 const mockState = {
+  theme: {themeType: false},
   form: {
     entities: [],
     editItem: {},
