@@ -81,6 +81,8 @@ const SideMenu = () => {
       <List>
         <Divider />
         <SettingsMenu />
+        <Divider />
+        {process.env.REACT_APP_VERSION && <ListSubheader>{`Version ${process.env.REACT_APP_VERSION}`}</ListSubheader>}
       </List>
     </Drawer>
   );

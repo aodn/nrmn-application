@@ -65,6 +65,9 @@
                         <phase>compile</phase>
                         <configuration>
                             <arguments>build</arguments>
+                            <environmentVariables>
+                                <REACT_APP_VERSION>${project.version}</REACT_APP_VERSION>
+                            </environmentVariables>
                         </configuration>
                     </execution>
                 </executions>
