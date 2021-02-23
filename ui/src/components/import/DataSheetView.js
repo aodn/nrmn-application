@@ -71,6 +71,10 @@ const DataSheetView = () => {
         });
       }
     }
+
+    if (gridApi && evt.key == 'z' && (evt.ctrlKey || evt.metaKey)) {
+      gridApi.undoCellEditing();
+    }
   };
 
   useEffect(() => {
@@ -97,6 +101,7 @@ const DataSheetView = () => {
           className={'ag-theme-material'}
         >
           <AgGridReact
+            immutable
             getRowNodeId={(data) => data.id}
             rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.IdentityCheck}
             pivotMode={false}
@@ -127,9 +132,8 @@ const DataSheetView = () => {
               sortable: true,
               resizable: true,
               valueSetter: (params) => {
-                console.log('back');
                 dispatch(AddRowIndex({id: params.node.childIndex, field: params.colDef.field, value: params.newValue}));
-                return true;
+                return false;
               }
             }}
             onGridReady={agGridReady}
