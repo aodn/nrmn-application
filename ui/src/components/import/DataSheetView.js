@@ -59,6 +59,20 @@ const DataSheetView = () => {
     ];
   };
 
+  const onKeyDown = (evt) => {
+    if (gridApi && evt.key == 'x' && (evt.ctrlKey || evt.metaKey)) {
+      const cells = gridApi.getCellRanges();
+      gridApi.copySelectedRangeToClipboard();
+      const fields = cells[0].columns.map((col) => col.colId);
+      for (let i = cells[0].startRow.rowIndex; i <= cells[0].endRow.rowIndex; i++) {
+        const row = gridApi.getRowNode(rows[i].id);
+        fields.forEach((field) => {
+          row.setDataValue(field, '');
+        });
+      }
+    }
+  };
+
   useEffect(() => {
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
       const instance = gridApi.getFilterInstance('id');
@@ -76,10 +90,13 @@ const DataSheetView = () => {
   return (
     <Box>
       {rows && (
-        <div id="validation-grid" style={{height: size.height - 165, width: '100%', marginTop: 25}} className={'ag-theme-material'}>
+        <div
+          onKeyDown={onKeyDown}
+          id="validation-grid"
+          style={{height: size.height - 165, width: '100%', marginTop: 25}}
+          className={'ag-theme-material'}
+        >
           <AgGridReact
-            reactNext
-            immutableRows={true}
             getRowNodeId={(data) => data.id}
             rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.IdentityCheck}
             pivotMode={false}
@@ -101,7 +118,7 @@ const DataSheetView = () => {
             rowSelection="multiple"
             enableRangeSelection={true}
             undoRedoCellEditing={true}
-            undoRedoCellEditingLimit={1000}
+            undoRedoCellEditingLimit={20}
             ensureDomOrder={true}
             rowData={rows}
             defaultColDef={{
@@ -110,8 +127,9 @@ const DataSheetView = () => {
               sortable: true,
               resizable: true,
               valueSetter: (params) => {
+                console.log('back');
                 dispatch(AddRowIndex({id: params.node.childIndex, field: params.colDef.field, value: params.newValue}));
-                return false;
+                return true;
               }
             }}
             onGridReady={agGridReady}
