@@ -10,6 +10,7 @@ import javax.persistence.QueryHint;
 import org.springframework.data.repository.query.Param;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
@@ -21,16 +22,19 @@ import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 
 @RepositoryRestResource
 @Tag(name = "divers")
-public interface DiverRepository extends JpaRepository<Diver, Integer>, JpaSpecificationExecutor<Diver>, EntityCriteria<Diver> {
+public interface DiverRepository
+        extends JpaRepository<Diver, Integer>, JpaSpecificationExecutor<Diver>, EntityCriteria<Diver> {
 
     @Override
-    @Query("SELECT d FROM  Diver  d WHERE d.initials = :initials")
-    @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
-    List<Diver> findByCriteria(@Param("initials")String initials);
-
+    @Query("SELECT d FROM Diver d WHERE d.initials = :initials")
+    @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
+    List<Diver> findByCriteria(@Param("initials") String initials);
 
     @Override
     @RestResource
+    @Query(value = "SELECT * FROM {h-schema}diver_ref d ORDER BY (CASE WHEN initials SIMILAR TO '%[a-zA-Z]' THEN 0 ELSE 1 END), d.initials", 
+           countQuery = "SELECT count(*) FROM {h-schema}diver_ref",
+           nativeQuery = true)
     Page<Diver> findAll(Pageable pageable);
 
     @Override

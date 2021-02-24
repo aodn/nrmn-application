@@ -46,40 +46,22 @@ const schematoColDef = (schema, size, entityName) => {
   });
 
   const widthUnit = 100;
-  const cloneButtonWidth = nonGenericEntities[entityName]?.cloneButton ? widthUnit : 0;
-  const deleteButtonWidth = nonGenericEntities[entityName]?.hideDeleteButton ? 0 : widthUnit;
-  const linksWidth = widthUnit + cloneButtonWidth + deleteButtonWidth;
 
   coldefs.push({
     field: 'Links',
-    maxWidth: linksWidth,
-    minWidth: linksWidth,
+    maxWidth: widthUnit,
+    minWidth: widthUnit,
     filter: undefined,
     cellRendererFramework: function (params) {
-      const linkPath = nonGenericEntities[entityName]?.entityLinkPath;
-
       if (params.data._links) {
         const hrefSplit = params.data._links.self.href.split('/');
         const id = hrefSplit.pop();
         const ent = hrefSplit.pop();
 
-        let link = '/edit/' + ent + '/' + id;
-        const cloneLink = '/edit/' + ent + '/clone/' + id;
-        const deleteLink = '/delete/' + ent + '/' + id;
-        let linkLabel = 'Edit';
+        const link = '/edit/' + ent + '/' + id;
+        const linkLabel = nonGenericEntities[entityName]?.entityLinkLabel ? nonGenericEntities[entityName]?.entityLinkLabel : 'Edit';
 
-        if (linkPath) {
-          link = '/' + linkPath.replace(/{(.*?)}/, id);
-          linkLabel = nonGenericEntities[entityName]?.entityLinkLabel ? nonGenericEntities[entityName]?.entityLinkLabel : linkLabel;
-        }
-
-        return (
-          <>
-            <LinkCell label={linkLabel} link={link}></LinkCell>
-            {nonGenericEntities[entityName]?.cloneButton ? <LinkCell label={'Clone'} link={cloneLink}></LinkCell> : null}
-            {nonGenericEntities[entityName]?.hideDeleteButton ? null : <LinkCell label={'Delete'} link={deleteLink}></LinkCell>}
-          </>
-        );
+        return <LinkCell label={linkLabel} link={link}></LinkCell>;
       }
     }
   });
@@ -99,31 +81,12 @@ const renderError = (msgArray) => {
   );
 };
 
-// nonGenericEntities parameters
-//
-// title: 'Job',
-// createButtonPath:  - attribute required if entity defined, or no create button will show
-// hideDeleteButton - delete button shown by default
-// cloneButton: true - show a clone link button
-// entityLinkLabel: 'Details', - defaults to be the main edit button per item
-// entityLinkPath: 'view/stagedJobs/{}',
-// additionalPageLinks: {label, link} - additional links for the page
 const nonGenericEntities = {
-  Diver: {
-    cloneButton: true,
-    hideDeleteButton: false
-  },
   StagedJob: {
     title: 'Job',
     createButtonPath: '/upload',
     entityLinkLabel: 'Details',
     entityLinkPath: 'view/stagedJobs/{}'
-    // additionalPageLinks: [
-    //   {
-    //     label: 'New Corrections',
-    //     link: 'corrections'
-    //   }
-    // ]
   },
   Site: {
     entityListName: 'SiteListItem',
@@ -221,10 +184,8 @@ const EntityList = () => {
 
   const newEntityButton = () => {
     let createButtonPath = nonGenericEntities[entityName]?.createButtonPath;
-    if (!(entityName in nonGenericEntities) || createButtonPath) {
-      const to = createButtonPath ? createButtonPath : '/edit/' + entityPluralise(entityName);
-      return <LinkButton key={getTitle() + to} title={'New ' + getTitle()} label={'New ' + getTitle()} to={to} />;
-    }
+    const to = createButtonPath ? createButtonPath : '/edit/' + entityPluralise(entityName);
+    return <LinkButton key={getTitle() + to} title={'New ' + getTitle()} label={'New ' + getTitle()} to={to} />;
   };
 
   if (Object.keys(schemaDefinition).length === 0) {
@@ -235,6 +196,7 @@ const EntityList = () => {
     }
 
     const colDef = schematoColDef(schemaDefinition[getListEntity()], size, entityName);
+
     const agGridParentWidth = columnFit ? '100%' : '99%'; // triggers agGrid layout
 
     if (items !== undefined && agGridApi.setRowData) {
@@ -274,7 +236,7 @@ const EntityList = () => {
               loadingOverlayComponent={'customLoadingOverlay'}
               tooltipShowDelay={0}
               defaultColDef={{
-                sortable: true,
+                sortable: false,
                 resizable: true,
                 tooltipComponent: 'customTooltip',
                 floatingFilter: true,
