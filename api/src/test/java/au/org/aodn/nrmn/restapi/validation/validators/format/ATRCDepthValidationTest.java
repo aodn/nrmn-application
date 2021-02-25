@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SurveyNumValidationTest {
+class ATRCDepthValidationTest {
 
     @Test
     void depthWithoutTransectShouldFail() {
@@ -19,7 +19,7 @@ class SurveyNumValidationTest {
         stage.setDepth("8,3");
         stage.setStagedJob(job);
         val res =
-                new SurveyNumValidation(Arrays.asList(1, 2)).valid(stage);
+                new ATRCDepthValidation().valid(stage);
         assertTrue(res.isInvalid());
 
     }
@@ -32,7 +32,7 @@ class SurveyNumValidationTest {
         stage.setDepth("10.9");
         stage.setStagedJob(job);
         val res =
-                new SurveyNumValidation(Arrays.asList(1, 2)).valid(stage);
+                new ATRCDepthValidation().valid(stage);;
         assertTrue(res.isInvalid());
 
     }
@@ -46,7 +46,7 @@ class SurveyNumValidationTest {
         stage.setStagedJob(job);
 
         val res =
-                new SurveyNumValidation(Arrays.asList(1, 2, 3)).valid(stage);
+                new ATRCDepthValidation().valid(stage);;
         assertTrue(res.isValid());
     }
 
