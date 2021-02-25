@@ -36,6 +36,8 @@ const mockState = {
   }
 };
 
+const testEntity = {name: 'TestEntities', entityName: 'TestEntity', entityListName: 'testentities'};
+
 jest.mock('react-redux', () => {
   const ActualReactRedux = require.requireActual('react-redux');
   return {
@@ -71,19 +73,19 @@ describe('EntityList Component', () => {
   test('Test EntityList.js exists', async () => {
     const {findByText} = renderWithProviders(
       <Route path="/list/:entityName">
-        <EntityList />
+        <EntityList entity={testEntity} />
       </Route>,
       {
-        route: '/list/munt'
+        route: '/list/testentities'
       }
     );
-    await findByText("ERROR: Entity 'Munt' missing from API Schema");
+    await findByText('New TestEntity');
   });
 
   test('Test EntityList.js New Entity button exists', async () => {
     const {findByTitle} = renderWithProviders(
       <Route path="/list/:entityName">
-        <EntityList />
+        <EntityList entity={testEntity} />
       </Route>,
       {
         route: '/list/TestEntity'

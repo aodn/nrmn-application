@@ -1,5 +1,4 @@
 import {createSlice} from '@reduxjs/toolkit';
-import pluralize from 'pluralize';
 
 const formState = {
   entities: undefined,
@@ -21,6 +20,8 @@ const formSlice = createSlice({
       state.errors = [];
     },
     entitiesError: (state, action) => {
+      state.errors = action.payload.e.response?.data?.errors;
+      if (state.errors) return;
       const error = action.payload.e.response?.data?.error ? action.payload.e.response.data.error : 'Error while getting the entity data';
       state.entities = [];
       state.errors = [error];
@@ -38,7 +39,7 @@ const formSlice = createSlice({
     selectedItemsLoaded: (state, action) => {
       let resp = {};
       const key = Object.keys(action.payload._embedded)[0];
-      const singularKey = pluralize.singular(key);
+      const singularKey = key;
       resp[key] = action.payload._embedded;
       resp[singularKey + 'Selected'] = action.payload.selected;
       resp[singularKey] = action.payload.selected ? action.payload.selected._links.self.href : undefined;

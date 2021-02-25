@@ -27,7 +27,7 @@ public class BeforeSaveDiverValidator implements Validator {
         val existingDiverWithInitials = diverRepository.findOne(diverExample);
 
         if (existingDiverWithInitials.isPresent() && existingDiverWithInitials.get().getDiverId() != diver.getDiverId()) {
-            errors.rejectValue("initials", "diver.initials.exists", "a diver with those initials already exists");
+            errors.rejectValue("initials", "diver.initials.exists", "A diver with those initials already exists.");
         }
     }
 }

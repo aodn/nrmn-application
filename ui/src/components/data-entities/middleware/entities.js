@@ -58,8 +58,12 @@ function* saveEntities(action) {
     const href = action.payload.data?._links?.self?.href ? action.payload.data._links.self.href : action.payload.path;
     delete action.payload.data._links;
 
-    const resp = yield call(entitySave, href, action.payload.data);
-    yield put(entitiesSaved(isSuccessful200Response(resp.status)));
+    const response = yield call(entitySave, href, action.payload.data);
+    if (response?.data?.errors) {
+      yield put(entitiesError({e: {response: response}}));
+    } else {
+      yield put(entitiesSaved(isSuccessful200Response(response.status)));
+    }
   } catch (e) {
     yield put(entitiesError({e}));
   }
