@@ -35,6 +35,8 @@ const mockState = {
   }
 };
 
+const testEntity = {name: 'TestEntities', entityName: 'TestEntity', entityListName: 'testentities'};
+
 jest.mock('react-redux', () => {
   const ActualReactRedux = require.requireActual('react-redux');
   return {
@@ -70,22 +72,22 @@ describe('GenericForm.js Component', () => {
   test('Test GenericForm.js exists', async () => {
     const {findByText} = renderWithProviders(
       <Route path="/edit/:entityName">
-        <GenericForm />
+        <GenericForm entity={testEntity} />
       </Route>,
       {
-        route: '/edit/munt'
+        route: '/edit/testentities'
       }
     );
-    await findByText("ERROR: Entity 'Munt' missing from API Schema");
+    await findByText('New TestEntity');
   });
 
-  test('Test GenericForm.js TestEntity renders form submit button', async () => {
+  test('Test GenericForm.js TestEntity renders save button', async () => {
     const {findByText} = renderWithProviders(
       <Route path="/edit/:entityName">
-        <GenericForm />
+        <GenericForm entity={testEntity} />
       </Route>,
       {
-        route: '/edit/TestEntity'
+        route: '/edit/testentities'
       }
     );
     await findByText('Save');

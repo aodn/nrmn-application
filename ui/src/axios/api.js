@@ -9,12 +9,17 @@ function getToken() {
 }
 
 function getAxiosPromise(method, path, params, contentType) {
-  return axiosInstance({
-    headers: {'Content-Type': contentType ? contentType : 'application/json'},
-    method: method,
-    url: path,
-    data: params
-  });
+  return axiosInstance(
+    {
+      headers: {'Content-Type': contentType ? contentType : 'application/json'},
+      method: method,
+      url: path,
+      data: params
+    },
+    {
+      validateStatus: () => true
+    }
+  );
 }
 
 axiosInstance.interceptors.request.use(
@@ -105,7 +110,12 @@ export const getSelectedEntityItems = (paths) =>
   });
 
 export const entitySave = (entity, params) => {
-  return axiosInstance.post('/api/' + entity, params).then((res) => res);
+  return axiosInstance
+    .post('/api/' + entity, params, {
+      validateStatus: () => true
+    })
+    .then((res) => res)
+    .catch((err) => err);
 };
 
 export const entityEdit = (path, params) => {

@@ -5,10 +5,8 @@ import GenericDetailsView from './GenericDetailsView';
 import {Route} from 'react-router-dom';
 import {renderWithProviders} from '../utils/test-utils';
 import '@testing-library/jest-dom/extend-expect';
-import {screen} from '@testing-library/react';
 import config from 'react-global-configuration';
 import {useSelector} from 'react-redux';
-import {waitForElement} from '@testing-library/dom';
 
 const testSchema = {
   TestEntity: {
@@ -36,6 +34,8 @@ const mockState = {
     errors: []
   }
 };
+
+const testEntity = {name: 'TestEntities', entityName: 'TestEntity', entityListName: 'testentities'};
 
 jest.mock('react-redux', () => {
   const ActualReactRedux = require.requireActual('react-redux');
@@ -72,7 +72,7 @@ describe('GenericForm.js Component', () => {
   test('Test GenericDetailsView header exists', async () => {
     const {queryByText} = renderWithProviders(
       <Route path="/edit/:entityName">
-        <GenericDetailsView />
+        <GenericDetailsView entity={testEntity} />
       </Route>,
       {
         route: '/edit/TestEntity'
@@ -84,7 +84,7 @@ describe('GenericForm.js Component', () => {
   test('Test there is no submit button', async () => {
     const {queryByText} = renderWithProviders(
       <Route path="/edit/:entityName">
-        <GenericDetailsView />
+        <GenericDetailsView entity={testEntity} />
       </Route>,
       {
         route: '/edit/TestEntity'

@@ -2,13 +2,10 @@ import React from 'react';
 import {Box, Typography} from '@material-ui/core';
 import {useSelector, useDispatch} from 'react-redux';
 import {useEffect} from 'react';
-import {useParams} from 'react-router-dom';
-import pluralize from 'pluralize';
 import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
 import useWindowSize from '../utils/useWindowSize';
 import Alert from '@material-ui/lab/Alert';
 import config from 'react-global-configuration';
-import {titleCase} from 'title-case';
 import Grid from '@material-ui/core/Grid';
 import CustomTooltip from './customTooltip';
 import CustomLoadingOverlay from './CustomLoadingOverlay';
@@ -17,6 +14,7 @@ import {resetState} from './form-reducer';
 import LinkCell from './customWidgetFields/LinkCell';
 import LinkButton from './LinkButton';
 import {useHistory} from 'react-router';
+import {PropTypes} from 'prop-types';
 
 const cellRenderer = (params) => {
   if (typeof params.value === 'object') {
@@ -33,7 +31,7 @@ const getCellFilter = (format) => {
   return filterTypes[format] ? filterTypes[format] : 'agTextColumnFilter';
 };
 
-const schematoColDef = (schema, size, entityName) => {
+const schematoColDef = (schema, entity) => {
   const fields = Object.keys(schema.properties);
   const coldefs = fields.map((field) => {
     let type = schema.properties[field] ? schema.properties[field]?.type : 'string';
@@ -59,7 +57,7 @@ const schematoColDef = (schema, size, entityName) => {
         const ent = hrefSplit.pop();
 
         const link = '/edit/' + ent + '/' + id;
-        const linkLabel = nonGenericEntities[entityName]?.entityLinkLabel ? nonGenericEntities[entityName]?.entityLinkLabel : 'Edit';
+        const linkLabel = entity.entityLinkLabel ?? 'Edit';
 
         return <LinkCell label={linkLabel} link={link}></LinkCell>;
       }
@@ -81,27 +79,6 @@ const renderError = (msgArray) => {
   );
 };
 
-const nonGenericEntities = {
-  StagedJob: {
-    title: 'Job',
-    createButtonPath: '/upload',
-    entityLinkLabel: 'Details',
-    entityLinkPath: 'view/stagedJobs/{}'
-  },
-  Site: {
-    entityListName: 'SiteListItem',
-    createButtonPath: '/edit/sites',
-    entityLinkLabel: 'Details',
-    entityLinkPath: 'view/sites/{}'
-  },
-  ObservableItem: {
-    entityListName: 'ObservableItemListItem',
-    createButtonPath: '/edit/observableItems',
-    entityLinkLabel: 'Details',
-    entityLinkPath: 'view/observableItems/{}'
-  }
-};
-
 const gotoDetailsView = (event, history) => {
   if (event.node.isSelected() && event.colDef.field !== 'Links' && event.node.data._links) {
     const hrefSplit = event.node.data._links.self.href.split('/');
@@ -111,31 +88,15 @@ const gotoDetailsView = (event, history) => {
   }
 };
 
-const EntityList = () => {
-  const {entityName} = useParams();
+const EntityList = (props) => {
   const history = useHistory();
-
-  const entityPluralise = (thisEntityName) => {
-    const plural = pluralize.plural(thisEntityName);
-    return plural.charAt(0).toLowerCase() + plural.slice(1);
-  };
-
-  const getListEntity = () => {
-    let entityListName = nonGenericEntities[entityName]?.entityListName;
-    if (entityListName) {
-      return entityListName;
-    } else {
-      return schemaDefinition[titleCase(entityName)] ? titleCase(entityName) : entityName;
-    }
-  };
-
   const schemaDefinition = config.get('api');
   const size = useWindowSize();
   const columnFit = useSelector((state) => state.theme.columnFit);
   const dispatch = useDispatch();
   const entities = useSelector((state) => state.form.entities);
   const errors = useSelector((state) => state.form.errors);
-  const items = entities?._embedded ? entities._embedded[entityPluralise(getListEntity())] : undefined;
+  const items = entities?._embedded ? entities._embedded[props.entity.entityListName] : undefined;
 
   const agGridReady = (agGrid) => {
     agGridApi = Object.create(agGrid.api);
@@ -167,91 +128,88 @@ const EntityList = () => {
       onGridSizeChanged();
       agGridApi.showLoadingOverlay();
     }
-    const entityListName = nonGenericEntities[entityName]?.entityListName ? nonGenericEntities[entityName]?.entityListName : entityName;
-    dispatch(selectRequested(entityPluralise(entityListName)));
-  }, [entityName]); // reset when new or entityName prop changes
-
-  const getTitle = () => {
-    return nonGenericEntities[entityName]?.title ? nonGenericEntities[entityName]?.title : entityName;
-  };
+    const entityListName = props.entity.entityListName ?? props.entity.name;
+    dispatch(selectRequested(entityListName));
+  }, [props.entity.name]); // reset when new or entityName prop changes
 
   const additionalPageLinks = () => {
-    let links = nonGenericEntities[entityName]?.additionalPageLinks;
+    let links = props.entity.additionalPageLinks;
     return links?.map((item) => {
-      return <LinkButton key={getTitle() + item.label} title={item.label} label={item.label} to={item.link} />;
+      return <LinkButton key={props.entity.entityName + item.label} title={item.label} label={item.label} to={item.link} />;
     });
   };
 
   const newEntityButton = () => {
-    let createButtonPath = nonGenericEntities[entityName]?.createButtonPath;
-    const to = createButtonPath ? createButtonPath : '/edit/' + entityPluralise(entityName);
-    return <LinkButton key={getTitle() + to} title={'New ' + getTitle()} label={'New ' + getTitle()} to={to} />;
+    let createButtonPath = props.entity.createButtonPath;
+    const to = createButtonPath ? createButtonPath : '/edit/' + props.entity.name;
+    return (
+      <LinkButton
+        key={props.entity.entityName + to}
+        title={'New ' + props.entity.entityName}
+        label={'New ' + props.entity.entityName}
+        to={to}
+      />
+    );
   };
 
-  if (Object.keys(schemaDefinition).length === 0) {
-    return renderError(['Error: API not yet loaded']);
-  } else {
-    if (!schemaDefinition[getListEntity()]) {
-      return renderError(["ERROR: Entity '" + titleCase(entityName) + "' missing from API Schema"]);
-    }
+  const colDef = schematoColDef(schemaDefinition[props.entity.entityName], size, props.entity.name);
+  const agGridParentWidth = columnFit ? '100%' : '99%'; // triggers agGrid layout
 
-    const colDef = schematoColDef(schemaDefinition[getListEntity()], size, entityName);
+  if (items !== undefined && agGridApi.setRowData) {
+    agGridApi.setRowData(items);
+  }
 
-    const agGridParentWidth = columnFit ? '100%' : '99%'; // triggers agGrid layout
-
-    if (items !== undefined && agGridApi.setRowData) {
-      agGridApi.setRowData(items);
-    }
-
-    return (
-      <>
-        <Box>
-          <Grid container direction="row" justify="space-between" alignItems="center">
-            <Grid item>
-              <Typography variant="h4">{getTitle()}</Typography>
-            </Grid>
-            <Grid item>
-              <Grid container spacing={2}>
-                {additionalPageLinks()}
-                {newEntityButton()}
-              </Grid>
+  return (
+    <>
+      <Box>
+        <Grid container direction="row" justify="space-between" alignItems="center">
+          <Grid item>
+            <Typography variant="h4">{props.entity.name}</Typography>
+          </Grid>
+          <Grid item>
+            <Grid container spacing={2}>
+              {additionalPageLinks()}
+              {newEntityButton()}
             </Grid>
           </Grid>
+        </Grid>
 
-          <div style={{width: agGridParentWidth, height: size.height - 170, marginTop: 25}} className={'ag-theme-material'}>
-            <AgGridReact
-              columnDefs={colDef}
-              rowSelection="single"
-              animateRows={true}
-              onGridReady={agGridReady}
-              onFirstDataRendered={onGridSizeChanged}
-              onGridSizeChanged={onGridSizeChanged}
-              onCellClicked={(e) => {
-                gotoDetailsView(e, history);
-              }}
-              frameworkComponents={{
-                customTooltip: CustomTooltip,
-                customLoadingOverlay: CustomLoadingOverlay
-              }}
-              loadingOverlayComponent={'customLoadingOverlay'}
-              tooltipShowDelay={0}
-              defaultColDef={{
-                sortable: false,
-                resizable: true,
-                tooltipComponent: 'customTooltip',
-                floatingFilter: true,
-                headerComponentParams: {
-                  menuIcon: 'fa-bars'
-                }
-              }}
-            />
-          </div>
-          {!colDef ? renderError(["Entity '" + entityName + "' can not be found!"]) : ''}
-          {errors.length > 0 ? renderError(errors) : ''}
-        </Box>
-      </>
-    );
-  }
+        <div style={{width: agGridParentWidth, height: size.height - 170, marginTop: 25}} className={'ag-theme-material'}>
+          <AgGridReact
+            columnDefs={colDef}
+            rowSelection="single"
+            animateRows={true}
+            onGridReady={agGridReady}
+            onFirstDataRendered={onGridSizeChanged}
+            onGridSizeChanged={onGridSizeChanged}
+            onCellClicked={(e) => {
+              gotoDetailsView(e, history);
+            }}
+            frameworkComponents={{
+              customTooltip: CustomTooltip,
+              customLoadingOverlay: CustomLoadingOverlay
+            }}
+            loadingOverlayComponent={'customLoadingOverlay'}
+            tooltipShowDelay={0}
+            defaultColDef={{
+              sortable: false,
+              resizable: true,
+              tooltipComponent: 'customTooltip',
+              floatingFilter: true,
+              headerComponentParams: {
+                menuIcon: 'fa-bars'
+              }
+            }}
+          />
+        </div>
+        {!colDef ? renderError(["Entity '" + props.entity.entityName + "' can not be found!"]) : ''}
+        {errors.length > 0 ? renderError(errors) : ''}
+      </Box>
+    </>
+  );
 };
 
+EntityList.propTypes = {
+  entity: PropTypes.object
+};
 export default EntityList;

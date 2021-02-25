@@ -13,6 +13,7 @@ import SettingsMenu from './SettingsMenu';
 import {useDispatch, useSelector} from 'react-redux';
 import {toggleLeftSideMenu} from './layout-reducer';
 import {NavLink} from 'react-router-dom';
+import {PropTypes} from 'prop-types';
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ? process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
@@ -34,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const SideMenu = () => {
+const SideMenu = (props) => {
   const classes = useStyles();
   const theme = useTheme();
   const leftSideMenuIsOpen = useSelector((state) => state.toggle.leftSideMenuIsOpen);
@@ -72,9 +73,9 @@ const SideMenu = () => {
       <Divider />
       <List>
         <ListSubheader>REFERENCE DATA</ListSubheader>
-        {['Diver', 'Location', 'ObservableItem', 'Site'].map((text) => (
-          <ListItem button key={text} component={NavLink} to={'/list/' + text}>
-            <ListItemText primary={text} />
+        {props.entities.map((e) => (
+          <ListItem button key={e.name} component={NavLink} to={'/list/' + e.entityListName}>
+            <ListItemText primary={e.name} />
           </ListItem>
         ))}
       </List>
@@ -86,6 +87,10 @@ const SideMenu = () => {
       </List>
     </Drawer>
   );
+};
+
+SideMenu.propTypes = {
+  entities: PropTypes.array
 };
 
 export default SideMenu;

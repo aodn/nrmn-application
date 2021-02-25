@@ -4,7 +4,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {useEffect} from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
-import pluralize from 'pluralize';
 import {Typography} from '@material-ui/core';
 import {selectedItemsRequested, setNestedField} from '../middleware/entities';
 import {markupProjectionQuery} from '../../utils/helpers';
@@ -15,7 +14,7 @@ const NestedApiField = (props) => {
   const dispatch = useDispatch();
 
   const entity = props.name;
-  const pluralEntity = pluralize(entity);
+  const pluralEntity = entity;
 
   let itemsList = editItemValues[pluralEntity] ? editItemValues[pluralEntity][pluralEntity] : [];
   let selectedItems = editItemValues[entity + 'Selected'] ? [editItemValues[entity + 'Selected']].filter(Boolean) : [];

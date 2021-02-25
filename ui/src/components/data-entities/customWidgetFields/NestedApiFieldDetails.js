@@ -2,7 +2,6 @@ import React from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 import {useEffect} from 'react';
-import pluralize from 'pluralize';
 import {selectedItemsRequested} from '../middleware/entities';
 import {markupProjectionQuery} from '../../utils/helpers';
 import Grid from '@material-ui/core/Grid';
@@ -13,13 +12,12 @@ const NestedApiFieldDetails = (props) => {
   const dispatch = useDispatch();
 
   const entity = props.name;
-  const pluralEntity = pluralize(entity);
 
   let selectedItems = editItemValues[entity + 'Selected'] ? [editItemValues[entity + 'Selected']].filter(Boolean) : [];
 
   useEffect(() => {
     if (selectedItems.length === 0 && editItemValues._links) {
-      let urls = [markupProjectionQuery(pluralEntity)];
+      let urls = [markupProjectionQuery(entity)];
       urls.push(markupProjectionQuery(editItemValues._links[entity].href));
       dispatch(selectedItemsRequested(urls));
     }

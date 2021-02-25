@@ -1,20 +1,17 @@
 import React from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
-import {Link} from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 import {useEffect} from 'react';
-import {useParams} from 'react-router-dom';
 import NestedApiFieldDetails from './customWidgetFields/NestedApiFieldDetails';
-import pluralize from 'pluralize';
 import config from 'react-global-configuration';
-import {Box} from '@material-ui/core';
-import Alert from '@material-ui/lab/Alert';
 import Grid from '@material-ui/core/Grid';
 import {itemRequested} from './middleware/entities';
 import Button from '@material-ui/core/Button';
 import {makeStyles} from '@material-ui/core/styles';
 import BaseForm from '../BaseForm';
 import ObjectListViewTemplate from './ObjectListViewTemplate';
+import {PropTypes} from 'prop-types';
 import LinkButton from './LinkButton';
 import _ from 'lodash';
 
@@ -26,56 +23,21 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const renderError = (msgArray) => {
-  return msgArray.length > 0 ? (
-    <>
-      <Box>
-        <Alert severity="error" variant="filled">
-          {msgArray}
-        </Alert>
-      </Box>
-    </>
-  ) : (
-    <></>
-  );
-};
-
-const GenericDetailsView = () => {
-  const nonGenericEntities = {
-    stagedJobs: {
-      linkLabel: 'Edit Job  ',
-      linkPath: '/validation/{}'
-    }
-  };
-
+const GenericDetailsView = (props) => {
+  const {id} = useParams();
+  const dispatch = useDispatch();
   const classes = useStyles();
-
-  const {entityName, id} = useParams();
-  const schemaDefinition = config.get('api') || {};
 
   const editItem = useSelector((state) => state.form.editItem);
 
-  const dispatch = useDispatch();
-  const singular = pluralize.singular(entityName);
-  const entityTitle = singular.charAt(0).toUpperCase() + singular.slice(1);
+  const schemaDefinition = config.get('api') || {};
 
   useEffect(() => {
-    if (id !== undefined) {
-      // Todo: make this request the specific list view api
-      dispatch(itemRequested(entityName + '/' + id));
-    }
+    dispatch(itemRequested(props.entity.entityListName + '/' + id));
   }, []);
 
-  if (Object.keys(schemaDefinition).length === 0) {
-    return renderError('ERROR: API Schema not found');
-  }
-  if (typeof schemaDefinition[entityTitle] == 'undefined') {
-    return renderError("ERROR: Entity '" + entityTitle + "' missing from API Schema");
-  }
-
-  const entityDef = schemaDefinition[entityTitle];
-
-  let fullTitle = 'Details for ' + entityTitle;
+  const entityDef = schemaDefinition[props.entity.entityName];
+  let fullTitle = 'Details for ' + props.entity.entityName;
   const entitySchema = {title: fullTitle, ...entityDef};
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
   const uiSchema = {
@@ -96,7 +58,7 @@ const GenericDetailsView = () => {
     const value = elem.formData?.toString();
     return (
       <span>
-        <b>{elem.name}: </b> {value ? value : ' -- '}
+        <b>{elem.schema.title}: </b> {value ? value : ' -- '}
       </span>
     );
   };
@@ -140,15 +102,8 @@ const GenericDetailsView = () => {
   };
 
   const submitButton = () => {
-    const linkPath = nonGenericEntities[entityName]?.linkPath;
-    let linkLabel = `Edit ` + entityTitle;
-    let link = '/';
-    if (entityName in nonGenericEntities && linkPath) {
-      link = '/' + linkPath.replace(/{(.*?)}/, id);
-      linkLabel = nonGenericEntities[entityName]?.linkLabel ? nonGenericEntities[entityName]?.linkLabel : linkLabel;
-    } else {
-      link = '/edit/' + entityName + '/' + id;
-    }
+    let linkLabel = `Edit ` + props.entity.entityName;
+    let link = '/edit/' + props.entity.entityListName + '/' + id;
     return (
       <div className={classes.buttons}>
         <Button type={'submit'} component={Link} to={link} color="secondary" aria-label={linkLabel} variant={'contained'}>
@@ -166,12 +121,16 @@ const GenericDetailsView = () => {
     <Grid container direction="row" justify="center" alignItems="center">
       <Grid item>
         <Grid container alignItems="flex-end" justify="space-around" direction="column">
-          <LinkButton to={'/list/' + entityTitle} title={'List ' + entityName} size={'small'} />
+          <LinkButton to={'/list/' + props.entity.entityListName} title={'List ' + props.entity.name} size={'small'} />
           <Grid item>{formContent()}</Grid>
         </Grid>
       </Grid>
     </Grid>
   );
+};
+
+GenericDetailsView.propTypes = {
+  entity: PropTypes.object
 };
 
 export default GenericDetailsView;

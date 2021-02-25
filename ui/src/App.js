@@ -42,6 +42,37 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+const entityDefinitions = [
+  {
+    name: 'Locations',
+    entityName: 'Location',
+    entityListName: 'locations',
+    createButtonPath: '/edit/locations',
+    entityLinkPath: 'view/location/{}'
+  },
+  {
+    name: 'Divers',
+    entityName: 'Diver',
+    entityListName: 'divers',
+    createButtonPath: '/edit/divers',
+    entityLinkPath: 'view/diver/{}'
+  },
+  {
+    name: 'Sites',
+    entityName: 'Site',
+    entityListName: 'sites',
+    createButtonPath: '/edit/sites',
+    entityLinkPath: 'view/sites/{}'
+  },
+  {
+    name: 'Observable Items',
+    entityName: 'ObservableItem',
+    entityListName: 'observableItems',
+    createButtonPath: '/edit/observableItems',
+    entityLinkPath: 'view/observableItems/{}'
+  }
+];
+
 const App = () => {
   const classes = useStyles();
   const leftSideMenuIsOpen = useSelector((state) => state.toggle.leftSideMenuIsOpen);
@@ -75,14 +106,13 @@ const App = () => {
     }
   });
   theme = responsiveFontSizes(theme);
-
   return (
     <div className={classes.root}>
       <ThemeProvider theme={theme}>
         <Router>
           <CssBaseline />
           <TopBar></TopBar>
-          <SideMenu></SideMenu>
+          <SideMenu entities={entityDefinitions}></SideMenu>
           <main
             className={clsx(classes.mainContent, {
               [classes.contentShift]: leftSideMenuIsOpen
@@ -92,14 +122,19 @@ const App = () => {
               <Route exact path="/home" component={Homepage} />
               <Route exact path="/jobs" component={JobList} />
               <Route exact path="/jobs/:id/view" component={JobView} />
-
               <Route exact path="/validation/:jobId" component={ValidationPage} />
               <Route exact path="/upload" component={XlxsUpload} />
               <Route exact path="/login" component={Login} />
               <Redirect exact from="/list/stagedJob" to="/jobs" />
-              <Route exact path="/edit/:entityName/:id?" component={GenericForm} />
-              <Route exact path="/view/:entityName/:id?" component={GenericDetailsView} />
-              <Route exact path="/list/:entityName" component={EntityList} />
+              {entityDefinitions.map((e, i) => (
+                <Route exact key={`E${i}`} path={`/edit/${e.name}/:id?`} render={() => <GenericForm entity={e} />} />
+              ))}
+              {entityDefinitions.map((e, i) => (
+                <Route exact key={`V${i}`} path={`/view/${e.name}/:id?`} render={() => <GenericDetailsView entity={e} />} />
+              ))}
+              {entityDefinitions.map((e, i) => (
+                <Route exact key={`L${i}`} path={`/list/${e.name}`} render={() => <EntityList entity={e} />} />
+              ))}
               <Route path="/404" component={FourOFour}></Route>
               <Redirect exact from="/" to="/home" />
               <Route path="*" component={FourOFour}></Route>
