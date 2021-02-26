@@ -54,3 +54,7 @@ header a:hover {
 .MuiDialog-paper {
     z-index: 201 !important;;
 }
+
+.ag-react-container {
+    width: 100%;
+}
