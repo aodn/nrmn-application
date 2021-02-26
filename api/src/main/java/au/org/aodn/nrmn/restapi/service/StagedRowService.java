@@ -28,4 +28,15 @@ public class StagedRowService {
                 Validated.invalid(new ErrorInput("Couldn't find job: " + jobId, "job")));
 
     }
+
+    public Validated<ErrorInput, Integer> delete(Long jobId, List<StagedRow> toDeleteRows) {
+        return jobRepo.findById(jobId).map(job -> {
+            toDeleteRows.forEach(row -> row.setStagedJob(job));
+            rowRepo.deleteAll(toDeleteRows);
+            return Validated.<ErrorInput, Integer>valid(toDeleteRows.size());
+        }).orElseGet(() ->
+                Validated.invalid(new ErrorInput("Couldn't find job: " + jobId, "job")));
+
+
+    }
 }
