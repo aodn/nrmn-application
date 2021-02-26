@@ -6,6 +6,7 @@ const importState = {
   isLoading: false,
   validationLoading: false,
   editLoading: false,
+  deleteLoading: false,
   ingestLoading: false,
   submitReady: false,
   ingestSuccess: false,
@@ -137,6 +138,12 @@ const importSlice = createSlice({
         draft.EnableSubmit = false;
       });
     },
+    RowDeleteRequested: (state) => {
+      state.deleteLoading = true;
+    },
+    RowDeleteFinished: (state) => {
+      state.deleteLoading = false;
+    },
     RowUpdateRequested: (state) => {
       state.editLoading = true;
     },
@@ -191,6 +198,8 @@ export const {
   ingestFinished,
   EnableSubmit,
   RowUpdateRequested,
+  RowDeleteRequested,
+  RowDeleteFinished,
   ResetRowIndex,
   ValidationRequested,
   SubmitingestRequested,

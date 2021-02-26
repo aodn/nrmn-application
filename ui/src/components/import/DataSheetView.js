@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {AgGridReact} from 'ag-grid-react';
 import {AllModules} from 'ag-grid-enterprise';
 import {useEffect} from 'react';
-import {JobFinished, AddRowIndex} from './reducers/create-import';
+import {JobFinished, AddRowIndex, RowDeleteRequested} from './reducers/create-import';
 import {ColumnDef, ExtendedSize} from './ColumnDef';
 import {Box} from '@material-ui/core';
 import useWindowSize from '../utils/useWindowSize';
@@ -52,6 +52,7 @@ const DataSheetView = () => {
         name: 'Delete selected Row(s)',
         action: () => {
           const selectedRows = params.api.getSelectedRows();
+          dispatch(RowDeleteRequested({id: job.id, rows: selectedRows}));
           params.api.applyTransaction({remove: selectedRows});
         },
         cssClasses: ['redBoldFont']

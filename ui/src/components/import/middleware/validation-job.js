@@ -8,15 +8,18 @@ import {
   ValidationRequested,
   EditRowFinished,
   SubmitingestRequested,
-  ingestFinished
+  ingestFinished,
+  RowDeleteRequested
 } from '../reducers/create-import';
-import {updateRow, getDataJob, postJobValidation, submitingest} from '../../../axios/api';
+import {updateRow, getDataJob, postJobValidation, submitingest, deleteRow} from '../../../axios/api';
 
 export default function* Watcher() {
   yield takeEvery(JobRequested, loadJob);
   yield takeEvery(ValidationRequested, validateJob);
   yield takeEvery(RowUpdateRequested, update);
   yield takeEvery(SubmitingestRequested, submit);
+  yield takeEvery(RowDeleteRequested, deleteRows);
+
 }
 
 function* loadJob(action) {
@@ -53,5 +56,14 @@ function* submit(action) {
     yield put(ingestFinished(payload.data));
   } catch (error) {
     yield put(jobFailed(error));
+  }
+}
+
+function* deleteRows(action) {
+  try {
+    yield call(deleteRow, action.payload.id, action.payload.rows);
+    yield put(EditRowFinished());
+  } catch (e) {
+    yield put(jobFailed(e));
   }
 }
