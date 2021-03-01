@@ -28,4 +28,7 @@ public interface StagedRowRepository extends JpaRepository<StagedRow, Long>, Jpa
 
     @Query("SELECT CONCAT(CONCAT(r.siteCode, r.date),r.depth) as id, r.method as method FROM StagedRow r  WHERE  r.stagedJob.id = :id GROUP BY r.siteCode, r.date, r.depth, r.method ")
     List<RowMethodBlock> getMethodsPerSurvey(@Param("id") Long  id);
+
+    @Query("delete from StagedRow r where r.id in (:ids)")
+    void deleteAllByIds(@Param("ids") List<Long> ids);
 }

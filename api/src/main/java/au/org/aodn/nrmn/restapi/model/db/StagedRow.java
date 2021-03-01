@@ -111,8 +111,9 @@ public class StagedRow implements Serializable {
     @Type(type = "jsonb")
     private Map<Integer, String> measureJson;
 
+
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.DETACH)
+    @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "staged_row_staged_job_id_fkey"))
     @ToString.Exclude
     private StagedJob stagedJob;

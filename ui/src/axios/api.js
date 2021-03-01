@@ -152,7 +152,8 @@ export const updateRow = (jobId, rows) => {
   return axiosInstance.put('/api/stage/updates/' + jobId, rows).then((res) => res);
 };
 export const deleteRow = (jobId, rows) => {
-  return axiosInstance.delete('/api/stage/delete/' + jobId, rows).then((res) => res);
+  console.log(rows);
+  return axiosInstance.put('/api/stage/delete/rows/' + jobId, rows).then((res) => res);
 };
 
 export const submitJobFile = (params) => {
