@@ -152,7 +152,6 @@ export const updateRow = (jobId, rows) => {
   return axiosInstance.put('/api/stage/updates/' + jobId, rows).then((res) => res);
 };
 export const deleteRow = (jobId, rows) => {
-  console.log(rows);
   return axiosInstance.put('/api/stage/delete/rows/' + jobId, rows).then((res) => res);
 };
 
