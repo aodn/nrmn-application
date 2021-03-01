@@ -34,7 +34,7 @@ public class BeforeSaveSiteValidator implements Validator {
 
         if (existingSiteWithCodeAndName.isPresent()
                 && !site.getSiteId().equals(existingSiteWithCodeAndName.get().getSiteId())) {
-            errors.rejectValue("siteName", "site.exists", "a site with that code and name already exists");
+            errors.rejectValue("siteName", "site.exists", "A site with that code and name already exists.");
         }
     }
 }

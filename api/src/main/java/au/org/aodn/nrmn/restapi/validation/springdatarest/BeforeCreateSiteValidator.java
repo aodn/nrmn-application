@@ -32,7 +32,7 @@ public class BeforeCreateSiteValidator implements Validator {
 
         if (siteRepository.exists(siteWithCodeAndNameExample)) {
             errors.rejectValue("siteName", "site.exists",
-                    "a site with that code and name already exists");
+                    "A site with that code and name already exists.");
         }
     }
 }
