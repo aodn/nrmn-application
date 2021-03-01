@@ -60,7 +60,7 @@ const ValidationJob = () => {
 
   useEffect(() => {
     if (jobId) {
-      dispatch(JobRequested(jobId));
+     dispatch(JobRequested(jobId));
     }
     return function clean() {
       dispatch(ResetState());

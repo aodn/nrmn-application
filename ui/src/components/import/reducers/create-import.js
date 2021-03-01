@@ -144,9 +144,6 @@ const importSlice = createSlice({
       state.editLoading = false;
       state.indexChanged = {};
     },
-    JobStarting: (state) => {
-      state.isLoading = true;
-    },
     JobRequested: (state) => {
       state.isLoading = true;
     },
@@ -181,10 +178,8 @@ export const importReducer = importSlice.reducer;
 export const {
   ResetState,
   jobFailed,
-  JobStarting,
   validationFilter,
   validationReady,
-  EditRowStarting,
   EditRowFinished,
   JobFinished,
   JobReady,

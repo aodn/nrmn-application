@@ -3,11 +3,12 @@ import {useDispatch, useSelector} from 'react-redux';
 import {AgGridReact} from 'ag-grid-react';
 import {AllModules} from 'ag-grid-enterprise';
 import {useEffect} from 'react';
-import {JobFinished, AddRowIndex} from './reducers/create-import';
+import {exportRow, JobFinished} from './reducers/create-import';
 import {ColumnDef, ExtendedSize} from './ColumnDef';
 import {Box} from '@material-ui/core';
 import useWindowSize from '../utils/useWindowSize';
 import {ChangeDetectionStrategyType} from 'ag-grid-react/lib/changeDetectionService';
+import {getDataJob} from '../../axios/api';
 
 Object.unfreeze = function (o) {
   var oo = undefined;
@@ -30,11 +31,12 @@ Object.unfreeze = function (o) {
 
 const DataSheetView = () => {
   const dispatch = useDispatch();
-  const rows = useSelector((state) => state.import.rows);
+  const [rows, setRows] = useState([]);
   const errSelected = useSelector((state) => state.import.errSelected);
   const [gridApi, setGridApi] = useState(null);
   const job = useSelector((state) => state.import.job);
   const colDefinition = job && job.isExtendedSize ? ColumnDef.concat(ExtendedSize) : ColumnDef;
+
   const agGridReady = (params) => {
     setGridApi(params.api);
     dispatch(JobFinished());
@@ -77,6 +79,10 @@ const DataSheetView = () => {
     }
   };
 
+  const onCellChanged = ((evt) => {
+      console.log(evt);
+  });
+
   useEffect(() => {
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
       const instance = gridApi.getFilterInstance('id');
@@ -89,11 +95,21 @@ const DataSheetView = () => {
     }
   });
 
-  const size = useWindowSize();
+  useEffect(() => {
+    if (job?.id) {
+      getDataJob(job.id).then((res) =>{
+        if (res.data.rows && res.data.rows.length > 0) {
+          const rowsTmp = res.data.rows.map((row) => exportRow(row));
+          setRows([...rows, ...rowsTmp]);
+        }
+      });
+    }},[]);
 
+  const size = useWindowSize();
+  console.log(rows);
   return (
     <Box>
-      {rows && (
+      {rows && rows.length > 0 && (
         <div
           onKeyDown={onKeyDown}
           id="validation-grid"
@@ -101,7 +117,6 @@ const DataSheetView = () => {
           className={'ag-theme-material'}
         >
           <AgGridReact
-            immutable
             getRowNodeId={(data) => data.id}
             rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.IdentityCheck}
             pivotMode={false}
@@ -114,6 +129,7 @@ const DataSheetView = () => {
                 innerRenderer: 'nameCellRenderer'
               }
             }}
+            onCellValueChanged={onCellChanged}
             columnDefs={colDefinition}
             groupDefaultExpanded={4}
             rowHeight={18}
@@ -131,10 +147,6 @@ const DataSheetView = () => {
               filter: true,
               sortable: true,
               resizable: true,
-              valueSetter: (params) => {
-                dispatch(AddRowIndex({id: params.node.childIndex, field: params.colDef.field, value: params.newValue}));
-                return false;
-              }
             }}
             onGridReady={agGridReady}
             modules={AllModules}
