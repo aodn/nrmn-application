@@ -141,7 +141,11 @@ const importSlice = createSlice({
     RowDeleteRequested: (state) => {
       state.deleteLoading = true;
     },
-    RowDeleteFinished: (state) => {
+    RowDeleteFinished: (state, action) => {
+      action.payload.forEach(i =>  {
+        delete state.rows[i];
+      });
+      // TODOstate.rows = state.rows.splice(action.payload[0], action.payload.indexes.length);
       state.deleteLoading = false;
     },
     RowUpdateRequested: (state) => {
@@ -177,6 +181,7 @@ const importSlice = createSlice({
       state.success = false;
       state.isLoading = false;
       state.validationLoading = false;
+      state.deleteLoading = false;
       if (action.payload) {
         state.errors = action.payload;
       }

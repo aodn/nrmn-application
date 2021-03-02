@@ -9,7 +9,8 @@ import {
   EditRowFinished,
   SubmitingestRequested,
   ingestFinished,
-  RowDeleteRequested
+  RowDeleteRequested,
+  RowDeleteFinished
 } from '../reducers/create-import';
 import {updateRow, getDataJob, postJobValidation, submitingest, deleteRow} from '../../../axios/api';
 
@@ -62,8 +63,8 @@ function* submit(action) {
 function* deleteRows(action) {
   try {
     yield call(deleteRow, action.payload.id, action.payload.rows);
-    yield put(EditRowFinished());
+    yield put(RowDeleteFinished(action.payload.indexes));
   } catch (e) {
-    yield put(jobFailed(e));
+    yield put(jobFailed(e.message));
   }
 }

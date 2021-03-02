@@ -52,7 +52,8 @@ const DataSheetView = () => {
         name: 'Delete selected Row(s)',
         action: () => {
           const selectedRows = params.api.getSelectedRows();
-          dispatch(RowDeleteRequested({id: job.id, rows: selectedRows}));
+          const indexes  = params.api.getSelectedNodes().map(n => n.childIndex);
+          dispatch(RowDeleteRequested({id: job.id, rows: selectedRows, indexes: indexes}));
           params.api.applyTransaction({remove: selectedRows});
         },
         cssClasses: ['redBoldFont']
@@ -94,7 +95,7 @@ const DataSheetView = () => {
 
   return (
     <Box>
-      {rows && (
+      {rows && rows.length && (
         <div
           onKeyDown={onKeyDown}
           id="validation-grid"

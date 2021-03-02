@@ -32,6 +32,7 @@ public class StagedRowService {
 
     public Validated<ErrorInput, Integer> delete( List<StagedRow> toDeleteRows) {
         rowRepo.deleteAll(toDeleteRows);
+        rowRepo.flush();
         return Validated.<ErrorInput, Integer>valid(toDeleteRows.size());
     }
 }
