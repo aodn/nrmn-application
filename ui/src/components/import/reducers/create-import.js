@@ -121,7 +121,6 @@ const importSlice = createSlice({
               errors: err
             };
           });
-
           const validationErrors = mergeErrors(action.payload.errors);
           draft.EnableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
           draft.errorsByMsg = action.payload.summaries.sort((sum1, sum2) => sum2.count - sum1.count);
@@ -145,7 +144,6 @@ const importSlice = createSlice({
       action.payload.forEach(i =>  {
         delete state.rows[i];
       });
-      // TODOstate.rows = state.rows.splice(action.payload[0], action.payload.indexes.length);
       state.deleteLoading = false;
     },
     RowUpdateRequested: (state) => {
