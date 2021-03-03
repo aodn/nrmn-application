@@ -21,11 +21,23 @@ class DateFormatTest {
     }
 
     @Test
-    void quarterPastTenShouldBeOk() {
+    void longDateFormatShouldBeOk() {
         val job = new StagedJob();
         job.setId(1L);
         val stage = new StagedRow();
         stage.setDate("11/09/2018");
+        stage.setStagedJob(job);
+        val res = new DateFormatValidation().valid(stage);
+        assertTrue(res.isValid());
+
+    }
+
+    @Test
+    void shortDateFormatShouldBeOk() {
+        val job = new StagedJob();
+        job.setId(1L);
+        val stage = new StagedRow();
+        stage.setDate("11/9/18");
         stage.setStagedJob(job);
         val res = new DateFormatValidation().valid(stage);
         assertTrue(res.isValid());
