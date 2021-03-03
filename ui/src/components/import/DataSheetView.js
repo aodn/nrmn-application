@@ -120,7 +120,6 @@ const DataSheetView = () => {
   const onKeyDown = (evt) => {
     if (gridApi && evt.key == 'x' && (evt.ctrlKey || evt.metaKey)) {
       const [cells] = gridApi.getCellRanges();
-      console.log(cells);
       gridApi.copySelectedRangeToClipboard();
       const rows = getAllRows();
       const fields = cells.columns.map((col) => col.colId);
