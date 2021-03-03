@@ -23,12 +23,7 @@ import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 
 @RepositoryRestResource
 @Tag(name = "aphia refs")
-public interface AphiaRefRepository extends JpaRepository<AphiaRef, Integer>, JpaSpecificationExecutor<AphiaRef>, EntityCriteria<AphiaRef> {
-
-    @Override
-    @Query("SELECT a from AphiaRef  a WHERE a.validName = :name")
-    @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
-    List<AphiaRef> findByCriteria(@Param("name") String name);
+public interface AphiaRefRepository extends JpaRepository<AphiaRef, Integer>, JpaSpecificationExecutor<AphiaRef> {
 
     @Override
     @RestResource
