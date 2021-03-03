@@ -4,7 +4,6 @@ import {AgGridReact} from 'ag-grid-react';
 import {AllModules} from 'ag-grid-enterprise';
 import {useEffect} from 'react';
 import {
-  AddRowIndex,
   exportRow,
   JobFinished,
   RowUpdateRequested,
@@ -15,7 +14,6 @@ import {
 import {ColumnDef, ExtendedSize} from './ColumnDef';
 import {Box, ButtonGroup, Fab, makeStyles} from '@material-ui/core';
 import useWindowSize from '../utils/useWindowSize';
-import {ChangeDetectionStrategyType} from 'ag-grid-react/lib/changeDetectionService';
 import {getDataJob} from '../../axios/api';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import PlaylistAddCheckOutlinedIcon from '@material-ui/icons/PlaylistAddCheckOutlined';
@@ -68,8 +66,8 @@ const DataSheetView = () => {
   const job = useSelector((state) => state.import.job);
   const colDefinition = job && job.isExtendedSize ? ColumnDef.concat(ExtendedSize) : ColumnDef;
   const enableSubmit = useSelector((state) => state.import.enableSubmit);
-  const indexMap = useSelector((state) => state.import.indexChanged);
-  const enableSaved = Object.keys(indexMap || {}).length > 0;
+  const [indexMap, setIndexMap] =  useState({});
+  const [canSaved, setCanSaved] = useState(true);
   const validationErrors = useSelector((state) => state.import.validationErrors);
 
   const handleValidate = () => {
@@ -86,6 +84,8 @@ const DataSheetView = () => {
 
   const handleSave = () => {
     dispatch(RowUpdateRequested({jobId: job.id, rows: indexMap}));
+    setCanSaved(false);
+
   };
 
   const agGridReady = (params) => {
@@ -93,7 +93,7 @@ const DataSheetView = () => {
     getDataJob(job.id).then((res) => {
       if (res.data.rows && res.data.rows.length > 0) {
         const rowsTmp = res.data.rows.map((row) => exportRow(row));
-        params.api.setRowData(rowsTmp);
+        params.api.setRowData([...rowsTmp]);
         var allColumnIds = [];
         params.columnApi.getAllColumns().forEach(function (column) {
           allColumnIds.push(column.colId);
@@ -119,20 +119,29 @@ const DataSheetView = () => {
 
   const onKeyDown = (evt) => {
     if (gridApi && evt.key == 'x' && (evt.ctrlKey || evt.metaKey)) {
-     // const cells = gridApi.getCellRanges();
+      const [cells] = gridApi.getCellRanges();
+      console.log(cells);
       gridApi.copySelectedRangeToClipboard();
-     // const fields = cells[0].columns.map((col) => col.colId);
-      // for (let i = cells[0].startRow.rowIndex; i <= cells[0].endRow.rowIndex; i++) {
-        // const row = gridApi.getRowNode(rows[i].id);
-        // fields.forEach((field) => {
-        //   row.setDataValue(field, '');
-        // });
-     // }
+      const rows = getAllRows();
+      const fields = cells.columns.map((col) => col.colId);
+       for (let i = cells.startRow.rowIndex; i <= cells.endRow.rowIndex; i++) {
+         const row = rows[i];
+         fields.forEach((field) => {
+           row[field] = '';
+         });
+         let toAdd ={};
+         toAdd[i] = row;
+         gridApi.applyTransaction({update: [row]});
+         setIndexMap({...indexMap, ...toAdd});
+     }
     }
   };
 
   const onCellChanged = (evt) => {
-    dispatch(AddRowIndex({id: evt.rowIndex, row: evt.data}));
+    let toAdd = {};
+    toAdd[evt.rowIndex] = evt.data;
+    setIndexMap({...indexMap, ...toAdd});
+    setCanSaved(true);
   };
   const getAllRows = () => {
     let rowData = [];
@@ -164,7 +173,7 @@ const DataSheetView = () => {
   return (
     <Box mt={2}>
       <ButtonGroup disableElevation spacing={2} size="small" variant="text" aria-label="small outlined button group">
-        <Fab className={classes.fab} onClick={handleSave} disabled={!enableSaved} variant="extended" size="small" color="primary">
+        <Fab className={classes.fab} onClick={handleSave} disabled={!canSaved} variant="extended" size="small" color="primary">
           <SaveOutlinedIcon className={classes.extendedIcon} />
           Save
         </Fab>
@@ -193,7 +202,6 @@ const DataSheetView = () => {
         >
           <AgGridReact
             getRowNodeId={(data) => data.id}
-            rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.IdentityCheck}
             pivotMode={false}
             pivotColumnGroupTotals={'before'}
             sideBar={true}
