@@ -211,7 +211,8 @@ const ValidationDrawer = () => {
         {errList.map((err, i) => (
           <ListItem
             onClick={() => handleFilter(err)}
-            className={err.message === errSelected.msg ? classes.selected : classes.errorItem}
+            selected={err.message === errSelected.message}
+            className={err.message === errSelected.message ? classes.selected : classes.errorItem}
             button
             key={i}
           >
