@@ -83,15 +83,11 @@ public class SurveyIngestionService {
         SurveyMethod surveyMethod = surveyMethodRepository.save(getSurveyMethod(stagedRow));
         Diver diver = stagedRow.getDiver();
         Map<Integer, Integer> measures = stagedRow.getMeasureJson();
-        ObservableItem observableItem = observableItemRepository.findOne(
-                Example.of(ObservableItem.builder()
-                        .aphiaRef(stagedRow.getSpecies())
-                        .build())).get();
 
         Observation.ObservationBuilder baseObservationBuilder = Observation.builder()
                 .diver(diver)
                 .surveyMethod(surveyMethod)
-                .observableItem(observableItem);
+                .observableItem(stagedRow.getSpecies());
 
 
         List<Observation> observations = measures.entrySet().stream().map(m -> {

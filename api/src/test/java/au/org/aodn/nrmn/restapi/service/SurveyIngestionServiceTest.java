@@ -59,7 +59,7 @@ public class SurveyIngestionServiceTest {
                 .method(2)
                 .diver(diver)
                 .buddy(Diver.builder().initials("MAX").build())
-                .species(AphiaRef.builder().scientificName("THE SPECIES").build())
+                .species(ObservableItem.builder().observableItemName("THE SPECIES").build())
                 .site(Site.builder().siteCode("A SITE").build())
                 .depth(1)
                 .surveyNum(2)
@@ -143,7 +143,6 @@ public class SurveyIngestionServiceTest {
         ObservableItem observableItem = ObservableItem.builder()
             .observableItemName("The Species")
             .build();
-        when(observableItemRepository.findOne(any(Example.class))).thenReturn(Optional.of(observableItem));
 
         StagedRowFormatted row = rowBuilder.build();
         StagedRowFormatted rowFromSameSurvey = rowBuilder
@@ -169,7 +168,6 @@ public class SurveyIngestionServiceTest {
         ObservableItem observableItem = ObservableItem.builder()
                 .observableItemName("The Species")
                 .build();
-        when(observableItemRepository.findOne(any(Example.class))).thenReturn(Optional.of(observableItem));
 
         StagedRowFormatted row = rowBuilder.build();
         StagedRowFormatted rowWithDifferentDepth = rowBuilder
@@ -196,7 +194,6 @@ public class SurveyIngestionServiceTest {
         ObservableItem observableItem = ObservableItem.builder()
                 .observableItemName("The Species")
                 .build();
-        when(observableItemRepository.findOne(any(Example.class))).thenReturn(Optional.of(observableItem));
 
         StagedRowFormatted row = rowBuilder.build();
         StagedRowFormatted rowWithDifferentDate = rowBuilder
@@ -222,7 +219,6 @@ public class SurveyIngestionServiceTest {
         ObservableItem observableItem = ObservableItem.builder()
                 .observableItemName("The Species")
                 .build();
-        when(observableItemRepository.findOne(any(Example.class))).thenReturn(Optional.of(observableItem));
 
         StagedRowFormatted row = rowBuilder.build();
         StagedRowFormatted rowWithDifferentSite = rowBuilder

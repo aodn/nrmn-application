@@ -10,7 +10,7 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
 import au.org.aodn.nrmn.restapi.validation.provider.ATRCValidators;
 import au.org.aodn.nrmn.restapi.validation.provider.RLSValidators;
-import au.org.aodn.nrmn.restapi.validation.validators.entities.SpeciesExists;
+import au.org.aodn.nrmn.restapi.validation.validators.entities.ObservableItemExists;
 import au.org.aodn.nrmn.restapi.validation.validators.data.DirectionDataCheck;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.DiverExists;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.SiteCodeExists;
@@ -41,7 +41,7 @@ public class RawValidation extends ValidatorHelpers {
     SiteCodeExists siteCodeExists;
 
     @Autowired
-    SpeciesExists speciesExists;
+    ObservableItemExists observableItemExists;
 
     @Autowired
     RLSValidators rlsValidators;
@@ -77,7 +77,7 @@ public class RawValidation extends ValidatorHelpers {
                         Tuple2.of("Method", new IntegerFormatValidation(StagedRow::getMethod, "Method", Arrays.asList(0, 1, 2, 3, 4, 5, 7, 10))),
                         Tuple2.of("Block", new IntegerFormatValidation(StagedRow::getBlock, "Block", Arrays.asList(0, 1, 2, 10))),
                         Tuple2.of("Code", new PassThruString(StagedRow::getCode, "Code")),
-                        Tuple2.of("Species", speciesExists),
+                        Tuple2.of("Species", observableItemExists),
 
                         Tuple2.of("Vis", new IntegerFormatValidation(StagedRow::getVis, "Vis", Collections.emptyList())),
 
@@ -136,7 +136,7 @@ public class RawValidation extends ValidatorHelpers {
         val method = (Integer) values.get("Method").orElseGet(null);
         val block = (Integer) values.get("Block").orElseGet(null);
 
-        val species = (AphiaRef) values.get("Species").orElseGet(null);
+        val species = (ObservableItem) values.get("Species").orElseGet(null);
         val code = (String) values.get("Code").orElseGet(null);
 
         val vis = (Integer) values.get("Vis").orElseGet(null);

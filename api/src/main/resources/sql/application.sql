@@ -89,8 +89,6 @@ CREATE TABLE nrmn.observable_item_ref_aud (
     report_group_mod boolean,
     superseded_by varchar(255),
     superseded_by_mod boolean,
-    template_code varchar(255),
-    templatecode_mod boolean,
     aphia_id integer,
     aphia_ref_mod boolean,
     aphia_rel_type_id integer,

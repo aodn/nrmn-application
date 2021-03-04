@@ -16,9 +16,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest
 @ExtendWith(PostgresqlContainerExtension.class)
 @WithTestData
-class SpeciesExistsIT {
+class ObservableItemExistsIT {
     @Autowired
-    SpeciesExists speciesExists;
+    ObservableItemExists observableItemExists;
 
     @Test
     void notFoundSpeciesCodeShouldFail() {
@@ -27,7 +27,7 @@ class SpeciesExistsIT {
         val stage = new StagedRow();
         stage.setSpecies("Species 20");
         stage.setStagedJob(job);
-        val codeFound = speciesExists.valid(stage);
+        val codeFound = observableItemExists.valid(stage);
         Assertions.assertTrue(codeFound.isInvalid());
     }
 
@@ -38,7 +38,7 @@ class SpeciesExistsIT {
         val stage = new StagedRow();
         stage.setSpecies("Specie 56");
         stage.setStagedJob(job);
-        val codeFound = speciesExists.valid(stage);
+        val codeFound = observableItemExists.valid(stage);
         Assertions.assertTrue(codeFound.isValid());
     }
 }

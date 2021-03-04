@@ -5,7 +5,7 @@
     <parent>
         <artifactId>nrmn</artifactId>
         <groupId>au.org.aodn.nrmn</groupId>
-        <version>0.0.102</version>
+        <version>0.0.106</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>au.org.aodn.nrmn</groupId>
@@ -244,6 +244,12 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>30.0-jre</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.7.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
