@@ -159,6 +159,9 @@ const DataSheetView = () => {
     }
 
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
+      const firstRow = gridApi.getRowNode(errSelected.ids[0]);
+      gridApi.ensureIndexVisible(firstRow.rowIndex, 'middle');
+      firstRow.setSelected(false,true);
       errSelected.ids.forEach((id) => {
         const row = gridApi.getRowNode(id);
         if (row.isSelected) {
@@ -166,9 +169,6 @@ const DataSheetView = () => {
         }
         return row;
       });
-
-      const firstRow = gridApi.getRowNode(errSelected.ids[0]);
-      gridApi.ensureIndexVisible(firstRow.rowIndex, 'middle');
     }
   });
 
