@@ -132,7 +132,7 @@ const DataSheetView = () => {
         gridApi.applyTransaction({update: [row]});
         setIndexMap({...indexMap, ...toAdd});
       }
-      gridApi.refreshCells({force: true});
+     // gridApi.refreshCells({force: true});
     }
   };
 
@@ -153,8 +153,7 @@ const DataSheetView = () => {
       const updatedRows = getAllRows().map((row) => {
         return {...row, errors: validationErrors[row.id] || []};
       });
-      gridApi.applyTransaction({update: updatedRows});
-      gridApi.refreshCells({force: true});
+      gridApi.setRowData(updatedRows);
       dispatch(ValidationFinished());
     }
 
