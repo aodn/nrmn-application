@@ -133,6 +133,8 @@ const DataSheetView = () => {
          gridApi.applyTransaction({update: [row]});
          setIndexMap({...indexMap, ...toAdd});
      }
+     gridApi.refreshCells({force: true});
+
     }
   };
 
@@ -153,18 +155,18 @@ const DataSheetView = () => {
       const updatedRows = getAllRows().map((row) => {
         return {...row, errors: validationErrors[row.id] || []};
       });
-      gridApi.setRowData(updatedRows);
+      gridApi.applyTransaction({update: updatedRows});
+      gridApi.refreshCells({force: true});
       dispatch(ValidationFinished());
     }
 
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
-      const instance = gridApi.getFilterInstance('id');
-      instance.setModel({values: errSelected.ids.map((id) => id.toString())}).then(() => gridApi.onFilterChanged());
-    }
-
-    if (errSelected.ids === null) {
-      const instance = gridApi.getFilterInstance('id');
-      instance.setModel(null).then(() => gridApi.onFilterChanged());
+      errSelected.ids.forEach((id) => {
+        const row = gridApi.getRowNode(id);
+        row.setSelected(true);
+      });
+      const firstRow = gridApi.getRowNode(errSelected.ids[0]);
+      gridApi.ensureIndexVisible(firstRow.rowIndex, 'middle');
     }
   });
 
@@ -196,7 +198,7 @@ const DataSheetView = () => {
         <div
           onKeyDown={onKeyDown}
           id="validation-grid"
-          style={{height: size.height - 165, width: '100%', marginTop: 25}}
+          style={{height: size.height - 210, width: '100%', marginTop: 25}}
           className={'ag-theme-material'}
         >
           <AgGridReact
