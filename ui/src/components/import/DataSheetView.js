@@ -66,7 +66,7 @@ const DataSheetView = () => {
   const job = useSelector((state) => state.import.job);
   const colDefinition = job && job.isExtendedSize ? ColumnDef.concat(ExtendedSize) : ColumnDef;
   const enableSubmit = useSelector((state) => state.import.enableSubmit);
-  const [indexMap, setIndexMap] =  useState({});
+  const [indexMap, setIndexMap] = useState({});
   const [canSaved, setCanSaved] = useState(true);
   const validationErrors = useSelector((state) => state.import.validationErrors);
 
@@ -85,7 +85,6 @@ const DataSheetView = () => {
   const handleSave = () => {
     dispatch(RowUpdateRequested({jobId: job.id, rows: indexMap}));
     setCanSaved(false);
-
   };
 
   const agGridReady = (params) => {
@@ -123,18 +122,17 @@ const DataSheetView = () => {
       gridApi.copySelectedRangeToClipboard();
       const rows = getAllRows();
       const fields = cells.columns.map((col) => col.colId);
-       for (let i = cells.startRow.rowIndex; i <= cells.endRow.rowIndex; i++) {
-         const row = rows[i];
-         fields.forEach((field) => {
-           row[field] = '';
-         });
-         let toAdd ={};
-         toAdd[i] = row;
-         gridApi.applyTransaction({update: [row]});
-         setIndexMap({...indexMap, ...toAdd});
-     }
-     gridApi.refreshCells({force: true});
-
+      for (let i = cells.startRow.rowIndex; i <= cells.endRow.rowIndex; i++) {
+        const row = rows[i];
+        fields.forEach((field) => {
+          row[field] = '';
+        });
+        let toAdd = {};
+        toAdd[i] = row;
+        gridApi.applyTransaction({update: [row]});
+        setIndexMap({...indexMap, ...toAdd});
+      }
+      gridApi.refreshCells({force: true});
     }
   };
 
@@ -161,12 +159,18 @@ const DataSheetView = () => {
     }
 
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
-      errSelected.ids.forEach((id) => {
+      const rows = errSelected.ids.map((id) => {
         const row = gridApi.getRowNode(id);
         row.setSelected(true);
+        return row;
       });
+
       const firstRow = gridApi.getRowNode(errSelected.ids[0]);
       gridApi.ensureIndexVisible(firstRow.rowIndex, 'middle');
+
+      gridApi.flashCells({
+        rowNodes: rows
+      });
     }
   });
 
@@ -195,48 +199,48 @@ const DataSheetView = () => {
           Submit
         </Fab>
       </ButtonGroup>
-        <div
-          onKeyDown={onKeyDown}
-          id="validation-grid"
-          style={{height: size.height - 210, width: '100%', marginTop: 25}}
-          className={'ag-theme-material'}
-        >
-          <AgGridReact
-            getRowNodeId={(data) => data.id}
-            pivotMode={false}
-            pivotColumnGroupTotals={'before'}
-            sideBar={true}
-            autoGroupColumnDef={{
-              width: 20,
-              cellRendererParams: {
-                suppressCount: true,
-                innerRenderer: 'nameCellRenderer'
-              }
-            }}
-            onCellValueChanged={onCellChanged}
-            columnDefs={colDefinition}
-            groupDefaultExpanded={4}
-            rowHeight={18}
-            animateRows={true}
-            groupMultiAutoColumn={true}
-            groupHideOpenParents={true}
-            rowSelection="multiple"
-            enableRangeSelection={true}
-            undoRedoCellEditing={true}
-            undoRedoCellEditingLimit={20}
-            ensureDomOrder={true}
-            defaultColDef={{
-              minWidth: 80,
-              filter: true,
-              sortable: true,
-              resizable: true,
-              editable: true
-            }}
-            onGridReady={agGridReady}
-            modules={AllModules}
-            getContextMenuItems={getContextMenuItems}
-          ></AgGridReact>
-        </div>
+      <div
+        onKeyDown={onKeyDown}
+        id="validation-grid"
+        style={{height: size.height - 210, width: '100%', marginTop: 25}}
+        className={'ag-theme-material'}
+      >
+        <AgGridReact
+          getRowNodeId={(data) => data.id}
+          pivotMode={false}
+          pivotColumnGroupTotals={'before'}
+          sideBar={true}
+          autoGroupColumnDef={{
+            width: 20,
+            cellRendererParams: {
+              suppressCount: true,
+              innerRenderer: 'nameCellRenderer'
+            }
+          }}
+          onCellValueChanged={onCellChanged}
+          columnDefs={colDefinition}
+          groupDefaultExpanded={4}
+          rowHeight={18}
+          animateRows={true}
+          groupMultiAutoColumn={true}
+          groupHideOpenParents={true}
+          rowSelection="multiple"
+          enableRangeSelection={true}
+          undoRedoCellEditing={true}
+          undoRedoCellEditingLimit={20}
+          ensureDomOrder={true}
+          defaultColDef={{
+            minWidth: 80,
+            filter: true,
+            sortable: true,
+            resizable: true,
+            editable: true
+          }}
+          onGridReady={agGridReady}
+          modules={AllModules}
+          getContextMenuItems={getContextMenuItems}
+        ></AgGridReact>
+      </div>
     </Box>
   );
 };
