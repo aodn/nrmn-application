@@ -150,8 +150,8 @@ const ValidationDrawer = () => {
   };
 
   var errList = errorsByMsg;
-  if (errList && errList.length > 0 && filter !== '') {
-    errList = errList.filter((err) => err.msg.toLowerCase().indexOf(filter) >= 0);
+  if (errList && errorsByMsg.length > 0 && filter !== '') {
+    errList = errList.filter((err) => err.message.toLowerCase().indexOf(filter) >= 0);
   }
 
   return errorsByMsg && errorsByMsg.length > 0 ? (
@@ -209,12 +209,12 @@ const ValidationDrawer = () => {
         </Toolbar>
       </Box>
       <List>
-        {errList.map((err) => (
+        {errList.map((err, i) => (
           <ListItem
             onClick={() => handleFilter(err)}
             className={err.msg === errSelected.msg ? classes.selected : classes.errorItem}
             button
-            key={err.msg}
+            key={i}
           >
             <ListItemIcon>
               <Badge badgeContent={err.count} color="primary">
