@@ -8,7 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import ObjectListViewTemplate from '../ObjectListViewTemplate';
 
 const NestedApiFieldDetails = (props) => {
-  let editItemValues = useSelector((state) => state.form.editItem);
+  let editItemValues = useSelector((state) => state.form.formData);
   const dispatch = useDispatch();
 
   const entity = props.name;

@@ -1,5 +1,6 @@
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import {useHistory} from 'react-router-dom';
 import {AccountCircle, VerifiedUser} from '@material-ui/icons';
 import Logout from '../auth/logout';
 import {toggleLogoutMenuOpen} from './layout-reducer';
@@ -8,6 +9,7 @@ import {Button} from '@material-ui/core';
 const AuthState = () => {
   const userName = useSelector((state) => state.auth.username);
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const openLogout = () => dispatch(toggleLogoutMenuOpen());
 
@@ -19,7 +21,7 @@ const AuthState = () => {
         color="inherit"
         size="small"
         onClick={() => {
-          window.location = '/login';
+          history.push('/login');
         }}
         startIcon={<AccountCircle />}
       >

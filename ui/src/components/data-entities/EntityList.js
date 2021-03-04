@@ -1,20 +1,18 @@
-import React from 'react';
-import {Box, Typography} from '@material-ui/core';
+import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {useEffect} from 'react';
+import config from 'react-global-configuration';
+import {useHistory} from 'react-router';
+import {PropTypes} from 'prop-types';
+import {Box, Grid, IconButton, Typography} from '@material-ui/core';
+import EditIcon from '@material-ui/icons/Edit';
+import Alert from '@material-ui/lab/Alert';
 import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
 import useWindowSize from '../utils/useWindowSize';
-import Alert from '@material-ui/lab/Alert';
-import config from 'react-global-configuration';
-import Grid from '@material-ui/core/Grid';
 import CustomTooltip from './customTooltip';
 import CustomLoadingOverlay from './CustomLoadingOverlay';
 import {selectRequested} from './middleware/entities';
 import {resetState} from './form-reducer';
-import LinkCell from './customWidgetFields/LinkCell';
 import LinkButton from './LinkButton';
-import {useHistory} from 'react-router';
-import {PropTypes} from 'prop-types';
 
 const cellRenderer = (params) => {
   if (typeof params.value === 'object') {
@@ -31,7 +29,7 @@ const getCellFilter = (format) => {
   return filterTypes[format] ? filterTypes[format] : 'agTextColumnFilter';
 };
 
-const schematoColDef = (schema, entity) => {
+const schematoColDef = (schema) => {
   const fields = Object.keys(schema.properties);
   const coldefs = fields.map((field) => {
     let type = schema.properties[field] ? schema.properties[field]?.type : 'string';
@@ -46,21 +44,17 @@ const schematoColDef = (schema, entity) => {
   const widthUnit = 100;
 
   coldefs.push({
-    field: 'Links',
+    field: '',
     maxWidth: widthUnit,
     minWidth: widthUnit,
     filter: undefined,
-    cellRendererFramework: function (params) {
-      if (params.data._links) {
-        const hrefSplit = params.data._links.self.href.split('/');
-        const id = hrefSplit.pop();
-        const ent = hrefSplit.pop();
-
-        const link = '/edit/' + ent + '/' + id;
-        const linkLabel = entity.entityLinkLabel ?? 'Edit';
-
-        return <LinkCell label={linkLabel} link={link}></LinkCell>;
-      }
+    // eslint-disable-next-line react/display-name
+    cellRendererFramework: function () {
+      return (
+        <IconButton>
+          <EditIcon />
+        </IconButton>
+      );
     }
   });
   return coldefs;
@@ -79,12 +73,13 @@ const renderError = (msgArray) => {
   );
 };
 
-const gotoDetailsView = (event, history) => {
-  if (event.node.isSelected() && event.colDef.field !== 'Links' && event.node.data._links) {
-    const hrefSplit = event.node.data._links.self.href.split('/');
-    const id = hrefSplit.pop();
-    const ent = hrefSplit.pop();
-    history.push('/view/' + ent + '/' + id);
+const gotoEntity = (event, history, route) => {
+  const id = event.node.data._links.self.href.split('/').pop();
+  // HACK: the existence of a cellRendererFramework means it is an edit button
+  if (event.node.isSelected() && !event.colDef.cellRendererFramework) {
+    history.push(`${route}/${id}`);
+  } else if (event.colDef.cellRendererFramework) {
+    history.push(`${route}/${id}/edit`);
   }
 };
 
@@ -92,25 +87,16 @@ const EntityList = (props) => {
   const history = useHistory();
   const schemaDefinition = config.get('api');
   const size = useWindowSize();
-  const columnFit = useSelector((state) => state.theme.columnFit);
   const dispatch = useDispatch();
   const entities = useSelector((state) => state.form.entities);
   const errors = useSelector((state) => state.form.errors);
-  const items = entities?._embedded ? entities._embedded[props.entity.entityListName] : undefined;
+  const items = entities?._embedded ? entities._embedded[props.entity.list.name] : undefined;
 
   const agGridReady = (agGrid) => {
     agGridApi = Object.create(agGrid.api);
     agGridColumnApi = agGrid.columnApi;
     agGridApi.setRowData(items);
     Object.freeze(agGridApi);
-  };
-
-  const onGridSizeChanged = () => {
-    if (columnFit) {
-      autoSizeAll();
-    } else {
-      agGridApi.sizeColumnsToFit();
-    }
   };
 
   function autoSizeAll() {
@@ -125,38 +111,16 @@ const EntityList = (props) => {
     dispatch(resetState());
     if (agGridApi.setRowData) {
       agGridApi.setRowData([]);
-      onGridSizeChanged();
       agGridApi.showLoadingOverlay();
     }
-    const entityListName = props.entity.entityListName ?? props.entity.name;
-    dispatch(selectRequested(entityListName));
+    dispatch(selectRequested(props.entity.list.endpoint));
   }, [props.entity.name]); // reset when new or entityName prop changes
 
-  const additionalPageLinks = () => {
-    let links = props.entity.additionalPageLinks;
-    return links?.map((item) => {
-      return <LinkButton key={props.entity.entityName + item.label} title={item.label} label={item.label} to={item.link} />;
-    });
-  };
-
-  const newEntityButton = () => {
-    let createButtonPath = props.entity.createButtonPath;
-    const to = createButtonPath ? createButtonPath : '/edit/' + props.entity.name;
-    return (
-      <LinkButton
-        key={props.entity.entityName + to}
-        title={'New ' + props.entity.entityName}
-        label={'New ' + props.entity.entityName}
-        to={to}
-      />
-    );
-  };
-
-  const colDef = schematoColDef(schemaDefinition[props.entity.entityName], size, props.entity.name);
-  const agGridParentWidth = columnFit ? '100%' : '99%'; // triggers agGrid layout
+  const colDef = schematoColDef(schemaDefinition[props.entity.list.schemaKey], size, props.entity.name);
 
   if (items !== undefined && agGridApi.setRowData) {
     agGridApi.setRowData(items);
+    autoSizeAll();
   }
 
   return (
@@ -168,22 +132,20 @@ const EntityList = (props) => {
           </Grid>
           <Grid item>
             <Grid container spacing={2}>
-              {additionalPageLinks()}
-              {newEntityButton()}
+              <LinkButton key={props.entity.name} title={`New ${props.entity.name}`} to={props.entity.route.base} />
             </Grid>
           </Grid>
         </Grid>
 
-        <div style={{width: agGridParentWidth, height: size.height - 170, marginTop: 25}} className={'ag-theme-material'}>
+        <div style={{height: size.height - 150}} className={'ag-theme-material'}>
           <AgGridReact
             columnDefs={colDef}
             rowSelection="single"
             animateRows={true}
             onGridReady={agGridReady}
-            onFirstDataRendered={onGridSizeChanged}
-            onGridSizeChanged={onGridSizeChanged}
+            onFirstDataRendered={autoSizeAll}
             onCellClicked={(e) => {
-              gotoDetailsView(e, history);
+              gotoEntity(e, history, props.entity.route.base);
             }}
             frameworkComponents={{
               customTooltip: CustomTooltip,
@@ -202,7 +164,7 @@ const EntityList = (props) => {
             }}
           />
         </div>
-        {!colDef ? renderError(["Entity '" + props.entity.entityName + "' can not be found!"]) : ''}
+        {!colDef ? renderError(["Entity '" + props.entity.name + "' can not be found!"]) : ''}
         {errors.length > 0 ? renderError(errors) : ''}
       </Box>
     </>

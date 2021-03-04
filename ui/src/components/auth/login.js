@@ -29,7 +29,7 @@ const uiSchema = {
 
 var Login = () => {
   const dispatch = useDispatch();
-  const errors = useSelector((state) => state.auth.errors);
+  let errors = useSelector((state) => state.auth.errors);
   let loading = useSelector((state) => state.auth.loading);
   let success = useSelector((state) => state.auth.success);
   let redirect = useSelector((state) => state.auth.redirect);
@@ -42,19 +42,27 @@ var Login = () => {
     }
     dispatch(loginSubmitted(form.formData));
   };
+
   if (success) {
     return <Redirect component="link" to={redirect}></Redirect>;
   }
+
+  if (location && errors.length === 0) {
+    errors[0] = 'Please login to view this page';
+  }
+
   return (
-    <BaseForm
-      schema={schema}
-      uiSchema={uiSchema}
-      errors={errors}
-      loading={loading}
-      hideCancel={true}
-      onSubmit={handleLogin}
-      submitLabel="Login"
-    ></BaseForm>
+    <>
+      <BaseForm
+        schema={schema}
+        uiSchema={uiSchema}
+        errors={errors}
+        loading={loading}
+        hideCancel={true}
+        onSubmit={handleLogin}
+        submitLabel="Login"
+      ></BaseForm>
+    </>
   );
 };
 
