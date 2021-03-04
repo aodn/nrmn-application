@@ -9,7 +9,7 @@ import {
   RowUpdateRequested,
   SubmitingestRequested,
   ValidationRequested,
-  ValidationFinished
+  ValidationFinished,
 } from './reducers/create-import';
 import {ColumnDef, ExtendedSize} from './ColumnDef';
 import {Box, ButtonGroup, Fab, makeStyles} from '@material-ui/core';
@@ -159,9 +159,11 @@ const DataSheetView = () => {
     }
 
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
-       errSelected.ids.forEachorigin ((id) => {
+      errSelected.ids.forEach((id) => {
         const row = gridApi.getRowNode(id);
-        row.setSelected(true);
+        if (row.isSelected) {
+          row.setSelected(true);
+        }
         return row;
       });
 
