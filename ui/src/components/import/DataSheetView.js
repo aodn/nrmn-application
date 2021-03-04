@@ -159,8 +159,7 @@ const DataSheetView = () => {
     }
 
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
-      console.log(errSelected.ids);
-       errSelected.ids.forEach((id) => {
+       errSelected.ids.forEachorigin ((id) => {
         const row = gridApi.getRowNode(id);
         row.setSelected(true);
         return row;
