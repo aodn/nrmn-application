@@ -159,7 +159,8 @@ const DataSheetView = () => {
     }
 
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
-      const rows = errSelected.ids.map((id) => {
+      console.log(errSelected.ids);
+       errSelected.ids.forEach((id) => {
         const row = gridApi.getRowNode(id);
         row.setSelected(true);
         return row;
@@ -167,10 +168,6 @@ const DataSheetView = () => {
 
       const firstRow = gridApi.getRowNode(errSelected.ids[0]);
       gridApi.ensureIndexVisible(firstRow.rowIndex, 'middle');
-
-      gridApi.flashCells({
-        rowNodes: rows
-      });
     }
   });
 
