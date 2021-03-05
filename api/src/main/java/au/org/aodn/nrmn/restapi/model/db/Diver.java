@@ -40,7 +40,7 @@ public class Diver {
     private Integer diverId;
 
     @Column(name = "initials")
-    @Schema(title = "Inititals")
+    @Schema(title = "Initials")
     @NotNull
     private String initials;
 

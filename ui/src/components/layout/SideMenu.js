@@ -74,7 +74,7 @@ const SideMenu = (props) => {
       <List>
         <ListSubheader>REFERENCE DATA</ListSubheader>
         {props.entities.map((e) => (
-          <ListItem button key={e.name} component={NavLink} to={'/list/' + e.entityListName}>
+          <ListItem button key={e.name} component={NavLink} to={e.list.route}>
             <ListItemText primary={e.name} />
           </ListItem>
         ))}

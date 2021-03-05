@@ -1,14 +1,11 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import au.org.aodn.nrmn.restapi.assembler.SiteListItemAssembler;
-import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.dto.site.SiteListItem;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.server.EntityLinks;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
