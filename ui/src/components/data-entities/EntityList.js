@@ -2,9 +2,10 @@ import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import config from 'react-global-configuration';
 import {useHistory} from 'react-router';
+import {NavLink} from 'react-router-dom';
 import {PropTypes} from 'prop-types';
 import {Box, Grid, IconButton, Typography} from '@material-ui/core';
-import EditIcon from '@material-ui/icons/Edit';
+import {Edit, FileCopy, Delete} from '@material-ui/icons';
 import Alert from '@material-ui/lab/Alert';
 import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
 import useWindowSize from '../utils/useWindowSize';
@@ -29,7 +30,7 @@ const getCellFilter = (format) => {
   return filterTypes[format] ? filterTypes[format] : 'agTextColumnFilter';
 };
 
-const schematoColDef = (schema) => {
+const schematoColDef = (schema, entity) => {
   const fields = Object.keys(schema.properties);
   const coldefs = fields.map((field) => {
     let type = schema.properties[field] ? schema.properties[field]?.type : 'string';
@@ -41,22 +42,31 @@ const schematoColDef = (schema) => {
     };
   });
 
-  const widthUnit = 100;
-
   coldefs.push({
     field: '',
-    maxWidth: widthUnit,
-    minWidth: widthUnit,
-    filter: undefined,
+    filter: null,
     // eslint-disable-next-line react/display-name
-    cellRendererFramework: function () {
+    cellRendererFramework: function (e) {
       return (
-        <IconButton>
-          <EditIcon />
-        </IconButton>
+        <>
+          <IconButton component={NavLink} to={`${entity.route.base}/${e.data[`${entity.name.toLowerCase()}Id`]}/edit`}>
+            <Edit />
+          </IconButton>
+          {entity.can.clone && (
+            <IconButton component={NavLink} name="copy" to="/wip">
+              <FileCopy />
+            </IconButton>
+          )}
+          {entity.can.delete && (
+            <IconButton component={NavLink} name="delete" to="/wip">
+              <Delete />
+            </IconButton>
+          )}
+        </>
       );
     }
   });
+
   return coldefs;
 };
 
@@ -73,13 +83,9 @@ const renderError = (msgArray) => {
   );
 };
 
-const gotoEntity = (event, history, route) => {
-  const id = event.node.data._links.self.href.split('/').pop();
-  // HACK: the existence of a cellRendererFramework means it is an edit button
-  if (event.node.isSelected() && !event.colDef.cellRendererFramework) {
-    history.push(`${route}/${id}`);
-  } else if (event.colDef.cellRendererFramework) {
-    history.push(`${route}/${id}/edit`);
+const gotoEntity = (e, history, entity) => {
+  if (e.node.isSelected() && !e.colDef.cellRendererFramework) {
+    history.push(`${entity.route.base}/${e.data[`${entity.name.toLowerCase()}Id`]}`);
   }
 };
 
@@ -116,7 +122,7 @@ const EntityList = (props) => {
     dispatch(selectRequested(props.entity.list.endpoint));
   }, [props.entity.name]); // reset when new or entityName prop changes
 
-  const colDef = schematoColDef(schemaDefinition[props.entity.list.schemaKey], size, props.entity.name);
+  const colDef = schematoColDef(schemaDefinition[props.entity.list.schemaKey], props.entity);
 
   if (items !== undefined && agGridApi.setRowData) {
     agGridApi.setRowData(items);
@@ -145,7 +151,7 @@ const EntityList = (props) => {
             onGridReady={agGridReady}
             onFirstDataRendered={autoSizeAll}
             onCellClicked={(e) => {
-              gotoEntity(e, history, props.entity.route.base);
+              gotoEntity(e, history, props.entity);
             }}
             frameworkComponents={{
               customTooltip: CustomTooltip,
