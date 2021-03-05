@@ -9,6 +9,7 @@ import {
   RowUpdateRequested,
   SubmitingestRequested,
   ValidationRequested,
+  RowDeleteRequested,
   ValidationFinished,
 } from './reducers/create-import';
 import {ColumnDef, ExtendedSize} from './ColumnDef';
@@ -109,6 +110,8 @@ const DataSheetView = () => {
         name: 'Delete selected Row(s)',
         action: () => {
           const selectedRows = params.api.getSelectedRows();
+          const indexes  = params.api.getSelectedNodes().map(n => n.childIndex);
+          dispatch(RowDeleteRequested({id: job.id, rows: selectedRows, indexes: indexes}));
           params.api.applyTransaction({remove: selectedRows});
         },
         cssClasses: ['redBoldFont']
@@ -160,7 +163,7 @@ const DataSheetView = () => {
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
       const firstRow = gridApi.getRowNode(errSelected.ids[0]);
       gridApi.ensureIndexVisible(firstRow.rowIndex, 'middle');
-      firstRow.setSelected(false,true);
+      gridApi.deselectAll();
       errSelected.ids.forEach((id) => {
         const row = gridApi.getRowNode(id);
         if (row.isSelected) {

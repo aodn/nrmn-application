@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StagedRowService {
@@ -27,5 +28,11 @@ public class StagedRowService {
         }).orElseGet(() ->
                 Validated.invalid(new ErrorInput("Couldn't find job: " + jobId, "job")));
 
+    }
+
+    public Validated<ErrorInput, Integer> delete( List<StagedRow> toDeleteRows) {
+        rowRepo.deleteAll(toDeleteRows);
+        rowRepo.flush();
+        return Validated.<ErrorInput, Integer>valid(toDeleteRows.size());
     }
 }

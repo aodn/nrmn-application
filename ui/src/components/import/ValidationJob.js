@@ -13,9 +13,10 @@ const ValidationJob = () => {
   const dispatch = useDispatch();
   const job = useSelector((state) => state.import.job);
   const isLoading = useSelector((state) => state.import.isLoading);
-  const validationLoading = useSelector((state) => state.import.validationLoading);
   const submitLoading = useSelector((state) => state.import.submitLoading);
+  const validationLoading = useSelector((state) => state.import.validationLoading);
   const ingestSuccess = useSelector((state) => state.import.ingestSuccess);
+  const deleteLoading =  useSelector((state) => state.import.deleteLoading);
 
 
   useEffect(() => {
@@ -61,19 +62,8 @@ const ValidationJob = () => {
         )}
       </Grid>
       <DataSheetView></DataSheetView>
-      {submitLoading && (
-        <Backdrop open={submitLoading}>
-          <Typography variant="h2">Ingesting...</Typography>
-          <CircularProgress size={200} style={{color: '#ccc'}}></CircularProgress>
-        </Backdrop>
-      )}
-      {isLoading && (
-        <Backdrop open={isLoading}>
-          <CircularProgress size={200} style={{color: '#ccc'}}></CircularProgress>
-        </Backdrop>
-      )}
-      {validationLoading && (
-        <Backdrop open={validationLoading}>
+      {(submitLoading || isLoading || deleteLoading || validationLoading) && (
+        <Backdrop open={submitLoading || isLoading || deleteLoading || validationLoading}>
           <CircularProgress size={200} style={{color: '#ccc'}}></CircularProgress>
         </Backdrop>
       )}

@@ -5,6 +5,7 @@ const importState = {
   isLoading: false,
   validationLoading: false,
   editLoading: false,
+  deleteLoading: false,
   ingestLoading: false,
   submitReady: false,
   ingestSuccess: false,
@@ -119,6 +120,15 @@ const importSlice = createSlice({
         state.indexChanged[action.payload.id] = action.payload.row;
         state.EnableSubmit = false;
     },
+    RowDeleteRequested: (state) => {
+      state.deleteLoading = true;
+    },
+    RowDeleteFinished: (state, action) => {
+      action.payload.forEach(i =>  {
+        delete state.rows[i];
+      });
+      state.deleteLoading = false;
+    },
     RowUpdateRequested: (state) => {
       state.editLoading = true;
     },
@@ -153,6 +163,7 @@ const importSlice = createSlice({
       state.success = false;
       state.isLoading = false;
       state.validationLoading = false;
+      state.deleteLoading = false;
       if (action.payload) {
         state.errors = action.payload;
       }
@@ -173,6 +184,8 @@ export const {
   ingestFinished,
   EnableSubmit,
   RowUpdateRequested,
+  RowDeleteRequested,
+  RowDeleteFinished,
   ResetRowIndex,
   ValidationRequested,
   SubmitingestRequested,
