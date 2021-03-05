@@ -54,6 +54,7 @@ const useStyles = makeStyles((theme) => ({
 const referenceData = [
   {
     name: 'Location',
+    idKey: 'locationId',
     can: {delete: false, clone: false},
     route: {base: '/reference/location', view: '/reference/location/:id?/:success?', edit: '/reference/location/:id?/edit'},
     schemaKey: 'Location',
@@ -68,6 +69,7 @@ const referenceData = [
   },
   {
     name: 'Diver',
+    idKey: 'diverId',
     can: {delete: false, clone: false},
     route: {base: '/reference/diver', view: '/reference/diver/:id?/:success?', edit: '/reference/diver/:id?/edit'},
     schemaKey: 'Diver',
@@ -82,6 +84,7 @@ const referenceData = [
   },
   {
     name: 'Site',
+    idKey: 'siteId',
     can: {delete: true, clone: true},
     route: {base: '/reference/site', view: '/reference/site/:id?/:success?', edit: '/reference/site/:id?/edit'},
     schemaKey: 'Site',
@@ -96,6 +99,7 @@ const referenceData = [
   },
   {
     name: 'Observable Item',
+    idKey: 'observableItemId',
     can: {delete: true, clone: true},
     route: {
       base: '/reference/observableItem',
@@ -108,7 +112,7 @@ const referenceData = [
     list: {
       name: 'observableItems',
       schemaKey: 'ObservableItem',
-      route: '/wip',
+      route: '/wip', // FUTURE: When ObservableItem is ready, change this to the correct route
       endpoint: 'observableItems'
     }
   }

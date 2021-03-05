@@ -49,7 +49,7 @@ const schematoColDef = (schema, entity) => {
     cellRendererFramework: function (e) {
       return (
         <>
-          <IconButton component={NavLink} to={`${entity.route.base}/${e.data[`${entity.name.toLowerCase()}Id`]}/edit`}>
+          <IconButton component={NavLink} to={`${entity.route.base}/${e.data[entity.idKey]}/edit`}>
             <Edit />
           </IconButton>
           {entity.can.clone && (
@@ -85,7 +85,7 @@ const renderError = (msgArray) => {
 
 const gotoEntity = (e, history, entity) => {
   if (e.node.isSelected() && !e.colDef.cellRendererFramework) {
-    history.push(`${entity.route.base}/${e.data[`${entity.name.toLowerCase()}Id`]}`);
+    history.push(`${entity.route.base}/${e.data[entity.idKey]}`);
   }
 };
 
@@ -170,7 +170,6 @@ const EntityList = (props) => {
             }}
           />
         </div>
-        {!colDef ? renderError(["Entity '" + props.entity.name + "' can not be found!"]) : ''}
         {errors.length > 0 ? renderError(errors) : ''}
       </Box>
     </>
