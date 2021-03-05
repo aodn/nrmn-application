@@ -22,7 +22,7 @@ public class SiteListItem extends RepresentationModel<SiteListItem> {
     @Schema(title = "Name")
     String siteName;
 
-    @Schema(title = "Location name")
+    @Schema(title = "Location Name")
     String locationName;
 
     @Schema(title = "State")

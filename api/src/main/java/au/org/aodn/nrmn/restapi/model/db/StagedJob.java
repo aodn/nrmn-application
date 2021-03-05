@@ -81,7 +81,7 @@ public class StagedJob implements Serializable {
     private List<StagedJobLog> logs;
 
     @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "stagedJob", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "stagedJob", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StagedRow> rows;
 
 }

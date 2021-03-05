@@ -18,7 +18,9 @@ import jobWatcher from './job/jobMiddleware';
 const initialiseSagaMiddleware = createSagaMiddleware();
 const isDev = process.env.NODE_ENV == 'development';
 
-const middleware = isDev ? [...getDefaultMiddleware(), initialiseSagaMiddleware] : [initialiseSagaMiddleware];
+const middleware = isDev
+  ? [...getDefaultMiddleware({serializableCheck: false, immutableCheck: false}), initialiseSagaMiddleware]
+  : [initialiseSagaMiddleware];
 
 const store = configureStore({
   reducer: {

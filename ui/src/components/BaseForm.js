@@ -6,6 +6,7 @@ import Form from '@rjsf/material-ui';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
+import {NavLink} from 'react-router-dom';
 import green from '@material-ui/core/colors/green';
 import {PropTypes} from 'prop-types';
 
@@ -81,6 +82,7 @@ const BaseForm = (params) => {
             showErrorList={true}
             fields={params.fields}
             formData={params.formData}
+            ObjectFieldTemplate={params.template}
           >
             <div className={classes.rootFlex}>
               <div className={classes.wrapper}>
@@ -91,8 +93,8 @@ const BaseForm = (params) => {
                     <Button type="submit" className={classes.button} variant="contained" color="secondary" disabled={loading}>
                       {params.submitLabel ?? 'Save'}
                     </Button>
-                    {!params.hideCancel ? (
-                      <Button className={classes.button} variant="contained" href={params.onCancel}>
+                    {!params.hideCancel && params.onCancel ? (
+                      <Button component={NavLink} className={classes.button} variant="contained" to={params.onCancel}>
                         Cancel
                       </Button>
                     ) : null}
@@ -109,7 +111,8 @@ const BaseForm = (params) => {
 };
 
 BaseForm.propTypes = {
-  submitLabel: PropTypes.string
+  submitLabel: PropTypes.string,
+  template: PropTypes.object
 };
 
 export default BaseForm;

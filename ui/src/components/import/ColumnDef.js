@@ -508,3 +508,30 @@ export const ExtendedSize = [
     editable: true
   }
 ];
+
+// const emtpyRow = {
+// Inverts: '',
+// "P-Qs': ''
+// block: "1"m
+// buddy: "MFL"
+// code: "Est"
+// commonName: "Smallspotted Combtooth Blenny"
+// created: "2021-03-02T01:06:07.405+0000"
+// date: "12/16/20"
+// depth: "10"
+// direction: "SE"
+// diver: "Ella Clausius"
+// errors: []
+// id: 43434
+// inverts: "0"
+// lastUpdated: "2021-03-02T01:06:07.405+0000"
+// latitude: "-23.25738"
+// longitude: "151.94713"
+// method: "2"
+// siteCode: "AIMS9"
+// siteName: "Broomfield Reef Site 3"
+// species: "Ecsenius stictus"
+// time: "9:00"
+// total: "6"
+// vis: "20"
+// }

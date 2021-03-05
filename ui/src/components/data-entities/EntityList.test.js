@@ -36,7 +36,19 @@ const mockState = {
   }
 };
 
-const testEntity = {name: 'TestEntities', entityName: 'TestEntity', entityListName: 'testentities'};
+const testEntity = {
+  name: 'TestEntity',
+  route: {base: '/reference/test', view: '/reference/test/:id?/:success?', edit: '/reference/test/:id?/edit'},
+  schemaKey: 'TestEntity',
+  endpoint: 'tests',
+  template: {add: null, edit: null, view: null},
+  list: {
+    schemaKey: 'TestEntity',
+    name: 'tests',
+    route: '/reference/tests',
+    endpoint: 'tests'
+  }
+};
 
 jest.mock('react-redux', () => {
   const ActualReactRedux = require.requireActual('react-redux');
@@ -72,11 +84,11 @@ describe('EntityList Component', () => {
 
   test('Test EntityList.js exists', async () => {
     const {findByText} = renderWithProviders(
-      <Route path="/list/:entityName">
+      <Route path=":entityName">
         <EntityList entity={testEntity} />
       </Route>,
       {
-        route: '/list/testentities'
+        route: 'testentities'
       }
     );
     await findByText('New TestEntity');
@@ -84,11 +96,11 @@ describe('EntityList Component', () => {
 
   test('Test EntityList.js New Entity button exists', async () => {
     const {findByTitle} = renderWithProviders(
-      <Route path="/list/:entityName">
+      <Route path="/:entityName">
         <EntityList entity={testEntity} />
       </Route>,
       {
-        route: '/list/TestEntity'
+        route: '/TestEntity'
       }
     );
     await findByTitle('New TestEntity');

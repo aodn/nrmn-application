@@ -8,20 +8,6 @@ function getToken() {
   return `${tokenType} ${token}`;
 }
 
-function getAxiosPromise(method, path, params, contentType) {
-  return axiosInstance(
-    {
-      headers: {'Content-Type': contentType ? contentType : 'application/json'},
-      method: method,
-      url: path,
-      data: params
-    },
-    {
-      validateStatus: () => true
-    }
-  );
-}
-
 axiosInstance.interceptors.request.use(
   (config) => {
     config.headers.authorization = getToken();
@@ -118,16 +104,13 @@ export const entitySave = (entity, params) => {
     .catch((err) => err);
 };
 
-export const entityEdit = (path, params) => {
-  let axiosPromises = [getAxiosPromise('put', path, params)];
-
-  Object.keys(params).filter((key) => {
-    if (key.endsWith('Selected')) {
-      const thisnestedEntity = key.replace('Selected', '');
-      axiosPromises.push(getAxiosPromise('put', path + '/' + thisnestedEntity, params[key]._links.self.href, 'text/uri-list'));
-    }
-  });
-  return axiosInstance.all(axiosPromises).then((res) => res);
+export const entityEdit = (url, params) => {
+  return axiosInstance
+    .put(url, params, {
+      validateStatus: () => true
+    })
+    .then((res) => res)
+    .catch((err) => err);
 };
 
 export const entityRelation = (entity, urls) => {
@@ -150,6 +133,9 @@ export const getDataJob = (jobId) =>
 export const postJobValidation = (jobId) => axiosInstance.post('/api/stage/validate/' + jobId).then((res) => res);
 export const updateRow = (jobId, rows) => {
   return axiosInstance.put('/api/stage/updates/' + jobId, rows).then((res) => res);
+};
+export const deleteRow = (jobId, rows) => {
+  return axiosInstance.put('/api/stage/delete/rows/' + jobId, rows).then((res) => res);
 };
 
 export const submitJobFile = (params) => {
