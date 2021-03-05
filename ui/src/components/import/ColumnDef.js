@@ -121,6 +121,10 @@ export const ColumnDef = [
   },
   {
     field: 'species',
+    pivot: true,
+    enablePivot: false,
+    rowGroup: false,
+    enableRowGroup: true,
     editable: true,
     cellStyle: cell
   },

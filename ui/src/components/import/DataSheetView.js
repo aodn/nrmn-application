@@ -5,7 +5,7 @@ import {AllModules} from 'ag-grid-enterprise';
 import {useEffect} from 'react';
 import {JobFinished, AddRowIndex} from './reducers/create-import';
 import {ColumnDef, ExtendedSize} from './ColumnDef';
-import {Box} from '@material-ui/core';
+import {Box, Dialog, TextField} from '@material-ui/core';
 import useWindowSize from '../utils/useWindowSize';
 import {ChangeDetectionStrategyType} from 'ag-grid-react/lib/changeDetectionService';
 
@@ -32,6 +32,7 @@ const DataSheetView = () => {
   const dispatch = useDispatch();
   const rows = useSelector((state) => state.import.rows);
   const errSelected = useSelector((state) => state.import.errSelected);
+  const [addDialogueOpen, setAddDialogueOpen] = useState(false);
   const [gridApi, setGridApi] = useState(null);
   const job = useSelector((state) => state.import.job);
   const colDefinition = job && job.isExtendedSize ? ColumnDef.concat(ExtendedSize) : ColumnDef;
@@ -55,8 +56,21 @@ const DataSheetView = () => {
           params.api.applyTransaction({remove: selectedRows});
         },
         cssClasses: ['redBoldFont']
+      },
+      {
+        name: 'Add row(s)',
+        action: () => {
+          //   const selected  = params.api.getSelectedRows();
+          console.log(params.node.rowIndex);
+          setAddDialogueOpen(true);
+        }
       }
     ];
+  };
+
+  const handleAdd = (evt) => {
+    console.log(evt);
+    setAddDialogueOpen(false);
   };
 
   const onKeyDown = (evt) => {
@@ -88,7 +102,6 @@ const DataSheetView = () => {
       instance.setModel(null).then(() => gridApi.onFilterChanged());
     }
   });
-
   const size = useWindowSize();
 
   return (
@@ -140,6 +153,13 @@ const DataSheetView = () => {
             modules={AllModules}
             getContextMenuItems={getContextMenuItems}
           ></AgGridReact>
+          <Dialog onClose={handleAdd} aria-labelledby="Add Rows Dialogue" open={addDialogueOpen}>
+            <Box p={2}>
+              <form noValidate autoComplete="off">
+                <TextField id="outlined-basic" label="Number of rows" variant="outlined" />
+              </form>
+            </Box>
+          </Dialog>
         </div>
       )}
     </Box>
