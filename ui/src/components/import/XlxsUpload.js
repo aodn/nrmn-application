@@ -101,6 +101,7 @@ const XlxsUpload = () => {
         errors={displayErros}
         formData={formData}
         onSubmit={handleSubmit}
+        onCancel="/jobs"
       ></BaseForm>
 
       <Dialog fullScreen={fullScreen} open={open} onClose={() => setOpen(false)} aria-labelledby="Confirmation-upload">
