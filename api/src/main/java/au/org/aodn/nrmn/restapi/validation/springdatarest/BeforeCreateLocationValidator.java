@@ -28,7 +28,7 @@ public class BeforeCreateLocationValidator implements Validator {
 
         if (locationRepository.exists(locationWithNameExample)) {
             errors.rejectValue("locationName", "location.locationName.exists",
-                    "a location with that name already exists");
+                    "A location with that name already exists.");
         }
     }
 }

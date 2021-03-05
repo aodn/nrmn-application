@@ -8,6 +8,7 @@ import {
   entitiesLoaded,
   itemLoaded,
   selectedItemsLoaded,
+  selectedItemEdited,
   selectedItemsEdited
 } from '../form-reducer';
 import {isSuccessful200Response} from '../../utils/helpers';
@@ -16,9 +17,10 @@ export default function* getEntitiesWatcher() {
   yield takeEvery(selectRequested, entities);
   yield takeEvery(itemRequested, getEntityData);
   yield takeEvery(selectedItemsRequested, getSelectedItemsData);
-  yield takeEvery(createEntityRequested, saveEntities);
-  yield takeEvery(updateEntityRequested, updateEntities);
+  yield takeEvery(createEntityRequested, saveEntity);
+  yield takeEvery(updateEntityRequested, updateEntity);
   yield takeEvery(setNestedField, setNestedFormData);
+  yield takeEvery(setField, setFieldFormData);
 }
 
 function* entities(action) {
@@ -42,6 +44,16 @@ function* setNestedFormData(action) {
   }
 }
 
+function* setFieldFormData(action) {
+  try {
+    const resp = {};
+    resp[action.payload.entity] = action.payload.newValue;
+    yield put(selectedItemEdited(resp));
+  } catch (e) {
+    yield put(entitiesError({e}));
+  }
+}
+
 function* getEntityData(action) {
   try {
     const resp = yield call(getEntity, action.payload);
@@ -60,56 +72,61 @@ function* getSelectedItemsData(action) {
   }
 }
 
-function* saveEntities(action) {
+function* saveEntity(action) {
   try {
-    const href = (action.payload.data?._links?.self?.href) ?
-        action.payload.data._links.self.href :
-        action.payload.path;
+    const href = action.payload.data?._links?.self?.href ? action.payload.data._links.self.href : action.payload.path;
     delete action.payload.data._links;
 
-    const resp = yield call(entitySave, href, action.payload.data);
-    yield put(entitiesSaved(isSuccessful200Response(resp.status)));
+    const response = yield call(entitySave, href, action.payload.data);
+    if (response?.data?.errors || !isSuccessful200Response(response.status)) {
+      yield put(entitiesError({e: {response: response}}));
+    } else {
+      yield put(entitiesSaved(response.data));
+    }
   } catch (e) {
     yield put(entitiesError({e}));
   }
 }
 
-function* updateEntities(action) {
+function* updateEntity(action) {
   try {
-    const resp = yield call(entityEdit, action.payload.data._links.self.href, action.payload.data);
-    const checkStatus = (response) => isSuccessful200Response(response.status);
-    yield put(entitiesSaved(resp.every(checkStatus)));
+    const url = action.payload.data?._links?.self?.href ? action.payload.data._links.self.href : action.payload.path;
+    delete action.payload.data._links;
+    const response = yield call(entityEdit, url, action.payload.data);
+    if (response?.data?.errors) {
+      yield put(entitiesError({e: {response: response}}));
+    } else {
+      yield put(entitiesSaved(response.data));
+    }
   } catch (e) {
     yield put(entitiesError({e}));
   }
 }
 
-export const selectRequested = createAction('SELECT_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
+export const selectRequested = createAction('SELECT_REQUESTED', function (entity) {
+  return {payload: entity};
+});
 
-export const itemRequested = createAction('ID_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
+export const itemRequested = createAction('ID_REQUESTED', function (entity) {
+  return {payload: entity};
+});
 
-export const setNestedField = createAction('SELECTED_NESTED_ENTITY',
-    function (entity) {
-      return {payload: entity};
-    });
+export const setField = createAction('SELECTED_ENTITY', function (entity) {
+  return {payload: entity};
+});
 
-export const selectedItemsRequested = createAction('SELECTED_ENTITY_ITEMS_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
+export const setNestedField = createAction('SELECTED_NESTED_ENTITY', function (entity) {
+  return {payload: entity};
+});
 
-export const createEntityRequested = createAction('CREATE_ENTITY_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
+export const selectedItemsRequested = createAction('SELECTED_ENTITY_ITEMS_REQUESTED', function (entity) {
+  return {payload: entity};
+});
 
-export const updateEntityRequested = createAction('UPDATE_ENTITY_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
+export const createEntityRequested = createAction('CREATE_ENTITY_REQUESTED', function (entity) {
+  return {payload: entity};
+});
+
+export const updateEntityRequested = createAction('UPDATE_ENTITY_REQUESTED', function (entity) {
+  return {payload: entity};
+});

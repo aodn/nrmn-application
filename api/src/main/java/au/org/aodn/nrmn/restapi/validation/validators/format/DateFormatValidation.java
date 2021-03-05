@@ -13,7 +13,7 @@ import java.util.Date;
 public final class DateFormatValidation extends BaseRowFormatValidation<LocalDate> {
 
     public DateFormatValidation() {
-        super("Date", "dd/MM/yyyy");
+        super("Date", "d/M/y");
     }
 
     @Override

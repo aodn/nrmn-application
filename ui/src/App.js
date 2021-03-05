@@ -1,38 +1,36 @@
 import React from 'react';
+import {useSelector} from 'react-redux';
+import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
 import clsx from 'clsx';
-import {
-  ThemeProvider,
-  createMuiTheme,
-  responsiveFontSizes,
-  makeStyles
-} from '@material-ui/core/styles';
+import {ThemeProvider, createMuiTheme, responsiveFontSizes, makeStyles} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import {blueGrey, deepPurple} from '@material-ui/core/colors';
+import Alert from '@material-ui/lab/Alert';
 import TopBar from './components/layout/TopBar';
+import store from './components/store';
 import SideMenu from './components/layout/SideMenu';
 import Login from './components/auth/login';
-import { blueGrey, deepPurple } from '@material-ui/core/colors';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect,
-} from 'react-router-dom';
 import XlxsUpload from './components/import/XlxsUpload';
 import ValidationPage from './components/import/ValidationJob';
-import GenericForm from './components/data-entities/GenericForm';
-import { useSelector } from 'react-redux';
+import EntityEdit from './components/data-entities/EntityEdit';
 import EntityList from './components/data-entities/EntityList';
-import GenericDetailsView from './components/data-entities/GenericDetailsView';
+import EntityView from './components/data-entities/EntityView';
 import Homepage from './components/layout/Homepage';
 import FourOFour from './components/layout/FourOFour';
 import JobList from './components/job/JobList';
 import JobView from './components/job/JobView';
-const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ?
-  process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
+import LocationTemplate from './components/data-entities/LocationTemplate';
+import DiverTemplate from './components/data-entities/DiverTemplate';
+import SiteEditTemplate from './components/data-entities/SiteEditTemplate';
+import SiteAddTemplate from './components/data-entities/SiteAddTemplate';
+import SiteViewTemplate from './components/data-entities/SiteViewTemplate';
+import ObservableItemTemplate from './components/data-entities/ObservableItemTemplate';
+
+const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ? process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: 'flex',
+    display: 'flex'
   },
   mainContent: {
     marginTop: 50,
@@ -40,41 +38,102 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(3),
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
+      duration: theme.transitions.duration.leavingScreen
     }),
     marginLeft: `-${drawerWidth}px`
   },
   contentShift: {
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
+      duration: theme.transitions.duration.enteringScreen
     }),
-    marginLeft: 0,
+    marginLeft: 0
   }
 }));
 
+const referenceData = [
+  {
+    name: 'Location',
+    route: {base: '/reference/location', view: '/reference/location/:id?/:success?', edit: '/reference/location/:id?/edit'},
+    schemaKey: 'Location',
+    endpoint: 'locations',
+    template: {add: LocationTemplate, edit: LocationTemplate, view: LocationTemplate},
+    list: {
+      schemaKey: 'Location',
+      name: 'locations',
+      route: '/reference/locations',
+      endpoint: 'locations'
+    }
+  },
+  {
+    name: 'Diver',
+    route: {base: '/reference/diver', view: '/reference/diver/:id?/:success?', edit: '/reference/diver/:id?/edit'},
+    schemaKey: 'Diver',
+    endpoint: 'divers',
+    template: {add: DiverTemplate, edit: DiverTemplate, view: DiverTemplate},
+    list: {
+      schemaKey: 'Diver',
+      name: 'divers',
+      route: '/reference/divers',
+      endpoint: 'divers'
+    }
+  },
+  {
+    name: 'Site',
+    route: {base: '/reference/site', view: '/reference/site/:id?/:success?', edit: '/reference/site/:id?/edit'},
+    schemaKey: 'Site',
+    endpoint: 'sites',
+    template: {add: SiteAddTemplate, edit: SiteEditTemplate, view: SiteViewTemplate},
+    list: {
+      name: 'siteListItems',
+      schemaKey: 'SiteListItem',
+      route: '/reference/sites',
+      endpoint: 'siteListItems'
+    }
+  },
+  {
+    name: 'Observable Item',
+    route: {
+      base: '/reference/observableItem',
+      view: '/reference/observableItem/:id?/:success?',
+      edit: '/reference/observableItem/:id?/edit'
+    },
+    schemaKey: 'ObservableItem',
+    endpoint: 'observableItems',
+    template: {add: ObservableItemTemplate, edit: ObservableItemTemplate, view: ObservableItemTemplate},
+    list: {
+      name: 'observableItems',
+      schemaKey: 'ObservableItem',
+      route: '/wip',
+      endpoint: 'observableItems'
+    }
+  }
+];
+
 const App = () => {
   const classes = useStyles();
-  const themeState = useSelector(state => state.theme);
-  const leftSideMenuIsOpen = useSelector(state => state.toggle.leftSideMenuIsOpen);
+  const leftSideMenuIsOpen = useSelector((state) => state.toggle.leftSideMenuIsOpen);
+  // TODO: do token expiry checks and such
+  const loggedIn = () => {
+    return store.getState().auth.accessToken !== null;
+  };
 
   let theme = createMuiTheme({
     palette: {
       text: {
-        primary: themeState.themeType ? '#eee' : '#607d8b',
-        secondary: themeState.themeType ? '#999' : '#555'
+        primary: '#607d8b',
+        secondary: '#555'
       },
       primary: blueGrey,
       secondary: {
         main: deepPurple[300]
-      },
-      type: themeState.themeType ? 'dark' : 'light',
+      }
     },
     props: {
       MuiTextField: {
         variant: 'outlined',
         margin: 'dense',
-        notched: 'true',
+        notched: 'true'
       }
     },
     overrides: {
@@ -82,11 +141,15 @@ const App = () => {
         '@global': {
           '.ag-root-wrapper-body': {
             minHeight: 400
+          },
+          '.ag-header-cell:hover': {
+            '&:hover .menu-icon': {
+              opacity: '1 !important'
+            }
           }
-
-        },
-      },
-    },
+        }
+      }
+    }
   });
   theme = responsiveFontSizes(theme);
 
@@ -96,27 +159,83 @@ const App = () => {
         <Router>
           <CssBaseline />
           <TopBar></TopBar>
-          <SideMenu></SideMenu>
+          <SideMenu entities={referenceData}></SideMenu>
           <main
             className={clsx(classes.mainContent, {
               [classes.contentShift]: leftSideMenuIsOpen
             })}
           >
             <Switch>
-              <Route exact path='/home' component={Homepage} />
-              <Route exact path='/jobs' component={JobList} />
-              <Route exact path='/jobs/:id/view' component={JobView} />
-
-              <Route exact path='/validation/:jobId' component={ValidationPage} />
-              <Route exact path='/upload' component={XlxsUpload} />
+              <Route
+                path="/wip"
+                render={() => (
+                  <Alert severity="info" variant="filled">
+                    This feature is under construction.
+                  </Alert>
+                )}
+              />
+              <Route exact path="/home" component={Homepage} />
+              <Route exact path="/jobs" component={JobList} />
+              <Route exact path="/jobs/:id/view" component={JobView} />
+              <Route exact path="/validation/:jobId" component={ValidationPage} />
+              <Route exact path="/upload" component={XlxsUpload} />
               <Route exact path="/login" component={Login} />
               <Redirect exact from="/list/stagedJob" to="/jobs" />
-              <Route exact path="/edit/:entityName/:id?" component={GenericForm} />
-              <Route exact path="/view/:entityName/:id?" component={GenericDetailsView} />
-              <Route exact path="/list/:entityName" component={EntityList} />
-              <Route path='/404' component={FourOFour}></Route>
+              {referenceData.map((e) => (
+                <Route
+                  exact
+                  key={e.route.base}
+                  path={e.route.base}
+                  render={() => {
+                    return loggedIn() ? (
+                      <EntityEdit entity={e} template={e.template.add} />
+                    ) : (
+                      <Redirect to={`/login?redirect=${e.route.base}`} />
+                    );
+                  }}
+                />
+              ))}
+              {referenceData.map((e) => (
+                <Route
+                  exact
+                  key={e.route.edit}
+                  path={e.route.edit}
+                  render={() => {
+                    return loggedIn() ? (
+                      <EntityEdit entity={e} template={e.template.edit} />
+                    ) : (
+                      <Redirect to={`/login?redirect=${e.route.edit}`} />
+                    );
+                  }}
+                />
+              ))}
+              {referenceData.map((e) => (
+                <Route
+                  exact
+                  key={e.route.view}
+                  path={e.route.view}
+                  render={() => {
+                    return loggedIn() ? (
+                      <EntityView entity={e} template={e.template.view} />
+                    ) : (
+                      <Redirect to={`/login?redirect=${e.route.view}`} />
+                    );
+                  }}
+                />
+              ))}
+              {referenceData.map((e) => (
+                <Route
+                  exact
+                  key={e.list.route}
+                  path={e.list.route}
+                  render={() => {
+                    return loggedIn() ? <EntityList entity={e} /> : <Redirect to={`/login?redirect=${e.list.route}`} />;
+                  }}
+                />
+              ))}
+              <Route path="/404" component={FourOFour}></Route>
               <Redirect exact from="/" to="/home" />
-              <Route path='*' component={FourOFour}></Route>
+              <Route path="*" component={FourOFour}></Route>
             </Switch>
           </main>
         </Router>

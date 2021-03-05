@@ -1,16 +1,13 @@
-import {
-  createSlice
-} from '@reduxjs/toolkit';
-import pluralize from 'pluralize';
-
+import {createSlice} from '@reduxjs/toolkit';
 
 const formState = {
   entities: undefined,
-  editItem: {},
+  formData: {},
+  formOptions: {},
   entitySaved: false,
-  errors: []
+  errors: [],
+  isLoading: false
 };
-
 
 const formSlice = createSlice({
   name: 'form',
@@ -19,39 +16,60 @@ const formSlice = createSlice({
     resetState: () => formState,
     entitiesLoaded: (state, action) => {
       state.entityEdited = {};
-      state.editItem = {};
+      state.formData = {};
       state.entitySaved = false;
       state.entities = action.payload;
       state.errors = [];
     },
     entitiesError: (state, action) => {
-      const error = (action.payload.e.response?.data?.error) ? action.payload.e.response.data.error : 'Error while getting the entity data';
+      const error = action.payload.e.response?.data?.error ? action.payload.e.response.data.error : 'Error while getting the entity data';
       state.entities = [];
       state.errors = [error];
     },
     itemLoaded: (state, action) => {
-      state.editItem = action.payload;
+      state.formData = action.payload;
+    },
+    selectedItemEdited: (state, action) => {
+      const key = Object.keys(action.payload)[0];
+      let fieldData = {};
+      fieldData[key] = action.payload[key];
+      state.formData = {...state.formData, ...fieldData};
     },
     selectedItemsEdited: (state, action) => {
-      let resp = {};
       const key = Object.keys(action.payload)[0];
-      resp[key + 'Selected'] = action.payload[key];
-      resp[key] = action.payload[key]._links.self.href;
-      state.editItem = {...state.editItem, ...resp};
+
+      let optionsData = {};
+      optionsData[key] = action.payload[key];
+      state.formOptions = {...state.formOptions, ...optionsData};
+
+      let fieldData = {};
+      fieldData[key] = action.payload[key]._links.self.href;
+      state.formData = {...state.formData, ...fieldData};
+    },
+    embeddedFieldEdited: (state, action) => {
+      const key = Object.keys(action.payload)[0];
+      let fieldData = {};
+      fieldData[key] = action.payload[key];
+      state.formData = {...state.formData, ...fieldData};
     },
     selectedItemsLoaded: (state, action) => {
-      let resp = {};
       const key = Object.keys(action.payload._embedded)[0];
-      const singularKey = pluralize.singular(key);
-      resp[key] = action.payload._embedded;
-      resp[singularKey + 'Selected'] = action.payload.selected;
-      resp[singularKey] = (action.payload.selected) ? action.payload.selected._links.self.href: undefined;
-      state.editItem = {...state.editItem, ...resp};
+      const newOptions = {};
+      // FIXME: this should not be necessary
+      if (key === 'marineProtectedAreas' || key === 'protectionStatuses') {
+        newOptions[key] = action.payload._embedded[key].reduce((f, v) => {
+          if (v.name) f.push(v.name);
+          return f;
+        }, []);
+      } else {
+        newOptions[key] = action.payload._embedded[key];
+      }
+      state.formOptions = {...state.formOptions, ...newOptions};
     },
     entitiesSaved: (state, action) => {
       state.entitySaved = action.payload;
     }
-  },
+  }
 });
 export const formReducer = formSlice.reducer;
 export const {
@@ -61,7 +79,7 @@ export const {
   entitiesSaved,
   itemLoaded,
   selectedItemsLoaded,
-  selectedItemsEdited
+  selectedItemEdited,
+  selectedItemsEdited,
+  embeddedFieldEdited
 } = formSlice.actions;
-
-

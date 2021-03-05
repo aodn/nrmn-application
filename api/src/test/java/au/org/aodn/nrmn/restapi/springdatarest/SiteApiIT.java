@@ -181,7 +181,7 @@ public class SiteApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("a site with that code and name already exists")));
+                .body("errors[0].message", is(equalTo("A site with that code and name already exists.")));
     }
 
     @Test
@@ -205,7 +205,7 @@ public class SiteApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("a site with that code and name already exists")));
+                .body("errors[0].message", is(equalTo("A site with that code and name already exists.")));
     }
 
     @Test

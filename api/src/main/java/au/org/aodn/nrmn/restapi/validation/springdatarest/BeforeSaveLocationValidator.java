@@ -30,7 +30,7 @@ public class BeforeSaveLocationValidator implements Validator {
         if (existingLocationWithName.isPresent()
                 && !existingLocationWithName.get().getLocationId().equals(location.getLocationId())) {
             errors.rejectValue("locationName", "location.locationName.exists",
-                    "a location with that name already exists");
+                    "A location with that name already exists.");
         }
     }
 }

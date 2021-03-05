@@ -14,7 +14,6 @@ let responseErrors = {
 };
 
 export const getAPIErrorMessages = (responseData, errorCode) => {
-
   responseErrors.messages = [];
 
   if (Array.isArray(responseData)) {
@@ -33,5 +32,4 @@ export const getAPIErrorMessages = (responseData, errorCode) => {
   responseErrors.header = errorHeaders['errorHeader' + errorCode];
 
   return responseErrors;
-
 };

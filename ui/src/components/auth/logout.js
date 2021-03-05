@@ -10,11 +10,10 @@ import {logoutSubmitted} from './auth-reducer';
 import {toggleLogoutMenuOpen} from '../../../../ui/src/components/layout/layout-reducer';
 import store from '../store';
 
-
 var Logout = () => {
   const dispatch = useDispatch();
-  const logoutMenuOpen = useSelector(state => state.toggle.logoutMenuOpen);
-  const username = useSelector(state => state.auth.username);
+  const logoutMenuOpen = useSelector((state) => state.toggle.logoutMenuOpen);
+  const username = useSelector((state) => state.auth.username);
 
   const handleCancel = () => {
     store.dispatch(toggleLogoutMenuOpen());
@@ -27,28 +26,22 @@ var Logout = () => {
   };
 
   return (
-      <>
-        <Dialog
-            open={logoutMenuOpen}
-            aria-labelledby='alert-dialog-title'
-            aria-describedby='alert-dialog-description'
-        >
-          <DialogTitle id='alert-dialog-title'>Logout</DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              {`Do you really want to log out as '` + username + `' ?`}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCancel} color='primary'>
-              Cancel
-            </Button>
-            <Button onClick={handleClose} color='primary' autoFocus>
-              Logout
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </>
+    <>
+      <Dialog open={logoutMenuOpen} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+        <DialogTitle id="alert-dialog-title">Logout</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">{`Do you really want to log out as '` + username + `' ?`}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancel} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleClose} color="primary" autoFocus>
+            Logout
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 

@@ -1,59 +1,61 @@
 import React from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {useEffect} from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import TextField from '@material-ui/core/TextField';
-import pluralize from 'pluralize';
-import { Typography } from '@material-ui/core';
-import { selectedItemsRequested, setNestedField } from '../middleware/entities';
-import { markupProjectionQuery } from '../../utils/helpers';
-import { PropTypes } from 'prop-types';
+import {Typography, CircularProgress, TextField} from '@material-ui/core';
+import {selectedItemsRequested, setField} from '../middleware/entities';
+import {markupProjectionQuery} from '../../utils/helpers';
+import {PropTypes} from 'prop-types';
 
 const NestedApiField = (props) => {
-  let editItemValues = useSelector(state => state.form.editItem);
+  let editItemValues = useSelector((state) => state.form.formData);
+  let formOptions = useSelector((state) => state.form.formOptions);
+
   const dispatch = useDispatch();
 
   const entity = props.name;
-  const pluralEntity = pluralize(entity);
+  let itemsList = formOptions['locations'] ?? []; // FIXME: hardcoded test value!
 
-  let itemsList = (editItemValues[pluralEntity]) ? editItemValues[pluralEntity][pluralEntity] : [];
-  let selectedItems = (editItemValues[entity + 'Selected']) ? [editItemValues[entity + 'Selected']].filter(Boolean) : [];
+  const pluralEntity = entity;
 
+  let selectedItems = editItemValues[entity + 'Selected'] ? [editItemValues[entity + 'Selected']].filter(Boolean) : [];
 
   useEffect(() => {
     let urls = [markupProjectionQuery(pluralEntity)];
     if (editItemValues._links) {
       urls.push(markupProjectionQuery(editItemValues._links[entity].href));
     }
-    dispatch(selectedItemsRequested(urls));
-
+    // FIXME: hardcoded test value!
+    dispatch(selectedItemsRequested(['locations?projection=selection']));
   }, []);
 
-  return (itemsList.length > 0) ? (
+  return itemsList.length > 0 ? (
     <>
-      <Typography variant={'h5'}>{entity}</Typography>
+      <Typography variant="subtitle2">{props.schema.title}</Typography>
       <Autocomplete
         id={'select-auto-' + entity}
         options={itemsList}
         multiple={props.multiple || false}
         getOptionLabel={(option) => option.label}
-        defaultValue={(props.multiple) ? selectedItems : selectedItems[0]}
+        defaultValue={props.multiple ? selectedItems : selectedItems[0]}
         filterSelectedOptions
-        onChange={(event, newValues) => dispatch(setNestedField({ newValues, entity }))}
-        renderInput={(params) => <TextField {...params} label={'Select ' + entity} variant="outlined" />}
+        onChange={(_, value) => dispatch(setField({newValue: value.id, entity}))}
+        renderInput={(params) => <TextField {...params} variant="outlined" />}
       />
     </>
-  ) : (<>
-    <Typography variant={'h5'}>{pluralEntity}</Typography>
-    <div>add item</div></>);
-
+  ) : (
+    <>
+      <Typography variant="subtitle2">{props.schema.title}</Typography>
+      <CircularProgress size={30} />
+    </>
+  );
 };
 
 NestedApiField.propTypes = {
   name: PropTypes.string,
-  multiple: PropTypes.bool
+  multiple: PropTypes.bool,
+  schema: PropTypes.object
 };
 
 export default NestedApiField;
-

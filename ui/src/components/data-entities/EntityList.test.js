@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
 
 import React from 'react';
-import { Route } from 'react-router-dom';
+import {Route} from 'react-router-dom';
 import {renderWithProviders} from '../utils/test-utils';
 import '@testing-library/jest-dom/extend-expect';
 import config from 'react-global-configuration';
@@ -10,10 +10,7 @@ import EntityList from './EntityList';
 
 const testSchema = {
   TestEntity: {
-    required: [
-      'password',
-      'username'
-    ],
+    required: ['password', 'username'],
     type: 'object',
     properties: {
       username: {
@@ -29,7 +26,6 @@ const testSchema = {
 config.set({api: testSchema});
 jest.mock('ag-grid-react/lib/agGridReact');
 
-
 const mockState = {
   theme: {themeType: false},
   form: {
@@ -40,27 +36,45 @@ const mockState = {
   }
 };
 
+const testEntity = {
+  name: 'TestEntity',
+  route: {base: '/reference/test', view: '/reference/test/:id?/:success?', edit: '/reference/test/:id?/edit'},
+  schemaKey: 'TestEntity',
+  endpoint: 'tests',
+  template: {add: null, edit: null, view: null},
+  list: {
+    schemaKey: 'TestEntity',
+    name: 'tests',
+    route: '/reference/tests',
+    endpoint: 'tests'
+  }
+};
+
 jest.mock('react-redux', () => {
   const ActualReactRedux = require.requireActual('react-redux');
   return {
     ...ActualReactRedux,
     useSelector: jest.fn().mockImplementation(() => {
-      return function(){ return {};};
+      return function () {
+        return {};
+      };
     }),
     useDispatch: jest.fn().mockImplementation(() => {
-      return function(){ return {};};
+      return function () {
+        return {};
+      };
     }),
     useEffect: jest.fn().mockImplementation(() => {
-      return function(){ return {};};
-    }),
+      return function () {
+        return {};
+      };
+    })
   };
 });
 
-
 describe('EntityList Component', () => {
-
   beforeEach(() => {
-    useSelector.mockImplementation(callback => {
+    useSelector.mockImplementation((callback) => {
       return callback(mockState);
     });
   });
@@ -70,31 +84,25 @@ describe('EntityList Component', () => {
 
   test('Test EntityList.js exists', async () => {
     const {findByText} = renderWithProviders(
-        <Route path="/list/:entityName">
-          <EntityList />
-        </Route>,
-        {
-          route: '/list/munt'
-        }
+      <Route path=":entityName">
+        <EntityList entity={testEntity} />
+      </Route>,
+      {
+        route: 'testentities'
+      }
     );
-    await findByText("ERROR: Entity 'Munt' missing from API Schema");
+    await findByText('New TestEntity');
   });
 
-
   test('Test EntityList.js New Entity button exists', async () => {
-
     const {findByTitle} = renderWithProviders(
-        <Route path="/list/:entityName">
-          <EntityList/>
-        </Route>,
-        {
-          route: '/list/TestEntity'
-        }
+      <Route path="/:entityName">
+        <EntityList entity={testEntity} />
+      </Route>,
+      {
+        route: '/TestEntity'
+      }
     );
     await findByTitle('New TestEntity');
   });
-
 });
-
-
-

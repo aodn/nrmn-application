@@ -45,7 +45,7 @@ public class TemplateServiceTest {
     void getDiversCsv() throws IOException {
         List<Diver> divers = Arrays.asList(
                 Diver.builder().initials("GWB").fullName("George Bush").build(),
-                Diver.builder().initials("BHO").fullName("Barrack Obama").build(),
+                Diver.builder().initials("BHO").fullName("Barack Obama").build(),
                 Diver.builder().initials("DJT").fullName("Donald Trump").build()
         );
 
@@ -57,7 +57,7 @@ public class TemplateServiceTest {
 
         assertEquals(4, csvLines.size());
         assertEquals("INITIALS,FULL NAME", csvLines.get(0));
-        assertEquals("BHO,Barrack Obama", csvLines.get(1));
+        assertEquals("BHO,Barack Obama", csvLines.get(1));
         assertEquals("DJT,Donald Trump", csvLines.get(2));
         assertEquals("GWB,George Bush", csvLines.get(3));
     }
@@ -65,7 +65,7 @@ public class TemplateServiceTest {
     @Test
     void getDiversForTemplate() throws IOException {
         Diver bush = Diver.builder().initials("GWB").fullName("George Bush").build();
-        Diver obama = Diver.builder().initials("BHO").fullName("Barrack Obama").build();
+        Diver obama = Diver.builder().initials("BHO").fullName("Barack Obama").build();
         Diver trump = Diver.builder().initials("DJT").fullName("Donald Trump").build();
         Diver robot = Diver.builder().initials("101").fullName("Robopresident").build();
         when(diverRepository.findAll()).thenReturn(Arrays.asList(bush, obama, trump, robot));

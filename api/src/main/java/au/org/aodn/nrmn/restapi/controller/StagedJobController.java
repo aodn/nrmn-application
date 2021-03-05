@@ -223,9 +223,21 @@ public class StagedJobController {
     public ResponseEntity deleteJob(@PathVariable Long jobId) {
         jobRepo.deleteById(jobId);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/delete/rows/{jobId}")
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
+    public ResponseEntity deleteJobRows(@PathVariable Long jobId,
+                                        Authentication authentication,
+                                        @RequestBody List<StagedRow> toDeleRows) {
+        return rowService.delete( toDeleRows).fold(err ->
+                        ResponseEntity
+                                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                                .body(err)
+                , rowUpdate -> ResponseEntity.ok().body(rowUpdate));
 
     }
 
 
-    }
+}
 

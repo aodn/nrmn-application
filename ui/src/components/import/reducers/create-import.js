@@ -1,28 +1,71 @@
 import {createSlice} from '@reduxjs/toolkit';
-import produce from 'immer';
 
 const importState = {
   success: false,
   isLoading: false,
   validationLoading: false,
   editLoading: false,
+  deleteLoading: false,
   ingestLoading: false,
   submitReady: false,
   ingestSuccess: false,
   percentCompleted: 0,
   indexChanged: {},
   errors: [],
-  rows: [],
+  validationErrors: {},
   errorsByMsg: [],
   errSelected: [],
   jobId: '',
   job: {}
 };
+const measureKey = [
+  'Inverts',
+  '2-5',
+  '5',
+  '7-5',
+  '10',
+  '12-5',
+  '15',
+  '20',
+  '25',
+  '30',
+  '35',
+  '40',
+  '50',
+  '62-5',
+  '75',
+  '87-5',
+  '100',
+  '112-5',
+  '125',
+  '137-5',
+  '150',
+  '162-5',
+  '175',
+  '187-5',
+  '200',
+  '250',
+  '300',
+  '350',
+  '400',
+  '450',
+  '500',
+  '550',
+  '600',
+  '650',
+  '700',
+  '750',
+  '800',
+  '850',
+  '900',
+  '950',
+  '1000'
+];
 
 export const exportRow = (row) => {
   const {measureJson} = {...row};
   Object.getOwnPropertyNames(measureJson || {}).forEach((numKey) => {
-    row[numKey] = measureJson[numKey];
+    row[measureKey[numKey]] = measureJson[numKey];
   });
   delete row.measureJson;
   return row;
@@ -53,9 +96,6 @@ const importSlice = createSlice({
   reducers: {
     ResetState: () => importState,
     JobReady: (state, action) => {
-      if (action.payload.rows && action.payload.rows.length > 0) {
-        state.rows = action.payload.rows.map((row) => exportRow(row));
-      }
       state.job = action.payload.job;
       state.isLoading = false;
     },
@@ -63,36 +103,31 @@ const importSlice = createSlice({
       state.errSelected = action.payload;
     },
     validationReady: (state, action) => {
-      return produce(state, (draft) => {
-        if (action.payload.errors.length > 0) {
-          const errors = action.payload.errors.reduce((acc, err) => {
-            acc[err.id] = err.errors;
-            return acc;
-          }, {});
+      if (action.payload.errors.length > 0) {
+        state.validationErrors = action.payload.errors.reduce((acc, err) => {
+          acc[err.id] = err.errors;
+          return acc;
+        }, {});
 
-          draft.rows = draft.rows.map((row) => {
-            const err = errors[row.id] || [];
-            return {
-              ...row,
-              errors: err
-            };
-          });
-
-          const validationErrors = mergeErrors(action.payload.errors);
-          draft.EnableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
-          draft.errorsByMsg = action.payload.summaries.sort((sum1, sum2) => sum2.count - sum1.count);
-          draft.validationLoading = false;
-        }
-      });
+        const validationErrors = mergeErrors(action.payload.errors);
+        state.EnableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
+        state.errorsByMsg = action.payload.summaries.sort((sum1, sum2) => sum2.count - sum1.count);
+      } else {
+        state.EnableSubmit = true;
+      }
     },
     AddRowIndex: (state, action) => {
-      return produce(state, (draft) => {
-        draft.rows[action.payload.id][action.payload.field] = action.payload.value;
-        const row = draft.rows[action.payload.id];
-        draft.indexChanged[row.id] = row;
-
-        draft.EnableSubmit = false;
+        state.indexChanged[action.payload.id] = action.payload.row;
+        state.EnableSubmit = false;
+    },
+    RowDeleteRequested: (state) => {
+      state.deleteLoading = true;
+    },
+    RowDeleteFinished: (state, action) => {
+      action.payload.forEach(i =>  {
+        delete state.rows[i];
       });
+      state.deleteLoading = false;
     },
     RowUpdateRequested: (state) => {
       state.editLoading = true;
@@ -100,9 +135,6 @@ const importSlice = createSlice({
     EditRowFinished: (state) => {
       state.editLoading = false;
       state.indexChanged = {};
-    },
-    JobStarting: (state) => {
-      state.isLoading = true;
     },
     JobRequested: (state) => {
       state.isLoading = true;
@@ -112,6 +144,10 @@ const importSlice = createSlice({
     },
     ValidationRequested: (state) => {
       state.validationLoading = true;
+    },
+    ValidationFinished: (state) => {
+      state.validationErrors = {};
+      state.validationLoading = false;
     },
     JobFinished: (state) => {
       state.isLoading = false;
@@ -127,6 +163,7 @@ const importSlice = createSlice({
       state.success = false;
       state.isLoading = false;
       state.validationLoading = false;
+      state.deleteLoading = false;
       if (action.payload) {
         state.errors = action.payload;
       }
@@ -138,16 +175,17 @@ export const importReducer = importSlice.reducer;
 export const {
   ResetState,
   jobFailed,
-  JobStarting,
   validationFilter,
   validationReady,
-  EditRowStarting,
+  ValidationFinished,
   EditRowFinished,
   JobFinished,
   JobReady,
   ingestFinished,
   EnableSubmit,
   RowUpdateRequested,
+  RowDeleteRequested,
+  RowDeleteFinished,
   ResetRowIndex,
   ValidationRequested,
   SubmitingestRequested,

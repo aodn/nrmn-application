@@ -1,12 +1,12 @@
 package au.org.aodn.nrmn.restapi.validation.validators.entities;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.model.EntityCriteria;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
-import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import cyclops.control.Validated;
 import lombok.val;
 
@@ -20,27 +20,26 @@ public abstract class BaseRowExistingEntity<E, R extends EntityCriteria<E>> exte
     }
 
     protected Validated<StagedRowError, E> checkExists(StagedRow target, String criteria, ValidationLevel errorLevel) {
-        val errorID = new ErrorID(
-                target.getId(),
-                target.getStagedJob().getId(),
-                criteria + " couldn't be found"
-        );
-
-        if (criteria == null || criteria.isEmpty())
-            errorID.setMessage(columnTarget + "is empty");
+        if (criteria == null || criteria.isEmpty()) {
+            return invalid(target, errorLevel, columnTarget + "is empty");
+        }
 
         return repo.findByCriteria(criteria)
                 .stream()
                 .findFirst()
                 .map(Validated::<StagedRowError, E>valid)
-                .orElseGet(() ->
-                        Validated.<StagedRowError, E>invalid(
-                                new StagedRowError(
-                                        errorID,
-                                        ValidationCategory.ENTITY,
-                                        errorLevel,
-                                        columnTarget,
-                                        target))
-                );
+                .orElseGet(() -> invalid(target, errorLevel, criteria + " couldn't be found"));
+    }
+
+    private Validated<StagedRowError, E> invalid(StagedRow target, ValidationLevel errorLevel, String error) {
+        return Validated.invalid(new StagedRowError(
+                new ErrorID(
+                        target.getId(),
+                        target.getStagedJob().getId(),
+                        error),
+                ValidationCategory.ENTITY,
+                errorLevel,
+                columnTarget,
+                target));
     }
 }
