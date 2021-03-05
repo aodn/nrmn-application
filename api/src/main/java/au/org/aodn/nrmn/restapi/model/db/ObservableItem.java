@@ -88,11 +88,6 @@ public class ObservableItem {
     private String habitatGroups;
 
     @Basic
-    @Column(name = "template_code")
-    @Schema(title = "Template code")
-    private String templatecode;
-
-    @Basic
     @Column(name = "letter_code")
     @Schema(title = "Letter code")
     private String letterCode;

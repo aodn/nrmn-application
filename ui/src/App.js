@@ -100,6 +100,11 @@ const App = () => {
         '@global': {
           '.ag-root-wrapper-body': {
             minHeight: 400
+          },
+          '.ag-header-cell:hover': {
+            '&:hover .menu-icon': {
+              opacity: '1 !important'
+            }
           }
         }
       }

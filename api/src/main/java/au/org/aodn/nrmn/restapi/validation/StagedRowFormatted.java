@@ -1,19 +1,14 @@
 package au.org.aodn.nrmn.restapi.validation;
 
-import au.org.aodn.nrmn.restapi.model.db.AphiaRef;
 import au.org.aodn.nrmn.restapi.model.db.Diver;
+import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -44,7 +39,7 @@ public class StagedRowFormatted {
 
     private Integer block;
 
-    private AphiaRef species;
+    private ObservableItem species;
 
 
     private Integer vis;
