@@ -9,7 +9,6 @@ import List from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import SettingsMenu from './SettingsMenu';
 import {useDispatch, useSelector} from 'react-redux';
 import {toggleLeftSideMenu} from './layout-reducer';
 import {NavLink} from 'react-router-dom';
@@ -80,8 +79,6 @@ const SideMenu = (props) => {
         ))}
       </List>
       <List>
-        <Divider />
-        <SettingsMenu />
         <Divider />
         {process.env.REACT_APP_VERSION && <ListSubheader>{`Version ${process.env.REACT_APP_VERSION}`}</ListSubheader>}
       </List>

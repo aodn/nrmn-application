@@ -112,7 +112,7 @@ const BaseForm = (params) => {
 
 BaseForm.propTypes = {
   submitLabel: PropTypes.string,
-  template: PropTypes.object
+  template: PropTypes.function
 };
 
 export default BaseForm;

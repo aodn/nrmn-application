@@ -12,7 +12,7 @@ import {itemRequested} from './middleware/entities';
 import Form from '@rjsf/material-ui';
 import ObjectListViewTemplate from './ObjectListViewTemplate';
 import {PropTypes} from 'prop-types';
-import {FileCopy, Edit} from '@material-ui/icons';
+import {Edit} from '@material-ui/icons';
 import {resetState} from './form-reducer';
 
 import EntityContainer from './EntityContainer';
@@ -139,18 +139,6 @@ const EntityView = (props) => {
             Edit
           </Button>
         </Grid>
-        <Grid item xs>
-          <Button
-            style={{marginTop: 25, width: '75%'}}
-            component={Link}
-            to={'/wip'}
-            color="secondary"
-            variant={'contained'}
-            startIcon={<FileCopy>copy</FileCopy>}
-          >
-            Copy
-          </Button>
-        </Grid>
       </Grid>
     </EntityContainer>
   );
@@ -158,7 +146,7 @@ const EntityView = (props) => {
 
 EntityView.propTypes = {
   entity: PropTypes.object,
-  template: PropTypes.object
+  template: PropTypes.function
 };
 
 export default EntityView;
