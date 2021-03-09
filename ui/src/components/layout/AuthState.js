@@ -7,13 +7,14 @@ import {toggleLogoutMenuOpen} from './layout-reducer';
 import {Button} from '@material-ui/core';
 
 const AuthState = () => {
-  const userName = useSelector((state) => state.auth.username);
+  const loggedIn = useSelector((state) => state.auth.success);
+  const username = useSelector((state) => state.auth.username);
   const dispatch = useDispatch();
   const history = useHistory();
 
   const openLogout = () => dispatch(toggleLogoutMenuOpen());
 
-  if (!userName || userName === '') {
+  if (!loggedIn) {
     return (
       <Button
         pt={10}
@@ -32,7 +33,7 @@ const AuthState = () => {
     return (
       <>
         <Button pt={10} variant="text" color="inherit" size="small" title={'Log out'} startIcon={<VerifiedUser />} onClick={openLogout}>
-          {userName}
+          {username}
         </Button>
         <Logout />
       </>
