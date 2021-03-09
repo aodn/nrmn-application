@@ -40,25 +40,6 @@ const useStyles = makeStyles((theme) => {
   };
 });
 
-Object.unfreeze = function (o) {
-  var oo = undefined;
-  if (o instanceof Array) {
-    oo = [];
-    var clone = function (v) {
-      oo.push(v);
-    };
-    o.forEach(clone);
-  } else if (o instanceof String) {
-    oo = new String(o).toString();
-  } else if (typeof o == 'object') {
-    oo = {};
-    for (var property in o) {
-      oo[property] = o[property];
-    }
-  }
-  return oo;
-};
-
 const DataSheetView = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -94,15 +75,16 @@ const DataSheetView = () => {
     setGridApi(params.api);
     getDataJob(job.id).then((res) => {
       if (res.data.rows && res.data.rows.length > 0) {
-        const rowsTmp = res.data.rows.map((row) => exportRow(row));
+        const rowsTmp = res.data.rows.map((row, i) => {
+          exportRow(row);
+          row.pos = i;
+          return row;
+        });
         const lastId = rowsTmp[rowsTmp.length - 1].id;
-        console.log(lastId);
 
         setAddDialog((prevDialog) => {
-          console.log({...prevDialog, lastId: lastId});
           return {...prevDialog, lastId: lastId};
         });
-        console.log(addDialog);
 
         params.api.setRowData([...rowsTmp]);
         var allColumnIds = [];
@@ -130,19 +112,24 @@ const DataSheetView = () => {
       {
         name: 'Add row(s)',
         action: () => {
-          setAddDialog((preDialog) => ({...preDialog, open: true, rowIndex: params.node.rowIndex}));
-          console.log(addDialog);
+          setAddDialog((preDialog) => ({...preDialog, open: true, rowIndex: params.node.data.pos}));
         }
       }
     ];
   };
 
   const handleAdd = () => {
+    const rowPosUpdated = getAllRows()
+      .filter((row) => row.pos >= addDialog.rowIndex)
+      .map((row) => {
+        return {...row, pos: row.pos + addDialog.number};
+      });
+
     const newLines = [];
-    for (let i = 1; i <= addDialog.number; i++) {
-      newLines.push({id: addDialog.lastId + i + ''});
+    for (let i = 0; i < addDialog.number; i++) {
+      newLines.push({id: addDialog.lastId + (i  + 1)+ '', pos: addDialog.rowIndex + i});
     }
-    console.log('newLine', addDialog);
+    gridApi.applyTransaction({update: rowPosUpdated});
     gridApi.applyTransaction({add: newLines, addIndex: addDialog.rowIndex});
     setAddDialog({...addDialog, open: false, number: 1, lastId: addDialog.lastId + addDialog.number, rowIndex: -1});
   };
@@ -167,7 +154,6 @@ const DataSheetView = () => {
         gridApi.applyTransaction({update: [row]});
         setIndexMap({...indexMap, ...toAdd});
       }
-      // gridApi.refreshCells({force: true});
     }
   };
 
