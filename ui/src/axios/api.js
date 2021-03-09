@@ -2,10 +2,10 @@ import axiosInstance from './index.js';
 import axios from 'axios';
 import store from '../components/store'; // will be useful to access to axios.all and axios.spread
 import {ImportProgress} from '../components/import/reducers/upload';
+
 function getToken() {
-  const token = store.getState().auth.accessToken;
-  const tokenType = store.getState().auth.tokenType;
-  return `${tokenType} ${token}`;
+  const {accessToken, tokenType} = store.getState().auth;
+  return `${tokenType} ${accessToken}`;
 }
 
 axiosInstance.interceptors.request.use(
@@ -26,6 +26,11 @@ const dataURLtoBlob = (dataurl) => {
     u8arr[n] = bstr.charCodeAt(n);
   }
   return new Blob([u8arr], {type: mime});
+};
+
+export const tokenExpired = () => {
+  const {expires} = store.getState().auth;
+  return expires && expires < Date.now();
 };
 
 export const userLogin = (params) => {

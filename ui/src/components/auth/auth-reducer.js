@@ -12,12 +12,14 @@ const authSlice = createSlice({
       state.loading = true;
     },
     login: (state, action) => {
+      const jwt = jwtDecode(action.payload.accessToken);
+      state.expires = jwt.exp * 1000;
       state.errors = [];
       state.username = action.payload.username;
       state.redirect = action.payload.redirect;
       state.accessToken = action.payload.accessToken;
       state.tokenType = action.payload.tokenType;
-      state.roles = jwtDecode(action.payload.accessToken).roles;
+      state.roles = jwt.roles;
       state.success = true;
       state.loading = false;
       localStorage.setItem('auth', JSON.stringify(state));

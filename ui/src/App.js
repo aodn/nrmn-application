@@ -7,7 +7,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import {blueGrey, deepPurple} from '@material-ui/core/colors';
 import Alert from '@material-ui/lab/Alert';
 import TopBar from './components/layout/TopBar';
-import store from './components/store';
 import SideMenu from './components/layout/SideMenu';
 import Login from './components/auth/login';
 import XlxsUpload from './components/import/XlxsUpload';
@@ -121,10 +120,7 @@ const referenceData = [
 const App = () => {
   const classes = useStyles();
   const leftSideMenuIsOpen = useSelector((state) => state.toggle.leftSideMenuIsOpen);
-  // TODO: do token expiry checks and such
-  const loggedIn = () => {
-    return store.getState().auth.accessToken !== null;
-  };
+  const loggedIn = useSelector((state) => state.auth.success);
 
   let theme = createMuiTheme({
     palette: {
@@ -195,7 +191,7 @@ const App = () => {
                   key={e.route.base}
                   path={e.route.base}
                   render={() => {
-                    return loggedIn() ? (
+                    return loggedIn ? (
                       <EntityEdit entity={e} template={e.template.add} />
                     ) : (
                       <Redirect to={`/login?redirect=${e.route.base}`} />
@@ -209,7 +205,7 @@ const App = () => {
                   key={e.route.edit}
                   path={e.route.edit}
                   render={() => {
-                    return loggedIn() ? (
+                    return loggedIn ? (
                       <EntityEdit entity={e} template={e.template.edit} />
                     ) : (
                       <Redirect to={`/login?redirect=${e.route.edit}`} />
@@ -223,7 +219,7 @@ const App = () => {
                   key={e.route.view}
                   path={e.route.view}
                   render={() => {
-                    return loggedIn() ? (
+                    return loggedIn ? (
                       <EntityView entity={e} template={e.template.view} />
                     ) : (
                       <Redirect to={`/login?redirect=${e.route.view}`} />
@@ -237,7 +233,7 @@ const App = () => {
                   key={e.list.route}
                   path={e.list.route}
                   render={() => {
-                    return loggedIn() ? <EntityList entity={e} /> : <Redirect to={`/login?redirect=${e.list.route}`} />;
+                    return loggedIn ? <EntityList entity={e} /> : <Redirect to={`/login?redirect=${e.list.route}`} />;
                   }}
                 />
               ))}
