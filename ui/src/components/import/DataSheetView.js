@@ -75,10 +75,8 @@ const DataSheetView = () => {
     setGridApi(params.api);
     getDataJob(job.id).then((res) => {
       if (res.data.rows && res.data.rows.length > 0) {
-        const rowsTmp = res.data.rows.map((row, i) => {
-          exportRow(row);
-          row.pos = i;
-          return row;
+        const rowsTmp = res.data.rows.map((row) => {
+          return exportRow(row);
         });
         const lastId = rowsTmp[rowsTmp.length - 1].id;
 
@@ -119,15 +117,17 @@ const DataSheetView = () => {
   };
 
   const handleAdd = () => {
+    let toUpdate ={};
     const rowPosUpdated = getAllRows()
       .filter((row) => row.pos >= addDialog.rowIndex)
       .map((row) => {
-        return {...row, pos: row.pos + addDialog.number};
+        toUpdate[row.pos] = {...row, pos: row.pos + addDialog.number};
+        return toUpdate[row.pos];
       });
-
+    setIndexMap({...indexMap, ...toUpdate});
     const newLines = [];
     for (let i = 0; i < addDialog.number; i++) {
-      newLines.push({id: addDialog.lastId + (i  + 1)+ '', pos: addDialog.rowIndex + i});
+      newLines.push({id: addDialog.lastId + (i + 1) + '', pos: addDialog.rowIndex + i});
     }
     gridApi.applyTransaction({update: rowPosUpdated});
     gridApi.applyTransaction({add: newLines, addIndex: addDialog.rowIndex});
