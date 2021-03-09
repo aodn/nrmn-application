@@ -22,7 +22,8 @@ export const ColumnDef = [
   {
       field: 'pos',
       editable: false,
-      headerName: '#'
+      headerName: '#',
+      sort: 'asc',
   },
   {
     field: 'diver',

@@ -157,12 +157,17 @@ const DataSheetView = () => {
     }
   };
 
+  const onPasteStart = (evt) => {
+    console.log(evt.api.getSelectedNodes());
+  };
+
   const onCellChanged = (evt) => {
     let toAdd = {};
     toAdd[evt.rowIndex] = evt.data;
     setIndexMap({...indexMap, ...toAdd});
     setCanSaved(true);
   };
+
   const getAllRows = () => {
     let rowData = [];
     gridApi.forEachNode((node) => rowData.push(node.data));
@@ -235,6 +240,7 @@ const DataSheetView = () => {
             }
           }}
           onCellValueChanged={onCellChanged}
+          onPasteStart={onPasteStart}
           columnDefs={colDefinition}
           groupDefaultExpanded={4}
           rowHeight={18}
