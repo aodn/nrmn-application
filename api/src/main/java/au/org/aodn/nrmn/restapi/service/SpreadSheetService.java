@@ -142,6 +142,7 @@ public class SpreadSheetService {
                         stagedRow.setDepth(_getCellValue(row.getCell(headerMap.get("Depth")), eval, fmt));
                         stagedRow.setMethod(_getCellValue(row.getCell(headerMap.get("Method")), eval, fmt));
                         stagedRow.setBlock((_getCellValue(row.getCell(headerMap.get("Block")), eval, fmt)));
+                        stagedRow.setCode(_getCellValue(row.getCell(headerMap.get("Code")), eval, fmt));
                         stagedRow.setSpecies(_getCellValue(row.getCell(headerMap.get("Species")), eval, fmt));
                         stagedRow.setCommonName(_getCellValue(row.getCell(headerMap.get("Common name")), eval, fmt));
                         stagedRow.setTotal(_getCellValue(row.getCell(headerMap.get("Total")), eval, fmt));
