@@ -4,8 +4,8 @@ import config from 'react-global-configuration';
 import {useHistory} from 'react-router';
 import {NavLink} from 'react-router-dom';
 import {PropTypes} from 'prop-types';
-import {Box, Grid, IconButton, Typography} from '@material-ui/core';
-import {Edit, FileCopy, Delete} from '@material-ui/icons';
+import {Box, Button, Grid, IconButton, Typography} from '@material-ui/core';
+import {Add, Edit, FileCopy, Delete} from '@material-ui/icons';
 import Alert from '@material-ui/lab/Alert';
 import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
 import useWindowSize from '../utils/useWindowSize';
@@ -13,14 +13,6 @@ import CustomTooltip from './customTooltip';
 import CustomLoadingOverlay from './CustomLoadingOverlay';
 import {selectRequested} from './middleware/entities';
 import {resetState} from './form-reducer';
-import LinkButton from './LinkButton';
-
-const cellRenderer = (params) => {
-  if (typeof params.value === 'object') {
-    return JSON.stringify(params.value)?.replaceAll(/["{}]/g, '').replaceAll(',', ', ').trim();
-  }
-  return params.value;
-};
 
 const getCellFilter = (format) => {
   const filterTypes = {
@@ -37,14 +29,16 @@ const schematoColDef = (schema, entity) => {
     return {
       field: field,
       tooltipField: field,
-      filter: getCellFilter(type),
-      cellRenderer: cellRenderer
+      suppressMovable: true,
+      flex: field === entity.flexField ? true : false,
+      filter: getCellFilter(type)
     };
   });
 
   coldefs.push({
     field: '',
     filter: null,
+    suppressMovable: true,
     // eslint-disable-next-line react/display-name
     cellRendererFramework: function (e) {
       return (
@@ -96,19 +90,18 @@ const EntityList = (props) => {
   const dispatch = useDispatch();
   const entities = useSelector((state) => state.form.entities);
   const errors = useSelector((state) => state.form.errors);
-  const items = entities?._embedded ? entities._embedded[props.entity.list.name] : undefined;
+  const items = entities?._embedded[props.entity.list.name];
 
   const agGridReady = (agGrid) => {
     agGridApi = Object.create(agGrid.api);
     agGridColumnApi = agGrid.columnApi;
-    agGridApi.setRowData(items);
     Object.freeze(agGridApi);
   };
 
   function autoSizeAll() {
     let allColumnIds = [];
     agGridColumnApi.getAllColumns().forEach(function (column) {
-      allColumnIds.push(column.colId);
+      if (props.entity.flexField !== column.colId) allColumnIds.push(column.colId);
     });
     agGridColumnApi.autoSizeColumns(allColumnIds, false);
   }
@@ -120,58 +113,59 @@ const EntityList = (props) => {
       agGridApi.showLoadingOverlay();
     }
     dispatch(selectRequested(props.entity.list.endpoint));
-  }, [props.entity.name]); // reset when new or entityName prop changes
+  }, [props.entity.name]);
 
   const colDef = schematoColDef(schemaDefinition[props.entity.list.schemaKey], props.entity);
 
-  if (items !== undefined && agGridApi.setRowData) {
-    agGridApi.setRowData(items);
-    autoSizeAll();
-  }
-
   return (
     <>
-      <Box>
-        <Grid container direction="row" justify="space-between" alignItems="center">
-          <Grid item>
-            <Typography variant="h4">{props.entity.name}</Typography>
-          </Grid>
-          <Grid item>
-            <Grid container spacing={2}>
-              <LinkButton key={props.entity.name} title={`New ${props.entity.name}`} to={props.entity.route.base} />
-            </Grid>
-          </Grid>
+      <Grid container direction="row" justify="space-between" style={{paddingLeft: 20}} alignItems="center">
+        <Grid item>
+          <Typography variant="h4">{props.entity.name}</Typography>
         </Grid>
+        <Grid item>
+          <Button
+            {...props}
+            to={props.entity.route.base}
+            component={NavLink}
+            color="secondary"
+            variant={'contained'}
+            startIcon={<Add></Add>}
+          >
+            New {props.entity.name}
+          </Button>
+        </Grid>
+      </Grid>
 
-        <div style={{height: size.height - 150}} className={'ag-theme-material'}>
-          <AgGridReact
-            columnDefs={colDef}
-            rowSelection="single"
-            animateRows={true}
-            onGridReady={agGridReady}
-            onFirstDataRendered={autoSizeAll}
-            onCellClicked={(e) => {
-              gotoEntity(e, history, props.entity);
-            }}
-            frameworkComponents={{
-              customTooltip: CustomTooltip,
-              customLoadingOverlay: CustomLoadingOverlay
-            }}
-            loadingOverlayComponent={'customLoadingOverlay'}
-            tooltipShowDelay={0}
-            defaultColDef={{
-              sortable: false,
-              resizable: true,
-              tooltipComponent: 'customTooltip',
-              floatingFilter: true,
-              headerComponentParams: {
-                menuIcon: 'fa-bars'
-              }
-            }}
-          />
-        </div>
-        {errors.length > 0 ? renderError(errors) : ''}
-      </Box>
+      <div style={{height: size.height - 150, marginTop: 20}} className={'ag-theme-material'}>
+        <AgGridReact
+          columnDefs={colDef}
+          rowSelection="single"
+          animateRows={false}
+          rowData={items}
+          onGridReady={agGridReady}
+          onFirstDataRendered={autoSizeAll}
+          onCellClicked={(e) => {
+            gotoEntity(e, history, props.entity);
+          }}
+          frameworkComponents={{
+            customTooltip: CustomTooltip,
+            customLoadingOverlay: CustomLoadingOverlay
+          }}
+          loadingOverlayComponent={'customLoadingOverlay'}
+          tooltipShowDelay={0}
+          defaultColDef={{
+            sortable: true,
+            resizable: true,
+            tooltipComponent: 'customTooltip',
+            floatingFilter: true,
+            headerComponentParams: {
+              menuIcon: 'fa-bars'
+            }
+          }}
+        />
+      </div>
+      {errors.length > 0 ? renderError(errors) : ''}
     </>
   );
 };

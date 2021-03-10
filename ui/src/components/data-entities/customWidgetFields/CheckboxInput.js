@@ -11,6 +11,7 @@ const CheckboxInput = (props) => {
 
   return (
     <FormControlLabel
+      style={{marginTop: '25px', marginLeft: '5px'}}
       control={
         <Checkbox
           checked={formData[entity] ?? false}

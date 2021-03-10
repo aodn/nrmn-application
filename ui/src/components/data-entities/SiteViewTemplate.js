@@ -1,4 +1,4 @@
-import {Box, Grid} from '@material-ui/core';
+import {Box, Grid, Paper} from '@material-ui/core';
 
 import React from 'react';
 import {PropTypes} from 'prop-types';
@@ -11,58 +11,61 @@ const SiteViewTemplate = (props) => {
   });
 
   return (
-    <Box width={600}>
-      <h1>{title}</h1>
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          {el['siteCode']}
+    <>
+      <Box width={600}>
+        <h1>{title}</h1>
+        <Grid container spacing={2} component={Paper}>
+          <Grid item xs={6}>
+            {el['siteCode']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['siteName']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['locationName']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['isActive']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['state']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['country']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['mpa']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['protectionStatus']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['latitude']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['longitude']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['relief']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['slope']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['waveExposure']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['currents']}
+          </Grid>
+          <Grid item xs={12}>
+            {el['oldSiteCodes']}
+          </Grid>
+          <Grid item xs={12}>
+            {el['siteAttribute']}
+          </Grid>
         </Grid>
-        <Grid item xs={6}>
-          {el['siteName']}
-        </Grid>
-        <Grid item xs={6}>
-          {el['location']}
-        </Grid>
-        <Grid item xs={6}>
-          {el['isActive']}
-        </Grid>
-      </Grid>
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          {el['state']}
-        </Grid>
-        <Grid item xs={6}>
-          {el['country']}
-        </Grid>
-        <Grid item xs={6}>
-          {el['latitude']}
-        </Grid>
-        <Grid item xs={6}>
-          {el['longitude']}
-        </Grid>
-        <Grid item xs={6}>
-          {el['mpa']}
-        </Grid>
-        <Grid item xs={6}>
-          {el['protectionStatus']}
-        </Grid>
-        <Grid item xs={6}>
-          {el['relief']}
-        </Grid>
-        <Grid item xs={6}>
-          {el['slope']}
-        </Grid>
-        <Grid item xs={6}>
-          {el['waveExposure']}
-        </Grid>
-        <Grid item xs={6}>
-          {el['currents']}
-        </Grid>
-        <Grid item xs={6}>
-          {el['siteAttribute']}
-        </Grid>
-      </Grid>
-    </Box>
+      </Box>
+    </>
   );
 };
 

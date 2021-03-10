@@ -109,9 +109,9 @@ export const entitySave = (entity, params) => {
     .catch((err) => err);
 };
 
-export const entityEdit = (url, params) => {
+export const entityEdit = (entity, params) => {
   return axiosInstance
-    .put(url, params, {
+    .put('/api/' + entity, params, {
       validateStatus: () => true
     })
     .then((res) => res)

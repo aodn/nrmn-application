@@ -32,9 +32,11 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex'
   },
   mainContent: {
-    marginTop: 50,
+    marginTop: 60,
     flexGrow: 1,
-    padding: theme.spacing(3),
+    paddingTop: theme.spacing(3),
+    paddingLeft: theme.spacing(3),
+    paddingRight: theme.spacing(3),
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen
@@ -55,6 +57,7 @@ const referenceData = [
     name: 'Location',
     idKey: 'locationId',
     can: {delete: false, clone: false},
+    flexField: 'locationName',
     route: {base: '/reference/location', view: '/reference/location/:id?/:success?', edit: '/reference/location/:id?/edit'},
     schemaKey: 'Location',
     endpoint: 'locations',
@@ -70,6 +73,7 @@ const referenceData = [
     name: 'Diver',
     idKey: 'diverId',
     can: {delete: false, clone: false},
+    flexField: 'fullName',
     route: {base: '/reference/diver', view: '/reference/diver/:id?/:success?', edit: '/reference/diver/:id?/edit'},
     schemaKey: 'Diver',
     endpoint: 'divers',
@@ -85,8 +89,9 @@ const referenceData = [
     name: 'Site',
     idKey: 'siteId',
     can: {delete: true, clone: true},
+    flexField: null,
     route: {base: '/reference/site', view: '/reference/site/:id?/:success?', edit: '/reference/site/:id?/edit'},
-    schemaKey: 'Site',
+    schemaKey: 'SiteGetDto',
     endpoint: 'sites',
     template: {add: SiteAddTemplate, edit: SiteEditTemplate, view: SiteViewTemplate},
     list: {
@@ -100,6 +105,7 @@ const referenceData = [
     name: 'Observable Item',
     idKey: 'observableItemId',
     can: {delete: true, clone: true},
+    flexField: null,
     route: {
       base: '/reference/observableItem',
       view: '/reference/observableItem/:id?/:success?',

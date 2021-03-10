@@ -11,36 +11,41 @@ import {PropTypes} from 'prop-types';
 const NestedApiField = (props) => {
   let editItemValues = useSelector((state) => state.form.formData);
   let formOptions = useSelector((state) => state.form.formOptions);
-
   const dispatch = useDispatch();
+  const {entity, key, valueKey, route, entityList, values} = props.uiSchema;
 
-  const entity = props.name;
-  let itemsList = formOptions['locations'] ?? []; // FIXME: hardcoded test value!
-
+  let items = values ?? formOptions[entityList] ?? [];
+  const itemsList =
+    values ??
+    items.map((i) => {
+      return {id: i[key], label: i[valueKey]};
+    });
   const pluralEntity = entity;
 
-  let selectedItems = editItemValues[entity + 'Selected'] ? [editItemValues[entity + 'Selected']].filter(Boolean) : [];
-
   useEffect(() => {
-    let urls = [markupProjectionQuery(pluralEntity)];
-    if (editItemValues._links) {
-      urls.push(markupProjectionQuery(editItemValues._links[entity].href));
+    if (!values) {
+      let urls = [markupProjectionQuery(pluralEntity)];
+      if (editItemValues._links) {
+        urls.push(markupProjectionQuery(editItemValues._links[entity].href));
+      }
+      dispatch(selectedItemsRequested([route]));
     }
-    // FIXME: hardcoded test value!
-    dispatch(selectedItemsRequested(['locations?projection=selection']));
   }, []);
-
+  const id = editItemValues[key];
+  const value = itemsList.find((i) => i.id === id);
   return itemsList.length > 0 ? (
     <>
       <Typography variant="subtitle2">{props.schema.title}</Typography>
       <Autocomplete
-        id={'select-auto-' + entity}
+        id={'select-auto-' + key}
         options={itemsList}
         multiple={props.multiple || false}
-        getOptionLabel={(option) => option.label}
-        defaultValue={props.multiple ? selectedItems : selectedItems[0]}
+        getOptionLabel={(option) => {
+          return option.label;
+        }}
+        defaultValue={value}
         filterSelectedOptions
-        onChange={(_, value) => dispatch(setField({newValue: value.id, entity}))}
+        onChange={(_, value) => dispatch(setField({newValue: value.id, entity: key}))}
         renderInput={(params) => <TextField {...params} variant="outlined" />}
       />
     </>
@@ -55,7 +60,8 @@ const NestedApiField = (props) => {
 NestedApiField.propTypes = {
   name: PropTypes.string,
   multiple: PropTypes.bool,
-  schema: PropTypes.object
+  schema: PropTypes.object,
+  uiSchema: PropTypes.object
 };
 
 export default NestedApiField;
