@@ -16,7 +16,14 @@ function cell(params) {
 export const ColumnDef = [
   {
     field: 'id',
-    editable: false
+    editable: false,
+    hide: true
+  },
+  {
+      field: 'pos',
+      editable: false,
+      headerName: '#',
+      sort: 'asc',
   },
   {
     field: 'diver',
@@ -121,6 +128,10 @@ export const ColumnDef = [
   },
   {
     field: 'species',
+    pivot: true,
+    enablePivot: false,
+    rowGroup: false,
+    enableRowGroup: true,
     editable: true,
     cellStyle: cell
   },

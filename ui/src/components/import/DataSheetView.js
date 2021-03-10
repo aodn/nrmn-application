@@ -10,15 +10,16 @@ import {
   SubmitingestRequested,
   ValidationRequested,
   RowDeleteRequested,
-  ValidationFinished,
+  ValidationFinished
 } from './reducers/create-import';
 import {ColumnDef, ExtendedSize} from './ColumnDef';
-import {Box, ButtonGroup, Fab, makeStyles} from '@material-ui/core';
+import {Box, ButtonGroup, Fab, makeStyles, Dialog, TextField, DialogTitle, DialogActions, DialogContent, Button} from '@material-ui/core';
 import useWindowSize from '../utils/useWindowSize';
 import {getDataJob} from '../../axios/api';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import PlaylistAddCheckOutlinedIcon from '@material-ui/icons/PlaylistAddCheckOutlined';
 import SaveOutlinedIcon from '@material-ui/icons/SaveOutlined';
+import moment from 'moment';
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -40,25 +41,6 @@ const useStyles = makeStyles((theme) => {
   };
 });
 
-Object.unfreeze = function (o) {
-  var oo = undefined;
-  if (o instanceof Array) {
-    oo = [];
-    var clone = function (v) {
-      oo.push(v);
-    };
-    o.forEach(clone);
-  } else if (o instanceof String) {
-    oo = new String(o).toString();
-  } else if (typeof o == 'object') {
-    oo = {};
-    for (var property in o) {
-      oo[property] = o[property];
-    }
-  }
-  return oo;
-};
-
 const DataSheetView = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -69,6 +51,8 @@ const DataSheetView = () => {
   const enableSubmit = useSelector((state) => state.import.enableSubmit);
   const [indexMap, setIndexMap] = useState({});
   const [canSaved, setCanSaved] = useState(true);
+  const [addDialog, setAddDialog] = useState({open: false, rowIndex: -1, number: 1, lastId: 0});
+
   const validationErrors = useSelector((state) => state.import.validationErrors);
 
   const handleValidate = () => {
@@ -92,7 +76,15 @@ const DataSheetView = () => {
     setGridApi(params.api);
     getDataJob(job.id).then((res) => {
       if (res.data.rows && res.data.rows.length > 0) {
-        const rowsTmp = res.data.rows.map((row) => exportRow(row));
+        const rowsTmp = res.data.rows.map((row) => {
+          return exportRow(row);
+        });
+        const lastId = rowsTmp[rowsTmp.length - 1].id;
+
+        setAddDialog((prevDialog) => {
+          return {...prevDialog, lastId: lastId};
+        });
+
         params.api.setRowData([...rowsTmp]);
         var allColumnIds = [];
         params.columnApi.getAllColumns().forEach(function (column) {
@@ -110,13 +102,44 @@ const DataSheetView = () => {
         name: 'Delete selected Row(s)',
         action: () => {
           const selectedRows = params.api.getSelectedRows();
-          const indexes  = params.api.getSelectedNodes().map(n => n.childIndex);
+          const indexes = params.api.getSelectedNodes().map((n) => n.childIndex);
           dispatch(RowDeleteRequested({id: job.id, rows: selectedRows, indexes: indexes}));
           params.api.applyTransaction({remove: selectedRows});
         },
         cssClasses: ['redBoldFont']
+      },
+      {
+        name: 'Add row(s)',
+        action: () => {
+          setAddDialog((preDialog) => ({...preDialog, open: true, rowIndex: params.node.data.pos}));
+        }
       }
     ];
+  };
+
+  const handleAdd = () => {
+    let toUpdate = {};
+    const rowPosUpdated = getAllRows()
+      .filter((row) => row.pos >= addDialog.rowIndex)
+      .map((row) => {
+        toUpdate[row.id] = {...row, pos: row.pos + addDialog.number};
+        return toUpdate[row.id];
+      });
+    const newLines = [];
+    const time = moment(new Date().toISOString()).utcOffset(0,false).format('YYYY-DD-MMTHH:mm:ss.SSSZZ');
+    for (let i = 0; i < addDialog.number; i++) {
+      const newRow = {id: addDialog.lastId + (i + 1) + '', pos: addDialog.rowIndex + i, isNew: true, created: time};
+      toUpdate[newRow.id] = newRow;
+      newLines.push(newRow);
+    }
+    setIndexMap({...indexMap, ...toUpdate});
+    gridApi.applyTransaction({update: rowPosUpdated});
+    gridApi.applyTransaction({add: newLines, addIndex: addDialog.rowIndex});
+    setAddDialog({...addDialog, open: false, number: 1, lastId: addDialog.lastId + addDialog.number, rowIndex: -1});
+  };
+
+  const handAddleClose = () => {
+    setAddDialog({...addDialog, open: false, number: 1, rowIndex: -1});
   };
 
   const onKeyDown = (evt) => {
@@ -131,20 +154,20 @@ const DataSheetView = () => {
           row[field] = '';
         });
         let toAdd = {};
-        toAdd[i] = row;
+        toAdd[row.id] = row;
         gridApi.applyTransaction({update: [row]});
         setIndexMap({...indexMap, ...toAdd});
       }
-     // gridApi.refreshCells({force: true});
     }
   };
 
   const onCellChanged = (evt) => {
     let toAdd = {};
-    toAdd[evt.rowIndex] = evt.data;
+    toAdd[evt.data.id] = evt.data;
     setIndexMap({...indexMap, ...toAdd});
     setCanSaved(true);
   };
+
   const getAllRows = () => {
     let rowData = [];
     gridApi.forEachNode((node) => rowData.push(node.data));
@@ -173,7 +196,6 @@ const DataSheetView = () => {
       });
     }
   });
-
   const size = useWindowSize();
   return (
     <Box mt={2}>
@@ -240,6 +262,30 @@ const DataSheetView = () => {
           modules={AllModules}
           getContextMenuItems={getContextMenuItems}
         ></AgGridReact>
+        <Dialog aria-labelledby="Add Rows Dialogue" open={addDialog.open}>
+          <DialogTitle id="form-dialog-title">Add Rows</DialogTitle>
+          <DialogContent>
+            <TextField
+              id="outlined-basic"
+              default={addDialog.number}
+              onChange={(evt) => setAddDialog({...addDialog, number: parseInt(evt.target.value, 10)})}
+              label="Number of rows"
+              variant="outlined"
+              type="number"
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handAddleClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleAdd} color="primary">
+              Add
+            </Button>
+          </DialogActions>{' '}
+        </Dialog>
       </div>
     </Box>
   );

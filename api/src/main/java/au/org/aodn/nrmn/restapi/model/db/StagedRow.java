@@ -92,6 +92,9 @@ public class StagedRow implements Serializable {
     @Column(name = "inverts")
     private String inverts;
 
+    @Column(name = "position")
+    private Integer pos;
+
     @Column(name = "m2_invert_sizing_species")
     private String m2InvertSizingSpecies;
 
