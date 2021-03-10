@@ -25,7 +25,7 @@ import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecificationExecutor<Site>, EntityCriteria<Site> {
 
     @Override
-    @Query("SELECT s FROM Site s WHERE s.siteCode = :code")
+    @Query("SELECT s FROM Site s WHERE lower(s.siteCode) = lower(:code)")
     @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
     List<Site> findByCriteria(@Param("code") String siteCode);
 
