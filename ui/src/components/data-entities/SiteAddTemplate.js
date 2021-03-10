@@ -21,7 +21,7 @@ const SiteAddTemplate = (props) => {
           {el['siteName']}
         </Grid>
         <Grid item xs={6}>
-          {el['location']}
+          {el['locationId']}
         </Grid>
       </Grid>
       <Grid container spacing={2}>

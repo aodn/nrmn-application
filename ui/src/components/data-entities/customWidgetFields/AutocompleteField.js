@@ -12,7 +12,7 @@ const AutocompleteField = (props) => {
 
   const entity = props.name;
 
-  let route = props.uiSchema['ui:route'];
+  let route = props.uiSchema.route;
   let itemsList = formOptions[route] ?? [];
   let selectedItem = formData[entity];
 

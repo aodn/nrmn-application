@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.model.db.projections;
+package au.org.aodn.nrmn.restapi.repository.projections;
 
 import au.org.aodn.nrmn.restapi.model.db.Location;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.restapi.assembler.ObservableItemListItemAssembler;
+import au.org.aodn.nrmn.restapi.controller.assembler.ObservableItemListItemAssembler;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemListItem;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -21,10 +21,7 @@ const SiteEditTemplate = (props) => {
           {el['siteName']}
         </Grid>
         <Grid item xs={6}>
-          {el['location']}
-        </Grid>
-        <Grid item xs={6}>
-          {el['isActive']}
+          {el['locationId']}
         </Grid>
       </Grid>
       <Grid container spacing={2}>
@@ -58,8 +55,8 @@ const SiteEditTemplate = (props) => {
         <Grid item xs={6}>
           {el['currents']}
         </Grid>
-        <Grid item xs={6}>
-          {el['siteAttribute']}
+        <Grid item xs={12}>
+          {el['oldSiteCodes']}
         </Grid>
       </Grid>
     </Box>

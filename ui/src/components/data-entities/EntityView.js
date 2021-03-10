@@ -1,20 +1,17 @@
-import React from 'react';
-
-import {useDispatch, useSelector} from 'react-redux';
+import React, {useEffect} from 'react';
 import {Link, useParams} from 'react-router-dom';
-import {useEffect} from 'react';
-import NestedApiFieldDetails from './customWidgetFields/NestedApiFieldDetails';
-import TextInput from './customWidgetFields/TextInput';
+import {useDispatch, useSelector} from 'react-redux';
 import config from 'react-global-configuration';
-import {Box, Button, Grid} from '@material-ui/core';
-import Alert from '@material-ui/lab/Alert';
-import {itemRequested} from './middleware/entities';
-import Form from '@rjsf/material-ui';
-import ObjectListViewTemplate from './ObjectListViewTemplate';
 import {PropTypes} from 'prop-types';
 import {Edit} from '@material-ui/icons';
-import {resetState} from './form-reducer';
+import {Box, Button, Divider, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
+import Form from '@rjsf/material-ui';
 
+import TextInput from './customWidgetFields/TextInput';
+import {itemRequested} from './middleware/entities';
+// import ObjectListViewTemplate from './ObjectListViewTemplate';
+import {resetState} from './form-reducer';
 import EntityContainer from './EntityContainer';
 
 const EntityView = (props) => {
@@ -29,22 +26,14 @@ const EntityView = (props) => {
   }, []);
 
   const entityDef = schemaDefinition[props.entity.schemaKey];
-  const fullTitle = 'Details for ' + props.entity.name;
+  const fullTitle = `${props.entity.name} Details`;
   const entitySchema = {title: fullTitle, ...entityDef};
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
   const uiSchema = {'ui:widget': 'string'};
 
   for (const key in entitySchema.properties) {
     const item = entitySchema.properties[key];
-    if (item.type === 'string' && item.format === 'uri') {
-      uiSchema[key] = {'ui:field': 'relationship'};
-    }
-    if (item.type === 'object') {
-      uiSchema[key] = {'ui:field': 'objects'};
-    }
-    if (item.type === 'string') {
-      uiSchema[key] = {'ui:field': 'readonly'};
-    }
+    uiSchema[key] = item.type === 'object' ? {'ui:field': 'objects'} : {'ui:field': 'readonly'};
   }
 
   const inputDisplay = (elem) => {
@@ -56,35 +45,53 @@ const EntityView = (props) => {
     );
   };
 
-  const objectDisplay = (elem) => {
-    let items = [];
-    if (elem.formData) {
-      if (!Array.isArray(elem.formData)) {
-        if (elem.formData.label) {
-          items.push(<Grid item>{elem.formData.label}</Grid>);
-        } else {
-          for (let key of Object.keys(elem.formData)) {
-            items.push(
-              <Grid key={key} item>
-                <b>{key}: </b>
-                {elem.formData[key]}
-              </Grid>
-            );
-          }
-        }
-      } else {
-        elem.formData.map((item) => items.push(<Grid item>{item}</Grid>));
-      }
-    } else {
-      items.push(<Grid item>--</Grid>);
-    }
-    return ObjectListViewTemplate({name: elem.schema.title ?? elem.name, items: items});
+  const objectTable = (elem) => {
+    const keys = elem.formData ? Object.keys(elem.formData) : [];
+    return keys.length > 0 ? (
+      <>
+        <Divider />
+        <TableContainer>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>{elem.schema.title}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {keys.map((key) => (
+                <TableRow key={key}>
+                  <TableCell>{key}</TableCell>
+                  <TableCell>{elem.formData[key]}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </>
+    ) : (
+      <Typography variant="subtitle2" component="i">
+        No {elem.schema.title}
+      </Typography>
+    );
+  };
+
+  const arrayTable = (elem) => {
+    const keys = elem.formData ? Object.keys(elem.formData) : [];
+    return keys.length > 0 ? (
+      <>
+        <Typography variant="subtitle2">{elem.schema.title}</Typography>{' '}
+        {keys.map((i) => `${elem.formData[i]}${i < keys.length - 1 ? ', ' : ''}`)}
+      </>
+    ) : (
+      <Typography variant="subtitle2" component="i">
+        No {elem.schema.title}
+      </Typography>
+    );
   };
 
   const fields = {
-    relationship: NestedApiFieldDetails,
-    objects: objectDisplay,
-    ArrayField: objectDisplay,
+    objects: objectTable,
+    ArrayField: arrayTable,
     BooleanField: inputDisplay,
     NumberField: inputDisplay,
     StringField: TextInput
@@ -129,7 +136,7 @@ const EntityView = (props) => {
       <Grid item xs>
         <Grid container alignItems="flex-start" direction="column">
           <Button
-            style={{marginTop: 25, width: '75%'}}
+            style={{marginTop: 35, width: '75%'}}
             component={Link}
             to={`${props.entity.route.base}/${params.id}/edit`}
             color="secondary"

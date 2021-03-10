@@ -74,7 +74,7 @@ public class SiteApiIT {
                         "\"siteName\": \"Low Islets\"," +
                         "\"longitude\": 147.7243," +
                         "\"latitude\": -40.13547," +
-                        "\"location\": \"" + entityRef(port, "locations", location.getLocationId()) + "\"," +
+                        "\"locationId\": " + location.getLocationId() + "," +
                         "\"oldSiteCodes\": [\"SIT01\", \"SIT02\"]," +
                         "\"siteAttribute\": {" +
                         "    \"OldSiteCodes\": \"2102,7617\"," +
@@ -120,7 +120,8 @@ public class SiteApiIT {
                         "    \"ProtectionStatus\": \"Fishing\"," +
                         "    \"ProxCountry\": \"Australia\"" +
                         "}," +
-                        "\"isActive\": true}")
+                        "\"isActive\": true," +
+                         "\"locationId\": " + site.getLocation().getLocationId() + "}")
                 .put(site.getSiteId().toString())
                 .then()
                 .assertThat()
@@ -130,28 +131,6 @@ public class SiteApiIT {
 
         assertThat(updatedSite.getSiteCode(), is(equalTo("TAS377")));
         assertThat(updatedSite.getSiteAttribute().get("OldSiteCodes"), is(equalTo("2102,7617")));
-    }
-
-    @Test
-    @WithUserDetails("test@gmail.com")
-    public void testPutSiteLocation() {
-        val site = siteTestData.persistedSite();
-        val newLocation = locationTestData.persistedLocation();
-
-        given()
-                .spec(spec)
-                .contentType("text/uri-list")
-                .auth()
-                .oauth2(jwtToken.get())
-                .body(entityRef(port, "locations", newLocation.getLocationId()))
-                .put(site.getSiteId().toString() + "/location")
-                .then()
-                .assertThat()
-                .statusCode(204);
-
-        val updatedSite = siteRepository.findById(site.getSiteId()).get();
-
-        assertThat(updatedSite.getLocation().getLocationId(), is(equalTo(newLocation.getLocationId())));
     }
 
     @Test
@@ -168,7 +147,7 @@ public class SiteApiIT {
                         "\"siteName\": \"" + existingSite.getSiteName() + "\"," +
                         "\"longitude\": 147.7243," +
                         "\"latitude\": -40.13547," +
-                        "\"location\": \"" + entityRef(port, "locations", existingSite.getLocation().getLocationId()) + "\"," +
+                        "\"locationId\": " + existingSite.getLocation().getLocationId() + "," +
                         "\"siteAttribute\": {" +
                         "    \"OldSiteCodes\": \"2102,7617\"," +
                         "    \"State\": \"Tasmania\"," +
@@ -199,7 +178,7 @@ public class SiteApiIT {
                         "\"siteName\": \"" + anotherSite.getSiteName() + "\"," +
                         "\"longitude\": " + site.getLongitude() + "," +
                         "\"latitude\": " + site.getLatitude() + "," +
-                        "\"location\": \"" + entityRef(port, "locations", site.getLocation().getLocationId()) + "\"," +
+                        "\"locationId\": " + site.getLocation().getLocationId() + "," +
                         "\"isActive\": " + site.getIsActive() + "}")
                 .put(site.getSiteId().toString())
                 .then()
@@ -220,7 +199,7 @@ public class SiteApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors.property", hasItems("siteCode", "siteName", "location"))
+                .body("errors.property", hasItems("siteCode", "siteName", "locationId"))
                 .body("errors.message", contains("must not be null", "must not be null", "must not be null"));
     }
 

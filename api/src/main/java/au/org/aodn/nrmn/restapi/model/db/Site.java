@@ -58,7 +58,7 @@ public class Site {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @NotNull
-    @Schema(title = "Location Name", implementation = String.class, format = "uri")
+    @Schema(title = "Location", implementation = String.class, format = "uri")
     @JoinColumn(name = "location_id", referencedColumnName = "location_id", nullable = false)
     private Location location;
 
@@ -84,7 +84,7 @@ public class Site {
 
     @Basic
     @Column(name = "mpa")
-    @Schema(title = "MPA")
+    @Schema(title = "Marine Protected Area")
     private String mpa;
 
     @Basic
@@ -98,13 +98,23 @@ public class Site {
     private Integer relief;
 
     @Basic
+    @Column(name = "slope")
+    @Schema(title = "Slope")
+    private Integer slope;
+
+    @Basic
+    @Column(name = "wave_exposure")
+    @Schema(title = "Wave exposure")
+    private Integer waveExposure;
+
+    @Basic
     @Column(name = "currents")
     @Schema(title = "Currents")
     private Integer currents;
 
     @Basic
     @Column(name = "is_active")
-    @Schema(title = "Active")
+    @Schema(title = "Is Active")
     private Boolean isActive;
 
     @Basic
