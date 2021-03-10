@@ -219,6 +219,22 @@ const App = () => {
                   }}
                 />
               ))}
+              {referenceData
+                .filter((e) => e.can.clone)
+                .map((e) => (
+                  <Route
+                    exact
+                    key={`${e.route.base}/:id?/clone`}
+                    path={`${e.route.base}/:id?/clone`}
+                    render={() => {
+                      return loggedIn ? (
+                        <EntityEdit entity={e} template={e.template.add} clone />
+                      ) : (
+                        <Redirect to={`/login?redirect=${e.route.base}/:id?/clone`} />
+                      );
+                    }}
+                  />
+                ))}
               {referenceData.map((e) => (
                 <Route
                   exact

@@ -20,7 +20,7 @@ import NumberInput from './customWidgetFields/NumberInput';
 import CheckboxInput from './customWidgetFields/CheckboxInput';
 import AutocompleteField from './customWidgetFields/AutocompleteField';
 
-const EntityEdit = ({entity, template}) => {
+const EntityEdit = ({entity, template, clone}) => {
   const params = useParams();
 
   const schemaDefinition = config.get('api') || {};
@@ -29,7 +29,7 @@ const EntityEdit = ({entity, template}) => {
   const errors = useSelector((state) => state.form.errors);
   const dispatch = useDispatch();
 
-  const isEdit = typeof params.id !== 'undefined';
+  const edit = !clone && typeof params.id !== 'undefined';
 
   useEffect(() => {
     if (params.id !== undefined) {
@@ -38,7 +38,7 @@ const EntityEdit = ({entity, template}) => {
   }, [entitySaved]);
 
   const handleSubmit = (form) => {
-    if (isEdit) {
+    if (edit) {
       const data = {path: `${entity.endpoint}/${params.id}`, data: form.formData};
       dispatch(updateEntityRequested(data));
     } else {
@@ -47,7 +47,7 @@ const EntityEdit = ({entity, template}) => {
     }
   };
 
-  const title = (isEdit ? 'Edit ' : 'New ') + entity.name;
+  const title = (edit ? 'Edit ' : clone ? 'Clone ' : 'New ') + entity.name;
   const entityDef = {...schemaDefinition[entity.schemaKey]};
   const entitySchema = {title: title, ...entityDef};
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
@@ -141,7 +141,7 @@ const EntityEdit = ({entity, template}) => {
 
   if (entitySaved) {
     const id = entitySaved[entity.idKey];
-    return <Redirect to={`${entity.route.base}/${id}/${isEdit ? 'saved' : 'new'}`} />;
+    return <Redirect to={`${entity.route.base}/${id}/${edit ? 'saved' : 'new'}`} />;
   }
 
   return params.id && Object.keys(editItem).length === 0 ? (
@@ -198,7 +198,8 @@ const EntityEdit = ({entity, template}) => {
 
 EntityEdit.propTypes = {
   entity: PropTypes.object,
-  template: PropTypes.function
+  template: PropTypes.function,
+  clone: PropTypes.boolean
 };
 
 export default EntityEdit;

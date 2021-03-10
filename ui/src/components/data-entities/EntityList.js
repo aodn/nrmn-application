@@ -4,7 +4,7 @@ import config from 'react-global-configuration';
 import {useHistory} from 'react-router';
 import {NavLink} from 'react-router-dom';
 import {PropTypes} from 'prop-types';
-import {Box, Button, Grid, IconButton, Typography} from '@material-ui/core';
+import {Box, Button, Grid, IconButton, Tooltip, Typography} from '@material-ui/core';
 import {Add, Edit, FileCopy, Delete} from '@material-ui/icons';
 import Alert from '@material-ui/lab/Alert';
 import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
@@ -34,27 +34,34 @@ const schematoColDef = (schema, entity) => {
       filter: getCellFilter(type)
     };
   });
-
+  const scale = 1 + (entity.can.clone | 0) + (entity.can.delete | 0);
   coldefs.push({
     field: '',
     filter: null,
     suppressMovable: true,
+    minWidth: 60 * scale,
     // eslint-disable-next-line react/display-name
     cellRendererFramework: function (e) {
       return (
         <>
-          <IconButton component={NavLink} to={`${entity.route.base}/${e.data[entity.idKey]}/edit`}>
-            <Edit />
-          </IconButton>
-          {entity.can.clone && (
-            <IconButton component={NavLink} name="copy" to="/wip">
-              <FileCopy />
+          <Tooltip title="Edit" aria-label="edit">
+            <IconButton component={NavLink} to={`${entity.route.base}/${e.data[entity.idKey]}/edit`}>
+              <Edit />
             </IconButton>
+          </Tooltip>
+          {entity.can.clone && (
+            <Tooltip title="Clone" aria-label="clone">
+              <IconButton component={NavLink} to={`${entity.route.base}/${e.data[entity.idKey]}/clone`}>
+                <FileCopy />
+              </IconButton>
+            </Tooltip>
           )}
           {entity.can.delete && (
-            <IconButton component={NavLink} name="delete" to="/wip">
-              <Delete />
-            </IconButton>
+            <Tooltip title="Delete" aria-label="delete">
+              <IconButton component={NavLink} name="delete" to="/wip">
+                <Delete />
+              </IconButton>
+            </Tooltip>
           )}
         </>
       );
