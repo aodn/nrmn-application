@@ -3,15 +3,12 @@ package au.org.aodn.nrmn.restapi.repository;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.repository.model.EntityCriteria;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.data.rest.core.annotation.RestResource;
 
 import javax.persistence.QueryHint;
 import java.util.Collection;
@@ -29,23 +26,8 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
     @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
     List<Site> findByCriteria(@Param("code") String siteCode);
 
-    @Override
-    @RestResource
-    Page<Site> findAll(Pageable pageable);
-
-    @Override
-    @RestResource
-    <S extends Site> S save(S s);
-
-    @Override
-    @RestResource
-    Optional<Site> findById(Integer integer);
-
-    @Override
-    @RestResource
-    void delete(Site site);
-
     @Query(nativeQuery = true, value = "SELECT site_code FROM {h-schema}ep_site_list WHERE province = ?1")
     Collection<String> findSiteCodesByProvince(String province);
 
+    <T> Optional<T> findBySiteId(Integer id, Class<T> type);
 }

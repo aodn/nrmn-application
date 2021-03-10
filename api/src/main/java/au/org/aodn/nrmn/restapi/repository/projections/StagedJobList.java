@@ -1,11 +1,10 @@
-package au.org.aodn.nrmn.restapi.model.db.projections;
+package au.org.aodn.nrmn.restapi.repository.projections;
 
 import au.org.aodn.nrmn.restapi.model.db.Program;
 import au.org.aodn.nrmn.restapi.model.db.SecUser;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.data.rest.core.config.Projection;
 
 import java.sql.Timestamp;
