@@ -229,6 +229,7 @@ CREATE TABLE nrmn.staged_row (
     time varchar(255),
     total varchar(255),
     vis varchar(255),
+    position  bigint,
     staged_job_id bigint,
     CONSTRAINT staged_row_pkey PRIMARY KEY (id)
 );

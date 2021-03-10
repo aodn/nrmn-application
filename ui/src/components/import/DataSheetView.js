@@ -19,6 +19,7 @@ import {getDataJob} from '../../axios/api';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import PlaylistAddCheckOutlinedIcon from '@material-ui/icons/PlaylistAddCheckOutlined';
 import SaveOutlinedIcon from '@material-ui/icons/SaveOutlined';
+import moment from 'moment';
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -117,18 +118,21 @@ const DataSheetView = () => {
   };
 
   const handleAdd = () => {
-    let toUpdate ={};
+    let toUpdate = {};
     const rowPosUpdated = getAllRows()
       .filter((row) => row.pos >= addDialog.rowIndex)
       .map((row) => {
-        toUpdate[row.pos] = {...row, pos: row.pos + addDialog.number};
-        return toUpdate[row.pos];
+        toUpdate[row.id] = {...row, pos: row.pos + addDialog.number};
+        return toUpdate[row.id];
       });
-    setIndexMap({...indexMap, ...toUpdate});
     const newLines = [];
+    const time = moment(new Date().toISOString()).utcOffset(0,false).format('YYYY-DD-MMTHH:mm:ss.SSSZZ');
     for (let i = 0; i < addDialog.number; i++) {
-      newLines.push({id: addDialog.lastId + (i + 1) + '', pos: addDialog.rowIndex + i});
+      const newRow = {id: addDialog.lastId + (i + 1) + '', pos: addDialog.rowIndex + i, isNew: true, created: time};
+      toUpdate[newRow.id] = newRow;
+      newLines.push(newRow);
     }
+    setIndexMap({...indexMap, ...toUpdate});
     gridApi.applyTransaction({update: rowPosUpdated});
     gridApi.applyTransaction({add: newLines, addIndex: addDialog.rowIndex});
     setAddDialog({...addDialog, open: false, number: 1, lastId: addDialog.lastId + addDialog.number, rowIndex: -1});
@@ -150,20 +154,16 @@ const DataSheetView = () => {
           row[field] = '';
         });
         let toAdd = {};
-        toAdd[i] = row;
+        toAdd[row.id] = row;
         gridApi.applyTransaction({update: [row]});
         setIndexMap({...indexMap, ...toAdd});
       }
     }
   };
 
-  const onPasteStart = (evt) => {
-    console.log(evt.api.getSelectedNodes());
-  };
-
   const onCellChanged = (evt) => {
     let toAdd = {};
-    toAdd[evt.rowIndex] = evt.data;
+    toAdd[evt.data.id] = evt.data;
     setIndexMap({...indexMap, ...toAdd});
     setCanSaved(true);
   };
@@ -240,7 +240,6 @@ const DataSheetView = () => {
             }
           }}
           onCellValueChanged={onCellChanged}
-          onPasteStart={onPasteStart}
           columnDefs={colDefinition}
           groupDefaultExpanded={4}
           rowHeight={18}
@@ -272,6 +271,10 @@ const DataSheetView = () => {
               onChange={(evt) => setAddDialog({...addDialog, number: parseInt(evt.target.value, 10)})}
               label="Number of rows"
               variant="outlined"
+              type="number"
+              InputLabelProps={{
+                shrink: true
+              }}
             />
           </DialogContent>
           <DialogActions>
