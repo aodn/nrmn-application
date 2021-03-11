@@ -250,6 +250,8 @@ const DataSheetView = () => {
           enableRangeSelection={true}
           undoRedoCellEditing={true}
           undoRedoCellEditingLimit={20}
+          enableFillHandle={true}
+          fillHandleDirection="xy"
           ensureDomOrder={true}
           defaultColDef={{
             minWidth: 80,
