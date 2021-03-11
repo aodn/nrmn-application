@@ -8,6 +8,10 @@ import au.org.aodn.nrmn.restapi.dto.payload.JwtAuthenticationResponse;
 import au.org.aodn.nrmn.restapi.model.db.SecUser;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.specification.RequestSpecification;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +26,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Collections;
 
+import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers
@@ -30,6 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(PostgresqlContainerExtension.class)
 public class AuthControllerIT {
 
+    private static final String NON_EXISTENT_DIVER = "923579";
+    private static final String INVALID_TOKEN = "";
     @Autowired
     public TestRestTemplate testRestTemplate;
     @LocalServerPort
@@ -56,16 +63,7 @@ public class AuthControllerIT {
 
     @Test
     public void loginLogout() throws Exception {
-        val logReq = new LoginRequest("auth@gmail.com", "#12Trois");
-        val reqBuilder = new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
-
-        ResponseEntity<JwtAuthenticationResponse> response = reqBuilder
-                .withAppJson()
-                .withUri(_createUrl("/api/auth/signin"))
-                .withMethod(HttpMethod.POST)
-                .withEntity(logReq)
-                .withResponseType(JwtAuthenticationResponse.class)
-                .build(testRestTemplate);
+        ResponseEntity<JwtAuthenticationResponse> response = loginResponse("auth@gmail.com", "#12Trois");
 
         assertEquals(response.getStatusCode(), HttpStatus.OK);
         assertEquals(response.getBody().getAccessToken().length() > 10, true);
@@ -73,32 +71,42 @@ public class AuthControllerIT {
 
         val token = response.getBody().getAccessToken();
 
-
-
-
-        val logOutReq = new RequestWrapper<Void, Void>();
-        val resp = logOutReq
-                .withAppJson()
-                .withMethod(HttpMethod.POST)
-                .withToken(token)
-                .withUri(_createUrl("/api/auth/signout"))
-                .build(testRestTemplate);
+        ResponseEntity<Void> resp = logoutResponse(token);
         assertEquals(resp.getStatusCode(), HttpStatus.OK);
+    }
 
+    @Test
+    public void testLoginLogoutTokenAuth() throws Exception {
+        assertGetMissingDiverReturns(INVALID_TOKEN, HttpStatus.UNAUTHORIZED);
+        String firstLoginToken= login("auth@gmail.com", "#12Trois");
+        assertGetMissingDiverReturns(firstLoginToken, HttpStatus.NOT_FOUND);
+        logoutResponse(firstLoginToken);
+        assertGetMissingDiverReturns(firstLoginToken, HttpStatus.UNAUTHORIZED);
+        String secondLoginToken = login("auth@gmail.com", "#12Trois");
+        assertGetMissingDiverReturns(secondLoginToken, HttpStatus.NOT_FOUND);
+    }
+
+    private void assertGetMissingDiverReturns(String token, HttpStatus statusCode) {
+        RequestSpecification spec = new RequestSpecBuilder()
+                .setBaseUri(_createUrl(""))
+                .setBasePath("/api/divers")
+                .setContentType("application/json")
+                .addFilter(new ResponseLoggingFilter())
+                .addFilter(new RequestLoggingFilter())
+                .build();
+
+        given().spec(spec)
+               .auth()
+               .oauth2(token)
+               .get(NON_EXISTENT_DIVER)
+               .then()
+               .assertThat()
+               .statusCode(statusCode.value());
     }
 
     @Test
     public void badSignin() throws Exception {
-        val logReq = new LoginRequest("", "#12Trois");
-        val reqBuilder = new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
-
-        ResponseEntity<JwtAuthenticationResponse> response = reqBuilder
-                .withAppJson()
-                .withUri(_createUrl("/api/auth/signin"))
-                .withMethod(HttpMethod.POST)
-                .withEntity(logReq)
-                .withResponseType(JwtAuthenticationResponse.class)
-                .build(testRestTemplate);
+        ResponseEntity<JwtAuthenticationResponse> response = loginResponse("", "#12Trois");
 
         assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
     }
@@ -120,6 +128,34 @@ public class AuthControllerIT {
 
     private String _createUrl(String uri) {
         return "http://localhost:" + randomServerPort + uri;
+    }
+
+    private ResponseEntity<JwtAuthenticationResponse> loginResponse(String username, String password) throws Exception {
+        val logReq = new LoginRequest(username, password);
+        val reqBuilder = new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
+
+        return reqBuilder
+                .withAppJson()
+                .withUri(_createUrl("/api/auth/signin"))
+                .withMethod(HttpMethod.POST)
+                .withEntity(logReq)
+                .withResponseType(JwtAuthenticationResponse.class)
+                .build(testRestTemplate);
+    }
+
+    private ResponseEntity<Void> logoutResponse(String token) throws Exception {
+        val logOutReq = new RequestWrapper<Void, Void>();
+        return logOutReq
+                .withAppJson()
+                .withMethod(HttpMethod.POST)
+                .withToken(token)
+                .withUri(_createUrl("/api/auth/signout"))
+                .build(testRestTemplate);
+    }
+
+    private String login(String username, String password) throws Exception {
+        val response = loginResponse(username, password);
+        return response.getBody().getAccessToken();
     }
 
 }
