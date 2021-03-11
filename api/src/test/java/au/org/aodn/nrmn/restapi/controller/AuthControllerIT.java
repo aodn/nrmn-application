@@ -56,7 +56,7 @@ public class AuthControllerIT {
 
     @Test
     public void loginLogout() throws Exception {
-        val logReq = new LoginRequest("test@gmail.com", "#12Trois");
+        val logReq = new LoginRequest("auth@gmail.com", "#12Trois");
         val reqBuilder = new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
 
         ResponseEntity<JwtAuthenticationResponse> response = reqBuilder
