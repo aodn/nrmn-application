@@ -2,8 +2,8 @@ import AgGridHeader from './custom/header';
 
 function cell(params) {
   if (params.data?.errors?.length > 0) {
-    const fields = params.data.errors.map((e) => ({field: e.columnTarget.toLowerCase(), errorLevel: e.errorLevel}));
-    const target = params.colDef.field.toLowerCase();
+    const fields = params.data.errors.map((e) => ({field: e.columnTarget?.toLowerCase(), errorLevel: e.errorLevel}));
+    const target = params.colDef.field?.toLowerCase();
     const inter = fields.filter((e) => e.field === target);
     if (inter.length > 0) {
       const color = inter[0].errorLevel == 'BLOCKING' ? '#f44336' : '#ff9800';
@@ -30,12 +30,16 @@ export const ColumnDef = [
     editable: true,
     pivot: true,
     enablePivot: false,
-    cellStyle: cell
+    cellStyle: cell,
+    keyCreator: params => params.value?.toLowerCase()
+
   },
   {
     field: 'buddy',
     editable: true,
-    cellStyle: cell
+    cellStyle: cell,
+    keyCreator: params => params.value?.toLowerCase()
+
   },
   {
     field: 'siteCode',
@@ -43,7 +47,9 @@ export const ColumnDef = [
     editable: true,
     rowGroup: false,
     enableRowGroup: true,
-    cellStyle: cell
+    cellStyle: cell,
+    keyCreator: params => params.value?.toLowerCase()
+
   },
   {
     field: 'siteName',
@@ -68,7 +74,8 @@ export const ColumnDef = [
     cellStyle: cell,
     rowGroup: false,
     enableRowGroup: true,
-    minWidth: 105
+    minWidth: 105,
+    keyCreator: params => params.value?.toLowerCase()
   },
   {
     field: 'vis',
@@ -94,7 +101,9 @@ export const ColumnDef = [
     editable: true,
     rowGroup: false,
     enableRowGroup: true,
-    cellStyle: cell
+    cellStyle: cell,
+    keyCreator: params => params.value?.toLowerCase()
+
   },
   {
     field: 'method',
@@ -102,6 +111,7 @@ export const ColumnDef = [
     rowGroup: false,
     enableRowGroup: true,
     width: 105,
+    keyCreator: params => params.value?.toLowerCase()
 
   },
   {
@@ -110,7 +120,8 @@ export const ColumnDef = [
     rowGroup: false,
     enableRowGroup: true,
     cellStyle: cell,
-    width: 80
+    width: 80,
+    keyCreator: params => params.value?.toLowerCase()
   },
   {
     field: 'code',
@@ -133,7 +144,9 @@ export const ColumnDef = [
     rowGroup: false,
     enableRowGroup: true,
     editable: true,
-    cellStyle: cell
+    cellStyle: cell,
+    keyCreator: params => params.value?.toLowerCase()
+
   },
   {
     field: 'commonName',

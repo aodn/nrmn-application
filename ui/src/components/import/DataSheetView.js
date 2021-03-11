@@ -204,7 +204,7 @@ const DataSheetView = () => {
           <SaveOutlinedIcon className={classes.extendedIcon} />
           Save
         </Fab>
-        <Fab className={classes.fab} variant="extended" onClick={() => handleValidate()} size="small" label="Validate" color="secondary">
+        <Fab className={classes.fab} variant="extended" disabled={canSaved} onClick={() => handleValidate()} size="small" label="Validate" color="secondary">
           <PlaylistAddCheckOutlinedIcon className={classes.extendedIcon} />
           Validate
         </Fab>
@@ -250,6 +250,8 @@ const DataSheetView = () => {
           enableRangeSelection={true}
           undoRedoCellEditing={true}
           undoRedoCellEditingLimit={20}
+          enableFillHandle={true}
+          fillHandleDirection="xy"
           ensureDomOrder={true}
           defaultColDef={{
             minWidth: 80,
