@@ -38,7 +38,7 @@ const NestedApiField = (props) => {
     }
   }, []);
 
-  const selectedValue = itemsList.find((o) => o.id === formData[idKey]);
+  const selectedValue = itemsList.find((o) => o.id === formData[idKey ?? entity]);
   return itemsList.length > 1 ? (
     <>
       <Typography variant="subtitle2">{props.schema.title}</Typography>
@@ -52,7 +52,7 @@ const NestedApiField = (props) => {
         defaultValue={selectedValue}
         filterSelectedOptions
         onChange={(_, o) => {
-          dispatch(setField({newValue: o.id, entity: idKey}));
+          dispatch(setField({newValue: o.id, entity: idKey ?? entity}));
         }}
         renderInput={(params) => <TextField {...params} variant="outlined" />}
       />
