@@ -27,8 +27,8 @@ const AutocompleteField = (props) => {
         options={itemsList}
         freeSolo
         defaultValue={selectedItem}
-        onChange={(_, newValues) => {
-          dispatch(setField({newValues, entity}));
+        onChange={(_, newValue) => {
+          dispatch(setField({newValue: newValue, entity: entity}));
         }}
         renderInput={(params) => <TextField {...params} color="primary" variant="outlined" />}
       />

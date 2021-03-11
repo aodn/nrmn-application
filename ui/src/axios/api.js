@@ -118,6 +118,15 @@ export const entityEdit = (entity, params) => {
     .catch((err) => err);
 };
 
+export const entityDelete = (url, id) => {
+  return axiosInstance
+    .delete(`/api/${url}/${id}`, {
+      validateStatus: () => true
+    })
+    .then((res) => res)
+    .catch((err) => err);
+};
+
 export const entityRelation = (entity, urls) => {
   const config = {
     headers: {
