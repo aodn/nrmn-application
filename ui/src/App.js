@@ -184,10 +184,12 @@ const App = () => {
                   </Alert>
                 )}
               />
-              <Route exact path="/home" component={Homepage} />
-              <Route path="/404" component={FourOFour}></Route>
-              <Route path="/login" component={Login} />
 
+              <Route path="/login" component={Login} />
+              <Route exact path="/home" component={Homepage} />
+              <Route exact path="/404" component={FourOFour}></Route>
+
+              <Redirect exact from="/" to="/home" />
               {!loggedIn ? <Redirect to={`/login?redirect=${window.location.pathname}`} /> : null}
 
               {/** Authenticated Pages */}
@@ -218,7 +220,6 @@ const App = () => {
               {referenceData.map((e) => (
                 <Route exact key={e.list.route} path={e.list.route} render={() => <EntityList entity={e} />} />
               ))}
-              <Redirect exact from="/" to="/home" />
               <Route path="*" component={FourOFour}></Route>
             </Switch>
           </main>
