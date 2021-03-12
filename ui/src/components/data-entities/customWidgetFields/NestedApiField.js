@@ -9,43 +9,51 @@ import {markupProjectionQuery} from '../../utils/helpers';
 import {PropTypes} from 'prop-types';
 
 const NestedApiField = (props) => {
-  let editItemValues = useSelector((state) => state.form.formData);
+  let formData = useSelector((state) => state.form.formData);
   let formOptions = useSelector((state) => state.form.formOptions);
   const dispatch = useDispatch();
-  const {entity, key, valueKey, route, entityList, values} = props.uiSchema;
+  const {entity, idKey, valueKey, route, entityList, values} = props.uiSchema;
 
   let items = values ?? formOptions[entityList] ?? [];
-  const itemsList =
-    values ??
-    items.map((i) => {
-      return {id: i[key], label: i[valueKey]};
+
+  let itemsList = [];
+  if (values) {
+    itemsList = [...values];
+  } else {
+    const formattedItems = items.map((i) => {
+      return {id: i[idKey], label: i[valueKey]};
     });
+    itemsList = [...formattedItems];
+  }
+
   const pluralEntity = entity;
 
   useEffect(() => {
     if (!values) {
       let urls = [markupProjectionQuery(pluralEntity)];
-      if (editItemValues._links) {
-        urls.push(markupProjectionQuery(editItemValues._links[entity].href));
+      if (formData._links) {
+        urls.push(markupProjectionQuery(formData._links[entity].href));
       }
       dispatch(selectedItemsRequested([route]));
     }
   }, []);
-  const id = editItemValues[key];
-  const value = itemsList.find((i) => i.id === id);
-  return itemsList.length > 0 ? (
+
+  const selectedValue = itemsList.find((o) => o.id === formData[idKey ?? entity]);
+  return itemsList.length > 1 ? (
     <>
       <Typography variant="subtitle2">{props.schema.title}</Typography>
       <Autocomplete
-        id={'select-auto-' + key}
+        disableClearable
+        id={'select-auto-' + idKey}
         options={itemsList}
         multiple={props.multiple || false}
-        getOptionLabel={(option) => {
-          return option.label;
-        }}
-        defaultValue={value}
+        getOptionLabel={(o) => o.label}
+        getOptionSelected={(o, v) => o.id === v.id}
+        defaultValue={selectedValue}
         filterSelectedOptions
-        onChange={(_, value) => dispatch(setField({newValue: value.id, entity: key}))}
+        onChange={(_, o) => {
+          dispatch(setField({newValue: o.id, entity: idKey ?? entity}));
+        }}
         renderInput={(params) => <TextField {...params} variant="outlined" />}
       />
     </>

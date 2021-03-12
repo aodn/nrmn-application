@@ -1,15 +1,15 @@
 import {takeEvery, call, put} from 'redux-saga/effects';
 
-import {entityEdit, entitySave, getEntity, getSelectedEntityItems} from '../../../axios/api';
+import {entityEdit, entitySave, entityDelete, getEntity, getSelectedEntityItems} from '../../../axios/api';
 import {createAction} from '@reduxjs/toolkit';
 import {
+  itemLoaded,
   entitiesSaved,
   entitiesError,
   entitiesLoaded,
-  itemLoaded,
-  selectedItemsLoaded,
   selectedItemEdited,
-  selectedItemsEdited
+  selectedItemsEdited,
+  selectedItemsLoaded
 } from '../form-reducer';
 import {isSuccessful200Response} from '../../utils/helpers';
 
@@ -19,6 +19,7 @@ export default function* getEntitiesWatcher() {
   yield takeEvery(selectedItemsRequested, getSelectedItemsData);
   yield takeEvery(createEntityRequested, saveEntity);
   yield takeEvery(updateEntityRequested, updateEntity);
+  yield takeEvery(deleteEntityRequested, deleteEntity);
   yield takeEvery(setNestedField, setNestedFormData);
   yield takeEvery(setField, setFieldFormData);
 }
@@ -88,6 +89,15 @@ function* saveEntity(action) {
   }
 }
 
+function* deleteEntity(action) {
+  try {
+    const {entity, id} = action.payload;
+    yield call(entityDelete, entity.endpoint, id);
+  } catch (e) {
+    yield put(entitiesError({e}));
+  }
+}
+
 function* updateEntity(action) {
   try {
     const url = action.payload.data?._links?.self?.href ? action.payload.data._links.self.href : action.payload.path;
@@ -128,5 +138,9 @@ export const createEntityRequested = createAction('CREATE_ENTITY_REQUESTED', fun
 });
 
 export const updateEntityRequested = createAction('UPDATE_ENTITY_REQUESTED', function (entity) {
+  return {payload: entity};
+});
+
+export const deleteEntityRequested = createAction('DELETE_ENTITY_REQUESTED', function (entity) {
   return {payload: entity};
 });
