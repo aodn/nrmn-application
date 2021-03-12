@@ -91,8 +91,8 @@ function* saveEntity(action) {
 
 function* deleteEntity(action) {
   try {
-    const {entity, data} = action.payload;
-    yield call(entityDelete, entity.endpoint, data[entity.idKey]);
+    const {entity, id} = action.payload;
+    yield call(entityDelete, entity.endpoint, id);
   } catch (e) {
     yield put(entitiesError({e}));
   }

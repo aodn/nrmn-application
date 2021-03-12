@@ -44,7 +44,7 @@ const EntityList = (props) => {
   const dispatch = useDispatch();
   const entities = useSelector((state) => state.form.entities);
   const errors = useSelector((state) => state.form.errors);
-  const items = entities?._embedded ? entities?._embedded[props.entity.list.name] : null;
+  let items = entities?._embedded ? entities?._embedded[props.entity.list.name] : null;
 
   useEffect(() => {
     dispatch(resetState());
@@ -90,6 +90,7 @@ const EntityList = (props) => {
               <Tooltip title="Delete" aria-label="delete">
                 <IconButton
                   name="delete"
+                  disabled={cell.data.isActive}
                   onClick={() => {
                     setDialogState({
                       open: true,
@@ -152,8 +153,8 @@ const EntityList = (props) => {
         </Button>
         <Button
           onClick={() => {
-            const item = items[dialogState.index];
-            dispatch(deleteEntityRequested({entity: props.entity, data: item}));
+            const item = items.find((i) => i.siteId === dialogState.id);
+            dispatch(deleteEntityRequested({entity: props.entity, id: dialogState.id}));
             agGridApi.applyTransaction({remove: [item]});
             setDialogState({open: false});
           }}
