@@ -63,8 +63,8 @@ public class SiteDto {
     @Schema(title = "Other attributes", accessMode = Schema.AccessMode.READ_ONLY)
     private Map<String, String> siteAttribute;
 
-    @Schema(title = "Is Active")
-    private Boolean isActive;
+    @Schema(title = "Is Active", accessMode = Schema.AccessMode.READ_ONLY)
+    private Boolean isActive = false;
 
     @NotNull
     @Schema(title = "Location")
