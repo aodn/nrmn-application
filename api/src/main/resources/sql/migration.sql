@@ -551,7 +551,7 @@ CREATE TABLE nrmn.site_ref (
     wave_exposure integer,
     slope integer,
     site_attribute jsonb,
-    is_active boolean
+    is_active boolean NOT NULL
 );
 
 

@@ -113,7 +113,7 @@ public class Site {
     private Integer currents;
 
     @Basic
-    @Column(name = "is_active")
+    @Column(name = "is_active", columnDefinition = "boolean default false")
     @Schema(title = "Is Active")
     private Boolean isActive;
 
