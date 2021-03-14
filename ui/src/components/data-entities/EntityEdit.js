@@ -152,12 +152,9 @@ const EntityEdit = ({entity, template, clone}) => {
     <EntityContainer name={entity.name} goBackTo={entity.list.route}>
       <Grid item>
         {errors.length > 0 ? (
-          <Box padding={2}>
+          <Box pt={2} pl={2} pr={2}>
             <Alert severity="error" variant="filled">
-              {errors[0].message ?? `${entity.name} validation failed.`}
-            </Alert>
-            <Alert style={{marginTop: 5}} severity="info" variant="filled">
-              This feature is under construction.
+              Please review this submission for errors and try again.
             </Alert>
           </Box>
         ) : null}
@@ -168,6 +165,7 @@ const EntityEdit = ({entity, template, clone}) => {
             {errorAlert}
             <Form
               onError={params.onError}
+              errors={errors}
               schema={JSSchema}
               uiSchema={uiSchema}
               onSubmit={handleSubmit}

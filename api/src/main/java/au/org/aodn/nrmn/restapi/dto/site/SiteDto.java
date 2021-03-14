@@ -18,23 +18,27 @@ public class SiteDto {
     @Schema(title = "Id", accessMode = Schema.AccessMode.READ_ONLY)
     private Integer siteId;
 
-    @NotNull
+    @NotNull(message = "Site Code is required")
     @Schema(title = "Site Code")
     private String siteCode;
 
-    @NotNull
+    @NotNull(message = "Site Name is required")
     @Schema(title = "Site Name")
     private String siteName;
 
+    @NotNull(message = "Longitude is required")
     @Schema(title = "Longitude")
     private Double longitude;
 
+    @NotNull(message = "Latitude is required")
     @Schema(title = "Latitude")
     private Double latitude;
 
+    @NotNull(message = "State is required")
     @Schema(title = "State")
     private String state;
 
+    @NotNull(message = "Country is required")
     @Schema(title = "Country")
     private String country;
 
@@ -66,7 +70,7 @@ public class SiteDto {
     @Schema(title = "Is Active", accessMode = Schema.AccessMode.READ_ONLY)
     private Boolean isActive;
 
-    @NotNull
+    @NotNull(message = "Location is required")
     @Schema(title = "Location")
     private Integer locationId;
 }
