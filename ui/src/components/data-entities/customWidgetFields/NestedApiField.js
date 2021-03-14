@@ -11,6 +11,7 @@ import {PropTypes} from 'prop-types';
 const NestedApiField = (props) => {
   let formData = useSelector((state) => state.form.formData);
   let formOptions = useSelector((state) => state.form.formOptions);
+  const errors = useSelector((state) => state.form.errors);
   const dispatch = useDispatch();
   const {entity, idKey, valueKey, route, entityList, values} = props.uiSchema;
 
@@ -38,7 +39,9 @@ const NestedApiField = (props) => {
     }
   }, []);
 
-  const selectedValue = itemsList.find((o) => o.id === formData[idKey ?? entity]);
+  const name = idKey ?? entity;
+  const selectedValue = itemsList.find((o) => o.id === formData[name]);
+  const fieldError = errors.find((e) => e.property === name);
   return itemsList.length > 1 ? (
     <>
       <Typography variant="subtitle2">{props.schema.title}</Typography>
@@ -52,9 +55,9 @@ const NestedApiField = (props) => {
         defaultValue={selectedValue}
         filterSelectedOptions
         onChange={(_, o) => {
-          dispatch(setField({newValue: o.id, entity: idKey ?? entity}));
+          dispatch(setField({newValue: o.id, entity: name}));
         }}
-        renderInput={(params) => <TextField {...params} variant="outlined" />}
+        renderInput={(params) => <TextField {...params} variant="outlined" error={fieldError} helperText={fieldError?.message} />}
       />
     </>
   ) : (

@@ -22,9 +22,8 @@ const formSlice = createSlice({
       state.errors = [];
     },
     entitiesError: (state, action) => {
-      const error = action.payload.e.response?.data?.error ? action.payload.e.response.data.error : 'Error while getting the entity data';
       state.entities = [];
-      state.errors = [error];
+      state.errors = action.payload.e.response?.data?.errors;
     },
     itemLoaded: (state, action) => {
       state.formData = action.payload;
