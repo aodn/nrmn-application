@@ -76,7 +76,6 @@ public class SiteApiIT {
                         "\"latitude\": -40.13547," +
                         "\"state\": \"Tasmania\"," +
                         "\"country\": \"Australia\"," +
-                        "\"isActive\": false," +
                         "\"locationId\": " + location.getLocationId() + "}")
                 .post()
                 .then()
