@@ -14,7 +14,7 @@ const CheckboxInput = (props) => {
       style={{marginTop: '25px', marginLeft: '5px'}}
       control={
         <Checkbox
-          checked={formData[entity] ?? false}
+          checked={formData[entity] ?? props.schema.default}
           onChange={(event) => {
             const newValue = event.target.checked;
             dispatch(setField({newValue, entity}));

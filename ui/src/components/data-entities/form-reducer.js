@@ -23,7 +23,7 @@ const formSlice = createSlice({
     },
     entitiesError: (state, action) => {
       state.entities = [];
-      state.errors = action.payload.e.response?.data?.errors;
+      state.errors = action.payload.e.response?.data?.errors ?? [];
     },
     itemLoaded: (state, action) => {
       state.formData = action.payload;
