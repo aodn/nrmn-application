@@ -1,12 +1,12 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 const formState = {
-  entities: undefined,
-  formData: {},
-  formOptions: {},
-  entitySaved: false,
-  errors: [],
-  isLoading: false
+  entities: null,
+  data: {},
+  options: {},
+  loading: false,
+  saved: false,
+  errors: []
 };
 
 const formSlice = createSlice({
@@ -16,8 +16,8 @@ const formSlice = createSlice({
     resetState: () => formState,
     entitiesLoaded: (state, action) => {
       state.entityEdited = {};
-      state.formData = {};
-      state.entitySaved = false;
+      state.data = {};
+      state.saved = false;
       state.entities = action.payload;
       state.errors = [];
     },
@@ -26,30 +26,30 @@ const formSlice = createSlice({
       state.errors = action.payload.e.response?.data?.errors ?? [];
     },
     itemLoaded: (state, action) => {
-      state.formData = action.payload;
+      state.data = action.payload;
     },
     selectedItemEdited: (state, action) => {
       const key = Object.keys(action.payload)[0];
       let fieldData = {};
       fieldData[key] = action.payload[key];
-      state.formData = {...state.formData, ...fieldData};
+      state.data = {...state.data, ...fieldData};
     },
     selectedItemsEdited: (state, action) => {
       const key = Object.keys(action.payload)[0];
 
       let optionsData = {};
       optionsData[key] = action.payload[key];
-      state.formOptions = {...state.formOptions, ...optionsData};
+      state.options = {...state.options, ...optionsData};
 
       let fieldData = {};
       fieldData[key] = action.payload[key]._links.self.href;
-      state.formData = {...state.formData, ...fieldData};
+      state.data = {...state.data, ...fieldData};
     },
     embeddedFieldEdited: (state, action) => {
       const key = Object.keys(action.payload)[0];
       let fieldData = {};
       fieldData[key] = action.payload[key];
-      state.formData = {...state.formData, ...fieldData};
+      state.data = {...state.data, ...fieldData};
     },
     selectedItemsLoaded: (state, action) => {
       const key = Object.keys(action.payload._embedded)[0];
@@ -63,10 +63,10 @@ const formSlice = createSlice({
       } else {
         newOptions[key] = action.payload._embedded[key];
       }
-      state.formOptions = {...state.formOptions, ...newOptions};
+      state.options = {...state.options, ...newOptions};
     },
     entitiesSaved: (state, action) => {
-      state.entitySaved = action.payload;
+      state.saved = action.payload;
     }
   }
 });

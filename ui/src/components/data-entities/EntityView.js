@@ -10,14 +10,13 @@ import Form from '@rjsf/material-ui';
 
 import TextInput from './customWidgetFields/TextInput';
 import {itemRequested} from './middleware/entities';
-// import ObjectListViewTemplate from './ObjectListViewTemplate';
 import {resetState} from './form-reducer';
 import EntityContainer from './EntityContainer';
 
 const EntityView = (props) => {
   const params = useParams();
   const dispatch = useDispatch();
-  const editItem = useSelector((state) => state.form.formData);
+  const formData = useSelector((state) => state.form.data);
   const schemaDefinition = config.get('api') || {};
 
   useEffect(() => {
@@ -126,7 +125,7 @@ const EntityView = (props) => {
             uiSchema={uiSchema}
             showErrorList={true}
             fields={fields}
-            formData={editItem}
+            formData={formData}
             ObjectFieldTemplate={props.template}
           >
             <div></div>
@@ -153,7 +152,7 @@ const EntityView = (props) => {
 
 EntityView.propTypes = {
   entity: PropTypes.object,
-  template: PropTypes.function
+  template: PropTypes.func
 };
 
 export default EntityView;

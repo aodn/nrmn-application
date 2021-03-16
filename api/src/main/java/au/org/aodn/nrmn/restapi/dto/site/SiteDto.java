@@ -49,7 +49,7 @@ public class SiteDto {
     @Schema(title = "Marine Protected Area")
     private String mpa;
 
-    @Schema(title = "Protection status")
+    @Schema(title = "Protection Status")
     private String protectionStatus;
 
     @Schema(title = "Relief")
@@ -58,13 +58,13 @@ public class SiteDto {
     @Schema(title = "Slope")
     private Integer slope;
 
-    @Schema(title = "Wave exposure")
+    @Schema(title = "Wave Exposure")
     private Integer waveExposure;
 
     @Schema(title = "Currents")
     private Integer currents;
 
-    @Schema(title = "Other attributes", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(title = "Other Attributes", accessMode = Schema.AccessMode.READ_ONLY)
     private Map<String, String> siteAttribute;
 
     @NotNull(message = "Location is required")

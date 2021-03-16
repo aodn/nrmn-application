@@ -6,7 +6,7 @@ import {setField} from '../middleware/entities';
 
 const CheckboxInput = (props) => {
   const dispatch = useDispatch();
-  let formData = useSelector((state) => state.form.formData);
+  let formData = useSelector((state) => state.form.data);
   const entity = props.name;
 
   return (

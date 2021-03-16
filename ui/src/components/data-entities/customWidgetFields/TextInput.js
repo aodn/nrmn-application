@@ -7,25 +7,24 @@ import {setField} from '../middleware/entities';
 
 const TextInput = ({name, schema, uiSchema}) => {
   const dispatch = useDispatch();
-  const formData = useSelector((state) => state.form.formData);
-  const errors = useSelector((state) => state.form.errors);
+  const value = useSelector((state) => state.form.data[name]);
+  const error = useSelector((state) => state.form.errors).find((e) => e.property === name);
   const readOnly = uiSchema['ui:field'] === 'readonly';
 
-  const fieldError = errors.find((e) => e.property === name);
   return (
     <>
       <Typography variant="subtitle2">{schema.title}</Typography>
       {readOnly ? (
-        <Typography>{formData[name]}</Typography>
+        <Typography>{value}</Typography>
       ) : (
         <TextField
           color="primary"
           inputProps={{
             readOnly: readOnly
           }}
-          error={fieldError}
-          helperText={fieldError?.message}
-          value={formData[name] ?? ''}
+          error={error}
+          helperText={error?.message}
+          value={value}
           onChange={(event) => {
             const newValue = event.target.value;
             dispatch(setField({newValue, entity: name}));
