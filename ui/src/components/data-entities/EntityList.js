@@ -226,9 +226,4 @@ EntityList.propTypes = {
   entity: PropTypes.object
 };
 
-// const mapStateToProps = (state) => ({
-//   auth: state.auth,
-//   errors: state.errors
-// });
-
 export default EntityList;
