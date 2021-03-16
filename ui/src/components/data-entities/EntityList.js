@@ -88,21 +88,23 @@ const EntityList = (props) => {
             )}
             {entity.can.delete && (
               <Tooltip title="Delete" aria-label="delete">
-                <IconButton
-                  name="delete"
-                  disabled={cell.data.isActive}
-                  onClick={() => {
-                    setDialogState({
-                      open: true,
-                      id: cell.data[entity.idKey],
-                      index: cell.rowIndex,
-                      // HACK: making the assumption that all entities called `Entity` have a property `entityName`
-                      description: cell.data[`${entity.name.toLowerCase()}Name`]
-                    });
-                  }}
-                >
-                  <Delete />
-                </IconButton>
+                <span>
+                  <IconButton
+                    name="delete"
+                    disabled={cell.data.isActive}
+                    onClick={() => {
+                      setDialogState({
+                        open: true,
+                        id: cell.data[entity.idKey],
+                        index: cell.rowIndex,
+                        // HACK: making the assumption that all entities called `Entity` have a property `entityName`
+                        description: cell.data[`${entity.name.toLowerCase()}Name`]
+                      });
+                    }}
+                  >
+                    <Delete />
+                  </IconButton>
+                </span>
               </Tooltip>
             )}
           </>
@@ -223,5 +225,10 @@ const EntityList = (props) => {
 EntityList.propTypes = {
   entity: PropTypes.object
 };
+
+// const mapStateToProps = (state) => ({
+//   auth: state.auth,
+//   errors: state.errors
+// });
 
 export default EntityList;

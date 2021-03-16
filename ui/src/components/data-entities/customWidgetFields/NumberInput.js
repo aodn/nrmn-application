@@ -8,7 +8,7 @@ import {setField} from '../middleware/entities';
 const NumberInput = (props) => {
   const entity = props.name;
   const dispatch = useDispatch();
-  const formData = useSelector((state) => state.form.formData[entity]);
+  const formData = useSelector((state) => state.form.data[entity]);
   const errors = useSelector((state) => state.form.errors);
 
   const fieldError = errors.find((e) => e.property === entity);
@@ -40,7 +40,7 @@ NumberInput.propTypes = {
   name: PropTypes.string,
   title: PropTypes.string,
   schema: PropTypes.object,
-  formData: PropTypes.string
+  formData: PropTypes.number
 };
 
 export default NumberInput;

@@ -72,7 +72,7 @@ const SiteViewTemplate = (props) => {
 SiteViewTemplate.propTypes = {
   properties: PropTypes.any,
   title: PropTypes.string,
-  formData: PropTypes.array
+  formData: PropTypes.object
 };
 
 export default SiteViewTemplate;
