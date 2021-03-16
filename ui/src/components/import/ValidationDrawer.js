@@ -24,6 +24,12 @@ import {orange} from '@material-ui/core/colors';
 import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
 import ArrowBackIosOutlinedIcon from '@material-ui/icons/ArrowBackIosOutlined';
 import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 const drawerWidth = 500;
 
 const useStyles = makeStyles((theme) => ({
@@ -139,6 +145,12 @@ const ValidationDrawer = () => {
     }
   };
 
+  const titleCase = (word) => {
+    const result = word.replace(/([A-Z])/g, ' $1');
+    const finalResult = result.charAt(0).toUpperCase() + result.slice(1);
+    return finalResult;
+  };
+
   const removeFilter = () => {
     dispatch(validationFilter({ids: null}));
     setFilter('');
@@ -149,11 +161,21 @@ const ValidationDrawer = () => {
     setFilter(targetValue.toLowerCase());
   };
 
-  var errList = errorsByMsg;
-  if (errList && errorsByMsg.length > 0 && filter !== '') {
-    errList = errList.filter((err) => err.message.toLowerCase().indexOf(filter) >= 0);
+  var errList = Object.keys(errorsByMsg).map((label) => {
+    return {key: label, total: errorsByMsg[label].reduce((acc, v1) => {
+      return v1.count + acc;
+    }, 0), value: errorsByMsg[label]};
+  });
+
+  if (errList && errList.length > 0 && filter !== '') {
+    errList = errList.map((pair) => ({
+      key: pair.key,
+      total: pair.total,
+      value: pair.value.filter((err) => err.message.toLowerCase().indexOf(filter) >= 0)
+    }));
   }
-  return errorsByMsg && errorsByMsg.length > 0 ? (
+  console.log(errList);
+  return errList && errList.length > 0 ? (
     <Drawer
       anchor="right"
       variant="permanent"
@@ -207,24 +229,42 @@ const ValidationDrawer = () => {
           </IconButton>
         </Toolbar>
       </Box>
-      <List>
-        {errList.map((err, i) => (
-          <ListItem
-            onClick={() => handleFilter(err)}
-            selected={err.message === errSelected.message}
-            className={err.message === errSelected.message ? classes.selected : classes.errorItem}
-            button
-            key={i}
-          >
-            <ListItemIcon>
-              <Badge badgeContent={err.count} color="primary">
-                {err.level == 'WARNING' ? <ReportProblemOutlined style={{color: orange[500]}} /> : <BlockOutlinedIcon color="error" />}
-              </Badge>
-            </ListItemIcon>
-            <ListItemText color="secondary" primary={err.message} secondary={err.columnTarget} />
-          </ListItem>
-        ))}
-      </List>
+      {errList.map((err) => (
+        <Accordion key={err.key} defaultExpanded>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1c-content" id="panel1c-header">
+            <div className={classes.column}>
+              <Typography className={classes.heading}>{titleCase(err.key)}</Typography>
+            </div>
+            <div className={classes.column}>
+              <Typography className={classes.secondaryHeading}> ({err.total}) </Typography>
+            </div>
+          </AccordionSummary>
+          <AccordionDetails className={classes.details}>
+            <List>
+              {err.value.map((item, i) => (
+                <ListItem
+                  onClick={() => handleFilter(item)}
+                  selected={item.message === errSelected.message}
+                  className={item.message === errSelected.message ? classes.selected : classes.errorItem}
+                  button
+                  key={i}
+                >
+                  <ListItemIcon>
+                    <Badge badgeContent={item.count} color="primary">
+                      {item.level == 'WARNING' ? (
+                        <ReportProblemOutlined style={{color: orange[500]}} />
+                      ) : (
+                        <BlockOutlinedIcon color="error" />
+                      )}
+                    </Badge>
+                  </ListItemIcon>
+                  <ListItemText color="secondary" primary={item.message} secondary={item.columnTarget} />
+                </ListItem>
+              ))}
+            </List>
+          </AccordionDetails>
+        </Accordion>
+      ))}
     </Drawer>
   ) : (
     <></>
