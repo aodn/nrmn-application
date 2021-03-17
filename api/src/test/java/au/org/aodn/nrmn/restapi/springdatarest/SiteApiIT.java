@@ -74,16 +74,9 @@ public class SiteApiIT {
                         "\"siteName\": \"Low Islets\"," +
                         "\"longitude\": 147.7243," +
                         "\"latitude\": -40.13547," +
-                        "\"locationId\": " + location.getLocationId() + "," +
-                        "\"oldSiteCodes\": [\"SIT01\", \"SIT02\"]," +
-                        "\"siteAttribute\": {" +
-                        "    \"OldSiteCodes\": \"2102,7617\"," +
-                        "    \"State\": \"Tasmania\"," +
-                        "    \"Country\": \"Australia\"," +
-                        "    \"ProtectionStatus\": \"Fishing\"," +
-                        "    \"ProxCountry\": \"Australia\"" +
-                        "}," +
-                        "\"isActive\": true}")
+                        "\"state\": \"Tasmania\"," +
+                        "\"country\": \"Australia\"," +
+                        "\"locationId\": " + location.getLocationId() + "}")
                 .post()
                 .then()
                 .assertThat()
@@ -94,9 +87,9 @@ public class SiteApiIT {
         val updatedSite = siteRepository.findById(siteId).get();
 
         assertThat(updatedSite.getSiteCode(), is(equalTo("TAS377")));
-        assertThat(updatedSite.getSiteAttribute().get("OldSiteCodes"), is(equalTo("2102,7617")));
+        assertThat(updatedSite.getCountry(), is(equalTo("Australia")));
         assertThat(updatedSite.getLocation().getLocationId(), is(equalTo(location.getLocationId())));
-        assertThat(updatedSite.getOldSiteCodes(), hasItems("SIT01", "SIT02"));
+        assertThat(updatedSite.getState(), is(equalTo("Tasmania")));
     }
 
     @Test
@@ -113,14 +106,14 @@ public class SiteApiIT {
                         "\"siteName\": \"Low Islets\"," +
                         "\"longitude\": 147.7243," +
                         "\"latitude\": -40.13547," +
+                        "\"state\": \"Tasmania\"," +
+                        "\"country\": \"Australia\"," +
+                        "\"isActive\": false," +
                         "\"siteAttribute\": {" +
                         "    \"OldSiteCodes\": \"2102,7617\"," +
-                        "    \"State\": \"Tasmania\"," +
-                        "    \"Country\": \"Australia\"," +
                         "    \"ProtectionStatus\": \"Fishing\"," +
                         "    \"ProxCountry\": \"Australia\"" +
                         "}," +
-                        "\"isActive\": true," +
                          "\"locationId\": " + site.getLocation().getLocationId() + "}")
                 .put(site.getSiteId().toString())
                 .then()
@@ -148,14 +141,8 @@ public class SiteApiIT {
                         "\"longitude\": 147.7243," +
                         "\"latitude\": -40.13547," +
                         "\"locationId\": " + existingSite.getLocation().getLocationId() + "," +
-                        "\"siteAttribute\": {" +
-                        "    \"OldSiteCodes\": \"2102,7617\"," +
-                        "    \"State\": \"Tasmania\"," +
-                        "    \"Country\": \"Australia\"," +
-                        "    \"ProtectionStatus\": \"Fishing\"," +
-                        "    \"ProxCountry\": \"Australia\"" +
-                        "}," +
-                        "\"isActive\": true}")
+                        "\"state\": \"Tasmania\"," +
+                        "\"country\": \"Australia\"}")
                 .post()
                 .then()
                 .assertThat()
@@ -178,8 +165,9 @@ public class SiteApiIT {
                         "\"siteName\": \"" + anotherSite.getSiteName() + "\"," +
                         "\"longitude\": " + site.getLongitude() + "," +
                         "\"latitude\": " + site.getLatitude() + "," +
-                        "\"locationId\": " + site.getLocation().getLocationId() + "," +
-                        "\"isActive\": " + site.getIsActive() + "}")
+                        "\"state\": \"Tasmania\"," +
+                        "\"country\": \"Australia\"," +
+                        "\"locationId\": " + site.getLocation().getLocationId() + "}")
                 .put(site.getSiteId().toString())
                 .then()
                 .assertThat()
@@ -194,13 +182,12 @@ public class SiteApiIT {
                 .spec(spec)
                 .auth()
                 .oauth2(jwtToken.get())
-                .body("{\"isActive\": true}")
+                .body("{\"mpa\": \"mpa\"}")
                 .post()
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors.property", hasItems("siteCode", "siteName", "locationId"))
-                .body("errors.message", contains("must not be null", "must not be null", "must not be null"));
+                .body("errors.property", hasItems("siteCode", "siteName", "locationId", "state", "longitude", "latitude", "country"));
     }
 
     @Test

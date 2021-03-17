@@ -184,67 +184,42 @@ const App = () => {
                   </Alert>
                 )}
               />
+
+              <Route path="/login" component={Login} />
               <Route exact path="/home" component={Homepage} />
+              <Route exact path="/404" component={FourOFour}></Route>
+
+              <Redirect exact from="/" to="/home" />
+              {!loggedIn ? <Redirect to={`/login?redirect=${window.location.pathname}`} /> : null}
+
+              {/** Authenticated Pages */}
               <Route exact path="/jobs" component={JobList} />
               <Route exact path="/jobs/:id/view" component={JobView} />
               <Route exact path="/validation/:jobId" component={ValidationPage} />
               <Route exact path="/upload" component={XlxsUpload} />
-              <Route exact path="/login" component={Login} />
               <Redirect exact from="/list/stagedJob" to="/jobs" />
               {referenceData.map((e) => (
-                <Route
-                  exact
-                  key={e.route.base}
-                  path={e.route.base}
-                  render={() => {
-                    return loggedIn ? (
-                      <EntityEdit entity={e} template={e.template.add} />
-                    ) : (
-                      <Redirect to={`/login?redirect=${e.route.base}`} />
-                    );
-                  }}
-                />
+                <Route exact key={e.route.base} path={e.route.base} render={() => <EntityEdit entity={e} template={e.template.add} />} />
               ))}
               {referenceData.map((e) => (
-                <Route
-                  exact
-                  key={e.route.edit}
-                  path={e.route.edit}
-                  render={() => {
-                    return loggedIn ? (
-                      <EntityEdit entity={e} template={e.template.edit} />
-                    ) : (
-                      <Redirect to={`/login?redirect=${e.route.edit}`} />
-                    );
-                  }}
-                />
+                <Route exact key={e.route.edit} path={e.route.edit} render={() => <EntityEdit entity={e} template={e.template.edit} />} />
+              ))}
+              {referenceData
+                .filter((e) => e.can.clone)
+                .map((e) => (
+                  <Route
+                    exact
+                    key={`${e.route.base}/:id?/clone`}
+                    path={`${e.route.base}/:id?/clone`}
+                    render={() => <EntityEdit entity={e} template={e.template.add} clone />}
+                  />
+                ))}
+              {referenceData.map((e) => (
+                <Route exact key={e.route.view} path={e.route.view} render={() => <EntityView entity={e} template={e.template.view} />} />
               ))}
               {referenceData.map((e) => (
-                <Route
-                  exact
-                  key={e.route.view}
-                  path={e.route.view}
-                  render={() => {
-                    return loggedIn ? (
-                      <EntityView entity={e} template={e.template.view} />
-                    ) : (
-                      <Redirect to={`/login?redirect=${e.route.view}`} />
-                    );
-                  }}
-                />
+                <Route exact key={e.list.route} path={e.list.route} render={() => <EntityList entity={e} />} />
               ))}
-              {referenceData.map((e) => (
-                <Route
-                  exact
-                  key={e.list.route}
-                  path={e.list.route}
-                  render={() => {
-                    return loggedIn ? <EntityList entity={e} /> : <Redirect to={`/login?redirect=${e.list.route}`} />;
-                  }}
-                />
-              ))}
-              <Route path="/404" component={FourOFour}></Route>
-              <Redirect exact from="/" to="/home" />
               <Route path="*" component={FourOFour}></Route>
             </Switch>
           </main>

@@ -1,4 +1,4 @@
-import {Box, Grid, Paper} from '@material-ui/core';
+import {Box, Grid, Paper, Typography} from '@material-ui/core';
 
 import React from 'react';
 import {PropTypes} from 'prop-types';
@@ -25,7 +25,7 @@ const SiteViewTemplate = (props) => {
             {el['locationName']}
           </Grid>
           <Grid item xs={6}>
-            {el['isActive']}
+            {props.formData['isActive'] ? el['isActive'] : <Typography variant="subtitle2">Not Active</Typography>}
           </Grid>
           <Grid item xs={6}>
             {el['state']}
@@ -71,7 +71,8 @@ const SiteViewTemplate = (props) => {
 
 SiteViewTemplate.propTypes = {
   properties: PropTypes.any,
-  title: PropTypes.string
+  title: PropTypes.string,
+  formData: PropTypes.object
 };
 
 export default SiteViewTemplate;

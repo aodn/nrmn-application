@@ -5,27 +5,29 @@ import {TextField, Typography} from '@material-ui/core';
 import {PropTypes} from 'prop-types';
 import {setField} from '../middleware/entities';
 
-const TextInput = (props) => {
+const TextInput = ({name, schema, uiSchema}) => {
   const dispatch = useDispatch();
-  const formData = useSelector((state) => state.form.formData);
-  const entity = props.name;
-  const readOnly = props.uiSchema['ui:field'] === 'readonly';
+  const value = useSelector((state) => state.form.data[name]);
+  const error = useSelector((state) => state.form.errors).find((e) => e.property === name);
+  const readOnly = uiSchema['ui:field'] === 'readonly';
 
   return (
     <>
-      <Typography variant="subtitle2">{props.schema.title}</Typography>
+      <Typography variant="subtitle2">{schema.title}</Typography>
       {readOnly ? (
-        <Typography>{formData[entity]}</Typography>
+        <Typography>{value}</Typography>
       ) : (
         <TextField
           color="primary"
           inputProps={{
             readOnly: readOnly
           }}
-          value={formData[entity] ?? ''}
+          error={error}
+          helperText={error?.message}
+          value={value}
           onChange={(event) => {
             const newValue = event.target.value;
-            dispatch(setField({newValue, entity}));
+            dispatch(setField({newValue, entity: name}));
           }}
         />
       )}

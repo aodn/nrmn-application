@@ -15,16 +15,6 @@ export const stripCurlyBraces = (value) => {
   return value.replace(/[{}]+/g, '');
 };
 
-export const markupProjectionQuery = (url) => {
-  let cleanedUrl = stripCurlyBraces(url);
-
-  if (cleanedUrl.endsWith('?projection')) {
-    return cleanedUrl + '=selection';
-  } else {
-    return cleanedUrl + '?projection=selection';
-  }
-};
-
 export const getSearchParams = (location) => {
   return new URLSearchParams(location.search);
 };

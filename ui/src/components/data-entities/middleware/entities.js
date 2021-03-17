@@ -1,15 +1,15 @@
 import {takeEvery, call, put} from 'redux-saga/effects';
 
-import {entityEdit, entitySave, getEntity, getSelectedEntityItems} from '../../../axios/api';
+import {entityEdit, entitySave, entityDelete, getEntity, getSelectedEntityItems} from '../../../axios/api';
 import {createAction} from '@reduxjs/toolkit';
 import {
+  itemLoaded,
   entitiesSaved,
   entitiesError,
   entitiesLoaded,
-  itemLoaded,
-  selectedItemsLoaded,
   selectedItemEdited,
-  selectedItemsEdited
+  selectedItemsEdited,
+  selectedItemsLoaded
 } from '../form-reducer';
 import {isSuccessful200Response} from '../../utils/helpers';
 
@@ -19,6 +19,7 @@ export default function* getEntitiesWatcher() {
   yield takeEvery(selectedItemsRequested, getSelectedItemsData);
   yield takeEvery(createEntityRequested, saveEntity);
   yield takeEvery(updateEntityRequested, updateEntity);
+  yield takeEvery(deleteEntityRequested, deleteEntity);
   yield takeEvery(setNestedField, setNestedFormData);
   yield takeEvery(setField, setFieldFormData);
 }
@@ -74,15 +75,22 @@ function* getSelectedItemsData(action) {
 
 function* saveEntity(action) {
   try {
-    const href = action.payload.data?._links?.self?.href ? action.payload.data._links.self.href : action.payload.path;
     delete action.payload.data._links;
-
-    const response = yield call(entitySave, href, action.payload.data);
-    if (response?.data?.errors || !isSuccessful200Response(response.status)) {
-      yield put(entitiesError({e: {response: response}}));
+    const resp = yield call(entitySave, action.payload.path, action.payload.data);
+    if (resp?.data?.errors || !isSuccessful200Response(resp.status)) {
+      yield put(entitiesError({e: {response: resp}}));
     } else {
-      yield put(entitiesSaved(response.data));
+      yield put(entitiesSaved(resp.data));
     }
+  } catch (e) {
+    yield put(entitiesError({e}));
+  }
+}
+
+function* deleteEntity(action) {
+  try {
+    const {entity, id} = action.payload;
+    yield call(entityDelete, entity.endpoint, id);
   } catch (e) {
     yield put(entitiesError({e}));
   }
@@ -90,13 +98,12 @@ function* saveEntity(action) {
 
 function* updateEntity(action) {
   try {
-    const url = action.payload.data?._links?.self?.href ? action.payload.data._links.self.href : action.payload.path;
     delete action.payload.data._links;
-    const response = yield call(entityEdit, url, action.payload.data);
-    if (response?.data?.errors) {
-      yield put(entitiesError({e: {response: response}}));
+    const resp = yield call(entityEdit, action.payload.path, action.payload.data);
+    if (resp?.data?.errors) {
+      yield put(entitiesError({e: {response: resp}}));
     } else {
-      yield put(entitiesSaved(response.data));
+      yield put(entitiesSaved(resp.data));
     }
   } catch (e) {
     yield put(entitiesError({e}));
@@ -128,5 +135,9 @@ export const createEntityRequested = createAction('CREATE_ENTITY_REQUESTED', fun
 });
 
 export const updateEntityRequested = createAction('UPDATE_ENTITY_REQUESTED', function (entity) {
+  return {payload: entity};
+});
+
+export const deleteEntityRequested = createAction('DELETE_ENTITY_REQUESTED', function (entity) {
   return {payload: entity};
 });

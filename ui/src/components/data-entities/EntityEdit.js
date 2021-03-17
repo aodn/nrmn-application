@@ -14,40 +14,40 @@ import LoadingBanner from '../layout/loadingBanner';
 import ObjectListViewTemplate from './ObjectListViewTemplate';
 import EntityContainer from './EntityContainer';
 
-import NestedApiField from './customWidgetFields/NestedApiField';
+import DropDownInput from './customWidgetFields/DropDownInput';
 import TextInput from './customWidgetFields/TextInput';
 import NumberInput from './customWidgetFields/NumberInput';
 import CheckboxInput from './customWidgetFields/CheckboxInput';
-import AutocompleteField from './customWidgetFields/AutocompleteField';
+import AutoCompleteInput from './customWidgetFields/AutoCompleteInput';
 
-const EntityEdit = ({entity, template}) => {
+const EntityEdit = ({entity, template, clone}) => {
   const params = useParams();
 
   const schemaDefinition = config.get('api') || {};
-  const editItem = useSelector((state) => state.form.formData);
-  const entitySaved = useSelector((state) => state.form.entitySaved);
+  const formData = useSelector((state) => state.form.data);
+  const saved = useSelector((state) => state.form.saved);
   const errors = useSelector((state) => state.form.errors);
   const dispatch = useDispatch();
 
-  const isEdit = typeof params.id !== 'undefined';
+  const edit = !clone && typeof params.id !== 'undefined';
 
   useEffect(() => {
     if (params.id !== undefined) {
       dispatch(itemRequested(`${entity.endpoint}/${params.id}`));
     }
-  }, [entitySaved]);
+  }, [saved]);
 
-  const handleSubmit = (form) => {
-    if (isEdit) {
-      const data = {path: `${entity.endpoint}/${params.id}`, data: form.formData};
+  const handleSubmit = (e) => {
+    if (edit) {
+      const data = {path: `${entity.endpoint}/${params.id}`, data: e.formData};
       dispatch(updateEntityRequested(data));
     } else {
-      const data = {path: entity.endpoint, data: form.formData};
+      const data = {path: entity.endpoint, data: e.formData};
       dispatch(createEntityRequested(data));
     }
   };
 
-  const title = (isEdit ? 'Edit ' : 'New ') + entity.name;
+  const title = (edit ? 'Edit ' : clone ? 'Clone ' : 'New ') + entity.name;
   const entityDef = {...schemaDefinition[entity.schemaKey]};
   const entitySchema = {title: title, ...entityDef};
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
@@ -74,11 +74,12 @@ const EntityEdit = ({entity, template}) => {
       uiSchema[key] = {
         'ui:field': 'dropdown',
         entity: key,
+        optional: true,
         values: [
-          {id: 0, label: '0'},
           {id: 1, label: '1'},
           {id: 2, label: '2'},
-          {id: 3, label: '3'}
+          {id: 3, label: '3'},
+          {id: 4, label: '4'}
         ]
       };
     } else if (item.type === 'object' && item.readOnly === true) {
@@ -116,12 +117,12 @@ const EntityEdit = ({entity, template}) => {
   };
 
   const fields = {
-    dropdown: NestedApiField,
+    dropdown: DropDownInput,
     readonlyObject: objectDisplay,
     string: TextInput,
     double: NumberInput,
     boolean: CheckboxInput,
-    autostring: AutocompleteField
+    autostring: AutoCompleteInput
   };
 
   function getErrors(errors) {
@@ -139,12 +140,12 @@ const EntityEdit = ({entity, template}) => {
       ''
     );
 
-  if (entitySaved) {
-    const id = entitySaved[entity.idKey];
-    return <Redirect to={`${entity.route.base}/${id}/${isEdit ? 'saved' : 'new'}`} />;
+  if (saved) {
+    const id = saved[entity.idKey];
+    return <Redirect to={`${entity.route.base}/${id}/${edit ? 'saved' : 'new'}`} />;
   }
 
-  return params.id && Object.keys(editItem).length === 0 ? (
+  return params.id && Object.keys(formData).length === 0 ? (
     <Grid container direction="row" justify="flex-start" alignItems="center">
       <LoadingBanner variant={'h5'} msg={`Loading ${entity.name}`} />
     </Grid>
@@ -152,9 +153,9 @@ const EntityEdit = ({entity, template}) => {
     <EntityContainer name={entity.name} goBackTo={entity.list.route}>
       <Grid item>
         {errors.length > 0 ? (
-          <Box>
+          <Box pt={2} pl={2} pr={2}>
             <Alert severity="error" variant="filled">
-              {errors[0].message}
+              Please review this submission for errors and try again.
             </Alert>
           </Box>
         ) : null}
@@ -165,12 +166,13 @@ const EntityEdit = ({entity, template}) => {
             {errorAlert}
             <Form
               onError={params.onError}
+              errors={errors}
               schema={JSSchema}
               uiSchema={uiSchema}
               onSubmit={handleSubmit}
               showErrorList={true}
               fields={fields}
-              formData={editItem}
+              formData={formData}
               ObjectFieldTemplate={template}
             >
               <Box display="flex" justifyContent="center" mt={5}>
@@ -198,7 +200,8 @@ const EntityEdit = ({entity, template}) => {
 
 EntityEdit.propTypes = {
   entity: PropTypes.object,
-  template: PropTypes.function
+  template: PropTypes.func,
+  clone: PropTypes.bool
 };
 
 export default EntityEdit;

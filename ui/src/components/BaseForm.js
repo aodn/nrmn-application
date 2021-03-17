@@ -49,7 +49,6 @@ const BaseForm = (params) => {
   const loading = params.loading;
 
   function submitForm(formData) {
-    console.warn(formData);
     params.onSubmit(formData);
   }
 

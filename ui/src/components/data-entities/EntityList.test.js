@@ -30,8 +30,8 @@ const mockState = {
   theme: {themeType: false},
   form: {
     entities: {_embedded: {tests: {}}},
-    editItem: {},
-    entitySaved: false,
+    formData: {},
+    saved: false,
     errors: []
   }
 };
@@ -42,6 +42,7 @@ const testEntity = {
   schemaKey: 'TestEntity',
   endpoint: 'tests',
   template: {add: null, edit: null, view: null},
+  can: {},
   list: {
     schemaKey: 'TestEntity',
     name: 'tests!!',
@@ -84,11 +85,11 @@ describe('EntityList Component', () => {
 
   test('Test EntityList.js exists', async () => {
     const {findByText} = renderWithProviders(
-      <Route path=":entityName">
+      <Route path={testEntity.list.route}>
         <EntityList entity={testEntity} />
       </Route>,
       {
-        route: 'testentities'
+        route: testEntity.list.route
       }
     );
     await findByText('TestEntity');
@@ -96,11 +97,11 @@ describe('EntityList Component', () => {
 
   test('Test EntityList.js New Entity button exists', async () => {
     const {findByText} = renderWithProviders(
-      <Route path="/:entityName">
+      <Route path={testEntity.list.route}>
         <EntityList entity={testEntity} />
       </Route>,
       {
-        route: '/TestEntity'
+        route: testEntity.list.route
       }
     );
     await findByText('TestEntity');
