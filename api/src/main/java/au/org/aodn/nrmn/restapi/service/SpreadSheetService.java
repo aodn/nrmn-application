@@ -10,6 +10,7 @@ import cyclops.control.Try;
 import cyclops.control.Validated;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -54,17 +55,15 @@ public class SpreadSheetService {
                     XSSFWorkbook res = new XSSFWorkbook(in);
                     in.close();
                     return res;
-                }).onFail(e ->
-                log.error(String.format("Error while reading the excelFile:" + e.getMessage()))
-        ).toOptional();
+                });
 
-        if (!bookOpt.isPresent()) {
+        if (bookOpt.isFailure()) {
             return Validated.invalid(
-                    new ErrorInput("Error while opening the file, Excel 2007 or above required", "file")
+                    new ErrorInput(ExceptionUtils.getRootCauseMessage(bookOpt.failureGet().orElseGet(IllegalAccessError::new)), "file")
             );
         }
-        val book = bookOpt.get();
-        val evaluator = new XSSFFormulaEvaluator((XSSFWorkbook) book);
+        val book = bookOpt.get().orElseGet(XSSFWorkbook::new);
+        val evaluator = new XSSFFormulaEvaluator(book);
         DataFormatter defaultFormat = new DataFormatter();
 
         if (book.getSheetIndex("DATA") < 0) {
@@ -85,7 +84,7 @@ public class SpreadSheetService {
                 .collect(Collectors.toList());
 
         List<String> headerByName = headers.stream()
-                .map(head -> head.getName()).collect(Collectors.toList());
+                .map(HeaderCellIndex::getName).collect(Collectors.toList());
 
         List<String> missingHeaders = refHeader.stream()
                 .filter(refHead -> headerByName.stream()
