@@ -52,6 +52,7 @@ public class SpreadSheetService {
 
         val bookOpt = Try.withResources(
                 excelFile::getInputStream, (in) -> {
+                    ZipSecureFile.setMinInflateRatio(-1.0d);
                     XSSFWorkbook res = new XSSFWorkbook(in);
                     in.close();
                     return res;
@@ -73,6 +74,10 @@ public class SpreadSheetService {
         val refHeader = (withInvertedSize) ? longHeadersRef : shortHeadersRef;
         val sheet = book.getSheet("DATA");
         val indexFirstRow = sheet.getFirstRowNum();
+        if (indexFirstRow == -1) {
+            return Validated.invalid(new ErrorInput("Empty DATA sheet", "excel"));
+
+        }
         val firstRow = sheet.getRow(indexFirstRow);
         List<HeaderCellIndex> headers = IntStream
                 .range(firstRow.getFirstCellNum(), firstRow.getLastCellNum())
