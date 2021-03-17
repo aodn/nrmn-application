@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WormsClientConfig {
 
     @Bean
-    public WebClient wormsClient(@Value("app.worms.restapi.url") String wormsRestApiUrl) {
+    public WebClient wormsClient(@Value("${app.worms.restapi.url}") String wormsRestApiUrl) {
         return WebClient.create(wormsRestApiUrl);
     }
 }

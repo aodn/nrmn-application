@@ -1,16 +1,19 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import au.org.aodn.nrmn.restapi.model.db.AphiaRef;
+import au.org.aodn.nrmn.restapi.service.model.SpeciesRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class WormsService implements AphiaRefService {
+@Service
+public class WormsService {
 
     private final WebClient wormsClient;
 
@@ -19,17 +22,17 @@ public class WormsService implements AphiaRefService {
         this.wormsClient = wormsClient;
     }
 
-    @Override
-    public List<AphiaRef> fuzzyNameSearch(String searchTerm) {
-        Mono<AphiaRef[][]> response = wormsClient
+    public List<SpeciesRecord> fuzzyNameSearch(String searchTerm) {
+        Mono<SpeciesRecord[][]> response = wormsClient
                 .get().uri(uriBuilder ->
                         uriBuilder.path("/AphiaRecordsByMatchNames")
                                   .queryParam("scientificnames[]", searchTerm)
                                   .build())
                 .retrieve()
-                .bodyToMono(AphiaRef[][].class);
-        AphiaRef[][] aphiaRefs = response.block();
-        return Arrays.stream(aphiaRefs)
+                .bodyToMono(SpeciesRecord[][].class);
+        SpeciesRecord[][] matchingSpecies = Optional.ofNullable(response.block())
+                                                   .orElse(new SpeciesRecord[0][0]);
+        return Arrays.stream(matchingSpecies)
                      .flatMap(children -> Arrays.stream(children))
                      .collect(Collectors.toList());
     }
