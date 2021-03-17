@@ -31,5 +31,4 @@ public class ObservableItemController {
         );
     }
 
-    @GetMapping(path = "/api/observableItems")
 }
