@@ -162,9 +162,7 @@ const ValidationDrawer = () => {
   };
 
   var errList = Object.keys(errorsByMsg).map((label) => {
-    return {key: label, total: errorsByMsg[label].reduce((acc, v1) => {
-      return v1.count + acc;
-    }, 0), value: errorsByMsg[label]};
+    return {key: label, total: errorsByMsg[label].length, value: errorsByMsg[label]};
   });
 
   if (errList && errList.length > 0 && filter !== '') {
@@ -174,7 +172,6 @@ const ValidationDrawer = () => {
       value: pair.value.filter((err) => err.message.toLowerCase().indexOf(filter) >= 0)
     }));
   }
-  console.log(errList);
   return errList && errList.length > 0 ? (
     <Drawer
       anchor="right"
@@ -230,7 +227,7 @@ const ValidationDrawer = () => {
         </Toolbar>
       </Box>
       {errList.map((err) => (
-        <Accordion key={err.key} defaultExpanded>
+        <Accordion key={err.key} >
           <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1c-content" id="panel1c-header">
             <div className={classes.column}>
               <Typography className={classes.heading}>{titleCase(err.key)}</Typography>
