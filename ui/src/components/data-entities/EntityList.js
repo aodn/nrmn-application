@@ -54,16 +54,22 @@ const EntityList = (props) => {
   const schematoColDef = (schema, entity) => {
     const fields = Object.keys(schema.properties);
 
-    const coldefs = fields.map((field) => {
-      let type = schema.properties[field] ? schema.properties[field]?.type : 'string';
-      return {
-        field: field,
-        tooltipField: field,
-        suppressMovable: true,
-        flex: field === entity.flexField ? true : false,
-        filter: getCellFilter(type)
-      };
-    });
+    const coldefs = fields.reduce((acc, field) => {
+      const fieldSchema = schema.properties[field];
+      if (fieldSchema.title) {
+        const sortable = entity.list.sort?.includes(field) ?? true;
+        acc.push({
+          headerName: fieldSchema.title,
+          field: field,
+          tooltipField: field,
+          suppressMovable: true,
+          sortable: sortable,
+          flex: field === entity.flexField ? true : false,
+          filter: getCellFilter(fieldSchema?.type || 'string')
+        });
+      }
+      return acc;
+    }, []);
     const scale = 1 + (entity.can.clone | 0) + (entity.can.delete | 0);
     coldefs.push({
       field: '',

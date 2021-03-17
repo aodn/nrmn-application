@@ -104,21 +104,25 @@ const referenceData = [
   {
     name: 'Observable Item',
     idKey: 'observableItemId',
-    can: {delete: true, clone: true},
+    can: {},
     flexField: null,
     route: {
-      base: '/reference/observableItem',
-      view: '/reference/observableItem/:id?/:success?',
-      edit: '/reference/observableItem/:id?/edit'
+      base: '/wip',
+      view: '/wip',
+      edit: '/wip'
+      // base: '/reference/observableItem',
+      // view: '/reference/observableItem/:id?/:success?',
+      // edit: '/reference/observableItem/:id?/edit'
     },
     schemaKey: 'ObservableItem',
     endpoint: 'observableItems',
     template: {add: ObservableItemTemplate, edit: ObservableItemTemplate, view: ObservableItemTemplate},
     list: {
-      name: 'observableItems',
-      schemaKey: 'ObservableItem',
-      route: '/wip', // FUTURE: When ObservableItem is ready, change this to the correct route
-      endpoint: 'observableItems'
+      name: 'observableItemListItems',
+      schemaKey: 'ObservableItemListItem',
+      route: '/reference/observableItems',
+      endpoint: 'observableItemListItems',
+      sort: ['obsItemTypeName', 'name']
     }
   }
 ];
