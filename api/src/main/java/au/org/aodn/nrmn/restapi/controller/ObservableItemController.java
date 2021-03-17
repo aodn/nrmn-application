@@ -21,7 +21,7 @@ public class ObservableItemController {
     @Autowired
     private ObservableItemListItemAssembler assembler;
 
-    @GetMapping(path = "/api/observableItemListItems")
+    @GetMapping(path = "/api/observableItems")
     public CollectionModel<ObservableItemListItem> list() {
         return CollectionModel.of(
                 observableItemRepository.findAll()
