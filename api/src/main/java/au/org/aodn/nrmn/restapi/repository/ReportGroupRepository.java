@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.repository;
 
-import au.org.aodn.nrmn.restapi.model.db.MarineProtectedArea;
+import au.org.aodn.nrmn.restapi.model.db.ReportGroup;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,12 +10,12 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
 @RepositoryRestResource
-@Tag(name = "marine protected areas")
-public interface MarineProtectedAreaRepository extends JpaRepository<MarineProtectedArea, Integer>,
- JpaSpecificationExecutor<MarineProtectedArea> {
+@Tag(name = "report groups")
+public interface ReportGroupRepository extends JpaRepository<ReportGroup, Integer>,
+ JpaSpecificationExecutor<ReportGroup> {
 
     @Override
     @RestResource
-    Page<MarineProtectedArea> findAll(Pageable pageable);
-    
+    Page<ReportGroup> findAll(Pageable pageable);
+
 }
