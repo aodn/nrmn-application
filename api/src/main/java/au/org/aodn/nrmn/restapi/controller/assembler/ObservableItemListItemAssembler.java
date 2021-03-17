@@ -24,6 +24,6 @@ public class ObservableItemListItemAssembler {
         ObservableItemListItem observableItemListItem = mapper.map(observableItem, ObservableItemListItem.class);
 
         return observableItemListItem.add(entityLinks.linkToItemResource(ObservableItem.class,
-         observableItemListItem.getObservableItemId()).withSelfRel());
+         observableItemListItem.getId()).withSelfRel());
     }
 }
