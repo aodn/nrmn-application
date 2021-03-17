@@ -43,7 +43,7 @@ public class ObservableItemControllerIT {
     public void setup() {
         spec = new RequestSpecBuilder()
                 .setBaseUri(String.format("http://localhost:%s", port))
-                .setBasePath("/api/observableItemListItems")
+                .setBasePath("/api/observableItems")
                 .setContentType("application/json")
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter())
@@ -63,7 +63,7 @@ public class ObservableItemControllerIT {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("_embedded.observableItemListItems.observableItemId",
+                .body("_embedded.observableItemListItems.id",
                  hasItems(testObservableItem.getObservableItemId()));
     }
 
