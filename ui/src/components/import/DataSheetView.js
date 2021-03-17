@@ -50,7 +50,7 @@ const DataSheetView = () => {
   const colDefinition = job && job.isExtendedSize ? ColumnDef.concat(ExtendedSize) : ColumnDef;
   const enableSubmit = useSelector((state) => state.import.enableSubmit);
   const [indexMap, setIndexMap] = useState({});
-  const [canSaved, setCanSaved] = useState(true);
+  const [canSaved, setCanSaved] = useState(false);
   const [addDialog, setAddDialog] = useState({open: false, rowIndex: -1, number: 1, lastId: 0});
 
   const validationErrors = useSelector((state) => state.import.validationErrors);
@@ -90,7 +90,7 @@ const DataSheetView = () => {
         params.columnApi.getAllColumns().forEach(function (column) {
           allColumnIds.push(column.colId);
         });
-        params.columnApi.autoSizeColumns(allColumnIds, true);
+        params.columnApi.autoSizeColumns(allColumnIds, false);
         dispatch(JobFinished());
       }
     });
@@ -199,7 +199,7 @@ const DataSheetView = () => {
   const size = useWindowSize();
   return (
     <Box mt={2}>
-      <ButtonGroup disableElevation spacing={2} size="small" variant="text" aria-label="small outlined button group">
+      <ButtonGroup spacing={2} size="small" variant="text" aria-label="small outlined button group">
         <Fab className={classes.fab} onClick={handleSave} disabled={!canSaved} variant="extended" size="small" color="primary">
           <SaveOutlinedIcon className={classes.extendedIcon} />
           Save
@@ -254,11 +254,12 @@ const DataSheetView = () => {
           fillHandleDirection="xy"
           ensureDomOrder={true}
           defaultColDef={{
-            minWidth: 80,
+          //  minWidth: 80,
             filter: true,
             sortable: true,
             resizable: true,
-            editable: true
+            editable: true,
+            suppressMenu: true
           }}
           onGridReady={agGridReady}
           modules={AllModules}

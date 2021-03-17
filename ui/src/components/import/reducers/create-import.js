@@ -111,8 +111,7 @@ const importSlice = createSlice({
 
         const validationErrors = mergeErrors(action.payload.errors);
         state.EnableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
-        state.errorsByMsg = action.payload.summaries.sort((sum1, sum2) => sum2.count - sum1.count);
-      } else {
+        state.errorsByMsg = action.payload.summaries;
         state.EnableSubmit = true;
       }
     },

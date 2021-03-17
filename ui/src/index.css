@@ -47,6 +47,14 @@ header a:hover {
     line-height: 18px;
 }
 
+#validation-grid .ag-header-cell {
+  padding: 0 2px !important;
+}
+
+#validation-grid .ag-cell {
+    padding: 0 2px !important;
+}
+
 .MuiBackdrop-root {
     z-index: 200 !important;
 }

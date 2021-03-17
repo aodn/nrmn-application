@@ -85,7 +85,7 @@ const JobView = () => {
       {!isLoading && job && (
         <Grid container>
           <Grid item sm={12} md={12} lg={4}>
-            <Paper elevation={3} style={{padding: 15}}>
+            <Paper  style={{padding: 15}}>
               <Grid item lg={10} md={10}>
                 <Typography variant="h5" color="primary">
                   {job.reference}
@@ -139,7 +139,7 @@ const JobView = () => {
                       <TimelineConnector />
                     </TimelineSeparator>
                     <TimelineContent>
-                      <Paper elevation={3} className={classes.paper}>
+                      <Paper  className={classes.paper}>
                         <Typography variant="h6" component="h1">
                           {log.eventType}
                         </Typography>
