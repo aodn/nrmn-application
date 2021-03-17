@@ -63,7 +63,7 @@ public class ObservableItemControllerIT {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("_embedded.observableItemListItems.id",
+                .body("_embedded.observableItems.observableItemId",
                  hasItems(testObservableItem.getObservableItemId()));
     }
 
