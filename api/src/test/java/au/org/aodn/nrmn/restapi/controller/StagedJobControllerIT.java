@@ -94,6 +94,7 @@ class StagedJobControllerIT {
 
 
     @Test
+    @WithUserDetails("test@gmail.com")
     public void UploadingShortCorrectIngestFileShouldbeOK() throws Exception {
         Mockito.when(provider.getClient()).thenReturn(client);
         val auth = getContext().getAuthentication();
