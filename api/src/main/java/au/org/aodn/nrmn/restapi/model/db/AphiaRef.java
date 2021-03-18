@@ -113,7 +113,7 @@ public class AphiaRef {
     @Basic
     @Column(name = "rank_genus")
     @Schema(title = "Rank genus")
-    private String rankGenus;
+    private String genus;
 
     @Basic
     @Column(name = "citation")

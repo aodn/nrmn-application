@@ -41,7 +41,7 @@ public class AphiaRefTestData {
             .className("Actinopterygii")
             .order("Beryciformes")
             .family("Holocentridae")
-            .rankGenus("Sargocentron")
+            .genus("Sargocentron")
             .citation("Froese, R. and D. Pauly. Editors. (2019). FishBase. Sargocentron spiniferum (Forsskål, 1775). " +
                 "Accessed through: World Register of Marine Species at: http://www.marinespecies.org/aphia" +
                 ".php?p=taxdetails&id=217950 on 2019-11-14")
