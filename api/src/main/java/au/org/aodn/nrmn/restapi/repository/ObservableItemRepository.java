@@ -42,7 +42,8 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
     Optional<ObservableItem> findById(Integer integer);
 
     @Query(value =
-            "SELECT * FROM {h-schema}observable_item_ref oi " +
+            "SELECT * FROM {h-schema}observable_item_ref oi" +
+                    " LEFT JOIN {h-schema}lengthweight_ref lw ON (lw.observable_item_id = oi.observable_item_id)" +
                     " WHERE SIMILARITY(observable_item_name, :search_term) > 0.4 " +
                     " ORDER BY SIMILARITY(observable_item_name, :search_term) DESC ",
             countQuery =

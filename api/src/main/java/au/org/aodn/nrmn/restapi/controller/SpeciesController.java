@@ -43,7 +43,7 @@ public class SpeciesController {
         } else {
             return observableItemRepository.fuzzySearch(PageRequest.of(0, 50), speciesName)
             .stream()
-            .map(observableItem -> mapper.map(observableItem.getAphiaRef(), SpeciesDto.class))
+            .map(observableItem -> mapper.map(observableItem, SpeciesDto.class))
             .collect(Collectors.toList());
         }
     }
