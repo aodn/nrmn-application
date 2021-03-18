@@ -17,7 +17,7 @@ public class WormsServiceIT {
     public void fuzzySearchReturnsResults() {
         WebClient wormsClient = WebClient.create("https://www.marinespecies.org/rest");
         WormsService wormsService = new WormsService(wormsClient);
-        List<SpeciesRecord> results = wormsService.fuzzyNameSearch("Paratrachichthys trailli");
+        List<SpeciesRecord> results = wormsService.fuzzySearch("Paratrachichthys trailli");
         assertThat(results.isEmpty(), is(false));
     }
 

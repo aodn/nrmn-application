@@ -22,7 +22,7 @@ public class WormsService {
         this.wormsClient = wormsClient;
     }
 
-    public List<SpeciesRecord> fuzzyNameSearch(String searchTerm) {
+    public List<SpeciesRecord> fuzzySearch(String searchTerm) {
         Mono<SpeciesRecord[][]> response = wormsClient
                 .get().uri(uriBuilder ->
                         uriBuilder.path("/AphiaRecordsByMatchNames")
