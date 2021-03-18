@@ -10,10 +10,13 @@ import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
 public class WormsService {
+
+    static private Pattern REMOVE_TRAILING_JUNK_PATTERN = Pattern.compile("( (sp\\.|spp\\.))?( (\\(.*\\)|\\[.*\\]))?$");
 
     private final WebClient wormsClient;
 
@@ -26,7 +29,7 @@ public class WormsService {
         Mono<SpeciesRecord[][]> response = wormsClient
                 .get().uri(uriBuilder ->
                         uriBuilder.path("/AphiaRecordsByMatchNames")
-                                  .queryParam("scientificnames[]", searchTerm)
+                                  .queryParam("scientificnames[]", removeTrailingJunk(searchTerm))
                                   .build())
                 .retrieve()
                 .bodyToMono(SpeciesRecord[][].class);
@@ -35,5 +38,9 @@ public class WormsService {
         return Arrays.stream(matchingSpecies)
                      .flatMap(children -> Arrays.stream(children))
                      .collect(Collectors.toList());
+    }
+
+    static String removeTrailingJunk(String searchTerm) {
+        return REMOVE_TRAILING_JUNK_PATTERN.matcher(searchTerm).replaceAll("");
     }
 }
