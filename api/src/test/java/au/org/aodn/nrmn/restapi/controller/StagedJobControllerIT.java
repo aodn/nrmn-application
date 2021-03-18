@@ -94,7 +94,6 @@ class StagedJobControllerIT {
 
 
     @Test
-    @WithUserDetails("test@gmail.com")
     public void UploadingShortCorrectIngestFileShouldbeOK() throws Exception {
         Mockito.when(provider.getClient()).thenReturn(client);
         val auth = getContext().getAuthentication();
@@ -158,5 +157,31 @@ class StagedJobControllerIT {
 
 
 
+
     }
+    @Test
+    @WithUserDetails("test@gmail.com")
+    public void emptyFileShouldFail() throws Exception {
+        Mockito.when(provider.getClient()).thenReturn(client);
+        val auth = getContext().getAuthentication();
+        val token = jwtProvider.generateToken(auth);
+        val reqUpload = new RequestWrapper<LinkedMultiValueMap<String, Object>, UploadResponse>();
+        val file = new FileSystemResource("src/test/resources/sheets/empty.xlsx");
+        LinkedMultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
+        parameters.add("file", file);
+        parameters.add("withInvertSize", true);
+        parameters.add("programId", 55);
+
+        val resp = reqUpload
+                .withContentType(MediaType.MULTIPART_FORM_DATA)
+                .withEntity(parameters)
+                .withToken(token)
+                .withMethod(HttpMethod.POST)
+                .withResponseType(UploadResponse.class)
+                .withUri(_createUrl("/api/stage/upload"))
+                .build(testRestTemplate);
+        assertEquals(resp.getStatusCode().value(), 422);
+        assertEquals(resp.getBody().getErrors().stream().findFirst().get().getMessage(), "Empty DATA sheet");
+    }
+
 }
