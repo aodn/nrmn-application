@@ -11,9 +11,9 @@ public class WormsServiceTest {
     @ParameterizedTest
     @CsvSource(value = {
             "some text sp. (trailing)|some text",
-            "some text spp. (trailing)|some text",
+            "some text sPP. (trailing)|some text",
             "some text (trailing)|some text",
-            "some text sp. [trailing]|some text",
+            "some text Sp. [trailing]|some text",
             "some text spp. [trailing]|some text",
             "some text [trailing]|some text",
             "some text|some text"

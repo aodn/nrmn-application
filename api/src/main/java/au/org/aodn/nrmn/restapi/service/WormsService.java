@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 @Service
 public class WormsService {
 
-    static private Pattern REMOVE_TRAILING_JUNK_PATTERN = Pattern.compile("( (sp\\.|spp\\.))?( (\\(.*\\)|\\[.*\\]))?$");
+    static private Pattern REMOVE_TRAILING_JUNK_PATTERN =
+            Pattern.compile("( (sp\\.|spp\\.))?( (\\(.*\\)|\\[.*\\]))?$", Pattern.CASE_INSENSITIVE);
 
     private final WebClient wormsClient;
 
