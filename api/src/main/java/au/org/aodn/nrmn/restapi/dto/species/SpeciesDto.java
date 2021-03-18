@@ -7,22 +7,18 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class SpeciesDto {
-    @JsonProperty("phylum")
-    private String rankPhylum;
+    private String phylum;
 
     @JsonProperty("class")
-    private String rankClass;
+    private String className;
 
-    @JsonProperty("family")
-    private String rankFamily;
+    private String family;
 
-    @JsonProperty("genus")
-    private String rankGenus;
+    private String genus;
 
     @JsonProperty("species")
-    private String rankSpecies;
+    private String scientificName;
 
-    @JsonProperty("order")
-    private String rankOrder;
+    private String order;
 
 }

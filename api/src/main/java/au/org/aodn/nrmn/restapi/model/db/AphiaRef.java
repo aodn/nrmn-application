@@ -88,27 +88,27 @@ public class AphiaRef {
     @Basic
     @Column(name = "rank_kingdom")
     @Schema(title = "Rank kingdom")
-    private String rankKingdom;
+    private String kingdom;
 
     @Basic
     @Column(name = "rank_phylum")
     @Schema(title = "Rank phylum")
-    private String rankPhylum;
+    private String phylum;
 
     @Basic
     @Column(name = "rank_class")
     @Schema(title = "Rank class")
-    private String rankClass;
+    private String className;
 
     @Basic
     @Column(name = "rank_order")
     @Schema(title = "Rank order")
-    private String rankOrder;
+    private String order;
 
     @Basic
     @Column(name = "rank_family")
     @Schema(title = "Rank family")
-    private String rankFamily;
+    private String family;
 
     @Basic
     @Column(name = "rank_genus")

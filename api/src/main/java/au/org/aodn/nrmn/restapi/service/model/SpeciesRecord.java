@@ -41,23 +41,18 @@ public class SpeciesRecord {
     @JsonAlias("parentNameUsageID")
     private Integer parentNameUsageId;
 
-    @JsonAlias("kingdom")
-    private String rankKingdom;
+    private String kingdom;
 
-    @JsonAlias("phylum")
-    private String rankPhylum;
+    private String phylum;
 
     @JsonAlias("class")
-    private String rankClass;
+    private String className;
 
-    @JsonAlias("order")
-    private String rankOrder;
+    private String order;
 
-    @JsonAlias("family")
-    private String rankFamily;
+    private String family;
 
-    @JsonAlias("genus")
-    private String rankGenus;
+    private String genus;
 
     private String citation;
 
