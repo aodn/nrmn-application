@@ -95,6 +95,8 @@ CREATE TABLE nrmn.observable_item_ref_aud (
     aphia_rel_type_mod boolean,
     obs_item_type_id integer,
     obs_item_type_mod boolean,
+    species_epithet varchar(255),
+    species_epithet_mod boolean,
     CONSTRAINT observable_item_ref_aud_pkey PRIMARY KEY (observable_item_id, rev)
 );
 
