@@ -170,7 +170,7 @@ const EntityEdit = ({entity, template, clone}) => {
               {errors.length > 0 ? (
                 <Box pt={2}>
                   <Alert severity="error" variant="filled">
-                    Please review this submission for errors and try again.
+                    Please review this form for errors and try again.
                   </Alert>
                 </Box>
               ) : null}

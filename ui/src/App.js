@@ -120,6 +120,20 @@ const referenceData = [
       schemaKey: 'ObservableItemRow',
       route: '/reference/observableItems',
       endpoint: 'reference/observableItems',
+      headers: [
+        'id',
+        'typeName',
+        'name',
+        'commonName',
+        'supersededBy',
+        'supersededNames',
+        'supersededIDs',
+        'phylum',
+        'class',
+        'order',
+        'family',
+        'genus'
+      ],
       sort: ['obsItemTypeName', 'name']
     }
   }
