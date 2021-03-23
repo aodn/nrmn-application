@@ -4,6 +4,7 @@ import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
@@ -48,6 +49,9 @@ public class RawValidation extends ValidatorHelpers {
 
     @Autowired
     ATRCValidators atrcValidators;
+
+    @Autowired
+    ObservationRepository obsRepo;
 
 
     public HashMap<String, BaseRowValidator> getExtendedValidators() {
@@ -137,6 +141,7 @@ public class RawValidation extends ValidatorHelpers {
         val block = (Integer) values.get("Block").orElseGet(null);
 
         val species = (ObservableItem) values.get("Species").orElseGet(null);
+        val speciesAttributes = obsRepo.getSpeciesAttributesById(species.getObservableItemId()).stream().findFirst().orElseGet(null);
         val code = (String) values.get("Code").orElseGet(null);
 
         val vis = (Integer) values.get("Vis").orElseGet(null);
@@ -170,7 +175,7 @@ public class RawValidation extends ValidatorHelpers {
             val m2InvertSizingSpecies = (Integer) values.get("M2InvertSizingSpecies").orElseGet(null);
             val l5 = (Double) values.get("L5").orElseGet(null);
             val l95 = (Double) values.get("L95").orElseGet(null);
-            val lmax = (Double) values.get("Lmax").orElseGet(null);
+            val lmax = (Integer) values.get("Lmax").orElseGet(null);
             val isInvertSizing = (Boolean) values.get("IsInvertSizing").orElseGet(null);
             rowFormatted.setInverts(inverts);
             rowFormatted.setM2InvertSizingSpecies(m2InvertSizingSpecies);

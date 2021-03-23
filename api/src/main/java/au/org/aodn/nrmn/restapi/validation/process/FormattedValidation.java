@@ -8,6 +8,7 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.model.MonoidRowValidation;
 import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
 import au.org.aodn.nrmn.restapi.validation.provider.ValidatorProvider;
+import au.org.aodn.nrmn.restapi.validation.validators.formatted.*;
 import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import cyclops.data.Seq;
@@ -34,7 +35,7 @@ public class FormattedValidation extends ValidatorHelpers {
 
     private Seq<BaseFormattedValidator> getCommonValidators() {
         //TODO Add comon formatted validtors
-        return Seq.empty();
+        return Seq.of(new SpeciesNotFound(), new MeasureBetweenL5l95(), new MeasureUnderLmax(), new SpeciesNotSuperseeded());
     }
 
     private Seq<BaseFormattedValidator> getValidators(StagedJob job) {

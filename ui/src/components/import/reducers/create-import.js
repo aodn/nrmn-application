@@ -112,8 +112,10 @@ const importSlice = createSlice({
         const validationErrors = mergeErrors(action.payload.errors);
         state.EnableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
         state.errorsByMsg = action.payload.summaries;
+      } else {
         state.EnableSubmit = true;
       }
+      state.validationLoading = false;
     },
     AddRowIndex: (state, action) => {
         state.indexChanged[action.payload.id] = action.payload.row;

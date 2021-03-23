@@ -11,7 +11,9 @@ import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.stream.Collectors;
-
+/*
+   waiting for more spec
+ */
 public class SurveyNotDoneCheck extends BaseRowValidator {
 
     public SurveyNotDoneCheck(String columnTarget) {
@@ -20,21 +22,21 @@ public class SurveyNotDoneCheck extends BaseRowValidator {
 
     @Override
     public Validated<StagedRowError, Boolean> valid(StagedRow target) {
-        val filteredEntry = target.getMeasureJson().entrySet().stream().filter(entry -> StringUtils.isNumeric(entry.getValue())
-                && !entry.getValue().trim().equals("0")).collect(Collectors.toList());
-        if (target.getSpecies().toLowerCase().trim().equals("No Species Found")) {
-            if (filteredEntry.size() == 0) {
-                return Validated.valid(true);
-            }
-            return Validated.invalid(new StagedRowError(
-                    new ErrorID(target.getId(),
-                            target.getStagedJob().getId(),
-                            target.getSpecies() + " should have no measure"),
-                    ValidationCategory.DATA,
-                    ValidationLevel.WARNING,
-                    columnTarget,
-                    target));
-        }
+//        val filteredEntry = target.getMeasureJson().entrySet().stream().filter(entry -> StringUtils.isNumeric(entry.getValue())
+//                && !entry.getValue().trim().equals("0")).collect(Collectors.toList());
+//        if (target.getSpecies().toLowerCase().trim().equals("No Species Found")) {
+//            if (filteredEntry.size() == 0) {
+//                return Validated.valid(true);
+//            }
+//            return Validated.invalid(new StagedRowError(
+//                    new ErrorID(target.getId(),
+//                            target.getStagedJob().getId(),
+//                            target.getSpecies() + " should have no measure"),
+//                    ValidationCategory.DATA,
+//                    ValidationLevel.WARNING,
+//                    columnTarget,
+//                    target));
+//        }
         return Validated.valid(false);
     }
 }
