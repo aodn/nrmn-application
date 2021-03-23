@@ -116,7 +116,7 @@ const referenceData = [
     endpoint: 'reference/observableItem',
     template: {add: ObservableItemTemplate, edit: false, view: false},
     list: {
-      name: 'observableItemRows',
+      name: 'tupleBackedMaps',
       schemaKey: 'ObservableItemRow',
       route: '/reference/observableItems',
       endpoint: 'reference/observableItems',
