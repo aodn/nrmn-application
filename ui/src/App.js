@@ -103,25 +103,23 @@ const referenceData = [
   },
   {
     name: 'Observable Item',
-    idKey: 'observableItemId',
+    idKey: 'id',
     can: {},
+    showSpeciesSeach: true,
     flexField: null,
     route: {
-      base: '/wip',
-      view: '/wip',
-      edit: '/wip'
-      // base: '/reference/observableItem',
-      // view: '/reference/observableItem/:id?/:success?',
-      // edit: '/reference/observableItem/:id?/edit'
+      base: '/reference/observableItem',
+      view: '/reference/observableItem/:id?/:success?',
+      edit: '/reference/observableItem/:id?/edit'
     },
-    schemaKey: 'ObservableItem',
-    endpoint: 'observableItems',
+    schemaKey: 'ObservableItemDto',
+    endpoint: 'reference/observableItem',
     template: {add: ObservableItemTemplate, edit: ObservableItemTemplate, view: ObservableItemTemplate},
     list: {
-      name: 'observableItemListItems',
-      schemaKey: 'ObservableItemListItem',
+      name: 'observableItemRows',
+      schemaKey: 'ObservableItemRow',
       route: '/reference/observableItems',
-      endpoint: 'observableItemListItems',
+      endpoint: 'reference/observableItems',
       sort: ['obsItemTypeName', 'name']
     }
   }

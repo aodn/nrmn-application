@@ -4,6 +4,7 @@ const formState = {
   entities: null,
   data: {},
   options: {},
+  searchResults: null,
   loading: false,
   saved: false,
   errors: []
@@ -51,11 +52,14 @@ const formSlice = createSlice({
       fieldData[key] = action.payload[key];
       state.data = {...state.data, ...fieldData};
     },
+    updateFormFields: (state, action) => {
+      state.data = {...state.data, ...action.payload};
+    },
     selectedItemsLoaded: (state, action) => {
       const key = Object.keys(action.payload._embedded)[0];
       const newOptions = {};
-      // FIXME: this should not be necessary
-      if (key === 'marineProtectedAreas' || key === 'protectionStatuses') {
+      // HACK: this should not be necessary
+      if (key === 'marineProtectedAreas' || key === 'protectionStatuses' || key === 'reportGroups' || key === 'habitatGroups') {
         newOptions[key] = action.payload._embedded[key].reduce((f, v) => {
           if (v.name) f.push(v.name);
           return f;
@@ -67,16 +71,36 @@ const formSlice = createSlice({
     },
     entitiesSaved: (state, action) => {
       state.saved = action.payload;
+    },
+    searchRequested: (state) => {
+      state.loading = true;
+      state.searchResults = [];
+    },
+    searchFailed: (state, action) => {
+      state.loading = false;
+      state.errors = action.payload;
+    },
+    searchFound: (state, action) => {
+      if (action.payload?.length > 0)
+        state.searchResults = action.payload.map((r, id) => {
+          return {id: id, ...r, speciesEpithet: r.species};
+        });
+      else state.searchResults = [];
+      state.loading = false;
     }
   }
 });
 export const formReducer = formSlice.reducer;
 export const {
+  searchRequested,
+  searchFailed,
+  searchFound,
   resetState,
   entitiesLoaded,
   entitiesError,
   entitiesSaved,
   itemLoaded,
+  updateFormFields,
   selectedItemsLoaded,
   selectedItemEdited,
   selectedItemsEdited,

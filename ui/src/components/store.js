@@ -13,6 +13,7 @@ import {all} from 'redux-saga/effects';
 import LoginWatcher from './auth/auth-middleware';
 import {jobReducer} from './job/jobReducer';
 import jobWatcher from './job/jobMiddleware';
+import getSearchResult from './data-entities/middleware/search';
 
 const initialiseSagaMiddleware = createSagaMiddleware();
 const isDev = process.env.NODE_ENV == 'development';
@@ -34,7 +35,7 @@ const store = configureStore({
 });
 
 function* rootSaga() {
-  yield all([importMiddleware(), FileMiddleware(), LoginWatcher(), getEntitiesWatcher(), jobWatcher()]);
+  yield all([importMiddleware(), FileMiddleware(), LoginWatcher(), getEntitiesWatcher(), jobWatcher(), getSearchResult()]);
 }
 
 initialiseSagaMiddleware.run(rootSaga);
