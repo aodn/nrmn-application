@@ -3,10 +3,9 @@ package au.org.aodn.nrmn.restapi.controller;
 import au.org.aodn.nrmn.restapi.controller.exception.ValidationException;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItemRow;
+import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemDto;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemRowRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.modelmapper.ModelMapper;
@@ -32,15 +31,12 @@ public class ObservableItemController {
     private ObservableItemRepository observableItemRepository;
 
     @Autowired
-    private ObservableItemRowRepository observableItemRowRepository;
-
-    @Autowired
     private ModelMapper mapper;
     
     @GetMapping(path = "/observableItems")
     public CollectionModel<ObservableItemRow> list() {
         return CollectionModel.of(
-                observableItemRowRepository.findAll()
+                observableItemRepository.findAllProjectedBy(null)
                 .stream()
                 .collect(Collectors.toList())
         );
