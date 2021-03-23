@@ -18,7 +18,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Table(name = "ep_observable_items")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ObservableItemListItem {
+public class ObservableItemRow {
 
     @Id
     @Column(name = "observable_item_id")
@@ -31,7 +31,7 @@ public class ObservableItemListItem {
     
     @Column(name = "observable_item_name")
     @Schema(title = "Name")
-    private String name;
+    private String observableItemName;
 
     @Column(name = "common_name")
     @Schema(title = "Common Name")

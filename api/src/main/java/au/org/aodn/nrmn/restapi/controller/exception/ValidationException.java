@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.Collections;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,6 +17,10 @@ public class ValidationException extends RuntimeException {
     public ValidationException(String object, String property, String message) {
         ValidationError error = new ValidationError(object, property, null, message);
         this.errors = new ValidationErrors(Collections.singletonList(error));
+    }
+
+    public ValidationException(List<ValidationError> validationErrors) {
+        this.errors = new ValidationErrors(validationErrors);
     }
 
 }

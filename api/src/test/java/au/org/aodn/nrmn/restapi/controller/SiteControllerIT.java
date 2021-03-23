@@ -32,9 +32,6 @@ public class SiteControllerIT {
     private SiteTestData siteTestData;
 
     @Autowired
-    private SiteRepository siteRepository;
-
-    @Autowired
     private JwtToken jwtToken;
 
     private RequestSpecification spec;

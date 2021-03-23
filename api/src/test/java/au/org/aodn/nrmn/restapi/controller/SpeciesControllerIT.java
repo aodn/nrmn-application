@@ -76,6 +76,7 @@ public class SpeciesControllerIT {
         ObservableItem observableItem = ObservableItem.builder()
                                                       .obsItemType(obsItemType)
                                                       .observableItemName(name)
+                                                      .speciesEpithet(name)
                                                       .build();
 
         observableItemRepository.saveAndFlush(observableItem);
