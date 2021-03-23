@@ -147,6 +147,8 @@ const EntityEdit = ({entity, template, clone}) => {
     autostring: AutoCompleteInput
   };
 
+  if (template === false) return <Redirect to="/wip" />;
+
   if (saved) {
     const id = saved[entity.idKey];
     return <Redirect to={`${entity.route.base}/${id}/${edit ? 'saved' : 'new'}`} />;

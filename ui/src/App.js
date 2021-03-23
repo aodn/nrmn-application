@@ -104,7 +104,7 @@ const referenceData = [
   {
     name: 'Observable Item',
     idKey: 'id',
-    can: {},
+    can: {edit: false},
     showSpeciesSeach: true,
     flexField: null,
     route: {
@@ -114,7 +114,7 @@ const referenceData = [
     },
     schemaKey: 'ObservableItemDto',
     endpoint: 'reference/observableItem',
-    template: {add: ObservableItemTemplate, edit: ObservableItemTemplate, view: ObservableItemTemplate},
+    template: {add: ObservableItemTemplate, edit: false, view: false},
     list: {
       name: 'observableItemRows',
       schemaKey: 'ObservableItemRow',
