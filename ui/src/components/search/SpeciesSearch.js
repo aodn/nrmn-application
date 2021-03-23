@@ -27,6 +27,7 @@ const SpeciesSearch = () => {
   const searchResults = useSelector((state) => state.form.searchResults);
 
   const handleChange = (event, newValue) => {
+    setSearchTerm('');
     setValue(newValue);
   };
 
@@ -46,12 +47,13 @@ const SpeciesSearch = () => {
         <Typography variant="subtitle2">Scientific Name</Typography>
         <Grid container direction="row" alignItems="center">
           <Grid item xs={5}>
-            <TextField fullWidth onBlur={(e) => setSearchTerm(e.target.value)} />
+            <TextField fullWidth onChange={(e) => setSearchTerm(e.target.value)} />
           </Grid>
           <Grid item xs={1}></Grid>
           <Grid item xs={3}>
             <Button
               variant="contained"
+              disabled={loading || !(searchTerm?.length > 3)}
               startIcon={<Search></Search>}
               onClick={() => dispatch(searchRequested({searchType: 'NRMN', species: searchTerm}))}
               color="primary"
@@ -66,12 +68,13 @@ const SpeciesSearch = () => {
         <Typography variant="subtitle2">Scientific Name</Typography>
         <Grid container direction="row" alignItems="center">
           <Grid item xs={5}>
-            <TextField fullWidth />
+            <TextField fullWidth onChange={(e) => setSearchTerm(e.target.value)} />
           </Grid>
           <Grid item xs={1}></Grid>
           <Grid item xs={4}>
             <Button
               variant="contained"
+              disabled={loading || !(searchTerm?.length > 3)}
               startIcon={<Search></Search>}
               onClick={() => dispatch(searchRequested({searchType: 'WORMS', species: searchTerm}))}
               color="primary"
