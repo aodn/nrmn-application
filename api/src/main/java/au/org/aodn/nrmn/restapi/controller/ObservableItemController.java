@@ -36,7 +36,7 @@ public class ObservableItemController {
     @GetMapping(path = "/observableItems")
     public CollectionModel<ObservableItemRow> list() {
         return CollectionModel.of(
-                observableItemRepository.findAllProjectedBy(null)
+                observableItemRepository.findAllProjectedBy()
                 .stream()
                 .collect(Collectors.toList())
         );

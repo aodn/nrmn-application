@@ -65,6 +65,6 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
                 "where oi_1.superseded_by = oi.observable_item_name) as superseded on true",
         countQuery = "SELECT count(*) FROM {h-schema}observable_item_ref",
         nativeQuery = true)
-    Page<ObservableItemRow> findAllProjectedBy(Pageable pageable);
+    List<ObservableItemRow> findAllProjectedBy();
 
 }
