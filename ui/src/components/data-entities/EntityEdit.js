@@ -150,6 +150,7 @@ const EntityEdit = ({entity, template, clone}) => {
   if (template === false) return <Redirect to="/wip" />;
 
   if (saved) {
+    if (entity.name === 'Observable Item') window.location = '/reference/observableItems';
     const id = saved[entity.idKey];
     return <Redirect to={`${entity.route.base}/${id}/${edit ? 'saved' : 'new'}`} />;
   }
