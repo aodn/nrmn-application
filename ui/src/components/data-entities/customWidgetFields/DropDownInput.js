@@ -8,10 +8,10 @@ import {selectedItemsRequested, setField} from '../middleware/entities';
 import {PropTypes} from 'prop-types';
 
 const DropDownInput = (props) => {
-  const {entity, idKey, valueKey, route, entityList, values, optional} = props.uiSchema;
+  const {entity, idKey, valueKey, route, entityList, values, optional, fieldName} = props.uiSchema;
   const name = idKey ?? entity;
 
-  const formValue = useSelector((state) => state.form.data[name]);
+  const formValue = useSelector((state) => state.form.data[fieldName ?? name]);
   const formOptions = useSelector((state) => state.form.options[entityList])?.map((i) => {
     return {id: i[idKey], label: i[valueKey]};
   });
@@ -25,6 +25,10 @@ const DropDownInput = (props) => {
     if (route) dispatch(selectedItemsRequested([route]));
   }, []);
 
+  if (!formValue && !optional && options) {
+    dispatch(setField({newValue: options[0].id, entity: fieldName ?? name}));
+  }
+
   const error = errors.find((e) => e.property === name);
   return options ? (
     <>
@@ -36,7 +40,7 @@ const DropDownInput = (props) => {
         getOptionLabel={(o) => o.label}
         getOptionSelected={(o, v) => (v ? o.id === v.id : null)}
         value={options.find((o) => o.id === formValue) ?? null}
-        onChange={(_, o) => dispatch(setField({newValue: o?.id, entity: name}))}
+        onChange={(_, o) => dispatch(setField({newValue: o?.id, entity: fieldName ?? name}))}
         renderInput={(params) => <TextField {...params} variant="outlined" error={error} helperText={error?.message} />}
       />
     </>

@@ -20,6 +20,8 @@ import NumberInput from './customWidgetFields/NumberInput';
 import CheckboxInput from './customWidgetFields/CheckboxInput';
 import AutoCompleteInput from './customWidgetFields/AutoCompleteInput';
 
+import SpeciesSearch from '../search/SpeciesSearch';
+
 const EntityEdit = ({entity, template, clone}) => {
   const params = useParams();
 
@@ -60,14 +62,34 @@ const EntityEdit = ({entity, template, clone}) => {
       uiSchema[key] = {'ui:field': 'autostring', route: 'marineProtectedAreas'};
     } else if (key === 'protectionStatus') {
       uiSchema[key] = {'ui:field': 'autostring', route: 'protectionStatuses'};
+    } else if (key === 'obsItemTypeId') {
+      uiSchema[key] = {
+        'ui:field': 'dropdown',
+        default: 'Species',
+        route: 'obsItemTypes',
+        entity: 'obsItemTypeId',
+        entityList: 'obsItemTypes',
+        idKey: 'obsItemTypeId',
+        valueKey: 'obsItemTypeName'
+      };
     } else if (key === 'locationId') {
-      uiSchema['locationId'] = {
+      uiSchema[key] = {
         'ui:field': 'dropdown',
         route: 'locations?projection=selection',
         entity: 'location',
         entityList: 'locations',
         idKey: 'locationId',
         valueKey: 'locationName'
+      };
+    } else if (key === 'reportGroup') {
+      uiSchema[key] = {
+        'ui:field': 'autostring',
+        route: 'reportGroups'
+      };
+    } else if (key === 'habitatGroups') {
+      uiSchema[key] = {
+        'ui:field': 'autostring',
+        route: 'habitatGroups'
       };
       // HACK: just to get these fields working on the Edit page
     } else if (key === 'relief' || key === 'slope' || key === 'waveExposure' || key === 'currents') {
@@ -125,22 +147,10 @@ const EntityEdit = ({entity, template, clone}) => {
     autostring: AutoCompleteInput
   };
 
-  function getErrors(errors) {
-    return errors.map((item, key) => {
-      return <div key={key}>{item}</div>;
-    });
-  }
-
-  let errorAlert =
-    params.errors && params.errors.length > 0 ? (
-      <Alert severity="error" variant="filled">
-        {getErrors(params.errors)}
-      </Alert>
-    ) : (
-      ''
-    );
+  if (template === false) return <Redirect to="/wip" />;
 
   if (saved) {
+    if (entity.name === 'Observable Item') window.location = '/reference/observableItems';
     const id = saved[entity.idKey];
     return <Redirect to={`${entity.route.base}/${id}/${edit ? 'saved' : 'new'}`} />;
   }
@@ -152,46 +162,48 @@ const EntityEdit = ({entity, template, clone}) => {
   ) : (
     <EntityContainer name={entity.name} goBackTo={entity.list.route}>
       <Grid item>
-        {errors.length > 0 ? (
-          <Box pt={2} pl={2} pr={2}>
-            <Alert severity="error" variant="filled">
-              Please review this submission for errors and try again.
-            </Alert>
-          </Box>
-        ) : null}
         {params.loading ? (
           <CircularProgress size={20} />
         ) : (
-          <Box pt={2} px={6} pb={6}>
-            {errorAlert}
-            <Form
-              onError={params.onError}
-              errors={errors}
-              schema={JSSchema}
-              uiSchema={uiSchema}
-              onSubmit={handleSubmit}
-              showErrorList={true}
-              fields={fields}
-              formData={formData}
-              ObjectFieldTemplate={template}
-            >
-              <Box display="flex" justifyContent="center" mt={5}>
-                <Button variant="contained" disabled={params.loading} component={NavLink} to={entity.list.route}>
-                  Cancel
-                </Button>
-                <Button
-                  style={{width: '50%', marginLeft: '5%', marginRight: '20%'}}
-                  type="submit"
-                  variant="contained"
-                  color="secondary"
-                  startIcon={<Save></Save>}
-                  disabled={params.loading}
-                >
-                  Save {entity.name}
-                </Button>
-              </Box>
-            </Form>
-          </Box>
+          <>
+            {entity.showSpeciesSeach && <SpeciesSearch />}
+            <Box pt={2} px={6.25} pb={6}>
+              {errors.length > 0 ? (
+                <Box pt={2}>
+                  <Alert severity="error" variant="filled">
+                    Please review this form for errors and try again.
+                  </Alert>
+                </Box>
+              ) : null}
+              <Form
+                onError={params.onError}
+                errors={errors}
+                schema={JSSchema}
+                uiSchema={uiSchema}
+                onSubmit={handleSubmit}
+                showErrorList={false}
+                fields={fields}
+                formData={formData}
+                ObjectFieldTemplate={template}
+              >
+                <Box display="flex" justifyContent="center" mt={5}>
+                  <Button variant="contained" disabled={params.loading} component={NavLink} to={entity.list.route}>
+                    Cancel
+                  </Button>
+                  <Button
+                    style={{width: '50%', marginLeft: '5%', marginRight: '20%'}}
+                    type="submit"
+                    variant="contained"
+                    color="secondary"
+                    startIcon={<Save></Save>}
+                    disabled={params.loading}
+                  >
+                    Save {entity.name}
+                  </Button>
+                </Box>
+              </Form>
+            </Box>
+          </>
         )}
       </Grid>
     </EntityContainer>

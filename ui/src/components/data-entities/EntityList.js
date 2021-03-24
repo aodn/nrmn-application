@@ -52,7 +52,7 @@ const EntityList = (props) => {
   }, [props.entity.name]);
 
   const schematoColDef = (schema, entity) => {
-    const fields = Object.keys(schema.properties);
+    const fields = entity.list.headers ?? Object.keys(schema.properties);
 
     const coldefs = fields.reduce((acc, field) => {
       const fieldSchema = schema.properties[field];

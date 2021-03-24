@@ -103,25 +103,37 @@ const referenceData = [
   },
   {
     name: 'Observable Item',
-    idKey: 'observableItemId',
-    can: {},
+    idKey: 'id',
+    can: {edit: false},
+    showSpeciesSeach: true,
     flexField: null,
     route: {
-      base: '/wip',
-      view: '/wip',
-      edit: '/wip'
-      // base: '/reference/observableItem',
-      // view: '/reference/observableItem/:id?/:success?',
-      // edit: '/reference/observableItem/:id?/edit'
+      base: '/reference/observableItem',
+      view: '/reference/observableItem/:id?/:success?',
+      edit: '/reference/observableItem/:id?/edit'
     },
-    schemaKey: 'ObservableItem',
-    endpoint: 'observableItems',
-    template: {add: ObservableItemTemplate, edit: ObservableItemTemplate, view: ObservableItemTemplate},
+    schemaKey: 'ObservableItemDto',
+    endpoint: 'reference/observableItem',
+    template: {add: ObservableItemTemplate, edit: false, view: false},
     list: {
-      name: 'observableItemListItems',
-      schemaKey: 'ObservableItemListItem',
+      name: 'tupleBackedMaps',
+      schemaKey: 'ObservableItemRow',
       route: '/reference/observableItems',
-      endpoint: 'observableItemListItems',
+      endpoint: 'reference/observableItems',
+      headers: [
+        'id',
+        'typeName',
+        'name',
+        'commonName',
+        'supersededBy',
+        'supersededNames',
+        'supersededIDs',
+        'phylum',
+        'class',
+        'order',
+        'family',
+        'genus'
+      ],
       sort: ['obsItemTypeName', 'name']
     }
   }
