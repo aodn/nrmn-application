@@ -21,7 +21,7 @@ class ObservableItemExistsIT {
     ObservableItemExists observableItemExists;
 
     @Test
-    void notFoundSpeciesCodeShouldFail() {
+    void notFoundSpeciesShouldFail() {
         val job = new StagedJob();
         job.setId(1L);
         val stage = new StagedRow();
@@ -32,11 +32,22 @@ class ObservableItemExistsIT {
     }
 
     @Test
-    void existingSiteCodeShouldBeOk() {
+    void existingSpeciesShouldBeOk() {
         val job = new StagedJob();
         job.setId(1L);
         val stage = new StagedRow();
         stage.setSpecies("Specie 56");
+        stage.setStagedJob(job);
+        val codeFound = observableItemExists.valid(stage);
+        Assertions.assertTrue(codeFound.isValid());
+    }
+
+    @Test
+    void surveyNotFoundShouldBeOk() {
+        val job = new StagedJob();
+        job.setId(1L);
+        val stage = new StagedRow();
+        stage.setSpecies("Survey not done");
         stage.setStagedJob(job);
         val codeFound = observableItemExists.valid(stage);
         Assertions.assertTrue(codeFound.isValid());
