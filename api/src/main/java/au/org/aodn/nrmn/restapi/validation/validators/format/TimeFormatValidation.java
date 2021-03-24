@@ -4,6 +4,7 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.util.TimeUtils;
 import cyclops.control.Validated;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoField;
@@ -16,6 +17,10 @@ public final class TimeFormatValidation extends BaseRowFormatValidation<LocalTim
 
     @Override
     public Validated<StagedRowError, LocalTime> valid(StagedRow target) {
+        if (StringUtils.isBlank(target.getTime())) {
+            return Validated.valid(null);
+        }
+
         return validFormat(
                 StagedRow::getTime,
                 timeString -> {

@@ -70,4 +70,16 @@ class TimeFormatTest {
         assertTrue(res.isValid());
     }
 
+    @Test
+    void missingTimeShouldBeOK() {
+        val job = new StagedJob();
+        job.setId(1L);
+        val stage = new StagedRow();
+        stage.setTime("");
+        stage.setStagedJob(job);
+        val res = new TimeFormatValidation().valid(stage);
+        assertTrue(res.isValid());
+    }
+
+
 }
