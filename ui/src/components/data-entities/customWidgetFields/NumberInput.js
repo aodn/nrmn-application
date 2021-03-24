@@ -8,14 +8,18 @@ import {setField} from '../middleware/entities';
 const NumberInput = (props) => {
   const entity = props.name;
   const dispatch = useDispatch();
-  let formData = useSelector((state) => state.form.formData[entity]);
+  const formData = useSelector((state) => state.form.data[entity]);
+  const errors = useSelector((state) => state.form.errors);
 
+  const fieldError = errors.find((e) => e.property === entity);
   return (
     <>
       <Typography variant="subtitle2">{props.schema.title}</Typography>
       <TextField
         color="primary"
         type="number"
+        error={fieldError}
+        helperText={fieldError?.message}
         value={formData ?? ''}
         onBlur={(event) => {
           if (isNaN(event.target.value)) {
@@ -36,7 +40,7 @@ NumberInput.propTypes = {
   name: PropTypes.string,
   title: PropTypes.string,
   schema: PropTypes.object,
-  formData: PropTypes.string
+  formData: PropTypes.number
 };
 
 export default NumberInput;

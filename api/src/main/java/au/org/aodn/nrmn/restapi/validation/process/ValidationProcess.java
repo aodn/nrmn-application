@@ -87,7 +87,7 @@ public class ValidationProcess extends ValidatorHelpers {
         return new ValidationResponse(
                 job,
                 Collections.emptyList(),
-                Collections.emptyList(),
+                Collections.emptyMap(),
                 toErrorList(globalResult),
                 Collections.emptyList());
     }

@@ -14,18 +14,18 @@ import LoadingBanner from '../layout/loadingBanner';
 import ObjectListViewTemplate from './ObjectListViewTemplate';
 import EntityContainer from './EntityContainer';
 
-import NestedApiField from './customWidgetFields/NestedApiField';
+import DropDownInput from './customWidgetFields/DropDownInput';
 import TextInput from './customWidgetFields/TextInput';
 import NumberInput from './customWidgetFields/NumberInput';
 import CheckboxInput from './customWidgetFields/CheckboxInput';
-import AutocompleteField from './customWidgetFields/AutocompleteField';
+import AutoCompleteInput from './customWidgetFields/AutoCompleteInput';
 
 const EntityEdit = ({entity, template, clone}) => {
   const params = useParams();
 
   const schemaDefinition = config.get('api') || {};
-  const editItem = useSelector((state) => state.form.formData);
-  const entitySaved = useSelector((state) => state.form.entitySaved);
+  const formData = useSelector((state) => state.form.data);
+  const saved = useSelector((state) => state.form.saved);
   const errors = useSelector((state) => state.form.errors);
   const dispatch = useDispatch();
 
@@ -35,14 +35,14 @@ const EntityEdit = ({entity, template, clone}) => {
     if (params.id !== undefined) {
       dispatch(itemRequested(`${entity.endpoint}/${params.id}`));
     }
-  }, [entitySaved]);
+  }, [saved]);
 
-  const handleSubmit = (form) => {
+  const handleSubmit = (e) => {
     if (edit) {
-      const data = {path: `${entity.endpoint}/${params.id}`, data: form.formData};
+      const data = {path: `${entity.endpoint}/${params.id}`, data: e.formData};
       dispatch(updateEntityRequested(data));
     } else {
-      const data = {path: entity.endpoint, data: form.formData};
+      const data = {path: entity.endpoint, data: e.formData};
       dispatch(createEntityRequested(data));
     }
   };
@@ -74,11 +74,12 @@ const EntityEdit = ({entity, template, clone}) => {
       uiSchema[key] = {
         'ui:field': 'dropdown',
         entity: key,
+        optional: true,
         values: [
-          {id: 0, label: '0'},
           {id: 1, label: '1'},
           {id: 2, label: '2'},
-          {id: 3, label: '3'}
+          {id: 3, label: '3'},
+          {id: 4, label: '4'}
         ]
       };
     } else if (item.type === 'object' && item.readOnly === true) {
@@ -116,12 +117,12 @@ const EntityEdit = ({entity, template, clone}) => {
   };
 
   const fields = {
-    dropdown: NestedApiField,
+    dropdown: DropDownInput,
     readonlyObject: objectDisplay,
     string: TextInput,
     double: NumberInput,
     boolean: CheckboxInput,
-    autostring: AutocompleteField
+    autostring: AutoCompleteInput
   };
 
   function getErrors(errors) {
@@ -139,12 +140,12 @@ const EntityEdit = ({entity, template, clone}) => {
       ''
     );
 
-  if (entitySaved) {
-    const id = entitySaved[entity.idKey];
+  if (saved) {
+    const id = saved[entity.idKey];
     return <Redirect to={`${entity.route.base}/${id}/${edit ? 'saved' : 'new'}`} />;
   }
 
-  return params.id && Object.keys(editItem).length === 0 ? (
+  return params.id && Object.keys(formData).length === 0 ? (
     <Grid container direction="row" justify="flex-start" alignItems="center">
       <LoadingBanner variant={'h5'} msg={`Loading ${entity.name}`} />
     </Grid>
@@ -152,12 +153,9 @@ const EntityEdit = ({entity, template, clone}) => {
     <EntityContainer name={entity.name} goBackTo={entity.list.route}>
       <Grid item>
         {errors.length > 0 ? (
-          <Box padding={2}>
+          <Box pt={2} pl={2} pr={2}>
             <Alert severity="error" variant="filled">
-              {errors[0].message ?? `${entity.name} validation failed.`}
-            </Alert>
-            <Alert style={{marginTop: 5}} severity="info" variant="filled">
-              This feature is under construction.
+              Please review this submission for errors and try again.
             </Alert>
           </Box>
         ) : null}
@@ -168,12 +166,13 @@ const EntityEdit = ({entity, template, clone}) => {
             {errorAlert}
             <Form
               onError={params.onError}
+              errors={errors}
               schema={JSSchema}
               uiSchema={uiSchema}
               onSubmit={handleSubmit}
               showErrorList={true}
               fields={fields}
-              formData={editItem}
+              formData={formData}
               ObjectFieldTemplate={template}
             >
               <Box display="flex" justifyContent="center" mt={5}>

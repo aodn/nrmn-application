@@ -60,7 +60,7 @@ public class ObservableItem {
     @Column(name = "class")
     @Audited(withModifiedFlag = true, modifiedColumnName = "class_mod")
     @Schema(title = "Class")
-    private String clazz;
+    private String className;
 
     @Basic
     @Column(name = "\"order\"")

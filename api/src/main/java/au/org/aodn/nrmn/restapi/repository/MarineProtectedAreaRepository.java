@@ -10,7 +10,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
 @RepositoryRestResource
-@Tag(name = "Marine Protected Areas")
+@Tag(name = "marine protected areas")
 public interface MarineProtectedAreaRepository extends JpaRepository<MarineProtectedArea, Integer>,
  JpaSpecificationExecutor<MarineProtectedArea> {
 

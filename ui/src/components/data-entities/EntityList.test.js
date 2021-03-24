@@ -30,8 +30,8 @@ const mockState = {
   theme: {themeType: false},
   form: {
     entities: {_embedded: {tests: {}}},
-    editItem: {},
-    entitySaved: false,
+    formData: {},
+    saved: false,
     errors: []
   }
 };

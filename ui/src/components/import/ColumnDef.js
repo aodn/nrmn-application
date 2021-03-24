@@ -20,10 +20,10 @@ export const ColumnDef = [
     hide: true
   },
   {
-      field: 'pos',
-      editable: false,
-      headerName: '#',
-      sort: 'asc',
+    field: 'pos',
+    editable: false,
+    headerName: '#',
+    sort: 'asc'
   },
   {
     field: 'diver',
@@ -31,15 +31,13 @@ export const ColumnDef = [
     pivot: true,
     enablePivot: false,
     cellStyle: cell,
-    keyCreator: params => params.value?.toLowerCase()
-
+    keyCreator: (params) => params.value?.toLowerCase()
   },
   {
     field: 'buddy',
     editable: true,
     cellStyle: cell,
-    keyCreator: params => params.value?.toLowerCase()
-
+    keyCreator: (params) => params.value?.toLowerCase()
   },
   {
     field: 'siteCode',
@@ -48,8 +46,7 @@ export const ColumnDef = [
     rowGroup: false,
     enableRowGroup: true,
     cellStyle: cell,
-    keyCreator: params => params.value?.toLowerCase()
-
+    keyCreator: (params) => params.value?.toLowerCase()
   },
   {
     field: 'siteName',
@@ -74,8 +71,7 @@ export const ColumnDef = [
     cellStyle: cell,
     rowGroup: false,
     enableRowGroup: true,
-    minWidth: 105,
-    keyCreator: params => params.value?.toLowerCase()
+    keyCreator: (params) => params.value?.toLowerCase()
   },
   {
     field: 'vis',
@@ -102,17 +98,14 @@ export const ColumnDef = [
     rowGroup: false,
     enableRowGroup: true,
     cellStyle: cell,
-    keyCreator: params => params.value?.toLowerCase()
-
+    keyCreator: (params) => params.value?.toLowerCase()
   },
   {
     field: 'method',
     editable: true,
     rowGroup: false,
     enableRowGroup: true,
-    width: 105,
-    keyCreator: params => params.value?.toLowerCase()
-
+    keyCreator: (params) => params.value?.toLowerCase()
   },
   {
     field: 'block',
@@ -120,15 +113,12 @@ export const ColumnDef = [
     rowGroup: false,
     enableRowGroup: true,
     cellStyle: cell,
-    width: 80,
-    keyCreator: params => params.value?.toLowerCase()
+    keyCreator: (params) => params.value?.toLowerCase()
   },
   {
     field: 'code',
     editable: true,
-    cellStyle: cell,
-    width: 105,
-    minWidth:80,
+    cellStyle: cell
   },
   {
     field: 'species',
@@ -143,10 +133,10 @@ export const ColumnDef = [
     enablePivot: false,
     rowGroup: false,
     enableRowGroup: true,
+    aggFunc: 'count',
     editable: true,
     cellStyle: cell,
-    keyCreator: params => params.value?.toLowerCase()
-
+    keyCreator: (params) => params.value?.toLowerCase()
   },
   {
     field: 'commonName',
@@ -156,245 +146,243 @@ export const ColumnDef = [
   {
     field: 'total',
     editable: true,
-    width: 80
+    aggFunc: 'count',
+    rowGroup: false,
+    enableRowGroup: true
   },
   {
     field: 'inverts',
-    editable: true,
-    width: 80
+    editable: true
   },
   {
     field: '2-5',
     headerName: '2.5',
-    width: 105,
-    minWidth:80,
-    invertSize:  '0.5',
-    headerComponentFramework: AgGridHeader
+    invertSize: '0.5',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '5',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '1',
-    headerComponentFramework: AgGridHeader
+    invertSize: '1',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
 
   {
     field: '7-5',
     headerName: '7.5',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '1.5',
+
+    invertSize: '1.5',
     headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '10',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '2',
-    headerComponentFramework: AgGridHeader
+    invertSize: '2',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '12-5',
     headerName: '12.5',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '2.5',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '2.5',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '15',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '3',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '3',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '20',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '3.5',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '3.5',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '25',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '4',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '4',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '30',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '4.5',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '4.5',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '35',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '5',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '5',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '40',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '5.5',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '5.5',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '50',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '6',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '6',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '62-5',
     headerName: '62.5',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '6.5',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '6.5',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '75',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '7',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '7',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '87-5',
     headerName: '87.5',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '7.5',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '7.5',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '100',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '8',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '8',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '112-5',
     headerName: '112.5',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '8.5',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '8.5',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '125',
     editable: 75,
-    width: 105,
-    minWidth:80,
-    invertSize:  '9',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '9',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '137-5',
     headerName: '137.5',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '9.5',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '9.5',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '150',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '10',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '10',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '162-5',
     headerName: '162.5',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '10.5',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '10.5',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '175',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '11',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '11',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '187-5',
     headerName: '187.5',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '11.5',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '11.5',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '200',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '12',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '12',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '250',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '12.5',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '12.5',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '300',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '13',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '13',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '350',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '13.5',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '13.5',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '400',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '14',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '14',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   }
 ];
 
@@ -402,129 +390,133 @@ export const ExtendedSize = [
   {
     field: '450',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '14.5',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '14.5',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '500',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '15',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '15',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '550',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '16',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '16',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '600',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '17',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '17',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '650',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '18',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '18',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '700',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '19',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '19',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '750',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '20',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '20',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '800',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '22',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '22',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '850',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '24',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '24',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '900',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '26',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '26',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '950',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '28',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '28',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: '1000',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '30',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '30',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: 'l5',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '1',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '1',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: 'l95',
     editable: true,
-    width: 105,
-    minWidth:80,
-    invertSize:  '1',
-    headerComponentFramework: AgGridHeader
+
+    invertSize: '1',
+    headerComponentFramework: AgGridHeader,
+    width: 35
   },
   {
     field: 'inverts',
-    editable: true
+    editable: true,
+    width: 35
   },
   {
     field: 'm2InvertSizingSpecies',
-    editable: true
+    editable: true,
+    width: 55
   },
   {
     field: 'isInvertSizing',
-    editable: true
+    editable: true,
+    width: 40
   },
   {
     field: 'lmax',
-    editable: true
+    editable: true,
+    width: 35
   }
 ];

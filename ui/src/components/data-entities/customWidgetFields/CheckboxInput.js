@@ -6,7 +6,7 @@ import {setField} from '../middleware/entities';
 
 const CheckboxInput = (props) => {
   const dispatch = useDispatch();
-  let formData = useSelector((state) => state.form.formData);
+  let formData = useSelector((state) => state.form.data);
   const entity = props.name;
 
   return (
@@ -14,7 +14,7 @@ const CheckboxInput = (props) => {
       style={{marginTop: '25px', marginLeft: '5px'}}
       control={
         <Checkbox
-          checked={formData[entity] ?? false}
+          checked={formData[entity] ?? props.schema.default}
           onChange={(event) => {
             const newValue = event.target.checked;
             dispatch(setField({newValue, entity}));

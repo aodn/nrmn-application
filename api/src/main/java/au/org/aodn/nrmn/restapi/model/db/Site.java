@@ -104,7 +104,7 @@ public class Site {
 
     @Basic
     @Column(name = "wave_exposure")
-    @Schema(title = "Wave exposure")
+    @Schema(title = "Wave Exposure")
     private Integer waveExposure;
 
     @Basic
@@ -113,9 +113,9 @@ public class Site {
     private Integer currents;
 
     @Basic
-    @Column(name = "is_active")
+    @Column(name = "is_active", columnDefinition = "boolean default false")
     @Schema(title = "Is Active")
-    private Boolean isActive;
+    private Boolean isActive = false;
 
     @Basic
     @Column(name = "geom")
@@ -126,7 +126,7 @@ public class Site {
 
     @Column(name = "site_attribute", columnDefinition = "jsonb")
     @Type(type = "jsonb")
-    @Schema(title = "Other attributes", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(title = "Other Attributes", accessMode = Schema.AccessMode.READ_ONLY)
     private Map<String, String> siteAttribute;
 
     /* Calculate geom from lat/lon when persisting to the db.  Ideally, we would just use geom in the db and */
