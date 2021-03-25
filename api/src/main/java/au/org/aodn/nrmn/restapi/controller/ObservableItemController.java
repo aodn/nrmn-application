@@ -1,10 +1,13 @@
 package au.org.aodn.nrmn.restapi.controller;
 
+import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.exception.ValidationException;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemDto;
+import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemGetDto;
+import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemPutDto;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -50,9 +53,23 @@ public class ObservableItemController {
         ObservableItem persistedObservableItem = observableItemRepository.save(newObservableItem);
         return mapper.map(persistedObservableItem, ObservableItemDto.class);
     }
+    
+    @GetMapping("/observableItem/{id}")
+    public ObservableItemGetDto findOne(@PathVariable Integer id) {
+        ObservableItem observableItem = observableItemRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        return mapper.map(observableItem, ObservableItemGetDto.class);
+    }
 
     private void validatePost(@RequestBody @Valid ObservableItemDto sitePostDto) {
 
+        List<ValidationError> errors = new ArrayList<ValidationError>();
+
+        if(sitePostDto.getObsItemTypeId() == null)
+            errors.add(new ValidationError(ObservableItemDto.class.getName(), "obsItemTypeId", null, "Observable Item Type is required"));
+
+        if(sitePostDto.getSpeciesEpithet() == null || sitePostDto.getSpeciesEpithet().isEmpty())
+            errors.add(new ValidationError(ObservableItemDto.class.getName(), "speciesEpithet", null, "Species Epithet is required."));
+        
         ObservableItem probe = new ObservableItem();
         
         probe.setCommonName(sitePostDto.getCommonName());
@@ -61,7 +78,6 @@ public class ObservableItemController {
 
         Example<ObservableItem> example = Example.of(probe, ExampleMatcher.matchingAny());
 
-        List<ValidationError> errors = new ArrayList<ValidationError>();
         List<ObservableItem> allMatches = observableItemRepository.findAll(example);
         for(ObservableItem match: allMatches) {
             if(match.getObservableItemName() != null && match.getObservableItemName().equals(sitePostDto.getObservableItemName()))
@@ -73,6 +89,23 @@ public class ObservableItemController {
             if(match.getLetterCode() != null && match.getLetterCode().equals(sitePostDto.getLetterCode()))
                 errors.add(new ValidationError(ObservableItemDto.class.getName(), "letterCode", sitePostDto.getLetterCode(), "An item with this letter code already exists."));
         }
+
+        if(!errors.isEmpty())
+            throw new ValidationException(errors);
+    }
+
+    @PutMapping("/observableItem/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ObservableItemGetDto newObservableItem(@Valid @RequestBody ObservableItemPutDto observableItemPutDto) {
+        validatePut(observableItemPutDto);
+        ObservableItem newObservableItem = mapper.map(observableItemPutDto, ObservableItem.class);
+        ObservableItem persistedObservableItem = observableItemRepository.save(newObservableItem);
+        return mapper.map(persistedObservableItem, ObservableItemGetDto.class);
+    }
+
+    private void validatePut(@RequestBody @Valid ObservableItemPutDto sitePostDto) {
+
+        List<ValidationError> errors = new ArrayList<ValidationError>();
 
         if(!errors.isEmpty())
             throw new ValidationException(errors);
