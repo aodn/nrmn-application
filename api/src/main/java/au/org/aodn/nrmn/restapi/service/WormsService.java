@@ -37,6 +37,7 @@ public class WormsService {
         SpeciesRecord[] matchingSpecies = Optional.ofNullable(response.block())
                                                    .orElse(new SpeciesRecord[0]);
         return Arrays.stream(matchingSpecies)
+                     .filter(speciesRecord -> !speciesRecord.getStatus().equalsIgnoreCase("deleted"))
                      .collect(Collectors.toList());
     }
 
