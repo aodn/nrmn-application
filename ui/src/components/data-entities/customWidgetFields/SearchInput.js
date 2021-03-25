@@ -1,20 +1,16 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {TextField, Typography} from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import {selectedItemsRequested, setField} from '../middleware/entities';
+import {setField} from '../middleware/entities';
 import {PropTypes} from 'prop-types';
 import {searchRequested} from '../form-reducer';
 
-const SearchInput = ({schema, uiSchema, name}) => {
+const SearchInput = ({schema, name}) => {
   const dispatch = useDispatch();
 
-  const value = useSelector((state) => state.form.data[name]);
+  const value = useSelector((state) => state.form.data[name]) ?? '';
   const searchResults = useSelector((state) => state.form.searchResults);
-
-  useEffect(() => {
-    dispatch(selectedItemsRequested([uiSchema.route]));
-  }, []);
 
   return (
     <>
