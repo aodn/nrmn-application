@@ -158,6 +158,8 @@ export const ColumnDef = [
     field: '2-5',
     headerName: '2.5',
     invertSize: '0.5',
+    editable: true,
+
     headerComponentFramework: AgGridHeader,
     width: 35
   },
