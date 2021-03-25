@@ -59,12 +59,6 @@ function* setFieldFormData(action) {
 
 function* setFieldsFormData(action) {
   try {
-    // for (const key in action.payload.row) {
-    //   if (key === 'id') continue;
-    //   const resp = {};
-    //   resp[key] = action.payload.row[key];
-    //   yield put(selectedItemEdited(resp));
-    // }
     yield put(updateFormFields(action.payload.row));
   } catch (e) {
     yield put(entitiesError({e}));
