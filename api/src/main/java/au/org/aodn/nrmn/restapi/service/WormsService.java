@@ -26,18 +26,17 @@ public class WormsService {
         this.wormsClient = wormsClient;
     }
 
-    public List<SpeciesRecord> fuzzySearch(String searchTerm) {
-        Mono<SpeciesRecord[][]> response = wormsClient
+    public List<SpeciesRecord> partialSearch(String searchTerm) {
+        Mono<SpeciesRecord[]> response = wormsClient
                 .get().uri(uriBuilder ->
-                        uriBuilder.path("/AphiaRecordsByMatchNames")
-                                  .queryParam("scientificnames[]", removeTrailingJunk(searchTerm))
+                        uriBuilder.path("/AphiaRecordsByName")
+                                  .pathSegment("%" + removeTrailingJunk(searchTerm))
                                   .build())
                 .retrieve()
-                .bodyToMono(SpeciesRecord[][].class);
-        SpeciesRecord[][] matchingSpecies = Optional.ofNullable(response.block())
-                                                   .orElse(new SpeciesRecord[0][0]);
+                .bodyToMono(SpeciesRecord[].class);
+        SpeciesRecord[] matchingSpecies = Optional.ofNullable(response.block())
+                                                   .orElse(new SpeciesRecord[0]);
         return Arrays.stream(matchingSpecies)
-                     .flatMap(children -> Arrays.stream(children))
                      .collect(Collectors.toList());
     }
 

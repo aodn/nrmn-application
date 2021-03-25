@@ -14,10 +14,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class WormsServiceIT {
 
     @Test @Ignore
-    public void fuzzySearchReturnsResults() {
+    public void partialSearchReturnsResults() {
         WebClient wormsClient = WebClient.create("https://www.marinespecies.org/rest");
         WormsService wormsService = new WormsService(wormsClient);
-        List<SpeciesRecord> results = wormsService.fuzzySearch("Paratrachichthys trailli");
+        List<SpeciesRecord> results = wormsService.partialSearch("Paratrachichthys trailli");
         assertThat(results.isEmpty(), is(false));
     }
 
