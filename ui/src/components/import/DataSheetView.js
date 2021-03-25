@@ -199,7 +199,7 @@ const DataSheetView = () => {
   const size = useWindowSize();
   return (
     <Box mt={2}>
-      <ButtonGroup spacing={2} size="small" variant="text" aria-label="small outlined button group">
+    {job && job.status == 'STAGED' &&   (<ButtonGroup spacing={2} size="small" variant="text" aria-label="small outlined button group">
         <Fab className={classes.fab} onClick={handleSave} disabled={!canSaved} variant="extended" size="small" color="primary">
           <SaveOutlinedIcon className={classes.extendedIcon} />
           Save
@@ -220,7 +220,7 @@ const DataSheetView = () => {
           <CloudUploadIcon className={classes.extendedIcon} />
           Submit
         </Fab>
-      </ButtonGroup>
+      </ButtonGroup>)}
       <div
         onKeyDown={onKeyDown}
         id="validation-grid"
@@ -254,11 +254,9 @@ const DataSheetView = () => {
           fillHandleDirection="xy"
           ensureDomOrder={true}
           defaultColDef={{
-          //  minWidth: 80,
             filter: true,
             sortable: true,
             resizable: true,
-            editable: true,
             suppressMenu: true
           }}
           onGridReady={agGridReady}

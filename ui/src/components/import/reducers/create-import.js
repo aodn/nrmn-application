@@ -7,6 +7,7 @@ const importState = {
   editLoading: false,
   deleteLoading: false,
   ingestLoading: false,
+  enableSubmit: false,
   submitReady: false,
   ingestSuccess: false,
   percentCompleted: 0,
@@ -71,6 +72,18 @@ export const exportRow = (row) => {
   return row;
 };
 
+export const importRow = (row) => {
+  var measure = {};
+  Object.getOwnPropertyNames(row || {})
+  .filter(key => !isNaN(parseFloat(key)))
+  .forEach((numKey) => {
+      measure[numKey.replace('-', '.')] = row[numKey];
+      delete row[numKey];
+  });
+  row.measureJson =  measure;
+  return row;
+};
+
 export const flatten = (row) => {
   const measures = row.MeasureJson;
   if (measures) {
@@ -110,14 +123,16 @@ const importSlice = createSlice({
         }, {});
 
         const validationErrors = mergeErrors(action.payload.errors);
-        state.EnableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
+        state.enableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
         state.errorsByMsg = action.payload.summaries;
-        state.EnableSubmit = true;
+      } else {
+        state.enableSubmit = true;
       }
+      state.validationLoading = false;
     },
     AddRowIndex: (state, action) => {
         state.indexChanged[action.payload.id] = action.payload.row;
-        state.EnableSubmit = false;
+        state.enableSubmit = false;
     },
     RowDeleteRequested: (state) => {
       state.deleteLoading = true;
