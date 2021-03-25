@@ -10,8 +10,7 @@ import {
   SubmitingestRequested,
   ValidationRequested,
   RowDeleteRequested,
-  ValidationFinished,
-  importRow
+  ValidationFinished
 } from './reducers/create-import';
 import {ColumnDef, ExtendedSize} from './ColumnDef';
 import {Box, ButtonGroup, Fab, makeStyles, Dialog, TextField, DialogTitle, DialogActions, DialogContent, Button} from '@material-ui/core';
@@ -164,7 +163,7 @@ const DataSheetView = () => {
 
   const onCellChanged = (evt) => {
     let toAdd = {};
-    toAdd[evt.data.id] = importRow(evt.data);
+    toAdd[evt.data.id] = evt.data;
     setIndexMap({...indexMap, ...toAdd});
     setCanSaved(true);
   };

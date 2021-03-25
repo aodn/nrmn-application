@@ -2,6 +2,7 @@ import axiosInstance from './index.js';
 import axios from 'axios';
 import store from '../components/store'; // will be useful to access to axios.all and axios.spread
 import {ImportProgress} from '../components/import/reducers/upload';
+import { importRow } from '../components/import/reducers/create-import.js';
 
 function getToken() {
   const {accessToken, tokenType} = store.getState().auth;
@@ -146,7 +147,7 @@ export const getDataJob = (jobId) =>
 
 export const postJobValidation = (jobId) => axiosInstance.post('/api/stage/validate/' + jobId).then((res) => res);
 export const updateRow = (jobId, rows) => {
-  return axiosInstance.put('/api/stage/updates/' + jobId, rows).then((res) => res);
+  return axiosInstance.put('/api/stage/updates/' + jobId, rows.map(importRow)).then((res) => res);
 };
 export const deleteRow = (jobId, rows) => {
   return axiosInstance.put('/api/stage/delete/rows/' + jobId, rows).then((res) => res);
