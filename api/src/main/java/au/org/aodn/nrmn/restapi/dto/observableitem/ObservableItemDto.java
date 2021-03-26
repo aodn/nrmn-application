@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -20,6 +21,7 @@ public class ObservableItemDto {
     private String observableItemName;
 
     @Schema(title = "Observable Item Type")
+    @NotNull(message = "Observable Item Type is required")
     private Integer obsItemTypeId;
 
     @Schema(title = "Common Name")
@@ -42,6 +44,7 @@ public class ObservableItemDto {
     private String genus;
 
     @Schema(title = "Species Epithet")
+    @NotNull(message =  "Species Epithet is required.")
     private String speciesEpithet;
 
     @Schema(title = "Letter Code")

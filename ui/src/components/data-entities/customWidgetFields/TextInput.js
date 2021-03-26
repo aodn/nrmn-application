@@ -7,7 +7,7 @@ import {setField} from '../middleware/entities';
 
 const TextInput = ({name, schema, uiSchema}) => {
   const dispatch = useDispatch();
-  const value = useSelector((state) => state.form.data[name]) ?? '---';
+  const value = useSelector((state) => state.form.data[name]) ?? '';
   const error = useSelector((state) => state.form.errors).find((e) => e.property === name);
   const readOnlyInput = uiSchema['ui:readonly'] === true || uiSchema['ui:field'] === 'readonly';
 
@@ -16,7 +16,7 @@ const TextInput = ({name, schema, uiSchema}) => {
       <Typography variant="subtitle2">{schema.title}</Typography>
       {readOnlyInput ? (
         <Box pl={0.5} pt={0.75}>
-          <Typography>{value ?? '---'}</Typography>
+          <Typography>{value.length > 0 ? value : '---'}</Typography>
         </Box>
       ) : (
         <TextField
