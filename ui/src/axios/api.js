@@ -178,3 +178,13 @@ export const submitJobFile = (params) => {
 export const submitingest = (jobId) => {
   return axiosInstance.post('/api/ingestion/ingest/' + jobId).then((res) => res);
 };
+
+export const search = (params) => {
+  const url = `/api/species?searchType=${escape(params.searchType)}&species=${escape(params.species)}`;
+  return axiosInstance
+    .get(url, {
+      validateStatus: () => true
+    })
+    .then((res) => res)
+    .catch((err) => err);
+};

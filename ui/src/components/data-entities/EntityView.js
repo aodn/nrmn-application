@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Link, useParams} from 'react-router-dom';
+import {Link, useParams, Redirect} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import config from 'react-global-configuration';
 import {PropTypes} from 'prop-types';
@@ -113,23 +113,27 @@ const EntityView = (props) => {
       </Alert>
     ) : null;
 
+  if (props.template === false) return params.success ? <Redirect to={props.entity.list.route} /> : <Redirect to="/wip" />;
+
   return (
     <EntityContainer name={props.entity.name} goBackTo={props.entity.list.route}>
       <Grid item xs={9}>
         <Box pt={4} px={6} pb={6}>
           {alert}
-          <Form
-            disabled
-            onError={params.onError}
-            schema={JSSchema}
-            uiSchema={uiSchema}
-            showErrorList={true}
-            fields={fields}
-            formData={formData}
-            ObjectFieldTemplate={props.template}
-          >
-            <div></div>
-          </Form>
+          {Object.keys(formData).length > 0 && (
+            <Form
+              disabled
+              onError={params.onError}
+              schema={JSSchema}
+              uiSchema={uiSchema}
+              showErrorList={true}
+              fields={fields}
+              formData={formData}
+              ObjectFieldTemplate={props.template}
+            >
+              <div></div>
+            </Form>
+          )}
         </Box>
       </Grid>
       <Grid item xs>
