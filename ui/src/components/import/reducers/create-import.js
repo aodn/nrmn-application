@@ -77,7 +77,8 @@ export const importRow = (row) => {
   Object.getOwnPropertyNames(row || {})
   .filter(key => !isNaN(parseFloat(key)))
   .forEach((numKey) => {
-      measure[numKey.replace('-', '.')] = row[numKey];
+    var pos = measureKey.indexOf(numKey);
+      measure[pos] = row[numKey];
       delete row[numKey];
   });
   row.measureJson =  measure;
