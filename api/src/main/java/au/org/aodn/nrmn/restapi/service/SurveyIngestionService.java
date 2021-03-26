@@ -60,8 +60,8 @@ public class SurveyIngestionService {
                 .direction(stagedRow.getDirection().toString())
                 .site(stagedRow.getSite())
                 .surveyDate(Date.valueOf(stagedRow.getDate()))
-                .surveyTime(Time.valueOf(stagedRow.getTime()))
-                .visibility(stagedRow.getVis())
+                .surveyTime(Time.valueOf(stagedRow.getTime().orElse(null)))
+                .visibility(stagedRow.getVis().orElse(null))
                 .program(stagedRow.getRef().getStagedJob().getProgram())
                 .build()));
     }
