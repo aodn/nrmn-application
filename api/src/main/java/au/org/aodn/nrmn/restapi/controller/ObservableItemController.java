@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 
@@ -55,9 +56,8 @@ public class ObservableItemController {
     }
     
     @GetMapping("/observableItem/{id}")
-    public ObservableItemGetDto findOne(@PathVariable Integer id) {
-        ObservableItem observableItem = observableItemRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        return mapper.map(observableItem, ObservableItemGetDto.class);
+    public ResponseEntity<ObservableItemGetDto> findOne(@PathVariable Integer id) {
+        return observableItemRepository.findById(id).map(item -> ResponseEntity.ok(mapper.map(item, ObservableItemGetDto.class))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/observableItem/{id}")
