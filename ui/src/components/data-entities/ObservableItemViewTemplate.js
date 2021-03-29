@@ -47,7 +47,7 @@ const ObservableItemTemplate = ({properties, title}) => {
           </Grid>
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              {el['supersededByIDs']}
+              {el['supersededByIds']}
             </Grid>
             <Grid item xs={6}>
               {el['letterCode']}

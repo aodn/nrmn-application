@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.repository;
 
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
+import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemSupersededBy;
 import au.org.aodn.nrmn.restapi.repository.model.EntityCriteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -69,18 +70,15 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
 
 
     @Query(value =
-    "select observable_item_id as observableItemId, obs_item_type_name as typeName, observable_item_name as name, " +
-           "common_name as commonName, phylum, class as className, \"order\", family, genus, superseded_by as " + 
-           "supersededBy, supersededNames, supersededIds " +
+    "select superseded_by_names as supersededByNames, superseded_by_ids as supersededByIds " +
         "FROM {h-schema}observable_item_ref oi " +
-        "LEFT JOIN {h-schema}obs_item_type_ref oitr ON oitr.obs_item_type_id = oi.obs_item_type_id " +
         "LEFT JOIN LATERAL (" +
             "select string_agg(oi_1.observable_item_name, ', ' order by oi_1.observable_item_name) as " +
-             "supersededNames, " +
+             "superseded_by_names, " +
             "string_agg(cast(oi_1.observable_item_id AS varchar ), ', ' order by oi_1.observable_item_name) as " +
-             "supersededIds " +
+             "superseded_by_ids " +
             "from {h-schema}observable_item_ref oi_1 " +
             "where oi_1.superseded_by = oi.observable_item_name) as superseded on true WHERE observable_item_id = :id",
     nativeQuery = true)
-    ObservableItemRow findOneProjectedById(Integer id);
+    ObservableItemSupersededBy findSupersededForId(Integer id);
 }
