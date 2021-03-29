@@ -138,10 +138,7 @@ const importSlice = createSlice({
     RowDeleteRequested: (state) => {
       state.deleteLoading = true;
     },
-    RowDeleteFinished: (state, action) => {
-      action.payload.forEach(i =>  {
-        delete state.rows[i];
-      });
+    RowDeleteFinished: (state) => {
       state.deleteLoading = false;
     },
     RowUpdateRequested: (state) => {
