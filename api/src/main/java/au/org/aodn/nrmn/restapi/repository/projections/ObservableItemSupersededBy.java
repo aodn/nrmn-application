@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public interface ObservableItemSupersededBy {
 
-    String getSupersededByIds();
+    String getSupersededIds();
 
-    String getSupersededByNames();
+    String getSupersededNames();
 }

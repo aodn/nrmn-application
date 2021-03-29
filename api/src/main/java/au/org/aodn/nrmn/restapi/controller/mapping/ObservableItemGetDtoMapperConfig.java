@@ -22,8 +22,8 @@ public class ObservableItemGetDtoMapperConfig {
             ObservableItem observableItem = context.getSource();
             ObservableItemGetDto observableItemGetDto = context.getDestination();
             ObservableItemSupersededBy supersededBy = observableItemRepository.findSupersededForId(observableItem.getObservableItemId());
-            observableItemGetDto.setSupersededByIds(supersededBy.getSupersededByIds());
-            observableItemGetDto.setSupersededByNames(supersededBy.getSupersededByNames());
+            observableItemGetDto.setSupersededIds(supersededBy.getSupersededIds());
+            observableItemGetDto.setSupersededNames(supersededBy.getSupersededNames());
             return observableItemGetDto;
         };
     }

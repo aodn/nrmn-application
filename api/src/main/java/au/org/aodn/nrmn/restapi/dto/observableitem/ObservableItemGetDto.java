@@ -38,10 +38,10 @@ public class ObservableItemGetDto {
     private String supersededBy;
 
     @Schema(title = "Superseded Names")
-    private String supersededByNames;
+    private String supersededNames;
 
     @Schema(title = "Superseded IDs")
-    private String supersededByIds;
+    private String supersededIds;
 
     @Schema(title = "Phylum")
     private String phylum;

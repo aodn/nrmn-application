@@ -70,13 +70,13 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
 
 
     @Query(value =
-    "select superseded_by_names as supersededByNames, superseded_by_ids as supersededByIds " +
+    "select superseded_names as supersededNames, superseded_ids as supersededIds " +
         "FROM {h-schema}observable_item_ref oi " +
         "LEFT JOIN LATERAL (" +
             "select string_agg(oi_1.observable_item_name, ', ' order by oi_1.observable_item_name) as " +
-             "superseded_by_names, " +
+             "superseded_names, " +
             "string_agg(cast(oi_1.observable_item_id AS varchar ), ', ' order by oi_1.observable_item_name) as " +
-             "superseded_by_ids " +
+             "superseded_ids " +
             "from {h-schema}observable_item_ref oi_1 " +
             "where oi_1.superseded_by = oi.observable_item_name) as superseded on true WHERE observable_item_id = :id",
     nativeQuery = true)
