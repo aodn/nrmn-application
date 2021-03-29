@@ -1,10 +1,13 @@
 package au.org.aodn.nrmn.restapi.controller;
 
+import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.exception.ValidationException;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemDto;
+import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemGetDto;
+import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemPutDto;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 
@@ -45,33 +49,47 @@ public class ObservableItemController {
     @PostMapping("/observableItem")
     @ResponseStatus(HttpStatus.CREATED)
     public ObservableItemDto newObservableItem(@Valid @RequestBody ObservableItemDto observableItemDto) {
-        validatePost(observableItemDto);
         ObservableItem newObservableItem = mapper.map(observableItemDto, ObservableItem.class);
+        validate(newObservableItem);
         ObservableItem persistedObservableItem = observableItemRepository.save(newObservableItem);
         return mapper.map(persistedObservableItem, ObservableItemDto.class);
     }
+    
+    @GetMapping("/observableItem/{id}")
+    public ResponseEntity<ObservableItemGetDto> findOne(@PathVariable Integer id) {
+        return observableItemRepository.findById(id).map(item -> ResponseEntity.ok(mapper.map(item, ObservableItemGetDto.class))).orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
-    private void validatePost(@RequestBody @Valid ObservableItemDto sitePostDto) {
+    @PutMapping("/observableItem/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ObservableItemGetDto updateObservableItem(@Valid @RequestBody ObservableItemPutDto observableItemPutDto) {
+        ObservableItem newObservableItem = mapper.map(observableItemPutDto, ObservableItem.class);
+        validate(newObservableItem);
+        ObservableItem persistedObservableItem = observableItemRepository.save(newObservableItem);
+        return mapper.map(persistedObservableItem, ObservableItemGetDto.class);
+    }
 
-        ObservableItem probe = new ObservableItem();
-        
-        probe.setCommonName(sitePostDto.getCommonName());
-        probe.setLetterCode(sitePostDto.getLetterCode());
-        probe.setObservableItemName(sitePostDto.getObservableItemName());
-
-        Example<ObservableItem> example = Example.of(probe, ExampleMatcher.matchingAny());
+    private void validate(ObservableItem item) {
 
         List<ValidationError> errors = new ArrayList<ValidationError>();
+
+        ObservableItem probe = ObservableItem.builder().commonName(item.getCommonName()).letterCode(item.getLetterCode()).observableItemName(item.getObservableItemName()).build();
+        Example<ObservableItem> example = Example.of(probe, ExampleMatcher.matchingAny());
+
         List<ObservableItem> allMatches = observableItemRepository.findAll(example);
         for(ObservableItem match: allMatches) {
-            if(match.getObservableItemName() != null && match.getObservableItemName().equals(sitePostDto.getObservableItemName()))
-                errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName", sitePostDto.getObservableItemName(), "An item with this name already exists."));
+
+            if(match.getObservableItemId().equals(item.getObservableItemId()))
+                continue;
+
+            if(match.getObservableItemName() != null && match.getObservableItemName().equals(item.getObservableItemName()))
+                errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName", item.getObservableItemName(), "An item with this name already exists."));
             
-            if(match.getCommonName() != null && match.getCommonName().equals(sitePostDto.getCommonName()))
-                errors.add(new ValidationError(ObservableItemDto.class.getName(), "commonName", sitePostDto.getCommonName(), "An item with this common name already exists."));
+            if(match.getCommonName() != null && match.getCommonName().equals(item.getCommonName()))
+                errors.add(new ValidationError(ObservableItemDto.class.getName(), "commonName", item.getCommonName(), "An item with this common name already exists."));
             
-            if(match.getLetterCode() != null && match.getLetterCode().equals(sitePostDto.getLetterCode()))
-                errors.add(new ValidationError(ObservableItemDto.class.getName(), "letterCode", sitePostDto.getLetterCode(), "An item with this letter code already exists."));
+            if(match.getLetterCode() != null && match.getLetterCode().equals(item.getLetterCode()))
+                errors.add(new ValidationError(ObservableItemDto.class.getName(), "letterCode", item.getLetterCode(), "An item with this letter code already exists."));
         }
 
         if(!errors.isEmpty())

@@ -69,8 +69,6 @@ public class ObservableItem {
 
     @Basic
     @Column(name = "species_epithet")
-    @Audited(targetAuditMode = NOT_AUDITED)
-    @NotNull(message = "Species Epithet is required.")
     private String speciesEpithet;
 
     @Basic

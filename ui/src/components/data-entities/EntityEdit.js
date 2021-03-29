@@ -19,6 +19,7 @@ import TextInput from './customWidgetFields/TextInput';
 import NumberInput from './customWidgetFields/NumberInput';
 import CheckboxInput from './customWidgetFields/CheckboxInput';
 import AutoCompleteInput from './customWidgetFields/AutoCompleteInput';
+import SearchInput from './customWidgetFields/SearchInput';
 
 import SpeciesSearch from '../search/SpeciesSearch';
 
@@ -50,7 +51,7 @@ const EntityEdit = ({entity, template, clone}) => {
   };
 
   const title = (edit ? 'Edit ' : clone ? 'Clone ' : 'New ') + entity.name;
-  const entityDef = {...schemaDefinition[entity.schemaKey]};
+  const entityDef = {...schemaDefinition[edit ? entity.schemaKey.edit : entity.schemaKey.add]};
   const entitySchema = {title: title, ...entityDef};
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
 
@@ -104,6 +105,8 @@ const EntityEdit = ({entity, template, clone}) => {
           {id: 4, label: '4'}
         ]
       };
+    } else if (key === 'supersededBy') {
+      uiSchema[key] = {'ui:field': 'searchInput'};
     } else if (item.type === 'object' && item.readOnly === true) {
       uiSchema[key] = {'ui:field': 'readonlyObject'};
     } else if (item.format === 'double') {
@@ -113,7 +116,7 @@ const EntityEdit = ({entity, template, clone}) => {
     } else if (key === 'oldSiteCodes') {
       uiSchema[key] = {'ui:field': 'array'};
     } else {
-      uiSchema[key] = {'ui:field': 'string'};
+      uiSchema[key] = {'ui:field': 'string', 'ui:readonly': item.readOnly ?? false};
     }
   }
 
@@ -144,13 +147,11 @@ const EntityEdit = ({entity, template, clone}) => {
     string: TextInput,
     double: NumberInput,
     boolean: CheckboxInput,
-    autostring: AutoCompleteInput
+    autostring: AutoCompleteInput,
+    searchInput: SearchInput
   };
 
-  if (template === false) return <Redirect to="/wip" />;
-
   if (saved) {
-    if (entity.name === 'Observable Item') window.location = '/reference/observableItems';
     const id = saved[entity.idKey];
     return <Redirect to={`${entity.route.base}/${id}/${edit ? 'saved' : 'new'}`} />;
   }
@@ -166,6 +167,7 @@ const EntityEdit = ({entity, template, clone}) => {
           <CircularProgress size={20} />
         ) : (
           <>
+            {entity.showSpeciesSearch && !edit && <SpeciesSearch />}
             <Box pt={2} px={6.25} pb={6}>
               {errors.length > 0 ? (
                 <Box pt={2}>
@@ -182,6 +184,7 @@ const EntityEdit = ({entity, template, clone}) => {
                 onSubmit={handleSubmit}
                 showErrorList={false}
                 fields={fields}
+                noValidate
                 formData={formData}
                 ObjectFieldTemplate={template}
               >

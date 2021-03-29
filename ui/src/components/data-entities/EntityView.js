@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Link, useParams, Redirect} from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import config from 'react-global-configuration';
 import {PropTypes} from 'prop-types';
@@ -24,7 +24,7 @@ const EntityView = (props) => {
     dispatch(itemRequested(`${props.entity.endpoint}/${params.id}`));
   }, []);
 
-  const entityDef = schemaDefinition[props.entity.schemaKey];
+  const entityDef = schemaDefinition[props.entity.schemaKey.view];
   const fullTitle = `${props.entity.name} Details`;
   const entitySchema = {title: fullTitle, ...entityDef};
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
@@ -112,8 +112,6 @@ const EntityView = (props) => {
         {props.entity.name} {params.success === 'new' ? 'Created' : 'Updated'}
       </Alert>
     ) : null;
-
-  if (props.template === false) return params.success ? <Redirect to={props.entity.list.route} /> : <Redirect to="/wip" />;
 
   return (
     <EntityContainer name={props.entity.name} goBackTo={props.entity.list.route}>

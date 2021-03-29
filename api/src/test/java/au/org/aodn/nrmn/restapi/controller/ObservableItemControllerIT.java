@@ -46,21 +46,20 @@ public class ObservableItemControllerIT {
                 .build();
     }
 
-    // @Test
-    // @WithUserDetails("test@gmail.com")
-    // public void testGetObservableItemListItems() {
-    //     val testObservableItem = observableItemTestData.persistedObservableItem();
+    @Test
+    @WithUserDetails("test@gmail.com")
+    public void testGetObservableItemListItems() {
+        val testObservableItem = observableItemTestData.persistedObservableItem();
 
-    //     given()
-    //             .spec(spec)
-    //             .auth()
-    //             .oauth2(jwtToken.get())
-    //             .get()
-    //             .then()
-    //             .assertThat()
-    //             .statusCode(200)
-    //             .body("_embedded.observableItemRows.id",
-    //              hasItems(testObservableItem.getObservableItemId()));
-    // }
-
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .get()
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .body("_embedded.tupleBackedMaps.observableItemId",
+                 hasItems(testObservableItem.getObservableItemId()));
+    }
 }

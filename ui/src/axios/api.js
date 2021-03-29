@@ -67,8 +67,6 @@ export const apiDefinition = () => axiosInstance.get('/v3/api-docs').then((res) 
 
 export const getEntity = (entity) => axiosInstance.get('/api/' + entity).then((res) => res);
 
-export const getResource = (url) => axiosInstance.get(url).then((res) => res);
-
 export const getFullJob = (id) => {
   const jobReq = axiosInstance.get('/api/stagedJobs/' + id);
   const logsReq = axiosInstance.get('/api/stagedJobs/' + id + '/logs');
