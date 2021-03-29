@@ -9,6 +9,7 @@ const EntityContainer = (props) => (
       {'<< Back to ' + props.name}
     </NavLink>
     <Grid container justify="center">
+      {props.header}
       <Box style={{background: 'white', width: 700}} boxShadow={1} margin={3}>
         <Grid container alignItems="flex-start" direction="row">
           {props.children}
@@ -21,7 +22,8 @@ const EntityContainer = (props) => (
 EntityContainer.propTypes = {
   name: PropTypes.string.isRequired,
   goBackTo: PropTypes.string.isRequired,
-  children: PropTypes.any
+  children: PropTypes.any,
+  header: PropTypes.any
 };
 
 export default EntityContainer;

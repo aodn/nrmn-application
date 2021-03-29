@@ -36,7 +36,7 @@ public class SpeciesController {
     public List<SpeciesDto> findSpecies(@RequestParam("species") String speciesName,
                                         SpeciesSearchType searchType) {
         if (searchType.equals(WORMS)) {
-            return wormsService.fuzzySearch(speciesName)
+            return wormsService.partialSearch(speciesName)
             .stream()
             .map(aphiaRef -> mapper.map(aphiaRef, SpeciesDto.class))
             .collect(Collectors.toList());

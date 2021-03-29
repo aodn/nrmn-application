@@ -21,4 +21,8 @@ public class SpeciesDto {
 
     private String order;
 
+    private String supersededBy;
+
+    private Integer supersededById;
+
 }
