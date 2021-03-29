@@ -49,7 +49,9 @@ const DataSheetView = () => {
   const job = useSelector((state) => state.import.job);
   const colDefinition = job && job.isExtendedSize ? ColumnDef.concat(ExtendedSize) : ColumnDef;
   const enableSubmit = useSelector((state) => state.import.enableSubmit);
-  const [indexMap, setIndexMap] = useState({});
+  const [indexAdd, setIndexAdd] = useState({});
+  const [indexDelete, setIndexDelete] = useState({});
+
   const [canSaved, setCanSaved] = useState(false);
   const [addDialog, setAddDialog] = useState({open: false, rowIndex: -1, number: 1, lastId: 0});
 
@@ -68,7 +70,14 @@ const DataSheetView = () => {
   };
 
   const handleSave = () => {
-    dispatch(RowUpdateRequested({jobId: job.id, rows: indexMap}));
+    var toSave =  Object.values(indexAdd);
+    if (toSave.length > 0) {
+      dispatch(RowUpdateRequested({jobId: job.id, rows: toSave}));
+    }
+    var toDelete = Object.values(indexDelete);
+    if (toDelete.length > 0) {
+      dispatch(RowDeleteRequested({jobId: job.id, rows: toDelete}));
+    }
     setCanSaved(false);
   };
 
@@ -102,8 +111,19 @@ const DataSheetView = () => {
         name: 'Delete selected Row(s)',
         action: () => {
           const selectedRows = params.api.getSelectedRows();
-          const indexes = params.api.getSelectedNodes().map((n) => n.childIndex);
-          dispatch(RowDeleteRequested({id: job.id, rows: selectedRows, indexes: indexes}));
+          var deleteRows = {};
+          selectedRows.forEach((drow) => {
+            if (indexAdd[drow.id]) {
+              var tmp = indexAdd;
+              delete tmp[drow.id];
+              setIndexAdd(tmp);
+            } else {
+              deleteRows[drow.id] = drow;
+            }
+          });
+
+          setIndexDelete({...indexDelete, ...deleteRows});
+          setCanSaved(true);
           params.api.applyTransaction({remove: selectedRows});
         },
         cssClasses: ['redBoldFont']
@@ -126,13 +146,13 @@ const DataSheetView = () => {
         return toUpdate[row.id];
       });
     const newLines = [];
-    const time = moment(new Date().toISOString()).utcOffset(0,false).format('YYYY-DD-MMTHH:mm:ss.SSSZZ');
+    const time = moment(new Date().toISOString()).utcOffset(0, false).format('YYYY-DD-MMTHH:mm:ss.SSSZZ');
     for (let i = 0; i < addDialog.number; i++) {
       const newRow = {id: addDialog.lastId + (i + 1) + '', pos: addDialog.rowIndex + i, isNew: true, created: time};
       toUpdate[newRow.id] = newRow;
       newLines.push(newRow);
     }
-    setIndexMap({...indexMap, ...toUpdate});
+    setIndexAdd({...indexAdd, ...toUpdate});
     gridApi.applyTransaction({update: rowPosUpdated});
     gridApi.applyTransaction({add: newLines, addIndex: addDialog.rowIndex});
     setAddDialog({...addDialog, open: false, number: 1, lastId: addDialog.lastId + addDialog.number, rowIndex: -1});
@@ -156,7 +176,7 @@ const DataSheetView = () => {
         let toAdd = {};
         toAdd[row.id] = row;
         gridApi.applyTransaction({update: [row]});
-        setIndexMap({...indexMap, ...toAdd});
+        setIndexAdd({...indexAdd, ...toAdd});
       }
     }
   };
@@ -164,7 +184,7 @@ const DataSheetView = () => {
   const onCellChanged = (evt) => {
     let toAdd = {};
     toAdd[evt.data.id] = evt.data;
-    setIndexMap({...indexMap, ...toAdd});
+    setIndexAdd({...indexAdd, ...toAdd});
     setCanSaved(true);
   };
 
@@ -199,28 +219,38 @@ const DataSheetView = () => {
   const size = useWindowSize();
   return (
     <Box mt={2}>
-    {job && job.status == 'STAGED' &&   (<ButtonGroup spacing={2} size="small" variant="text" aria-label="small outlined button group">
-        <Fab className={classes.fab} onClick={handleSave} disabled={!canSaved} variant="extended" size="small" color="primary">
-          <SaveOutlinedIcon className={classes.extendedIcon} />
-          Save
-        </Fab>
-        <Fab className={classes.fab} variant="extended" disabled={canSaved} onClick={() => handleValidate()} size="small" label="Validate" color="secondary">
-          <PlaylistAddCheckOutlinedIcon className={classes.extendedIcon} />
-          Validate
-        </Fab>
-        <Fab
-          className={classes.fab}
-          variant="extended"
-          size="small"
-          onClick={handleSubmit}
-          label="Submit"
-          disabled={!enableSubmit}
-          color="primary"
-        >
-          <CloudUploadIcon className={classes.extendedIcon} />
-          Submit
-        </Fab>
-      </ButtonGroup>)}
+      {job && job.status == 'STAGED' && (
+        <ButtonGroup spacing={2} size="small" variant="text" aria-label="small outlined button group">
+          <Fab className={classes.fab} onClick={handleSave} disabled={!canSaved} variant="extended" size="small" color="primary">
+            <SaveOutlinedIcon className={classes.extendedIcon} />
+            Save
+          </Fab>
+          <Fab
+            className={classes.fab}
+            variant="extended"
+            disabled={canSaved}
+            onClick={() => handleValidate()}
+            size="small"
+            label="Validate"
+            color="secondary"
+          >
+            <PlaylistAddCheckOutlinedIcon className={classes.extendedIcon} />
+            Validate
+          </Fab>
+          <Fab
+            className={classes.fab}
+            variant="extended"
+            size="small"
+            onClick={handleSubmit}
+            label="Submit"
+            disabled={!enableSubmit}
+            color="primary"
+          >
+            <CloudUploadIcon className={classes.extendedIcon} />
+            Submit
+          </Fab>
+        </ButtonGroup>
+      )}
       <div
         onKeyDown={onKeyDown}
         id="validation-grid"
