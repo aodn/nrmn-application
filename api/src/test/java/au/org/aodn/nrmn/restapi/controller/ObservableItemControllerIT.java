@@ -1,7 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import au.org.aodn.nrmn.restapi.model.db.ObservableItemTestData;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
@@ -30,10 +29,7 @@ public class ObservableItemControllerIT {
 
     @Autowired
     private ObservableItemTestData observableItemTestData;
-
-    @Autowired
-    private ObservableItemRepository observableItemRepository;
-
+    
     @Autowired
     private JwtToken jwtToken;
 
@@ -43,7 +39,7 @@ public class ObservableItemControllerIT {
     public void setup() {
         spec = new RequestSpecBuilder()
                 .setBaseUri(String.format("http://localhost:%s", port))
-                .setBasePath("/api/observableItems")
+                .setBasePath("/api/reference/observableItems")
                 .setContentType("application/json")
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter())
@@ -63,8 +59,7 @@ public class ObservableItemControllerIT {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("_embedded.observableItems.observableItemId",
+                .body("_embedded.tupleBackedMaps.observableItemId",
                  hasItems(testObservableItem.getObservableItemId()));
     }
-
 }

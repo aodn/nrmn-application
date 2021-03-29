@@ -7,6 +7,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Map;
+import java.util.Optional;
 
 @Data
 @Getter
@@ -20,7 +21,7 @@ public class StagedRowFormatted {
 
     private LocalDate date;
 
-    private LocalTime time;
+    private Optional<LocalTime> time;
 
     private Diver diver;
 
@@ -39,7 +40,7 @@ public class StagedRowFormatted {
     private ObservableItem species;
 
 
-    private Integer vis;
+    private Optional<Integer> vis;
 
     private Directions direction;
 

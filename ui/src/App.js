@@ -5,7 +5,6 @@ import clsx from 'clsx';
 import {ThemeProvider, createMuiTheme, responsiveFontSizes, makeStyles} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import {blueGrey, deepPurple} from '@material-ui/core/colors';
-import Alert from '@material-ui/lab/Alert';
 import TopBar from './components/layout/TopBar';
 import SideMenu from './components/layout/SideMenu';
 import Login from './components/auth/login';
@@ -24,6 +23,8 @@ import SiteEditTemplate from './components/data-entities/SiteEditTemplate';
 import SiteAddTemplate from './components/data-entities/SiteAddTemplate';
 import SiteViewTemplate from './components/data-entities/SiteViewTemplate';
 import ObservableItemTemplate from './components/data-entities/ObservableItemTemplate';
+import ObservableItemViewTemplate from './components/data-entities/ObservableItemViewTemplate';
+import ObservableItemEditTemplate from './components/data-entities/ObservableItemEditTemplate';
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ? process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
@@ -58,9 +59,9 @@ const referenceData = [
     idKey: 'locationId',
     can: {delete: false, clone: false},
     flexField: 'locationName',
-    route: {base: '/reference/location', view: '/reference/location/:id?/:success?', edit: '/reference/location/:id?/edit'},
-    schemaKey: 'Location',
     endpoint: 'locations',
+    route: {base: '/reference/location', view: '/reference/location/:id?/:success?', edit: '/reference/location/:id?/edit'},
+    schemaKey: {add: 'Location', edit: 'Location', view: 'Location'},
     template: {add: LocationTemplate, edit: LocationTemplate, view: LocationTemplate},
     list: {
       schemaKey: 'Location',
@@ -74,9 +75,9 @@ const referenceData = [
     idKey: 'diverId',
     can: {delete: false, clone: false},
     flexField: 'fullName',
-    route: {base: '/reference/diver', view: '/reference/diver/:id?/:success?', edit: '/reference/diver/:id?/edit'},
-    schemaKey: 'Diver',
     endpoint: 'divers',
+    route: {base: '/reference/diver', view: '/reference/diver/:id?/:success?', edit: '/reference/diver/:id?/edit'},
+    schemaKey: {add: 'Diver', edit: 'Diver', view: 'Diver'},
     template: {add: DiverTemplate, edit: DiverTemplate, view: DiverTemplate},
     list: {
       schemaKey: 'Diver',
@@ -90,9 +91,9 @@ const referenceData = [
     idKey: 'siteId',
     can: {delete: true, clone: true},
     flexField: null,
-    route: {base: '/reference/site', view: '/reference/site/:id?/:success?', edit: '/reference/site/:id?/edit'},
-    schemaKey: 'SiteGetDto',
     endpoint: 'sites',
+    route: {base: '/reference/site', view: '/reference/site/:id?/:success?', edit: '/reference/site/:id?/edit'},
+    schemaKey: {add: 'SiteGetDto', edit: 'SiteGetDto', view: 'SiteGetDto'},
     template: {add: SiteAddTemplate, edit: SiteEditTemplate, view: SiteViewTemplate},
     list: {
       name: 'siteListItems',
@@ -104,24 +105,36 @@ const referenceData = [
   {
     name: 'Observable Item',
     idKey: 'observableItemId',
-    can: {},
+    can: {edit: true},
+    showSpeciesSearch: true,
     flexField: null,
+    endpoint: 'reference/observableItem',
     route: {
-      base: '/wip',
-      view: '/wip',
-      edit: '/wip'
-      // base: '/reference/observableItem',
-      // view: '/reference/observableItem/:id?/:success?',
-      // edit: '/reference/observableItem/:id?/edit'
+      base: '/reference/observableItem',
+      view: '/reference/observableItem/:id?/:success?',
+      edit: '/reference/observableItem/:id?/edit'
     },
-    schemaKey: 'ObservableItem',
-    endpoint: 'observableItems',
-    template: {add: ObservableItemTemplate, edit: ObservableItemTemplate, view: ObservableItemTemplate},
+    schemaKey: {add: 'ObservableItemDto', edit: 'ObservableItemPutDto', view: 'ObservableItemGetDto'},
+    template: {add: ObservableItemTemplate, edit: ObservableItemEditTemplate, view: ObservableItemViewTemplate},
     list: {
-      name: 'observableItemListItems',
-      schemaKey: 'ObservableItemListItem',
+      name: 'tupleBackedMaps',
+      schemaKey: 'ObservableItemRow',
       route: '/reference/observableItems',
-      endpoint: 'observableItemListItems',
+      endpoint: 'reference/observableItems',
+      headers: [
+        'observableItemId',
+        'typeName',
+        'name',
+        'commonName',
+        'supersededBy',
+        'supersededNames',
+        'supersededIDs',
+        'phylum',
+        'class',
+        'order',
+        'family',
+        'genus'
+      ],
       sort: ['obsItemTypeName', 'name']
     }
   }
@@ -180,15 +193,6 @@ const App = () => {
             })}
           >
             <Switch>
-              <Route
-                path="/wip"
-                render={() => (
-                  <Alert severity="info" variant="filled">
-                    This feature is under construction.
-                  </Alert>
-                )}
-              />
-
               <Route path="/login" component={Login} />
               <Route exact path="/home" component={Homepage} />
               <Route exact path="/404" component={FourOFour}></Route>

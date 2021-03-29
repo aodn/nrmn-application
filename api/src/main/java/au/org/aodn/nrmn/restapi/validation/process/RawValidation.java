@@ -83,7 +83,7 @@ public class RawValidation extends ValidatorHelpers {
                         Tuple2.of("Code", new PassThruString(StagedRow::getCode, "Code")),
                         Tuple2.of("Species", observableItemExists),
 
-                        Tuple2.of("Vis", new IntegerFormatValidation(StagedRow::getVis, "Vis", Collections.emptyList())),
+                        Tuple2.of("Vis", new OptionalIntegerFormatValidation(StagedRow::getVis, "Vis")),
 
                         Tuple2.of("Total", new IntegerFormatValidation(StagedRow::getTotal, "Total", Collections.emptyList())),
                         Tuple2.of("MeasureJson", new MeasureJsonValidation()),
@@ -127,7 +127,7 @@ public class RawValidation extends ValidatorHelpers {
     public StagedRowFormatted toFormat(HashMap<String, Object> values) {
         val site = (Site) values.get("Site").orElseGet(null);
         val date = (LocalDate) values.get("Date").orElseGet(null);
-        val time = (LocalTime) values.get("Time").orElseGet(null);
+        val time = (Optional<LocalTime>) values.get("Time").orElse(Optional.empty());
 
         val diver = (Diver) values.get("Diver").orElseGet(null);
         val buddy = (Diver) values.get("Buddy").orElseGet(null);
@@ -144,7 +144,7 @@ public class RawValidation extends ValidatorHelpers {
         val speciesAttributes = obsRepo.getSpeciesAttributesById(species.getObservableItemId()).stream().findFirst().orElseGet(null);
         val code = (String) values.get("Code").orElseGet(null);
 
-        val vis = (Integer) values.get("Vis").orElseGet(null);
+        val vis = (Optional<Integer>) values.get("Vis").orElse(Optional.empty());
         val total = (Integer) values.get("Total").orElseGet(null);
         val direction = (Directions) values.get("Direction").orElseGet(null);
         val measureJson = (java.util.Map<Integer, Integer>) values.get("MeasureJson").orElseGet(null);

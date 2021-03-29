@@ -21,7 +21,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.security.test.context.support.WithUserDetails;
 
-import static au.org.aodn.nrmn.restapi.test.ApiUrl.entityRef;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -35,19 +34,7 @@ public class ObservableItemApiIT {
     private int port;
 
     @Autowired
-    private ObservableItemRepository observableItemRepository;
-
-    @Autowired
-    private ObservableItemTestData observableItemTestData;
-
-    @Autowired
     private ObsItemTypeTestData obsItemTypeTestData;
-
-    @Autowired
-    private AphiaRefTestData aphiaRefTestData;
-
-    @Autowired
-    private AphiaRelTypeTestData aphiaRelTypeTestData;
 
     @Autowired
     private JwtToken jwtToken;
@@ -58,7 +45,7 @@ public class ObservableItemApiIT {
     public void setup() {
         spec = new RequestSpecBuilder()
                 .setBaseUri(String.format("http://localhost:%s", port))
-                .setBasePath("/api/observableItems")
+                .setBasePath("/api/reference/observableItem")
                 .setContentType("application/json")
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter())
@@ -69,8 +56,6 @@ public class ObservableItemApiIT {
     @WithUserDetails("test@gmail.com")
     public void testCreateObservableItem() {
         val obsItemType = obsItemTypeTestData.persistedObsItemType();
-        val aphiaRef = aphiaRefTestData.persistedAphiaRef();
-        val aphiaRelType = aphiaRelTypeTestData.persistedAphiaRelType();
 
         given()
                 .spec(spec)
@@ -78,96 +63,16 @@ public class ObservableItemApiIT {
                 .oauth2(jwtToken.get())
                 .body("{" +
                         "\"observableItemName\": \"Lotella rhacina\"," +
-                        "\"obsItemAttribute\": {" +
-                        "    \"Class\": \"Actinopterygii\"," +
-                        "    \"Genus\": \"Conger\"," +
-                        "    \"Order\": \"Anguilliformes\"," +
-                        "    \"Family\": \"Congridae\"," +
-                        "    \"Phylum\": \"Chordata\"," +
-                        "    \"MaxLength\": 200," +
-                        "    \"CommonName\": \"Conger eel\"," +
-                        "    \"LetterCode\": \"CVER\"," +
-                        "    \"OtherGroups\": \"Higher carnivore (including piscivore)\"," +
-                        "    \"SpeciesEpithet\": \"verreauxi\"}," +
-                        "\"lengthWeight\": {" +
-                        "    \"a\": 0.0017," +
-                        "    \"b\": 3.145," +
-                        "    \"cf\": 1," +
-                        "    \"sgfgu\": \"Gu\"}," +
-                        "\"obsItemType\": \"" + entityRef(port, "obsItemTypes", obsItemType.getObsItemTypeId()) +
-                        "\"," +
-                        "\"aphiaRef\": \"" + entityRef(port, "aphiaRefs", aphiaRef.getAphiaId()) + "\"," +
-                        "\"aphiaRefType\": \"" + entityRef(port, "aphiaRefTypes", aphiaRelType.getAphiaRelTypeId()) +
-                        "\"" +
+                        "\"speciesEpithet\": \"verreauxi\"," +
+                        "\"commonName\": \"Conger eel\"," +
+                        "\"letterCode\": \"CVER\"," +
+                        "\"obsItemTypeId\":"  + obsItemType.getObsItemTypeId()  +
                         "}")
                 .post()
                 .then()
                 .assertThat()
                 .statusCode(201)
                 .body("observableItemName", is(equalTo("Lotella rhacina")))
-                .body("obsItemAttribute.CommonName", is(equalTo("Conger eel")))
-                .body("lengthWeight.b", is(equalTo(3.145f)));
-    }
-
-    @Test
-    @WithUserDetails("test@gmail.com")
-    public void testCreateObservableItemNoLengthWeight() {
-        val obsItemType = obsItemTypeTestData.persistedObsItemType();
-        val aphiaRef = aphiaRefTestData.persistedAphiaRef();
-        val aphiaRelType = aphiaRelTypeTestData.persistedAphiaRelType();
-
-        given()
-                .spec(spec)
-                .auth()
-                .oauth2(jwtToken.get())
-                .body("{" +
-                        "\"observableItemName\": \"Lotella rhacina\"," +
-                        "\"obsItemType\": \"" + entityRef(port, "obsItemTypes", obsItemType.getObsItemTypeId()) +
-                        "\"," +
-                        "\"aphiaRef\": \"" + entityRef(port, "aphiaRefs", aphiaRef.getAphiaId()) + "\"," +
-                        "\"aphiaRefType\": \"" + entityRef(port, "aphiaRefTypes", aphiaRelType.getAphiaRelTypeId()) +
-                        "\"" +
-                        "}")
-                .post()
-                .then()
-                .assertThat()
-                .statusCode(201)
-                .body("observableItemName", is(equalTo("Lotella rhacina")));
-    }
-
-    @Test
-    @WithUserDetails("test@gmail.com")
-    public void testUpdateObservableItemLengthWeight() {
-        val observableItem = observableItemRepository.save(
-                observableItemTestData.defaultBuilder()
-                                      .lengthWeight(null)
-                                      .obsItemAttribute(null)
-                                      .build());
-
-        given()
-                .spec(spec)
-                .auth()
-                .oauth2(jwtToken.get())
-                .body("{" +
-                        "\"observableItemName\": \"" + observableItem.getObservableItemName() + "\"," +
-                        "\"obsItemType\": \"" + entityRef(port, "obsItemTypes", observableItem.getObsItemType().getObsItemTypeId()) +
-                        "\"," +
-                        "\"lengthWeight\": {" +
-                        "    \"observableItemId\": " + observableItem.getObservableItemId() + "," +
-                        "    \"a\": 0.0017," +
-                        "    \"b\": 3.145," +
-                        "    \"cf\": 1," +
-                        "    \"sgfgu\": \"Gu\"," +
-                        "    \"observableItem\": \"" + entityRef(port, "observableItems",
-                        observableItem.getObservableItemId()) + "\"}," +
-                        "\"aphiaRef\": \"" + entityRef(port, "aphiaRefs", observableItem.getAphiaRef().getAphiaId()) + "\"," +
-                        "\"aphiaRefType\": " +
-                        "    \"" + entityRef(port, "aphiaRefTypes", observableItem.getAphiaRelType().getAphiaRelTypeId()) +
-                        "\"" +
-                        "}")
-                .put(observableItem.getObservableItemId().toString())
-                .then()
-                .assertThat()
-                .statusCode(200);
+                .body("commonName", is(equalTo("Conger eel")));
     }
 }

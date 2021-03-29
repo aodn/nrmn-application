@@ -24,7 +24,7 @@ const EntityView = (props) => {
     dispatch(itemRequested(`${props.entity.endpoint}/${params.id}`));
   }, []);
 
-  const entityDef = schemaDefinition[props.entity.schemaKey];
+  const entityDef = schemaDefinition[props.entity.schemaKey.view];
   const fullTitle = `${props.entity.name} Details`;
   const entitySchema = {title: fullTitle, ...entityDef};
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
@@ -118,18 +118,20 @@ const EntityView = (props) => {
       <Grid item xs={9}>
         <Box pt={4} px={6} pb={6}>
           {alert}
-          <Form
-            disabled
-            onError={params.onError}
-            schema={JSSchema}
-            uiSchema={uiSchema}
-            showErrorList={true}
-            fields={fields}
-            formData={formData}
-            ObjectFieldTemplate={props.template}
-          >
-            <div></div>
-          </Form>
+          {Object.keys(formData).length > 0 && (
+            <Form
+              disabled
+              onError={params.onError}
+              schema={JSSchema}
+              uiSchema={uiSchema}
+              showErrorList={true}
+              fields={fields}
+              formData={formData}
+              ObjectFieldTemplate={props.template}
+            >
+              <div></div>
+            </Form>
+          )}
         </Box>
       </Grid>
       <Grid item xs>

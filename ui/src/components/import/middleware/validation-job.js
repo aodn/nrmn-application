@@ -43,8 +43,7 @@ function* validateJob(action) {
 
 function* update(action) {
   try {
-    const rows = Object.values(action.payload.rows);
-    yield call(updateRow, action.payload.jobId, rows);
+    yield call(updateRow, action.payload.jobId, action.payload.rows);
     yield put(EditRowFinished());
   } catch (e) {
     yield put(jobFailed(e));
@@ -62,8 +61,8 @@ function* submit(action) {
 
 function* deleteRows(action) {
   try {
-    yield call(deleteRow, action.payload.id, action.payload.rows);
-    yield put(RowDeleteFinished(action.payload.indexes));
+    yield call(deleteRow, action.payload.jobId, action.payload.rows);
+    yield put(RowDeleteFinished());
   } catch (e) {
     yield put(jobFailed(e.message));
   }

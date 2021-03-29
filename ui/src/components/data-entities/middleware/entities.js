@@ -7,6 +7,7 @@ import {
   entitiesSaved,
   entitiesError,
   entitiesLoaded,
+  updateFormFields,
   selectedItemEdited,
   selectedItemsEdited,
   selectedItemsLoaded
@@ -22,6 +23,7 @@ export default function* getEntitiesWatcher() {
   yield takeEvery(deleteEntityRequested, deleteEntity);
   yield takeEvery(setNestedField, setNestedFormData);
   yield takeEvery(setField, setFieldFormData);
+  yield takeEvery(setFields, setFieldsFormData);
 }
 
 function* entities(action) {
@@ -50,6 +52,14 @@ function* setFieldFormData(action) {
     const resp = {};
     resp[action.payload.entity] = action.payload.newValue;
     yield put(selectedItemEdited(resp));
+  } catch (e) {
+    yield put(entitiesError({e}));
+  }
+}
+
+function* setFieldsFormData(action) {
+  try {
+    yield put(updateFormFields(action.payload.row));
   } catch (e) {
     yield put(entitiesError({e}));
   }
@@ -119,6 +129,10 @@ export const itemRequested = createAction('ID_REQUESTED', function (entity) {
 });
 
 export const setField = createAction('SELECTED_ENTITY', function (entity) {
+  return {payload: entity};
+});
+
+export const setFields = createAction('SET_FIELDS', function (entity) {
   return {payload: entity};
 });
 

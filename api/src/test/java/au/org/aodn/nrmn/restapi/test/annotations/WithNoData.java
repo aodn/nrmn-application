@@ -11,7 +11,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * Composed annotation that clears schema before each test
  */
-@Sql({"/sql/drop_nrmn.sql", "/sql/migration.sql", "/sql/application.sql", "/testdata/TEST_USER.sql"})
+@Sql({"/sql/drop_nrmn.sql", "/sql/migration.sql", "/sql/application.sql", "/sql/pg_trgm.sql",
+        "/testdata/TEST_USER.sql"})
 @Retention(RUNTIME)
 @Target(TYPE)
 public @interface WithNoData {

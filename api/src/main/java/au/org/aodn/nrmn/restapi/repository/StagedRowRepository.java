@@ -2,7 +2,6 @@ package au.org.aodn.nrmn.restapi.repository;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.repository.model.RowMethodBlock;
-import au.org.aodn.nrmn.restapi.repository.model.RowMethodCount;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
