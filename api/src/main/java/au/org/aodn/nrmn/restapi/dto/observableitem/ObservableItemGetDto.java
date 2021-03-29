@@ -37,10 +37,10 @@ public class ObservableItemGetDto {
     @Schema(title = "Superseded By")
     private String supersededBy;
 
-    @Schema(title = "Superseded By Names")
+    @Schema(title = "Superseded Names")
     private String supersededByNames;
 
-    @Schema(title = "Superseded By IDs")
+    @Schema(title = "Superseded IDs")
     private String supersededByIds;
 
     @Schema(title = "Phylum")
