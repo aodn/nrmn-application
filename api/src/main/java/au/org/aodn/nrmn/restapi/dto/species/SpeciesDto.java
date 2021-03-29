@@ -29,4 +29,6 @@ public class SpeciesDto {
 
     private String validName;
 
+    private Integer validAphiaId;
+
 }
