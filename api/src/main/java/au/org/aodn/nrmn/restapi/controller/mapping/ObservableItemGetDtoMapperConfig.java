@@ -3,7 +3,7 @@ package au.org.aodn.nrmn.restapi.controller.mapping;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemGetDto;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemSupersededBy;
+import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemSuperseded;
 
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -21,9 +21,9 @@ public class ObservableItemGetDtoMapperConfig {
         return context -> {
             ObservableItem observableItem = context.getSource();
             ObservableItemGetDto observableItemGetDto = context.getDestination();
-            ObservableItemSupersededBy supersededBy = observableItemRepository.findSupersededForId(observableItem.getObservableItemId());
-            observableItemGetDto.setSupersededIds(supersededBy.getSupersededIds());
-            observableItemGetDto.setSupersededNames(supersededBy.getSupersededNames());
+            ObservableItemSuperseded superseded = observableItemRepository.findSupersededForId(observableItem.getObservableItemId());
+            observableItemGetDto.setSupersededIds(superseded.getSupersededIds());
+            observableItemGetDto.setSupersededNames(superseded.getSupersededNames());
             return observableItemGetDto;
         };
     }

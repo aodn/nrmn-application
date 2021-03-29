@@ -2,7 +2,7 @@ package au.org.aodn.nrmn.restapi.repository;
 
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
-import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemSupersededBy;
+import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemSuperseded;
 import au.org.aodn.nrmn.restapi.repository.model.EntityCriteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -80,5 +80,5 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             "from {h-schema}observable_item_ref oi_1 " +
             "where oi_1.superseded_by = oi.observable_item_name) as superseded on true WHERE observable_item_id = :id",
     nativeQuery = true)
-    ObservableItemSupersededBy findSupersededForId(Integer id);
+    ObservableItemSuperseded findSupersededForId(Integer id);
 }
