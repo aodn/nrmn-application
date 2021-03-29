@@ -24,10 +24,12 @@ public class SpeciesDtoMapperConfig {
         return context -> {
             SpeciesRecord speciesRecord = context.getSource();
             SpeciesDto speciesDto = context.getDestination();
-            speciesDto.setDisplayName(speciesRecord.getScientificName()
-                    + " (" + speciesRecord.getRank() + ")"
-                    + (speciesRecord.getStatus().equalsIgnoreCase("unaccepted") ? " [Sup]" : ""));
-            speciesDto.setSuperceded(speciesRecord.getStatus().equalsIgnoreCase("unaccepted"));
+
+            if (speciesRecord.getStatus().equalsIgnoreCase("unaccepted")) {
+                speciesDto.setSupersededBy(speciesRecord.getValidName());
+                speciesDto.setSupersededById(speciesRecord.getValidAphiaId());
+            }
+
             return speciesDto;
         };
     }
