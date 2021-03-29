@@ -32,6 +32,7 @@ public interface ObservableItemRow {
     @Schema(title = "Phylum")
     String getPhylum();
 
+    @Schema(title = "Class")
     @JsonProperty(value = "class")
     String getClassName();
 
