@@ -161,13 +161,12 @@ const EntityEdit = ({entity, template, clone}) => {
       <LoadingBanner variant={'h5'} msg={`Loading ${entity.name}`} />
     </Grid>
   ) : (
-    <EntityContainer name={entity.name} goBackTo={entity.list.route} header={entity.showSpeciesSeach && <SpeciesSearch />}>
+    <EntityContainer name={entity.name} goBackTo={entity.list.route} header={entity.showSpeciesSearch && <SpeciesSearch />}>
       <Grid container direction="row" justify="flex-start" alignItems="center">
         {params.loading ? (
           <CircularProgress size={20} />
         ) : (
           <>
-            {entity.showSpeciesSearch && !edit && <SpeciesSearch />}
             <Box pt={2} px={6.25} pb={6}>
               {errors.length > 0 ? (
                 <Box pt={2}>
