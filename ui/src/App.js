@@ -25,6 +25,8 @@ import SiteViewTemplate from './components/data-entities/SiteViewTemplate';
 import ObservableItemTemplate from './components/data-entities/ObservableItemTemplate';
 import ObservableItemViewTemplate from './components/data-entities/ObservableItemViewTemplate';
 import ObservableItemEditTemplate from './components/data-entities/ObservableItemEditTemplate';
+import SurveyViewTemplate from './components/data-entities/SurveyViewTemplate';
+import SurveyEditTemplate from './components/data-entities/SurveyEditTemplate';
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ? process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
@@ -64,6 +66,7 @@ const referenceData = [
     schemaKey: {add: 'Location', edit: 'Location', view: 'Location'},
     template: {add: LocationTemplate, edit: LocationTemplate, view: LocationTemplate},
     list: {
+      showNew: true,
       schemaKey: 'Location',
       name: 'locations',
       route: '/reference/locations',
@@ -80,6 +83,7 @@ const referenceData = [
     schemaKey: {add: 'Diver', edit: 'Diver', view: 'Diver'},
     template: {add: DiverTemplate, edit: DiverTemplate, view: DiverTemplate},
     list: {
+      showNew: true,
       schemaKey: 'Diver',
       name: 'divers',
       route: '/reference/divers',
@@ -96,6 +100,7 @@ const referenceData = [
     schemaKey: {add: 'SiteGetDto', edit: 'SiteGetDto', view: 'SiteGetDto'},
     template: {add: SiteAddTemplate, edit: SiteEditTemplate, view: SiteViewTemplate},
     list: {
+      showNew: true,
       name: 'siteListItems',
       schemaKey: 'SiteListItem',
       route: '/reference/sites',
@@ -117,6 +122,7 @@ const referenceData = [
     schemaKey: {add: 'ObservableItemDto', edit: 'ObservableItemPutDto', view: 'ObservableItemGetDto'},
     template: {add: ObservableItemTemplate, edit: ObservableItemEditTemplate, view: ObservableItemViewTemplate},
     list: {
+      showNew: true,
       name: 'tupleBackedMaps',
       schemaKey: 'ObservableItemRow',
       route: '/reference/observableItems',
@@ -136,6 +142,29 @@ const referenceData = [
         'genus'
       ],
       sort: ['obsItemTypeName', 'name']
+    }
+  },
+  {
+    hide: true,
+    name: 'Survey',
+    idKey: 'surveyId',
+    can: {edit: true},
+    flexField: null,
+    endpoint: 'data/survey',
+    route: {
+      base: '/data/survey',
+      view: '/data/survey/:id?/:success?',
+      edit: '/data/survey/:id?/edit'
+    },
+    schemaKey: {edit: 'SurveyDto', view: 'SurveyDto'},
+    template: {edit: SurveyEditTemplate, view: SurveyViewTemplate},
+    list: {
+      showNew: false,
+      schemaKey: 'SurveyRow',
+      route: '/data/surveys',
+      endpoint: 'data/surveys',
+      headers: ['surveyId', 'siteName', 'programName', 'surveyDate', 'surveyTime', 'depth', 'surveyNum'],
+      sort: ['siteName']
     }
   }
 ];
@@ -186,7 +215,7 @@ const App = () => {
         <Router>
           <CssBaseline />
           <TopBar></TopBar>
-          <SideMenu entities={referenceData}></SideMenu>
+          <SideMenu entities={referenceData.filter((e) => !e.hide)}></SideMenu>
           <main
             className={clsx(classes.mainContent, {
               [classes.contentShift]: leftSideMenuIsOpen

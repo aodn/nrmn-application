@@ -61,7 +61,7 @@ const EntityEdit = ({entity, template, clone}) => {
     // HACK: to just get this working
     if (key === 'mpa') {
       uiSchema[key] = {'ui:field': 'autostring', route: 'marineProtectedAreas'};
-    } else if (key === 'protectionStatus') {
+    } else if (entity.name === 'Site' && key === 'protectionStatus') {
       uiSchema[key] = {'ui:field': 'autostring', route: 'protectionStatuses'};
     } else if (key === 'obsItemTypeId') {
       uiSchema[key] = {
@@ -103,6 +103,17 @@ const EntityEdit = ({entity, template, clone}) => {
           {id: 2, label: '2'},
           {id: 3, label: '3'},
           {id: 4, label: '4'}
+        ]
+      };
+    } else if (key === 'insideMarinePark') {
+      uiSchema[key] = {
+        'ui:field': 'dropdown',
+        entity: key,
+        optional: true,
+        values: [
+          {id: 'Yes', label: 'Yes'},
+          {id: 'No', label: 'No'},
+          {id: 'Unsure', label: 'Unsure'}
         ]
       };
     } else if (key === 'supersededBy') {
