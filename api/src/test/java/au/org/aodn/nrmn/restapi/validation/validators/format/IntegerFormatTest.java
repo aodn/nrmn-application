@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.validation.validators.format;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
+import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import cyclops.companion.Monoids;
 import cyclops.data.Seq;
 import cyclops.data.Vector;
@@ -17,6 +18,7 @@ import java.util.stream.Stream;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import static au.org.aodn.nrmn.restapi.util.ValidatorHelpers.toErrorList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -64,8 +66,7 @@ class IntegerFormatTest {
         stage.setStagedJob(job);
         val res = new IntegerFormatValidation(StagedRow::getMethod, "Lmax", Stream.of(8).collect(Collectors.toList())).valid(stage);
         assertTrue(res.isInvalid());
-        List<StagedRowError> errorList = res.bimap(Seq::of, Function.identity()).foldInvalidLeft(Monoids.seqConcat()).toList();
-        assertEquals("7 is invalid. Must be 8", errorList.get(0).getId().getMessage());
+        assertEquals("7 is invalid. Must be 8", toErrorList(res).get(0).getId().getMessage());
     }
 
     @Test
@@ -79,6 +80,6 @@ class IntegerFormatTest {
          Stream.of(8, 9, 10).collect(Collectors.toList())).valid(stage);
         assertTrue(res.isInvalid());
         List<StagedRowError> errorList = res.bimap(Seq::of, Function.identity()).foldInvalidLeft(Monoids.seqConcat()).toList();
-        assertEquals("7 is invalid. Must be 8, 9 or 10", errorList.get(0).getId().getMessage());
+        assertEquals("7 is invalid. Must be 8, 9 or 10", toErrorList(res).get(0).getId().getMessage());
     }
 }
