@@ -2,7 +2,7 @@ import axiosInstance from './index.js';
 import axios from 'axios';
 import store from '../components/store'; // will be useful to access to axios.all and axios.spread
 import {ImportProgress} from '../components/import/reducers/upload';
-import { importRow } from '../components/import/reducers/create-import.js';
+import {importRow} from '../components/import/reducers/create-import.js';
 
 function getToken() {
   const {accessToken, tokenType} = store.getState().auth;
@@ -174,7 +174,10 @@ export const submitJobFile = (params) => {
 };
 
 export const submitingest = (jobId) => {
-  return axiosInstance.post('/api/ingestion/ingest/' + jobId).then((res) => res);
+  return axiosInstance
+    .get('/api/ingestion/ingest/' + jobId)
+    .then((res) => res)
+    .catch((err) => ({err}));
 };
 
 export const search = (params) => {

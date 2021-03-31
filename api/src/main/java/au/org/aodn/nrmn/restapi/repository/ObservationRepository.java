@@ -9,12 +9,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ObservationRepository extends JpaRepository<Observation, Integer>,
         JpaSpecificationExecutor<Observation> {
 
-    @Query(nativeQuery = true, value = "SELECT * FROM nrmn.UiSpeciesAttributes usa  where usa.id = :id")
-    List<UiSpeciesAttributes> getSpeciesAttributesById(@Param("id") Integer id);
+    @Query(nativeQuery = true, value = "SELECT  observable_item_id as id,species_name, common_name, is_invert_sized, l5, l95, maxabundance as max_abundance, lmax FROM  nrmn.ui_species_attributes   where observable_item_id = :id")
+    List<UiSpeciesAttributes> getSpeciesAttributesById(@Param("id") Long id);
 
 }

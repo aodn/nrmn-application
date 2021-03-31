@@ -1,27 +1,69 @@
 package au.org.aodn.nrmn.restapi.validation.validators.formatted;
 
+import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.utils.ImmutableMap;
 
+import java.util.Collections;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DebrisZeroObsTest {
+class DebrisZeroObsTest extends  FormattedTestProvider {
 
     @Test
-    public void dezDebrizwith0ShouldbeOK() {
-        val job = new StagedJob();
-        job.setId(1L);
-        val stage = new StagedRow();
-        stage.setCode("dez");
-        stage.setSpecies("Debris");
-        stage.setTotal("0");
-        stage.setInverts("0");
-        val measure = new HashMap<Integer, String>();
-        stage.setMeasureJson(measure);
-        stage.setStagedJob(job);
+    public void debrisWithNoValueShouldbeOK() {
+        val formatted = getDefaultFormatted().build();
+        val validationRule = new DebrisZeroObs();
+        formatted.setCode("dez");
+        formatted.setSpecies(ObservableItem.builder().observableItemName("Debris-Zero").build());
+        formatted.setTotal(0);
+        formatted.setInverts(0);
+        formatted.setMeasureJson(Collections.emptyMap());
+        val res = validationRule.valid(formatted);
+        assertTrue(res.isValid());
+    }
+
+    public void deBrisWith0ValueShouldbeOK() {
+        val formatted = getDefaultFormatted().build();
+        val validationRule = new DebrisZeroObs();
+        formatted.setCode("dez");
+        formatted.setSpecies(ObservableItem.builder().observableItemName("Debris-Zero").build());
+        formatted.setTotal(0);
+        formatted.setInverts(0);
+        formatted.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 0).build());
+        val res = validationRule.valid(formatted);
+        assertTrue(res.isInvalid());
+    }
+
+    @Test
+    public void NoDebris0ShouldbeOK() {
+        val formatted = getDefaultFormatted().build();
+        val validationRule = new DebrisZeroObs();
+        formatted.setCode("123");
+        formatted.setSpecies(ObservableItem.builder().observableItemName("SomethingElse").build());
+        formatted.setTotal(0);
+        formatted.setInverts(0);
+        formatted.setMeasureJson(Collections.emptyMap());
+        val res = validationRule.valid(formatted);
+        assertTrue(res.isValid());
+    }
+
+
+    @Test
+    public void debris0WithInvertShouldFail() {
+        val formatted = getDefaultFormatted().build();
+        val validationRule = new DebrisZeroObs();
+        formatted.setCode("dez");
+        formatted.setSpecies(ObservableItem.builder().observableItemName("Debris-Zero").build());
+        formatted.setTotal(10);
+        formatted.setInverts(1);
+        formatted.setMeasureJson(Collections.emptyMap());
+        val res = validationRule.valid(formatted);
+        assertTrue(res.isInvalid());
     }
 }

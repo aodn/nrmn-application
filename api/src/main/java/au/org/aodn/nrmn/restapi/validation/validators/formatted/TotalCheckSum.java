@@ -19,7 +19,7 @@ public class TotalCheckSum extends BaseFormattedValidator {
         val checkSum = target.getMeasureJson().entrySet()
                 .stream().map(entry -> entry.getValue())
                 .reduce(0,(acc, measure) -> acc + measure);
-q
+
         if (target.getTotal() == checkSum) {
             return Validated.valid("Checksum match Total");
         }

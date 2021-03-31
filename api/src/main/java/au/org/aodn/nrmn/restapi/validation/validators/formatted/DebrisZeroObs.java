@@ -18,7 +18,7 @@ public class DebrisZeroObs extends BaseFormattedValidator {
 
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
-        if (target.getSite().getSiteCode().equalsIgnoreCase("dez") &&
+        if (target.getCode().equalsIgnoreCase("dez") &&
             target.getSpecies().getObservableItemName().equalsIgnoreCase("Debris-Zero"))     {
             val sum = target.getMeasureJson()
                     .entrySet().stream()

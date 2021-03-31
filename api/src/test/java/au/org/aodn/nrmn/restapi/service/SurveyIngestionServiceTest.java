@@ -72,7 +72,7 @@ public class SurveyIngestionServiceTest {
                 .isInvertSizing(true)
                 .l5(2.1)
                 .l95(7.2)
-                .lMax(50.5)
+                .lMax(50)
                 .code("AAA")
                 .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build())
                 .ref(ref)

@@ -141,7 +141,11 @@ public class RawValidation extends ValidatorHelpers {
         val block = (Integer) values.get("Block").orElseGet(null);
 
         val species = (ObservableItem) values.get("Species").orElseGet(null);
-        val speciesAttributes = obsRepo.getSpeciesAttributesById(species.getObservableItemId()).stream().findFirst().orElseGet(null);
+        val speciesAttributesOtp = obsRepo.getSpeciesAttributesById(new Long(species.getObservableItemId()));
+        val speciesAttributes = speciesAttributesOtp
+                .stream()
+                .findFirst()
+                .orElseGet(null);
         val code = (String) values.get("Code").orElseGet(null);
 
         val vis = (Optional<Integer>) values.get("Vis").orElse(Optional.empty());
@@ -169,6 +173,7 @@ public class RawValidation extends ValidatorHelpers {
         rowFormatted.setTotal(total);
         rowFormatted.setMeasureJson(measureJson);
         rowFormatted.setRef(ref);
+        rowFormatted.setSpeciesAttributes(speciesAttributes);
 
         if (values.containsKey("Inverts") && values.containsKey("IsInvertSizing")) {
             val inverts = (Integer) values.get("Inverts").orElseGet(null);

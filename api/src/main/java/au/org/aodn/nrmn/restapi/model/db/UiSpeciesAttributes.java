@@ -4,36 +4,29 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Immutable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Table(name = "ui_species_attributes")
-public class UiSpeciesAttributes {
 
-    @Id
-    @Column(name = "observable_item_id")
-    private Long id;
+public interface UiSpeciesAttributes {
+     Long getId();
 
-    private String speciesName;
+     String getSpeciesName();
 
-    private String commonName;
+     String getCommonName();
 
-    private Boolean isInvertSized;
+     Boolean getIsInvertSized();
 
-    private Integer l5;
+     Double getL5();
 
-    private Integer l95;
+     Double getL95();
 
-    private Integer maxAbundance;
+     Long getMaxAbundance();
 
-    private Integer lmax;
+     Long getLmax();
 
 }

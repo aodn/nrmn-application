@@ -110,6 +110,6 @@ public class SurveyIngestionService {
                 .measureType(measureType)
                 .build());
 
-        return measureRepository.findOne(exampleMeasure);
+        return measureRepository.findAll(exampleMeasure).stream().findFirst();
     }
 }
