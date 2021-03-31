@@ -1,4 +1,4 @@
-import {Box, Grid, Paper} from '@material-ui/core';
+import {Box, Grid} from '@material-ui/core';
 
 import React from 'react';
 import {PropTypes} from 'prop-types';
@@ -14,7 +14,7 @@ const SurveyViewTemplate = (props) => {
     <>
       <Box width={600}>
         <h1>{title}</h1>
-        <Grid container spacing={2} component={Paper}>
+        <Grid container spacing={2}>
           <Grid item xs={6}>
             {el['surveyId']}
           </Grid>
@@ -29,6 +29,9 @@ const SurveyViewTemplate = (props) => {
           </Grid>
           <Grid item xs={6}>
             {el['surveyTime']}
+          </Grid>
+          <Grid item xs={12}>
+            {el['projectTitle']}
           </Grid>
           <Grid item xs={6}>
             {el['depth']}
@@ -68,9 +71,6 @@ const SurveyViewTemplate = (props) => {
           </Grid>
           <Grid item xs={6}>
             {el['blockAbundanceSimulated']}
-          </Grid>
-          <Grid item xs={6}>
-            {el['projectTitle']}
           </Grid>
           <Grid item xs={12}>
             {el['surveyNotDone']}

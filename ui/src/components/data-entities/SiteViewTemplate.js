@@ -1,4 +1,4 @@
-import {Box, Grid, Paper, Typography} from '@material-ui/core';
+import {Box, Grid, Typography} from '@material-ui/core';
 
 import React from 'react';
 import {PropTypes} from 'prop-types';
@@ -14,7 +14,7 @@ const SiteViewTemplate = (props) => {
     <>
       <Box width={600}>
         <h1>{title}</h1>
-        <Grid container spacing={2} component={Paper}>
+        <Grid container spacing={2}>
           <Grid item xs={6}>
             {el['siteCode']}
           </Grid>
