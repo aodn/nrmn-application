@@ -14,7 +14,10 @@ import java.util.List;
 @Repository
 public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpecificationExecutor<Survey> {
 
-    @Query(value = "select survey_date as surveyDate, survey_time as surveyTime, depth, survey_num as surveyNum, sv.survey_id as surveyId, st.site_name as siteName, pg.program_name as programName FROM {h-schema}survey sv LEFT JOIN {h-schema}program_ref pg ON pg.program_id = sv.program_id LEFT JOIN {h-schema}site_ref st ON st.site_id = sv.site_id",
+    @Query(value = "select survey_date as surveyDate, survey_time as surveyTime, depth, survey_num as surveyNum, " +
+                    "sv.survey_id as surveyId, st.site_name as siteName, pg.program_name as programName FROM {h-schema}survey " +
+                    "sv LEFT JOIN {h-schema}program_ref pg ON pg.program_id = sv.program_id LEFT JOIN {h-schema}site_ref st ON st.site_id = sv.site_id "+
+                    "ORDER BY surveyDate DESC",
         countQuery = "SELECT count(*) FROM {h-schema}survey",
         nativeQuery = true)
     List<SurveyRow> findAllProjectedBy();
