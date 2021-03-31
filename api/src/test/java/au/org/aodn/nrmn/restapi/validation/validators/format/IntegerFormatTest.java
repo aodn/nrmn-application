@@ -79,7 +79,6 @@ class IntegerFormatTest {
         val res = new IntegerFormatValidation(StagedRow::getMethod, "Lmax",
          Stream.of(8, 9, 10).collect(Collectors.toList())).valid(stage);
         assertTrue(res.isInvalid());
-        List<StagedRowError> errorList = res.bimap(Seq::of, Function.identity()).foldInvalidLeft(Monoids.seqConcat()).toList();
         assertEquals("7 is invalid. Must be 8, 9 or 10", toErrorList(res).get(0).getId().getMessage());
     }
 }
