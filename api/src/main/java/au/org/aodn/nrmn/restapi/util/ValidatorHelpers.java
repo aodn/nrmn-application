@@ -28,7 +28,7 @@ public class ValidatorHelpers {
     }
 
 
-    public static List<ErrorInput> reducetoErrrors(Validated<ErrorInput, String>  ...validators){
+    public static <E> List<E> reducetoErrrors(Validated<E, String>  ...validators){
        val combineValidator = Arrays.stream(validators).reduce((acc, validator) ->
                     acc.combine( Semigroups.stringJoin(". "), validator)).orElse(Validated.valid("no validators"));
        return toErrorList(combineValidator);
