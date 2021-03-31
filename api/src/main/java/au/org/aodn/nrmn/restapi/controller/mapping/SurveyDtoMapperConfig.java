@@ -2,9 +2,11 @@ package au.org.aodn.nrmn.restapi.controller.mapping;
 
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
+import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyMethodRepository;
-import lombok.val;
+
+import java.util.Optional;
 
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -20,7 +22,8 @@ public class SurveyDtoMapperConfig {
         Converter<Integer, String> toBlockString = ctx -> String.join(", ", surveyMethodRepository.findBlocksForSurveyId(ctx.getSource()));
         Converter<Integer, String> toSurveyNotDoneString = ctx -> String.join(", ", surveyMethodRepository.findSurveyNotDoneForSurveyId(ctx.getSource()));
         Converter<Integer, String> toDiverName = ctx -> {
-            val diver = diverRepository.findById(ctx.getSource()); 
+            Optional<Integer> diverId = Optional.ofNullable(ctx.getSource());
+            Optional<Diver> diver = diverId.isPresent() ? diverRepository.findById(diverId.get()) : Optional.empty();
             return diver.isPresent() ? diver.get().getFullName() : "";
         };
         modelMapper.typeMap(Survey.class, SurveyDto.class).addMappings(mapper -> {
