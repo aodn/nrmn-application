@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 import javax.persistence.Id;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -77,6 +79,6 @@ public class ObservableItemGetDto {
     @Schema(title = "Length-Weight cf")
     private Double lengthWeightCf;
 
-    @Schema(title = "Other Attributes")
-    private String obsItemAttribute;
+    @Schema(title = "Other Attributes", accessMode = Schema.AccessMode.READ_ONLY)
+    private Map<String, String> obsItemAttribute;
 }
