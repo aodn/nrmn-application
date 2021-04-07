@@ -1,18 +1,17 @@
-import {Box, Grid} from '@material-ui/core';
+import {Box, Grid, Typography} from '@material-ui/core';
 
 import React from 'react';
 import {PropTypes} from 'prop-types';
 
-const SiteEditTemplate = (props) => {
-  const {properties, title} = props;
+const SiteViewTemplate = (props) => {
+  const {properties} = props;
   const el = {};
   properties.map((e) => {
     el[e.name] = e.content;
   });
 
   return (
-    <Box width={600}>
-      <h1>{title}</h1>
+    <Box pt={2} pb={2}>
       <Grid container spacing={2}>
         <Grid item xs={6}>
           {el['siteCode']}
@@ -21,10 +20,11 @@ const SiteEditTemplate = (props) => {
           {el['siteName']}
         </Grid>
         <Grid item xs={6}>
-          {el['locationId']}
+          {el['locationName']}
         </Grid>
-      </Grid>
-      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          {props.formData['isActive'] ? el['isActive'] : <Typography variant="subtitle2">Not Active</Typography>}
+        </Grid>
         <Grid item xs={6}>
           {el['state']}
         </Grid>
@@ -32,16 +32,16 @@ const SiteEditTemplate = (props) => {
           {el['country']}
         </Grid>
         <Grid item xs={6}>
-          {el['latitude']}
-        </Grid>
-        <Grid item xs={6}>
-          {el['longitude']}
-        </Grid>
-        <Grid item xs={6}>
           {el['mpa']}
         </Grid>
         <Grid item xs={6}>
           {el['protectionStatus']}
+        </Grid>
+        <Grid item xs={6}>
+          {el['latitude']}
+        </Grid>
+        <Grid item xs={6}>
+          {el['longitude']}
         </Grid>
         <Grid item xs={6}>
           {el['relief']}
@@ -58,14 +58,18 @@ const SiteEditTemplate = (props) => {
         <Grid item xs={12}>
           {el['oldSiteCodes']}
         </Grid>
+        <Grid item xs={12}>
+          {el['siteAttribute']}
+        </Grid>
       </Grid>
     </Box>
   );
 };
 
-SiteEditTemplate.propTypes = {
+SiteViewTemplate.propTypes = {
   properties: PropTypes.any,
-  title: PropTypes.string
+  title: PropTypes.string,
+  formData: PropTypes.object
 };
 
-export default SiteEditTemplate;
+export default SiteViewTemplate;

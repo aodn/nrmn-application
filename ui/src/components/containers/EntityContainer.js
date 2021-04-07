@@ -10,7 +10,7 @@ const EntityContainer = (props) => (
     </NavLink>
     <Grid container justify="center">
       {props.header}
-      <Box style={{background: 'white', width: 700}} boxShadow={1} margin={3}>
+      <Box style={{background: 'white', width: 900}} boxShadow={1} margin={3} padding={3}>
         <Grid container alignItems="flex-start" direction="row">
           {props.children}
         </Grid>

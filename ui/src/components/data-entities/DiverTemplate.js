@@ -3,17 +3,16 @@ import {Box} from '@material-ui/core';
 import React from 'react';
 import {PropTypes} from 'prop-types';
 
-const DiverTemplate = ({properties, title}) => {
+const DiverTemplate = ({properties}) => {
   const el = {};
   properties.map((e) => {
     el[e.name] = e.content;
   });
 
   return (
-    <Box width={400} spacing={2} flexDirection="column">
-      <h1>{title}</h1>
-      {el['initials']}
-      {el['fullName']}
+    <Box flexDirection="column">
+      <Box width={200}>{el['initials']}</Box>
+      <Box>{el['fullName']}</Box>
     </Box>
   );
 };
