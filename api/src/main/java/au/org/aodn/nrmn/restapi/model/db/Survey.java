@@ -89,6 +89,12 @@ public class Survey {
     @Schema(title = "PQ catalogued")
     private Boolean pqCatalogued;
 
+    
+    @Basic
+    @Column(name = "pq_diver_id")
+    @Schema(title = "PQ Diver ID")
+    private Integer pqDiverId;
+
     @Basic
     @Column(name = "block_abundance_simulated")
     @Schema(title = "Block abundance simulated")

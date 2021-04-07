@@ -61,7 +61,10 @@ const SideMenu = (props) => {
       <List>
         <ListSubheader>DATA</ListSubheader>
         <List component="div" disablePadding>
-          <ListItem button onClick={handleMainMenu} component={NavLink} aweirdprop="true" to="/jobs">
+          <ListItem button onClick={handleMainMenu} component={NavLink} to="/data/surveys">
+            <ListItemText primary="List Surveys" />
+          </ListItem>
+          <ListItem button onClick={handleMainMenu} component={NavLink} to="/jobs">
             <ListItemText primary="List Jobs" />
           </ListItem>
           <ListItem button onClick={handleMainMenu} component={NavLink} to="/upload">

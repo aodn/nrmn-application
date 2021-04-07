@@ -44,7 +44,7 @@ const EntityList = (props) => {
   const dispatch = useDispatch();
   const entities = useSelector((state) => state.form.entities);
   const errors = useSelector((state) => state.form.errors);
-  let items = entities?._embedded ? entities?._embedded[props.entity.list.name] : null;
+  let items = entities?._embedded ? entities?._embedded[props.entity.list.name] : entities;
 
   useEffect(() => {
     dispatch(resetState());
@@ -144,7 +144,8 @@ const EntityList = (props) => {
     }
   };
 
-  const colDef = schematoColDef(config.get('api')[props.entity.list.schemaKey], props.entity);
+  const schemas = config.get('api');
+  const colDef = schematoColDef(schemas[props.entity.list.schemaKey], props.entity);
 
   const dialog = (
     <Dialog disableBackdropClick disableEscapeKeyDown maxWidth="xs" open>
@@ -182,16 +183,18 @@ const EntityList = (props) => {
           <Typography variant="h4">{props.entity.name}</Typography>
         </Grid>
         <Grid item>
-          <Button
-            {...props}
-            to={props.entity.route.base}
-            component={NavLink}
-            color="secondary"
-            variant={'contained'}
-            startIcon={<Add></Add>}
-          >
-            New {props.entity.name}
-          </Button>
+          {props.entity.list.showNew && (
+            <Button
+              {...props}
+              to={props.entity.route.base}
+              component={NavLink}
+              color="secondary"
+              variant={'contained'}
+              startIcon={<Add></Add>}
+            >
+              New {props.entity.name}
+            </Button>
+          )}
         </Grid>
       </Grid>
 

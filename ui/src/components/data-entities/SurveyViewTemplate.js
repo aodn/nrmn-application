@@ -1,9 +1,9 @@
-import {Box, Grid, Typography} from '@material-ui/core';
+import {Box, Grid} from '@material-ui/core';
 
 import React from 'react';
 import {PropTypes} from 'prop-types';
 
-const SiteViewTemplate = (props) => {
+const SurveyViewTemplate = (props) => {
   const {properties, title} = props;
   const el = {};
   properties.map((e) => {
@@ -16,52 +16,67 @@ const SiteViewTemplate = (props) => {
         <h1>{title}</h1>
         <Grid container spacing={2}>
           <Grid item xs={6}>
-            {el['siteCode']}
+            {el['surveyId']}
           </Grid>
           <Grid item xs={6}>
             {el['siteName']}
           </Grid>
           <Grid item xs={6}>
-            {el['locationName']}
+            {el['program']}
           </Grid>
           <Grid item xs={6}>
-            {props.formData['isActive'] ? el['isActive'] : <Typography variant="subtitle2">Not Active</Typography>}
+            {el['surveyDate']}
           </Grid>
           <Grid item xs={6}>
-            {el['state']}
+            {el['surveyTime']}
+          </Grid>
+          <Grid item xs={12}>
+            {el['projectTitle']}
           </Grid>
           <Grid item xs={6}>
-            {el['country']}
+            {el['depth']}
           </Grid>
           <Grid item xs={6}>
-            {el['mpa']}
+            {el['surveyNum']}
           </Grid>
           <Grid item xs={6}>
-            {el['protectionStatus']}
+            {el['visibility']}
           </Grid>
           <Grid item xs={6}>
-            {el['latitude']}
+            {el['direction']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['method']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['block']}
           </Grid>
           <Grid item xs={6}>
             {el['longitude']}
           </Grid>
           <Grid item xs={6}>
-            {el['relief']}
+            {el['latitude']}
           </Grid>
           <Grid item xs={6}>
-            {el['slope']}
+            {el['protectionStatus']}
           </Grid>
           <Grid item xs={6}>
-            {el['waveExposure']}
+            {el['insideMarinePark']}
           </Grid>
           <Grid item xs={6}>
-            {el['currents']}
+            {el['pqCatalogued']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['pqDiver']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['blockAbundanceSimulated']}
           </Grid>
           <Grid item xs={12}>
-            {el['oldSiteCodes']}
+            {el['surveyNotDone']}
           </Grid>
           <Grid item xs={12}>
-            {el['siteAttribute']}
+            {el['notes']}
           </Grid>
         </Grid>
       </Box>
@@ -69,10 +84,10 @@ const SiteViewTemplate = (props) => {
   );
 };
 
-SiteViewTemplate.propTypes = {
+SurveyViewTemplate.propTypes = {
   properties: PropTypes.any,
   title: PropTypes.string,
   formData: PropTypes.object
 };
 
-export default SiteViewTemplate;
+export default SurveyViewTemplate;

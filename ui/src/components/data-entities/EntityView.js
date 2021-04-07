@@ -113,12 +113,13 @@ const EntityView = (props) => {
       </Alert>
     ) : null;
 
+  const loaded = Object.keys(formData).length > 0;
   return (
     <EntityContainer name={props.entity.name} goBackTo={props.entity.list.route}>
       <Grid item xs={9}>
         <Box pt={4} px={6} pb={6}>
           {alert}
-          {Object.keys(formData).length > 0 && (
+          {loaded && (
             <Form
               disabled
               onError={params.onError}
@@ -136,16 +137,18 @@ const EntityView = (props) => {
       </Grid>
       <Grid item xs>
         <Grid container alignItems="flex-start" direction="column">
-          <Button
-            style={{marginTop: 35, width: '75%'}}
-            component={Link}
-            to={`${props.entity.route.base}/${params.id}/edit`}
-            color="secondary"
-            variant={'contained'}
-            startIcon={<Edit>edit</Edit>}
-          >
-            Edit
-          </Button>
+          {loaded && (
+            <Button
+              style={{marginTop: 35, width: '75%'}}
+              component={Link}
+              to={`${props.entity.route.base}/${params.id}/edit`}
+              color="secondary"
+              variant={'contained'}
+              startIcon={<Edit>edit</Edit>}
+            >
+              Edit
+            </Button>
+          )}
         </Grid>
       </Grid>
     </EntityContainer>

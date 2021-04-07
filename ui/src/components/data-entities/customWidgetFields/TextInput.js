@@ -16,7 +16,7 @@ const TextInput = ({name, schema, uiSchema}) => {
       <Typography variant="subtitle2">{schema.title}</Typography>
       {readOnlyInput ? (
         <Box pl={0.5} pt={0.75}>
-          <Typography>{value.length > 0 ? value : '---'}</Typography>
+          <Typography>{value !== '' ? value : '---'}</Typography>
         </Box>
       ) : (
         <TextField
