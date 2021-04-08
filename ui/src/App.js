@@ -17,16 +17,16 @@ import Homepage from './components/layout/Homepage';
 import FourOFour from './components/layout/FourOFour';
 import JobList from './components/job/JobList';
 import JobView from './components/job/JobView';
-import LocationTemplate from './components/data-entities/LocationTemplate';
 import DiverTemplate from './components/data-entities/DiverTemplate';
-import SiteEditTemplate from './components/data-entities/SiteEditTemplate';
-import SiteAddTemplate from './components/data-entities/SiteAddTemplate';
-import SiteViewTemplate from './components/data-entities/SiteViewTemplate';
-import ObservableItemTemplate from './components/data-entities/ObservableItemTemplate';
-import ObservableItemViewTemplate from './components/data-entities/ObservableItemViewTemplate';
-import ObservableItemEditTemplate from './components/data-entities/ObservableItemEditTemplate';
-import SurveyViewTemplate from './components/data-entities/SurveyViewTemplate';
-import SurveyEditTemplate from './components/data-entities/SurveyEditTemplate';
+import LocationTemplate from './components/templates/LocationTemplate';
+import SiteEditTemplate from './components/templates/SiteEditTemplate';
+import SiteAddTemplate from './components/templates/SiteAddTemplate';
+import SiteViewTemplate from './components/templates/SiteViewTemplate';
+import ObservableItemTemplate from './components/templates/ObservableItemTemplate';
+import ObservableItemViewTemplate from './components/templates/ObservableItemViewTemplate';
+import ObservableItemEditTemplate from './components/templates/ObservableItemEditTemplate';
+import SurveyViewTemplate from './components/templates/SurveyViewTemplate';
+import SurveyEditTemplate from './components/templates/SurveyEditTemplate';
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ? process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
@@ -66,9 +66,10 @@ const referenceData = [
     schemaKey: {add: 'Location', edit: 'Location', view: 'Location'},
     template: {add: LocationTemplate, edit: LocationTemplate, view: LocationTemplate},
     list: {
+      name: 'Locations',
       showNew: true,
       schemaKey: 'Location',
-      name: 'locations',
+      key: 'locations',
       route: '/reference/locations',
       endpoint: 'locations'
     }
@@ -83,9 +84,10 @@ const referenceData = [
     schemaKey: {add: 'Diver', edit: 'Diver', view: 'Diver'},
     template: {add: DiverTemplate, edit: DiverTemplate, view: DiverTemplate},
     list: {
+      name: 'Divers',
       showNew: true,
       schemaKey: 'Diver',
-      name: 'divers',
+      key: 'divers',
       route: '/reference/divers',
       endpoint: 'divers'
     }
@@ -100,8 +102,9 @@ const referenceData = [
     schemaKey: {add: 'SiteGetDto', edit: 'SiteGetDto', view: 'SiteGetDto'},
     template: {add: SiteAddTemplate, edit: SiteEditTemplate, view: SiteViewTemplate},
     list: {
+      name: 'Sites',
       showNew: true,
-      name: 'siteListItems',
+      key: 'siteListItems',
       schemaKey: 'SiteListItem',
       route: '/reference/sites',
       endpoint: 'siteListItems'
@@ -122,8 +125,9 @@ const referenceData = [
     schemaKey: {add: 'ObservableItemDto', edit: 'ObservableItemPutDto', view: 'ObservableItemGetDto'},
     template: {add: ObservableItemTemplate, edit: ObservableItemEditTemplate, view: ObservableItemViewTemplate},
     list: {
+      name: 'Observable Items',
       showNew: true,
-      name: 'tupleBackedMaps',
+      key: 'tupleBackedMaps',
       schemaKey: 'ObservableItemRow',
       route: '/reference/observableItems',
       endpoint: 'reference/observableItems',
@@ -159,6 +163,8 @@ const referenceData = [
     schemaKey: {edit: 'SurveyDto', view: 'SurveyDto'},
     template: {edit: SurveyEditTemplate, view: SurveyViewTemplate},
     list: {
+      name: 'Surveys',
+      // key: 'surveys',
       showNew: false,
       schemaKey: 'SurveyRow',
       route: '/data/surveys',

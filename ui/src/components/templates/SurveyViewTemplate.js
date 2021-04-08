@@ -4,7 +4,7 @@ import React from 'react';
 import {PropTypes} from 'prop-types';
 
 const SurveyViewTemplate = (props) => {
-  const {properties, title} = props;
+  const {properties} = props;
   const el = {};
   properties.map((e) => {
     el[e.name] = e.content;
@@ -12,8 +12,7 @@ const SurveyViewTemplate = (props) => {
 
   return (
     <>
-      <Box width={600}>
-        <h1>{title}</h1>
+      <Box pt={2} pb={2}>
         <Grid container spacing={2}>
           <Grid item xs={6}>
             {el['surveyId']}
@@ -30,7 +29,7 @@ const SurveyViewTemplate = (props) => {
           <Grid item xs={6}>
             {el['surveyTime']}
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             {el['projectTitle']}
           </Grid>
           <Grid item xs={6}>
@@ -46,10 +45,10 @@ const SurveyViewTemplate = (props) => {
             {el['direction']}
           </Grid>
           <Grid item xs={6}>
-            {el['method']}
+            {el['block']}
           </Grid>
           <Grid item xs={6}>
-            {el['block']}
+            {el['method']}
           </Grid>
           <Grid item xs={6}>
             {el['longitude']}
@@ -72,10 +71,12 @@ const SurveyViewTemplate = (props) => {
           <Grid item xs={6}>
             {el['blockAbundanceSimulated']}
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}></Grid>
+          <Grid item xs={6}>
             {el['surveyNotDone']}
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}></Grid>
+          <Grid item xs={6}>
             {el['notes']}
           </Grid>
         </Grid>

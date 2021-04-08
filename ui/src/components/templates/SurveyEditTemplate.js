@@ -1,56 +1,54 @@
-import {Box, Grid} from '@material-ui/core';
+import {Grid} from '@material-ui/core';
 
 import React from 'react';
 import {PropTypes} from 'prop-types';
 
-const SiteAddTemplate = (props) => {
-  const {properties, title} = props;
+const SurveyEditTemplate = (props) => {
+  const {properties} = props;
   const el = {};
   properties.map((e) => {
     el[e.name] = e.content;
   });
 
   return (
-    <Box width={600}>
-      <h1>{title}</h1>
+    <>
       <Grid container spacing={2}>
         <Grid item xs={6}>
-          {el['siteCode']}
+          {el['surveyId']}
         </Grid>
         <Grid item xs={6}>
           {el['siteName']}
         </Grid>
         <Grid item xs={6}>
-          {el['locationId']}
-        </Grid>
-      </Grid>
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          {el['state']}
+          {el['program']}
         </Grid>
         <Grid item xs={6}>
-          {el['country']}
+          {el['surveyDate']}
         </Grid>
         <Grid item xs={6}>
-          {el['latitude']}
+          {el['surveyTime']}
         </Grid>
-        <Grid item xs={6}>
-          {el['longitude']}
-        </Grid>
-        <Grid item xs={6}>
-          {el['mpa']}
+        <Grid item xs={12}>
+          {el['projectTitle']}
         </Grid>
         <Grid item xs={6}>
           {el['protectionStatus']}
         </Grid>
+        <Grid item xs={6}>
+          {el['insideMarinePark']}
+        </Grid>
+        <Grid item xs={12}>
+          {el['notes']}
+        </Grid>
       </Grid>
-    </Box>
+    </>
   );
 };
 
-SiteAddTemplate.propTypes = {
+SurveyEditTemplate.propTypes = {
   properties: PropTypes.any,
-  title: PropTypes.string
+  title: PropTypes.string,
+  formData: PropTypes.object
 };
 
-export default SiteAddTemplate;
+export default SurveyEditTemplate;
