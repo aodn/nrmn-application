@@ -2,7 +2,7 @@ import axiosInstance from './index.js';
 import axios from 'axios';
 import store from '../components/store'; // will be useful to access to axios.all and axios.spread
 import {ImportProgress} from '../components/import/reducers/upload';
-import { importRow } from '../components/import/reducers/create-import.js';
+import {importRow} from '../components/import/reducers/create-import.js';
 
 function getToken() {
   const {accessToken, tokenType} = store.getState().auth;
@@ -65,7 +65,9 @@ export const user = (params) => {
 
 export const apiDefinition = () => axiosInstance.get('/v3/api-docs').then((res) => res);
 
-export const getEntity = (entity) => axiosInstance.get('/api/' + entity).then((res) => res);
+export const getResult = (entity) => axiosInstance.get('/api/' + entity);
+
+export const getEntity = (entity) => getResult(entity).then((res) => res);
 
 export const getFullJob = (id) => {
   const jobReq = axiosInstance.get('/api/stagedJobs/' + id);
@@ -185,4 +187,8 @@ export const search = (params) => {
     })
     .then((res) => res)
     .catch((err) => err);
+};
+
+export const templateZip = (params) => {
+  return axiosInstance.get(`/api/template/template.zip?${params}`, {responseType: 'blob'});
 };
