@@ -134,10 +134,16 @@ INSERT INTO nrmn.survey_method(survey_method_id, block_num,
                                    (421,2,'{}',false,2,812300133);
 
 INSERT INTO nrmn.measure_type_ref(measure_type_id, measure_type_name, is_active)
-VALUES (1, 'Fish Size Class', true);
+VALUES (1, 'Fish Size Class', true),
+       (2, 'Big Size Class', true),
+       (3, 'Giga Size Class', true),
+       (4, 'Mega Size Class', true);
 
 INSERT INTO nrmn.measure_ref(measure_id, measure_type_id, measure_name, seq_no, is_active)
-VALUES (2, 1, '2.5cm', 1, true),(3, 1, '5cm', 1, true);
+VALUES  (1, 1, '2.5cm', 1, true),
+       (2, 2, '5cm', 1, true),
+       (3, 3, '7.5cm', 1, true),
+       (4, 4, '10cm', 1, true);;
 
 
 INSERT INTO nrmn.observation(observation_id, measure_value,

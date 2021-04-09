@@ -18,6 +18,8 @@ import software.amazon.awssdk.utils.ImmutableMap;
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -137,7 +139,7 @@ public class SurveyIngestionServiceTest {
 
     @Test
     void getObservationsForSameSurveyReturnsSameSurvey() {
-        when(measureRepository.findOne(any(Example.class))).then(m -> Optional.of(Measure.builder().build()));
+        when(measureRepository.findAll(any(Example.class))).then(m -> Arrays.asList(Measure.builder().build()));
         when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
 
         ObservableItem observableItem = ObservableItem.builder()
@@ -159,7 +161,7 @@ public class SurveyIngestionServiceTest {
 
     @Test
     void getObservationsDifferentSurveysForDifferentDepths() {
-        when(measureRepository.findOne(any(Example.class))).then(m -> Optional.of(Measure.builder().build()));
+        when(measureRepository.findAll(any(Example.class))).then(m -> Arrays.asList(Measure.builder().build()));
         when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
 
         Method theMethod = Method.builder().methodId(2).methodName("The Method").isActive(true).build();
@@ -185,14 +187,14 @@ public class SurveyIngestionServiceTest {
 
     @Test
     void getObservationsDifferentSurveysForDifferentDate() {
-        when(measureRepository.findOne(any(Example.class))).then(m -> Optional.of(Measure.builder().build()));
+        when(measureRepository.findAll(any(Example.class))).then(m -> Arrays.asList(Measure.builder().build()));
         when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
 
         Method theMethod = Method.builder().methodId(2).methodName("The Method").isActive(true).build();
         when(entityManager.getReference(Method.class, 2)).thenReturn(theMethod);
 
         ObservableItem observableItem = ObservableItem.builder()
-                .observableItemName("The Species")
+                .observableItemName("THE SPECIES")
                 .build();
 
         StagedRowFormatted row = rowBuilder.build();
@@ -210,7 +212,7 @@ public class SurveyIngestionServiceTest {
 
     @Test
     void getObservationsDifferentSurveysForDifferentSites() {
-        when(measureRepository.findOne(any(Example.class))).then(m -> Optional.of(Measure.builder().build()));
+        when(measureRepository.findAll(any(Example.class))).then(m -> Arrays.asList(Measure.builder().build()));
         when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
 
         Method theMethod = Method.builder().methodId(2).methodName("The Method").isActive(true).build();
