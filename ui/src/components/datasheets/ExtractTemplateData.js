@@ -31,7 +31,7 @@ const ExtractTemplateData = () => {
   const [loading, setLoading] = useState(false);
 
   const [entity, setEntity] = useState(null);
-  const [params, setDownloadParams] = useState(null);
+  const [downloadParams, setDownloadParams] = useState(null);
 
   const options = [
     {entity: 'locations', label: 'Location'},
@@ -68,16 +68,16 @@ const ExtractTemplateData = () => {
       setDownloadParams(null);
     };
 
-    if (params) {
+    if (downloadParams) {
       const p = options.reduce((a, o) => {
-        a[o.entity] = params.filter((f) => f.type === o.entity).map((f) => f.value);
+        a[o.entity] = downloadParams.filter((f) => f.type === o.entity).map((f) => f.value);
         return a;
       }, {});
       downloadZip({locations: p.locations, siteCodes: p.siteCodes, states: p.siteStates, provinces: p.siteProvinces});
     } else if (entity) {
       fetch();
     }
-  }, [entity, params]);
+  }, [entity, downloadParams]);
 
   const filterTable = (
     <TableContainer component={Paper}>
@@ -130,7 +130,7 @@ const ExtractTemplateData = () => {
           <Grid item xs={4}>
             <Typography variant="subtitle2">Area</Typography>
             {loading ? (
-              <CircularProgress />
+              <CircularProgress size={25} />
             ) : (
               <Autocomplete
                 filterSelectedOptions
@@ -153,11 +153,11 @@ const ExtractTemplateData = () => {
             <Button
               style={{width: '100%'}}
               onClick={() => setDownloadParams(filters)}
-              disabled={filters.length < 1}
+              disabled={downloadParams || filters.length < 1}
               color="secondary"
               variant="contained"
             >
-              Download Sheets
+              {downloadParams ? <CircularProgress size={25} /> : 'Download Sheets'}
             </Button>
           </Grid>
         </Grid>
