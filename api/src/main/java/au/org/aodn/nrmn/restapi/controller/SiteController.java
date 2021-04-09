@@ -15,6 +15,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -49,6 +50,22 @@ public class SiteController {
     @GetMapping("/sites")
     List<Site> findAll() {
         return siteRepository.findAll();
+    }
+
+    @GetMapping(path = "/siteCodes")
+    public ResponseEntity<List<String>> getAllSiteAreas() {
+        return ResponseEntity.ok(siteRepository.findAllSiteCodes().stream().collect(Collectors.toList()));
+    }
+
+    @GetMapping(path = "/siteStates")
+    public ResponseEntity<List<String>> getAllSiteStates() {
+        return ResponseEntity.ok(siteRepository.findAllSiteStates().stream().collect(Collectors.toList()));
+    }
+
+
+    @GetMapping(path = "/siteProvinces")
+    public ResponseEntity<List<String>> getAllSiteProvinces() {
+        return ResponseEntity.ok(siteRepository.findAllSiteProvinces().stream().collect(Collectors.toList()));
     }
 
     @GetMapping("/sites/{id}")
