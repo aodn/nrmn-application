@@ -75,19 +75,14 @@ const XlxsUpload = () => {
     }
   });
 
-  const goToEdit = () => {
-    history.push('/validation/' + jobId);
+  const goToJobs = () => {
+    history.push('/jobs/');
     dispatch(ImportReset());
   };
 
-  const handleResetAndClose = () => {
-    setOpen(false);
-    dispatch(ImportReset());
-  };
-
-  var displayErros = [];
+  var displayErrors = [];
   if (errors && errors.length > 0) {
-    displayErros = errors.map((e) => e.message);
+    displayErrors = errors.map((e) => e.message);
   }
 
   return (
@@ -98,7 +93,7 @@ const XlxsUpload = () => {
         uiSchema={uiSchema}
         loading={isLoading}
         success={success}
-        errors={displayErros}
+        errors={displayErrors}
         formData={formData}
         onSubmit={handleSubmit}
         onCancel="/jobs"
@@ -112,11 +107,8 @@ const XlxsUpload = () => {
           <DialogContentText>The file has been staged.</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={handleResetAndClose} color="secondary">
-            Add another file
-          </Button>
-          <Button color="secondary" onClick={goToEdit} autoFocus>
-            View File
+          <Button color="secondary" onClick={goToJobs} autoFocus>
+            Done
           </Button>
         </DialogActions>
       </Dialog>

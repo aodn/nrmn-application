@@ -53,8 +53,8 @@ const SpeciesSearch = () => {
   const dispatch = useDispatch();
   return (
     <Box ml={6} style={{background: 'white'}} boxShadow={1} margin={3} width={1000}>
-      <Box pl={6}>
-        <h1>Species Lookup</h1>
+      <Box pl={6} py={2}>
+        <Typography variant="h4">Species Lookup</Typography>
       </Box>
       <AppBar position="static">
         <Tabs value={value} onChange={handleChange}>

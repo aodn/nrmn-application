@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {useParams, NavLink, Redirect} from 'react-router-dom';
 import config from 'react-global-configuration';
 import Form from '@rjsf/material-ui';
-import {Box, Button, CircularProgress, Grid} from '@material-ui/core';
+import {Box, Button, CircularProgress, Grid, Typography} from '@material-ui/core';
 import {Save} from '@material-ui/icons';
 import Alert from '@material-ui/lab/Alert';
 import PropTypes from 'prop-types';
@@ -11,8 +11,7 @@ import PropTypes from 'prop-types';
 import {createEntityRequested, itemRequested, updateEntityRequested} from './middleware/entities';
 
 import LoadingBanner from '../layout/loadingBanner';
-import ObjectListViewTemplate from './ObjectListViewTemplate';
-import EntityContainer from './EntityContainer';
+import EntityContainer from '../containers/EntityContainer';
 
 import DropDownInput from './customWidgetFields/DropDownInput';
 import TextInput from './customWidgetFields/TextInput';
@@ -50,7 +49,7 @@ const EntityEdit = ({entity, template, clone}) => {
     }
   };
 
-  const title = (edit ? 'Edit ' : clone ? 'Clone ' : 'New ') + entity.name;
+  const title = (edit === true ? 'Edit ' : clone === true ? 'Clone ' : 'New ') + entity.name;
   const entityDef = {...schemaDefinition[edit ? entity.schemaKey.edit : entity.schemaKey.add]};
   const entitySchema = {title: title, ...entityDef};
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
@@ -61,7 +60,7 @@ const EntityEdit = ({entity, template, clone}) => {
     // HACK: to just get this working
     if (key === 'mpa') {
       uiSchema[key] = {'ui:field': 'autostring', route: 'marineProtectedAreas'};
-    } else if (key === 'protectionStatus') {
+    } else if (entity.name === 'Site' && key === 'protectionStatus') {
       uiSchema[key] = {'ui:field': 'autostring', route: 'protectionStatuses'};
     } else if (key === 'obsItemTypeId') {
       uiSchema[key] = {
@@ -105,10 +104,19 @@ const EntityEdit = ({entity, template, clone}) => {
           {id: 4, label: '4'}
         ]
       };
+    } else if (key === 'insideMarinePark') {
+      uiSchema[key] = {
+        'ui:field': 'dropdown',
+        entity: key,
+        optional: true,
+        values: [
+          {id: 'Yes', label: 'Yes'},
+          {id: 'No', label: 'No'},
+          {id: 'Unsure', label: 'Unsure'}
+        ]
+      };
     } else if (key === 'supersededBy') {
       uiSchema[key] = {'ui:field': 'searchInput'};
-    } else if (item.type === 'object' && item.readOnly === true) {
-      uiSchema[key] = {'ui:field': 'readonlyObject'};
     } else if (item.format === 'double') {
       uiSchema[key] = {'ui:field': 'double'};
     } else if (item.type === 'boolean') {
@@ -120,30 +128,8 @@ const EntityEdit = ({entity, template, clone}) => {
     }
   }
 
-  const objectDisplay = (elem) => {
-    let items = [];
-    if (elem.formData) {
-      if (!Array.isArray(elem.formData)) {
-        for (let key of Object.keys(elem.formData)) {
-          items.push(
-            <Grid key={key} item>
-              <b>{key}: </b>
-              {elem.formData[key]}
-            </Grid>
-          );
-        }
-      } else {
-        elem.formData.map((item) => items.push(<Grid item>{item}</Grid>));
-      }
-    } else {
-      items.push(<Grid item>--</Grid>);
-    }
-    return ObjectListViewTemplate({name: elem.name + ' (Readonly)', items: items});
-  };
-
   const fields = {
     dropdown: DropDownInput,
-    readonlyObject: objectDisplay,
     string: TextInput,
     double: NumberInput,
     boolean: CheckboxInput,
@@ -161,50 +147,55 @@ const EntityEdit = ({entity, template, clone}) => {
       <LoadingBanner variant={'h5'} msg={`Loading ${entity.name}`} />
     </Grid>
   ) : (
-    <EntityContainer name={entity.name} goBackTo={entity.list.route} header={entity.showSpeciesSearch && <SpeciesSearch />}>
-      <Grid container direction="row" justify="flex-start" alignItems="center">
+    <EntityContainer name={entity.list.name} goBackTo={entity.list.route} header={entity.showSpeciesSearch && !edit && <SpeciesSearch />}>
+      <Grid container alignItems="flex-start" direction="row">
+        <Grid item xs={10}>
+          <Box fontWeight="fontWeightBold">
+            <Typography variant="h4">{title}</Typography>
+          </Box>
+        </Grid>
+      </Grid>
+      <Grid container direction="column" justify="flex-start" alignItems="center">
         {params.loading ? (
           <CircularProgress size={20} />
         ) : (
-          <>
-            <Box pt={2} px={6.25} pb={6}>
-              {errors.length > 0 ? (
-                <Box pt={2}>
-                  <Alert severity="error" variant="filled">
-                    Please review this form for errors and try again.
-                  </Alert>
-                </Box>
-              ) : null}
-              <Form
-                onError={params.onError}
-                errors={errors}
-                schema={JSSchema}
-                uiSchema={uiSchema}
-                onSubmit={handleSubmit}
-                showErrorList={false}
-                fields={fields}
-                noValidate
-                formData={formData}
-                ObjectFieldTemplate={template}
-              >
-                <Box display="flex" justifyContent="center" mt={5}>
-                  <Button variant="contained" disabled={params.loading} component={NavLink} to={entity.list.route}>
-                    Cancel
-                  </Button>
-                  <Button
-                    style={{width: '50%', marginLeft: '5%', marginRight: '20%'}}
-                    type="submit"
-                    variant="contained"
-                    color="secondary"
-                    startIcon={<Save></Save>}
-                    disabled={params.loading}
-                  >
-                    Save {entity.name}
-                  </Button>
-                </Box>
-              </Form>
-            </Box>
-          </>
+          <Box pt={2} pb={6} padding={2} width="90%">
+            {errors.length > 0 ? (
+              <Box py={2}>
+                <Alert severity="error" variant="filled">
+                  Please review this form for errors and try again.
+                </Alert>
+              </Box>
+            ) : null}
+            <Form
+              onError={params.onError}
+              errors={errors}
+              schema={JSSchema}
+              uiSchema={uiSchema}
+              onSubmit={handleSubmit}
+              showErrorList={false}
+              fields={fields}
+              noValidate
+              formData={formData}
+              ObjectFieldTemplate={template}
+            >
+              <Box display="flex" justifyContent="center" mt={5}>
+                <Button variant="contained" disabled={params.loading} component={NavLink} to={entity.list.route}>
+                  Cancel
+                </Button>
+                <Button
+                  style={{width: '50%', marginLeft: '5%', marginRight: '20%'}}
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<Save></Save>}
+                  disabled={params.loading}
+                >
+                  Save {entity.name}
+                </Button>
+              </Box>
+            </Form>
+          </Box>
         )}
       </Grid>
     </EntityContainer>

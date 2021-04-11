@@ -153,6 +153,10 @@ const JobList = () => {
     setDeletePopup(defaultPopup);
   };
 
+  const autoSizeAll = (params) => {
+    params.columnApi.autoSizeAllColumns(false);
+  };
+
   return (
     <Box>
       <Grid container direction="row" justify="space-between" alignItems="center">
@@ -176,15 +180,17 @@ const JobList = () => {
       {jobs && jobs.length > 0 && (
         <div style={{width: '100%', height: size.height - 170, marginTop: 25}} className={'ag-theme-material'}>
           <AgGridReact
-            sideBar={'filters'}
             columnDefs={colunmDef}
             rowSelection="single"
             animateRows={true}
             onGridReady={onReady}
+            onFirstDataRendered={autoSizeAll}
             defaultColDef={{
               sortable: true,
               resizable: true,
               filter: true,
+              suppressMenu: true,
+              floatingFilter: true,
               headerComponentParams: {
                 menuIcon: 'fa-bars'
               }
