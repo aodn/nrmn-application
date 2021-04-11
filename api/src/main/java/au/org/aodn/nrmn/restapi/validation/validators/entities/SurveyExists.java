@@ -30,7 +30,7 @@ public class SurveyExists extends BaseFormattedValidator {
         if (!Arrays.asList(METHODS_TO_CHECK).contains(target.getMethod())) {
             return Validated.valid("Doesn't apply to method");
         }
-        List<Survey> existingSurveys = surveyRepository.findBySiteDepthSurveyNumDepth(
+        List<Survey> existingSurveys = surveyRepository.findBySiteDepthSurveyNumDate(
                 target.getSite(), target.getDepth(), target.getSurveyNum(),
                 toDate(target));
         return existingSurveys.isEmpty() ?

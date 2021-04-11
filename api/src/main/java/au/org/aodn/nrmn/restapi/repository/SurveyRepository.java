@@ -36,7 +36,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
             "  AND s.surveyNum = :surveyNum " +
             "  AND s.surveyDate = :date")
     @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
-    List<Survey> findBySiteDepthSurveyNumDepth(
+    List<Survey> findBySiteDepthSurveyNumDate(
             @Param("site") Site site,
             @Param("depth") Integer depth,
             @Param("surveyNum") Integer surveyNum,
