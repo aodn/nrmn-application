@@ -70,6 +70,9 @@ const SideMenu = (props) => {
           <ListItem button onClick={handleMainMenu} component={NavLink} to="/upload">
             <ListItemText primary="Add Job" />
           </ListItem>
+          <ListItem button onClick={handleMainMenu} component={NavLink} to="/data/extract">
+            <ListItemText primary="Template Data" />
+          </ListItem>
         </List>
       </List>
       <Divider />

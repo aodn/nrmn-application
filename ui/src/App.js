@@ -27,6 +27,7 @@ import ObservableItemViewTemplate from './components/templates/ObservableItemVie
 import ObservableItemEditTemplate from './components/templates/ObservableItemEditTemplate';
 import SurveyViewTemplate from './components/templates/SurveyViewTemplate';
 import SurveyEditTemplate from './components/templates/SurveyEditTemplate';
+import ExtractTemplateData from './components/datasheets/ExtractTemplateData';
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ? process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
@@ -240,6 +241,7 @@ const App = () => {
               <Route exact path="/jobs/:id/view" component={JobView} />
               <Route exact path="/validation/:jobId" component={ValidationPage} />
               <Route exact path="/upload" component={XlxsUpload} />
+              <Route exact path="/data/extract" component={ExtractTemplateData} />
               <Redirect exact from="/list/stagedJob" to="/jobs" />
               {referenceData.map((e) => (
                 <Route exact key={e.route.base} path={e.route.base} render={() => <EntityEdit entity={e} template={e.template.add} />} />
