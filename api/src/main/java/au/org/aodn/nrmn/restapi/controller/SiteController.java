@@ -54,18 +54,18 @@ public class SiteController {
 
     @GetMapping(path = "/siteCodes")
     public ResponseEntity<List<String>> getAllSiteAreas() {
-        return ResponseEntity.ok(siteRepository.findAllSiteCodes().stream().collect(Collectors.toList()));
+        return ResponseEntity.ok(siteRepository.findAllSiteCodes());
     }
 
     @GetMapping(path = "/siteStates")
     public ResponseEntity<List<String>> getAllSiteStates() {
-        return ResponseEntity.ok(siteRepository.findAllSiteStates().stream().collect(Collectors.toList()));
+        return ResponseEntity.ok(siteRepository.findAllSiteStates());
     }
 
 
     @GetMapping(path = "/siteProvinces")
     public ResponseEntity<List<String>> getAllSiteProvinces() {
-        return ResponseEntity.ok(siteRepository.findAllSiteProvinces().stream().collect(Collectors.toList()));
+        return ResponseEntity.ok(siteRepository.findAllSiteProvinces());
     }
 
     @GetMapping("/sites/{id}")
