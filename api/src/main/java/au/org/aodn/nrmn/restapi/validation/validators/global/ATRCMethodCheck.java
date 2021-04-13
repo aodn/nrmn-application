@@ -40,7 +40,6 @@ public class ATRCMethodCheck extends BaseGlobalValidator {
 
                                          val methods = entry.getValue().stream()
                                                             .map(StagedSurveyMethod::getMethod)
-                                                            .sorted()
                                                             .collect(Collectors.toList());
 
                                          if (methods.containsAll(Arrays.asList("1", "2"))
