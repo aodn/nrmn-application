@@ -38,7 +38,7 @@ public class ATRCValidators implements ValidatorProvider {
 
     @Override
     public Seq<BaseGlobalValidator> getGlobalValidators() {
-        return Seq.empty();
+        return Seq.of(atrcMethodCheck);
     }
 }
 
