@@ -10,9 +10,9 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
 import au.org.aodn.nrmn.restapi.validation.provider.ATRCValidators;
 import au.org.aodn.nrmn.restapi.validation.provider.RLSValidators;
-import au.org.aodn.nrmn.restapi.validation.validators.entities.ObservableItemExists;
 import au.org.aodn.nrmn.restapi.validation.validators.data.DirectionDataCheck;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.DiverExists;
+import au.org.aodn.nrmn.restapi.validation.validators.entities.ObservableItemExists;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.SiteCodeExists;
 import au.org.aodn.nrmn.restapi.validation.validators.format.*;
 import au.org.aodn.nrmn.restapi.validation.validators.passThu.PassThruRef;
@@ -28,7 +28,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -129,7 +132,10 @@ public class RawValidation extends ValidatorHelpers {
 
         val splitDepth = values.get("Depth").orElseGet(null).toString().split("\\.");
         val depth = Integer.parseInt(splitDepth[0]);
-        val survey_num = Integer.parseInt(splitDepth[1]);
+
+        Optional<Integer> survey_num = splitDepth.length == 1
+                ? Optional.empty()
+                : Optional.of(Integer.parseInt(splitDepth[1]));
 
         val method = (Integer) values.get("Method").orElseGet(null);
         val block = (Integer) values.get("Block").orElseGet(null);
