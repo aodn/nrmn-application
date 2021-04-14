@@ -58,6 +58,6 @@ public class ATRCSurveyGroupComplete extends BaseGlobalValidator {
     }
 
     private boolean surveyGroupComplete(List<String> surveyNums) {
-        return surveyNums.containsAll(Arrays.asList());
+        return surveyNums.containsAll(Arrays.asList("1", "2", "3", "4"));
     }
 }
