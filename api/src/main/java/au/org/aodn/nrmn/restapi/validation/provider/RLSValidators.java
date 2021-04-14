@@ -8,6 +8,7 @@ import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.validation.validators.format.DoubleFormatValidation;
 import au.org.aodn.nrmn.restapi.validation.validators.format.IntegerFormatValidation;
 import au.org.aodn.nrmn.restapi.validation.validators.global.RLSMethodBlockAssociation;
+import au.org.aodn.nrmn.restapi.validation.validators.global.RLSMethodCheck;
 import cyclops.data.Seq;
 import cyclops.data.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class RLSValidators implements ValidatorProvider {
 
     @Autowired
     RLSMethodBlockAssociation rslBlockAssoc;
+
+    @Autowired
+    RLSMethodCheck rlsMethodCheck;
 
     @Override
     public Seq<Tuple2<String, BaseRowValidator>> getRowValidators() {
@@ -39,7 +43,9 @@ public class RLSValidators implements ValidatorProvider {
 
     @Override
     public Seq<BaseGlobalValidator> getGlobalValidators() {
-
-        return Seq.of(rslBlockAssoc);
+        return Seq.of(
+                rslBlockAssoc,
+                rlsMethodCheck
+        );
     }
 }

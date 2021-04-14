@@ -1,9 +1,11 @@
 package au.org.aodn.nrmn.restapi.validation.validators.global;
 
+import au.org.aodn.nrmn.restapi.model.db.StagedJobTestData;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -21,18 +23,19 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest
 @ExtendWith(PostgresqlContainerExtension.class)
 @WithTestData
-class ATRCMethodCheckIT {
+class RLSMethodCheckIT {
     @Autowired
     StagedRowRepository stagedRowRepo;
 
     @Autowired
     StagedJobRepository jobRepo;
+
     @Autowired
-    ATRCMethodCheck atrcMethodCheck;
+    RLSMethodCheck rlsMethodCheck;
 
     @Test
     void only12methodShouldSucceed() {
-        val job = jobRepo.findByReference("jobid-atrc").get();
+        val job = jobRepo.findByReference("jobid-rls").get();
         val date = "11/09/2020";
         val depth = "7";
         val siteNo = "ERZ1";
@@ -58,15 +61,15 @@ class ATRCMethodCheckIT {
 
         stagedRowRepo.saveAll(Arrays.asList(m1b1, m2b1, m2b2, m1b1d8, m2b1d8));
 
-        val res = atrcMethodCheck.valid(job);
+        val res = rlsMethodCheck.valid(job);
 
         assertTrue(res.isValid());
     }
 
 
     @Test
-    void onlyMethod0345ShouldSucceed() {
-        val job = jobRepo.findByReference("jobid-atrc").get();
+    void onlyMethod0345ShouldFail() {
+        val job = jobRepo.findByReference("jobid-rls").get();
         val date = "11/09/2020";
         val depth = "7";
         val siteNo = "ERZ1";
@@ -95,14 +98,14 @@ class ATRCMethodCheckIT {
 
         stagedRowRepo.saveAll(Arrays.asList(m0b1, m0b2, m3b1, m3b3, m5b3));
 
-        val res = atrcMethodCheck.valid(job);
+        val res = rlsMethodCheck.valid(job);
 
-        assertTrue(res.isValid());
+        assertTrue(res.isInvalid());
     }
 
     @Test
     void missingM2ShouldFail() {
-        val job = jobRepo.findByReference("jobid-atrc").get();
+        val job = jobRepo.findByReference("jobid-rls").get();
         val date = "11/09/2020";
         val depth = "7";
         val siteNo = "ERZ1";
@@ -124,7 +127,7 @@ class ATRCMethodCheckIT {
         stagedRowRepo.deleteAll();
         stagedRowRepo.saveAll(Arrays.asList(m1b1, m1b1d10, m1b1d8, m2b1d8));
 
-        val res = atrcMethodCheck.valid(job);
+        val res = rlsMethodCheck.valid(job);
 
         assertTrue(res.isInvalid());
     }
