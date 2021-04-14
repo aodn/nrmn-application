@@ -18,7 +18,7 @@ import {
   Typography
 } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
+import {RemoveCircleOutline, AddCircleOutline} from '@material-ui/icons';
 
 import qs from 'qs';
 import FileDownload from 'js-file-download';
@@ -28,6 +28,7 @@ import {getResult, templateZip} from '../../axios/api';
 const ExtractTemplateData = () => {
   const [areas, setAreas] = useState([]);
   const [filters, setFilters] = useState([]);
+  const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const [entity, setEntity] = useState(null);
@@ -95,7 +96,7 @@ const ExtractTemplateData = () => {
               <TableCell>
                 <Tooltip title="Remove" xs={1}>
                   <IconButton size="small" onClick={() => setFilters([...filters.filter((ff) => ff.value !== f.value)])}>
-                    <RemoveCircleOutlineIcon />
+                    <RemoveCircleOutline />
                   </IconButton>
                 </Tooltip>
               </TableCell>
@@ -136,14 +137,23 @@ const ExtractTemplateData = () => {
                 filterSelectedOptions
                 options={areas}
                 getOptionLabel={(o) => o.label}
-                onChange={(_, o) => {
-                  if (o && filters.filter((f) => f.value === o.value).length < 1) setFilters([o, ...filters]);
-                }}
+                onChange={(_, o) => setSelected(o)}
                 renderInput={(params) => <TextField {...params} variant="outlined" />}
               />
             )}
           </Grid>
-          <Grid item xs={2} />
+          <Grid item xs={1}>
+            <Box pt={3} ml={-2}>
+              <IconButton
+                disabled={!selected}
+                onClick={() => {
+                  if (selected && filters.filter((f) => f.value === selected.value).length < 1) setFilters([selected, ...filters]);
+                }}
+              >
+                <AddCircleOutline />
+              </IconButton>
+            </Box>
+          </Grid>
           <Grid item xs={2} />
           <Grid item xs={8}>
             {filters.length > 0 && filterTable}
