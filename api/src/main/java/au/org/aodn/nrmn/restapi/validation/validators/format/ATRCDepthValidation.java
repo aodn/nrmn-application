@@ -18,7 +18,7 @@ import static au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel.WARNING;
 
 public class ATRCDepthValidation extends BaseRowValidator {
 
-    private static final Pattern VALID_DEPTH_SURVEY_NUM = Pattern.compile("^[0-9]+(\\.[1-4])?$");
+    private static final Pattern VALID_DEPTH_SURVEY_NUM = Pattern.compile("^[0-9]+(\\.[0-9])?$");
 
     public ATRCDepthValidation() {
         super("Depth");
@@ -35,6 +35,9 @@ public class ATRCDepthValidation extends BaseRowValidator {
         Optional<Integer> surveyNum = split.length > 1 ? Optional.of(Integer.parseInt(split[1])) : Optional.empty();
         if (surveyNumIsRequired(target.getMethod()) && !surveyNum.isPresent()) {
             return getError(target, "Survey number not specified", FORMAT, WARNING);
+        }
+        if (surveyNumIsRequired(target.getMethod()) && (surveyNum.get() < 1 || surveyNum.get() > 4)) {
+            return getError(target, "Survey number should be 1, 2, 3 or 4", FORMAT, WARNING);
         }
         return Validated.valid(new Tuple2<>(depth, surveyNum));
     }

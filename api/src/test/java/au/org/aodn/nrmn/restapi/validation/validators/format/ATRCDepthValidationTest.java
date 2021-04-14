@@ -29,6 +29,7 @@ class ATRCDepthValidationTest {
         val job = new StagedJob();
         job.setId(1L);
         val stage = new StagedRow();
+        stage.setMethod("1");
         stage.setDepth("10.9");
         stage.setStagedJob(job);
         val res =
