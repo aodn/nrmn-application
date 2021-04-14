@@ -31,7 +31,7 @@ public class SurveyExists extends BaseFormattedValidator {
             return Validated.valid("Doesn't apply to method");
         }
         List<Survey> existingSurveys = surveyRepository.findBySiteDepthSurveyNumDate(
-                target.getSite(), target.getDepth(), target.getSurveyNum(),
+                target.getSite(), target.getDepth(), target.getSurveyNum().orElse(null),
                 toDate(target));
         return existingSurveys.isEmpty() ?
                 Validated.valid("New survey") :

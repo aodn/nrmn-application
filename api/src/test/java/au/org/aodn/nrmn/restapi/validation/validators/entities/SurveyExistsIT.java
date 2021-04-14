@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -41,7 +43,7 @@ class SurveyExistsIT {
                 .builder()
                 .site(siteTestData.persistedSite())
                 .depth(6)
-                .surveyNum(1)
+                .surveyNum(Optional.of(1))
                 .method(1)
                 .date(LocalDate.parse("2020-05-21"))
                 .ref(stagedJob.getRows().get(0))
@@ -59,7 +61,7 @@ class SurveyExistsIT {
                 .builder()
                 .site(survey.getSite())
                 .depth(survey.getDepth())
-                .surveyNum(survey.getSurveyNum())
+                .surveyNum(Optional.ofNullable(survey.getSurveyNum()))
                 .date(survey.getSurveyDate().toLocalDate())
                 .method(1)
                 .ref(stagedJob.getRows().get(0))
@@ -77,7 +79,7 @@ class SurveyExistsIT {
                 .builder()
                 .site(survey.getSite())
                 .depth(survey.getDepth())
-                .surveyNum(survey.getSurveyNum())
+                .surveyNum(Optional.ofNullable(survey.getSurveyNum()))
                 .date(survey.getSurveyDate().toLocalDate())
                 .method(3)
                 .ref(stagedJob.getRows().get(0))

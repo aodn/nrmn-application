@@ -25,7 +25,7 @@ public class ATRCValidators implements ValidatorProvider {
     @Override
     public Seq<Tuple2<String, BaseRowValidator>> getRowValidators() {
         return Seq.of(
-                Tuple2.of("SurveyNum", new ATRCDepthValidation()),
+                Tuple2.of("Depth", new ATRCDepthValidation()),
                 Tuple2.of("Method", new IntegerFormatValidation(StagedRow::getMethod, "Method",
                         Arrays.asList(0, 1, 2, 3, 4, 5, 7, 10)))
         );
