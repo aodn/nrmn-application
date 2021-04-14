@@ -5,6 +5,7 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.format.DoubleFormatValidation;
 import au.org.aodn.nrmn.restapi.validation.validators.format.IntegerFormatValidation;
 import au.org.aodn.nrmn.restapi.validation.validators.global.RLSMethodBlockAssociation;
 import cyclops.data.Seq;
@@ -24,6 +25,7 @@ public class RLSValidators implements ValidatorProvider {
     @Override
     public Seq<Tuple2<String, BaseRowValidator>> getRowValidators() {
         return Seq.of(
+                Tuple2.of("Depth", new DoubleFormatValidation(StagedRow::getDepth, "Depth")),
                 Tuple2.of("Method", new IntegerFormatValidation(StagedRow::getMethod, "Method",
                         Arrays.asList(0, 1, 2, 10)))
         );

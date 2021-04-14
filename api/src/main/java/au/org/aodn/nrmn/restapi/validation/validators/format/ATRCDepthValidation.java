@@ -28,7 +28,7 @@ public class ATRCDepthValidation extends BaseRowValidator {
     public Validated<StagedRowError, Tuple2<Integer, Optional<Integer>>> valid(StagedRow target) {
         String value = target.getDepth();
         if (!VALID_DEPTH_SURVEY_NUM.matcher(value).matches()) {
-            return getError(target, "Depth is invalid, expected: {depth}[.{surveyNum}]", FORMAT, BLOCKING);
+            return getError(target, "Depth is invalid, expected: depth[.surveyNum]", FORMAT, BLOCKING);
         }
         String[] split = value.split("\\.");
         Integer depth = Integer.parseInt(split[0]);
