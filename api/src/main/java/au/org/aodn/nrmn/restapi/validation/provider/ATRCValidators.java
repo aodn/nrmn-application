@@ -4,6 +4,7 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.data.ATRCMethod7BlockCheck;
 import au.org.aodn.nrmn.restapi.validation.validators.format.ATRCDepthValidation;
 import au.org.aodn.nrmn.restapi.validation.validators.format.IntegerFormatValidation;
 import au.org.aodn.nrmn.restapi.validation.validators.global.ATRCMethodCheck;
@@ -27,7 +28,8 @@ public class ATRCValidators implements ValidatorProvider {
         return Seq.of(
                 Tuple2.of("SurveyNum", new ATRCDepthValidation()),
                 Tuple2.of("Method", new IntegerFormatValidation(StagedRow::getMethod, "Method",
-                        Arrays.asList(0, 1, 2, 3, 4, 5, 7, 10)))
+                        Arrays.asList(0, 1, 2, 3, 4, 5, 7, 10))),
+                Tuple2.of("Method7Block", new ATRCMethod7BlockCheck())
         );
     }
 
