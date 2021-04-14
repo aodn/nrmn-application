@@ -32,6 +32,12 @@ public interface StagedRowRepository extends JpaRepository<StagedRow, Long>, Jpa
             "GROUP BY r.siteCode, r.date, r.depth, r.method ")
     List<StagedSurveyMethod> getStagedSurveyMethods(@Param("id") Long id);
 
+    @Query("SELECT NEW StagedSurveyTransect(r.siteCode, r.date, r.depth) " +
+            "FROM StagedRow r " +
+            "WHERE r.stagedJob.id = :id " +
+            "GROUP BY r.siteCode, r.date, r.depth")
+    List<StagedSurveyTransect> getStagedSurveyTransects(@Param("id") Long id);
+
     @Query("delete from StagedRow r where r.id in (:ids)")
     void deleteAllByIds(@Param("ids") List<Long> ids);
 }
