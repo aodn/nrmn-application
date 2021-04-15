@@ -32,7 +32,7 @@ public class TooOldFutureDate extends BaseFormattedValidator {
         return Validated.invalid(new StagedRowError(
                 new ErrorID(target.getId(),
                         target.getRef().getStagedJob().getId(),
-                        "Date must be between "+  dateStr" and Today"),
+                        "Date must be between "+  dateStr +" and Today"),
                 ValidationCategory.DATA,
                 ValidationLevel.WARNING,
                 columnTarget,
