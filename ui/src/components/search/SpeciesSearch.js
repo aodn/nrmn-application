@@ -44,6 +44,7 @@ const SpeciesSearch = () => {
   const [warning, setWarning] = React.useState(null);
   const loading = useSelector((state) => state.form.loading);
   const searchResults = useSelector((state) => state.form.searchResults);
+  const searchError = useSelector((state) => state.form.searchError);
 
   const handleChange = (event, newValue) => {
     setSearchTerm('');
@@ -62,6 +63,13 @@ const SpeciesSearch = () => {
           <Tab label="NRMN" style={{minWidth: '50%'}} />
         </Tabs>
       </AppBar>
+      {searchError ? (
+        <Box pt={2} mx={2}>
+          <Alert severity="error" variant="filled">
+            The server may be experiencing problems. Please wait a moment and try again. (Error: {searchError})
+          </Alert>
+        </Box>
+      ) : null}
       <TabPanel value={value} index={0}>
         <Typography variant="subtitle2">Scientific Name</Typography>
         <Grid container direction="row" alignItems="center">

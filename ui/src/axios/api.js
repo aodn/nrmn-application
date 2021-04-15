@@ -185,8 +185,7 @@ export const search = (params) => {
     .get(url, {
       validateStatus: () => true
     })
-    .then((res) => res)
-    .catch((err) => err);
+    .then((res) => res);
 };
 
 export const templateZip = (params) => {
