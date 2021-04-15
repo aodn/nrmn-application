@@ -2,44 +2,48 @@ package au.org.aodn.nrmn.restapi.validation.validators.format;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
 import cyclops.control.Validated;
 import cyclops.data.tuple.Tuple2;
 
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory.FORMAT;
 import static au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel.BLOCKING;
+import static au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel.WARNING;
 
 
 public class ATRCDepthValidation extends BaseRowValidator {
 
-    private static final Pattern VALID_DEPTH = Pattern.compile("^[0-9]+$");
-    private static final Pattern VALID_SURVEY_NUM = Pattern.compile("^[1-4]$");
+    private static final Pattern VALID_DEPTH_SURVEY_NUM = Pattern.compile("^[0-9]+(\\.[0-9])?$");
 
     public ATRCDepthValidation() {
         super("Depth");
     }
 
     @Override
-    public Validated<StagedRowError, Tuple2<Integer, Integer>> valid(StagedRow target) {
+    public Validated<StagedRowError, String> valid(StagedRow target) {
         String value = target.getDepth();
+        if (!VALID_DEPTH_SURVEY_NUM.matcher(value).matches()) {
+            return getError(target, "Depth is invalid, expected: depth[.surveyNum]", FORMAT, BLOCKING);
+        }
         String[] split = value.split("\\.");
-        if (split.length != 2) {
-            return getError(target, "Depth is invalid, expected: {depth}.{surveyNum}", FORMAT,
-                    BLOCKING);
+        Integer depth = Integer.parseInt(split[0]);
+        Optional<Integer> surveyNum = split.length > 1 ? Optional.of(Integer.parseInt(split[1])) : Optional.empty();
+        if (surveyNumIsRequired(target.getMethod()) && !surveyNum.isPresent()) {
+            return getError(target, "Survey number not specified", FORMAT, WARNING);
         }
-        String depth = split[0];
-        if (!VALID_DEPTH.matcher(depth).matches()) {
-            return getError(target, "Depth is invalid, expected: Positive Integer for depth", FORMAT,
-                    BLOCKING);
+        if (surveyNumIsRequired(target.getMethod()) && (surveyNum.get() < 1 || surveyNum.get() > 4)) {
+            return getError(target, "Survey number should be 1, 2, 3 or 4", FORMAT, WARNING);
         }
-        String surveyNum = split[1];
-        if (!VALID_SURVEY_NUM.matcher(surveyNum).matches()) {
-            return getError(target, "Depth is invalid, expected: 1, 2, 3 or 4 for surveyNum",
-                    FORMAT, BLOCKING);
-        }
-        return Validated.valid(new Tuple2<>(Integer.parseInt(depth), Integer.parseInt(surveyNum)));
+        return Validated.valid(value);
+    }
+
+    private boolean surveyNumIsRequired(String method) {
+        return Arrays.asList("1", "2", "3", "4", "5", "7").contains(method);
     }
 
 }

@@ -11,7 +11,7 @@ import Form from '@rjsf/material-ui';
 import TextInput from './customWidgetFields/TextInput';
 import {itemRequested} from './middleware/entities';
 import {resetState} from './form-reducer';
-import EntityContainer from './EntityContainer';
+import EntityContainer from '../containers/EntityContainer';
 
 const EntityView = (props) => {
   const params = useParams();
@@ -35,21 +35,12 @@ const EntityView = (props) => {
     uiSchema[key] = item.type === 'object' ? {'ui:field': 'objects'} : {'ui:field': 'readonly'};
   }
 
-  const inputDisplay = (elem) => {
-    const value = elem.formData?.toString();
-    return (
-      <span>
-        <b>{elem.schema.title}: </b> {value ? value : ' -- '}
-      </span>
-    );
-  };
-
   const objectTable = (elem) => {
     const keys = elem.formData ? Object.keys(elem.formData) : [];
     return keys.length > 0 ? (
       <>
         <Divider />
-        <TableContainer>
+        <TableContainer style={{width: '50%'}}>
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -91,8 +82,8 @@ const EntityView = (props) => {
   const fields = {
     objects: objectTable,
     ArrayField: arrayTable,
-    BooleanField: inputDisplay,
-    NumberField: inputDisplay,
+    BooleanField: TextInput,
+    NumberField: TextInput,
     StringField: TextInput
   };
 
@@ -108,17 +99,41 @@ const EntityView = (props) => {
         {getErrors(params.errors)}
       </Alert>
     ) : params.success ? (
-      <Alert severity="info" variant="filled">
-        {props.entity.name} {params.success === 'new' ? 'Created' : 'Updated'}
-      </Alert>
+      <Box margin={2} width="50%">
+        <Alert severity="info" variant="filled">
+          {props.entity.name} {params.success === 'new' ? 'Created' : 'Updated'}
+        </Alert>
+      </Box>
     ) : null;
 
+  const loaded = Object.keys(formData).length > 0;
   return (
-    <EntityContainer name={props.entity.name} goBackTo={props.entity.list.route}>
-      <Grid item xs={9}>
-        <Box pt={4} px={6} pb={6}>
-          {alert}
-          {Object.keys(formData).length > 0 && (
+    <EntityContainer name={props.entity.list.name} goBackTo={props.entity.list.route}>
+      {!alert && (
+        <Grid container alignItems="flex-start" direction="row">
+          <Grid item xs={10}>
+            <Box fontWeight="fontWeightBold">
+              <Typography variant="h4">{props.entity.name} Details</Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={2}>
+            <Button
+              style={{width: '100%'}}
+              component={Link}
+              to={`${props.entity.route.base}/${params.id}/edit`}
+              color="secondary"
+              variant={'contained'}
+              startIcon={<Edit>edit</Edit>}
+            >
+              Edit
+            </Button>
+          </Grid>
+        </Grid>
+      )}
+      <Grid container alignItems="center" direction="column">
+        {alert}
+        <Box pt={4} pb={6}>
+          {loaded && (
             <Form
               disabled
               onError={params.onError}
@@ -133,20 +148,6 @@ const EntityView = (props) => {
             </Form>
           )}
         </Box>
-      </Grid>
-      <Grid item xs>
-        <Grid container alignItems="flex-start" direction="column">
-          <Button
-            style={{marginTop: 35, width: '75%'}}
-            component={Link}
-            to={`${props.entity.route.base}/${params.id}/edit`}
-            color="secondary"
-            variant={'contained'}
-            startIcon={<Edit>edit</Edit>}
-          >
-            Edit
-          </Button>
-        </Grid>
       </Grid>
     </EntityContainer>
   );

@@ -12,7 +12,6 @@ import Alert from '@material-ui/lab/Alert';
 import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
 
 import useWindowSize from '../utils/useWindowSize';
-import CustomTooltip from './customTooltip';
 import CustomLoadingOverlay from './CustomLoadingOverlay';
 import {selectRequested, deleteEntityRequested} from './middleware/entities';
 import {resetState} from './form-reducer';
@@ -44,7 +43,7 @@ const EntityList = (props) => {
   const dispatch = useDispatch();
   const entities = useSelector((state) => state.form.entities);
   const errors = useSelector((state) => state.form.errors);
-  let items = entities?._embedded ? entities?._embedded[props.entity.list.name] : null;
+  let items = entities?._embedded ? entities?._embedded[props.entity.list.key] : entities;
 
   useEffect(() => {
     dispatch(resetState());
@@ -144,7 +143,8 @@ const EntityList = (props) => {
     }
   };
 
-  const colDef = schematoColDef(config.get('api')[props.entity.list.schemaKey], props.entity);
+  const schemas = config.get('api');
+  const colDef = schematoColDef(schemas[props.entity.list.schemaKey], props.entity);
 
   const dialog = (
     <Dialog disableBackdropClick disableEscapeKeyDown maxWidth="xs" open>
@@ -179,19 +179,21 @@ const EntityList = (props) => {
       {dialogState.open && dialog}
       <Grid container direction="row" justify="space-between" style={{paddingLeft: 20}} alignItems="center">
         <Grid item>
-          <Typography variant="h4">{props.entity.name}</Typography>
+          <Typography variant="h4">{props.entity.list.name}</Typography>
         </Grid>
         <Grid item>
-          <Button
-            {...props}
-            to={props.entity.route.base}
-            component={NavLink}
-            color="secondary"
-            variant={'contained'}
-            startIcon={<Add></Add>}
-          >
-            New {props.entity.name}
-          </Button>
+          {props.entity.list.showNew && (
+            <Button
+              {...props}
+              to={props.entity.route.base}
+              component={NavLink}
+              color="secondary"
+              variant={'contained'}
+              startIcon={<Add></Add>}
+            >
+              New {props.entity.name}
+            </Button>
+          )}
         </Grid>
       </Grid>
 
@@ -207,7 +209,6 @@ const EntityList = (props) => {
             onRowClick(e, history, props.entity);
           }}
           frameworkComponents={{
-            customTooltip: CustomTooltip,
             customLoadingOverlay: CustomLoadingOverlay
           }}
           loadingOverlayComponent={'customLoadingOverlay'}
@@ -215,11 +216,8 @@ const EntityList = (props) => {
           defaultColDef={{
             sortable: true,
             resizable: true,
-            tooltipComponent: 'customTooltip',
             floatingFilter: true,
-            headerComponentParams: {
-              menuIcon: 'fa-bars'
-            }
+            suppressMenu: true
           }}
         />
       </div>
