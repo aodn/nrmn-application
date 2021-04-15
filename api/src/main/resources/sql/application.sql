@@ -89,14 +89,14 @@ CREATE TABLE nrmn.observable_item_ref_aud (
     report_group_mod boolean,
     superseded_by varchar(255),
     superseded_by_mod boolean,
-    template_code varchar(255),
-    templatecode_mod boolean,
     aphia_id integer,
     aphia_ref_mod boolean,
     aphia_rel_type_id integer,
     aphia_rel_type_mod boolean,
     obs_item_type_id integer,
     obs_item_type_mod boolean,
+    species_epithet varchar(255),
+    species_epithet_mod boolean,
     CONSTRAINT observable_item_ref_aud_pkey PRIMARY KEY (observable_item_id, rev)
 );
 
@@ -137,6 +137,8 @@ CREATE TABLE nrmn.survey_aud (
     notes_mod boolean,
     pq_catalogued boolean,
     pq_catalogued_mod boolean,
+    pq_diver_id integer,
+    pq_diver_id_mod boolean,
     project_title varchar(255),
     project_title_mod boolean,
     protection_status varchar(255),
@@ -188,6 +190,7 @@ CREATE TABLE nrmn.staged_job (
     source varchar(255),
     status varchar(255),
     program_id integer NOT NULL,
+    sec_user_id bigint NOT NULL,
     CONSTRAINT staged_job_pkey PRIMARY KEY (id)
 );
 
@@ -230,6 +233,7 @@ CREATE TABLE nrmn.staged_row (
     time varchar(255),
     total varchar(255),
     vis varchar(255),
+    position  bigint,
     staged_job_id bigint,
     CONSTRAINT staged_row_pkey PRIMARY KEY (id)
 );
@@ -248,6 +252,7 @@ CREATE TABLE nrmn.staged_row_error (
     message varchar(255) NOT NULL,
     column_target varchar(255),
     error_type varchar(255),
+    error_level varchar(255),
     row_id bigint NOT NULL,
     CONSTRAINT staged_row_error_pkey PRIMARY KEY (job_id, message, row_id)
 );
@@ -286,6 +291,10 @@ CREATE TABLE nrmn.site_ref_aud (
     protection_status_mod boolean,
     relief integer,
     relief_mod boolean,
+    slope integer,
+    slope_mod boolean,
+    wave_exposure integer,
+    wave_exposure_mod boolean,
     site_attribute jsonb,
     site_attribute_mod boolean,
     site_code varchar(255),
@@ -322,6 +331,10 @@ ALTER TABLE nrmn.sec_user_roles
 
 ALTER TABLE nrmn.staged_job
     ADD CONSTRAINT fkstvpeikdu4c83xc9tmpfb4spq FOREIGN KEY (program_id) REFERENCES nrmn.program_ref (program_id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE nrmn.staged_job
+    ADD CONSTRAINT fk_staged_job_sec_user FOREIGN KEY (sec_user_id) REFERENCES nrmn.sec_user (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
 
 ALTER TABLE nrmn.staged_row
     ADD CONSTRAINT staged_row_staged_job_id_fkey FOREIGN KEY (staged_job_id) REFERENCES nrmn.staged_job (id) ON UPDATE NO ACTION ON DELETE NO ACTION;

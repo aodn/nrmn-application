@@ -22,4 +22,8 @@ public interface SecUserRepository extends JpaRepository<SecUser, Long>, JpaSpec
         return blackListedToken.getOrDefault(token, -1L) != -1L;
     }
 
+    static void removeBlackListedToken(String token) {
+        blackListedToken.remove(token);
+    }
+
 }

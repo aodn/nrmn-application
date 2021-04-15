@@ -1,94 +1,90 @@
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
-import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import {makeStyles} from '@material-ui/core/styles';
 import clsx from 'clsx';
-import { toggleLeftSideMenu } from './layout-reducer';
-import { connect } from 'react-redux';
-import store from '../store';
-import AuthState from "./AuthState";
-import SettingsMenu from "./SettingsMenu";
+import {toggleLeftSideMenu} from './layout-reducer';
+import {useDispatch, useSelector} from 'react-redux';
+import AuthState from './AuthState';
+import {Typography, useMediaQuery} from '@material-ui/core';
 
-const drawerWidth = 240;
+const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ? process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
 const useStyles = makeStyles((theme) => ({
+  toolbar: {
+    flexGrow: 1
+  },
+  header: {
+    fontFamily: ['Roboto'].join(','),
+    color: '#FFF',
+    flexGrow: 1,
+    fontSize: 'x-large',
+    fontWeight: 500,
+    textAlign: 'left',
+    textTransform: 'initial'
+  },
+  logo: {
+    maxWidth: 100,
+    height: 'auto',
+    marginLeft: 25,
+    marginRight: 25
+  },
   appBar: {
+    zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
+      duration: theme.transitions.duration.leavingScreen
+    })
   },
   appBarShift: {
     width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
+    marginLeft: `${drawerWidth}px`,
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
+      duration: theme.transitions.duration.enteringScreen
     })
   },
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
+  menuButton: {},
   hide: {
-    display: 'none',
-  },
+    display: 'none'
+  }
 }));
 
-const mapStateToProps = state => {
-  return { leftSideMenuIsOpen: state.toggle.leftSideMenuIsOpen };
-};
-
-const handleClick = () => {
-  store.dispatch(toggleLeftSideMenu())
-}
-
-const ReduxTopBar = ({ leftSideMenuIsOpen }) => {
+const TopBar = () => {
   const classes = useStyles();
+  const leftSideMenuIsOpen = useSelector((state) => state.toggle.leftSideMenuIsOpen);
+  const dispatch = useDispatch();
+  const matches = useMediaQuery((theme) => theme.breakpoints.up('md'));
+
+  const handleClick = () => {
+    dispatch(toggleLeftSideMenu());
+  };
 
   return (
-  <AppBar
-    position="fixed"
-    className={clsx(classes.appBar, {
-      [classes.appBarShift]: leftSideMenuIsOpen,
-    })}
-  >
-    <Toolbar position="static">
-      <Grid container alignItems={'center'} justify="space-between" >
-        <Grid item >
-          <Grid container alignItems={'center'} justify="space-between" >
-            <Grid item >
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleClick}
-                edge="start"
-                className={clsx(classes.menuButton, leftSideMenuIsOpen && classes.hide)} >
-                <MenuIcon />
-              </IconButton>
-            </Grid>
-            <Grid item >
-              <Typography
-                  variant="h5"
-                  className={clsx(classes.header)}
-                  noWrap>
-                {process.env.REACT_APP_SITE_TITLE}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item >
-          <AuthState /> |
-          <SettingsMenu />
-        </Grid>
-      </Grid>
-    </Toolbar>
-  </AppBar>
-  )
+    <AppBar
+      position="fixed"
+      className={clsx(classes.appBar, {
+        [classes.appBarShift]: leftSideMenuIsOpen
+      })}
+    >
+      <Toolbar position="static">
+        <IconButton
+          color="inherit"
+          aria-label="open drawer"
+          onClick={handleClick}
+          edge="start"
+          className={clsx(classes.menuButton, leftSideMenuIsOpen && classes.hide)}
+        >
+          <MenuIcon />
+        </IconButton>
+        <img className={clsx(classes.logo)} src={'https://static.emii.org.au/images/logo/IMOS-Ocean-Portal-logo.png'} alt={'IMOS Logo'} />
+        <Typography className={clsx(classes.header)}>{matches ? process.env.REACT_APP_SITE_TITLE : 'NRMN'}</Typography>
+        <AuthState />
+      </Toolbar>
+    </AppBar>
+  );
 };
 
-const TopBar = connect(mapStateToProps)(ReduxTopBar);
 export default TopBar;

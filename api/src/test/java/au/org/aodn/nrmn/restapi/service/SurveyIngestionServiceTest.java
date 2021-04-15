@@ -59,14 +59,14 @@ public class SurveyIngestionServiceTest {
                 .method(2)
                 .diver(diver)
                 .buddy(Diver.builder().initials("MAX").build())
-                .species(AphiaRef.builder().scientificName("THE SPECIES").build())
+                .species(ObservableItem.builder().observableItemName("THE SPECIES").build())
                 .site(Site.builder().siteCode("A SITE").build())
                 .depth(1)
-                .surveyNum(2)
+                .surveyNum(Optional.of(2))
                 .direction(Directions.N)
-                .vis(15)
+                .vis(Optional.of(15))
                 .date(LocalDate.of(2003, 03, 03))
-                .time(LocalTime.of(12, 34, 56))
+                .time(Optional.of(LocalTime.of(12, 34, 56)))
                 .pqs(diver)
                 .m2InvertSizingSpecies(5)
                 .isInvertSizing(true)
@@ -143,7 +143,6 @@ public class SurveyIngestionServiceTest {
         ObservableItem observableItem = ObservableItem.builder()
             .observableItemName("The Species")
             .build();
-        when(observableItemRepository.findOne(any(Example.class))).thenReturn(Optional.of(observableItem));
 
         StagedRowFormatted row = rowBuilder.build();
         StagedRowFormatted rowFromSameSurvey = rowBuilder
@@ -169,12 +168,11 @@ public class SurveyIngestionServiceTest {
         ObservableItem observableItem = ObservableItem.builder()
                 .observableItemName("The Species")
                 .build();
-        when(observableItemRepository.findOne(any(Example.class))).thenReturn(Optional.of(observableItem));
 
         StagedRowFormatted row = rowBuilder.build();
         StagedRowFormatted rowWithDifferentDepth = rowBuilder
                 .depth(5)
-                .surveyNum(3)
+                .surveyNum(Optional.of(3))
                 .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 10).put(3, 11).build())
                 .build();
 
@@ -196,7 +194,6 @@ public class SurveyIngestionServiceTest {
         ObservableItem observableItem = ObservableItem.builder()
                 .observableItemName("The Species")
                 .build();
-        when(observableItemRepository.findOne(any(Example.class))).thenReturn(Optional.of(observableItem));
 
         StagedRowFormatted row = rowBuilder.build();
         StagedRowFormatted rowWithDifferentDate = rowBuilder
@@ -222,7 +219,6 @@ public class SurveyIngestionServiceTest {
         ObservableItem observableItem = ObservableItem.builder()
                 .observableItemName("The Species")
                 .build();
-        when(observableItemRepository.findOne(any(Example.class))).thenReturn(Optional.of(observableItem));
 
         StagedRowFormatted row = rowBuilder.build();
         StagedRowFormatted rowWithDifferentSite = rowBuilder

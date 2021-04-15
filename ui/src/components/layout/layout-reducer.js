@@ -1,26 +1,22 @@
-import {
-  createSlice
-} from "@reduxjs/toolkit";
-
+import {createSlice} from '@reduxjs/toolkit';
 
 const toggleState = {
   leftSideMenuIsOpen: false,
   logoutMenuOpen: false
-}
+};
 
 const toggleSlice = createSlice({
-  name: "toggle",
+  name: 'toggle',
   initialState: toggleState,
   reducers: {
-    toggleLeftSideMenu: (state, action) => {
+    toggleLeftSideMenu: (state) => {
       state.leftSideMenuIsOpen = !state.leftSideMenuIsOpen;
     },
-    toggleLogoutMenuOpen: (state, action) => {
+    toggleLogoutMenuOpen: (state) => {
       state.logoutMenuOpen = !state.logoutMenuOpen;
     }
-  },
+  }
 });
 
 export const toggleReducer = toggleSlice.reducer;
-export const { toggleLeftSideMenu, toggleLogoutMenuOpen } = toggleSlice.actions;
-
+export const {toggleLeftSideMenu, toggleLogoutMenuOpen} = toggleSlice.actions;

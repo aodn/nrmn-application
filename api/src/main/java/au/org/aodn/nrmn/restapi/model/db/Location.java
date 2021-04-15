@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import org.hibernate.annotations.Cache;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.Column;
@@ -17,7 +19,10 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
+
 @Entity
+@Cache(region = "entities", usage = READ_WRITE)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,7 +35,7 @@ public class Location {
     @SequenceGenerator(name = "location_ref_location_id", sequenceName = "location_ref_location_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="location_ref_location_id")
     @Column(name = "location_id", unique = true, updatable = false, nullable = false)
-    @Schema(title = "Id", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(title = "Id", accessMode = Schema.AccessMode.READ_ONLY, hidden = true)
     private Integer locationId;
 
     @Column(name = "location_name")
@@ -39,6 +44,7 @@ public class Location {
     private String locationName;
 
     @Column(name = "is_active")
-    @Schema(title = "Active")
+    @NotNull
+    @Schema(title = "Is Active", defaultValue = "true")
     private Boolean isActive;
 }

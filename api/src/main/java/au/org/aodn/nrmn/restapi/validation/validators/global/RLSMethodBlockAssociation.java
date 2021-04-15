@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.validation.validators.global;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.model.RowMethodBlock;
 import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
@@ -17,6 +18,8 @@ import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel.BLOCKING;
+
 @Component
 public class RLSMethodBlockAssociation extends BaseGlobalValidator {
 
@@ -30,18 +33,6 @@ public class RLSMethodBlockAssociation extends BaseGlobalValidator {
     @Override
     public Validated<StagedRowError, String> valid(StagedJob job) {
 
-
-        Function<String, StagedRowError> getGlobalError = (String msg) -> {
-            return new StagedRowError(
-                    new ErrorID(
-                            null,
-                            job.getId(),
-                            msg
-                    ), ValidationCategory.GLOBAL,
-                    ruleName,
-                    null
-            );
-        };
         val aggregatedBlocks = stageRowRepo.findBlockMethods12(job.getId());
         val groupById = aggregatedBlocks.stream().collect(Collectors.groupingBy(
                 RowMethodBlock::getId));
@@ -54,7 +45,7 @@ public class RLSMethodBlockAssociation extends BaseGlobalValidator {
                             .reduce("", (e1 , e2) -> e1 + e2);
 
                     if (!blockSum.startsWith("12"))
-                        return Validated.<StagedRowError, String>invalid(getGlobalError.apply(item.getKey() + "invalid block combination"));
+                        return invalid(job.getId(), item.getKey() + "invalid block combination", BLOCKING);
 
                     return Validated.<StagedRowError, String>valid(item.getKey() + " has valid method/block");
                 })

@@ -83,7 +83,7 @@ public class DiverApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("a diver with those initials already exists")));
+                .body("errors[0].message", is(equalTo("A diver with those initials already exists.")));
     }
 
     @Test
@@ -103,7 +103,7 @@ public class DiverApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("a diver with those initials already exists")));
+                .body("errors[0].message", is(equalTo("A diver with those initials already exists.")));
     }
 
 }

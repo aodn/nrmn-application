@@ -1,49 +1,41 @@
-import {
-  configureStore,
-  getDefaultMiddleware
-} from "@reduxjs/toolkit";
+import {configureStore, getDefaultMiddleware} from '@reduxjs/toolkit';
 
-import { themeReducer } from './layout/theme-reducer';
-import { toggleReducer } from './layout/layout-reducer';
-import { importReducer } from "./import/reducers/create-import";
-import { authReducer } from "./auth/auth-reducer";
-import { listFileReducer } from "./import/reducers/list-import";
-import { formReducer } from "./data-entities/form-reducer";
-import createSagaMiddleware from "redux-saga";
+import {toggleReducer} from './layout/layout-reducer';
+import {importReducer} from './import/reducers/create-import';
+import {uploadReducer} from './import/reducers/upload';
+import {authReducer} from './auth/auth-reducer';
+import {formReducer} from './data-entities/form-reducer';
+import createSagaMiddleware from 'redux-saga';
 import importMiddleware from './import/middleware/create-import';
-import ListFileMiddleware from './import/middleware/list-import';
-import FileMiddleware from './import/middleware/file-import';
+import FileMiddleware from './import/middleware/validation-job';
 import getEntitiesWatcher from './data-entities/middleware/entities';
-import { all } from "redux-saga/effects";
-import LoginWatcher from "./auth/auth-middleware";
+import {all} from 'redux-saga/effects';
+import LoginWatcher from './auth/auth-middleware';
+import {jobReducer} from './job/jobReducer';
+import jobWatcher from './job/jobMiddleware';
+import getSearchResult from './data-entities/middleware/search';
 
 const initialiseSagaMiddleware = createSagaMiddleware();
+const isDev = process.env.NODE_ENV == 'development';
 
-const middleware = [
-  ...getDefaultMiddleware(),
-  initialiseSagaMiddleware
-]; 
+const middleware = isDev
+  ? [...getDefaultMiddleware({serializableCheck: false, immutableCheck: false}), initialiseSagaMiddleware]
+  : [initialiseSagaMiddleware];
 
 const store = configureStore({
   reducer: {
-    theme: themeReducer,
     auth: authReducer,
     toggle: toggleReducer,
     import: importReducer,
-    fileList: listFileReducer,
-    form : formReducer
+    form: formReducer,
+    job: jobReducer,
+    upload: uploadReducer
   },
-  middleware,
+  middleware
 });
 
- function* rootSaga() {
-  yield all([
-    ListFileMiddleware(),
-    importMiddleware(),
-    FileMiddleware(),
-    LoginWatcher(),
-    getEntitiesWatcher()
-  ])
+function* rootSaga() {
+  yield all([importMiddleware(), FileMiddleware(), LoginWatcher(), getEntitiesWatcher(), jobWatcher(), getSearchResult()]);
 }
 
 initialiseSagaMiddleware.run(rootSaga);

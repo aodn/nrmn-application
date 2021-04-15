@@ -86,6 +86,9 @@ public class AuthController {
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         val jwt = tokenProvider.generateToken(authentication);
+        if (SecUserRepository.blackListedTokenPresent(jwt)) {
+            SecUserRepository.removeBlackListedToken(jwt);
+        }
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 

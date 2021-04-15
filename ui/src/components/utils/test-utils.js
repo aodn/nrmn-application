@@ -1,7 +1,7 @@
-import React from "react";
-import { createMemoryHistory } from "history";
-import { Router, Route } from "react-router-dom";
-import { render } from "@testing-library/react";
+import React from 'react';
+import {createMemoryHistory} from 'history';
+import {Router, Route} from 'react-router-dom';
+import {render} from '@testing-library/react';
 
 // USAGE
 // See https://testing-library.com/docs/dom-testing-library/api-queries
@@ -19,18 +19,12 @@ import { render } from "@testing-library/react";
 //
 //
 
-export function renderWithProviders(
-    ui,
-    {
-      route = "/",
-      history = createMemoryHistory({ initialEntries: [route] })
-    } = {}
-) {
+export function renderWithProviders(ui, {route = '/', history = createMemoryHistory({initialEntries: [route]})} = {}) {
   return {
     ...render(
-        <Router history={history}>
-          <Route path={route}>{ui}</Route>
-        </Router>
+      <Router history={history}>
+        <Route path={route}>{ui}</Route>
+      </Router>
     ),
     history
   };

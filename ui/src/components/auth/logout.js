@@ -5,16 +5,15 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import {useDispatch, useSelector} from "react-redux";
-import {logoutSubmitted} from "./auth-reducer";
-import {toggleLogoutMenuOpen} from "../../../../ui/src/components/layout/layout-reducer";
-import store from "../store";
+import {useDispatch, useSelector} from 'react-redux';
+import {logoutSubmitted} from './auth-reducer';
+import {toggleLogoutMenuOpen} from '../../../../ui/src/components/layout/layout-reducer';
+import store from '../store';
 
-
-function Logout() {
+var Logout = () => {
   const dispatch = useDispatch();
-  const logoutMenuOpen = useSelector(state => state.toggle.logoutMenuOpen);
-  const username = useSelector(state => state.auth.username);
+  const logoutMenuOpen = useSelector((state) => state.toggle.logoutMenuOpen);
+  const username = useSelector((state) => state.auth.username);
 
   const handleCancel = () => {
     store.dispatch(toggleLogoutMenuOpen());
@@ -27,29 +26,23 @@ function Logout() {
   };
 
   return (
-      <>
-        <Dialog
-            open={logoutMenuOpen}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">Logout</DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              Do you really want to log out as '{username}'?
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCancel} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={handleClose} color="primary" autoFocus>
-              Logout
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </>
+    <>
+      <Dialog open={logoutMenuOpen} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+        <DialogTitle id="alert-dialog-title">Logout</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">{`Do you really want to log out as '` + username + `' ?`}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancel} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleClose} color="primary" autoFocus>
+            Logout
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
-}
+};
 
 export default Logout;

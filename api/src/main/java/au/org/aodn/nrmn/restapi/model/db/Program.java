@@ -22,7 +22,7 @@ import java.io.Serializable;
 @Builder
 @Table(name = "program_ref")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Program  implements Serializable {
+public class Program implements Serializable {
     @Id
     @SequenceGenerator(name = "program_ref_program_id", sequenceName = "program_ref_program_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="program_ref_program_id")

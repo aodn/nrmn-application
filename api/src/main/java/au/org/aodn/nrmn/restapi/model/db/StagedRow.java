@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
@@ -13,6 +14,7 @@ import javax.persistence.*;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,9 +32,8 @@ public class StagedRow implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonProperty(value = "Site No")
     @Column(name = "site_no")
-    private String siteNo;
+    private String siteCode;
 
     @Column(name = "date")
     private String date;
@@ -55,7 +56,7 @@ public class StagedRow implements Serializable {
     @Column(name = "buddy")
     private String buddy;
 
-    @JsonProperty(value = "Site Name")
+
     @Column(name = "site_name")
     private String siteName;
 
@@ -81,7 +82,7 @@ public class StagedRow implements Serializable {
     @Column(name = "code")
     private String code;
 
-    @JsonProperty(value = "Common name")
+
     @Column(name = "common_name")
     private String commonName;
 
@@ -90,6 +91,9 @@ public class StagedRow implements Serializable {
 
     @Column(name = "inverts")
     private String inverts;
+
+    @Column(name = "position")
+    private Integer pos;
 
     @Column(name = "m2_invert_sizing_species")
     private String m2InvertSizingSpecies;
@@ -110,8 +114,11 @@ public class StagedRow implements Serializable {
     @Type(type = "jsonb")
     private Map<Integer, String> measureJson;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @JsonIgnore
+    @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "staged_row_staged_job_id_fkey"))
+    @ToString.Exclude
     private StagedJob stagedJob;
 
     @Column(name = "created", columnDefinition = "timestamp with time zone", nullable = false)
@@ -125,5 +132,5 @@ public class StagedRow implements Serializable {
     private Timestamp lastUpdated;
 
     @Transient
-    private List<StagedRowError> errors;
+    private List<StagedRowError> errors = new ArrayList<>();
 }

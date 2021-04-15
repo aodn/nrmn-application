@@ -49,19 +49,19 @@ public class SurveyIngestionService {
 
         Optional<Survey> existingSurvey = surveyRepository.findOne(Example.of(Survey.builder()
                 .depth(stagedRow.getDepth())
-                .surveyNum(stagedRow.getSurveyNum())
+                .surveyNum(stagedRow.getSurveyNum().orElse(null))
                 .site(stagedRow.getSite())
                 .surveyDate(Date.valueOf(stagedRow.getDate()))
                 .build()));
 
         return existingSurvey.orElseGet(() -> surveyRepository.save(Survey.builder()
                 .depth(stagedRow.getDepth())
-                .surveyNum(stagedRow.getSurveyNum())
+                .surveyNum(stagedRow.getSurveyNum().orElse(null))
                 .direction(stagedRow.getDirection().toString())
                 .site(stagedRow.getSite())
                 .surveyDate(Date.valueOf(stagedRow.getDate()))
-                .surveyTime(Time.valueOf(stagedRow.getTime()))
-                .visibility(stagedRow.getVis())
+                .surveyTime(Time.valueOf(stagedRow.getTime().orElse(null)))
+                .visibility(stagedRow.getVis().orElse(null))
                 .program(stagedRow.getRef().getStagedJob().getProgram())
                 .build()));
     }
@@ -83,15 +83,11 @@ public class SurveyIngestionService {
         SurveyMethod surveyMethod = surveyMethodRepository.save(getSurveyMethod(stagedRow));
         Diver diver = stagedRow.getDiver();
         Map<Integer, Integer> measures = stagedRow.getMeasureJson();
-        ObservableItem observableItem = observableItemRepository.findOne(
-                Example.of(ObservableItem.builder()
-                        .aphiaRef(stagedRow.getSpecies())
-                        .build())).get();
 
         Observation.ObservationBuilder baseObservationBuilder = Observation.builder()
                 .diver(diver)
                 .surveyMethod(surveyMethod)
-                .observableItem(observableItem);
+                .observableItem(stagedRow.getSpecies());
 
 
         List<Observation> observations = measures.entrySet().stream().map(m -> {

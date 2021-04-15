@@ -2,8 +2,7 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.enums.SecUserStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
@@ -24,6 +23,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,9 +31,12 @@ import java.util.Set;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@Builder
 @Table(name = "sec_user", uniqueConstraints = {@UniqueConstraint(name = "UNIQUE_EMAIL", columnNames = {"email_address"})})
 @Audited(withModifiedFlag = true)
-public class SecUser {
+public class  SecUser implements Serializable {
 
     @Id
     @SequenceGenerator(name = "user_id_seq", allocationSize = 1)
@@ -70,7 +73,7 @@ public class SecUser {
 
     @NotAudited
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "sec_user_roles",
         joinColumns = @JoinColumn(name = "sec_user_id", foreignKey = @ForeignKey(name = "FK_USER_SEC_ROLE")),

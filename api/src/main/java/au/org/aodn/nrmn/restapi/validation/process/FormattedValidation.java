@@ -1,10 +1,14 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
+import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.validation.model.MonoidRowValidation;
+import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
 import au.org.aodn.nrmn.restapi.validation.provider.ValidatorProvider;
+import au.org.aodn.nrmn.restapi.validation.validators.entities.SurveyExists;
 import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import cyclops.data.Seq;
@@ -18,18 +22,20 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class FormattedValidation {
+public class FormattedValidation extends ValidatorHelpers {
     private final BeanFactory beanFactory;
+    private SurveyRepository surveyRepository;
 
     @Autowired
-    public FormattedValidation(BeanFactory beanFactory) {
+    public FormattedValidation(BeanFactory beanFactory, SurveyRepository surveyRepository) {
         this.beanFactory = beanFactory;
-
+        this.surveyRepository = surveyRepository;
     }
 
     private Seq<BaseFormattedValidator> getCommonValidators() {
-        //TODO Add comon formatted validtors
-        return Seq.empty();
+        return Seq.of(
+            new SurveyExists(surveyRepository)
+        );
     }
 
     private Seq<BaseFormattedValidator> getValidators(StagedJob job) {
@@ -38,19 +44,23 @@ public class FormattedValidation {
         return validators;
     }
 
+    // is the process Valid & return list of stagedRow
 
-    public Validated<StagedRowError, String> process(List<StagedRowFormatted> formattedList, StagedJob job) {
+    public RowWithValidation<String> process(List<StagedRowFormatted> formattedList, StagedJob job) {
         val validators = getValidators(job);
-        return formattedList.stream().map(rowFormatted ->
-                validators
-                        .map(v -> v.valid(rowFormatted))
-                        .stream()
-                        .reduce(
-                                Validated.valid(""),
-                                (v1, v2) -> v1.combine(Monoids.firstNonNull(), v2)
-                        )
-        ).reduce(
-                Validated.valid(""),
-                (v1, v2) -> v1.combine(Monoids.stringConcat, v2));
+        val mono = new MonoidRowValidation("", Monoids.stringConcat);
+        return formattedList.stream().map(rowFormatted -> {
+            val formattedResult = validators
+                    .map(v -> v.valid(rowFormatted))
+                    .stream()
+                    .reduce(
+                            Validated.valid(""),
+                            (v1, v2) -> v1.combine(Monoids.stringConcat, v2)
+                    );
+            val errors = toErrorList(formattedResult);
+            val stagedRow = rowFormatted.getRef();
+            stagedRow.setErrors(errors);
+            return new RowWithValidation(Seq.of(stagedRow), formattedResult);
+        }).reduce(mono.zero(), mono);
     }
 }

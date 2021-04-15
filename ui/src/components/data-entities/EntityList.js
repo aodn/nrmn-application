@@ -1,168 +1,233 @@
-import React from "react";
-import {Box, Typography, Button} from "@material-ui/core";
-import {useSelector, useDispatch} from "react-redux";
-import {useEffect} from 'react';
-import {useParams, NavLink} from "react-router-dom";
-import pluralize from 'pluralize';
-import {AgGridReact} from "ag-grid-react/lib/agGridReact";
-import useWindowSize from "../utils/useWindowSize";
-import Alert from "@material-ui/lab/Alert";
-import config from "react-global-configuration";
-import {titleCase} from "title-case";
-import Grid from "@material-ui/core/Grid";
-import CustomTooltip from "./customTooltip";
-import {selectRequested} from "./middleware/entities";
-import {resetState} from "./form-reducer";
+import React, {useEffect, useState} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
+import config from 'react-global-configuration';
+import {useHistory} from 'react-router';
+import {NavLink} from 'react-router-dom';
+import {PropTypes} from 'prop-types';
 
+import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Tooltip, Typography} from '@material-ui/core';
+import {Add, Edit, FileCopy, Delete} from '@material-ui/icons';
+import Alert from '@material-ui/lab/Alert';
 
-const cellRenderer = (params) => {
-  if (typeof params.value === 'object') {
-    return (
-        JSON.stringify(params.value)?.replaceAll(/["{}]/g,'')
-            .replaceAll(',',', ').trim()
-    );
-  };
-  return params.value;
-}
-const schematoColDef = (schema, size) => {
+import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
 
-  const fields = Object.keys(schema.properties);
-  const widthSize = size.width / (fields.length + 1 );
-  const coldefs = fields.map(field => {
-
-    return {
-      field: field,
-      width: widthSize,
-      tooltipField: field,
-      // make every column use 'text' filter by default
-      filter: 'agTextColumnFilter',
-      cellRenderer: cellRenderer
-    }
-  });
-
-  coldefs.push({
-    field: "Edit",
-    filter: undefined,
-    cellRenderer: function (params) {
-      if (params.data._links) {
-        const hrefSplit = params.data._links.self.href.split("/");
-        const id = hrefSplit.pop();
-        const ent = hrefSplit.pop();
-        const link = "/form/" + ent + "/" + id;
-        return '<a href="' + link + '">Edit</a>';
-      }
-    }
-  })
-  return coldefs;
-}
+import useWindowSize from '../utils/useWindowSize';
+import CustomLoadingOverlay from './CustomLoadingOverlay';
+import {selectRequested, deleteEntityRequested} from './middleware/entities';
+import {resetState} from './form-reducer';
 
 let agGridApi = {};
+let agGridColumnApi = {};
+
+const getCellFilter = (format) => {
+  const filterTypes = {
+    int64: 'agNumberColumnFilter',
+    'date-time': 'agDateColumnFilter'
+  };
+  return filterTypes[format] ? filterTypes[format] : 'agTextColumnFilter';
+};
 
 const renderError = (msgArray) => {
-  return <Box>
-    <Alert style={{ height: 'auto', lineHeight: '28px', whiteSpace: 'pre-line' }}
-          severity="error"
-          variant="filled"
-    >{msgArray.join('\r\n ')}
-    </Alert></Box>
-}
+  return (
+    <Box>
+      <Alert style={{height: 'auto', lineHeight: '28px', whiteSpace: 'pre-line'}} severity="error" variant="filled">
+        {msgArray.join('\r\n ')}
+      </Alert>
+    </Box>
+  );
+};
 
-const EntityList = () => {
-
-  const {entityName} = useParams();
-  const plural = pluralize.plural(entityName);
-  const entityNamePlural = plural.charAt(0).toLowerCase() + plural.slice(1);
-
-  const schemaDefinition = config.get('api');
+const EntityList = (props) => {
+  const history = useHistory();
   const size = useWindowSize();
-
-  const themeType = useSelector(state => state.theme.themeType);
   const dispatch = useDispatch();
-  const entities = useSelector(state => state.form.entities);
-  const errors = useSelector(state => state.form.errors);
-  const items =  (entities?._embedded) ? entities._embedded[entityNamePlural] : undefined;
-
-  const agGridReady = (agGrid) => {
-    agGridApi = Object.create(agGrid.api);
-    agGridApi.setRowData(items);
-    Object.freeze(agGridApi);
-  }
+  const entities = useSelector((state) => state.form.entities);
+  const errors = useSelector((state) => state.form.errors);
+  let items = entities?._embedded ? entities?._embedded[props.entity.list.key] : entities;
 
   useEffect(() => {
     dispatch(resetState());
-    dispatch(selectRequested(entityNamePlural));
-  }, [entityName]); // reset when new or entityName prop changes
+    dispatch(selectRequested(props.entity.list.endpoint));
+  }, [props.entity.name]);
 
-  const getEntitySchema = () => {
-    return (schemaDefinition[titleCase(entityName)]) ? (schemaDefinition[titleCase(entityName)]) :
-        (schemaDefinition[entityName]);
-  }
+  const schematoColDef = (schema, entity) => {
+    const fields = entity.list.headers ?? Object.keys(schema.properties);
 
-  if (Object.keys(schemaDefinition).length === 0) {
-    return (renderError(["Error: API not yet loaded"]));
-  }
-  else {
+    const coldefs = fields.reduce((acc, field) => {
+      const fieldSchema = schema.properties[field];
+      if (fieldSchema.title) {
+        const sortable = entity.list.sort?.includes(field) ?? true;
+        acc.push({
+          headerName: fieldSchema.title,
+          field: field,
+          tooltipField: field,
+          suppressMovable: true,
+          sortable: sortable,
+          flex: field === entity.flexField ? true : false,
+          filter: getCellFilter(fieldSchema?.type || 'string')
+        });
+      }
+      return acc;
+    }, []);
+    const scale = 1 + (entity.can.clone | 0) + (entity.can.delete | 0);
+    coldefs.push({
+      field: '',
+      filter: null,
+      suppressMovable: true,
+      minWidth: 60 * scale,
+      // eslint-disable-next-line react/display-name
+      cellRendererFramework: function (cell) {
+        return (
+          <>
+            <Tooltip title="Edit" aria-label="edit">
+              <IconButton component={NavLink} to={`${entity.route.base}/${cell.data[entity.idKey]}/edit`}>
+                <Edit />
+              </IconButton>
+            </Tooltip>
+            {entity.can.clone && (
+              <Tooltip title="Clone" aria-label="clone">
+                <IconButton component={NavLink} to={`${entity.route.base}/${cell.data[entity.idKey]}/clone`}>
+                  <FileCopy />
+                </IconButton>
+              </Tooltip>
+            )}
+            {entity.can.delete && (
+              <Tooltip title="Delete" aria-label="delete">
+                <span>
+                  <IconButton
+                    name="delete"
+                    disabled={cell.data.isActive}
+                    onClick={() => {
+                      setDialogState({
+                        open: true,
+                        id: cell.data[entity.idKey],
+                        index: cell.rowIndex,
+                        // HACK: making the assumption that all entities called `Entity` have a property `entityName`
+                        description: cell.data[`${entity.name.toLowerCase()}Name`]
+                      });
+                    }}
+                  >
+                    <Delete />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
+          </>
+        );
+      }
+    });
 
-    if (!getEntitySchema()) {
-      return renderError(["ERROR: Entity '" + titleCase(entityName) + "' missing from API Schema"]);
+    return coldefs;
+  };
+
+  const agGridReady = (agGrid) => {
+    agGridApi = Object.create(agGrid.api);
+    agGridColumnApi = agGrid.columnApi;
+    Object.freeze(agGridApi);
+    agGridApi.showLoadingOverlay();
+  };
+
+  const autoSizeAll = () => {
+    let allColumnIds = [];
+    agGridColumnApi.getAllColumns().forEach(function (column) {
+      if (props.entity.flexField !== column.colId) allColumnIds.push(column.colId);
+    });
+    agGridColumnApi.autoSizeColumns(allColumnIds, false);
+  };
+
+  const [dialogState, setDialogState] = useState({open: false});
+
+  const onRowClick = (e, history, entity) => {
+    if (e.node.isSelected() && !e.colDef.cellRendererFramework) {
+      history.push(`${entity.route.base}/${e.data[entity.idKey]}`);
     }
+  };
 
-    const colDef = schematoColDef(getEntitySchema(), size);
+  const schemas = config.get('api');
+  const colDef = schematoColDef(schemas[props.entity.list.schemaKey], props.entity);
 
-    if (items !== undefined && agGridApi.setRowData) {
-      agGridApi.setRowData(items);
-    }
+  const dialog = (
+    <Dialog disableBackdropClick disableEscapeKeyDown maxWidth="xs" open>
+      <DialogTitle>Delete {props.entity.name}?</DialogTitle>
+      <DialogContent>
+        Are you sure you want to permanently delete this {props.entity.name.toLowerCase()}?
+        <Box p={2}>
+          <Typography variant="subtitle2">{dialogState.description}</Typography>
+        </Box>
+      </DialogContent>
+      <DialogActions>
+        <Button autoFocus onClick={() => setDialogState({open: false})}>
+          Cancel
+        </Button>
+        <Button
+          onClick={() => {
+            const item = items.find((i) => i.siteId === dialogState.id);
+            dispatch(deleteEntityRequested({entity: props.entity, id: dialogState.id}));
+            agGridApi.applyTransaction({remove: [item]});
+            setDialogState({open: false});
+          }}
+          style={{color: 'red'}}
+        >
+          Delete {props.entity.name}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
 
-    return (
-        <>
-          <Box >
-            <Grid
-                container
-                direction="row"
-                justify="space-between"
-                alignItems="center"
+  return (
+    <>
+      {dialogState.open && dialog}
+      <Grid container direction="row" justify="space-between" style={{paddingLeft: 20}} alignItems="center">
+        <Grid item>
+          <Typography variant="h4">{props.entity.list.name}</Typography>
+        </Grid>
+        <Grid item>
+          {props.entity.list.showNew && (
+            <Button
+              {...props}
+              to={props.entity.route.base}
+              component={NavLink}
+              color="secondary"
+              variant={'contained'}
+              startIcon={<Add></Add>}
             >
-              <Typography variant="h4">{entityNamePlural.charAt(0).toUpperCase() + entityNamePlural.slice(1)} </Typography>
-              <Button title={"Add new " + titleCase(entityName)}
-                      component={NavLink}
-                      to={"/form/" + entityNamePlural}
-                      color="secondary"
-                      aria-label={"Add " + entityName}
-                      variant={"contained"}
-              >New {titleCase(entityName)}
+              New {props.entity.name}
+            </Button>
+          )}
+        </Grid>
+      </Grid>
 
-              </Button>
-            </Grid>
+      <div style={{height: size.height - 150, marginTop: 20}} className={'ag-theme-material'}>
+        <AgGridReact
+          columnDefs={colDef}
+          rowSelection="single"
+          animateRows={true}
+          rowData={items}
+          onGridReady={agGridReady}
+          onFirstDataRendered={autoSizeAll}
+          onCellClicked={(e) => {
+            onRowClick(e, history, props.entity);
+          }}
+          frameworkComponents={{
+            customLoadingOverlay: CustomLoadingOverlay
+          }}
+          loadingOverlayComponent={'customLoadingOverlay'}
+          tooltipShowDelay={0}
+          defaultColDef={{
+            sortable: true,
+            resizable: true,
+            floatingFilter: true,
+            suppressMenu: true
+          }}
+        />
+      </div>
+      {errors.length > 0 ? renderError(errors) : ''}
+    </>
+  );
+};
 
-            <div style={{width: '100%', height: size.height - 170, marginTop: 25}}
-                 className={themeType ? "ag-theme-alpine-dark" : "ag-theme-alpine"}>
-              <AgGridReact
-                  columnDefs={colDef}
-                  rowSelection="multiple"
-                  animateRows={true}
-                  onGridReady={agGridReady}
-                  frameworkComponents={{customTooltip: CustomTooltip}}
-                  tooltipShowDelay={0}
-                  defaultColDef={{
-                    sortable: true,
-                    resizable: true,// make every column use 'text' filter by default
-                    filter: 'agTextColumnFilter',
-                    tooltipComponent: 'customTooltip',
-                    floatingFilter: true,
-                    headerComponentParams: {
-                      menuIcon: 'fa-bars'
-                    }
-                  }}/>
-            </div>
-            {(!colDef) ? renderError(["Entity '" + entityName + "' can not be found!"]) : ""}
-            {(errors.length > 0) ? renderError(errors) : ""}
-          </Box>
-        </>
-    )
-  }
-}
+EntityList.propTypes = {
+  entity: PropTypes.object
+};
 
 export default EntityList;
-
-
-

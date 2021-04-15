@@ -38,7 +38,7 @@ class PreValidationProcessIT {
         program.setProgramName("RLS");
         job.setProgram(program);
         val stage = new StagedRow();
-        stage.setSiteNo("EYR71");
+        stage.setSiteCode("EYR71");
         stage.setSiteName("South East Slade Point");
         stage.setLongitude("154");
         stage.setLatitude("-35");
@@ -67,7 +67,7 @@ class PreValidationProcessIT {
         assertEquals(row.getBlock(), 1);
         assertEquals(row.getDirection(), Directions.NE);
         assertEquals(row.getDiver().getFullName(), "Tanjona Julien Rafidison");
-        assertEquals(row.getSpecies().getAphiaId(), 102);
+        assertEquals(row.getSpecies().getAphiaRef().getAphiaId(), 102);
         assertEquals(row.getMeasureJson().get(13), 1);
 
     }

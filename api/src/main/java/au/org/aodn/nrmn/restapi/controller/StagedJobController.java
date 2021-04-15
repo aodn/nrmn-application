@@ -2,18 +2,19 @@ package au.org.aodn.nrmn.restapi.controller;
 
 import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
 import au.org.aodn.nrmn.restapi.dto.stage.FileUpload;
+import au.org.aodn.nrmn.restapi.dto.stage.JobResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.UploadResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
+import au.org.aodn.nrmn.restapi.model.db.StagedJobLog;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
+import au.org.aodn.nrmn.restapi.model.db.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
-import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
-import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
+import au.org.aodn.nrmn.restapi.repository.*;
 import au.org.aodn.nrmn.restapi.service.SpreadSheetService;
+import au.org.aodn.nrmn.restapi.service.StagedRowService;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.process.ValidationProcess;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +28,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
+import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +42,9 @@ public class StagedJobController {
 
     @Autowired
     SpreadSheetService sheetService;
+
+    @Autowired
+    StagedRowService rowService;
 
     @Autowired
 
@@ -58,6 +62,12 @@ public class StagedJobController {
     @Autowired
     private ValidationProcess validation;
 
+    @Autowired
+    private SecUserRepository userRepo;
+
+    @Autowired
+    private StagedJobLogRepository logRepo;
+
     @PostMapping("/upload")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity<UploadResponse> uploadFile(
@@ -65,59 +75,100 @@ public class StagedJobController {
             @RequestParam("programId") Integer programId,
             @RequestParam("file") MultipartFile file,
             Authentication authentication) {
+
         userAuditRepo.save(
                 new UserActionAudit(
                         "stage/upload",
                         "upload excel file attempt for username: " + authentication.getName()
                                 + "file: " + file.getOriginalFilename())
         );
-
-        val validationHelper = new ValidatorHelpers();
-        val validatedSheet =
-                sheetService
-                        .validatedExcelFile(
-                                file.getOriginalFilename() + "-" + System.currentTimeMillis(),
-                                file,
-                                withInvertSize);
-
-        List<ErrorInput> errors = validationHelper.toErrorList(validatedSheet);
         val programOpt = programRepo.findById(programId);
         if (!programOpt.isPresent())
             return ResponseEntity
                     .status(HttpStatus.UNPROCESSABLE_ENTITY)
                     .body(new UploadResponse(Optional.empty(),
                             Stream.of(new ErrorInput("Program Not found", "program")).collect(Collectors.toList())));
+        val user = userRepo.findByEmail(authentication.getName());
+
+        val job = StagedJob.builder()
+                .isExtendedSize(withInvertSize)
+                .source(SourceJobType.INGEST)
+                .reference(file.getOriginalFilename())
+                .status(StatusJobType.PENDING)
+                .program(programOpt.get())
+                .creator(user.get())
+                .build();
+        jobRepo.save(job);
+
+        val jobLog = StagedJobLog.builder()
+                .eventTime(new Timestamp(System.currentTimeMillis()))
+                .eventType(StagedJobEventType.UPLOADED)
+                .stagedJob(job)
+                .details(file.getOriginalFilename() + " uploaded by:" + authentication.getName())
+                .build();
+        logRepo.save(jobLog);
+
+        val validatedSheet =
+                sheetService
+                        .validatedExcelFile(
+                                file.getOriginalFilename() + "-" + job.getId(),
+                                file,
+                                withInvertSize);
 
         return validatedSheet.fold(
-                err -> ResponseEntity.unprocessableEntity().
-
-                        body(new UploadResponse(Optional.empty(), errors)),
+                err -> {
+                    job.setStatus(StatusJobType.FAILED);
+                    jobRepo.save(job);
+                    val errorLog = StagedJobLog.builder()
+                            .eventTime(new Timestamp(System.currentTimeMillis()))
+                            .eventType(StagedJobEventType.ERROR)
+                            .stagedJob(job)
+                            .details(err.stream().map(ErrorInput::getMessage).collect(Collectors.joining(";")))
+                            .build();
+                    logRepo.save(errorLog);
+                    return ResponseEntity.unprocessableEntity().
+                            body(new UploadResponse(Optional.empty(), err.stream().toList()));
+                },
                 sheet -> {
                     val stagedRowToSave = sheetService.sheets2Staged(sheet);
-                    val stagedJob = jobRepo.save(
-                            StagedJob.builder()
-                                    .isExtendedSize(withInvertSize)
-                                    .source(SourceJobType.FILE)
-                                    .reference(sheet.getFileId())
-                                    .status(StatusJobType.PENDING)
-                                    .program(programOpt.get())
-                                    .build());
+                    job.setStatus(StatusJobType.STAGED);
+                    jobRepo.save(job);
+
+                    val stagedLog = StagedJobLog.builder()
+                            .eventTime(new Timestamp(System.currentTimeMillis()))
+                            .eventType(StagedJobEventType.STAGED)
+                            .stagedJob(job)
+                            .details("Staged with " + stagedRowToSave.size() + " row(s).")
+                            .build();
+                    logRepo.save(stagedLog);
                     stagedRowRepo.saveAll(stagedRowToSave.stream().map(s -> {
-                        s.setStagedJob(stagedJob);
+                        s.setStagedJob(job);
                         return s;
-                    })
-                            .collect(Collectors.toList()));
-                    val filesResult = new FileUpload(sheet.getFileId(), stagedRowToSave.size());
+                    }).collect(Collectors.toList()));
+                    val filesResult = new FileUpload(job.getId(), stagedRowToSave.size());
                     return ResponseEntity
                             .status(HttpStatus.OK)
                             .body(new UploadResponse(Optional.of(filesResult), Collections.emptyList()));
                 });
     }
 
-    @PostMapping("/validate")
+    @PutMapping("/updates/{jobId}")
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
+    public ResponseEntity updateRow(@PathVariable Long jobId,
+                                    Authentication authentication,
+                                    @RequestBody List<StagedRow> newRows) {
+        return rowService.update(jobId, newRows).fold(err ->
+                        ResponseEntity
+                                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                                .body(err)
+                , rowUpdate -> ResponseEntity.ok().body(rowUpdate));
+    }
+
+
+    @PostMapping("/validate/{jobId}")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity validateJob(
-            @RequestParam("jobId") Long jobId,
+            @PathVariable Long jobId,
             Authentication authentication) {
 
         userAuditRepo.save(
@@ -128,20 +179,65 @@ public class StagedJobController {
         );
 
         return jobRepo.findById(jobId).map(job -> {
-            val list = validation.process(job);
-            return ResponseEntity.ok().body(new ValidationResponse(list, Collections.emptyList()));
+            val validatingLog = StagedJobLog.builder()
+                    .eventTime(new Timestamp(System.currentTimeMillis()))
+                    .eventType(StagedJobEventType.VALIDATING)
+                    .stagedJob(job)
+                    .details("requested by:" + authentication.getName())
+                    .build();
+            logRepo.save(validatingLog);
+
+            val validationResponse = validation.process(job);
+            return ResponseEntity.ok().body(validationResponse);
         }).orElseGet(() -> ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new ValidationResponse(Collections.emptyList(),
+                .body(new ValidationResponse(
+                        null,
+                        Collections.emptyList(),
+                        Collections.emptyMap(),
+                        Collections.emptyList(),
                         Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob")))));
     }
 
-    @GetMapping("/job")
+    @GetMapping("/job/{jobId}")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
-    public List<StagedRow> getJob(@RequestParam("reference") String reference) {
-        return stagedRowRepo.findRowsByReference("reference");
+    public ResponseEntity<JobResponse> getJob(@PathVariable Long jobId) {
+        val rows = stagedRowRepo.findRowsByJobId(jobId);
+        return jobRepo.findById(jobId)
+                .map(job ->
+                        ResponseEntity.ok().body(
+                                new JobResponse(
+                                        job, rows, Collections.emptyList()
+                                ))
+                ).orElseGet(() ->
+                        ResponseEntity.badRequest().body(
+                                new JobResponse(
+                                        null,
+                                        Collections.emptyList(),
+                                        Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob"))
+                                )));
+
     }
 
+    @DeleteMapping("/delete/{jobId}")
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
+    public ResponseEntity deleteJob(@PathVariable Long jobId) {
+        jobRepo.deleteById(jobId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/delete/rows/{jobId}")
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
+    public ResponseEntity deleteJobRows(@PathVariable Long jobId,
+                                        Authentication authentication,
+                                        @RequestBody List<StagedRow> toDeleRows) {
+        return rowService.delete( toDeleRows).fold(err ->
+                        ResponseEntity
+                                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                                .body(err)
+                , rowUpdate -> ResponseEntity.ok().body(rowUpdate));
+
+    }
 
 
 }

@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import org.hibernate.annotations.Cache;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -13,7 +14,10 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 
+import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
+
 @Entity
+@Cache(region = "entities", usage = READ_WRITE)
 @Data
 @Builder
 @NoArgsConstructor
@@ -84,32 +88,32 @@ public class AphiaRef {
     @Basic
     @Column(name = "rank_kingdom")
     @Schema(title = "Rank kingdom")
-    private String rankKingdom;
+    private String kingdom;
 
     @Basic
     @Column(name = "rank_phylum")
     @Schema(title = "Rank phylum")
-    private String rankPhylum;
+    private String phylum;
 
     @Basic
     @Column(name = "rank_class")
     @Schema(title = "Rank class")
-    private String rankClass;
+    private String className;
 
     @Basic
     @Column(name = "rank_order")
     @Schema(title = "Rank order")
-    private String rankOrder;
+    private String order;
 
     @Basic
     @Column(name = "rank_family")
     @Schema(title = "Rank family")
-    private String rankFamily;
+    private String family;
 
     @Basic
     @Column(name = "rank_genus")
     @Schema(title = "Rank genus")
-    private String rankGenus;
+    private String genus;
 
     @Basic
     @Column(name = "citation")

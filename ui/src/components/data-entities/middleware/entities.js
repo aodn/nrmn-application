@@ -1,24 +1,29 @@
-import {takeEvery, call, put} from "redux-saga/effects";
+import {takeEvery, call, put} from 'redux-saga/effects';
 
-import {entityEdit, entitySave, getEntity, getSelectedEntityItems} from "../../../axios/api";
-import {createAction} from "@reduxjs/toolkit";
+import {entityEdit, entitySave, entityDelete, getEntity, getSelectedEntityItems} from '../../../axios/api';
+import {createAction} from '@reduxjs/toolkit';
 import {
+  itemLoaded,
   entitiesSaved,
   entitiesError,
   entitiesLoaded,
-  itemLoaded,
-  selectedItemsLoaded,
-  selectedItemsEdited
-} from "../form-reducer";
-import {isSuccessful200Response} from "../../utils/helpers";
+  updateFormFields,
+  selectedItemEdited,
+  selectedItemsEdited,
+  selectedItemsLoaded
+} from '../form-reducer';
+import {isSuccessful200Response} from '../../utils/helpers';
 
 export default function* getEntitiesWatcher() {
   yield takeEvery(selectRequested, entities);
   yield takeEvery(itemRequested, getEntityData);
   yield takeEvery(selectedItemsRequested, getSelectedItemsData);
-  yield takeEvery(createEntityRequested, saveEntities);
-  yield takeEvery(updateEntityRequested, updateEntities);
+  yield takeEvery(createEntityRequested, saveEntity);
+  yield takeEvery(updateEntityRequested, updateEntity);
+  yield takeEvery(deleteEntityRequested, deleteEntity);
   yield takeEvery(setNestedField, setNestedFormData);
+  yield takeEvery(setField, setFieldFormData);
+  yield takeEvery(setFields, setFieldsFormData);
 }
 
 function* entities(action) {
@@ -34,9 +39,27 @@ function* entities(action) {
 
 function* setNestedFormData(action) {
   try {
-    const resp = {}
+    const resp = {};
     resp[action.payload.entity] = action.payload.newValues;
     yield put(selectedItemsEdited(resp));
+  } catch (e) {
+    yield put(entitiesError({e}));
+  }
+}
+
+function* setFieldFormData(action) {
+  try {
+    const resp = {};
+    resp[action.payload.entity] = action.payload.newValue;
+    yield put(selectedItemEdited(resp));
+  } catch (e) {
+    yield put(entitiesError({e}));
+  }
+}
+
+function* setFieldsFormData(action) {
+  try {
+    yield put(updateFormFields(action.payload.row));
   } catch (e) {
     yield put(entitiesError({e}));
   }
@@ -60,56 +83,75 @@ function* getSelectedItemsData(action) {
   }
 }
 
-function* saveEntities(action) {
+function* saveEntity(action) {
   try {
-    const href = (action.payload.data?._links?.self?.href) ?
-        action.payload.data._links.self.href :
-        action.payload.path;
     delete action.payload.data._links;
-
-    const resp = yield call(entitySave, href, action.payload.data);
-    yield put(entitiesSaved(isSuccessful200Response(resp.status)));
+    const resp = yield call(entitySave, action.payload.path, action.payload.data);
+    if (resp?.data?.errors || !isSuccessful200Response(resp.status)) {
+      yield put(entitiesError({e: {response: resp}}));
+    } else {
+      yield put(entitiesSaved(resp.data));
+    }
   } catch (e) {
     yield put(entitiesError({e}));
   }
 }
 
-function* updateEntities(action) {
+function* deleteEntity(action) {
   try {
-    const resp = yield call(entityEdit, action.payload.data._links.self.href, action.payload.data);
-    const checkStatus = (response) => isSuccessful200Response(response.status);
-    yield put(entitiesSaved(resp.every(checkStatus)));
+    const {entity, id} = action.payload;
+    yield call(entityDelete, entity.endpoint, id);
   } catch (e) {
     yield put(entitiesError({e}));
   }
 }
 
-export const selectRequested = createAction('SELECT_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
+function* updateEntity(action) {
+  try {
+    delete action.payload.data._links;
+    const resp = yield call(entityEdit, action.payload.path, action.payload.data);
+    if (resp?.data?.errors) {
+      yield put(entitiesError({e: {response: resp}}));
+    } else {
+      yield put(entitiesSaved(resp.data));
+    }
+  } catch (e) {
+    yield put(entitiesError({e}));
+  }
+}
 
-export const itemRequested = createAction('ID_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
+export const selectRequested = createAction('SELECT_REQUESTED', function (entity) {
+  return {payload: entity};
+});
 
-export const setNestedField = createAction('SELECTED_NESTED_ENTITY',
-    function (entity) {
-      return {payload: entity};
-    });
+export const itemRequested = createAction('ID_REQUESTED', function (entity) {
+  return {payload: entity};
+});
 
-export const selectedItemsRequested = createAction('SELECTED_ENTITY_ITEMS_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
+export const setField = createAction('SELECTED_ENTITY', function (entity) {
+  return {payload: entity};
+});
 
-export const createEntityRequested = createAction('CREATE_ENTITY_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
+export const setFields = createAction('SET_FIELDS', function (entity) {
+  return {payload: entity};
+});
 
-export const updateEntityRequested = createAction('UPDATE_ENTITY_REQUESTED',
-    function (entity) {
-      return {payload: entity};
-    });
+export const setNestedField = createAction('SELECTED_NESTED_ENTITY', function (entity) {
+  return {payload: entity};
+});
+
+export const selectedItemsRequested = createAction('SELECTED_ENTITY_ITEMS_REQUESTED', function (entity) {
+  return {payload: entity};
+});
+
+export const createEntityRequested = createAction('CREATE_ENTITY_REQUESTED', function (entity) {
+  return {payload: entity};
+});
+
+export const updateEntityRequested = createAction('UPDATE_ENTITY_REQUESTED', function (entity) {
+  return {payload: entity};
+});
+
+export const deleteEntityRequested = createAction('DELETE_ENTITY_REQUESTED', function (entity) {
+  return {payload: entity};
+});
