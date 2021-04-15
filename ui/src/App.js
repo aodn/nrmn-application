@@ -1,5 +1,5 @@
-import React from 'react';
-import {useSelector} from 'react-redux';
+import React, { useEffect } from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
 import clsx from 'clsx';
 import {ThemeProvider, createMuiTheme, responsiveFontSizes, makeStyles} from '@material-ui/core/styles';
@@ -28,6 +28,7 @@ import ObservableItemEditTemplate from './components/templates/ObservableItemEdi
 import SurveyViewTemplate from './components/templates/SurveyViewTemplate';
 import SurveyEditTemplate from './components/templates/SurveyEditTemplate';
 import ExtractTemplateData from './components/datasheets/ExtractTemplateData';
+import { logout } from './components/auth/auth-reducer';
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ? process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
@@ -178,8 +179,17 @@ const referenceData = [
 
 const App = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const leftSideMenuIsOpen = useSelector((state) => state.toggle.leftSideMenuIsOpen);
   const loggedIn = useSelector((state) => state.auth.success);
+  const expiresToken = useSelector((state) => state.auth.expires);
+useEffect(() => {
+  const now  = +new Date();
+  const h24 = 86400000;
+  if (expiresToken && !(now - expiresToken < h24)) {
+    dispatch(logout());
+  }
+}, [loggedIn]);
 
   let theme = createMuiTheme({
     palette: {
