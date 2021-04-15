@@ -36,19 +36,18 @@ public class ATRCSurveyGroupComplete extends BaseGlobalValidator {
                         stagedSurveyMethod.getDate(), stagedSurveyMethod.getDepth())));
         return transectsGroupedBySurveyGroup.entrySet()
                                      .stream()
-                                     .map((entry) -> validateSurveyGroup(job, entry))
+                                     .map((entry) -> validateSurveyGroup(job, entry.getKey(), entry.getValue()))
                                      .reduce(Validated.valid("survey group is complete: nothing to validate"), (acc,
                                       validator) ->
                         acc.combine(Monoids.stringConcat, validator)
                 );
     }
 
-    private Validated<StagedRowError, String> validateSurveyGroup(StagedJob job, Map.Entry<Tuple3, List<StagedSurveyTransect>> entry) {
-        val surveyNums = entry.getValue().stream()
+    private Validated<StagedRowError, String> validateSurveyGroup(StagedJob job, Tuple3 surveyGroupKey,
+     List<StagedSurveyTransect> transects) {
+        val surveyNums = transects.stream()
                               .map(StagedSurveyTransect::getSurveyNum)
                               .collect(Collectors.toList());
-
-        val surveyGroupKey = entry.getKey();
 
         if (surveyGroupComplete(surveyNums)) {
             return Validated.valid("surveyGroup " + surveyGroupKey + ": is complete");
