@@ -65,5 +65,5 @@ public class StagedRowFormatted {
 
     private Map<Integer, Integer> measureJson;
 
-    private UiSpeciesAttributes speciesAttributes;
+    private Optional<UiSpeciesAttributes> speciesAttributesOpt;
 }

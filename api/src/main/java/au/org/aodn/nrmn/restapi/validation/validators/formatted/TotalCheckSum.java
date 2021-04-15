@@ -9,6 +9,8 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.control.Validated;
 import lombok.val;
 
+import java.util.Map;
+
 public class TotalCheckSum extends BaseFormattedValidator {
     public TotalCheckSum() {
         super("Total");
@@ -17,10 +19,10 @@ public class TotalCheckSum extends BaseFormattedValidator {
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
         val checkSum = target.getMeasureJson().entrySet()
-                .stream().map(entry -> entry.getValue())
-                .reduce(0,(acc, measure) -> acc + measure);
+                .stream().map(Map.Entry::getValue)
+                .reduce(0, Integer::sum);
 
-        if (target.getTotal() == checkSum) {
+        if (target.getTotal().equals(checkSum)) {
             return Validated.valid("Checksum match Total");
         }
         return Validated.invalid(new StagedRowError(

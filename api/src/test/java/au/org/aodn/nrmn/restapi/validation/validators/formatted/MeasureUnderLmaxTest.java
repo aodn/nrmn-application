@@ -9,19 +9,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MeasureBetweenL5l95Test extends FormattedTestProvider{
-
-
+class MeasureUnderLmaxTest extends  FormattedTestProvider {
     @Test
-    public void outOfScopeShouldSuccess() {
-        val formatted = getDefaultFormatted().build();
-        val validationRule = new MeasureBetweenL5l95();
-        formatted.setMethod(3);
-        val res = validationRule.valid(formatted);
-        assertTrue(res.isValid());
-    }
-    @Test
-    public void OutOfRangeShouldFail() {
+    public void underLmaxShouldSuccess() {
         val formatted = getDefaultFormatted().build();
         val specAttribute = new UiSpeciesAttributes(){
             @Override
@@ -61,14 +51,14 @@ class MeasureBetweenL5l95Test extends FormattedTestProvider{
 
             @Override
             public Long getLmax() {
-                return null;
+                return 20L;
             }
         };
         formatted.setSpeciesAttributesOpt(Optional.of(specAttribute));
         formatted.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 1).put(4, 2).build());
         formatted.setMethod(1);
-        val validationRule = new MeasureBetweenL5l95();
+        val validationRule = new MeasureUnderLmax();
         val res = validationRule.valid(formatted);
-        assertTrue(res.isInvalid());
+        assertTrue(res.isValid());
     }
 }

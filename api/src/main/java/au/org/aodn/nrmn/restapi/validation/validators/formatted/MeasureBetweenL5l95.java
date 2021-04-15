@@ -26,11 +26,18 @@ public class MeasureBetweenL5l95  extends BaseFormattedValidator {
             return Validated.valid("not affected");
         }
 
-        val l5 = target.getSpeciesAttributes().getL5();
-        val l95 =   target.getSpeciesAttributes().getL95();
+
+        if (!target.getSpeciesAttributesOpt().isPresent()) {
+            return Validated.valid("No Species Data");
+        }
+
+
+        val speciesAttributes =  target.getSpeciesAttributesOpt().get();
+        val l5 = speciesAttributes.getL5();
+        val l95 =  speciesAttributes.getL95();
         val outOfRange = target.getMeasureJson()
                  .entrySet().stream()
-                 .filter(entry -> entry.getValue() > l5 && entry.getValue() < l95)
+                 .filter(entry -> entry.getValue() != 0 && (entry.getValue() < l5 || entry.getValue() > l95))
                  .map(Map.Entry::getKey).collect(Collectors.toList());
 
         if (outOfRange.isEmpty()){

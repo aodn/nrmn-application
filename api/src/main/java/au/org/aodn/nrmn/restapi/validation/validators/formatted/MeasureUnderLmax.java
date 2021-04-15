@@ -21,11 +21,21 @@ public class MeasureUnderLmax extends BaseFormattedValidator {
         if (!target.getRef().getStagedJob().getIsExtendedSize()) {
             return Validated.valid("not affected");
         }
-        val lmax = target.getSpeciesAttributes().getLmax();
+
+        if (!target.getSpeciesAttributesOpt().isPresent()) {
+            return Validated.valid("No Species Data");
+        }
+
+        val speciesAttributes =  target.getSpeciesAttributesOpt().get();
+        val lmax = speciesAttributes.getLmax();
         val outOfRange = target.getMeasureJson().entrySet().stream()
                 .filter(entry -> entry.getValue() > lmax)
                 .collect(Collectors.toList());
 
+
+        if (outOfRange.isEmpty()) {
+            return Validated.valid("Values under Lmax");
+        }
         val keysStr = outOfRange.stream().map(Object::toString)
                 .reduce("", (acc, value) -> acc + "|" + value);
         return Validated.invalid(

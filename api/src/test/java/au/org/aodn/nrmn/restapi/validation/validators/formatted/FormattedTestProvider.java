@@ -14,6 +14,7 @@ public  class FormattedTestProvider {
     protected StagedRowFormatted.StagedRowFormattedBuilder  getDefaultFormatted() {
         StagedRow ref = StagedRow.builder()
                 .stagedJob(StagedJob.builder()
+                        .isExtendedSize(true)
                         .program(Program.builder().programName("PROJECT")
                                 .build()).build()).build();
 
