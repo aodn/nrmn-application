@@ -1,10 +1,8 @@
 package au.org.aodn.nrmn.restapi.validation.validators.formatted;
 
-import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-
-import java.util.Optional;
+import software.amazon.awssdk.utils.ImmutableMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
