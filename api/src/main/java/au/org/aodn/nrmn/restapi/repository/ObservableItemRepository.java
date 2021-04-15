@@ -53,7 +53,7 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
 
     @Query("SELECT DISTINCT oi FROM ObservableItem oi " +
             "LEFT JOIN Observation o ON (o.observableItem = oi) " +
-            "WHERE (oi.clazz NOT IN ('Ophiuroidea', 'Polyplacophora') " +
+            "WHERE (oi.className NOT IN ('Ophiuroidea', 'Polyplacophora') " +
             "AND o.surveyMethod.method.methodId = 2 " +
             "AND o.surveyMethod.survey.site IN :sites) " +
             "OR oi.obsItemType.obsItemTypeId = 5 OR oi.obsItemType.obsItemTypeId = 6")
@@ -61,7 +61,7 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
 
     @Query("SELECT DISTINCT oi FROM ObservableItem oi " +
             "LEFT JOIN Observation o ON (o.observableItem = oi) " +
-            "WHERE (oi.clazz NOT IN ('Ophiuroidea', 'Polyplacophora') " +
+            "WHERE (oi.className NOT IN ('Ophiuroidea', 'Polyplacophora') " +
             "AND o.surveyMethod.method.methodId = 1 " +
             "AND o.surveyMethod.survey.site IN :sites) " +
             "OR oi.obsItemType.obsItemTypeId = 5 OR oi.obsItemType.obsItemTypeId = 6")
