@@ -8,6 +8,7 @@ import au.org.aodn.nrmn.restapi.validation.validators.data.ATRCMethod7BlockCheck
 import au.org.aodn.nrmn.restapi.validation.validators.format.ATRCDepthValidation;
 import au.org.aodn.nrmn.restapi.validation.validators.format.IntegerFormatValidation;
 import au.org.aodn.nrmn.restapi.validation.validators.global.ATRCMethodCheck;
+import au.org.aodn.nrmn.restapi.validation.validators.global.ATRCSurveyGroupComplete;
 import cyclops.data.Seq;
 import cyclops.data.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ public class ATRCValidators implements ValidatorProvider {
     @Autowired
     ATRCMethodCheck atrcMethodCheck;
 
+    @Autowired
+    ATRCSurveyGroupComplete atrcSurveyGroupComplete;
 
     @Override
     public Seq<Tuple2<String, BaseRowValidator>> getRowValidators() {
@@ -40,7 +43,10 @@ public class ATRCValidators implements ValidatorProvider {
 
     @Override
     public Seq<BaseGlobalValidator> getGlobalValidators() {
-        return Seq.of(atrcMethodCheck);
+        return Seq.of(
+            atrcMethodCheck,
+            atrcSurveyGroupComplete
+        );
     }
 }
 

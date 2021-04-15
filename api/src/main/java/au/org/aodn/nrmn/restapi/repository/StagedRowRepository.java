@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.repository;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.repository.model.RowMethodBlock;
 import au.org.aodn.nrmn.restapi.repository.model.StagedSurveyMethod;
+import au.org.aodn.nrmn.restapi.repository.model.StagedSurveyTransect;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -31,6 +32,12 @@ public interface StagedRowRepository extends JpaRepository<StagedRow, Long>, Jpa
             "WHERE r.stagedJob.id = :id " +
             "GROUP BY r.siteCode, r.date, r.depth, r.method ")
     List<StagedSurveyMethod> getStagedSurveyMethods(@Param("id") Long id);
+
+    @Query("SELECT NEW au.org.aodn.nrmn.restapi.repository.model.StagedSurveyTransect(r.siteCode, r.date, r.depth) " +
+            "FROM StagedRow r " +
+            "WHERE r.stagedJob.id = :id " +
+            "GROUP BY r.siteCode, r.date, r.depth")
+    List<StagedSurveyTransect> getStagedSurveyTransects(@Param("id") Long id);
 
     @Query("delete from StagedRow r where r.id in (:ids)")
     void deleteAllByIds(@Param("ids") List<Long> ids);
