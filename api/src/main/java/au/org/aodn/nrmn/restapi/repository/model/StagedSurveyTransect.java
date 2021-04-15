@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.repository;
+package au.org.aodn.nrmn.restapi.repository.model;
 
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
