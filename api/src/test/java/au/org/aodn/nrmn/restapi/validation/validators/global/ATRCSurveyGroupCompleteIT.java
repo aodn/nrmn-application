@@ -61,7 +61,7 @@ class ATRCSurveyGroupCompleteIT {
 
 
     @Test
-    void groupWithIncompleteSurveyNumsShouldSucceed() {
+    void groupWithIncompleteSurveyNumsShouldFail() {
         val job = jobRepo.findByReference("jobid-atrc").get();
         val date = "11/09/2020";
         val siteNo = "ERZ1";
