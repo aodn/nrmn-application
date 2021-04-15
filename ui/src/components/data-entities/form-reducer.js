@@ -78,7 +78,7 @@ const formSlice = createSlice({
     },
     searchFailed: (state, action) => {
       state.loading = false;
-      state.errors = action.payload;
+      state.searchError = action.payload.message;
     },
     searchFound: (state, action) => {
       if (action.payload?.length > 0)
