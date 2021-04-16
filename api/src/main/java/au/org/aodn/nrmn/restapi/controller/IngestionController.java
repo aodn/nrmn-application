@@ -58,7 +58,7 @@ public class IngestionController {
         }
 
         StagedJob job = optionalJob.get();
-        if(job.getStatus() != StatusJobType.PENDING) {
+        if(job.getStatus() != StatusJobType.STAGED) {
             return ResponseEntity.badRequest().body("Job with given id has not been validated: " + jobId);
         }
 

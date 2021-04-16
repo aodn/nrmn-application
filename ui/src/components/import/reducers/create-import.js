@@ -119,6 +119,7 @@ const importSlice = createSlice({
         state.errorsByMsg = action.payload.summaries;
       } else {
         state.enableSubmit = true;
+        state.errorsByMsg = [];
       }
       state.validationLoading = false;
     },

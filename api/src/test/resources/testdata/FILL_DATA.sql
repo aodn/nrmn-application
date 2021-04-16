@@ -81,7 +81,7 @@ INSERT INTO nrmn.staged_job (id,
                              program_id,
                              sec_user_id,
                              is_extended_size)
-VALUES (119, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP , 'jobid-atrc', 'INGEST', 'PENDING', 56,123456, false);
+VALUES (119, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP , 'jobid-atrc', 'INGEST', 'STAGED', 56,123456, false);
 
 INSERT INTO nrmn.staged_job (id,
                              created,
@@ -92,7 +92,7 @@ INSERT INTO nrmn.staged_job (id,
                              program_id,
                              sec_user_id,
                              is_extended_size)
-VALUES (120, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP , 'jobid-unvalidated', 'INGEST', 'STAGED', 56,123456, false);
+VALUES (120, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP , 'jobid-unvalidated', 'INGEST', 'PENDING', 56,123456, false);
 
 
 INSERT INTO  nrmn.aphia_ref (
