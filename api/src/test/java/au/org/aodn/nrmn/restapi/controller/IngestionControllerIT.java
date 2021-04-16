@@ -55,7 +55,7 @@ class IngestionControllerIT {
 
         ResponseEntity<SecUser> response = reqBuilder
                 .withUri(_createUrl("/api/ingestion/ingest/109"))
-                .withMethod(HttpMethod.GET)
+                .withMethod(HttpMethod.POST)
                 .withToken(token)
                 .build(testRestTemplate);
 
@@ -80,7 +80,7 @@ class IngestionControllerIT {
 
         ResponseEntity<SecUser> response = reqBuilder
                 .withUri(_createUrl("/api/ingestion/ingest/120"))
-                .withMethod(HttpMethod.GET)
+                .withMethod(HttpMethod.POST)
                 .withToken(token)
                 .build(testRestTemplate);
 
