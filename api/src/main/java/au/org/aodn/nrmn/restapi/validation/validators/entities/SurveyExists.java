@@ -33,9 +33,16 @@ public class SurveyExists extends BaseFormattedValidator {
         List<Survey> existingSurveys = surveyRepository.findBySiteDepthSurveyNumDate(
                 target.getSite(), target.getDepth(), target.getSurveyNum().orElse(null),
                 toDate(target));
-        return existingSurveys.isEmpty() ?
-                Validated.valid("New survey") :
-                invalid(target, "Survey already exists", DATA, BLOCKING);
+                
+        if (existingSurveys.isEmpty()) {
+            Validated.valid("New survey");
+        }
+        
+        Survey existingSurvey = existingSurveys.stream().findFirst().get();
+
+        return invalid(target, "Survey " + existingSurvey.getSurveyId() + " already includes [" +
+                        target.getSite().getSiteCode() + ", " + target.getDate() + ", " + target.getDepth() + "]",
+                DATA, BLOCKING);
     }
 
     private Date toDate(StagedRowFormatted target) {
