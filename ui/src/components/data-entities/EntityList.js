@@ -17,7 +17,7 @@ import {selectRequested, deleteEntityRequested} from './middleware/entities';
 import {resetState} from './form-reducer';
 
 let agGridApi = {};
-let agGridColumnApi = {};
+let agGridColumnApi = null;
 
 const getCellFilter = (format) => {
   const filterTypes = {
@@ -43,12 +43,22 @@ const EntityList = (props) => {
   const dispatch = useDispatch();
   const entities = useSelector((state) => state.form.entities);
   const errors = useSelector((state) => state.form.errors);
-  let items = entities?._embedded ? entities?._embedded[props.entity.list.key] : entities;
 
   useEffect(() => {
     dispatch(resetState());
     dispatch(selectRequested(props.entity.list.endpoint));
   }, [props.entity.name]);
+
+  let items = entities?._embedded ? entities?._embedded[props.entity.list.key] : entities;
+  useEffect(() => {
+    if (agGridColumnApi) {
+      let allColumnIds = [];
+      agGridColumnApi.getAllColumns().forEach(function (column) {
+        if (props.entity.flexField !== column.colId && column.colId !== '0') allColumnIds.push(column.colId);
+      });
+      agGridColumnApi.autoSizeColumns(allColumnIds, false);
+    }
+  }, [items]);
 
   const schematoColDef = (schema, entity) => {
     const fields = entity.list.headers ?? Object.keys(schema.properties);
@@ -74,7 +84,7 @@ const EntityList = (props) => {
       field: '',
       filter: null,
       suppressMovable: true,
-      minWidth: 60 * scale,
+      width: Math.max(60 * scale, 100),
       // eslint-disable-next-line react/display-name
       cellRendererFramework: function (cell) {
         return (
@@ -125,14 +135,6 @@ const EntityList = (props) => {
     agGridColumnApi = agGrid.columnApi;
     Object.freeze(agGridApi);
     agGridApi.showLoadingOverlay();
-  };
-
-  const autoSizeAll = () => {
-    let allColumnIds = [];
-    agGridColumnApi.getAllColumns().forEach(function (column) {
-      if (props.entity.flexField !== column.colId) allColumnIds.push(column.colId);
-    });
-    agGridColumnApi.autoSizeColumns(allColumnIds, false);
   };
 
   const [dialogState, setDialogState] = useState({open: false});
@@ -204,7 +206,6 @@ const EntityList = (props) => {
           animateRows={true}
           rowData={items}
           onGridReady={agGridReady}
-          onFirstDataRendered={autoSizeAll}
           onCellClicked={(e) => {
             onRowClick(e, history, props.entity);
           }}
