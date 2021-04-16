@@ -29,7 +29,7 @@ public class RLSValidators implements ValidatorProvider {
     public Seq<BaseFormattedValidator> getFormattedValidators() {
         return Seq.of(
                 new TooOldFutureDate("2006-01-01"),
-                new SpeciesInvertSizing(),
+           //     new SpeciesInvertSizing(),
                 new DebrisZeroObs());
     }
     @Override

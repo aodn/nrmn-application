@@ -35,7 +35,10 @@ public class FormattedValidation extends ValidatorHelpers {
 
     private Seq<BaseFormattedValidator> getCommonValidators() {
         //TODO Add comon formatted validtors
-        return Seq.of(new SpeciesNotFound(), new MeasureBetweenL5l95(), new MeasureUnderLmax(), new SpeciesNotSuperseeded());
+        return Seq.of(new SpeciesNotFound(),
+               // new MeasureBetweenL5l95(),
+              //  new MeasureUnderLmax(),
+                new SpeciesNotSuperseeded());
     }
 
     private Seq<BaseFormattedValidator> getValidators(StagedJob job) {
