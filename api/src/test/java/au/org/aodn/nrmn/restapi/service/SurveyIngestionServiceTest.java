@@ -64,7 +64,7 @@ public class SurveyIngestionServiceTest {
                 .species(ObservableItem.builder().observableItemName("THE SPECIES").build())
                 .site(Site.builder().siteCode("A SITE").build())
                 .depth(1)
-                .surveyNum(2)
+                .surveyNum(Optional.of(2))
                 .direction(Directions.N)
                 .vis(Optional.of(15))
                 .date(LocalDate.of(2003, 03, 03))
@@ -174,7 +174,7 @@ public class SurveyIngestionServiceTest {
         StagedRowFormatted row = rowBuilder.build();
         StagedRowFormatted rowWithDifferentDepth = rowBuilder
                 .depth(5)
-                .surveyNum(3)
+                .surveyNum(Optional.of(3))
                 .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 10).put(3, 11).build())
                 .build();
 

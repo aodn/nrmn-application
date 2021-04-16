@@ -2,7 +2,7 @@ import React from 'react';
 import {PropTypes} from 'prop-types';
 import {Box, Divider, Grid} from '@material-ui/core';
 
-const ObservableItemEditTemplate = ({properties, title}) => {
+const ObservableItemEditTemplate = ({properties}) => {
   const el = {};
   properties.map((e) => {
     el[e.name] = e.content;
@@ -10,8 +10,7 @@ const ObservableItemEditTemplate = ({properties, title}) => {
 
   return (
     <>
-      <Box component="div" width={600}>
-        <h1>{title}</h1>
+      <Box component="div">
         <Box pt={2} pb={2}>
           <Grid container spacing={2}>
             <Grid item xs={6}>

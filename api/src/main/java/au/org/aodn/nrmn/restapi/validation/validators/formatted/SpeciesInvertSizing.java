@@ -16,11 +16,18 @@ public class SpeciesInvertSizing extends BaseFormattedValidator {
 
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
-        val isInverted = target.getSpeciesAttributes().getIsInvertSized();
+
 
         if (!target.getRef().getStagedJob().getIsExtendedSize()) {
             return Validated.valid("Not affected");
         }
+        if (!target.getSpeciesAttributesOpt().isPresent()) {
+            return Validated.valid("No Species Data");
+        }
+
+        val speciesAttributes =  target.getSpeciesAttributesOpt().get();
+
+        val isInverted = speciesAttributes.getIsInvertSized();
 
         if (isInverted == target.getIsInvertSizing()) {
             return Validated.valid("IsInvertSizing valid");

@@ -65,7 +65,9 @@ export const user = (params) => {
 
 export const apiDefinition = () => axiosInstance.get('/v3/api-docs').then((res) => res);
 
-export const getEntity = (entity) => axiosInstance.get('/api/' + entity).then((res) => res);
+export const getResult = (entity) => axiosInstance.get('/api/' + entity);
+
+export const getEntity = (entity) => getResult(entity).then((res) => res);
 
 export const getFullJob = (id) => {
   const jobReq = axiosInstance.get('/api/stagedJobs/' + id);
@@ -188,4 +190,8 @@ export const search = (params) => {
     })
     .then((res) => res)
     .catch((err) => err);
+};
+
+export const templateZip = (params) => {
+  return axiosInstance.get(`/api/template/template.zip?${params}`, {responseType: 'blob'});
 };

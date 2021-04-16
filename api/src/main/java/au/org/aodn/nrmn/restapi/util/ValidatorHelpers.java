@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class ValidatorHelpers {
-    public<T> Validated<ErrorInput, String> uniqValid(Optional<T> optionalValue , String fieldName) {
+    public static <T> Validated<ErrorInput, String> uniqValid(Optional<T> optionalValue , String fieldName) {
         Validated<ErrorInput, String>  valid = Validated.valid(fieldName +" is valid");
         Validated<ErrorInput, String>  invalid =  Validated.invalid(
                         new ErrorInput(fieldName  + " already exists", fieldName)
@@ -22,14 +22,16 @@ public class ValidatorHelpers {
                 .map(value -> invalid)
                 .orElse(valid);
     }
-  public <E,T> List<E> toErrorList(Validated<E, T>  validator) {
+
+    public static <E,T> List<E> toErrorList(Validated<E, T>  validator) {
         return  validator.bimap(Seq::of, Function.identity()).foldInvalidLeft(Monoids.seqConcat()).toList();
     }
 
 
-    public List<ErrorInput> reducetoErrrors(Validated<ErrorInput, String>  ...validators){
+    public static <E> List<E> reducetoErrrors(Validated<E, String>  ...validators){
        val combineValidator = Arrays.stream(validators).reduce((acc, validator) ->
                     acc.combine( Semigroups.stringJoin(". "), validator)).orElse(Validated.valid("no validators"));
        return toErrorList(combineValidator);
     }
+
 }

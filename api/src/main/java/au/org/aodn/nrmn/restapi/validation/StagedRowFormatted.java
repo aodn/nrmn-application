@@ -31,7 +31,7 @@ public class StagedRowFormatted {
 
     private Integer depth;
 
-    private  Integer surveyNum;
+    private Optional<Integer> surveyNum;
 
     private Integer method;
 
@@ -65,5 +65,5 @@ public class StagedRowFormatted {
 
     private Map<Integer, Integer> measureJson;
 
-    private UiSpeciesAttributes speciesAttributes;
+    private Optional<UiSpeciesAttributes> speciesAttributesOpt;
 }

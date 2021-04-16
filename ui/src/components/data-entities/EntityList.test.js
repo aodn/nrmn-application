@@ -45,7 +45,7 @@ const testEntity = {
   can: {},
   list: {
     schemaKey: 'TestEntity',
-    name: 'tests!!',
+    name: 'TestEntities',
     route: '/reference/tests',
     endpoint: 'tests'
   }
@@ -92,7 +92,7 @@ describe('EntityList Component', () => {
         route: testEntity.list.route
       }
     );
-    await findByText('TestEntity');
+    await findByText('TestEntities');
   });
 
   test('Test EntityList.js New Entity button exists', async () => {
@@ -104,6 +104,6 @@ describe('EntityList Component', () => {
         route: testEntity.list.route
       }
     );
-    await findByText('TestEntity');
+    await findByText('TestEntities');
   });
 });
