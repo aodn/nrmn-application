@@ -94,15 +94,6 @@ export const flatten = (row) => {
   return row;
 };
 
-const mergeErrors = (errors) => {
-  if (errors && errors.length > 0)
-    return errors
-      .map((err) => err.errors | [])
-      .reduce((acc, err) => {
-        return acc.concat(err);
-      }, []);
-  return [];
-};
 
 const importSlice = createSlice({
   name: 'import',
@@ -122,9 +113,9 @@ const importSlice = createSlice({
           acc[err.id] = err.errors;
           return acc;
         }, {});
-
-        const validationErrors = mergeErrors(action.payload.errors);
-        state.enableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
+       const errorsList =  action.payload.errors.map(err =>err.errors);
+        const validationErrors = errorsList.reduce((acc,err) => [...acc, ...err], []);
+        state.enableSubmit = validationErrors.filter((err) => err.errorLevel === 'BLOCKING').length === 0;
         state.errorsByMsg = action.payload.summaries;
       } else {
         state.enableSubmit = true;
