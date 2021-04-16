@@ -115,7 +115,7 @@ const importSlice = createSlice({
         }, {});
        const errorsList =  action.payload.errors.map(err =>err.errors);
         const validationErrors = errorsList.reduce((acc,err) => [...acc, ...err], []);
-        state.enableSubmit = validationErrors.filter((err) => err.errorLevel === 'BLOCKING').length === 0;
+        state.enableSubmit = validationErrors.some((err) => err.errorLevel === 'BLOCKING') === 0;
         state.errorsByMsg = action.payload.summaries;
       } else {
         state.enableSubmit = true;
