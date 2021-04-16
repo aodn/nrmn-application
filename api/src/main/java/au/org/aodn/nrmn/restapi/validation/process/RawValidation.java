@@ -150,7 +150,7 @@ public class RawValidation extends ValidatorHelpers {
 //                .stream()
 //                .findFirst()
 
-        val speciesAttributes = Optional.<UiSpeciesAttributes>empty();
+        val mayBeSpeciesAttributes = Optional.<UiSpeciesAttributes>empty();
 
         val code = (String) values.get("Code").orElseGet(null);
 
