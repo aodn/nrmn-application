@@ -40,7 +40,7 @@ public class SurveyExists extends BaseFormattedValidator {
         
         Survey existingSurvey = existingSurveys.stream().findFirst().get();
 
-        return invalid(target, "Survey " + existingSurvey.getSurveyId() + " already includes [" +
+        return invalid(target, "Survey " + existingSurvey.getSurveyId() + " includes [" +
                         target.getSite().getSiteCode() + ", " + target.getDate() + ", " + target.getDepth() + "]",
                 DATA, BLOCKING);
     }
