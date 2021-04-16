@@ -35,7 +35,7 @@ public class SurveyExists extends BaseFormattedValidator {
                 toDate(target));
                 
         if (existingSurveys.isEmpty()) {
-            Validated.valid("New survey");
+            return Validated.valid("New survey");
         }
         
         Survey existingSurvey = existingSurveys.stream().findFirst().get();
