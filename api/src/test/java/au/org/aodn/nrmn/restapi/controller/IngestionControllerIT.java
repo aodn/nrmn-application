@@ -87,7 +87,7 @@ class IngestionControllerIT {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 
         StagedJob job = stagedJobRepository.findById(120L).get();
-        assertEquals(StatusJobType.STAGED, job.getStatus());
+        assertEquals(StatusJobType.PENDING, job.getStatus());
 
         assertEquals(initialObservationCount, observationRepository.count());
     }
