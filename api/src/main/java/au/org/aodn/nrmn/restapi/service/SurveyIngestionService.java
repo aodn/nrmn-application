@@ -50,7 +50,7 @@ public class SurveyIngestionService {
         val survey = Survey.builder()
                 .depth(stagedRow.getDepth())
                 .surveyNum(stagedRow.getSurveyNum().orElse(null))
-                .site(stagedRow.getSite())
+                .site(Site.builder().siteCode(stagedRow.getSite().getSiteCode()).build())
                 .surveyDate(Date.valueOf(stagedRow.getDate()))
                 .build();
 
