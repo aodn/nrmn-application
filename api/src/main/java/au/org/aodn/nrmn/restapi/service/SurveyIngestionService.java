@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.service;
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.repository.*;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,13 +47,15 @@ public class SurveyIngestionService {
     }
 
     public Survey getSurvey(StagedRowFormatted stagedRow) {
-
-        Optional<Survey> existingSurvey = surveyRepository.findOne(Example.of(Survey.builder()
+        val survey = Survey.builder()
                 .depth(stagedRow.getDepth())
                 .surveyNum(stagedRow.getSurveyNum())
                 .site(stagedRow.getSite())
                 .surveyDate(Date.valueOf(stagedRow.getDate()))
-                .build()));
+                .build();
+
+        Optional<Survey> existingSurvey = surveyRepository.findAll(Example.of(survey)).stream()
+                .findFirst();
 
         return existingSurvey.orElseGet(() -> surveyRepository.save(Survey.builder()
                 .depth(stagedRow.getDepth())
