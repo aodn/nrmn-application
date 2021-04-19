@@ -62,8 +62,8 @@ public class IngestionController {
             return ResponseEntity.badRequest().body("Job with given id has not been validated: " + jobId);
         }
 
-        job.setStatus(StatusJobType.INGESTING);
-        jobRepository.save(job);
+//        job.setStatus(StatusJobType.INGESTING);
+//        jobRepository.save(job);
 
         try {
             stagedJobLogRepository.save(StagedJobLog.builder()
@@ -82,8 +82,6 @@ public class IngestionController {
                     .eventType(StagedJobEventType.INGESTED)
                     .build());
         } catch (Exception e) {
-            job.setStatus(StatusJobType.FAILED);
-            jobRepository.save(job);
             stagedJobLogRepository.save(StagedJobLog.builder()
                     .stagedJob(job)
                     .details(e.getMessage())
