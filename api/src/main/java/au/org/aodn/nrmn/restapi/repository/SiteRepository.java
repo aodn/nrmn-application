@@ -27,7 +27,16 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
     List<Site> findByCriteria(@Param("code") String siteCode);
 
     @Query(nativeQuery = true, value = "SELECT site_code FROM {h-schema}ep_site_list WHERE province = ?1")
-    Collection<String> findSiteCodesByProvince(String province);
+    List<String> findSiteCodesByProvince(String province);
+
+    @Query(value = "SELECT DISTINCT siteCode FROM Site where siteCode is not null ORDER BY siteCode")
+    List<String> findAllSiteCodes();
+
+    @Query(value = "SELECT DISTINCT state FROM Site WHERE state is not null ORDER BY state")
+    List<String> findAllSiteStates();
+
+    @Query(nativeQuery = true, value = "SELECT DISTINCT province FROM {h-schema}ep_site_list where province is not null ORDER BY province")
+    List<String> findAllSiteProvinces();
 
     <T> Optional<T> findBySiteId(Integer id, Class<T> type);
 }

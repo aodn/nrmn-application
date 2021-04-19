@@ -3,15 +3,14 @@ import {Box} from '@material-ui/core';
 import React from 'react';
 import {PropTypes} from 'prop-types';
 
-const LocationTemplate = ({properties, title}) => {
+const LocationTemplate = ({properties}) => {
   const el = {};
   properties.map((e) => {
     el[e.name] = e.content;
   });
 
   return (
-    <Box width={400} spacing={2} flexDirection="column">
-      <h1>{title}</h1>
+    <Box spacing={2} flexDirection="column">
       {el['locationName']}
       {el['isActive']}
     </Box>

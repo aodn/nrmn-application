@@ -138,7 +138,7 @@ CREATE TABLE nrmn.survey_aud (
     pq_catalogued boolean,
     pq_catalogued_mod boolean,
     pq_diver_id integer,
-    pq_diver_mod boolean,
+    pq_diver_id_mod boolean,
     project_title varchar(255),
     project_title_mod boolean,
     protection_status varchar(255),

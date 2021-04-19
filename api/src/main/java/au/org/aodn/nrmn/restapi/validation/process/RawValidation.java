@@ -10,9 +10,9 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
 import au.org.aodn.nrmn.restapi.validation.provider.ATRCValidators;
 import au.org.aodn.nrmn.restapi.validation.provider.RLSValidators;
-import au.org.aodn.nrmn.restapi.validation.validators.entities.ObservableItemExists;
 import au.org.aodn.nrmn.restapi.validation.validators.data.DirectionDataCheck;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.DiverExists;
+import au.org.aodn.nrmn.restapi.validation.validators.entities.ObservableItemExists;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.SiteCodeExists;
 import au.org.aodn.nrmn.restapi.validation.validators.format.*;
 import au.org.aodn.nrmn.restapi.validation.validators.passThu.PassThruRef;
@@ -28,7 +28,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -73,8 +76,6 @@ public class RawValidation extends ValidatorHelpers {
                         Tuple2.of("Diver", new DiverExists(StagedRow::getDiver, "Diver", diverRepo, ValidationLevel.BLOCKING)),
                         Tuple2.of("Buddy", new DiverExists(StagedRow::getBuddy, "Buddy", diverRepo, ValidationLevel.WARNING)),
                         Tuple2.of("P-Qs", new DiverExists(StagedRow::getPqs, "P-Qs", diverRepo, ValidationLevel.BLOCKING)),
-                        Tuple2.of("Depth", new DoubleFormatValidation(StagedRow::getDepth, "Depth")),
-                        Tuple2.of("Method", new IntegerFormatValidation(StagedRow::getMethod, "Method", Arrays.asList(0, 1, 2, 3, 4, 5, 7, 10))),
                         Tuple2.of("Block", new IntegerFormatValidation(StagedRow::getBlock, "Block", Arrays.asList(0, 1, 2, 10))),
                         Tuple2.of("Code", new PassThruString(StagedRow::getCode, "Code")),
                         Tuple2.of("Species", observableItemExists),
@@ -131,7 +132,10 @@ public class RawValidation extends ValidatorHelpers {
 
         val splitDepth = values.get("Depth").orElseGet(null).toString().split("\\.");
         val depth = Integer.parseInt(splitDepth[0]);
-        val survey_num = Integer.parseInt(splitDepth[1]);
+
+        Optional<Integer> survey_num = splitDepth.length == 1
+                ? Optional.empty()
+                : Optional.of(Integer.parseInt(splitDepth[1]));
 
         val method = (Integer) values.get("Method").orElseGet(null);
         val block = (Integer) values.get("Block").orElseGet(null);

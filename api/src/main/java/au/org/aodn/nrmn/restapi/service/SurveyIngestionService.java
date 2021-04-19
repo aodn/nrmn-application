@@ -49,7 +49,7 @@ public class SurveyIngestionService {
     public Survey getSurvey(StagedRowFormatted stagedRow) {
         val survey = Survey.builder()
                 .depth(stagedRow.getDepth())
-                .surveyNum(stagedRow.getSurveyNum())
+                .surveyNum(stagedRow.getSurveyNum().orElse(null))
                 .site(stagedRow.getSite())
                 .surveyDate(Date.valueOf(stagedRow.getDate()))
                 .build();
@@ -59,7 +59,7 @@ public class SurveyIngestionService {
 
         return existingSurvey.orElseGet(() -> surveyRepository.save(Survey.builder()
                 .depth(stagedRow.getDepth())
-                .surveyNum(stagedRow.getSurveyNum())
+                .surveyNum(stagedRow.getSurveyNum().orElse(null))
                 .direction(stagedRow.getDirection().toString())
                 .site(stagedRow.getSite())
                 .surveyDate(Date.valueOf(stagedRow.getDate()))

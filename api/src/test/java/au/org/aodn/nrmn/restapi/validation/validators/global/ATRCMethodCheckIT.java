@@ -115,12 +115,14 @@ class ATRCMethodCheckIT {
         m1b1.setSiteCode(siteNo);
         m1b1.setStagedJob(job);
 
+        val m1b1d10 = (StagedRow) SerializationUtils.clone(m1b1);
+        m1b1d10.setDepth("10");
         val m1b1d8 = (StagedRow) SerializationUtils.clone(m1b1);
         m1b1d8.setDepth("8");
         val m2b1d8 = (StagedRow) SerializationUtils.clone(m1b1d8);
         m1b1d8.setMethod("2");
         stagedRowRepo.deleteAll();
-        stagedRowRepo.saveAll(Arrays.asList(m1b1, m1b1d8, m2b1d8));
+        stagedRowRepo.saveAll(Arrays.asList(m1b1, m1b1d10, m1b1d8, m2b1d8));
 
         val res = atrcMethodCheck.valid(job);
 

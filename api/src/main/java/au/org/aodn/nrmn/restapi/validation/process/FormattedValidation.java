@@ -1,18 +1,18 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
+import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.model.MonoidRowValidation;
 import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
 import au.org.aodn.nrmn.restapi.validation.provider.ValidatorProvider;
+import au.org.aodn.nrmn.restapi.validation.validators.entities.SurveyExists;
 import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import cyclops.data.Seq;
 
-import cyclops.data.tuple.Tuple2;
 import lombok.val;
 
 import org.springframework.beans.factory.BeanFactory;
@@ -20,21 +20,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class FormattedValidation extends ValidatorHelpers {
     private final BeanFactory beanFactory;
+    private SurveyRepository surveyRepository;
 
     @Autowired
-    public FormattedValidation(BeanFactory beanFactory) {
+    public FormattedValidation(BeanFactory beanFactory, SurveyRepository surveyRepository) {
         this.beanFactory = beanFactory;
-
+        this.surveyRepository = surveyRepository;
     }
 
     private Seq<BaseFormattedValidator> getCommonValidators() {
-        //TODO Add comon formatted validtors
-        return Seq.empty();
+        return Seq.of(
+            new SurveyExists(surveyRepository)
+        );
     }
 
     private Seq<BaseFormattedValidator> getValidators(StagedJob job) {

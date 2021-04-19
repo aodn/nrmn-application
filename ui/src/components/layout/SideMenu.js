@@ -61,11 +61,17 @@ const SideMenu = (props) => {
       <List>
         <ListSubheader>DATA</ListSubheader>
         <List component="div" disablePadding>
-          <ListItem button onClick={handleMainMenu} component={NavLink} aweirdprop="true" to="/jobs">
+          <ListItem button onClick={handleMainMenu} component={NavLink} to="/data/surveys">
+            <ListItemText primary="List Surveys" />
+          </ListItem>
+          <ListItem button onClick={handleMainMenu} component={NavLink} to="/jobs">
             <ListItemText primary="List Jobs" />
           </ListItem>
           <ListItem button onClick={handleMainMenu} component={NavLink} to="/upload">
             <ListItemText primary="Add Job" />
+          </ListItem>
+          <ListItem button onClick={handleMainMenu} component={NavLink} to="/data/extract">
+            <ListItemText primary="Template Data" />
           </ListItem>
         </List>
       </List>
@@ -73,8 +79,8 @@ const SideMenu = (props) => {
       <List>
         <ListSubheader>REFERENCE DATA</ListSubheader>
         {props.entities.map((e) => (
-          <ListItem button onClick={handleMainMenu} key={e.name} component={NavLink} to={e.list.route}>
-            <ListItemText primary={e.name} />
+          <ListItem button onClick={handleMainMenu} key={e.list.name} component={NavLink} to={e.list.route}>
+            <ListItemText primary={e.list.name} />
           </ListItem>
         ))}
       </List>
