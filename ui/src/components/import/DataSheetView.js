@@ -20,6 +20,7 @@ import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import PlaylistAddCheckOutlinedIcon from '@material-ui/icons/PlaylistAddCheckOutlined';
 import SaveOutlinedIcon from '@material-ui/icons/SaveOutlined';
 import moment from 'moment';
+import Alert from '@material-ui/lab/Alert';
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -49,6 +50,8 @@ const DataSheetView = () => {
   const job = useSelector((state) => state.import.job);
   const colDefinition = job && job.isExtendedSize ? ColumnDef.concat(ExtendedSize) : ColumnDef;
   const enableSubmit = useSelector((state) => state.import.enableSubmit);
+  const errors = useSelector((state) => state.import.errors);
+
   const [indexAdd, setIndexAdd] = useState({});
   const [indexDelete, setIndexDelete] = useState({});
 
@@ -70,7 +73,7 @@ const DataSheetView = () => {
   };
 
   const handleSave = () => {
-    var toSave =  Object.values(indexAdd);
+    var toSave = Object.values(indexAdd);
     if (toSave.length > 0) {
       dispatch(RowUpdateRequested({jobId: job.id, rows: toSave}));
     }
@@ -104,6 +107,17 @@ const DataSheetView = () => {
       }
     });
   };
+
+  const errorAlert =
+    errors && errors.length > 0 ? (
+      <Alert severity="error" variant="filled">
+        {errors.map((item, key) => {
+          return <div key={key}>{item}</div>;
+        })}
+      </Alert>
+    ) : (
+      ''
+    );
 
   const getContextMenuItems = (params) => {
     return [
@@ -219,6 +233,7 @@ const DataSheetView = () => {
   const size = useWindowSize();
   return (
     <Box mt={2}>
+      {errorAlert}
       {job && job.status == 'STAGED' && (
         <ButtonGroup spacing={2} size="small" variant="text" aria-label="small outlined button group">
           <Fab className={classes.fab} onClick={handleSave} disabled={!canSaved} variant="extended" size="small" color="primary">
