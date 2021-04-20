@@ -54,8 +54,7 @@ public class SurveyIngestionService {
                 .surveyDate(Date.valueOf(stagedRow.getDate()))
                 .build();
 
-        Optional<Survey> existingSurvey = surveyRepository.findAll(Example.of(survey)).stream()
-                .findFirst();
+        Optional<Survey> existingSurvey = surveyRepository.findOne(Example.of(survey));
 
         return existingSurvey.orElseGet(() -> surveyRepository.save(Survey.builder()
                 .depth(stagedRow.getDepth())
