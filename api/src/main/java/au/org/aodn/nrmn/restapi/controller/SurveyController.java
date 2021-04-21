@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.controller;
 
 import au.org.aodn.nrmn.restapi.repository.projections.SurveyRow;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
+import au.org.aodn.nrmn.restapi.dto.survey.SurveyFilterDto;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,10 +30,13 @@ public class SurveyController {
     private ModelMapper mapper;
 
     @GetMapping(path = "/surveys")
-    public ResponseEntity<List<SurveyRow>> list() {
-        return ResponseEntity.ok(surveyRepository.findAllProjectedBy().stream().collect(Collectors.toList()));
+    public ResponseEntity<List<SurveyRow>> listMatching(SurveyFilterDto surveyFilter) {
+        if(surveyFilter.isSet())
+            return ResponseEntity.ok(surveyRepository.findByCriteria(surveyFilter).stream().collect(Collectors.toList()));
+        else
+            return ResponseEntity.ok(surveyRepository.findAllProjectedBy().stream().collect(Collectors.toList()));
     }
-
+    
     @GetMapping("/survey/{id}")
     public ResponseEntity<SurveyDto> findOne(@PathVariable Integer id) {
         return surveyRepository.findById(id).map(survey -> 
