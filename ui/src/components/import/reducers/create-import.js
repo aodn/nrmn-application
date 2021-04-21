@@ -108,6 +108,7 @@ const importSlice = createSlice({
       state.errSelected = action.payload;
     },
     validationReady: (state, action) => {
+      state.errors = [];
       if (action.payload.errors.length > 0) {
         state.validationErrors = action.payload.errors.reduce((acc, err) => {
           acc[err.id] = err.errors;
@@ -139,6 +140,7 @@ const importSlice = createSlice({
     EditRowFinished: (state) => {
       state.editLoading = false;
       state.indexChanged = {};
+      state.errors = [];
     },
     JobRequested: (state) => {
       state.isLoading = true;

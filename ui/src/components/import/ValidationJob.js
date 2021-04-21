@@ -29,7 +29,7 @@ const ValidationJob = () => {
   }, []);
 
   if (ingestSuccess) {
-    return <Redirect to="/"></Redirect>;
+    return <Redirect to={'/jobs/' + jobId + '/view'} ></Redirect>;
   }
   const jobReady = job && Object.keys(job).length > 0;
   return jobReady ? (

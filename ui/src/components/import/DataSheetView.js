@@ -110,11 +110,13 @@ const DataSheetView = () => {
 
   const errorAlert =
     errors && errors.length > 0 ? (
-      <Alert severity="error" variant="filled">
-        {errors.map((item, key) => {
-          return <div key={key}>{item}</div>;
-        })}
-      </Alert>
+      <Box mb={2}>
+        <Alert severity="error" variant="filled">
+          {errors.map((item, key) => {
+            return <div key={key}>{item}</div>;
+          })}
+        </Alert>
+      </Box>
     ) : (
       ''
     );

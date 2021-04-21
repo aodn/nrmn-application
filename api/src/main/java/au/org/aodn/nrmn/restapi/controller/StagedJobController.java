@@ -179,14 +179,6 @@ public class StagedJobController {
         );
 
         return jobRepo.findById(jobId).map(job -> {
-            val validatingLog = StagedJobLog.builder()
-                    .eventTime(new Timestamp(System.currentTimeMillis()))
-                    .eventType(StagedJobEventType.VALIDATING)
-                    .stagedJob(job)
-                    .details("requested by:" + authentication.getName())
-                    .build();
-            logRepo.save(validatingLog);
-
             val validationResponse = validation.process(job);
             return ResponseEntity.ok().body(validationResponse);
         }).orElseGet(() -> ResponseEntity
