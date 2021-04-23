@@ -19,7 +19,7 @@ const GridFindReplace = ({gridApi, onRowsChanged, onSelectionChanged}) => {
   const [undoStack, setUndoStack] = useState([]);
   const [searchString, setSearchString] = useState('');
   const [replaceString, setReplaceString] = useState('');
-  const [matchCase, setMatchCase] = useState(false);
+  const [matchCase, setMatchCase] = useState(true);
   const [status, setStatus] = useState('');
   const undoBtnEl = useRef(null);
 
