@@ -96,15 +96,6 @@ export const flatten = (row) => {
   return row;
 };
 
-const mergeErrors = (errors) => {
-  if (errors && errors.length > 0)
-    return errors
-      .map((err) => err.errors | [])
-      .reduce((acc, err) => {
-        return acc.concat(err);
-      }, []);
-  return [];
-};
 
 const importSlice = createSlice({
   name: 'import',
@@ -125,9 +116,9 @@ const importSlice = createSlice({
           acc[err.id] = err.errors;
           return acc;
         }, {});
-
-        const validationErrors = mergeErrors(action.payload.errors);
-        state.enableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
+       const errorsList =  action.payload.errors.map(err =>err.errors);
+        const validationErrors = errorsList.reduce((acc,err) => [...acc, ...err], []);
+        state.enableSubmit = validationErrors.some((err) => err.errorLevel === 'BLOCKING') === 0;
         state.errorsByMsg = action.payload.summaries;
       } else if (action.payload.errorGlobal) {
         state.globalWarnings = action.payload.errorGlobal.filter((e) => e.errorLevel === 'WARNING');
@@ -135,6 +126,7 @@ const importSlice = createSlice({
         state.enableSubmit = state.globalErrors.length === 0;
       } else {
         state.enableSubmit = true;
+        state.errorsByMsg = [];
       }
       state.validationLoading = false;
     },
@@ -154,6 +146,7 @@ const importSlice = createSlice({
     EditRowFinished: (state) => {
       state.editLoading = false;
       state.indexChanged = {};
+      state.errors = [];
     },
     JobRequested: (state) => {
       state.isLoading = true;

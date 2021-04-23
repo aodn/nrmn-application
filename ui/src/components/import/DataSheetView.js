@@ -3,6 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {AgGridReact} from 'ag-grid-react';
 import {AllModules} from 'ag-grid-enterprise';
 import moment from 'moment';
+import Alert from '@material-ui/lab/Alert';
 import {Box, Fab, makeStyles, Dialog, TextField, DialogTitle, DialogActions, DialogContent, Button} from '@material-ui/core';
 import {
   CloudUpload as CloudUploadIcon,
@@ -19,12 +20,10 @@ import {
   RowDeleteRequested,
   ValidationFinished
 } from './reducers/create-import';
-import {ColumnDef, ExtendedSize} from './ColumnDef';
-import Alert from '@material-ui/lab/Alert';
 import useWindowSize from '../utils/useWindowSize';
 import {getDataJob} from '../../axios/api';
-
 import GridFindReplace from '../search/GridFindReplace';
+import {ColumnDef, ExtendedSize} from './ColumnDef';
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -58,6 +57,8 @@ const DataSheetView = () => {
   const job = useSelector((state) => state.import.job);
   const colDefinition = job && job.isExtendedSize ? ColumnDef.concat(ExtendedSize) : ColumnDef;
   const enableSubmit = useSelector((state) => state.import.enableSubmit);
+  const errors = useSelector((state) => state.import.errors);
+
   const [indexAdd, setIndexAdd] = useState({});
   const [indexDelete, setIndexDelete] = useState({});
 
@@ -121,6 +122,19 @@ const DataSheetView = () => {
       }
     });
   };
+
+  const errorAlert =
+    errors && errors.length > 0 ? (
+      <Box mb={2}>
+        <Alert severity="error" variant="filled">
+          {errors.map((item, key) => {
+            return <div key={key}>{item}</div>;
+          })}
+        </Alert>
+      </Box>
+    ) : (
+      ''
+    );
 
   const getContextMenuItems = (params) => {
     return [
@@ -237,6 +251,7 @@ const DataSheetView = () => {
   const size = useWindowSize();
   return (
     <Box mt={2}>
+      {errorAlert}
       {job && job.status == 'STAGED' && (
         <>
           <Box spacing={2} mb={3} size="small" variant="text" aria-label="small outlined button group">

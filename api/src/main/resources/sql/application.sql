@@ -1,3 +1,4 @@
+
 CREATE TABLE nrmn.diver_ref_aud (
     diver_id integer NOT NULL,
     rev integer NOT NULL,
@@ -189,6 +190,7 @@ CREATE TABLE nrmn.staged_job (
     reference varchar(255),
     source varchar(255),
     status varchar(255),
+    survey_ids integer[],
     program_id integer NOT NULL,
     sec_user_id bigint NOT NULL,
     CONSTRAINT staged_job_pkey PRIMARY KEY (id)
@@ -366,4 +368,3 @@ CREATE SEQUENCE IF NOT EXISTS nrmn.staged_job_id_seq;
 CREATE SEQUENCE IF NOT EXISTS nrmn.staged_job_log_id_seq;
 
 CREATE SEQUENCE IF NOT EXISTS nrmn.user_id_seq;
-

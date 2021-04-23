@@ -176,7 +176,11 @@ export const submitJobFile = (params) => {
 };
 
 export const submitingest = (jobId) => {
-  return axiosInstance.post('/api/ingestion/ingest/' + jobId).then((res) => res);
+  return axiosInstance.post('/api/ingestion/ingest/' + jobId, {}, {
+    validateStatus: () => true
+  })
+   .then((response) => ({response}))
+   .catch((err) => ({err}));
 };
 
 export const search = (params) => {
@@ -185,7 +189,7 @@ export const search = (params) => {
     .get(url, {
       validateStatus: () => true
     })
-    .then((res) => res);
+    .then((response) => response);
 };
 
 export const templateZip = (params) => {

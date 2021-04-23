@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -83,5 +84,11 @@ public class StagedJob implements Serializable {
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "stagedJob", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StagedRow> rows;
+
+
+    @Basic
+    @Column(name = "survey_ids", columnDefinition = "integer[]")
+    @Type(type = "list-array")
+    private List<Integer> surveyIds;
 
 }
