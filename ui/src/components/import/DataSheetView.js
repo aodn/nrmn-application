@@ -1,8 +1,15 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {AgGridReact} from 'ag-grid-react';
 import {AllModules} from 'ag-grid-enterprise';
-import {useEffect} from 'react';
+import moment from 'moment';
+import {Box, Fab, makeStyles, Dialog, TextField, DialogTitle, DialogActions, DialogContent, Button} from '@material-ui/core';
+import {
+  CloudUpload as CloudUploadIcon,
+  FindReplace as FindReplaceIcon,
+  SaveOutlined as SaveOutlinedIcon,
+  PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon
+} from '@material-ui/icons/';
 import {
   exportRow,
   JobFinished,
@@ -13,14 +20,11 @@ import {
   ValidationFinished
 } from './reducers/create-import';
 import {ColumnDef, ExtendedSize} from './ColumnDef';
-import {Box, ButtonGroup, Fab, makeStyles, Dialog, TextField, DialogTitle, DialogActions, DialogContent, Button} from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import useWindowSize from '../utils/useWindowSize';
 import {getDataJob} from '../../axios/api';
-import CloudUploadIcon from '@material-ui/icons/CloudUpload';
-import PlaylistAddCheckOutlinedIcon from '@material-ui/icons/PlaylistAddCheckOutlined';
-import SaveOutlinedIcon from '@material-ui/icons/SaveOutlined';
-import moment from 'moment';
+
+import GridFindReplace from '../search/GridFindReplace';
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -32,6 +36,10 @@ const useStyles = makeStyles((theme) => {
     },
     hide: {
       display: 'none'
+    },
+    fabFlat: {
+      marginRight: theme.spacing(2),
+      boxShadow: 'none'
     },
     extendedIcon: {
       marginRight: theme.spacing(1)
@@ -53,10 +61,12 @@ const DataSheetView = () => {
   const [indexAdd, setIndexAdd] = useState({});
   const [indexDelete, setIndexDelete] = useState({});
 
-  const [canSaved, setCanSaved] = useState(false);
+  const [canSave, setCanSave] = useState(false);
+  const [showFindReplace, setShowFindReplace] = useState(false);
   const [addDialog, setAddDialog] = useState({open: false, rowIndex: -1, number: 1, lastId: 0});
 
   const validationErrors = useSelector((state) => state.import.validationErrors);
+  const [selectedCells, setSelectedCells] = useState([]);
   const globalErrors = useSelector((state) => state.import.globalErrors);
   const globalWarnings = useSelector((state) => state.import.globalWarnings);
 
@@ -73,6 +83,10 @@ const DataSheetView = () => {
   };
 
   const handleSave = () => {
+    gridApi.forEachNode((node) => {
+      node.data.selected = [];
+    });
+    setSelectedCells(true);
     var toSave = Object.values(indexAdd);
     if (toSave.length > 0) {
       dispatch(RowUpdateRequested({jobId: job.id, rows: toSave}));
@@ -81,7 +95,7 @@ const DataSheetView = () => {
     if (toDelete.length > 0) {
       dispatch(RowDeleteRequested({jobId: job.id, rows: toDelete}));
     }
-    setCanSaved(false);
+    setCanSave(false);
   };
 
   const agGridReady = (params) => {
@@ -126,7 +140,7 @@ const DataSheetView = () => {
           });
 
           setIndexDelete({...indexDelete, ...deleteRows});
-          setCanSaved(true);
+          setCanSave(true);
           params.api.applyTransaction({remove: selectedRows});
         },
         cssClasses: ['redBoldFont']
@@ -145,7 +159,7 @@ const DataSheetView = () => {
     const rowPosUpdated = getAllRows()
       .filter((row) => row.pos >= addDialog.rowIndex)
       .map((row) => {
-        toUpdate[row.id] = {...row, pos: row.pos + addDialog.number};
+        toUpdate[row.id] = {...row, selected: [], pos: row.pos + addDialog.number};
         return toUpdate[row.id];
       });
     const newLines = [];
@@ -188,7 +202,7 @@ const DataSheetView = () => {
     let toAdd = {};
     toAdd[evt.data.id] = evt.data;
     setIndexAdd({...indexAdd, ...toAdd});
-    setCanSaved(true);
+    setCanSave(true);
   };
 
   const getAllRows = () => {
@@ -198,12 +212,13 @@ const DataSheetView = () => {
   };
 
   useEffect(() => {
-    if (gridApi && Object.keys(validationErrors).length > 0) {
+    if (gridApi && (Object.keys(validationErrors).length > 0 || selectedCells)) {
       const updatedRows = getAllRows().map((row) => {
         return {...row, errors: validationErrors[row.id] || []};
       });
       gridApi.setRowData(updatedRows);
       dispatch(ValidationFinished());
+      setSelectedCells(false);
     }
 
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
@@ -218,41 +233,70 @@ const DataSheetView = () => {
         return row;
       });
     }
-  });
+  }, [validationErrors, selectedCells]);
   const size = useWindowSize();
   return (
     <Box mt={2}>
       {job && job.status == 'STAGED' && (
-        <ButtonGroup spacing={2} size="small" variant="text" aria-label="small outlined button group">
-          <Fab className={classes.fab} onClick={handleSave} disabled={!canSaved} variant="extended" size="small" color="primary">
-            <SaveOutlinedIcon className={classes.extendedIcon} />
-            Save
-          </Fab>
-          <Fab
-            className={classes.fab}
-            variant="extended"
-            disabled={canSaved}
-            onClick={() => handleValidate()}
-            size="small"
-            label="Validate"
-            color="secondary"
-          >
-            <PlaylistAddCheckOutlinedIcon className={classes.extendedIcon} />
-            Validate
-          </Fab>
-          <Fab
-            className={classes.fab}
-            variant="extended"
-            size="small"
-            onClick={handleSubmit}
-            label="Submit"
-            disabled={!enableSubmit}
-            color="primary"
-          >
-            <CloudUploadIcon className={classes.extendedIcon} />
-            Submit
-          </Fab>
-        </ButtonGroup>
+        <>
+          <Box spacing={2} mb={3} size="small" variant="text" aria-label="small outlined button group">
+            <Fab
+              className={showFindReplace ? classes.fabFlat : classes.fab}
+              onClick={() => setShowFindReplace(!showFindReplace)}
+              variant="extended"
+              size="small"
+              color="primary"
+            >
+              <FindReplaceIcon className={classes.extendedIcon} />
+              Find & Replace
+            </Fab>
+            <Fab
+              className={classes.fab}
+              onClick={handleSave}
+              disabled={canSave ? false : true}
+              variant="extended"
+              size="small"
+              color="primary"
+            >
+              <SaveOutlinedIcon className={classes.extendedIcon} />
+              Save
+            </Fab>
+            <Fab
+              className={classes.fab}
+              variant="extended"
+              disabled={canSave ? true : false}
+              onClick={() => handleValidate()}
+              size="small"
+              label="Validate"
+              color="secondary"
+            >
+              <PlaylistAddCheckOutlinedIcon className={classes.extendedIcon} />
+              Validate
+            </Fab>
+            <Fab
+              className={classes.fab}
+              variant="extended"
+              size="small"
+              onClick={handleSubmit}
+              label="Submit"
+              disabled={!enableSubmit}
+              color="primary"
+            >
+              <CloudUploadIcon className={classes.extendedIcon} />
+              Submit
+            </Fab>
+          </Box>
+          {showFindReplace && (
+            <GridFindReplace
+              gridApi={gridApi}
+              onSelectionChanged={() => setSelectedCells(true)}
+              onRowsChanged={(toAdd) => {
+                setIndexAdd({...indexAdd, ...toAdd});
+                setCanSave(true);
+              }}
+            />
+          )}
+        </>
       )}
       {globalErrors.length > 0 && (
         <Box mt={1}>
