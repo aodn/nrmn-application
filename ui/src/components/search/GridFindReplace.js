@@ -63,7 +63,7 @@ const GridFindReplace = ({gridApi, onRowsChanged, onSelectionChanged}) => {
         let didUpdate = false;
         if (stringCompare(node.data[p], searchString) >= 0) {
           node.data.undo.push({key: p, data: node.data[p], ts: ts});
-          node.data.selected.push(p);
+          node.data.selected?.splice(node.data.selected.indexOf(p), 1);
           const value = node.data[p];
           const idx = stringCompare(value, searchString);
           if (idx >= 0) {
@@ -123,7 +123,7 @@ const GridFindReplace = ({gridApi, onRowsChanged, onSelectionChanged}) => {
         </Grid>
         <Grid item xs={2}>
           <Button className={classes.button} variant="contained" startIcon={<SearchIcon />} onClick={find} color="primary">
-            Find
+            Find All
           </Button>
         </Grid>
         <Grid item xs={5} className={classes.checkbox}>
@@ -144,7 +144,7 @@ const GridFindReplace = ({gridApi, onRowsChanged, onSelectionChanged}) => {
         </Grid>
         <Grid item xs={2}>
           <Button className={classes.button} variant="contained" startIcon={<FindReplaceIcon />} onClick={replace} color="primary">
-            Replace
+            Replace All
           </Button>
         </Grid>
         <Grid item xs={2}>
