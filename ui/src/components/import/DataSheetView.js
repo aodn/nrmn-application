@@ -14,7 +14,6 @@ import {
 } from './reducers/create-import';
 import {ColumnDef, ExtendedSize} from './ColumnDef';
 import {Box, ButtonGroup, Fab, makeStyles, Dialog, TextField, DialogTitle, DialogActions, DialogContent, Button} from '@material-ui/core';
-import Alert from '@material-ui/lab/Alert';
 import useWindowSize from '../utils/useWindowSize';
 import {getDataJob} from '../../axios/api';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
