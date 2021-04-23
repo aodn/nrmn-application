@@ -50,7 +50,7 @@ public class MeasureBetweenL5l95  extends BaseFormattedValidator {
                 new StagedRowError(
                         new ErrorID(target.getId(),
                                 target.getRef().getStagedJob().getId(),
-                                target.getRef().getSpecies() + " is superseeded"),
+                                "Measure for " + target.getRef().getSpecies() + " outside the L5/L95 bounds [" + l5 + "/" + l95 + "]"),
                         ValidationCategory.DATA,
                         ValidationLevel.WARNING,
                         columnTarget + ":" + keysStr,
