@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class DebrisZeroObsTest extends  FormattedTestProvider {
 
     @Test
-    public void debrisWithNoValueShouldbeOK() {
+    public void debrisWithNoValueShouldBeOK() {
         val formatted = getDefaultFormatted().build();
         val validationRule = new DebrisZeroObs();
         formatted.setCode("dez");
@@ -28,7 +28,8 @@ class DebrisZeroObsTest extends  FormattedTestProvider {
         assertTrue(res.isValid());
     }
 
-    public void deBrisWith0ValueShouldbeOK() {
+    @Test
+    public void debrisWith0ValueShouldBeOK() {
         val formatted = getDefaultFormatted().build();
         val validationRule = new DebrisZeroObs();
         formatted.setCode("dez");
@@ -37,11 +38,11 @@ class DebrisZeroObsTest extends  FormattedTestProvider {
         formatted.setInverts(0);
         formatted.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 0).build());
         val res = validationRule.valid(formatted);
-        assertTrue(res.isInvalid());
+        assertTrue(res.isValid());
     }
 
     @Test
-    public void NoDebris0ShouldbeOK() {
+    public void NoDebris0ShouldBeOK() {
         val formatted = getDefaultFormatted().build();
         val validationRule = new DebrisZeroObs();
         formatted.setCode("123");
