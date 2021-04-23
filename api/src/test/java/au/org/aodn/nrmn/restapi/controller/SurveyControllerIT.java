@@ -33,26 +33,21 @@ public class SurveyControllerIT {
 
     @Autowired
     private SurveyTestData surveyTestData;
-    private String NON_EXISTENT_SURVEY = "123123123";
+    private String NON_EXISTENT_SURVEY_ID = "123123123";
+    // private String NON_EXISTENT_SITE_ID = "123123123";
+    // private String queryPreamble = "surveys?startDate=2004-01-01T18:35:24.00Z&endDate=2005-01-01T18:35:24.00Z";
 
     @Autowired
     private JwtToken jwtToken;
 
-    RequestSpecification allSurveysSpec, getSurveySpec;
+    RequestSpecification getDataSpec;
 
     @BeforeEach
     public void setup() {
-        allSurveysSpec = new RequestSpecBuilder()
-                .setBaseUri(String.format("http://localhost:%s", port))
-                .setBasePath("/api/data/surveys")
-                .setContentType("application/json")
-                .addFilter(new ResponseLoggingFilter())
-                .addFilter(new RequestLoggingFilter())
-                .build();
 
-        getSurveySpec = new RequestSpecBuilder()
+        getDataSpec = new RequestSpecBuilder()
             .setBaseUri(String.format("http://localhost:%s", port))
-            .setBasePath("/api/data/survey/")
+            .setBasePath("/api/data/")
             .setContentType("application/json")
             .addFilter(new ResponseLoggingFilter())
             .addFilter(new RequestLoggingFilter())
@@ -66,10 +61,10 @@ public class SurveyControllerIT {
         val testSurvey = surveyTestData.persistedSurvey();
 
         given()
-                .spec(allSurveysSpec)
+                .spec(getDataSpec)
                 .auth()
                 .oauth2(jwtToken.get())
-                .get()
+                .get("surveys")
                 .then()
                 .assertThat()
                 .statusCode(200)
@@ -82,10 +77,10 @@ public class SurveyControllerIT {
 
         val testSurvey = surveyTestData.persistedSurvey();
 
-        given().spec(getSurveySpec)
+        given().spec(getDataSpec)
                .auth()
                .oauth2(jwtToken.get())
-               .get(testSurvey.getSurveyId().toString())
+               .get("survey/" + testSurvey.getSurveyId().toString())
                .then()
                .assertThat()
                .statusCode(200)
@@ -98,14 +93,55 @@ public class SurveyControllerIT {
 
         val testSurvey = surveyTestData.persistedSurvey();
 
-        assertFalse(testSurvey.getSurveyId().toString().equals(NON_EXISTENT_SURVEY));
+        assertFalse(testSurvey.getSurveyId().toString().equals(NON_EXISTENT_SURVEY_ID));
 
-        given().spec(getSurveySpec)
+        given().spec(getDataSpec)
                .auth()
                .oauth2(jwtToken.get())
-               .get(NON_EXISTENT_SURVEY)
+               .get("survey/" + NON_EXISTENT_SURVEY_ID)
                .then()
                .assertThat()
                .statusCode(404);
     }
+
+    // Tests are commented due to the use of ep_site_list
+
+    // @Test
+    // @WithUserDetails("test@gmail.com")
+    // public void testFilterSurveys() {
+
+    //     val testSurvey = surveyTestData.persistedSurvey();
+
+    //     given().spec(getDataSpec)
+    //            .auth()
+    //            .oauth2(jwtToken.get())
+    //            .get("surveys?surveyId=" + testSurvey.getSurveyId())
+    //            .then()
+    //            .assertThat()
+    //            .body("[0].surveyId", equalTo(testSurvey.getSurveyId()));
+    // }
+
+    // @Test
+    // @WithUserDetails("test@gmail.com")
+    // public void testFilterSurveysForSite() {
+
+    //     val testSurvey = surveyTestData.persistedSurvey();
+    //     val siteId = testSurvey.getSite().getSiteId();
+
+    //     given().spec(getDataSpec)
+    //            .auth()
+    //            .oauth2(jwtToken.get())
+    //            .get(queryPreamble + "&siteId=" + siteId)
+    //            .then()
+    //            .assertThat()
+    //            .body("[0].surveyId", equalTo(testSurvey.getSurveyId()));
+
+    //     given().spec(getDataSpec)
+    //            .auth()
+    //            .oauth2(jwtToken.get())
+    //            .get(queryPreamble + "&siteId=" + NON_EXISTENT_SITE_ID)
+    //            .then()
+    //            .assertThat()
+    //            .body("size()", equalTo(0));
+    // }
 }
