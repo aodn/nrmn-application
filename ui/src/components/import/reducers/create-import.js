@@ -16,8 +16,6 @@ const importState = {
   validationErrors: {},
   errorsByMsg: [],
   errSelected: [],
-  globalErrors: [],
-  globalWarnings: [],
   jobId: '',
   job: {}
 };
@@ -77,13 +75,13 @@ export const exportRow = (row) => {
 export const importRow = (row) => {
   var measure = {};
   Object.getOwnPropertyNames(row || {})
-    .filter((key) => !isNaN(parseFloat(key)))
-    .forEach((numKey) => {
-      var pos = measureKey.indexOf(numKey);
+  .filter(key => !isNaN(parseFloat(key)))
+  .forEach((numKey) => {
+    var pos = measureKey.indexOf(numKey);
       measure[pos] = row[numKey];
       delete row[numKey];
-    });
-  row.measureJson = measure;
+  });
+  row.measureJson =  measure;
   return row;
 };
 
@@ -119,7 +117,6 @@ const importSlice = createSlice({
       state.errSelected = action.payload;
     },
     validationReady: (state, action) => {
-      state.globalWarnings = state.globalErrors = [];
       if (action.payload.errors.length > 0) {
         state.validationErrors = action.payload.errors.reduce((acc, err) => {
           acc[err.id] = err.errors;
@@ -129,18 +126,14 @@ const importSlice = createSlice({
         const validationErrors = mergeErrors(action.payload.errors);
         state.enableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
         state.errorsByMsg = action.payload.summaries;
-      } else if (action.payload.errorGlobal) {
-        state.globalWarnings = action.payload.errorGlobal.filter((e) => e.errorLevel === 'WARNING');
-        state.globalErrors = action.payload.errorGlobal.filter((e) => e.errorLevel === 'BLOCKING');
-        state.enableSubmit = state.globalErrors.length === 0;
       } else {
         state.enableSubmit = true;
       }
       state.validationLoading = false;
     },
     AddRowIndex: (state, action) => {
-      state.indexChanged[action.payload.id] = action.payload.row;
-      state.enableSubmit = false;
+        state.indexChanged[action.payload.id] = action.payload.row;
+        state.enableSubmit = false;
     },
     RowDeleteRequested: (state) => {
       state.deleteLoading = true;
