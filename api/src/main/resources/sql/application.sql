@@ -190,6 +190,7 @@ CREATE TABLE nrmn.staged_job (
     reference varchar(255),
     source varchar(255),
     status varchar(255),
+    survey_ids integer[],
     program_id integer NOT NULL,
     sec_user_id bigint NOT NULL,
     CONSTRAINT staged_job_pkey PRIMARY KEY (id)

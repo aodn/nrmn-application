@@ -20,7 +20,6 @@ export default function* Watcher() {
   yield takeEvery(RowUpdateRequested, update);
   yield takeEvery(SubmitingestRequested, submit);
   yield takeEvery(RowDeleteRequested, deleteRows);
-
 }
 
 function* loadJob(action) {
@@ -52,10 +51,14 @@ function* update(action) {
 
 function* submit(action) {
   try {
-    const payload = yield call(submitingest, action.payload);
-    yield put(ingestFinished(payload.data));
+    const {response} = yield call(submitingest, action.payload);
+    if (response.data.error) {
+      yield put(jobFailed([response.data.error]));
+    } else {
+      yield put(ingestFinished(response.data));
+    }
   } catch (error) {
-    yield put(jobFailed(error));
+    yield put(jobFailed([error]));
   }
 }
 

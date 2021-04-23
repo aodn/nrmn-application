@@ -42,18 +42,19 @@ public class SurveyIngestionService {
     @Autowired
     EntityManager entityManager;
 
-    public void ingestStagedRow(StagedRowFormatted stagedRow) {
-        observationRepository.saveAll(getObservations(stagedRow));
+    public List<Observation> ingestStagedRow(StagedRowFormatted stagedRow) {
+      return  observationRepository.saveAll(getObservations(stagedRow));
     }
 
     public Survey getSurvey(StagedRowFormatted stagedRow) {
-
-        Optional<Survey> existingSurvey = surveyRepository.findOne(Example.of(Survey.builder()
+        val survey = Survey.builder()
                 .depth(stagedRow.getDepth())
                 .surveyNum(stagedRow.getSurveyNum().orElse(null))
-                .site(stagedRow.getSite())
+                .site(Site.builder().siteCode(stagedRow.getSite().getSiteCode()).build())
                 .surveyDate(Date.valueOf(stagedRow.getDate()))
-                .build()));
+                .build();
+
+        Optional<Survey> existingSurvey = surveyRepository.findOne(Example.of(survey));
 
         return existingSurvey.orElseGet(() -> surveyRepository.save(Survey.builder()
                 .depth(stagedRow.getDepth())
@@ -82,6 +83,7 @@ public class SurveyIngestionService {
 
     public List<Observation> getObservations(StagedRowFormatted stagedRow) {
         SurveyMethod surveyMethod = surveyMethodRepository.save(getSurveyMethod(stagedRow));
+        surveyMethod.getSurvey().getSurveyId();
         Diver diver = stagedRow.getDiver();
         Map<Integer, Integer> measures = stagedRow.getMeasureJson();
 
@@ -100,6 +102,8 @@ public class SurveyIngestionService {
                             .measureValue(m.getValue())
                             .build();
                 }).collect(Collectors.toList());
+
+        observations.stream().map(obs -> obs.getSurveyMethod().getSurvey());
         return observations;
     }
 

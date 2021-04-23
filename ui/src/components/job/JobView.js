@@ -19,9 +19,14 @@ import EditIcon from '@material-ui/icons/Edit';
 import BackupIcon from '@material-ui/icons/Backup';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import {Link} from 'react-router-dom';
+
 const useStyles = makeStyles((theme) => ({
   paper: {
     padding: '6px 16px'
+  },
+  title: {
+    overflowWrap: 'break-word'
   },
   secondaryTail: {
     backgroundColor: theme.palette.secondary.main
@@ -85,9 +90,9 @@ const JobView = () => {
       {!isLoading && job && (
         <Grid container>
           <Grid item sm={12} md={12} lg={4}>
-            <Paper  style={{padding: 15}}>
+            <Paper style={{padding: 15}}>
               <Grid item lg={10} md={10}>
-                <Typography variant="h5" color="primary">
+                <Typography className={classes.title} variant="h5" color="primary">
                   {job.reference}
                 </Typography>
               </Grid>
@@ -121,6 +126,15 @@ const JobView = () => {
                     Created by: {job.creator.email} at {job.created}{' '}
                   </Typography>
                 </Grid>
+                {job.surveyIds &&
+                  job.surveyIds.length > 0 &&
+                  job.surveyIds.map((id) => (
+                    <Grid key={id} item>
+                      <Link to={'/data/survey/' + id} variant="a">
+                       survey {id}
+                      </Link>
+                    </Grid>
+                  ))}
               </Grid>
             </Paper>
           </Grid>
@@ -139,7 +153,7 @@ const JobView = () => {
                       <TimelineConnector />
                     </TimelineSeparator>
                     <TimelineContent>
-                      <Paper  className={classes.paper}>
+                      <Paper className={classes.paper}>
                         <Typography variant="h6" component="h1">
                           {log.eventType}
                         </Typography>
