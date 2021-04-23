@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.service;
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.repository.*;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +93,7 @@ public class SurveyIngestionService {
 
         List<Observation> observations = measures.entrySet().stream().map(m -> {
                     int measureId = METHOD_ID_TO_MEASURE_ID_MAP.get(stagedRow.getMethod());
-                    Measure measure = getMeasure(m.getKey(), measureId).get();
+                    Measure measure = getMeasure(m.getKey(), measureId).get() ;
 
                     return baseObservationBuilder
                             .measure(measure)
@@ -109,7 +110,7 @@ public class SurveyIngestionService {
                 .seqNo(sequenceNumber)
                 .measureType(measureType)
                 .build());
-
-        return measureRepository.findOne(exampleMeasure);
+        val list =  measureRepository.findAll(exampleMeasure);
+        return list.stream().findFirst();
     }
 }

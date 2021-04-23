@@ -1,3 +1,4 @@
+
 CREATE TABLE nrmn.diver_ref_aud (
     diver_id integer NOT NULL,
     rev integer NOT NULL,
@@ -366,4 +367,3 @@ CREATE SEQUENCE IF NOT EXISTS nrmn.staged_job_id_seq;
 CREATE SEQUENCE IF NOT EXISTS nrmn.staged_job_log_id_seq;
 
 CREATE SEQUENCE IF NOT EXISTS nrmn.user_id_seq;
-

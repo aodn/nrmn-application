@@ -176,7 +176,10 @@ export const submitJobFile = (params) => {
 };
 
 export const submitingest = (jobId) => {
-  return axiosInstance.post('/api/ingestion/ingest/' + jobId).then((res) => res);
+  return axiosInstance
+    .get('/api/ingestion/ingest/' + jobId)
+    .then((res) => res)
+    .catch((err) => ({err}));
 };
 
 export const search = (params) => {
