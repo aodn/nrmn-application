@@ -95,7 +95,7 @@ public class SurveyIngestionService {
 
         List<Observation> observations = measures.entrySet().stream().map(m -> {
                     int measureId = METHOD_ID_TO_MEASURE_ID_MAP.get(stagedRow.getMethod());
-                    Measure measure = getMeasure(m.getKey(), measureId).get();
+                    Measure measure = getMeasure(m.getKey(), measureId).get() ;
 
                     return baseObservationBuilder
                             .measure(measure)
@@ -114,7 +114,7 @@ public class SurveyIngestionService {
                 .seqNo(sequenceNumber)
                 .measureType(measureType)
                 .build());
-
-        return measureRepository.findOne(exampleMeasure);
+        val list =  measureRepository.findAll(exampleMeasure);
+        return list.stream().findFirst();
     }
 }
