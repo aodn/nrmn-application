@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
+import {PropTypes} from 'prop-types';
+import {useHotkeys} from 'react-hotkeys-hook';
 import {Search as SearchIcon, FindReplace as FindReplaceIcon, Undo as UndoIcon} from '@material-ui/icons/';
 import {Box, Button, Checkbox, FormControlLabel, Grid, makeStyles, Paper, TextField} from '@material-ui/core';
-import {PropTypes} from 'prop-types';
 
 const useStyles = makeStyles(() => {
   return {
@@ -14,12 +15,21 @@ const useStyles = makeStyles(() => {
 
 const GridFindReplace = ({gridApi, onRowsChanged, onSelectionChanged}) => {
   const classes = useStyles();
-
-  const [sheetUndoStack, setSheetUndoStack] = useState([]);
+  const [doUndo, setDoUndo] = useState(false);
+  const [undoStack, setUndoStack] = useState([]);
   const [searchString, setSearchString] = useState('');
   const [replaceString, setReplaceString] = useState('');
   const [matchCase, setMatchCase] = useState(false);
   const [status, setStatus] = useState('');
+  const undoBtnEl = useRef(null);
+
+  useEffect(() => {
+    if (doUndo) {
+      setDoUndo(false);
+      undo();
+      undoBtnEl.current.focus();
+    }
+  }, [doUndo]);
 
   const stringCompare = (source, target) => {
     if (typeof source !== 'string' || typeof target !== 'string' || source.length === 0 || target.length === 0) return -1;
@@ -61,7 +71,7 @@ const GridFindReplace = ({gridApi, onRowsChanged, onSelectionChanged}) => {
             const prefix = value.substr(0, idx);
             const suffix = value.substr(idx + searchString.length);
             node.data[p] = prefix + replaceString + suffix;
-            setSheetUndoStack([...sheetUndoStack, ts]);
+            setUndoStack([...undoStack, ts]);
           }
         }
         if (didUpdate) {
@@ -77,8 +87,8 @@ const GridFindReplace = ({gridApi, onRowsChanged, onSelectionChanged}) => {
 
   const undo = () => {
     let updatedNodes = [];
-    const undoId = sheetUndoStack.pop();
-    setSheetUndoStack([...sheetUndoStack]);
+    const undoId = undoStack.pop();
+    setUndoStack([...undoStack]);
     gridApi.forEachNode((node) => {
       const rowUndos = node.data.undo ? [...node.data.undo] : [];
       let didUpdate = false;
@@ -100,6 +110,10 @@ const GridFindReplace = ({gridApi, onRowsChanged, onSelectionChanged}) => {
     if (onRowsChanged) onRowsChanged(updatedNodes);
     setStatus('');
   };
+
+  useHotkeys('ctrl+z', () => {
+    setDoUndo(true);
+  });
 
   return (
     <Paper pl={4}>
@@ -135,8 +149,9 @@ const GridFindReplace = ({gridApi, onRowsChanged, onSelectionChanged}) => {
         </Grid>
         <Grid item xs={2}>
           <Button
+            ref={undoBtnEl}
             className={classes.button}
-            disabled={sheetUndoStack.length === 0}
+            disabled={undoStack.length === 0}
             variant="contained"
             startIcon={<UndoIcon />}
             onClick={undo}
