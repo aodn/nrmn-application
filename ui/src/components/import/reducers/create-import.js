@@ -110,9 +110,7 @@ const importSlice = createSlice({
       state.errSelected = action.payload;
     },
     validationReady: (state, action) => {
-      
       state.globalWarnings = state.globalErrors = [];
-      
       if (action.payload.errors.length > 0) {
         state.validationErrors = action.payload.errors.reduce((acc, err) => {
           acc[err.id] = err.errors;
