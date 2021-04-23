@@ -6,9 +6,8 @@ import useWindowSize from '../utils/useWindowSize';
 import {jobsRequested, DeleteJobRequested, ResetState} from './jobReducer';
 import LinkCell from '../data-entities/customWidgetFields/LinkCell';
 import {NavLink} from 'react-router-dom';
-import CloudUploadOutlinedIcon from '@material-ui/icons/CloudUploadOutlined';
+import {CloudUploadOutlined, Delete} from '@material-ui/icons';
 import {Backdrop} from '@material-ui/core';
-import DeleteForeverOutlinedIcon from '@material-ui/icons/DeleteForeverOutlined';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -130,8 +129,8 @@ const JobList = () => {
       field: 'Delete',
       cellRendererFramework: function detelete(params) {
         return (
-          <IconButton color="error" onClick={() => setPopup(params.data.id, params.rowIndex)}>
-            <DeleteForeverOutlinedIcon color="error" />
+          <IconButton onClick={() => setPopup(params.data.id, params.rowIndex)}>
+            <Delete />
           </IconButton>
         );
       }
@@ -154,6 +153,10 @@ const JobList = () => {
     setDeletePopup(defaultPopup);
   };
 
+  const autoSizeAll = (params) => {
+    params.columnApi.autoSizeAllColumns(false);
+  };
+
   return (
     <Box>
       <Grid container direction="row" justify="space-between" alignItems="center">
@@ -162,7 +165,7 @@ const JobList = () => {
           <Grid container justify="space-between" spacing={2}>
             <Grid item>
               <Fab variant="extended" size="small" color="secondary" component={NavLink} to="/upload">
-                <CloudUploadOutlinedIcon className={classes.extendedIcon} />
+                <CloudUploadOutlined className={classes.extendedIcon} />
                 Upload File
               </Fab>
             </Grid>
@@ -177,15 +180,17 @@ const JobList = () => {
       {jobs && jobs.length > 0 && (
         <div style={{width: '100%', height: size.height - 170, marginTop: 25}} className={'ag-theme-material'}>
           <AgGridReact
-            sideBar={'filters'}
             columnDefs={colunmDef}
             rowSelection="single"
             animateRows={true}
             onGridReady={onReady}
+            onFirstDataRendered={autoSizeAll}
             defaultColDef={{
               sortable: true,
               resizable: true,
               filter: true,
+              suppressMenu: true,
+              floatingFilter: true,
               headerComponentParams: {
                 menuIcon: 'fa-bars'
               }

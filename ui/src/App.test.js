@@ -10,7 +10,6 @@ test('Title is in ENV and in the page', () => {
       <App />
     </Provider>
   );
-  const regex = new RegExp(`${process.env.REACT_APP_SITE_TITLE}`, 'i');
-  const linkElement = getAllByText(regex);
+  const linkElement = getAllByText('NRMN');
   expect(linkElement[0]).toBeInTheDocument();
 });

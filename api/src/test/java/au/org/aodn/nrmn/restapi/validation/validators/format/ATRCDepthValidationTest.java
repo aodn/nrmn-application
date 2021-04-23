@@ -29,6 +29,7 @@ class ATRCDepthValidationTest {
         val job = new StagedJob();
         job.setId(1L);
         val stage = new StagedRow();
+        stage.setMethod("1");
         stage.setDepth("10.9");
         stage.setStagedJob(job);
         val res =
@@ -38,12 +39,27 @@ class ATRCDepthValidationTest {
     }
 
     @Test
-    void depthWithTransectInRangeShouldSucceed() {
+    void depthWithTransectInRangeForMethod1ShouldSucceed() {
         val job = new StagedJob();
         job.setId(1L);
         val stage = new StagedRow();
         stage.setDepth("7.3");
         stage.setStagedJob(job);
+        stage.setMethod("1");
+
+        val res =
+                new ATRCDepthValidation().valid(stage);;
+        assertTrue(res.isValid());
+    }
+
+    @Test
+    void depthWithNoTransectForMethod0ShouldSucceed() {
+        val job = new StagedJob();
+        job.setId(1L);
+        val stage = new StagedRow();
+        stage.setDepth("7");
+        stage.setStagedJob(job);
+        stage.setMethod("0");
 
         val res =
                 new ATRCDepthValidation().valid(stage);;

@@ -1,12 +1,13 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 const formState = {
-  entities: undefined,
-  formData: {},
-  formOptions: {},
-  entitySaved: false,
-  errors: [],
-  isLoading: false
+  entities: null,
+  data: {},
+  options: {},
+  searchResults: null,
+  loading: false,
+  saved: false,
+  errors: []
 };
 
 const formSlice = createSlice({
@@ -16,47 +17,49 @@ const formSlice = createSlice({
     resetState: () => formState,
     entitiesLoaded: (state, action) => {
       state.entityEdited = {};
-      state.formData = {};
-      state.entitySaved = false;
+      state.data = {};
+      state.saved = false;
       state.entities = action.payload;
       state.errors = [];
     },
     entitiesError: (state, action) => {
-      const error = action.payload.e.response?.data?.error ? action.payload.e.response.data.error : 'Error while getting the entity data';
       state.entities = [];
-      state.errors = [error];
+      state.errors = action.payload.e.response?.data?.errors ?? [];
     },
     itemLoaded: (state, action) => {
-      state.formData = action.payload;
+      state.data = action.payload;
     },
     selectedItemEdited: (state, action) => {
       const key = Object.keys(action.payload)[0];
       let fieldData = {};
       fieldData[key] = action.payload[key];
-      state.formData = {...state.formData, ...fieldData};
+      state.data = {...state.data, ...fieldData};
     },
     selectedItemsEdited: (state, action) => {
       const key = Object.keys(action.payload)[0];
 
       let optionsData = {};
       optionsData[key] = action.payload[key];
-      state.formOptions = {...state.formOptions, ...optionsData};
+      state.options = {...state.options, ...optionsData};
 
       let fieldData = {};
       fieldData[key] = action.payload[key]._links.self.href;
-      state.formData = {...state.formData, ...fieldData};
+      state.data = {...state.data, ...fieldData};
     },
     embeddedFieldEdited: (state, action) => {
       const key = Object.keys(action.payload)[0];
       let fieldData = {};
       fieldData[key] = action.payload[key];
-      state.formData = {...state.formData, ...fieldData};
+      state.data = {...state.data, ...fieldData};
+    },
+    updateFormFields: (state, action) => {
+      state.data = {...state.data, ...action.payload};
     },
     selectedItemsLoaded: (state, action) => {
       const key = Object.keys(action.payload._embedded)[0];
       const newOptions = {};
-      // FIXME: this should not be necessary
-      if (key === 'marineProtectedAreas' || key === 'protectionStatuses') {
+      // HACK: this should not be necessary
+      if (key === 'marineProtectedAreas' || key === 'protectionStatuses' || key === 'reportGroups' || key === 'habitatGroups') {
         newOptions[key] = action.payload._embedded[key].reduce((f, v) => {
           if (v.name) f.push(v.name);
           return f;
@@ -64,20 +67,40 @@ const formSlice = createSlice({
       } else {
         newOptions[key] = action.payload._embedded[key];
       }
-      state.formOptions = {...state.formOptions, ...newOptions};
+      state.options = {...state.options, ...newOptions};
     },
     entitiesSaved: (state, action) => {
-      state.entitySaved = action.payload;
+      state.saved = action.payload;
+    },
+    searchRequested: (state) => {
+      state.loading = true;
+      state.searchResults = [];
+    },
+    searchFailed: (state, action) => {
+      state.loading = false;
+      state.searchError = action.payload.message;
+    },
+    searchFound: (state, action) => {
+      if (action.payload?.length > 0)
+        state.searchResults = action.payload.map((r, id) => {
+          return {id: id, ...r, speciesEpithet: r.species};
+        });
+      else state.searchResults = [];
+      state.loading = false;
     }
   }
 });
 export const formReducer = formSlice.reducer;
 export const {
+  searchRequested,
+  searchFailed,
+  searchFound,
   resetState,
   entitiesLoaded,
   entitiesError,
   entitiesSaved,
   itemLoaded,
+  updateFormFields,
   selectedItemsLoaded,
   selectedItemEdited,
   selectedItemsEdited,

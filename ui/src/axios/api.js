@@ -2,10 +2,11 @@ import axiosInstance from './index.js';
 import axios from 'axios';
 import store from '../components/store'; // will be useful to access to axios.all and axios.spread
 import {ImportProgress} from '../components/import/reducers/upload';
+import {importRow} from '../components/import/reducers/create-import.js';
+
 function getToken() {
-  const token = store.getState().auth.accessToken;
-  const tokenType = store.getState().auth.tokenType;
-  return `${tokenType} ${token}`;
+  const {accessToken, tokenType} = store.getState().auth;
+  return `${tokenType} ${accessToken}`;
 }
 
 axiosInstance.interceptors.request.use(
@@ -26,6 +27,11 @@ const dataURLtoBlob = (dataurl) => {
     u8arr[n] = bstr.charCodeAt(n);
   }
   return new Blob([u8arr], {type: mime});
+};
+
+export const tokenExpired = () => {
+  const {expires} = store.getState().auth;
+  return expires && expires < Date.now();
 };
 
 export const userLogin = (params) => {
@@ -59,9 +65,9 @@ export const user = (params) => {
 
 export const apiDefinition = () => axiosInstance.get('/v3/api-docs').then((res) => res);
 
-export const getEntity = (entity) => axiosInstance.get('/api/' + entity).then((res) => res);
+export const getResult = (entity) => axiosInstance.get('/api/' + entity);
 
-export const getResource = (url) => axiosInstance.get(url).then((res) => res);
+export const getEntity = (entity) => getResult(entity).then((res) => res);
 
 export const getFullJob = (id) => {
   const jobReq = axiosInstance.get('/api/stagedJobs/' + id);
@@ -104,9 +110,18 @@ export const entitySave = (entity, params) => {
     .catch((err) => err);
 };
 
-export const entityEdit = (url, params) => {
+export const entityEdit = (entity, params) => {
   return axiosInstance
-    .put(url, params, {
+    .put('/api/' + entity, params, {
+      validateStatus: () => true
+    })
+    .then((res) => res)
+    .catch((err) => err);
+};
+
+export const entityDelete = (url, id) => {
+  return axiosInstance
+    .delete(`/api/${url}/${id}`, {
       validateStatus: () => true
     })
     .then((res) => res)
@@ -132,7 +147,7 @@ export const getDataJob = (jobId) =>
 
 export const postJobValidation = (jobId) => axiosInstance.post('/api/stage/validate/' + jobId).then((res) => res);
 export const updateRow = (jobId, rows) => {
-  return axiosInstance.put('/api/stage/updates/' + jobId, rows).then((res) => res);
+  return axiosInstance.put('/api/stage/updates/' + jobId, rows.map(importRow)).then((res) => res);
 };
 export const deleteRow = (jobId, rows) => {
   return axiosInstance.put('/api/stage/delete/rows/' + jobId, rows).then((res) => res);
@@ -161,5 +176,18 @@ export const submitJobFile = (params) => {
 };
 
 export const submitingest = (jobId) => {
-  return axiosInstance.post('/api/ingest/' + jobId).then((res) => res);
+  return axiosInstance.post('/api/ingestion/ingest/' + jobId).then((res) => res);
+};
+
+export const search = (params) => {
+  const url = `/api/species?searchType=${escape(params.searchType)}&species=${escape(params.species)}`;
+  return axiosInstance
+    .get(url, {
+      validateStatus: () => true
+    })
+    .then((res) => res);
+};
+
+export const templateZip = (params) => {
+  return axiosInstance.get(`/api/template/template.zip?${params}`, {responseType: 'blob'});
 };

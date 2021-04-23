@@ -1,13 +1,11 @@
-import React from 'react';
-import {useSelector} from 'react-redux';
+import React, {useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
 import clsx from 'clsx';
 import {ThemeProvider, createMuiTheme, responsiveFontSizes, makeStyles} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import {blueGrey, deepPurple} from '@material-ui/core/colors';
-import Alert from '@material-ui/lab/Alert';
 import TopBar from './components/layout/TopBar';
-import store from './components/store';
 import SideMenu from './components/layout/SideMenu';
 import Login from './components/auth/login';
 import XlxsUpload from './components/import/XlxsUpload';
@@ -19,12 +17,18 @@ import Homepage from './components/layout/Homepage';
 import FourOFour from './components/layout/FourOFour';
 import JobList from './components/job/JobList';
 import JobView from './components/job/JobView';
-import LocationTemplate from './components/data-entities/LocationTemplate';
 import DiverTemplate from './components/data-entities/DiverTemplate';
-import SiteEditTemplate from './components/data-entities/SiteEditTemplate';
-import SiteAddTemplate from './components/data-entities/SiteAddTemplate';
-import SiteViewTemplate from './components/data-entities/SiteViewTemplate';
-import ObservableItemTemplate from './components/data-entities/ObservableItemTemplate';
+import LocationTemplate from './components/templates/LocationTemplate';
+import SiteEditTemplate from './components/templates/SiteEditTemplate';
+import SiteAddTemplate from './components/templates/SiteAddTemplate';
+import SiteViewTemplate from './components/templates/SiteViewTemplate';
+import ObservableItemTemplate from './components/templates/ObservableItemTemplate';
+import ObservableItemViewTemplate from './components/templates/ObservableItemViewTemplate';
+import ObservableItemEditTemplate from './components/templates/ObservableItemEditTemplate';
+import SurveyViewTemplate from './components/templates/SurveyViewTemplate';
+import SurveyEditTemplate from './components/templates/SurveyEditTemplate';
+import ExtractTemplateData from './components/datasheets/ExtractTemplateData';
+import {logout} from './components/auth/auth-reducer';
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ? process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
@@ -33,9 +37,11 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex'
   },
   mainContent: {
-    marginTop: 50,
+    marginTop: 60,
     flexGrow: 1,
-    padding: theme.spacing(3),
+    paddingTop: theme.spacing(3),
+    paddingLeft: theme.spacing(3),
+    paddingRight: theme.spacing(3),
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen
@@ -54,38 +60,53 @@ const useStyles = makeStyles((theme) => ({
 const referenceData = [
   {
     name: 'Location',
-    route: {base: '/reference/location', view: '/reference/location/:id?/:success?', edit: '/reference/location/:id?/edit'},
-    schemaKey: 'Location',
+    idKey: 'locationId',
+    can: {delete: false, clone: false},
+    flexField: 'locationName',
     endpoint: 'locations',
+    route: {base: '/reference/location', view: '/reference/location/:id?/:success?', edit: '/reference/location/:id?/edit'},
+    schemaKey: {add: 'Location', edit: 'Location', view: 'Location'},
     template: {add: LocationTemplate, edit: LocationTemplate, view: LocationTemplate},
     list: {
+      name: 'Locations',
+      showNew: true,
       schemaKey: 'Location',
-      name: 'locations',
+      key: 'locations',
       route: '/reference/locations',
       endpoint: 'locations'
     }
   },
   {
     name: 'Diver',
-    route: {base: '/reference/diver', view: '/reference/diver/:id?/:success?', edit: '/reference/diver/:id?/edit'},
-    schemaKey: 'Diver',
+    idKey: 'diverId',
+    can: {delete: false, clone: false},
+    flexField: 'fullName',
     endpoint: 'divers',
+    route: {base: '/reference/diver', view: '/reference/diver/:id?/:success?', edit: '/reference/diver/:id?/edit'},
+    schemaKey: {add: 'Diver', edit: 'Diver', view: 'Diver'},
     template: {add: DiverTemplate, edit: DiverTemplate, view: DiverTemplate},
     list: {
+      name: 'Divers',
+      showNew: true,
       schemaKey: 'Diver',
-      name: 'divers',
+      key: 'divers',
       route: '/reference/divers',
       endpoint: 'divers'
     }
   },
   {
     name: 'Site',
-    route: {base: '/reference/site', view: '/reference/site/:id?/:success?', edit: '/reference/site/:id?/edit'},
-    schemaKey: 'Site',
+    idKey: 'siteId',
+    can: {delete: true, clone: true},
+    flexField: null,
     endpoint: 'sites',
+    route: {base: '/reference/site', view: '/reference/site/:id?/:success?', edit: '/reference/site/:id?/edit'},
+    schemaKey: {add: 'SiteGetDto', edit: 'SiteGetDto', view: 'SiteGetDto'},
     template: {add: SiteAddTemplate, edit: SiteEditTemplate, view: SiteViewTemplate},
     list: {
-      name: 'siteListItems',
+      name: 'Sites',
+      showNew: true,
+      key: 'siteListItems',
       schemaKey: 'SiteListItem',
       route: '/reference/sites',
       endpoint: 'siteListItems'
@@ -93,30 +114,82 @@ const referenceData = [
   },
   {
     name: 'Observable Item',
+    idKey: 'observableItemId',
+    can: {edit: true},
+    showSpeciesSearch: true,
+    flexField: null,
+    endpoint: 'reference/observableItem',
     route: {
       base: '/reference/observableItem',
       view: '/reference/observableItem/:id?/:success?',
       edit: '/reference/observableItem/:id?/edit'
     },
-    schemaKey: 'ObservableItem',
-    endpoint: 'observableItems',
-    template: {add: ObservableItemTemplate, edit: ObservableItemTemplate, view: ObservableItemTemplate},
+    schemaKey: {add: 'ObservableItemDto', edit: 'ObservableItemPutDto', view: 'ObservableItemGetDto'},
+    template: {add: ObservableItemTemplate, edit: ObservableItemEditTemplate, view: ObservableItemViewTemplate},
     list: {
-      name: 'observableItems',
-      schemaKey: 'ObservableItem',
-      route: '/wip',
-      endpoint: 'observableItems'
+      name: 'Observable Items',
+      showNew: true,
+      key: 'tupleBackedMaps',
+      schemaKey: 'ObservableItemRow',
+      route: '/reference/observableItems',
+      endpoint: 'reference/observableItems',
+      headers: [
+        'observableItemId',
+        'typeName',
+        'name',
+        'commonName',
+        'supersededBy',
+        'supersededNames',
+        'supersededIDs',
+        'phylum',
+        'class',
+        'order',
+        'family',
+        'genus'
+      ],
+      sort: ['obsItemTypeName', 'name']
+    }
+  },
+  {
+    hide: true,
+    name: 'Survey',
+    idKey: 'surveyId',
+    can: {edit: true},
+    flexField: null,
+    endpoint: 'data/survey',
+    route: {
+      base: '/data/survey',
+      view: '/data/survey/:id?/:success?',
+      edit: '/data/survey/:id?/edit'
+    },
+    schemaKey: {edit: 'SurveyDto', view: 'SurveyDto'},
+    template: {edit: SurveyEditTemplate, view: SurveyViewTemplate},
+    list: {
+      name: 'Surveys',
+      // key: 'surveys',
+      showNew: false,
+      schemaKey: 'SurveyRow',
+      route: '/data/surveys',
+      endpoint: 'data/surveys',
+      headers: ['surveyId', 'siteName', 'programName', 'surveyDate', 'surveyTime', 'depth', 'surveyNum'],
+      sort: ['siteName']
     }
   }
 ];
 
 const App = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const leftSideMenuIsOpen = useSelector((state) => state.toggle.leftSideMenuIsOpen);
-  // TODO: do token expiry checks and such
-  const loggedIn = () => {
-    return store.getState().auth.accessToken !== null;
-  };
+  const loggedIn = useSelector((state) => state.auth.success);
+  const expiresToken = useSelector((state) => state.auth.expires);
+  useEffect(() => {
+    const now = +new Date();
+    const h24 = 86400000;
+    if (expiresToken && !(now - expiresToken < h24)) {
+      dispatch(logout());
+    }
+  }, [loggedIn]);
 
   let theme = createMuiTheme({
     palette: {
@@ -159,82 +232,49 @@ const App = () => {
         <Router>
           <CssBaseline />
           <TopBar></TopBar>
-          <SideMenu entities={referenceData}></SideMenu>
+          <SideMenu entities={referenceData.filter((e) => !e.hide)}></SideMenu>
           <main
             className={clsx(classes.mainContent, {
               [classes.contentShift]: leftSideMenuIsOpen
             })}
           >
             <Switch>
-              <Route
-                path="/wip"
-                render={() => (
-                  <Alert severity="info" variant="filled">
-                    This feature is under construction.
-                  </Alert>
-                )}
-              />
+              <Route path="/login" component={Login} />
               <Route exact path="/home" component={Homepage} />
+              <Route exact path="/404" component={FourOFour}></Route>
+
+              <Redirect exact from="/" to="/home" />
+              {!loggedIn ? <Redirect to={`/login?redirect=${window.location.pathname}`} /> : null}
+
+              {/** Authenticated Pages */}
               <Route exact path="/jobs" component={JobList} />
               <Route exact path="/jobs/:id/view" component={JobView} />
               <Route exact path="/validation/:jobId" component={ValidationPage} />
               <Route exact path="/upload" component={XlxsUpload} />
-              <Route exact path="/login" component={Login} />
+              <Route exact path="/data/extract" component={ExtractTemplateData} />
               <Redirect exact from="/list/stagedJob" to="/jobs" />
               {referenceData.map((e) => (
-                <Route
-                  exact
-                  key={e.route.base}
-                  path={e.route.base}
-                  render={() => {
-                    return loggedIn() ? (
-                      <EntityEdit entity={e} template={e.template.add} />
-                    ) : (
-                      <Redirect to={`/login?redirect=${e.route.base}`} />
-                    );
-                  }}
-                />
+                <Route exact key={e.route.base} path={e.route.base} render={() => <EntityEdit entity={e} template={e.template.add} />} />
               ))}
               {referenceData.map((e) => (
-                <Route
-                  exact
-                  key={e.route.edit}
-                  path={e.route.edit}
-                  render={() => {
-                    return loggedIn() ? (
-                      <EntityEdit entity={e} template={e.template.edit} />
-                    ) : (
-                      <Redirect to={`/login?redirect=${e.route.edit}`} />
-                    );
-                  }}
-                />
+                <Route exact key={e.route.edit} path={e.route.edit} render={() => <EntityEdit entity={e} template={e.template.edit} />} />
+              ))}
+              {referenceData
+                .filter((e) => e.can.clone)
+                .map((e) => (
+                  <Route
+                    exact
+                    key={`${e.route.base}/:id?/clone`}
+                    path={`${e.route.base}/:id?/clone`}
+                    render={() => <EntityEdit entity={e} template={e.template.add} clone />}
+                  />
+                ))}
+              {referenceData.map((e) => (
+                <Route exact key={e.route.view} path={e.route.view} render={() => <EntityView entity={e} template={e.template.view} />} />
               ))}
               {referenceData.map((e) => (
-                <Route
-                  exact
-                  key={e.route.view}
-                  path={e.route.view}
-                  render={() => {
-                    return loggedIn() ? (
-                      <EntityView entity={e} template={e.template.view} />
-                    ) : (
-                      <Redirect to={`/login?redirect=${e.route.view}`} />
-                    );
-                  }}
-                />
+                <Route exact key={e.list.route} path={e.list.route} render={() => <EntityList entity={e} />} />
               ))}
-              {referenceData.map((e) => (
-                <Route
-                  exact
-                  key={e.list.route}
-                  path={e.list.route}
-                  render={() => {
-                    return loggedIn() ? <EntityList entity={e} /> : <Redirect to={`/login?redirect=${e.list.route}`} />;
-                  }}
-                />
-              ))}
-              <Route path="/404" component={FourOFour}></Route>
-              <Redirect exact from="/" to="/home" />
               <Route path="*" component={FourOFour}></Route>
             </Switch>
           </main>

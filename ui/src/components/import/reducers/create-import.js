@@ -7,6 +7,7 @@ const importState = {
   editLoading: false,
   deleteLoading: false,
   ingestLoading: false,
+  enableSubmit: false,
   submitReady: false,
   ingestSuccess: false,
   percentCompleted: 0,
@@ -15,6 +16,8 @@ const importState = {
   validationErrors: {},
   errorsByMsg: [],
   errSelected: [],
+  globalErrors: [],
+  globalWarnings: [],
   jobId: '',
   job: {}
 };
@@ -71,6 +74,19 @@ export const exportRow = (row) => {
   return row;
 };
 
+export const importRow = (row) => {
+  var measure = {};
+  Object.getOwnPropertyNames(row || {})
+    .filter((key) => !isNaN(parseFloat(key)))
+    .forEach((numKey) => {
+      var pos = measureKey.indexOf(numKey);
+      measure[pos] = row[numKey];
+      delete row[numKey];
+    });
+  row.measureJson = measure;
+  return row;
+};
+
 export const flatten = (row) => {
   const measures = row.MeasureJson;
   if (measures) {
@@ -103,6 +119,7 @@ const importSlice = createSlice({
       state.errSelected = action.payload;
     },
     validationReady: (state, action) => {
+      state.globalWarnings = state.globalErrors = [];
       if (action.payload.errors.length > 0) {
         state.validationErrors = action.payload.errors.reduce((acc, err) => {
           acc[err.id] = err.errors;
@@ -110,23 +127,25 @@ const importSlice = createSlice({
         }, {});
 
         const validationErrors = mergeErrors(action.payload.errors);
-        state.EnableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
-        state.errorsByMsg = action.payload.summaries.sort((sum1, sum2) => sum2.count - sum1.count);
+        state.enableSubmit = validationErrors.filter((err) => err.level === 'BLOCKING').length === 0;
+        state.errorsByMsg = action.payload.summaries;
+      } else if (action.payload.errorGlobal) {
+        state.globalWarnings = action.payload.errorGlobal.filter((e) => e.errorLevel === 'WARNING');
+        state.globalErrors = action.payload.errorGlobal.filter((e) => e.errorLevel === 'BLOCKING');
+        state.enableSubmit = state.globalErrors.length === 0;
       } else {
-        state.EnableSubmit = true;
+        state.enableSubmit = true;
       }
+      state.validationLoading = false;
     },
     AddRowIndex: (state, action) => {
-        state.indexChanged[action.payload.id] = action.payload.row;
-        state.EnableSubmit = false;
+      state.indexChanged[action.payload.id] = action.payload.row;
+      state.enableSubmit = false;
     },
     RowDeleteRequested: (state) => {
       state.deleteLoading = true;
     },
-    RowDeleteFinished: (state, action) => {
-      action.payload.forEach(i =>  {
-        delete state.rows[i];
-      });
+    RowDeleteFinished: (state) => {
       state.deleteLoading = false;
     },
     RowUpdateRequested: (state) => {

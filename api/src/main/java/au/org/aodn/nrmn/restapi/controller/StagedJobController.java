@@ -75,6 +75,7 @@ public class StagedJobController {
             @RequestParam("programId") Integer programId,
             @RequestParam("file") MultipartFile file,
             Authentication authentication) {
+
         userAuditRepo.save(
                 new UserActionAudit(
                         "stage/upload",
@@ -193,7 +194,7 @@ public class StagedJobController {
                 .body(new ValidationResponse(
                         null,
                         Collections.emptyList(),
-                        Collections.emptyList(),
+                        Collections.emptyMap(),
                         Collections.emptyList(),
                         Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob")))));
     }

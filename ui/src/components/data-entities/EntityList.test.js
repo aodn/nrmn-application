@@ -29,9 +29,9 @@ jest.mock('ag-grid-react/lib/agGridReact');
 const mockState = {
   theme: {themeType: false},
   form: {
-    entities: [],
-    editItem: {},
-    entitySaved: false,
+    entities: {_embedded: {tests: {}}},
+    formData: {},
+    saved: false,
     errors: []
   }
 };
@@ -42,9 +42,10 @@ const testEntity = {
   schemaKey: 'TestEntity',
   endpoint: 'tests',
   template: {add: null, edit: null, view: null},
+  can: {},
   list: {
     schemaKey: 'TestEntity',
-    name: 'tests',
+    name: 'TestEntities',
     route: '/reference/tests',
     endpoint: 'tests'
   }
@@ -84,25 +85,25 @@ describe('EntityList Component', () => {
 
   test('Test EntityList.js exists', async () => {
     const {findByText} = renderWithProviders(
-      <Route path=":entityName">
+      <Route path={testEntity.list.route}>
         <EntityList entity={testEntity} />
       </Route>,
       {
-        route: 'testentities'
+        route: testEntity.list.route
       }
     );
-    await findByText('New TestEntity');
+    await findByText('TestEntities');
   });
 
   test('Test EntityList.js New Entity button exists', async () => {
-    const {findByTitle} = renderWithProviders(
-      <Route path="/:entityName">
+    const {findByText} = renderWithProviders(
+      <Route path={testEntity.list.route}>
         <EntityList entity={testEntity} />
       </Route>,
       {
-        route: '/TestEntity'
+        route: testEntity.list.route
       }
     );
-    await findByTitle('New TestEntity');
+    await findByText('TestEntities');
   });
 });

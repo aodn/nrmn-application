@@ -2,27 +2,27 @@ package au.org.aodn.nrmn.restapi.dto.site;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.hateoas.Links;
 import org.springframework.hateoas.RepresentationModel;
 
 /* Site list page entry */
 
 @Data
-@Builder
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SiteListItem extends RepresentationModel<SiteListItem> {
     @Schema(hidden = true)
     Integer siteId;
 
-    @Schema(title = "Code")
+    @Schema(title = "Site Code")
     String siteCode;
 
-    @Schema(title = "Name")
+    @Schema(title = "Site Name")
     String siteName;
 
-    @Schema(title = "Location Name")
+    @Schema(title = "Location")
     String locationName;
 
     @Schema(title = "State")
@@ -37,7 +37,7 @@ public class SiteListItem extends RepresentationModel<SiteListItem> {
     @Schema(title = "Longitude")
     Double longitude;
 
-    @Schema(title = "Active")
+    @Schema(title = "Is Active")
     Boolean isActive;
 
     @Schema(hidden = true)

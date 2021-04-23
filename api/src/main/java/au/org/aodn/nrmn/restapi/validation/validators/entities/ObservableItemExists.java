@@ -6,6 +6,7 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import cyclops.control.Validated;
+import cyclops.data.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,11 @@ public class ObservableItemExists extends BaseRowExistingEntity<ObservableItem, 
 
     @Override
     public Validated<StagedRowError, ObservableItem> valid(StagedRow target) {
-        return checkExists(target, target.getSpecies(), ValidationLevel.BLOCKING);
+        String speciesName = target.getSpecies();
+        if (speciesName != null && speciesName.equalsIgnoreCase("Survey not done")) {
+            return Validated.valid(null);
+        } else {
+            return checkExists(target, speciesName, ValidationLevel.BLOCKING);
+        }
     }
 }

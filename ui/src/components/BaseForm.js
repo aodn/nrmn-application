@@ -49,7 +49,6 @@ const BaseForm = (params) => {
   const loading = params.loading;
 
   function submitForm(formData) {
-    console.warn(formData);
     params.onSubmit(formData);
   }
 
@@ -82,7 +81,6 @@ const BaseForm = (params) => {
             showErrorList={true}
             fields={params.fields}
             formData={params.formData}
-            ObjectFieldTemplate={params.template}
           >
             <div className={classes.rootFlex}>
               <div className={classes.wrapper}>
@@ -111,8 +109,7 @@ const BaseForm = (params) => {
 };
 
 BaseForm.propTypes = {
-  submitLabel: PropTypes.string,
-  template: PropTypes.object
+  submitLabel: PropTypes.string
 };
 
 export default BaseForm;

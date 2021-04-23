@@ -15,7 +15,7 @@ const CustomLoadingOverlay = () => {
   const classes = useStyles();
 
   return (
-    <div className="ag-custom-loading-cell">
+    <div style={{width: '100%'}}>
       <Box component="div" ml={2} className={classes.main}>
         <LoadingBanner variant={'h5'} msg={'Loading data..  '} />
       </Box>

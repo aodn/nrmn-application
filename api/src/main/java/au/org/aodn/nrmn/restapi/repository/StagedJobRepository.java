@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.repository;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.projections.StagedJobList;
+import au.org.aodn.nrmn.restapi.repository.projections.StagedJobList;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

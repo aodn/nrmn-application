@@ -1,26 +1,22 @@
-import React from 'react';
-
-import {useDispatch, useSelector} from 'react-redux';
+import React, {useEffect} from 'react';
 import {Link, useParams} from 'react-router-dom';
-import {useEffect} from 'react';
-import NestedApiFieldDetails from './customWidgetFields/NestedApiFieldDetails';
-import TextInput from './customWidgetFields/TextInput';
+import {useDispatch, useSelector} from 'react-redux';
 import config from 'react-global-configuration';
-import {Box, Button, Grid} from '@material-ui/core';
-import Alert from '@material-ui/lab/Alert';
-import {itemRequested} from './middleware/entities';
-import Form from '@rjsf/material-ui';
-import ObjectListViewTemplate from './ObjectListViewTemplate';
 import {PropTypes} from 'prop-types';
-import {FileCopy, Edit} from '@material-ui/icons';
-import {resetState} from './form-reducer';
+import {Edit} from '@material-ui/icons';
+import {Box, Button, Divider, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
+import Form from '@rjsf/material-ui';
 
-import EntityContainer from './EntityContainer';
+import TextInput from './customWidgetFields/TextInput';
+import {itemRequested} from './middleware/entities';
+import {resetState} from './form-reducer';
+import EntityContainer from '../containers/EntityContainer';
 
 const EntityView = (props) => {
   const params = useParams();
   const dispatch = useDispatch();
-  const editItem = useSelector((state) => state.form.formData);
+  const formData = useSelector((state) => state.form.data);
   const schemaDefinition = config.get('api') || {};
 
   useEffect(() => {
@@ -28,65 +24,66 @@ const EntityView = (props) => {
     dispatch(itemRequested(`${props.entity.endpoint}/${params.id}`));
   }, []);
 
-  const entityDef = schemaDefinition[props.entity.schemaKey];
-  const fullTitle = 'Details for ' + props.entity.name;
+  const entityDef = schemaDefinition[props.entity.schemaKey.view];
+  const fullTitle = `${props.entity.name} Details`;
   const entitySchema = {title: fullTitle, ...entityDef};
   const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
   const uiSchema = {'ui:widget': 'string'};
 
   for (const key in entitySchema.properties) {
     const item = entitySchema.properties[key];
-    if (item.type === 'string' && item.format === 'uri') {
-      uiSchema[key] = {'ui:field': 'relationship'};
-    }
-    if (item.type === 'object') {
-      uiSchema[key] = {'ui:field': 'objects'};
-    }
-    if (item.type === 'string') {
-      uiSchema[key] = {'ui:field': 'readonly'};
-    }
+    uiSchema[key] = item.type === 'object' ? {'ui:field': 'objects'} : {'ui:field': 'readonly'};
   }
 
-  const inputDisplay = (elem) => {
-    const value = elem.formData?.toString();
-    return (
-      <span>
-        <b>{elem.schema.title}: </b> {value ? value : ' -- '}
-      </span>
+  const objectTable = (elem) => {
+    const keys = elem.formData ? Object.keys(elem.formData) : [];
+    return keys.length > 0 ? (
+      <>
+        <Divider />
+        <TableContainer style={{width: '50%'}}>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>{elem.schema.title}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {keys.map((key) => (
+                <TableRow key={key}>
+                  <TableCell>{key}</TableCell>
+                  <TableCell>{elem.formData[key]}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </>
+    ) : (
+      <Typography variant="subtitle2" component="i">
+        No {elem.schema.title}
+      </Typography>
     );
   };
 
-  const objectDisplay = (elem) => {
-    let items = [];
-    if (elem.formData) {
-      if (!Array.isArray(elem.formData)) {
-        if (elem.formData.label) {
-          items.push(<Grid item>{elem.formData.label}</Grid>);
-        } else {
-          for (let key of Object.keys(elem.formData)) {
-            items.push(
-              <Grid key={key} item>
-                <b>{key}: </b>
-                {elem.formData[key]}
-              </Grid>
-            );
-          }
-        }
-      } else {
-        elem.formData.map((item) => items.push(<Grid item>{item}</Grid>));
-      }
-    } else {
-      items.push(<Grid item>--</Grid>);
-    }
-    return ObjectListViewTemplate({name: elem.schema.title ?? elem.name, items: items});
+  const arrayTable = (elem) => {
+    const keys = elem.formData ? Object.keys(elem.formData) : [];
+    return keys.length > 0 ? (
+      <>
+        <Typography variant="subtitle2">{elem.schema.title}</Typography>{' '}
+        {keys.map((i) => `${elem.formData[i]}${i < keys.length - 1 ? ', ' : ''}`)}
+      </>
+    ) : (
+      <Typography variant="subtitle2" component="i">
+        No {elem.schema.title}
+      </Typography>
+    );
   };
 
   const fields = {
-    relationship: NestedApiFieldDetails,
-    objects: objectDisplay,
-    ArrayField: objectDisplay,
-    BooleanField: inputDisplay,
-    NumberField: inputDisplay,
+    objects: objectTable,
+    ArrayField: arrayTable,
+    BooleanField: TextInput,
+    NumberField: TextInput,
     StringField: TextInput
   };
 
@@ -102,55 +99,55 @@ const EntityView = (props) => {
         {getErrors(params.errors)}
       </Alert>
     ) : params.success ? (
-      <Alert severity="info" variant="filled">
-        {props.entity.name} {params.success === 'new' ? 'Created' : 'Updated'}
-      </Alert>
+      <Box margin={2} width="50%">
+        <Alert severity="info" variant="filled">
+          {props.entity.name} {params.success === 'new' ? 'Created' : 'Updated'}
+        </Alert>
+      </Box>
     ) : null;
 
+  const loaded = Object.keys(formData).length > 0;
   return (
-    <EntityContainer name={props.entity.name} goBackTo={props.entity.list.route}>
-      <Grid item xs={9}>
-        <Box pt={4} px={6} pb={6}>
-          {alert}
-          <Form
-            disabled
-            onError={params.onError}
-            schema={JSSchema}
-            uiSchema={uiSchema}
-            showErrorList={true}
-            fields={fields}
-            formData={editItem}
-            ObjectFieldTemplate={props.template}
-          >
-            <div></div>
-          </Form>
+    <EntityContainer name={props.entity.list.name} goBackTo={props.entity.list.route}>
+      {!alert && (
+        <Grid container alignItems="flex-start" direction="row">
+          <Grid item xs={10}>
+            <Box fontWeight="fontWeightBold">
+              <Typography variant="h4">{props.entity.name} Details</Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={2}>
+            <Button
+              style={{width: '100%'}}
+              component={Link}
+              to={`${props.entity.route.base}/${params.id}/edit`}
+              color="secondary"
+              variant={'contained'}
+              startIcon={<Edit>edit</Edit>}
+            >
+              Edit
+            </Button>
+          </Grid>
+        </Grid>
+      )}
+      <Grid container alignItems="center" direction="column">
+        {alert}
+        <Box pt={4} pb={6}>
+          {loaded && (
+            <Form
+              disabled
+              onError={params.onError}
+              schema={JSSchema}
+              uiSchema={uiSchema}
+              showErrorList={true}
+              fields={fields}
+              formData={formData}
+              ObjectFieldTemplate={props.template}
+            >
+              <div></div>
+            </Form>
+          )}
         </Box>
-      </Grid>
-      <Grid item xs>
-        <Grid container alignItems="flex-start" direction="column">
-          <Button
-            style={{marginTop: 25, width: '75%'}}
-            component={Link}
-            to={`${props.entity.route.base}/${params.id}/edit`}
-            color="secondary"
-            variant={'contained'}
-            startIcon={<Edit>edit</Edit>}
-          >
-            Edit
-          </Button>
-        </Grid>
-        <Grid item xs>
-          <Button
-            style={{marginTop: 25, width: '75%'}}
-            component={Link}
-            to={'/wip'}
-            color="secondary"
-            variant={'contained'}
-            startIcon={<FileCopy>copy</FileCopy>}
-          >
-            Copy
-          </Button>
-        </Grid>
       </Grid>
     </EntityContainer>
   );
@@ -158,7 +155,7 @@ const EntityView = (props) => {
 
 EntityView.propTypes = {
   entity: PropTypes.object,
-  template: PropTypes.object
+  template: PropTypes.func
 };
 
 export default EntityView;

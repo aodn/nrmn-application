@@ -95,6 +95,8 @@ CREATE TABLE nrmn.observable_item_ref_aud (
     aphia_rel_type_mod boolean,
     obs_item_type_id integer,
     obs_item_type_mod boolean,
+    species_epithet varchar(255),
+    species_epithet_mod boolean,
     CONSTRAINT observable_item_ref_aud_pkey PRIMARY KEY (observable_item_id, rev)
 );
 
@@ -135,6 +137,8 @@ CREATE TABLE nrmn.survey_aud (
     notes_mod boolean,
     pq_catalogued boolean,
     pq_catalogued_mod boolean,
+    pq_diver_id integer,
+    pq_diver_id_mod boolean,
     project_title varchar(255),
     project_title_mod boolean,
     protection_status varchar(255),
@@ -229,6 +233,7 @@ CREATE TABLE nrmn.staged_row (
     time varchar(255),
     total varchar(255),
     vis varchar(255),
+    position  bigint,
     staged_job_id bigint,
     CONSTRAINT staged_row_pkey PRIMARY KEY (id)
 );
@@ -286,6 +291,10 @@ CREATE TABLE nrmn.site_ref_aud (
     protection_status_mod boolean,
     relief integer,
     relief_mod boolean,
+    slope integer,
+    slope_mod boolean,
+    wave_exposure integer,
+    wave_exposure_mod boolean,
     site_attribute jsonb,
     site_attribute_mod boolean,
     site_code varchar(255),

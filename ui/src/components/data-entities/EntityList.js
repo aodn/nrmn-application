@@ -1,25 +1,23 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import config from 'react-global-configuration';
 import {useHistory} from 'react-router';
+import {NavLink} from 'react-router-dom';
 import {PropTypes} from 'prop-types';
-import {Box, Grid, IconButton, Typography} from '@material-ui/core';
-import EditIcon from '@material-ui/icons/Edit';
-import Alert from '@material-ui/lab/Alert';
-import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
-import useWindowSize from '../utils/useWindowSize';
-import CustomTooltip from './customTooltip';
-import CustomLoadingOverlay from './CustomLoadingOverlay';
-import {selectRequested} from './middleware/entities';
-import {resetState} from './form-reducer';
-import LinkButton from './LinkButton';
 
-const cellRenderer = (params) => {
-  if (typeof params.value === 'object') {
-    return JSON.stringify(params.value)?.replaceAll(/["{}]/g, '').replaceAll(',', ', ').trim();
-  }
-  return params.value;
-};
+import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Tooltip, Typography} from '@material-ui/core';
+import {Add, Edit, FileCopy, Delete} from '@material-ui/icons';
+import Alert from '@material-ui/lab/Alert';
+
+import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
+
+import useWindowSize from '../utils/useWindowSize';
+import CustomLoadingOverlay from './CustomLoadingOverlay';
+import {selectRequested, deleteEntityRequested} from './middleware/entities';
+import {resetState} from './form-reducer';
+
+let agGridApi = {};
+let agGridColumnApi = null;
 
 const getCellFilter = (format) => {
   const filterTypes = {
@@ -28,40 +26,6 @@ const getCellFilter = (format) => {
   };
   return filterTypes[format] ? filterTypes[format] : 'agTextColumnFilter';
 };
-
-const schematoColDef = (schema) => {
-  const fields = Object.keys(schema.properties);
-  const coldefs = fields.map((field) => {
-    let type = schema.properties[field] ? schema.properties[field]?.type : 'string';
-    return {
-      field: field,
-      tooltipField: field,
-      filter: getCellFilter(type),
-      cellRenderer: cellRenderer
-    };
-  });
-
-  const widthUnit = 100;
-
-  coldefs.push({
-    field: '',
-    maxWidth: widthUnit,
-    minWidth: widthUnit,
-    filter: undefined,
-    // eslint-disable-next-line react/display-name
-    cellRendererFramework: function () {
-      return (
-        <IconButton>
-          <EditIcon />
-        </IconButton>
-      );
-    }
-  });
-  return coldefs;
-};
-
-let agGridApi = {};
-let agGridColumnApi = {};
 
 const renderError = (msgArray) => {
   return (
@@ -73,100 +37,192 @@ const renderError = (msgArray) => {
   );
 };
 
-const gotoEntity = (event, history, route) => {
-  const id = event.node.data._links.self.href.split('/').pop();
-  // HACK: the existence of a cellRendererFramework means it is an edit button
-  if (event.node.isSelected() && !event.colDef.cellRendererFramework) {
-    history.push(`${route}/${id}`);
-  } else if (event.colDef.cellRendererFramework) {
-    history.push(`${route}/${id}/edit`);
-  }
-};
-
 const EntityList = (props) => {
   const history = useHistory();
-  const schemaDefinition = config.get('api');
   const size = useWindowSize();
   const dispatch = useDispatch();
   const entities = useSelector((state) => state.form.entities);
   const errors = useSelector((state) => state.form.errors);
-  const items = entities?._embedded ? entities._embedded[props.entity.list.name] : undefined;
+
+  useEffect(() => {
+    dispatch(resetState());
+    dispatch(selectRequested(props.entity.list.endpoint));
+  }, [props.entity.name]);
+
+  let items = entities?._embedded ? entities?._embedded[props.entity.list.key] : entities;
+  useEffect(() => {
+    if (agGridColumnApi) {
+      let allColumnIds = [];
+      agGridColumnApi.getAllColumns().forEach(function (column) {
+        if (props.entity.flexField !== column.colId && column.colId !== '0') allColumnIds.push(column.colId);
+      });
+      agGridColumnApi.autoSizeColumns(allColumnIds, false);
+    }
+  }, [items]);
+
+  const schematoColDef = (schema, entity) => {
+    const fields = entity.list.headers ?? Object.keys(schema.properties);
+
+    const coldefs = fields.reduce((acc, field) => {
+      const fieldSchema = schema.properties[field];
+      if (fieldSchema.title) {
+        const sortable = entity.list.sort?.includes(field) ?? true;
+        acc.push({
+          headerName: fieldSchema.title,
+          field: field,
+          tooltipField: field,
+          suppressMovable: true,
+          sortable: sortable,
+          flex: field === entity.flexField ? true : false,
+          filter: getCellFilter(fieldSchema?.type || 'string')
+        });
+      }
+      return acc;
+    }, []);
+    const scale = 1 + (entity.can.clone | 0) + (entity.can.delete | 0);
+    coldefs.push({
+      field: '',
+      filter: null,
+      suppressMovable: true,
+      width: Math.max(60 * scale, 100),
+      // eslint-disable-next-line react/display-name
+      cellRendererFramework: function (cell) {
+        return (
+          <>
+            <Tooltip title="Edit" aria-label="edit">
+              <IconButton component={NavLink} to={`${entity.route.base}/${cell.data[entity.idKey]}/edit`}>
+                <Edit />
+              </IconButton>
+            </Tooltip>
+            {entity.can.clone && (
+              <Tooltip title="Clone" aria-label="clone">
+                <IconButton component={NavLink} to={`${entity.route.base}/${cell.data[entity.idKey]}/clone`}>
+                  <FileCopy />
+                </IconButton>
+              </Tooltip>
+            )}
+            {entity.can.delete && (
+              <Tooltip title="Delete" aria-label="delete">
+                <span>
+                  <IconButton
+                    name="delete"
+                    disabled={cell.data.isActive}
+                    onClick={() => {
+                      setDialogState({
+                        open: true,
+                        id: cell.data[entity.idKey],
+                        index: cell.rowIndex,
+                        // HACK: making the assumption that all entities called `Entity` have a property `entityName`
+                        description: cell.data[`${entity.name.toLowerCase()}Name`]
+                      });
+                    }}
+                  >
+                    <Delete />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
+          </>
+        );
+      }
+    });
+
+    return coldefs;
+  };
 
   const agGridReady = (agGrid) => {
     agGridApi = Object.create(agGrid.api);
     agGridColumnApi = agGrid.columnApi;
-    agGridApi.setRowData(items);
     Object.freeze(agGridApi);
+    agGridApi.showLoadingOverlay();
   };
 
-  function autoSizeAll() {
-    let allColumnIds = [];
-    agGridColumnApi.getAllColumns().forEach(function (column) {
-      allColumnIds.push(column.colId);
-    });
-    agGridColumnApi.autoSizeColumns(allColumnIds, false);
-  }
+  const [dialogState, setDialogState] = useState({open: false});
 
-  useEffect(() => {
-    dispatch(resetState());
-    if (agGridApi.setRowData) {
-      agGridApi.setRowData([]);
-      agGridApi.showLoadingOverlay();
+  const onRowClick = (e, history, entity) => {
+    if (e.node.isSelected() && !e.colDef.cellRendererFramework) {
+      history.push(`${entity.route.base}/${e.data[entity.idKey]}`);
     }
-    dispatch(selectRequested(props.entity.list.endpoint));
-  }, [props.entity.name]); // reset when new or entityName prop changes
+  };
 
-  const colDef = schematoColDef(schemaDefinition[props.entity.list.schemaKey], size, props.entity.name);
+  const schemas = config.get('api');
+  const colDef = schematoColDef(schemas[props.entity.list.schemaKey], props.entity);
 
-  if (items !== undefined && agGridApi.setRowData) {
-    agGridApi.setRowData(items);
-    autoSizeAll();
-  }
+  const dialog = (
+    <Dialog disableBackdropClick disableEscapeKeyDown maxWidth="xs" open>
+      <DialogTitle>Delete {props.entity.name}?</DialogTitle>
+      <DialogContent>
+        Are you sure you want to permanently delete this {props.entity.name.toLowerCase()}?
+        <Box p={2}>
+          <Typography variant="subtitle2">{dialogState.description}</Typography>
+        </Box>
+      </DialogContent>
+      <DialogActions>
+        <Button autoFocus onClick={() => setDialogState({open: false})}>
+          Cancel
+        </Button>
+        <Button
+          onClick={() => {
+            const item = items.find((i) => i.siteId === dialogState.id);
+            dispatch(deleteEntityRequested({entity: props.entity, id: dialogState.id}));
+            agGridApi.applyTransaction({remove: [item]});
+            setDialogState({open: false});
+          }}
+          style={{color: 'red'}}
+        >
+          Delete {props.entity.name}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
 
   return (
     <>
-      <Box>
-        <Grid container direction="row" justify="space-between" alignItems="center">
-          <Grid item>
-            <Typography variant="h4">{props.entity.name}</Typography>
-          </Grid>
-          <Grid item>
-            <Grid container spacing={2}>
-              <LinkButton key={props.entity.name} title={`New ${props.entity.name}`} to={props.entity.route.base} />
-            </Grid>
-          </Grid>
+      {dialogState.open && dialog}
+      <Grid container direction="row" justify="space-between" style={{paddingLeft: 20}} alignItems="center">
+        <Grid item>
+          <Typography variant="h4">{props.entity.list.name}</Typography>
         </Grid>
+        <Grid item>
+          {props.entity.list.showNew && (
+            <Button
+              {...props}
+              to={props.entity.route.base}
+              component={NavLink}
+              color="secondary"
+              variant={'contained'}
+              startIcon={<Add></Add>}
+            >
+              New {props.entity.name}
+            </Button>
+          )}
+        </Grid>
+      </Grid>
 
-        <div style={{height: size.height - 150}} className={'ag-theme-material'}>
-          <AgGridReact
-            columnDefs={colDef}
-            rowSelection="single"
-            animateRows={true}
-            onGridReady={agGridReady}
-            onFirstDataRendered={autoSizeAll}
-            onCellClicked={(e) => {
-              gotoEntity(e, history, props.entity.route.base);
-            }}
-            frameworkComponents={{
-              customTooltip: CustomTooltip,
-              customLoadingOverlay: CustomLoadingOverlay
-            }}
-            loadingOverlayComponent={'customLoadingOverlay'}
-            tooltipShowDelay={0}
-            defaultColDef={{
-              sortable: false,
-              resizable: true,
-              tooltipComponent: 'customTooltip',
-              floatingFilter: true,
-              headerComponentParams: {
-                menuIcon: 'fa-bars'
-              }
-            }}
-          />
-        </div>
-        {!colDef ? renderError(["Entity '" + props.entity.name + "' can not be found!"]) : ''}
-        {errors.length > 0 ? renderError(errors) : ''}
-      </Box>
+      <div style={{height: size.height - 150, marginTop: 20}} className={'ag-theme-material'}>
+        <AgGridReact
+          columnDefs={colDef}
+          rowSelection="single"
+          animateRows={true}
+          rowData={items}
+          onGridReady={agGridReady}
+          onCellClicked={(e) => {
+            onRowClick(e, history, props.entity);
+          }}
+          frameworkComponents={{
+            customLoadingOverlay: CustomLoadingOverlay
+          }}
+          loadingOverlayComponent={'customLoadingOverlay'}
+          tooltipShowDelay={0}
+          defaultColDef={{
+            sortable: true,
+            resizable: true,
+            floatingFilter: true,
+            suppressMenu: true
+          }}
+        />
+      </div>
+      {errors.length > 0 ? renderError(errors) : ''}
     </>
   );
 };
@@ -174,4 +230,5 @@ const EntityList = (props) => {
 EntityList.propTypes = {
   entity: PropTypes.object
 };
+
 export default EntityList;

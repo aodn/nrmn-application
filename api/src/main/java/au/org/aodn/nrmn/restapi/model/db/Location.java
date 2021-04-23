@@ -45,6 +45,6 @@ public class Location {
 
     @Column(name = "is_active")
     @NotNull
-    @Schema(title = "Active", defaultValue = "true")
+    @Schema(title = "Is Active", defaultValue = "true")
     private Boolean isActive;
 }
