@@ -13,6 +13,18 @@ function cell(params) {
   return null;
 }
 
+function cellRenderer(p) {
+  const mask = p.data.selected?.find((s) => s.key === p.colDef.field)?.value;
+  if (mask) {
+    const prefix = p.value.substr(0, mask.idx);
+    const text = `<span style="background-color: yellow">${p.value.substr(mask.idx, mask.length)}</span>`;
+    const suffix = p.value.substr(mask.idx + mask.length);
+    return prefix + text + suffix;
+  } else {
+    return p.value;
+  }
+}
+
 export const ColumnDef = [
   {
     field: 'id',
@@ -31,12 +43,14 @@ export const ColumnDef = [
     pivot: true,
     enablePivot: false,
     cellStyle: cell,
+    cellRenderer: cellRenderer,
     keyCreator: (params) => params.value?.toLowerCase()
   },
   {
     field: 'buddy',
     editable: true,
     cellStyle: cell,
+    cellRenderer: cellRenderer,
     keyCreator: (params) => params.value?.toLowerCase()
   },
   {
@@ -46,29 +60,35 @@ export const ColumnDef = [
     rowGroup: false,
     enableRowGroup: true,
     cellStyle: cell,
+    cellRenderer: cellRenderer,
     keyCreator: (params) => params.value?.toLowerCase()
   },
   {
     field: 'siteName',
     headerName: 'Site Name',
+    cellStyle: cell,
+    cellRenderer: cellRenderer,
     editable: true
   },
   {
     field: 'latitude',
     headerName: 'Lat',
     editable: true,
-    cellStyle: cell
+    cellStyle: cell,
+    cellRenderer: cellRenderer
   },
   {
     field: 'longitude',
     headerName: 'Long',
     editable: true,
-    cellStyle: cell
+    cellStyle: cell,
+    cellRenderer: cellRenderer
   },
   {
     field: 'date',
     editable: true,
     cellStyle: cell,
+    cellRenderer: cellRenderer,
     rowGroup: false,
     enableRowGroup: true,
     keyCreator: (params) => params.value?.toLowerCase()
@@ -80,17 +100,20 @@ export const ColumnDef = [
   {
     field: 'direction',
     editable: true,
-    cellStyle: cell
+    cellStyle: cell,
+    cellRenderer: cellRenderer
   },
   {
     field: 'time',
     editable: true,
-    cellStyle: cell
+    cellStyle: cell,
+    cellRenderer: cellRenderer
   },
   {
     field: 'P-Qs',
     editable: true,
-    cellStyle: cell
+    cellStyle: cell,
+    cellRenderer: cellRenderer
   },
   {
     field: 'depth',
@@ -98,6 +121,7 @@ export const ColumnDef = [
     rowGroup: false,
     enableRowGroup: true,
     cellStyle: cell,
+    cellRenderer: cellRenderer,
     keyCreator: (params) => params.value?.toLowerCase()
   },
   {
@@ -113,19 +137,22 @@ export const ColumnDef = [
     rowGroup: false,
     enableRowGroup: true,
     cellStyle: cell,
+    cellRenderer: cellRenderer,
     keyCreator: (params) => params.value?.toLowerCase()
   },
   {
     field: 'code',
     editable: true,
-    cellStyle: cell
+    cellStyle: cell,
+    cellRenderer: cellRenderer
   },
   {
     field: 'species',
     editable: true,
     hide: true,
     aggFunc: 'count',
-    cellStyle: cell
+    cellStyle: cell,
+    cellRenderer: cellRenderer
   },
   {
     field: 'species',
@@ -136,11 +163,13 @@ export const ColumnDef = [
     aggFunc: 'count',
     editable: true,
     cellStyle: cell,
+    cellRenderer: cellRenderer,
     keyCreator: (params) => params.value?.toLowerCase()
   },
   {
     field: 'commonName',
     headerName: 'Common Name',
+    cellRenderer: cellRenderer,
     editable: true
   },
   {

@@ -47,7 +47,7 @@ const JobList = () => {
     setDeletePopup({isOpen: true, jobId: id, index: rowIndex});
   };
 
-  const colunmDef = [
+  const columnDef = [
     {
       field: 'id',
       cellRendererFramework: function stagedRender(params) {
@@ -173,14 +173,14 @@ const JobList = () => {
         </Grid>
       </Grid>
       {isLoading && (
-        <Backdrop open={isLoading}>
+        <Backdrop transitionDuration={0} open={isLoading}>
           <CircularProgress size={200} style={{color: '#ccc'}}></CircularProgress>
         </Backdrop>
       )}
       {jobs && jobs.length > 0 && (
         <div style={{width: '100%', height: size.height - 170, marginTop: 25}} className={'ag-theme-material'}>
           <AgGridReact
-            columnDefs={colunmDef}
+            columnDefs={columnDef}
             rowSelection="single"
             animateRows={true}
             onGridReady={onReady}
