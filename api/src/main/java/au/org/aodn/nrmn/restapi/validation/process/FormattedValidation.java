@@ -8,6 +8,7 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.model.MonoidRowValidation;
 import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
 import au.org.aodn.nrmn.restapi.validation.provider.ValidatorProvider;
+import au.org.aodn.nrmn.restapi.validation.validators.formatted.*;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.SurveyExists;
 import cyclops.companion.Monoids;
 import cyclops.control.Validated;
@@ -33,8 +34,13 @@ public class FormattedValidation extends ValidatorHelpers {
     }
 
     private Seq<BaseFormattedValidator> getCommonValidators() {
-        return Seq.of(
-            new SurveyExists(surveyRepository)
+
+        return Seq.of(new SpeciesNotFound(),
+//                new MeasureBetweenL5l95(),
+//                new MeasureUnderLmax(),
+//                new SpeciesNotSuperseeded(),
+                new TotalCheckSum(),
+                new SurveyExists(surveyRepository)
         );
     }
 
@@ -44,7 +50,6 @@ public class FormattedValidation extends ValidatorHelpers {
         return validators;
     }
 
-    // is the process Valid & return list of stagedRow
 
     public RowWithValidation<String> process(List<StagedRowFormatted> formattedList, StagedJob job) {
         val validators = getValidators(job);

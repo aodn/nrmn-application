@@ -1,9 +1,6 @@
 package au.org.aodn.nrmn.restapi.validation;
 
-import au.org.aodn.nrmn.restapi.model.db.Diver;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import lombok.*;
 
@@ -62,9 +59,11 @@ public class StagedRowFormatted {
 
     private Boolean isInvertSizing;
 
-    private Double lMax;
+    private Integer lMax;
 
     private StagedRow ref;
 
     private Map<Integer, Integer> measureJson;
+
+    private Optional<UiSpeciesAttributes> speciesAttributesOpt;
 }

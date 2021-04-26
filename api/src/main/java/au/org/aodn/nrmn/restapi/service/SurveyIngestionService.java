@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.service;
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.repository.*;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,18 +42,19 @@ public class SurveyIngestionService {
     @Autowired
     EntityManager entityManager;
 
-    public void ingestStagedRow(StagedRowFormatted stagedRow) {
-        observationRepository.saveAll(getObservations(stagedRow));
+    public List<Observation> ingestStagedRow(StagedRowFormatted stagedRow) {
+      return  observationRepository.saveAll(getObservations(stagedRow));
     }
 
     public Survey getSurvey(StagedRowFormatted stagedRow) {
-
-        Optional<Survey> existingSurvey = surveyRepository.findOne(Example.of(Survey.builder()
+        val survey = Survey.builder()
                 .depth(stagedRow.getDepth())
                 .surveyNum(stagedRow.getSurveyNum().orElse(null))
-                .site(stagedRow.getSite())
+                .site(Site.builder().siteCode(stagedRow.getSite().getSiteCode()).build())
                 .surveyDate(Date.valueOf(stagedRow.getDate()))
-                .build()));
+                .build();
+
+        Optional<Survey> existingSurvey = surveyRepository.findOne(Example.of(survey));
 
         return existingSurvey.orElseGet(() -> surveyRepository.save(Survey.builder()
                 .depth(stagedRow.getDepth())
@@ -81,6 +83,7 @@ public class SurveyIngestionService {
 
     public List<Observation> getObservations(StagedRowFormatted stagedRow) {
         SurveyMethod surveyMethod = surveyMethodRepository.save(getSurveyMethod(stagedRow));
+        surveyMethod.getSurvey().getSurveyId();
         Diver diver = stagedRow.getDiver();
         Map<Integer, Integer> measures = stagedRow.getMeasureJson();
 
@@ -92,13 +95,15 @@ public class SurveyIngestionService {
 
         List<Observation> observations = measures.entrySet().stream().map(m -> {
                     int measureId = METHOD_ID_TO_MEASURE_ID_MAP.get(stagedRow.getMethod());
-                    Measure measure = getMeasure(m.getKey(), measureId).get();
+                    Measure measure = getMeasure(m.getKey(), measureId).get() ;
 
                     return baseObservationBuilder
                             .measure(measure)
                             .measureValue(m.getValue())
                             .build();
                 }).collect(Collectors.toList());
+
+        observations.stream().map(obs -> obs.getSurveyMethod().getSurvey());
         return observations;
     }
 
@@ -109,7 +114,7 @@ public class SurveyIngestionService {
                 .seqNo(sequenceNumber)
                 .measureType(measureType)
                 .build());
-
-        return measureRepository.findOne(exampleMeasure);
+        val list =  measureRepository.findAll(exampleMeasure);
+        return list.stream().findFirst();
     }
 }

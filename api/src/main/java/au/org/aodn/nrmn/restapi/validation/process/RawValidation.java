@@ -4,6 +4,7 @@ import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
@@ -51,6 +52,9 @@ public class RawValidation extends ValidatorHelpers {
 
     @Autowired
     ATRCValidators atrcValidators;
+
+    @Autowired
+    ObservationRepository obsRepo;
 
 
     public HashMap<String, BaseRowValidator> getExtendedValidators() {
@@ -141,6 +145,13 @@ public class RawValidation extends ValidatorHelpers {
         val block = (Integer) values.get("Block").orElseGet(null);
 
         val species = (ObservableItem) values.get("Species").orElseGet(null);
+        //val speciesAttributesOtp = obsRepo.getSpeciesAttributesById(new Long(species.getObservableItemId()));
+//        val speciesAttributes = speciesAttributesOtp
+//                .stream()
+//                .findFirst()
+
+        val mayBeSpeciesAttributes = Optional.<UiSpeciesAttributes>empty();
+
         val code = (String) values.get("Code").orElseGet(null);
 
         val vis = (Optional<Integer>) values.get("Vis").orElse(Optional.empty());
@@ -168,13 +179,14 @@ public class RawValidation extends ValidatorHelpers {
         rowFormatted.setTotal(total);
         rowFormatted.setMeasureJson(measureJson);
         rowFormatted.setRef(ref);
+        rowFormatted.setSpeciesAttributesOpt(mayBeSpeciesAttributes);
 
         if (values.containsKey("Inverts") && values.containsKey("IsInvertSizing")) {
             val inverts = (Integer) values.get("Inverts").orElseGet(null);
             val m2InvertSizingSpecies = (Integer) values.get("M2InvertSizingSpecies").orElseGet(null);
             val l5 = (Double) values.get("L5").orElseGet(null);
             val l95 = (Double) values.get("L95").orElseGet(null);
-            val lmax = (Double) values.get("Lmax").orElseGet(null);
+            val lmax = (Integer) values.get("Lmax").orElseGet(null);
             val isInvertSizing = (Boolean) values.get("IsInvertSizing").orElseGet(null);
             rowFormatted.setInverts(inverts);
             rowFormatted.setM2InvertSizingSpecies(m2InvertSizingSpecies);
