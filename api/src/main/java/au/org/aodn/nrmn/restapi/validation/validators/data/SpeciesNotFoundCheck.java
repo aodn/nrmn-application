@@ -40,7 +40,7 @@ public class SpeciesNotFoundCheck extends BaseRowValidator {
                             target.getStagedJob().getId(),
                             target.getSpecies() + " should have no measure"),
                     ValidationCategory.DATA,
-                    ValidationLevel.WARNING,
+                    ValidationLevel.BLOCKING,
                     columnTarget,
                     target));
         }
