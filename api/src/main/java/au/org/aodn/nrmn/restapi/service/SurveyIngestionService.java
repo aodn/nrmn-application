@@ -43,7 +43,7 @@ public class SurveyIngestionService {
     EntityManager entityManager;
 
     public List<Observation> ingestStagedRow(StagedRowFormatted stagedRow) {
-      return  observationRepository.saveAll(getObservations(stagedRow));
+        return observationRepository.saveAll(getObservations(stagedRow));
     }
 
     public Survey getSurvey(StagedRowFormatted stagedRow) {
@@ -82,7 +82,10 @@ public class SurveyIngestionService {
     }
 
     public List<Observation> getObservations(StagedRowFormatted stagedRow) {
-        SurveyMethod surveyMethod = surveyMethodRepository.save(getSurveyMethod(stagedRow));
+        val surveyMethodExample = getSurveyMethod(stagedRow);
+        val surveyMethod = surveyMethodRepository.findOne(Example.of(surveyMethodExample)).orElseGet(() ->
+                surveyMethodRepository.save(surveyMethodExample)
+        );
         surveyMethod.getSurvey().getSurveyId();
         Diver diver = stagedRow.getDiver();
         Map<Integer, Integer> measures = stagedRow.getMeasureJson();
@@ -94,14 +97,14 @@ public class SurveyIngestionService {
 
 
         List<Observation> observations = measures.entrySet().stream().map(m -> {
-                    int measureId = METHOD_ID_TO_MEASURE_ID_MAP.get(stagedRow.getMethod());
-                    Measure measure = getMeasure(m.getKey(), measureId).get() ;
+            int measureId = METHOD_ID_TO_MEASURE_ID_MAP.get(stagedRow.getMethod());
+            Measure measure = getMeasure(m.getKey(), measureId).get();
 
-                    return baseObservationBuilder
-                            .measure(measure)
-                            .measureValue(m.getValue())
-                            .build();
-                }).collect(Collectors.toList());
+            return baseObservationBuilder
+                    .measure(measure)
+                    .measureValue(m.getValue())
+                    .build();
+        }).collect(Collectors.toList());
 
         observations.stream().map(obs -> obs.getSurveyMethod().getSurvey());
         return observations;
@@ -114,7 +117,7 @@ public class SurveyIngestionService {
                 .seqNo(sequenceNumber)
                 .measureType(measureType)
                 .build());
-        val list =  measureRepository.findAll(exampleMeasure);
+        val list = measureRepository.findAll(exampleMeasure);
         return list.stream().findFirst();
     }
 }
