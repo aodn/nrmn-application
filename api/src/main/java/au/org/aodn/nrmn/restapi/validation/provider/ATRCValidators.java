@@ -51,7 +51,7 @@ public class ATRCValidators implements ValidatorProvider {
     public Seq<BaseGlobalValidator> getGlobalValidators() {
         return Seq.of(
             atrcMethodCheck,
-            atrcSurveyGroupComplete,
+            atrcSurveyGroupComplete
         );
     }
 }
