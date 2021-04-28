@@ -15,7 +15,6 @@ import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.*;
 import au.org.aodn.nrmn.restapi.service.SpreadSheetService;
 import au.org.aodn.nrmn.restapi.service.StagedRowService;
-import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.process.ValidationProcess;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -40,197 +39,144 @@ import java.util.stream.Stream;
 @Tag(name = "staged jobs")
 public class StagedJobController {
 
-    @Autowired
-    SpreadSheetService sheetService;
+        @Autowired
+        SpreadSheetService sheetService;
 
-    @Autowired
-    StagedRowService rowService;
+        @Autowired
+        StagedRowService rowService;
 
-    @Autowired
+        @Autowired
+        StagedRowRepository stagedRowRepo;
 
-    StagedRowRepository stagedRowRepo;
+        @Autowired
+        UserActionAuditRepository userAuditRepo;
 
-    @Autowired
-    UserActionAuditRepository userAuditRepo;
+        @Autowired
+        ProgramRepository programRepo;
 
-    @Autowired
-    ProgramRepository programRepo;
+        @Autowired
+        private StagedJobRepository jobRepo;
 
-    @Autowired
-    private StagedJobRepository jobRepo;
+        @Autowired
+        private ValidationProcess validation;
 
-    @Autowired
-    private ValidationProcess validation;
+        @Autowired
+        private SecUserRepository userRepo;
 
-    @Autowired
-    private SecUserRepository userRepo;
+        @Autowired
+        private StagedJobLogRepository logRepo;
 
-    @Autowired
-    private StagedJobLogRepository logRepo;
+        @PostMapping("/upload")
+        @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+        public ResponseEntity<UploadResponse> uploadFile(@RequestParam("withInvertSize") Boolean withInvertSize,
+                        @RequestParam("programId") Integer programId, @RequestParam("file") MultipartFile file,
+                        Authentication authentication) {
 
-    @PostMapping("/upload")
-    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
-    public ResponseEntity<UploadResponse> uploadFile(
-            @RequestParam("withInvertSize") Boolean withInvertSize,
-            @RequestParam("programId") Integer programId,
-            @RequestParam("file") MultipartFile file,
-            Authentication authentication) {
+                userAuditRepo.save(new UserActionAudit("stage/upload", "upload excel file attempt for username: "
+                                + authentication.getName() + "file: " + file.getOriginalFilename()));
+                val programOpt = programRepo.findById(programId);
+                if (!programOpt.isPresent())
+                        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                                        .body(new UploadResponse(Optional.empty(),
+                                                        Stream.of(new ErrorInput("Program Not found", "program"))
+                                                                        .collect(Collectors.toList())));
+                val user = userRepo.findByEmail(authentication.getName());
 
-        userAuditRepo.save(
-                new UserActionAudit(
-                        "stage/upload",
-                        "upload excel file attempt for username: " + authentication.getName()
-                                + "file: " + file.getOriginalFilename())
-        );
-        val programOpt = programRepo.findById(programId);
-        if (!programOpt.isPresent())
-            return ResponseEntity
-                    .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                    .body(new UploadResponse(Optional.empty(),
-                            Stream.of(new ErrorInput("Program Not found", "program")).collect(Collectors.toList())));
-        val user = userRepo.findByEmail(authentication.getName());
+                val job = StagedJob.builder().isExtendedSize(withInvertSize).source(SourceJobType.INGEST)
+                                .reference(file.getOriginalFilename()).status(StatusJobType.PENDING)
+                                .program(programOpt.get()).creator(user.get()).build();
+                jobRepo.save(job);
 
-        val job = StagedJob.builder()
-                .isExtendedSize(withInvertSize)
-                .source(SourceJobType.INGEST)
-                .reference(file.getOriginalFilename())
-                .status(StatusJobType.PENDING)
-                .program(programOpt.get())
-                .creator(user.get())
-                .build();
-        jobRepo.save(job);
+                val jobLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis()))
+                                .eventType(StagedJobEventType.UPLOADED).stagedJob(job)
+                                .details(file.getOriginalFilename() + " uploaded by:" + authentication.getName())
+                                .build();
 
-        val jobLog = StagedJobLog.builder()
-                .eventTime(new Timestamp(System.currentTimeMillis()))
-                .eventType(StagedJobEventType.UPLOADED)
-                .stagedJob(job)
-                .details(file.getOriginalFilename() + " uploaded by:" + authentication.getName())
-                .build();
-        logRepo.save(jobLog);
+                logRepo.save(jobLog);
 
-        val validatedSheet =
-                sheetService
-                        .validatedExcelFile(
-                                file.getOriginalFilename() + "-" + job.getId(),
-                                file,
-                                withInvertSize);
+                val validatedSheet = sheetService.stageXlsxFile(file, withInvertSize);
+                
+                sheetService.saveToS3(file, job.getId());
 
-        return validatedSheet.fold(
-                err -> {
-                    job.setStatus(StatusJobType.FAILED);
-                    jobRepo.save(job);
-                    val errorLog = StagedJobLog.builder()
-                            .eventTime(new Timestamp(System.currentTimeMillis()))
-                            .eventType(StagedJobEventType.ERROR)
-                            .stagedJob(job)
-                            .details(err.stream().map(ErrorInput::getMessage).collect(Collectors.joining(";")))
-                            .build();
-                    logRepo.save(errorLog);
-                    return ResponseEntity.unprocessableEntity().
-                            body(new UploadResponse(Optional.empty(), err.stream().toList()));
-                },
-                sheet -> {
-                    val stagedRowToSave = sheetService.sheets2Staged(sheet);
-                    job.setStatus(StatusJobType.STAGED);
-                    jobRepo.save(job);
+                return validatedSheet.fold(err -> {
+                        job.setStatus(StatusJobType.FAILED);
+                        jobRepo.save(job);
+                        val errorLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis()))
+                                        .eventType(StagedJobEventType.ERROR).stagedJob(job).details(err.stream()
+                                                        .map(ErrorInput::getMessage).collect(Collectors.joining(";")))
+                                        .build();
+                        logRepo.save(errorLog);
+                        return ResponseEntity.unprocessableEntity()
+                                        .body(new UploadResponse(Optional.empty(), err.stream().toList()));
+                }, stagedRowToSave -> {
+                        job.setStatus(StatusJobType.STAGED);
+                        jobRepo.save(job);
 
-                    val stagedLog = StagedJobLog.builder()
-                            .eventTime(new Timestamp(System.currentTimeMillis()))
-                            .eventType(StagedJobEventType.STAGED)
-                            .stagedJob(job)
-                            .details("Staged with " + stagedRowToSave.size() + " row(s).")
-                            .build();
-                    logRepo.save(stagedLog);
-                    stagedRowRepo.saveAll(stagedRowToSave.stream().map(s -> {
-                        s.setStagedJob(job);
-                        return s;
-                    }).collect(Collectors.toList()));
-                    val filesResult = new FileUpload(job.getId(), stagedRowToSave.size());
-                    return ResponseEntity
-                            .status(HttpStatus.OK)
-                            .body(new UploadResponse(Optional.of(filesResult), Collections.emptyList()));
+                        val stagedLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis()))
+                                        .eventType(StagedJobEventType.STAGED).stagedJob(job)
+                                        .details("Staged with " + stagedRowToSave.size() + " row(s).").build();
+                        logRepo.save(stagedLog);
+                        stagedRowRepo.saveAll(stagedRowToSave.stream().map(s -> {
+                                s.setStagedJob(job);
+                                return s;
+                        }).collect(Collectors.toList()));
+                        val filesResult = new FileUpload(job.getId(), stagedRowToSave.size());
+                        return ResponseEntity.status(HttpStatus.OK)
+                                        .body(new UploadResponse(Optional.of(filesResult), Collections.emptyList()));
                 });
-    }
+        }
 
-    @PutMapping("/updates/{jobId}")
-    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
-    public ResponseEntity updateRow(@PathVariable Long jobId,
-                                    Authentication authentication,
-                                    @RequestBody List<StagedRow> newRows) {
-        return rowService.update(jobId, newRows).fold(err ->
-                        ResponseEntity
-                                .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                                .body(err)
-                , rowUpdate -> ResponseEntity.ok().body(rowUpdate));
-    }
+        @PutMapping("/updates/{jobId}")
+        @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+        public ResponseEntity<?> updateRow(@PathVariable Long jobId, Authentication authentication,
+                        @RequestBody List<StagedRow> newRows) {
+                return rowService.update(jobId, newRows).fold(
+                                err -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(err),
+                                rowUpdate -> ResponseEntity.ok().body(rowUpdate));
+        }
 
+        @PostMapping("/validate/{jobId}")
+        @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+        public ResponseEntity<?> validateJob(@PathVariable Long jobId, Authentication authentication) {
 
-    @PostMapping("/validate/{jobId}")
-    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
-    public ResponseEntity validateJob(
-            @PathVariable Long jobId,
-            Authentication authentication) {
+                userAuditRepo.save(new UserActionAudit("stage/validate",
+                                "validate job attempt for username " + authentication.getName() + " file: " + jobId));
 
-        userAuditRepo.save(
-                new UserActionAudit(
-                        "stage/validate",
-                        "validate job attempt for username " + authentication.getName()
-                                + " file: " + jobId)
-        );
+                return jobRepo.findById(jobId).map(job -> {
+                        val validationResponse = validation.process(job);
+                        return ResponseEntity.ok().body(validationResponse);
+                }).orElseGet(() -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ValidationResponse(
+                                null, Collections.emptyList(), Collections.emptyMap(), Collections.emptyList(),
+                                Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob")))));
+        }
 
-        return jobRepo.findById(jobId).map(job -> {
-            val validationResponse = validation.process(job);
-            return ResponseEntity.ok().body(validationResponse);
-        }).orElseGet(() -> ResponseEntity
-                .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new ValidationResponse(
-                        null,
-                        Collections.emptyList(),
-                        Collections.emptyMap(),
-                        Collections.emptyList(),
-                        Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob")))));
-    }
+        @GetMapping("/job/{jobId}")
+        @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+        public ResponseEntity<JobResponse> getJob(@PathVariable Long jobId) {
+                val rows = stagedRowRepo.findRowsByJobId(jobId);
+                return jobRepo.findById(jobId).map(
+                                job -> ResponseEntity.ok().body(new JobResponse(job, rows, Collections.emptyList())))
+                                .orElseGet(() -> ResponseEntity.badRequest().body(new JobResponse(null,
+                                                Collections.emptyList(), Collections.singletonList(
+                                                                new ErrorInput("StagedJob Not found", "StagedJob")))));
 
-    @GetMapping("/job/{jobId}")
-    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
-    public ResponseEntity<JobResponse> getJob(@PathVariable Long jobId) {
-        val rows = stagedRowRepo.findRowsByJobId(jobId);
-        return jobRepo.findById(jobId)
-                .map(job ->
-                        ResponseEntity.ok().body(
-                                new JobResponse(
-                                        job, rows, Collections.emptyList()
-                                ))
-                ).orElseGet(() ->
-                        ResponseEntity.badRequest().body(
-                                new JobResponse(
-                                        null,
-                                        Collections.emptyList(),
-                                        Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob"))
-                                )));
+        }
 
-    }
+        @DeleteMapping("/delete/{jobId}")
+        @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+        public ResponseEntity<Object> deleteJob(@PathVariable Long jobId) {
+                jobRepo.deleteById(jobId);
+                return ResponseEntity.ok().build();
+        }
 
-    @DeleteMapping("/delete/{jobId}")
-    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
-    public ResponseEntity deleteJob(@PathVariable Long jobId) {
-        jobRepo.deleteById(jobId);
-        return ResponseEntity.ok().build();
-    }
+        @PutMapping("/delete/rows/{jobId}")
+        @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+        public ResponseEntity<?> deleteJobRows(@PathVariable Long jobId, Authentication authentication,
+                        @RequestBody List<StagedRow> toDeleRows) {
+                return rowService.delete(toDeleRows).fold(
+                                err -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(err),
+                                rowUpdate -> ResponseEntity.ok().body(rowUpdate));
 
-    @PutMapping("/delete/rows/{jobId}")
-    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
-    public ResponseEntity deleteJobRows(@PathVariable Long jobId,
-                                        Authentication authentication,
-                                        @RequestBody List<StagedRow> toDeleRows) {
-        return rowService.delete( toDeleRows).fold(err ->
-                        ResponseEntity
-                                .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                                .body(err)
-                , rowUpdate -> ResponseEntity.ok().body(rowUpdate));
-
-    }
-
+        }
 
 }
-

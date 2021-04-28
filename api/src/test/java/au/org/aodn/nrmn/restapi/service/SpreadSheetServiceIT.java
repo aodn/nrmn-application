@@ -1,9 +1,12 @@
 package au.org.aodn.nrmn.restapi.service;
 
 
-import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
-import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
-import lombok.val;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.testcontainers.containers.localstack.LocalStackContainer.Service.S3;
+
+import java.io.InputStream;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -14,20 +17,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
+import lombok.val;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
-
-import java.io.InputStream;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.testcontainers.containers.localstack.LocalStackContainer.Service.S3;
 
 @Testcontainers
 @SpringBootTest
@@ -76,9 +77,8 @@ public class SpreadSheetServiceIT {
                 .getClassLoader().getResourceAsStream("sheets/correctShortHeader.xlsx");
 
         val validSheet =
-                sheetService.validatedExcelFile(
-                        "idfileShortValid-1234",
-                        new MockMultipartFile("sheets/correctShortHeader.xsx", rottnestInput),
+                sheetService.stageXlsxFile(
+                        new MockMultipartFile("sheets/correctShortHeader.xlsx", rottnestInput),
                         false
                 );
         assertTrue(validSheet.isValid());
@@ -90,9 +90,8 @@ public class SpreadSheetServiceIT {
         InputStream rottnestInput = getClass()
                 .getClassLoader().getResourceAsStream("sheets/correctLongHeader.xlsx");
         val validSheet =
-                sheetService.validatedExcelFile(
-                        "idfileLongValid-1234",
-                        new MockMultipartFile("sheets/correctLongHeader.xsx", rottnestInput),
+                sheetService.stageXlsxFile(
+                        new MockMultipartFile("sheets/correctLongHeader.xlsx", rottnestInput),
                         true);
         assertTrue(validSheet.isValid());
     }
@@ -103,9 +102,8 @@ public class SpreadSheetServiceIT {
         InputStream rottnestInput = getClass()
                 .getClassLoader().getResourceAsStream("sheets/missingDataSheet.xlsx");
         val validSheet =
-                sheetService.validatedExcelFile(
-                        "idfileMissingInvalid-123",
-                        new MockMultipartFile("sheets/missingDataSheet.xsx", rottnestInput),
+                sheetService.stageXlsxFile(
+                        new MockMultipartFile("sheets/missingDataSheet.xlsx", rottnestInput),
                         false);
         assertTrue(validSheet.isInvalid());
     }
@@ -116,9 +114,8 @@ public class SpreadSheetServiceIT {
 
         InputStream rottnestInput = getClass()
                 .getClassLoader().getResourceAsStream("sheets/missingColumnsHeader.xlsx");
-        val validSheet = sheetService.validatedExcelFile(
-                "idfileInvalid-1245",
-                new MockMultipartFile("sheets/missingColumnsHeader.xsx", rottnestInput),
+        val validSheet = sheetService.stageXlsxFile(
+                new MockMultipartFile("sheets/missingColumnsHeader.xlsx", rottnestInput),
                 false);
         assertTrue(validSheet.isInvalid());
     }
@@ -128,21 +125,21 @@ public class SpreadSheetServiceIT {
     void validFileShouldBeCorrectlyTransformToStageSurvey() throws Exception {
         Mockito.when(provider.getClient()).thenReturn(client);
         val file3 = new FileSystemResource("src/test/resources/sheets/correctShortHeader3.xlsx");
-        val sheetWithHeader = sheetService.validatedExcelFile(
-                "testFile-1234561",
-                new MockMultipartFile("sheets/correctShortHeader3.xsx", file3.getInputStream()),
+        val stageSurveys = sheetService.stageXlsxFile(
+                new MockMultipartFile("sheets/correctShortHeader3.xlsx", file3.getInputStream()),
                 false).orElseGet(() -> null);
-        val stageSurveys = sheetService.sheets2Staged(sheetWithHeader);
         assertEquals(stageSurveys.size(), 2);
         val obs1 = stageSurveys.get(0);
 
-        //test Double
+        // Test Double
         assertEquals(obs1.getLatitude(), "-41.253706");
         assertEquals(obs1.getLongitude(), "148.339749");
-        //test Map filling
+        
+        // Test Map filling
         assertEquals(obs1.getMeasureJson().size(), 5);
         assertEquals(obs1.getMeasureJson().get(21), "4");
-        // test Macro
+
+        // Test Macro
         assertEquals(obs1.getSpecies(), "Caesioperca rasor");
     }
 }
