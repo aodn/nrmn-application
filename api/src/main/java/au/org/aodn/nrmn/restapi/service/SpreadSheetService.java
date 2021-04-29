@@ -4,8 +4,10 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
@@ -42,6 +44,7 @@ public class SpreadSheetService {
             InputStream inputStream = file.getInputStream();
             OPCPackage opcPackage = OPCPackage.open(inputStream);
             XSSFReader xssfReader = new XSSFReader(opcPackage);
+            ZipSecureFile.setMinInflateRatio(0.0d);
 
             SurveyContentsHandler surveyContentsHandler = new SurveyContentsHandler((withInvertSize) ? longHeadersRef : shortHeadersRef);
 
@@ -67,7 +70,9 @@ public class SpreadSheetService {
             }
             return surveyContentsHandler.getResult();
         } catch (NotOfficeXmlFileException e) {
-            return Validated.invalid(new ErrorInput("This does not appear to be an XLSX Excel file.", "excel"));
+            return Validated.invalid(new ErrorInput("Does not appear to be an XLSX Excel file. Please open this file in Excel and save as Excel Workbook (*.xlsx)", "excel"));
+        } catch (POIXMLException e) {
+            return Validated.invalid(new ErrorInput("This document type is not supported. Please open this file in Excel and save as Excel Workbook (*.xlsx)", "excel"));
         } catch (Exception e) {
             return Validated.invalid(new ErrorInput(e.getMessage(), "excel"));
         }
