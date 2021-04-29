@@ -8,6 +8,7 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.model.MonoidRowValidation;
 import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
 import au.org.aodn.nrmn.restapi.validation.provider.ValidatorProvider;
+import au.org.aodn.nrmn.restapi.validation.validators.data.SpeciesNotFoundCheck;
 import au.org.aodn.nrmn.restapi.validation.validators.formatted.*;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.SurveyExists;
 import cyclops.companion.Monoids;
@@ -35,7 +36,7 @@ public class FormattedValidation extends ValidatorHelpers {
 
     private Seq<BaseFormattedValidator> getCommonValidators() {
 
-        return Seq.of(new SpeciesNotFound(),
+        return Seq.of(
 //                new MeasureBetweenL5l95(),
 //                new MeasureUnderLmax(),
 //                new SpeciesNotSuperseeded(),
