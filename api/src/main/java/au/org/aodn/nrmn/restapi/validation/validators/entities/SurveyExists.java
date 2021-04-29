@@ -3,7 +3,7 @@ package au.org.aodn.nrmn.restapi.validation.validators.entities;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
-import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.control.Validated;
 

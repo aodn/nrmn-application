@@ -1,19 +1,15 @@
 package au.org.aodn.nrmn.restapi.validation.validators.formatted;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
-import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
-import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.control.Validated;
 import lombok.val;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class SpeciesNotFound extends BaseFormattedValidator {
 

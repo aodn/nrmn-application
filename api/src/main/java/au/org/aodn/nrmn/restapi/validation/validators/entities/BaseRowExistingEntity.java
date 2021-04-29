@@ -6,9 +6,8 @@ import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.model.EntityCriteria;
-import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseRowValidator;
 import cyclops.control.Validated;
-import lombok.val;
 
 public abstract class BaseRowExistingEntity<E, R extends EntityCriteria<E>> extends BaseRowValidator {
 

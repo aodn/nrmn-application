@@ -1,11 +1,11 @@
-package au.org.aodn.nrmn.restapi.validation.validators.global;
+package au.org.aodn.nrmn.restapi.validation.validators.global.raw;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.model.StagedSurveyMethod;
-import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseGlobalRawValidator;
 import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import cyclops.data.tuple.Tuple3;
@@ -15,11 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class BaseMethodCheck extends BaseGlobalValidator {
+public abstract class BaseMethodCheckRaw extends BaseGlobalRawValidator {
     @Autowired
     StagedRowRepository stagedRowRepo;
 
-    public BaseMethodCheck(String ruleName) {
+    public BaseMethodCheckRaw(String ruleName) {
         super(ruleName);
     }
 

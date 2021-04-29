@@ -6,7 +6,7 @@ import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
-import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
 import au.org.aodn.nrmn.restapi.validation.provider.ATRCValidators;
