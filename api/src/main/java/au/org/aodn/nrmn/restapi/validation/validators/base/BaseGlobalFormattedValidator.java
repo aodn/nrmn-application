@@ -17,7 +17,7 @@ public abstract class BaseGlobalFormattedValidator {
         this.ruleName = ruleName;
     }
 
-    abstract public Validated<StagedRowError, String> valid(List<StagedRowFormatted> rows );
+    abstract public Validated<StagedRowError, String> valid(StagedJob job, List<StagedRowFormatted> rows );
 
     protected Validated<StagedRowError, String> invalid(Long id, String message, ValidationLevel level) {
         return Validated.invalid(
