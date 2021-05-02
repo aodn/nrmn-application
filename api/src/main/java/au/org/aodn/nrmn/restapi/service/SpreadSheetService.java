@@ -38,15 +38,16 @@ public class SpreadSheetService {
 
     @Autowired
     private S3IO s3client;
-    
-    public Validated<ErrorInput, List<StagedRow>> stageXlsxFile(MultipartFile file, Boolean withInvertSize) {
-        try {
-            InputStream inputStream = file.getInputStream();
+
+    public Validated<ErrorInput, List<StagedRow>> stageXlsxFile(MultipartFile file, Boolean withExtendedSizes) {
+        try (InputStream inputStream = file.getInputStream()) {
+
             OPCPackage opcPackage = OPCPackage.open(inputStream);
             XSSFReader xssfReader = new XSSFReader(opcPackage);
             ZipSecureFile.setMinInflateRatio(0.0d);
 
-            SurveyContentsHandler surveyContentsHandler = new SurveyContentsHandler((withInvertSize) ? longHeadersRef : shortHeadersRef);
+            SurveyContentsHandler surveyContentsHandler = new SurveyContentsHandler(
+                    (withExtendedSizes) ? longHeadersRef : shortHeadersRef);
 
             StylesTable styles = xssfReader.getStylesTable();
 
@@ -59,26 +60,27 @@ public class SpreadSheetService {
 
             Iterator<InputStream> sheets = xssfReader.getSheetsData();
             while ((sheets instanceof SheetIterator) && sheets.hasNext()) {
-                InputStream i = sheets.next();
-                try {
+                try (InputStream i = sheets.next()) {
                     if (((SheetIterator) (sheets)).getSheetName().toUpperCase().contentEquals("DATA")) {
                         parser.parse(new InputSource(i));
                     }
-                } finally {
-                    i.close();
                 }
             }
             return surveyContentsHandler.getResult();
         } catch (NotOfficeXmlFileException e) {
-            return Validated.invalid(new ErrorInput("Does not appear to be an XLSX Excel file. Please open this file in Excel and save as Excel Workbook (*.xlsx)", "excel"));
+            return Validated.invalid(new ErrorInput(
+                    "Does not appear to be an XLSX Excel file. Please open this file in Excel and save as Excel Workbook (*.xlsx)",
+                    "excel"));
         } catch (POIXMLException e) {
-            return Validated.invalid(new ErrorInput("This document type is not supported. Please open this file in Excel and save as Excel Workbook (*.xlsx)", "excel"));
+            return Validated.invalid(new ErrorInput(
+                    "This document type is not supported. Please open this file in Excel and save as Excel Workbook (*.xlsx)",
+                    "excel"));
         } catch (Exception e) {
             return Validated.invalid(new ErrorInput(e.getMessage(), "excel"));
         }
     }
 
     public void saveToS3(MultipartFile file, Long jobId) {
-        Future.of(() -> s3client.write("/raw-survey/" + file.getOriginalFilename() + "-" + jobId+ ".xlsx", file));
+        Future.of(() -> s3client.write("/raw-survey/" + file.getOriginalFilename() + "-" + jobId + ".xlsx", file));
     }
 }

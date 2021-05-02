@@ -68,7 +68,7 @@ public class StagedJobController {
 
         @PostMapping("/upload")
         @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-        public ResponseEntity<UploadResponse> uploadFile(@RequestParam("withInvertSize") Boolean withInvertSize,
+        public ResponseEntity<UploadResponse> uploadFile(@RequestParam("withInvertSize") Boolean withExtendedSizes,
                         @RequestParam("programId") Integer programId, @RequestParam("file") MultipartFile file,
                         Authentication authentication) {
 
@@ -82,7 +82,7 @@ public class StagedJobController {
                                                                         .collect(Collectors.toList())));
                 val user = userRepo.findByEmail(authentication.getName());
 
-                val job = StagedJob.builder().isExtendedSize(withInvertSize).source(SourceJobType.INGEST)
+                val job = StagedJob.builder().isExtendedSize(withExtendedSizes).source(SourceJobType.INGEST)
                                 .reference(file.getOriginalFilename()).status(StatusJobType.PENDING)
                                 .program(programOpt.get()).creator(user.get()).build();
                 jobRepo.save(job);
@@ -94,8 +94,8 @@ public class StagedJobController {
 
                 logRepo.save(jobLog);
 
-                val validatedSheet = sheetService.stageXlsxFile(file, withInvertSize);
-                
+                val validatedSheet = sheetService.stageXlsxFile(file, withExtendedSizes);
+
                 sheetService.saveToS3(file, job.getId());
 
                 return validatedSheet.fold(err -> {
