@@ -66,7 +66,6 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             result = Validated.valid(stagedRows);
         else
             result = result != null ? result : Validated.invalid(new ErrorInput("Empty DATA sheet", "sheet"));
-        SheetContentsHandler.super.endSheet();
     }
 
     @Override
