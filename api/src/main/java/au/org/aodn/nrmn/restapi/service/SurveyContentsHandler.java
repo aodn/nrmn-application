@@ -44,16 +44,21 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     @Override
     public void endRow(int rowNum) {
         if (isHeaderRow) {
+            List<String> errors = new ArrayList<String>();
             List<String> foundHeaders = new ArrayList<String>(columnHeaders.values());
             List<String> missingHeaders = new ArrayList<String>(requiredHeaders);
             missingHeaders.removeAll(foundHeaders);
             if (missingHeaders.size() > 0)
-                result = Validated
-                        .invalid(new ErrorInput("Missing Headers: " + String.join(", ", missingHeaders), "headers"));
+                errors.add("Missing Headers: " + String.join(", ", missingHeaders));
+            foundHeaders.removeAll(requiredHeaders);
+            if (foundHeaders.size() > 0)
+                errors.add("Unexpected Headers: " + String.join(", ", foundHeaders));
+            if(errors.size() > 0)
+                result = Validated.invalid(new ErrorInput(String.join(". ", errors), "headers"));
         } else {
             if (rowHasId) {
                 if (measureJson.size() > 0)
-                    currentRow.setMeasureJson(new HashMap<Integer,String>(measureJson));
+                    currentRow.setMeasureJson(new HashMap<Integer, String>(measureJson));
                 this.stagedRows.add(currentRow);
             }
         }
