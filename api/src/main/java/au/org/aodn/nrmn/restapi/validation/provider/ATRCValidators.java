@@ -6,6 +6,7 @@ import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
 import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.validation.validators.data.ATRCMethod7BlockCheck;
 import au.org.aodn.nrmn.restapi.validation.validators.format.ATRCDepthValidation;
+import au.org.aodn.nrmn.restapi.validation.validators.formatted.Method3QuadratMax50;
 import au.org.aodn.nrmn.restapi.validation.validators.formatted.TooOldFutureDate;
 import au.org.aodn.nrmn.restapi.validation.validators.format.IntegerFormatValidation;
 import au.org.aodn.nrmn.restapi.validation.validators.global.ATRCMethodCheck;
@@ -39,7 +40,11 @@ public class ATRCValidators implements ValidatorProvider {
 
     @Override
     public Seq<BaseFormattedValidator> getFormattedValidators() {
-        return Seq.of(new TooOldFutureDate("1992-01-01"));
+
+        return Seq.of(
+                new TooOldFutureDate("1992-01-01"),
+                new  Method3QuadratMax50()
+        );
     }
 
     @Override

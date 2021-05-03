@@ -28,8 +28,12 @@ import java.util.Map;
 @Table(name = "staged_row")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class StagedRow implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="staged_row_id_seq")
+    @SequenceGenerator(name="staged_row_id_seq", sequenceName = "staged_row_id_seq", allocationSize = 100)
     private Long id;
 
     @Column(name = "site_no")
@@ -56,7 +60,6 @@ public class StagedRow implements Serializable {
     @Column(name = "buddy")
     private String buddy;
 
-
     @Column(name = "site_name")
     private String siteName;
 
@@ -81,7 +84,6 @@ public class StagedRow implements Serializable {
 
     @Column(name = "code")
     private String code;
-
 
     @Column(name = "common_name")
     private String commonName;
@@ -114,7 +116,6 @@ public class StagedRow implements Serializable {
     @Type(type = "jsonb")
     private Map<Integer, String> measureJson;
 
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "staged_row_staged_job_id_fkey"))
@@ -132,5 +133,6 @@ public class StagedRow implements Serializable {
     private Timestamp lastUpdated;
 
     @Transient
+    @Builder.Default
     private List<StagedRowError> errors = new ArrayList<>();
 }
