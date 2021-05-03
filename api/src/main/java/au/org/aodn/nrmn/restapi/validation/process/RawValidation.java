@@ -11,7 +11,7 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
 import au.org.aodn.nrmn.restapi.validation.provider.ATRCValidators;
 import au.org.aodn.nrmn.restapi.validation.provider.RLSValidators;
-import au.org.aodn.nrmn.restapi.validation.validators.data.DirectionDataCheck;
+import au.org.aodn.nrmn.restapi.validation.validators.data.*;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.DiverExists;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.ObservableItemExists;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.SiteCodeExists;
@@ -91,6 +91,7 @@ public class RawValidation extends ValidatorHelpers {
                         Tuple2.of("Latitude", new DoubleFormatValidation(StagedRow::getLatitude, "Latitude")),
                         Tuple2.of("Longitude", new DoubleFormatValidation(StagedRow::getLongitude, "Longitude")),
                         Tuple2.of("Direction", new DirectionDataCheck()),
+                        Tuple2.of("SoeciesNotfound",new SpeciesNotFoundCheck()),
                         Tuple2.of("Ref", new PassThruRef())
                 );
     }
