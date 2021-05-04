@@ -368,3 +368,5 @@ CREATE SEQUENCE IF NOT EXISTS nrmn.staged_job_id_seq;
 CREATE SEQUENCE IF NOT EXISTS nrmn.staged_job_log_id_seq;
 
 CREATE SEQUENCE IF NOT EXISTS nrmn.user_id_seq;
+
+ALTER SEQUENCE nrmn.staged_row_id_seq INCREMENT BY 100;

@@ -7,6 +7,7 @@ import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.testcontainers.shaded.org.apache.commons.lang.SerializationUtils;
 
 import java.util.Collections;
 
@@ -47,19 +48,21 @@ public class StagedJobTestData {
                 .reference(reference)
                 .build();
 
-        stagedJob.setRows(Collections.singletonList(
-                StagedRow.builder()
-                         .block("1")
-                         .buddy("Nadia")
-                         .code("nte")
-                         .commonName("Blue-throat wrasse")
-                         .date("12/12/2019")
-                         .depth("6")
-                         .direction("0")
-                         .diver("SDL")
-                         .inverts("0")
-                         .stagedJob(stagedJob)
-                         .build())
+                val row1 = StagedRow.builder()
+                        .block("1")
+                        .method("1")
+                        .buddy("Nadia")
+                        .code("nte")
+                        .commonName("Blue-throat wrasse")
+                        .date("12/12/2019")
+                        .depth("6")
+                        .direction("0")
+                        .diver("SDL")
+                        .inverts("0")
+                        .stagedJob(stagedJob)
+                        .build();
+
+                stagedJob.setRows(Collections.singletonList(row1)
         );
 
         return stagedJobRepository.saveAndFlush(stagedJob);
