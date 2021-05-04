@@ -2,7 +2,7 @@ import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import BaseForm from '../../../../ui/src/components/BaseForm';
 import {loginSubmitted} from './auth-reducer';
-import {Redirect, useLocation} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 
 const schema = {
   title: 'Login',
@@ -29,37 +29,19 @@ const uiSchema = {
 
 var Login = () => {
   const dispatch = useDispatch();
-  let errors = useSelector((state) => state.auth.errors);
-  let loading = useSelector((state) => state.auth.loading);
-  let success = useSelector((state) => state.auth.success);
-  let redirect = useSelector((state) => state.auth.redirect);
-
-  const location = new URLSearchParams(useLocation().search).get('redirect');
-
-  const handleLogin = (form) => {
-    if (location) {
-      form.formData.redirect = location;
-    }
-    dispatch(loginSubmitted(form.formData));
-  };
-
-  if (success) {
-    return <Redirect component="link" to={redirect}></Redirect>;
-  }
-
-  if (location && errors.length === 0) {
-    errors[0] = 'Please login to view this page';
-  }
-
+  const location = useLocation();
+  const errors = useSelector((state) => state.auth.errors);
+  const loading = useSelector((state) => state.auth.loading);
+  const message = errors.length === 0 && location.pathname !== '/login' ? ['Please login to view this page'] : errors;
   return (
     <>
       <BaseForm
         schema={schema}
         uiSchema={uiSchema}
-        errors={errors}
+        errors={message}
         loading={loading}
         hideCancel={true}
-        onSubmit={handleLogin}
+        onSubmit={(form) => dispatch(loginSubmitted(form.formData))}
         submitLabel="Login"
       ></BaseForm>
     </>

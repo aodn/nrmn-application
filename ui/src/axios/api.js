@@ -16,11 +16,6 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-export const tokenExpired = () => {
-  const {expires} = store.getState().auth;
-  return expires && expires < Date.now();
-};
-
 export const userLogin = (params) => {
   return axiosInstance.post(
     '/api/auth/signin',
