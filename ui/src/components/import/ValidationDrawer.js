@@ -136,7 +136,6 @@ const ValidationDrawer = () => {
   const [filter, setFilter] = useState('');
 
   const handleFilter = (err) => {
-    console.log(err);
     dispatch(validationFilter(err));
   };
 

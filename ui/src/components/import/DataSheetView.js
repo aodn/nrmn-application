@@ -214,7 +214,6 @@ const DataSheetView = () => {
 
   const onCellChanged = (evt) => {
     let toAdd = {};
-    console.log(evt.data);
     toAdd[evt.data.id] = evt.data;
     setIndexAdd({...indexAdd, ...toAdd});
     setCanSave(true);
@@ -239,7 +238,6 @@ const DataSheetView = () => {
 
   useEffect(() => {
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
-      console.log('errSelected:', errSelected);
       const firstRow = gridApi.getRowNode(errSelected.ids[0]);
       gridApi.ensureIndexVisible(firstRow.rowIndex, 'middle');
       gridApi.deselectAll();
