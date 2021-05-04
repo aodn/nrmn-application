@@ -170,10 +170,12 @@ public class SurveyContentsHandler implements SheetContentsHandler {
                 break;
             case "Inverts":
                 currentRow.setInverts(formattedValue);
-                measureJson.put(0, formattedValue);
+                if (formattedValue.length() > 0)
+                    measureJson.put(0, formattedValue);
                 break;
             default:
-                if (requiredHeaders.contains(columnValue) && columnValue.matches("\\d.*"))
+                if (formattedValue.length() > 0 && requiredHeaders.contains(columnValue)
+                        && columnValue.matches("\\d.*"))
                     measureJson.put(requiredHeaders.indexOf(columnValue) - requiredHeaders.indexOf("Inverts"),
                             formattedValue);
                 break;
