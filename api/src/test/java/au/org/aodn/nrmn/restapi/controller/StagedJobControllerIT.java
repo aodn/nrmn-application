@@ -104,7 +104,7 @@ class StagedJobControllerIT {
         val file = new FileSystemResource("src/test/resources/sheets/correctShortHeader.xlsx");
         LinkedMultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
         parameters.add("file", file);
-        parameters.add("withInvertSize", false);
+        parameters.add("withExtendedSizes", false);
         parameters.add("programId", 55);
 
 
@@ -135,7 +135,7 @@ class StagedJobControllerIT {
         val file = new FileSystemResource("src/test/resources/sheets/correctLongHeader.xlsx");
         LinkedMultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
         parameters.add("file", file);
-        parameters.add("withInvertSize", true);
+        parameters.add("withExtendedSizes", true);
         parameters.add("programId", 55);
 
 
@@ -170,7 +170,7 @@ class StagedJobControllerIT {
         val file = new FileSystemResource("src/test/resources/sheets/empty.xlsx");
         LinkedMultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
         parameters.add("file", file);
-        parameters.add("withInvertSize", true);
+        parameters.add("withExtendedSizes", true);
         parameters.add("programId", 55);
 
         val resp = reqUpload

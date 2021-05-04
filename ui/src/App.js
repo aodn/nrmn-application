@@ -8,7 +8,7 @@ import {blueGrey, deepPurple} from '@material-ui/core/colors';
 import TopBar from './components/layout/TopBar';
 import SideMenu from './components/layout/SideMenu';
 import Login from './components/auth/login';
-import XlxsUpload from './components/import/XlxsUpload';
+import JobUpload from './components/import/JobUpload';
 import ValidationPage from './components/import/ValidationJob';
 import EntityEdit from './components/data-entities/EntityEdit';
 import EntityList from './components/data-entities/EntityList';
@@ -240,7 +240,7 @@ const App = () => {
               <Route exact path="/jobs" component={JobList} />
               <Route exact path="/jobs/:id/view" component={JobView} />
               <Route exact path="/validation/:jobId" component={ValidationPage} />
-              <Route exact path="/upload" component={XlxsUpload} />
+              <Route exact path="/upload" component={JobUpload} />
               <Route exact path="/data/extract" component={ExtractTemplateData} />
               <Redirect exact from="/list/stagedJob" to="/jobs" />
               {referenceData.map((e) => (

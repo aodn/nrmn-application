@@ -68,7 +68,7 @@ public class StagedJobController {
 
         @PostMapping("/upload")
         @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-        public ResponseEntity<UploadResponse> uploadFile(@RequestParam("withInvertSize") Boolean withExtendedSizes,
+        public ResponseEntity<UploadResponse> uploadFile(@RequestParam("withExtendedSizes") Boolean withExtendedSizes,
                         @RequestParam("programId") Integer programId, @RequestParam("file") MultipartFile file,
                         Authentication authentication) {
 
