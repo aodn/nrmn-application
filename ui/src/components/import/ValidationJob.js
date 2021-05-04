@@ -6,22 +6,22 @@ import {Redirect, useParams} from 'react-router';
 import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutlined';
 import {Backdrop} from '@material-ui/core';
 import ValidationDrawer from './ValidationDrawer';
-import { JobRequested, ResetState } from './reducers/create-import';
+import {JobRequested, ResetState} from './reducers/create-import';
 
 const ValidationJob = () => {
   const {jobId} = useParams();
   const dispatch = useDispatch();
   const job = useSelector((state) => state.import.job);
   const isLoading = useSelector((state) => state.import.isLoading);
+  const editLoading = useSelector((state) => state.import.editLoading);
   const submitLoading = useSelector((state) => state.import.submitLoading);
   const validationLoading = useSelector((state) => state.import.validationLoading);
   const ingestSuccess = useSelector((state) => state.import.ingestSuccess);
-  const deleteLoading =  useSelector((state) => state.import.deleteLoading);
-
+  const deleteLoading = useSelector((state) => state.import.deleteLoading);
 
   useEffect(() => {
     if (jobId) {
-     dispatch(JobRequested(jobId));
+      dispatch(JobRequested(jobId));
     }
     return function clean() {
       dispatch(ResetState());
@@ -29,7 +29,7 @@ const ValidationJob = () => {
   }, []);
 
   if (ingestSuccess) {
-    return <Redirect to={'/jobs/' + jobId + '/view'} ></Redirect>;
+    return <Redirect to={'/jobs/' + jobId + '/view'}></Redirect>;
   }
   const jobReady = job && Object.keys(job).length > 0;
   return jobReady ? (
@@ -62,8 +62,8 @@ const ValidationJob = () => {
         )}
       </Grid>
       <DataSheetView></DataSheetView>
-      {(submitLoading || isLoading || deleteLoading || validationLoading) && (
-        <Backdrop open={submitLoading || isLoading || deleteLoading || validationLoading}>
+      {(submitLoading || isLoading || editLoading || deleteLoading || validationLoading) && (
+        <Backdrop open={submitLoading || isLoading || editLoading || deleteLoading || validationLoading}>
           <CircularProgress size={200} style={{color: '#ccc'}}></CircularProgress>
         </Backdrop>
       )}
