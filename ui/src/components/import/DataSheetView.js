@@ -214,6 +214,7 @@ const DataSheetView = () => {
 
   const onCellChanged = (evt) => {
     let toAdd = {};
+    console.log(evt.data);
     toAdd[evt.data.id] = evt.data;
     setIndexAdd({...indexAdd, ...toAdd});
     setCanSave(true);
@@ -241,7 +242,7 @@ const DataSheetView = () => {
       gridApi.deselectAll();
       errSelected.ids.forEach((id) => {
         const row = gridApi.getRowNode(id);
-        if (row.isSelected) {
+        if (!row.isSelected) {
           row.setSelected(true);
         }
         return row;

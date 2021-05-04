@@ -24,6 +24,7 @@ const GridFindReplace = ({gridApi, onRowsChanged, onSelectionChanged}) => {
   const undoBtnEl = useRef(null);
 
   useEffect(() => {
+    console.log('doUndo:', doUndo);
     if (doUndo) {
       setDoUndo(false);
       undo();
