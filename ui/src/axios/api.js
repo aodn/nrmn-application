@@ -29,11 +29,6 @@ const dataURLtoBlob = (dataurl) => {
   return new Blob([u8arr], {type: mime});
 };
 
-export const tokenExpired = () => {
-  const {expires} = store.getState().auth;
-  return expires && expires < Date.now();
-};
-
 export const userLogin = (params) => {
   return axiosInstance.post(
     '/api/auth/signin',
@@ -176,11 +171,16 @@ export const submitJobFile = (params) => {
 };
 
 export const submitingest = (jobId) => {
-  return axiosInstance.post('/api/ingestion/ingest/' + jobId, {}, {
-    validateStatus: () => true
-  })
-   .then((response) => ({response}))
-   .catch((err) => ({err}));
+  return axiosInstance
+    .post(
+      '/api/ingestion/ingest/' + jobId,
+      {},
+      {
+        validateStatus: () => true
+      }
+    )
+    .then((response) => ({response}))
+    .catch((err) => ({err}));
 };
 
 export const search = (params) => {

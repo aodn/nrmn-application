@@ -1,11 +1,10 @@
 import {takeEvery, call, put} from 'redux-saga/effects';
 import {login, loginAttempted, logout, loginFailed, authError, loginSubmitted, logoutSubmitted} from './auth-reducer';
-import {userLogin, userLogout, tokenExpired} from '../../axios/api';
+import {userLogin, userLogout} from '../../axios/api';
 
 export default function* LoginWatcher() {
   yield takeEvery(loginSubmitted, apiLogin);
   yield takeEvery(logoutSubmitted, apiLogout);
-  yield takeEvery(tokenExpired, loginExpired);
 }
 
 function* apiLogin(loginSubmitted) {
@@ -22,7 +21,6 @@ function* apiLogin(loginSubmitted) {
       const username = JSON.parse(payload.config.data).username;
       var data = {...payload.data};
       data.username = username;
-      data.redirect = loginSubmitted.payload.redirect;
       yield put(login(data));
     }
   } catch (e) {
@@ -37,8 +35,4 @@ function* apiLogout(logoutSubmitted) {
   } catch (e) {
     console.error('ERROR: Logout failed', e);
   }
-}
-
-function* loginExpired(tokenExpired) {
-  if (tokenExpired) yield put(logout());
 }

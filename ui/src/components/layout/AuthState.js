@@ -7,10 +7,11 @@ import {toggleLogoutMenuOpen} from './layout-reducer';
 import {Button} from '@material-ui/core';
 
 const AuthState = () => {
-  const loggedIn = useSelector((state) => state.auth.success);
+  const expires = useSelector((state) => state.auth.expires);
   const username = useSelector((state) => state.auth.username);
   const dispatch = useDispatch();
   const history = useHistory();
+  const loggedIn = Date.now() < expires;
 
   const openLogout = () => dispatch(toggleLogoutMenuOpen());
 
