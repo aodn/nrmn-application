@@ -90,9 +90,10 @@ public class SpreadSheetServiceIT {
                 Mockito.when(provider.getClient()).thenReturn(client);
                 InputStream rottnestInput = getClass().getClassLoader()
                                 .getResourceAsStream("sheets/correctLongHeader.xlsx");
-                // withExtendedSizes = false should reject the sheet as having unexpected headers
                 val validSheet = sheetService.stageXlsxFile(
                                 new MockMultipartFile("sheets/correctLongHeader.xlsx", rottnestInput), false);
+
+                // Reject the sheet for having unexpected headers
                 assertTrue(validSheet.isInvalid());
         }
 
@@ -148,5 +149,22 @@ public class SpreadSheetServiceIT {
 
                 // Test Macro
                 assertEquals(obs1.getSpecies(), "Caesioperca rasor");
+        }
+
+        @Test
+        void datesShouldNeverBeFormattedMDY() throws Exception {
+                Mockito.when(provider.getClient()).thenReturn(client);
+                val file = new FileSystemResource("src/test/resources/sheets/dateFormats.xlsx");
+                val mockFile = new MockMultipartFile("sheets/dateFormats.xlsx", file.getInputStream());
+                val stageSurveys = sheetService.stageXlsxFile(mockFile, false).orElseGet(() -> null);
+
+                // Test that dates are formatted the same way as they appear in the sheet.
+                assertEquals("12/12/2019", stageSurveys.get(0).getDate());
+                assertEquals("12/12/2019", stageSurveys.get(1).getDate());
+                assertEquals("12/12/2019", stageSurveys.get(2).getDate());
+                assertEquals("14/3/2019", stageSurveys.get(3).getDate());
+                assertEquals("14/3/2019", stageSurveys.get(4).getDate());
+                assertEquals("14/03/2019", stageSurveys.get(5).getDate());
+                assertEquals("14/03/2019", stageSurveys.get(6).getDate());
         }
 }
