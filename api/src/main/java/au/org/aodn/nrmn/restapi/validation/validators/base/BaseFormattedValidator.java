@@ -1,9 +1,10 @@
-package au.org.aodn.nrmn.restapi.validation;
+package au.org.aodn.nrmn.restapi.validation.validators.base;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
+import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.control.Validated;
 
 public abstract class BaseFormattedValidator {

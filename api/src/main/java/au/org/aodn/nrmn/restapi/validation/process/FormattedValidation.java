@@ -3,7 +3,7 @@ package au.org.aodn.nrmn.restapi.validation.process;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
-import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.model.MonoidRowValidation;
 import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
