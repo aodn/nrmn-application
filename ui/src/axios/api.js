@@ -10,10 +10,21 @@ function getToken() {
 
 axiosInstance.interceptors.request.use(
   (config) => {
+    window.setApplicationError(null);
     config.headers.authorization = getToken();
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    window.setApplicationError(error?.message || JSON.stringify(error), error);
+    console.error({error});
+  }
 );
 
 export const userLogin = (params) => {
@@ -127,7 +138,11 @@ export const getDataJob = (jobId) =>
     .then((res) => res)
     .catch((err) => err);
 
-export const postJobValidation = (jobId) => axiosInstance.post('/api/stage/validate/' + jobId).then((res) => res);
+export const postJobValidation = (jobId) =>
+  axiosInstance
+    .post('/api/stage/validate/' + jobId)
+    .then((res) => res)
+    .catch((err) => err);
 export const updateRow = (jobId, rows) => {
   return axiosInstance.put('/api/stage/updates/' + jobId, rows.map(importRow)).then((res) => res);
 };
