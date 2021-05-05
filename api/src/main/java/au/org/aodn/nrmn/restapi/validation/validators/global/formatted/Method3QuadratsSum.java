@@ -25,14 +25,14 @@ public class Method3QuadratsSum extends BaseGlobalFormattedValidator {
         val transectsMap = rows.stream()
                 .filter(row -> row.getMethod().equals(3))
                 .collect(Collectors.groupingBy(row ->
-                        row.getDepth()
+                        row.getDepth() + "." + row.getSurveyNum().orElseGet(() -> 0)
                                 + "-"
                                 + row.getSite().getSiteCode()
                                 + "-"
                                 + row.getDate().toEpochDay()
                 ));
 
-        val transectSumQuadratsUnder50 =  transectsMap
+        val transectSumQuadratsUnder50 = transectsMap
                 .entrySet().stream()
                 .map(entry ->
                         Tuple2.of(
