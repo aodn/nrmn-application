@@ -28,7 +28,7 @@ public class Method3QuadratsMissing extends BaseGlobalFormattedValidator {
         val transectsMap = rows.stream()
                 .filter(row -> row.getMethod().equals(3))
                 .collect(Collectors.groupingBy(row ->
-                        row.getDepth()
+                        row.getDepth() + "." + row.getSurveyNum().orElseGet(() -> 0)
                                 + "-"
                                 + row.getSite().getSiteCode()
                                 + "-"

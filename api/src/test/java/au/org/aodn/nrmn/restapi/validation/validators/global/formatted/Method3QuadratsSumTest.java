@@ -66,15 +66,15 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
 
         val r2 = getDefaultFormatted().build();
         r2.setMethod(3);
-        r2.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(3, 80).put(5, 5).build());
+        r2.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(3, 80).put(4, 45).put(5, 30).build());
 
         val r3 = getDefaultFormatted().build();
         r3.setMethod(3);
-        r3.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(3, 4).build());
+        r3.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(2,10).put(4, 6).build());
 
         val r4 = getDefaultFormatted().build();
         r4.setMethod(3);
-        r4.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build());
+        r4.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(2,20).put(1, 140).put(5, 27).build());
 
         val date = LocalDate.now();
 
@@ -82,17 +82,17 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
 
         a1.setMethod(3);
         a1.setDate(date);
-        a1.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 70).build());
+        a1.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 42).put(3, 70).build());
 
         val a2 = getDefaultFormatted().build();
         a2.setMethod(3);
         a2.setDate(date);
-        a2.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(2, 3).build());
+        a2.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1,10).put(2, 35).build());
 
         val a3 = getDefaultFormatted().build();
         a3.setMethod(3);
         a3.setDate(date);
-        a3.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(4, 10).build());
+        a3.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(2,16).put(4, 100).put(5,52).build());
 
         val a4 = getDefaultFormatted().build();
         a4.setMethod(3);

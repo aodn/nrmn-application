@@ -6,6 +6,7 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.validators.base.BaseGlobalFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.validators.base.BaseGlobalRawValidator;
 import au.org.aodn.nrmn.restapi.validation.provider.ValidatorProvider;
+import au.org.aodn.nrmn.restapi.validation.validators.global.formatted.Method3QuadratsMissing;
 import au.org.aodn.nrmn.restapi.validation.validators.global.formatted.Method3QuadratsSum;
 import cyclops.companion.Monoids;
 import cyclops.control.Validated;
@@ -39,7 +40,7 @@ public class GlobalValidation {
     }
 
     private Seq<BaseGlobalFormattedValidator> getFormattedValidators(StagedJob job) {
-        return Seq.of(new Method3QuadratsSum());
+        return Seq.of(new Method3QuadratsSum(), new Method3QuadratsMissing());
     }
 
 
