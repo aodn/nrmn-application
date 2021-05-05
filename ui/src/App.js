@@ -1,9 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
 import clsx from 'clsx';
+import Alert from '@material-ui/lab/Alert';
 import {ThemeProvider, createMuiTheme, responsiveFontSizes, makeStyles} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import Box from '@material-ui/core/Box';
 import {blueGrey, deepPurple} from '@material-ui/core/colors';
 import TopBar from './components/layout/TopBar';
 import SideMenu from './components/layout/SideMenu';
@@ -179,6 +181,9 @@ const App = () => {
   const classes = useStyles();
   const leftSideMenuIsOpen = useSelector((state) => state.toggle.leftSideMenuIsOpen);
   const expires = useSelector((state) => state.auth.expires);
+  const [applicationError, setApplicationError] = useState(null);
+  window.setApplicationError = setApplicationError;
+
   const loggedIn = Date.now() < expires;
   let theme = createMuiTheme({
     palette: {
@@ -227,6 +232,13 @@ const App = () => {
               [classes.contentShift]: leftSideMenuIsOpen
             })}
           >
+            {applicationError && (
+              <Box m={1}>
+                <Alert severity="error" variant="filled">
+                  {applicationError}
+                </Alert>
+              </Box>
+            )}
             <Switch>
               <Route exact path="/home" component={Homepage} />
               <Route exact path="/404" component={FourOFour}></Route>
