@@ -37,7 +37,7 @@ public class GlobalValidation {
         val provider = beanFactory.getBean(job.getProgram().getProgramName(), ValidatorProvider.class);
         val validators = getCommonValidators().appendAll(provider.getGlobalValidators());
         return validators;
-    }
+    }                                                                                                                                                                      
 
     private Seq<BaseGlobalFormattedValidator> getFormattedValidators(StagedJob job) {
         return Seq.of(new Method3QuadratsSum(), new Method3QuadratsMissing());

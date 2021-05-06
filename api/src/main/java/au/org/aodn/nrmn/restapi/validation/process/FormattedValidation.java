@@ -37,9 +37,10 @@ public class FormattedValidation extends ValidatorHelpers {
     private Seq<BaseFormattedValidator> getCommonValidators() {
 
         return Seq.of(
-//                new MeasureBetweenL5l95(),
-//                new MeasureUnderLmax(),
-//                new SpeciesNotSuperseeded(),
+                new MeasureBetweenL5l95(),
+                new MeasureUnderLmax(),
+                new SpeciesNotSuperseeded(),
+                new SpeciesAbundanceCheck(),
                 new TotalCheckSum(),
                 new SurveyExists(surveyRepository)
         );
