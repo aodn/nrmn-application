@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 @Service
 public class SurveyIngestionService {
     private static final ImmutableMap<Integer, Integer> METHOD_ID_TO_MEASURE_ID_MAP = ImmutableMap.<Integer, Integer>builder()
-            .put(1, 1).put(2, 4).put(3, 2).put(4, 3).put(5, 7).build();
+            .put(0,1).put(1, 1).put(2, 4).put(3, 2).put(4, 3).put(5, 7).build();
     private static Logger logger = LoggerFactory.getLogger(SurveyIngestionService.class);
     @Autowired
     SurveyRepository surveyRepository;

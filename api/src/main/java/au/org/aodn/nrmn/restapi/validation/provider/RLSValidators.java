@@ -2,16 +2,15 @@ package au.org.aodn.nrmn.restapi.validation.provider;
 
 
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
-import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
-import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseGlobalRawValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.validation.validators.formatted.DebrisZeroObs;
-import au.org.aodn.nrmn.restapi.validation.validators.formatted.SpeciesInvertSizing;
 import au.org.aodn.nrmn.restapi.validation.validators.formatted.TooOldFutureDate;
 import au.org.aodn.nrmn.restapi.validation.validators.format.DoubleFormatValidation;
 import au.org.aodn.nrmn.restapi.validation.validators.format.IntegerFormatValidation;
-import au.org.aodn.nrmn.restapi.validation.validators.global.RLSMethodBlockAssociation;
-import au.org.aodn.nrmn.restapi.validation.validators.global.RLSMethodCheck;
+import au.org.aodn.nrmn.restapi.validation.validators.global.raw.RLSMethodBlockAssociation;
+import au.org.aodn.nrmn.restapi.validation.validators.global.raw.RLSMethodCheck;
 import cyclops.data.Seq;
 import cyclops.data.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +45,7 @@ public class RLSValidators implements ValidatorProvider {
                 new DebrisZeroObs());
     }
     @Override
-    public Seq<BaseGlobalValidator> getGlobalValidators() {
+    public Seq<BaseGlobalRawValidator> getGlobalValidators() {
         return Seq.of(
                 rslBlockAssoc,
                 rlsMethodCheck

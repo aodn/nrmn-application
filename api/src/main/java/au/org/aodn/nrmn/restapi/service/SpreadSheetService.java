@@ -40,11 +40,13 @@ public class SpreadSheetService {
     private S3IO s3client;
 
     public Validated<ErrorInput, List<StagedRow>> stageXlsxFile(MultipartFile file, Boolean withExtendedSizes) {
+
+        ZipSecureFile.setMinInflateRatio(0.0d);
+
         try (InputStream inputStream = file.getInputStream()) {
 
             OPCPackage opcPackage = OPCPackage.open(inputStream);
             XSSFReader xssfReader = new XSSFReader(opcPackage);
-            ZipSecureFile.setMinInflateRatio(0.0d);
 
             SurveyContentsHandler surveyContentsHandler = new SurveyContentsHandler(
                     (withExtendedSizes) ? longHeadersRef : shortHeadersRef);
@@ -53,7 +55,9 @@ public class SpreadSheetService {
 
             ReadOnlySharedStringsTable sharedStrings = new ReadOnlySharedStringsTable(opcPackage);
 
-            ContentHandler handler = new XSSFSheetXMLHandler(styles, sharedStrings, surveyContentsHandler, false);
+            SurveyCellFormatter surveyCellFormatter = new SurveyCellFormatter();
+            ContentHandler handler = new XSSFSheetXMLHandler(styles, sharedStrings, surveyContentsHandler,
+                    surveyCellFormatter, false);
 
             XMLReader parser = XMLReaderFactory.createXMLReader();
             parser.setContentHandler(handler);
