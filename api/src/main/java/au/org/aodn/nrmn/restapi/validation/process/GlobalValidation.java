@@ -33,7 +33,7 @@ public class GlobalValidation {
         val provider = beanFactory.getBean(job.getProgram().getProgramName(), ValidatorProvider.class);
         val validators = getCommonValidators().appendAll(provider.getGlobalValidators());
         return validators;
-    }
+    }                                                                                                                                                                      
 
 
     public Validated<StagedRowError, String> process(StagedJob job) {
