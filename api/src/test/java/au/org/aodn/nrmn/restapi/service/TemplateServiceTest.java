@@ -2,9 +2,15 @@ package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.Location;
+import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.Site;
+import au.org.aodn.nrmn.restapi.model.db.SpeciesWithAttributes;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.repository.SpeciesWithAttributesRepository;
+import lombok.val;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -36,6 +43,12 @@ public class TemplateServiceTest {
     @Mock
     SiteRepository siteRepository;
 
+    @Mock
+    SpeciesWithAttributesRepository speciesWithAttributesRepository;
+
+    @Mock
+    ObservableItemRepository observableItemRepository;
+
     @BeforeEach
     void init() {
         MockitoAnnotations.initMocks(this);
@@ -43,20 +56,18 @@ public class TemplateServiceTest {
 
     @Test
     void getDiversCsv() throws IOException {
-        List<Diver> divers = Arrays.asList(
-                Diver.builder().initials("GWB").fullName("George Bush").build(),
+        List<Diver> divers = Arrays.asList(Diver.builder().initials("GWB").fullName("George Bush").build(),
                 Diver.builder().initials("BHO").fullName("Barack Obama").build(),
-                Diver.builder().initials("DJT").fullName("Donald Trump").build()
-        );
+                Diver.builder().initials("DJT").fullName("Donald Trump").build());
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         templateService.writeDiversCsv(printWriter, divers);
-        List<String> csvLines = Arrays.stream(stringWriter.toString().split("\n"))
-                .map(String::trim).collect(Collectors.toList());
+        List<String> csvLines = Arrays.stream(stringWriter.toString().split("\n")).map(String::trim)
+                .collect(Collectors.toList());
 
         assertEquals(4, csvLines.size());
-        assertEquals("INITIALS,FULL NAME", csvLines.get(0));
+        assertEquals("Initials,Full_name", csvLines.get(0));
         assertEquals("BHO,Barack Obama", csvLines.get(1));
         assertEquals("DJT,Donald Trump", csvLines.get(2));
         assertEquals("GWB,George Bush", csvLines.get(3));
@@ -73,42 +84,33 @@ public class TemplateServiceTest {
         List<Diver> divers = templateService.getDiversForTemplate();
 
         assertEquals(3, divers.size());
-        assert(divers.contains(bush));
-        assert(divers.contains(obama));
-        assert(divers.contains(trump));
+        assert (divers.contains(bush));
+        assert (divers.contains(obama));
+        assert (divers.contains(trump));
         assertFalse("divers should only include alphabetic initials", divers.contains(robot));
 
     }
 
     @Test
     void getSitesCsv() throws IOException {
-        Site.SiteBuilder builder = Site.builder()
-                .state("Tasmania")
-                .latitude(-43.1)
-                .longitude(147.1)
+        Site.SiteBuilder builder = Site.builder().state("Tasmania").latitude(-43.1).longitude(147.1)
                 .siteName("Springfield");
-        Site testSite333 = builder
-                .siteCode("TAS333")
+        Site testSite333 = builder.siteCode("TAS333")
                 .location(Location.builder().locationId(333).locationName("Southish").build()).build();
-        Site testSite334 = builder
-                .siteCode("TAS334")
+        Site testSite334 = builder.siteCode("TAS334")
                 .location(Location.builder().locationId(334).locationName("Southish").build()).build();
-        Site testSite335 = builder
-                .siteCode("TAS335")
+        Site testSite335 = builder.siteCode("TAS335")
                 .location(Location.builder().locationId(335).locationName("Southish").build()).build();
-        Site testSite336 = builder
-                .siteCode("VIC336")
-                .state("Victoria")
+        Site testSite336 = builder.siteCode("VIC336").state("Victoria")
                 .location(Location.builder().locationId(336).locationName("Southish").build()).build();
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        templateService.writeSitesCsv(printWriter,
-                Arrays.asList(testSite336, testSite335, testSite334, testSite333));
+        templateService.writeSitesCsv(printWriter, Arrays.asList(testSite336, testSite335, testSite334, testSite333));
 
-        List<String> csvLines = Arrays.stream(stringWriter.toString().split("\n"))
-                .map(String::trim).collect(Collectors.toList());
+        List<String> csvLines = Arrays.stream(stringWriter.toString().split("\n")).map(String::trim)
+                .collect(Collectors.toList());
 
         assertEquals(5, csvLines.size());
         assertEquals("SITE,Site Name,Latitude,Longitude,Region", csvLines.get(0));
@@ -120,23 +122,15 @@ public class TemplateServiceTest {
 
     @Test
     void getSitesForTemplate() throws IOException {
-        Site.SiteBuilder builder = Site.builder()
-                .state("Tasmania")
-                .latitude(-43.1)
-                .longitude(147.1)
+        Site.SiteBuilder builder = Site.builder().state("Tasmania").latitude(-43.1).longitude(147.1)
                 .siteName("Springfield");
-        Site testSite333 = builder
-                .siteCode("TAS333")
+        Site testSite333 = builder.siteCode("TAS333")
                 .location(Location.builder().locationId(333).locationName("Southish").build()).build();
-        Site testSite334 = builder
-                .siteCode("TAS334")
+        Site testSite334 = builder.siteCode("TAS334")
                 .location(Location.builder().locationId(334).locationName("Southish").build()).build();
-        Site testSite335 = builder
-                .siteCode("TAS335")
+        Site testSite335 = builder.siteCode("TAS335")
                 .location(Location.builder().locationId(335).locationName("Southish").build()).build();
-        Site testSite336 = builder
-                .siteCode("VIC336")
-                .state("Victoria")
+        Site testSite336 = builder.siteCode("VIC336").state("Victoria")
                 .location(Location.builder().locationId(336).locationName("Southish").build()).build();
 
         when(siteRepository.findSiteCodesByProvince("Antipodes")).thenReturn(Arrays.asList("TAS333"));
@@ -146,22 +140,68 @@ public class TemplateServiceTest {
         when(siteRepository.findAll(Example.of(Site.builder().siteCode("TAS334").build())))
                 .thenReturn(Arrays.asList(testSite334));
 
-        when(siteRepository.findAll(Example.of(Site.builder().location(Location.builder().locationId(335).build()).build())))
-                .thenReturn(Arrays.asList(testSite335));
+        when(siteRepository
+                .findAll(Example.of(Site.builder().location(Location.builder().locationId(335).build()).build())))
+                        .thenReturn(Arrays.asList(testSite335));
 
         when(siteRepository.findAll(Example.of(Site.builder().state("Victoria").build())))
                 .thenReturn(Arrays.asList(testSite336));
 
-        List<Site> sites = templateService.getSitesForTemplate(
-                Arrays.asList(335),
-                Arrays.asList("Antipodes"),
-                Arrays.asList("Victoria"),
-                Arrays.asList("TAS334"));
+        Set<Site> sites = templateService.getSitesForTemplate(Arrays.asList(335), Arrays.asList("Antipodes"),
+                Arrays.asList("Victoria"), Arrays.asList("TAS334"));
 
         assertEquals(4, sites.size());
-        assert(sites.contains(testSite333));
-        assert(sites.contains(testSite334));
-        assert(sites.contains(testSite335));
-        assert(sites.contains(testSite336));
+        assert (sites.contains(testSite333));
+        assert (sites.contains(testSite334));
+        assert (sites.contains(testSite335));
+        assert (sites.contains(testSite336));
+    }
+
+    @Test
+    void getSpeciesCsv() throws IOException {
+        SpeciesWithAttributes.SpeciesWithAttributesBuilder sb = SpeciesWithAttributes.builder();
+        SpeciesWithAttributes s1 = sb.letterCode("asa").speciesName("Abudefduf saxatilis")
+                .commonName("Sergeant major").l5(2.5).l95(15.0).lMax(20).build();
+
+        SpeciesWithAttributes s2 = sb.letterCode("aba").speciesName("Acanthurus bahianus")
+                .commonName("Ocean surgeon").l5(5.0).l95(30.0).lMax(40).build();
+
+        SpeciesWithAttributes s3 = sb.letterCode("ach").speciesName("Acanthurus chirurgus")
+                .commonName("Doctorfish").l5(7.5).l95(45.0).lMax(60).build();
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        templateService.writeSpeciesCsv(printWriter, Arrays.asList(s1, s2, s3));
+        List<String> csvLines = Arrays.stream(stringWriter.toString().split("\n")).map(String::trim)
+                .collect(Collectors.toList());
+
+        assertEquals(4, csvLines.size());
+        assertEquals("code,Species_name,Common Name,L5,L95,LMax", csvLines.get(0));
+        assertEquals("asa,Abudefduf saxatilis,Sergeant major,2.5,15.0,20", csvLines.get(1));
+        assertEquals("aba,Acanthurus bahianus,Ocean surgeon,5.0,30.0,40", csvLines.get(2));
+        assertEquals("ach,Acanthurus chirurgus,Doctorfish,7.5,45.0,60", csvLines.get(3));
+    }
+
+    @Test
+    void getSpeciesForTemplate() throws IOException {
+        SpeciesWithAttributes.SpeciesWithAttributesBuilder sb = SpeciesWithAttributes.builder();
+        SpeciesWithAttributes swa1 = sb.letterCode("asa").speciesName("Abudefduf saxatilis")
+                .commonName("Sergeant major").l5(2.5).l95(15.0).lMax(20).build();
+        SpeciesWithAttributes swa2 = sb.letterCode("aba").speciesName("Acanthurus bahianus")
+                .commonName("Ocean surgeon").l5(5.0).l95(30.0).lMax(40).build();
+        SpeciesWithAttributes swa3 = sb.letterCode("ach").speciesName("Acanthurus chirurgus")
+                .commonName("Doctorfish").l5(7.5).l95(45.0).lMax(60).build();
+        List<SpeciesWithAttributes> swaList = Arrays.asList(swa1,swa2,swa3);
+        ObservableItem.ObservableItemBuilder ob = ObservableItem.builder();
+        ObservableItem o1 = ob.observableItemId(123).commonName("commonName").className("className").build();
+        Site site1 = Site.builder().siteId(1).build();
+        val sites = Arrays.asList(site1);
+        val obsIds = Arrays.asList(123);
+        when(observableItemRepository.getAllM2ObservableItems(sites)).thenReturn(Arrays.asList(o1).stream().collect(Collectors.toSet()));
+        when(speciesWithAttributesRepository.findAllById(obsIds)).thenReturn(swaList);
+        List<SpeciesWithAttributes> speciesWithAttributes = templateService.getM2SpeciesForTemplate(sites);
+        assertEquals(swaList.size() + 2,speciesWithAttributes.size());
+        assertEquals("nsf", speciesWithAttributes.get(3).getLetterCode());
+        assertEquals("snd", speciesWithAttributes.get(4).getLetterCode());
     }
 }

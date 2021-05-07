@@ -215,9 +215,10 @@ public class TemplateService {
         Set<ObservableItem> observableItems = observableItemRepository.getAllM2ObservableItems(sites);
         List<SpeciesWithAttributes> species =  speciesWithAttributesRepository.findAllById(
                 observableItems.stream().map(ObservableItem::getObservableItemId).collect(toList()));
-        species.add(new SpeciesWithAttributes(null, "nsf", "No Species Found", null, null,null, null, null));
-        species.add(new SpeciesWithAttributes(null, "snd", "Survey Not Done", null, null,null, null, null));
-        return species;
+        List<SpeciesWithAttributes> speciesWithDefaults = species.stream().collect(Collectors.toList());
+        speciesWithDefaults.add(new SpeciesWithAttributes(null, "nsf", "No Species Found", null, null,null, null, null));
+        speciesWithDefaults.add(new SpeciesWithAttributes(null, "snd", "Survey Not Done", null, null,null, null, null));
+        return speciesWithDefaults;
     }
 
     private String toString(Object couldBeNull) {
