@@ -29,10 +29,10 @@ public class TemplateController {
 
     @GetMapping(path = "/template.zip", produces = "application/zip")
     public void getTemplateZip(final HttpServletResponse response,
-                               @RequestParam(required = false) List<Integer> locations,
-                               @RequestParam(required = false) List<String> provinces,
-                               @RequestParam(required = false) List<String> states,
-                               @RequestParam(required = false) List<String> siteCodes) throws IOException {
+                               @RequestParam(defaultValue = "") List<Integer> locations,
+                               @RequestParam(defaultValue = "") List<String> provinces,
+                               @RequestParam(defaultValue = "") List<String> states,
+                               @RequestParam(defaultValue = "") List<String> siteCodes) throws IOException {
         logger.info(LogInfo.withContext(String.format("downloading template zip")));
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
