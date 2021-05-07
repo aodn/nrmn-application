@@ -41,7 +41,8 @@ public class FormattedValidation extends ValidatorHelpers {
 //                new MeasureUnderLmax(),
 //                new SpeciesNotSuperseeded(),
                 new TotalCheckSum(),
-                new SurveyExists(surveyRepository)
+                new SurveyExists(surveyRepository),
+                new Within200MSiteCheck()
         );
     }
 
