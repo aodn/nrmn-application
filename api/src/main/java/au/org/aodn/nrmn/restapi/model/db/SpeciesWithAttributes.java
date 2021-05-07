@@ -21,8 +21,6 @@ public class SpeciesWithAttributes {
     @Column(name = "observable_item_id")
     private Integer id;
 
-    private String letterCode;
-
     @Basic
     @Column(name = "species_name")
     private String speciesName;

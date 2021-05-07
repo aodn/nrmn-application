@@ -1,15 +1,16 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import au.org.aodn.nrmn.restapi.model.db.Diver;
-import au.org.aodn.nrmn.restapi.model.db.Location;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.model.db.SpeciesWithAttributes;
-import au.org.aodn.nrmn.restapi.repository.DiverRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import au.org.aodn.nrmn.restapi.repository.SpeciesWithAttributesRepository;
-import lombok.val;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,17 +21,16 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Example;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.mockito.Mockito.when;
+import au.org.aodn.nrmn.restapi.model.db.Diver;
+import au.org.aodn.nrmn.restapi.model.db.Location;
+import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
+import au.org.aodn.nrmn.restapi.model.db.Site;
+import au.org.aodn.nrmn.restapi.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.repository.SpeciesWithAttributesRepository;
+import au.org.aodn.nrmn.restapi.repository.projections.SpeciesWithAttributesCsvRow;
+import lombok.val;
 
 @ExtendWith(MockitoExtension.class)
 public class TemplateServiceTest {
@@ -159,14 +159,14 @@ public class TemplateServiceTest {
 
     @Test
     void getSpeciesCsv() throws IOException {
-        SpeciesWithAttributes.SpeciesWithAttributesBuilder sb = SpeciesWithAttributes.builder();
-        SpeciesWithAttributes s1 = sb.letterCode("asa").speciesName("Abudefduf saxatilis")
+        SpeciesWithAttributesCsvRow.SpeciesWithAttributesCsvRowBuilder sb = SpeciesWithAttributesCsvRow.builder();
+        SpeciesWithAttributesCsvRow s1 = sb.letterCode("asa").speciesName("Abudefduf saxatilis")
                 .commonName("Sergeant major").l5(2.5).l95(15.0).lMax(20).build();
 
-        SpeciesWithAttributes s2 = sb.letterCode("aba").speciesName("Acanthurus bahianus")
+        SpeciesWithAttributesCsvRow s2 = sb.letterCode("aba").speciesName("Acanthurus bahianus")
                 .commonName("Ocean surgeon").l5(5.0).l95(30.0).lMax(40).build();
 
-        SpeciesWithAttributes s3 = sb.letterCode("ach").speciesName("Acanthurus chirurgus")
+        SpeciesWithAttributesCsvRow s3 = sb.letterCode("ach").speciesName("Acanthurus chirurgus")
                 .commonName("Doctorfish").l5(7.5).l95(45.0).lMax(60).build();
 
         StringWriter stringWriter = new StringWriter();
@@ -184,24 +184,25 @@ public class TemplateServiceTest {
 
     @Test
     void getSpeciesForTemplate() throws IOException {
-        SpeciesWithAttributes.SpeciesWithAttributesBuilder sb = SpeciesWithAttributes.builder();
-        SpeciesWithAttributes swa1 = sb.letterCode("asa").speciesName("Abudefduf saxatilis")
+        SpeciesWithAttributesCsvRow.SpeciesWithAttributesCsvRowBuilder sb = SpeciesWithAttributesCsvRow.builder();
+        SpeciesWithAttributesCsvRow swa1 = sb.speciesName("Abudefduf saxatilis")
                 .commonName("Sergeant major").l5(2.5).l95(15.0).lMax(20).build();
-        SpeciesWithAttributes swa2 = sb.letterCode("aba").speciesName("Acanthurus bahianus")
-                .commonName("Ocean surgeon").l5(5.0).l95(30.0).lMax(40).build();
-        SpeciesWithAttributes swa3 = sb.letterCode("ach").speciesName("Acanthurus chirurgus")
-                .commonName("Doctorfish").l5(7.5).l95(45.0).lMax(60).build();
-        List<SpeciesWithAttributes> swaList = Arrays.asList(swa1,swa2,swa3);
+                SpeciesWithAttributesCsvRow swa2 = sb.speciesName("Acanthurus bahianus").commonName("Ocean surgeon")
+                .l5(5.0).l95(30.0).lMax(40).build();
+                SpeciesWithAttributesCsvRow swa3 = sb.speciesName("Acanthurus chirurgus").commonName("Doctorfish")
+                .l5(7.5).l95(45.0).lMax(60).build();
+        List<SpeciesWithAttributesCsvRow> swaList = Arrays.asList(swa1, swa2, swa3);
         ObservableItem.ObservableItemBuilder ob = ObservableItem.builder();
         ObservableItem o1 = ob.observableItemId(123).commonName("commonName").className("className").build();
         Site site1 = Site.builder().siteId(1).build();
         val sites = Arrays.asList(site1);
         val obsIds = Arrays.asList(123);
-        when(observableItemRepository.getAllM2ObservableItems(sites)).thenReturn(Arrays.asList(o1).stream().collect(Collectors.toSet()));
-        when(speciesWithAttributesRepository.findAllById(obsIds)).thenReturn(swaList);
-        List<SpeciesWithAttributes> speciesWithAttributes = templateService.getM2SpeciesForTemplate(sites);
-        assertEquals(swaList.size() + 2,speciesWithAttributes.size());
-        assertEquals("nsf", speciesWithAttributes.get(3).getLetterCode());
-        assertEquals("snd", speciesWithAttributes.get(4).getLetterCode());
+        when(observableItemRepository.getAllM2ObservableItems(sites))
+                .thenReturn(Arrays.asList(o1).stream().collect(Collectors.toSet()));
+        when(speciesWithAttributesRepository.findAllById(obsIds, null)).thenReturn(swaList);
+        List<SpeciesWithAttributesCsvRow> speciesWithAttributes = templateService.getSpeciesForTemplate(2, sites, null);
+        assertEquals(swaList.size() + 2, speciesWithAttributes.size());
+        assertEquals("Acanthurus bahianus", speciesWithAttributes.get(1).getSpeciesName());
+        assertEquals("Doctorfish", speciesWithAttributes.get(2).getCommonName());
     }
 }
