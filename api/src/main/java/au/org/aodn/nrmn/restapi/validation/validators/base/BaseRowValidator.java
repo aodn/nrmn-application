@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation;
+package au.org.aodn.nrmn.restapi.validation.validators.base;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;

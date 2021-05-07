@@ -11,6 +11,7 @@ import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.model.MonoidRowValidation;
 import au.org.aodn.nrmn.restapi.validation.summary.DefaultSummary;
 import cyclops.companion.Monoids;
+import cyclops.companion.Semigroups;
 import cyclops.data.Seq;
 import cyclops.data.tuple.Tuple2;
 import lombok.val;
@@ -64,21 +65,21 @@ public class ValidationProcess extends ValidatorHelpers {
                                 .map(seq -> seq.toHashMap(Tuple2::_1, Tuple2::_2)).stream())
                 .collect(Collectors.toList());
 
+        val globalResult = globalProcess.process(job);
 
         val formattedRows = rowWithHasMap.stream().map(preProcess::toFormat).collect(Collectors.toList());
-
+        val globalFormatted = globalProcess.processFormatted(job, formattedRows);
         val formattedResult = postProcess.process(formattedRows, job);
         
         if (formattedResult.getValid().isInvalid()) {
             return rowsWithErrorsResponse(job, formattedResult.getRows());
         }
         
-        val globalResult = globalProcess.process(job);
         return new ValidationResponse(
                 job,
                 Collections.emptyList(),
                 Collections.emptyMap(),
-                toErrorList(globalResult),
+                toErrorList(globalResult.combine(Semigroups.stringConcat, globalFormatted)),
                 Collections.emptyList());
     }
 

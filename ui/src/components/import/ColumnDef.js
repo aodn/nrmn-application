@@ -14,7 +14,7 @@ function cell(params) {
 }
 
 function cellRenderer(p) {
-  const mask = p.data.selected?.find((s) => s.key === p.colDef.field)?.value;
+  const mask = p.data?.selected?.find((s) => s.key === p.colDef.field)?.value;
   if (mask) {
     const prefix = p.value.substr(0, mask.idx);
     const text = `<span style="background-color: yellow">${p.value.substr(mask.idx, mask.length)}</span>`;
@@ -44,6 +44,7 @@ export const ColumnDef = [
     enablePivot: false,
     cellStyle: cell,
     cellRenderer: cellRenderer,
+
     keyCreator: (params) => params.value?.toLowerCase()
   },
   {
@@ -51,6 +52,7 @@ export const ColumnDef = [
     editable: true,
     cellStyle: cell,
     cellRenderer: cellRenderer,
+
     keyCreator: (params) => params.value?.toLowerCase()
   },
   {
@@ -61,6 +63,7 @@ export const ColumnDef = [
     enableRowGroup: true,
     cellStyle: cell,
     cellRenderer: cellRenderer,
+
     keyCreator: (params) => params.value?.toLowerCase()
   },
   {
@@ -68,6 +71,7 @@ export const ColumnDef = [
     headerName: 'Site Name',
     cellStyle: cell,
     cellRenderer: cellRenderer,
+
     editable: true
   },
   {
@@ -148,19 +152,9 @@ export const ColumnDef = [
   },
   {
     field: 'species',
-    editable: true,
-    hide: true,
-    aggFunc: 'count',
-    cellStyle: cell,
-    cellRenderer: cellRenderer
-  },
-  {
-    field: 'species',
     pivot: true,
     enablePivot: false,
-    rowGroup: false,
     enableRowGroup: true,
-    aggFunc: 'count',
     editable: true,
     cellStyle: cell,
     cellRenderer: cellRenderer,
@@ -176,12 +170,12 @@ export const ColumnDef = [
     field: 'total',
     editable: true,
     aggFunc: 'count',
-    rowGroup: false,
-    enableRowGroup: true
+    cellStyle: cell
   },
   {
     field: 'inverts',
-    editable: true
+    editable: true,
+    cellStyle: cell
   },
   {
     field: '2-5',
@@ -203,7 +197,6 @@ export const ColumnDef = [
     field: '7-5',
     headerName: '7.5',
     editable: true,
-
     invertSize: '1.5',
     headerComponentFramework: AgGridHeader,
     width: 35
@@ -219,7 +212,6 @@ export const ColumnDef = [
     field: '12-5',
     headerName: '12.5',
     editable: true,
-
     invertSize: '2.5',
     headerComponentFramework: AgGridHeader,
     width: 35
@@ -227,7 +219,6 @@ export const ColumnDef = [
   {
     field: '15',
     editable: true,
-
     invertSize: '3',
     headerComponentFramework: AgGridHeader,
     width: 35
@@ -235,7 +226,6 @@ export const ColumnDef = [
   {
     field: '20',
     editable: true,
-
     invertSize: '3.5',
     headerComponentFramework: AgGridHeader,
     width: 35
@@ -243,7 +233,6 @@ export const ColumnDef = [
   {
     field: '25',
     editable: true,
-
     invertSize: '4',
     headerComponentFramework: AgGridHeader,
     width: 35
@@ -251,7 +240,6 @@ export const ColumnDef = [
   {
     field: '30',
     editable: true,
-
     invertSize: '4.5',
     headerComponentFramework: AgGridHeader,
     width: 35
@@ -259,7 +247,6 @@ export const ColumnDef = [
   {
     field: '35',
     editable: true,
-
     invertSize: '5',
     headerComponentFramework: AgGridHeader,
     width: 35
@@ -267,7 +254,6 @@ export const ColumnDef = [
   {
     field: '40',
     editable: true,
-
     invertSize: '5.5',
     headerComponentFramework: AgGridHeader,
     width: 35

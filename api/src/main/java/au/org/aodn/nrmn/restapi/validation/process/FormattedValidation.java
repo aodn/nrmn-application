@@ -3,7 +3,7 @@ package au.org.aodn.nrmn.restapi.validation.process;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
-import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.model.MonoidRowValidation;
 import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
@@ -37,9 +37,10 @@ public class FormattedValidation extends ValidatorHelpers {
     private Seq<BaseFormattedValidator> getCommonValidators() {
 
         return Seq.of(
-//                new MeasureBetweenL5l95(),
-//                new MeasureUnderLmax(),
-//                new SpeciesNotSuperseeded(),
+                new MeasureBetweenL5l95(),
+                new MeasureUnderLmax(),
+                new SpeciesNotSuperseeded(),
+                new SpeciesAbundanceCheck(),
                 new TotalCheckSum(),
                 new SurveyExists(surveyRepository),
                 new Within200MSiteCheck()

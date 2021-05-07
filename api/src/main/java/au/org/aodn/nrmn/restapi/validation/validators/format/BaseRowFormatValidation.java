@@ -5,7 +5,7 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.util.ConsumerThrowable;
-import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import cyclops.companion.Functions;
 import cyclops.control.Try;

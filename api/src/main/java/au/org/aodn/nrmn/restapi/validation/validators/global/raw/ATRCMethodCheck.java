@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation.validators.global;
+package au.org.aodn.nrmn.restapi.validation.validators.global.raw;
 
 import org.springframework.stereotype.Component;
 
@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class ATRCMethodCheck extends BaseMethodCheck {
+public class ATRCMethodCheck extends BaseMethodCheckRaw {
 
     public ATRCMethodCheck() {
         super("ATRC Method check");

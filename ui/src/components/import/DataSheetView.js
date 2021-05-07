@@ -234,20 +234,21 @@ const DataSheetView = () => {
       dispatch(ValidationFinished());
       setSelectedCells(false);
     }
+  }, [validationErrors, selectedCells]);
 
+  useEffect(() => {
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
       const firstRow = gridApi.getRowNode(errSelected.ids[0]);
       gridApi.ensureIndexVisible(firstRow.rowIndex, 'middle');
       gridApi.deselectAll();
       errSelected.ids.forEach((id) => {
         const row = gridApi.getRowNode(id);
-        if (row.isSelected) {
           row.setSelected(true);
-        }
         return row;
       });
     }
-  }, [validationErrors, selectedCells]);
+  }, [errSelected]);
+
   const size = useWindowSize();
   return (
     <Box mt={2}>
