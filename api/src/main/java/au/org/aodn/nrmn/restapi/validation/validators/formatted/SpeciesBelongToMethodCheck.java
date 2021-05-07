@@ -17,18 +17,14 @@ public class SpeciesBelongToMethodCheck extends BaseFormattedValidator {
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
 
-        val methodAttribute = target.getSpecies().getObsItemAttribute().getOrDefault("is_method", "-1");
-        val methodExpected = Try
-                .withCatch(() -> Integer.parseInt(methodAttribute))
-                .orElseGet(() -> -1);
-        if (methodExpected == -1) {
-            return Validated.valid("Not affected");
-        }
-        if (methodExpected == target.getMethod()) {
+        if (target.getSpecies()
+                .getObsItemAttribute()
+                .containsKey("is_M" + target.getMethod())) {
             return Validated.valid("Species match method");
         }
+
         return invalid(target,
-                "Species method(" + methodExpected + ") didn't match method column (" + target.getMethod() + ").",
+                "Species method didn't match method  (" + target.getMethod() + ").",
                 ValidationCategory.DATA,
                 ValidationLevel.WARNING);
     }
