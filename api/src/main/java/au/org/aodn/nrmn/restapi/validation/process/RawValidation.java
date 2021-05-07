@@ -182,7 +182,7 @@ public class RawValidation extends ValidatorHelpers {
         rowFormatted.setRef(ref);
         rowFormatted.setSpeciesAttributesOpt(mayBeSpeciesAttributes);
 
-        if (values.containsKey("Inverts") && values.containsKey("IsInvertSizing")) {
+        if (isExtendedSizing) {
             val isInvertSizing = (Optional<Boolean>) values.get("IsInvertSizing").orElse(Optional.empty());
             rowFormatted.setIsInvertSizing(isInvertSizing);
         }

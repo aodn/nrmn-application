@@ -33,8 +33,14 @@ public class SpreadSheetService {
     @Value("${app.excel.headers.short}")
     private List<String> shortHeadersRef;
 
+    @Value("${app.excel.headers.short.ignore}")
+    private List<String> ignoreShortHeaders;
+
     @Value("${app.excel.headers.long}")
     private List<String> longHeadersRef;
+
+    @Value("${app.excel.headers.short.ignore}")
+    private List<String> ignoreLongHeaders;
 
     @Autowired
     private S3IO s3client;
@@ -49,7 +55,8 @@ public class SpreadSheetService {
             XSSFReader xssfReader = new XSSFReader(opcPackage);
 
             SurveyContentsHandler surveyContentsHandler = new SurveyContentsHandler(
-                    (withExtendedSizes) ? longHeadersRef : shortHeadersRef);
+                    (withExtendedSizes) ? longHeadersRef : shortHeadersRef,
+                    (withExtendedSizes) ? ignoreLongHeaders: ignoreShortHeaders);
 
             StylesTable styles = xssfReader.getStylesTable();
 
