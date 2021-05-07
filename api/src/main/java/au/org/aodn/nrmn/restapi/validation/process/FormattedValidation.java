@@ -46,7 +46,8 @@ public class FormattedValidation extends ValidatorHelpers {
         );
     }
 
-git commit -am         val provider = beanFactory.getBean(job.getProgram().getProgramName(), ValidatorProvider.class);
+    private Seq<BaseFormattedValidator> getValidators(StagedJob job) {
+        val provider = beanFactory.getBean(job.getProgram().getProgramName(), ValidatorProvider.class);
         val validators = getCommonValidators().appendAll(provider.getFormattedValidators());
         return validators;
     }
