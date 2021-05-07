@@ -153,18 +153,6 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             case "Total":
                 currentRow.setTotal(formattedValue);
                 break;
-            case "M2 Invert Sizing Species":
-                currentRow.setM2InvertSizingSpecies(formattedValue);
-                break;
-            case "L5":
-                currentRow.setL5(formattedValue);
-                break;
-            case "L95":
-                currentRow.setL95(formattedValue);
-                break;
-            case "Lmax":
-                currentRow.setLMax(formattedValue);
-                break;
             case "Use InvertSizing":
                 currentRow.setIsInvertSizing(formattedValue);
                 break;

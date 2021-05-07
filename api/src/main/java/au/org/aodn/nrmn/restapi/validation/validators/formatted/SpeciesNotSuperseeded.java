@@ -15,7 +15,7 @@ public class SpeciesNotSuperseeded extends BaseFormattedValidator {
 
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
-                if (target.getSpecies().getSupersededBy() == null) {
+                if (!target.getSpecies().isPresent() || target.getSpecies().get().getSupersededBy() == null) {
                     return Validated.valid("Species Not Superseeded");
                 }
         return Validated.invalid(new StagedRowError(
