@@ -39,7 +39,7 @@ public class SpreadSheetService {
     @Value("${app.excel.headers.long}")
     private List<String> longHeadersRef;
 
-    @Value("${app.excel.headers.short.ignore}")
+    @Value("${app.excel.headers.long.ignore}")
     private List<String> ignoreLongHeaders;
 
     @Autowired

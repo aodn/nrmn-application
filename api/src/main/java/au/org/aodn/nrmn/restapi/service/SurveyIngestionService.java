@@ -93,7 +93,7 @@ public class SurveyIngestionService {
         Observation.ObservationBuilder baseObservationBuilder = Observation.builder()
                 .diver(diver)
                 .surveyMethod(surveyMethod)
-                .observableItem(stagedRow.getSpecies().get());
+                .observableItem(stagedRow.getSpecies().orElse(null));
 
 
         List<Observation> observations = measures.entrySet().stream().map(m -> {
