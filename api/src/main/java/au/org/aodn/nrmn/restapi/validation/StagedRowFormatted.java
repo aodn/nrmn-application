@@ -43,6 +43,10 @@ public class StagedRowFormatted {
 
     private Directions direction;
 
+    private Double latitude;
+
+    private Double longitude;
+
     private String code;
 
     private Integer total;

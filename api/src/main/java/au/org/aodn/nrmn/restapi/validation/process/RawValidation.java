@@ -132,6 +132,8 @@ public class RawValidation extends ValidatorHelpers {
         val diver = (Diver) values.get("Diver").orElseGet(null);
         val buddy = (Diver) values.get("Buddy").orElseGet(null);
         val pqs = (Diver) values.get("P-Qs").orElseGet(null);
+        val longitude = (Double) values.get("Longitude").orElseGet(null);
+        val latitude = (Double) values.get("Latitude").orElseGet(null);
 
         val splitDepth = values.get("Depth").orElseGet(null).toString().split("\\.");
         val depth = Integer.parseInt(splitDepth[0]);
@@ -167,6 +169,8 @@ public class RawValidation extends ValidatorHelpers {
         rowFormatted.setSite(site);
         rowFormatted.setDiver(diver);
         rowFormatted.setBuddy(buddy);
+        rowFormatted.setLongitude(longitude);
+        rowFormatted.setLatitude(latitude);
         rowFormatted.setPqs(pqs);
         rowFormatted.setDepth(depth);
         rowFormatted.setSurveyNum(survey_num);
