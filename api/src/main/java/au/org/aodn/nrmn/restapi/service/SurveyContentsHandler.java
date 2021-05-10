@@ -13,6 +13,7 @@ import cyclops.control.Validated;
 
 public class SurveyContentsHandler implements SheetContentsHandler {
 
+    private final List<String> optionalHeaders;
     private List<String> requiredHeaders;
 
     private Validated<ErrorInput, List<StagedRow>> result;
@@ -23,8 +24,9 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     HashMap<Integer, String> measureJson = new HashMap<Integer, String>();
     List<StagedRow> stagedRows = new ArrayList<StagedRow>();
 
-    SurveyContentsHandler(List<String> requiredHeaders) {
+    SurveyContentsHandler(List<String> requiredHeaders, List<String> optionalHeaders) {
         this.requiredHeaders = requiredHeaders;
+        this.optionalHeaders = optionalHeaders;
     }
 
     public Validated<ErrorInput, List<StagedRow>> getResult() {
@@ -55,6 +57,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             if (missingHeaders.size() > 0)
                 errors.add("Missing Headers: " + String.join(", ", missingHeaders));
             foundHeaders.removeAll(requiredHeaders);
+            foundHeaders.removeAll(optionalHeaders);
             if (foundHeaders.size() > 0)
                 errors.add("Unexpected Headers: " + String.join(", ", foundHeaders));
             if (errors.size() > 0)
@@ -152,18 +155,6 @@ public class SurveyContentsHandler implements SheetContentsHandler {
                 break;
             case "Total":
                 currentRow.setTotal(formattedValue);
-                break;
-            case "M2 Invert Sizing Species":
-                currentRow.setM2InvertSizingSpecies(formattedValue);
-                break;
-            case "L5":
-                currentRow.setL5(formattedValue);
-                break;
-            case "L95":
-                currentRow.setL95(formattedValue);
-                break;
-            case "Lmax":
-                currentRow.setLMax(formattedValue);
                 break;
             case "Use InvertSizing":
                 currentRow.setIsInvertSizing(formattedValue);

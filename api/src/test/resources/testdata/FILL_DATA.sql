@@ -156,10 +156,10 @@ VALUES (551, 1, '{}',51, 3, 333,121),
        (553, 5, '{}',51, 2, 331,  121);
 
 INSERT INTO nrmn.staged_row(pqs, block, buddy, code, created, date, depth, direction, diver,
-                            inverts, is_invert_sizing, last_updated, latitude, longitude, m2_invert_sizing_species,
+                            inverts, is_invert_sizing, last_updated, latitude, longitude, 
                             measure_value, method, site_name, site_no, species, time, total, vis, staged_job_id)
 VALUES ('TJR', 1, 'AZS', 'AAA', '09/09/2009', '03/03/2003', 3.3, 'NW', 'TJR',
-        0, false, '01/01/2001', -5, 35, false,
+        0, false, '01/01/2001', -5, 35, 
         '{
           "1": "5"
         }', 1, 'Castillo', 'CEU4', 'Specie 56', '11:11', 5, 11, 109);

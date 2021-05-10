@@ -20,7 +20,7 @@ class OptionalIntegerFormatTest {
         val stage = new StagedRow();
         stage.setVis("");
         stage.setStagedJob(job);
-        val res = new OptionalIntegerFormatValidation(StagedRow::getLMax, "Vis").valid(stage);
+        val res = new OptionalIntegerFormatValidation(StagedRow::getVis, "Vis").valid(stage);
         assertTrue(res.isValid());
     }
 

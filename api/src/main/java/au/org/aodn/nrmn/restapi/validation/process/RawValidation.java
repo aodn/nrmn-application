@@ -6,12 +6,13 @@ import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
-import au.org.aodn.nrmn.restapi.validation.validators.base.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
 import au.org.aodn.nrmn.restapi.validation.provider.ATRCValidators;
 import au.org.aodn.nrmn.restapi.validation.provider.RLSValidators;
-import au.org.aodn.nrmn.restapi.validation.validators.data.*;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseRowValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.data.DirectionDataCheck;
+import au.org.aodn.nrmn.restapi.validation.validators.data.SpeciesNotFoundCheck;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.DiverExists;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.ObservableItemExists;
 import au.org.aodn.nrmn.restapi.validation.validators.entities.SiteCodeExists;
@@ -60,12 +61,8 @@ public class RawValidation extends ValidatorHelpers {
     public HashMap<String, BaseRowValidator> getExtendedValidators() {
         return HashMap.fromStream(
                 Stream.of(
-                        Tuple2.of("Inverts", new PassThruString(StagedRow::getInverts, "Inverts")),
-                        Tuple2.of("M2InvertSizingSpecies", new PassThruString(StagedRow::getM2InvertSizingSpecies, "M2InvertSizingSpecies")),
-                        Tuple2.of("L5", new DoubleFormatValidation(StagedRow::getL5, "L5,")),
-                        Tuple2.of("L95", new DoubleFormatValidation(StagedRow::getL95, "L95,")),
-                        Tuple2.of("Lmax", new DoubleFormatValidation(StagedRow::getLMax, "Lmax,")),
-                        Tuple2.of("IsInvertSizing", new BooleanFormatValidation(StagedRow::getIsInvertSizing, "IsInvertSizing"))
+                        Tuple2.of("IsInvertSizing", new OptionalBooleanFormatValidation(StagedRow::getIsInvertSizing,
+                                "IsInvertSizing"))
                 )
         );
     }
@@ -87,6 +84,7 @@ public class RawValidation extends ValidatorHelpers {
                         Tuple2.of("Vis", new OptionalIntegerFormatValidation(StagedRow::getVis, "Vis")),
 
                         Tuple2.of("Total", new IntegerFormatValidation(StagedRow::getTotal, "Total", Collections.emptyList())),
+                        Tuple2.of("Inverts", new OptionalIntegerFormatValidation(StagedRow::getInverts, "Inverts")),
                         Tuple2.of("MeasureJson", new MeasureJsonValidation()),
                         Tuple2.of("Latitude", new DoubleFormatValidation(StagedRow::getLatitude, "Latitude")),
                         Tuple2.of("Longitude", new DoubleFormatValidation(StagedRow::getLongitude, "Longitude")),
@@ -126,7 +124,7 @@ public class RawValidation extends ValidatorHelpers {
         return new RowWithValidation(Seq.of(target), validation);
     }
 
-    public StagedRowFormatted toFormat(HashMap<String, Object> values) {
+    public StagedRowFormatted toFormat(HashMap<String, Object> values, boolean isExtendedSizing) {
         val site = (Site) values.get("Site").orElseGet(null);
         val date = (LocalDate) values.get("Date").orElseGet(null);
         val time = (Optional<LocalTime>) values.get("Time").orElse(Optional.empty());
@@ -134,6 +132,8 @@ public class RawValidation extends ValidatorHelpers {
         val diver = (Diver) values.get("Diver").orElseGet(null);
         val buddy = (Diver) values.get("Buddy").orElseGet(null);
         val pqs = (Diver) values.get("P-Qs").orElseGet(null);
+        val longitude = (Double) values.get("Longitude").orElseGet(null);
+        val latitude = (Double) values.get("Latitude").orElseGet(null);
 
         val splitDepth = values.get("Depth").orElseGet(null).toString().split("\\.");
         val depth = Integer.parseInt(splitDepth[0]);
@@ -152,10 +152,12 @@ public class RawValidation extends ValidatorHelpers {
                 .findFirst()
 
 
+
         val code = (String) values.get("Code").orElseGet(null);
 
         val vis = (Optional<Integer>) values.get("Vis").orElse(Optional.empty());
         val total = (Integer) values.get("Total").orElseGet(null);
+        val inverts = (Optional<Integer>) values.get("Inverts").orElse(Optional.empty());
         val direction = (Directions) values.get("Direction").orElseGet(null);
         val measureJson = (java.util.Map<Integer, Integer>) values.get("MeasureJson").orElseGet(null);
 
@@ -167,6 +169,8 @@ public class RawValidation extends ValidatorHelpers {
         rowFormatted.setSite(site);
         rowFormatted.setDiver(diver);
         rowFormatted.setBuddy(buddy);
+        rowFormatted.setLongitude(longitude);
+        rowFormatted.setLatitude(latitude);
         rowFormatted.setPqs(pqs);
         rowFormatted.setDepth(depth);
         rowFormatted.setSurveyNum(survey_num);
@@ -177,22 +181,13 @@ public class RawValidation extends ValidatorHelpers {
         rowFormatted.setCode(code);
         rowFormatted.setDirection(direction);
         rowFormatted.setTotal(total);
+        rowFormatted.setInverts(inverts.orElse(0));
         rowFormatted.setMeasureJson(measureJson);
         rowFormatted.setRef(ref);
         rowFormatted.setSpeciesAttributesOpt(mayBeSpeciesAttributes);
 
-        if (values.containsKey("Inverts") && values.containsKey("IsInvertSizing")) {
-            val inverts = (Integer) values.get("Inverts").orElseGet(null);
-            val m2InvertSizingSpecies = (Integer) values.get("M2InvertSizingSpecies").orElseGet(null);
-            val l5 = (Double) values.get("L5").orElseGet(null);
-            val l95 = (Double) values.get("L95").orElseGet(null);
-            val lmax = (Integer) values.get("Lmax").orElseGet(null);
-            val isInvertSizing = (Boolean) values.get("IsInvertSizing").orElseGet(null);
-            rowFormatted.setInverts(inverts);
-            rowFormatted.setM2InvertSizingSpecies(m2InvertSizingSpecies);
-            rowFormatted.setL5(l5);
-            rowFormatted.setL95(l95);
-            rowFormatted.setLMax(lmax);
+        if (isExtendedSizing) {
+            val isInvertSizing = (Optional<Boolean>) values.get("IsInvertSizing").orElse(Optional.empty());
             rowFormatted.setIsInvertSizing(isInvertSizing);
         }
         return rowFormatted;
@@ -208,7 +203,7 @@ public class RawValidation extends ValidatorHelpers {
                     val validatedRow = validate(row, validators);
                     val validated = validatedRow.getValid();
                     val validatorsWithMap =
-                            validated.map(seq -> toFormat(seq.toHashMap(Tuple2::_1, Tuple2::_2)));
+                            validated.map(seq -> toFormat(seq.toHashMap(Tuple2::_1, Tuple2::_2), job.getIsExtendedSize()));
                     return validatorsWithMap.stream();
                 }).collect(Collectors.toList());
     }
