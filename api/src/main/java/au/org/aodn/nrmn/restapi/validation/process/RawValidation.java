@@ -20,6 +20,7 @@ import au.org.aodn.nrmn.restapi.validation.validators.format.*;
 import au.org.aodn.nrmn.restapi.validation.validators.passThu.PassThruRef;
 import au.org.aodn.nrmn.restapi.validation.validators.passThu.PassThruString;
 import cyclops.companion.Monoids;
+import cyclops.control.Option;
 import cyclops.control.Validated;
 import cyclops.data.HashMap;
 import cyclops.data.Seq;
@@ -176,7 +177,7 @@ public class RawValidation extends ValidatorHelpers {
         rowFormatted.setSurveyNum(survey_num);
         rowFormatted.setMethod(method);
         rowFormatted.setBlock(block);
-        rowFormatted.setSpecies(species);
+        rowFormatted.setSpecies(Optional.ofNullable(species));
         rowFormatted.setVis(vis);
         rowFormatted.setCode(code);
         rowFormatted.setDirection(direction);
