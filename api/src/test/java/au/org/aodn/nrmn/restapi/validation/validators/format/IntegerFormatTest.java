@@ -29,9 +29,9 @@ class IntegerFormatTest {
         val job = new StagedJob();
         job.setId(1L);
         val stage = new StagedRow();
-                stage.setLMax("Not a number");
+                stage.setTotal("Not a number");
                 stage.setStagedJob(job);
-        val res = new IntegerFormatValidation(StagedRow::getLMax, "Lmax", Collections.emptyList()).valid(stage);
+        val res = new IntegerFormatValidation(StagedRow::getTotal, "Total", Collections.emptyList()).valid(stage);
         assertTrue(res.isInvalid());
     }
 
@@ -40,9 +40,9 @@ class IntegerFormatTest {
         val job = new StagedJob();
         job.setId(1L);
         val stage = new StagedRow();
-        stage.setLMax("10");
+        stage.setTotal("10");
         stage.setStagedJob(job);
-        val res = new IntegerFormatValidation(StagedRow::getLMax, "Lmax", Collections.emptyList()).valid(stage);
+        val res = new IntegerFormatValidation(StagedRow::getTotal, "Total", Collections.emptyList()).valid(stage);
         assertTrue(res.isValid());
     }
 
@@ -53,7 +53,7 @@ class IntegerFormatTest {
         val stage = new StagedRow();
         stage.setMethod("7");
         stage.setStagedJob(job);
-        val res = new IntegerFormatValidation(StagedRow::getMethod, "Lmax", Stream.of(1,2,3,4,7,8).collect(Collectors.toList())).valid(stage);
+        val res = new IntegerFormatValidation(StagedRow::getMethod, "Total", Stream.of(1,2,3,4,7,8).collect(Collectors.toList())).valid(stage);
         assertTrue(res.isValid());
     }
 
@@ -64,7 +64,7 @@ class IntegerFormatTest {
         val stage = new StagedRow();
         stage.setMethod("7");
         stage.setStagedJob(job);
-        val res = new IntegerFormatValidation(StagedRow::getMethod, "Lmax", Stream.of(8).collect(Collectors.toList())).valid(stage);
+        val res = new IntegerFormatValidation(StagedRow::getMethod, "Total", Stream.of(8).collect(Collectors.toList())).valid(stage);
         assertTrue(res.isInvalid());
         assertEquals("7 is invalid. Must be 8", toErrorList(res).get(0).getId().getMessage());
     }
@@ -76,7 +76,7 @@ class IntegerFormatTest {
         val stage = new StagedRow();
         stage.setMethod("7");
         stage.setStagedJob(job);
-        val res = new IntegerFormatValidation(StagedRow::getMethod, "Lmax",
+        val res = new IntegerFormatValidation(StagedRow::getMethod, "Total",
          Stream.of(8, 9, 10).collect(Collectors.toList())).valid(stage);
         assertTrue(res.isInvalid());
         assertEquals("7 is invalid. Must be 8, 9 or 10", toErrorList(res).get(0).getId().getMessage());

@@ -81,7 +81,6 @@ export const importRow = (row) => {
     .forEach((numKey) => {
       var pos = measureKey.indexOf(numKey);
       measure[pos] = row[numKey];
-      delete row[numKey];
     });
   row.measureJson = measure;
   return row;
@@ -95,7 +94,6 @@ export const flatten = (row) => {
   }
   return row;
 };
-
 
 const importSlice = createSlice({
   name: 'import',
@@ -116,8 +114,8 @@ const importSlice = createSlice({
           acc[err.id] = err.errors;
           return acc;
         }, {});
-       const errorsList =  action.payload.errors.map(err =>err.errors);
-        const validationErrors = errorsList.reduce((acc,err) => [...acc, ...err], []);
+        const errorsList = action.payload.errors.map((err) => err.errors);
+        const validationErrors = errorsList.reduce((acc, err) => [...acc, ...err], []);
         state.enableSubmit = validationErrors.some((err) => err.errorLevel === 'BLOCKING') === 0;
         state.errorsByMsg = action.payload.summaries;
       } else if (action.payload.errorGlobal) {

@@ -4,14 +4,13 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
-import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.control.Validated;
 import lombok.val;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
 
 public class TooOldFutureDate extends BaseFormattedValidator {
     private String dateStr = "";

@@ -219,13 +219,9 @@ CREATE TABLE nrmn.staged_row (
     diver varchar(255),
     inverts varchar(255),
     is_invert_sizing varchar(255),
-    l5 varchar(255),
-    l95 varchar(255),
-    lmax varchar(255),
     last_updated timestamp with time zone NOT NULL,
     latitude varchar(255),
     longitude varchar(255),
-    m2_invert_sizing_species varchar(255),
     measure_value json,
     method varchar(255),
     pqs varchar(255),
@@ -368,3 +364,5 @@ CREATE SEQUENCE IF NOT EXISTS nrmn.staged_job_id_seq;
 CREATE SEQUENCE IF NOT EXISTS nrmn.staged_job_log_id_seq;
 
 CREATE SEQUENCE IF NOT EXISTS nrmn.user_id_seq;
+
+ALTER SEQUENCE nrmn.staged_row_id_seq INCREMENT BY 100;

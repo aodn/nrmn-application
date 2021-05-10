@@ -28,8 +28,12 @@ import java.util.Map;
 @Table(name = "staged_row")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class StagedRow implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="staged_row_id_seq")
+    @SequenceGenerator(name="staged_row_id_seq", sequenceName = "staged_row_id_seq", allocationSize = 100)
     private Long id;
 
     @Column(name = "site_no")
@@ -56,7 +60,6 @@ public class StagedRow implements Serializable {
     @Column(name = "buddy")
     private String buddy;
 
-
     @Column(name = "site_name")
     private String siteName;
 
@@ -82,7 +85,6 @@ public class StagedRow implements Serializable {
     @Column(name = "code")
     private String code;
 
-
     @Column(name = "common_name")
     private String commonName;
 
@@ -95,25 +97,12 @@ public class StagedRow implements Serializable {
     @Column(name = "position")
     private Integer pos;
 
-    @Column(name = "m2_invert_sizing_species")
-    private String m2InvertSizingSpecies;
-
-    @Column(name = "L5")
-    private String l5;
-
-    @Column(name = "L95")
-    private String l95;
-
     @Column(name = "is_invert_Sizing")
     private String isInvertSizing;
-
-    @Column(name = "Lmax")
-    private String lMax;
 
     @Column(name = "measure_value", columnDefinition = "json")
     @Type(type = "jsonb")
     private Map<Integer, String> measureJson;
-
 
     @JsonIgnore
     @ManyToOne
@@ -132,5 +121,6 @@ public class StagedRow implements Serializable {
     private Timestamp lastUpdated;
 
     @Transient
+    @Builder.Default
     private List<StagedRowError> errors = new ArrayList<>();
 }

@@ -1,7 +1,6 @@
 import axiosInstance from './index.js';
 import axios from 'axios';
 import store from '../components/store'; // will be useful to access to axios.all and axios.spread
-import {ImportProgress} from '../components/import/reducers/upload';
 import {importRow} from '../components/import/reducers/create-import.js';
 
 function getToken() {
@@ -11,28 +10,22 @@ function getToken() {
 
 axiosInstance.interceptors.request.use(
   (config) => {
+    window.setApplicationError(null);
     config.headers.authorization = getToken();
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-const dataURLtoBlob = (dataurl) => {
-  var arr = dataurl.split(','),
-    mime = arr[0].match(/:(.*?);/)[1],
-    bstr = atob(arr[1]),
-    n = bstr.length,
-    u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    window.setApplicationError(error?.message || JSON.stringify(error), error);
+    console.error({error});
   }
-  return new Blob([u8arr], {type: mime});
-};
-
-export const tokenExpired = () => {
-  const {expires} = store.getState().auth;
-  return expires && expires < Date.now();
-};
+);
 
 export const userLogin = (params) => {
   return axiosInstance.post(
@@ -145,7 +138,11 @@ export const getDataJob = (jobId) =>
     .then((res) => res)
     .catch((err) => err);
 
-export const postJobValidation = (jobId) => axiosInstance.post('/api/stage/validate/' + jobId).then((res) => res);
+export const postJobValidation = (jobId) =>
+  axiosInstance
+    .post('/api/stage/validate/' + jobId)
+    .then((res) => res)
+    .catch((err) => err);
 export const updateRow = (jobId, rows) => {
   return axiosInstance.put('/api/stage/updates/' + jobId, rows.map(importRow)).then((res) => res);
 };
@@ -153,20 +150,18 @@ export const deleteRow = (jobId, rows) => {
   return axiosInstance.put('/api/stage/delete/rows/' + jobId, rows).then((res) => res);
 };
 
-export const submitJobFile = (params) => {
+export const submitJobFile = (params, onProgress) => {
   const data = new FormData();
-  const splited = params.file.split(';');
-  const filename = splited[1].split('=')[1];
-  data.append('file', dataURLtoBlob(params.file), filename);
+  data.append('file', params.file);
   data.append('programId', params.programId);
-  data.append('withInvertSize', params.withInvertSize);
+  data.append('withExtendedSizes', params.withExtendedSizes);
 
   const config = {
     validateStatus: () => true,
-    'Content-Type': 'multipart/form-data; boundary=' + data._boundary,
+    'Content-Type': 'multipart/form-data',
     onUploadProgress: (progressEvent) => {
       const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-      store.dispatch(ImportProgress(percentCompleted));
+      onProgress(percentCompleted);
     }
   };
   return axiosInstance
@@ -176,11 +171,16 @@ export const submitJobFile = (params) => {
 };
 
 export const submitingest = (jobId) => {
-  return axiosInstance.post('/api/ingestion/ingest/' + jobId, {}, {
-    validateStatus: () => true
-  })
-   .then((response) => ({response}))
-   .catch((err) => ({err}));
+  return axiosInstance
+    .post(
+      '/api/ingestion/ingest/' + jobId,
+      {},
+      {
+        validateStatus: () => true
+      }
+    )
+    .then((response) => ({response}))
+    .catch((err) => ({err}));
 };
 
 export const search = (params) => {

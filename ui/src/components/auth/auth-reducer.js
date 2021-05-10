@@ -16,14 +16,12 @@ const authSlice = createSlice({
       state.expires = jwt.exp * 1000;
       state.errors = [];
       state.username = action.payload.username;
-      state.redirect = action.payload.redirect;
       state.accessToken = action.payload.accessToken;
       state.tokenType = action.payload.tokenType;
       state.roles = jwt.roles;
       state.success = true;
       state.loading = false;
       localStorage.setItem('auth', JSON.stringify(state));
-      state.redirect = action.payload.redirect ? action.payload.redirect : '/';
     },
     loginFailed: (state) => {
       state.errors = ['Login failed: invalid username or password.'];
@@ -37,7 +35,6 @@ const authSlice = createSlice({
     },
     logout: () => {
       localStorage.clear();
-      window.location = '/login';
       return initialState;
     }
   }
