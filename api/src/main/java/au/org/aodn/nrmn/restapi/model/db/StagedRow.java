@@ -97,20 +97,8 @@ public class StagedRow implements Serializable {
     @Column(name = "position")
     private Integer pos;
 
-    @Column(name = "m2_invert_sizing_species")
-    private String m2InvertSizingSpecies;
-
-    @Column(name = "L5")
-    private String l5;
-
-    @Column(name = "L95")
-    private String l95;
-
     @Column(name = "is_invert_Sizing")
     private String isInvertSizing;
-
-    @Column(name = "Lmax")
-    private String lMax;
 
     @Column(name = "measure_value", columnDefinition = "json")
     @Type(type = "jsonb")
