@@ -146,12 +146,11 @@ public class RawValidation extends ValidatorHelpers {
         val block = (Integer) values.get("Block").orElseGet(null);
 
         val species = (ObservableItem) values.get("Species").orElseGet(null);
-        //val speciesAttributesOtp = obsRepo.getSpeciesAttributesById(new Long(species.getObservableItemId()));
-//        val speciesAttributes = speciesAttributesOtp
-//                .stream()
-//                .findFirst()
+        val speciesAttributesOtp = obsRepo.getSpeciesAttributesById(new Long(species.getObservableItemId()));
+        val mayBeSpeciesAttributes = speciesAttributesOtp
+                .stream()
+                .findFirst()
 
-        val mayBeSpeciesAttributes = Optional.<UiSpeciesAttributes>empty();
 
         val code = (String) values.get("Code").orElseGet(null);
 
