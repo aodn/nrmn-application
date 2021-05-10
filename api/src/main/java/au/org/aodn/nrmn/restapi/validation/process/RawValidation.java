@@ -149,7 +149,7 @@ public class RawValidation extends ValidatorHelpers {
         val speciesAttributesOtp = obsRepo.getSpeciesAttributesById(new Long(species.getObservableItemId()));
         val mayBeSpeciesAttributes = speciesAttributesOtp
                 .stream()
-                .findFirst()
+                .findFirst();
 
 
 
