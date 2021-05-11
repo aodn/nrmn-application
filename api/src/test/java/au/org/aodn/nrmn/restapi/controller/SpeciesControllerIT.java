@@ -42,42 +42,37 @@ public class SpeciesControllerIT {
 
     @BeforeEach
     public void setup() {
-        spec = new RequestSpecBuilder()
-                .setBaseUri(String.format("http://localhost:%s", port))
-                .setBasePath("/api/species")
-                .addFilter(new ResponseLoggingFilter())
-                .addFilter(new RequestLoggingFilter())
-                .build();
+        spec = new RequestSpecBuilder().setBaseUri(String.format("http://localhost:%s", port))
+                .setBasePath("/api/species").addFilter(new ResponseLoggingFilter())
+                .addFilter(new RequestLoggingFilter()).build();
     }
 
     @Test
     @WithUserDetails("test@gmail.com")
     public void testNrmnSearch() {
-        ObservableItem species1 = getObservableItem("sea snake");
-        ObservableItem species2 = getObservableItem("sea snakes");
-        ObservableItem species3 = getObservableItem("underwater bulldog");
+        ObservableItem species1 = getObservableItem("sea snake", "sea snakes");
+        ObservableItem species2 = getObservableItem("sea snakes", "underwater bulldog");
+        ObservableItem species3 = getObservableItem("underwater bulldog", null);
 
-        given()
-                .spec(spec)
-                .auth()
-                .oauth2(jwtToken.get())
-                .queryParam("species", "sea snack")
-                .queryParam("searchType", "NRMN")
-                .get()
-                .then()
-                .assertThat()
+        given().spec(spec).auth().oauth2(jwtToken.get()).queryParam("species", "sea snack")
+                .queryParam("searchType", "NRMN").queryParam("includeSuperseded", true).get().then().assertThat()
                 .statusCode(200)
                 .body("species", hasItems(species1.getObservableItemName(), species2.getObservableItemName()));
+
+        given().spec(spec).auth().oauth2(jwtToken.get()).queryParam("species", "sea snack")
+                .queryParam("searchType", "NRMN").queryParam("includeSuperseded", false).get().then().assertThat()
+                .statusCode(200).body("species", hasItems());
+
+        given().spec(spec).auth().oauth2(jwtToken.get()).queryParam("species", "underwater")
+                .queryParam("searchType", "NRMN").queryParam("includeSuperseded", false).get().then().assertThat()
+                .statusCode(200).body("species", hasItems(species3.getObservableItemName()));
     }
 
-    private ObservableItem getObservableItem(String name) {
+    private ObservableItem getObservableItem(String name, String supersededBy) {
         ObsItemType obsItemType = obsItemTypeTestData.persistedObsItemType();
 
-        ObservableItem observableItem = ObservableItem.builder()
-                                                      .obsItemType(obsItemType)
-                                                      .observableItemName(name)
-                                                      .speciesEpithet(name)
-                                                      .build();
+        ObservableItem observableItem = ObservableItem.builder().obsItemType(obsItemType).observableItemName(name)
+                .speciesEpithet(name).supersededBy(supersededBy).build();
 
         observableItemRepository.saveAndFlush(observableItem);
         return observableItem;
