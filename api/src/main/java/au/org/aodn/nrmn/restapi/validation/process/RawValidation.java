@@ -61,8 +61,10 @@ public class RawValidation extends ValidatorHelpers {
     public HashMap<String, BaseRowValidator> getExtendedValidators() {
         return HashMap.fromStream(
                 Stream.of(
-                        Tuple2.of("IsInvertSizing", new OptionalBooleanFormatValidation(StagedRow::getIsInvertSizing,
+                        Tuple2.of("IsInvertSizing", new OptionalBooleanFormatValidation(target ->
+                                String.valueOf(target.getIsInvertSizing().equalsIgnoreCase("yes")),
                                 "IsInvertSizing"))
+
                 )
         );
     }
@@ -89,7 +91,7 @@ public class RawValidation extends ValidatorHelpers {
                         Tuple2.of("Latitude", new DoubleFormatValidation(StagedRow::getLatitude, "Latitude")),
                         Tuple2.of("Longitude", new DoubleFormatValidation(StagedRow::getLongitude, "Longitude")),
                         Tuple2.of("Direction", new DirectionDataCheck()),
-                        Tuple2.of("SoeciesNotfound",new SpeciesNotFoundCheck()),
+                        Tuple2.of("SoeciesNotfound", new SpeciesNotFoundCheck()),
                         Tuple2.of("Ref", new PassThruRef())
                 );
     }

@@ -29,6 +29,10 @@ public class SpeciesInvertSizing extends BaseFormattedValidator {
 
         val isInverted = speciesAttributes.getIsInvertSized();
 
+        if (isInverted == null)  {
+            return Validated.valid("Not affected");
+        }
+
         if (!target.getIsInvertSizing().isPresent() || isInverted == target.getIsInvertSizing().get()) {
             return Validated.valid("IsInvertSizing valid");
         }

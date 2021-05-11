@@ -494,13 +494,13 @@ export const ExtendedSize = [
   {
     field: '1000',
     editable: true,
-
     invertSize: '30',
     headerComponentFramework: AgGridHeader,
     width: 35
   },
   {
     field: 'isInvertSizing',
+    headerName: 'Use InvertSizing',
     editable: true,
     width: 40
   }
