@@ -80,7 +80,7 @@ class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
         formatted.setMethod(4);
         formatted.setSpeciesAttributesOpt(Optional.empty());
 
-        val validationRule = new MeasureUnderLmax();
+        val validationRule = new SpeciesAbundanceCheck();
         val res = validationRule.valid(formatted);
         assertTrue(res.isValid());
     }
