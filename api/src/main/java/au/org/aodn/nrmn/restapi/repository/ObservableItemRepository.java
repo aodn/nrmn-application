@@ -45,7 +45,7 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
                     " LEFT JOIN {h-schema}lengthweight_ref lw ON (lw.observable_item_id = oi.observable_item_id)" +
                     " WHERE (:include_superseded = TRUE OR oi.superseded_by IS NULL) " +
                     " AND observable_item_name ILIKE :search_term || '%' " +
-                    " ORDER BY SIMILARITY(lower(observable_item_name), lower(:search_term)) DESC ",
+                    " ORDER BY lower(observable_item_name) DESC ",
             countQuery =
                     "SELECT count(*) FROM {h-schema}observable_item_ref oi " +
                             " WHERE (:include_superseded = TRUE OR oi.superseded_by IS NULL) " +

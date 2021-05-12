@@ -54,12 +54,12 @@ public class SpeciesControllerIT {
         ObservableItem species2 = getObservableItem("sea snakes", "underwater bulldog");
         ObservableItem species3 = getObservableItem("underwater bulldog", null);
 
-        given().spec(spec).auth().oauth2(jwtToken.get()).queryParam("species", "sea snack")
+        given().spec(spec).auth().oauth2(jwtToken.get()).queryParam("species", "sea snak")
                 .queryParam("searchType", "NRMN").queryParam("includeSuperseded", true).get().then().assertThat()
                 .statusCode(200)
                 .body("species", hasItems(species1.getObservableItemName(), species2.getObservableItemName()));
 
-        given().spec(spec).auth().oauth2(jwtToken.get()).queryParam("species", "sea snack")
+        given().spec(spec).auth().oauth2(jwtToken.get()).queryParam("species", "sea snak")
                 .queryParam("searchType", "NRMN").queryParam("includeSuperseded", false).get().then().assertThat()
                 .statusCode(200).body("species", hasItems());
 
