@@ -14,11 +14,11 @@ class SpeciesBelongToMethodCheckTest extends FormattedTestProvider{
     public void matchingMethodShouldSuccess() {
         val formatted = getDefaultFormatted().build();
         formatted.setMethod(1);
-        formatted.setSpecies(Optional.of(
+        formatted.setSpecies(
                 ObservableItem.builder()
                         .obsItemAttribute(ImmutableMap.<String, String>builder()
                                 .put("is_M1", "true").build())
-                        .observableItemName("THE SPECIES").build()));
+                        .observableItemName("THE SPECIES").build());
 
         val validator = new SpeciesBelongToMethodCheck();
         val res =validator.valid(formatted);
@@ -29,11 +29,11 @@ class SpeciesBelongToMethodCheckTest extends FormattedTestProvider{
     public void nonMatchingMethodShouldFail() {
         val formatted = getDefaultFormatted().build();
         formatted.setMethod(2);
-        formatted.setSpecies(Optional.of(
+        formatted.setSpecies(
                 ObservableItem.builder()
                         .obsItemAttribute(ImmutableMap.<String, String>builder()
                                 .put("is_M1", "true").build())
-                        .observableItemName("THE SPECIES").build()));
+                        .observableItemName("THE SPECIES").build());
 
         val validator = new SpeciesBelongToMethodCheck();
         val res =validator.valid(formatted);

@@ -61,7 +61,7 @@ public class SurveyIngestionServiceTest {
                 .method(2)
                 .diver(diver)
                 .buddy(Diver.builder().initials("MAX").build())
-                .species(Optional.of(ObservableItem.builder().observableItemName("THE SPECIES").build()))
+                .species(ObservableItem.builder().observableItemName("THE SPECIES").build())
                 .site(Site.builder().siteCode("A SITE").build())
                 .depth(1)
                 .surveyNum(Optional.of(2))

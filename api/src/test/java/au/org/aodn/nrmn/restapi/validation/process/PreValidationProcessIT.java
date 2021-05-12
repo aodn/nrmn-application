@@ -67,7 +67,7 @@ class PreValidationProcessIT {
         assertEquals(row.getBlock(), 1);
         assertEquals(row.getDirection(), Directions.NE);
         assertEquals(row.getDiver().getFullName(), "Tanjona Julien Rafidison");
-        assertEquals(row.getSpecies().get().getAphiaRef().getAphiaId(), 102);
+        assertEquals(row.getSpecies().getAphiaRef().getAphiaId(), 102);
         assertEquals(row.getMeasureJson().get(13), 1);
 
     }

@@ -5,6 +5,7 @@ import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.util.OptionalUtil;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
@@ -90,7 +91,7 @@ public class RawValidation extends ValidatorHelpers {
                         Tuple2.of("Latitude", new DoubleFormatValidation(StagedRow::getLatitude, "Latitude")),
                         Tuple2.of("Longitude", new DoubleFormatValidation(StagedRow::getLongitude, "Longitude")),
                         Tuple2.of("Direction", new DirectionDataCheck()),
-                        Tuple2.of("SoeciesNotfound",new SpeciesNotFoundCheck()),
+                        Tuple2.of("SoeciesNotfound", new SpeciesNotFoundCheck()),
                         Tuple2.of("Ref", new PassThruRef())
                 );
     }
@@ -125,7 +126,11 @@ public class RawValidation extends ValidatorHelpers {
         return new RowWithValidation(Seq.of(target), validation);
     }
 
-    public StagedRowFormatted toFormat(HashMap<String, Object> values, boolean isExtendedSizing) {
+    public Optional<StagedRowFormatted> toFormat(HashMap<String, Object> values, boolean isExtendedSizing) {
+        val species = (ObservableItem) values.get("Species").orElseGet(null);
+        if (species == null)
+            return Optional.empty();
+
         val site = (Site) values.get("Site").orElseGet(null);
         val date = (LocalDate) values.get("Date").orElseGet(null);
         val time = (Optional<LocalTime>) values.get("Time").orElse(Optional.empty());
@@ -146,12 +151,12 @@ public class RawValidation extends ValidatorHelpers {
         val method = (Integer) values.get("Method").orElseGet(null);
         val block = (Integer) values.get("Block").orElseGet(null);
 
-        val species = (ObservableItem) values.get("Species").orElseGet(null);
+
+
         val speciesAttributesOtp = obsRepo.getSpeciesAttributesById(new Long(species.getObservableItemId()));
         val mayBeSpeciesAttributes = speciesAttributesOtp
                 .stream()
                 .findFirst();
-
 
 
         val code = (String) values.get("Code").orElseGet(null);
@@ -177,7 +182,7 @@ public class RawValidation extends ValidatorHelpers {
         rowFormatted.setSurveyNum(survey_num);
         rowFormatted.setMethod(method);
         rowFormatted.setBlock(block);
-        rowFormatted.setSpecies(Optional.ofNullable(species));
+        rowFormatted.setSpecies(species);
         rowFormatted.setVis(vis);
         rowFormatted.setCode(code);
         rowFormatted.setDirection(direction);
@@ -191,7 +196,7 @@ public class RawValidation extends ValidatorHelpers {
             val isInvertSizing = (Optional<Boolean>) values.get("IsInvertSizing").orElse(Optional.empty());
             rowFormatted.setIsInvertSizing(isInvertSizing);
         }
-        return rowFormatted;
+        return Optional.of(rowFormatted);
     }
 
     public List<StagedRowFormatted> preValidated(List<StagedRow> targets, StagedJob job) {
@@ -205,7 +210,7 @@ public class RawValidation extends ValidatorHelpers {
                     val validated = validatedRow.getValid();
                     val validatorsWithMap =
                             validated.map(seq -> toFormat(seq.toHashMap(Tuple2::_1, Tuple2::_2), job.getIsExtendedSize()));
-                    return validatorsWithMap.stream();
+                    return validatorsWithMap.stream().flatMap(OptionalUtil::toStream);
                 }).collect(Collectors.toList());
     }
 }

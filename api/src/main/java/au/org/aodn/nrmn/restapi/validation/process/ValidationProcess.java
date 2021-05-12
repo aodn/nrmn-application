@@ -7,6 +7,7 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowErrorRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
+import au.org.aodn.nrmn.restapi.util.OptionalUtil;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.model.MonoidRowValidation;
 import au.org.aodn.nrmn.restapi.validation.summary.DefaultSummary;
@@ -69,8 +70,9 @@ public class ValidationProcess extends ValidatorHelpers {
 
         val formattedRows = rowWithHasMap
                 .stream()
-                .map(tuple2s -> preProcess.toFormat(tuple2s, job.getIsExtendedSize()))
-                .collect(Collectors.toList());
+                .flatMap(tuple2s -> OptionalUtil.toStream(
+                        preProcess.toFormat(tuple2s, job.getIsExtendedSize()))
+                ).collect(Collectors.toList());
         val globalFormatted = globalProcess.processFormatted(job, formattedRows);
         val formattedResult = postProcess.process(formattedRows, job);
         
