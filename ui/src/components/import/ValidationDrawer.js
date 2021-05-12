@@ -175,7 +175,6 @@ const ValidationDrawer = () => {
       value: pair.value.filter((err) => err.message.toLowerCase().indexOf(filter) >= 0)
     }));
   }
-  console.log(errList);
   return errList && errList.length > 0 ? (
     <Drawer
       anchor="right"
