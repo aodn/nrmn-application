@@ -110,7 +110,7 @@ const importSlice = createSlice({
     validationReady: (state, action) => {
       state.globalWarnings = state.globalErrors = [];
       state.errorsByMsg = [];
-      state.enableSubmit = true;
+      state.enableSubmit = false;
 
       if (action.payload.errors.length > 0) {
         state.validationErrors = action.payload.errors.reduce((acc, err) => {
@@ -119,7 +119,7 @@ const importSlice = createSlice({
         }, {});
         const errorsList = action.payload.errors.map((err) => err.errors);
         const validationErrors = errorsList.reduce((acc, err) => [...acc, ...err], []);
-        state.enableSubmit = validationErrors.some((err) => err.errorLevel === 'BLOCKING') === 0;
+        state.enableSubmit = !validationErrors.some((err) => err.errorLevel === 'BLOCKING');
         state.errorsByMsg = action.payload.summaries;
       }
       if (action.payload.errorGlobal) {
