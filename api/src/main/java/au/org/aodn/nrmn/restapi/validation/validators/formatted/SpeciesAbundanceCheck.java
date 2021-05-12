@@ -15,7 +15,9 @@ public class SpeciesAbundanceCheck extends BaseFormattedValidator {
 
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
-        if (target.getMethod() != 1 && target.getMethod() != 2 && !target.getSpeciesAttributesOpt().isPresent())
+        if (target.getMethod() == 1 ||
+                target.getMethod() == 2 ||
+                !target.getSpeciesAttributesOpt().isPresent())
             return Validated.valid("No affected");
 
         val maxAbundance = target.getSpeciesAttributesOpt().get().getMaxAbundance();
