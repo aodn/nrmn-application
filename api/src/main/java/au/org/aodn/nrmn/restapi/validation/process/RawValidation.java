@@ -63,8 +63,10 @@ public class RawValidation extends ValidatorHelpers {
     public HashMap<String, BaseRowValidator> getExtendedValidators() {
         return HashMap.fromStream(
                 Stream.of(
-                        Tuple2.of("IsInvertSizing", new OptionalBooleanFormatValidation(StagedRow::getIsInvertSizing,
+                        Tuple2.of("IsInvertSizing", new OptionalBooleanFormatValidation(target ->
+                                String.valueOf(target.getIsInvertSizing().equalsIgnoreCase("yes")),
                                 "IsInvertSizing"))
+
                 )
         );
     }
@@ -170,6 +172,7 @@ public class RawValidation extends ValidatorHelpers {
         val ref = (StagedRow) values.get("Ref").orElseGet(null);
 
         val rowFormatted = new StagedRowFormatted();
+        rowFormatted.setId(ref.getId());
         rowFormatted.setDate(date);
         rowFormatted.setTime(time);
         rowFormatted.setSite(site);

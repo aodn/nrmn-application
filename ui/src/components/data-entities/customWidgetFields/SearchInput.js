@@ -6,17 +6,18 @@ import {setField} from '../middleware/entities';
 import {PropTypes} from 'prop-types';
 import {searchRequested} from '../form-reducer';
 
-const SearchInput = ({schema, name}) => {
+const SearchInput = ({schema, name, uiSchema}) => {
   const dispatch = useDispatch();
 
   const value = useSelector((state) => state.form.data[name]) ?? '';
+  const exclude = useSelector((state) => state.form.data[uiSchema.exclude]) ?? '';
   const searchResults = useSelector((state) => state.form.searchResults);
 
   return (
     <>
       <Typography variant="subtitle2">{schema.title}</Typography>
       <Autocomplete
-        options={searchResults?.map((i) => i.species) ?? []}
+        options={searchResults?.map((i) => i.species).filter((f) => f !== exclude) ?? []}
         freeSolo
         defaultValue={value}
         onSelect={(e) => {
@@ -24,7 +25,8 @@ const SearchInput = ({schema, name}) => {
         }}
         onKeyUp={(e) => {
           dispatch(setField({newValue: e.target.value, entity: name}));
-          if (e.target.value?.length > 3) dispatch(searchRequested({searchType: 'NRMN', species: e.target.value}));
+          if (e.target.value?.length > 2)
+            dispatch(searchRequested({searchType: 'NRMN', species: e.target.value, includeSuperseded: false}));
         }}
         renderInput={(params) => <TextField {...params} color="primary" variant="outlined" />}
       />
