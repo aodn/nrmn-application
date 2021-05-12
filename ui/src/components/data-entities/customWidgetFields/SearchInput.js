@@ -24,7 +24,7 @@ const SearchInput = ({schema, name}) => {
         }}
         onKeyUp={(e) => {
           dispatch(setField({newValue: e.target.value, entity: name}));
-          if (e.target.value?.length > 2)
+          if (e.target.value?.length > 3)
             dispatch(searchRequested({searchType: 'NRMN', species: e.target.value, includeSuperseded: false}));
         }}
         renderInput={(params) => <TextField {...params} color="primary" variant="outlined" />}

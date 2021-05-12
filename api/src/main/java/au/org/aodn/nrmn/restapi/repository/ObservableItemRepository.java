@@ -43,13 +43,13 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
     @Query(value =
             "SELECT * FROM {h-schema}observable_item_ref oi" +
                     " LEFT JOIN {h-schema}lengthweight_ref lw ON (lw.observable_item_id = oi.observable_item_id)" +
-                    " WHERE (:include_superseded = TRUE OR oi.superseded_by IS NULL) " +
-                    " AND observable_item_name ILIKE :search_term || '%' " +
+                    " WHERE SIMILARITY(lower(observable_item_name), lower(:search_term)) > 0.4 " +
+                    " AND (:include_superseded = TRUE OR oi.superseded_by IS NULL) " +
                     " ORDER BY SIMILARITY(lower(observable_item_name), lower(:search_term)) DESC ",
             countQuery =
                     "SELECT count(*) FROM {h-schema}observable_item_ref oi " +
-                            " WHERE (:include_superseded = TRUE OR oi.superseded_by IS NULL) " +
-                            " AND observable_item_name ILIKE :search_term || '%' ",
+                            " WHERE SIMILARITY(lower(observable_item_name), lower(:search_term)) > 0.4 " +
+                            " AND (:include_superseded = TRUE OR oi.superseded_by IS NULL)",
             nativeQuery = true)
     Page<ObservableItem> fuzzySearch(Pageable pageable, @Param("search_term") String searchTerm, @Param("include_superseded") Boolean includeSuperseded);
 
