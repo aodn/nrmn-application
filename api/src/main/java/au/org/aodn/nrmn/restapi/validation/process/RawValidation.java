@@ -166,6 +166,7 @@ public class RawValidation extends ValidatorHelpers {
         val ref = (StagedRow) values.get("Ref").orElseGet(null);
 
         val rowFormatted = new StagedRowFormatted();
+        rowFormatted.setId(ref.getId());
         rowFormatted.setDate(date);
         rowFormatted.setTime(time);
         rowFormatted.setSite(site);
