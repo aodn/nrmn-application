@@ -73,15 +73,19 @@ public class ValidationProcess extends ValidatorHelpers {
                 .collect(Collectors.toList());
         val globalFormatted = globalProcess.processFormatted(job, formattedRows);
         val formattedResult = postProcess.process(formattedRows, job);
-        
-        if (formattedResult.getValid().isInvalid()) {
-            return rowsWithErrorsResponse(job, formattedResult.getRows());
-        }
+                
+        val formattedRowErrors =
+                formattedResult.getRows()
+                        .flatMap(row ->
+                                Seq.fromIterable(row.getErrors())
+                        ).toList();
+
+        val msgSummary = summary.aggregate(formattedRowErrors);
         
         return new ValidationResponse(
                 job,
-                Collections.emptyList(),
-                Collections.emptyMap(),
+                formattedResult.getRows().map(row -> new RowErrors(row.getId(),row.getErrors())).toList(),
+                msgSummary,
                 toErrorList(globalResult.combine(Semigroups.stringConcat, globalFormatted)),
                 Collections.emptyList());
     }
