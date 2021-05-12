@@ -14,13 +14,12 @@ import {
   InputBase,
   Fab
 } from '@material-ui/core';
-import {PlaylistAddCheckOutlined, ReportProblemOutlined, SearchOutlined} from '@material-ui/icons';
-import BlockOutlinedIcon from '@material-ui/icons/BlockOutlined';
+import {PlaylistAddCheckOutlined, SearchOutlined} from '@material-ui/icons';
+import {BlockOutlined as BlockOutlinedIcon, WarningOutlined as WarningOutlinedIcon} from '@material-ui/icons';
 import clsx from 'clsx';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {validationFilter, ValidationRequested} from './reducers/create-import';
-import {orange} from '@material-ui/core/colors';
 import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
 import ArrowBackIosOutlinedIcon from '@material-ui/icons/ArrowBackIosOutlined';
 import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
@@ -82,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(3)
   },
   errorItem: {
-    color: theme.palette.error
+    backgroundColor: fade('#ff0000', 0.15)
   },
   searchIcon: {
     padding: theme.spacing(0, 2),
@@ -162,14 +161,21 @@ const ValidationDrawer = () => {
   };
 
   var errList = Object.keys(errorsByMsg).map((label) => {
-    return {key: label, total: errorsByMsg[label].length, value: errorsByMsg[label]};
+    const b = errorsByMsg[label].find((e) => e.errorLeve === 'BLOCKING');
+    return {
+      key: label,
+      total: errorsByMsg[label].length,
+      value: errorsByMsg[label],
+      blocking: b ? true : false
+    };
   });
 
   if (errList && errList.length > 0 && filter !== '') {
     errList = errList.map((pair) => ({
       key: pair.key,
       total: pair.total,
-      value: pair.value.filter((err) => err.message.toLowerCase().indexOf(filter) >= 0)
+      value: pair.value.filter((err) => err.message.toLowerCase().indexOf(filter) >= 0),
+      blocking: errList.find((e) => e.errorLeve === 'BLOCKING') ? true : false
     }));
   }
   return errList && errList.length > 0 ? (
@@ -227,7 +233,7 @@ const ValidationDrawer = () => {
         </Toolbar>
       </Box>
       {errList.map((err) => (
-        <Accordion key={err.key} >
+        <Accordion key={err.key}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1c-content" id="panel1c-header">
             <div className={classes.column}>
               <Typography className={classes.heading}>{titleCase(err.key)}</Typography>
@@ -242,17 +248,13 @@ const ValidationDrawer = () => {
                 <ListItem
                   onClick={() => handleFilter(item)}
                   selected={item.message === errSelected.message}
-                  className={item.message === errSelected.message ? classes.selected : classes.errorItem}
+                  className={item.errorLeve === 'WARNING' ? classes.selected : classes.errorItem}
                   button
                   key={i}
                 >
                   <ListItemIcon>
                     <Badge badgeContent={item.count} color="primary">
-                      {item.level == 'WARNING' ? (
-                        <ReportProblemOutlined style={{color: orange[500]}} />
-                      ) : (
-                        <BlockOutlinedIcon color="error" />
-                      )}
+                      {item.errorLeve == 'WARNING' ? <WarningOutlinedIcon color="error" /> : <BlockOutlinedIcon color="error" />}
                     </Badge>
                   </ListItemIcon>
                   <ListItemText color="secondary" primary={item.message} secondary={item.columnTarget} />
