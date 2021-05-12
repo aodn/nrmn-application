@@ -6,17 +6,18 @@ import {setField} from '../middleware/entities';
 import {PropTypes} from 'prop-types';
 import {searchRequested} from '../form-reducer';
 
-const SearchInput = ({schema, name}) => {
+const SearchInput = ({schema, name, uiSchema}) => {
   const dispatch = useDispatch();
 
   const value = useSelector((state) => state.form.data[name]) ?? '';
+  const exclude = useSelector((state) => state.form.data[uiSchema.exclude]) ?? '';
   const searchResults = useSelector((state) => state.form.searchResults);
 
   return (
     <>
       <Typography variant="subtitle2">{schema.title}</Typography>
       <Autocomplete
-        options={searchResults?.map((i) => i.species) ?? []}
+        options={searchResults?.map((i) => i.species).filter((f) => f !== exclude) ?? []}
         freeSolo
         defaultValue={value}
         onSelect={(e) => {
