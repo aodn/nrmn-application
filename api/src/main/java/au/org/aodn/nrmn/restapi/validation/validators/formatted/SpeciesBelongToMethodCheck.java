@@ -18,8 +18,10 @@ public class SpeciesBelongToMethodCheck extends BaseFormattedValidator {
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
 
         if (target.getSpecies()
-                .getObsItemAttribute()
-                .containsKey("is_M" + target.getMeth                              od())) {
+                .getObsItemAttribute().entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().startsWith("is_M"+ target.getMethod())).count() != 0)
+        {
             return Validated.valid("Species match method");
         }
 
