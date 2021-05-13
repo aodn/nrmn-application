@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 @Service
 public class SurveyIngestionService {
     private static final ImmutableMap<Integer, Integer> METHOD_ID_TO_MEASURE_ID_MAP = ImmutableMap.<Integer, Integer>builder()
-            .put(0,1).put(1, 1).put(2, 4).put(3, 2).put(4, 3).put(5, 7).build();
+            .put(0, 1).put(1, 1).put(2, 4).put(3, 2).put(4, 3).put(5, 7).build();
     private static Logger logger = LoggerFactory.getLogger(SurveyIngestionService.class);
     @Autowired
     SurveyRepository surveyRepository;
@@ -40,6 +40,8 @@ public class SurveyIngestionService {
     @Autowired
     ProgramRepository programRepository;
     @Autowired
+    SiteRepository siteRepo;
+    @Autowired
     EntityManager entityManager;
 
     public List<Observation> ingestStagedRow(StagedRowFormatted stagedRow) {
@@ -47,25 +49,42 @@ public class SurveyIngestionService {
     }
 
     public Survey getSurvey(StagedRowFormatted stagedRow) {
+        val site = stagedRow.getSite();
+
         val survey = Survey.builder()
                 .depth(stagedRow.getDepth())
                 .surveyNum(stagedRow.getSurveyNum().orElse(null))
-                .site(Site.builder().siteCode(stagedRow.getSite().getSiteCode()).build())
+                .site(Site.builder().siteCode(site.getSiteCode()).build())
                 .surveyDate(Date.valueOf(stagedRow.getDate()))
                 .build();
 
         Optional<Survey> existingSurvey = surveyRepository.findOne(Example.of(survey));
 
-        return existingSurvey.orElseGet(() -> surveyRepository.save(Survey.builder()
-                .depth(stagedRow.getDepth())
-                .surveyNum(stagedRow.getSurveyNum().orElse(null))
-                .direction(stagedRow.getDirection().toString())
-                .site(stagedRow.getSite())
-                .surveyDate(Date.valueOf(stagedRow.getDate()))
-                .surveyTime(Time.valueOf(stagedRow.getTime().orElse(null)))
-                .visibility(stagedRow.getVis().orElse(null))
-                .program(stagedRow.getRef().getStagedJob().getProgram())
-                .build()));
+        val siteSurveys = surveyRepository.findAll(
+                Example.of(
+                        Survey.builder().site(
+                                Site.builder()
+                                        .siteCode(stagedRow.getSite().getSiteCode())
+                                        .build()
+                        ).build()
+                )
+        );
+        if (siteSurveys.isEmpty()) {
+            site.setIsActive(true);
+            siteRepo.save(site);
+        }
+        return existingSurvey.orElseGet(() ->
+             surveyRepository.save(Survey.builder()
+                    .depth(stagedRow.getDepth())
+                    .surveyNum(stagedRow.getSurveyNum().orElse(null))
+                    .direction(stagedRow.getDirection().toString())
+                    .site(site)
+                    .surveyDate(Date.valueOf(stagedRow.getDate()))
+                    .surveyTime(Time.valueOf(stagedRow.getTime().orElse(null)))
+                    .visibility(stagedRow.getVis().orElse(null))
+                    .program(stagedRow.getRef().getStagedJob().getProgram())
+                    .build())
+        );
     }
 
     public SurveyMethod getSurveyMethod(StagedRowFormatted stagedRow) {

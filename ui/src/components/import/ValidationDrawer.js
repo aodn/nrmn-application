@@ -248,7 +248,7 @@ const ValidationDrawer = () => {
                 <ListItem
                   onClick={() => handleFilter(item)}
                   selected={item.message === errSelected.message}
-                  className={item.errorLeve === 'WARNING' ? classes.selected : classes.errorItem}
+                  className={item.level === 'WARNING' ? classes.selected : classes.errorItem}
                   button
                   key={i}
                 >
