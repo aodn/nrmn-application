@@ -18,6 +18,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
@@ -42,10 +43,12 @@ public class Diver {
     @Column(name = "initials")
     @Schema(title = "Initials")
     @NotNull
+    @NotBlank
     private String initials;
 
     @Column(name = "full_name")
     @Schema(title = "Full name")
     @NotNull
+    @NotBlank
     private String fullName;
 }
