@@ -259,7 +259,7 @@ const ValidationDrawer = () => {
                       )}
                     </Badge>
                   </ListItemIcon>
-                  <ListItemText style={{overflow: 'hidden', width:'100%',whiteSpace: 'break-spaces'}} color="secondary" primary={item.message} secondary={item.columnTarget} />
+                  <ListItemText style={{overflow: 'hidden', width:'100%',whiteSpace: 'break-spaces'}} color="secondary" primary={item.message} />
                 </ListItem>
               ))}
             </List>

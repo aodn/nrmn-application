@@ -36,6 +36,9 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
         val speciesAttributes = target.getSpeciesAttributesOpt().get();
         val l5 = speciesAttributes.getL5();
         val l95 = speciesAttributes.getL95();
+        if (target.getMeasureJson().isEmpty() || l5 == null || l95 == null)
+            return Validated.valid("No data");
+
         val outOfRange = target.getMeasureJson()
                 .entrySet().stream()
                 .filter(entry -> entry.getValue() != 0 && (entry.getValue() < l5 || entry.getValue() > l95))
