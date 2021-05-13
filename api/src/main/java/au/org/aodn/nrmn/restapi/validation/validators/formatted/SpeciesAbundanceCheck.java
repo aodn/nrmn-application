@@ -11,7 +11,7 @@ import lombok.val;
 
 public class SpeciesAbundanceCheck extends BaseFormattedValidator {
     public SpeciesAbundanceCheck() {
-        super("measures");
+        super("total");
     }
 
     @Override
