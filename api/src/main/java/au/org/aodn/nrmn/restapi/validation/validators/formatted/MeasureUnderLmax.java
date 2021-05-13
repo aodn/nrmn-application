@@ -31,7 +31,6 @@ public class MeasureUnderLmax extends BaseFormattedValidator {
         val lmax = speciesAttributes.getLmax();
         if (target.getMeasureJson().isEmpty() || lmax == null)
             return Validated.valid("No data");
-
         val outOfRangef = target.getMeasureJson().entrySet().stream()
                 .filter(entry -> entry.getValue() > lmax)
                 .collect(Collectors.toList());
