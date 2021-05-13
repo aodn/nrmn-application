@@ -16,7 +16,7 @@ import CustomLoadingOverlay from './CustomLoadingOverlay';
 import {selectRequested, deleteEntityRequested} from './middleware/entities';
 import {resetState} from './form-reducer';
 
-let agGridApi = {};
+let agGridApi = null;
 let agGridColumnApi = null;
 
 const getCellFilter = (format) => {
@@ -37,12 +37,22 @@ const renderError = (msgArray) => {
   );
 };
 
+const saveFilterModel = (entityName, filterModel) => {
+  window[`AgGrid-FilterModel-${entityName}`] = JSON.stringify(filterModel);
+};
+
+const restoreFilterModel = (entityName) => {
+  const serialisedFilter = window[`AgGrid-FilterModel-${entityName}`];
+  return serialisedFilter ? JSON.parse(serialisedFilter) : null;
+};
+
 const EntityList = (props) => {
   const history = useHistory();
   const size = useWindowSize();
   const dispatch = useDispatch();
   const entities = useSelector((state) => state.form.entities);
   const errors = useSelector((state) => state.form.errors);
+  const [disableResetFilter, setResetFilterDisabled] = useState(true);
 
   useEffect(() => {
     dispatch(resetState());
@@ -51,12 +61,13 @@ const EntityList = (props) => {
 
   let items = entities?._embedded ? entities?._embedded[props.entity.list.key] : entities;
   useEffect(() => {
-    if (agGridColumnApi) {
+    if (agGridApi && agGridColumnApi) {
       let allColumnIds = [];
       agGridColumnApi.getAllColumns().forEach(function (column) {
         if (props.entity.flexField !== column.colId && column.colId !== '0') allColumnIds.push(column.colId);
       });
       agGridColumnApi.autoSizeColumns(allColumnIds, false);
+      agGridApi.setFilterModel(restoreFilterModel(props.entity.name));
     }
   }, [items]);
 
@@ -179,14 +190,26 @@ const EntityList = (props) => {
   return (
     <>
       {dialogState.open && dialog}
-      <Grid container direction="row" justify="space-between" style={{paddingLeft: 20}} alignItems="center">
-        <Grid item>
+      <Grid container direction="row" justify="space-between" alignItems="right">
+        <Grid item xs={8}>
           <Typography variant="h4">{props.entity.list.name}</Typography>
         </Grid>
-        <Grid item>
+        <Grid item xs={2}>
+          <Button
+            style={{width: '75%'}}
+            disabled={disableResetFilter}
+            onClick={() => agGridApi.setFilterModel(null)}
+            color="primary"
+            variant={'contained'}
+          >
+            Reset Filter
+          </Button>
+        </Grid>
+        <Grid item xs={2}>
           {props.entity.list.showNew && (
             <Button
               {...props}
+              style={{width: '100%'}}
               to={props.entity.route.base}
               component={NavLink}
               color="secondary"
@@ -203,12 +226,14 @@ const EntityList = (props) => {
         <AgGridReact
           columnDefs={colDef}
           rowSelection="single"
-          animateRows={true}
           rowData={items}
           onGridReady={agGridReady}
-          onCellClicked={(e) => {
-            onRowClick(e, history, props.entity);
+          onFilterChanged={(e) => {
+            const filterModel = e.api.getFilterModel();
+            saveFilterModel(props.entity.name, filterModel);
+            setResetFilterDisabled(Object.keys(filterModel)?.length < 1);
           }}
+          onCellClicked={(e) => onRowClick(e, history, props.entity)}
           frameworkComponents={{
             customLoadingOverlay: CustomLoadingOverlay
           }}
