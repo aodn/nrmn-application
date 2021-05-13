@@ -63,7 +63,7 @@ public class IngestionController {
             return ResponseEntity.badRequest().body("Job with given id has not been validated: " + jobId);
         }
 
-        try {
+        try {   
             stagedJobLogRepository.save(StagedJobLog.builder()
                     .stagedJob(job)
                     .eventType(StagedJobEventType.INGESTING)
@@ -101,6 +101,6 @@ public class IngestionController {
             throw e;
         }
 
-        return ResponseEntity.ok("job " + jobId + " sucessfully ingested.");
+        return ResponseEntity.ok("job " + jobId + " successfully ingested.");
     }
 }

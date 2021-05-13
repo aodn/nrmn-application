@@ -25,7 +25,7 @@ public class SpeciesAbundanceCheck extends BaseFormattedValidator {
                 return Validated.<StagedRowError, String>valid("Total under MaxAbundance");
             }
             return invalid(target,
-                    "Total is above max Abudance(" +
+                    "Total is above max Abundance(" +
                             maxAbundance +
                             ").",
                     ValidationCategory.DATA,

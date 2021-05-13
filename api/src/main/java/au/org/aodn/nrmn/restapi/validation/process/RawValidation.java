@@ -93,7 +93,7 @@ public class RawValidation extends ValidatorHelpers {
                         Tuple2.of("Latitude", new DoubleFormatValidation(StagedRow::getLatitude, "Latitude")),
                         Tuple2.of("Longitude", new DoubleFormatValidation(StagedRow::getLongitude, "Longitude")),
                         Tuple2.of("Direction", new DirectionDataCheck()),
-                        Tuple2.of("SoeciesNotfound", new SpeciesNotFoundCheck()),
+                        Tuple2.of("SpeciesNotfound", new SpeciesNotFoundCheck()),
                         Tuple2.of("Ref", new PassThruRef())
                 );
     }
