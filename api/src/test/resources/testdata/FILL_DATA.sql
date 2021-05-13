@@ -163,3 +163,5 @@ VALUES ('TJR', 1, 'AZS', 'AAA', '09/09/2009', '03/03/2003', 3.3, 'NW', 'TJR',
         '{
           "1": "5"
         }', 1, 'Castillo', 'CEU4', 'Specie 56', '11:11', 5, 11, 109);
+
+REFRESH MATERIALIZED VIEW nrmn.ui_species_attributes;

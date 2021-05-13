@@ -10,7 +10,7 @@ import lombok.val;
 
 public class Within200MSiteCheck extends BaseFormattedValidator {
     public Within200MSiteCheck() {
-        super("Longittude,Lattitude");
+        super("Longitude,Latitude");
     }
 
     private static double _distance(double lat1, double lon1, double lat2, double lon2) {
@@ -34,6 +34,6 @@ public class Within200MSiteCheck extends BaseFormattedValidator {
         if (dist <= 0.2) {
             return Validated.valid("coords in range");
         }
-        return invalid(target, "Coordinates are beyound 0.2KM from the Site(" + dist + "KM)", ValidationCategory.DATA, ValidationLevel.WARNING);
+        return invalid(target, "Coordinates are further than 0.2km from the Site (" + dist + "km)", ValidationCategory.DATA, ValidationLevel.WARNING);
     }
 }

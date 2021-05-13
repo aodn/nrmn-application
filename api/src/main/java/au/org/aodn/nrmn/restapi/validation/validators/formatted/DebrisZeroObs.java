@@ -19,7 +19,7 @@ public class DebrisZeroObs extends BaseFormattedValidator {
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
         if (target.getCode().equalsIgnoreCase("dez") &&
-            target.getSpecies().get().getObservableItemName().equalsIgnoreCase("Debris-Zero"))     {
+            target.getSpecies().getObservableItemName().equalsIgnoreCase("Debris-Zero"))     {
             val sum = target.getMeasureJson()
                     .entrySet().stream()
                     .map(Map.Entry::getValue)
@@ -31,7 +31,7 @@ public class DebrisZeroObs extends BaseFormattedValidator {
                     new StagedRowError(
                             new ErrorID(target.getId(),
                                     target.getRef().getStagedJob().getId(),
-                                    "Debris  has Value/Total/Inverts not 0 "),
+                                    "Debris has Value/Total/Inverts not 0 "),
                             ValidationCategory.DATA,
                             ValidationLevel.BLOCKING,
                             columnTarget,

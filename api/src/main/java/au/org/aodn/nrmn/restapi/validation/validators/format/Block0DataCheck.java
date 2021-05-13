@@ -27,7 +27,7 @@ public class Block0DataCheck extends BaseRowValidator {
             return Validated.invalid(new StagedRowError(
                     new ErrorID(target.getId(),
                             target.getStagedJob().getId(),
-                            "Block 0 must happen with M0,M3, M4, M5"),
+                            "Block 0 must happen with M0, M3, M4, M5"),
                     ValidationCategory.DATA,
                     ValidationLevel.BLOCKING,
                     columnTarget,
