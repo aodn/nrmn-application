@@ -25,8 +25,8 @@ public abstract class BaseFormattedValidator {
                         formattedRow.getRef().getStagedJob().getId(),
                         errorMsg
                 ),
-                ValidationCategory.DATA,
-                ValidationLevel.BLOCKING,
+                category,
+                level,
                 columnTarget,
                formattedRow.getRef()));
     }

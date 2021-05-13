@@ -17,7 +17,7 @@ public class SpeciesBelongToMethodCheck extends BaseFormattedValidator {
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
 
-        if (!target.getSpecies().isPresent() || target.getSpecies().get()
+        if (target.getSpecies()
                 .getObsItemAttribute()
                 .containsKey("is_M" + target.getMethod())) {
             return Validated.valid("Species match method");

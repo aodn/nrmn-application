@@ -339,7 +339,7 @@ const DataSheetView = () => {
       <div
         onKeyDown={onKeyDown}
         id="validation-grid"
-        style={{height: size.height - 210, width: '100%', marginTop: 25}}
+        style={{height: size.height - 230, width: '100%', marginTop: 25}}
         className={'ag-theme-material'}
       >
         <AgGridReact
