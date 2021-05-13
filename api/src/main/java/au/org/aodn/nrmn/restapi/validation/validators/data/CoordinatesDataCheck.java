@@ -84,11 +84,11 @@ public class CoordinatesDataCheck extends BaseRowValidator {
                 new ErrorID(
                         target.getId(),
                         target.getStagedJob().getId(),
-                        "Lat and Long didn't match with the Site"
+                        "Latitude and Longitude didn't match with the Site"
                 ),
                 ValidationCategory.DATA,
                 ValidationLevel.BLOCKING,
-                "longitude, Lattitude",
+                "Longitude, Latitude",
 
                 target
         ));

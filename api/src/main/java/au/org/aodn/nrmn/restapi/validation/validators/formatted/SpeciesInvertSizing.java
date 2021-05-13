@@ -39,7 +39,7 @@ public class SpeciesInvertSizing extends BaseFormattedValidator {
     return Validated.invalid(new StagedRowError(
             new ErrorID(target.getId(),
                     target.getRef().getStagedJob().getId(),
-                    "IsInvertSized didn't match  database"),
+                    "IsInvertSized didn't match database"),
             ValidationCategory.DATA,
             ValidationLevel.WARNING,
             columnTarget,

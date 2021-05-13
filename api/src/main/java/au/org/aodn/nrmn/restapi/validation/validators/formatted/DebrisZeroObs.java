@@ -31,7 +31,7 @@ public class DebrisZeroObs extends BaseFormattedValidator {
                     new StagedRowError(
                             new ErrorID(target.getId(),
                                     target.getRef().getStagedJob().getId(),
-                                    "Debris  has Value/Total/Inverts not 0 "),
+                                    "Debris has Value/Total/Inverts not 0 "),
                             ValidationCategory.DATA,
                             ValidationLevel.BLOCKING,
                             columnTarget,
