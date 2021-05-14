@@ -23,7 +23,6 @@ public  class FormattedTestProvider {
                 .block(1)
                 .method(2)
                 .diver(diver)
-                .buddy(Diver.builder().initials("MAX").build())
                 .species(ObservableItem.builder().observableItemName("THE SPECIES").build())
                 .site(Site.builder().siteCode("A SITE").build())
                 .depth(1)
