@@ -35,6 +35,8 @@ public class SurveyIngestionServiceTest {
     @Mock
     SurveyRepository surveyRepository;
     @Mock
+    SiteRepository siteRepo;
+    @Mock
     SurveyMethodRepository surveyMethodRepository;
     @Mock
     ObservableItemRepository observableItemRepository;
@@ -49,6 +51,7 @@ public class SurveyIngestionServiceTest {
     void init() {
         MockitoAnnotations.initMocks(this);
         when(surveyRepository.save(any())).then(s -> s.getArgument(0));
+        when(siteRepo.save(any())).then(s -> s.getArgument(0));
 
         StagedRow ref = StagedRow.builder()
                 .stagedJob(StagedJob.builder()
@@ -80,6 +83,7 @@ public class SurveyIngestionServiceTest {
     @Test
     void getSurveyForNewSurvey() {
         when(surveyRepository.findOne(any(Example.class))).thenReturn(Optional.empty());
+        when(siteRepo.save(any())).then(s -> s.getArgument(0));
 
         Survey survey = surveyIngestionService.getSurvey(rowBuilder.build());
         assertEquals(1, survey.getDepth());
