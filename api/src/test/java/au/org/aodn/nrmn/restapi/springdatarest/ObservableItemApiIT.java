@@ -1,7 +1,5 @@
 package au.org.aodn.nrmn.restapi.springdatarest;
 
-import au.org.aodn.nrmn.restapi.model.db.AphiaRefTestData;
-import au.org.aodn.nrmn.restapi.model.db.AphiaRelTypeTestData;
 import au.org.aodn.nrmn.restapi.model.db.ObsItemTypeTestData;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItemTestData;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
@@ -22,6 +20,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -35,6 +34,12 @@ public class ObservableItemApiIT {
 
     @Autowired
     private ObsItemTypeTestData obsItemTypeTestData;
+
+    @Autowired
+    private ObservableItemTestData observableItemTestData;
+
+    @Autowired
+    private ObservableItemRepository observableItemRepository;
 
     @Autowired
     private JwtToken jwtToken;
@@ -74,5 +79,36 @@ public class ObservableItemApiIT {
                 .statusCode(201)
                 .body("observableItemName", is(equalTo("Lotella rhacina")))
                 .body("commonName", is(equalTo("Conger eel")));
+    }
+
+    @Test
+    @WithUserDetails("test@gmail.com")
+    public void testUpdateObservableItem() {
+        val observableItem = observableItemTestData
+                .defaultBuilder()
+                .isInvertSized(true)
+                .build();
+
+        observableItemRepository.saveAndFlush(observableItem);
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body("{" +
+                        "\"observableItemId\": \"" + observableItem.getObservableItemId() + "\"," +
+                        "\"observableItemName\": \"" + observableItem.getObservableItemName() + "\"," +
+                        "\"speciesEpithet\": \"" + observableItem.getObservableItemName() + "\"," +
+                        "\"isInvertSized\": \"" + observableItem.getIsInvertSized() + "\"," +
+                        "\"obsItemTypeId\":"  + observableItem.getObsItemType().getObsItemTypeId()  +
+                        "}")
+                .put(observableItem.getObservableItemId().toString())
+                .then()
+                .assertThat()
+                .statusCode(200);
+
+        val updatedItem = observableItemRepository.findById(observableItem.getObservableItemId());
+
+        assertThat(updatedItem.get().getIsInvertSized(), equalTo(true));
     }
 }

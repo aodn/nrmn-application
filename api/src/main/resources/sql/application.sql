@@ -78,6 +78,8 @@ CREATE TABLE nrmn.observable_item_ref_aud (
     habitat_groups_mod boolean,
     letter_code varchar(255),
     letter_code_mod boolean,
+    is_invert_sized boolean,
+    is_invert_sized_mod boolean,
     obs_item_attribute jsonb,
     obs_item_attribute_mod boolean,
     observable_item_name varchar(255),
