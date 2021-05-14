@@ -147,9 +147,6 @@ class StagedJobControllerIT {
 
         assertEquals(resp.getStatusCode(), HttpStatus.OK);
         assertEquals(resp.getBody().getFile().get().getRowCount(), 34);
-        val path = "/raw-survey/correctLongHeader.xlsx-" + resp.getBody().getFile().get().getJobId() + ".xlsx";
-        val checkfile = client.getObject(GetObjectRequest.builder().bucket(bucket).key(path).build()).response();
-        assertTrue(checkfile.sdkHttpResponse().isSuccessful());
     }
 
     @Test
