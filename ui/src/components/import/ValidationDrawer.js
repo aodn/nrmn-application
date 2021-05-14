@@ -14,13 +14,13 @@ import {
   InputBase,
   Fab
 } from '@material-ui/core';
-import {PlaylistAddCheckOutlined, ReportProblemOutlined, SearchOutlined} from '@material-ui/icons';
-import BlockOutlinedIcon from '@material-ui/icons/BlockOutlined';
+import {PlaylistAddCheckOutlined, SearchOutlined} from '@material-ui/icons';
+import {BlockOutlined as BlockOutlinedIcon, WarningOutlined as WarningOutlinedIcon} from '@material-ui/icons';
 import clsx from 'clsx';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {validationFilter, ValidationRequested} from './reducers/create-import';
-import {orange} from '@material-ui/core/colors';
+import {orange, red} from '@material-ui/core/colors';
 import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
 import ArrowBackIosOutlinedIcon from '@material-ui/icons/ArrowBackIosOutlined';
 import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(3)
   },
   errorItem: {
-    color: theme.palette.error
+    backgroundColor: fade('#ff0000', 0.15)
   },
   searchIcon: {
     padding: theme.spacing(0, 2),
@@ -120,6 +120,9 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up('md')]: {
       width: '20ch'
     }
+  },
+  details: {
+    padding: 1
   }
 }));
 
@@ -132,7 +135,7 @@ const ValidationDrawer = () => {
   const editLoading = useSelector((state) => state.import.editLoading);
   const job = useSelector((state) => state.import.job);
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [filter, setFilter] = useState('');
 
   const handleFilter = (err) => {
@@ -162,14 +165,21 @@ const ValidationDrawer = () => {
   };
 
   var errList = Object.keys(errorsByMsg).map((label) => {
-    return {key: label, total: errorsByMsg[label].length, value: errorsByMsg[label]};
+    const b = errorsByMsg[label].find((e) => e.errorLeve === 'BLOCKING');
+    return {
+      key: label,
+      total: errorsByMsg[label].length,
+      value: errorsByMsg[label],
+      blocking: b ? true : false
+    };
   });
 
   if (errList && errList.length > 0 && filter !== '') {
     errList = errList.map((pair) => ({
       key: pair.key,
       total: pair.total,
-      value: pair.value.filter((err) => err.message.toLowerCase().indexOf(filter) >= 0)
+      value: pair.value.filter((err) => err.message.toLowerCase().indexOf(filter) >= 0),
+      blocking: errList.find((e) => e.errorLeve === 'BLOCKING') ? true : false
     }));
   }
   return errList && errList.length > 0 ? (
@@ -227,7 +237,7 @@ const ValidationDrawer = () => {
         </Toolbar>
       </Box>
       {errList.map((err) => (
-        <Accordion key={err.key} >
+        <Accordion key={err.key}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1c-content" id="panel1c-header">
             <div className={classes.column}>
               <Typography className={classes.heading}>{titleCase(err.key)}</Typography>
@@ -237,25 +247,22 @@ const ValidationDrawer = () => {
             </div>
           </AccordionSummary>
           <AccordionDetails className={classes.details}>
-            <List>
+            <List style={{width: '100%'}}>
               {err.value.map((item, i) => (
                 <ListItem
                   onClick={() => handleFilter(item)}
                   selected={item.message === errSelected.message}
                   className={item.message === errSelected.message ? classes.selected : classes.errorItem}
-                  button
+                  style={{backgroundColor:   item.level == 'WARNING' ? orange[100]:red[100] }}
                   key={i}
+                  button
                 >
                   <ListItemIcon>
                     <Badge badgeContent={item.count} color="primary">
-                      {item.level == 'WARNING' ? (
-                        <ReportProblemOutlined style={{color: orange[500]}} />
-                      ) : (
-                        <BlockOutlinedIcon color="error" />
-                      )}
+                      {item.errorLeve == 'WARNING' ? <WarningOutlinedIcon color="error" /> : <BlockOutlinedIcon color="error" />}
                     </Badge>
                   </ListItemIcon>
-                  <ListItemText color="secondary" primary={item.message} secondary={item.columnTarget} />
+                  <ListItemText style={{overflow: 'hidden', width:'100%',whiteSpace: 'break-spaces'}} color="secondary" primary={item.message} />
                 </ListItem>
               ))}
             </List>

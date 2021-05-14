@@ -7,6 +7,7 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowErrorRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
+import au.org.aodn.nrmn.restapi.util.OptionalUtil;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.model.MonoidRowValidation;
 import au.org.aodn.nrmn.restapi.validation.summary.DefaultSummary;
@@ -67,18 +68,26 @@ public class ValidationProcess extends ValidatorHelpers {
 
         val globalResult = globalProcess.process(job);
 
-        val formattedRows = rowWithHasMap.stream().map(preProcess::toFormat).collect(Collectors.toList());
+        val formattedRows = rowWithHasMap
+                .stream()
+                .flatMap(tuple2s -> OptionalUtil.toStream(
+                        preProcess.toFormat(tuple2s, job.getIsExtendedSize()))
+                ).collect(Collectors.toList());
         val globalFormatted = globalProcess.processFormatted(job, formattedRows);
         val formattedResult = postProcess.process(formattedRows, job);
-        
-        if (formattedResult.getValid().isInvalid()) {
-            return rowsWithErrorsResponse(job, formattedResult.getRows());
-        }
+                
+        val formattedRowErrors =
+                formattedResult.getRows()
+                        .flatMap(row ->
+                                Seq.fromIterable(row.getErrors())
+                        ).toList();
+
+        val msgSummary = summary.aggregate(formattedRowErrors);
         
         return new ValidationResponse(
                 job,
-                Collections.emptyList(),
-                Collections.emptyMap(),
+                formattedResult.getRows().map(row -> new RowErrors(row.getId(),row.getErrors())).toList(),
+                msgSummary,
                 toErrorList(globalResult.combine(Semigroups.stringConcat, globalFormatted)),
                 Collections.emptyList());
     }

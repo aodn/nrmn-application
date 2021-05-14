@@ -10,6 +10,7 @@ import software.amazon.awssdk.utils.ImmutableMap;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 

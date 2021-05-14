@@ -494,45 +494,14 @@ export const ExtendedSize = [
   {
     field: '1000',
     editable: true,
-
     invertSize: '30',
     headerComponentFramework: AgGridHeader,
     width: 35
   },
   {
-    field: 'l5',
-    editable: true,
-
-    invertSize: '1',
-    headerComponentFramework: AgGridHeader,
-    width: 35
-  },
-  {
-    field: 'l95',
-    editable: true,
-
-    invertSize: '1',
-    headerComponentFramework: AgGridHeader,
-    width: 35
-  },
-  {
-    field: 'inverts',
-    editable: true,
-    width: 35
-  },
-  {
-    field: 'm2InvertSizingSpecies',
-    editable: true,
-    width: 55
-  },
-  {
     field: 'isInvertSizing',
+    headerName: 'Use InvertSizing',
     editable: true,
     width: 40
-  },
-  {
-    field: 'lmax',
-    editable: true,
-    width: 35
   }
 ];

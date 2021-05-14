@@ -20,7 +20,7 @@ public abstract class BaseRowExistingEntity<E, R extends EntityCriteria<E>> exte
 
     protected Validated<StagedRowError, E> checkExists(StagedRow target, String criteria, ValidationLevel errorLevel) {
         if (criteria == null || criteria.isEmpty()) {
-            return invalid(target, errorLevel, columnTarget + "is empty");
+            return invalid(target, errorLevel, columnTarget + " is empty");
         }
 
         return repo.findByCriteria(criteria)

@@ -243,7 +243,7 @@ const DataSheetView = () => {
       gridApi.deselectAll();
       errSelected.ids.forEach((id) => {
         const row = gridApi.getRowNode(id);
-          row.setSelected(true);
+        row.setSelected(true);
         return row;
       });
     }
@@ -295,7 +295,7 @@ const DataSheetView = () => {
               size="small"
               onClick={handleSubmit}
               label="Submit"
-              disabled={!enableSubmit}
+              disabled={!enableSubmit || canSave}
               color="primary"
             >
               <CloudUploadIcon className={classes.extendedIcon} />
@@ -339,7 +339,7 @@ const DataSheetView = () => {
       <div
         onKeyDown={onKeyDown}
         id="validation-grid"
-        style={{height: size.height - 210, width: '100%', marginTop: 25}}
+        style={{height: size.height - 230, width: '100%', marginTop: 25}}
         className={'ag-theme-material'}
       >
         <AgGridReact

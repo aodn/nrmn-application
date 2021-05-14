@@ -6,6 +6,7 @@ import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import lombok.val;
 
@@ -26,27 +27,25 @@ public class MeasureUnderLmax extends BaseFormattedValidator {
             return Validated.valid("No Species Data");
         }
 
-        val speciesAttributes =  target.getSpeciesAttributesOpt().get();
+        val speciesAttributes = target.getSpeciesAttributesOpt().get();
         val lmax = speciesAttributes.getLmax();
-        val outOfRange = target.getMeasureJson().entrySet().stream()
+        if (target.getMeasureJson().isEmpty() || lmax == null)
+            return Validated.valid("No data");
+        val outOfRangef = target.getMeasureJson().entrySet().stream()
                 .filter(entry -> entry.getValue() > lmax)
                 .collect(Collectors.toList());
 
 
-        if (outOfRange.isEmpty()) {
+        if (outOfRangef.isEmpty() || lmax == null) {
             return Validated.valid("Values under Lmax");
         }
-        val keysStr = outOfRange.stream().map(Object::toString)
-                .reduce("", (acc, value) -> acc + "|" + value);
-        return Validated.invalid(
-                new StagedRowError(
-                        new ErrorID(target.getId(),
-                                target.getRef().getStagedJob().getId(),
-                                "measure above Lmax"),
-                        ValidationCategory.DATA,
-                        ValidationLevel.WARNING,
-                        columnTarget + ":" + keysStr,
-                        target.getRef())
-        );
+       return outOfRangef.stream().map(measure -> {
+            this.columnTarget = "Measure:" + measure.getKey();
+            return invalid(
+                    target,
+                    "Measure: " + measure.getKey() + " is above Lmax[" + lmax + "]",
+                    ValidationCategory.DATA,
+                    ValidationLevel.WARNING);
+        }).reduce(Validated.valid(""), (acc, err) -> acc.combine(Monoids.stringConcat, err));
     }
 }

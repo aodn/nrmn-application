@@ -39,11 +39,13 @@ public class StagedRowFormatted {
 
     private ObservableItem species;
 
-
     private Optional<Integer> vis;
 
     private Directions direction;
 
+    private Double latitude;
+
+    private Double longitude;
 
     private String code;
 
@@ -51,15 +53,7 @@ public class StagedRowFormatted {
 
     private Integer inverts;
 
-    private Integer m2InvertSizingSpecies;
-
-    private Double l5;
-
-    private Double l95;
-
-    private Boolean isInvertSizing;
-
-    private Integer lMax;
+    private Optional<Boolean> isInvertSizing;
 
     private StagedRow ref;
 

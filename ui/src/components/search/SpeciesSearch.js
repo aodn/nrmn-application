@@ -82,7 +82,7 @@ const SpeciesSearch = () => {
               variant="contained"
               disabled={loading || !(searchTerm?.length > 3)}
               startIcon={<Search></Search>}
-              onClick={() => dispatch(searchRequested({searchType: 'WORMS', species: searchTerm}))}
+              onClick={() => dispatch(searchRequested({searchType: 'WORMS', species: searchTerm, includeSuperseded: true}))}
               color="primary"
               style={{textTransform: 'none'}}
             >
@@ -110,7 +110,7 @@ const SpeciesSearch = () => {
               variant="contained"
               disabled={loading || !(searchTerm?.length > 3)}
               startIcon={<Search></Search>}
-              onClick={() => dispatch(searchRequested({searchType: 'NRMN', species: searchTerm}))}
+              onClick={() => dispatch(searchRequested({searchType: 'NRMN', species: searchTerm, includeSuperseded: true}))}
               color="primary"
               style={{textTransform: 'none'}}
             >

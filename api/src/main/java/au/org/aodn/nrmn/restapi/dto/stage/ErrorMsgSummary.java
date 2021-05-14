@@ -14,6 +14,6 @@ public class ErrorMsgSummary {
     private Integer count;
     private List<Long> ids;
     private String columnTarget;
-    private ValidationLevel errorLeve;
+    private ValidationLevel level;
     private ValidationCategory category;
 };
