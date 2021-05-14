@@ -88,6 +88,10 @@ public class ObservableItem {
     private String supersededBy;
     
     @Basic
+    @Column(name = "is_invert_sized")
+    private Boolean isInvertSized;
+
+    @Basic
     @Column(name = "obs_item_attribute", columnDefinition = "jsonb")
     @Type(type = "jsonb")
     private Map<String, String> obsItemAttribute;
