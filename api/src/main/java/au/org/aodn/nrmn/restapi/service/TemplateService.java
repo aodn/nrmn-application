@@ -84,19 +84,19 @@ public class TemplateService {
         HashMap<Integer, String> letterCodeMap = new HashMap<Integer, String>();
         letterCodeMappings.forEach(m -> letterCodeMap.put(m.getObservableItemId(), m.getLetterCode()));
 
-        List<SpeciesWithAttributesCsvRow> speciesWithAttributes = getSpeciesForTemplate(1, sites, letterCodeMap);
+        List<SpeciesWithAttributesCsvRow> speciesWithAttributes = getSpeciesForTemplate(1, siteIds, letterCodeMap);
         zipOutputStream.putNextEntry(new ZipEntry("m1species.csv"));
         writeSpeciesCsv(writer, speciesWithAttributes);
         writer.flush();
         zipOutputStream.closeEntry();
 
         zipOutputStream.putNextEntry(new ZipEntry("m2species.csv"));
-        writeSpeciesCsv(writer, getSpeciesForTemplate(2, sites, letterCodeMap));
+        writeSpeciesCsv(writer, getSpeciesForTemplate(2, siteIds, letterCodeMap));
         writer.flush();
         zipOutputStream.closeEntry();
 
         zipOutputStream.putNextEntry(new ZipEntry("m3species.csv"));
-        Set<ObservableItem> observableItems = observableItemRepository.getAllM3ObservableItems(sites);
+        Set<ObservableItem> observableItems = observableItemRepository.getAllObservableItemsForSitesWithMethod(3, siteIds);
         writeM3SpeciesCsv(writer, observableItems);
         writer.flush();
         zipOutputStream.closeEntry();
@@ -183,10 +183,10 @@ public class TemplateService {
                 toString(species.getL5()), toString(species.getL95()), toString(species.getLMax()));
     }
 
-    public List<SpeciesWithAttributesCsvRow> getSpeciesForTemplate(Integer mode, Collection<Site> sites,
+    public List<SpeciesWithAttributesCsvRow> getSpeciesForTemplate(Integer mode, Collection<Integer> siteIds,
             HashMap<Integer, String> letterCodeMap) {
-        Set<ObservableItem> observableItems = mode == 1 ? observableItemRepository.getAllM1ObservableItems(sites)
-                : observableItemRepository.getAllM2ObservableItems(sites);
+        Set<ObservableItem> observableItems = observableItemRepository.getAllObservableItemsForSitesWithMethod(mode, siteIds);
+
         List<SpeciesWithAttributesCsvRow> species = speciesWithAttributesRepository.findAllById(
                 observableItems.stream().map(ObservableItem::getObservableItemId).collect(toList()), letterCodeMap);
         List<SpeciesWithAttributesCsvRow> speciesResult = species.stream().collect(Collectors.toList());

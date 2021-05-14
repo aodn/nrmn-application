@@ -60,7 +60,7 @@ class StagedJobControllerIT {
     JwtTokenProvider jwtProvider;
 
     @Value("${app.s3.bucket}")
-    private static String bucket;
+    private static String bucket = "nrmn-dev";
 
     @Autowired
     public TestRestTemplate testRestTemplate;

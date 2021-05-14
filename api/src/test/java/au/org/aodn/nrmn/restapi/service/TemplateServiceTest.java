@@ -195,12 +195,12 @@ public class TemplateServiceTest {
         ObservableItem.ObservableItemBuilder ob = ObservableItem.builder();
         ObservableItem o1 = ob.observableItemId(123).commonName("commonName").className("className").build();
         Site site1 = Site.builder().siteId(1).build();
-        val sites = Arrays.asList(site1);
+        val siteIds = Arrays.asList(site1.getSiteId());
         val obsIds = Arrays.asList(123);
-        when(observableItemRepository.getAllM2ObservableItems(sites))
+        when(observableItemRepository.getAllObservableItemsForSitesWithMethod(2, siteIds))
                 .thenReturn(Arrays.asList(o1).stream().collect(Collectors.toSet()));
         when(speciesWithAttributesRepository.findAllById(obsIds, null)).thenReturn(swaList);
-        List<SpeciesWithAttributesCsvRow> speciesWithAttributes = templateService.getSpeciesForTemplate(2, sites, null);
+        List<SpeciesWithAttributesCsvRow> speciesWithAttributes = templateService.getSpeciesForTemplate(2, siteIds, null);
         assertEquals(swaList.size() + 2, speciesWithAttributes.size());
         assertEquals("Acanthurus bahianus", speciesWithAttributes.get(1).getSpeciesName());
         assertEquals("Doctorfish", speciesWithAttributes.get(2).getCommonName());

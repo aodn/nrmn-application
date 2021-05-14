@@ -44,28 +44,15 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
     @RestResource
     Optional<ObservableItem> findById(Integer integer);
 
-
-    @Query("SELECT DISTINCT oi FROM ObservableItem oi " +
-            "LEFT JOIN Observation o ON (o.observableItem = oi) " +
-            "WHERE oi.letterCode IS NOT NULL " +
-            "AND o.surveyMethod.survey.site IN :sites")
-    Set<ObservableItem> getAllM3ObservableItems(@Param("sites") Collection<Site> sites);
-
-    @Query("SELECT DISTINCT oi FROM ObservableItem oi " +
-            "LEFT JOIN Observation o ON (o.observableItem = oi) " +
-            "WHERE (oi.className NOT IN ('Ophiuroidea', 'Polyplacophora') " +
-            "AND o.surveyMethod.method.methodId = 2 " +
-            "AND o.surveyMethod.survey.site IN :sites) " +
-            "OR oi.obsItemType.obsItemTypeId = 5 OR oi.obsItemType.obsItemTypeId = 6")
-    Set<ObservableItem> getAllM2ObservableItems(@Param("sites") Collection<Site> sites);
-
-    @Query("SELECT DISTINCT oi FROM ObservableItem oi " +
-            "LEFT JOIN Observation o ON (o.observableItem = oi) " +
-            "WHERE (oi.className NOT IN ('Ophiuroidea', 'Polyplacophora') " +
-            "AND o.surveyMethod.method.methodId = 1 " +
-            "AND o.surveyMethod.survey.site IN :sites) " +
-            "OR oi.obsItemType.obsItemTypeId = 5 OR oi.obsItemType.obsItemTypeId = 6")
-    Set<ObservableItem> getAllM1ObservableItems(@Param("sites") Collection<Site> sites);
+    @Query(value = "select distinct o from {h-schema}observable_item_ref o " +
+            "left join {h-schema}methods_species ms ON ms.observable_item_id = o.observable_item_id " +
+            "left join {h-schema}observation b on o.observable_item_id = b.observable_item_id " +
+            "left join {h-schema}survey_method m on b.survey_method_id = m.method_id " +
+            "left join {h-schema}survey s on s.survey_id = m.survey_id " +
+            "left join {h-schema}site_ref i on s.site_id = i.site_id " +
+            "where ms.method_id = :methodId AND i.site_id IN :siteIds " +
+            "ORDER BY lower(o.observable_item_name) DESC ", nativeQuery = true)
+    Set<ObservableItem> getAllObservableItemsForSitesWithMethod(@Param("methodId") Integer methodId, @Param("siteIds") Collection<Integer> siteIds);
 
     @Query(value =
             "SELECT * FROM {h-schema}observable_item_ref oi" +
