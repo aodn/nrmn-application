@@ -4,6 +4,7 @@ import au.org.aodn.nrmn.restapi.dto.stage.RowErrors;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowErrorRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
@@ -54,8 +55,13 @@ public class ValidationProcess extends ValidatorHelpers {
                         .map(row -> preProcess.validate(row, rawValidators))
                         .collect(Collectors.toList());
         val preCheck = rowChecks.stream().reduce(reducer.zero(), reducer::apply);
+        val rawErrorList = toErrorList(preCheck.getValid());
+        val blockingErrors = rawErrorList
+                .stream()
+                .filter(err -> err.getErrorLevel().compareTo(ValidationLevel.BLOCKING) == 0)
+                .collect(Collectors.toList());
 
-        if (preCheck.getValid().isInvalid()) {
+        if (preCheck.getValid().isInvalid() && blockingErrors.size() > 0) {
             return rowsWithErrorsResponse(job, preCheck.getRows());
         }
 
@@ -75,18 +81,18 @@ public class ValidationProcess extends ValidatorHelpers {
                 ).collect(Collectors.toList());
         val globalFormatted = globalProcess.processFormatted(job, formattedRows);
         val formattedResult = postProcess.process(formattedRows, job);
-                
+
         val formattedRowErrors =
                 formattedResult.getRows()
                         .flatMap(row ->
                                 Seq.fromIterable(row.getErrors())
                         ).toList();
-
+        formattedRowErrors.addAll(formattedRowErrors);
         val msgSummary = summary.aggregate(formattedRowErrors);
-        
+
         return new ValidationResponse(
                 job,
-                formattedResult.getRows().map(row -> new RowErrors(row.getId(),row.getErrors())).toList(),
+                formattedResult.getRows().map(row -> new RowErrors(row.getId(), row.getErrors())).toList(),
                 msgSummary,
                 toErrorList(globalResult.combine(Semigroups.stringConcat, globalFormatted)),
                 Collections.emptyList());
@@ -102,7 +108,7 @@ public class ValidationProcess extends ValidatorHelpers {
         val msgSummary = summary.aggregate(errors);
         return new ValidationResponse(
                 job,
-                rows.map(row -> new RowErrors(row.getId(),row.getErrors())).toList(),
+                rows.map(row -> new RowErrors(row.getId(), row.getErrors())).toList(),
                 msgSummary,
                 Collections.emptyList(),
                 Collections.emptyList());
