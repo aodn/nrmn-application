@@ -41,7 +41,6 @@ public class FormattedValidation extends ValidatorHelpers {
                 new SpeciesAbundanceCheck(),
                 new TotalCheckSum(),
                 new SurveyExists(surveyRepository),
-                new SpeciesBelongToMethodCheck(),
                 new Within200MSiteCheck()
         );
     }
