@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.validation.validators.formatted;
 
+import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
@@ -9,6 +10,10 @@ import cyclops.control.Try;
 import cyclops.control.Validated;
 import lombok.val;
 
+import java.util.Collections;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 public class SpeciesBelongToMethodCheck extends BaseFormattedValidator {
     public SpeciesBelongToMethodCheck() {
         super("Species");
@@ -16,9 +21,9 @@ public class SpeciesBelongToMethodCheck extends BaseFormattedValidator {
 
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
-
-        if (target.getSpecies()
-                .getObsItemAttribute().entrySet()
+        val species =  target.getSpecies();
+        val attributes =  Optional.of(species).map(ObservableItem::getObsItemAttribute).orElseGet(Collections::emptyMap);
+        if (attributes.entrySet()
                 .stream()
                 .filter(entry -> entry.getKey().startsWith("is_M"+ target.getMethod())).count() != 0)
         {
