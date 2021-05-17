@@ -7,9 +7,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,39 +36,17 @@ import lombok.val;
 @Tag(name = "ingestion")
 public class IngestionController {
     @Autowired
+    StagedJobRepository jobRepository;
+    @Autowired
+    StagedRowRepository rowRepository;
+    @Autowired
     RawValidation validation;
     @Autowired
     SurveyIngestionService surveyIngestionService;
     @Autowired
     StagedJobLogRepository stagedJobLogRepository;
     @Autowired
-    StagedJobRepository jobRepository;
-    @Autowired
-    StagedRowRepository rowRepository;
-    @Autowired
     UserActionAuditRepository userActionAuditRepository;
-    @Autowired
-    private TransactionTemplate transactionTemplate;
-
-    private void ingestTransaction(StagedJob job) {
-        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                List<StagedRow> rows = rowRepository.findAll(Example.of(StagedRow.builder().stagedJob(job).build()));
-                List<Integer> surveyIds = validation.preValidated(rows, job).stream().flatMap(row -> {
-                    val optSurvey = surveyIngestionService.ingestStagedRow(row).stream()
-                            .map(obs -> obs.getSurveyMethod().getSurvey()).findFirst();
-                    return OptionalUtil.toStream(optSurvey);
-                }).map(Survey::getSurveyId).distinct().collect(Collectors.toList());
-
-                job.setStatus(StatusJobType.INGESTED);
-                job.setSurveyIds(surveyIds);
-                jobRepository.save(job);
-                stagedJobLogRepository
-                        .save(StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.INGESTED).build());
-            }
-        });
-    }
 
     @PostMapping(path = "ingest/{job_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
@@ -92,7 +67,14 @@ public class IngestionController {
         try {
             stagedJobLogRepository
                     .save(StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.INGESTING).build());
-            ingestTransaction(job);
+            List<StagedRow> rows = rowRepository.findAll(Example.of(StagedRow.builder().stagedJob(job).build()));
+            List<Integer> surveyIds = validation.preValidated(rows, job).stream().flatMap(row -> {
+                return OptionalUtil.toStream(surveyIngestionService.ingestStagedRow(row).stream()
+                        .map(obs -> obs.getSurveyMethod().getSurvey()).findFirst());
+            }).map(Survey::getSurveyId).distinct().collect(Collectors.toList());
+            surveyIngestionService.ingestTransaction(job, surveyIds);
+            stagedJobLogRepository
+                    .save(StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.INGESTED).build());
         } catch (Exception e) {
             stagedJobLogRepository.save(StagedJobLog.builder().stagedJob(job).details(e.getMessage())
                     .eventType(StagedJobEventType.ERROR).build());
