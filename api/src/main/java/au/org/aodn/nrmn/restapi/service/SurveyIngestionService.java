@@ -34,6 +34,7 @@ import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyMethodRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.util.OptionalUtil;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import lombok.val;
 import software.amazon.awssdk.utils.ImmutableMap;
@@ -64,10 +65,6 @@ public class SurveyIngestionService {
     StagedJobLogRepository stagedJobLogRepository;
     @Autowired
     StagedJobRepository jobRepository;
-
-    public List<Observation> ingestStagedRow(StagedRowFormatted stagedRow) {
-        return observationRepository.saveAll(getObservations(stagedRow));
-    }
 
     public Survey getSurvey(StagedRowFormatted stagedRow) {
         val site = stagedRow.getSite();
@@ -132,7 +129,10 @@ public class SurveyIngestionService {
     }
 
     @Transactional
-    public void ingestTransaction(StagedJob job, List<Integer> surveyIds) {
+    public void ingestTransaction(StagedJob job, List<StagedRowFormatted> validatedRows) {
+        List<Integer> surveyIds = validatedRows.stream().flatMap(row -> {
+            return OptionalUtil.toStream(observationRepository.saveAll(getObservations(row)).stream().map(obs -> obs.getSurveyMethod().getSurvey()).findFirst());
+        }).map(Survey::getSurveyId).distinct().collect(Collectors.toList());
         job.setStatus(StatusJobType.INGESTED);
         job.setSurveyIds(surveyIds);
         jobRepository.save(job);
