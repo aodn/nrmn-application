@@ -138,8 +138,6 @@ public class RawValidation extends ValidatorHelpers {
         val time = (Optional<LocalTime>) values.get("Time").orElse(Optional.empty());
 
         val diver = (Diver) values.get("Diver").orElseGet(null);
-        val buddy = (Diver) values.get("Buddy").orElseGet(null);
-        val pqs = (Diver) values.get("P-Qs").orElseGet(null);
         val longitude = (Double) values.get("Longitude").orElseGet(null);
         val latitude = (Double) values.get("Latitude").orElseGet(null);
 
@@ -176,11 +174,9 @@ public class RawValidation extends ValidatorHelpers {
         rowFormatted.setDate(date);
         rowFormatted.setTime(time);
         rowFormatted.setSite(site);
-        rowFormatted.setDiver(diver);
-        rowFormatted.setBuddy(buddy);
+rowFormatted.setDiver(diver);
         rowFormatted.setLongitude(longitude);
-        rowFormatted.setLatitude(latitude);
-        rowFormatted.setPqs(pqs);
+rowFormatted.setLatitude(latitude);
         rowFormatted.setDepth(depth);
         rowFormatted.setSurveyNum(survey_num);
         rowFormatted.setMethod(method);

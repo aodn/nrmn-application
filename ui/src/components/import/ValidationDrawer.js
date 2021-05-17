@@ -259,7 +259,7 @@ const ValidationDrawer = () => {
                 >
                   <ListItemIcon>
                     <Badge badgeContent={item.count} color="primary">
-                      {item.errorLeve == 'WARNING' ? <WarningOutlinedIcon color="error" /> : <BlockOutlinedIcon color="error" />}
+                      {item.level == 'WARNING' ? <WarningOutlinedIcon color="error" /> : <BlockOutlinedIcon color="error" />}
                     </Badge>
                   </ListItemIcon>
                   <ListItemText style={{overflow: 'hidden', width:'100%',whiteSpace: 'break-spaces'}} color="secondary" primary={item.message} />

@@ -29,6 +29,7 @@ import au.org.aodn.nrmn.restapi.repository.MethodRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
+import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyMethodRepository;
@@ -56,27 +57,36 @@ public class SurveyIngestionService {
     @Autowired
     ProgramRepository programRepository;
     @Autowired
+    SiteRepository siteRepo;
+    @Autowired
     EntityManager entityManager;
     @Autowired
     StagedJobLogRepository stagedJobLogRepository;
     @Autowired
     StagedJobRepository jobRepository;
 
-
     public List<Observation> ingestStagedRow(StagedRowFormatted stagedRow) {
         return observationRepository.saveAll(getObservations(stagedRow));
     }
 
     public Survey getSurvey(StagedRowFormatted stagedRow) {
+        val site = stagedRow.getSite();
+
         val survey = Survey.builder().depth(stagedRow.getDepth()).surveyNum(stagedRow.getSurveyNum().orElse(null))
-                .site(Site.builder().siteCode(stagedRow.getSite().getSiteCode()).build())
-                .surveyDate(Date.valueOf(stagedRow.getDate())).build();
+                .site(Site.builder().siteCode(site.getSiteCode()).build()).surveyDate(Date.valueOf(stagedRow.getDate()))
+                .build();
 
         Optional<Survey> existingSurvey = surveyRepository.findOne(Example.of(survey));
 
+        val siteSurveys = surveyRepository.findAll(Example
+                .of(Survey.builder().site(Site.builder().siteCode(stagedRow.getSite().getSiteCode()).build()).build()));
+        if (siteSurveys.isEmpty()) {
+            site.setIsActive(true);
+            siteRepo.save(site);
+        }
         return existingSurvey.orElseGet(() -> surveyRepository.save(Survey.builder().depth(stagedRow.getDepth())
                 .surveyNum(stagedRow.getSurveyNum().orElse(null)).direction(stagedRow.getDirection().toString())
-                .site(stagedRow.getSite()).surveyDate(Date.valueOf(stagedRow.getDate()))
+                .site(site).surveyDate(Date.valueOf(stagedRow.getDate()))
                 .surveyTime(Time.valueOf(stagedRow.getTime().orElse(null))).visibility(stagedRow.getVis().orElse(null))
                 .program(stagedRow.getRef().getStagedJob().getProgram()).build()));
     }
