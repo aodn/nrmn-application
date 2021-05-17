@@ -2,14 +2,10 @@ package au.org.aodn.nrmn.restapi.controller;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedJobLog;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
 import au.org.aodn.nrmn.restapi.model.db.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
@@ -27,17 +22,20 @@ import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.service.SurveyIngestionService;
-import au.org.aodn.nrmn.restapi.util.OptionalUtil;
+import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.process.RawValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.val;
 
 @RestController
 @RequestMapping(path = "/api/ingestion")
 @Tag(name = "ingestion")
 public class IngestionController {
+    @Autowired
+    StagedJobRepository jobRepository;
+    @Autowired
+    StagedRowRepository rowRepository;
     @Autowired
     RawValidation validation;
     @Autowired
@@ -45,33 +43,7 @@ public class IngestionController {
     @Autowired
     StagedJobLogRepository stagedJobLogRepository;
     @Autowired
-    StagedJobRepository jobRepository;
-    @Autowired
-    StagedRowRepository rowRepository;
-    @Autowired
     UserActionAuditRepository userActionAuditRepository;
-    @Autowired
-    private TransactionTemplate transactionTemplate;
-
-    private void ingestTransaction(StagedJob job) {
-        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                List<StagedRow> rows = rowRepository.findAll(Example.of(StagedRow.builder().stagedJob(job).build()));
-                List<Integer> surveyIds = validation.preValidated(rows, job).stream().flatMap(row -> {
-                    val optSurvey = surveyIngestionService.ingestStagedRow(row).stream()
-                            .map(obs -> obs.getSurveyMethod().getSurvey()).findFirst();
-                    return OptionalUtil.toStream(optSurvey);
-                }).map(Survey::getSurveyId).distinct().collect(Collectors.toList());
-
-                job.setStatus(StatusJobType.INGESTED);
-                job.setSurveyIds(surveyIds);
-                jobRepository.save(job);
-                stagedJobLogRepository
-                        .save(StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.INGESTED).build());
-            }
-        });
-    }
 
     @PostMapping(path = "ingest/{job_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
@@ -92,7 +64,10 @@ public class IngestionController {
         try {
             stagedJobLogRepository
                     .save(StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.INGESTING).build());
-            ingestTransaction(job);
+            List<StagedRowFormatted> validatedRows = validation.preValidated(rowRepository.findAll(Example.of(StagedRow.builder().stagedJob(job).build())), job);
+            surveyIngestionService.ingestTransaction(job, validatedRows);
+            stagedJobLogRepository
+                    .save(StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.INGESTED).build());
         } catch (Exception e) {
             stagedJobLogRepository.save(StagedJobLog.builder().stagedJob(job).details(e.getMessage())
                     .eventType(StagedJobEventType.ERROR).build());

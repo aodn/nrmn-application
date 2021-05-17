@@ -17,6 +17,7 @@ const ValidationJob = () => {
   const submitLoading = useSelector((state) => state.import.submitLoading);
   const validationLoading = useSelector((state) => state.import.validationLoading);
   const ingestSuccess = useSelector((state) => state.import.ingestSuccess);
+  const ingestLoading = useSelector((state) => state.import.ingestLoading);
   const deleteLoading = useSelector((state) => state.import.deleteLoading);
 
   useEffect(() => {
@@ -62,8 +63,8 @@ const ValidationJob = () => {
         )}
       </Grid>
       <DataSheetView></DataSheetView>
-      {(submitLoading || isLoading || editLoading || deleteLoading || validationLoading) && (
-        <Backdrop open={submitLoading || isLoading || editLoading || deleteLoading || validationLoading}>
+      {(submitLoading || isLoading || editLoading || deleteLoading || validationLoading || ingestLoading) && (
+        <Backdrop open={submitLoading || isLoading || editLoading || deleteLoading || validationLoading || ingestLoading}>
           <CircularProgress size={200} style={{color: '#ccc'}}></CircularProgress>
         </Backdrop>
       )}
