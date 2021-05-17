@@ -41,7 +41,7 @@ public abstract class BaseRowFormatValidation<T> extends BaseRowValidator {
     ) {
         return Try.withCatch(() ->
                 formatCheck
-                        .apply(entry.apply(target))
+                        .apply(entry.apply(target).trim())
                         .<StagedRowError, T>bimap(
                                 errMsg -> getError(target, errMsg),
                                 Functions.identity())

@@ -27,9 +27,13 @@ public class MeasureJsonValidation extends BaseRowValidator {
         Validated<StagedRowError, Seq<Tuple2<Integer, Integer>>> mapValidators = target.getMeasureJson()
                 .entrySet()
                 .stream().map(entry -> {
+                            if (entry.getValue().isEmpty()){
+                                return Validated.<StagedRowError, Seq<Tuple2<Integer, Integer>>>valid(Seq.empty());
+                            }
                             val intValidator = new IntegerFormatValidation(
                                     r -> entry.getValue(),
                                     entry.getKey().toString(), Collections.emptyList());
+
                             return intValidator.valid(target).map(i ->
                                     Seq.of(Tuple2.of(entry.getKey(), i)));
                         }
