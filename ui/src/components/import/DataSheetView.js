@@ -246,6 +246,8 @@ const DataSheetView = () => {
         row.setSelected(true);
         return row;
       });
+      gridApi.columnApi.setColumnVisible('100', false);
+
     }
   }, [errSelected]);
 
