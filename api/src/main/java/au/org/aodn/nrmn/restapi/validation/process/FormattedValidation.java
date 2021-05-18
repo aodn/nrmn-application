@@ -40,8 +40,8 @@ public class FormattedValidation extends ValidatorHelpers {
                 new SpeciesNotSuperseeded(),
                 new SpeciesAbundanceCheck(),
                 new TotalCheckSum(),
-                new SurveyExists(surveyRepository),
                 new SpeciesBelongToMethodCheck(),
+                new SurveyExists(surveyRepository),
                 new Within200MSiteCheck()
         );
     }

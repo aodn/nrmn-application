@@ -73,7 +73,7 @@ public class StagedJobController {
                         Authentication authentication) {
 
                 userAuditRepo.save(new UserActionAudit("stage/upload", "upload excel file attempt for username: "
-                                + authentication.getName() + "file: " + file.getOriginalFilename()));
+                                + authentication.getName() + " file: " + file.getOriginalFilename()));
                 val programOpt = programRepo.findById(programId);
                 if (!programOpt.isPresent())
                         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)

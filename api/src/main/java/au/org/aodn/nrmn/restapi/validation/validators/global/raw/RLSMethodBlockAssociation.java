@@ -40,7 +40,7 @@ public class RLSMethodBlockAssociation extends BaseGlobalRawValidator {
                             .reduce("", (e1 , e2) -> e1 + e2);
 
                     if (!blockSum.startsWith("12"))
-                        return invalid(job.getId(), item.getKey() + "invalid block combination", BLOCKING);
+                        return invalid(job.getId(), item.getKey() + " invalid block combination", BLOCKING);
 
                     return Validated.<StagedRowError, String>valid(item.getKey() + " has valid method/block");
                 })
