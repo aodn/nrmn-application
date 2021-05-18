@@ -1,16 +1,15 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
+import java.util.Set;
 
 import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
@@ -110,4 +109,11 @@ public class ObservableItem {
     @JoinColumn(name = "aphia_rel_type_id", referencedColumnName = "aphia_rel_type_id")
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     private AphiaRelType aphiaRelType;
+
+    @OneToMany()
+    @JoinTable(name = "methods_species", joinColumns = @JoinColumn(name = "observable_item_id"),
+      inverseJoinColumns = @JoinColumn(name = "method_id"))
+    @NotAudited
+    @EqualsAndHashCode.Exclude
+    private Set<Method> methods;
 }
