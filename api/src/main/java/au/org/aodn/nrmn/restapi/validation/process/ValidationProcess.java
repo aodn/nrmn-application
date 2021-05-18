@@ -97,7 +97,7 @@ public class ValidationProcess extends ValidatorHelpers {
                 job,
                 formattedResult.getRows().map(row -> new RowErrors(row.getId(), row.getErrors())).toList(),
                 msgSummary,
-                toErrorList(globalResult.combine( .stringConcat, globalFormatted)),
+                toErrorList(globalResult.combine(Semigroups.stringConcat, globalFormatted)),
                 Collections.emptyList());
     }
 
