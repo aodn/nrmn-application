@@ -69,7 +69,7 @@ public class TemplateServiceTest {
                 .collect(Collectors.toList());
 
         assertEquals(4, csvLines.size());
-        assertEquals("Initials,Full_name", csvLines.get(0));
+        assertEquals("Initials,Full Name", csvLines.get(0));
         assertEquals("BHO,Barack Obama", csvLines.get(1));
         assertEquals("DJT,Donald Trump", csvLines.get(2));
         assertEquals("GWB,George Bush", csvLines.get(3));
@@ -115,7 +115,7 @@ public class TemplateServiceTest {
                 .collect(Collectors.toList());
 
         assertEquals(5, csvLines.size());
-        assertEquals("SITE,Site Name,Latitude,Longitude,Region", csvLines.get(0));
+        assertEquals("Site,Site Name,Latitude,Longitude,Region", csvLines.get(0));
         assertEquals("TAS333,Springfield,-43.1,147.1,Southish", csvLines.get(1));
         assertEquals("TAS334,Springfield,-43.1,147.1,Southish", csvLines.get(2));
         assertEquals("TAS335,Springfield,-43.1,147.1,Southish", csvLines.get(3));
