@@ -110,21 +110,23 @@ public class TemplateService {
 
         private void writeM3SpeciesCsv(Writer writer, Collection<ObservableItemRow> observableItems)
                         throws IOException {
+
+                List<SpeciesWithAttributesCsvRow> species = observableItems.stream()
+                                .map(s -> SpeciesWithAttributesCsvRow.builder().speciesName(s.getName())
+                                                .commonName(s.getCommonName()).letterCode(s.getLetterCode()).build())
+                                .collect(Collectors.toList());
+
+                List<SpeciesWithAttributesCsvRow> speciesResult = species.stream().collect(Collectors.toList());
+                speciesResult.add(SpeciesWithAttributesCsvRow.builder().letterCode("snd").speciesName("Survey Not Done")
+                                .isInvertSized(false).build());
+
                 CSVPrinter csvPrinter = M3_FORMAT.print(writer);
-                List<List<String>> records = observableItems.stream().distinct()
-                                .sorted(Comparator.comparing(ObservableItemRow::getName))
-                                .map(this::getSpeciesAsM3Record).collect(toList());
+                List<List<String>> records = speciesResult.stream().distinct()
+                                .sorted(Comparator.comparing(SpeciesWithAttributesCsvRow::getSpeciesName))
+                                .map(this::getSpeciesAsCsvRecord).collect(toList());
                 csvPrinter.printRecords(records);
-
         }
-
-        private List<String> getSpeciesAsM3Record(ObservableItemRow observableItemRow) {
-                return Arrays.asList(observableItemRow.getLetterCode(),
-                                observableItemRow.getSupersededBy() != null ? observableItemRow.getSupersededBy()
-                                                : observableItemRow.getName(),
-                                observableItemRow.getCommonName());
-        }
-
+        
         public void writeDiversCsv(Writer writer, Collection<Diver> divers) throws IOException {
                 CSVPrinter csvPrinter = DIVERS_FORMAT.print(writer);
                 List<List<String>> records = divers.stream().distinct().sorted(Comparator.comparing(Diver::getInitials))
