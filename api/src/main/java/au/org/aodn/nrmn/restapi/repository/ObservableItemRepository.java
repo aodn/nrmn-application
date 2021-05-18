@@ -42,14 +42,16 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
     @RestResource
     Optional<ObservableItem> findById(Integer integer);
 
-    @Query(value = "select distinct o.observable_item_id as observableItemId, o.common_name as name, o.superseded_by as supersededBy from {h-schema}observable_item_ref o " +
-                "left join {h-schema}methods_species ms ON ms.observable_item_id = o.observable_item_id " +
-                "left join {h-schema}observation b on o.observable_item_id = b.observable_item_id " +
-                "left join {h-schema}survey_method m on b.survey_method_id = m.method_id " +
-                "left join {h-schema}survey s on s.survey_id = m.survey_id " +
-                "left join {h-schema}site_ref i on s.site_id = i.site_id " +
-                "where ms.method_id = :methodId AND i.site_id IN :siteIds " +
-                "AND (ms.method_id != 2 OR (o.class_name NOT IN ('Ophiuroidea', 'Polyplacophora') AND o.family NOT 'Pyuridae'))", nativeQuery = true)
+    @Query(value = "select distinct obsitem.observable_item_id as observableItemId, obsitem.common_name as name, obsitem.superseded_by as supersededBy  "
+            + "FROM {h-schema}location_ref loc "
+            + "INNER JOIN {h-schema}site_ref site_raw ON site_raw.location_id = loc.location_id "
+            + "INNER JOIN {h-schema}ep_site_list site ON site.site_code = site_raw.site_code "
+            + "INNER JOIN {h-schema}survey sur ON sur.site_id = site_raw.site_id "
+            + "INNER JOIN {h-schema}survey_method surmet ON surmet.survey_id = sur.survey_id "
+            + "INNER JOIN {h-schema}observation obs ON obs.survey_method_id = surmet.survey_method_id "
+            + "INNER JOIN {h-schema}ep_observable_items obsitem ON obsitem.observable_item_id = obs.observable_item_id "
+            + "where surmet.method_id = :methodId AND site_raw.site_id IN :siteIds "
+            + "AND (surmet.method_id != 2 OR (obsitem.class NOT IN ('Ophiuroidea', 'Polyplacophora') AND obsitem.family != 'Pyuridae'))", nativeQuery = true)
     List<ObservableItemRow> getAllWithMethodForSites(@Param("methodId") Integer methodId, @Param("siteIds") Collection<Integer> siteIds);
 
     @Query(value = "SELECT * FROM {h-schema}observable_item_ref oi"
