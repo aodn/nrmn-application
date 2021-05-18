@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -172,12 +173,13 @@ public class TemplateServiceTest {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
-        templateService.writeSpeciesCsv(printWriter, Arrays.asList(s1, s2, s3));
+        templateService.writeSpeciesCsv(printWriter, CSVFormat.DEFAULT.withHeader("Letter Code", "Species Name",
+        "Common Name", "L5", "L95", "LMax"), Arrays.asList(s1, s2, s3), false);
         List<String> csvLines = Arrays.stream(stringWriter.toString().split("\n")).map(String::trim)
                 .collect(Collectors.toList());
 
         assertEquals(4, csvLines.size());
-        assertEquals("code,Species_name,Common Name,L5,L95,LMax", csvLines.get(0));
+        assertEquals("Letter Code,Species Name,Common Name,L5,L95,LMax", csvLines.get(0));
         assertEquals("asa,Abudefduf saxatilis,Sergeant major,2.5,15.0,20", csvLines.get(1));
         assertEquals("aba,Acanthurus bahianus,Ocean surgeon,5.0,30.0,40", csvLines.get(2));
         assertEquals("ach,Acanthurus chirurgus,Doctorfish,7.5,45.0,60", csvLines.get(3));
