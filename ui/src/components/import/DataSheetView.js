@@ -54,6 +54,7 @@ const DataSheetView = () => {
   const dispatch = useDispatch();
   const errSelected = useSelector((state) => state.import.errSelected);
   const [gridApi, setGridApi] = useState(null);
+
   const job = useSelector((state) => state.import.job);
   const colDefinition = job && job.isExtendedSize ? ColumnDef.concat(ExtendedSize) : ColumnDef;
   const enableSubmit = useSelector((state) => state.import.enableSubmit);
@@ -237,7 +238,7 @@ const DataSheetView = () => {
   }, [validationErrors, selectedCells]);
 
   useEffect(() => {
-    if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
+    if (gridApi  && errSelected.ids && errSelected.ids.length > 0) {
       const firstRow = gridApi.getRowNode(errSelected.ids[0]);
       gridApi.ensureIndexVisible(firstRow.rowIndex, 'middle');
       gridApi.deselectAll();
@@ -246,7 +247,7 @@ const DataSheetView = () => {
         row.setSelected(true);
         return row;
       });
-      gridApi.columnApi.setColumnVisible('100', false);
+      gridApi.ensureColumnVisible(errSelected.columnTarget.toLowerCase());
 
     }
   }, [errSelected]);
