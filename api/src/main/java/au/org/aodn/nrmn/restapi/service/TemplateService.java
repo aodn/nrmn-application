@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.Location;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.LetterCodeRespository;
@@ -34,6 +33,7 @@ import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.repository.SpeciesWithAttributesRepository;
 import au.org.aodn.nrmn.restapi.repository.projections.LetterCodeMapping;
+import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import au.org.aodn.nrmn.restapi.repository.projections.SpeciesWithAttributesCsvRow;
 import cyclops.companion.Streams;
 
@@ -96,7 +96,7 @@ public class TemplateService {
         zipOutputStream.closeEntry();
 
         zipOutputStream.putNextEntry(new ZipEntry("m3species.csv"));
-        Set<ObservableItem> observableItems = observableItemRepository.getAllObservableItemsForSitesWithMethod(3, siteIds);
+        List<ObservableItemRow> observableItems = observableItemRepository.getAllWithMethodForSites(3, siteIds);
         writeM3SpeciesCsv(writer, observableItems);
         writer.flush();
         zipOutputStream.closeEntry();
@@ -105,20 +105,20 @@ public class TemplateService {
         zipOutputStream.close();
     }
 
-    private void writeM3SpeciesCsv(Writer writer, Collection<ObservableItem> observableItems) throws IOException {
+    private void writeM3SpeciesCsv(Writer writer, Collection<ObservableItemRow> observableItems) throws IOException {
         CSVPrinter csvPrinter = M3_FORMAT.print(writer);
         List<List<String>> records = observableItems.stream().distinct()
-                .sorted(Comparator.comparing(ObservableItem::getObservableItemName)).map(this::getSpeciesAsM3Record)
+                .sorted(Comparator.comparing(ObservableItemRow::getName)).map(this::getSpeciesAsM3Record)
                 .collect(toList());
         csvPrinter.printRecords(records);
 
     }
 
-    private List<String> getSpeciesAsM3Record(ObservableItem observableItem) {
-        return Arrays.asList(observableItem.getLetterCode(),
-                observableItem.getSupersededBy() != null ? observableItem.getSupersededBy()
-                        : observableItem.getObservableItemName(),
-                observableItem.getCommonName());
+    private List<String> getSpeciesAsM3Record(ObservableItemRow observableItemRow) {
+        return Arrays.asList(observableItemRow.getLetterCode(),
+        observableItemRow.getSupersededBy() != null ? observableItemRow.getSupersededBy()
+                        : observableItemRow.getName(),
+                        observableItemRow.getCommonName());
     }
 
     public void writeDiversCsv(Writer writer, Collection<Diver> divers) throws IOException {
@@ -185,13 +185,11 @@ public class TemplateService {
 
     public List<SpeciesWithAttributesCsvRow> getSpeciesForTemplate(Integer mode, Collection<Integer> siteIds,
             HashMap<Integer, String> letterCodeMap) {
-        Set<ObservableItem> observableItems = observableItemRepository.getAllObservableItemsForSitesWithMethod(mode, siteIds);
+        List<ObservableItemRow> observableItemRows = observableItemRepository.getAllWithMethodForSites(mode, siteIds);
 
-        List<SpeciesWithAttributesCsvRow> species = speciesWithAttributesRepository.findAllById(
-                observableItems.stream().map(ObservableItem::getObservableItemId).collect(toList()), letterCodeMap);
+        List<Integer> observableItemIds = observableItemRows.stream().map(ObservableItemRow::getObservableItemId).collect(toList());
+        List<SpeciesWithAttributesCsvRow> species = speciesWithAttributesRepository.findAllById(observableItemIds, letterCodeMap);
         List<SpeciesWithAttributesCsvRow> speciesResult = species.stream().collect(Collectors.toList());
-        speciesResult
-                .add(SpeciesWithAttributesCsvRow.builder().letterCode("nsf").speciesName("No Species Found").build());
         speciesResult
                 .add(SpeciesWithAttributesCsvRow.builder().letterCode("snd").speciesName("Survey Not Done").build());
         return speciesResult;

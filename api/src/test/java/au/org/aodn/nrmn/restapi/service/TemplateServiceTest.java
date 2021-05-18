@@ -23,18 +23,19 @@ import org.springframework.data.domain.Example;
 
 import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.Location;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.repository.SpeciesWithAttributesRepository;
+import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import au.org.aodn.nrmn.restapi.repository.projections.SpeciesWithAttributesCsvRow;
 import lombok.val;
 
 @ExtendWith(MockitoExtension.class)
 public class TemplateServiceTest {
-    @InjectMocks
+
+@InjectMocks
     TemplateService templateService;
 
     @Mock
@@ -192,13 +193,78 @@ public class TemplateServiceTest {
                 SpeciesWithAttributesCsvRow swa3 = sb.speciesName("Acanthurus chirurgus").commonName("Doctorfish")
                 .l5(7.5).l95(45.0).lMax(60).build();
         List<SpeciesWithAttributesCsvRow> swaList = Arrays.asList(swa1, swa2, swa3);
-        ObservableItem.ObservableItemBuilder ob = ObservableItem.builder();
-        ObservableItem o1 = ob.observableItemId(123).commonName("commonName").className("className").build();
+        ObservableItemRow o1 = new ObservableItemRow(){
+
+                @Override
+                public Integer getObservableItemId() {
+                        return 123;
+                }
+
+                @Override
+                public String getLetterCode() {
+                        return null;
+                }
+
+                @Override
+                public String getTypeName() {
+                        return null;
+                }
+
+                @Override
+                public String getName() {
+                        return null;
+                }
+
+                @Override
+                public String getCommonName() {
+                        return "commonName";
+                }
+
+                @Override
+                public String getSupersededBy() {
+                        return null;
+                }
+
+                @Override
+                public String getSupersededNames() {
+                        return null;
+                }
+
+                @Override
+                public String getSupersededIDs() {
+                        return null;
+                }
+
+                @Override
+                public String getPhylum() {
+                        return null;
+                }
+
+                @Override
+                public String getClassName() {
+                        return "className";
+                }
+
+                @Override
+                public String getOrder() {
+                        return null;
+                }
+
+                @Override
+                public String getFamily() {
+                        return null;
+                }
+
+                @Override
+                public String getGenus() {
+                        return null;
+                }
+        };
         Site site1 = Site.builder().siteId(1).build();
         val siteIds = Arrays.asList(site1.getSiteId());
         val obsIds = Arrays.asList(123);
-        when(observableItemRepository.getAllObservableItemsForSitesWithMethod(2, siteIds))
-                .thenReturn(Arrays.asList(o1).stream().collect(Collectors.toSet()));
+        when(observableItemRepository.getAllWithMethodForSites(2, siteIds))
+                .thenReturn(Arrays.asList(o1).stream().collect(Collectors.toList()));
         when(speciesWithAttributesRepository.findAllById(obsIds, null)).thenReturn(swaList);
         List<SpeciesWithAttributesCsvRow> speciesWithAttributes = templateService.getSpeciesForTemplate(2, siteIds, null);
         assertEquals(swaList.size() + 2, speciesWithAttributes.size());

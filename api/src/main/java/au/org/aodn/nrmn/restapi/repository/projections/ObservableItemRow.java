@@ -11,6 +11,9 @@ public interface ObservableItemRow {
     @Schema(title = "ID")
     Integer getObservableItemId();
 
+    @Schema(hidden = true)
+    String getLetterCode();
+
     @Schema(title = "Type")
     String getTypeName();
 
