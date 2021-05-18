@@ -267,7 +267,8 @@ public class TemplateServiceTest {
                 .thenReturn(Arrays.asList(o1).stream().collect(Collectors.toList()));
         when(speciesWithAttributesRepository.findAllById(obsIds, null)).thenReturn(swaList);
         List<SpeciesWithAttributesCsvRow> speciesWithAttributes = templateService.getSpeciesForTemplate(2, siteIds, null);
-        assertEquals(swaList.size() + 2, speciesWithAttributes.size());
+        // Add one for 'survey not done' added by the service
+        assertEquals(swaList.size() + 1, speciesWithAttributes.size());
         assertEquals("Acanthurus bahianus", speciesWithAttributes.get(1).getSpeciesName());
         assertEquals("Doctorfish", speciesWithAttributes.get(2).getCommonName());
     }
