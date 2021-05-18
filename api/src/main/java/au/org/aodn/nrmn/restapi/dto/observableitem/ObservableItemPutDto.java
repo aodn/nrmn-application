@@ -57,9 +57,6 @@ public class ObservableItemPutDto {
     @Schema(title = "Habitat Groups")
     private String habitatGroups;
 
-    @Schema(hidden = true)
-    private Boolean isInvertSized;
-
     @Schema(title = "Length-Weight a")
     private Double lengthWeightA;
 
