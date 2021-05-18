@@ -21,7 +21,7 @@ public interface LetterCodeRespository extends JpaRepository<Survey, Integer>, J
             + "INNER JOIN {h-schema}survey sur ON sur.site_id = site_raw.site_id "
             + "INNER JOIN {h-schema}survey_method surmet ON surmet.survey_id = sur.survey_id "
             + "INNER JOIN {h-schema}observation obs ON obs.survey_method_id = surmet.survey_method_id "
-            + "INNER JOIN {h-schema}ep_observable_items obsitem ON obsitem.observable_item_id = obs.observable_item_id "
+            + "INNER JOIN {h-schema}observable_item_ref obsitem ON obsitem.observable_item_id = obs.observable_item_id "
             + "WHERE site_raw.site_id in (:siteIds) "
             + "GROUP BY obsitem.observable_item_id, species_name, common_name),"
             + "stage1 AS (SELECT *, {h-schema}abbreviated_species_code(species_name, 3) AS code_len3 FROM stage0),"
