@@ -19,7 +19,7 @@ public class BeforeDateCheck extends BaseFormattedValidator {
     private final LocalDate beforeDate;
 
     public BeforeDateCheck(LocalDate beforeDate) {
-        super("Date");
+        super("date");
         this.beforeDate = beforeDate;
     }
 

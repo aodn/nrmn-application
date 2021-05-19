@@ -4,6 +4,7 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
+import au.org.aodn.nrmn.restapi.util.MeasureUtil;
 import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.companion.Monoids;
@@ -12,6 +13,7 @@ import lombok.val;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class MeasureBetweenL5l95 extends BaseFormattedValidator {
@@ -50,11 +52,12 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
 
         return outOfRange.stream().map(measure -> {
             this.columnTarget = "Measure:" + measure;
+            val column = MeasureUtil.getMeasureName(measure);
             return invalid(
                     target,
-                    "Measure: " + measure + " is outside l5/95[" + l5 + "," + l95 + "]",
+                    "Measure: " + column.replace('-', '.') + " is outside l5/95[" + l5 + "," + l95 + "]",
                     ValidationCategory.DATA,
-                    ValidationLevel.WARNING);
+                    ValidationLevel.WARNING, Optional.of(column));
         }).reduce(Validated.valid(""), (acc, err) -> acc.combine(Monoids.stringConcat, err));
 
     }

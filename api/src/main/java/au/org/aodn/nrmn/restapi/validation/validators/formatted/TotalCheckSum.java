@@ -20,7 +20,7 @@ public class TotalCheckSum extends BaseFormattedValidator {
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
         val checkSum = target.getMeasureJson().entrySet()
                 .stream().map(Map.Entry::getValue)
-                .reduce(0, Integer::sum);
+                .reduce(0, Integer::sum) + target.getInverts();
 
         if (target.getTotal().equals(checkSum)) {
             return Validated.valid("Checksum match Total");

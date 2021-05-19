@@ -4,12 +4,14 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
+import au.org.aodn.nrmn.restapi.util.MeasureUtil;
 import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import lombok.val;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class MeasureUnderLmax extends BaseFormattedValidator {
@@ -40,12 +42,14 @@ public class MeasureUnderLmax extends BaseFormattedValidator {
             return Validated.valid("Values under Lmax");
         }
        return outOfRangef.stream().map(measure -> {
-            this.columnTarget = "Measure:" + measure.getKey();
-            return invalid(
+           val column = MeasureUtil.getMeasureName(measure.getKey());
+
+           return invalid(
                     target,
-                    "Measure: " + measure.getKey() + " is above Lmax[" + lmax + "]",
+                    "Measure: " + column.replace('-', '.') + " is above Lmax[" + lmax + "]",
                     ValidationCategory.DATA,
-                    ValidationLevel.WARNING);
+                    ValidationLevel.WARNING,
+                    Optional.of(column));
         }).reduce(Validated.valid(""), (acc, err) -> acc.combine(Monoids.stringConcat, err));
     }
 }

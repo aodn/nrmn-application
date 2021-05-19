@@ -183,6 +183,7 @@ export const ColumnDef = [
     invertSize: '0.5',
     editable: true,
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -190,6 +191,7 @@ export const ColumnDef = [
     editable: true,
     invertSize: '1',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
 
@@ -199,6 +201,7 @@ export const ColumnDef = [
     editable: true,
     invertSize: '1.5',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -206,6 +209,7 @@ export const ColumnDef = [
     editable: true,
     invertSize: '2',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -214,6 +218,7 @@ export const ColumnDef = [
     editable: true,
     invertSize: '2.5',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -221,6 +226,7 @@ export const ColumnDef = [
     editable: true,
     invertSize: '3',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -228,6 +234,7 @@ export const ColumnDef = [
     editable: true,
     invertSize: '3.5',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -235,6 +242,7 @@ export const ColumnDef = [
     editable: true,
     invertSize: '4',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -242,6 +250,7 @@ export const ColumnDef = [
     editable: true,
     invertSize: '4.5',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -249,6 +258,7 @@ export const ColumnDef = [
     editable: true,
     invertSize: '5',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -256,6 +266,7 @@ export const ColumnDef = [
     editable: true,
     invertSize: '5.5',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -264,6 +275,7 @@ export const ColumnDef = [
 
     invertSize: '6',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -273,6 +285,7 @@ export const ColumnDef = [
 
     invertSize: '6.5',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -281,6 +294,7 @@ export const ColumnDef = [
 
     invertSize: '7',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -290,6 +304,7 @@ export const ColumnDef = [
 
     invertSize: '7.5',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -298,6 +313,7 @@ export const ColumnDef = [
 
     invertSize: '8',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -307,6 +323,7 @@ export const ColumnDef = [
 
     invertSize: '8.5',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -315,6 +332,7 @@ export const ColumnDef = [
 
     invertSize: '9',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -324,6 +342,7 @@ export const ColumnDef = [
 
     invertSize: '9.5',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -332,6 +351,7 @@ export const ColumnDef = [
 
     invertSize: '10',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -341,6 +361,7 @@ export const ColumnDef = [
 
     invertSize: '10.5',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -349,6 +370,7 @@ export const ColumnDef = [
 
     invertSize: '11',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -358,6 +380,7 @@ export const ColumnDef = [
 
     invertSize: '11.5',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -366,6 +389,7 @@ export const ColumnDef = [
 
     invertSize: '12',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -374,6 +398,7 @@ export const ColumnDef = [
 
     invertSize: '12.5',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -382,6 +407,7 @@ export const ColumnDef = [
 
     invertSize: '13',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -390,6 +416,7 @@ export const ColumnDef = [
 
     invertSize: '13.5',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -398,6 +425,7 @@ export const ColumnDef = [
 
     invertSize: '14',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   }
 ];
@@ -409,6 +437,7 @@ export const ExtendedSize = [
 
     invertSize: '14.5',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -417,6 +446,7 @@ export const ExtendedSize = [
 
     invertSize: '15',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -425,6 +455,7 @@ export const ExtendedSize = [
 
     invertSize: '16',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -433,6 +464,7 @@ export const ExtendedSize = [
 
     invertSize: '17',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -441,6 +473,7 @@ export const ExtendedSize = [
 
     invertSize: '18',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -449,6 +482,7 @@ export const ExtendedSize = [
 
     invertSize: '19',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -457,6 +491,7 @@ export const ExtendedSize = [
 
     invertSize: '20',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -465,6 +500,7 @@ export const ExtendedSize = [
 
     invertSize: '22',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -473,6 +509,7 @@ export const ExtendedSize = [
 
     invertSize: '24',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -481,6 +518,7 @@ export const ExtendedSize = [
 
     invertSize: '26',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -489,6 +527,7 @@ export const ExtendedSize = [
 
     invertSize: '28',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {
@@ -496,6 +535,7 @@ export const ExtendedSize = [
     editable: true,
     invertSize: '30',
     headerComponentFramework: AgGridHeader,
+    cellStyle: cell,
     width: 35
   },
   {

@@ -19,7 +19,7 @@ public class ATRCDepthValidation extends BaseRowValidator {
     private static final Pattern VALID_DEPTH_SURVEY_NUM = Pattern.compile("^[0-9]+(\\.[0-9])?$");
 
     public ATRCDepthValidation() {
-        super("Depth");
+        super("depth");
     }
 
     @Override

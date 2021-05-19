@@ -362,6 +362,7 @@ const DataSheetView = () => {
           groupDefaultExpanded={4}
           rowHeight={18}
           animateRows={true}
+          suppressCopyRowsToClipboard = {false}
           groupMultiAutoColumn={true}
           groupHideOpenParents={true}
           rowSelection="multiple"

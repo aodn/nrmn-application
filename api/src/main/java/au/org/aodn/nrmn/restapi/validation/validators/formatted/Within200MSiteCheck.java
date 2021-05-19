@@ -8,6 +8,8 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.control.Validated;
 import lombok.val;
 
+import java.util.Optional;
+
 public class Within200MSiteCheck extends BaseFormattedValidator {
     public Within200MSiteCheck() {
         super("Longitude,Latitude");
@@ -34,6 +36,6 @@ public class Within200MSiteCheck extends BaseFormattedValidator {
         if (dist <= 0.2) {
             return Validated.valid("coords in range");
         }
-        return invalid(target, "Coordinates are further than 0.2km from the Site (" + dist + "km)", ValidationCategory.DATA, ValidationLevel.WARNING);
+        return invalid(target, "Coordinates are further than 0.2km from the Site (" + dist + "km)", ValidationCategory.DATA, ValidationLevel.WARNING, Optional.empty());
     }
 }

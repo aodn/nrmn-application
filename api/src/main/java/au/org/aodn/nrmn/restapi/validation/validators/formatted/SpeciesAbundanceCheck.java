@@ -9,6 +9,8 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.control.Validated;
 import lombok.val;
 
+import java.util.Optional;
+
 public class SpeciesAbundanceCheck extends BaseFormattedValidator {
     public SpeciesAbundanceCheck() {
         super("total");
@@ -29,7 +31,7 @@ public class SpeciesAbundanceCheck extends BaseFormattedValidator {
                             maxAbundance +
                             ").",
                     ValidationCategory.DATA,
-                    ValidationLevel.WARNING);
+                    ValidationLevel.WARNING, Optional.empty());
 
         }).orElseGet(() -> Validated.<StagedRowError, String>valid("Not Affected"));
     }

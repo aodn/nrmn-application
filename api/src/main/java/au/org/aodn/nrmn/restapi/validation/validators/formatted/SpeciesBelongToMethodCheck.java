@@ -33,6 +33,6 @@ public class SpeciesBelongToMethodCheck extends BaseFormattedValidator {
         return invalid(target,
                 "Species method didn't match method  (" + target.getMethod() + ").",
                 ValidationCategory.DATA,
-                ValidationLevel.WARNING);
+                ValidationLevel.WARNING, Optional.empty());
     }
 }

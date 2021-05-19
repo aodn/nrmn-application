@@ -7,6 +7,8 @@ import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.control.Validated;
 
+import java.util.Optional;
+
 public abstract class BaseFormattedValidator {
 
     protected String columnTarget;
@@ -18,7 +20,7 @@ public abstract class BaseFormattedValidator {
     abstract public Validated<StagedRowError, String> valid(StagedRowFormatted target);
 
     public Validated<StagedRowError, String> invalid(StagedRowFormatted formattedRow, String errorMsg,
-                                   ValidationCategory category, ValidationLevel level) {
+                                   ValidationCategory category, ValidationLevel level, Optional<String> target) {
         return Validated.invalid(new StagedRowError(
                 new ErrorID(
                         formattedRow.getRef().getId(),
@@ -27,7 +29,7 @@ public abstract class BaseFormattedValidator {
                 ),
                 category,
                 level,
-                columnTarget,
+                target.orElseGet(() -> columnTarget),
                formattedRow.getRef()));
     }
 }

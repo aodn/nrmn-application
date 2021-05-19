@@ -22,7 +22,8 @@ public class CoordinatesDataCheck extends BaseRowValidator {
     private Site site;
 
     public CoordinatesDataCheck(Site site) {
-        super("Latitude, Longitude");
+        super("latitude, l" +
+                "ongitude");
         this.site = site;
     }
 
