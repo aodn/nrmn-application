@@ -1,6 +1,8 @@
 package au.org.aodn.nrmn.restapi.validation.validators.formatted;
 
+import au.org.aodn.nrmn.restapi.model.db.Method;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
+import com.google.common.collect.ImmutableSet;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.utils.ImmutableMap;
@@ -16,9 +18,9 @@ class SpeciesBelongToMethodCheckTest extends FormattedTestProvider{
         formatted.setMethod(1);
         formatted.setSpecies(
                 ObservableItem.builder()
-                        .obsItemAttribute(ImmutableMap.<String, String>builder()
-                                .put("is_M1", "true").build())
-                        .observableItemName("THE SPECIES").build());
+                              .observableItemName("THE SPECIES")
+                              .methods(ImmutableSet.of(Method.builder().methodId(1).build()))
+                              .build());
 
         val validator = new SpeciesBelongToMethodCheck();
         val res =validator.valid(formatted);
@@ -31,9 +33,9 @@ class SpeciesBelongToMethodCheckTest extends FormattedTestProvider{
         formatted.setMethod(2);
         formatted.setSpecies(
                 ObservableItem.builder()
-                        .obsItemAttribute(ImmutableMap.<String, String>builder()
-                                .put("is_M1", "true").build())
-                        .observableItemName("THE SPECIES").build());
+                        .observableItemName("THE SPECIES")
+                        .methods(ImmutableSet.of(Method.builder().methodId(1).build()))
+                        .build());
 
         val validator = new SpeciesBelongToMethodCheck();
         val res =validator.valid(formatted);

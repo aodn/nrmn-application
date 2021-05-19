@@ -349,7 +349,25 @@ const DataSheetView = () => {
           getRowNodeId={(data) => data.id}
           pivotMode={false}
           pivotColumnGroupTotals={'before'}
-          sideBar={true}
+          sideBar={{
+            toolPanels: [
+              {
+                id: 'columns',
+                labelDefault: 'Columns',
+                labelKey: 'columns',
+                iconKey: 'columns',
+                toolPanel: 'agColumnsToolPanel'
+              },
+              {
+                id: 'filters',
+                labelDefault: 'Filters',
+                labelKey: 'filters',
+                iconKey: 'filter',
+                toolPanel: 'agFiltersToolPanel'
+              }
+            ],
+            defaultToolPanel: ''
+          }}
           autoGroupColumnDef={{
             width: 20,
             cellRendererParams: {

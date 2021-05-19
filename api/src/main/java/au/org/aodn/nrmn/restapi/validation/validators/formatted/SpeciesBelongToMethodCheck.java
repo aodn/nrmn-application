@@ -22,11 +22,9 @@ public class SpeciesBelongToMethodCheck extends BaseFormattedValidator {
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
         val species =  target.getSpecies();
-        val attributes =  Optional.of(species).map(ObservableItem::getObsItemAttribute).orElseGet(Collections::emptyMap);
-        if (attributes.entrySet()
-                .stream()
-                .filter(entry -> entry.getKey().startsWith("is_M"+ target.getMethod())).count() != 0)
-        {
+
+
+        if (species.getMethods().stream().anyMatch(method -> method.getMethodId().equals(target.getMethod()))) {
             return Validated.valid("Species match method");
         }
 

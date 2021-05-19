@@ -55,7 +55,4 @@ public class ObservableItemDto {
 
     @Schema(title = "Habitat Groups")
     private String habitatGroups;
-
-    @Schema(hidden = true)
-    private Boolean isInvertSized;
 }
