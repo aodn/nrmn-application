@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,9 +28,11 @@ import au.org.aodn.nrmn.restapi.model.db.Location;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.repository.LetterCodeRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.repository.projections.LetterCodeMapping;
 import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import au.org.aodn.nrmn.restapi.repository.projections.SpeciesWithAttributesCsvRow;
 import lombok.val;
@@ -42,6 +45,9 @@ public class TemplateServiceTest {
 
         @Mock
         DiverRepository diverRepository;
+
+        @Mock
+        LetterCodeRepository letterCodeRepository;
 
         @Mock
         SiteRepository siteRepository;
@@ -190,14 +196,12 @@ public class TemplateServiceTest {
 
         @Test
         void getSpeciesForTemplate() throws IOException {
-                SpeciesWithAttributesCsvRow.SpeciesWithAttributesCsvRowBuilder sb = SpeciesWithAttributesCsvRow
-                                .builder();
 
                 UiSpeciesAttributes usa1 = new UiSpeciesAttributes() {
 
                         @Override
                         public Long getId() {
-                                return null;
+                                return 1l;
                         }
 
                         @Override
@@ -240,7 +244,7 @@ public class TemplateServiceTest {
 
                         @Override
                         public Long getId() {
-                                return null;
+                                return 2l;
                         }
 
                         @Override
@@ -283,7 +287,7 @@ public class TemplateServiceTest {
 
                         @Override
                         public Long getId() {
-                                return null;
+                                return 3l;
                         }
 
                         @Override
@@ -390,20 +394,65 @@ public class TemplateServiceTest {
                                 return null;
                         }
                 };
+
+                val lcm1 = new LetterCodeMapping() {
+
+                        @Override
+                        public Long getObservableItemId() {
+                                return 1l;
+                        }
+
+                        @Override
+                        public String getLetterCode() {
+                                return "one";
+                        }
+                };
+
+                val lcm2 = new LetterCodeMapping() {
+
+                        @Override
+                        public Long getObservableItemId() {
+                                return 2l;
+                        }
+
+                        @Override
+                        public String getLetterCode() {
+                                return "two";
+                        }
+                };
+
+                val lcm3 = new LetterCodeMapping() {
+
+                        @Override
+                        public Long getObservableItemId() {
+                                return 3l;
+                        }
+
+                        @Override
+                        public String getLetterCode() {
+                                return "three";
+                        }
+                };
+
                 Site site1 = Site.builder().siteId(1).build();
                 val siteIds = Arrays.asList(site1.getSiteId());
                 val obsIds = Arrays.asList(123);
                 when(observableItemRepository.getAllWithMethodForSites(2, siteIds))
                                 .thenReturn(Arrays.asList(o1).stream().collect(Collectors.toList()));
                 when(observationRepository.getSpeciesAttributesByIds(obsIds)).thenReturn(swaList);
-                val speciesWithAttributes = swaList.stream()
-                                .map(s -> SpeciesWithAttributesCsvRow.builder().speciesName(s.getSpeciesName())
-                                                .commonName(s.getCommonName()).isInvertSized(s.getIsInvertSized())
-                                                .l5(s.getL5()).l95(s.getL95()).lMax(s.getLmax()).build())
-                                .collect(Collectors.toList());
+                when(letterCodeRepository.getForSiteIds(siteIds)).thenReturn(Arrays.asList(lcm1, lcm2, lcm3));
+                List<LetterCodeMapping> letterCodeMappings = letterCodeRepository.getForSiteIds(siteIds);
+                HashMap<Long, String> letterCodeMap = new HashMap<Long, String>();
+                letterCodeMappings.forEach(
+                                m -> letterCodeMap.put(Long.valueOf(m.getObservableItemId()), m.getLetterCode()));
+                val speciesWithAttributes = templateService.getSpeciesForTemplate(2, siteIds, letterCodeMap);
                 // Add one for 'survey not done' added by the service
                 assertEquals(swaList.size() + 1, speciesWithAttributes.size());
-                assertEquals("Acanthurus bahianus", speciesWithAttributes.get(1).getSpeciesName());
+                assertEquals("Abudefduf saxatilis", speciesWithAttributes.get(0).getSpeciesName());
+                assertEquals("one", speciesWithAttributes.get(0).getLetterCode());
                 assertEquals("Doctorfish", speciesWithAttributes.get(2).getCommonName());
+                assertEquals("two", speciesWithAttributes.get(1).getLetterCode());
+                assertEquals("Doctorfish", speciesWithAttributes.get(2).getCommonName());
+                assertEquals("three", speciesWithAttributes.get(2).getLetterCode());
         }
 }
