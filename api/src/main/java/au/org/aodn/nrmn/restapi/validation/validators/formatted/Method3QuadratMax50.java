@@ -23,10 +23,10 @@ public class Method3QuadratMax50 extends BaseFormattedValidator {
         if (!target.getMethod().equals(3)) {
             return Validated.valid("not affected");
         }
-        val isUnder50 = IntStream.range(1, 5)
+        val isUnder50 = IntStream.range(1, 6)
                 .map(i -> target.getMeasureJson().getOrDefault(i, 0))
-                .filter(measure -> measure <= 50).toArray();
-        if (isUnder50.length > 0)
+                .filter(measure -> measure > 50).toArray();
+        if (isUnder50.length == 0)
             return Validated.valid("quadrats under 50");
         return Validated.invalid(new StagedRowError(
                 new ErrorID(target.getId(),
