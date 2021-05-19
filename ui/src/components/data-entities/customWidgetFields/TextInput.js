@@ -8,7 +8,7 @@ import {setField} from '../middleware/entities';
 const TextInput = ({name, schema, uiSchema}) => {
   const dispatch = useDispatch();
   const formValue = useSelector((state) => state.form.data[name]) ?? '';
-  const value = Number.isInteger(formValue) || typeof formValue === 'boolean' ? formValue.toString() : formValue;
+  const value = typeof formValue === 'number' || typeof formValue === 'boolean' ? formValue.toString() : formValue;
   const error = useSelector((state) => state.form.errors).find((e) => e.property === name);
   const readOnlyInput = uiSchema['ui:field'] === 'readonly';
   const readOnlyModify = uiSchema['ui:readonly'] === true;
