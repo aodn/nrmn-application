@@ -82,7 +82,7 @@ public class TemplateService {
                 zipOutputStream.closeEntry();
 
                 List<Integer> siteIds = sites.stream().map(s -> s.getSiteId()).collect(Collectors.toList());
-                List<LetterCodeMapping> letterCodeMappings = letterCodeRespository.findByCriteria(siteIds);
+                List<LetterCodeMapping> letterCodeMappings = letterCodeRespository.getForSiteIds(siteIds);
                 HashMap<Integer, String> letterCodeMap = new HashMap<Integer, String>();
                 letterCodeMappings.forEach(m -> letterCodeMap.put(m.getObservableItemId(), m.getLetterCode()));
 

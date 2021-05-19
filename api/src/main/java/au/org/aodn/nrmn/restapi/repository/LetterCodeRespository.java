@@ -36,5 +36,5 @@ public interface LetterCodeRespository extends JpaRepository<Survey, Integer>, J
             + "FROM {h-schema}observable_item_ref oir JOIN stage7 s7 on s7.observable_item_id = oir.observable_item_id "
             + "JOIN {h-schema}obs_item_type_ref oitr ON oitr.obs_item_type_id = oir.obs_item_type_id "
             + "WHERE oitr.obs_item_type_id = ANY (ARRAY[1, 2]) ORDER BY letterCode", nativeQuery = true)
-    List<LetterCodeMapping> findByCriteria(@Param("siteIds") List<Integer> siteIds);
+    List<LetterCodeMapping> getForSiteIds(@Param("siteIds") List<Integer> siteIds);
 }
