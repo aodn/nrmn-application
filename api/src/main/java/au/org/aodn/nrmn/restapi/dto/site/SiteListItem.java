@@ -32,10 +32,10 @@ public class SiteListItem extends RepresentationModel<SiteListItem> {
     String country;
 
     @Schema(title = "Latitude")
-    Double latitude;
+    Float latitude;
 
     @Schema(title = "Longitude")
-    Double longitude;
+    Float longitude;
 
     @Schema(title = "Is Active")
     Boolean isActive;
