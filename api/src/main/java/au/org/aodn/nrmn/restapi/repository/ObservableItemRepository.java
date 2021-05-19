@@ -42,7 +42,7 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
     @RestResource
     Optional<ObservableItem> findById(Integer integer);
 
-    @Query(value = "select distinct obsitem.observable_item_id as observableItemId, obsitem.observable_item_name as name, obsitem.superseded_by as supersededBy, obsitem.letter_code as letterCode, obsitem.common_name as commonName "
+    @Query(value = "select distinct on (obsitem.observable_item_id) obsitem.observable_item_id as observableItemId, obsitem.observable_item_name as name, obsitem.letter_code as letterCode, obsitem.common_name as commonName "
             + "FROM {h-schema}location_ref loc "
             + "INNER JOIN {h-schema}site_ref site_raw ON site_raw.location_id = loc.location_id "
             + "INNER JOIN {h-schema}ep_site_list site ON site.site_code = site_raw.site_code "
@@ -50,7 +50,7 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "INNER JOIN {h-schema}survey_method surmet ON surmet.survey_id = sur.survey_id "
             + "INNER JOIN {h-schema}observation obs ON obs.survey_method_id = surmet.survey_method_id "
             + "INNER JOIN {h-schema}observable_item_ref obsitem ON obsitem.observable_item_id = obs.observable_item_id "
-            + "where surmet.method_id = :methodId AND site_raw.site_id IN :siteIds "
+            + "where surmet.method_id = :methodId AND site_raw.site_id IN :siteIds AND obsitem.superseded_by IS NULL "
             + "AND (surmet.method_id != 2 OR (obsitem.class NOT IN ('Ophiuroidea', 'Polyplacophora') AND obsitem.family != 'Pyuridae'))", nativeQuery = true)
     List<ObservableItemRow> getAllWithMethodForSites(@Param("methodId") Integer methodId, @Param("siteIds") Collection<Integer> siteIds);
 
