@@ -19,5 +19,5 @@ public class SpeciesWithAttributesCsvRow {
 
     private Double l95;
 
-    private Integer lMax;
+    private Long lMax;
 }

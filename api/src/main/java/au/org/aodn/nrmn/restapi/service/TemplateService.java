@@ -30,8 +30,8 @@ import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.LetterCodeRespository;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import au.org.aodn.nrmn.restapi.repository.SpeciesWithAttributesRepository;
 import au.org.aodn.nrmn.restapi.repository.projections.LetterCodeMapping;
 import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import au.org.aodn.nrmn.restapi.repository.projections.SpeciesWithAttributesCsvRow;
@@ -62,7 +62,7 @@ public class TemplateService {
         LetterCodeRespository letterCodeRespository;
 
         @Autowired
-        private SpeciesWithAttributesRepository speciesWithAttributesRepository;
+        private ObservationRepository observationRepository;
 
         public void writeZip(OutputStream outputStream, Collection<Integer> locations, Collection<String> provinces,
                         Collection<String> states, Collection<String> siteCodes) throws IOException {
@@ -83,8 +83,8 @@ public class TemplateService {
 
                 List<Integer> siteIds = sites.stream().map(s -> s.getSiteId()).collect(Collectors.toList());
                 List<LetterCodeMapping> letterCodeMappings = letterCodeRespository.getForSiteIds(siteIds);
-                HashMap<Integer, String> letterCodeMap = new HashMap<Integer, String>();
-                letterCodeMappings.forEach(m -> letterCodeMap.put(m.getObservableItemId(), m.getLetterCode()));
+                HashMap<Long, String> letterCodeMap = new HashMap<Long, String>();
+                letterCodeMappings.forEach(m -> letterCodeMap.put(Long.valueOf(m.getObservableItemId()), m.getLetterCode()));
 
                 List<SpeciesWithAttributesCsvRow> speciesWithAttributes = getSpeciesForTemplate(1, siteIds,
                                 letterCodeMap);
@@ -198,14 +198,17 @@ public class TemplateService {
         }
 
         public List<SpeciesWithAttributesCsvRow> getSpeciesForTemplate(Integer mode, Collection<Integer> siteIds,
-                        HashMap<Integer, String> letterCodeMap) {
+                        HashMap<Long, String> letterCodeMap) {
                 List<ObservableItemRow> observableItemRows = observableItemRepository.getAllWithMethodForSites(mode,
                                 siteIds);
 
                 List<Integer> observableItemIds = observableItemRows.stream()
                                 .map(ObservableItemRow::getObservableItemId).collect(toList());
-                List<SpeciesWithAttributesCsvRow> species = speciesWithAttributesRepository
-                                .findAllById(observableItemIds, letterCodeMap);
+                List<SpeciesWithAttributesCsvRow> species = observationRepository
+                                .getSpeciesAttributesByIds(observableItemIds).stream().map(s -> SpeciesWithAttributesCsvRow.builder().letterCode(letterCodeMap.get(s.getId()))
+                                .speciesName(s.getSpeciesName()).commonName(s.getCommonName())
+                                .isInvertSized(s.getIsInvertSized()).l5(s.getL5()).l95(s.getL95()).lMax(s.getLmax()).build())
+                        .collect(Collectors.toList());
                 List<SpeciesWithAttributesCsvRow> speciesResult = species.stream().collect(Collectors.toList());
                 speciesResult.add(SpeciesWithAttributesCsvRow.builder().letterCode("snd").speciesName("Survey Not Done")
                                 .isInvertSized(false).build());
