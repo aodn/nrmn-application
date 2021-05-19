@@ -28,7 +28,7 @@ import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.Location;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
-import au.org.aodn.nrmn.restapi.repository.LetterCodeRespository;
+import au.org.aodn.nrmn.restapi.repository.LetterCodeRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
@@ -59,7 +59,7 @@ public class TemplateService {
         ObservableItemRepository observableItemRepository;
 
         @Autowired
-        LetterCodeRespository letterCodeRespository;
+        LetterCodeRepository LetterCodeRepository;
 
         @Autowired
         private ObservationRepository observationRepository;
@@ -82,7 +82,7 @@ public class TemplateService {
                 zipOutputStream.closeEntry();
 
                 List<Integer> siteIds = sites.stream().map(s -> s.getSiteId()).collect(Collectors.toList());
-                List<LetterCodeMapping> letterCodeMappings = letterCodeRespository.getForSiteIds(siteIds);
+                List<LetterCodeMapping> letterCodeMappings = LetterCodeRepository.getForSiteIds(siteIds);
                 HashMap<Long, String> letterCodeMap = new HashMap<Long, String>();
                 letterCodeMappings.forEach(m -> letterCodeMap.put(Long.valueOf(m.getObservableItemId()), m.getLetterCode()));
 

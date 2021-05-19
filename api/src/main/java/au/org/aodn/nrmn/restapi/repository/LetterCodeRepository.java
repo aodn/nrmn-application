@@ -12,7 +12,7 @@ import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.repository.projections.LetterCodeMapping;
 
 @Repository
-public interface LetterCodeRespository extends JpaRepository<Survey, Integer>, JpaSpecificationExecutor<Survey> {
+public interface LetterCodeRepository extends JpaRepository<Survey, Integer>, JpaSpecificationExecutor<Survey> {
 
     @Query(value = "WITH stage0 AS (SELECT COALESCE(obsitem.superseded_by, obsitem.observable_item_name) AS species_name, obsitem.observable_item_id, SUM(obs.measure_value) AS abundance "
             + "FROM {h-schema}location_ref loc "
