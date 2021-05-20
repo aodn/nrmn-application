@@ -50,8 +50,9 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "INNER JOIN {h-schema}survey_method surmet ON surmet.survey_id = sur.survey_id "
             + "INNER JOIN {h-schema}observation obs ON obs.survey_method_id = surmet.survey_method_id "
             + "INNER JOIN {h-schema}observable_item_ref obsitem ON obsitem.observable_item_id = obs.observable_item_id "
-            + "where surmet.method_id = :methodId AND site_raw.site_id IN :siteIds AND obsitem.superseded_by IS NULL "
-            + "AND (surmet.method_id != 2 OR (obsitem.class NOT IN ('Ophiuroidea', 'Polyplacophora') AND obsitem.family != 'Pyuridae'))", nativeQuery = true)
+            + "INNER JOIN {h-schema}methods_species m ON m.observable_item_id = obsitem.observable_item_id "
+            + "where m.method_id = :methodId AND site_raw.site_id IN :siteIds AND obsitem.superseded_by IS NULL "
+            + "AND (:methodId != 2 OR (obsitem.class NOT IN ('Ophiuroidea', 'Polyplacophora') AND obsitem.family != 'Pyuridae'))", nativeQuery = true)
     List<ObservableItemRow> getAllWithMethodForSites(@Param("methodId") Integer methodId, @Param("siteIds") Collection<Integer> siteIds);
 
     @Query(value = "SELECT * FROM {h-schema}observable_item_ref oi"
