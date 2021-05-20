@@ -210,18 +210,18 @@ public class SiteApiIT {
                 .auth()
                 .oauth2(jwtToken.get())
                 .body("{" +
-                        "\"siteCode\": \"" + anotherSite.getSiteCode() + "#2" + "\"," +
+                        "\"siteCode\": \"" + site.getSiteCode()  + "\"," +
                         "\"siteName\": \"" + anotherSite.getSiteName() + "\"," +
                         "\"longitude\": " + site.getLongitude() + "," +
                         "\"latitude\": " + site.getLatitude() + "," +
                         "\"state\": \"Tasmania\"," +
                         "\"country\": \"Australia\"," +
-                        "\"locationId\": " + site.getLocation().getLocationId() + "}")
+                        "\"locationId\": " + anotherSite.getLocation().getLocationId() + "}")
                 .put(site.getSiteId().toString())
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("A site with that code already exists.")));
+                .body("errors[0].message", is(equalTo("A site with that name already exists in that location.")));
     }
 
     @Test
