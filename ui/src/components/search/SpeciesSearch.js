@@ -53,7 +53,7 @@ const SpeciesSearch = () => {
 
   const dispatch = useDispatch();
   return (
-    <Box ml={6} style={{background: 'white'}} boxShadow={1} margin={3} width={1000}>
+    <Box ml={6} style={{background: 'white'}} boxShadow={1} margin={3} width="80%">
       <Box pl={6} py={2}>
         <Typography variant="h4">Species Lookup</Typography>
       </Box>
@@ -123,6 +123,7 @@ const SpeciesSearch = () => {
         <div style={{height: 640, backgroundColor: 'white'}}>
           <DataGrid
             className={classes.root}
+            disableSelectionOnClick
             density="compact"
             style={{fontSize: 4}}
             rows={searchResults}
