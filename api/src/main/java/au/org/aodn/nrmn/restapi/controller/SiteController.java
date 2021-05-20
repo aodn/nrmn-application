@@ -1,7 +1,8 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import au.org.aodn.nrmn.restapi.controller.assembler.SiteListItemAssembler;
-import au.org.aodn.nrmn.restapi.controller.exception.DuplicateSiteException;
+import au.org.aodn.nrmn.restapi.controller.exception.DuplicateSiteCodeException;
+import au.org.aodn.nrmn.restapi.controller.exception.DuplicateSiteNameException;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.dto.site.SiteDto;
 import au.org.aodn.nrmn.restapi.dto.site.SiteGetDto;
@@ -78,8 +79,8 @@ public class SiteController {
     @PostMapping("/sites")
     @ResponseStatus(HttpStatus.CREATED)
     public SiteDto newSite(@Valid @RequestBody SiteDto sitePostDto) {
-        validatePost(sitePostDto);
         Site newSite = mapper.map(sitePostDto, Site.class);
+        validateConstraints(newSite);
         Site persistedSite = siteRepository.save(newSite);
         return mapper.map(persistedSite, SiteDto.class);
     }
@@ -87,9 +88,9 @@ public class SiteController {
     @PutMapping("/sites/{id}")
     @ResponseStatus(HttpStatus.OK)
     public SiteDto updateSite(@PathVariable Integer id, @Valid @RequestBody SiteDto sitePutDto) {
-        validatePut(id, sitePutDto);
         Site site = siteRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         mapper.map(sitePutDto, site);
+        validateConstraints(site);
         Site persistedSite = siteRepository.save(site);
         return mapper.map(persistedSite, SiteDto.class);
     }
@@ -100,29 +101,30 @@ public class SiteController {
         siteRepository.deleteById(id);
     }
 
-    private void validatePost(@RequestBody @Valid SiteDto sitePostDto) {
-        Optional<Site> existingSite = getSiteWithCodeAndName(sitePostDto.getSiteCode(), sitePostDto.getSiteName());
-
-        if (existingSite.isPresent()) {
-            throw new DuplicateSiteException();
-        }
-    }
-
-    private void validatePut(Integer id, SiteDto sitePutDto) {
-        Optional<Site> existingSite = getSiteWithCodeAndName(sitePutDto.getSiteCode(), sitePutDto.getSiteName());
-
-        if (existingSite.isPresent() && !existingSite.get().getSiteId().equals(id)) {
-            throw new DuplicateSiteException();
-        }
-    }
-
-    private Optional<Site> getSiteWithCodeAndName(String siteCode, String siteName) {
-        Example<Site> siteWithCodeAndNameExample = Example.of(
+    private void validateConstraints(Site siteDto) {
+        Example<Site> siteWithCodeExample = Example.of(
                 Site.builder()
-                    .siteCode(siteCode)
-                    .siteName(siteName)
+                    .siteCode(siteDto.getSiteCode())
                     .build());
 
-        return siteRepository.findOne(siteWithCodeAndNameExample);
+        Optional<Site> existingSite = siteRepository.findOne(siteWithCodeExample);
+
+        if (existingSite.isPresent() && !existingSite.get().getSiteId().equals(siteDto.getSiteId())) {
+            throw new DuplicateSiteCodeException();
+        }
+
+        Example<Site> siteWithLocationAndNameExample = Example.of(
+                Site.builder()
+                    .location(siteDto.getLocation())
+                    .siteName(siteDto.getSiteName())
+                    .build());
+
+        Optional<Site> existingSiteWithName = siteRepository.findOne(siteWithLocationAndNameExample);
+        
+        if (existingSiteWithName.isPresent() && !existingSiteWithName.get().getSiteId().equals(siteDto.getSiteId())) {
+            throw new DuplicateSiteNameException();
+        }
+
     }
+
 }

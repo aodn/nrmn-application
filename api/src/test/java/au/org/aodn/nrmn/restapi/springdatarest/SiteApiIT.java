@@ -128,7 +128,7 @@ public class SiteApiIT {
 
     @Test
     @WithUserDetails("test@gmail.com")
-    public void testCreateUsingExistingSiteCodeAndName() {
+    public void testCreateUsingExistingSiteCode() {
         val existingSite = siteTestData.persistedSite();
 
         given()
@@ -147,12 +147,36 @@ public class SiteApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("A site with that code and name already exists.")));
+                .body("errors[0].message", is(equalTo("A site with that code already exists.")));
     }
 
     @Test
     @WithUserDetails("test@gmail.com")
-    public void testUpdateWithExistingSiteCodeAndName() {
+    public void testCreateUsingExistingSiteNameAtLocation() {
+        val existingSite = siteTestData.persistedSite();
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body("{" +
+                        "\"siteCode\": \"" + existingSite.getSiteCode() + "#2" + "\"," +
+                        "\"siteName\": \"" + existingSite.getSiteName() + "\"," +
+                        "\"longitude\": 147.7243," +
+                        "\"latitude\": -40.13547," +
+                        "\"locationId\": " + existingSite.getLocation().getLocationId() + "," +
+                        "\"state\": \"Tasmania\"," +
+                        "\"country\": \"Australia\"}")
+                .post()
+                .then()
+                .assertThat()
+                .statusCode(400)
+                .body("errors[0].message", is(equalTo("A site with that name already exists in that location.")));
+    }
+
+    @Test
+    @WithUserDetails("test@gmail.com")
+    public void testUpdateWithExistingSiteCode() {
         val site = siteTestData.persistedSite();
         val anotherSite = siteTestData.persistedSite();
 
@@ -172,7 +196,32 @@ public class SiteApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("A site with that code and name already exists.")));
+                .body("errors[0].message", is(equalTo("A site with that code already exists.")));
+    }
+
+    @Test
+    @WithUserDetails("test@gmail.com")
+    public void testUpdateWithExistingSiteName() {
+        val site = siteTestData.persistedSite();
+        val anotherSite = siteTestData.persistedSite();
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body("{" +
+                        "\"siteCode\": \"" + anotherSite.getSiteCode() + "#2" + "\"," +
+                        "\"siteName\": \"" + anotherSite.getSiteName() + "\"," +
+                        "\"longitude\": " + site.getLongitude() + "," +
+                        "\"latitude\": " + site.getLatitude() + "," +
+                        "\"state\": \"Tasmania\"," +
+                        "\"country\": \"Australia\"," +
+                        "\"locationId\": " + site.getLocation().getLocationId() + "}")
+                .put(site.getSiteId().toString())
+                .then()
+                .assertThat()
+                .statusCode(400)
+                .body("errors[0].message", is(equalTo("A site with that code already exists.")));
     }
 
     @Test
