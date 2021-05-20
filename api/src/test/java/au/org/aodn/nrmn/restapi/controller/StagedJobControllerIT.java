@@ -60,7 +60,7 @@ class StagedJobControllerIT {
     JwtTokenProvider jwtProvider;
 
     @Value("${app.s3.bucket}")
-    private String bucket;
+    private static String bucket = "nrmn-dev";
 
     @Autowired
     public TestRestTemplate testRestTemplate;
@@ -79,7 +79,7 @@ class StagedJobControllerIT {
                 )))
                 .region(Region.of(localstack.getRegion()))
                 .build();
-        CreateBucketResponse bucketResp = client.createBucket(CreateBucketRequest.builder().bucket("nrmn-dev").build());
+        CreateBucketResponse bucketResp = client.createBucket(CreateBucketRequest.builder().bucket(bucket).build());
         assertTrue(bucketResp.sdkHttpResponse().isSuccessful());
     }
 
@@ -89,7 +89,6 @@ class StagedJobControllerIT {
         client = null;
 
     }
-
 
     @Test
     @WithUserDetails("test@gmail.com")
@@ -149,7 +148,7 @@ class StagedJobControllerIT {
         assertEquals(resp.getStatusCode(), HttpStatus.OK);
         assertEquals(resp.getBody().getFile().get().getRowCount(), 34);
     }
-    
+
     @Test
     @WithUserDetails("test@gmail.com")
     public void emptyFileShouldFail() throws Exception {
