@@ -85,8 +85,8 @@ public class SiteController {
             return ResponseEntity.badRequest().body(errors);
         }
         Site persistedSite = siteRepository.save(newSite);
-        SiteDto updatedSiteDto = mapper.map(persistedSite, SiteDto.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(updatedSiteDto);
+        SiteDto persistedSiteDto = mapper.map(persistedSite, SiteDto.class);
+        return ResponseEntity.status(HttpStatus.CREATED).body(persistedSiteDto);
     }
 
     @PutMapping("/sites/{id}")
