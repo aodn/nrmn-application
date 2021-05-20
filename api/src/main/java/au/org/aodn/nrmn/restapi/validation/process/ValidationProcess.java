@@ -55,7 +55,10 @@ public class ValidationProcess extends ValidatorHelpers {
                         .map(row -> preProcess.validate(row, rawValidators))
                         .collect(Collectors.toList());
         val preCheck = rowChecks.stream().reduce(reducer.zero(), reducer::apply);
-        val rawErrorList = toErrorList(preCheck.getValid());
+        val rawErrorList = preCheck.getRows()
+                .stream()
+                .flatMap(r ->
+                        r.getErrors().stream()).toList();
         val blockingErrors = rawErrorList
                 .stream()
                 .filter(err -> err.getErrorLevel().compareTo(ValidationLevel.BLOCKING) == 0)

@@ -12,7 +12,7 @@ import org.apache.commons.lang3.EnumUtils;
 
 public class DirectionDataCheck extends BaseRowValidator {
     public DirectionDataCheck() {
-        super("Direction");
+        super("direction");
     }
 
     @Override

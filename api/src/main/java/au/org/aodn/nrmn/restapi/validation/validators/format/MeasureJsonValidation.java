@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.validation.validators.format;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
+import au.org.aodn.nrmn.restapi.util.MeasureUtil;
 import au.org.aodn.nrmn.restapi.validation.validators.base.BaseRowValidator;
 import cyclops.companion.Monoids;
 import cyclops.control.Validated;
@@ -27,12 +28,14 @@ public class MeasureJsonValidation extends BaseRowValidator {
         Validated<StagedRowError, Seq<Tuple2<Integer, Integer>>> mapValidators = target.getMeasureJson()
                 .entrySet()
                 .stream().map(entry -> {
-                            if (entry.getValue().isEmpty()){
+                            if (entry.getValue().trim().isEmpty()){
                                 return Validated.<StagedRowError, Seq<Tuple2<Integer, Integer>>>valid(Seq.empty());
                             }
+                            val col = MeasureUtil.getMeasureName( entry.getKey());
                             val intValidator = new IntegerFormatValidation(
                                     r -> entry.getValue(),
-                                    entry.getKey().toString(), Collections.emptyList());
+                                    col,
+                                    Collections.emptyList());
 
                             return intValidator.valid(target).map(i ->
                                     Seq.of(Tuple2.of(entry.getKey(), i)));

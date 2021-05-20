@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class DebrisZeroObs extends BaseFormattedValidator {
     public DebrisZeroObs() {
-        super("Species");
+        super("species");
     }
 
     @Override

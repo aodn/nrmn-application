@@ -23,6 +23,7 @@ public class SpeciesBelongToMethodCheck extends BaseFormattedValidator {
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
         val species =  target.getSpecies();
 
+
         if (species.getMethods().stream().anyMatch(method -> method.getMethodId().equals(target.getMethod()))) {
             return Validated.valid("Species match method");
         }
@@ -30,6 +31,6 @@ public class SpeciesBelongToMethodCheck extends BaseFormattedValidator {
         return invalid(target,
                 "Species method didn't match method  (" + target.getMethod() + ").",
                 ValidationCategory.DATA,
-                ValidationLevel.WARNING);
+                ValidationLevel.WARNING, Optional.empty());
     }
 }

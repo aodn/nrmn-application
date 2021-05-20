@@ -28,7 +28,7 @@ public class IntegerFormatValidation extends BaseRowFormatValidation<Integer> {
         return validFormat(getField, (input) -> {
             Integer value = Integer.parseInt(input);
             if (!validValues.isEmpty() && !validValues.contains(value)) {
-                return Validated.invalid(value + " is invalid. Must be " + format(validValues));
+                return Validated.invalid( "[" +value + "] is invalid. Must be " + format(validValues));
             }
             return Validated.valid(value);
         }, target);
