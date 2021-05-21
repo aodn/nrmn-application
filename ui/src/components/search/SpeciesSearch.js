@@ -21,6 +21,7 @@ const useStyles = makeStyles({
 });
 
 const columns = [
+  {field: 'status', headerName: 'Status', flex: 1},
   {
     field: 'species',
     headerName: 'Species',
