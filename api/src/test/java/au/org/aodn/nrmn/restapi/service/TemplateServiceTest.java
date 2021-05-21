@@ -183,15 +183,15 @@ public class TemplateServiceTest {
                 StringWriter stringWriter = new StringWriter();
                 PrintWriter printWriter = new PrintWriter(stringWriter);
                 templateService.writeSpeciesCsv(printWriter, CSVFormat.DEFAULT.withHeader("Letter Code", "Species Name",
-                                "Common Name", "L5", "L95", "LMax"), Arrays.asList(s1, s2, s3), false);
+                                "Common Name", "Species Invert Sizing", "L5", "L95", "LMax"), Arrays.asList(s1, s2, s3));
                 List<String> csvLines = Arrays.stream(stringWriter.toString().split("\n")).map(String::trim)
                                 .collect(Collectors.toList());
 
                 assertEquals(4, csvLines.size());
-                assertEquals("Letter Code,Species Name,Common Name,L5,L95,LMax", csvLines.get(0));
-                assertEquals("asa,Abudefduf saxatilis,Sergeant major,2.5,15.0,20", csvLines.get(1));
-                assertEquals("aba,Acanthurus bahianus,Ocean surgeon,5.0,30.0,40", csvLines.get(2));
-                assertEquals("ach,Acanthurus chirurgus,Doctorfish,7.5,45.0,60", csvLines.get(3));
+                assertEquals("Letter Code,Species Name,Common Name,Species Invert Sizing,L5,L95,LMax", csvLines.get(0));
+                assertEquals("asa,Abudefduf saxatilis,Sergeant major,No,2.5,15.0,20", csvLines.get(1));
+                assertEquals("aba,Acanthurus bahianus,Ocean surgeon,No,5.0,30.0,40", csvLines.get(2));
+                assertEquals("ach,Acanthurus chirurgus,Doctorfish,No,7.5,45.0,60", csvLines.get(3));
         }
 
         @Test
