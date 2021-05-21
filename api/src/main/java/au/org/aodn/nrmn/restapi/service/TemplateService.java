@@ -201,7 +201,7 @@ public class TemplateService {
                                 .getSpeciesAttributesByIds(observableItemIds).stream()
                                 .map(s -> SpeciesWithAttributesCsvRow.builder().letterCode(letterCodeMap.get(s.getId()))
                                                 .speciesName(s.getSpeciesName()).commonName(s.getCommonName())
-                                                .isInvertSized(s.getIsInvertSized() == true).l5(s.getL5()).l95(s.getL95())
+                                                .isInvertSized(s.getIsInvertSized() != null && s.getIsInvertSized() == true).l5(s.getL5()).l95(s.getL95())
                                                 .lMax(s.getLmax()).build())
                                 .collect(Collectors.toList());
                 List<SpeciesWithAttributesCsvRow> speciesResult = species.stream().collect(Collectors.toList());
