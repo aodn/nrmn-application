@@ -1,16 +1,16 @@
 package au.org.aodn.nrmn.restapi.validation.provider;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
-import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
-import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseGlobalRawValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.validation.validators.data.ATRCMethod7BlockCheck;
 import au.org.aodn.nrmn.restapi.validation.validators.format.ATRCDepthValidation;
 import au.org.aodn.nrmn.restapi.validation.validators.formatted.Method3QuadratMax50;
 import au.org.aodn.nrmn.restapi.validation.validators.formatted.TooOldFutureDate;
 import au.org.aodn.nrmn.restapi.validation.validators.format.IntegerFormatValidation;
-import au.org.aodn.nrmn.restapi.validation.validators.global.ATRCMethodCheck;
-import au.org.aodn.nrmn.restapi.validation.validators.global.ATRCSurveyGroupComplete;
+import au.org.aodn.nrmn.restapi.validation.validators.global.raw.ATRCMethodCheck;
+import au.org.aodn.nrmn.restapi.validation.validators.global.raw.ATRCSurveyGroupComplete;
 import cyclops.data.Seq;
 import cyclops.data.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ public class ATRCValidators implements ValidatorProvider {
     }
 
     @Override
-    public Seq<BaseGlobalValidator> getGlobalValidators() {
+    public Seq<BaseGlobalRawValidator> getGlobalValidators() {
         return Seq.of(
             atrcMethodCheck,
             atrcSurveyGroupComplete

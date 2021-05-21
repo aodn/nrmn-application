@@ -2,10 +2,8 @@ package au.org.aodn.nrmn.restapi.validation.validators.format;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
-import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
-import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseRowValidator;
 import cyclops.control.Validated;
-import cyclops.data.tuple.Tuple2;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -21,7 +19,7 @@ public class ATRCDepthValidation extends BaseRowValidator {
     private static final Pattern VALID_DEPTH_SURVEY_NUM = Pattern.compile("^[0-9]+(\\.[0-9])?$");
 
     public ATRCDepthValidation() {
-        super("Depth");
+        super("depth");
     }
 
     @Override

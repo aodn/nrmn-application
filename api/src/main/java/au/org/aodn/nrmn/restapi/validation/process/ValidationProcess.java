@@ -4,13 +4,16 @@ import au.org.aodn.nrmn.restapi.dto.stage.RowErrors;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowErrorRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
+import au.org.aodn.nrmn.restapi.util.OptionalUtil;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.model.MonoidRowValidation;
 import au.org.aodn.nrmn.restapi.validation.summary.DefaultSummary;
 import cyclops.companion.Monoids;
+import cyclops.companion.Semigroups;
 import cyclops.data.Seq;
 import cyclops.data.tuple.Tuple2;
 import lombok.val;
@@ -52,8 +55,16 @@ public class ValidationProcess extends ValidatorHelpers {
                         .map(row -> preProcess.validate(row, rawValidators))
                         .collect(Collectors.toList());
         val preCheck = rowChecks.stream().reduce(reducer.zero(), reducer::apply);
+        val rawErrorList = preCheck.getRows()
+                .stream()
+                .flatMap(r ->
+                        r.getErrors().stream()).toList();
+        val blockingErrors = rawErrorList
+                .stream()
+                .filter(err -> err.getErrorLevel().compareTo(ValidationLevel.BLOCKING) == 0)
+                .collect(Collectors.toList());
 
-        if (preCheck.getValid().isInvalid()) {
+        if (preCheck.getValid().isInvalid() && blockingErrors.size() > 0) {
             return rowsWithErrorsResponse(job, preCheck.getRows());
         }
 
@@ -64,21 +75,29 @@ public class ValidationProcess extends ValidatorHelpers {
                                 .map(seq -> seq.toHashMap(Tuple2::_1, Tuple2::_2)).stream())
                 .collect(Collectors.toList());
 
-
-        val formattedRows = rowWithHasMap.stream().map(preProcess::toFormat).collect(Collectors.toList());
-
-        val formattedResult = postProcess.process(formattedRows, job);
-        
-        if (formattedResult.getValid().isInvalid()) {
-            return rowsWithErrorsResponse(job, formattedResult.getRows());
-        }
-        
         val globalResult = globalProcess.process(job);
+
+        val formattedRows = rowWithHasMap
+                .stream()
+                .flatMap(tuple2s -> OptionalUtil.toStream(
+                        preProcess.toFormat(tuple2s, job.getIsExtendedSize()))
+                ).collect(Collectors.toList());
+        val globalFormatted = globalProcess.processFormatted(job, formattedRows);
+        val formattedResult = postProcess.process(formattedRows, job);
+
+        val formattedRowErrors =
+                formattedResult.getRows()
+                        .flatMap(row ->
+                                Seq.fromIterable(row.getErrors())
+                        ).toList();
+        formattedRowErrors.addAll(formattedRowErrors);
+        val msgSummary = summary.aggregate(formattedRowErrors);
+
         return new ValidationResponse(
                 job,
-                Collections.emptyList(),
-                Collections.emptyMap(),
-                toErrorList(globalResult),
+                formattedResult.getRows().map(row -> new RowErrors(row.getId(), row.getErrors())).toList(),
+                msgSummary,
+                toErrorList(globalResult.combine(Semigroups.stringConcat, globalFormatted)),
                 Collections.emptyList());
     }
 
@@ -92,7 +111,7 @@ public class ValidationProcess extends ValidatorHelpers {
         val msgSummary = summary.aggregate(errors);
         return new ValidationResponse(
                 job,
-                rows.map(row -> new RowErrors(row.getId(),row.getErrors())).toList(),
+                rows.map(row -> new RowErrors(row.getId(), row.getErrors())).toList(),
                 msgSummary,
                 Collections.emptyList(),
                 Collections.emptyList());

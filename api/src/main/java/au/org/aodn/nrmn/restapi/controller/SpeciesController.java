@@ -34,6 +34,7 @@ public class SpeciesController {
 
     @GetMapping
     public List<SpeciesDto> findSpecies(@RequestParam("species") String speciesName,
+                                        @RequestParam("includeSuperseded") Boolean includeSuperseded,
                                         SpeciesSearchType searchType) {
         if (searchType.equals(WORMS)) {
             return wormsService.partialSearch(speciesName)
@@ -41,7 +42,7 @@ public class SpeciesController {
             .map(aphiaRef -> mapper.map(aphiaRef, SpeciesDto.class))
             .collect(Collectors.toList());
         } else {
-            return observableItemRepository.fuzzySearch(PageRequest.of(0, 50), speciesName)
+            return observableItemRepository.fuzzySearch(PageRequest.of(0, 50), speciesName, includeSuperseded)
             .stream()
             .map(observableItem -> mapper.map(observableItem, SpeciesDto.class))
             .collect(Collectors.toList());

@@ -23,10 +23,10 @@ public class SiteGetDto {
     private String siteName;
 
     @Schema(title = "Longitude")
-    private Double longitude;
+    private Float longitude;
 
     @Schema(title = "Latitude")
-    private Double latitude;
+    private Float latitude;
 
     @Schema(title = "State")
     private String state;

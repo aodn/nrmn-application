@@ -53,7 +53,7 @@ const SpeciesSearch = () => {
 
   const dispatch = useDispatch();
   return (
-    <Box ml={6} style={{background: 'white'}} boxShadow={1} margin={3} width={1000}>
+    <Box ml={6} style={{background: 'white'}} boxShadow={1} margin={3} width="80%">
       <Box pl={6} py={2}>
         <Typography variant="h4">Species Lookup</Typography>
       </Box>
@@ -82,7 +82,7 @@ const SpeciesSearch = () => {
               variant="contained"
               disabled={loading || !(searchTerm?.length > 3)}
               startIcon={<Search></Search>}
-              onClick={() => dispatch(searchRequested({searchType: 'WORMS', species: searchTerm}))}
+              onClick={() => dispatch(searchRequested({searchType: 'WORMS', species: searchTerm, includeSuperseded: true}))}
               color="primary"
               style={{textTransform: 'none'}}
             >
@@ -110,7 +110,7 @@ const SpeciesSearch = () => {
               variant="contained"
               disabled={loading || !(searchTerm?.length > 3)}
               startIcon={<Search></Search>}
-              onClick={() => dispatch(searchRequested({searchType: 'NRMN', species: searchTerm}))}
+              onClick={() => dispatch(searchRequested({searchType: 'NRMN', species: searchTerm, includeSuperseded: true}))}
               color="primary"
               style={{textTransform: 'none'}}
             >
@@ -123,6 +123,7 @@ const SpeciesSearch = () => {
         <div style={{height: 640, backgroundColor: 'white'}}>
           <DataGrid
             className={classes.root}
+            disableSelectionOnClick
             density="compact"
             style={{fontSize: 4}}
             rows={searchResults}

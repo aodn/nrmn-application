@@ -13,6 +13,7 @@ import cyclops.control.Validated;
 
 public class SurveyContentsHandler implements SheetContentsHandler {
 
+    private final List<String> optionalHeaders;
     private List<String> requiredHeaders;
 
     private Validated<ErrorInput, List<StagedRow>> result;
@@ -23,8 +24,9 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     HashMap<Integer, String> measureJson = new HashMap<Integer, String>();
     List<StagedRow> stagedRows = new ArrayList<StagedRow>();
 
-    SurveyContentsHandler(List<String> requiredHeaders) {
+    SurveyContentsHandler(List<String> requiredHeaders, List<String> optionalHeaders) {
         this.requiredHeaders = requiredHeaders;
+        this.optionalHeaders = optionalHeaders;
     }
 
     public Validated<ErrorInput, List<StagedRow>> getResult() {
@@ -38,7 +40,11 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     public void startRow(int rowNum) {
         rowHasId = false;
         isHeaderRow = (rowNum == 0);
-        currentRow = StagedRow.builder().pos(rowNum - 1).build();
+        if (!isHeaderRow) {
+            currentRow = StagedRow.builder().pos(rowNum - 1).build();
+            for (String col : requiredHeaders)
+                setValue(col, "");
+        }
     }
 
     @Override
@@ -51,14 +57,14 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             if (missingHeaders.size() > 0)
                 errors.add("Missing Headers: " + String.join(", ", missingHeaders));
             foundHeaders.removeAll(requiredHeaders);
+            foundHeaders.removeAll(optionalHeaders);
             if (foundHeaders.size() > 0)
                 errors.add("Unexpected Headers: " + String.join(", ", foundHeaders));
-            if(errors.size() > 0)
+            if (errors.size() > 0)
                 result = Validated.invalid(new ErrorInput(String.join(". ", errors), "headers"));
         } else {
             if (rowHasId) {
-                if (measureJson.size() > 0)
-                    currentRow.setMeasureJson(new HashMap<Integer, String>(measureJson));
+                currentRow.setMeasureJson(new HashMap<Integer, String>(measureJson));
                 this.stagedRows.add(currentRow);
             }
         }
@@ -87,90 +93,83 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             columnValue = columnValue == null || columnValue.contentEquals("") || columnValue.contentEquals("null")
                     ? "0"
                     : columnValue;
-            switch (columnValue) {
-                case "ID":
-                    rowHasId = true;
-                    break;
-                case "Buddy":
-                    currentRow.setBuddy(formattedValue);
-                    break;
-                case "Diver":
-                    currentRow.setDiver(formattedValue);
-                    break;
-                case "Site No.":
-                    currentRow.setSiteCode(formattedValue);
-                    break;
-                case "Site Name":
-                    currentRow.setSiteName(formattedValue);
-                    break;
-                case "Latitude":
-                    currentRow.setLatitude(formattedValue);
-                    break;
-                case "Longitude":
-                    currentRow.setLongitude(formattedValue);
-                    break;
-                case "Date":
-                    currentRow.setDate(formattedValue);
-                    break;
-                case "vis":
-                    currentRow.setVis(formattedValue);
-                    break;
-                case "Direction":
-                    currentRow.setDirection(formattedValue);
-                    break;
-                case "Time":
-                    currentRow.setTime(formattedValue);
-                    break;
-                case "P-Qs":
-                    currentRow.setPqs(formattedValue);
-                    break;
-                case "Depth":
-                    currentRow.setDepth(formattedValue);
-                    break;
-                case "Method":
-                    currentRow.setMethod(formattedValue);
-                    break;
-                case "Block":
-                    currentRow.setBlock(formattedValue);
-                    break;
-                case "Code":
-                    currentRow.setCode(formattedValue);
-                    break;
-                case "Species":
-                    currentRow.setSpecies(formattedValue);
-                    break;
-                case "Common name":
-                    currentRow.setCommonName(formattedValue);
-                    break;
-                case "Total":
-                    currentRow.setTotal(formattedValue);
-                    break;
-                case "M2 Invert Sizing Species":
-                    currentRow.setM2InvertSizingSpecies(formattedValue);
-                    break;
-                case "L5":
-                    currentRow.setL5(formattedValue);
-                    break;
-                case "L95":
-                    currentRow.setL95(formattedValue);
-                    break;
-                case "Lmax":
-                    currentRow.setLMax(formattedValue);
-                    break;
-                case "Use InvertSizing":
-                    currentRow.setIsInvertSizing(formattedValue);
-                    break;
-                case "Inverts":
-                    currentRow.setInverts(formattedValue);
-                    measureJson.put(0, formattedValue);
-                    break;
-                default:
-                    if (requiredHeaders.contains(columnValue) && columnValue.matches("\\d.*"))
-                        measureJson.put(requiredHeaders.indexOf(columnValue) - requiredHeaders.indexOf("Inverts"),
-                                formattedValue);
-                    break;
-            }
+            setValue(columnValue, formattedValue);
         }
     }
 
+    private void setValue(String columnValue, String formattedValue) {
+        switch (columnValue) {
+            case "ID":
+                rowHasId = formattedValue.length() > 0;
+                break;
+            case "Buddy":
+                currentRow.setBuddy(formattedValue);
+                break;
+            case "Diver":
+                currentRow.setDiver(formattedValue);
+                break;
+            case "Site No.":
+                currentRow.setSiteCode(formattedValue);
+                break;
+            case "Site Name":
+                currentRow.setSiteName(formattedValue);
+                break;
+            case "Latitude":
+                currentRow.setLatitude(formattedValue);
+                break;
+            case "Longitude":
+                currentRow.setLongitude(formattedValue);
+                break;
+            case "Date":
+                currentRow.setDate(formattedValue);
+                break;
+            case "vis":
+                currentRow.setVis(formattedValue);
+                break;
+            case "Direction":
+                currentRow.setDirection(formattedValue);
+                break;
+            case "Time":
+                currentRow.setTime(formattedValue);
+                break;
+            case "P-Qs":
+                currentRow.setPqs(formattedValue);
+                break;
+            case "Depth":
+                currentRow.setDepth(formattedValue);
+                break;
+            case "Method":
+                currentRow.setMethod(formattedValue);
+                break;
+            case "Block":
+                currentRow.setBlock(formattedValue);
+                break;
+            case "Code":
+                currentRow.setCode(formattedValue);
+                break;
+            case "Species":
+                currentRow.setSpecies(formattedValue);
+                break;
+            case "Common name":
+                currentRow.setCommonName(formattedValue);
+                break;
+            case "Total":
+                currentRow.setTotal(formattedValue);
+                break;
+            case "Use InvertSizing":
+                currentRow.setIsInvertSizing(formattedValue);
+                break;
+            case "Inverts":
+                currentRow.setInverts(formattedValue);
+                if (formattedValue.length() > 0)
+                    measureJson.put(0, formattedValue);
+                break;
+            default:
+                if (formattedValue.length() > 0 && requiredHeaders.contains(columnValue)
+                        && columnValue.matches("\\d.*"))
+                    measureJson.put(requiredHeaders.indexOf(columnValue) - requiredHeaders.indexOf("Inverts"),
+                            formattedValue);
+                break;
+        }
+    }
 }

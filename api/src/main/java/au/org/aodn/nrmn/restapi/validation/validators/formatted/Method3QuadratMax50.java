@@ -4,11 +4,12 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
-import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.control.Validated;
 import lombok.val;
 
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -22,10 +23,10 @@ public class Method3QuadratMax50 extends BaseFormattedValidator {
         if (!target.getMethod().equals(3)) {
             return Validated.valid("not affected");
         }
-        val isUnder50 = IntStream.range(1, 5)
+        val isUnder50 = IntStream.range(1, 6)
                 .map(i -> target.getMeasureJson().getOrDefault(i, 0))
-                .allMatch(measure -> measure <= 50);
-        if (isUnder50)
+                .filter(measure -> measure > 50).toArray();
+        if (isUnder50.length == 0)
             return Validated.valid("quadrats under 50");
         return Validated.invalid(new StagedRowError(
                 new ErrorID(target.getId(),

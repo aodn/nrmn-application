@@ -68,6 +68,7 @@ const JobUpload = () => {
                   <Box padding={3}>
                     <DropzoneArea
                       showFileNames
+                      showAlerts={false}
                       dropzoneText={!formData.file ? 'Drop an XLSX file here or click to select' : ''}
                       style={{height: '20px'}}
                       acceptedFiles={['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}

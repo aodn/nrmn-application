@@ -1,9 +1,11 @@
-import React, {useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import React, {useState} from 'react';
+import {useSelector} from 'react-redux';
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
 import clsx from 'clsx';
+import Alert from '@material-ui/lab/Alert';
 import {ThemeProvider, createMuiTheme, responsiveFontSizes, makeStyles} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import Box from '@material-ui/core/Box';
 import {blueGrey, deepPurple} from '@material-ui/core/colors';
 import TopBar from './components/layout/TopBar';
 import SideMenu from './components/layout/SideMenu';
@@ -28,7 +30,6 @@ import ObservableItemEditTemplate from './components/templates/ObservableItemEdi
 import SurveyViewTemplate from './components/templates/SurveyViewTemplate';
 import SurveyEditTemplate from './components/templates/SurveyEditTemplate';
 import ExtractTemplateData from './components/datasheets/ExtractTemplateData';
-import {logout} from './components/auth/auth-reducer';
 
 const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ? process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
 
@@ -166,7 +167,6 @@ const referenceData = [
     template: {edit: SurveyEditTemplate, view: SurveyViewTemplate},
     list: {
       name: 'Surveys',
-      // key: 'surveys',
       showNew: false,
       schemaKey: 'SurveyRow',
       route: '/data/surveys',
@@ -179,18 +179,12 @@ const referenceData = [
 
 const App = () => {
   const classes = useStyles();
-  const dispatch = useDispatch();
   const leftSideMenuIsOpen = useSelector((state) => state.toggle.leftSideMenuIsOpen);
-  const loggedIn = useSelector((state) => state.auth.success);
-  const expiresToken = useSelector((state) => state.auth.expires);
-  useEffect(() => {
-    const now = +new Date();
-    const h24 = 86400000;
-    if (expiresToken && !(now - expiresToken < h24)) {
-      dispatch(logout());
-    }
-  }, [loggedIn]);
+  const expires = useSelector((state) => state.auth.expires);
+  const [applicationError, setApplicationError] = useState(null);
+  window.setApplicationError = setApplicationError;
 
+  const loggedIn = Date.now() < expires;
   let theme = createMuiTheme({
     palette: {
       text: {
@@ -238,13 +232,21 @@ const App = () => {
               [classes.contentShift]: leftSideMenuIsOpen
             })}
           >
+            {applicationError && (
+              <Box m={1}>
+                <Alert severity="error" variant="filled">
+                  {applicationError}
+                </Alert>
+              </Box>
+            )}
             <Switch>
-              <Route path="/login" component={Login} />
               <Route exact path="/home" component={Homepage} />
               <Route exact path="/404" component={FourOFour}></Route>
 
               <Redirect exact from="/" to="/home" />
-              {!loggedIn ? <Redirect to={`/login?redirect=${window.location.pathname}`} /> : null}
+
+              {!loggedIn && <Login />}
+              <Redirect exact from="/login" to="/home" />
 
               {/** Authenticated Pages */}
               <Route exact path="/jobs" component={JobList} />

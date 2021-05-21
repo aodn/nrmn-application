@@ -3,28 +3,26 @@ package au.org.aodn.nrmn.restapi.controller;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.exception.ValidationException;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemGetDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemPutDto;
+import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
-
-import java.util.stream.Collectors;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @Tag(name = "observable items")
@@ -62,10 +60,12 @@ public class ObservableItemController {
 
     @PutMapping("/observableItem/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ObservableItemGetDto updateObservableItem(@Valid @RequestBody ObservableItemPutDto observableItemPutDto) {
-        ObservableItem newObservableItem = mapper.map(observableItemPutDto, ObservableItem.class);
-        validate(newObservableItem);
-        ObservableItem persistedObservableItem = observableItemRepository.save(newObservableItem);
+    public ObservableItemGetDto updateObservableItem(@PathVariable Integer id,
+                                                     @Valid @RequestBody ObservableItemPutDto observableItemPutDto) {
+        ObservableItem observableItem = observableItemRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        mapper.map(observableItemPutDto, observableItem);
+        validate(observableItem);
+        ObservableItem persistedObservableItem = observableItemRepository.save(observableItem);
         return mapper.map(persistedObservableItem, ObservableItemGetDto.class);
     }
 

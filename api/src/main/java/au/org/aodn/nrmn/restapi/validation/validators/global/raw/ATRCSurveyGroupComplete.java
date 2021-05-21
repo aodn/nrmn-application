@@ -1,11 +1,11 @@
-package au.org.aodn.nrmn.restapi.validation.validators.global;
+package au.org.aodn.nrmn.restapi.validation.validators.global.raw;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.model.StagedSurveyTransect;
-import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseGlobalRawValidator;
 import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import cyclops.data.tuple.Tuple3;
@@ -15,11 +15,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-public class ATRCSurveyGroupComplete extends BaseGlobalValidator {
+public class ATRCSurveyGroupComplete extends BaseGlobalRawValidator {
 
     @Autowired
     StagedRowRepository stagedRowRepo;

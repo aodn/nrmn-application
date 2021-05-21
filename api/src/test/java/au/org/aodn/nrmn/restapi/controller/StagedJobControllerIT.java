@@ -1,14 +1,10 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.restapi.RestApiApplication;
-import au.org.aodn.nrmn.restapi.controller.utils.RequestWrapper;
-import au.org.aodn.nrmn.restapi.dto.stage.UploadResponse;
-import au.org.aodn.nrmn.restapi.security.JwtTokenProvider;
-import au.org.aodn.nrmn.restapi.service.S3ClientProvider;
-import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
-import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
-import lombok.val;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+import static org.testcontainers.containers.localstack.LocalStackContainer.Service.S3;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -29,19 +25,21 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import au.org.aodn.nrmn.restapi.RestApiApplication;
+import au.org.aodn.nrmn.restapi.controller.utils.RequestWrapper;
+import au.org.aodn.nrmn.restapi.dto.stage.UploadResponse;
+import au.org.aodn.nrmn.restapi.security.JwtTokenProvider;
+import au.org.aodn.nrmn.restapi.service.S3ClientProvider;
+import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
+import lombok.val;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.CreateBucketResponse;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
-import static org.testcontainers.containers.localstack.LocalStackContainer.Service.S3;
 
 @Testcontainers
 @SpringBootTest(classes = RestApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -62,7 +60,7 @@ class StagedJobControllerIT {
     JwtTokenProvider jwtProvider;
 
     @Value("${app.s3.bucket}")
-    private String bucket;
+    private static String bucket = "nrmn-dev";
 
     @Autowired
     public TestRestTemplate testRestTemplate;
@@ -81,7 +79,7 @@ class StagedJobControllerIT {
                 )))
                 .region(Region.of(localstack.getRegion()))
                 .build();
-        CreateBucketResponse bucketResp = client.createBucket(CreateBucketRequest.builder().bucket("nrmn-dev").build());
+        CreateBucketResponse bucketResp = client.createBucket(CreateBucketRequest.builder().bucket(bucket).build());
         assertTrue(bucketResp.sdkHttpResponse().isSuccessful());
     }
 
@@ -91,7 +89,6 @@ class StagedJobControllerIT {
         client = null;
 
     }
-
 
     @Test
     @WithUserDetails("test@gmail.com")
@@ -150,16 +147,8 @@ class StagedJobControllerIT {
 
         assertEquals(resp.getStatusCode(), HttpStatus.OK);
         assertEquals(resp.getBody().getFile().get().getRowCount(), 34);
-        val path = "/raw-survey/correctLongHeader.xlsx-" + resp.getBody().getFile().get().getJobId() + ".xlsx";
-        
-        val s3resp = client
-                .getObject(GetObjectRequest.builder().bucket(bucket).key(path).build())
-                .response();
-
-
-
-
     }
+
     @Test
     @WithUserDetails("test@gmail.com")
     public void emptyFileShouldFail() throws Exception {

@@ -5,9 +5,8 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
-import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseRowValidator;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
-import com.graphbuilder.geom.Point2d;
 import cyclops.companion.Monoids;
 import cyclops.control.Try;
 import cyclops.control.Validated;
@@ -16,7 +15,6 @@ import cyclops.data.tuple.Tuple2;
 import lombok.val;
 import org.locationtech.jts.geom.*;
 
-import java.awt.geom.Point2D;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -24,7 +22,8 @@ public class CoordinatesDataCheck extends BaseRowValidator {
     private Site site;
 
     public CoordinatesDataCheck(Site site) {
-        super("Latitude, Longitude");
+        super("latitude, l" +
+                "ongitude");
         this.site = site;
     }
 
@@ -86,11 +85,11 @@ public class CoordinatesDataCheck extends BaseRowValidator {
                 new ErrorID(
                         target.getId(),
                         target.getStagedJob().getId(),
-                        "Lat and Long didn't match with the Site"
+                        "Latitude and Longitude didn't match with the Site"
                 ),
                 ValidationCategory.DATA,
                 ValidationLevel.BLOCKING,
-                "longitude, Lattitude",
+                "Longitude, Latitude",
 
                 target
         ));

@@ -25,7 +25,7 @@ class Method3QuadratMax50Test extends FormattedTestProvider{
                 .put(1, 30)
                 .put(3, 15)
                 .put(4, 20)
-                .put(5, 50)
+                .put(5, 49)
                 .put(2, 20).build());
 
         val res = validationRule.valid(formatted);

@@ -6,13 +6,13 @@ import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
-import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseRowValidator;
 import cyclops.control.Validated;
 import org.apache.commons.lang3.EnumUtils;
 
 public class DirectionDataCheck extends BaseRowValidator {
     public DirectionDataCheck() {
-        super("Direction");
+        super("direction");
     }
 
     @Override

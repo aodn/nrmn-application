@@ -16,7 +16,7 @@ public class ObservableItemExists extends BaseRowExistingEntity<ObservableItem, 
 
     @Autowired
     ObservableItemExists(ObservableItemRepository observableItemRepo) {
-        super("Species", observableItemRepo);
+        super("species", observableItemRepo);
     }
 
     @Override

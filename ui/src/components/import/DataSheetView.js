@@ -54,6 +54,7 @@ const DataSheetView = () => {
   const dispatch = useDispatch();
   const errSelected = useSelector((state) => state.import.errSelected);
   const [gridApi, setGridApi] = useState(null);
+
   const job = useSelector((state) => state.import.job);
   const colDefinition = job && job.isExtendedSize ? ColumnDef.concat(ExtendedSize) : ColumnDef;
   const enableSubmit = useSelector((state) => state.import.enableSubmit);
@@ -234,20 +235,23 @@ const DataSheetView = () => {
       dispatch(ValidationFinished());
       setSelectedCells(false);
     }
+  }, [validationErrors, selectedCells]);
 
-    if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
+  useEffect(() => {
+    if (gridApi  && errSelected.ids && errSelected.ids.length > 0) {
       const firstRow = gridApi.getRowNode(errSelected.ids[0]);
       gridApi.ensureIndexVisible(firstRow.rowIndex, 'middle');
       gridApi.deselectAll();
       errSelected.ids.forEach((id) => {
         const row = gridApi.getRowNode(id);
-        if (row.isSelected) {
-          row.setSelected(true);
-        }
+        row.setSelected(true);
         return row;
       });
+      gridApi.ensureColumnVisible(errSelected.columnTarget.toLowerCase());
+
     }
-  }, [validationErrors, selectedCells]);
+  }, [errSelected]);
+
   const size = useWindowSize();
   return (
     <Box mt={2}>
@@ -294,7 +298,7 @@ const DataSheetView = () => {
               size="small"
               onClick={handleSubmit}
               label="Submit"
-              disabled={!enableSubmit}
+              disabled={!enableSubmit || canSave}
               color="primary"
             >
               <CloudUploadIcon className={classes.extendedIcon} />
@@ -338,14 +342,32 @@ const DataSheetView = () => {
       <div
         onKeyDown={onKeyDown}
         id="validation-grid"
-        style={{height: size.height - 210, width: '100%', marginTop: 25}}
+        style={{height: size.height - 230, width: '100%', marginTop: 25}}
         className={'ag-theme-material'}
       >
         <AgGridReact
           getRowNodeId={(data) => data.id}
           pivotMode={false}
           pivotColumnGroupTotals={'before'}
-          sideBar={true}
+          sideBar={{
+            toolPanels: [
+              {
+                id: 'columns',
+                labelDefault: 'Columns',
+                labelKey: 'columns',
+                iconKey: 'columns',
+                toolPanel: 'agColumnsToolPanel'
+              },
+              {
+                id: 'filters',
+                labelDefault: 'Filters',
+                labelKey: 'filters',
+                iconKey: 'filter',
+                toolPanel: 'agFiltersToolPanel'
+              }
+            ],
+            defaultToolPanel: ''
+          }}
           autoGroupColumnDef={{
             width: 20,
             cellRendererParams: {
@@ -358,6 +380,7 @@ const DataSheetView = () => {
           groupDefaultExpanded={4}
           rowHeight={18}
           animateRows={true}
+          suppressCopyRowsToClipboard = {false}
           groupMultiAutoColumn={true}
           groupHideOpenParents={true}
           rowSelection="multiple"

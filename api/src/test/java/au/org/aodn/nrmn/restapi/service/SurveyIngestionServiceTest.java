@@ -35,6 +35,8 @@ public class SurveyIngestionServiceTest {
     @Mock
     SurveyRepository surveyRepository;
     @Mock
+    SiteRepository siteRepo;
+    @Mock
     SurveyMethodRepository surveyMethodRepository;
     @Mock
     ObservableItemRepository observableItemRepository;
@@ -49,6 +51,7 @@ public class SurveyIngestionServiceTest {
     void init() {
         MockitoAnnotations.initMocks(this);
         when(surveyRepository.save(any())).then(s -> s.getArgument(0));
+        when(siteRepo.save(any())).then(s -> s.getArgument(0));
 
         StagedRow ref = StagedRow.builder()
                 .stagedJob(StagedJob.builder()
@@ -60,7 +63,6 @@ public class SurveyIngestionServiceTest {
                 .block(1)
                 .method(2)
                 .diver(diver)
-                .buddy(Diver.builder().initials("MAX").build())
                 .species(ObservableItem.builder().observableItemName("THE SPECIES").build())
                 .site(Site.builder().siteCode("A SITE").build())
                 .depth(1)
@@ -70,11 +72,7 @@ public class SurveyIngestionServiceTest {
                 .date(LocalDate.of(2003, 03, 03))
                 .time(Optional.of(LocalTime.of(12, 34, 56)))
                 .pqs(diver)
-                .m2InvertSizingSpecies(5)
-                .isInvertSizing(true)
-                .l5(2.1)
-                .l95(7.2)
-                .lMax(50)
+                .isInvertSizing(Optional.of(true))
                 .code("AAA")
                 .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build())
                 .ref(ref)
@@ -84,6 +82,7 @@ public class SurveyIngestionServiceTest {
     @Test
     void getSurveyForNewSurvey() {
         when(surveyRepository.findOne(any(Example.class))).thenReturn(Optional.empty());
+        when(siteRepo.save(any())).then(s -> s.getArgument(0));
 
         Survey survey = surveyIngestionService.getSurvey(rowBuilder.build());
         assertEquals(1, survey.getDepth());

@@ -3,7 +3,7 @@ package au.org.aodn.nrmn.restapi.validation.validators.entities;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
-import au.org.aodn.nrmn.restapi.validation.BaseFormattedValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.control.Validated;
 
@@ -11,6 +11,7 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory.DATA;
 import static au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel.BLOCKING;
@@ -21,7 +22,7 @@ public class SurveyExists extends BaseFormattedValidator {
     private final SurveyRepository surveyRepository;
 
     public SurveyExists(SurveyRepository surveyRepository) {
-        super("Survey");
+        super("survey");
         this.surveyRepository = surveyRepository;
     }
 
@@ -42,7 +43,7 @@ public class SurveyExists extends BaseFormattedValidator {
 
         return invalid(target, "Survey " + existingSurvey.getSurveyId() + " includes [" +
                         target.getSite().getSiteCode() + ", " + target.getDate() + ", " + target.getDepth() + "]",
-                DATA, BLOCKING);
+                DATA, BLOCKING, Optional.empty());
     }
 
     private Date toDate(StagedRowFormatted target) {

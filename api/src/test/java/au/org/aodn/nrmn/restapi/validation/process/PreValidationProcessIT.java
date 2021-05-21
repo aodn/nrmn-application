@@ -38,6 +38,7 @@ class PreValidationProcessIT {
         program.setProgramName("RLS");
         job.setProgram(program);
         val stage = new StagedRow();
+        stage.setId(1L);
         stage.setSiteCode("EYR71");
         stage.setSiteName("South East Slade Point");
         stage.setLongitude("154");

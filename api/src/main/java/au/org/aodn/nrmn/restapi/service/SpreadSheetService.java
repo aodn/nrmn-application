@@ -33,27 +33,38 @@ public class SpreadSheetService {
     @Value("${app.excel.headers.short}")
     private List<String> shortHeadersRef;
 
+    @Value("${app.excel.headers.short.ignore}")
+    private List<String> ignoreShortHeaders;
+
     @Value("${app.excel.headers.long}")
     private List<String> longHeadersRef;
+
+    @Value("${app.excel.headers.long.ignore}")
+    private List<String> ignoreLongHeaders;
 
     @Autowired
     private S3IO s3client;
 
     public Validated<ErrorInput, List<StagedRow>> stageXlsxFile(MultipartFile file, Boolean withExtendedSizes) {
+
+        ZipSecureFile.setMinInflateRatio(0.0d);
+
         try (InputStream inputStream = file.getInputStream()) {
 
             OPCPackage opcPackage = OPCPackage.open(inputStream);
             XSSFReader xssfReader = new XSSFReader(opcPackage);
-            ZipSecureFile.setMinInflateRatio(0.0d);
 
             SurveyContentsHandler surveyContentsHandler = new SurveyContentsHandler(
-                    (withExtendedSizes) ? longHeadersRef : shortHeadersRef);
+                    (withExtendedSizes) ? longHeadersRef : shortHeadersRef,
+                    (withExtendedSizes) ? ignoreLongHeaders: ignoreShortHeaders);
 
             StylesTable styles = xssfReader.getStylesTable();
 
             ReadOnlySharedStringsTable sharedStrings = new ReadOnlySharedStringsTable(opcPackage);
 
-            ContentHandler handler = new XSSFSheetXMLHandler(styles, sharedStrings, surveyContentsHandler, false);
+            SurveyCellFormatter surveyCellFormatter = new SurveyCellFormatter();
+            ContentHandler handler = new XSSFSheetXMLHandler(styles, sharedStrings, surveyContentsHandler,
+                    surveyCellFormatter, false);
 
             XMLReader parser = XMLReaderFactory.createXMLReader();
             parser.setContentHandler(handler);

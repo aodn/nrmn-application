@@ -5,7 +5,7 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
-import au.org.aodn.nrmn.restapi.validation.BaseRowValidator;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseRowValidator;
 import cyclops.control.Validated;
 import lombok.val;
 
@@ -27,7 +27,7 @@ public class Block0DataValidation extends BaseRowValidator {
             return Validated.invalid(new StagedRowError(
                     new ErrorID(target.getId(),
                             target.getStagedJob().getId(),
-                            "Block 0 must happen with M0,M3, M4, M5"),
+                            "Block 0 must happen with M0, M3, M4, M5"),
                     ValidationCategory.DATA,
                     ValidationLevel.BLOCKING,
                     columnTarget,

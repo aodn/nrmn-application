@@ -1,8 +1,9 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import au.org.aodn.nrmn.restapi.controller.assembler.SiteListItemAssembler;
-import au.org.aodn.nrmn.restapi.controller.exception.DuplicateSiteException;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
+import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
+import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
 import au.org.aodn.nrmn.restapi.dto.site.SiteDto;
 import au.org.aodn.nrmn.restapi.dto.site.SiteGetDto;
 import au.org.aodn.nrmn.restapi.dto.site.SiteListItem;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -76,22 +78,28 @@ public class SiteController {
     }
 
     @PostMapping("/sites")
-    @ResponseStatus(HttpStatus.CREATED)
-    public SiteDto newSite(@Valid @RequestBody SiteDto sitePostDto) {
-        validatePost(sitePostDto);
+    public ResponseEntity newSite(@Valid @RequestBody SiteDto sitePostDto) {
         Site newSite = mapper.map(sitePostDto, Site.class);
+        ValidationErrors errors = validateConstraints(newSite);
+        if (!errors.getErrors().isEmpty()) {
+            return ResponseEntity.badRequest().body(errors);
+        }
         Site persistedSite = siteRepository.save(newSite);
-        return mapper.map(persistedSite, SiteDto.class);
+        SiteDto persistedSiteDto = mapper.map(persistedSite, SiteDto.class);
+        return ResponseEntity.status(HttpStatus.CREATED).body(persistedSiteDto);
     }
 
     @PutMapping("/sites/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public SiteDto updateSite(@PathVariable Integer id, @Valid @RequestBody SiteDto sitePutDto) {
-        validatePut(id, sitePutDto);
+    public ResponseEntity updateSite(@PathVariable Integer id, @Valid @RequestBody SiteDto sitePutDto) {
         Site site = siteRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         mapper.map(sitePutDto, site);
+        ValidationErrors errors = validateConstraints(site);
+        if (!errors.getErrors().isEmpty()) {
+            return ResponseEntity.badRequest().body(errors);
+        }
         Site persistedSite = siteRepository.save(site);
-        return mapper.map(persistedSite, SiteDto.class);
+        SiteDto updatedSiteDto = mapper.map(persistedSite, SiteDto.class);
+        return ResponseEntity.ok().body(updatedSiteDto);
     }
 
     @DeleteMapping("/sites/{id}")
@@ -100,29 +108,35 @@ public class SiteController {
         siteRepository.deleteById(id);
     }
 
-    private void validatePost(@RequestBody @Valid SiteDto sitePostDto) {
-        Optional<Site> existingSite = getSiteWithCodeAndName(sitePostDto.getSiteCode(), sitePostDto.getSiteName());
-
-        if (existingSite.isPresent()) {
-            throw new DuplicateSiteException();
-        }
-    }
-
-    private void validatePut(Integer id, SiteDto sitePutDto) {
-        Optional<Site> existingSite = getSiteWithCodeAndName(sitePutDto.getSiteCode(), sitePutDto.getSiteName());
-
-        if (existingSite.isPresent() && !existingSite.get().getSiteId().equals(id)) {
-            throw new DuplicateSiteException();
-        }
-    }
-
-    private Optional<Site> getSiteWithCodeAndName(String siteCode, String siteName) {
-        Example<Site> siteWithCodeAndNameExample = Example.of(
+    private ValidationErrors validateConstraints(Site site) {
+        List<ValidationError> errors = new ArrayList<>();
+        
+        Example<Site> siteWithCodeExample = Example.of(
                 Site.builder()
-                    .siteCode(siteCode)
-                    .siteName(siteName)
+                    .siteCode(site.getSiteCode())
                     .build());
 
-        return siteRepository.findOne(siteWithCodeAndNameExample);
+        Optional<Site> existingSite = siteRepository.findOne(siteWithCodeExample);
+
+        if (existingSite.isPresent() && !existingSite.get().getSiteId().equals(site.getSiteId())) {
+            errors.add(new ValidationError("Site", "siteCode", site.getSiteCode(), 
+            "A site with this code already exists."));
+        }
+
+        Example<Site> siteWithLocationAndNameExample = Example.of(
+                Site.builder()
+                    .location(site.getLocation())
+                    .siteName(site.getSiteName())
+                    .build());
+
+        Optional<Site> existingSiteWithName = siteRepository.findOne(siteWithLocationAndNameExample);
+        
+        if (existingSiteWithName.isPresent() && !existingSiteWithName.get().getSiteId().equals(site.getSiteId())) {
+            errors.add(new ValidationError("Site", "siteName", site.getSiteName(), 
+            "A site with this name already exists in this location."));
+        }
+
+        return new ValidationErrors(errors);
     }
+
 }

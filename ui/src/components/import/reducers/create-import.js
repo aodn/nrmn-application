@@ -81,7 +81,6 @@ export const importRow = (row) => {
     .forEach((numKey) => {
       var pos = measureKey.indexOf(numKey);
       measure[pos] = row[numKey];
-      delete row[numKey];
     });
   row.measureJson = measure;
   return row;
@@ -95,7 +94,6 @@ export const flatten = (row) => {
   }
   return row;
 };
-
 
 const importSlice = createSlice({
   name: 'import',
@@ -111,22 +109,23 @@ const importSlice = createSlice({
     },
     validationReady: (state, action) => {
       state.globalWarnings = state.globalErrors = [];
+      state.errorsByMsg = [];
+      state.enableSubmit = false;
+
       if (action.payload.errors.length > 0) {
         state.validationErrors = action.payload.errors.reduce((acc, err) => {
           acc[err.id] = err.errors;
           return acc;
         }, {});
-       const errorsList =  action.payload.errors.map(err =>err.errors);
-        const validationErrors = errorsList.reduce((acc,err) => [...acc, ...err], []);
-        state.enableSubmit = validationErrors.some((err) => err.errorLevel === 'BLOCKING') === 0;
+        const errorsList = action.payload.errors.map((err) => err.errors);
+        const validationErrors = errorsList.reduce((acc, err) => [...acc, ...err], []);
+        state.enableSubmit = !validationErrors.some((err) => err.errorLevel === 'BLOCKING');
         state.errorsByMsg = action.payload.summaries;
-      } else if (action.payload.errorGlobal) {
+      }
+      if (action.payload.errorGlobal) {
         state.globalWarnings = action.payload.errorGlobal.filter((e) => e.errorLevel === 'WARNING');
         state.globalErrors = action.payload.errorGlobal.filter((e) => e.errorLevel === 'BLOCKING');
-        state.enableSubmit = state.globalErrors.length === 0;
-      } else {
-        state.enableSubmit = true;
-        state.errorsByMsg = [];
+        state.enableSubmit = state.enableSubmit && state.globalErrors.length === 0;
       }
       state.validationLoading = false;
     },

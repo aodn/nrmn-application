@@ -26,7 +26,7 @@ public interface DiverRepository
         extends JpaRepository<Diver, Integer>, JpaSpecificationExecutor<Diver>, EntityCriteria<Diver> {
 
     @Override
-    @Query("SELECT d FROM Diver d WHERE lower(d.initials) = lower(:initials)")
+    @Query("SELECT d FROM Diver d WHERE lower(d.initials) = lower(:initials) or  lower(d.fullName) = lower(:initials)")
     @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
     List<Diver> findByCriteria(@Param("initials") String initials);
 

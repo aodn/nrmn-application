@@ -1,27 +1,22 @@
-package au.org.aodn.nrmn.restapi.validation.validators.global;
+package au.org.aodn.nrmn.restapi.validation.validators.global.raw;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
-import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.model.RowMethodBlock;
-import au.org.aodn.nrmn.restapi.validation.BaseGlobalValidator;
-import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseGlobalRawValidator;
 import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel.BLOCKING;
 
 @Component
-public class RLSMethodBlockAssociation extends BaseGlobalValidator {
+public class RLSMethodBlockAssociation extends BaseGlobalRawValidator {
 
     @Autowired
     StagedRowRepository stageRowRepo;
@@ -45,7 +40,7 @@ public class RLSMethodBlockAssociation extends BaseGlobalValidator {
                             .reduce("", (e1 , e2) -> e1 + e2);
 
                     if (!blockSum.startsWith("12"))
-                        return invalid(job.getId(), item.getKey() + "invalid block combination", BLOCKING);
+                        return invalid(job.getId(), item.getKey() + " invalid block combination", BLOCKING);
 
                     return Validated.<StagedRowError, String>valid(item.getKey() + " has valid method/block");
                 })
