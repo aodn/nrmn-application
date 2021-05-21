@@ -42,9 +42,7 @@ public class TemplateService {
         private static final CSVFormat DIVERS_FORMAT = CSVFormat.DEFAULT.withHeader("Initials", "Full Name");
         private static final CSVFormat SITES_FORMAT = CSVFormat.DEFAULT.withHeader("Site", "Site Name", "Latitude",
                         "Longitude", "Region");
-        private static final CSVFormat M1_FORMAT = CSVFormat.DEFAULT.withHeader("Letter Code", "Species Name",
-                        "Common Name", "L5", "L95", "LMax");
-        private static final CSVFormat M2_FORMAT = CSVFormat.DEFAULT.withHeader("Letter Code", "Species Name",
+        private static final CSVFormat M1_M2_FORMAT = CSVFormat.DEFAULT.withHeader("Letter Code", "Species Name",
                         "Common Name", "Species Invert Sizing", "L5", "L95", "LMax");
         private static final CSVFormat M3_FORMAT = CSVFormat.DEFAULT.withHeader("Letter Code", "Species Name",
                         "Common Name");
@@ -84,17 +82,18 @@ public class TemplateService {
                 List<Integer> siteIds = sites.stream().map(s -> s.getSiteId()).collect(Collectors.toList());
                 List<LetterCodeMapping> letterCodeMappings = LetterCodeRepository.getForSiteIds(siteIds);
                 HashMap<Long, String> letterCodeMap = new HashMap<Long, String>();
-                letterCodeMappings.forEach(m -> letterCodeMap.put(Long.valueOf(m.getObservableItemId()), m.getLetterCode()));
+                letterCodeMappings.forEach(
+                                m -> letterCodeMap.put(Long.valueOf(m.getObservableItemId()), m.getLetterCode()));
 
                 List<SpeciesWithAttributesCsvRow> speciesWithAttributes = getSpeciesForTemplate(1, siteIds,
                                 letterCodeMap);
                 zipOutputStream.putNextEntry(new ZipEntry("m1species.csv"));
-                writeSpeciesCsv(writer, M1_FORMAT, speciesWithAttributes, false);
+                writeSpeciesCsv(writer, M1_M2_FORMAT, speciesWithAttributes);
                 writer.flush();
                 zipOutputStream.closeEntry();
 
                 zipOutputStream.putNextEntry(new ZipEntry("m2species.csv"));
-                writeSpeciesCsv(writer, M2_FORMAT, getSpeciesForTemplate(2, siteIds, letterCodeMap), true);
+                writeSpeciesCsv(writer, M1_M2_FORMAT, getSpeciesForTemplate(2, siteIds, letterCodeMap));
                 writer.flush();
                 zipOutputStream.closeEntry();
 
@@ -126,7 +125,7 @@ public class TemplateService {
                                 .map(this::getSpeciesAsCsvRecord).collect(toList());
                 csvPrinter.printRecords(records);
         }
-        
+
         public void writeDiversCsv(Writer writer, Collection<Diver> divers) throws IOException {
                 CSVPrinter csvPrinter = DIVERS_FORMAT.print(writer);
                 List<List<String>> records = divers.stream().distinct().sorted(Comparator.comparing(Diver::getInitials))
@@ -176,24 +175,18 @@ public class TemplateService {
                 return sites.collect(toSet());
         }
 
-        public void writeSpeciesCsv(Writer writer, CSVFormat csvFormat, Collection<SpeciesWithAttributesCsvRow> species,
-                        boolean withInverts) throws IOException {
+        public void writeSpeciesCsv(Writer writer, CSVFormat csvFormat, Collection<SpeciesWithAttributesCsvRow> species)
+                        throws IOException {
                 CSVPrinter csvPrinter = csvFormat.print(writer);
                 List<List<String>> records = species.stream().distinct()
                                 .sorted(Comparator.comparing(SpeciesWithAttributesCsvRow::getSpeciesName))
-                                .map(withInverts ? this::getSpeciesAsCsvRecordWithInverts : this::getSpeciesAsCsvRecord)
-                                .collect(toList());
+                                .map(this::getSpeciesAsCsvRecord).collect(toList());
                 csvPrinter.printRecords(records);
         }
 
         private List<String> getSpeciesAsCsvRecord(SpeciesWithAttributesCsvRow species) {
                 return Arrays.asList(species.getLetterCode(), species.getSpeciesName(), species.getCommonName(),
-                                toString(species.getL5()), toString(species.getL95()), toString(species.getLMax()));
-        }
-
-        private List<String> getSpeciesAsCsvRecordWithInverts(SpeciesWithAttributesCsvRow species) {
-                return Arrays.asList(species.getLetterCode(), species.getSpeciesName(), species.getCommonName(),
-                                species.getIsInvertSized() ? "Yes" : "No", toString(species.getL5()),
+                                species.getIsInvertSized() != null && species.getIsInvertSized() == true ? "Yes" : "No", toString(species.getL5()),
                                 toString(species.getL95()), toString(species.getLMax()));
         }
 
@@ -205,10 +198,12 @@ public class TemplateService {
                 List<Integer> observableItemIds = observableItemRows.stream()
                                 .map(ObservableItemRow::getObservableItemId).collect(toList());
                 List<SpeciesWithAttributesCsvRow> species = observationRepository
-                                .getSpeciesAttributesByIds(observableItemIds).stream().map(s -> SpeciesWithAttributesCsvRow.builder().letterCode(letterCodeMap.get(s.getId()))
-                                .speciesName(s.getSpeciesName()).commonName(s.getCommonName())
-                                .isInvertSized(s.getIsInvertSized()).l5(s.getL5()).l95(s.getL95()).lMax(s.getLmax()).build())
-                        .collect(Collectors.toList());
+                                .getSpeciesAttributesByIds(observableItemIds).stream()
+                                .map(s -> SpeciesWithAttributesCsvRow.builder().letterCode(letterCodeMap.get(s.getId()))
+                                                .speciesName(s.getSpeciesName()).commonName(s.getCommonName())
+                                                .isInvertSized(s.getIsInvertSized() == true).l5(s.getL5()).l95(s.getL95())
+                                                .lMax(s.getLmax()).build())
+                                .collect(Collectors.toList());
                 List<SpeciesWithAttributesCsvRow> speciesResult = species.stream().collect(Collectors.toList());
                 speciesResult.add(SpeciesWithAttributesCsvRow.builder().letterCode("snd").speciesName("Survey Not Done")
                                 .isInvertSized(false).build());

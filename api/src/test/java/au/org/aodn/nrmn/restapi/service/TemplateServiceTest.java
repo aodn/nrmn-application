@@ -183,7 +183,7 @@ public class TemplateServiceTest {
                 StringWriter stringWriter = new StringWriter();
                 PrintWriter printWriter = new PrintWriter(stringWriter);
                 templateService.writeSpeciesCsv(printWriter, CSVFormat.DEFAULT.withHeader("Letter Code", "Species Name",
-                                "Common Name", "L5", "L95", "LMax"), Arrays.asList(s1, s2, s3), false);
+                                "Common Name", "L5", "L95", "LMax"), Arrays.asList(s1, s2, s3));
                 List<String> csvLines = Arrays.stream(stringWriter.toString().split("\n")).map(String::trim)
                                 .collect(Collectors.toList());
 
