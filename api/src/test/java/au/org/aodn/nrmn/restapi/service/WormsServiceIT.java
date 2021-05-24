@@ -17,7 +17,7 @@ public class WormsServiceIT {
     public void partialSearchReturnsResults() {
         WebClient wormsClient = WebClient.create("https://www.marinespecies.org/rest");
         WormsService wormsService = new WormsService(wormsClient);
-        List<SpeciesRecord> results = wormsService.partialSearch("Paratrachichthys trailli");
+        List<SpeciesRecord> results = wormsService.partialSearch(0, "Paratrachichthys trailli");
         assertThat(results.isEmpty(), is(false));
     }
 

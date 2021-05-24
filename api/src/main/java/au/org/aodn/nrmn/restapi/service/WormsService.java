@@ -26,11 +26,12 @@ public class WormsService {
         this.wormsClient = wormsClient;
     }
 
-    public List<SpeciesRecord> partialSearch(String searchTerm) {
+    public List<SpeciesRecord> partialSearch(int page, String searchTerm) {
         Mono<SpeciesRecord[]> response = wormsClient
                 .get().uri(uriBuilder ->
                         uriBuilder.path("/AphiaRecordsByName")
                                   .pathSegment("%" + removeTrailingJunk(searchTerm))
+                                  .queryParam("offset", page * 50 + 1)
                                   .build())
                 .retrieve()
                 .bodyToMono(SpeciesRecord[].class);
