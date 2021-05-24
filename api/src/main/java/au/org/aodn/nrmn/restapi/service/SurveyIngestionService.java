@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.service;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -84,7 +85,7 @@ public class SurveyIngestionService {
         return existingSurvey.orElseGet(() -> surveyRepository.save(Survey.builder().depth(stagedRow.getDepth())
                 .surveyNum(stagedRow.getSurveyNum().orElse(null)).direction(stagedRow.getDirection().toString())
                 .site(site).surveyDate(Date.valueOf(stagedRow.getDate()))
-                .surveyTime(Time.valueOf(stagedRow.getTime().orElse(null))).visibility(stagedRow.getVis().orElse(null))
+                .surveyTime(Time.valueOf(stagedRow.getTime().orElse(LocalTime.NOON))).visibility(stagedRow.getVis().orElse(null))
                 .program(stagedRow.getRef().getStagedJob().getProgram()).build()));
     }
 
