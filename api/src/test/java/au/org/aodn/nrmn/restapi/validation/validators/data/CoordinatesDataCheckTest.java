@@ -14,8 +14,8 @@ class CoordinatesDataCheckTest extends ValidatorHelpers {
     @Test
     void latLongCorrectShouldBeOk() {
         Site site = new Site();
-        site.setLatitude(48.8566);
-        site.setLongitude(2.3522);
+        site.setLatitude(48.8566F);
+        site.setLongitude(2.3522F);
         site.calcGeom();
         val job = new StagedJob();
         job.setId(1L);
@@ -32,8 +32,8 @@ class CoordinatesDataCheckTest extends ValidatorHelpers {
     @Test
     void notMatchingSiteShouldFail() {
         Site site = new Site();
-        site.setLatitude(48.9566);
-        site.setLongitude(2.3522);
+        site.setLatitude(48.9566F);
+        site.setLongitude(2.3522F);
         site.calcGeom();
         val job = new StagedJob();
         job.setId(1L);
@@ -50,8 +50,8 @@ class CoordinatesDataCheckTest extends ValidatorHelpers {
     @Test
     void latIncorrectShouldFail() {
         Site site = new Site();
-        site.setLatitude(48.8566);
-        site.setLongitude(2.3522);
+        site.setLatitude(48.8566F);
+        site.setLongitude(2.3522F);
         site.calcGeom();
 
         val job = new StagedJob();
@@ -69,8 +69,8 @@ class CoordinatesDataCheckTest extends ValidatorHelpers {
     @Test
     void longIncorrectShouldFail() {
         Site site = new Site();
-        site.setLatitude(48.8566);
-        site.setLongitude(2.3522);
+        site.setLatitude(48.8566F);
+        site.setLongitude(2.3522F);
         site.calcGeom();
         val job = new StagedJob();
         job.setId(1L);
@@ -86,8 +86,8 @@ class CoordinatesDataCheckTest extends ValidatorHelpers {
     @Test
     void BothIncorrectShouldFail() {
         Site site = new Site();
-        site.setLatitude(48.8566);
-        site.setLongitude(2.3522);
+        site.setLatitude(48.8566F);
+        site.setLongitude(2.3522F);
         site.calcGeom();
         val job = new StagedJob();
         job.setId(1L);
