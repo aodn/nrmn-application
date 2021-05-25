@@ -200,7 +200,7 @@ const DataSheetView = () => {
       gridApi.copySelectedRangeToClipboard();
       const rows = getAllRows();
       const fields = cells.columns.map((col) => col.colId);
-      for (let i = cells.startRow.rowIndex; i <= cells.endRow.rowIndex; i++) {
+      for (let i = cells.startRow.rowIndex -1; i < cells.endRow.rowIndex; i++) {
         const row = rows[i];
         fields.forEach((field) => {
           row[field] = '';
