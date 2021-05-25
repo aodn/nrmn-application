@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.validation.validators.formatted;
 
+import au.org.aodn.nrmn.restapi.validation.validators.row.formatted.TotalCheckSum;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
