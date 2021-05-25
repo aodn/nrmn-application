@@ -1,16 +1,12 @@
 package au.org.aodn.nrmn.restapi.validation.validators.formatted;
 
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.validation.validators.row.formatted.DebrisZeroObs;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.utils.ImmutableMap;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
