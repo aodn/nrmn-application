@@ -27,4 +27,6 @@ public class SpeciesDto {
 
     private Integer supersededById;
 
+    private Boolean isPresent;
+
 }

@@ -1,8 +1,11 @@
 package au.org.aodn.nrmn.restapi.service;
 
+import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
+import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.service.model.SpeciesRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -22,6 +25,9 @@ public class WormsService {
     private final WebClient wormsClient;
 
     @Autowired
+    private ObservableItemRepository observableItemRepository;
+
+    @Autowired
     public WormsService(@Qualifier("wormsClient") WebClient wormsClient) {
         this.wormsClient = wormsClient;
     }
@@ -37,7 +43,12 @@ public class WormsService {
                 .bodyToMono(SpeciesRecord[].class);
         SpeciesRecord[] matchingSpecies = Optional.ofNullable(response.block())
                                                    .orElse(new SpeciesRecord[0]);
+
         return Arrays.stream(matchingSpecies)
+                     .map(m -> {
+                        m.setIsPresent(m.getScientificName() != null ? observableItemRepository.count(Example.of(ObservableItem.builder().observableItemName(m.getScientificName()).build())) > 0 : false);
+                        return m;
+                    })
                      .collect(Collectors.toList());
     }
 

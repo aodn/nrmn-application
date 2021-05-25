@@ -67,6 +67,8 @@ public class SpeciesRecord {
     private Boolean isTerrestrial;
 
     private Boolean isExtinct;
+    
+    private Boolean isPresent;
 
     @JsonAlias("match_type")
     private String matchType;
