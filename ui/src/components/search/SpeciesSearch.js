@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import clsx from 'clsx';
 import {AppBar, Box, Button, Divider, Grid, Tab, Tabs, TextField, Typography} from '@material-ui/core';
+import Pagination from '@material-ui/lab/Pagination';
 import {DataGrid} from '@material-ui/data-grid';
 import {Search} from '@material-ui/icons';
 import Alert from '@material-ui/lab/Alert';
@@ -21,45 +22,82 @@ const useStyles = makeStyles({
 });
 
 const columns = [
-  {field: 'status', headerName: 'Status', flex: 1},
-  {
-    field: 'species',
-    headerName: 'Species',
-    flex: 2,
-    cellClassName: (params) =>
-      clsx('root', {
-        superseded: params.row.supersededBy
-      })
-  },
-  {field: 'genus', headerName: 'Genus', flex: 1},
-  {field: 'family', headerName: 'Family', flex: 1},
-  {field: 'order', headerName: 'Order', flex: 1},
-  {field: 'class', headerName: 'Class', flex: 1},
-  {field: 'phylum', headerName: 'Phylum', flex: 1}
+  [
+    {field: 'status', headerName: 'Status', flex: 1},
+    {
+      field: 'species',
+      headerName: 'Species',
+      flex: 2,
+      cellClassName: (params) =>
+        clsx('root', {
+          superseded: params.row.supersededBy
+        })
+    },
+    {field: 'genus', headerName: 'Genus', flex: 1},
+    {field: 'family', headerName: 'Family', flex: 1},
+    {field: 'order', headerName: 'Order', flex: 1},
+    {field: 'class', headerName: 'Class', flex: 1},
+    {field: 'phylum', headerName: 'Phylum', flex: 1}
+  ],
+  [
+    {
+      field: 'species',
+      headerName: 'Species',
+      flex: 2,
+      cellClassName: (params) =>
+        clsx('root', {
+          superseded: params.row.supersededBy
+        })
+    },
+    {field: 'genus', headerName: 'Genus', flex: 1},
+    {field: 'family', headerName: 'Family', flex: 1},
+    {field: 'order', headerName: 'Order', flex: 1},
+    {field: 'class', headerName: 'Class', flex: 1},
+    {field: 'phylum', headerName: 'Phylum', flex: 1}
+  ]
 ];
 
 const SpeciesSearch = () => {
   const classes = useStyles();
-  const [value, setValue] = React.useState(0);
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const [warning, setWarning] = React.useState(null);
+  const [tabIndex, setTabIndex] = useState(0);
+  const [searchTerm, setSearchTerm] = useState(null);
+  const [page, setPage] = useState(1);
+  const [gridData, setGridData] = useState(null);
+  const [warning, setWarning] = useState(null);
   const loading = useSelector((state) => state.form.loading);
   const searchResults = useSelector((state) => state.form.searchResults);
   const searchError = useSelector((state) => state.form.searchError);
 
   const handleChange = (event, newValue) => {
-    setSearchTerm('');
-    setValue(newValue);
+    setSearchTerm(null);
+    setGridData([]);
+    setPage(1);
+    setTabIndex(newValue);
   };
 
+  const pageSize = 50;
+  const maxResults = 9999;
+
+  useEffect(() => {
+    if (searchResults !== null) setGridData(searchResults);
+  }, [searchResults]);
+
   const dispatch = useDispatch();
+  const paginator = ({api}) => (
+    <Pagination
+      page={page}
+      disabled={loading}
+      count={gridData !== null && gridData.length === pageSize ? page + 1 : page}
+      onChange={(e, value) => api.current.setPage(value)}
+    />
+  );
   return (
     <Box ml={6} style={{background: 'white'}} boxShadow={1} margin={3} width="80%">
       <Box pl={6} py={2}>
         <Typography variant="h4">Species Lookup</Typography>
       </Box>
       <AppBar position="static">
-        <Tabs value={value} onChange={handleChange}>
+        <Tabs value={tabIndex} onChange={handleChange}>
           <Tab label="WoRMS" style={{minWidth: '50%', textTransform: 'none'}} />
           <Tab label="NRMN" style={{minWidth: '50%'}} />
         </Tabs>
@@ -71,7 +109,7 @@ const SpeciesSearch = () => {
           </Alert>
         </Box>
       ) : null}
-      <TabPanel value={value} index={0}>
+      <TabPanel value={tabIndex} index={0}>
         <Typography variant="subtitle2">Scientific Name</Typography>
         <Grid container direction="row" alignItems="center">
           <Grid item xs={5}>
@@ -83,7 +121,10 @@ const SpeciesSearch = () => {
               variant="contained"
               disabled={loading || !(searchTerm?.length > 3)}
               startIcon={<Search></Search>}
-              onClick={() => dispatch(searchRequested({searchType: 'WORMS', species: searchTerm, includeSuperseded: true}))}
+              onClick={() => {
+                setPage(1);
+                dispatch(searchRequested({searchType: 'WORMS', species: searchTerm, includeSuperseded: true}));
+              }}
               color="primary"
               style={{textTransform: 'none'}}
             >
@@ -99,7 +140,7 @@ const SpeciesSearch = () => {
           </Alert>
         </Box>
       ) : null}
-      <TabPanel value={value} index={1}>
+      <TabPanel value={tabIndex} index={1}>
         <Typography variant="subtitle2">Scientific Name</Typography>
         <Grid container direction="row" alignItems="center">
           <Grid item xs={5}>
@@ -120,17 +161,35 @@ const SpeciesSearch = () => {
           </Grid>
         </Grid>
       </TabPanel>
-      {loading || searchResults !== null ? (
-        <div style={{height: 640, backgroundColor: 'white'}}>
+      {loading || gridData !== null ? (
+        <div style={{height: '640px', backgroundColor: 'white'}}>
           <DataGrid
             className={classes.root}
+            page={page}
+            pageSize={gridData === null ? 0 : Math.min(gridData.length, pageSize)}
+            rowCount={gridData === null ? 0 : gridData.length < pageSize ? pageSize * (page + 1) + gridData.length : maxResults}
+            paginationMode="server"
+            disabled={loading}
             disableSelectionOnClick
             density="compact"
             style={{fontSize: 4}}
-            rows={searchResults}
-            columns={columns}
-            autoPageSize={true}
+            rows={gridData === null ? [] : gridData}
+            columns={columns[tabIndex]}
+            components={{
+              Pagination: paginator
+            }}
             loading={loading}
+            onPageChange={(params) => {
+              dispatch(
+                searchRequested({
+                  searchType: tabIndex === 0 ? 'WORMS' : 'NRMN',
+                  species: searchTerm,
+                  includeSuperseded: true,
+                  page: params.page - 1
+                })
+              );
+              setPage(params.page);
+            }}
             onRowClick={(params) => {
               const supersededBy = params.row.supersededBy;
               if (supersededBy) {
@@ -140,7 +199,7 @@ const SpeciesSearch = () => {
                 dispatch(setFields(params));
               }
             }}
-          />
+          ></DataGrid>
         </div>
       ) : (
         <Divider />
@@ -149,6 +208,3 @@ const SpeciesSearch = () => {
   );
 };
 export default SpeciesSearch;
-// SpeciesSearch.propTypes = {
-//   title: PropTypes.string
-// };
