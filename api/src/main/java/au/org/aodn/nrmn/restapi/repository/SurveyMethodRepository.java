@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.repository;
 import au.org.aodn.nrmn.restapi.model.db.SurveyMethod;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -22,4 +23,9 @@ public interface SurveyMethodRepository extends JpaRepository<SurveyMethod, Inte
 
     @Query(value = "SELECT '(' || method_id || '-' || block_num || ': ' || survey_not_done || ')' from {h-schema}survey_method WHERE survey_id = :surveyId AND block_num is not null", nativeQuery = true)
     List<String> findSurveyNotDoneForSurveyId(@Param("surveyId") Integer surveyId);
+
+    @Query(value = "select sm from SurveyMethod sm where sm.survey.surveyId = :surveyId and sm.method.methodId = " +
+     ":methodId and sm.blockNum = :blockNum")
+    Optional<SurveyMethod> findBySurveyIdMethodIdBlockNum(@Param("surveyId") Integer surveyId,
+     @Param("methodId") Integer methodId, @Param("blockNum") Integer blockNum);
 }

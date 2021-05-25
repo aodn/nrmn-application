@@ -1,5 +1,18 @@
 package au.org.aodn.nrmn.restapi.service;
 
+import au.org.aodn.nrmn.restapi.model.db.*;
+import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
+import au.org.aodn.nrmn.restapi.repository.*;
+import au.org.aodn.nrmn.restapi.util.OptionalUtil;
+import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import lombok.val;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.stereotype.Service;
+import software.amazon.awssdk.utils.ImmutableMap;
+
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalTime;
@@ -7,38 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.stereotype.Service;
-
-import au.org.aodn.nrmn.restapi.model.db.Diver;
-import au.org.aodn.nrmn.restapi.model.db.Measure;
-import au.org.aodn.nrmn.restapi.model.db.MeasureType;
-import au.org.aodn.nrmn.restapi.model.db.Method;
-import au.org.aodn.nrmn.restapi.model.db.Observation;
-import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.Survey;
-import au.org.aodn.nrmn.restapi.model.db.SurveyMethod;
-import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
-import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
-import au.org.aodn.nrmn.restapi.repository.MethodRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
-import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
-import au.org.aodn.nrmn.restapi.repository.SurveyMethodRepository;
-import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
-import au.org.aodn.nrmn.restapi.util.OptionalUtil;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
-import lombok.val;
-import software.amazon.awssdk.utils.ImmutableMap;
 
 @Service
 public class SurveyIngestionService {
@@ -100,7 +81,9 @@ public class SurveyIngestionService {
 
     public List<Observation> getObservations(StagedRowFormatted stagedRow) {
         val surveyMethodExample = getSurveyMethod(stagedRow);
-        val surveyMethod = surveyMethodRepository.findOne(Example.of(surveyMethodExample))
+        val surveyMethod = surveyMethodRepository
+                .findBySurveyIdMethodIdBlockNum(surveyMethodExample.getSurvey().getSurveyId(),
+                        surveyMethodExample.getMethod().getMethodId(), surveyMethodExample.getBlockNum())
                 .orElseGet(() -> surveyMethodRepository.save(surveyMethodExample));
         surveyMethod.getSurvey().getSurveyId();
         Diver diver = stagedRow.getDiver();
