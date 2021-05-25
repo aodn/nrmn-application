@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
 import {AppBar, Box, Button, Divider, Grid, Tab, Tabs, TextField, Typography} from '@material-ui/core';
 import Pagination from '@material-ui/lab/Pagination';
@@ -16,13 +16,18 @@ import {setFields} from '../data-entities/middleware/entities';
 const useStyles = makeStyles({
   root: {
     '& .superseded': {
-      color: '#999999'
+      color: '#999999',
+      fontStyle: 'italic'
+    },
+    '& .present': {
+      fontStyle: 'bold'
     }
   }
 });
 
 const columns = [
   [
+    {field: 'isPresent', headerName: 'NRMN', flex: 0.75},
     {field: 'status', headerName: 'Status', flex: 1},
     {
       field: 'species',
@@ -63,7 +68,7 @@ const SpeciesSearch = () => {
   const [searchTerm, setSearchTerm] = useState(null);
   const [page, setPage] = useState(1);
   const [gridData, setGridData] = useState(null);
-  const [warning, setWarning] = useState(null);
+  const [info, setInfo] = useState(null);
   const loading = useSelector((state) => state.form.loading);
   const searchResults = useSelector((state) => state.form.searchResults);
   const searchError = useSelector((state) => state.form.searchError);
@@ -113,7 +118,13 @@ const SpeciesSearch = () => {
         <Typography variant="subtitle2">Scientific Name</Typography>
         <Grid container direction="row" alignItems="center">
           <Grid item xs={5}>
-            <TextField fullWidth onChange={(e) => setSearchTerm(e.target.value)} />
+            <TextField
+              fullWidth
+              onChange={(e) => setSearchTerm(e.target.value.trim())}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') dispatch(searchRequested({searchType: 'WORMS', species: searchTerm, includeSuperseded: true}));
+              }}
+            />
           </Grid>
           <Grid item xs={1}></Grid>
           <Grid item xs={4}>
@@ -133,10 +144,10 @@ const SpeciesSearch = () => {
           </Grid>
         </Grid>
       </TabPanel>
-      {warning ? (
+      {info ? (
         <Box pt={2}>
-          <Alert severity="warning" variant="filled">
-            {warning}
+          <Alert severity="info" variant="filled">
+            {info}
           </Alert>
         </Box>
       ) : null}
@@ -144,7 +155,13 @@ const SpeciesSearch = () => {
         <Typography variant="subtitle2">Scientific Name</Typography>
         <Grid container direction="row" alignItems="center">
           <Grid item xs={5}>
-            <TextField fullWidth onChange={(e) => setSearchTerm(e.target.value)} />
+            <TextField
+              fullWidth
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') dispatch(searchRequested({searchType: 'NRMN', species: searchTerm, includeSuperseded: true}));
+              }}
+              onChange={(e) => setSearchTerm(e.target.value.trim())}
+            />
           </Grid>
           <Grid item xs={1}></Grid>
           <Grid item xs={3}>
@@ -192,10 +209,13 @@ const SpeciesSearch = () => {
             }}
             onRowClick={(params) => {
               const supersededBy = params.row.supersededBy;
+              const isPresent = params.row.isPresent;
               if (supersededBy) {
-                setWarning(`This species has been superseded by ${supersededBy}`);
+                setInfo(`This species has been superseded by ${supersededBy}`);
+              } else if (isPresent) {
+                setInfo('This species name exists in the NRMN database');
               } else {
-                setWarning();
+                setInfo();
                 dispatch(setFields(params));
               }
             }}
