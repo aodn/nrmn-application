@@ -6,6 +6,7 @@ import moment from 'moment';
 import Alert from '@material-ui/lab/Alert';
 import {Box, Fab, makeStyles, Dialog, TextField, DialogTitle, DialogActions, DialogContent, Button} from '@material-ui/core';
 import {
+  CloudDownload as CloudDownloadIcon,
   CloudUpload as CloudUploadIcon,
   FindReplace as FindReplaceIcon,
   SaveOutlined as SaveOutlinedIcon,
@@ -238,7 +239,7 @@ const DataSheetView = () => {
   }, [validationErrors, selectedCells]);
 
   useEffect(() => {
-    if (gridApi  && errSelected.ids && errSelected.ids.length > 0) {
+    if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
       const firstRow = gridApi.getRowNode(errSelected.ids[0]);
       gridApi.ensureIndexVisible(firstRow.rowIndex, 'middle');
       gridApi.deselectAll();
@@ -248,7 +249,6 @@ const DataSheetView = () => {
         return row;
       });
       gridApi.ensureColumnVisible(errSelected.columnTarget.toLowerCase());
-
     }
   }, [errSelected]);
 
@@ -269,6 +269,18 @@ const DataSheetView = () => {
               <FindReplaceIcon className={classes.extendedIcon} />
               Find & Replace
             </Fab>
+            {gridApi && (
+              <Fab
+                className={showFindReplace ? classes.fabFlat : classes.fab}
+                onClick={() => gridApi.exportDataAsExcel()}
+                variant="extended"
+                size="small"
+                color="primary"
+              >
+                <CloudDownloadIcon className={classes.extendedIcon} />
+                Export to Excel
+              </Fab>
+            )}
             <Fab
               className={classes.fab}
               onClick={handleSave}
@@ -380,7 +392,7 @@ const DataSheetView = () => {
           groupDefaultExpanded={4}
           rowHeight={18}
           animateRows={true}
-          suppressCopyRowsToClipboard = {false}
+          suppressCopyRowsToClipboard={false}
           groupMultiAutoColumn={true}
           groupHideOpenParents={true}
           rowSelection="multiple"
@@ -399,7 +411,7 @@ const DataSheetView = () => {
           onGridReady={agGridReady}
           modules={AllModules}
           getContextMenuItems={getContextMenuItems}
-        ></AgGridReact>
+        />
         <Dialog aria-labelledby="Add Rows Dialogue" open={addDialog.open}>
           <DialogTitle id="form-dialog-title">Add Rows</DialogTitle>
           <DialogContent>
