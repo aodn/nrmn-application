@@ -31,7 +31,7 @@ public class SpeciesNotFoundCheck extends BaseRowValidator {
                         StringUtils.isNumeric(entry.getValue()) &&
                                 !entry.getValue().trim().equals("0"))
                 .collect(Collectors.toList());
-        if (target.getSpecies().trim().equalsIgnoreCase("No Species Found")) {
+        if (target.getSpecies() != null && target.getSpecies().trim().equalsIgnoreCase("No Species Found")) {
             if (filteredEntry.size() == 0) {
                 return Validated.valid(true);
             }
