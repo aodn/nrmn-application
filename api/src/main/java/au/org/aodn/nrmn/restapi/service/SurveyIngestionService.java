@@ -5,8 +5,12 @@ import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.*;
 import au.org.aodn.nrmn.restapi.util.OptionalUtil;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import cyclops.data.tuple.Tuple2;
+import cyclops.data.tuple.Tuple4;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.utils.ImmutableMap;
@@ -20,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 public class SurveyIngestionService {
@@ -70,22 +76,18 @@ public class SurveyIngestionService {
                 .program(stagedRow.getRef().getStagedJob().getProgram()).build()));
     }
 
-    public SurveyMethod getSurveyMethod(StagedRowFormatted stagedRow) {
-        Survey survey = getSurvey(stagedRow);
-
+    public SurveyMethod getSurveyMethod(Survey survey, StagedRowFormatted stagedRow) {
         boolean surveyNotDone = stagedRow.getCode().toLowerCase().equals("snd");
         Method method = entityManager.getReference(Method.class, stagedRow.getMethod());
-        return SurveyMethod.builder().survey(survey).method(method).blockNum(stagedRow.getBlock())
+        val surveyMethodExample = SurveyMethod.builder().survey(survey).method(method).blockNum(stagedRow.getBlock())
                 .surveyNotDone(surveyNotDone).build();
-    }
-
-    public List<Observation> getObservations(StagedRowFormatted stagedRow) {
-        val surveyMethodExample = getSurveyMethod(stagedRow);
-        val surveyMethod = surveyMethodRepository
+        return surveyMethodRepository
                 .findBySurveyIdMethodIdBlockNum(surveyMethodExample.getSurvey().getSurveyId(),
                         surveyMethodExample.getMethod().getMethodId(), surveyMethodExample.getBlockNum())
                 .orElseGet(() -> surveyMethodRepository.save(surveyMethodExample));
-        surveyMethod.getSurvey().getSurveyId();
+    }
+
+    public List<Observation> getObservations(SurveyMethod surveyMethod, StagedRowFormatted stagedRow) {
         Diver diver = stagedRow.getDiver();
         Map<Integer, Integer> measures = stagedRow.getMeasureJson();
 
@@ -94,29 +96,36 @@ public class SurveyIngestionService {
 
         List<Observation> observations = measures.entrySet().stream().map(m -> {
             int measureId = METHOD_ID_TO_MEASURE_ID_MAP.get(stagedRow.getMethod());
-            Measure measure = getMeasure(m.getKey(), measureId).get();
+            Measure measure = measureRepository.findById(measureId).orElse(null);
 
             return baseObservationBuilder.measure(measure).measureValue(m.getValue()).build();
         }).collect(Collectors.toList());
 
-        observations.stream().map(obs -> obs.getSurveyMethod().getSurvey());
         return observations;
-    }
-
-    private Optional<Measure> getMeasure(Integer sequenceNumber, int measureId) {
-        MeasureType measureType = MeasureType.builder().measureTypeId(measureId).build();
-
-        Example<Measure> exampleMeasure = Example
-                .of(Measure.builder().seqNo(sequenceNumber).measureType(measureType).build());
-        val list = measureRepository.findAll(exampleMeasure);
-        return list.stream().findFirst();
     }
 
     @Transactional
     public void ingestTransaction(StagedJob job, List<StagedRowFormatted> validatedRows) {
-        List<Integer> surveyIds = validatedRows.stream().flatMap(row -> {
-            return OptionalUtil.toStream(observationRepository.saveAll(getObservations(row)).stream().map(obs -> obs.getSurveyMethod().getSurvey()).findFirst());
-        }).map(Survey::getSurveyId).distinct().collect(Collectors.toList());
+        Map<Tuple4, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows
+                .stream()
+                .collect(groupingBy(row -> new Tuple4(row.getSite(), row.getDate(), row.getDepth(),
+                 row.getSurveyNum())));
+
+        List<Integer> surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
+            Survey survey = getSurvey(surveyRows.get(0));
+
+            Map<Tuple2, List<StagedRowFormatted>> rowsGroupedBySurveyMethod = surveyRows
+                .stream()
+                .collect(groupingBy(row -> new Tuple2(row.getMethod(), row.getBlock())));
+
+            rowsGroupedBySurveyMethod.values().forEach(surveyMethodRows -> {
+                SurveyMethod surveyMethod = getSurveyMethod(survey, surveyMethodRows.get(0));
+                surveyMethodRows.forEach(row -> observationRepository.saveAll(getObservations(surveyMethod, row)));
+            });
+
+            return survey.getSurveyId();
+        }).collect(Collectors.toList());
+
         job.setStatus(StatusJobType.INGESTED);
         job.setSurveyIds(surveyIds);
         jobRepository.save(job);
