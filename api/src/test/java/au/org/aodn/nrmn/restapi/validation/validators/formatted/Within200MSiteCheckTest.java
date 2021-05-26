@@ -17,7 +17,7 @@ class Within200MSiteCheckTest extends FormattedTestProvider {
         formatted.setLongitude(147.33520415427964);
 
         //Hobart Blue Eye SeaFood228 -42.88654698514, 147.33479357370092
-        formatted.setSite(Site.builder().siteCode("A SITE").latitude( -42.88654698514).longitude(147.33479357370092).build());
+        formatted.setSite(Site.builder().siteCode("A SITE").latitude( -42.88654698514F).longitude(147.33479357370092F).build());
 
          val validator =   new Within200MSiteCheck();
         val res = validator.valid(formatted);
@@ -33,8 +33,8 @@ class Within200MSiteCheckTest extends FormattedTestProvider {
 
         //Hobart Dpt. Treasury and Finance -42.88397415318471, 147.3293531695972
         formatted.setSite(Site.builder().siteCode("A SITE")
-                .latitude( -42.88397415318471)
-                .longitude(147.3293531695972).build());
+                .latitude( -42.88397415318471F)
+                .longitude(147.3293531695972F).build());
 
         val validator =   new Within200MSiteCheck();
         val res = validator.valid(formatted);

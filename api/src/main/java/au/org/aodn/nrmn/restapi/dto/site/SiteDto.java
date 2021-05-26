@@ -28,11 +28,11 @@ public class SiteDto {
 
     @NotNull(message = "Longitude is required")
     @Schema(title = "Longitude")
-    private Double longitude;
+    private Float longitude;
 
     @NotNull(message = "Latitude is required")
     @Schema(title = "Latitude")
-    private Double latitude;
+    private Float latitude;
 
     @NotNull(message = "State is required")
     @Schema(title = "State")
