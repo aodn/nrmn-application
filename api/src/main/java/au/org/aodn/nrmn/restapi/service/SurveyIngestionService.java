@@ -3,14 +3,11 @@ package au.org.aodn.nrmn.restapi.service;
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.*;
-import au.org.aodn.nrmn.restapi.util.OptionalUtil;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.data.tuple.Tuple2;
 import cyclops.data.tuple.Tuple4;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.utils.ImmutableMap;
@@ -79,12 +76,9 @@ public class SurveyIngestionService {
     public SurveyMethod getSurveyMethod(Survey survey, StagedRowFormatted stagedRow) {
         boolean surveyNotDone = stagedRow.getCode().toLowerCase().equals("snd");
         Method method = entityManager.getReference(Method.class, stagedRow.getMethod());
-        val surveyMethodExample = SurveyMethod.builder().survey(survey).method(method).blockNum(stagedRow.getBlock())
+        val surveyMethod = SurveyMethod.builder().survey(survey).method(method).blockNum(stagedRow.getBlock())
                 .surveyNotDone(surveyNotDone).build();
-        return surveyMethodRepository
-                .findBySurveyIdMethodIdBlockNum(surveyMethodExample.getSurvey().getSurveyId(),
-                        surveyMethodExample.getMethod().getMethodId(), surveyMethodExample.getBlockNum())
-                .orElseGet(() -> surveyMethodRepository.save(surveyMethodExample));
+        return surveyMethodRepository.save(surveyMethod);
     }
 
     public List<Observation> getObservations(SurveyMethod surveyMethod, StagedRowFormatted stagedRow) {
