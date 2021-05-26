@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.validation.validators.formatted;
 
+import au.org.aodn.nrmn.restapi.validation.validators.row.formatted.Method3QuadratMax50;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.utils.ImmutableMap;

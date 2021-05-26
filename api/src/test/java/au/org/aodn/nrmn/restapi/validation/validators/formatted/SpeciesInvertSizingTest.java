@@ -1,9 +1,9 @@
 package au.org.aodn.nrmn.restapi.validation.validators.formatted;
 
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
+import au.org.aodn.nrmn.restapi.validation.validators.row.formatted.SpeciesInvertSizing;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-import software.amazon.awssdk.utils.ImmutableMap;
 
 import java.util.Optional;
 

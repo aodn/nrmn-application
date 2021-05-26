@@ -14,6 +14,8 @@ public class SpeciesDto {
 
     private String family;
 
+    private String status;
+
     private String genus;
 
     @JsonProperty("species")
@@ -24,5 +26,7 @@ public class SpeciesDto {
     private String supersededBy;
 
     private Integer supersededById;
+
+    private Boolean isPresent;
 
 }

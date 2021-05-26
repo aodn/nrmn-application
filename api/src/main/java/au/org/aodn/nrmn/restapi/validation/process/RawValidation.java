@@ -12,16 +12,15 @@ import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
 import au.org.aodn.nrmn.restapi.validation.provider.ATRCValidators;
 import au.org.aodn.nrmn.restapi.validation.provider.RLSValidators;
 import au.org.aodn.nrmn.restapi.validation.validators.base.BaseRowValidator;
-import au.org.aodn.nrmn.restapi.validation.validators.data.DirectionDataCheck;
-import au.org.aodn.nrmn.restapi.validation.validators.data.SpeciesNotFoundCheck;
-import au.org.aodn.nrmn.restapi.validation.validators.entities.DiverExists;
-import au.org.aodn.nrmn.restapi.validation.validators.entities.ObservableItemExists;
-import au.org.aodn.nrmn.restapi.validation.validators.entities.SiteCodeExists;
-import au.org.aodn.nrmn.restapi.validation.validators.format.*;
-import au.org.aodn.nrmn.restapi.validation.validators.passThu.PassThruRef;
-import au.org.aodn.nrmn.restapi.validation.validators.passThu.PassThruString;
+import au.org.aodn.nrmn.restapi.validation.validators.row.data.DirectionDataCheck;
+import au.org.aodn.nrmn.restapi.validation.validators.row.data.SpeciesNotFoundCheck;
+import au.org.aodn.nrmn.restapi.validation.validators.row.entities.DiverExists;
+import au.org.aodn.nrmn.restapi.validation.validators.row.entities.ObservableItemExists;
+import au.org.aodn.nrmn.restapi.validation.validators.row.entities.SiteCodeExists;
+import au.org.aodn.nrmn.restapi.validation.validators.row.passThu.PassThruRef;
+import au.org.aodn.nrmn.restapi.validation.validators.row.passThu.PassThruString;
+import au.org.aodn.nrmn.restapi.validation.validators.row.format.*;
 import cyclops.companion.Monoids;
-import cyclops.control.Option;
 import cyclops.control.Validated;
 import cyclops.data.HashMap;
 import cyclops.data.Seq;
@@ -63,8 +62,10 @@ public class RawValidation extends ValidatorHelpers {
     public HashMap<String, BaseRowValidator> getExtendedValidators() {
         return HashMap.fromStream(
                 Stream.of(
-                        Tuple2.of("IsInvertSizing", new OptionalBooleanFormatValidation(target ->
-                                String.valueOf(target.getIsInvertSizing().equalsIgnoreCase("yes")),
+                        Tuple2.of("IsInvertSizing", new OptionalBooleanFormatValidation(target -> {
+                            val invertSizing = Optional.ofNullable(target.getIsInvertSizing()).orElseGet(() -> "false");
+                            return String.valueOf(invertSizing.equalsIgnoreCase("yes"));
+                        },
                                 "IsInvertSizing"))
 
                 )
@@ -174,9 +175,9 @@ public class RawValidation extends ValidatorHelpers {
         rowFormatted.setDate(date);
         rowFormatted.setTime(time);
         rowFormatted.setSite(site);
-rowFormatted.setDiver(diver);
+        rowFormatted.setDiver(diver);
         rowFormatted.setLongitude(longitude);
-rowFormatted.setLatitude(latitude);
+        rowFormatted.setLatitude(latitude);
         rowFormatted.setDepth(depth);
         rowFormatted.setSurveyNum(survey_num);
         rowFormatted.setMethod(method);

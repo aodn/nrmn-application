@@ -138,12 +138,10 @@ public class SurveyIngestionServiceTest {
 
     @Test
     void getObservationsForSameSurveyReturnsSameSurvey() {
+        Method theMethod = Method.builder().methodId(2).methodName("The Method").isActive(true).build();
+        when(entityManager.getReference(Method.class, 2)).thenReturn(theMethod);
         when(measureRepository.findAll(any(Example.class))).then(m -> Arrays.asList(Measure.builder().build()));
         when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
-
-        ObservableItem observableItem = ObservableItem.builder()
-            .observableItemName("The Species")
-            .build();
 
         StagedRowFormatted row = rowBuilder.build();
         StagedRowFormatted rowFromSameSurvey = rowBuilder
@@ -154,8 +152,6 @@ public class SurveyIngestionServiceTest {
         assertEquals(
             observations.get(0).getSurveyMethod().getSurvey(),
             observationsFromSameSurvey.get(0).getSurveyMethod().getSurvey());
-
-
     }
 
     @Test
