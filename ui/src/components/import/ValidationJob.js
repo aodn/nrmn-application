@@ -62,7 +62,7 @@ const ValidationJob = () => {
           </Grid>
         )}
       </Grid>
-      <DataSheetView></DataSheetView>
+      <DataSheetView fileName={job.reference} />
       {(submitLoading || isLoading || editLoading || deleteLoading || validationLoading || ingestLoading) && (
         <Backdrop open={submitLoading || isLoading || editLoading || deleteLoading || validationLoading || ingestLoading}>
           <CircularProgress size={200} style={{color: '#ccc'}}></CircularProgress>

@@ -25,6 +25,7 @@ import useWindowSize from '../utils/useWindowSize';
 import {getDataJob} from '../../axios/api';
 import GridFindReplace from '../search/GridFindReplace';
 import {ColumnDef, ExtendedSize} from './ColumnDef';
+import {PropTypes} from 'prop-types';
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -50,7 +51,7 @@ const useStyles = makeStyles((theme) => {
   };
 });
 
-const DataSheetView = () => {
+const DataSheetView = ({fileName}) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const errSelected = useSelector((state) => state.import.errSelected);
@@ -272,7 +273,7 @@ const DataSheetView = () => {
             {gridApi && (
               <Fab
                 className={showFindReplace ? classes.fabFlat : classes.fab}
-                onClick={() => gridApi.exportDataAsExcel()}
+                onClick={() => gridApi.exportDataAsExcel({sheetName: 'DATA', author: 'NRMN', fileName: `export_${fileName}`})}
                 variant="extended"
                 size="small"
                 color="primary"
@@ -439,6 +440,10 @@ const DataSheetView = () => {
       </div>
     </Box>
   );
+};
+
+DataSheetView.propTypes = {
+  fileName: PropTypes.string
 };
 
 export default DataSheetView;
