@@ -186,7 +186,8 @@ export const submitingest = (jobId) => {
 export const search = (params) => {
   const url = `/api/species?searchType=${escape(params.searchType)}&species=${escape(params.species)}&includeSuperseded=${
     params.includeSuperseded
-  }`;
+  }${params.page ? '&page=' + params.page : ''}`;
+
   return axiosInstance
     .get(url, {
       validateStatus: () => true

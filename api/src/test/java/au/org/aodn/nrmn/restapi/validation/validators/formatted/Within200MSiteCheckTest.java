@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.validators.formatted;
 
 import au.org.aodn.nrmn.restapi.model.db.Site;
+import au.org.aodn.nrmn.restapi.validation.validators.row.formatted.Within200MSiteCheck;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 

@@ -3,7 +3,7 @@ package au.org.aodn.nrmn.restapi.validation.provider;
 import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.validators.base.BaseGlobalRawValidator;
 
-import au.org.aodn.nrmn.restapi.validation.validators.format.BaseRowFormatValidation;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseRowFormatValidation;
 import cyclops.data.Seq;
 import cyclops.data.tuple.Tuple2;
 

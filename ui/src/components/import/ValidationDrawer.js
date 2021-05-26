@@ -30,7 +30,7 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
-const drawerWidth = 500;
+const drawerWidth = 450;
 
 const useStyles = makeStyles((theme) => ({
   root: {

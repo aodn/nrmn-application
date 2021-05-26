@@ -74,7 +74,7 @@ const formSlice = createSlice({
     },
     searchRequested: (state) => {
       state.loading = true;
-      state.searchResults = [];
+      state.searchResults = null;
     },
     searchFailed: (state, action) => {
       state.loading = false;
@@ -84,7 +84,7 @@ const formSlice = createSlice({
       if (action.payload?.length > 0)
         state.searchResults = action.payload.map((r, id) => {
           // remove the genus from the species to produce the species epithet
-          const speciesEpithet = r.species.replace(`${r.genus} `, '');
+          const speciesEpithet = r.species ? r.species.replace(`${r.genus} `, '') : '';
           return {id: id, ...r, speciesEpithet: speciesEpithet};
         });
       else state.searchResults = [];

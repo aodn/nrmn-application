@@ -2,12 +2,10 @@ package au.org.aodn.nrmn.restapi.validation.validators.formatted;
 
 import au.org.aodn.nrmn.restapi.model.db.Method;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
+import au.org.aodn.nrmn.restapi.validation.validators.row.formatted.SpeciesBelongToMethodCheck;
 import com.google.common.collect.ImmutableSet;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-import software.amazon.awssdk.utils.ImmutableMap;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
