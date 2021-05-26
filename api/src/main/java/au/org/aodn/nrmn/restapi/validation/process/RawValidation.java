@@ -63,8 +63,8 @@ public class RawValidation extends ValidatorHelpers {
         return HashMap.fromStream(
                 Stream.of(
                         Tuple2.of("IsInvertSizing", new OptionalBooleanFormatValidation(target -> {
-                            val InvertSizing = Optional.ofNullable(target.getIsInvertSizing()).orElseGet(() -> "false");
-                            return String.valueOf(InvertSizing.equalsIgnoreCase("yes"));
+                            val invertSizing = Optional.ofNullable(target.getIsInvertSizing()).orElseGet(() -> "false");
+                            return String.valueOf(invertSizing.equalsIgnoreCase("yes"));
                         },
                                 "IsInvertSizing"))
 
