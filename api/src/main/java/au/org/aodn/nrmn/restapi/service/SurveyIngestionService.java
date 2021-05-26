@@ -89,9 +89,8 @@ public class SurveyIngestionService {
                 .surveyMethod(surveyMethod).observableItem(stagedRow.getSpecies());
 
         List<Observation> observations = measures.entrySet().stream().map(m -> {
-            int measureId = METHOD_ID_TO_MEASURE_ID_MAP.get(stagedRow.getMethod());
-            Measure measure = measureRepository.findById(measureId).orElse(null);
-
+            int measureTypeId = METHOD_ID_TO_MEASURE_ID_MAP.get(stagedRow.getMethod());
+            Measure measure = measureRepository.findByMeasureTypeIdAndSeqNo(measureTypeId, m.getKey()).orElse(null);
             return baseObservationBuilder.measure(measure).measureValue(m.getValue()).build();
         }).collect(Collectors.toList());
 
