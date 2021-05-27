@@ -86,7 +86,7 @@ public class RawValidation extends ValidatorHelpers {
                         Tuple2.of("Code", new PassThruString(StagedRow::getCode, "Code")),
                         Tuple2.of("Species", observableItemExists),
 
-                        Tuple2.of("Vis", new OptionalIntegerFormatValidation(StagedRow::getVis, "Vis")),
+                        Tuple2.of("Vis", new OptionalPositiveIntegerFormatValidation(StagedRow::getVis, "Vis")),
 
                         Tuple2.of("Total", new IntegerFormatValidation(StagedRow::getTotal, "Total", Collections.emptyList())),
                         Tuple2.of("Inverts", new OptionalIntegerFormatValidation(StagedRow::getInverts, "Inverts")),
