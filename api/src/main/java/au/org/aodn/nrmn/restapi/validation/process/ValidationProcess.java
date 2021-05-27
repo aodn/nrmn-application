@@ -90,7 +90,6 @@ public class ValidationProcess extends ValidatorHelpers {
                         .flatMap(row ->
                                 Seq.fromIterable(row.getErrors())
                         ).toList();
-        formattedRowErrors.addAll(formattedRowErrors);
         val msgSummary = summary.aggregate(formattedRowErrors);
 
         return new ValidationResponse(
