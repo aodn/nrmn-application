@@ -85,9 +85,6 @@ public class ObservableItemController {
             if(match.getObservableItemName() != null && match.getObservableItemName().equals(item.getObservableItemName()))
                 errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName", item.getObservableItemName(), "An item with this name already exists."));
             
-            if(match.getCommonName() != null && match.getCommonName().equals(item.getCommonName()))
-                errors.add(new ValidationError(ObservableItemDto.class.getName(), "commonName", item.getCommonName(), "An item with this common name already exists."));
-            
             if(match.getLetterCode() != null && match.getLetterCode().equals(item.getLetterCode()))
                 errors.add(new ValidationError(ObservableItemDto.class.getName(), "letterCode", item.getLetterCode(), "An item with this letter code already exists."));
         }
