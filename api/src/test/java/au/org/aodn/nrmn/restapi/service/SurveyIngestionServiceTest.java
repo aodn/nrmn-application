@@ -3,7 +3,10 @@ package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
-import au.org.aodn.nrmn.restapi.repository.*;
+import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
+import au.org.aodn.nrmn.restapi.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.repository.SurveyMethodRepository;
+import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,13 +21,10 @@ import software.amazon.awssdk.utils.ImmutableMap;
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -39,8 +39,6 @@ public class SurveyIngestionServiceTest {
     @Mock
     SurveyMethodRepository surveyMethodRepository;
     @Mock
-    ObservableItemRepository observableItemRepository;
-    @Mock
     MeasureRepository measureRepository;
 
     @InjectMocks
@@ -50,8 +48,6 @@ public class SurveyIngestionServiceTest {
     @BeforeEach
     void init() {
         MockitoAnnotations.initMocks(this);
-        when(surveyRepository.save(any())).then(s -> s.getArgument(0));
-        when(siteRepo.save(any())).then(s -> s.getArgument(0));
 
         StagedRow ref = StagedRow.builder()
                 .stagedJob(StagedJob.builder()
@@ -82,6 +78,7 @@ public class SurveyIngestionServiceTest {
     @Test
     void getSurveyForNewSurvey() {
         when(surveyRepository.findOne(any(Example.class))).thenReturn(Optional.empty());
+        when(surveyRepository.save(any())).then(s -> s.getArgument(0));
         when(siteRepo.save(any())).then(s -> s.getArgument(0));
 
         Survey survey = surveyIngestionService.getSurvey(rowBuilder.build());
@@ -99,6 +96,9 @@ public class SurveyIngestionServiceTest {
      */
     @Test
     void getSurveyForExistingSurvey() {
+        when(surveyRepository.save(any())).then(s -> s.getArgument(0));
+        when(siteRepo.save(any())).then(s -> s.getArgument(0));
+
         StagedRowFormatted row1 = rowBuilder.build();
 
         Survey survey1 = surveyIngestionService.getSurvey(row1);
@@ -119,11 +119,13 @@ public class SurveyIngestionServiceTest {
     void getSurveyMethod() {
         Method theMethod = Method.builder().methodId(2).methodName("The Method").isActive(true).build();
         when(entityManager.getReference(Method.class, 2)).thenReturn(theMethod);
+        when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
         StagedRowFormatted row = rowBuilder.build();
-        SurveyMethod surveyMethod = surveyIngestionService.getSurveyMethod(row);
+        Survey survey = Survey.builder().surveyId(1).build();
+        SurveyMethod surveyMethod = surveyIngestionService.getSurveyMethod(survey, row);
         assertEquals(1, surveyMethod.getBlockNum());
         assertEquals(2, surveyMethod.getMethod().getMethodId());
-        assertEquals(surveyIngestionService.getSurvey(row), surveyMethod.getSurvey());
+        assertEquals(survey, surveyMethod.getSurvey());
         assertEquals(false, surveyMethod.getSurveyNotDone());
     }
 
@@ -131,102 +133,42 @@ public class SurveyIngestionServiceTest {
     void getSurveyMethodNotDone() {
         Method theMethod = Method.builder().methodId(2).methodName("The Method").isActive(true).build();
         when(entityManager.getReference(Method.class, 2)).thenReturn(theMethod);
+        when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
         StagedRowFormatted row = rowBuilder.code("snd").build();
-        SurveyMethod surveyMethod = surveyIngestionService.getSurveyMethod(row);
+        Survey survey = Survey.builder().surveyId(1).build();
+        SurveyMethod surveyMethod = surveyIngestionService.getSurveyMethod(survey, row);
         assertEquals(true, surveyMethod.getSurveyNotDone());
     }
 
     @Test
-    void getObservationsForSameSurveyReturnsSameSurvey() {
-        Method theMethod = Method.builder().methodId(2).methodName("The Method").isActive(true).build();
-        when(entityManager.getReference(Method.class, 2)).thenReturn(theMethod);
-        when(measureRepository.findAll(any(Example.class))).then(m -> Arrays.asList(Measure.builder().build()));
-        when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
+    void getObservations() {
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(4, 1))
+                .then(m -> Optional.of(Measure.builder().measureName("2.5cm").build()));
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(4, 3))
+                .then(m -> Optional.of(Measure.builder().measureName("10.5cm").build()));
 
         StagedRowFormatted row = rowBuilder.build();
-        StagedRowFormatted rowFromSameSurvey = rowBuilder
-            .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 10).put(3, 11).build()).build();
-
-        List<Observation> observations = surveyIngestionService.getObservations(row);
-        List<Observation> observationsFromSameSurvey = surveyIngestionService.getObservations(rowFromSameSurvey);
-        assertEquals(
-            observations.get(0).getSurveyMethod().getSurvey(),
-            observationsFromSameSurvey.get(0).getSurveyMethod().getSurvey());
-    }
-
-    @Test
-    void getObservationsDifferentSurveysForDifferentDepths() {
-        when(measureRepository.findAll(any(Example.class))).then(m -> Arrays.asList(Measure.builder().build()));
-        when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
-
+        Survey survey = Survey.builder().surveyId(1).build();
         Method theMethod = Method.builder().methodId(2).methodName("The Method").isActive(true).build();
-        when(entityManager.getReference(Method.class, 2)).thenReturn(theMethod);
 
-        ObservableItem observableItem = ObservableItem.builder()
-                .observableItemName("The Species")
+        SurveyMethod surveyMethod = SurveyMethod
+                .builder()
+                .survey(survey)
+                .method(theMethod)
+                .blockNum(1)
                 .build();
 
-        StagedRowFormatted row = rowBuilder.build();
-        StagedRowFormatted rowWithDifferentDepth = rowBuilder
-                .depth(5)
-                .surveyNum(Optional.of(3))
-                .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 10).put(3, 11).build())
-                .build();
-
-        List<Observation> observations = surveyIngestionService.getObservations(row);
-        List<Observation> observationsFromDifferentSurvey = surveyIngestionService.getObservations(rowWithDifferentDepth);
-        assertNotEquals(
-                observations.get(0).getSurveyMethod().getSurvey(),
-                observationsFromDifferentSurvey.get(0).getSurveyMethod().getSurvey());
+        List<Observation> observations = surveyIngestionService.getObservations(surveyMethod, row);
+        
+        assertEquals(2, observations.size());
+        assertEquals(surveyMethod, observations.get(0).getSurveyMethod());
+        assertEquals(row.getDiver(), observations.get(0).getDiver());
+        assertEquals("2.5cm", observations.get(0).getMeasure().getMeasureName());
+        assertEquals(4, observations.get(0).getMeasureValue());
+        assertEquals(surveyMethod, observations.get(1).getSurveyMethod());
+        assertEquals(row.getDiver(), observations.get(1).getDiver());
+        assertEquals("10.5cm", observations.get(1).getMeasure().getMeasureName());
+        assertEquals(7, observations.get(1).getMeasureValue());
     }
 
-    @Test
-    void getObservationsDifferentSurveysForDifferentDate() {
-        when(measureRepository.findAll(any(Example.class))).then(m -> Arrays.asList(Measure.builder().build()));
-        when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
-
-        Method theMethod = Method.builder().methodId(2).methodName("The Method").isActive(true).build();
-        when(entityManager.getReference(Method.class, 2)).thenReturn(theMethod);
-
-        ObservableItem observableItem = ObservableItem.builder()
-                .observableItemName("THE SPECIES")
-                .build();
-
-        StagedRowFormatted row = rowBuilder.build();
-        StagedRowFormatted rowWithDifferentDate = rowBuilder
-                .date(LocalDate.of(1999, 9, 9))
-                .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 10).put(3, 11).build())
-                .build();
-
-        List<Observation> observations = surveyIngestionService.getObservations(row);
-        List<Observation> observationsFromDifferentSurvey = surveyIngestionService.getObservations(rowWithDifferentDate);
-        assertNotEquals(
-                observations.get(0).getSurveyMethod().getSurvey(),
-                observationsFromDifferentSurvey.get(0).getSurveyMethod().getSurvey());
-    }
-
-    @Test
-    void getObservationsDifferentSurveysForDifferentSites() {
-        when(measureRepository.findAll(any(Example.class))).then(m -> Arrays.asList(Measure.builder().build()));
-        when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
-
-        Method theMethod = Method.builder().methodId(2).methodName("The Method").isActive(true).build();
-        when(entityManager.getReference(Method.class, 2)).thenReturn(theMethod);
-
-        ObservableItem observableItem = ObservableItem.builder()
-                .observableItemName("The Species")
-                .build();
-
-        StagedRowFormatted row = rowBuilder.build();
-        StagedRowFormatted rowWithDifferentSite = rowBuilder
-                .site(Site.builder().siteName("A DIFFERENT SITE").build())
-                .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 10).put(3, 11).build())
-                .build();
-
-        List<Observation> observations = surveyIngestionService.getObservations(row);
-        List<Observation> observationsFromDifferentSurvey = surveyIngestionService.getObservations(rowWithDifferentSite);
-        assertNotEquals(
-                observations.get(0).getSurveyMethod().getSurvey(),
-                observationsFromDifferentSurvey.get(0).getSurveyMethod().getSurvey());
-    }
 }
