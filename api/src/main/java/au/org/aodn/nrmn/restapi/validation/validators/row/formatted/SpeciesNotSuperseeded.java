@@ -15,16 +15,19 @@ public class SpeciesNotSuperseeded extends BaseFormattedValidator {
 
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
-                if (target.getSpecies().getSupersededBy() == null) {
-                    return Validated.valid("Species Not Superseded");
-                }
-        return Validated.invalid(new StagedRowError(
-                new ErrorID(target.getId(),
-                        target.getRef().getStagedJob().getId(),
-                        target.getRef().getSpecies() + " is superseded"),
-                ValidationCategory.DATA,
-                ValidationLevel.WARNING,
-                columnTarget,
-                target.getRef()));
+        if (!target.getSpecies().isPresent()) {
+            return Validated.valid("Not applicable");
+        } else if (target.getSpecies().get().getSupersededBy() == null) {
+            return Validated.valid("Species Not Superseded");
+        } else {
+            return Validated.invalid(new StagedRowError(
+                    new ErrorID(target.getId(),
+                            target.getRef().getStagedJob().getId(),
+                            target.getRef().getSpecies() + " is superseded"),
+                    ValidationCategory.DATA,
+                    ValidationLevel.WARNING,
+                    columnTarget,
+                    target.getRef()));
+        }
     }
 }

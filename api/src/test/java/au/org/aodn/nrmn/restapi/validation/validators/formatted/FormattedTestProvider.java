@@ -23,7 +23,7 @@ public  class FormattedTestProvider {
                 .block(1)
                 .method(2)
                 .diver(diver)
-                .species(ObservableItem.builder().observableItemName("THE SPECIES").build())
+                .species(Optional.of(ObservableItem.builder().observableItemName("THE SPECIES").build()))
                 .site(Site.builder().siteCode("A SITE").build())
                 .depth(1)
                 .surveyNum(Optional.of(2))

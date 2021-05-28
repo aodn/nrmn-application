@@ -79,9 +79,8 @@ public class ValidationProcess extends ValidatorHelpers {
 
         val formattedRows = rowWithHasMap
                 .stream()
-                .flatMap(tuple2s -> OptionalUtil.toStream(
-                        preProcess.toFormat(tuple2s, job.getIsExtendedSize()))
-                ).collect(Collectors.toList());
+                .map(tuple2s -> preProcess.toFormat(tuple2s, job.getIsExtendedSize()))
+                .collect(Collectors.toList());
         val globalFormatted = globalProcess.processFormatted(job, formattedRows);
         val formattedResult = postProcess.process(formattedRows, job);
 

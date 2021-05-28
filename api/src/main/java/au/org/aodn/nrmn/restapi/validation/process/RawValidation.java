@@ -5,7 +5,6 @@ import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
-import au.org.aodn.nrmn.restapi.util.OptionalUtil;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.model.RowWithValidation;
@@ -17,9 +16,9 @@ import au.org.aodn.nrmn.restapi.validation.validators.row.data.SpeciesNotFoundCh
 import au.org.aodn.nrmn.restapi.validation.validators.row.entities.DiverExists;
 import au.org.aodn.nrmn.restapi.validation.validators.row.entities.ObservableItemExists;
 import au.org.aodn.nrmn.restapi.validation.validators.row.entities.SiteCodeExists;
+import au.org.aodn.nrmn.restapi.validation.validators.row.format.*;
 import au.org.aodn.nrmn.restapi.validation.validators.row.passThu.PassThruRef;
 import au.org.aodn.nrmn.restapi.validation.validators.row.passThu.PassThruString;
-import au.org.aodn.nrmn.restapi.validation.validators.row.format.*;
 import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import cyclops.data.HashMap;
@@ -129,11 +128,7 @@ public class RawValidation extends ValidatorHelpers {
         return new RowWithValidation(Seq.of(target), validation);
     }
 
-    public Optional<StagedRowFormatted> toFormat(HashMap<String, Object> values, boolean isExtendedSizing) {
-        val species = (ObservableItem) values.get("Species").orElseGet(null);
-        if (species == null)
-            return Optional.empty();
-
+    public StagedRowFormatted toFormat(HashMap<String, Object> values, boolean isExtendedSizing) {
         val site = (Site) values.get("Site").orElseGet(null);
         val date = (LocalDate) values.get("Date").orElseGet(null);
         val time = (Optional<LocalTime>) values.get("Time").orElse(Optional.empty());
@@ -151,10 +146,12 @@ public class RawValidation extends ValidatorHelpers {
 
         val method = (Integer) values.get("Method").orElseGet(null);
         val block = (Integer) values.get("Block").orElseGet(null);
-        val speciesAttributesOtp = obsRepo.getSpeciesAttributesById(new Long(species.getObservableItemId()));
-        val mayBeSpeciesAttributes = speciesAttributesOtp
-                .stream()
-                .findFirst();
+        val species = Optional.ofNullable((ObservableItem) values.get("Species").orElse(null));
+
+        Optional<UiSpeciesAttributes> mayBeSpeciesAttributes = species.isPresent()
+                ? obsRepo.getSpeciesAttributesById(species.get().getObservableItemId())
+                : Optional.empty();
+
         val code = (String) values.get("Code").orElseGet(null);
 
         val vis = (Optional<Integer>) values.get("Vis").orElse(Optional.empty());
@@ -191,7 +188,7 @@ public class RawValidation extends ValidatorHelpers {
             val isInvertSizing = (Optional<Boolean>) values.get("IsInvertSizing").orElse(Optional.empty());
             rowFormatted.setIsInvertSizing(isInvertSizing);
         }
-        return Optional.of(rowFormatted);
+        return rowFormatted;
     }
 
     public List<StagedRowFormatted> preValidated(List<StagedRow> targets, StagedJob job) {
@@ -203,9 +200,8 @@ public class RawValidation extends ValidatorHelpers {
                 .flatMap(row -> {
                     val validatedRow = validate(row, validators);
                     val validated = validatedRow.getValid();
-                    val validatorsWithMap =
-                            validated.map(seq -> toFormat(seq.toHashMap(Tuple2::_1, Tuple2::_2), job.getIsExtendedSize()));
-                    return validatorsWithMap.stream().flatMap(OptionalUtil::toStream);
+                    return validated.map(seq -> toFormat(seq.toHashMap(Tuple2::_1, Tuple2::_2),
+                     job.getIsExtendedSize())).stream();
                 }).collect(Collectors.toList());
     }
 }

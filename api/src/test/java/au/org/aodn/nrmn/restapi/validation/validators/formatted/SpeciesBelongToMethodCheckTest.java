@@ -7,6 +7,8 @@ import com.google.common.collect.ImmutableSet;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class SpeciesBelongToMethodCheckTest extends FormattedTestProvider{
@@ -14,11 +16,11 @@ class SpeciesBelongToMethodCheckTest extends FormattedTestProvider{
     public void matchingMethodShouldSuccess() {
         val formatted = getDefaultFormatted().build();
         formatted.setMethod(1);
-        formatted.setSpecies(
+        formatted.setSpecies(Optional.of(
                 ObservableItem.builder()
                               .observableItemName("THE SPECIES")
                               .methods(ImmutableSet.of(Method.builder().methodId(1).build()))
-                              .build());
+                              .build()));
 
         val validator = new SpeciesBelongToMethodCheck();
         val res =validator.valid(formatted);
@@ -29,11 +31,11 @@ class SpeciesBelongToMethodCheckTest extends FormattedTestProvider{
     public void nonMatchingMethodShouldFail() {
         val formatted = getDefaultFormatted().build();
         formatted.setMethod(2);
-        formatted.setSpecies(
+        formatted.setSpecies(Optional.of(
                 ObservableItem.builder()
                         .observableItemName("THE SPECIES")
                         .methods(ImmutableSet.of(Method.builder().methodId(1).build()))
-                        .build());
+                        .build()));
 
         val validator = new SpeciesBelongToMethodCheck();
         val res =validator.valid(formatted);

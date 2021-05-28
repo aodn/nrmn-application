@@ -17,6 +17,7 @@ import javax.transaction.Transactional;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -106,12 +107,14 @@ public class SurveyIngestionService {
 
     public List<Observation> getObservations(SurveyMethod surveyMethod, StagedRowFormatted stagedRow,
             Boolean withExtendedSizing) {
+        if (!stagedRow.getSpecies().isPresent()) return Collections.emptyList();
+
         Diver diver = stagedRow.getDiver();
 
         Map<Integer, Integer> measures = stagedRow.getMeasureJson();
 
         Observation.ObservationBuilder baseObservationBuilder = Observation.builder().diver(diver)
-                .surveyMethod(surveyMethod).observableItem(stagedRow.getSpecies());
+                .surveyMethod(surveyMethod).observableItem(stagedRow.getSpecies().get());
 
         List<Observation> observations = measures.entrySet().stream().map(m -> {
 
@@ -128,10 +131,10 @@ public class SurveyIngestionService {
                                     : MEASURE_TYPE_FISH_SIZE_CLASS;
                 }
 
-                if (stagedRow.getSpecies().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)
+                if (stagedRow.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)
                     measureTypeId = MEASURE_TYPE_ABSENCE;
 
-                if (stagedRow.getSpecies().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_DEBRIS)
+                if (stagedRow.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_DEBRIS)
                     measureTypeId = MEASURE_TYPE_SINGLE_ITEM;
 
             } else if (method == METHOD_M3) {

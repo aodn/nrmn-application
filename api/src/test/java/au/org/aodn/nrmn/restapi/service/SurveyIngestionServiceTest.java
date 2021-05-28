@@ -55,7 +55,7 @@ public class SurveyIngestionServiceTest {
 
         Diver diver = Diver.builder().initials("SAM").build();
         rowBuilder = StagedRowFormatted.builder().block(1).method(2).diver(diver)
-                .species(ObservableItem.builder().observableItemName("THE SPECIES").build())
+                .species(Optional.of(ObservableItem.builder().observableItemName("THE SPECIES").build()))
                 .site(Site.builder().siteCode("A SITE").build()).depth(1).surveyNum(Optional.of(2))
                 .direction(Directions.N).vis(Optional.of(15)).date(LocalDate.of(2003, 03, 03))
                 .time(Optional.of(LocalTime.of(12, 34, 56))).pqs(diver).isInvertSizing(Optional.of(true)).code("AAA")
@@ -136,7 +136,8 @@ public class SurveyIngestionServiceTest {
         IntStream.of(0, 1, 2, 7, 10, 11).forEach(i -> {
             ObservableItem obsItem = ObservableItem.builder()
                     .obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build();
-            StagedRowFormatted row = rowBuilder.isInvertSizing(Optional.of(true)).species(obsItem).method(i).build();
+            StagedRowFormatted row =
+             rowBuilder.isInvertSizing(Optional.of(true)).species(Optional.of(obsItem)).method(i).build();
             Survey survey = Survey.builder().surveyId(i).build();
             Method theMethod = Method.builder().methodId(i).methodName("The Method").isActive(true).build();
             SurveyMethod surveyMethod = SurveyMethod.builder().survey(survey).method(theMethod).blockNum(1).build();
@@ -163,8 +164,8 @@ public class SurveyIngestionServiceTest {
         SurveyMethod surveyMethod3 = SurveyMethod.builder().survey(Survey.builder().surveyId(3).build())
                 .method(Method.builder().methodId(3).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations3 = surveyIngestionService.getObservations(surveyMethod3,
-                rowBuilder.isInvertSizing(Optional.of(true)).method(3).species(
-                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build())
+                rowBuilder.isInvertSizing(Optional.of(true)).method(3).species(Optional.of(
+                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build()))
                         .build(),
                 false);
         // M3 should be mapped to measure_type_id = 2 - In Situ Quadrats
@@ -178,8 +179,8 @@ public class SurveyIngestionServiceTest {
         SurveyMethod surveyMethod4 = SurveyMethod.builder().survey(Survey.builder().surveyId(4).build())
                 .method(Method.builder().methodId(4).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations4 = surveyIngestionService.getObservations(surveyMethod4,
-                rowBuilder.isInvertSizing(Optional.of(true)).method(4).species(
-                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build())
+                rowBuilder.isInvertSizing(Optional.of(true)).method(4).species(Optional.of(
+                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build()))
                         .build(),
                 false);
         // M4 should be mapped to measure_type_id = 3 - Macrocystis Block
@@ -193,8 +194,8 @@ public class SurveyIngestionServiceTest {
         SurveyMethod surveyMethod5 = SurveyMethod.builder().survey(Survey.builder().surveyId(5).build())
                 .method(Method.builder().methodId(4).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations5 = surveyIngestionService.getObservations(surveyMethod5,
-                rowBuilder.isInvertSizing(Optional.of(true)).method(5).species(
-                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build())
+                rowBuilder.isInvertSizing(Optional.of(true)).method(5).species(Optional.of(
+                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build()))
                         .build(),
                 false);
         // M4 should be mapped to measure_type_id = 7 - Limpet Quadrat
@@ -208,8 +209,9 @@ public class SurveyIngestionServiceTest {
         when(measureRepository.findByMeasureTypeIdAndSeqNo(4, 3)).then(m -> Optional.of(Measure.builder()
                 .measureName("1.5cm").measureType(MeasureType.builder().measureTypeId(4).build()).build()));
 
-        ObservableItem obsItem = ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build())
-                .build();
+        Optional<ObservableItem> obsItem =
+         Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build())
+                .build());
         StagedRowFormatted row = rowBuilder.isInvertSizing(Optional.of(true)).species(obsItem).build();
 
         // M2

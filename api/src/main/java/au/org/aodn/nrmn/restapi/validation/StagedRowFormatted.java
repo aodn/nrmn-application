@@ -36,7 +36,7 @@ public class StagedRowFormatted {
 
     private Integer block;
 
-    private ObservableItem species;
+    private Optional<ObservableItem> species;
 
     private Optional<Integer> vis;
 
