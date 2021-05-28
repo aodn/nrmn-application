@@ -1,6 +1,5 @@
 package au.org.aodn.nrmn.restapi.service;
 
-
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
@@ -23,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,29 +50,16 @@ public class SurveyIngestionServiceTest {
         MockitoAnnotations.initMocks(this);
 
         StagedRow ref = StagedRow.builder()
-                .stagedJob(StagedJob.builder()
-                        .program(Program.builder().programName("PROJECT")
-                                .build()).build()).build();
+                .stagedJob(StagedJob.builder().program(Program.builder().programName("PROJECT").build()).build())
+                .build();
 
         Diver diver = Diver.builder().initials("SAM").build();
-        rowBuilder = StagedRowFormatted.builder()
-                .block(1)
-                .method(2)
-                .diver(diver)
+        rowBuilder = StagedRowFormatted.builder().block(1).method(2).diver(diver)
                 .species(ObservableItem.builder().observableItemName("THE SPECIES").build())
-                .site(Site.builder().siteCode("A SITE").build())
-                .depth(1)
-                .surveyNum(Optional.of(2))
-                .direction(Directions.N)
-                .vis(Optional.of(15))
-                .date(LocalDate.of(2003, 03, 03))
-                .time(Optional.of(LocalTime.of(12, 34, 56)))
-                .pqs(diver)
-                .isInvertSizing(Optional.of(true))
-                .code("AAA")
-                .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build())
-                .ref(ref)
-        ;
+                .site(Site.builder().siteCode("A SITE").build()).depth(1).surveyNum(Optional.of(2))
+                .direction(Directions.N).vis(Optional.of(15)).date(LocalDate.of(2003, 03, 03))
+                .time(Optional.of(LocalTime.of(12, 34, 56))).pqs(diver).isInvertSizing(Optional.of(true)).code("AAA")
+                .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build()).ref(ref);
     }
 
     @Test
@@ -92,7 +79,8 @@ public class SurveyIngestionServiceTest {
     }
 
     /**
-     * If an existing survey with the same depth, date and site no. exists then getSurvey should return it
+     * If an existing survey with the same depth, date and site no. exists then
+     * getSurvey should return it
      */
     @Test
     void getSurveyForExistingSurvey() {
@@ -104,11 +92,8 @@ public class SurveyIngestionServiceTest {
         Survey survey1 = surveyIngestionService.getSurvey(row1);
         when(surveyRepository.findOne(any(Example.class))).thenReturn(Optional.of(survey1));
 
-        StagedRowFormatted row2 = rowBuilder
-                .block(2)
-                .method(1)
-                .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build())
-                .build();
+        StagedRowFormatted row2 = rowBuilder.block(2).method(1)
+                .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build()).build();
 
         Survey survey2 = surveyIngestionService.getSurvey(row2);
 
@@ -142,33 +127,107 @@ public class SurveyIngestionServiceTest {
 
     @Test
     void getObservations() {
-        when(measureRepository.findByMeasureTypeIdAndSeqNo(4, 1))
-                .then(m -> Optional.of(Measure.builder().measureName("2.5cm").build()));
-        when(measureRepository.findByMeasureTypeIdAndSeqNo(4, 3))
-                .then(m -> Optional.of(Measure.builder().measureName("10.5cm").build()));
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(1, 1)).then(m -> Optional.of(Measure.builder()
+                .measureName("2.5cm").measureType(MeasureType.builder().measureTypeId(1).build()).build()));
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(1, 3)).then(m -> Optional.of(Measure.builder()
+                .measureName("10.5cm").measureType(MeasureType.builder().measureTypeId(1).build()).build()));
 
-        StagedRowFormatted row = rowBuilder.build();
+        // M0, M1, M2, M7, M10, M11
+        IntStream.of(0, 1, 2, 7, 10, 11).forEach(i -> {
+            ObservableItem obsItem = ObservableItem.builder()
+                    .obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build();
+            StagedRowFormatted row = rowBuilder.isInvertSizing(Optional.of(true)).species(obsItem).method(i).build();
+            Survey survey = Survey.builder().surveyId(i).build();
+            Method theMethod = Method.builder().methodId(i).methodName("The Method").isActive(true).build();
+            SurveyMethod surveyMethod = SurveyMethod.builder().survey(survey).method(theMethod).blockNum(1).build();
+
+            // ExtendedSizing = false
+            List<Observation> observations = surveyIngestionService.getObservations(surveyMethod, row, false);
+            assertEquals(1, observations.get(0).getMeasure().getMeasureType().getMeasureTypeId());
+            assertEquals(2, observations.size());
+            assertEquals(surveyMethod, observations.get(0).getSurveyMethod());
+            assertEquals(row.getDiver(), observations.get(0).getDiver());
+            assertEquals("2.5cm", observations.get(0).getMeasure().getMeasureName());
+            assertEquals(4, observations.get(0).getMeasureValue());
+            assertEquals(surveyMethod, observations.get(1).getSurveyMethod());
+            assertEquals(row.getDiver(), observations.get(1).getDiver());
+            assertEquals("10.5cm", observations.get(1).getMeasure().getMeasureName());
+            assertEquals(7, observations.get(1).getMeasureValue());
+        });
+    }
+
+    @Test
+    void getObservationsM3() {
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(2, 1)).then(m -> Optional.of(Measure.builder()
+                .measureName("2.5cm").measureType(MeasureType.builder().measureTypeId(2).build()).build()));
+        SurveyMethod surveyMethod3 = SurveyMethod.builder().survey(Survey.builder().surveyId(3).build())
+                .method(Method.builder().methodId(3).methodName("").isActive(true).build()).blockNum(1).build();
+        List<Observation> observations3 = surveyIngestionService.getObservations(surveyMethod3,
+                rowBuilder.isInvertSizing(Optional.of(true)).method(3).species(
+                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build())
+                        .build(),
+                false);
+        // M3 should be mapped to measure_type_id = 2 - In Situ Quadrats
+        assertEquals(2, observations3.get(0).getMeasure().getMeasureType().getMeasureTypeId());
+    }
+
+    @Test
+    void getObservationsM4() {
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(3, 1)).then(m -> Optional.of(Measure.builder()
+                .measureName("2.5cm").measureType(MeasureType.builder().measureTypeId(3).build()).build()));
+        SurveyMethod surveyMethod4 = SurveyMethod.builder().survey(Survey.builder().surveyId(4).build())
+                .method(Method.builder().methodId(4).methodName("").isActive(true).build()).blockNum(1).build();
+        List<Observation> observations4 = surveyIngestionService.getObservations(surveyMethod4,
+                rowBuilder.isInvertSizing(Optional.of(true)).method(4).species(
+                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build())
+                        .build(),
+                false);
+        // M4 should be mapped to measure_type_id = 3 - Macrocystis Block
+        assertEquals(3, observations4.get(0).getMeasure().getMeasureType().getMeasureTypeId());
+    }
+
+    @Test
+    void getObservationsM5() {
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(7, 1)).then(m -> Optional.of(Measure.builder()
+                .measureName("2.5cm").measureType(MeasureType.builder().measureTypeId(7).build()).build()));
+        SurveyMethod surveyMethod5 = SurveyMethod.builder().survey(Survey.builder().surveyId(5).build())
+                .method(Method.builder().methodId(4).methodName("").isActive(true).build()).blockNum(1).build();
+        List<Observation> observations5 = surveyIngestionService.getObservations(surveyMethod5,
+                rowBuilder.isInvertSizing(Optional.of(true)).method(5).species(
+                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build())
+                        .build(),
+                false);
+        // M4 should be mapped to measure_type_id = 7 - Limpet Quadrat
+        assertEquals(7, observations5.get(0).getMeasure().getMeasureType().getMeasureTypeId());
+    }
+
+    @Test
+    void getObservationsWithExtendedSizing() {
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(4, 1)).then(m -> Optional.of(Measure.builder()
+                .measureName("0.5cm").measureType(MeasureType.builder().measureTypeId(4).build()).build()));
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(4, 3)).then(m -> Optional.of(Measure.builder()
+                .measureName("1.5cm").measureType(MeasureType.builder().measureTypeId(4).build()).build()));
+
+        ObservableItem obsItem = ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build())
+                .build();
+        StagedRowFormatted row = rowBuilder.isInvertSizing(Optional.of(true)).species(obsItem).build();
+
+        // M2
         Survey survey = Survey.builder().surveyId(1).build();
         Method theMethod = Method.builder().methodId(2).methodName("The Method").isActive(true).build();
+        SurveyMethod surveyMethod = SurveyMethod.builder().survey(survey).method(theMethod).blockNum(1).build();
 
-        SurveyMethod surveyMethod = SurveyMethod
-                .builder()
-                .survey(survey)
-                .method(theMethod)
-                .blockNum(1)
-                .build();
-
-        List<Observation> observations = surveyIngestionService.getObservations(surveyMethod, row);
-        
+        // ExtendedSizing = false
+        List<Observation> observations = surveyIngestionService.getObservations(surveyMethod, row, true);
+        assertEquals(4, observations.get(0).getMeasure().getMeasureType().getMeasureTypeId());
         assertEquals(2, observations.size());
         assertEquals(surveyMethod, observations.get(0).getSurveyMethod());
         assertEquals(row.getDiver(), observations.get(0).getDiver());
-        assertEquals("2.5cm", observations.get(0).getMeasure().getMeasureName());
+        assertEquals("0.5cm", observations.get(0).getMeasure().getMeasureName());
         assertEquals(4, observations.get(0).getMeasureValue());
         assertEquals(surveyMethod, observations.get(1).getSurveyMethod());
         assertEquals(row.getDiver(), observations.get(1).getDiver());
-        assertEquals("10.5cm", observations.get(1).getMeasure().getMeasureName());
+        assertEquals("1.5cm", observations.get(1).getMeasure().getMeasureName());
         assertEquals(7, observations.get(1).getMeasureValue());
     }
-
 }
