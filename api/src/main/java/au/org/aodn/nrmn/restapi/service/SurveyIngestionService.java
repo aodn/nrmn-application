@@ -21,13 +21,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.groupingBy;
 
 @Service
 public class SurveyIngestionService {
-    private static final ImmutableMap<Integer, Integer> METHOD_ID_TO_MEASURE_ID_MAP = ImmutableMap
-            .<Integer, Integer>builder().put(0, 1).put(1, 1).put(2, 4).put(3, 2).put(4, 3).put(5, 7).build();
+
+    public static final int METHOD_M0 = 0;
+    public static final int METHOD_M1 = 1;
+    public static final int METHOD_M2 = 2;
+    public static final int METHOD_M3 = 3;
+    public static final int METHOD_M4 = 4;
+    public static final int METHOD_M5 = 5;
+    public static final int METHOD_M7 = 7;
+    public static final int METHOD_M10 = 10;
+    public static final int METHOD_M11 = 11;
+
+    public static final int MEASURE_TYPE_FISH_SIZE_CLASS = 1;
+    public static final int MEASURE_TYPE_IN_SITU_QUADRAT = 2;
+    public static final int MEASURE_TYPE_MACROCYSTIS_BLOCK = 3;
+    public static final int MEASURE_TYPE_INVERT_SIZE_CLASS = 4;
+    public static final int MEASURE_TYPE_SINGLE_ITEM = 5;
+    public static final int MEASURE_TYPE_ABSENCE = 6;
+    public static final int MEASURE_TYPE_LIMPET_QUADRAT = 7;
+
+    public static final int OBS_ITEM_TYPE_DEBRIS = 5;
+    public static final int OBS_ITEM_TYPE_NO_SPECIES_FOUND = 6;
+
+
     @Autowired
     SurveyRepository surveyRepository;
     @Autowired
@@ -69,8 +91,9 @@ public class SurveyIngestionService {
         return existingSurvey.orElseGet(() -> surveyRepository.save(Survey.builder().depth(stagedRow.getDepth())
                 .surveyNum(stagedRow.getSurveyNum().orElse(null)).direction(stagedRow.getDirection().toString())
                 .site(site).surveyDate(Date.valueOf(stagedRow.getDate()))
-                .surveyTime(Time.valueOf(stagedRow.getTime().orElse(LocalTime.NOON))).visibility(stagedRow.getVis().orElse(null))
-                .program(stagedRow.getRef().getStagedJob().getProgram()).build()));
+                .surveyTime(Time.valueOf(stagedRow.getTime().orElse(LocalTime.NOON)))
+                .visibility(stagedRow.getVis().orElse(null)).program(stagedRow.getRef().getStagedJob().getProgram())
+                .build()));
     }
 
     public SurveyMethod getSurveyMethod(Survey survey, StagedRowFormatted stagedRow) {
@@ -81,15 +104,44 @@ public class SurveyIngestionService {
         return surveyMethodRepository.save(surveyMethod);
     }
 
-    public List<Observation> getObservations(SurveyMethod surveyMethod, StagedRowFormatted stagedRow) {
+    public List<Observation> getObservations(SurveyMethod surveyMethod, StagedRowFormatted stagedRow,
+            Boolean withExtendedSizing) {
         Diver diver = stagedRow.getDiver();
+
         Map<Integer, Integer> measures = stagedRow.getMeasureJson();
 
         Observation.ObservationBuilder baseObservationBuilder = Observation.builder().diver(diver)
                 .surveyMethod(surveyMethod).observableItem(stagedRow.getSpecies());
 
         List<Observation> observations = measures.entrySet().stream().map(m -> {
-            int measureTypeId = METHOD_ID_TO_MEASURE_ID_MAP.get(stagedRow.getMethod());
+
+            Integer method = stagedRow.getMethod();
+
+            int measureTypeId = MEASURE_TYPE_FISH_SIZE_CLASS;
+
+            if (IntStream.of(METHOD_M0, METHOD_M1, METHOD_M2, METHOD_M7, METHOD_M10, METHOD_M11)
+                    .anyMatch(x -> x == method)) {
+
+                if (withExtendedSizing) {
+                    measureTypeId = (stagedRow.getIsInvertSizing().isPresent()
+                            && stagedRow.getIsInvertSizing().get() == true) ? MEASURE_TYPE_INVERT_SIZE_CLASS
+                                    : MEASURE_TYPE_FISH_SIZE_CLASS;
+                }
+
+                if (stagedRow.getSpecies().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)
+                    measureTypeId = MEASURE_TYPE_ABSENCE;
+
+                if (stagedRow.getSpecies().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_DEBRIS)
+                    measureTypeId = MEASURE_TYPE_SINGLE_ITEM;
+
+            } else if (method == METHOD_M3) {
+                measureTypeId = MEASURE_TYPE_IN_SITU_QUADRAT;
+            } else if (method == METHOD_M4) {
+                measureTypeId = MEASURE_TYPE_MACROCYSTIS_BLOCK;
+            } else if (method == METHOD_M5) {
+                measureTypeId = MEASURE_TYPE_LIMPET_QUADRAT;
+            }
+
             Measure measure = measureRepository.findByMeasureTypeIdAndSeqNo(measureTypeId, m.getKey()).orElse(null);
             return baseObservationBuilder.measure(measure).measureValue(m.getValue()).build();
         }).collect(Collectors.toList());
@@ -99,21 +151,19 @@ public class SurveyIngestionService {
 
     @Transactional
     public void ingestTransaction(StagedJob job, List<StagedRowFormatted> validatedRows) {
-        Map<Tuple4, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows
-                .stream()
-                .collect(groupingBy(row -> new Tuple4(row.getSite(), row.getDate(), row.getDepth(),
-                 row.getSurveyNum())));
+        Map<Tuple4, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream().collect(
+                groupingBy(row -> new Tuple4(row.getSite(), row.getDate(), row.getDepth(), row.getSurveyNum())));
 
         List<Integer> surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
             Survey survey = getSurvey(surveyRows.get(0));
 
-            Map<Tuple2, List<StagedRowFormatted>> rowsGroupedBySurveyMethod = surveyRows
-                .stream()
-                .collect(groupingBy(row -> new Tuple2(row.getMethod(), row.getBlock())));
+            Map<Tuple2, List<StagedRowFormatted>> rowsGroupedBySurveyMethod = surveyRows.stream()
+                    .collect(groupingBy(row -> new Tuple2(row.getMethod(), row.getBlock())));
 
             rowsGroupedBySurveyMethod.values().forEach(surveyMethodRows -> {
                 SurveyMethod surveyMethod = getSurveyMethod(survey, surveyMethodRows.get(0));
-                surveyMethodRows.forEach(row -> observationRepository.saveAll(getObservations(surveyMethod, row)));
+                surveyMethodRows.forEach(row -> observationRepository
+                        .saveAll(getObservations(surveyMethod, row, job.getIsExtendedSize())));
             });
 
             return survey.getSurveyId();
