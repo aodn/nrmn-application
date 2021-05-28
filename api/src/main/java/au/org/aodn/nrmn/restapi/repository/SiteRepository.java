@@ -11,7 +11,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import javax.persistence.QueryHint;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,8 +28,11 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
     @Query(nativeQuery = true, value = "SELECT site_code FROM {h-schema}ep_site_list WHERE province = ?1")
     List<String> findSiteCodesByProvince(String province);
 
-    @Query(value = "SELECT DISTINCT siteCode FROM Site where siteCode is not null ORDER BY siteCode")
+    @Query(value = "SELECT DISTINCT site_code FROM {h-schema}site_ref WHERE site_code IS NOT NULL ORDER BY SUBSTRING(site_code, '^[A-Z]+'), CAST(SUBSTRING(site_code, '[0-9]+$') AS INTEGER)", nativeQuery = true)
     List<String> findAllSiteCodes();
+
+    @Query(value = "SELECT * FROM {h-schema}site_ref WHERE site_code IS NOT NULL ORDER BY SUBSTRING(site_code, '^[A-Z]+'), CAST(SUBSTRING(site_code, '[0-9]+$') AS INTEGER)", nativeQuery = true)
+    List<Site> findAll();
 
     @Query(value = "SELECT DISTINCT state FROM Site WHERE state is not null ORDER BY state")
     List<String> findAllSiteStates();
