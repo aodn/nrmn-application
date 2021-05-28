@@ -37,6 +37,7 @@ public class SurveyIngestionService {
     public static final int METHOD_M7 = 7;
     public static final int METHOD_M10 = 10;
     public static final int METHOD_M11 = 11;
+    public static final int METHOD_M12 = 12;
 
     public static final int MEASURE_TYPE_FISH_SIZE_CLASS = 1;
     public static final int MEASURE_TYPE_IN_SITU_QUADRAT = 2;
@@ -48,7 +49,6 @@ public class SurveyIngestionService {
 
     public static final int OBS_ITEM_TYPE_DEBRIS = 5;
     public static final int OBS_ITEM_TYPE_NO_SPECIES_FOUND = 6;
-
 
     @Autowired
     SurveyRepository surveyRepository;
@@ -149,6 +149,14 @@ public class SurveyIngestionService {
         return observations;
     }
 
+    public Map<Tuple2, List<StagedRowFormatted>> groupRowsBySurveyMethod(List<StagedRowFormatted> surveyRows) {
+        return surveyRows.stream().map(r -> {
+            if (r.getSpecies().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_DEBRIS)
+                r.setMethod(METHOD_M12);
+            return r;
+        }).collect(groupingBy(row -> new Tuple2(row.getMethod(), row.getBlock())));
+    }
+
     @Transactional
     public void ingestTransaction(StagedJob job, List<StagedRowFormatted> validatedRows) {
         Map<Tuple4, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream().collect(
@@ -157,10 +165,7 @@ public class SurveyIngestionService {
         List<Integer> surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
             Survey survey = getSurvey(surveyRows.get(0));
 
-            Map<Tuple2, List<StagedRowFormatted>> rowsGroupedBySurveyMethod = surveyRows.stream()
-                    .collect(groupingBy(row -> new Tuple2(row.getMethod(), row.getBlock())));
-
-            rowsGroupedBySurveyMethod.values().forEach(surveyMethodRows -> {
+            groupRowsBySurveyMethod(surveyRows).values().forEach(surveyMethodRows -> {
                 SurveyMethod surveyMethod = getSurveyMethod(survey, surveyMethodRows.get(0));
                 surveyMethodRows.forEach(row -> observationRepository
                         .saveAll(getObservations(surveyMethod, row, job.getIsExtendedSize())));

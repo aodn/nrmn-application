@@ -20,6 +20,7 @@ import software.amazon.awssdk.utils.ImmutableMap;
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -229,5 +230,17 @@ public class SurveyIngestionServiceTest {
         assertEquals(row.getDiver(), observations.get(1).getDiver());
         assertEquals("1.5cm", observations.get(1).getMeasure().getMeasureName());
         assertEquals(7, observations.get(1).getMeasureValue());
+    }
+
+    @Test
+    void getObservationsDebrisSavedAsM12() {
+
+        ObservableItem debrisItem = ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(5).build()).build();
+        StagedRowFormatted row = rowBuilder.isInvertSizing(Optional.of(true)).species(debrisItem).build();
+
+        StagedRowFormatted groupedRow = surveyIngestionService.groupRowsBySurveyMethod(Arrays.asList(row)).values().iterator().next().get(0);
+
+        // Debris are entered as M2 but stored as M12
+        assertEquals(12, groupedRow.getMethod());
     }
 }
