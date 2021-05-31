@@ -42,7 +42,7 @@ public class SiteController {
     @GetMapping("/siteListItems")
     public CollectionModel<SiteListItem> list() {
         return CollectionModel.of(
-                siteRepository.findAll(Sort.by("siteCode"))
+                siteRepository.findAll()
                               .stream()
                               .map(site -> assembler.toModel(site))
                               .collect(Collectors.toList())

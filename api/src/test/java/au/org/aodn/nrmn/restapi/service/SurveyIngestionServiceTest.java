@@ -15,6 +15,7 @@ import software.amazon.awssdk.utils.ImmutableMap;
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +23,6 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -239,7 +239,7 @@ public class SurveyIngestionServiceTest {
         when(surveyRepository.save(any())).then(s -> s.getArgument(0));
         when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
         when(observationRepository.saveAll(any())).then(s -> s.getArgument(0));
-        
+
         Program program = Program.builder().programId(1).build();
         StagedJob stagedJob = StagedJob.builder().id(1L).program(program).build();
         StagedRow stagedRow = StagedRow.builder().stagedJob(stagedJob).build();
@@ -266,5 +266,18 @@ public class SurveyIngestionServiceTest {
         Mockito.verify(surveyMethodRepository).save(surveyMethodCaptor.capture());
         SurveyMethod surveyMethod = surveyMethodCaptor.getValue();
         assertEquals(true, surveyMethod.getSurveyNotDone());
+
+    }
+
+    @Test
+    void getObservationsDebrisSavedAsM12() {
+
+        ObservableItem debrisItem = ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(5).build()).build();
+        StagedRowFormatted row = rowBuilder.isInvertSizing(Optional.of(true)).species(Optional.of(debrisItem)).build();
+
+        StagedRowFormatted groupedRow = surveyIngestionService.groupRowsBySurveyMethod(Arrays.asList(row)).values().iterator().next().get(0);
+
+        // Debris are entered as M2 but stored as M12
+        assertEquals(12, groupedRow.getMethod());
     }
 }
