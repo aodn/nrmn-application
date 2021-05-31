@@ -21,8 +21,11 @@ public class SpeciesBelongToMethodCheck extends BaseFormattedValidator {
 
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
-        val species =  target.getSpecies();
+        if (!target.getSpecies().isPresent()) {
+            return Validated.valid("Not applicable");
+        }
 
+        val species =  target.getSpecies().get();
 
         if (species.getMethods().stream().anyMatch(method -> method.getMethodId().equals(target.getMethod()))) {
             return Validated.valid("Species match method");
