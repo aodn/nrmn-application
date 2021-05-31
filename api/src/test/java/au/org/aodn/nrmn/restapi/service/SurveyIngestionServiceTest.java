@@ -61,6 +61,7 @@ public class SurveyIngestionServiceTest {
                 .site(Site.builder().siteCode("A SITE").isActive(false).build()).depth(1).surveyNum(Optional.of(2))
                 .direction(Directions.N).vis(Optional.of(15)).date(LocalDate.of(2003, 03, 03))
                 .time(Optional.of(LocalTime.of(12, 34, 56))).pqs(diver).isInvertSizing(Optional.of(true)).code("AAA")
+                .inverts(0)
                 .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build()).ref(ref);
     }
 
