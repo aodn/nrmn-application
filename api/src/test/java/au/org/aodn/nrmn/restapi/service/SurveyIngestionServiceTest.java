@@ -237,7 +237,7 @@ public class SurveyIngestionServiceTest {
         assertEquals("1.5cm", observations.get(1).getMeasure().getMeasureName());
         assertEquals(7, observations.get(1).getMeasureValue());
     }
-    
+
     @Test
     void getInvertsObservationM1() {
         Measure unsized = Measure.builder()
