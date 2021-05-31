@@ -74,20 +74,19 @@ public class SurveyIngestionService {
     StagedJobRepository jobRepository;
 
     public Survey getSurvey(StagedRowFormatted stagedRow) {
+        
         val site = stagedRow.getSite();
+
+        if (!site.getIsActive()) {
+            site.setIsActive(true);
+            siteRepo.save(site);
+        }
 
         val survey = Survey.builder().depth(stagedRow.getDepth()).surveyNum(stagedRow.getSurveyNum().orElse(null))
                 .site(Site.builder().siteCode(site.getSiteCode()).build()).surveyDate(Date.valueOf(stagedRow.getDate()))
                 .build();
 
         Optional<Survey> existingSurvey = surveyRepository.findOne(Example.of(survey));
-
-        val siteSurveys = surveyRepository.findAll(Example
-                .of(Survey.builder().site(Site.builder().siteCode(stagedRow.getSite().getSiteCode()).build()).build()));
-        if (siteSurveys.isEmpty()) {
-            site.setIsActive(true);
-            siteRepo.save(site);
-        }
         return existingSurvey.orElseGet(() -> surveyRepository.save(Survey.builder().depth(stagedRow.getDepth())
                 .surveyNum(stagedRow.getSurveyNum().orElse(null)).direction(stagedRow.getDirection().toString())
                 .site(site).surveyDate(Date.valueOf(stagedRow.getDate()))
