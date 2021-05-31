@@ -191,7 +191,7 @@ public class SurveyIngestionServiceTest {
         // M4 should be mapped to measure_type_id = 3 - Macrocystis Block
         assertEquals(3, observations4.get(0).getMeasure().getMeasureType().getMeasureTypeId());
     }
-    
+
     @Test
     void getObservationsM5() {
         when(measureRepository.findByMeasureTypeIdAndSeqNo(7, 1)).then(m -> Optional.of(Measure.builder()
