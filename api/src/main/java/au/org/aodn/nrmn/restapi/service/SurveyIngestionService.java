@@ -6,6 +6,7 @@ import au.org.aodn.nrmn.restapi.repository.*;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.data.tuple.Tuple2;
 import cyclops.data.tuple.Tuple4;
+import lombok.Value;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -114,7 +116,21 @@ public class SurveyIngestionService {
         Observation.ObservationBuilder baseObservationBuilder = Observation.builder().diver(diver)
                 .surveyMethod(surveyMethod).observableItem(stagedRow.getSpecies().get());
 
-        List<Observation> observations = measures.entrySet().stream().map(m -> {
+        @Value
+        class MeasureValue {
+            private Integer seqNo;
+            private Integer measureValue;
+        }
+        
+        Stream<MeasureValue> unsized = Stream.empty();
+
+        if (!stagedRow.getCode().equalsIgnoreCase("snd") && stagedRow.getInverts() > 0) {
+            unsized = Stream.of(new MeasureValue(0, stagedRow.getInverts()));
+        }
+
+        Stream<MeasureValue> sized = measures.entrySet().stream().map(m -> new MeasureValue(m.getKey(), m.getValue()));
+         
+        List<Observation> observations = Stream.concat(unsized, sized).map(m -> {
 
             Integer method = stagedRow.getMethod();
 
@@ -132,19 +148,18 @@ public class SurveyIngestionService {
                 if (stagedRow.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)
                     measureTypeId = MEASURE_TYPE_ABSENCE;
 
-                if (stagedRow.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_DEBRIS)
-                    measureTypeId = MEASURE_TYPE_SINGLE_ITEM;
-
             } else if (method == METHOD_M3) {
                 measureTypeId = MEASURE_TYPE_IN_SITU_QUADRAT;
             } else if (method == METHOD_M4) {
                 measureTypeId = MEASURE_TYPE_MACROCYSTIS_BLOCK;
             } else if (method == METHOD_M5) {
                 measureTypeId = MEASURE_TYPE_LIMPET_QUADRAT;
+            } else if (method == METHOD_M12) {
+                measureTypeId = MEASURE_TYPE_SINGLE_ITEM;
             }
 
-            Measure measure = measureRepository.findByMeasureTypeIdAndSeqNo(measureTypeId, m.getKey()).orElse(null);
-            return baseObservationBuilder.measure(measure).measureValue(m.getValue()).build();
+            Measure measure = measureRepository.findByMeasureTypeIdAndSeqNo(measureTypeId, m.getSeqNo()).orElse(null);
+            return baseObservationBuilder.measure(measure).measureValue(m.getMeasureValue()).build();
         }).collect(Collectors.toList());
 
         return observations;

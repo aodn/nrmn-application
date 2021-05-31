@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import static au.org.aodn.nrmn.restapi.service.SurveyIngestionService.MEASURE_TYPE_FISH_SIZE_CLASS;
+import static au.org.aodn.nrmn.restapi.service.SurveyIngestionService.MEASURE_TYPE_SINGLE_ITEM;
+import static au.org.aodn.nrmn.restapi.service.SurveyIngestionService.OBS_ITEM_TYPE_DEBRIS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -60,6 +63,7 @@ public class SurveyIngestionServiceTest {
                 .site(Site.builder().siteCode("A SITE").isActive(false).build()).depth(1).surveyNum(Optional.of(2))
                 .direction(Directions.N).vis(Optional.of(15)).date(LocalDate.of(2003, 03, 03))
                 .time(Optional.of(LocalTime.of(12, 34, 56))).pqs(diver).isInvertSizing(Optional.of(true)).code("AAA")
+                .inverts(0)
                 .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build()).ref(ref);
     }
 
@@ -233,7 +237,47 @@ public class SurveyIngestionServiceTest {
         assertEquals("1.5cm", observations.get(1).getMeasure().getMeasureName());
         assertEquals(7, observations.get(1).getMeasureValue());
     }
-    
+
+    @Test
+    void getInvertsObservationM1() {
+        Measure unsized = Measure.builder()
+                                 .measureName("Unsized")
+                                 .measureType(MeasureType.builder().measureTypeId(MEASURE_TYPE_FISH_SIZE_CLASS).build())
+                                 .build();
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(MEASURE_TYPE_FISH_SIZE_CLASS, 0)).then(m -> Optional.of(unsized));
+        SurveyMethod surveyMethod6 = SurveyMethod.builder().survey(Survey.builder().surveyId(6).build())
+                .method(Method.builder().methodId(1).methodName("").isActive(true).build()).blockNum(1).build();
+        List<Observation> observations6 = surveyIngestionService.getObservations(surveyMethod6,
+                rowBuilder.inverts(10).measureJson(Collections.emptyMap()).isInvertSizing(Optional.empty()).method(1).species(
+                        Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build()))
+                          .build(),
+                false);
+        // Should return one observation of 10 unsized species
+        assertEquals(1, observations6.size());
+        assertEquals("Unsized", observations6.get(0).getMeasure().getMeasureName());
+        assertEquals(10, observations6.get(0).getMeasureValue());
+    }
+
+    @Test
+    void getInvertsObservationDebris() {
+        Measure item = Measure.builder()
+                                 .measureName("Item")
+                                 .measureType(MeasureType.builder().measureTypeId(MEASURE_TYPE_SINGLE_ITEM).build())
+                                 .build();
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(MEASURE_TYPE_SINGLE_ITEM, 0)).then(m -> Optional.of(item));
+        SurveyMethod surveyMethod7 = SurveyMethod.builder().survey(Survey.builder().surveyId(7).build())
+                .method(Method.builder().methodId(12).methodName("").isActive(true).build()).blockNum(1).build();
+        List<Observation> observations7 = surveyIngestionService.getObservations(surveyMethod7,
+                rowBuilder.inverts(10).measureJson(Collections.emptyMap()).isInvertSizing(Optional.empty()).method(12).species(
+                        Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(OBS_ITEM_TYPE_DEBRIS).build()).build()))
+                          .build(),
+                false);
+        // Should return one observation of 10 items
+        assertEquals(1, observations7.size());
+        assertEquals("Item", observations7.get(0).getMeasure().getMeasureName());
+        assertEquals(10, observations7.get(0).getMeasureValue());
+    }
+
     @Test
     void ingestSurveyNotDone() {
         when(surveyRepository.save(any())).then(s -> s.getArgument(0));
