@@ -56,7 +56,7 @@ public class SurveyIngestionServiceTest {
         Diver diver = Diver.builder().initials("SAM").build();
         rowBuilder = StagedRowFormatted.builder().block(1).method(2).diver(diver)
                 .species(ObservableItem.builder().observableItemName("THE SPECIES").build())
-                .site(Site.builder().siteCode("A SITE").build()).depth(1).surveyNum(Optional.of(2))
+                .site(Site.builder().siteCode("A SITE").isActive(false).build()).depth(1).surveyNum(Optional.of(2))
                 .direction(Directions.N).vis(Optional.of(15)).date(LocalDate.of(2003, 03, 03))
                 .time(Optional.of(LocalTime.of(12, 34, 56))).pqs(diver).isInvertSizing(Optional.of(true)).code("AAA")
                 .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build()).ref(ref);
