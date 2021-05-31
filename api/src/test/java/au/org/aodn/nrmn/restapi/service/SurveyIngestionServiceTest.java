@@ -2,17 +2,12 @@ package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
-import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import au.org.aodn.nrmn.restapi.repository.SurveyMethodRepository;
-import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.repository.*;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Example;
 import software.amazon.awssdk.utils.ImmutableMap;
@@ -21,6 +16,7 @@ import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -41,6 +37,10 @@ public class SurveyIngestionServiceTest {
     SurveyMethodRepository surveyMethodRepository;
     @Mock
     MeasureRepository measureRepository;
+    @Mock
+    ObservationRepository observationRepository;
+    @Mock
+    StagedJobRepository jobRepository;
 
     @InjectMocks
     SurveyIngestionService surveyIngestionService;
@@ -56,7 +56,7 @@ public class SurveyIngestionServiceTest {
 
         Diver diver = Diver.builder().initials("SAM").build();
         rowBuilder = StagedRowFormatted.builder().block(1).method(2).diver(diver)
-                .species(ObservableItem.builder().observableItemName("THE SPECIES").build())
+                .species(Optional.of(ObservableItem.builder().observableItemName("THE SPECIES").build()))
                 .site(Site.builder().siteCode("A SITE").isActive(false).build()).depth(1).surveyNum(Optional.of(2))
                 .direction(Directions.N).vis(Optional.of(15)).date(LocalDate.of(2003, 03, 03))
                 .time(Optional.of(LocalTime.of(12, 34, 56))).pqs(diver).isInvertSizing(Optional.of(true)).code("AAA")
@@ -137,7 +137,8 @@ public class SurveyIngestionServiceTest {
         IntStream.of(0, 1, 2, 7, 10, 11).forEach(i -> {
             ObservableItem obsItem = ObservableItem.builder()
                     .obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build();
-            StagedRowFormatted row = rowBuilder.isInvertSizing(Optional.of(true)).species(obsItem).method(i).build();
+            StagedRowFormatted row =
+             rowBuilder.isInvertSizing(Optional.of(true)).species(Optional.of(obsItem)).method(i).build();
             Survey survey = Survey.builder().surveyId(i).build();
             Method theMethod = Method.builder().methodId(i).methodName("The Method").isActive(true).build();
             SurveyMethod surveyMethod = SurveyMethod.builder().survey(survey).method(theMethod).blockNum(1).build();
@@ -164,8 +165,8 @@ public class SurveyIngestionServiceTest {
         SurveyMethod surveyMethod3 = SurveyMethod.builder().survey(Survey.builder().surveyId(3).build())
                 .method(Method.builder().methodId(3).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations3 = surveyIngestionService.getObservations(surveyMethod3,
-                rowBuilder.isInvertSizing(Optional.of(true)).method(3).species(
-                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build())
+                rowBuilder.isInvertSizing(Optional.of(true)).method(3).species(Optional.of(
+                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build()))
                         .build(),
                 false);
         // M3 should be mapped to measure_type_id = 2 - In Situ Quadrats
@@ -179,8 +180,8 @@ public class SurveyIngestionServiceTest {
         SurveyMethod surveyMethod4 = SurveyMethod.builder().survey(Survey.builder().surveyId(4).build())
                 .method(Method.builder().methodId(4).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations4 = surveyIngestionService.getObservations(surveyMethod4,
-                rowBuilder.isInvertSizing(Optional.of(true)).method(4).species(
-                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build())
+                rowBuilder.isInvertSizing(Optional.of(true)).method(4).species(Optional.of(
+                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build()))
                         .build(),
                 false);
         // M4 should be mapped to measure_type_id = 3 - Macrocystis Block
@@ -194,8 +195,8 @@ public class SurveyIngestionServiceTest {
         SurveyMethod surveyMethod5 = SurveyMethod.builder().survey(Survey.builder().surveyId(5).build())
                 .method(Method.builder().methodId(4).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations5 = surveyIngestionService.getObservations(surveyMethod5,
-                rowBuilder.isInvertSizing(Optional.of(true)).method(5).species(
-                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build())
+                rowBuilder.isInvertSizing(Optional.of(true)).method(5).species(Optional.of(
+                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build()))
                         .build(),
                 false);
         // M4 should be mapped to measure_type_id = 7 - Limpet Quadrat
@@ -209,8 +210,9 @@ public class SurveyIngestionServiceTest {
         when(measureRepository.findByMeasureTypeIdAndSeqNo(4, 3)).then(m -> Optional.of(Measure.builder()
                 .measureName("1.5cm").measureType(MeasureType.builder().measureTypeId(4).build()).build()));
 
-        ObservableItem obsItem = ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build())
-                .build();
+        Optional<ObservableItem> obsItem =
+         Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build())
+                .build());
         StagedRowFormatted row = rowBuilder.isInvertSizing(Optional.of(true)).species(obsItem).build();
 
         // M2
@@ -231,12 +233,47 @@ public class SurveyIngestionServiceTest {
         assertEquals("1.5cm", observations.get(1).getMeasure().getMeasureName());
         assertEquals(7, observations.get(1).getMeasureValue());
     }
+    
+    @Test
+    void ingestSurveyNotDone() {
+        when(surveyRepository.save(any())).then(s -> s.getArgument(0));
+        when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
+        when(observationRepository.saveAll(any())).then(s -> s.getArgument(0));
+
+        Program program = Program.builder().programId(1).build();
+        StagedJob stagedJob = StagedJob.builder().id(1L).program(program).build();
+        StagedRow stagedRow = StagedRow.builder().stagedJob(stagedJob).build();
+        StagedRowFormatted formattedRow = StagedRowFormatted
+                .builder()
+                .ref(stagedRow)
+                .site(Site.builder().siteCode("test1").isActive(true).build())
+                .date(LocalDate.parse("2018-12-27"))
+                .time(Optional.empty())
+                .depth(10)
+                .surveyNum(Optional.of(1))
+                .direction(Directions.N)
+                .vis(Optional.empty())
+                .method(2)
+                .block(1)
+                .code("snd")
+                .species(Optional.empty())
+                .measureJson(Collections.emptyMap())
+                .build();
+
+        surveyIngestionService.ingestTransaction(stagedJob, Collections.singletonList(formattedRow));
+
+        ArgumentCaptor<SurveyMethod> surveyMethodCaptor = ArgumentCaptor.forClass(SurveyMethod.class);
+        Mockito.verify(surveyMethodRepository).save(surveyMethodCaptor.capture());
+        SurveyMethod surveyMethod = surveyMethodCaptor.getValue();
+        assertEquals(true, surveyMethod.getSurveyNotDone());
+
+    }
 
     @Test
     void getObservationsDebrisSavedAsM12() {
 
         ObservableItem debrisItem = ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(5).build()).build();
-        StagedRowFormatted row = rowBuilder.isInvertSizing(Optional.of(true)).species(debrisItem).build();
+        StagedRowFormatted row = rowBuilder.isInvertSizing(Optional.of(true)).species(Optional.of(debrisItem)).build();
 
         StagedRowFormatted groupedRow = surveyIngestionService.groupRowsBySurveyMethod(Arrays.asList(row)).values().iterator().next().get(0);
 
