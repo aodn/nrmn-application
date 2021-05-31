@@ -266,9 +266,9 @@ public class SurveyIngestionServiceTest {
                                  .build();
         when(measureRepository.findByMeasureTypeIdAndSeqNo(MEASURE_TYPE_SINGLE_ITEM, 1)).then(m -> Optional.of(item));
         SurveyMethod surveyMethod7 = SurveyMethod.builder().survey(Survey.builder().surveyId(7).build())
-                .method(Method.builder().methodId(2).methodName("").isActive(true).build()).blockNum(1).build();
+                .method(Method.builder().methodId(12).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations7 = surveyIngestionService.getObservations(surveyMethod7,
-                rowBuilder.inverts(10).measureJson(Collections.emptyMap()).isInvertSizing(Optional.empty()).method(1).species(
+                rowBuilder.inverts(10).measureJson(Collections.emptyMap()).isInvertSizing(Optional.empty()).method(12).species(
                         Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(OBS_ITEM_TYPE_DEBRIS).build()).build()))
                           .build(),
                 false);

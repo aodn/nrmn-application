@@ -149,15 +149,14 @@ public class SurveyIngestionService {
                 if (stagedRow.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)
                     measureTypeId = MEASURE_TYPE_ABSENCE;
 
-                if (stagedRow.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_DEBRIS)
-                    measureTypeId = MEASURE_TYPE_SINGLE_ITEM;
-
             } else if (method == METHOD_M3) {
                 measureTypeId = MEASURE_TYPE_IN_SITU_QUADRAT;
             } else if (method == METHOD_M4) {
                 measureTypeId = MEASURE_TYPE_MACROCYSTIS_BLOCK;
             } else if (method == METHOD_M5) {
                 measureTypeId = MEASURE_TYPE_LIMPET_QUADRAT;
+            } else if (method == METHOD_M12) {
+                measureTypeId = MEASURE_TYPE_SINGLE_ITEM;
             }
 
             Measure measure = measureRepository.findByMeasureTypeIdAndSeqNo(measureTypeId, m.getSeqNo()).orElse(null);
