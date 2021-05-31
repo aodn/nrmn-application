@@ -162,7 +162,7 @@ public class SurveyIngestionService {
             Measure measure = measureRepository.findByMeasureTypeIdAndSeqNo(measureTypeId, m.getSeqNo()).orElse(null);
             return baseObservationBuilder.measure(measure).measureValue(m.getValue()).build();
         }).collect(Collectors.toList());
-        
+
         return observations;
     }
 

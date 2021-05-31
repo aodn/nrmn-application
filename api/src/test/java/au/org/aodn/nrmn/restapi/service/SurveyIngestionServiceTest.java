@@ -200,7 +200,7 @@ public class SurveyIngestionServiceTest {
                 .method(Method.builder().methodId(1).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations5 = surveyIngestionService.getObservations(surveyMethod4,
                 rowBuilder.inverts(10).measureJson(Collections.emptyMap()).isInvertSizing(Optional.empty()).method(1).species(
-                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build())
+                        Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build()))
                           .build(),
                 false);
         // Should return one observation of 10 unsized species  
