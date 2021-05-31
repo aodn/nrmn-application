@@ -125,8 +125,7 @@ public class SurveyIngestionService {
         Stream<MeasureValue> unsized = Stream.empty();
 
         if (!stagedRow.getCode().equalsIgnoreCase("snd") && stagedRow.getInverts() > 0) {
-            int seqNo = stagedRow.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_DEBRIS ? 1 : 0;
-            unsized = Stream.of(new MeasureValue(seqNo, stagedRow.getInverts()));
+            unsized = Stream.of(new MeasureValue(0, stagedRow.getInverts()));
         }
 
         Stream<MeasureValue> sized = measures.entrySet().stream().map(m -> new MeasureValue(m.getKey(), m.getValue()));
