@@ -246,7 +246,7 @@ public class SurveyIngestionServiceTest {
         StagedRowFormatted formattedRow = StagedRowFormatted
                 .builder()
                 .ref(stagedRow)
-                .site(Site.builder().siteCode("test1").build())
+                .site(Site.builder().siteCode("test1").isActive(true).build())
                 .date(LocalDate.parse("2018-12-27"))
                 .time(Optional.empty())
                 .depth(10)
