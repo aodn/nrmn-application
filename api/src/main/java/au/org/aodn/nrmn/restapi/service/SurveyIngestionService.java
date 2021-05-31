@@ -3,7 +3,6 @@ package au.org.aodn.nrmn.restapi.service;
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.*;
-import au.org.aodn.nrmn.restapi.util.OptionalUtil;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.data.tuple.Tuple2;
 import cyclops.data.tuple.Tuple4;
@@ -120,13 +119,15 @@ public class SurveyIngestionService {
         @Value
         class MeasureValue {
             private Integer seqNo;
-            private Integer value;
+            private Integer measureValue;
         }
         
-        Stream<MeasureValue> unsized = OptionalUtil.toStream(
-                stagedRow.getCode().equalsIgnoreCase("snd") || stagedRow.getInverts() == 0 ?
-                        Optional.empty() :
-                        Optional.of(new MeasureValue(0, stagedRow.getInverts())));
+        Stream<MeasureValue> unsized = Stream.empty();
+
+        if (!stagedRow.getCode().equalsIgnoreCase("snd") && stagedRow.getInverts() > 0) {
+            int seqNo = stagedRow.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_DEBRIS ? 1 : 0;
+            unsized = Stream.of(new MeasureValue(seqNo, stagedRow.getInverts()));
+        }
 
         Stream<MeasureValue> sized = measures.entrySet().stream().map(m -> new MeasureValue(m.getKey(), m.getValue()));
          
@@ -160,7 +161,7 @@ public class SurveyIngestionService {
             }
 
             Measure measure = measureRepository.findByMeasureTypeIdAndSeqNo(measureTypeId, m.getSeqNo()).orElse(null);
-            return baseObservationBuilder.measure(measure).measureValue(m.getValue()).build();
+            return baseObservationBuilder.measure(measure).measureValue(m.getMeasureValue()).build();
         }).collect(Collectors.toList());
 
         return observations;
