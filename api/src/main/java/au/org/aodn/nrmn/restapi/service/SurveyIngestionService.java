@@ -3,9 +3,11 @@ package au.org.aodn.nrmn.restapi.service;
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.*;
+import au.org.aodn.nrmn.restapi.util.OptionalUtil;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import cyclops.data.tuple.Tuple2;
 import cyclops.data.tuple.Tuple4;
+import lombok.Value;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -21,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -111,7 +114,20 @@ public class SurveyIngestionService {
         Observation.ObservationBuilder baseObservationBuilder = Observation.builder().diver(diver)
                 .surveyMethod(surveyMethod).observableItem(stagedRow.getSpecies());
 
-        List<Observation> observations = measures.entrySet().stream().map(m -> {
+        @Value
+        class MeasureValue {
+            private Integer seqNo;
+            private Integer value;
+        }
+        
+        Stream<MeasureValue> unsized = OptionalUtil.toStream(
+                stagedRow.getCode().equalsIgnoreCase("snd") || stagedRow.getInverts() == 0 ?
+                        Optional.empty() :
+                        Optional.of(new MeasureValue(0, stagedRow.getInverts())));
+
+        Stream<MeasureValue> sized = measures.entrySet().stream().map(m -> new MeasureValue(m.getKey(), m.getValue()));
+         
+        List<Observation> observations = Stream.concat(unsized, sized).map(m -> {
 
             Integer method = stagedRow.getMethod();
 
@@ -140,10 +156,10 @@ public class SurveyIngestionService {
                 measureTypeId = MEASURE_TYPE_LIMPET_QUADRAT;
             }
 
-            Measure measure = measureRepository.findByMeasureTypeIdAndSeqNo(measureTypeId, m.getKey()).orElse(null);
+            Measure measure = measureRepository.findByMeasureTypeIdAndSeqNo(measureTypeId, m.getSeqNo()).orElse(null);
             return baseObservationBuilder.measure(measure).measureValue(m.getValue()).build();
         }).collect(Collectors.toList());
-
+        
         return observations;
     }
 

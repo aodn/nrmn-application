@@ -21,10 +21,12 @@ import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import static au.org.aodn.nrmn.restapi.service.SurveyIngestionService.MEASURE_TYPE_FISH_SIZE_CLASS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -185,6 +187,26 @@ public class SurveyIngestionServiceTest {
                 false);
         // M4 should be mapped to measure_type_id = 3 - Macrocystis Block
         assertEquals(3, observations4.get(0).getMeasure().getMeasureType().getMeasureTypeId());
+    }
+    
+    @Test
+    void getInvertsObservation() {
+        Measure unsized = Measure.builder()
+                                 .measureName("Unsized")
+                                 .measureType(MeasureType.builder().measureTypeId(MEASURE_TYPE_FISH_SIZE_CLASS).build())
+                                .build();
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(MEASURE_TYPE_FISH_SIZE_CLASS, 0)).then(m -> Optional.of(unsized));
+        SurveyMethod surveyMethod4 = SurveyMethod.builder().survey(Survey.builder().surveyId(5).build())
+                .method(Method.builder().methodId(1).methodName("").isActive(true).build()).blockNum(1).build();
+        List<Observation> observations5 = surveyIngestionService.getObservations(surveyMethod4,
+                rowBuilder.inverts(10).measureJson(Collections.emptyMap()).isInvertSizing(Optional.empty()).method(1).species(
+                        ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build())
+                          .build(),
+                false);
+        // Should return one observation of 10 unsized species  
+        assertEquals(1, observations5.size());
+        assertEquals("Unsized", observations5.get(0).getMeasure().getMeasureName());
+        assertEquals(10, observations5.get(0).getMeasureValue());
     }
 
     @Test
