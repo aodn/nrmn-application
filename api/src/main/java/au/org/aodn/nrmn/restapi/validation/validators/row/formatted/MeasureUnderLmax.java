@@ -1,7 +1,6 @@
 package au.org.aodn.nrmn.restapi.validation.validators.row.formatted;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
-import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.util.MeasureUtil;
@@ -30,11 +29,12 @@ public class MeasureUnderLmax extends BaseFormattedValidator {
         }
 
         val speciesAttributes = target.getSpeciesAttributesOpt().get();
+        boolean isInvertSized = (target.getIsInvertSizing().isPresent() && target.getIsInvertSizing().get() == true);
         val lmax = speciesAttributes.getLmax();
         if (target.getMeasureJson().isEmpty() || lmax == null)
             return Validated.valid("No data");
         val outOfRangef = target.getMeasureJson().entrySet().stream()
-                .filter(entry -> entry.getValue() > lmax)
+                .filter(entry -> isInvertSized ? INVERT_VALUES[entry.getKey()-1] > lmax : FISH_VALUES[entry.getKey()-1] > lmax)
                 .collect(Collectors.toList());
 
 
