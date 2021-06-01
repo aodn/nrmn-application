@@ -31,7 +31,7 @@ public class MeasureJsonValidation extends BaseRowValidator {
                             if (entry.getValue().trim().isEmpty()){
                                 return Validated.<StagedRowError, Seq<Tuple2<Integer, Integer>>>valid(Seq.empty());
                             }
-                            val col = MeasureUtil.getMeasureName( entry.getKey());
+                            val col = MeasureUtil.getMeasureName(entry.getKey(), target.getIsInvertSizing().equalsIgnoreCase("1"));
                             val intValidator = new IntegerFormatValidation(
                                     r -> entry.getValue(),
                                     col,

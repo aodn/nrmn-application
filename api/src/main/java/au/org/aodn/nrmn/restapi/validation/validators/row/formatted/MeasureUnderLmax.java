@@ -42,7 +42,8 @@ public class MeasureUnderLmax extends BaseFormattedValidator {
             return Validated.valid("Values under Lmax");
         }
        return outOfRangef.stream().map(measure -> {
-           val column = MeasureUtil.getMeasureName(measure.getKey());
+           boolean isInvert = target.getIsInvertSizing().isPresent() && target.getIsInvertSizing().get() == true;
+           val column = MeasureUtil.getMeasureName(measure.getKey(), isInvert);
 
            return invalid(
                     target,
