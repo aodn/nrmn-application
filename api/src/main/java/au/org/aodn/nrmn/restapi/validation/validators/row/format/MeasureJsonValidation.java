@@ -28,7 +28,8 @@ public class MeasureJsonValidation extends BaseRowValidator {
         Validated<StagedRowError, Seq<Tuple2<Integer, Integer>>> mapValidators = target.getMeasureJson()
                 .entrySet()
                 .stream().map(entry -> {
-                            if (entry.getValue().trim().isEmpty()){
+                            String value = entry.getValue().trim();
+                            if (value.isEmpty() || value.equalsIgnoreCase("0")){
                                 return Validated.<StagedRowError, Seq<Tuple2<Integer, Integer>>>valid(Seq.empty());
                             }
                             val col = MeasureUtil.getMeasureName(entry.getKey(), target.getIsInvertSizing() != null && target.getIsInvertSizing().equalsIgnoreCase("1"));
