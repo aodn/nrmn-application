@@ -29,7 +29,7 @@ public class MissingDataCheck extends BaseFormattedValidator {
         }
 
         int observationTotal = target.getMeasureJson().entrySet().stream().map(Map.Entry::getValue).reduce(0,
-                Integer::sum);
+                Integer::sum) + (target.getInverts() != null ? target.getInverts() : 0);
 
         if (observationTotal > 0)
             return Validated.valid("Observations exist");
