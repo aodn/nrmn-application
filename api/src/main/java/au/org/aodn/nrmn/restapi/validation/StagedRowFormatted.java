@@ -25,7 +25,6 @@ public class StagedRowFormatted {
 
     private Diver diver;
 
-
     private Diver pqs;
 
     private Integer depth;
