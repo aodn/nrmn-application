@@ -19,9 +19,31 @@ class TotalCheckSumTest extends FormattedTestProvider  {
     }
 
     @Test
+    public void validSumWithInvertsShouldSuccess() {
+        val formatted = getDefaultFormatted().build();
+        formatted.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 1).put(4, 2).build());
+        formatted.setInverts(2);
+        formatted.setTotal(5);
+        val validationRule = new TotalCheckSum();
+        val res = validationRule.valid(formatted);
+        assertTrue(res.isValid());
+    }
+
+    @Test
     public void InValidSumShouldFailed() {
         val formatted = getDefaultFormatted().build();
         formatted.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(0, 1).put(3, 1).put(4, 2).build());
+        formatted.setTotal(3);
+        val validationRule = new TotalCheckSum();
+        val res = validationRule.valid(formatted);
+        assertTrue(res.isInvalid());
+    }
+
+    @Test
+    public void invalidSumIgnoringInvertsShouldSuccess() {
+        val formatted = getDefaultFormatted().build();
+        formatted.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 1).put(4, 2).build());
+        formatted.setInverts(2);
         formatted.setTotal(3);
         val validationRule = new TotalCheckSum();
         val res = validationRule.valid(formatted);
