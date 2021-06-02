@@ -44,8 +44,9 @@ public class ATRCSurveyGroupComplete extends BaseGlobalRawValidator {
 
     private Validated<StagedRowError, String> validateSurveyGroup(StagedJob job, Tuple3 surveyGroupKey,
             List<StagedSurveyTransect> transects) {
-        
-                List<String> surveyNums = transects.stream().map(StagedSurveyTransect::getSurveyNum).collect(Collectors.toList());
+
+        List<String> surveyNums = transects.stream().map(StagedSurveyTransect::getSurveyNum)
+                .collect(Collectors.toList());
 
         if (!surveyGroupComplete(surveyNums)) {
             return invalid(job.getId(), surveyGroupKey + " has incorrect set of surveyNums: " + surveyNums,
@@ -54,7 +55,7 @@ public class ATRCSurveyGroupComplete extends BaseGlobalRawValidator {
 
         val surveys = transects.stream().collect(Collectors.groupingBy(StagedSurveyTransect::getSurveyNum));
 
-        List<Validated<StagedRowError,String>> result = new ArrayList<Validated<StagedRowError,String>>();
+        List<Validated<StagedRowError, String>> result = new ArrayList<Validated<StagedRowError, String>>();
 
         surveys.keySet().stream().forEach(key -> {
 
@@ -84,37 +85,5 @@ public class ATRCSurveyGroupComplete extends BaseGlobalRawValidator {
 
     private boolean surveyGroupComplete(List<String> surveyNums) {
         return surveyNums.containsAll(Arrays.asList("1", "2", "3", "4"));
-    }
-
-    private Validated<StagedRowError, String> surveyMethodBlocksComplete(long jobId,
-            Map<String, List<StagedSurveyTransect>> surveys) {
-
-        List<Validated> result = new ArrayList<Validated>();
-
-        surveys.keySet().stream().forEach(key -> {
-
-            val surveyRecords = surveys.get(key);
-            val surveyByMethod = surveyRecords.stream().collect(Collectors.groupingBy(StagedSurveyTransect::getMethod));
-
-            surveyByMethod.keySet().stream().forEach(sk -> {
-
-                val methodSurveys = surveyByMethod.get(sk);
-                val survey = methodSurveys.get(0);
-
-                // At least one record block 1
-                if (!methodSurveys.stream().anyMatch(r -> r.getBlock().equalsIgnoreCase("1")))
-                    result.add(invalid(jobId, "Survey " + survey.getDepth() + "." + survey.getSurveyNum()
-                            + " is missing Method " + sk + " Block 1", ValidationLevel.BLOCKING));
-
-                // For method 1, also check for at least one record on block 2
-                if (sk.equalsIgnoreCase("1")
-                        && !methodSurveys.stream().anyMatch(r -> r.getBlock().equalsIgnoreCase("2")))
-                    result.add(invalid(jobId, "Survey " + survey.getDepth() + "." + survey.getSurveyNum()
-                            + " is missing Method " + sk + " Block 2", ValidationLevel.BLOCKING));
-            });
-        });
-
-        return result.stream().reduce(Validated.valid(""),
-                (acc, validator) -> acc.combine(Monoids.stringConcat, validator));
     }
 }
