@@ -1,5 +1,14 @@
 package au.org.aodn.nrmn.restapi.validation.validators.global.raw;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
@@ -10,12 +19,6 @@ import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import cyclops.data.tuple.Tuple3;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class ATRCSurveyGroupComplete extends BaseGlobalRawValidator {
@@ -30,31 +33,61 @@ public class ATRCSurveyGroupComplete extends BaseGlobalRawValidator {
     @Override
     public Validated<StagedRowError, String> valid(StagedJob job) {
         val stagedSurveyTransects = stagedRowRepo.getStagedSurveyTransects(job.getId());
-        val transectsGroupedBySurveyGroup = stagedSurveyTransects.stream().collect(
-                Collectors.groupingBy(stagedSurveyMethod -> new Tuple3(stagedSurveyMethod.getSiteCode(),
+        val transectsGroupedBySurveyGroup = stagedSurveyTransects.stream()
+                .collect(Collectors.groupingBy(stagedSurveyMethod -> new Tuple3(stagedSurveyMethod.getSiteCode(),
                         stagedSurveyMethod.getDate(), stagedSurveyMethod.getDepth())));
-        return transectsGroupedBySurveyGroup.entrySet()
-                                     .stream()
-                                     .map((entry) -> validateSurveyGroup(job, entry.getKey(), entry.getValue()))
-                                     .reduce(Validated.valid("survey group is complete: nothing to validate"), (acc,
-                                      validator) ->
-                        acc.combine(Monoids.stringConcat, validator)
-                );
+        return transectsGroupedBySurveyGroup.entrySet().stream()
+                .map((entry) -> validateSurveyGroup(job, entry.getKey(), entry.getValue()))
+                .reduce(Validated.valid("survey group is complete: nothing to validate"),
+                        (acc, validator) -> acc.combine(Monoids.stringConcat, validator));
     }
 
     private Validated<StagedRowError, String> validateSurveyGroup(StagedJob job, Tuple3 surveyGroupKey,
-     List<StagedSurveyTransect> transects) {
-        val surveyNums = transects.stream()
-                              .map(StagedSurveyTransect::getSurveyNum)
-                              .collect(Collectors.toList());
+            List<StagedSurveyTransect> transects) {
 
-        if (surveyGroupComplete(surveyNums)) {
-            return Validated.valid("surveyGroup " + surveyGroupKey + ": is complete");
-        } else {
-            return invalid(job.getId(),
-                    surveyGroupKey + " has incorrect set of surveyNums: " + surveyNums,
+        List<String> surveyNums = transects.stream().map(StagedSurveyTransect::getSurveyNum)
+                .collect(Collectors.toList());
+
+        if (!surveyGroupComplete(surveyNums)) {
+            return invalid(job.getId(), surveyGroupKey + " has incorrect set of surveyNums: " + surveyNums,
                     ValidationLevel.BLOCKING);
         }
+
+        val surveys = transects.stream().collect(Collectors.groupingBy(StagedSurveyTransect::getSurveyNum));
+
+        List<Validated<StagedRowError, String>> result = new ArrayList<Validated<StagedRowError, String>>();
+
+        surveys.keySet().stream().forEach(key -> {
+
+            List<StagedSurveyTransect> surveyRecords = surveys.get(key);
+            Map<String, List<StagedSurveyTransect>> surveyByMethod = surveyRecords.stream()
+                    .collect(Collectors.groupingBy(StagedSurveyTransect::getMethod));
+
+            surveyByMethod.keySet().stream().forEach(method -> {
+
+                List<StagedSurveyTransect> rows = surveyByMethod.get(method);
+                StagedSurveyTransect row = rows.get(0);
+                String surveyName = "[" + row.getSiteCode() + "," + row.getDate() + "," + row.getDepth() + "."
+                        + row.getSurveyNum() + "]";
+                String errorMessage = surveyName + " is missing Method " + method;
+
+                // M1: Require least one record for both B1 and B2
+                if (method.equalsIgnoreCase("1")) {
+                    if (!rows.stream().anyMatch(r -> r.getBlock().equalsIgnoreCase("1")))
+                        result.add(invalid(job.getId(), errorMessage + " Block 1", ValidationLevel.BLOCKING));
+
+                    if (!rows.stream().anyMatch(r -> r.getBlock().equalsIgnoreCase("2")))
+                        result.add(invalid(job.getId(), errorMessage + " Block 2", ValidationLevel.BLOCKING));
+                }
+
+                // M2: Require at least one B1 record
+                if (method.equalsIgnoreCase("2") && !rows.stream().anyMatch(r -> r.getBlock().equalsIgnoreCase("1")))
+                    result.add(invalid(job.getId(), errorMessage + " Block 1", ValidationLevel.BLOCKING));
+            });
+        });
+
+        return result.stream().reduce(Validated.valid(""),
+                (acc, validator) -> acc.combine(Monoids.stringConcat, validator));
     }
 
     private boolean surveyGroupComplete(List<String> surveyNums) {
