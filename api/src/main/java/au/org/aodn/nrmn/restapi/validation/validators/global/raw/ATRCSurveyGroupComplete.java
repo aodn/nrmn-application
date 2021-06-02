@@ -69,13 +69,18 @@ public class ATRCSurveyGroupComplete extends BaseGlobalRawValidator {
                 String surveyName = rows.get(0).getDepth() + "." + rows.get(0).getSurveyNum();
                 String errorMessage = "Survey " + surveyName + " is missing Method " + method;
 
-                // At least one record block 1
-                if (!rows.stream().anyMatch(r -> r.getBlock().equalsIgnoreCase("1")))
-                    result.add(invalid(job.getId(), errorMessage + " Block 1", ValidationLevel.BLOCKING));
+                // M1: Require least one record for both B1 and B2
+                if (method.equalsIgnoreCase("1")) {
+                    if (!rows.stream().anyMatch(r -> r.getBlock().equalsIgnoreCase("1")))
+                        result.add(invalid(job.getId(), errorMessage + " Block 1", ValidationLevel.BLOCKING));
 
-                // For method 1, also check for at least one record on block 2
-                if (method.equalsIgnoreCase("1") && !rows.stream().anyMatch(r -> r.getBlock().equalsIgnoreCase("2")))
-                    result.add(invalid(job.getId(), errorMessage + " Block 2", ValidationLevel.BLOCKING));
+                    if (!rows.stream().anyMatch(r -> r.getBlock().equalsIgnoreCase("2")))
+                        result.add(invalid(job.getId(), errorMessage + " Block 2", ValidationLevel.BLOCKING));
+                }
+
+                // M2: Require at least one B1 record
+                if (method.equalsIgnoreCase("2") && !rows.stream().anyMatch(r -> r.getBlock().equalsIgnoreCase("1")))
+                    result.add(invalid(job.getId(), errorMessage + " Block 1", ValidationLevel.BLOCKING));
             });
         });
 
