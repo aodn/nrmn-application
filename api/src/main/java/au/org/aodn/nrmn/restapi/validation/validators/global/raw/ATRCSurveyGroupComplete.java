@@ -66,8 +66,10 @@ public class ATRCSurveyGroupComplete extends BaseGlobalRawValidator {
             surveyByMethod.keySet().stream().forEach(method -> {
 
                 List<StagedSurveyTransect> rows = surveyByMethod.get(method);
-                String surveyName = rows.get(0).getDepth() + "." + rows.get(0).getSurveyNum();
-                String errorMessage = "Survey " + surveyName + " is missing Method " + method;
+                StagedSurveyTransect row = rows.get(0);
+                String surveyName = "[" + row.getSiteCode() + "," + row.getDate() + "," + row.getDepth() + "."
+                        + row.getSurveyNum() + "]";
+                String errorMessage = surveyName + " is missing Method " + method;
 
                 // M1: Require least one record for both B1 and B2
                 if (method.equalsIgnoreCase("1")) {
