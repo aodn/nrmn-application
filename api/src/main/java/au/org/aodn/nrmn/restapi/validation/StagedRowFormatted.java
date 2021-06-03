@@ -51,7 +51,7 @@ public class StagedRowFormatted {
 
     private Integer inverts;
 
-    private Optional<Boolean> isInvertSizing;
+    private Boolean isInvertSizing;
 
     private StagedRow ref;
 

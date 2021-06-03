@@ -76,7 +76,7 @@ public class SurveyIngestionService {
     StagedJobRepository jobRepository;
 
     public Survey getSurvey(StagedRowFormatted stagedRow) {
-        
+
         val site = stagedRow.getSite();
 
         if (!site.getIsActive()) {
@@ -107,7 +107,8 @@ public class SurveyIngestionService {
 
     public List<Observation> getObservations(SurveyMethod surveyMethod, StagedRowFormatted stagedRow,
             Boolean withExtendedSizing) {
-        if (!stagedRow.getSpecies().isPresent()) return Collections.emptyList();
+        if (!stagedRow.getSpecies().isPresent())
+            return Collections.emptyList();
 
         Diver diver = stagedRow.getDiver();
 
@@ -121,7 +122,7 @@ public class SurveyIngestionService {
             private Integer seqNo;
             private Integer measureValue;
         }
-        
+
         Stream<MeasureValue> unsized = Stream.empty();
 
         if (!stagedRow.getCode().equalsIgnoreCase("snd") && stagedRow.getInverts() > 0) {
@@ -129,7 +130,7 @@ public class SurveyIngestionService {
         }
 
         Stream<MeasureValue> sized = measures.entrySet().stream().map(m -> new MeasureValue(m.getKey(), m.getValue()));
-         
+
         List<Observation> observations = Stream.concat(unsized, sized).map(m -> {
 
             Integer method = stagedRow.getMethod();
@@ -140,9 +141,8 @@ public class SurveyIngestionService {
                     .anyMatch(x -> x == method)) {
 
                 if (withExtendedSizing) {
-                    measureTypeId = (stagedRow.getIsInvertSizing().isPresent()
-                            && stagedRow.getIsInvertSizing().get() == true) ? MEASURE_TYPE_INVERT_SIZE_CLASS
-                                    : MEASURE_TYPE_FISH_SIZE_CLASS;
+                    measureTypeId = stagedRow.getIsInvertSizing() ? MEASURE_TYPE_INVERT_SIZE_CLASS
+                            : MEASURE_TYPE_FISH_SIZE_CLASS;
                 }
 
                 if (stagedRow.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)
@@ -167,7 +167,8 @@ public class SurveyIngestionService {
 
     public Map<Tuple2, List<StagedRowFormatted>> groupRowsBySurveyMethod(List<StagedRowFormatted> surveyRows) {
         return surveyRows.stream().map(r -> {
-            if (r.getSpecies().isPresent() && r.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_DEBRIS)
+            if (r.getSpecies().isPresent()
+                    && r.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_DEBRIS)
                 r.setMethod(METHOD_M12);
             return r;
         }).collect(groupingBy(row -> new Tuple2(row.getMethod(), row.getBlock())));

@@ -13,7 +13,7 @@ class SpeciesNotSuperseededTest extends FormattedTestProvider {
     @Test
     public void notSupperSeededShouldFSuccess() {
         val formatted = getDefaultFormatted().build();
-        formatted.setIsInvertSizing(Optional.of(false));
+        formatted.setIsInvertSizing(false);
         val validationRule = new SpeciesNotSuperseeded();
         val res = validationRule.valid(formatted);
         assertTrue(res.isValid());

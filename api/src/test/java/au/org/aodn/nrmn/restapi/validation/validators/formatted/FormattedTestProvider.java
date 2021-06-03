@@ -32,7 +32,7 @@ public  class FormattedTestProvider {
                 .date(LocalDate.of(2003, 03, 03))
                 .time(Optional.of(LocalTime.of(12, 34, 56)))
                 .pqs(diver)
-                .isInvertSizing(Optional.of(true))
+                .isInvertSizing(true)
                 .code("AAA")
                 .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build())
                 .ref(ref);

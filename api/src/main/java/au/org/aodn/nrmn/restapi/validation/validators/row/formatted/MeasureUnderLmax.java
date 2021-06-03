@@ -29,28 +29,21 @@ public class MeasureUnderLmax extends BaseFormattedValidator {
         }
 
         val speciesAttributes = target.getSpeciesAttributesOpt().get();
-        boolean isInvertSized = (target.getIsInvertSizing().isPresent() && target.getIsInvertSizing().get() == true);
         val lmax = speciesAttributes.getLmax();
         if (target.getMeasureJson().isEmpty() || lmax == null)
             return Validated.valid("No data");
         val outOfRangef = target.getMeasureJson().entrySet().stream()
-                .filter(entry -> isInvertSized ? INVERT_VALUES[entry.getKey()-1] > lmax : FISH_VALUES[entry.getKey()-1] > lmax)
+                .filter(entry -> target.getIsInvertSizing() ? INVERT_VALUES[entry.getKey() - 1] > lmax
+                        : FISH_VALUES[entry.getKey() - 1] > lmax)
                 .collect(Collectors.toList());
-
 
         if (outOfRangef.isEmpty() || lmax == null) {
             return Validated.valid("Values under Lmax");
         }
-       return outOfRangef.stream().map(measure -> {
-           boolean isInvert = target.getIsInvertSizing().isPresent() && target.getIsInvertSizing().get() == true;
-           val column = MeasureUtil.getMeasureName(measure.getKey(), isInvert);
-
-           return invalid(
-                    target,
-                    "Measure: " + column.replace('-', '.') + " is above Lmax[" + lmax + "]",
-                    ValidationCategory.DATA,
-                    ValidationLevel.WARNING,
-                    Optional.of(column));
+        return outOfRangef.stream().map(measure -> {
+            val column = MeasureUtil.getMeasureName(measure.getKey(), target.getIsInvertSizing());
+            return invalid(target, "Measure: " + column.replace('-', '.') + " is above Lmax[" + lmax + "]",
+                    ValidationCategory.DATA, ValidationLevel.WARNING, Optional.of(column));
         }).reduce(Validated.valid(""), (acc, err) -> acc.combine(Monoids.stringConcat, err));
     }
 }

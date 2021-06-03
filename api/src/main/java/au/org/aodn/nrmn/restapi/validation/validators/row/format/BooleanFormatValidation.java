@@ -10,16 +10,18 @@ import java.util.function.Function;
 public class BooleanFormatValidation extends BaseRowFormatValidation<Boolean> {
     protected Function<StagedRow, String> getField;
 
-    public BooleanFormatValidation(Function<StagedRow, String> getField, String colunmTarget) {
-        super(colunmTarget, "Boolean");
+    public BooleanFormatValidation(Function<StagedRow, String> getField, String columnTarget) {
+        super(columnTarget, "Boolean");
         this.getField = getField;
     }
 
     @Override
     public Validated<StagedRowError, Boolean> valid(StagedRow target) {
         return validFormat(getField, (input) ->  {
-            Boolean value = Boolean.parseBoolean(input);
-           return Validated.valid(value);
+            if(input != null && (input.equalsIgnoreCase("YES") || input.equalsIgnoreCase("NO")))
+               return Validated.valid(input.equalsIgnoreCase("YES"));
+            else
+                return Validated.invalid("Must be 'Yes' or 'No'");
         }, target);
     }
 }
