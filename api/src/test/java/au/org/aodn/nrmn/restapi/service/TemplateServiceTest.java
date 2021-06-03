@@ -171,13 +171,13 @@ public class TemplateServiceTest {
         void getSpeciesCsv() throws IOException {
                 SpeciesWithAttributesCsvRow.SpeciesWithAttributesCsvRowBuilder sb = SpeciesWithAttributesCsvRow
                                 .builder();
-                SpeciesWithAttributesCsvRow s1 = sb.letterCode("asa").speciesName("Abudefduf saxatilis")
+                SpeciesWithAttributesCsvRow s1 = sb.letterCode("asa").speciesName("Abudefduf saxatilis").isInvertSized(false)
                                 .commonName("Sergeant major").l5(2.5).l95(15.0).lMax(20l).build();
 
-                SpeciesWithAttributesCsvRow s2 = sb.letterCode("aba").speciesName("Acanthurus bahianus")
+                SpeciesWithAttributesCsvRow s2 = sb.letterCode("aba").speciesName("Acanthurus bahianus").isInvertSized(false)
                                 .commonName("Ocean surgeon").l5(5.0).l95(30.0).lMax(40l).build();
 
-                SpeciesWithAttributesCsvRow s3 = sb.letterCode("ach").speciesName("Acanthurus chirurgus")
+                SpeciesWithAttributesCsvRow s3 = sb.letterCode("ach").speciesName("Acanthurus chirurgus").isInvertSized(false)
                                 .commonName("Doctorfish").l5(7.5).l95(45.0).lMax(60l).build();
 
                 StringWriter stringWriter = new StringWriter();
