@@ -32,10 +32,7 @@ public class SpeciesInvertSizing extends BaseFormattedValidator {
         if (isInverted == null)  {
             return Validated.valid("Not affected");
         }
-
-        if (!target.getIsInvertSizing().isPresent() || isInverted == target.getIsInvertSizing().get()) {
-            return Validated.valid("IsInvertSizing valid");
-        }
+        
     return Validated.invalid(new StagedRowError(
             new ErrorID(target.getId(),
                     target.getRef().getStagedJob().getId(),

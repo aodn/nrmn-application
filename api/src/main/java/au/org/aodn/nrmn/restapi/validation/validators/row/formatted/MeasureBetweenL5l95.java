@@ -24,8 +24,7 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
         val methodAllowed = Arrays.asList(0, 1, 2);
-        if (!methodAllowed.contains(target.getMethod()) ||
-                !target.getRef().getStagedJob().getIsExtendedSize()) {
+        if (!methodAllowed.contains(target.getMethod()) || !target.getRef().getStagedJob().getIsExtendedSize()) {
             return Validated.valid("not affected");
         }
 
@@ -40,14 +39,16 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
         if (measureJson.isEmpty() || l5 == null || l95 == null)
             return Validated.valid("No data");
 
-        boolean isInvertSized = (target.getIsInvertSizing().isPresent() && target.getIsInvertSizing().get() == true);
+        boolean isInvertSized = target.getIsInvertSizing();
 
         // |measureJson| now contains the count of each species for a size column
-        // Map this value to the size class and check the matching class is within l5 and l95
+        // Map this value to the size class and check the matching class 
+        // is within l5 and l95
         val outOfRange = measureJson.entrySet().stream()
-                .filter(entry -> entry.getValue() != 0 && (
-                    ((isInvertSized) && (INVERT_VALUES[entry.getKey()-1] < l5 || INVERT_VALUES[entry.getKey()-1] > l95)) 
-                 || ((!isInvertSized) && (FISH_VALUES[entry.getKey()-1] < l5 || FISH_VALUES[entry.getKey()-1] > l95))))
+                .filter(entry -> entry.getValue() != 0 && (((isInvertSized)
+                        && (INVERT_VALUES[entry.getKey() - 1] < l5 || INVERT_VALUES[entry.getKey() - 1] > l95))
+                        || ((!isInvertSized)
+                                && (FISH_VALUES[entry.getKey() - 1] < l5 || FISH_VALUES[entry.getKey() - 1] > l95))))
                 .map(Map.Entry::getKey).collect(Collectors.toList());
 
         if (outOfRange.isEmpty()) {
@@ -57,11 +58,8 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
         return outOfRange.stream().map(measure -> {
             this.columnTarget = "Measure:" + measure;
             val column = MeasureUtil.getMeasureName(measure, isInvertSized);
-            return invalid(
-                    target,
-                    "Measure: " + column.replace('-', '.') + " is outside l5/95[" + l5 + "," + l95 + "]",
-                    ValidationCategory.DATA,
-                    ValidationLevel.WARNING, Optional.of(column));
+            return invalid(target, "Measure: " + column.replace('-', '.') + " is outside l5/95[" + l5 + "," + l95 + "]",
+                    ValidationCategory.DATA, ValidationLevel.WARNING, Optional.of(column));
         }).reduce(Validated.valid(""), (acc, err) -> acc.combine(Monoids.stringConcat, err));
 
     }

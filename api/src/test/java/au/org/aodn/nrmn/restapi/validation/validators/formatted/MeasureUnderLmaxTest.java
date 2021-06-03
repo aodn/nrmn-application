@@ -57,7 +57,7 @@ class MeasureUnderLmaxTest extends  FormattedTestProvider {
         val validationRule = new MeasureUnderLmax();
 
         val formatted_valid = getDefaultFormatted().build();
-        formatted_valid.setIsInvertSizing(Optional.of(false));
+        formatted_valid.setIsInvertSizing(false);
         formatted_valid.setSpeciesAttributesOpt(Optional.of(specAttribute));
         formatted_valid.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 1).put(4, 2).put(36,3).build());
         formatted_valid.setMethod(1);
@@ -65,7 +65,7 @@ class MeasureUnderLmaxTest extends  FormattedTestProvider {
 
         val formatted_invalid = getDefaultFormatted().build();
         formatted_invalid.setSpeciesAttributesOpt(Optional.of(specAttribute));
-        formatted_invalid.setIsInvertSizing(Optional.of(false));
+        formatted_invalid.setIsInvertSizing(false);
         formatted_invalid.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 1).put(4, 2).put(37,3).build());
         formatted_invalid.setMethod(1);
         assertTrue(validationRule.valid(formatted_invalid).isInvalid());
@@ -117,14 +117,14 @@ class MeasureUnderLmaxTest extends  FormattedTestProvider {
 
         val formatted_valid = getDefaultFormatted().build();
         formatted_valid.setSpeciesAttributesOpt(Optional.of(specAttribute));
-        formatted_valid.setIsInvertSizing(Optional.of(true));
+        formatted_valid.setIsInvertSizing(true);
         formatted_valid.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 1).put(4, 2).put(35,3).build());
         formatted_valid.setMethod(1);
         assertTrue(validationRule.valid(formatted_valid).isValid());
 
         val formatted_invalid = getDefaultFormatted().build();
         formatted_invalid.setSpeciesAttributesOpt(Optional.of(specAttribute));
-        formatted_invalid.setIsInvertSizing(Optional.of(true));
+        formatted_invalid.setIsInvertSizing(true);
         formatted_invalid.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 1).put(4, 2).put(36,3).build());
         formatted_invalid.setMethod(1);
         assertTrue(validationRule.valid(formatted_invalid).isInvalid());

@@ -62,7 +62,7 @@ public class SurveyIngestionServiceTest {
                 .species(Optional.of(ObservableItem.builder().observableItemName("THE SPECIES").build()))
                 .site(Site.builder().siteCode("A SITE").isActive(false).build()).depth(1).surveyNum(Optional.of(2))
                 .direction(Directions.N).vis(Optional.of(15)).date(LocalDate.of(2003, 03, 03))
-                .time(Optional.of(LocalTime.of(12, 34, 56))).pqs(diver).isInvertSizing(Optional.of(true)).code("AAA")
+                .time(Optional.of(LocalTime.of(12, 34, 56))).pqs(diver).isInvertSizing(true).code("AAA")
                 .inverts(0)
                 .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build()).ref(ref);
     }
@@ -142,7 +142,7 @@ public class SurveyIngestionServiceTest {
             ObservableItem obsItem = ObservableItem.builder()
                     .obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build();
             StagedRowFormatted row =
-             rowBuilder.isInvertSizing(Optional.of(true)).species(Optional.of(obsItem)).method(i).build();
+             rowBuilder.isInvertSizing(true).species(Optional.of(obsItem)).method(i).build();
             Survey survey = Survey.builder().surveyId(i).build();
             Method theMethod = Method.builder().methodId(i).methodName("The Method").isActive(true).build();
             SurveyMethod surveyMethod = SurveyMethod.builder().survey(survey).method(theMethod).blockNum(1).build();
@@ -169,7 +169,7 @@ public class SurveyIngestionServiceTest {
         SurveyMethod surveyMethod3 = SurveyMethod.builder().survey(Survey.builder().surveyId(3).build())
                 .method(Method.builder().methodId(3).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations3 = surveyIngestionService.getObservations(surveyMethod3,
-                rowBuilder.isInvertSizing(Optional.of(true)).method(3).species(Optional.of(
+                rowBuilder.isInvertSizing(true).method(3).species(Optional.of(
                         ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build()))
                         .build(),
                 false);
@@ -184,7 +184,7 @@ public class SurveyIngestionServiceTest {
         SurveyMethod surveyMethod4 = SurveyMethod.builder().survey(Survey.builder().surveyId(4).build())
                 .method(Method.builder().methodId(4).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations4 = surveyIngestionService.getObservations(surveyMethod4,
-                rowBuilder.isInvertSizing(Optional.of(true)).method(4).species(Optional.of(
+                rowBuilder.isInvertSizing(true).method(4).species(Optional.of(
                         ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build()))
                         .build(),
                 false);
@@ -199,7 +199,7 @@ public class SurveyIngestionServiceTest {
         SurveyMethod surveyMethod5 = SurveyMethod.builder().survey(Survey.builder().surveyId(5).build())
                 .method(Method.builder().methodId(4).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations5 = surveyIngestionService.getObservations(surveyMethod5,
-                rowBuilder.isInvertSizing(Optional.of(true)).method(5).species(Optional.of(
+                rowBuilder.isInvertSizing(true).method(5).species(Optional.of(
                         ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build()))
                         .build(),
                 false);
@@ -217,7 +217,7 @@ public class SurveyIngestionServiceTest {
         Optional<ObservableItem> obsItem =
          Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build())
                 .build());
-        StagedRowFormatted row = rowBuilder.isInvertSizing(Optional.of(true)).species(obsItem).build();
+        StagedRowFormatted row = rowBuilder.isInvertSizing(true).species(obsItem).build();
 
         // M2
         Survey survey = Survey.builder().surveyId(1).build();
@@ -248,7 +248,7 @@ public class SurveyIngestionServiceTest {
         SurveyMethod surveyMethod6 = SurveyMethod.builder().survey(Survey.builder().surveyId(6).build())
                 .method(Method.builder().methodId(1).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations6 = surveyIngestionService.getObservations(surveyMethod6,
-                rowBuilder.inverts(10).measureJson(Collections.emptyMap()).isInvertSizing(Optional.empty()).method(1).species(
+                rowBuilder.inverts(10).measureJson(Collections.emptyMap()).isInvertSizing(false).method(1).species(
                         Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).build()))
                           .build(),
                 false);
@@ -268,7 +268,7 @@ public class SurveyIngestionServiceTest {
         SurveyMethod surveyMethod7 = SurveyMethod.builder().survey(Survey.builder().surveyId(7).build())
                 .method(Method.builder().methodId(12).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations7 = surveyIngestionService.getObservations(surveyMethod7,
-                rowBuilder.inverts(10).measureJson(Collections.emptyMap()).isInvertSizing(Optional.empty()).method(12).species(
+                rowBuilder.inverts(10).measureJson(Collections.emptyMap()).isInvertSizing(false).method(12).species(
                         Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(OBS_ITEM_TYPE_DEBRIS).build()).build()))
                           .build(),
                 false);
@@ -317,7 +317,7 @@ public class SurveyIngestionServiceTest {
     void getObservationsDebrisSavedAsM12() {
 
         ObservableItem debrisItem = ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(5).build()).build();
-        StagedRowFormatted row = rowBuilder.isInvertSizing(Optional.of(true)).species(Optional.of(debrisItem)).build();
+        StagedRowFormatted row = rowBuilder.isInvertSizing(true).species(Optional.of(debrisItem)).build();
 
         StagedRowFormatted groupedRow = surveyIngestionService.groupRowsBySurveyMethod(Arrays.asList(row)).values().iterator().next().get(0);
 

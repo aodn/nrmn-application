@@ -175,8 +175,7 @@ public class RawValidation extends ValidatorHelpers {
                 rowFormatted.setSpeciesAttributesOpt(mayBeSpeciesAttributes);
 
                 if (isExtendedSizing) {
-                        val isInvertSizing = (Optional<Boolean>) values.get("IsInvertSizing").orElse(Optional.empty());
-                        rowFormatted.setIsInvertSizing(isInvertSizing);
+                        rowFormatted.setIsInvertSizing((Boolean)values.get("IsInvertSizing").orElse(false));
                 }
                 return rowFormatted;
         }

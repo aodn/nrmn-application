@@ -56,7 +56,7 @@ class SpeciesInvertSizingTest extends  FormattedTestProvider {
         };
         formatted.setSpeciesAttributesOpt(Optional.of(specAttribute));
         formatted.setMethod(1);
-        formatted.setIsInvertSizing(Optional.of(false));
+        formatted.setIsInvertSizing(false);
         val validationRule = new SpeciesInvertSizing();
         val res = validationRule.valid(formatted);
         assertTrue(res.isValid());
