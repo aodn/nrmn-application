@@ -74,15 +74,15 @@ public class ATRCSurveyGroupComplete extends BaseGlobalRawValidator {
                 // M1: Require least one record for both B1 and B2
                 if (method.equalsIgnoreCase("1")) {
                     if (!rows.stream().anyMatch(r -> r.getBlock().equalsIgnoreCase("1")))
-                        result.add(invalid(job.getId(), errorMessage + " Block 1", ValidationLevel.BLOCKING));
+                        result.add(invalid(job.getId(), errorMessage + " Block 1", ValidationLevel.WARNING));
 
                     if (!rows.stream().anyMatch(r -> r.getBlock().equalsIgnoreCase("2")))
-                        result.add(invalid(job.getId(), errorMessage + " Block 2", ValidationLevel.BLOCKING));
+                        result.add(invalid(job.getId(), errorMessage + " Block 2", ValidationLevel.WARNING));
                 }
 
                 // M2: Require at least one B1 record
                 if (method.equalsIgnoreCase("2") && !rows.stream().anyMatch(r -> r.getBlock().equalsIgnoreCase("1")))
-                    result.add(invalid(job.getId(), errorMessage + " Block 1", ValidationLevel.BLOCKING));
+                    result.add(invalid(job.getId(), errorMessage + " Block 1", ValidationLevel.WARNING));
             });
         });
 
