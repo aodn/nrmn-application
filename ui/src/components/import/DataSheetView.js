@@ -70,6 +70,7 @@ const DataSheetView = ({fileName}) => {
   const [addDialog, setAddDialog] = useState({open: false, rowIndex: -1, number: 1, lastId: 0});
 
   const validationErrors = useSelector((state) => state.import.validationErrors);
+  const ingestError = useSelector((state) => state.import.ingestError);
   const [selectedCells, setSelectedCells] = useState([]);
   const globalErrors = useSelector((state) => state.import.globalErrors);
   const globalWarnings = useSelector((state) => state.import.globalWarnings);
@@ -126,18 +127,28 @@ const DataSheetView = ({fileName}) => {
     });
   };
 
-  const errorAlert =
-    errors && errors.length > 0 ? (
-      <Box mb={2}>
-        <Alert severity="error" variant="filled">
-          {errors.map((item, key) => {
-            return <div key={key}>{item}</div>;
-          })}
-        </Alert>
-      </Box>
-    ) : (
-      ''
-    );
+  const errorAlert = errors && errors.length > 0 && (
+    <Box mb={2}>
+      <Alert severity="error" variant="filled">
+        {errors.map((item, key) => {
+          return <div key={key}>{item}</div>;
+        })}
+      </Alert>
+    </Box>
+  );
+
+  const ingestErrorAlert = ingestError && (
+    <Box mb={2}>
+      <Alert severity="error" variant="filled">
+        <p>
+          Sheet failed to ingest. No survey data has been inserted.
+          <br />
+          If this problem persists, please contact info@aodn.org.au.
+        </p>
+        <p>Error: {ingestError}</p>
+      </Alert>
+    </Box>
+  );
 
   const getContextMenuItems = (params) => {
     return [
@@ -202,7 +213,7 @@ const DataSheetView = ({fileName}) => {
       gridApi.copySelectedRangeToClipboard();
       const rows = getAllRows();
       const fields = cells.columns.map((col) => col.colId);
-      for (let i = cells.startRow.rowIndex -1; i < cells.endRow.rowIndex; i++) {
+      for (let i = cells.startRow.rowIndex - 1; i < cells.endRow.rowIndex; i++) {
         const row = rows[i];
         fields.forEach((field) => {
           row[field] = '';
@@ -237,7 +248,7 @@ const DataSheetView = ({fileName}) => {
       dispatch(ValidationFinished());
       setSelectedCells(false);
     }
-  }, [validationErrors, selectedCells]);
+  }, [ingestError, validationErrors, selectedCells]);
 
   useEffect(() => {
     if (gridApi && errSelected.ids && errSelected.ids.length > 0) {
@@ -341,6 +352,7 @@ const DataSheetView = ({fileName}) => {
           </Alert>
         </Box>
       )}
+      {ingestErrorAlert}
       {globalWarnings.length > 0 && (
         <Box mt={1}>
           <Alert m={2} severity="warning">
