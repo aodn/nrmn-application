@@ -36,8 +36,8 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
         val l5 = speciesAttributes.getL5();
         val l95 = speciesAttributes.getL95();
         val measureJson = target.getMeasureJson();
-        if (measureJson.isEmpty() || l5 == null || l95 == null)
-            return Validated.valid("No data");
+        if (measureJson.isEmpty() || (l5 == null && l95 == null) || (l5 == 0 && l95 == 0))
+            return Validated.valid("No expected sizing");
 
         boolean isInvertSized = target.getIsInvertSizing();
 
