@@ -72,4 +72,163 @@ class MeasureBetweenL5l95Test extends FormattedTestProvider{
         val res = validationRule.valid(formatted);
         assertTrue(res.isInvalid());
     }
+
+    @Test
+    public void validIfL5NullL95NotNull() {
+        val specAttribute = new UiSpeciesAttributes(){
+            @Override
+            public Long getId() {
+                return 1L;
+            }
+
+            @Override
+            public String getSpeciesName() {
+                return null;
+            }
+
+            @Override
+            public String getCommonName() {
+                return null;
+            }
+
+            @Override
+            public Boolean getIsInvertSized() {
+                return true;
+            }
+
+            @Override
+            public Double getL5() {
+                return null;
+            }
+
+            @Override
+            public Double getL95() {
+                return 100.0;
+            }
+
+            @Override
+            public Long getMaxAbundance() {
+                return null;
+            }
+
+            @Override
+            public Long getLmax() {
+                return 0l;
+            }
+        };
+
+        val validationRuleL5L95 = new MeasureBetweenL5l95();
+
+        val formatted_valid = getDefaultFormatted().build();
+        formatted_valid.setSpeciesAttributesOpt(Optional.of(specAttribute));
+        formatted_valid.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 1).put(4, 2).build());
+        formatted_valid.setMethod(1);
+        assertTrue(validationRuleL5L95.valid(formatted_valid).isValid());
+    }
+
+    @Test
+    public void validIfL5NotNullL95Null() {
+        val specAttribute = new UiSpeciesAttributes(){
+            @Override
+            public Long getId() {
+                return 1L;
+            }
+
+            @Override
+            public String getSpeciesName() {
+                return null;
+            }
+
+            @Override
+            public String getCommonName() {
+                return null;
+            }
+
+            @Override
+            public Boolean getIsInvertSized() {
+                return true;
+            }
+
+            @Override
+            public Double getL5() {
+                return null;
+            }
+
+            @Override
+            public Double getL95() {
+                return 10.0;
+            }
+
+            @Override
+            public Long getMaxAbundance() {
+                return null;
+            }
+
+            @Override
+            public Long getLmax() {
+                return 0l;
+            }
+        };
+
+        val validationRuleL5L95 = new MeasureBetweenL5l95();
+
+        val formatted_valid = getDefaultFormatted().build();
+        formatted_valid.setSpeciesAttributesOpt(Optional.of(specAttribute));
+        formatted_valid.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 1).put(4, 2).build());
+        formatted_valid.setMethod(1);
+        assertTrue(validationRuleL5L95.valid(formatted_valid).isValid());
+    }
+
+    @Test
+    public void validIfNull() {
+        val specAttribute = new UiSpeciesAttributes(){
+            @Override
+            public Long getId() {
+                return 1L;
+            }
+
+            @Override
+            public String getSpeciesName() {
+                return null;
+            }
+
+            @Override
+            public String getCommonName() {
+                return null;
+            }
+
+            @Override
+            public Boolean getIsInvertSized() {
+                return true;
+            }
+
+            @Override
+            public Double getL5() {
+                return null;
+            }
+
+            @Override
+            public Double getL95() {
+                return null;
+            }
+
+            @Override
+            public Long getMaxAbundance() {
+                return null;
+            }
+
+            @Override
+            public Long getLmax() {
+                return 0l;
+            }
+        };
+
+        val validationRuleL5L95 = new MeasureBetweenL5l95();
+
+        val formatted_valid = getDefaultFormatted().build();
+        formatted_valid.setSpeciesAttributesOpt(Optional.of(specAttribute));
+        formatted_valid.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 1).put(4, 2).put(35,3).build());
+        formatted_valid.setMethod(1);
+        assertTrue(validationRuleL5L95.valid(formatted_valid).isValid());
+    }
 }

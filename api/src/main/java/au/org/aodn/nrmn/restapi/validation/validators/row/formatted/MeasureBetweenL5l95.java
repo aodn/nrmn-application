@@ -33,10 +33,10 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
         }
 
         val speciesAttributes = target.getSpeciesAttributesOpt().get();
-        val l5 = speciesAttributes.getL5();
-        val l95 = speciesAttributes.getL95();
+        val l5 = speciesAttributes.getL5() != null ? speciesAttributes.getL5() : 0;
+        val l95 = speciesAttributes.getL95() != null ? speciesAttributes.getL95() : 0;
         val measureJson = target.getMeasureJson();
-        if (measureJson.isEmpty() || (l5 == null && l95 == null) || (l5 == 0 && l95 == 0))
+        if (measureJson.isEmpty() || (l5 == 0 && l95 == 0))
             return Validated.valid("No expected sizing");
 
         boolean isInvertSized = target.getIsInvertSizing();
@@ -46,9 +46,9 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
         // is within l5 and l95
         val outOfRange = measureJson.entrySet().stream()
                 .filter(entry -> entry.getValue() != 0 && (((isInvertSized)
-                        && (INVERT_VALUES[entry.getKey() - 1] < l5 || INVERT_VALUES[entry.getKey() - 1] > l95))
+                        && ((l5 > 0 && INVERT_VALUES[entry.getKey() - 1] < l5) || (l95 > 0 && INVERT_VALUES[entry.getKey() - 1] > l95)))
                         || ((!isInvertSized)
-                                && (FISH_VALUES[entry.getKey() - 1] < l5 || FISH_VALUES[entry.getKey() - 1] > l95))))
+                                && ((l5 > 0 && FISH_VALUES[entry.getKey() - 1] < l5) || (l95 > 0 && FISH_VALUES[entry.getKey() - 1] > l95)))))
                 .map(Map.Entry::getKey).collect(Collectors.toList());
 
         if (outOfRange.isEmpty()) {

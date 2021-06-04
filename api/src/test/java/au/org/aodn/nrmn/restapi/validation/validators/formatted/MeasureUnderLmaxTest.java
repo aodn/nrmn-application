@@ -133,7 +133,7 @@ class MeasureUnderLmaxTest extends  FormattedTestProvider {
     }
 
     @Test
-    public void validIfZeroLmax() {
+    public void validIfNullLmax() {
         val specAttribute = new UiSpeciesAttributes(){
             @Override
             public Long getId() {
@@ -172,7 +172,7 @@ class MeasureUnderLmaxTest extends  FormattedTestProvider {
 
             @Override
             public Long getLmax() {
-                return 0l;
+                return null;
             }
         };
         val validationRuleLmax = new MeasureUnderLmax();
