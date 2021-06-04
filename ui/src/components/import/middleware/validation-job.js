@@ -9,6 +9,7 @@ import {
   EditRowFinished,
   SubmitingestRequested,
   ingestFinished,
+  ingestFailed,
   RowDeleteRequested,
   RowDeleteFinished
 } from '../reducers/create-import';
@@ -52,13 +53,13 @@ function* update(action) {
 function* submit(action) {
   try {
     const {response} = yield call(submitingest, action.payload);
-    if (response.data.error) {
-      yield put(jobFailed([response.data.error]));
+    if (response.status != 200) {
+      yield put(ingestFailed(response.data));
     } else {
       yield put(ingestFinished(response.data));
     }
   } catch (error) {
-    yield put(jobFailed([error]));
+    yield put(ingestFailed([error]));
   }
 }
 

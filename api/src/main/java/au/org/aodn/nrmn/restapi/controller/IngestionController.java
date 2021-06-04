@@ -71,7 +71,7 @@ public class IngestionController {
         } catch (Exception e) {
             stagedJobLogRepository.save(StagedJobLog.builder().stagedJob(job).details(e.getMessage())
                     .eventType(StagedJobEventType.ERROR).build());
-            return ResponseEntity.badRequest().body("Error ingesting job: " + e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
         return ResponseEntity.ok("Job " + jobId + " successfully ingested.");
     }

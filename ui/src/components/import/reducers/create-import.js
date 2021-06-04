@@ -110,6 +110,7 @@ const importSlice = createSlice({
     validationReady: (state, action) => {
       state.globalWarnings = state.globalErrors = [];
       state.errorsByMsg = [];
+      state.ingestError = null;
       state.enableSubmit = false;
 
       if (action.payload.errors.length > 0) {
@@ -151,6 +152,7 @@ const importSlice = createSlice({
       state.isLoading = true;
     },
     SubmitingestRequested: (state) => {
+      state.ingestError = null;
       state.ingestLoading = true;
     },
     ValidationRequested: (state) => {
@@ -166,6 +168,13 @@ const importSlice = createSlice({
     ingestFinished: (state) => {
       state.ingestLoading = false;
       state.ingestSuccess = true;
+    },
+    ingestFailed: (state, action) => {
+      state.ingestLoading = false;
+      state.ingestError = action.payload;
+      state.ingestSuccess = false;
+      state.enableSubmit = false;
+      state.errorsByMsg = state.globalWarnings = state.globalErrors = [];
     },
     EnableSubmit: (state, action) => {
       state.submitReady = action.payload;
@@ -193,6 +202,7 @@ export const {
   JobFinished,
   JobReady,
   ingestFinished,
+  ingestFailed,
   EnableSubmit,
   RowUpdateRequested,
   RowDeleteRequested,
