@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.validators.formatted;
 
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
+import au.org.aodn.nrmn.restapi.validation.validators.row.formatted.MeasureBetweenL5l95;
 import au.org.aodn.nrmn.restapi.validation.validators.row.formatted.MeasureUnderLmax;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -71,6 +72,7 @@ class MeasureUnderLmaxTest extends  FormattedTestProvider {
         assertTrue(validationRule.valid(formatted_invalid).isInvalid());
     }
 
+    @Test
     public void underLmaxInverts() {
         val specAttribute = new UiSpeciesAttributes(){
             @Override
@@ -129,4 +131,60 @@ class MeasureUnderLmaxTest extends  FormattedTestProvider {
         formatted_invalid.setMethod(1);
         assertTrue(validationRule.valid(formatted_invalid).isInvalid());
     }
+
+    @Test
+    public void validIfNullLmax() {
+        val specAttribute = new UiSpeciesAttributes(){
+            @Override
+            public Long getId() {
+                return 1L;
+            }
+
+            @Override
+            public String getSpeciesName() {
+                return null;
+            }
+
+            @Override
+            public String getCommonName() {
+                return null;
+            }
+
+            @Override
+            public Boolean getIsInvertSized() {
+                return true;
+            }
+
+            @Override
+            public Double getL5() {
+                return 0.0;
+            }
+
+            @Override
+            public Double getL95() {
+                return 0.0;
+            }
+
+            @Override
+            public Long getMaxAbundance() {
+                return null;
+            }
+
+            @Override
+            public Long getLmax() {
+                return null;
+            }
+        };
+        val validationRuleLmax = new MeasureUnderLmax();
+        val validationRuleL5L95 = new MeasureBetweenL5l95();
+
+        val formatted_valid = getDefaultFormatted().build();
+        formatted_valid.setSpeciesAttributesOpt(Optional.of(specAttribute));
+        formatted_valid.setIsInvertSizing(true);
+        formatted_valid.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 1).put(4, 2).put(35,3).build());
+        formatted_valid.setMethod(1);
+        assertTrue(validationRuleLmax.valid(formatted_valid).isValid());
+        assertTrue(validationRuleL5L95.valid(formatted_valid).isValid());
+    }
 }
+

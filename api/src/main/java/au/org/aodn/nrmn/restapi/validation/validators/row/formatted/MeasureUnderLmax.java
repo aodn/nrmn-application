@@ -29,15 +29,16 @@ public class MeasureUnderLmax extends BaseFormattedValidator {
         }
 
         val speciesAttributes = target.getSpeciesAttributesOpt().get();
-        val lmax = speciesAttributes.getLmax();
-        if (target.getMeasureJson().isEmpty() || lmax == null)
-            return Validated.valid("No data");
+        val lmax = speciesAttributes.getLmax() != null ? speciesAttributes.getLmax() : 0;
+        if (target.getMeasureJson().isEmpty() || lmax == 0)
+            return Validated.valid("No expected sizing");
+
         val outOfRangef = target.getMeasureJson().entrySet().stream()
                 .filter(entry -> target.getIsInvertSizing() ? INVERT_VALUES[entry.getKey() - 1] > lmax
                         : FISH_VALUES[entry.getKey() - 1] > lmax)
                 .collect(Collectors.toList());
 
-        if (outOfRangef.isEmpty() || lmax == null) {
+        if (outOfRangef.isEmpty()) {
             return Validated.valid("Values under Lmax");
         }
         return outOfRangef.stream().map(measure -> {
