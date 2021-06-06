@@ -24,8 +24,8 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
 
-        val methodAllowed = Arrays.asList(3,4,5);
-        if (methodAllowed.contains(target.getMethod())) {
+        val skipMethods = Arrays.asList(3,4,5);
+        if (skipMethods.contains(target.getMethod())) {
             return Validated.valid("M3, M4, M5 species");
         }
 
