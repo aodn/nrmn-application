@@ -10,6 +10,7 @@ import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import lombok.val;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -20,8 +21,14 @@ public class MeasureUnderLmax extends BaseFormattedValidator {
 
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
-        if (!target.getRef().getStagedJob().getIsExtendedSize()) {
-            return Validated.valid("not affected");
+
+        val methodAllowed = Arrays.asList(3,4,5);
+        if (methodAllowed.contains(target.getMethod())) {
+            return Validated.valid("M3, M4, M5 species");
+        }
+
+        if(!target.getRef().getStagedJob().getIsExtendedSize()) {
+            return Validated.valid("Not extended sizing");
         }
 
         if (!target.getSpeciesAttributesOpt().isPresent()) {
