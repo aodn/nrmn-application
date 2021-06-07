@@ -10,6 +10,7 @@ import cyclops.companion.Monoids;
 import cyclops.control.Validated;
 import lombok.val;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -20,10 +21,12 @@ public class MeasureUnderLmax extends BaseFormattedValidator {
 
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
-        if (!target.getRef().getStagedJob().getIsExtendedSize()) {
-            return Validated.valid("not affected");
-        }
 
+        val skipMethods = Arrays.asList(3,4,5);
+        if (skipMethods.contains(target.getMethod())) {
+            return Validated.valid("M3, M4, M5 species");
+        }
+        
         if (!target.getSpeciesAttributesOpt().isPresent()) {
             return Validated.valid("No Species Data");
         }
@@ -33,8 +36,13 @@ public class MeasureUnderLmax extends BaseFormattedValidator {
         if (target.getMeasureJson().isEmpty() || lmax == 0)
             return Validated.valid("No expected sizing");
 
+        // Use isInvertSizing column value only if extended sizing is set
+        boolean isInvertSized = target.getRef().getStagedJob().getIsExtendedSize() && target.getIsInvertSizing() != null ? 
+                                target.getIsInvertSizing() : 
+                                false;
+
         val outOfRangef = target.getMeasureJson().entrySet().stream()
-                .filter(entry -> target.getIsInvertSizing() ? INVERT_VALUES[entry.getKey() - 1] > lmax
+                .filter(entry -> isInvertSized ? INVERT_VALUES[entry.getKey() - 1] > lmax
                         : FISH_VALUES[entry.getKey() - 1] > lmax)
                 .collect(Collectors.toList());
 
@@ -42,7 +50,7 @@ public class MeasureUnderLmax extends BaseFormattedValidator {
             return Validated.valid("Values under Lmax");
         }
         return outOfRangef.stream().map(measure -> {
-            val column = MeasureUtil.getMeasureName(measure.getKey(), target.getIsInvertSizing());
+            val column = MeasureUtil.getMeasureName(measure.getKey(), isInvertSized);
             return invalid(target, "Measure: " + column.replace('-', '.') + " is above Lmax[" + lmax + "]",
                     ValidationCategory.DATA, ValidationLevel.WARNING, Optional.of(column));
         }).reduce(Validated.valid(""), (acc, err) -> acc.combine(Monoids.stringConcat, err));

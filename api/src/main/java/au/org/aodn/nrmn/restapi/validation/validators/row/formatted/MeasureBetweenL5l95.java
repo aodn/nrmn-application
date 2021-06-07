@@ -23,11 +23,12 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
 
     @Override
     public Validated<StagedRowError, String> valid(StagedRowFormatted target) {
-        val methodAllowed = Arrays.asList(0, 1, 2);
-        if (!methodAllowed.contains(target.getMethod()) || !target.getRef().getStagedJob().getIsExtendedSize()) {
-            return Validated.valid("not affected");
-        }
 
+        val skipMethods = Arrays.asList(3,4,5);
+        if (skipMethods.contains(target.getMethod())) {
+            return Validated.valid("M3, M4, M5 species");
+        }
+        
         if (!target.getSpeciesAttributesOpt().isPresent()) {
             return Validated.valid("No Species Data");
         }
@@ -39,7 +40,10 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
         if (measureJson.isEmpty() || (l5 == 0 && l95 == 0))
             return Validated.valid("No expected sizing");
 
-        boolean isInvertSized = target.getIsInvertSizing();
+        // Use isInvertSizing column value only if extended sizing is set
+        boolean isInvertSized = target.getRef().getStagedJob().getIsExtendedSize() && target.getIsInvertSizing() != null ? 
+                                target.getIsInvertSizing() : 
+                                false;
 
         // |measureJson| now contains the count of each species for a size column
         // Map this value to the size class and check the matching class 
