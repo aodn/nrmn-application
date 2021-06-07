@@ -28,11 +28,7 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
         if (skipMethods.contains(target.getMethod())) {
             return Validated.valid("M3, M4, M5 species");
         }
-
-        if(!target.getRef().getStagedJob().getIsExtendedSize()) {
-            return Validated.valid("Not extended sizing");
-        }
-
+        
         if (!target.getSpeciesAttributesOpt().isPresent()) {
             return Validated.valid("No Species Data");
         }
