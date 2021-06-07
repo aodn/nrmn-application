@@ -36,7 +36,10 @@ public class MeasureUnderLmax extends BaseFormattedValidator {
         if (target.getMeasureJson().isEmpty() || lmax == 0)
             return Validated.valid("No expected sizing");
 
-        boolean isInvertSized = target.getIsInvertSizing() ? target.getIsInvertSizing() : false;
+        // Use isInvertSizing column value only if extended sizing is set
+        boolean isInvertSized = target.getRef().getStagedJob().getIsExtendedSize() && target.getIsInvertSizing() != null ? 
+                                target.getIsInvertSizing() : 
+                                false;
 
         val outOfRangef = target.getMeasureJson().entrySet().stream()
                 .filter(entry -> isInvertSized ? INVERT_VALUES[entry.getKey() - 1] > lmax

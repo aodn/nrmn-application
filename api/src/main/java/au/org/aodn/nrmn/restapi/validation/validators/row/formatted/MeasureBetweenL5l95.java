@@ -40,7 +40,10 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
         if (measureJson.isEmpty() || (l5 == 0 && l95 == 0))
             return Validated.valid("No expected sizing");
 
-        boolean isInvertSized = target.getIsInvertSizing() ? target.getIsInvertSizing() : false;
+        // Use isInvertSizing column value only if extended sizing is set
+        boolean isInvertSized = target.getRef().getStagedJob().getIsExtendedSize() && target.getIsInvertSizing() != null ? 
+                                target.getIsInvertSizing() : 
+                                false;
 
         // |measureJson| now contains the count of each species for a size column
         // Map this value to the size class and check the matching class 
