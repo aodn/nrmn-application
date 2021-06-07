@@ -71,7 +71,7 @@ public class RawValidation extends ValidatorHelpers {
                                                                 ValidationLevel.BLOCKING)),
                                 Tuple2.of("Block",
                                                 new IntegerFormatValidation(StagedRow::getBlock, "Block",
-                                                                Arrays.asList(0, 1, 2, 10))),
+                                                                Arrays.asList(0, 1, 2))),
                                 Tuple2.of("Code", new PassThruString(StagedRow::getCode, "Code")),
                                 Tuple2.of("Species", observableItemExists),
 
