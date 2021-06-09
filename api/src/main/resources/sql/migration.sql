@@ -549,6 +549,7 @@ CREATE TABLE nrmn.survey (
     inside_marine_park character varying(50),
     notes character varying(1000),
     pq_catalogued boolean,
+    pq_zip_url varchar(255),
     pq_diver_id integer,
     block_abundance_simulated boolean,
     project_title character varying(100)

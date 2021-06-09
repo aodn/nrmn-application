@@ -62,12 +62,12 @@ public class Survey {
     @Basic
     @Column(name = "longitude")
     @Schema(title = "Longitude")
-    private Double longitude;
+    private Float longitude;
 
     @Basic
     @Column(name = "latitude")
     @Schema(title = "Latitude")
-    private Double latitude;
+    private Float latitude;
 
     @Basic
     @Column(name = "protection_status")
@@ -89,7 +89,11 @@ public class Survey {
     @Schema(title = "PQ catalogued")
     private Boolean pqCatalogued;
 
-    
+    @Basic
+    @Column(name = "pq_zip_url")
+    @Schema(title = "PQ zip url")
+    private Boolean pqZipUrl;
+
     @Basic
     @Column(name = "pq_diver_id")
     @Schema(title = "PQ Diver ID")
