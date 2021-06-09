@@ -61,6 +61,9 @@ public class SurveyDto {
     @Schema(title = "PQ Catalogued")
     private String pqCatalogued;
 
+    @Schema(title = "PQ Zip Url")
+    private String pqZipUrl;
+
     @Schema(title = "PQ diver")
     private String pqDiver;
 
