@@ -11,6 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -33,18 +34,19 @@ public class WormsService {
     }
 
     public List<SpeciesRecord> partialSearch(int page, String searchTerm) {
-        Mono<SpeciesRecord[]> response = wormsClient
+        if (page > 0) return Collections.emptyList();
+
+        Mono<SpeciesRecord[][]> response = wormsClient
                 .get().uri(uriBuilder ->
-                        uriBuilder.path("/AphiaRecordsByName")
-                                  .pathSegment("%" + removeTrailingJunk(searchTerm))
-                                  .queryParam("offset", page * 50 + 1)
+                        uriBuilder.path("/AphiaRecordsByNames")
+                                  .queryParam("scientificnames[]", "%" + removeTrailingJunk(searchTerm))
                                   .build())
                 .retrieve()
-                .bodyToMono(SpeciesRecord[].class);
-        SpeciesRecord[] matchingSpecies = Optional.ofNullable(response.block())
-                                                   .orElse(new SpeciesRecord[0]);
+                .bodyToMono(SpeciesRecord[][].class);
+        SpeciesRecord[][] matchingSpecies = Optional.ofNullable(response.block())
+                                                   .orElse(new SpeciesRecord[1][0]);
 
-        return Arrays.stream(matchingSpecies)
+        return Arrays.stream(matchingSpecies[0])
                      .map(m -> {
                         m.setIsPresent(m.getScientificName() != null ? observableItemRepository.count(Example.of(ObservableItem.builder().observableItemName(m.getScientificName()).build())) > 0 : false);
                         return m;

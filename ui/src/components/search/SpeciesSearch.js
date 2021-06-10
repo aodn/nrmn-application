@@ -80,7 +80,7 @@ const SpeciesSearch = () => {
     setTabIndex(newValue);
   };
 
-  const pageSize = 50;
+  const pageSize = 500;
   const maxResults = 9999;
 
   useEffect(() => {
