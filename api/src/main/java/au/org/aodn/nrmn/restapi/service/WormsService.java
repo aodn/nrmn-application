@@ -39,7 +39,7 @@ public class WormsService {
         Mono<SpeciesRecord[][]> response = wormsClient
                 .get().uri(uriBuilder ->
                         uriBuilder.path("/AphiaRecordsByNames")
-                                  .queryParam("scientificnames[]", "%" + removeTrailingJunk(searchTerm))
+                                  .queryParam("scientificnames[]", "%" + removeTrailingJunk(searchTerm) + "%")
                                   .build())
                 .retrieve()
                 .bodyToMono(SpeciesRecord[][].class);
