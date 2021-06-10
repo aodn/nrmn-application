@@ -28,11 +28,11 @@ public class Method3QuadratsMissing extends BaseGlobalFormattedValidator {
         val transectsMap = rows.stream()
                 .filter(row -> row.getMethod().equals(3))
                 .collect(Collectors.groupingBy(row ->
-                        row.getDepth() + "." + row.getSurveyNum().orElseGet(() -> 0)
+                        row.getSite().getSiteCode()
                                 + "-"
-                                + row.getSite().getSiteCode()
+                                + row.getDate()
                                 + "-"
-                                + row.getDate().toEpochDay()
+                                + row.getDepth() + "." + row.getSurveyNum().orElseGet(() -> 0)
                 ));
         val transectSumQuadratsMissing = transectsMap
                 .entrySet().stream()
