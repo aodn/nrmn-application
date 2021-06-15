@@ -1,35 +1,38 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
-import org.apache.poi.xssf.usermodel.XSSFComment;
-
 import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import cyclops.control.Validated;
+import lombok.Value;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
+import org.apache.poi.xssf.usermodel.XSSFComment;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class SurveyContentsHandler implements SheetContentsHandler {
 
     private final List<String> optionalHeaders;
     private List<String> requiredHeaders;
 
-    private Validated<ErrorInput, List<StagedRow>> result;
+    private Validated<ErrorInput, ParsedSheet> result;
     private StagedRow currentRow;
-    private boolean isHeaderRow = false;
-    private boolean rowHasId = false;
+    private boolean isFirstHeaderRow = false;
+    private boolean isDataRow = false;
+    private boolean rowHasData = false;
     private HashMap<String, String> columnHeaders = new HashMap<>();
-    HashMap<Integer, String> measureJson = new HashMap<Integer, String>();
-    List<StagedRow> stagedRows = new ArrayList<StagedRow>();
+    HashMap<Integer, String> measureJson = new HashMap<>();
+    List<StagedRow> stagedRows = new ArrayList<>();
+    private Long numEmptyRows = 0L;
 
     SurveyContentsHandler(List<String> requiredHeaders, List<String> optionalHeaders) {
         this.requiredHeaders = requiredHeaders;
         this.optionalHeaders = optionalHeaders;
     }
 
-    public Validated<ErrorInput, List<StagedRow>> getResult() {
+    public Validated<ErrorInput, ParsedSheet> getResult() {
         if (this.result != null)
             return this.result;
         else
@@ -38,9 +41,10 @@ public class SurveyContentsHandler implements SheetContentsHandler {
 
     @Override
     public void startRow(int rowNum) {
-        rowHasId = false;
-        isHeaderRow = (rowNum == 0);
-        if (!isHeaderRow) {
+        isFirstHeaderRow = (rowNum == 0);
+        isDataRow = (rowNum > 1);
+        rowHasData = false;
+        if (isDataRow) {
             currentRow = StagedRow.builder().pos(rowNum - 1).build();
             for (String col : requiredHeaders)
                 setValue(col, "");
@@ -49,7 +53,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
 
     @Override
     public void endRow(int rowNum) {
-        if (isHeaderRow) {
+        if (isFirstHeaderRow) {
             List<String> errors = new ArrayList<String>();
             List<String> foundHeaders = new ArrayList<String>(columnHeaders.values());
             List<String> missingHeaders = new ArrayList<String>(requiredHeaders);
@@ -62,10 +66,12 @@ public class SurveyContentsHandler implements SheetContentsHandler {
                 errors.add("Unexpected Headers: " + String.join(", ", foundHeaders));
             if (errors.size() > 0)
                 result = Validated.invalid(new ErrorInput(String.join(". ", errors), "headers"));
-        } else {
-            if (rowHasId) {
-                currentRow.setMeasureJson(new HashMap<Integer, String>(measureJson));
+        } else if (isDataRow) {
+            if (rowHasData) {
+                currentRow.setMeasureJson(new HashMap<>(measureJson));
                 this.stagedRows.add(currentRow);
+            } else {
+                numEmptyRows++;
             }
         }
         measureJson.clear();
@@ -74,7 +80,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     @Override
     public void endSheet() {
         if (stagedRows.size() > 0)
-            result = Validated.valid(stagedRows);
+            result = Validated.valid(new ParsedSheet(stagedRows, numEmptyRows));
         else
             result = result != null ? result : Validated.invalid(new ErrorInput("Empty DATA sheet", "sheet"));
     }
@@ -86,21 +92,20 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             return;
 
         String columnKey = cellReference.replaceAll("[0123456789]", "");
-        if (isHeaderRow) {
+        if (isFirstHeaderRow) {
             columnHeaders.put(columnKey, formattedValue);
-        } else {
-            String columnValue = columnHeaders.getOrDefault(columnKey, "");
-            columnValue = columnValue == null || columnValue.contentEquals("") || columnValue.contentEquals("null")
-                    ? "0"
-                    : columnValue;
-            setValue(columnValue, formattedValue);
+        } else if (isDataRow){
+            String col = columnHeaders.getOrDefault(columnKey, "");
+            boolean cellHasData = StringUtils.isNotEmpty(formattedValue) && !formattedValue.contentEquals("null");
+            rowHasData = rowHasData || cellHasData;
+            String value = cellHasData ? formattedValue : "";
+            setValue(col, value);
         }
     }
 
-    private void setValue(String columnValue, String formattedValue) {
-        switch (columnValue) {
+    private void setValue(String columnHeader, String formattedValue) {
+        switch (columnHeader) {
             case "ID":
-                rowHasId = formattedValue.length() > 0;
                 break;
             case "Buddy":
                 currentRow.setBuddy(formattedValue);
@@ -163,11 +168,17 @@ public class SurveyContentsHandler implements SheetContentsHandler {
                 currentRow.setInverts(formattedValue);
                 break;
             default:
-                if (formattedValue.length() > 0 && requiredHeaders.contains(columnValue)
-                        && columnValue.matches("\\d.*"))
-                    measureJson.put(requiredHeaders.indexOf(columnValue) - requiredHeaders.indexOf("Inverts"),
+                if (formattedValue.length() > 0 && requiredHeaders.contains(columnHeader)
+                        && columnHeader.matches("\\d.*"))
+                    measureJson.put(requiredHeaders.indexOf(columnHeader) - requiredHeaders.indexOf("Inverts"),
                             formattedValue);
                 break;
         }
+    }
+
+    @Value
+    public class ParsedSheet {
+        private List<StagedRow> stagedRows;
+        private Long numEmptyRows;
     }
 }

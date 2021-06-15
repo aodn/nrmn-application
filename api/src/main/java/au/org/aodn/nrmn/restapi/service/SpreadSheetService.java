@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 
+import au.org.aodn.nrmn.restapi.service.SurveyContentsHandler.ParsedSheet;
 import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -23,7 +24,6 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import cyclops.control.Future;
 import cyclops.control.Validated;
 
@@ -45,7 +45,8 @@ public class SpreadSheetService {
     @Autowired
     private S3IO s3client;
 
-    public Validated<ErrorInput, List<StagedRow>> stageXlsxFile(MultipartFile file, Boolean withExtendedSizes) {
+    public Validated<ErrorInput, ParsedSheet> stageXlsxFile(MultipartFile file,
+                                                            Boolean withExtendedSizes) {
 
         ZipSecureFile.setMinInflateRatio(0.0d);
 

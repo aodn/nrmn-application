@@ -6,6 +6,7 @@ import static org.testcontainers.containers.localstack.LocalStackContainer.Servi
 
 import java.io.InputStream;
 
+import au.org.aodn.nrmn.restapi.service.SurveyContentsHandler.ParsedSheet;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -133,9 +134,10 @@ public class SpreadSheetServiceIT {
         void validFileShouldBeCorrectlyTransformToStageSurvey() throws Exception {
                 Mockito.when(provider.getClient()).thenReturn(client);
                 val file3 = new FileSystemResource("src/test/resources/sheets/correctShortHeader3.xlsx");
-                val stageSurveys = sheetService.stageXlsxFile(
-                                new MockMultipartFile("sheets/correctShortHeader3.xlsx", file3.getInputStream()), false)
-                                .orElseGet(() -> null);
+                ParsedSheet parsedSheet = sheetService.stageXlsxFile(
+                        new MockMultipartFile("sheets/correctShortHeader3.xlsx", file3.getInputStream()), false)
+                                                      .orElseGet(() -> null);
+                val stageSurveys = parsedSheet.getStagedRows();
                 assertEquals(stageSurveys.size(), 2);
                 val obs1 = stageSurveys.get(0);
 
@@ -156,7 +158,7 @@ public class SpreadSheetServiceIT {
                 Mockito.when(provider.getClient()).thenReturn(client);
                 val file = new FileSystemResource("src/test/resources/sheets/dateFormats.xlsx");
                 val mockFile = new MockMultipartFile("sheets/dateFormats.xlsx", file.getInputStream());
-                val stageSurveys = sheetService.stageXlsxFile(mockFile, false).orElseGet(() -> null);
+                val stageSurveys = sheetService.stageXlsxFile(mockFile, false).orElseGet(() -> null).getStagedRows();
 
                 // Test that dates are formatted the same way as they appear in the sheet.
                 assertEquals("12/12/2019", stageSurveys.get(0).getDate());
