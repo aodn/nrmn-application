@@ -151,6 +151,33 @@ class StagedJobControllerIT {
 
     @Test
     @WithUserDetails("test@gmail.com")
+    public void UploadingLongCorrectIngestFileWithMissingIdsShouldbeOK() throws Exception {
+        Mockito.when(provider.getClient()).thenReturn(client);
+        val auth = getContext().getAuthentication();
+        val token = jwtProvider.generateToken(auth);
+        val reqUpload = new RequestWrapper<LinkedMultiValueMap<String, Object>, UploadResponse>();
+        val file = new FileSystemResource("src/test/resources/sheets/correctLongHeaderMissingIds.xlsx");
+        LinkedMultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
+        parameters.add("file", file);
+        parameters.add("withExtendedSizes", true);
+        parameters.add("programId", 55);
+
+
+        val resp = reqUpload
+                .withContentType(MediaType.MULTIPART_FORM_DATA)
+                .withEntity(parameters)
+                .withToken(token)
+                .withMethod(HttpMethod.POST)
+                .withResponseType(UploadResponse.class)
+                .withUri(_createUrl("/api/stage/upload"))
+                .build(testRestTemplate);
+
+        assertEquals(resp.getStatusCode(), HttpStatus.OK);
+        assertEquals(resp.getBody().getFile().get().getRowCount(), 34);
+    }
+
+    @Test
+    @WithUserDetails("test@gmail.com")
     public void emptyFileShouldFail() throws Exception {
         Mockito.when(provider.getClient()).thenReturn(client);
         val auth = getContext().getAuthentication();
