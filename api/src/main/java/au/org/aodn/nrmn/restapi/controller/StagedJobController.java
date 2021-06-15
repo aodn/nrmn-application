@@ -108,19 +108,24 @@ public class StagedJobController {
                         logRepo.save(errorLog);
                         return ResponseEntity.unprocessableEntity()
                                         .body(new UploadResponse(Optional.empty(), err.stream().toList()));
-                }, stagedRowToSave -> {
+                }, parsedSheet -> {
                         job.setStatus(StatusJobType.STAGED);
                         jobRepo.save(job);
 
-                        val stagedLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis()))
-                                        .eventType(StagedJobEventType.STAGED).stagedJob(job)
-                                        .details("Staged with " + stagedRowToSave.size() + " row(s).").build();
+                    List<StagedRow> rowsToSave = parsedSheet.getStagedRows();
+                    Long numEmptyRows = parsedSheet.getNumEmptyRows();
+
+                    val stagedLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis()))
+                                                .eventType(StagedJobEventType.STAGED).stagedJob(job)
+                                                .details("Staged " + (rowsToSave.size()) + " row(s)." +
+                                                (numEmptyRows > 0 ? " " + numEmptyRows + " empty " +
+                                                 "row(s) skipped." : "")).build();
                         logRepo.save(stagedLog);
-                        stagedRowRepo.saveAll(stagedRowToSave.stream().map(s -> {
+                        stagedRowRepo.saveAll(rowsToSave.stream().map(s -> {
                                 s.setStagedJob(job);
                                 return s;
                         }).collect(Collectors.toList()));
-                        val filesResult = new FileUpload(job.getId(), stagedRowToSave.size());
+                        val filesResult = new FileUpload(job.getId(), rowsToSave.size());
                         return ResponseEntity.status(HttpStatus.OK)
                                         .body(new UploadResponse(Optional.of(filesResult), Collections.emptyList()));
                 });

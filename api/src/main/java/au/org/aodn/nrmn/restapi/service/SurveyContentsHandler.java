@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.service;
 import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import cyclops.control.Validated;
+import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
@@ -16,21 +17,22 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     private final List<String> optionalHeaders;
     private List<String> requiredHeaders;
 
-    private Validated<ErrorInput, List<StagedRow>> result;
+    private Validated<ErrorInput, ParsedSheet> result;
     private StagedRow currentRow;
     private boolean isFirstHeaderRow = false;
     private boolean isDataRow = false;
     private boolean rowHasData = false;
     private HashMap<String, String> columnHeaders = new HashMap<>();
-    HashMap<Integer, String> measureJson = new HashMap<Integer, String>();
-    List<StagedRow> stagedRows = new ArrayList<StagedRow>();
+    HashMap<Integer, String> measureJson = new HashMap<>();
+    List<StagedRow> stagedRows = new ArrayList<>();
+    private Long numEmptyRows = 0L;
 
     SurveyContentsHandler(List<String> requiredHeaders, List<String> optionalHeaders) {
         this.requiredHeaders = requiredHeaders;
         this.optionalHeaders = optionalHeaders;
     }
 
-    public Validated<ErrorInput, List<StagedRow>> getResult() {
+    public Validated<ErrorInput, ParsedSheet> getResult() {
         if (this.result != null)
             return this.result;
         else
@@ -68,6 +70,8 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             if (rowHasData) {
                 currentRow.setMeasureJson(new HashMap<>(measureJson));
                 this.stagedRows.add(currentRow);
+            } else {
+                numEmptyRows++;
             }
         }
         measureJson.clear();
@@ -76,7 +80,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     @Override
     public void endSheet() {
         if (stagedRows.size() > 0)
-            result = Validated.valid(stagedRows);
+            result = Validated.valid(new ParsedSheet(stagedRows, numEmptyRows));
         else
             result = result != null ? result : Validated.invalid(new ErrorInput("Empty DATA sheet", "sheet"));
     }
@@ -94,7 +98,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             String col = columnHeaders.getOrDefault(columnKey, "");
             boolean cellHasData = StringUtils.isNotEmpty(formattedValue) && !formattedValue.contentEquals("null");
             rowHasData = rowHasData || cellHasData;
-            String value = cellHasData ? formattedValue : "0";
+            String value = cellHasData ? formattedValue : "";
             setValue(col, value);
         }
     }
@@ -170,5 +174,11 @@ public class SurveyContentsHandler implements SheetContentsHandler {
                             formattedValue);
                 break;
         }
+    }
+
+    @Value
+    public class ParsedSheet {
+        private List<StagedRow> stagedRows;
+        private Long numEmptyRows;
     }
 }
