@@ -92,7 +92,7 @@ public class Survey {
     @Basic
     @Column(name = "pq_zip_url")
     @Schema(title = "PQ zip url")
-    private Boolean pqZipUrl;
+    private String pqZipUrl;
 
     @Basic
     @Column(name = "pq_diver_id")
