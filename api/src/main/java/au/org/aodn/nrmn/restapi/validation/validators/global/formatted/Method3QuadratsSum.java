@@ -26,9 +26,9 @@ public class Method3QuadratsSum extends BaseGlobalFormattedValidator {
                 .filter(row -> row.getMethod().equals(3))
                 .collect(Collectors.groupingBy(row ->
                         row.getSite().getSiteCode()
-                                + "-"
+                                + "/"
                                 + row.getDate()
-                                + "-"
+                                + "/"
                                 + row.getDepth() + "." + row.getSurveyNum().orElseGet(() -> 0)
                 ));
 
