@@ -11,7 +11,6 @@ import cyclops.data.tuple.Tuple2;
 import cyclops.data.tuple.Tuple5;
 import lombok.val;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,11 +27,11 @@ public class Method3QuadratsMissing extends BaseGlobalFormattedValidator {
         val transectsMap = rows.stream()
                 .filter(row -> row.getMethod().equals(3))
                 .collect(Collectors.groupingBy(row ->
-                        row.getDepth() + "." + row.getSurveyNum().orElseGet(() -> 0)
-                                + "-"
-                                + row.getSite().getSiteCode()
-                                + "-"
-                                + row.getDate().toEpochDay()
+                        row.getSite().getSiteCode()
+                                + "/"
+                                + row.getDate()
+                                + "/"
+                                + row.getDepth() + "." + row.getSurveyNum().orElseGet(() -> 0)
                 ));
         val transectSumQuadratsMissing = transectsMap
                 .entrySet().stream()
