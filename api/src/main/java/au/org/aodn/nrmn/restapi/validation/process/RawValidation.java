@@ -131,7 +131,7 @@ public class RawValidation extends ValidatorHelpers {
                 val splitDepth = values.get("Depth").orElseGet(null).toString().split("\\.");
                 val depth = Integer.parseInt(splitDepth[0]);
 
-                Optional<Integer> survey_num = splitDepth.length == 1 ? Optional.empty()
+                Optional<Integer> survey_num = splitDepth.length == 1 ? Optional.of(new Integer(0))
                                 : Optional.of(Integer.parseInt(splitDepth[1]));
 
                 val method = (Integer) values.get("Method").orElseGet(null);
