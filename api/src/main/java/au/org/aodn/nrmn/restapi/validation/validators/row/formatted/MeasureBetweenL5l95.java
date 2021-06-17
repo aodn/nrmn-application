@@ -62,7 +62,7 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
         return outOfRange.stream().map(measure -> {
             this.columnTarget = "Measure:" + measure;
             val column = MeasureUtil.getMeasureName(measure, isInvertSized);
-            return invalid(target, "Measure: " + column.replace('-', '.') + " is outside l5/95[" + l5 + "," + l95 + "]",
+            return invalid(target, "Measure [" + column.replace('-', '.') + "] is outside l5/95[" + l5 + "," + l95 + "] for Species [" + speciesAttributes.getSpeciesName() + "]",
                     ValidationCategory.DATA, ValidationLevel.WARNING, Optional.of(column));
         }).reduce(Validated.valid(""), (acc, err) -> acc.combine(Monoids.stringConcat, err));
 
