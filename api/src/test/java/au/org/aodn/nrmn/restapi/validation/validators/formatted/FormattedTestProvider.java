@@ -26,7 +26,7 @@ public  class FormattedTestProvider {
                 .species(Optional.of(ObservableItem.builder().observableItemName("THE SPECIES").build()))
                 .site(Site.builder().siteCode("A SITE").build())
                 .depth(1)
-                .surveyNum(Optional.of(2))
+                .surveyNum(2)
                 .direction(Directions.N)
                 .vis(Optional.of(15))
                 .date(LocalDate.of(2003, 03, 03))

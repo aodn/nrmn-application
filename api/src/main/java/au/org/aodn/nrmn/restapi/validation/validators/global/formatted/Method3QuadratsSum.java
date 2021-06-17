@@ -29,7 +29,7 @@ public class Method3QuadratsSum extends BaseGlobalFormattedValidator {
                                 + "/"
                                 + row.getDate()
                                 + "/"
-                                + row.getDepth() + "." + row.getSurveyNum().orElseGet(() -> 0)
+                                + row.getDepth() + "." + row.getSurveyNum()
                 ));
 
         val transectSumQuadratsUnder50 = transectsMap
