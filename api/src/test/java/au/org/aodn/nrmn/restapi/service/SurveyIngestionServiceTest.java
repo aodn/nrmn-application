@@ -60,7 +60,7 @@ public class SurveyIngestionServiceTest {
         Diver diver = Diver.builder().initials("SAM").build();
         rowBuilder = StagedRowFormatted.builder().block(1).method(2).diver(diver)
                 .species(Optional.of(ObservableItem.builder().observableItemName("THE SPECIES").build()))
-                .site(Site.builder().siteCode("A SITE").isActive(false).build()).depth(1).surveyNum(Optional.of(2))
+                .site(Site.builder().siteCode("A SITE").isActive(false).build()).depth(1).surveyNum(2)
                 .direction(Directions.N).vis(Optional.of(15)).date(LocalDate.of(2003, 03, 03))
                 .time(Optional.of(LocalTime.of(12, 34, 56))).pqs(diver).isInvertSizing(true).code("AAA")
                 .inverts(0)
@@ -294,7 +294,7 @@ public class SurveyIngestionServiceTest {
                 .date(LocalDate.parse("2018-12-27"))
                 .time(Optional.empty())
                 .depth(10)
-                .surveyNum(Optional.of(1))
+                .surveyNum(1)
                 .direction(Directions.N)
                 .vis(Optional.empty())
                 .method(2)

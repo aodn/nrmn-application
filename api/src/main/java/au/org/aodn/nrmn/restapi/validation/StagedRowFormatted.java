@@ -29,7 +29,7 @@ public class StagedRowFormatted {
 
     private Integer depth;
 
-    private Optional<Integer> surveyNum;
+    private Integer surveyNum;
 
     private Integer method;
 
