@@ -36,6 +36,7 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
         val speciesAttributes = target.getSpeciesAttributesOpt().get();
         val l5 = speciesAttributes.getL5() != null ? speciesAttributes.getL5() : 0;
         val l95 = speciesAttributes.getL95() != null ? speciesAttributes.getL95() : 0;
+        val speciesName = target.getRef().getSpecies();
         val measureJson = target.getMeasureJson();
         if (measureJson.isEmpty() || (l5 == 0 && l95 == 0))
             return Validated.valid("No expected sizing");
@@ -62,7 +63,7 @@ public class MeasureBetweenL5l95 extends BaseFormattedValidator {
         return outOfRange.stream().map(measure -> {
             this.columnTarget = "Measure:" + measure;
             val column = MeasureUtil.getMeasureName(measure, isInvertSized);
-            return invalid(target, "Measure: " + column.replace('-', '.') + " is outside l5/95[" + l5 + "," + l95 + "]",
+            return invalid(target, "Measure [" + column.replace('-', '.') + "] is outside l5/95[" + l5 + "," + l95 + "] for Species [" + speciesName + "]",
                     ValidationCategory.DATA, ValidationLevel.WARNING, Optional.of(column));
         }).reduce(Validated.valid(""), (acc, err) -> acc.combine(Monoids.stringConcat, err));
 

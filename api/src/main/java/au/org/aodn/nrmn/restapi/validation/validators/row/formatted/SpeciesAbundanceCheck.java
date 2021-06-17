@@ -27,9 +27,7 @@ public class SpeciesAbundanceCheck extends BaseFormattedValidator {
                 return Validated.<StagedRowError, String>valid("Total under MaxAbundance");
             }
             return invalid(target,
-                    "Total is above max Abundance(" +
-                            maxAbundance +
-                            ").",
+                    "Total is above max abundance [" + maxAbundance + "] for Species [" + target.getRef().getSpecies() + "].",
                     ValidationCategory.DATA,
                     ValidationLevel.WARNING, Optional.empty());
 

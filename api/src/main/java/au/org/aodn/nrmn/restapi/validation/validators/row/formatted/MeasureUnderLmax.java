@@ -51,7 +51,7 @@ public class MeasureUnderLmax extends BaseFormattedValidator {
         }
         return outOfRangef.stream().map(measure -> {
             val column = MeasureUtil.getMeasureName(measure.getKey(), isInvertSized);
-            return invalid(target, "Measure: " + column.replace('-', '.') + " is above Lmax[" + lmax + "]",
+            return invalid(target, "Measure [" + column.replace('-', '.') + "] is above Lmax [" + lmax + "] for Species [" + target.getRef().getSpecies() + "]",
                     ValidationCategory.DATA, ValidationLevel.WARNING, Optional.of(column));
         }).reduce(Validated.valid(""), (acc, err) -> acc.combine(Monoids.stringConcat, err));
     }
