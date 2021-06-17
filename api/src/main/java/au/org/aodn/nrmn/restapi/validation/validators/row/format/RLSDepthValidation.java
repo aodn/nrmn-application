@@ -22,7 +22,7 @@ public class RLSDepthValidation extends BaseRowValidator {
     @Override
     public Validated<StagedRowError, String> valid(StagedRow target) {
         String value = target.getDepth();
-        if (!VALID_DEPTH_SURVEY_NUM.matcher(value).matches()) {
+        if (value == null || !VALID_DEPTH_SURVEY_NUM.matcher(value).matches()) {
             return getError(target, "Depth is invalid, expected: depth[.surveyNum]", FORMAT, BLOCKING);
         }
         return Validated.valid(value);

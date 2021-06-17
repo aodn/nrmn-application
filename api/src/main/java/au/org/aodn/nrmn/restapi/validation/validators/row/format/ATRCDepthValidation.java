@@ -25,11 +25,10 @@ public class ATRCDepthValidation extends BaseRowValidator {
     @Override
     public Validated<StagedRowError, String> valid(StagedRow target) {
         String value = target.getDepth();
-        if (!VALID_DEPTH_SURVEY_NUM.matcher(value).matches()) {
+        if (value == null || !VALID_DEPTH_SURVEY_NUM.matcher(value).matches()) {
             return getError(target, "Depth is invalid, expected: depth[.surveyNum]", FORMAT, BLOCKING);
         }
         String[] split = value.split("\\.");
-        Integer depth = Integer.parseInt(split[0]);
         Optional<Integer> surveyNum = split.length > 1 ? Optional.of(Integer.parseInt(split[1])) : Optional.empty();
         if (surveyNumIsRequired(target.getMethod()) && !surveyNum.isPresent()) {
             return getError(target, "Survey number not specified", FORMAT, WARNING);

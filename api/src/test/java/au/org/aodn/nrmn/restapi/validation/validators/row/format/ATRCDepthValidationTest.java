@@ -23,6 +23,19 @@ class ATRCDepthValidationTest {
     }
 
     @Test
+    void nullDepthShouldFail() {
+        val job = new StagedJob();
+        job.setId(1L);
+        val stage = new StagedRow();
+        stage.setDepth(null);
+        stage.setStagedJob(job);
+        val res =
+                new ATRCDepthValidation().valid(stage);
+        assertTrue(res.isInvalid());
+
+    }
+
+    @Test
     void depthWithTransectOutOfRangeShouldFail() {
         val job = new StagedJob();
         job.setId(1L);
