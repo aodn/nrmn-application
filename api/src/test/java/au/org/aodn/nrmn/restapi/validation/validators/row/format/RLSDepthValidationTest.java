@@ -21,4 +21,17 @@ class RLSDepthValidationTest {
         assertTrue(res.isInvalid());
 
     }
+
+    @Test
+    void nullDepthShouldFail() {
+        val job = new StagedJob();
+        job.setId(1L);
+        val stage = new StagedRow();
+        stage.setDepth(null);
+        stage.setStagedJob(job);
+        val res =
+                new RLSDepthValidation().valid(stage);
+        assertTrue(res.isInvalid());
+
+    }
 }
