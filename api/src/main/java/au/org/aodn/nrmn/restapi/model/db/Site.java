@@ -75,12 +75,12 @@ public class Site {
     @Basic
     @Column(name = "latitude")
     @Schema(title = "Latitude", required = true, minimum="-90", maximum="90")
-    private Float latitude;
+    private Double latitude;
 
     @Basic
     @Column(name = "longitude")
     @Schema(title = "Longitude", required = true, minimum="-180", maximum="180")
-    private Float longitude;
+    private Double longitude;
 
     @Basic
     @Column(name = "mpa")

@@ -94,6 +94,8 @@ public class SurveyIngestionService {
                 .site(site).surveyDate(Date.valueOf(stagedRow.getDate()))
                 .surveyTime(Time.valueOf(stagedRow.getTime().orElse(LocalTime.NOON)))
                 .visibility(stagedRow.getVis().orElse(null)).program(stagedRow.getRef().getStagedJob().getProgram())
+                .protectionStatus(site.getProtectionStatus()).longitude(stagedRow.getLongitude())
+                .latitude(stagedRow.getLatitude())
                 .build()));
     }
 
