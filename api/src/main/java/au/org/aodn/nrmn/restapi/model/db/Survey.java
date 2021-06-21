@@ -62,12 +62,12 @@ public class Survey {
     @Basic
     @Column(name = "longitude")
     @Schema(title = "Longitude")
-    private Float longitude;
+    private Double longitude;
 
     @Basic
     @Column(name = "latitude")
     @Schema(title = "Latitude")
-    private Float latitude;
+    private Double latitude;
 
     @Basic
     @Column(name = "protection_status")

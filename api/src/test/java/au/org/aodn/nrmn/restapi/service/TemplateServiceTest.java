@@ -102,7 +102,7 @@ public class TemplateServiceTest {
 
         @Test
         void getSitesCsv() throws IOException {
-                Site.SiteBuilder builder = Site.builder().state("Tasmania").latitude(-43.1F).longitude(147.1F)
+                Site.SiteBuilder builder = Site.builder().state("Tasmania").latitude(-43.1).longitude(147.1)
                                 .siteName("Springfield");
                 Site testSite333 = builder.siteCode("TAS333")
                                 .location(Location.builder().locationId(333).locationName("Southish").build()).build();
@@ -132,7 +132,7 @@ public class TemplateServiceTest {
 
         @Test
         void getSitesForTemplate() throws IOException {
-                Site.SiteBuilder builder = Site.builder().state("Tasmania").latitude(-43.1F).longitude(147.1F)
+                Site.SiteBuilder builder = Site.builder().state("Tasmania").latitude(-43.1).longitude(147.1)
                                 .siteName("Springfield");
                 Site testSite333 = builder.siteCode("TAS333")
                                 .location(Location.builder().locationId(333).locationName("Southish").build()).build();
