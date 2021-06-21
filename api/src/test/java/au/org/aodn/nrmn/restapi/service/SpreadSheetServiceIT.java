@@ -141,7 +141,7 @@ public class SpreadSheetServiceIT {
                 assertEquals(stageSurveys.size(), 2);
                 val obs1 = stageSurveys.get(0);
 
-                // Test Real
+                // Test Double
                 assertEquals(obs1.getLatitude(), "-41.253706");
                 assertEquals(obs1.getLongitude(), "148.339749");
 
