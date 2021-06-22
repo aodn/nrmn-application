@@ -28,7 +28,7 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
     @Query(nativeQuery = true, value = "SELECT site_code FROM {h-schema}ep_site_list WHERE province = ?1")
     List<String> findSiteCodesByProvince(String province);
 
-    @Query(value = "SELECT DISTINCT site_code FROM {h-schema}site_ref WHERE site_code IS NOT NULL ORDER BY SUBSTRING(site_code, '^[A-Z]+'), CAST(SUBSTRING(site_code, '[0-9]+$') AS INTEGER)", nativeQuery = true)
+    @Query(value = "SELECT site_code FROM {h-schema}site_ref WHERE site_code IS NOT NULL ORDER BY SUBSTRING(site_code, '^[A-Z]+'), CAST(SUBSTRING(site_code, '[0-9]+$') AS INTEGER)", nativeQuery = true)
     List<String> findAllSiteCodes();
 
     @Query(value = "SELECT * FROM {h-schema}site_ref WHERE site_code IS NOT NULL ORDER BY SUBSTRING(site_code, '^[A-Z]+'), CAST(SUBSTRING(site_code, '[0-9]+$') AS INTEGER)", nativeQuery = true)
