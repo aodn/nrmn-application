@@ -53,6 +53,11 @@ Then restore it to your empty database:
 
 And then deploy the application to a tomcat instance e.g. in intellij 
 
+![image](https://user-images.githubusercontent.com/1860215/123058197-ec7a3600-d44b-11eb-957a-965542d581aa.png)
+
+![image](https://user-images.githubusercontent.com/1860215/123058279-ff8d0600-d44b-11eb-9a7d-efd216fd41f4.png)
+
+
 Note:
 
 This uses the spring.datasource database connection details specified in [application.properties](api/src/main/resources/application.properties)
