@@ -44,6 +44,7 @@ const EntityEdit = ({entity, template, clone}) => {
       const data = {path: `${entity.endpoint}/${params.id}`, data: e.formData};
       dispatch(updateEntityRequested(data));
     } else {
+      if (e.formData.siteAttribute) e.formData.siteAttribute = null;
       const data = {path: entity.endpoint, data: e.formData};
       dispatch(createEntityRequested(data));
     }
