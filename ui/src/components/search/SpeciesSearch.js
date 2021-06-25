@@ -129,14 +129,12 @@ const SpeciesSearch = () => {
           <Grid item xs={1}></Grid>
           <Grid item xs={4}>
             <Button
-              variant="contained"
               disabled={loading || !(searchTerm?.length > 3)}
               startIcon={<Search></Search>}
               onClick={() => {
                 setPage(1);
                 dispatch(searchRequested({searchType: 'WORMS', species: searchTerm, includeSuperseded: true}));
               }}
-              color="primary"
               style={{textTransform: 'none'}}
             >
               Search WoRMS
@@ -166,11 +164,9 @@ const SpeciesSearch = () => {
           <Grid item xs={1}></Grid>
           <Grid item xs={3}>
             <Button
-              variant="contained"
               disabled={loading || !(searchTerm?.length > 3)}
               startIcon={<Search></Search>}
               onClick={() => dispatch(searchRequested({searchType: 'NRMN', species: searchTerm, includeSuperseded: true}))}
-              color="primary"
               style={{textTransform: 'none'}}
             >
               Search NRMN

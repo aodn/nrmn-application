@@ -60,7 +60,7 @@ const BaseForm = (params) => {
 
   let errorAlert =
     params.errors && params.errors.length > 0 ? (
-      <Alert severity="error" variant="filled">
+      <Alert severity="info" variant="filled">
         {getErrors(params.errors)}
       </Alert>
     ) : (
@@ -88,11 +88,11 @@ const BaseForm = (params) => {
                   params.submitButton
                 ) : (
                   <>
-                    <Button type="submit" className={classes.button} variant="contained" color="secondary" disabled={loading}>
+                    <Button type="submit" className={classes.button} disabled={loading}>
                       {params.submitLabel ?? 'Save'}
                     </Button>
                     {!params.hideCancel && params.onCancel ? (
-                      <Button component={NavLink} className={classes.button} variant="contained" to={params.onCancel}>
+                      <Button component={NavLink} className={classes.button} to={params.onCancel}>
                         Cancel
                       </Button>
                     ) : null}

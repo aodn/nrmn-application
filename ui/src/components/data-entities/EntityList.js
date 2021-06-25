@@ -9,7 +9,10 @@ import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Ic
 import {Add, Edit, FileCopy, Delete} from '@material-ui/icons';
 import Alert from '@material-ui/lab/Alert';
 
-import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-material.css';
+import {AgGridReact} from 'ag-grid-react';
+import 'ag-grid-enterprise';
 
 import useWindowSize from '../utils/useWindowSize';
 import CustomLoadingOverlay from './CustomLoadingOverlay';
@@ -190,7 +193,7 @@ const EntityList = (props) => {
   return (
     <>
       {dialogState.open && dialog}
-      <Grid container direction="row" justify="space-between" alignItems="right">
+      <Grid container direction="row" justify="space-between">
         <Grid item xs={8}>
           <Typography variant="h4">{props.entity.list.name}</Typography>
         </Grid>

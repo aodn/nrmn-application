@@ -1,6 +1,5 @@
 import {configureStore, getDefaultMiddleware} from '@reduxjs/toolkit';
 
-import {toggleReducer} from './layout/layout-reducer';
 import {importReducer} from './import/reducers/create-import';
 import {uploadReducer} from './import/reducers/upload';
 import {authReducer} from './auth/auth-reducer';
@@ -25,7 +24,6 @@ const middleware = isDev
 const store = configureStore({
   reducer: {
     auth: authReducer,
-    toggle: toggleReducer,
     import: importReducer,
     form: formReducer,
     job: jobReducer,

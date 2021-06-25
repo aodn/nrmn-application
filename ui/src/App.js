@@ -1,10 +1,8 @@
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
-import clsx from 'clsx';
 import Alert from '@material-ui/lab/Alert';
-import {ThemeProvider, createMuiTheme, responsiveFontSizes, makeStyles} from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import {ThemeProvider, unstable_createMuiStrictModeTheme as createMuiTheme, responsiveFontSizes} from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import {blueGrey, deepPurple} from '@material-ui/core/colors';
 import TopBar from './components/layout/TopBar';
@@ -16,9 +14,9 @@ import EntityEdit from './components/data-entities/EntityEdit';
 import EntityList from './components/data-entities/EntityList';
 import EntityView from './components/data-entities/EntityView';
 import Homepage from './components/layout/Homepage';
-import FourOFour from './components/layout/FourOFour';
 import JobList from './components/job/JobList';
 import JobView from './components/job/JobView';
+import AppContent from './components/containers/AppContent';
 import DiverTemplate from './components/data-entities/DiverTemplate';
 import LocationTemplate from './components/templates/LocationTemplate';
 import SiteEditTemplate from './components/templates/SiteEditTemplate';
@@ -30,33 +28,6 @@ import ObservableItemEditTemplate from './components/templates/ObservableItemEdi
 import SurveyViewTemplate from './components/templates/SurveyViewTemplate';
 import SurveyEditTemplate from './components/templates/SurveyEditTemplate';
 import ExtractTemplateData from './components/datasheets/ExtractTemplateData';
-
-const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ? process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex'
-  },
-  mainContent: {
-    marginTop: 60,
-    flexGrow: 1,
-    paddingTop: theme.spacing(3),
-    paddingLeft: theme.spacing(3),
-    paddingRight: theme.spacing(3),
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    }),
-    marginLeft: `-${drawerWidth}px`
-  },
-  contentShift: {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen
-    }),
-    marginLeft: 0
-  }
-}));
 
 const referenceData = [
   {
@@ -178,36 +149,46 @@ const referenceData = [
 ];
 
 const App = () => {
-  const classes = useStyles();
-  const leftSideMenuIsOpen = useSelector((state) => state.toggle.leftSideMenuIsOpen);
+  const [menuOpen, setMenuOpen] = useState(false);
   const expires = useSelector((state) => state.auth.expires);
   const [applicationError, setApplicationError] = useState(null);
   window.setApplicationError = setApplicationError;
 
   const loggedIn = Date.now() < expires;
+
   let theme = createMuiTheme({
     palette: {
-      text: {
-        primary: '#607d8b',
-        secondary: '#555'
-      },
       primary: blueGrey,
       secondary: {
         main: deepPurple[300]
-      }
+      },
+      text: {
+        primary: '#607d8b',
+        secondary: '#999'
+      },
+      warning: {main: '#d32f2f'}
+    },
+    typography: {
+      fontFamily: `"Roboto", "Helvetica", "Arial", sans-serif`
     },
     props: {
       MuiTextField: {
         variant: 'outlined',
         margin: 'dense',
         notched: 'true'
+      },
+      MuiButton: {
+        disableRipple: true,
+        variant: 'contained',
+        color: 'primary',
+        ml: '4px'
       }
     },
     overrides: {
       MuiCssBaseline: {
         '@global': {
           '.ag-root-wrapper-body': {
-            minHeight: 400
+            height: '100%'
           },
           '.ag-header-cell:hover': {
             '&:hover .menu-icon': {
@@ -221,68 +202,63 @@ const App = () => {
   theme = responsiveFontSizes(theme);
 
   return (
-    <div className={classes.root}>
-      <ThemeProvider theme={theme}>
-        <Router>
-          <CssBaseline />
-          <TopBar></TopBar>
-          <SideMenu entities={referenceData.filter((e) => !e.hide)}></SideMenu>
-          <main
-            className={clsx(classes.mainContent, {
-              [classes.contentShift]: leftSideMenuIsOpen
-            })}
-          >
-            {applicationError && (
-              <Box m={1}>
-                <Alert severity="error" variant="filled">
-                  {applicationError}
-                </Alert>
-              </Box>
-            )}
-            <Switch>
-              <Route exact path="/home" component={Homepage} />
-              <Route exact path="/404" component={FourOFour}></Route>
+    <ThemeProvider theme={theme}>
+      <Router>
+        <AppContent>
+          <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} entities={referenceData.filter((e) => !e.hide)}></SideMenu>
+          <TopBar onMenuClick={() => setMenuOpen(true)}></TopBar>
+          {applicationError && (
+            <Box m={2}>
+              <Alert severity="error" variant="filled">
+                {applicationError}
+                <br />
+                The server may be experiencing problems. Please wait a moment and try again.
+                <br />
+                If this problem persists, please contact info@aodn.org.au.
+              </Alert>
+            </Box>
+          )}
+          <Switch>
+            <Route exact path="/home" component={Homepage} />
 
-              <Redirect exact from="/" to="/home" />
+            <Redirect exact from="/" to="/home" />
 
-              {!loggedIn && <Login />}
-              <Redirect exact from="/login" to="/home" />
+            {!loggedIn && <Login />}
+            <Redirect exact from="/login" to="/home" />
 
-              {/** Authenticated Pages */}
-              <Route exact path="/jobs" component={JobList} />
-              <Route exact path="/jobs/:id/view" component={JobView} />
-              <Route exact path="/validation/:jobId" component={ValidationPage} />
-              <Route exact path="/upload" component={JobUpload} />
-              <Route exact path="/data/extract" component={ExtractTemplateData} />
-              <Redirect exact from="/list/stagedJob" to="/jobs" />
-              {referenceData.map((e) => (
-                <Route exact key={e.route.base} path={e.route.base} render={() => <EntityEdit entity={e} template={e.template.add} />} />
+            {/** Authenticated Pages */}
+            <Route exact path="/jobs" component={JobList} />
+            <Route exact path="/jobs/:id/view" component={JobView} />
+            <Route exact path="/validation/:jobId" component={ValidationPage} />
+            <Route exact path="/upload" component={JobUpload} />
+            <Route exact path="/data/extract" component={ExtractTemplateData} />
+            <Redirect exact from="/list/stagedJob" to="/jobs" />
+            {referenceData.map((e) => (
+              <Route exact key={e.route.base} path={e.route.base} render={() => <EntityEdit entity={e} template={e.template.add} />} />
+            ))}
+            {referenceData.map((e) => (
+              <Route exact key={e.route.edit} path={e.route.edit} render={() => <EntityEdit entity={e} template={e.template.edit} />} />
+            ))}
+            {referenceData
+              .filter((e) => e.can.clone)
+              .map((e) => (
+                <Route
+                  exact
+                  key={`${e.route.base}/:id?/clone`}
+                  path={`${e.route.base}/:id?/clone`}
+                  render={() => <EntityEdit entity={e} template={e.template.add} clone />}
+                />
               ))}
-              {referenceData.map((e) => (
-                <Route exact key={e.route.edit} path={e.route.edit} render={() => <EntityEdit entity={e} template={e.template.edit} />} />
-              ))}
-              {referenceData
-                .filter((e) => e.can.clone)
-                .map((e) => (
-                  <Route
-                    exact
-                    key={`${e.route.base}/:id?/clone`}
-                    path={`${e.route.base}/:id?/clone`}
-                    render={() => <EntityEdit entity={e} template={e.template.add} clone />}
-                  />
-                ))}
-              {referenceData.map((e) => (
-                <Route exact key={e.route.view} path={e.route.view} render={() => <EntityView entity={e} template={e.template.view} />} />
-              ))}
-              {referenceData.map((e) => (
-                <Route exact key={e.list.route} path={e.list.route} render={() => <EntityList entity={e} />} />
-              ))}
-              <Route path="*" component={FourOFour}></Route>
-            </Switch>
-          </main>
-        </Router>
-      </ThemeProvider>
-    </div>
+            {referenceData.map((e) => (
+              <Route exact key={e.route.view} path={e.route.view} render={() => <EntityView entity={e} template={e.template.view} />} />
+            ))}
+            {referenceData.map((e) => (
+              <Route exact key={e.list.route} path={e.list.route} render={() => <EntityList entity={e} />} />
+            ))}
+          </Switch>
+        </AppContent>
+      </Router>
+    </ThemeProvider>
   );
 };
 

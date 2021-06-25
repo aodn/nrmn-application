@@ -1,85 +1,50 @@
 import React from 'react';
-import {makeStyles, useTheme} from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import List from '@material-ui/core/List';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import {useDispatch, useSelector} from 'react-redux';
-import {toggleLeftSideMenu} from './layout-reducer';
+import {Box, Divider, Drawer, IconButton, List, ListSubheader, Typography, ListItem, ListItemText} from '@material-ui/core';
+import MenuIcon from '@material-ui/icons/Menu';
 import {NavLink} from 'react-router-dom';
 import {PropTypes} from 'prop-types';
 
-const drawerWidth = process.env.REACT_APP_LEFT_DRAWER_WIDTH ? process.env.REACT_APP_LEFT_DRAWER_WIDTH : 180;
-
-const useStyles = makeStyles((theme) => ({
-  drawer: {
-    width: `${drawerWidth}px`,
-    flexShrink: 0
-  },
-  drawerPaper: {
-    width: `${drawerWidth}px`
-  },
-  drawerHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-    justifyContent: 'flex-end'
-  }
-}));
-
-const SideMenu = (props) => {
-  const classes = useStyles();
-  const theme = useTheme();
-  const leftSideMenuIsOpen = useSelector((state) => state.toggle.leftSideMenuIsOpen);
-  const dispatch = useDispatch();
-
-  const handleMainMenu = () => {
-    dispatch(toggleLeftSideMenu());
-  };
-
+const SideMenu = ({entities, open, onClose}) => {
   return (
-    <Drawer
-      className={classes.drawer}
-      variant="persistent"
-      anchor="left"
-      open={leftSideMenuIsOpen}
-      classes={{
-        paper: classes.drawerPaper
-      }}
-    >
-      <div className={classes.drawerHeader}>
-        <IconButton onClick={handleMainMenu}>{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}</IconButton>
-      </div>
+    <Drawer variant="temporary" anchor="left" open={open} onClose={onClose}>
+      <Box ml={3}>
+        <IconButton color="inherit" onClick={onClose} edge="start">
+          <MenuIcon />
+        </IconButton>
+      </Box>
       <Divider />
       <List>
-        <ListSubheader>DATA</ListSubheader>
+        <ListItem button onClick={onClose} component={NavLink} to="/home">
+          <ListItemText primary="Home" />
+        </ListItem>
+      </List>
+      <Divider />
+      <List>
+        <ListSubheader>
+          <Typography variant="button">Data</Typography>
+        </ListSubheader>
         <List component="div" disablePadding>
-          <ListItem button onClick={handleMainMenu} component={NavLink} to="/data/surveys">
+          <ListItem button onClick={onClose} component={NavLink} to="/data/surveys">
             <ListItemText primary="List Surveys" />
           </ListItem>
-          <ListItem button onClick={handleMainMenu} component={NavLink} to="/jobs">
+          <ListItem button onClick={onClose} component={NavLink} to="/jobs">
             <ListItemText primary="List Jobs" />
           </ListItem>
-          <ListItem button onClick={handleMainMenu} component={NavLink} to="/upload">
+          <ListItem button onClick={onClose} component={NavLink} to="/upload">
             <ListItemText primary="Add Job" />
           </ListItem>
-          <ListItem button onClick={handleMainMenu} component={NavLink} to="/data/extract">
+          <ListItem button onClick={onClose} component={NavLink} to="/data/extract">
             <ListItemText primary="Template Data" />
           </ListItem>
         </List>
       </List>
       <Divider />
       <List>
-        <ListSubheader>REFERENCE DATA</ListSubheader>
-        {props.entities.map((e) => (
-          <ListItem button onClick={handleMainMenu} key={e.list.name} component={NavLink} to={e.list.route}>
+        <ListSubheader>
+          <Typography variant="button">Reference Data</Typography>
+        </ListSubheader>
+        {entities.map((e) => (
+          <ListItem button onClick={onClose} key={e.list.name} component={NavLink} to={e.list.route}>
             <ListItemText primary={e.list.name} />
           </ListItem>
         ))}
@@ -93,7 +58,9 @@ const SideMenu = (props) => {
 };
 
 SideMenu.propTypes = {
-  entities: PropTypes.array
+  entities: PropTypes.array,
+  open: PropTypes.bool,
+  onClose: PropTypes.func
 };
 
 export default SideMenu;

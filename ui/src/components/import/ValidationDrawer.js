@@ -1,4 +1,5 @@
 import {
+  Button,
   Drawer,
   Divider,
   List,
@@ -11,8 +12,7 @@ import {
   Box,
   IconButton,
   Toolbar,
-  InputBase,
-  Fab
+  InputBase
 } from '@material-ui/core';
 import {PlaylistAddCheckOutlined, SearchOutlined} from '@material-ui/icons';
 import {BlockOutlined as BlockOutlinedIcon, WarningOutlined as WarningOutlinedIcon} from '@material-ui/icons';
@@ -201,7 +201,7 @@ const ValidationDrawer = () => {
       <Divider />
       <Box>
         <Toolbar position="static">
-          <IconButton color="inherit" aria-label="open drawer" onClick={() => setOpen(!open)} edge="start" title={open ? 'Close' : 'Open'}>
+          <IconButton color="inherit" onClick={() => setOpen(!open)} edge="start" title={open ? 'Close' : 'Open'}>
             {open ? <ArrowForwardIosOutlinedIcon /> : <ArrowBackIosOutlinedIcon />}
           </IconButton>
           <IconButton
@@ -209,12 +209,12 @@ const ValidationDrawer = () => {
             disabled={editLoading || isLoading}
             onClick={() => handleValidate()}
             color="inherit"
-            title={'Validate'}
+            title="Validate"
           >
-            <Fab size="small" color="secondary">
+            <Button>
               {' '}
               <PlaylistAddCheckOutlined />
-            </Fab>
+            </Button>
           </IconButton>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
@@ -227,18 +227,17 @@ const ValidationDrawer = () => {
                 root: classes.inputRoot,
                 input: classes.inputInput
               }}
-              inputProps={{'aria-label': 'filter'}}
               onChange={filterChange}
             />
           </div>
-          <IconButton title={'Clear Filters'} edge="end" onClick={removeFilter}>
+          <IconButton title="Clear Filters" edge="end" onClick={removeFilter}>
             <SelectAllOutlinedIcon></SelectAllOutlinedIcon>
           </IconButton>
         </Toolbar>
       </Box>
       {errList.map((err) => (
         <Accordion key={err.key}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1c-content" id="panel1c-header">
+          <AccordionSummary expandIcon={<ExpandMoreIcon />} id="panel1c-header">
             <div className={classes.column}>
               <Typography className={classes.heading}>{titleCase(err.key)}</Typography>
             </div>
@@ -253,7 +252,7 @@ const ValidationDrawer = () => {
                   onClick={() => handleFilter(item)}
                   selected={item.message === errSelected.message}
                   className={item.message === errSelected.message ? classes.selected : classes.errorItem}
-                  style={{backgroundColor:   item.level == 'WARNING' ? orange[100]:red[100] }}
+                  style={{backgroundColor: item.level == 'WARNING' ? orange[100] : red[100]}}
                   key={i}
                   button
                 >
@@ -262,7 +261,11 @@ const ValidationDrawer = () => {
                       {item.level == 'WARNING' ? <WarningOutlinedIcon color="error" /> : <BlockOutlinedIcon color="error" />}
                     </Badge>
                   </ListItemIcon>
-                  <ListItemText style={{overflow: 'hidden', width:'100%',whiteSpace: 'break-spaces'}} color="secondary" primary={item.message} />
+                  <ListItemText
+                    style={{overflow: 'hidden', width: '100%', whiteSpace: 'break-spaces'}}
+                    color="secondary"
+                    primary={item.message}
+                  />
                 </ListItem>
               ))}
             </List>

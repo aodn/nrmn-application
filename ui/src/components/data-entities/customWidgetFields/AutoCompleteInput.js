@@ -13,7 +13,7 @@ const AutoCompleteInput = ({schema, uiSchema, name}) => {
 
   useEffect(() => {
     dispatch(selectedItemsRequested([uiSchema.route]));
-  }, []);
+  });
 
   return options ? (
     <>

@@ -22,7 +22,7 @@ const EntityView = (props) => {
   useEffect(() => {
     dispatch(resetState());
     dispatch(itemRequested(`${props.entity.endpoint}/${params.id}`));
-  }, []);
+  });
 
   const entityDef = schemaDefinition[props.entity.schemaKey.view];
   const fullTitle = `${props.entity.name} Details`;
@@ -121,8 +121,6 @@ const EntityView = (props) => {
               style={{width: '100%'}}
               component={Link}
               to={`${props.entity.route.base}/${params.id}/edit`}
-              color="secondary"
-              variant={'contained'}
               startIcon={<Edit>edit</Edit>}
             >
               Edit

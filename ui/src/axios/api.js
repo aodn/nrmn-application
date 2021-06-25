@@ -143,11 +143,17 @@ export const postJobValidation = (jobId) =>
     .post('/api/stage/validate/' + jobId)
     .then((res) => res)
     .catch((err) => err);
+
 export const updateRow = (jobId, rows) => {
   return axiosInstance.put('/api/stage/updates/' + jobId, rows.map(importRow)).then((res) => res);
 };
+
 export const deleteRow = (jobId, rows) => {
   return axiosInstance.put('/api/stage/delete/rows/' + jobId, rows).then((res) => res);
+};
+
+export const updateRows = (jobId, rows, completion) => {
+  return axiosInstance.put(`/api/stage/job/${jobId}`, rows).then((res) => completion(res));
 };
 
 export const submitJobFile = (params, onProgress) => {
