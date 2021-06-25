@@ -78,6 +78,7 @@ public class ObservableItemApiIT {
                 .assertThat()
                 .statusCode(201)
                 .body("observableItemName", is(equalTo("Lotella rhacina")))
+                .body("speciesEpithet", is(equalTo("verreauxi")))
                 .body("commonName", is(equalTo("Conger eel")));
     }
 
