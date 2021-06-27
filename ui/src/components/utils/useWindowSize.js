@@ -1,15 +1,15 @@
 import {useState, useEffect} from 'react';
 
-export default function useWindowSize() {
-  const isClient = typeof window === 'object';
+const isClient = typeof window === 'object';
 
-  const getSize = () => {
-    return {
-      width: isClient ? window.innerWidth : undefined,
-      height: isClient ? window.innerHeight : undefined
-    };
+const getSize = () => {
+  return {
+    width: isClient ? window.innerWidth : undefined,
+    height: isClient ? window.innerHeight : undefined
   };
+};
 
+export default function useWindowSize() {
   const [windowSize, setWindowSize] = useState(getSize);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -60,7 +60,7 @@ const EntityList = (props) => {
   useEffect(() => {
     dispatch(resetState());
     dispatch(selectRequested(props.entity.list.endpoint));
-  }, [props.entity.name]);
+  }, [dispatch, props.entity]);
 
   let items = entities?._embedded ? entities?._embedded[props.entity.list.key] : entities;
   useEffect(() => {
@@ -72,7 +72,7 @@ const EntityList = (props) => {
       agGridColumnApi.autoSizeColumns(allColumnIds, false);
       agGridApi.setFilterModel(restoreFilterModel(props.entity.name));
     }
-  }, [items]);
+  }, [items, props.entity]);
 
   const schematoColDef = (schema, entity) => {
     const fields = entity.list.headers ?? Object.keys(schema.properties);
