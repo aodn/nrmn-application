@@ -5,7 +5,7 @@ import {PropTypes} from 'prop-types';
 
 const EntityContainer = (props) => (
   <>
-    <Box m={2}>
+    <Box m={1}>
       <NavLink to={props.goBackTo} color="secondary">
         <Typography>{'<< Back to ' + props.name}</Typography>
       </NavLink>

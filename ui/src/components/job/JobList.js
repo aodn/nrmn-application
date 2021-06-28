@@ -1,16 +1,20 @@
-import {Box, Button, CircularProgress, IconButton, Tooltip, Typography} from '@material-ui/core';
+import {Box, Button, IconButton, Tooltip, Typography} from '@material-ui/core';
 import {DataGrid} from '@material-ui/data-grid';
-import {CloudUploadOutlined, Delete, Info, Attachment} from '@material-ui/icons';
+import {CloudUploadOutlined, Delete, Info, GridOn} from '@material-ui/icons';
 import React, {useEffect, useState} from 'react';
 import {NavLink} from 'react-router-dom';
-import {getEntity} from '../../axios/api';
+import {deleteJob, getEntity} from '../../axios/api';
 import AlertDialog from '../ui/AlertDialog';
 
+const disabledHeader = {headerName: ' ', filterable: false, sortable: false, disableColumnMenu: true};
+
 const JobList = () => {
-  const [jobs, setJobs] = useState(null);
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [deleteJobId, setDeleteJobId] = useState(null);
 
   useEffect(() => {
-    if (!jobs)
+    if (loading)
       getEntity('stagedJobs').then((result) => {
         // HACK: fix the api to return the correct format instead
         const stagedJobs = result.data?._embedded?.stagedJobs || [];
@@ -24,16 +28,14 @@ const JobList = () => {
           };
         });
         setJobs(jobRows);
+        setLoading(false);
       });
-  }, [jobs]);
-
-  // const defaultPopup = {isOpen: false, jobId: 0, index: 0};
-  const [deletePopup, setDeletePopup] = useState(null);
+  }, [jobs, loading]);
 
   const ActionCell = (params) => {
     return (
       <Tooltip title="Delete">
-        <IconButton name="delete" onClick={() => setDeletePopup(params.row.id)}>
+        <IconButton name="delete" onClick={() => setDeleteJobId(params.row.id)}>
           <Delete />
         </IconButton>
       </Tooltip>
@@ -44,15 +46,17 @@ const JobList = () => {
     return (
       <>
         <Tooltip title="Info">
-          <IconButton name="info" onClick={() => setDeletePopup(params.row.id)}>
+          <IconButton component={NavLink} to={`/jobs/${params.row.id}/view`}>
             <Info />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Attachment">
-          <IconButton name="Attachment" onClick={() => setDeletePopup(params.row.id)}>
-            <Attachment />
-          </IconButton>
-        </Tooltip>
+        {params.row.status === 'STAGED' && (
+          <Tooltip title="View Staged Sheet">
+            <IconButton component={NavLink} to={`/validation/${params.row.id}`}>
+              <GridOn />
+            </IconButton>
+          </Tooltip>
+        )}
       </>
     );
   };
@@ -60,55 +64,47 @@ const JobList = () => {
   return (
     <>
       <AlertDialog
-        open={deletePopup !== null}
+        open={deleteJobId !== null}
         text="Delete Job?"
         action="Delete"
-        onClose={() => {
-          setDeletePopup(null);
+        onClose={() => setDeleteJobId(null)}
+        onConfirm={() => {
+          const id = deleteJobId;
+          setDeleteJobId(null);
+          deleteJob(deleteJobId).then(() => {
+            setJobs((jobs) => jobs.filter((j) => j.id !== id));
+          });
         }}
       />
-      <Box display="flex" flexDirection="row">
-        <Box p={1} flexGrow={1}>
+      <Box display="flex" flexDirection="row" p={1} pb={1}>
+        <Box flexGrow={1}>
           <Typography variant="h4">Jobs</Typography>
         </Box>
-        <Box p={1}>
+        <Box>
           <Button to="/upload" component={NavLink} startIcon={<CloudUploadOutlined />}>
             Upload XLSX File
           </Button>
         </Box>
       </Box>
-
-      {jobs ? (
-        <Box flexGrow={1}>
-          <DataGrid
-            columns={[
-              {field: 'id', headerName: ' ', flex: 0.5, renderCell: LinkCell},
-              {field: 'reference', headerName: 'Reference', flex: 2},
-              {field: 'isExtendedSize', headerName: 'Extended', flex: 0.75, filterable: false, sortable: false, disableColumnMenu: true},
-              {field: 'status', headerName: 'Status', flex: 0.75},
-              {field: 'program', headerName: 'Program', flex: 0.75},
-              {field: 'source', headerName: 'Type', flex: 0.75},
-              {field: 'creator', headerName: 'Creator', flex: 1.5},
-              {field: 'created', headerName: 'Created', flex: 1},
-              {
-                field: 'actions',
-                headerName: ' ',
-                flex: 0.5,
-                filterable: false,
-                sortable: false,
-                disableColumnMenu: true,
-                renderCell: ActionCell
-              }
-            ]}
-            autoPageSize
-            disableSelectionOnClick
-            density="compact"
-            rows={jobs}
-          />
-        </Box>
-      ) : (
-        <CircularProgress size={200} style={{color: '#ccc'}}></CircularProgress>
-      )}
+      <DataGrid
+        columns={[
+          {...disabledHeader, field: 'id', width: 100, renderCell: LinkCell},
+          {field: 'reference', headerName: 'Reference', flex: 2},
+          {field: 'isExtendedSize', headerName: 'Extended', width: 140},
+          {field: 'status', headerName: 'Status', width: 120},
+          {field: 'program', headerName: 'Program', width: 140},
+          {field: 'source', headerName: 'Type', width: 120},
+          {field: 'creator', headerName: 'Creator', flex: 1},
+          {field: 'created', headerName: 'Uploaded', width: 150},
+          {...disabledHeader, field: 'actions', width: 70, renderCell: ActionCell}
+        ]}
+        autoPageSize
+        disableSelectionOnClick
+        density="compact"
+        loading={loading}
+        hideFooter={loading}
+        rows={jobs}
+      />
     </>
   );
 };

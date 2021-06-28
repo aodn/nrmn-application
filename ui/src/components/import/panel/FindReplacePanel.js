@@ -27,7 +27,7 @@ const FindReplacePanel = (props) => {
   const [replaceString, setReplaceString] = useState('');
   const [currentFindString, setCurrentFindString] = useState('');
 
-  const [initialPosition, setInitialPosition] = useState({rowIndex: 0, column: 1});
+  const [initialPosition, setInitialPosition] = useState({});
 
   const classes = useStyles();
 
@@ -41,18 +41,20 @@ const FindReplacePanel = (props) => {
     context.findResults = [];
     context.highlighted = [];
     props.api.redrawRows();
-    props.api.setFocusedCell(initialPosition.rowIndex, initialPosition.column);
-    props.api.ensureIndexVisible(initialPosition.rowIndex);
-    props.api.ensureColumnVisible(initialPosition.column);
+    if (initialPosition) {
+      props.api.setFocusedCell(initialPosition.rowIndex, initialPosition.column);
+      props.api.ensureIndexVisible(initialPosition.rowIndex);
+      props.api.ensureColumnVisible(initialPosition.column);
+      setInitialPosition({});
+    }
   };
 
   const highlightNextResult = () => {
     if (context.findResults.length < 1) return;
-    const result = context.findResults[0];
+    const result = context.findResults.shift();
+    props.api.setFocusedCell(result.row, result.col);
     props.api.ensureIndexVisible(result.row);
     props.api.ensureColumnVisible(result.col);
-    props.api.setFocusedCell(result.row, result.col);
-    context.findResults.shift();
     context.findResults.push(result);
   };
 
@@ -63,7 +65,7 @@ const FindReplacePanel = (props) => {
     if (focusedCell) setInitialPosition({rowIndex: focusedCell.rowIndex, column: focusedCell.column});
     context.findResults = [];
     context.highlighted = [];
-    props.api.forEachNode((node) => {
+    props.api.forEachNodeAfterFilterAndSort((node) => {
       for (let column in node.data) {
         if (matchColumn && !selectedColumns.includes(column)) continue;
         const idx = stringCompare(node.data[column].toString(), findString, matchCase);

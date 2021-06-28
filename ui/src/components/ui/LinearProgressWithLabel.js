@@ -25,8 +25,8 @@ const LinearProgressWithLabel = (props) => {
 
 LinearProgressWithLabel.propTypes = {
   label: PropTypes.string.isRequired,
-  determinate: PropTypes.boolean,
-  done: PropTypes.boolean,
+  determinate: PropTypes.bool,
+  done: PropTypes.bool,
   value: PropTypes.number
 };
 

@@ -1,7 +1,5 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Box, Chip, CircularProgress, Divider, Grid, Paper, Typography} from '@material-ui/core';
-import {useDispatch, useSelector} from 'react-redux';
-import {jobRequested} from './jobReducer';
 import {useParams} from 'react-router';
 import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutlined';
 import Timeline from '@material-ui/lab/Timeline';
@@ -20,6 +18,8 @@ import BackupIcon from '@material-ui/icons/Backup';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import {Link} from 'react-router-dom';
+
+import {getFullJob} from '../../axios/api';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -73,14 +73,17 @@ const event2icon = {
 };
 
 const JobView = () => {
-  const dispatch = useDispatch();
   const {id} = useParams();
-  const job = useSelector((state) => state.job.currentJob);
+  const [job, setJob] = useState();
   const classes = useStyles();
 
   useEffect(() => {
-    dispatch(jobRequested({id}));
-  });
+    if (!job) {
+      getFullJob(id).then((res) => {
+        setJob(res);
+      });
+    }
+  }, [job, id]);
 
   return (
     <Box>

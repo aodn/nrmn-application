@@ -1,12 +1,13 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Box, Button, CircularProgress, Paper, Typography, makeStyles} from '@material-ui/core';
+import {Box, Button, Paper, Typography, makeStyles} from '@material-ui/core';
 import {
   CloudUpload as CloudUploadIcon,
   PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon,
   SaveOutlined as SaveOutlinedIcon
 } from '@material-ui/icons/';
 import Alert from '@material-ui/lab/Alert';
+import {NavLink} from 'react-router-dom';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
@@ -18,7 +19,7 @@ import {getDataJob, updateRows} from '../../axios/api';
 import {measurements} from '../../constants';
 import FindReplacePanel from './panel/FindReplacePanel';
 import ValidationPanel from './panel/ValidationPanel';
-import {exportRow, SubmitingestRequested, ValidationRequested} from './reducers/create-import';
+import {exportRow, importRow, SubmitingestRequested, ValidationRequested} from './reducers/create-import';
 import LinearProgressWithLabel from '../ui/LinearProgressWithLabel';
 
 const useStyles = makeStyles((theme) => {
@@ -62,37 +63,22 @@ const useStyles = makeStyles((theme) => {
 
 const LoadingOverlay = (e) => {
   const ctx = e.api.gridOptionsWrapper.gridOptions.context;
-  if (ctx.useOverlay === 'save1') {
-    return <span className="ag-overlay-loading-center">Please wait while your rows are saving</span>;
-  } else if (ctx.useOverlay === 'save') {
-    return (
-      <Box component={Paper} width={500} p={3}>
-        <LinearProgressWithLabel determinate={false} label="Saving..." />
-      </Box>
-    );
-  } else if (ctx.useOverlay === 'submit') {
-    return <></>;
-  } else {
-    return <CircularProgress size={80} />;
-  }
+  return (
+    <Box component={Paper} width={500} p={3}>
+      <LinearProgressWithLabel determinate={false} label={`${ctx.useOverlay}...`} />
+    </Box>
+  );
 };
 
+// |delta| is an array of rowData
 const pushUndo = (api, delta) => {
   const ctx = api.gridOptionsWrapper.gridOptions.context;
   ctx.undoStack.push(
     delta.map((d) => {
-      pushPutData(api, d.id);
+      ctx.putRowIds.push(d.id);
       return {...d};
     })
   );
-};
-
-const pushPutData = (api, rowId, toDelete) => {
-  const ctx = api.gridOptionsWrapper.gridOptions.context;
-  const idx = ctx.putData.findIndex((p) => p.id === rowId);
-  const update = {action: toDelete ? 1 : 0, rowId: rowId};
-  if (idx >= 0) ctx.putData[idx] = update;
-  else ctx.putData.push(update);
 };
 
 const popUndo = (api) => {
@@ -100,6 +86,7 @@ const popUndo = (api) => {
   const delta = ctx.undoStack.pop();
   let rowData = ctx.rowData;
   for (const i in delta) {
+    ctx.putRowIds.pop();
     if (delta[i].action === 0) {
       const j = rowData.findIndex((d) => d.id == delta[i].id);
       rowData.splice(j, 1);
@@ -121,7 +108,7 @@ const popUndo = (api) => {
 const context = {
   rowData: [],
   highlighted: [],
-  putData: [],
+  putRowIds: [],
   undoStack: [],
   pushUndo: pushUndo,
   popUndo: popUndo,
@@ -129,11 +116,10 @@ const context = {
   // paste operations must be done row-by-row. build up |pendingPasteUndo|
   // while in paste mode, then when onPasteEnd is called then call pushUndo
   pendingPasteUndo: [],
-  pasteMode: false,
-
-  // if a row has been modified in any way then append an update to |pushPutData|
-  pushPutData: pushPutData
+  pasteMode: false
 };
+
+const IngestState = {Loading: 0, Save: 1, Validate: 2, Submit: 3};
 
 const DataSheetView = ({jobId}) => {
   const classes = useStyles();
@@ -141,17 +127,21 @@ const DataSheetView = ({jobId}) => {
 
   const [job, setJob] = useState({});
   const [gridApi, setGridApi] = useState(null);
-
-  const [canSave, setCanSave] = useState();
+  const [state, setState] = useState(IngestState.Loading);
 
   const errors = useSelector((state) => state.import.errors);
-  const enableSubmit = false; //useSelector((state) => state.import.enableSubmit);
-
   const ingestError = useSelector((state) => state.import.ingestError);
   const globalErrors = useSelector((state) => state.import.globalErrors);
   const globalWarnings = useSelector((state) => state.import.globalWarnings);
+  const validationLoading = useSelector((state) => state.import.validationLoading);
+
+  useEffect(() => {
+    if (!validationLoading && gridApi) gridApi.hideOverlay();
+  }, [gridApi, validationLoading]);
 
   const handleValidate = () => {
+    context.useOverlay = 'Validating';
+    gridApi.showLoadingOverlay();
     dispatch(ValidationRequested(jobId));
   };
 
@@ -160,15 +150,18 @@ const DataSheetView = ({jobId}) => {
   };
 
   const handleSave = () => {
-    setCanSave(false);
-    context.useOverlay = 'save';
+    setState(IngestState.Loading);
+    context.useOverlay = 'Saving';
     gridApi.showLoadingOverlay();
     const rowUpdateDtos = [];
-    for (const put of context.putData) {
-      rowUpdateDtos.push({action: put.action, row: context.rowData.find((r) => r.id === put.rowId)});
-    }
+    Array.from(new Set(context.putRowIds)).forEach((rowId) => {
+      const row = context.rowData.find((r) => r.id === rowId);
+      // Null row data means that the row is to be deleted
+      rowUpdateDtos.push({rowId: rowId, row: row ? importRow(row) : null});
+    });
     updateRows(jobId, rowUpdateDtos, () => {
       gridApi.hideOverlay();
+      setState(IngestState.Validate);
     });
   };
 
@@ -203,6 +196,7 @@ const DataSheetView = ({jobId}) => {
     });
     ctx.pushUndo(e.api, [...oldRows]);
     ctx.pendingPasteUndo = [];
+    setState(IngestState.Save);
   };
 
   const onCopyRegion = (e) => {
@@ -245,7 +239,7 @@ const DataSheetView = ({jobId}) => {
           pushUndo(e.api, delta);
           e.api.setRowData(rowData);
           e.api.refreshCells();
-          setCanSave(true);
+          setState(IngestState.Save);
         }
       });
       items.push({
@@ -256,11 +250,11 @@ const DataSheetView = ({jobId}) => {
           const data = rowData.find((d) => d.id == row.data.id);
           const newId = +new Date().valueOf();
           const newData = {...data, id: newId, pos: data.pos + 1};
-          pushUndo(e.api, [{action: 0, row: {id: newId}}]);
+          pushUndo(e.api, [{id: newId}]);
           rowData.push(newData);
           e.api.setRowData(rowData);
           e.api.refreshCells();
-          setCanSave(true);
+          setState(IngestState.Save);
         }
       });
     }
@@ -292,7 +286,7 @@ const DataSheetView = ({jobId}) => {
     }
     pushUndo(e.api, delta);
     e.api.setRowData(rowData);
-    setCanSave(true);
+    setState(IngestState.Save);
   };
 
   const onClearRegion = (e) => fillRegion(e, '');
@@ -305,21 +299,16 @@ const DataSheetView = ({jobId}) => {
   const onUndo = (e) => {
     popUndo(e.api);
     e.api.refreshCells();
-    setCanSave(true);
+    setState(IngestState.Save);
   };
 
   const onCellEditingStopped = (e) => {
     if (e.oldValue === e.newValue) return;
-    const {rowData, pushPutData} = e.context;
 
-    pushPutData(e.api, e.data.id, true);
-
-    const i = rowData.findIndex((d) => d.id == e.data.id);
-    const row = {...rowData[i]};
+    const row = {...e.data};
     row[e.column.colId] = e.oldValue;
     pushUndo(e.api, [row]);
-
-    setCanSave(true);
+    setState(IngestState.Save);
   };
 
   const overrideKeyboardEvents = (e) => {
@@ -364,6 +353,7 @@ const DataSheetView = ({jobId}) => {
         p.api.setRowData(rowData);
       }
       setJob(job);
+      setState(IngestState.Validate);
     });
   };
 
@@ -387,7 +377,12 @@ const DataSheetView = ({jobId}) => {
 
   return (
     <>
-      <Box>
+      <Box pt={1} pl={1}>
+        <Box width={200}>
+          <NavLink to="/jobs" color="secondary">
+            <Typography>{'<< Back to Jobs'}</Typography>
+          </NavLink>
+        </Box>
         {errors && errors.length > 0 && (
           <Box mb={2}>
             <Alert severity="error" variant="filled">
@@ -405,13 +400,17 @@ const DataSheetView = ({jobId}) => {
               } `}</Typography>
             </Box>
             <Box p={1}>
-              <Button ml={1} onClick={handleSave} disabled={canSave !== true} startIcon={<SaveOutlinedIcon />}>
+              <Button disabled={state !== IngestState.Save} onClick={handleSave} startIcon={<SaveOutlinedIcon />}>
                 Save
               </Button>
-              <Button ml={1} disabled={canSave !== false} onClick={handleValidate} startIcon={<PlaylistAddCheckOutlinedIcon />}>
+            </Box>
+            <Box p={1}>
+              <Button disabled={state !== IngestState.Validate} onClick={handleValidate} startIcon={<PlaylistAddCheckOutlinedIcon />}>
                 Validate
               </Button>
-              <Button ml={1} onClick={handleSubmit} label="Submit" disabled={!enableSubmit || canSave} startIcon={<CloudUploadIcon />}>
+            </Box>
+            <Box p={1}>
+              <Button disabled={state !== IngestState.Submit} onClick={handleSubmit} startIcon={<CloudUploadIcon />}>
                 Submit
               </Button>
             </Box>

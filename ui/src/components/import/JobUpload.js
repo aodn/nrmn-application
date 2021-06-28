@@ -20,7 +20,7 @@ const JobUpload = () => {
 
   return (
     <>
-      <Box m={2}>
+      <Box m={1}>
         {uploadProgress < 0 ? (
           <NavLink to="/jobs" color="secondary">
             <Typography>{'<< Back to Jobs'}</Typography>

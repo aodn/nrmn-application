@@ -83,8 +83,8 @@ export const getFullJob = (id) => {
     });
 };
 
-export const deleteJobAPI = (jobId) => {
-  axiosInstance.delete('/api/stage/delete/' + jobId);
+export const deleteJob = (jobId) => {
+  return axiosInstance.delete('/api/stage/delete/' + jobId);
 };
 
 export const getSelectedEntityItems = (paths) =>
