@@ -13,14 +13,12 @@ import {
   RowDeleteRequested,
   RowDeleteFinished
 } from '../reducers/create-import';
-import {updateRow, getDataJob, postJobValidation, submitingest, deleteRow} from '../../../axios/api';
+import {getDataJob, postJobValidation, submitingest} from '../../../axios/api';
 
 export default function* Watcher() {
   yield takeEvery(JobRequested, loadJob);
   yield takeEvery(ValidationRequested, validateJob);
-  yield takeEvery(RowUpdateRequested, update);
   yield takeEvery(SubmitingestRequested, submit);
-  yield takeEvery(RowDeleteRequested, deleteRows);
 }
 
 function* loadJob(action) {
@@ -41,15 +39,6 @@ function* validateJob(action) {
   }
 }
 
-function* update(action) {
-  try {
-    yield call(updateRow, action.payload.jobId, action.payload.rows);
-    yield put(EditRowFinished());
-  } catch (e) {
-    yield put(jobFailed(e));
-  }
-}
-
 function* submit(action) {
   try {
     const {response} = yield call(submitingest, action.payload);
@@ -60,14 +49,5 @@ function* submit(action) {
     }
   } catch (error) {
     yield put(ingestFailed([error]));
-  }
-}
-
-function* deleteRows(action) {
-  try {
-    yield call(deleteRow, action.payload.jobId, action.payload.rows);
-    yield put(RowDeleteFinished());
-  } catch (e) {
-    yield put(jobFailed(e.message));
   }
 }

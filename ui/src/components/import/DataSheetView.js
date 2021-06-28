@@ -15,11 +15,11 @@ import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 
 import {PropTypes} from 'prop-types';
-import {getDataJob, updateRows} from '../../axios/api';
+import {getDataJob, validateJob, updateRows} from '../../axios/api';
 import {measurements} from '../../constants';
 import FindReplacePanel from './panel/FindReplacePanel';
 import ValidationPanel from './panel/ValidationPanel';
-import {exportRow, importRow, SubmitingestRequested, ValidationRequested} from './reducers/create-import';
+import {exportRow, importRow, SubmitingestRequested} from './reducers/create-import';
 import LinearProgressWithLabel from '../ui/LinearProgressWithLabel';
 
 const useStyles = makeStyles((theme) => {
@@ -110,6 +110,8 @@ const context = {
   highlighted: [],
   putRowIds: [],
   undoStack: [],
+  validationResults: [],
+  errors: [],
   pushUndo: pushUndo,
   popUndo: popUndo,
 
@@ -117,6 +119,26 @@ const context = {
   // while in paste mode, then when onPasteEnd is called then call pushUndo
   pendingPasteUndo: [],
   pasteMode: false
+};
+
+const defaultSideBar = {
+  toolPanels: [
+    {
+      id: 'findReplace',
+      labelDefault: 'Find Replace',
+      labelKey: 'findReplace',
+      iconKey: 'columns',
+      toolPanel: 'findReplacePanel'
+    },
+    {
+      id: 'columns',
+      labelDefault: 'Pivot',
+      labelKey: 'columns',
+      iconKey: 'columns',
+      toolPanel: 'agColumnsToolPanel'
+    }
+  ],
+  defaultToolPanel: ''
 };
 
 const IngestState = {Loading: 0, Save: 1, Validate: 2, Submit: 3};
@@ -128,6 +150,7 @@ const DataSheetView = ({jobId}) => {
   const [job, setJob] = useState({});
   const [gridApi, setGridApi] = useState(null);
   const [state, setState] = useState(IngestState.Loading);
+  const [sideBar, setSideBar] = useState(defaultSideBar);
 
   const errors = useSelector((state) => state.import.errors);
   const ingestError = useSelector((state) => state.import.ingestError);
@@ -141,8 +164,35 @@ const DataSheetView = ({jobId}) => {
 
   const handleValidate = () => {
     context.useOverlay = 'Validating';
+    setSideBar(defaultSideBar);
     gridApi.showLoadingOverlay();
-    dispatch(ValidationRequested(jobId));
+    validateJob(jobId, (result) => {
+      context.validationResults = result.data;
+      context.errors = result.data.errors
+        .map((e) => {
+          const err = e.errors[0];
+          if (!err) return null;
+          return {row: e.id, column: err.columnTarget, message: err.message};
+        })
+        .filter((e) => e !== null);
+      gridApi.hideOverlay();
+      gridApi.redrawRows();
+      setSideBar((sideBar) => {
+        return {
+          defaultToolPanel: 'validation',
+          toolPanels: [
+            {
+              id: 'validation',
+              labelDefault: 'Validation',
+              labelKey: 'validation',
+              iconKey: 'columns',
+              toolPanel: 'validationPanel'
+            },
+            ...sideBar.toolPanels
+          ]
+        };
+      });
+    });
   };
 
   const handleSubmit = () => {
@@ -368,7 +418,12 @@ const DataSheetView = ({jobId}) => {
   const chooseCellStyle = (params) => {
     if (params.colDef.field === 'row') return {color: 'grey'};
     const row = params.context.highlighted[params.rowIndex];
-    return row && row[params.colDef.field] ? {backgroundColor: 'yellow'} : null;
+    if (row && row[params.colDef.field]) return {backgroundColor: 'yellow'};
+    if (
+      params.context.errors.findIndex((e) => e.row === params.data.id && e.column.toUpperCase() === params.colDef.field.toUpperCase()) >= 0
+    )
+      return {backgroundColor: 'red'};
+    return null;
   };
 
   const onSortChanged = (e) => {
@@ -493,32 +548,7 @@ const DataSheetView = ({jobId}) => {
           loadingOverlayComponent="loadingOverlay"
           pivotMode={false}
           pivotColumnGroupTotals="before"
-          sideBar={{
-            toolPanels: [
-              {
-                id: 'validation',
-                labelDefault: 'Validation',
-                labelKey: 'validation',
-                iconKey: 'columns',
-                toolPanel: 'validationPanel'
-              },
-              {
-                id: 'findReplace',
-                labelDefault: 'Find Replace',
-                labelKey: 'findReplace',
-                iconKey: 'columns',
-                toolPanel: 'findReplacePanel'
-              },
-              {
-                id: 'columns',
-                labelDefault: 'Pivot',
-                labelKey: 'columns',
-                iconKey: 'columns',
-                toolPanel: 'agColumnsToolPanel'
-              }
-            ],
-            defaultToolPanel: ''
-          }}
+          sideBar={sideBar}
           onGridReady={onGridReady}
           onFirstDataRendered={onFirstDataRendered}
         >
