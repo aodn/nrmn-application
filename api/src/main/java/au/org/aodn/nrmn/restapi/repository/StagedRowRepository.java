@@ -6,6 +6,7 @@ import au.org.aodn.nrmn.restapi.repository.model.StagedSurveyMethod;
 import au.org.aodn.nrmn.restapi.repository.model.StagedSurveyTransect;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -39,6 +40,7 @@ public interface StagedRowRepository extends JpaRepository<StagedRow, Long>, Jpa
             "GROUP BY r.siteCode, r.date, r.depth, r.method, r.block")
     List<StagedSurveyTransect> getStagedSurveyTransects(@Param("id") Long id);
 
-    @Query("delete from StagedRow r where r.id in (:ids)")
+    @Modifying
+    @Query("delete from StagedRow r where r.id in ?1")
     void deleteAllByIds(@Param("ids") List<Long> ids);
 }

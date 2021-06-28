@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RowUpdateDto {
 
-    private Integer action;
+    private Long rowId;
 
     private StagedRow row;
 }

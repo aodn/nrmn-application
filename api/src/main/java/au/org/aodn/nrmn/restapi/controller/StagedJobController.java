@@ -175,36 +175,18 @@ public class StagedJobController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/delete/rows/{jobId}")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<?> deleteJobRows(@PathVariable Long jobId, Authentication authentication,
-            @RequestBody List<StagedRow> toDeleRows) {
-        return rowService.delete(toDeleRows).fold(
-                err -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(err),
-                rowUpdate -> ResponseEntity.ok().body(rowUpdate));
-
-    }
-
-    // FIXME : This is the new operation
     @PutMapping("/job/{jobId}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> updateJob(@PathVariable Long jobId, Authentication authentication,
             @RequestBody List<RowUpdateDto> rowUpdates) {
 
-        // TODO: Temporary until this can be placed in a transaction
-        List<StagedRow> deletions = rowUpdates.stream().filter(u -> u.getAction() == 0).map(u -> u.getRow())
+        List<Long> deletions = rowUpdates.stream().filter(u -> u.getRow() == null).map(u -> u.getRowId())
                 .collect(Collectors.toList());
-        List<StagedRow> updates = rowUpdates.stream().filter(u -> u.getAction() == 1).map(u -> u.getRow())
+                
+        List<StagedRow> updates = rowUpdates.stream().filter(u -> u.getRow() != null).map(u -> u.getRow())
                 .collect(Collectors.toList());
 
-        val result = rowService.delete(deletions);
-        val resp = result.fold(err -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(err),
-                rowUpdate -> ResponseEntity.ok().body(rowUpdate));
-
-        if (resp.getStatusCode() == HttpStatus.UNPROCESSABLE_ENTITY)
-            return resp;
-
-        return rowService.update(jobId, updates).fold(
+        return rowService.save(jobId, deletions, updates).fold(
                 err -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(err),
                 rowUpdate -> ResponseEntity.ok().body(rowUpdate));
     }
