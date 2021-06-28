@@ -8,6 +8,7 @@ import cyclops.data.tuple.Tuple2;
 import cyclops.data.tuple.Tuple4;
 import lombok.Value;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
@@ -89,14 +90,21 @@ public class SurveyIngestionService {
                 .build();
 
         Optional<Survey> existingSurvey = surveyRepository.findOne(Example.of(survey));
-        return existingSurvey.orElseGet(() -> surveyRepository.save(Survey.builder().depth(stagedRow.getDepth())
-                .surveyNum(stagedRow.getSurveyNum()).direction(stagedRow.getDirection().toString())
-                .site(site).surveyDate(Date.valueOf(stagedRow.getDate()))
-                .surveyTime(Time.valueOf(stagedRow.getTime().orElse(LocalTime.NOON)))
-                .visibility(stagedRow.getVis().orElse(null)).program(stagedRow.getRef().getStagedJob().getProgram())
-                .protectionStatus(site.getProtectionStatus()).longitude(stagedRow.getLongitude())
-                .latitude(stagedRow.getLatitude())
-                .build()));
+
+        return existingSurvey.orElseGet(() -> surveyRepository.save(
+                Survey.builder()
+                      .depth(stagedRow.getDepth())
+                      .surveyNum(stagedRow.getSurveyNum())
+                      .direction(stagedRow.getDirection().toString())
+                      .site(site).surveyDate(Date.valueOf(stagedRow.getDate()))
+                      .surveyTime(Time.valueOf(stagedRow.getTime().orElse(LocalTime.NOON)))
+                      .visibility(stagedRow.getVis().orElse(null))
+                      .program(stagedRow.getRef().getStagedJob().getProgram())
+                      .protectionStatus(site.getProtectionStatus())
+                      .insideMarinePark(StringUtils.isNotBlank(site.getMpa())?"yes":"no")
+                      .longitude(stagedRow.getLongitude())
+                      .latitude(stagedRow.getLatitude())
+                      .build()));
     }
 
     public SurveyMethod getSurveyMethod(Survey survey, StagedRowFormatted stagedRow) {
