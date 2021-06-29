@@ -26,10 +26,7 @@ public class ObservableItemDto {
 
     @Schema(title = "Aphia ID")
     private Integer aphiaId;
-
-    // @Schema(title = "Aphia Relation")
-    // private Integer aphiaRelType;
-
+    
     @Schema(title = "Common Name")
     private String commonName;
 
