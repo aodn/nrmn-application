@@ -38,7 +38,7 @@ public class ObservableItemDto {
 
     @Schema(title = "Class")
     @JsonProperty("class")
-    private String clazz;
+    private String className;
 
     @Schema(title = "Order")
     private String order;

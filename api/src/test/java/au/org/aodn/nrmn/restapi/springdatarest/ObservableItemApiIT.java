@@ -69,6 +69,7 @@ public class ObservableItemApiIT {
                 .body("{" +
                         "\"observableItemName\": \"Lotella rhacina\"," +
                         "\"speciesEpithet\": \"verreauxi\"," +
+                        "\"class\": \"ACTINOPTERYGII\"," +
                         "\"commonName\": \"Conger eel\"," +
                         "\"letterCode\": \"CVER\"," +
                         "\"obsItemTypeId\":"  + obsItemType.getObsItemTypeId()  +
@@ -78,6 +79,8 @@ public class ObservableItemApiIT {
                 .assertThat()
                 .statusCode(201)
                 .body("observableItemName", is(equalTo("Lotella rhacina")))
+                .body("speciesEpithet", is(equalTo("verreauxi")))
+                .body("class", is(equalTo("ACTINOPTERYGII")))
                 .body("commonName", is(equalTo("Conger eel")));
     }
 

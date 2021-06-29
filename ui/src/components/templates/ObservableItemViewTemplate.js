@@ -68,6 +68,9 @@ const ObservableItemTemplate = ({properties}) => {
           <Grid item xs={6}>
             {el['habitatGroups']}
           </Grid>
+          <Grid item xs={6}>
+            {el['speciesEpithet']}
+          </Grid>
         </Grid>
       </Box>
       <Divider />

@@ -21,6 +21,9 @@ public class ObservableItemGetDto {
     @Schema(title = "Species Name")
     private String observableItemName;
 
+    @Schema(title = "Species Epithet")
+    private String speciesEpithet;
+
     @Schema(title = "Observable Item Type")
     private String obsItemTypeName;
 
