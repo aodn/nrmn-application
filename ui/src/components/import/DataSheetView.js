@@ -1,19 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Box, Button, Paper, Typography, makeStyles} from '@material-ui/core';
 import {
   CloudUpload as CloudUploadIcon,
+  CloudDownload as CloudDownloadIcon,
   PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon,
   SaveOutlined as SaveOutlinedIcon
 } from '@material-ui/icons/';
 import Alert from '@material-ui/lab/Alert';
 import {NavLink} from 'react-router-dom';
-
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
-
 import {PropTypes} from 'prop-types';
 import {getDataJob, validateJob, updateRows} from '../../axios/api';
 import {measurements} from '../../constants';
@@ -55,7 +54,7 @@ const useStyles = makeStyles((theme) => {
         borderRight: '2px solid #eee'
       },
       '& .ag-tool-panel-wrapper': {
-        width: '250px'
+        width: '300px'
       }
     }
   };
@@ -106,11 +105,12 @@ const popUndo = (api) => {
 // associated with the ag-grid are stored
 // see: https://www.ag-grid.com/javascript-grid/context/
 const context = {
+  useOverlay: 'Loading',
   rowData: [],
   highlighted: [],
   putRowIds: [],
   undoStack: [],
-  validationResults: [],
+  summaries: [],
   errors: [],
   pushUndo: pushUndo,
   popUndo: popUndo,
@@ -156,25 +156,23 @@ const DataSheetView = ({jobId}) => {
   const ingestError = useSelector((state) => state.import.ingestError);
   const globalErrors = useSelector((state) => state.import.globalErrors);
   const globalWarnings = useSelector((state) => state.import.globalWarnings);
-  const validationLoading = useSelector((state) => state.import.validationLoading);
-
-  useEffect(() => {
-    if (!validationLoading && gridApi) gridApi.hideOverlay();
-  }, [gridApi, validationLoading]);
 
   const handleValidate = () => {
+    setState(IngestState.Loading);
     context.useOverlay = 'Validating';
     setSideBar(defaultSideBar);
     gridApi.showLoadingOverlay();
+    context.errors = [];
     validateJob(jobId, (result) => {
       context.validationResults = result.data;
-      context.errors = result.data.errors
-        .map((e) => {
-          const err = e.errors[0];
-          if (!err) return null;
-          return {row: e.id, column: err.columnTarget, message: err.message};
-        })
-        .filter((e) => e !== null);
+      result.data.errors.reduce((a, e) => {
+        e.errors.map((err) => a.push({row: e.id, column: err.columnTarget, message: err.message, type: err.errorLevel}));
+        return a;
+      }, context.errors);
+
+      if (context.errors.findIndex((e) => e.type === 'BLOCKING') < 0) setState(IngestState.Submit);
+
+      context.summaries = result.data.summaries;
       gridApi.hideOverlay();
       gridApi.redrawRows();
       setSideBar((sideBar) => {
@@ -196,6 +194,8 @@ const DataSheetView = ({jobId}) => {
   };
 
   const handleSubmit = () => {
+    context.useOverlay = 'Submitting';
+    gridApi.showLoadingOverlay();
     dispatch(SubmitingestRequested(jobId));
   };
 
@@ -204,14 +204,26 @@ const DataSheetView = ({jobId}) => {
     context.useOverlay = 'Saving';
     gridApi.showLoadingOverlay();
     const rowUpdateDtos = [];
+    let fullRefresh = false;
     Array.from(new Set(context.putRowIds)).forEach((rowId) => {
       const row = context.rowData.find((r) => r.id === rowId);
+
       // Null row data means that the row is to be deleted
       rowUpdateDtos.push({rowId: rowId, row: row ? importRow(row) : null});
+
+      // Hack: use the fact that new rows are assigned a very high string
+      // to determine if we need a full reload to get the server-assigned
+      // row id. A better way would be to do a full reload based on a server
+      // response.
+      fullRefresh = rowId.toString().length > 10;
     });
     updateRows(jobId, rowUpdateDtos, () => {
-      gridApi.hideOverlay();
-      setState(IngestState.Validate);
+      if (fullRefresh) {
+        reload(gridApi, jobId);
+      } else {
+        gridApi.hideOverlay();
+        setState(IngestState.Validate);
+      }
     });
   };
 
@@ -269,7 +281,7 @@ const DataSheetView = ({jobId}) => {
       });
     }
 
-    if (cells.startRow.rowIndex === cells.endRow.rowIndex) {
+    if (cells.startRow.rowIndex === cells.endRow.rowIndex && Object.keys(e.api.getFilterModel()).length < 1) {
       if (items.length > 0) items.push('separator');
       items.push({
         name: 'Delete Row',
@@ -384,9 +396,7 @@ const DataSheetView = ({jobId}) => {
     }
   };
 
-  const onGridReady = (p) => {
-    setGridApi(p.api);
-
+  const reload = (api, jobId) => {
     getDataJob(jobId).then((res) => {
       const job = {
         program: res.data.job.program.programName,
@@ -399,12 +409,17 @@ const DataSheetView = ({jobId}) => {
         const rowData = res.data.rows.map((row) => {
           return exportRow(row);
         });
-        p.api.gridOptionsWrapper.gridOptions.context.rowData = rowData;
-        p.api.setRowData(rowData);
+        api.gridOptionsWrapper.gridOptions.context.rowData = rowData;
+        api.setRowData(rowData);
       }
       setJob(job);
       setState(IngestState.Validate);
     });
+  };
+
+  const onGridReady = (p) => {
+    setGridApi(p.api);
+    reload(p.api, jobId);
   };
 
   const onFirstDataRendered = (e) => {
@@ -418,16 +433,26 @@ const DataSheetView = ({jobId}) => {
   const chooseCellStyle = (params) => {
     if (params.colDef.field === 'row') return {color: 'grey'};
     const row = params.context.highlighted[params.rowIndex];
-    if (row && row[params.colDef.field]) return {backgroundColor: 'yellow'};
-    if (
-      params.context.errors.findIndex((e) => e.row === params.data.id && e.column.toUpperCase() === params.colDef.field.toUpperCase()) >= 0
-    )
-      return {backgroundColor: 'red'};
+    if (row && row[params.colDef.field]) return {backgroundColor: '#fff9c4'};
+    const error = params.context.errors.find(
+      (e) => e.row === params.data.id && e.column.toUpperCase() === params.colDef.field.toUpperCase()
+    );
+    if (error?.type === 'BLOCKING') return {backgroundColor: '#ffcdd2'};
+    if (error?.type === 'WARNING') return {backgroundColor: '#fff9c4'};
     return null;
   };
 
   const onSortChanged = (e) => {
     e.api.refreshCells();
+  };
+
+  const toolTipValueGetter = (e) => {
+    const error = e.context.errors.find((r) => r.row === e.data.id && e.column.colId.toUpperCase() === r.column.toUpperCase());
+    if (error) {
+      return error.message;
+    } else {
+      return null;
+    }
   };
 
   return (
@@ -453,6 +478,14 @@ const DataSheetView = ({jobId}) => {
               <Typography>{`${job.status} ${job.source} ${job.program} ${job.isExtendedSize ? 'Extended Size' : ''}  ${
                 job.reference
               } `}</Typography>
+            </Box>
+            <Box p={1}>
+              <Button
+                onClick={() => gridApi.exportDataAsExcel({sheetName: 'DATA', author: 'NRMN', fileName: `export_${job.reference}`})}
+                startIcon={<CloudDownloadIcon />}
+              >
+                Export to Excel
+              </Button>
             </Box>
             <Box p={1}>
               <Button disabled={state !== IngestState.Save} onClick={handleSave} startIcon={<SaveOutlinedIcon />}>
@@ -525,9 +558,11 @@ const DataSheetView = ({jobId}) => {
             suppressMenu: true,
             suppressKeyboardEvent: overrideKeyboardEvents,
             cellStyle: chooseCellStyle,
-            enableCellChangeFlash: true
+            enableCellChangeFlash: true,
+            tooltipValueGetter: toolTipValueGetter
           }}
           rowHeight={20}
+          enableBrowserTooltips
           enableRangeSelection={true}
           animateRows={true}
           enableRangeHandle={true}
@@ -575,7 +610,7 @@ const DataSheetView = ({jobId}) => {
           <AgGridColumn field="vis" headerName="Vis" />
           <AgGridColumn field="direction" headerName="Direction" />
           <AgGridColumn field="time" headerName="Time" />
-          <AgGridColumn field="p-qs" headerName="P-Qs" />
+          <AgGridColumn field="P-Qs" headerName="P-Qs" />
           <AgGridColumn field="depth" headerName="Depth" rowGroup={false} enableRowGroup={true} />
           <AgGridColumn field="method" headerName="Method" rowGroup={false} enableRowGroup={true} />
           <AgGridColumn field="block" headerName="Block" rowGroup={false} enableRowGroup={true} />

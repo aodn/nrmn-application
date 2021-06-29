@@ -1,19 +1,15 @@
-import {takeEvery, call, put} from 'redux-saga/effects';
-import {
-  JobReady,
-  validationReady,
-  RowUpdateRequested,
-  jobFailed,
-  JobRequested,
-  ValidationRequested,
-  EditRowFinished,
-  SubmitingestRequested,
-  ingestFinished,
-  ingestFailed,
-  RowDeleteRequested,
-  RowDeleteFinished
-} from '../reducers/create-import';
+import {call, put, takeEvery} from 'redux-saga/effects';
 import {getDataJob, postJobValidation, submitingest} from '../../../axios/api';
+import {
+  ingestFailed,
+  ingestFinished,
+  jobFailed,
+  JobReady,
+  JobRequested,
+  SubmitingestRequested,
+  validationReady,
+  ValidationRequested
+} from '../reducers/create-import';
 
 export default function* Watcher() {
   yield takeEvery(JobRequested, loadJob);

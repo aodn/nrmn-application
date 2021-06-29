@@ -1,7 +1,6 @@
 import axiosInstance from './index.js';
 import axios from 'axios';
 import store from '../components/store'; // will be useful to access to axios.all and axios.spread
-import {importRow} from '../components/import/reducers/create-import.js';
 
 function getToken() {
   const {accessToken, tokenType} = store.getState().auth;
