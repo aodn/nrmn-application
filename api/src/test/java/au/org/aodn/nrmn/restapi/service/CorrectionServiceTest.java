@@ -60,7 +60,7 @@ public class CorrectionServiceTest {
         when(surveyMethodRepository.findAll(any(Example.class))).thenReturn(Arrays.asList(surveyMethodBuilder.build()));
         observationBuilder = Observation.builder()
                 .diver(Diver.builder().initials("SAM").build())
-                .observableItem(ObservableItem.builder().aphiaRef(AphiaRef.builder().build()).build())
+                .observableItem(ObservableItem.builder().aphiaId(AphiaRef.builder().build().getAphiaId()).build())
                 .surveyMethod(surveyMethodBuilder.build());
 
         List<Object> observations = Arrays.asList(
