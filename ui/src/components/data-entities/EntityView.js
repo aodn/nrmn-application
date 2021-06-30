@@ -22,7 +22,7 @@ const EntityView = (props) => {
   useEffect(() => {
     dispatch(resetState());
     dispatch(itemRequested(`${props.entity.endpoint}/${params.id}`));
-  });
+  }, [dispatch, params.id, props.entity.endpoint]);
 
   const entityDef = schemaDefinition[props.entity.schemaKey.view];
   const fullTitle = `${props.entity.name} Details`;
