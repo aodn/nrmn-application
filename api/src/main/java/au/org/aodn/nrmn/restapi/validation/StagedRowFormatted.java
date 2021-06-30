@@ -7,6 +7,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Data
@@ -58,4 +59,17 @@ public class StagedRowFormatted {
     private Map<Integer, Integer> measureJson;
 
     private Optional<UiSpeciesAttributes> speciesAttributesOpt;
+
+    public boolean isDuplicateOf(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StagedRowFormatted that = (StagedRowFormatted) o;
+        return Objects.equals(date, that.date)
+                && Objects.equals(depth, that.depth)
+                && Objects.equals(diver, that.diver)
+                && Objects.equals(site, that.site)
+                && Objects.equals(block, that.block)
+                && Objects.equals(method, that.method)
+                && Objects.equals(species, that.species);
+    }
 }
