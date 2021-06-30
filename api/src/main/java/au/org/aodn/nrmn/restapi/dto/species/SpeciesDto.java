@@ -26,6 +26,8 @@ public class SpeciesDto {
     private String supersededBy;
 
     private Integer supersededById;
+    
+    private Integer aphiaId;
 
     private Boolean isPresent;
 

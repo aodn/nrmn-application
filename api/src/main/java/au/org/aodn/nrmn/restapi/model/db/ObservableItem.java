@@ -100,10 +100,10 @@ public class ObservableItem {
     @Valid
     private LengthWeight lengthWeight;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "aphia_id", referencedColumnName = "aphia_id")
+    @Basic
+    @Column(name = "aphia_id")
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
-    private AphiaRef aphiaRef;
+    private Integer aphiaId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aphia_rel_type_id", referencedColumnName = "aphia_rel_type_id")

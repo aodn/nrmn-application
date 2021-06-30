@@ -24,6 +24,9 @@ public class ObservableItemDto {
     @NotNull(message = "Observable Item Type is required")
     private Integer obsItemTypeId;
 
+    @Schema(title = "Aphia ID")
+    private Integer aphiaId;
+    
     @Schema(title = "Common Name")
     private String commonName;
 
@@ -32,7 +35,7 @@ public class ObservableItemDto {
 
     @Schema(title = "Class")
     @JsonProperty("class")
-    private String clazz;
+    private String className;
 
     @Schema(title = "Order")
     private String order;
