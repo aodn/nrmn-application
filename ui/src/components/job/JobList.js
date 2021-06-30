@@ -23,7 +23,7 @@ const JobList = () => {
             ...j,
             program: j.program.programName,
             creator: j.creator.email,
-            created: new Date(j.created).toLocaleDateString('en-AU'),
+            created: j.created,
             updated: j.updated ? new Date(j.updated).toLocaleDateString('en-AU') : '---'
           };
         });
@@ -31,6 +31,10 @@ const JobList = () => {
         setLoading(false);
       });
   }, [jobs, loading]);
+
+  const TimeStampCell = (params) => {
+    return new Date(params.value).toLocaleDateString('en-AU') + ' ' + new Date(params.value).toLocaleTimeString('en-AU');
+  };
 
   const ActionCell = (params) => {
     return (
@@ -95,9 +99,10 @@ const JobList = () => {
           {field: 'program', headerName: 'Program', width: 140},
           {field: 'source', headerName: 'Type', width: 120},
           {field: 'creator', headerName: 'Creator', flex: 1},
-          {field: 'created', headerName: 'Uploaded', width: 150},
+          {field: 'created', headerName: 'Uploaded', width: 170, renderCell: TimeStampCell},
           {...disabledHeader, field: 'actions', width: 70, renderCell: ActionCell}
         ]}
+        sortModel={[{field: 'created', sort: 'desc'}]}
         autoPageSize
         disableSelectionOnClick
         density="compact"
