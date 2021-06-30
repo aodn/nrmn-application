@@ -23,14 +23,14 @@ public class StagedRowService {
     StagedJobRepository jobRepo;
 
     @Transactional
-    public Validated<ErrorInput, Integer> save(Long jobId, List<Long> toDeleteRowIds, List<StagedRow> newRows) {
+    public Validated<ErrorInput, Integer> save(Long jobId, List<Long> toDeleteRowIds, List<StagedRow> toAddUpdateRows) {
         rowRepo.deleteAllByIds(toDeleteRowIds);
-        Integer rowsAdded = 0;
+        Integer rowsSaved = 0;
         Optional<StagedJob> jobOptional = jobRepo.findById(jobId);
-        if(jobOptional.isPresent() && newRows.size() > 0){
-            newRows.forEach(row -> row.setStagedJob(jobOptional.get()));
-            rowsAdded = rowRepo.saveAll(newRows).size();
+        if(jobOptional.isPresent() && toAddUpdateRows.size() > 0){
+            toAddUpdateRows.forEach(row -> row.setStagedJob(jobOptional.get()));
+            rowsSaved = rowRepo.saveAll(toAddUpdateRows).size();
         }
-        return Validated.<ErrorInput, Integer>valid(rowsAdded);
+        return Validated.<ErrorInput, Integer>valid(rowsSaved);
     }
 }
