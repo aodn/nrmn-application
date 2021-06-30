@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {PropTypes} from 'prop-types';
-import {Button, Divider, List, ListItem, ListItemIcon, Badge, ListItemText} from '@material-ui/core';
+import {Button, Divider, List, ListItem, ListItemText} from '@material-ui/core';
 import {Accordion, AccordionDetails, AccordionSummary, Box} from '@material-ui/core';
-import {BlockOutlined as BlockOutlinedIcon, WarningOutlined as WarningOutlinedIcon} from '@material-ui/icons';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {measurements} from '../../../constants';
@@ -62,44 +61,28 @@ const ValidationPanel = (props) => {
   return (
     <Box m={2} mr={4}>
       <Button onClick={() => props.api.setFilterModel(null)}>Reset</Button>
-      {blocking.length > 0 && (
-        <Box p={1}>
-          <Typography variant="button">blocking</Typography>
-        </Box>
-      )}
+      <Box p={1}>
+        <Typography variant="button">{blocking.length > 0 ? `${blocking.length} Errors:` : 'No Errors ✔'}</Typography>
+      </Box>
       {blocking.map((err) => (
         <Accordion key={err.key}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />} id="panel1c-header">
-            <div>
-              <Typography>{err.key}</Typography>
-            </div>
-            <div>
-              <Typography> ({err.total}) </Typography>
-            </div>
+            <Typography variant="button">{`${err.key} (${err.total})`}</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <List style={{width: '100%'}}>
+            <List>
               {err.value.map((item, i) => (
                 <ListItem
+                  key={i}
                   onClick={() => {
                     if (item.ids) {
                       focusCell(props.api, mapColumnTargetToGridColumn(item.columnTarget), item.ids);
                     }
                   }}
                   style={{backgroundColor: '#ffcdd2'}}
-                  key={i}
                   button
                 >
-                  <ListItemIcon>
-                    <Badge badgeContent={item.count} color="primary">
-                      {item.level == 'WARNING' ? <WarningOutlinedIcon color="error" /> : <BlockOutlinedIcon color="error" />}
-                    </Badge>
-                  </ListItemIcon>
-                  <ListItemText
-                    style={{overflow: 'hidden', width: '100%', whiteSpace: 'break-spaces'}}
-                    color="secondary"
-                    primary={item.message}
-                  />
+                  <ListItemText color="secondary" primary={item.message} />
                 </ListItem>
               ))}
             </List>
@@ -109,7 +92,7 @@ const ValidationPanel = (props) => {
       <Divider />
       {warning.length > 0 && (
         <Box p={1}>
-          <Typography variant="button">warning</Typography>
+          <Typography variant="button">{warning.length > 0 ? `${warning.length} Warnings:` : 'No Warnings ✔'}</Typography>
         </Box>
       )}
       {warning.map((err) => (
@@ -123,7 +106,7 @@ const ValidationPanel = (props) => {
             </div>
           </AccordionSummary>
           <AccordionDetails>
-            <List style={{width: '100%'}}>
+            <List>
               {err.value.map((item, i) => (
                 <ListItem
                   onClick={() => {
@@ -131,20 +114,11 @@ const ValidationPanel = (props) => {
                       focusCell(props.api, mapColumnTargetToGridColumn(item.columnTarget), item.ids);
                     }
                   }}
-                  style={{backgroundColor: item.level == 'WARNING' ? '#ffe0b2' : '#ffcdd2'}}
+                  style={{backgroundColor: '#ffe0b2'}}
                   key={i}
                   button
                 >
-                  <ListItemIcon>
-                    <Badge badgeContent={item.count} color="primary">
-                      {item.level == 'WARNING' ? <WarningOutlinedIcon color="error" /> : <BlockOutlinedIcon color="error" />}
-                    </Badge>
-                  </ListItemIcon>
-                  <ListItemText
-                    style={{overflow: 'hidden', width: '100%', whiteSpace: 'break-spaces'}}
-                    color="secondary"
-                    primary={item.message}
-                  />
+                  <ListItemText color="secondary" primary={item.message} />
                 </ListItem>
               ))}
             </List>

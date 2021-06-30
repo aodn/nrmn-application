@@ -15,7 +15,7 @@ const AlertDialog = ({action, text, open, onClose, onConfirm}) => {
         <DialogContentText id="alert-dialog-description">{text}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disableElevation>
+        <Button onClick={onClose} variant="text">
           Cancel
         </Button>
         <Button onClick={onConfirm}>{action}</Button>

@@ -19,6 +19,7 @@ import FindReplacePanel from './panel/FindReplacePanel';
 import ValidationPanel from './panel/ValidationPanel';
 import {exportRow, importRow, SubmitingestRequested} from './reducers/create-import';
 import LinearProgressWithLabel from '../ui/LinearProgressWithLabel';
+import AlertDialog from '../ui/AlertDialog';
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -140,7 +141,7 @@ const defaultSideBar = {
   defaultToolPanel: ''
 };
 
-const IngestState = {Loading: 0, Save: 1, Validate: 2, Submit: 3};
+const IngestState = {Loading: 0, Save: 1, Validate: 2, Submit: 3, ConfirmSubmit: 4};
 
 const DataSheetView = ({jobId}) => {
   const classes = useStyles();
@@ -206,6 +207,7 @@ const DataSheetView = ({jobId}) => {
   };
 
   const handleSubmit = () => {
+    setState(IngestState.Loading);
     context.useOverlay = 'Submitting';
     gridApi.showLoadingOverlay();
     dispatch(SubmitingestRequested(jobId));
@@ -476,6 +478,13 @@ const DataSheetView = ({jobId}) => {
 
   return (
     <>
+      <AlertDialog
+        open={state === IngestState.ConfirmSubmit}
+        text="Submit Sheet?"
+        action="Submit"
+        onClose={() => setState(IngestState.Submit)}
+        onConfirm={handleSubmit}
+      />
       <Box pt={1} pl={1}>
         <Box width={200}>
           <NavLink to="/jobs" color="secondary">
@@ -508,7 +517,11 @@ const DataSheetView = ({jobId}) => {
               </Button>
             </Box>
             <Box p={1}>
-              <Button disabled={state !== IngestState.Submit} onClick={handleSubmit} startIcon={<CloudUploadIcon />}>
+              <Button
+                disabled={state !== IngestState.Submit}
+                onClick={() => setState(IngestState.ConfirmSubmit)}
+                startIcon={<CloudUploadIcon />}
+              >
                 Submit
               </Button>
             </Box>
