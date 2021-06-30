@@ -2,7 +2,6 @@ import React from 'react';
 import {useSelector} from 'react-redux';
 import {Redirect, useParams} from 'react-router';
 import DataSheetView from './DataSheetView';
-import ValidationDrawer from './ValidationDrawer';
 
 const ValidationJob = () => {
   const {jobId} = useParams();
@@ -10,14 +9,9 @@ const ValidationJob = () => {
 
   if (ingestSuccess) {
     return <Redirect to={`/jobs/${jobId}/view`}></Redirect>;
+  } else {
+    return <DataSheetView jobId={jobId} />;
   }
-
-  return (
-    <>
-      <DataSheetView jobId={jobId} />
-      <ValidationDrawer></ValidationDrawer>
-    </>
-  );
 };
 
 export default ValidationJob;

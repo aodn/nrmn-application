@@ -165,8 +165,23 @@ const DataSheetView = ({jobId}) => {
     context.errors = [];
     validateJob(jobId, (result) => {
       context.validationResults = result.data;
+
       result.data.errors.reduce((a, e) => {
-        e.errors.map((err) => a.push({row: e.id, column: err.columnTarget, message: err.message, type: err.errorLevel}));
+        e.errors.forEach((err) => {
+          if (err.columnTarget.includes(',')) {
+            const subErrors = err.columnTarget.split(',');
+            subErrors.forEach((subCol) => {
+              a.push({row: e.id, column: subCol, message: err.message, type: err.errorLevel});
+            });
+          } else {
+            a.push({row: e.id, column: err.columnTarget, message: err.message, type: err.errorLevel});
+          }
+        });
+        return a;
+      }, context.errors);
+
+      result.data.errorGlobal.reduce((a, e) => {
+        a.push({column: e.columnTarget, message: e.message, type: e.errorLevel});
         return a;
       }, context.errors);
 
@@ -211,7 +226,7 @@ const DataSheetView = ({jobId}) => {
       // Null row data means that the row is to be deleted
       rowUpdateDtos.push({rowId: rowId, row: row ? importRow(row) : null});
 
-      // Hack: use the fact that new rows are assigned a very high string
+      // HACK: use the fact that new rows are assigned a very high string
       // to determine if we need a full reload to get the server-assigned
       // row id. A better way would be to do a full reload based on a server
       // response.
@@ -434,9 +449,16 @@ const DataSheetView = ({jobId}) => {
     if (params.colDef.field === 'row') return {color: 'grey'};
     const row = params.context.highlighted[params.rowIndex];
     if (row && row[params.colDef.field]) return {backgroundColor: '#fff9c4'};
-    const error = params.context.errors.find(
-      (e) => e.row === params.data.id && e.column.toUpperCase() === params.colDef.field.toUpperCase()
-    );
+    // HACK: to work around the fact that invert validation returns the column as an invert size
+    // and NOT as the row data column name.
+    let fieldName = params.colDef.field.toUpperCase();
+    if (params.data && params.data.isInvertSizing && params.data.isInvertSizing.toUpperCase() === 'YES') {
+      const invertSizeMap = measurements.find((m) => m.invertSize === params.colDef.field);
+      if (invertSizeMap) {
+        fieldName = invertSizeMap.field;
+      }
+    }
+    const error = params.context.errors.find((e) => e.row === params.data.id && e.column.toUpperCase() === fieldName);
     if (error?.type === 'BLOCKING') return {backgroundColor: '#ffcdd2'};
     if (error?.type === 'WARNING') return {backgroundColor: '#fff9c4'};
     return null;

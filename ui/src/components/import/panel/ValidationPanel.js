@@ -5,9 +5,10 @@ import {Accordion, AccordionDetails, AccordionSummary, Box} from '@material-ui/c
 import {BlockOutlined as BlockOutlinedIcon, WarningOutlined as WarningOutlinedIcon} from '@material-ui/icons';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import {measurements} from '../../../constants';
 
 const focusCell = (api, column, ids) => {
-  api.ensureColumnVisible(column.toLowerCase());
+  api.ensureColumnVisible(column);
   const values = ids.map((id) => id.toString());
   api.setFilterModel({
     id: {
@@ -39,6 +40,20 @@ const ValidationPanel = (props) => {
     }
   }, [props.api.gridOptionsWrapper.gridOptions.context.summaries]);
 
+  // HACK: To work around the fact that the column returned in the validation results
+  // and the staged rows have different cases for the column names.
+  const mapColumnTargetToGridColumn = (columnTarget) => {
+    const col = columnTarget.split(',')[0].toLowerCase();
+    const matchingColumn = props.columnApi.columnController.columnDefs.find((d) => d.field.toLowerCase() === col);
+    if (!matchingColumn) {
+      // Assume invert sizing
+      const invertSizeMap = measurements.find((m) => m.invertSize === col);
+      console.assert(invertSizeMap);
+      return invertSizeMap?.field || '';
+    }
+    return matchingColumn.field;
+  };
+
   const blocking = errList.filter((e) => e.blocking);
   const warning = errList.filter((e) => !e.blocking);
 
@@ -61,7 +76,9 @@ const ValidationPanel = (props) => {
               {err.value.map((item, i) => (
                 <ListItem
                   onClick={() => {
-                    focusCell(props.api, item.columnTarget, item.ids);
+                    if (item.ids) {
+                      focusCell(props.api, mapColumnTargetToGridColumn(item.columnTarget), item.ids);
+                    }
                   }}
                   style={{backgroundColor: '#ffcdd2'}}
                   key={i}
@@ -100,7 +117,9 @@ const ValidationPanel = (props) => {
               {err.value.map((item, i) => (
                 <ListItem
                   onClick={() => {
-                    focusCell(props.api, item.columnTarget, item.ids);
+                    if (item.ids) {
+                      focusCell(props.api, mapColumnTargetToGridColumn(item.columnTarget), item.ids);
+                    }
                   }}
                   style={{backgroundColor: item.level == 'WARNING' ? '#ffe0b2' : '#ffcdd2'}}
                   key={i}
@@ -127,8 +146,8 @@ const ValidationPanel = (props) => {
 };
 
 ValidationPanel.propTypes = {
-  api: PropTypes.any,
-  agGridReact: PropTypes.any
+  api: PropTypes.object,
+  columnApi: PropTypes.object
 };
 
 export default ValidationPanel;
