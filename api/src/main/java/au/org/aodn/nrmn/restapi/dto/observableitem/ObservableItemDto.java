@@ -24,6 +24,9 @@ public class ObservableItemDto {
     @NotNull(message = "Observable Item Type is required")
     private Integer obsItemTypeId;
 
+    @Schema(title = "Aphia ID")
+    private Integer aphiaId;
+    
     @Schema(title = "Common Name")
     private String commonName;
 

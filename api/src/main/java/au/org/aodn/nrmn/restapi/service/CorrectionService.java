@@ -82,7 +82,7 @@ public class CorrectionService {
     }
 
     private String getSpeciesScientificName(ObservableItem observableItem) {
-        return observableItem.getAphiaRef().getScientificName();
+        return observableItem.getObservableItemName();
     }
 
 }

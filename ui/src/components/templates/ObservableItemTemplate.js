@@ -12,6 +12,9 @@ const ObservableItemTemplate = ({properties}) => {
     <>
       <Grid container spacing={2}>
         <Grid item xs={6}>
+          {el['aphiaId']}
+        </Grid>
+        <Grid item xs={6}>
           {el['observableItemName']}
         </Grid>
         <Grid item xs={6}>
