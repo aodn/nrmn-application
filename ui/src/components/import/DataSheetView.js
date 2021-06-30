@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import {Box, Button, Paper, Typography, makeStyles} from '@material-ui/core';
 import {
   CloudUpload as CloudUploadIcon,
@@ -7,7 +7,6 @@ import {
   PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon,
   SaveOutlined as SaveOutlinedIcon
 } from '@material-ui/icons/';
-import Alert from '@material-ui/lab/Alert';
 import {NavLink} from 'react-router-dom';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
@@ -33,8 +32,8 @@ const useStyles = makeStyles((theme) => {
     agGrid: {
       '& .ag-cell[role="gridcell"]': {
         borderRight: '1px solid #ccc',
-        padding: '0 2px',
-        lineHeight: '20px'
+        padding: '0 2px !important',
+        lineHeight: '20px !important'
       },
       '& .ag-header-cell[role="columnheader"]': {
         padding: '0 6px',
@@ -54,7 +53,7 @@ const useStyles = makeStyles((theme) => {
         borderRight: '2px solid #eee'
       },
       '& .ag-tool-panel-wrapper': {
-        width: '300px'
+        width: '350px'
       }
     }
   };
@@ -152,16 +151,12 @@ const DataSheetView = ({jobId}) => {
   const [state, setState] = useState(IngestState.Loading);
   const [sideBar, setSideBar] = useState(defaultSideBar);
 
-  const errors = useSelector((state) => state.import.errors);
-  const ingestError = useSelector((state) => state.import.ingestError);
-  const globalErrors = useSelector((state) => state.import.globalErrors);
-  const globalWarnings = useSelector((state) => state.import.globalWarnings);
-
   const handleValidate = () => {
     setState(IngestState.Loading);
     context.useOverlay = 'Validating';
     setSideBar(defaultSideBar);
     gridApi.showLoadingOverlay();
+    gridApi.setFilterModel(null);
     context.errors = [];
     validateJob(jobId, (result) => {
       context.validationResults = result.data;
@@ -181,15 +176,17 @@ const DataSheetView = ({jobId}) => {
       }, context.errors);
 
       result.data.errorGlobal.reduce((a, e) => {
-        a.push({column: e.columnTarget, message: e.message, type: e.errorLevel});
+        const rowData = {columnTarget: '', message: e.message, level: e.errorLevel};
+        a[e.columnTarget]?.length > 0 ? a[e.columnTarget].push(rowData) : (a[e.columnTarget] = [rowData]);
         return a;
-      }, context.errors);
+      }, result.data.summaries);
 
       if (context.errors.findIndex((e) => e.type === 'BLOCKING') < 0) setState(IngestState.Submit);
 
       context.summaries = result.data.summaries;
       gridApi.hideOverlay();
       gridApi.redrawRows();
+
       setSideBar((sideBar) => {
         return {
           defaultToolPanel: 'validation',
@@ -485,15 +482,6 @@ const DataSheetView = ({jobId}) => {
             <Typography>{'<< Back to Jobs'}</Typography>
           </NavLink>
         </Box>
-        {errors && errors.length > 0 && (
-          <Box mb={2}>
-            <Alert severity="error" variant="filled">
-              {errors.map((item, key) => {
-                return <div key={key}>{item}</div>;
-              })}
-            </Alert>
-          </Box>
-        )}
         {job && job.status === 'STAGED' && (
           <Box display="flex" flexDirection="row">
             <Box ml={1} p={2} flexGrow={1}>
@@ -524,40 +512,6 @@ const DataSheetView = ({jobId}) => {
                 Submit
               </Button>
             </Box>
-          </Box>
-        )}
-        {globalErrors.length > 0 && (
-          <Box mt={1}>
-            <Alert m={2} severity="error">
-              {globalErrors.map((e) => (
-                <span key={e.message}>
-                  {e.errorLevel}: {e.message} <br />
-                </span>
-              ))}
-            </Alert>
-          </Box>
-        )}
-        {ingestError && (
-          <Box mb={2}>
-            <Alert severity="error" variant="filled">
-              <p>
-                Sheet failed to ingest. No survey data has been inserted.
-                <br />
-                If this problem persists, please contact info@aodn.org.au.
-              </p>
-              <p>Error: {ingestError}</p>
-            </Alert>
-          </Box>
-        )}
-        {globalWarnings.length > 0 && (
-          <Box mt={1}>
-            <Alert m={2} severity="warning">
-              {globalWarnings.map((e) => (
-                <span key={e.message}>
-                  {e.errorLevel}: {e.message} <br />
-                </span>
-              ))}
-            </Alert>
           </Box>
         )}
       </Box>

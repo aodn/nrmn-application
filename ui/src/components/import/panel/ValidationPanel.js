@@ -9,13 +9,15 @@ import {measurements} from '../../../constants';
 
 const focusCell = (api, column, ids) => {
   api.ensureColumnVisible(column);
-  const values = ids.map((id) => id.toString());
-  api.setFilterModel({
-    id: {
-      type: 'set',
-      values: values
-    }
-  });
+  if (ids) {
+    const values = ids.map((id) => id.toString());
+    api.setFilterModel({
+      id: {
+        type: 'set',
+        values: values
+      }
+    });
+  }
   api.redrawRows();
 };
 
@@ -60,7 +62,11 @@ const ValidationPanel = (props) => {
   return (
     <Box m={2} mr={4}>
       <Button onClick={() => props.api.setFilterModel(null)}>Reset</Button>
-      <Typography>{blocking.length} blocking</Typography>
+      {blocking.length > 0 && (
+        <Box p={1}>
+          <Typography variant="button">blocking</Typography>
+        </Box>
+      )}
       {blocking.map((err) => (
         <Accordion key={err.key}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />} id="panel1c-header">
@@ -101,7 +107,11 @@ const ValidationPanel = (props) => {
         </Accordion>
       ))}
       <Divider />
-      <Typography>{warning.length} warning</Typography>
+      {warning.length > 0 && (
+        <Box p={1}>
+          <Typography variant="button">warning</Typography>
+        </Box>
+      )}
       {warning.map((err) => (
         <Accordion key={err.key}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />} id="panel1c-header">
