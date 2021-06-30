@@ -208,6 +208,7 @@ const DataSheetView = ({jobId}) => {
 
   const handleSubmit = () => {
     setState(IngestState.Loading);
+    setSideBar(defaultSideBar);
     context.useOverlay = 'Submitting';
     gridApi.showLoadingOverlay();
     dispatch(SubmitingestRequested(jobId));

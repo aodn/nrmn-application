@@ -23,7 +23,7 @@ const DropDownInput = (props) => {
 
   useEffect(() => {
     if (route) dispatch(selectedItemsRequested([route]));
-  });
+  }, [route, dispatch]);
 
   if (!formValue && !optional && options) {
     dispatch(setField({newValue: options[0].id, entity: fieldName ?? name}));
