@@ -36,6 +36,9 @@ const SideMenu = ({entities, open, onClose}) => {
           <ListItem button onClick={onClose} component={NavLink} to="/data/extract">
             <ListItemText primary="Template Data" />
           </ListItem>
+          <ListItem button onClick={onClose} component={NavLink} to="/data/corrections">
+            <ListItemText primary="Corrections" />
+          </ListItem>
         </List>
       </List>
       <Divider />

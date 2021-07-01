@@ -28,6 +28,7 @@ import ObservableItemEditTemplate from './components/templates/ObservableItemEdi
 import SurveyViewTemplate from './components/templates/SurveyViewTemplate';
 import SurveyEditTemplate from './components/templates/SurveyEditTemplate';
 import ExtractTemplateData from './components/datasheets/ExtractTemplateData';
+import SurveyCorrections from './components/pages/SurveyCorrections';
 
 const referenceData = [
   {
@@ -232,6 +233,7 @@ const App = () => {
             <Route exact path="/validation/:jobId" component={ValidationPage} />
             <Route exact path="/upload" component={JobUpload} />
             <Route exact path="/data/extract" component={ExtractTemplateData} />
+            <Route exact path="/data/corrections" component={SurveyCorrections} />
             <Redirect exact from="/list/stagedJob" to="/jobs" />
             {referenceData.map((e) => (
               <Route exact key={e.route.base} path={e.route.base} render={() => <EntityEdit entity={e} template={e.template.add} />} />
