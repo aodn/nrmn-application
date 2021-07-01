@@ -66,6 +66,7 @@ public class StagedRowFormatted {
         StagedRowFormatted that = (StagedRowFormatted) o;
         return Objects.equals(date, that.date)
                 && Objects.equals(depth, that.depth)
+                && Objects.equals(surveyNum, that.surveyNum)
                 && Objects.equals(diver, that.diver)
                 && Objects.equals(site, that.site)
                 && Objects.equals(block, that.block)
