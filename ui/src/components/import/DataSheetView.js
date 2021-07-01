@@ -155,7 +155,11 @@ const DataSheetView = ({jobId}) => {
         return a;
       }, result.data.summaries);
 
-      if (context.errors.findIndex((e) => e.type === 'BLOCKING') < 0) setState(IngestState.Submit);
+      if (context.errors.findIndex((e) => e.type === 'BLOCKING') < 0) {
+        setState(IngestState.Submit);
+      } else {
+        setState(IngestState.Validate);
+      }
 
       context.summaries = result.data.summaries;
       gridApi.hideOverlay();
