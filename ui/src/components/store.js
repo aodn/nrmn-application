@@ -1,6 +1,5 @@
 import {configureStore, getDefaultMiddleware} from '@reduxjs/toolkit';
 
-import {toggleReducer} from './layout/layout-reducer';
 import {importReducer} from './import/reducers/create-import';
 import {uploadReducer} from './import/reducers/upload';
 import {authReducer} from './auth/auth-reducer';
@@ -11,8 +10,6 @@ import FileMiddleware from './import/middleware/validation-job';
 import getEntitiesWatcher from './data-entities/middleware/entities';
 import {all} from 'redux-saga/effects';
 import LoginWatcher from './auth/auth-middleware';
-import {jobReducer} from './job/jobReducer';
-import jobWatcher from './job/jobMiddleware';
 import getSearchResult from './data-entities/middleware/search';
 
 const initialiseSagaMiddleware = createSagaMiddleware();
@@ -25,17 +22,15 @@ const middleware = isDev
 const store = configureStore({
   reducer: {
     auth: authReducer,
-    toggle: toggleReducer,
     import: importReducer,
     form: formReducer,
-    job: jobReducer,
     upload: uploadReducer
   },
   middleware
 });
 
 function* rootSaga() {
-  yield all([importMiddleware(), FileMiddleware(), LoginWatcher(), getEntitiesWatcher(), jobWatcher(), getSearchResult()]);
+  yield all([importMiddleware(), FileMiddleware(), LoginWatcher(), getEntitiesWatcher(), getSearchResult()]);
 }
 
 initialiseSagaMiddleware.run(rootSaga);

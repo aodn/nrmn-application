@@ -8,7 +8,7 @@ const LoadingBanner = (props) => {
   return (
     <Grid container direction="row" justify="flex-start" alignItems="center">
       <Typography variant={props.variant}>{props.msg} &nbsp; </Typography>
-      <LoadingSpinner color={'primary'} />
+      <LoadingSpinner color="primary" />
     </Grid>
   );
 };

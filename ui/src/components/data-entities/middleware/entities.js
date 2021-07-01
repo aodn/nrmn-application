@@ -12,7 +12,6 @@ import {
   selectedItemsEdited,
   selectedItemsLoaded
 } from '../form-reducer';
-import {isSuccessful200Response} from '../../utils/helpers';
 
 export default function* getEntitiesWatcher() {
   yield takeEvery(selectRequested, entities);
@@ -87,6 +86,13 @@ function* saveEntity(action) {
   try {
     delete action.payload.data._links;
     const resp = yield call(entitySave, action.payload.path, action.payload.data);
+
+    const isSuccessful200Response = (value) => {
+      const min = 200;
+      const max = 300;
+      return value >= min && value <= max;
+    };
+
     if (resp?.data?.errors || !isSuccessful200Response(resp.status)) {
       yield put(entitiesError({e: {response: resp}}));
     } else {

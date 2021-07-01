@@ -1,5 +1,3 @@
-const currentEnv = process.env.NODE_ENV;
-const onlyDuringDev = currentEnv == 'development' ? 0 : 2;
 module.exports = exports = {
   parser: 'babel-eslint',
   env: {
@@ -31,31 +29,31 @@ module.exports = exports = {
     }
   },
   rules: {
-    'no-process-env': 0,
-    'react/prop-types': [2],
+    'no-process-env': 'off',
+    'react/prop-types': ['error'],
     'react/function-component-definition': [
-      2,
+      'error',
       {
         namedComponents: 'arrow-function'
       }
     ],
-    'react/prefer-stateless-function': [2, {ignorePureComponents: true}],
-    'react-hooks/rules-of-hooks': 2,
-    'react-hooks/exhaustive-deps': 0,
-    semi: [2, 'always'],
+    'react/prefer-stateless-function': ['error', {ignorePureComponents: true}],
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
+    semi: ['error', 'always'],
     quotes: [
-      2,
+      'error',
       'single',
       {
         avoidEscape: true,
         allowTemplateLiterals: true
       }
     ],
-    'no-console-log/no-console-log': onlyDuringDev,
-    'no-empty': 2,
-    'no-trailing-spaces': 2,
-    'no-unused-vars': 2,
-    'no-alert': 2,
-    'no-debugger': onlyDuringDev
+    'no-console-log/no-console-log': 'warn',
+    'no-empty': 'warn',
+    'no-trailing-spaces': 'warn',
+    'no-unused-vars': 'warn',
+    'no-alert': 'error',
+    'no-debugger': 'warn'
   }
 };

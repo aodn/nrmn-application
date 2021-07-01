@@ -21,6 +21,7 @@ const importState = {
   jobId: '',
   job: {}
 };
+
 const measureKey = [
   'Inverts',
   '2-5',

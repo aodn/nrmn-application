@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  Divider,
   Grid,
   IconButton,
   Paper,
@@ -25,60 +24,56 @@ import FileDownload from 'js-file-download';
 
 import {getResult, templateZip} from '../../axios/api';
 
+const options = [
+  {entity: 'locations', label: 'Location'},
+  {entity: 'siteProvinces', label: 'MEOW Province'},
+  {entity: 'siteStates', label: 'State'},
+  {entity: 'siteCodes', label: 'Site Code'}
+];
+
 const ExtractTemplateData = () => {
   const [areas, setAreas] = useState([]);
   const [filters, setFilters] = useState([]);
   const [selected, setSelected] = useState(null);
-  const [loading, setLoading] = useState(false);
 
   const [entity, setEntity] = useState(null);
   const [downloadParams, setDownloadParams] = useState(null);
 
-  const options = [
-    {entity: 'locations', label: 'Location'},
-    {entity: 'siteProvinces', label: 'MEOW Province'},
-    {entity: 'siteStates', label: 'State'},
-    {entity: 'siteCodes', label: 'Site Code'}
-  ];
+  const downloadZip = (params) => {
+    templateZip(qs.stringify(params, {indices: false})).then((result) => {
+      FileDownload(result.data, `template.zip`);
+    });
+  };
 
   useEffect(() => {
-    const fetch = async () => {
-      setLoading(true);
-      const result = await getResult(entity);
-      setLoading(false);
-      if (result.data) {
-        if (entity === 'locations')
-          setAreas(
-            result.data._embedded.locations.map((l) => {
-              return {type: entity, value: l.locationId, label: l.locationName};
-            })
-          );
-        else
-          setAreas(
-            result.data.map((c) => {
-              return {type: entity, value: c, label: c};
-            })
-          );
-      }
-      setEntity(null);
-    };
+    if (entity)
+      getResult(entity).then((result) => {
+        if (result.data) {
+          if (entity === 'locations')
+            setAreas(
+              result.data._embedded.locations.map((l) => {
+                return {type: entity, value: l.locationId, label: l.locationName};
+              })
+            );
+          else
+            setAreas(
+              result.data.map((c) => {
+                return {type: entity, value: c, label: c};
+              })
+            );
+        }
+      });
+  }, [entity]);
 
-    const downloadZip = async (params) => {
-      const response = await templateZip(qs.stringify(params, {indices: false}));
-      FileDownload(response.data, `template.zip`);
-      setDownloadParams(null);
-    };
-
+  useEffect(() => {
     if (downloadParams) {
       const p = options.reduce((a, o) => {
         a[o.entity] = downloadParams.filter((f) => f.type === o.entity).map((f) => f.value);
         return a;
       }, {});
       downloadZip({locations: p.locations, siteCodes: p.siteCodes, states: p.siteStates, provinces: p.siteProvinces});
-    } else if (entity) {
-      fetch();
     }
-  }, [entity, downloadParams]);
+  }, [downloadParams]);
 
   const filterTable = (
     <TableContainer component={Paper}>
@@ -93,14 +88,13 @@ const ExtractTemplateData = () => {
             <TableRow key={f.value}>
               <TableCell>{options.find((o) => o.entity === f.type).label}</TableCell>
               <TableCell>{f.label}</TableCell>
-              <TableCell>
+              <TableCell style={{borderBottom: 'grey'}}>
                 <Tooltip title="Remove" xs={1}>
                   <IconButton size="small" onClick={() => setFilters([...filters.filter((ff) => ff.value !== f.value)])}>
                     <RemoveCircleOutline />
                   </IconButton>
                 </Tooltip>
               </TableCell>
-              <Divider />
             </TableRow>
           ))}
         </TableBody>
@@ -124,13 +118,16 @@ const ExtractTemplateData = () => {
               options={options}
               getOptionLabel={(o) => o.label}
               getOptionSelected={(o, v) => o.entity === v.entity}
-              onChange={(_, o) => setEntity(o.entity)}
+              onChange={(_, o) => {
+                setAreas(null);
+                setEntity(o.entity);
+              }}
               renderInput={(params) => <TextField {...params} variant="outlined" />}
             />
           </Grid>
           <Grid item xs={4}>
             <Typography variant="subtitle2">Area</Typography>
-            {loading ? (
+            {!areas ? (
               <CircularProgress size={25} />
             ) : (
               <Autocomplete
@@ -160,13 +157,7 @@ const ExtractTemplateData = () => {
           </Grid>
           <Grid item xs={4} />
           <Grid item xs={4}>
-            <Button
-              style={{width: '100%'}}
-              onClick={() => setDownloadParams(filters)}
-              disabled={downloadParams || filters.length < 1}
-              color="secondary"
-              variant="contained"
-            >
+            <Button style={{width: '100%'}} onClick={() => setDownloadParams(filters)} disabled={downloadParams || filters.length < 1}>
               {downloadParams ? <CircularProgress size={25} /> : 'Download Sheets'}
             </Button>
           </Grid>

@@ -45,7 +45,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
         isDataRow = (rowNum > 1);
         rowHasData = false;
         if (isDataRow) {
-            currentRow = StagedRow.builder().pos(rowNum - 1).build();
+            currentRow = StagedRow.builder().pos((rowNum - 1) * 1000).build();
             for (String col : requiredHeaders)
                 setValue(col, "");
         }

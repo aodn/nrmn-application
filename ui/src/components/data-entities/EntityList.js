@@ -9,15 +9,14 @@ import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Ic
 import {Add, Edit, FileCopy, Delete} from '@material-ui/icons';
 import Alert from '@material-ui/lab/Alert';
 
-import {AgGridReact} from 'ag-grid-react/lib/agGridReact';
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-material.css';
+import {AgGridReact} from 'ag-grid-react';
+import 'ag-grid-enterprise';
 
-import useWindowSize from '../utils/useWindowSize';
 import CustomLoadingOverlay from './CustomLoadingOverlay';
 import {selectRequested, deleteEntityRequested} from './middleware/entities';
 import {resetState} from './form-reducer';
-
-let agGridApi = null;
-let agGridColumnApi = null;
 
 const getCellFilter = (format) => {
   const filterTypes = {
@@ -48,16 +47,17 @@ const restoreFilterModel = (entityName) => {
 
 const EntityList = (props) => {
   const history = useHistory();
-  const size = useWindowSize();
   const dispatch = useDispatch();
   const entities = useSelector((state) => state.form.entities);
   const errors = useSelector((state) => state.form.errors);
   const [disableResetFilter, setResetFilterDisabled] = useState(true);
+  const [agGridApi, setAgGridApi] = useState(null);
+  const [agGridColumnApi, setAgGridColumnApi] = useState(null);
 
   useEffect(() => {
     dispatch(resetState());
     dispatch(selectRequested(props.entity.list.endpoint));
-  }, [props.entity.name]);
+  }, [dispatch, props.entity]);
 
   let items = entities?._embedded ? entities?._embedded[props.entity.list.key] : entities;
   useEffect(() => {
@@ -69,7 +69,7 @@ const EntityList = (props) => {
       agGridColumnApi.autoSizeColumns(allColumnIds, false);
       agGridApi.setFilterModel(restoreFilterModel(props.entity.name));
     }
-  }, [items]);
+  }, [agGridApi, agGridColumnApi, items, props.entity]);
 
   const schematoColDef = (schema, entity) => {
     const fields = entity.list.headers ?? Object.keys(schema.properties);
@@ -142,10 +142,9 @@ const EntityList = (props) => {
   };
 
   const agGridReady = (agGrid) => {
-    agGridApi = Object.create(agGrid.api);
-    agGridColumnApi = agGrid.columnApi;
-    Object.freeze(agGridApi);
-    agGridApi.showLoadingOverlay();
+    setAgGridApi(agGrid.api);
+    setAgGridColumnApi(agGrid.columnApi);
+    agGrid.api.showLoadingOverlay();
   };
 
   const [dialogState, setDialogState] = useState({open: false});
@@ -190,39 +189,41 @@ const EntityList = (props) => {
   return (
     <>
       {dialogState.open && dialog}
-      <Grid container direction="row" justify="space-between" alignItems="right">
-        <Grid item xs={8}>
-          <Typography variant="h4">{props.entity.list.name}</Typography>
-        </Grid>
-        <Grid item xs={2}>
-          <Button
-            style={{width: '75%'}}
-            disabled={disableResetFilter}
-            onClick={() => agGridApi.setFilterModel(null)}
-            color="primary"
-            variant={'contained'}
-          >
-            Reset Filter
-          </Button>
-        </Grid>
-        <Grid item xs={2}>
-          {props.entity.list.showNew && (
+      <Box m={2}>
+        <Grid container direction="row" justify="space-between">
+          <Grid item xs={8}>
+            <Typography variant="h4">{props.entity.list.name}</Typography>
+          </Grid>
+          <Grid item xs={2}>
             <Button
-              {...props}
-              style={{width: '100%'}}
-              to={props.entity.route.base}
-              component={NavLink}
-              color="secondary"
+              style={{width: '75%'}}
+              disabled={disableResetFilter}
+              onClick={() => agGridApi.setFilterModel(null)}
+              color="primary"
               variant={'contained'}
-              startIcon={<Add></Add>}
             >
-              New {props.entity.name}
+              Reset Filter
             </Button>
-          )}
+          </Grid>
+          <Grid item xs={2}>
+            {props.entity.list.showNew && (
+              <Button
+                {...props}
+                style={{width: '100%'}}
+                to={props.entity.route.base}
+                component={NavLink}
+                color="secondary"
+                variant={'contained'}
+                startIcon={<Add></Add>}
+              >
+                New {props.entity.name}
+              </Button>
+            )}
+          </Grid>
         </Grid>
-      </Grid>
-
-      <div style={{height: size.height - 150, marginTop: 20}} className={'ag-theme-material'}>
+      </Box>
+      {errors.length > 0 ? renderError(errors) : ''}
+      <Box flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
         <AgGridReact
           columnDefs={colDef}
           rowSelection="single"
@@ -246,8 +247,7 @@ const EntityList = (props) => {
             suppressMenu: true
           }}
         />
-      </div>
-      {errors.length > 0 ? renderError(errors) : ''}
+      </Box>
     </>
   );
 };

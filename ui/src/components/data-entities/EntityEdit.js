@@ -37,7 +37,7 @@ const EntityEdit = ({entity, template, clone}) => {
     if (params.id !== undefined) {
       dispatch(itemRequested(`${entity.endpoint}/${params.id}`));
     }
-  }, [saved]);
+  }, [dispatch, entity.endpoint, params.id, saved]);
 
   const handleSubmit = (e) => {
     if (edit) {
@@ -145,7 +145,7 @@ const EntityEdit = ({entity, template, clone}) => {
 
   return params.id && Object.keys(formData).length === 0 ? (
     <Grid container direction="row" justify="flex-start" alignItems="center">
-      <LoadingBanner variant={'h5'} msg={`Loading ${entity.name}`} />
+      <LoadingBanner variant="h5" msg={`Loading ${entity.name}`} />
     </Grid>
   ) : (
     <EntityContainer name={entity.list.name} goBackTo={entity.list.route} header={entity.showSpeciesSearch && !edit && <SpeciesSearch />}>
@@ -181,14 +181,12 @@ const EntityEdit = ({entity, template, clone}) => {
               ObjectFieldTemplate={template}
             >
               <Box display="flex" justifyContent="center" mt={5}>
-                <Button variant="contained" disabled={params.loading} component={NavLink} to={entity.list.route}>
+                <Button disabled={params.loading} component={NavLink} to={entity.list.route}>
                   Cancel
                 </Button>
                 <Button
                   style={{width: '50%', marginLeft: '5%', marginRight: '20%'}}
                   type="submit"
-                  variant="contained"
-                  color="secondary"
                   startIcon={<Save></Save>}
                   disabled={params.loading}
                 >

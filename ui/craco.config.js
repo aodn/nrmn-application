@@ -5,13 +5,10 @@ module.exports = {
     {
       plugin: CracoEslintWebpackPlugin,
       options: {
-        // See the options description below
         skipPreflightCheck: true,
         eslintOptions: {
           files: 'src/**/*.{js,jsx,ts,tsx}',
-          lintDirtyModulesOnly: false,
-          failOnWarning: true
-          // ...
+          lintDirtyModulesOnly: false
         }
       }
     }

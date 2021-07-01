@@ -17,7 +17,7 @@ const CustomLoadingOverlay = () => {
   return (
     <div style={{width: '100%'}}>
       <Box component="div" ml={2} className={classes.main}>
-        <LoadingBanner variant={'h5'} msg={'Loading data..  '} />
+        <LoadingBanner variant="h5" msg="Loading data.." />
       </Box>
     </div>
   );

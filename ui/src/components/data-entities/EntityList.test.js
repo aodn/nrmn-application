@@ -1,12 +1,22 @@
-/* eslint-disable no-unused-expressions */
-
 import React from 'react';
-import {Route} from 'react-router-dom';
-import {renderWithProviders} from '../utils/test-utils';
+import {createMemoryHistory} from 'history';
+import {Router, Route} from 'react-router-dom';
+import {render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import config from 'react-global-configuration';
 import {useSelector} from 'react-redux';
 import EntityList from './EntityList';
+
+const renderWithProviders = (ui, {route = '/', history = createMemoryHistory({initialEntries: [route]})} = {}) => {
+  return {
+    ...render(
+      <Router history={history}>
+        <Route path={route}>{ui}</Route>
+      </Router>
+    ),
+    history
+  };
+};
 
 const testSchema = {
   TestEntity: {
@@ -52,19 +62,15 @@ const testEntity = {
 };
 
 jest.mock('react-redux', () => {
-  const ActualReactRedux = require.requireActual('react-redux');
   return {
-    ...ActualReactRedux,
     useSelector: jest.fn().mockImplementation(() => {
       return function () {
         return {};
       };
     }),
-    useDispatch: jest.fn().mockImplementation(() => {
-      return function () {
-        return {};
-      };
-    }),
+    useDispatch: () => {
+      return () => {};
+    },
     useEffect: jest.fn().mockImplementation(() => {
       return function () {
         return {};

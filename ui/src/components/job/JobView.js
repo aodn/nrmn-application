@@ -1,7 +1,5 @@
-import React, {useEffect} from 'react';
-import {Backdrop, Box, Chip, CircularProgress, Divider, Grid, Paper, Typography} from '@material-ui/core';
-import {useDispatch, useSelector} from 'react-redux';
-import {jobRequested, ResetState} from './jobReducer';
+import React, {useEffect, useState} from 'react';
+import {Box, Chip, CircularProgress, Divider, Grid, Paper, Typography} from '@material-ui/core';
 import {useParams} from 'react-router';
 import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutlined';
 import Timeline from '@material-ui/lab/Timeline';
@@ -20,6 +18,8 @@ import BackupIcon from '@material-ui/icons/Backup';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import {Link} from 'react-router-dom';
+
+import {getFullJob} from '../../axios/api';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -73,21 +73,21 @@ const event2icon = {
 };
 
 const JobView = () => {
-  const dispatch = useDispatch();
   const {id} = useParams();
-  const job = useSelector((state) => state.job.currentJob);
-  const isLoading = useSelector((state) => state.job.isLoading);
+  const [job, setJob] = useState();
   const classes = useStyles();
+
   useEffect(() => {
-    dispatch(jobRequested({id}));
-    return function clean() {
-      dispatch(ResetState());
-    };
-  }, []);
+    if (!job) {
+      getFullJob(id).then((res) => {
+        setJob(res);
+      });
+    }
+  }, [job, id]);
 
   return (
     <Box>
-      {!isLoading && job && (
+      {job ? (
         <Grid container>
           <Grid item sm={12} md={12} lg={4}>
             <Paper style={{padding: 15}}>
@@ -107,15 +107,15 @@ const JobView = () => {
                   ></Chip>
                 </Grid>
                 <Grid item>
-                  <Chip size="small" color="seprimarycondary" label={job.source} variant="outlined"></Chip>
+                  <Chip size="small" label={job.source} variant="outlined"></Chip>
                 </Grid>
                 <Grid item>
-                  <Chip size="small" color="secondary" label={job.status} variant="outlined"></Chip>
+                  <Chip size="small" label={job.status} variant="outlined"></Chip>
                 </Grid>
 
                 {job.isExtendedSize && (
                   <Grid item>
-                    <Chip size="small" color="secondary" label={'Extended Size'} variant="outlined"></Chip>
+                    <Chip size="small" color="secondary" label="Extended Size" variant="outlined"></Chip>
                   </Grid>
                 )}
               </Grid>
@@ -130,8 +130,8 @@ const JobView = () => {
                   job.surveyIds.length > 0 &&
                   job.surveyIds.map((id) => (
                     <Grid key={id} item>
-                      <Link to={'/data/survey/' + id} variant="a">
-                       survey {id}
+                      <Link to={`/data/survey/${id}`} variant="a">
+                        survey {id}
                       </Link>
                     </Grid>
                   ))}
@@ -166,11 +166,9 @@ const JobView = () => {
             )}
           </Grid>
         </Grid>
-      )}
-      <Backdrop open={isLoading}>
-        {' '}
+      ) : (
         <CircularProgress size={200} color="secondary" />
-      </Backdrop>
+      )}
     </Box>
   );
 };

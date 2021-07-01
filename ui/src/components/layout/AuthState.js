@@ -1,19 +1,16 @@
-import React from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import React, {useState} from 'react';
+import {useSelector} from 'react-redux';
 import {useHistory} from 'react-router-dom';
-import {AccountCircle, VerifiedUser} from '@material-ui/icons';
+import {AccountCircle} from '@material-ui/icons';
 import Logout from '../auth/logout';
-import {toggleLogoutMenuOpen} from './layout-reducer';
 import {Button} from '@material-ui/core';
 
 const AuthState = () => {
   const expires = useSelector((state) => state.auth.expires);
   const username = useSelector((state) => state.auth.username);
-  const dispatch = useDispatch();
   const history = useHistory();
+  const [confirmLogout, showConfirmLogout] = useState(false);
   const loggedIn = Date.now() < expires;
-
-  const openLogout = () => dispatch(toggleLogoutMenuOpen());
 
   if (!loggedIn) {
     return (
@@ -25,7 +22,6 @@ const AuthState = () => {
         onClick={() => {
           history.push('/login');
         }}
-        startIcon={<AccountCircle />}
       >
         Log In
       </Button>
@@ -33,10 +29,18 @@ const AuthState = () => {
   } else {
     return (
       <>
-        <Button pt={10} variant="text" color="inherit" size="small" title={'Log out'} startIcon={<VerifiedUser />} onClick={openLogout}>
+        <Button
+          pt={10}
+          variant="text"
+          color="inherit"
+          size="small"
+          title="Log out"
+          startIcon={<AccountCircle />}
+          onClick={() => showConfirmLogout(true)}
+        >
           {username}
         </Button>
-        <Logout />
+        <Logout open={confirmLogout} />
       </>
     );
   }

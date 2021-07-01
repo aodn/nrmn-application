@@ -1,4 +1,6 @@
+import React from 'react';
 import AgGridHeader from './custom/header';
+import GridHeader from '../datasheets/GridHeader';
 
 function cell(params) {
   if (params.data?.errors?.length > 0) {
@@ -179,10 +181,8 @@ export const ColumnDef = [
   },
   {
     field: '2-5',
-    headerName: '2.5',
-    invertSize: '0.5',
     editable: true,
-    headerComponentFramework: AgGridHeader,
+    headerComponent: <GridHeader fishSize="2.5" invertSize="0.5" />,
     cellStyle: cell,
     width: 35
   },

@@ -1,35 +1,10 @@
 import React, {useState} from 'react';
-import {Box, Button, Checkbox, FormControlLabel, Grid, LinearProgress, MenuItem, Select, Typography} from '@material-ui/core';
+import {Box, Button, Checkbox, FormControlLabel, Grid, MenuItem, Select, Typography} from '@material-ui/core';
+import LinearProgressWithLabel from '../ui/LinearProgressWithLabel';
 import Alert from '@material-ui/lab/Alert';
 import {DropzoneArea} from 'material-ui-dropzone';
 import {submitJobFile} from '../../axios/api';
-import {PropTypes} from 'prop-types';
 import {NavLink} from 'react-router-dom';
-
-const LinearProgressWithLabel = (props) => {
-  return (
-    <Box>
-      {props.label}
-      <Box display="flex" alignItems="center">
-        <Box width="100%" mr={1}>
-          <LinearProgress variant={props.determinate ? 'determinate' : 'indeterminate'} value={props.value} />
-        </Box>
-        <Box minWidth={35}>
-          <Typography variant="body2" color="textSecondary">
-            {props.done ? 'Done' : props.value >= 0 ? `${Math.round(props.value)}%` : ''}
-          </Typography>
-        </Box>
-      </Box>
-    </Box>
-  );
-};
-
-LinearProgressWithLabel.propTypes = {
-  label: PropTypes.string.isRequired,
-  determinate: PropTypes.boolean,
-  done: PropTypes.boolean,
-  value: PropTypes.number
-};
 
 const JobUpload = () => {
   const emptyForm = {file: '', withExtendedSizes: false, programId: 1};
@@ -45,15 +20,17 @@ const JobUpload = () => {
 
   return (
     <>
-      {uploadProgress < 0 ? (
-        <NavLink to="/jobs" color="secondary">
-          {'<< Back to Jobs'}
-        </NavLink>
-      ) : (
-        <NavLink onClick={resetForm} to="/upload" color="secondary">
-          {'<< Back to Upload'}
-        </NavLink>
-      )}
+      <Box m={1}>
+        {uploadProgress < 0 ? (
+          <NavLink to="/jobs" color="secondary">
+            <Typography>{'<< Back to Jobs'}</Typography>
+          </NavLink>
+        ) : (
+          <NavLink onClick={resetForm} to="/upload" color="secondary">
+            <Typography>{'<< Back to Upload'}</Typography>
+          </NavLink>
+        )}
+      </Box>
       <Grid container justify="center">
         <Box style={{background: 'white', width: 800}} boxShadow={1} margin={3} padding={3}>
           <Grid container alignItems="flex-start" direction="row">
@@ -68,6 +45,7 @@ const JobUpload = () => {
                   <Box padding={3}>
                     <DropzoneArea
                       showFileNames
+                      showAlerts={false}
                       dropzoneText={!formData.file ? 'Drop an XLSX file here or click to select' : ''}
                       style={{height: '20px'}}
                       acceptedFiles={['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
@@ -104,9 +82,7 @@ const JobUpload = () => {
                 <Grid item xs={12}>
                   <Box p={3}>
                     <Button
-                      variant="contained"
                       disabled={!formData.file}
-                      color="primary"
                       style={{width: '100%'}}
                       onClick={() =>
                         submitJobFile(formData, setUploadProgress).then(({response}) => {
@@ -150,7 +126,7 @@ const JobUpload = () => {
                         </Alert>
                         <Box pt={5}>
                           <NavLink onClick={resetForm} to="/upload" color="secondary">
-                            {'<< Back to Upload'}
+                            <Typography>{'<< Back to Upload'}</Typography>
                           </NavLink>
                         </Box>
                       </>
@@ -161,17 +137,12 @@ const JobUpload = () => {
                           {formData.file.name} added.
                         </Alert>
                         <Box pt={5} px={15}>
-                          <Button
-                            variant="contained"
-                            style={{width: '100%'}}
-                            component={NavLink}
-                            to={`/validation/${uploadResponse.file.jobId}`}
-                          >
+                          <Button style={{width: '100%'}} component={NavLink} to={`/validation/${uploadResponse.file.jobId}`}>
                             View {formData.file.name}
                           </Button>
                         </Box>
                         <Box py={3} px={15}>
-                          <Button variant="contained" style={{width: '100%'}} component={NavLink} to="/jobs">
+                          <Button style={{width: '100%'}} component={NavLink} to="/jobs">
                             View All Jobs
                           </Button>
                         </Box>

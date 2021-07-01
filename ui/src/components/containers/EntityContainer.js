@@ -1,13 +1,15 @@
 import React from 'react';
-import {Box, Grid} from '@material-ui/core';
+import {Box, Grid, Typography} from '@material-ui/core';
 import {NavLink} from 'react-router-dom';
 import {PropTypes} from 'prop-types';
 
 const EntityContainer = (props) => (
   <>
-    <NavLink to={props.goBackTo} color="secondary">
-      {'<< Back to ' + props.name}
-    </NavLink>
+    <Box m={1}>
+      <NavLink to={props.goBackTo} color="secondary">
+        <Typography>{'<< Back to ' + props.name}</Typography>
+      </NavLink>
+    </Box>
     <Grid container justify="center">
       {props.header}
       <Box style={{background: 'white', width: 900}} boxShadow={1} margin={3} padding={3}>
