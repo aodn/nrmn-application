@@ -29,33 +29,6 @@ const useStyles = makeStyles((theme) => {
     },
     invertSize: {
       color: '#da9694'
-    },
-    agGrid: {
-      '& .ag-cell[role="gridcell"]': {
-        borderRight: '1px solid #ccc',
-        padding: '0 2px !important',
-        lineHeight: '20px !important'
-      },
-      '& .ag-header-cell[role="columnheader"]': {
-        padding: '0 6px',
-        borderLeft: '0px solid #ccc',
-        borderTop: '1px solid #ccc',
-        borderRight: '1px solid #ccc'
-      },
-      '& .ag-row[role="row"]': {
-        borderLeft: '2px solid #eee',
-        borderRight: '2px solid #eee'
-      },
-      '& .ag-row-last[role="row"]': {
-        borderBottom: '2px solid #eee'
-      },
-      '& .ag-header-row[role="row"]': {
-        borderLeft: '2px solid #eee',
-        borderRight: '2px solid #eee'
-      },
-      '& .ag-tool-panel-wrapper': {
-        width: '350px'
-      }
     }
   };
 });

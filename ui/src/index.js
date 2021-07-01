@@ -5,6 +5,7 @@ import {Provider} from 'react-redux';
 import store from './components/store';
 import {apiDefinition} from './axios/api';
 import config from 'react-global-configuration';
+import './index.css';
 
 window.setApplicationError = (message, error) => {
   if (message) {
