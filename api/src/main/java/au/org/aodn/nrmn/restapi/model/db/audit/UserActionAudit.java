@@ -1,15 +1,25 @@
 package au.org.aodn.nrmn.restapi.model.db.audit;
 
-import lombok.*;
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 import org.apache.logging.log4j.ThreadContext;
-import org.hibernate.envers.Audited;
 import org.springframework.security.core.Authentication;
 
-import javax.persistence.*;
-import java.sql.Timestamp;
-import java.util.Objects;
-
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @NoArgsConstructor

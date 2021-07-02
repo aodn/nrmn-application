@@ -1,17 +1,16 @@
 package au.org.aodn.nrmn.restapi.validation.summary;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
 import au.org.aodn.nrmn.restapi.dto.stage.ErrorMsgSummary;
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import lombok.val;
-import org.springframework.stereotype.Component;
-
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 public class DefaultSummary {

@@ -16,9 +16,6 @@ public class SurveyTestData {
     private SurveyRepository surveyRepository;
 
     @Autowired
-    private SurveyMethodTestData surveyMethodTestData;
-
-    @Autowired
     private SiteTestData siteTestData;
 
     @Autowired

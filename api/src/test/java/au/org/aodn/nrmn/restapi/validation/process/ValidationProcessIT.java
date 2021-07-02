@@ -29,8 +29,6 @@ public class ValidationProcessIT {
     private ValidationProcess validationProcess;
 
     @Autowired
-    private StagedJobTestData stagedJobTestData;
-    @Autowired
     private ProgramTestData ptd;
 
     @Autowired

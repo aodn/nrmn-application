@@ -1,12 +1,11 @@
 package au.org.aodn.nrmn.restapi.validation.validators.formatted;
 
-import au.org.aodn.nrmn.restapi.validation.validators.row.formatted.SpeciesNotSuperseeded;
-import lombok.val;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
+import au.org.aodn.nrmn.restapi.validation.validators.row.formatted.SpeciesNotSuperseeded;
+import lombok.val;
 
 class SpeciesNotSuperseededTest extends FormattedTestProvider {
 

@@ -1,15 +1,14 @@
 package au.org.aodn.nrmn.restapi.validation.validators.row.formatted;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import java.util.Optional;
+
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
-import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
 import cyclops.control.Validated;
 import lombok.val;
-
-import java.util.Optional;
 
 public class SpeciesAbundanceCheck extends BaseFormattedValidator {
     public SpeciesAbundanceCheck() {

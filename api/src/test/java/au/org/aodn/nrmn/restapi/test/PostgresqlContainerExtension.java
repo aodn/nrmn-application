@@ -19,11 +19,12 @@ public class PostgresqlContainerExtension implements Extension {
             DockerImageName postgisImage = DockerImageName
                     .parse("mdillon/postgis:9.6")
                     .asCompatibleSubstituteFor("postgres");
-            PostgreSQLContainer container = new PostgreSQLContainer(postgisImage);
+            PostgreSQLContainer container = new PostgreSQLContainer<>(postgisImage);
             container.start();
             System.setProperty("DB_URL", container.getJdbcUrl());
             System.setProperty("DB_USERNAME", container.getUsername());
             System.setProperty("DB_PASSWORD", container.getPassword());
+            container.close();
         } catch (Throwable t) {
             logger.error("Couldn't start postgis container", t);
         }

@@ -53,7 +53,7 @@ public class AuthController {
 
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     @PostMapping(path = "/signout", consumes = "application/json", produces = "application/json")
-    public ResponseEntity logOutUser(
+    public ResponseEntity<Object> logOutUser(
             Authentication authentication,
             @RequestHeader(name = "Authorization") String bearerToken) {
         val timeStamp = System.currentTimeMillis();
@@ -74,7 +74,7 @@ public class AuthController {
     }
 
     @PostMapping(path = "/signin", consumes = "application/json", produces = "application/json")
-    public ResponseEntity authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         logger.info(LogInfo.withContext("login attempt"));
         userAuditRepo.save(
                 new UserActionAudit("signin", "login attempt for username: " + loginRequest.getUsername()));
@@ -93,12 +93,12 @@ public class AuthController {
     }
 
     @PostMapping(path = "/signup", consumes = "application/json", produces = "application/json")
-    public ResponseEntity registerUser(@Valid @RequestBody SignUpRequest signUpRequestDto) {
+    public ResponseEntity<Object> registerUser(@Valid @RequestBody SignUpRequest signUpRequestDto) {
 
         userAuditRepo.save(new UserActionAudit("registerUser", signUpRequestDto.toString()));
 
         val validedUSer = userService.createUser(signUpRequestDto);
-        ResponseEntity<?> response = validedUSer.fold(
+        ResponseEntity<Object> response = validedUSer.fold(
                 (err) -> {
                     logger.info("Error while signup");
                     return ResponseEntity.unprocessableEntity().body(err);

@@ -1,12 +1,12 @@
 package au.org.aodn.nrmn.restapi.validation.validators.row.data;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.validation.validators.row.data.DirectionDataCheck;
-import lombok.val;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import au.org.aodn.nrmn.restapi.model.db.StagedJob;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import lombok.val;
 
 class DirectionDataCheckTest {
     @Test

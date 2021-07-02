@@ -1,5 +1,11 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
+import java.util.Collections;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import au.org.aodn.nrmn.restapi.dto.stage.RowErrors;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
@@ -8,7 +14,6 @@ import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowErrorRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
-import au.org.aodn.nrmn.restapi.util.OptionalUtil;
 import au.org.aodn.nrmn.restapi.util.ValidatorHelpers;
 import au.org.aodn.nrmn.restapi.validation.model.MonoidRowValidation;
 import au.org.aodn.nrmn.restapi.validation.summary.DefaultSummary;
@@ -17,11 +22,6 @@ import cyclops.companion.Semigroups;
 import cyclops.data.Seq;
 import cyclops.data.tuple.Tuple2;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.Collections;
-import java.util.stream.Collectors;
 
 @Component
 public class ValidationProcess extends ValidatorHelpers {
