@@ -67,7 +67,7 @@ public class PQSurveyService {
 
         surveyRepository.saveAll(updatedSurveys);
 
-        logger.info(String.format("Updates PQ zip file urls for %s surveys", updatedSurveys.size()));
+        logger.info(String.format("Updates PQ zip file urls for %d surveys", updatedSurveys.size()));
 
     }
 }
