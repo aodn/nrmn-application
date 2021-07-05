@@ -17,7 +17,6 @@ const focusCell = (api, column, ids) => {
       }
     });
   }
-  api.redrawRows();
 };
 
 const ValidationPanel = (props) => {
@@ -58,6 +57,17 @@ const ValidationPanel = (props) => {
   const blocking = errList.filter((e) => e.blocking);
   const warning = errList.filter((e) => !e.blocking);
 
+  const handleItemClick = (item) => {
+    if (item.ids) {
+      focusCell(props.api, mapColumnTargetToGridColumn(item.columnTarget), item.ids);
+    } else if (item.row) {
+      props.api.setFilterModel(null);
+      const rowIdx = props.api.gridOptionsWrapper.gridOptions.context.rowData.findIndex((r) => r.id === item.row);
+      props.api.ensureIndexVisible(rowIdx, 'middle');
+    }
+    props.api.redrawRows();
+  };
+
   return (
     <Box m={2} mr={4}>
       <Button onClick={() => props.api.setFilterModel(null)}>Reset</Button>
@@ -72,16 +82,7 @@ const ValidationPanel = (props) => {
           <AccordionDetails>
             <List>
               {err.value.map((item, i) => (
-                <ListItem
-                  key={i}
-                  onClick={() => {
-                    if (item.ids) {
-                      focusCell(props.api, mapColumnTargetToGridColumn(item.columnTarget), item.ids);
-                    }
-                  }}
-                  style={{backgroundColor: '#ffcdd2'}}
-                  button
-                >
+                <ListItem key={i} onClick={() => handleItemClick(item)} style={{backgroundColor: '#ffcdd2'}} button>
                   <ListItemText color="secondary" primary={item.message} />
                 </ListItem>
               ))}
@@ -108,16 +109,7 @@ const ValidationPanel = (props) => {
           <AccordionDetails>
             <List>
               {err.value.map((item, i) => (
-                <ListItem
-                  onClick={() => {
-                    if (item.ids) {
-                      focusCell(props.api, mapColumnTargetToGridColumn(item.columnTarget), item.ids);
-                    }
-                  }}
-                  style={{backgroundColor: '#ffe0b2'}}
-                  key={i}
-                  button
-                >
+                <ListItem onClick={() => handleItemClick(item)} style={{backgroundColor: '#ffe0b2'}} key={i} button>
                   <ListItemText color="secondary" primary={item.message} />
                 </ListItem>
               ))}

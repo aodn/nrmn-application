@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DuplicateRowCheck extends BaseGlobalFormattedValidator {
+
     public DuplicateRowCheck() {
         super("Duplicates");
     }
@@ -36,10 +37,9 @@ public class DuplicateRowCheck extends BaseGlobalFormattedValidator {
                 .map(duplicateRow ->
                         invalid(
                                 job.getId(),
-                                String.format("Row %s may be a duplicate of row %s.",
-                                        duplicateRow.getRef().getPos(),
-                                        duplicateRow.getRef().getPos() - 1),
-                                ValidationLevel.WARNING)
+                                "Row may be a duplicate of the preceding row",
+                                ValidationLevel.WARNING,
+                                duplicateRow)
                 ).reduce(Validated.valid(""), (acc, elem) -> acc.combine(Monoids.stringConcat, elem));
     }
 }

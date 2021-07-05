@@ -19,17 +19,17 @@ public abstract class BaseGlobalFormattedValidator {
 
     abstract public Validated<StagedRowError, String> valid(StagedJob job, List<StagedRowFormatted> rows );
 
-    protected Validated<StagedRowError, String> invalid(Long id, String message, ValidationLevel level) {
+    protected Validated<StagedRowError, String> invalid(Long id, String message, ValidationLevel level, StagedRowFormatted targetRow) {
         return Validated.invalid(
                 new StagedRowError(
                         new ErrorID(
-                                null,
+                                targetRow != null ? targetRow.getRef().getId() : null,
                                 id,
                                 message),
                         ValidationCategory.GLOBAL,
                         level,
                         ruleName,
-                        null
+                        targetRow != null ? targetRow.getRef() : null
                 ));
     }
 }

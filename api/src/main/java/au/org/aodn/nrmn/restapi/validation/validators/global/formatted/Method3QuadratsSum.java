@@ -71,7 +71,8 @@ public class Method3QuadratsSum extends BaseGlobalFormattedValidator {
                         invalid(
                                 job.getId(),
                                 "Transect: " + transectQuadrats._1() + " quadrats sum under 50.",
-                                ValidationLevel.BLOCKING)
+                                ValidationLevel.BLOCKING,
+                                null)
                 ).reduce(Validated.valid(""), (acc, elem) -> acc.combine(Monoids.stringConcat, elem));
     }
 }

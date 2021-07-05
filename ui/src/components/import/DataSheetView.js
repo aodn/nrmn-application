@@ -7,6 +7,7 @@ import {
   PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon,
   SaveOutlined as SaveOutlinedIcon
 } from '@material-ui/icons/';
+import {red, orange, yellow, grey, lightGreen} from '@material-ui/core/colors';
 import {NavLink} from 'react-router-dom';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
@@ -21,14 +22,14 @@ import {exportRow, importRow, SubmitingestRequested} from './reducers/create-imp
 import LinearProgressWithLabel from '../ui/LinearProgressWithLabel';
 import AlertDialog from '../ui/AlertDialog';
 
-const useStyles = makeStyles((theme) => {
+const useStyles = makeStyles(() => {
   return {
     fishSize: {
-      color: '#c4d79b',
-      borderBottom: '1px solid ' + theme.palette.divider
+      color: red[200],
+      borderBottom: '1px solid '
     },
     invertSize: {
-      color: '#da9694'
+      color: lightGreen[200]
     }
   };
 });
@@ -85,6 +86,7 @@ const context = {
   undoStack: [],
   summaries: [],
   errors: [],
+  globalErrors: [],
   pushUndo: pushUndo,
   popUndo: popUndo,
 
@@ -132,6 +134,7 @@ const DataSheetView = ({jobId}) => {
     gridApi.showLoadingOverlay();
     gridApi.setFilterModel(null);
     context.errors = [];
+    context.globalErrors = [];
     validateJob(jobId, (result) => {
       context.validationResults = result.data;
 
@@ -150,8 +153,9 @@ const DataSheetView = ({jobId}) => {
       }, context.errors);
 
       result.data.errorGlobal.reduce((a, e) => {
-        const rowData = {columnTarget: '', message: e.message, level: e.errorLevel};
+        const rowData = {row: e.rowId, columnTarget: '', message: e.message, level: e.errorLevel};
         a[e.columnTarget]?.length > 0 ? a[e.columnTarget].push(rowData) : (a[e.columnTarget] = [rowData]);
+        context.globalErrors.push({rowId: e.rowId, type: e.errorLevel, message: e.message});
         return a;
       }, result.data.summaries);
 
@@ -423,9 +427,21 @@ const DataSheetView = ({jobId}) => {
   };
 
   const chooseCellStyle = (params) => {
-    if (params.colDef.field === 'row') return {color: 'grey'};
+    // Highlight global validations
+    const global = params.context.globalErrors.find((g) => g.rowId === params.data.id);
+    if (global) {
+      let color = params.colDef.field === 'row' ? grey[500] : grey[900];
+      if (global.type === 'BLOCKING') return {color: color, backgroundColor: red[100]};
+      if (global.type === 'WARNING') return {color: color, backgroundColor: orange[100]};
+    }
+
+    // Grey-out the first  column containing the row number
+    if (params.colDef.field === 'row') return {color: grey[500]};
+
+    // Highlight and search results
     const row = params.context.highlighted[params.rowIndex];
-    if (row && row[params.colDef.field]) return {backgroundColor: '#fff9c4'};
+    if (row && row[params.colDef.field]) return {backgroundColor: yellow[100]};
+
     // HACK: to work around the fact that invert validation returns the column as an invert size
     // and NOT as the row data column name.
     let fieldName = params.colDef.field.toUpperCase();
@@ -435,9 +451,13 @@ const DataSheetView = ({jobId}) => {
         fieldName = invertSizeMap.field;
       }
     }
+
+    // Highlight cell validations
     const error = params.context.errors.find((e) => e.row === params.data.id && e.column.toUpperCase() === fieldName);
-    if (error?.type === 'BLOCKING') return {backgroundColor: '#ffcdd2'};
-    if (error?.type === 'WARNING') return {backgroundColor: '#fff9c4'};
+    if (error) {
+      if (error.type === 'BLOCKING') return {backgroundColor: red[100]};
+      if (error.type === 'WARNING') return {backgroundColor: orange[100]};
+    }
     return null;
   };
 
@@ -446,12 +466,10 @@ const DataSheetView = ({jobId}) => {
   };
 
   const toolTipValueGetter = (e) => {
-    const error = e.context.errors.find((r) => r.row === e.data.id && e.column.colId.toUpperCase() === r.column.toUpperCase());
-    if (error) {
-      return error.message;
-    } else {
-      return null;
-    }
+    const error =
+      e.context.errors.find((r) => r.row === e.data.id && e.column.colId.toUpperCase() === r.column.toUpperCase()) ||
+      e.context.globalErrors.find((g) => e.data.id === g.rowId);
+    return error?.message;
   };
 
   return (
