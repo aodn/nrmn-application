@@ -57,9 +57,9 @@ const FindReplacePanel = (props) => {
   const highlightNextResult = () => {
     if (context.findResults.length < 1) return;
     const result = context.findResults.shift();
-    props.api.setFocusedCell(result.row, result.col);
     props.api.ensureIndexVisible(result.row);
     props.api.ensureColumnVisible(result.col);
+    props.api.setFocusedCell(result.row, result.col);
     context.findResults.push(result);
   };
 
