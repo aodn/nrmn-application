@@ -62,4 +62,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
                 "(?#{#f.speciesId}  IS NULL OR v.species_id  = (CAST (CAST(?#{#f.speciesId} AS character varying) AS integer))) "              + 
                 "ORDER BY surveyDate DESC", nativeQuery = true)
         List<SurveyRow> findByCriteria(@Param("f") SurveyFilterDto surveyFilter);
+
+        @Query("SELECT s FROM Survey s WHERE s.surveyId IN :ids AND s.pqCatalogued = false")
+        List<Survey> findSurveysWithoutPQ(@Param("ids") List<Integer> ids);
 }

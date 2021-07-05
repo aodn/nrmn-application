@@ -42,6 +42,7 @@ const ExtractTemplateData = () => {
   const downloadZip = (params) => {
     templateZip(qs.stringify(params, {indices: false})).then((result) => {
       FileDownload(result.data, `template.zip`);
+      setDownloadParams(null);
     });
   };
 
