@@ -12,8 +12,9 @@ const useStyles = makeStyles(() => {
   };
 });
 
-const stringCompare = (source, target, matchCase) => {
+const stringCompare = (source, target, matchCase, matchWholeString) => {
   if (typeof source !== 'string' || typeof target !== 'string' || source.length === 0 || target.length === 0) return -1;
+  if (matchWholeString) return source.normalize() === target.normalize() ? 0 : -1;
   if (matchCase) return source.indexOf(target);
   else return source.toUpperCase().indexOf(target.toUpperCase());
 };
@@ -21,6 +22,8 @@ const stringCompare = (source, target, matchCase) => {
 const FindReplacePanel = (props) => {
   const [matchCase, setMatchCase] = useState(false);
   const [matchColumn, setMatchColumn] = useState(false);
+  const [matchCell, setMatchCell] = useState(false);
+  const [inProgress, setInProgress] = useState(false);
 
   const [status, setStatus] = useState('');
   const [findString, setFindString] = useState('');
@@ -35,8 +38,10 @@ const FindReplacePanel = (props) => {
   const context = props.agGridReact.gridOptions.context;
 
   const reset = () => {
+    setInProgress(false);
     setStatus('');
     setFindString('');
+    setReplaceString('');
     setCurrentFindString('');
     context.findResults = [];
     context.highlighted = [];
@@ -66,13 +71,15 @@ const FindReplacePanel = (props) => {
     context.findResults = [];
     context.highlighted = [];
     props.api.forEachNodeAfterFilterAndSort((node) => {
-      for (let column in node.data) {
-        if (matchColumn && !selectedColumns.includes(column)) continue;
-        const idx = stringCompare(node.data[column].toString(), findString, matchCase);
+      for (let columnIdx in node.columnApi.columnController.columnDefs) {
+        const columnDef = node.columnApi.columnController.columnDefs[columnIdx];
+        const fieldValue = node.data[columnDef.field];
+        if ((matchColumn && !selectedColumns.includes(columnDef.field)) || !fieldValue || columnDef.editable === false) continue;
+        const idx = stringCompare(fieldValue.toString(), findString, matchCase, matchCell);
         if (idx >= 0) {
           context.highlighted[node.rowIndex] = context.highlighted[node.rowIndex] || [];
-          context.highlighted[node.rowIndex][column] = true;
-          context.findResults.push({row: node.rowIndex, col: column});
+          context.highlighted[node.rowIndex][columnDef.field] = true;
+          context.findResults.push({row: node.rowIndex, col: columnDef.field});
         }
       }
     });
@@ -83,6 +90,7 @@ const FindReplacePanel = (props) => {
   };
 
   const onFind = () => {
+    setInProgress(true);
     if (findString !== currentFindString) findInGrid(findString, matchCase);
     highlightNextResult();
   };
@@ -96,7 +104,11 @@ const FindReplacePanel = (props) => {
       newRow[key] = row.data[key];
       oldRow[key] = row.data[key];
     });
-    newRow[focusedCell.column.colId] = replaceString;
+
+    const colId = focusedCell.column.colId;
+    const findRegex = new RegExp(findString, matchCase ? 'g' : 'gi');
+    newRow[colId] = matchCell ? replaceString : oldRow[colId].replace(findRegex, replaceString);
+
     context.pushUndo(props.api, [oldRow]);
     const rowIndex = context.rowData.findIndex((r) => r.id === row.id);
     context.rowData[rowIndex] = newRow;
@@ -109,6 +121,7 @@ const FindReplacePanel = (props) => {
       <Button onClick={reset}>Reset</Button>
       <TextField
         placeholder="Find.."
+        autoFocus={false}
         className={classes.textfield}
         value={findString}
         onChange={(e) => {
@@ -122,6 +135,7 @@ const FindReplacePanel = (props) => {
         placeholder="Replace With.."
         className={classes.textfield}
         value={replaceString}
+        autoFocus={false}
         onChange={(e) => {
           setReplaceString(e.target.value);
         }}
@@ -132,12 +146,17 @@ const FindReplacePanel = (props) => {
       <FormControlLabel
         label="Match case"
         className={classes.checkbox}
-        control={<Checkbox checked={matchCase} onChange={(e) => setMatchCase(e.target.checked)} />}
+        control={<Checkbox disabled={inProgress} checked={matchCase} onChange={(e) => setMatchCase(e.target.checked)} />}
       />
       <FormControlLabel
         label="Only this column"
         className={classes.checkbox}
-        control={<Checkbox checked={matchColumn} onChange={(e) => setMatchColumn(e.target.checked)} />}
+        control={<Checkbox disabled={inProgress} checked={matchColumn} onChange={(e) => setMatchColumn(e.target.checked)} />}
+      />
+      <FormControlLabel
+        label="Match whole cell"
+        className={classes.checkbox}
+        control={<Checkbox disabled={inProgress} checked={matchCell} onChange={(e) => setMatchCell(e.target.checked)} />}
       />
       <Box className={classes.status}>{status}</Box>
     </Box>
