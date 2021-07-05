@@ -68,7 +68,7 @@ public class Method3QuadratsMissing extends BaseGlobalFormattedValidator {
         }
 
         return transectSumQuadratsMissing.stream().map(keyQuadrats ->
-             invalid(job.getId(),keyQuadrats._1() + ": missing quadrats", ValidationLevel.BLOCKING)
+             invalid(job.getId(),keyQuadrats._1() + ": missing quadrats", ValidationLevel.BLOCKING, null)
         ).reduce(Validated.valid(""),(acc, error) ->acc.combine(Monoids.stringConcat, error));
     }
 }
