@@ -37,7 +37,7 @@ public class DuplicateRowCheck extends BaseGlobalFormattedValidator {
                 .map(duplicateRow ->
                         invalid(
                                 job.getId(),
-                                "Row may be a duplicate of preceding row",
+                                "Row may be a duplicate of the preceding row",
                                 ValidationLevel.WARNING,
                                 duplicateRow)
                 ).reduce(Validated.valid(""), (acc, elem) -> acc.combine(Monoids.stringConcat, elem));
