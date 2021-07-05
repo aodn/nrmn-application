@@ -155,7 +155,7 @@ const DataSheetView = ({jobId}) => {
       result.data.errorGlobal.reduce((a, e) => {
         const rowData = {row: e.rowId, columnTarget: '', message: e.message, level: e.errorLevel};
         a[e.columnTarget]?.length > 0 ? a[e.columnTarget].push(rowData) : (a[e.columnTarget] = [rowData]);
-        context.globalErrors.push({rowId: e.rowId, type: e.errorLevel});
+        context.globalErrors.push({rowId: e.rowId, type: e.errorLevel, message: e.message});
         return a;
       }, result.data.summaries);
 
@@ -466,12 +466,10 @@ const DataSheetView = ({jobId}) => {
   };
 
   const toolTipValueGetter = (e) => {
-    const error = e.context.errors.find((r) => r.row === e.data.id && e.column.colId.toUpperCase() === r.column.toUpperCase());
-    if (error) {
-      return error.message;
-    } else {
-      return null;
-    }
+    const error =
+      e.context.errors.find((r) => r.row === e.data.id && e.column.colId.toUpperCase() === r.column.toUpperCase()) ||
+      e.context.globalErrors.find((g) => e.data.id === g.rowId);
+    return error?.message;
   };
 
   return (

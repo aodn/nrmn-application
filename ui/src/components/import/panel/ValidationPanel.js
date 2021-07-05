@@ -61,6 +61,7 @@ const ValidationPanel = (props) => {
     if (item.ids) {
       focusCell(props.api, mapColumnTargetToGridColumn(item.columnTarget), item.ids);
     } else if (item.row) {
+      props.api.setFilterModel(null);
       const rowIdx = props.api.gridOptionsWrapper.gridOptions.context.rowData.findIndex((r) => r.id === item.row);
       props.api.ensureIndexVisible(rowIdx, 'middle');
     }
