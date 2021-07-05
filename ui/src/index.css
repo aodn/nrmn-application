@@ -1,30 +1,30 @@
 #validation-grid .ag-cell[role="gridcell"] {
-  border-right: 1px solid #ccc !important;
-  padding: 0 2px !important;
-  line-height: 20px !important;
-};
+  border-right: 1px solid #ccc;
+  padding: 0 2px;
+  line-height: 20px;
+}
 
 #validation-grid .ag-header-cell[role="columnheader"] {
   padding: 0 6px;
   border-left: 0px solid #ccc;
   border-top: 1px solid #ccc;
   border-right: 1px solid #ccc;
-};
+}
 
-#validation-grid  .ag-row[role="row"] {
+#validation-grid .ag-row[role="row"] {
   border-left: 2px solid #eee;
   border-right: 2px solid #eee;
-};
+}
 
-#validation-grid  .ag-row-last[role="row"] {
+#validation-grid .ag-row-last[role="row"] {
   border-bottom: 2px solid #eee;
-};
+}
 
-#validation-grid  .ag-header-row[role="row"] {
+#validation-grid .ag-header-row[role="row"] {
   border-left: 2px solid #eee;
   border-right: 2px solid #eee;
-};
+}
 
 #validation-grid .ag-tool-panel-wrapper {
   width: 350px;
-};
+}
