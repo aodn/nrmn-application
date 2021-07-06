@@ -16,6 +16,8 @@ public class SpeciesDto {
 
     private String status;
 
+    private String unacceptReason;
+
     private String genus;
 
     @JsonProperty("species")

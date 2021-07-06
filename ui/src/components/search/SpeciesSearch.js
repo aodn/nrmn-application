@@ -205,9 +205,10 @@ const SpeciesSearch = () => {
             }}
             onRowClick={(params) => {
               const supersededBy = params.row.supersededBy;
+              const unacceptReason = params.row.unacceptReason;
               const isPresent = params.row.isPresent;
               if (supersededBy) {
-                setInfo(`This species has been superseded by ${supersededBy}`);
+                setInfo(`This species has been superseded by ${supersededBy}` + (unacceptReason != null ? ` (Reason: ${unacceptReason})` : ''));
               } else if (isPresent) {
                 setInfo('This species name exists in the NRMN database');
               } else {
