@@ -56,19 +56,19 @@ const pushUndo = (api, delta) => {
 
 const popUndo = (api) => {
   const ctx = api.gridOptionsWrapper.gridOptions.context;
-  const delta = ctx.undoStack.pop();
+  const deltaSet = ctx.undoStack.pop();
   let rowData = ctx.rowData;
-  for (const i in delta) {
-    ctx.putRowIds.pop();
-    if (delta[i].action === 0) {
-      const j = rowData.findIndex((d) => d.id == delta[i].id);
-      rowData.splice(j, 1);
+  for (const deltaIdx in deltaSet) {
+    const deltaId = deltaSet[deltaIdx].id;
+    ctx.putRowIds.push(deltaId);
+    const rowIdx = rowData.findIndex((d) => d.id === deltaId);
+    if (Object.keys(deltaSet[deltaIdx]).length < 2) {
+      rowData.splice(rowIdx, 1);
     } else {
-      const j = rowData.findIndex((d) => d.id == delta[i].id);
-      if (j < 0) {
-        rowData.push(delta[i]);
+      if (rowIdx < 0) {
+        rowData.push(deltaSet[deltaIdx]);
       } else {
-        rowData[j] = delta[i];
+        rowData[rowIdx] = deltaSet[deltaIdx];
       }
     }
   }
