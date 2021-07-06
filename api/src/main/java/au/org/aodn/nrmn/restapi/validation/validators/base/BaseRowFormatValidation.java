@@ -1,17 +1,16 @@
 package au.org.aodn.nrmn.restapi.validation.validators.base;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
+import java.util.function.Function;
+
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.util.ConsumerThrowable;
-import au.org.aodn.nrmn.restapi.validation.validators.base.BaseRowValidator;
-import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import cyclops.companion.Functions;
 import cyclops.control.Try;
 import cyclops.control.Validated;
-
-import java.util.function.Function;
 
 
 public abstract class BaseRowFormatValidation<T> extends BaseRowValidator {

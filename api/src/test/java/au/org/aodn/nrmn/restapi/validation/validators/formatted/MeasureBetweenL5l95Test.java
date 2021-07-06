@@ -1,17 +1,17 @@
 package au.org.aodn.nrmn.restapi.validation.validators.formatted;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow.StagedRowBuilder;
-import au.org.aodn.nrmn.restapi.validation.validators.row.formatted.MeasureBetweenL5l95;
-import lombok.val;
-import org.junit.jupiter.api.Test;
-import software.amazon.awssdk.utils.ImmutableMap;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+
+import au.org.aodn.nrmn.restapi.model.db.StagedJob;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
+import au.org.aodn.nrmn.restapi.validation.validators.row.formatted.MeasureBetweenL5l95;
+import lombok.val;
+import software.amazon.awssdk.utils.ImmutableMap;
 
 class MeasureBetweenL5l95Test extends FormattedTestProvider{
 

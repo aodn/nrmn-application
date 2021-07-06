@@ -1,20 +1,23 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import org.hibernate.annotations.Cache;
+import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
+
+import java.sql.Timestamp;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import java.sql.Timestamp;
 
-import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
+import org.hibernate.annotations.Cache;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Cache(region = "entities", usage = READ_WRITE)

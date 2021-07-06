@@ -1,15 +1,15 @@
 package au.org.aodn.nrmn.restapi.validation.validators.row.data;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.validation.validators.row.data.SpeciesNotFoundCheck;
-import lombok.val;
-import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
+
+import au.org.aodn.nrmn.restapi.model.db.StagedJob;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import lombok.val;
 
 class SpeciesNotFoundCheckTest {
 

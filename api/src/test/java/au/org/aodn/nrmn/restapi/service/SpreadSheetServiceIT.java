@@ -20,6 +20,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
@@ -45,7 +46,7 @@ public class SpreadSheetServiceIT {
         public static S3Client client;
 
         @Container
-        static public LocalStackContainer localstack = new LocalStackContainer().withServices(S3);
+        static public LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse("localstack/localstack:0.12.14")).withServices(S3);
 
         @BeforeAll
         static public void setup() {

@@ -1,10 +1,14 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
-import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
-import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
-import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
-import lombok.val;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +19,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
+import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
+import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
+import lombok.val;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
         pattern = ".*TestData"))

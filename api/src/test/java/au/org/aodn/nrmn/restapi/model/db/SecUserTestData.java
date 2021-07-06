@@ -1,18 +1,16 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import java.util.Collections;
+import java.util.HashSet;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import au.org.aodn.nrmn.restapi.model.db.SecUser.SecUserBuilder;
 import au.org.aodn.nrmn.restapi.model.db.enums.SecUserStatus;
 import au.org.aodn.nrmn.restapi.repository.SecRoleRepository;
 import au.org.aodn.nrmn.restapi.repository.SecUserRepository;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import au.org.aodn.nrmn.restapi.model.db.SecUser.SecUserBuilder;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.stream.Collectors;
 
 @Component
 public class SecUserTestData {

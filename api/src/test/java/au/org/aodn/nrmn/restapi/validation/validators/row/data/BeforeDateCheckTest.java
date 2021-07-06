@@ -1,16 +1,16 @@
 package au.org.aodn.nrmn.restapi.validation.validators.row.data;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
-import au.org.aodn.nrmn.restapi.validation.validators.row.data.BeforeDateCheck;
-import lombok.val;
-import org.junit.jupiter.api.Test;
+import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import au.org.aodn.nrmn.restapi.model.db.StagedJob;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import lombok.val;
 
 class BeforeDateCheckTest {
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");

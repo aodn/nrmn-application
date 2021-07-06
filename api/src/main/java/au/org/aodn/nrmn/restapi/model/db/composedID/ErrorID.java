@@ -1,11 +1,15 @@
 package au.org.aodn.nrmn.restapi.model.db.composedID;
 
-import lombok.*;
-import org.springframework.lang.Nullable;
+import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 //error message unique per cell
 @Embeddable

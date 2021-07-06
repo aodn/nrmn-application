@@ -1,14 +1,15 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.model.db.Site.SiteBuilder;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import com.google.common.collect.ImmutableList;
+import java.util.Arrays;
+
 import com.google.common.collect.ImmutableMap;
-import lombok.val;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import au.org.aodn.nrmn.restapi.model.db.Site.SiteBuilder;
+import au.org.aodn.nrmn.restapi.repository.SiteRepository;
+import lombok.val;
 
 @Component
 public class SiteTestData {

@@ -1,28 +1,32 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.Survey;
-import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
-import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
-import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
-import au.org.aodn.nrmn.restapi.repository.*;
-import au.org.aodn.nrmn.restapi.service.CorrectionService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.val;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import au.org.aodn.nrmn.restapi.model.db.StagedJob;
+import au.org.aodn.nrmn.restapi.model.db.Survey;
+import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
+import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
+import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
+import au.org.aodn.nrmn.restapi.repository.SecUserRepository;
+import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
+import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
+import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
+import au.org.aodn.nrmn.restapi.service.CorrectionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.val;
 
 @RestController
 @RequestMapping(path = "/api/correction")
@@ -48,7 +52,7 @@ public class CorrectionController {
 
     @PostMapping("/correct")
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
-    public ResponseEntity correctSurvey(
+    public ResponseEntity<Long> correctSurvey(
             @RequestParam(value = "surveyIdList") List<Integer> surveyIdList,
             Authentication authentication) {
 

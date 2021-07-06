@@ -1,17 +1,15 @@
 package au.org.aodn.nrmn.restapi.validation.validators.row.formatted;
 
+import java.util.stream.IntStream;
+
 import au.org.aodn.nrmn.restapi.model.db.StagedRowError;
 import au.org.aodn.nrmn.restapi.model.db.composedID.ErrorID;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
-import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.validation.validators.base.BaseFormattedValidator;
 import cyclops.control.Validated;
 import lombok.val;
-
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class Method3QuadratMax50 extends BaseFormattedValidator {
     public Method3QuadratMax50() {
