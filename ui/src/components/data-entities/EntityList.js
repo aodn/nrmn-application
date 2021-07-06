@@ -36,15 +36,6 @@ const renderError = (msgArray) => {
   );
 };
 
-const saveFilterModel = (entityName, filterModel) => {
-  window[`AgGrid-FilterModel-${entityName}`] = JSON.stringify(filterModel);
-};
-
-const restoreFilterModel = (entityName) => {
-  const serialisedFilter = window[`AgGrid-FilterModel-${entityName}`];
-  return serialisedFilter ? JSON.parse(serialisedFilter) : null;
-};
-
 const EntityList = (props) => {
   const history = useHistory();
   const dispatch = useDispatch();
@@ -66,8 +57,6 @@ const EntityList = (props) => {
       agGridColumnApi.getAllColumns().forEach(function (column) {
         if (props.entity.flexField !== column.colId && column.colId !== '0') allColumnIds.push(column.colId);
       });
-      agGridColumnApi.autoSizeColumns(allColumnIds, false);
-      agGridApi.setFilterModel(restoreFilterModel(props.entity.name));
     }
   }, [agGridApi, agGridColumnApi, items, props.entity]);
 
@@ -84,7 +73,7 @@ const EntityList = (props) => {
           tooltipField: field,
           suppressMovable: true,
           sortable: sortable,
-          flex: field === entity.flexField ? true : false,
+          flex: 1,
           filter: getCellFilter(fieldSchema?.type || 'string')
         });
       }
@@ -231,7 +220,6 @@ const EntityList = (props) => {
           onGridReady={agGridReady}
           onFilterChanged={(e) => {
             const filterModel = e.api.getFilterModel();
-            saveFilterModel(props.entity.name, filterModel);
             setResetFilterDisabled(Object.keys(filterModel)?.length < 1);
           }}
           onCellClicked={(e) => onRowClick(e, history, props.entity)}
