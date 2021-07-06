@@ -12,6 +12,7 @@ import cyclops.data.tuple.Tuple5;
 import lombok.val;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Method3QuadratsSum extends BaseGlobalFormattedValidator {
@@ -22,44 +23,19 @@ public class Method3QuadratsSum extends BaseGlobalFormattedValidator {
     @Override
     public Validated<StagedRowError, String> valid(StagedJob job, List<StagedRowFormatted> rows) {
 
-        val transectsMap = rows.stream()
+        Map<Object, List<StagedRowFormatted>> transectsMaps = rows.stream()
                 .filter(row -> row.getMethod().equals(3))
-                .collect(Collectors.groupingBy(row ->
-                        row.getSite().getSiteCode()
-                                + "/"
-                                + row.getDate()
-                                + "/"
-                                + row.getDepth() + "." + row.getSurveyNum()
-                ));
+                .collect(Collectors.groupingBy(StagedRowFormatted::getTransectName));
 
-        val transectSumQuadratsUnder50 = transectsMap
-                .entrySet().stream()
-                .map(entry ->
-                        Tuple2.of(
-                                entry.getKey(),
-                                entry.getValue()
-                                        .stream().map(row -> Tuple5.of(
-                                        row.getMeasureJson().getOrDefault(1, 0),
-                                        row.getMeasureJson().getOrDefault(2, 0),
-                                        row.getMeasureJson().getOrDefault(3, 0),
-                                        row.getMeasureJson().getOrDefault(4, 0),
-                                        row.getMeasureJson().getOrDefault(5, 0)))
-                                        .reduce(Tuple5.of(0, 0, 0, 0, 0),
-                                                (acc, t) ->
-                                                        Tuple5.of(
-                                                                acc._1() + t._1(),
-                                                                acc._2() + t._2(),
-                                                                acc._3() + t._3(),
-                                                                acc._4() + t._4(),
-                                                                acc._5() + t._5())
-                                        )))
-                .filter(keyValue ->
-                        keyValue._2()._1() < 50 ||
-                                keyValue._2()._2() < 50 ||
-                                keyValue._2()._3() < 50 ||
-                                keyValue._2()._4() < 50 ||
-                                keyValue._2()._5() < 50
-                ).collect(Collectors.toList());
+        List<StagedRowFormatted> transectSumQuadratsUnder50 = transectsMaps.entrySet().stream()
+                .filter(entry ->
+                        entry.getValue().stream().mapToInt(row -> row.getMeasureJson().getOrDefault(1, 0) ).sum() < 50 ||
+                        entry.getValue().stream().mapToInt(row -> row.getMeasureJson().getOrDefault(2, 0) ).sum() < 50 ||
+                        entry.getValue().stream().mapToInt(row -> row.getMeasureJson().getOrDefault(3, 0) ).sum() < 50 ||
+                        entry.getValue().stream().mapToInt(row -> row.getMeasureJson().getOrDefault(4, 0) ).sum() < 50 ||
+                        entry.getValue().stream().mapToInt(row -> row.getMeasureJson().getOrDefault(5, 0) ).sum() < 50)
+                .map(entry -> (StagedRowFormatted) entry.getValue().get(0))
+                .collect(Collectors.toList());
 
         if (transectSumQuadratsUnder50.isEmpty())
             return Validated.valid("all transect quadrats sum above 50");
@@ -70,9 +46,13 @@ public class Method3QuadratsSum extends BaseGlobalFormattedValidator {
                 .map(transectQuadrats ->
                         invalid(
                                 job.getId(),
-                                "Transect: " + transectQuadrats._1() + " quadrats sum under 50.",
+                                transectQuadrats.getTransectName() + " Quadrats sum under 50",
                                 ValidationLevel.BLOCKING,
-                                null)
-                ).reduce(Validated.valid(""), (acc, elem) -> acc.combine(Monoids.stringConcat, elem));
+                                transectQuadrats
+                        )
+                ).reduce(
+                        Validated.valid(""),
+                        (acc, elem) -> acc.combine(Monoids.stringConcat, elem)
+                );
     }
 }
