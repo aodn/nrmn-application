@@ -38,6 +38,7 @@ class RawValidationTest {
         values.put("Species", null);
         values.put("Inverts", Optional.of(0));
         values.put("Diver", Diver.builder().initials("CCJ").build());
+        values.put("P-Qs", Diver.builder().initials("CCJ").build());
         values.put("IsInvertSizing", Optional.of(false));
         values.put("Direction", Directions.N);
 

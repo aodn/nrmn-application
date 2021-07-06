@@ -104,6 +104,7 @@ public class SurveyIngestionService {
                       .insideMarinePark(StringUtils.isNotBlank(site.getMpa())?"yes":"no")
                       .longitude(stagedRow.getLongitude())
                       .latitude(stagedRow.getLatitude())
+                      .pqDiverId(stagedRow.getPqs() != null ? stagedRow.getPqs().getDiverId() : null)
                       .build()));
     }
 
