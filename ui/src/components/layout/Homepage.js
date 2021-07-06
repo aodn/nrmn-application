@@ -19,7 +19,7 @@ const Homepage = () => {
 
   return (
     <>
-      <Box flexGrow={5} m={5}>
+      <Box flexGrow={11} m={5} maxWidth={900} alignSelf="center">
         <Typography variant="h2" color="textPrimary">
           NRMN - Data Portal
         </Typography>
