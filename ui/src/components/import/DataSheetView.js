@@ -254,7 +254,6 @@ const DataSheetView = ({jobId}) => {
     });
     ctx.pushUndo(e.api, [...oldRows]);
     ctx.pendingPasteUndo = [];
-    setState(IngestState.Save);
   };
 
   const onCopyRegion = (e) => {
@@ -297,7 +296,6 @@ const DataSheetView = ({jobId}) => {
           pushUndo(e.api, delta);
           e.api.setRowData(rowData);
           e.api.refreshCells();
-          setState(IngestState.Save);
         }
       });
       items.push({
@@ -312,7 +310,6 @@ const DataSheetView = ({jobId}) => {
           rowData.push(newData);
           e.api.setRowData(rowData);
           e.api.refreshCells();
-          setState(IngestState.Save);
         }
       });
     }
@@ -344,7 +341,6 @@ const DataSheetView = ({jobId}) => {
     }
     pushUndo(e.api, delta);
     e.api.setRowData(rowData);
-    setState(IngestState.Save);
   };
 
   const onClearRegion = (e) => fillRegion(e, '');
@@ -357,12 +353,10 @@ const DataSheetView = ({jobId}) => {
   const onUndo = (e) => {
     popUndo(e.api);
     e.api.refreshCells();
-    setState(IngestState.Save);
   };
 
   const onCellEditingStopped = (e) => {
     if (e.oldValue === e.newValue) return;
-
     const row = {...e.data};
     row[e.column.colId] = e.oldValue;
     pushUndo(e.api, [row]);
@@ -465,6 +459,13 @@ const DataSheetView = ({jobId}) => {
     e.api.refreshCells();
   };
 
+  const onRowDataUpdated = (e) => {
+    const ctx = e.api.gridOptionsWrapper.gridOptions.context;
+    if (ctx.putRowIds.length > 0) {
+      setState(IngestState.Save);
+    }
+  };
+
   const toolTipValueGetter = (e) => {
     const error =
       e.context.errors.find((r) => r.row === e.data.id && e.column.colId.toUpperCase() === r.column.toUpperCase()) ||
@@ -556,6 +557,7 @@ const DataSheetView = ({jobId}) => {
           onCellValueChanged={onCellValueChanged}
           onSortChanged={onSortChanged}
           onFilterChanged={onSortChanged}
+          onRowDataUpdated={onRowDataUpdated}
           fillHandleDirection="y"
           getContextMenuItems={getContextMenuItems}
           undoRedoCellEditing={false}
