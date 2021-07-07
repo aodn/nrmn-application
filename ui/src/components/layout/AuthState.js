@@ -2,8 +2,10 @@ import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {useHistory} from 'react-router-dom';
 import {AccountCircle} from '@material-ui/icons';
-import Logout from '../auth/logout';
 import {Button} from '@material-ui/core';
+import {useDispatch} from 'react-redux';
+import {logoutSubmitted} from '../auth/auth-reducer';
+import AlertDialog from '../ui/AlertDialog';
 
 const AuthState = () => {
   const expires = useSelector((state) => state.auth.expires);
@@ -11,6 +13,12 @@ const AuthState = () => {
   const history = useHistory();
   const [confirmLogout, showConfirmLogout] = useState(false);
   const loggedIn = Date.now() < expires;
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    localStorage.clear();
+    dispatch(logoutSubmitted());
+  };
 
   if (!loggedIn) {
     return (
@@ -40,7 +48,13 @@ const AuthState = () => {
         >
           {username}
         </Button>
-        <Logout open={confirmLogout} />
+        <AlertDialog
+          open={confirmLogout}
+          text="Do you want to log out?"
+          action="Log Out"
+          onClose={() => showConfirmLogout(false)}
+          onConfirm={handleLogout}
+        />
       </>
     );
   }
