@@ -171,7 +171,7 @@ export const submitJobFile = (params, onProgress) => {
     .catch((err) => ({err}));
 };
 
-export const submitingest = (jobId) => {
+export const submitIngest = (jobId, success, error) => {
   return axiosInstance
     .post(
       '/api/ingestion/ingest/' + jobId,
@@ -180,8 +180,8 @@ export const submitingest = (jobId) => {
         validateStatus: () => true
       }
     )
-    .then((response) => ({response}))
-    .catch((err) => ({err}));
+    .then((res) => success(res))
+    .catch((err) => error(err));
 };
 
 export const search = (params) => {
