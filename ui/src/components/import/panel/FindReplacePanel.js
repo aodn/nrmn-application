@@ -111,7 +111,7 @@ const FindReplacePanel = (props) => {
     const agRow = props.api.getDisplayedRowAtIndex(focusedCell.rowIndex);
     let [oldRow, newRow] = clone(agRow.data);
     const colId = focusedCell.column.colId;
-    const findRegex = new RegExp(findString, matchCase ? 'g' : 'gi');
+    const findRegex = new RegExp(findString, matchCase ? '' : 'i');
     newRow[colId] = matchCell ? replaceString : oldRow[colId].replace(findRegex, replaceString);
     context.pushUndo(props.api, [oldRow]);
     const rowDataIndex = context.rowData.findIndex((r) => r.id === agRow.data.id);
@@ -133,7 +133,7 @@ const FindReplacePanel = (props) => {
         if ((matchColumn && !selectedColumns.includes(fieldKey)) || !fieldValue) return;
         const substringIdx = stringCompare(fieldValue.toString(), findString, matchCase, matchCell);
         if (substringIdx >= 0) {
-          const findRegex = new RegExp(findString, matchCase ? 'g' : 'gi');
+          const findRegex = new RegExp(findString, matchCase ? '' : 'i');
           newRow[fieldKey] = matchCell ? replaceString : oldRow[fieldKey].replace(findRegex, replaceString);
           modifiedRow = true;
         }
