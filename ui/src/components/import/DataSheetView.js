@@ -1,11 +1,9 @@
 import React, {useState} from 'react';
-import {useDispatch} from 'react-redux';
 import {Box, Button, Paper, Typography, makeStyles} from '@material-ui/core';
 import {
   CloudUpload as CloudUploadIcon,
   CloudDownload as CloudDownloadIcon,
-  PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon,
-  SaveOutlined as SaveOutlinedIcon
+  PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon
 } from '@material-ui/icons/';
 import {red, orange, yellow, grey, lightGreen} from '@material-ui/core/colors';
 import {NavLink} from 'react-router-dom';
@@ -14,11 +12,10 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import {PropTypes} from 'prop-types';
-import {getDataJob, validateJob, updateRows} from '../../axios/api';
-import {measurements} from '../../constants';
+import {getDataJob, validateJob, updateRows, submitIngest} from '../../axios/api';
+import {measurements, measureKey} from '../../constants';
 import FindReplacePanel from './panel/FindReplacePanel';
 import ValidationPanel from './panel/ValidationPanel';
-import {exportRow, importRow, SubmitingestRequested} from './reducers/create-import';
 import LinearProgressWithLabel from '../ui/LinearProgressWithLabel';
 import AlertDialog from '../ui/AlertDialog';
 
@@ -26,7 +23,7 @@ const useStyles = makeStyles(() => {
   return {
     fishSize: {
       color: red[200],
-      borderBottom: '1px solid '
+      borderBottom: '1px solid'
     },
     invertSize: {
       color: lightGreen[200]
@@ -116,12 +113,10 @@ const defaultSideBar = {
   defaultToolPanel: ''
 };
 
-const IngestState = {Loading: 0, Save: 1, Validate: 2, Submit: 3, ConfirmSubmit: 4};
+const IngestState = Object.freeze({Loading: 0, SaveAndValidate: 1, Submit: 2, ConfirmSubmit: 3});
 
-const DataSheetView = ({jobId}) => {
+const DataSheetView = ({jobId, onIngest}) => {
   const classes = useStyles();
-  const dispatch = useDispatch();
-
   const [job, setJob] = useState({});
   const [gridApi, setGridApi] = useState(null);
   const [state, setState] = useState(IngestState.Loading);
@@ -159,10 +154,10 @@ const DataSheetView = ({jobId}) => {
         return a;
       }, result.data.summaries);
 
-      if (context.errors.findIndex((e) => e.type === 'BLOCKING') < 0) {
-        setState(IngestState.Submit);
+      if (context.errors.some((e) => e.type === 'BLOCKING')) {
+        setState(IngestState.SaveAndValidate);
       } else {
-        setState(IngestState.Validate);
+        setState(IngestState.Submit);
       }
 
       context.summaries = result.data.summaries;
@@ -192,20 +187,38 @@ const DataSheetView = ({jobId}) => {
     setSideBar(defaultSideBar);
     context.useOverlay = 'Submitting';
     gridApi.showLoadingOverlay();
-    dispatch(SubmitingestRequested(jobId));
+    submitIngest(
+      jobId,
+      (res) => onIngest({success: res}),
+      (err) => onIngest({error: err})
+    );
   };
 
-  const handleSave = () => {
+  const handleSaveAndValidate = () => {
     setState(IngestState.Loading);
+    setSideBar(defaultSideBar);
     context.useOverlay = 'Saving';
     gridApi.showLoadingOverlay();
     const rowUpdateDtos = [];
     let fullRefresh = false;
+
     Array.from(new Set(context.putRowIds)).forEach((rowId) => {
       const row = context.rowData.find((r) => r.id === rowId);
 
+      // Serialise the measure JSON
+      if (row) {
+        let measure = {};
+        Object.getOwnPropertyNames(row || {})
+          .filter((key) => !isNaN(parseFloat(key)))
+          .forEach((numKey) => {
+            const pos = measureKey.indexOf(numKey);
+            measure[pos] = row[numKey];
+          });
+        row.measureJson = measure;
+      }
+
       // Null row data means that the row is to be deleted
-      rowUpdateDtos.push({rowId: rowId, row: row ? importRow(row) : null});
+      rowUpdateDtos.push({rowId: rowId, row: row});
 
       // HACK: use the fact that new rows are assigned a very high string
       // to determine if we need a full reload to get the server-assigned
@@ -215,10 +228,9 @@ const DataSheetView = ({jobId}) => {
     });
     updateRows(jobId, rowUpdateDtos, () => {
       if (fullRefresh) {
-        reload(gridApi, jobId);
+        reload(gridApi, jobId, handleValidate);
       } else {
-        gridApi.hideOverlay();
-        setState(IngestState.Validate);
+        handleValidate();
       }
     });
   };
@@ -328,7 +340,7 @@ const DataSheetView = ({jobId}) => {
       const dataIdx = rowData.findIndex((d) => d.id == row.data.id);
       const data = {...rowData[dataIdx]};
       delta.push(data);
-      var newData = {};
+      let newData = {};
       Object.keys(data).forEach(function (key) {
         newData[key] = data[key];
       });
@@ -360,7 +372,7 @@ const DataSheetView = ({jobId}) => {
     const row = {...e.data};
     row[e.column.colId] = e.oldValue;
     pushUndo(e.api, [row]);
-    setState(IngestState.Save);
+    setState(IngestState.SaveAndValidate);
   };
 
   const overrideKeyboardEvents = (e) => {
@@ -386,7 +398,7 @@ const DataSheetView = ({jobId}) => {
     }
   };
 
-  const reload = (api, jobId) => {
+  const reload = (api, jobId, completion) => {
     getDataJob(jobId).then((res) => {
       const job = {
         program: res.data.job.program.programName,
@@ -397,19 +409,24 @@ const DataSheetView = ({jobId}) => {
       };
       if (res.data.rows && res.data.rows.length > 0) {
         const rowData = res.data.rows.map((row) => {
-          return exportRow(row);
+          const {measureJson} = {...row};
+          Object.getOwnPropertyNames(measureJson || {}).forEach((numKey) => {
+            row[measureKey[numKey]] = measureJson[numKey];
+          });
+          delete row.measureJson;
+          return row;
         });
         api.gridOptionsWrapper.gridOptions.context.rowData = rowData;
         api.setRowData(rowData);
       }
       setJob(job);
-      setState(IngestState.Validate);
+      if (completion) completion();
     });
   };
 
   const onGridReady = (p) => {
     setGridApi(p.api);
-    reload(p.api, jobId);
+    reload(p.api, jobId, () => setState(IngestState.SaveAndValidate));
   };
 
   const onFirstDataRendered = (e) => {
@@ -462,7 +479,7 @@ const DataSheetView = ({jobId}) => {
   const onRowDataUpdated = (e) => {
     const ctx = e.api.gridOptionsWrapper.gridOptions.context;
     if (ctx.putRowIds.length > 0) {
-      setState(IngestState.Save);
+      setState(IngestState.SaveAndValidate);
     }
   };
 
@@ -504,13 +521,12 @@ const DataSheetView = ({jobId}) => {
               </Button>
             </Box>
             <Box p={1}>
-              <Button disabled={state !== IngestState.Save} onClick={handleSave} startIcon={<SaveOutlinedIcon />}>
-                Save
-              </Button>
-            </Box>
-            <Box p={1}>
-              <Button disabled={state !== IngestState.Validate} onClick={handleValidate} startIcon={<PlaylistAddCheckOutlinedIcon />}>
-                Validate
+              <Button
+                disabled={state !== IngestState.SaveAndValidate}
+                onClick={handleSaveAndValidate}
+                startIcon={<PlaylistAddCheckOutlinedIcon />}
+              >
+                {`Save & Validate`}
               </Button>
             </Box>
             <Box p={1}>
@@ -636,7 +652,8 @@ const DataSheetView = ({jobId}) => {
 };
 
 DataSheetView.propTypes = {
-  jobId: PropTypes.string
+  jobId: PropTypes.string.required,
+  onIngest: PropTypes.func.required
 };
 
 export default DataSheetView;
