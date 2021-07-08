@@ -73,4 +73,8 @@ public class StagedRowFormatted {
                 && Objects.equals(method, that.method)
                 && Objects.equals(species, that.species);
     }
+
+    public String getTransectName() {
+        return site.getSiteCode() + "/" + date + "/" + depth + "." + surveyNum;
+    }
 }
