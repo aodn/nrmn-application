@@ -113,7 +113,7 @@ const defaultSideBar = {
   defaultToolPanel: ''
 };
 
-const IngestState = Object.freeze({Loading: 0, SaveAndValidate: 1, Submit: 2, ConfirmSubmit: 3});
+const IngestState = Object.freeze({Loading: 0, Edited: 1, Valid: 2, ConfirmSubmit: 3});
 
 const DataSheetView = ({jobId, onIngest}) => {
   const classes = useStyles();
@@ -154,10 +154,8 @@ const DataSheetView = ({jobId, onIngest}) => {
         return a;
       }, result.data.summaries);
 
-      if (context.errors.some((e) => e.type === 'BLOCKING')) {
-        setState(IngestState.SaveAndValidate);
-      } else {
-        setState(IngestState.Submit);
+      if (!context.errors.some((e) => e.type === 'BLOCKING')) {
+        setState(IngestState.Valid);
       }
 
       context.summaries = result.data.summaries;
@@ -372,7 +370,7 @@ const DataSheetView = ({jobId, onIngest}) => {
     const row = {...e.data};
     row[e.column.colId] = e.oldValue;
     pushUndo(e.api, [row]);
-    setState(IngestState.SaveAndValidate);
+    setState(IngestState.Edited);
   };
 
   const overrideKeyboardEvents = (e) => {
@@ -426,7 +424,7 @@ const DataSheetView = ({jobId, onIngest}) => {
 
   const onGridReady = (p) => {
     setGridApi(p.api);
-    reload(p.api, jobId, () => setState(IngestState.SaveAndValidate));
+    reload(p.api, jobId, () => setState(IngestState.Edited));
   };
 
   const onFirstDataRendered = (e) => {
@@ -479,7 +477,7 @@ const DataSheetView = ({jobId, onIngest}) => {
   const onRowDataUpdated = (e) => {
     const ctx = e.api.gridOptionsWrapper.gridOptions.context;
     if (ctx.putRowIds.length > 0) {
-      setState(IngestState.SaveAndValidate);
+      setState(IngestState.Edited);
     }
   };
 
@@ -496,7 +494,7 @@ const DataSheetView = ({jobId, onIngest}) => {
         open={state === IngestState.ConfirmSubmit}
         text="Submit Sheet?"
         action="Submit"
-        onClose={() => setState(IngestState.Submit)}
+        onClose={() => setState(IngestState.Valid)}
         onConfirm={handleSubmit}
       />
       <Box pt={1} pl={1}>
@@ -521,17 +519,13 @@ const DataSheetView = ({jobId, onIngest}) => {
               </Button>
             </Box>
             <Box p={1}>
-              <Button
-                disabled={state !== IngestState.SaveAndValidate}
-                onClick={handleSaveAndValidate}
-                startIcon={<PlaylistAddCheckOutlinedIcon />}
-              >
+              <Button onClick={handleSaveAndValidate} startIcon={<PlaylistAddCheckOutlinedIcon />}>
                 {`Save & Validate`}
               </Button>
             </Box>
             <Box p={1}>
               <Button
-                disabled={state !== IngestState.Submit}
+                disabled={state !== IngestState.Valid}
                 onClick={() => setState(IngestState.ConfirmSubmit)}
                 startIcon={<CloudUploadIcon />}
               >
