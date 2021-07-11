@@ -18,6 +18,7 @@ const SearchInput = ({schema, name, uiSchema}) => {
       <Typography variant="subtitle2">{schema.title}</Typography>
       <Autocomplete
         options={searchResults?.map((i) => i.species).filter((f) => f !== exclude) ?? []}
+        clearOnBlur={uiSchema.clearOnBlur}
         freeSolo
         defaultValue={value}
         onSelect={(e) => {

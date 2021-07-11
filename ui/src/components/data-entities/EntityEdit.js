@@ -117,7 +117,7 @@ const EntityEdit = ({entity, template, clone}) => {
         ]
       };
     } else if (key === 'supersededBy') {
-      uiSchema[key] = {'ui:field': 'searchInput', exclude: 'observableItemName'};
+      uiSchema[key] = {'ui:field': 'searchInput', exclude: 'observableItemName', clearOnBlur: true};
     } else if (item.format === 'double') {
       uiSchema[key] = {'ui:field': 'double'};
     } else if (item.type === 'boolean') {
