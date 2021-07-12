@@ -42,7 +42,8 @@ const columns = [
     {field: 'family', headerName: 'Family', flex: 1},
     {field: 'order', headerName: 'Order', flex: 1},
     {field: 'class', headerName: 'Class', flex: 1},
-    {field: 'phylum', headerName: 'Phylum', flex: 1}
+    {field: 'phylum', headerName: 'Phylum', flex: 1},
+    {field: 'supersededBy', headerName: 'Superseded By', flex: 1}
   ],
   [
     {
@@ -58,7 +59,8 @@ const columns = [
     {field: 'family', headerName: 'Family', flex: 1},
     {field: 'order', headerName: 'Order', flex: 1},
     {field: 'class', headerName: 'Class', flex: 1},
-    {field: 'phylum', headerName: 'Phylum', flex: 1}
+    {field: 'phylum', headerName: 'Phylum', flex: 1},
+    {field: 'supersededBy', headerName: 'Superseded By', flex: 1}
   ]
 ];
 

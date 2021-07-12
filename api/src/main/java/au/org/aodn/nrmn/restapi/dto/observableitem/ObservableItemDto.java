@@ -1,13 +1,12 @@
 package au.org.aodn.nrmn.restapi.dto.observableitem;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Data
 @NoArgsConstructor
@@ -58,4 +57,7 @@ public class ObservableItemDto {
 
     @Schema(title = "Habitat Groups")
     private String habitatGroups;
+
+    @Schema(title = "Superseded By")
+    private String supersededBy;
 }
