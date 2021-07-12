@@ -56,6 +56,9 @@ const formSlice = createSlice({
       state.data = {...state.data, ...action.payload};
     },
     selectedItemsLoaded: (state, action) => {
+      if(!('_embedded' in action.payload)) {
+        action.payload['_embedded'] = {'.': action.payload.map(item => { return {'.': item};} )};
+      }
       const key = Object.keys(action.payload._embedded)[0];
       const newOptions = {};
       // HACK: this should not be necessary

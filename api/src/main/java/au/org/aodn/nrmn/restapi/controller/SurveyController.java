@@ -1,22 +1,23 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.restapi.repository.projections.SurveyRow;
+import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
+import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyFilterDto;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
+import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.repository.projections.SurveyRow;
+import au.org.aodn.nrmn.restapi.service.SurveyEditService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @Tag(name = "surveys")
@@ -25,6 +26,12 @@ public class SurveyController {
 
     @Autowired
     private SurveyRepository surveyRepository;
+
+    @Autowired
+    private DiverRepository diverRepository;
+
+    @Autowired
+    private SurveyEditService surveyEditService;
 
     @Autowired
     private ModelMapper mapper;
@@ -45,19 +52,19 @@ public class SurveyController {
     }
     
     @PutMapping("/survey/{id}")
-    public ResponseEntity<SurveyDto> findOne(@Valid @RequestBody SurveyDto surveyDto) {
+    public ResponseEntity<?> findOne(@Valid @RequestBody SurveyDto surveyDto) {
 
-        Optional<Survey> survey = surveyRepository.findById(surveyDto.getSurveyId());
-        
-        if(!survey.isPresent()) 
-            return ResponseEntity.notFound().build();
+        ValidationErrors errors = surveyEditService.validateSurvey(surveyDto);
+        if (!errors.getErrors().isEmpty()) {
+            return ResponseEntity.badRequest().body(errors);
+        }
 
-        Survey updatedSurvey = survey.get();
-        updatedSurvey.setProtectionStatus(surveyDto.getProtectionStatus());
-        updatedSurvey.setNotes(surveyDto.getNotes());
-        updatedSurvey.setProjectTitle(surveyDto.getProjectTitle());
-        updatedSurvey.setInsideMarinePark(surveyDto.getInsideMarinePark());
+        Survey survey = surveyRepository.findById(surveyDto.getSurveyId()).orElseThrow(ResourceNotFoundException::new);
+        surveyEditService.updateSurvey(surveyDto);
 
-        return ResponseEntity.ok(mapper.map(surveyRepository.save(updatedSurvey), SurveyDto.class));
+        Survey persistedSurvey = surveyRepository.save(survey);
+        SurveyDto updatedSurveyDto = mapper.map(persistedSurvey, SurveyDto.class);
+        return ResponseEntity.ok().body(updatedSurveyDto);
+
     }
 }

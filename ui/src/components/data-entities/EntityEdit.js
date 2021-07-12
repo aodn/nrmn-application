@@ -124,6 +124,43 @@ const EntityEdit = ({entity, template, clone}) => {
       uiSchema[key] = {'ui:field': 'boolean'};
     } else if (key === 'oldSiteCodes') {
       uiSchema[key] = {'ui:field': 'array'};
+    } else if (key === 'siteCode') {
+      uiSchema[key] = {
+        'ui:field': 'dropdown',
+        route: 'siteListItems',
+        entity: 'Site',
+        entityList: 'siteListItems',
+        idKey: 'siteCode',
+        valueKey: 'siteCode'
+      };
+    } else if (key === 'siteName') {
+      uiSchema[key] = {
+        'ui:field': 'dropdown',
+        route: 'siteListItems',
+        entity: 'Site',
+        entityList: 'siteListItems',
+        idKey: 'siteName',
+        valueKey: 'siteName'
+      };
+    } else if (key === 'pqDiverInitials') {
+      uiSchema[key] = {
+        'ui:field': 'dropdown',
+        route: 'divers',
+        entity: 'diver',
+        entityList: 'divers',
+        idKey: 'initials',
+        valueKey: 'fullName',
+        fieldName: 'pqDiverInitials'
+      };
+    } else if (key === 'program') {
+      uiSchema[key] = {
+        'ui:field': 'dropdown',
+        route: 'programs',
+        entity: 'program',
+        entityList: 'programs',
+        idKey: 'programId',
+        valueKey: 'programName'
+      };
     } else if (key === 'phylum') {
       uiSchema[key] = {
         'ui:field': 'autostring',
