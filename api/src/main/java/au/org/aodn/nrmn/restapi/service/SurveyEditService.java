@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistance;
 import static au.org.aodn.nrmn.restapi.util.TimeUtils.parseDate;
 import static au.org.aodn.nrmn.restapi.util.TimeUtils.parseTime;
 
@@ -100,16 +101,40 @@ public class SurveyEditService {
         }
 
         // Lat and Lon match site
-        String lat = surveyDto.getLatitude();
-        if(!StringUtils.isEmpty(lat) && !truncateNumber(surveyDtoSite.getLatitude()).equals(truncateNumber(Double.parseDouble(lat)))){
+        Double lat = null;
+        Double lon = null;
+        try {
+            lat = StringUtils.isEmpty(surveyDto.getLatitude()) ? null : Double.parseDouble(surveyDto.getLatitude());
+        } catch (NumberFormatException e) {
             errors.add(new ValidationError("Survey", "latitude", surveyDto.getLatitude(),
-                    String.format("The survey latitude does not match the latitude of the site (%s)", surveyDtoSite.getLatitude())));
+                    "Latitude must contain a valid number"));
         }
 
-        String lon = surveyDto.getLongitude();
-        if(!StringUtils.isEmpty(lon) && !truncateNumber(surveyDtoSite.getLongitude()).equals(truncateNumber(Double.parseDouble(lon)))){
+        try {
+            lon = StringUtils.isEmpty(surveyDto.getLongitude()) ? null : Double.parseDouble(surveyDto.getLongitude());
+        } catch (NumberFormatException e) {
             errors.add(new ValidationError("Survey", "longitude", surveyDto.getLongitude(),
-                    String.format("The survey longitude does not match the longitude of the site (%s)", surveyDtoSite.getLongitude())));
+                    "Longitude must contain a valid number"));
+        }
+
+        boolean hasValidCoords = lat != null && lon != null && !lat.isNaN() && !lon.isNaN();
+        if(hasValidCoords && getDistance(lat, lon, surveyDtoSite.getLatitude(), surveyDtoSite.getLongitude()) > 0.2){
+            errors.add(new ValidationError("Survey", "latitude", surveyDto.getLatitude(),
+                    String.format("The survey coordinates are not within 200m of the site. The sites latitude: %s",
+                            surveyDtoSite.getLatitude())));
+            errors.add(new ValidationError("Survey", "longitude", surveyDto.getLongitude(),
+                    String.format("The survey coordinates are not within 200m of the site. The sites longitude: %s",
+                            surveyDtoSite.getLongitude())));
+        }
+
+        if(lat != null && !lat.isNaN() && (lat < -90 || lat > 90) ) {
+            errors.add(new ValidationError("Survey", "latitude", surveyDto.getLatitude(),
+                    "The latitude must be a valid number between -90 and 90"));
+        }
+
+        if(lon != null && !lon.isNaN() && (lon < -180 || lon > 180) ) {
+            errors.add(new ValidationError("Survey", "longitude", surveyDto.getLongitude(),
+                    "The longitude must be a valid number between -180 and 180"));
         }
 
         // Direction Validation
