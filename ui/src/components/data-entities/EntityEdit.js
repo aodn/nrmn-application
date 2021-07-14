@@ -135,12 +135,10 @@ const EntityEdit = ({entity, template, clone}) => {
       };
     } else if (key === 'siteName') {
       uiSchema[key] = {
-        'ui:field': 'dropdown',
-        route: 'siteListItems',
-        entity: 'Site',
-        entityList: 'siteListItems',
-        idKey: 'siteName',
-        valueKey: 'siteName'
+        'ui:field': 'autostring',
+        route: 'siteNames',
+        entity: 'siteNames',
+        listOnly: true
       };
     } else if (key === 'pqDiverInitials') {
       uiSchema[key] = {

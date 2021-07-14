@@ -53,6 +53,7 @@ public class SurveyEditService {
         mapper.map(surveyDto, survey);
 
         Site site = siteRepository.findBySiteCode(surveyDto.getSiteCode());
+        site.setSiteName(surveyDto.getSiteName());
         survey.setSite(site);
 
         Diver pqDiver = diverRepository.findByCriteria(surveyDto.getPqDiverInitials()).get(0);
@@ -94,11 +95,22 @@ public class SurveyEditService {
                     "The survey time must be in the format hh:mm[:ss]"));
         }
 
-        // Site code and site name exist and match
-        if (!surveyDtoSite.getSiteName().equals(surveyDto.getSiteName())) {
-            errors.add(new ValidationError("Site", "siteCode", surveyDto.getSiteName(),
-                    String.format("The site code %s does not match the site name \"%s\"", surveyDto.getSiteCode(), surveyDto.getSiteName())));
-        }
+        // Commented out as it is unclear how to validate the site name matching the site code as there is no unique
+        // site name constraint nor a way to determine if it is a valid change.
+
+//        // Site code and site name exist and match
+//        if (!surveyDtoSite.getSiteName().equals(surveyDto.getSiteName())) {
+//
+//            List<Site> siteNameExistsAlready = siteRepository.findAll().stream()
+//                    .filter(site -> site.getSiteName().equals(surveyDto.getSiteName())).collect(Collectors.toList());
+//
+//            if(siteNameExistsAlready.size() > 0) {
+//            errors.add(new ValidationError("Site", "siteName", surveyDto.getSiteName(),
+//                    String.format("The site name \"%s\" already exists for site code \"%s\"",
+//                            surveyDto.getSiteName(), siteNameExistsAlready.get(0).getSiteCode())));
+//            }
+//
+//        }
 
         // Lat and Lon match site
         Double lat = null;
