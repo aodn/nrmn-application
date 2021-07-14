@@ -68,7 +68,7 @@ public class RawValidation extends ValidatorHelpers {
                                                                 ValidationLevel.WARNING)),
                                 Tuple2.of("P-Qs",
                                                 new DiverExists(StagedRow::getPqs, "P-Qs", diverRepo,
-                                                                ValidationLevel.BLOCKING)),
+                                                                ValidationLevel.WARNING)),
                                 Tuple2.of("Block",
                                                 new IntegerFormatValidation(StagedRow::getBlock, "Block",
                                                                 Arrays.asList(0, 1, 2))),
