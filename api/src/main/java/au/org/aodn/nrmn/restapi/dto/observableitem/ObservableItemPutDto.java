@@ -1,12 +1,11 @@
 package au.org.aodn.nrmn.restapi.dto.observableitem;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Id;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Data
 @NoArgsConstructor
@@ -26,23 +25,23 @@ public class ObservableItemPutDto {
     @Schema(title = "Common Name")
     private String commonName;
 
-    @Schema(title = "Phylum", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(title = "Phylum")
     private String phylum;
 
-    @Schema(title = "Class", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(title = "Class")
     @JsonProperty("class")
     private String className;
 
-    @Schema(title = "Order", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(title = "Order")
     private String order;
 
-    @Schema(title = "Family", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(title = "Family")
     private String family;
 
-    @Schema(title = "Genus", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(title = "Genus")
     private String genus;
 
-    @Schema(title = "Species Epithet", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(title = "Species Epithet")
     private String speciesEpithet;
 
     @Schema(title = "Superseded By")

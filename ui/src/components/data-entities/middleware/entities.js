@@ -10,13 +10,14 @@ import {
   updateFormFields,
   selectedItemEdited,
   selectedItemsEdited,
-  selectedItemsLoaded
+  selectedItemsLoaded, selectedListItemsLoaded
 } from '../form-reducer';
 
 export default function* getEntitiesWatcher() {
   yield takeEvery(selectRequested, entities);
   yield takeEvery(itemRequested, getEntityData);
   yield takeEvery(selectedItemsRequested, getSelectedItemsData);
+  yield takeEvery(selectedListItemsRequested, getSelectedListItemsData);
   yield takeEvery(createEntityRequested, saveEntity);
   yield takeEvery(updateEntityRequested, updateEntity);
   yield takeEvery(deleteEntityRequested, deleteEntity);
@@ -77,6 +78,15 @@ function* getSelectedItemsData(action) {
   try {
     const resp = yield call(getSelectedEntityItems, action.payload);
     yield put(selectedItemsLoaded(resp));
+  } catch (e) {
+    yield put(entitiesError({e}));
+  }
+}
+
+function* getSelectedListItemsData(action) {
+  try {
+    const resp = yield call(getSelectedEntityItems, action.payload.route);
+    yield put(selectedListItemsLoaded({'resp': resp, 'key': action.payload.key}));
   } catch (e) {
     yield put(entitiesError({e}));
   }
@@ -147,6 +157,10 @@ export const setNestedField = createAction('SELECTED_NESTED_ENTITY', function (e
 });
 
 export const selectedItemsRequested = createAction('SELECTED_ENTITY_ITEMS_REQUESTED', function (entity) {
+  return {payload: entity};
+});
+
+export const selectedListItemsRequested = createAction('SELECTED_LIST_ITEMS_REQUESTED', function (entity) {
   return {payload: entity};
 });
 
