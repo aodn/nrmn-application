@@ -69,6 +69,15 @@ const formSlice = createSlice({
       }
       state.options = {...state.options, ...newOptions};
     },
+    selectedListItemsLoaded: (state, action) => {
+      // Hack to work with AutoCompleteInput
+      const newOptions = {};
+      const key = action.payload.key;
+
+      newOptions[key] = action.payload.resp[key];
+
+      state.options = {...state.options, ...newOptions};
+    },
     entitiesSaved: (state, action) => {
       state.saved = action.payload;
     },
@@ -104,6 +113,7 @@ export const {
   itemLoaded,
   updateFormFields,
   selectedItemsLoaded,
+  selectedListItemsLoaded,
   selectedItemEdited,
   selectedItemsEdited,
   embeddedFieldEdited

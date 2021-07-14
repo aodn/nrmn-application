@@ -124,6 +124,48 @@ const EntityEdit = ({entity, template, clone}) => {
       uiSchema[key] = {'ui:field': 'boolean'};
     } else if (key === 'oldSiteCodes') {
       uiSchema[key] = {'ui:field': 'array'};
+    } else if (key === 'phylum') {
+      uiSchema[key] = {
+        'ui:field': 'autostring',
+        route: 'species/taxonomyDetail',
+        entity: 'phylum',
+        listOnly: true    // Tells input to treat this custom endpoint - Avoids using @RestResource style payloads
+      };
+    } else if (key === 'class') {
+      uiSchema[key] = {
+        'ui:field': 'autostring',
+        route: 'species/taxonomyDetail',
+        entity: 'className',
+        listOnly: true
+      };
+    } else if (key === 'order') {
+      uiSchema[key] = {
+        'ui:field': 'autostring',
+        route: 'species/taxonomyDetail',
+        entity: 'order',
+        listOnly: true
+      };
+    } else if (key === 'family') {
+      uiSchema[key] = {
+        'ui:field': 'autostring',
+        route: 'species/taxonomyDetail',
+        entity: 'family',
+        listOnly: true
+      };
+    } else if (key === 'genus') {
+      uiSchema[key] = {
+        'ui:field': 'autostring',
+        route: 'species/taxonomyDetail',
+        entity: 'genus',
+        listOnly: true
+      };
+    } else if (key === 'speciesEpithet') {
+      uiSchema[key] = {
+        'ui:field': 'autostring',
+        route: 'species/taxonomyDetail',
+        entity: 'speciesEpithet',
+        listOnly: true
+      };
     } else {
       uiSchema[key] = {'ui:field': 'string', 'ui:readonly': item.readOnly ?? false};
     }
