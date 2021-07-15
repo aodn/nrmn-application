@@ -290,23 +290,7 @@ const DataSheetView = ({jobId, onIngest}) => {
       if (items.length > 0) items.push('separator');
       items.push({
         name: 'Delete Row',
-        action: () => {
-          const rows = [];
-          const [cells] = e.api.getCellRanges();
-          const startIdx = Math.min(cells.startRow.rowIndex, cells.endRow.rowIndex);
-          const endIdx = Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
-          const delta = [];
-          for (let i = startIdx; i < endIdx + 1; i++) {
-            const row = e.api.getDisplayedRowAtIndex(i);
-            const data = rowData.find((d) => d.id == row.data.id);
-            delta.push({...data});
-            rowData.splice(rowData.indexOf(data), 1);
-            rows.push(row);
-          }
-          pushUndo(e.api, delta);
-          e.api.setRowData(rowData);
-          e.api.refreshCells();
-        }
+        action: () => deleteRow(e)
       });
       items.push({
         name: 'Clone Row',
@@ -321,6 +305,12 @@ const DataSheetView = ({jobId, onIngest}) => {
           e.api.setRowData(rowData);
           e.api.refreshCells();
         }
+      });
+    } else {
+      if (items.length > 0) items.push('separator');
+      items.push({
+        name: 'Delete Selected Rows',
+        action: () => deleteRow(e)
       });
     }
     return items;
@@ -486,6 +476,25 @@ const DataSheetView = ({jobId, onIngest}) => {
       e.context.errors.find((r) => r.row === e.data.id && e.column.colId.toUpperCase() === r.column.toUpperCase()) ||
       e.context.globalErrors.find((g) => e.data.id === g.rowId);
     return error?.message;
+  };
+
+  const deleteRow = (e) => {
+    const rowData = e.context.rowData;
+    const rows = [];
+    const [cells] = e.api.getCellRanges();
+    const startIdx = Math.min(cells.startRow.rowIndex, cells.endRow.rowIndex);
+    const endIdx = Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
+    const delta = [];
+    for (let i = startIdx; i < endIdx + 1; i++) {
+      const row = e.api.getDisplayedRowAtIndex(i);
+      const data = rowData.find((d) => d.id === row.data.id);
+      delta.push({...data});
+      rowData.splice(rowData.indexOf(data), 1);
+      rows.push(row);
+    }
+    pushUndo(e.api, delta);
+    e.api.setRowData(rowData);
+    e.api.refreshCells();
   };
 
   return (
