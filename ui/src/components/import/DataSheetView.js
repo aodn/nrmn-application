@@ -286,27 +286,12 @@ const DataSheetView = ({jobId, onIngest}) => {
       });
     }
 
-    if (cells.startRow.rowIndex === cells.endRow.rowIndex && Object.keys(e.api.getFilterModel()).length < 1) {
+    const multiRowsSelected = e.api.getSelectedRows().length > 1 || cells.startRow.rowIndex !== cells.endRow.rowIndex;
+    if (!multiRowsSelected && Object.keys(e.api.getFilterModel()).length < 1) {
       if (items.length > 0) items.push('separator');
       items.push({
         name: 'Delete Row',
-        action: () => {
-          const rows = [];
-          const [cells] = e.api.getCellRanges();
-          const startIdx = Math.min(cells.startRow.rowIndex, cells.endRow.rowIndex);
-          const endIdx = Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
-          const delta = [];
-          for (let i = startIdx; i < endIdx + 1; i++) {
-            const row = e.api.getDisplayedRowAtIndex(i);
-            const data = rowData.find((d) => d.id == row.data.id);
-            delta.push({...data});
-            rowData.splice(rowData.indexOf(data), 1);
-            rows.push(row);
-          }
-          pushUndo(e.api, delta);
-          e.api.setRowData(rowData);
-          e.api.refreshCells();
-        }
+        action: () => deleteRow(e)
       });
       items.push({
         name: 'Clone Row',
@@ -321,6 +306,12 @@ const DataSheetView = ({jobId, onIngest}) => {
           e.api.setRowData(rowData);
           e.api.refreshCells();
         }
+      });
+    } else {
+      if (items.length > 0) items.push('separator');
+      items.push({
+        name: 'Delete Selected Rows',
+        action: () => deleteRow(e)
       });
     }
     return items;
@@ -488,6 +479,31 @@ const DataSheetView = ({jobId, onIngest}) => {
     return error?.message;
   };
 
+  const deleteRow = (e) => {
+    const rowData = e.context.rowData;
+    const [cells] = e.api.getCellRanges();
+    const startIdx = Math.min(cells.startRow.rowIndex, cells.endRow.rowIndex);
+    const endIdx = Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
+    const delta = [];
+    if(startIdx === endIdx) {
+      e.api.getSelectedRows().forEach((row) => {
+        const data = rowData.find((d) => d.id === row.id);
+        delta.push({...data});
+        rowData.splice(rowData.indexOf(data), 1);
+      });
+    } else {
+      for (let i = startIdx; i < endIdx + 1; i++) {
+        const row = e.api.getDisplayedRowAtIndex(i);
+        const data = rowData.find((d) => d.id === row.data.id);
+        delta.push({...data});
+        rowData.splice(rowData.indexOf(data), 1);
+      }
+    }
+    pushUndo(e.api, delta);
+    e.api.setRowData(rowData);
+    e.api.refreshCells();
+  };
+
   return (
     <>
       <AlertDialog
@@ -559,6 +575,7 @@ const DataSheetView = ({jobId, onIngest}) => {
           }}
           rowHeight={20}
           enableBrowserTooltips
+          rowSelection="multiple"
           enableRangeSelection={true}
           animateRows={true}
           enableRangeHandle={true}
