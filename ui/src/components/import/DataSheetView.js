@@ -485,7 +485,7 @@ const DataSheetView = ({jobId, onIngest}) => {
     const startIdx = Math.min(cells.startRow.rowIndex, cells.endRow.rowIndex);
     const endIdx = Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
     const delta = [];
-    if(startIdx === endIdx) {
+    if (startIdx === endIdx) {
       e.api.getSelectedRows().forEach((row) => {
         const data = rowData.find((d) => d.id === row.id);
         delta.push({...data});
@@ -502,6 +502,34 @@ const DataSheetView = ({jobId, onIngest}) => {
     pushUndo(e.api, delta);
     e.api.setRowData(rowData);
     e.api.refreshCells();
+  };
+
+  const onCellKeyDown = (e) => {
+    const editingCells = e.api.getEditingCells();
+    if (editingCells.length === 1) {
+      if (e.event.key === 'ArrowLeft') {
+        e.event.preventDefault();
+        e.api.stopEditing();
+        e.api.tabToPreviousCell();
+      }
+      if (e.event.key === 'ArrowRight') {
+        e.event.preventDefault();
+        e.api.stopEditing();
+        e.api.tabToNextCell();
+      }
+      if (e.event.key === 'ArrowUp') {
+        e.event.preventDefault();
+        e.api.stopEditing();
+        e.api.tabToNextCell((e) => {
+          console.log(e);
+        });
+      }
+      if (e.event.key === 'ArrowUp') {
+        e.event.preventDefault();
+        e.api.stopEditing();
+        e.api.setFocusedCell(editingCells[0].rowIndex + 1, editingCells[0].column.colId);
+      }
+    }
   };
 
   return (
@@ -579,6 +607,7 @@ const DataSheetView = ({jobId, onIngest}) => {
           enableRangeSelection={true}
           animateRows={true}
           enableRangeHandle={true}
+          onCellKeyDown={onCellKeyDown}
           onPasteStart={onPasteStart}
           onPasteEnd={onPasteEnd}
           onCellValueChanged={onCellValueChanged}
