@@ -24,4 +24,22 @@ public interface SurveyRow {
 
     @Schema(title = "Survey Number")
     String getSurveyNum();
+
+    @Schema(title = "Site Code")
+    String getSiteCode();
+
+    @Schema(title = "Has PQs")
+    String getHasPQs();
+    
+    @Schema(title = "MPA")
+    String getMPA();
+
+    @Schema(title = "Country")
+    String getCountry();
+
+    @Schema(title = "Diver")
+    String getDiverName();
+
+    @Schema(title = "Location")
+    String getLocationName();
 }
