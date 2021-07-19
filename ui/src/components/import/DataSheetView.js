@@ -485,7 +485,7 @@ const DataSheetView = ({jobId, onIngest}) => {
     const startIdx = Math.min(cells.startRow.rowIndex, cells.endRow.rowIndex);
     const endIdx = Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
     const delta = [];
-    if(startIdx === endIdx) {
+    if (startIdx === endIdx) {
       e.api.getSelectedRows().forEach((row) => {
         const data = rowData.find((d) => d.id === row.id);
         delta.push({...data});
@@ -502,6 +502,55 @@ const DataSheetView = ({jobId, onIngest}) => {
     pushUndo(e.api, delta);
     e.api.setRowData(rowData);
     e.api.refreshCells();
+  };
+
+  const onCellKeyDown = (e) => {
+    const editingCells = e.api.getEditingCells();
+    if (editingCells.length === 1) {
+      e.api.gridOptionsWrapper.gridOptions.context.navigationKey = e.event.key;
+      if (['ArrowLeft', 'ArrowUp'].includes(e.event.key)) {
+        e.event.preventDefault();
+        e.api.stopEditing();
+        e.api.tabToPreviousCell();
+      }
+      if (['ArrowRight', 'ArrowDown'].includes(e.event.key)) {
+        e.event.preventDefault();
+        e.api.stopEditing();
+        e.api.tabToNextCell();
+      }
+      e.api.gridOptionsWrapper.gridOptions.context.navigationKey = '';
+    }
+  };
+
+  const onTabToNextCell = (params) => {
+    let context = gridApi.gridOptionsWrapper.gridOptions.context;
+    let result;
+
+    if (['ArrowUp', 'ArrowDown'].includes(context.navigationKey) && params.previousCellPosition) {
+      let previousCell = params.previousCellPosition,
+        lastRowIndex = previousCell.rowIndex,
+        nextRowIndex = params.backwards ? lastRowIndex - 1 : lastRowIndex + 1,
+        renderedRowCount = gridApi.getModel().getRowCount();
+
+      if (nextRowIndex < 0) nextRowIndex = -1;
+      if (nextRowIndex >= renderedRowCount) nextRowIndex = renderedRowCount - 1;
+
+      result = {
+        rowIndex: nextRowIndex,
+        column: previousCell.column,
+        floating: previousCell.floating
+      };
+    }
+
+    if (['ArrowLeft', 'ArrowRight'].includes(context.navigationKey) && params.nextCellPosition) {
+      result = {
+        rowIndex: params.nextCellPosition.rowIndex,
+        column: params.nextCellPosition.column,
+        floating: params.nextCellPosition.floating
+      };
+    }
+
+    return result;
   };
 
   return (
@@ -579,8 +628,10 @@ const DataSheetView = ({jobId, onIngest}) => {
           enableRangeSelection={true}
           animateRows={true}
           enableRangeHandle={true}
+          onCellKeyDown={onCellKeyDown}
           onPasteStart={onPasteStart}
           onPasteEnd={onPasteEnd}
+          tabToNextCell={onTabToNextCell}
           onCellValueChanged={onCellValueChanged}
           onSortChanged={onSortChanged}
           onFilterChanged={onSortChanged}
