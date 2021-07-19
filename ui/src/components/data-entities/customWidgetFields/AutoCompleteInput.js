@@ -29,7 +29,7 @@ const AutoCompleteInput = ({schema, uiSchema, name}) => {
       <Autocomplete
         options={options}
         freeSolo
-        defaultValue={value}
+        value={value ? value : ''}
         onBlur={(e) => {
           dispatch(setField({newValue: e.target.value, entity: name}));
         }}
