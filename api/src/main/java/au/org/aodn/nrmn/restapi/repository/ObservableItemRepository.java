@@ -65,6 +65,9 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
     Page<ObservableItem> fuzzySearch(Pageable pageable, @Param("search_term") String searchTerm,
             @Param("include_superseded") Boolean includeSuperseded);
 
+    @Query("SELECT oi FROM ObservableItem oi WHERE oi.observableItemName = :search_term")
+    List<ObservableItem> exactSearch(@Param("search_term") String searchTerm);
+
     @Query(value = "select observable_item_id as observableItemId, obs_item_type_name as typeName, observable_item_name as name, "
             + "common_name as commonName, phylum, class as className, \"order\", family, genus, superseded_by as "
             + "supersededBy, supersededNames, supersededIds " + "FROM {h-schema}observable_item_ref oi "
