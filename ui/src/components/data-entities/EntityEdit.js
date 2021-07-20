@@ -131,7 +131,9 @@ const EntityEdit = ({entity, template, clone}) => {
         entity: 'Site',
         entityList: 'siteListItems',
         idKey: 'siteCode',
-        valueKey: 'siteCode'
+        valueKey: 'siteCode',
+        relatedAttr: 'siteName',
+        relatedField: 'siteName'
       };
     } else if (key === 'siteName') {
       uiSchema[key] = {
