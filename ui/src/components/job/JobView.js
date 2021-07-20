@@ -100,13 +100,13 @@ const JobView = () => {
                 job.surveyIds.length ?
                   <Grid item xs={12}>
                     <Typography className={classes.title} variant="h6" color="primary" style={{paddingLeft: 15, fontSize: 15, fontWeight: 400}}>
-                      Surveys:
+                      Surveys: ({job.surveyIds.length})
                     </Typography>
                     <Grid container>
                       {job.surveyIds &&
                       job.surveyIds.length > 0 &&
                       job.surveyIds.map((id) => (
-                        <Grid key={id} item xs={3} lg={12} >
+                        <Grid key={id} item xs={3} lg={6} >
                           <List dense style={{paddingTop: 0}}>
                             <ListItem>
                               <Link to={`/data/survey/${id}`} variant="a">
