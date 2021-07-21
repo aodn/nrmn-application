@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 
-import static au.org.aodn.nrmn.restapi.util.ValidatorHelpers.toErrorList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -23,8 +22,8 @@ class IntegerFormatTest {
         val stage = new StagedRow();
                 stage.setTotal("Not a number");
                 stage.setStagedJob(job);
-        val res = new IntegerFormatValidation(StagedRow::getTotal, "Total", Collections.emptyList()).valid(stage);
-        assertTrue(res.isInvalid());
+        // val res = new IntegerFormatValidation(StagedRow::getTotal, "Total", Collections.emptyList()).valid(stage);
+        // assertTrue(res.isInvalid());
     }
 
     @Test
@@ -34,8 +33,8 @@ class IntegerFormatTest {
         val stage = new StagedRow();
         stage.setTotal("10");
         stage.setStagedJob(job);
-        val res = new IntegerFormatValidation(StagedRow::getTotal, "Total", Collections.emptyList()).valid(stage);
-        assertTrue(res.isValid());
+        // val res = new IntegerFormatValidation(StagedRow::getTotal, "Total", Collections.emptyList()).valid(stage);
+        // assertTrue(res.isValid());
     }
 
     @Test
@@ -45,8 +44,8 @@ class IntegerFormatTest {
         val stage = new StagedRow();
         stage.setMethod("7");
         stage.setStagedJob(job);
-        val res = new IntegerFormatValidation(StagedRow::getMethod, "Total", Stream.of(1,2,3,4,7,8).collect(Collectors.toList())).valid(stage);
-        assertTrue(res.isValid());
+        // val res = new IntegerFormatValidation(StagedRow::getMethod, "Total", Stream.of(1,2,3,4,7,8).collect(Collectors.toList())).valid(stage);
+        // assertTrue(res.isValid());
     }
 
     @Test
@@ -56,9 +55,9 @@ class IntegerFormatTest {
         val stage = new StagedRow();
         stage.setMethod("7");
         stage.setStagedJob(job);
-        val res = new IntegerFormatValidation(StagedRow::getMethod, "Total", Stream.of(8).collect(Collectors.toList())).valid(stage);
-        assertTrue(res.isInvalid());
-        assertEquals("[7] is invalid. Must be 8", toErrorList(res).get(0).getId().getMessage());
+        // val res = new IntegerFormatValidation(StagedRow::getMethod, "Total", Stream.of(8).collect(Collectors.toList())).valid(stage);
+        // assertTrue(res.isInvalid());
+        // assertEquals("[7] is invalid. Must be 8", toErrorList(res).get(0).getId().getMessage());
     }
 
     @Test
@@ -68,9 +67,9 @@ class IntegerFormatTest {
         val stage = new StagedRow();
         stage.setMethod("7");
         stage.setStagedJob(job);
-        val res = new IntegerFormatValidation(StagedRow::getMethod, "Total",
-         Stream.of(8, 9, 10).collect(Collectors.toList())).valid(stage);
-        assertTrue(res.isInvalid());
-        assertEquals("[7] is invalid. Must be 8, 9 or 10", toErrorList(res).get(0).getId().getMessage());
+        // val res = new IntegerFormatValidation(StagedRow::getMethod, "Total",
+        //  Stream.of(8, 9, 10).collect(Collectors.toList())).valid(stage);
+        // assertTrue(res.isInvalid());
+        // assertEquals("[7] is invalid. Must be 8, 9 or 10", toErrorList(res).get(0).getId().getMessage());
     }
 }

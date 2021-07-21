@@ -2,7 +2,9 @@ package au.org.aodn.nrmn.restapi.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,6 @@ import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.service.SurveyIngestionService;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
-import au.org.aodn.nrmn.restapi.validation.process.RawValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,18 +33,24 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/ingestion")
 @Tag(name = "ingestion")
 public class IngestionController {
+    
     @Autowired
     StagedJobRepository jobRepository;
+    
     @Autowired
     StagedRowRepository rowRepository;
-    @Autowired
-    RawValidation validation;
+
     @Autowired
     SurveyIngestionService surveyIngestionService;
+    
     @Autowired
     StagedJobLogRepository stagedJobLogRepository;
+    
     @Autowired
     UserActionAuditRepository userActionAuditRepository;
+
+    @Autowired
+    private ModelMapper mapper;
 
     @PostMapping(path = "ingest/{job_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
@@ -64,7 +71,7 @@ public class IngestionController {
         try {
             stagedJobLogRepository
                     .save(StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.INGESTING).build());
-            List<StagedRowFormatted> validatedRows = validation.preValidated(rowRepository.findAll(Example.of(StagedRow.builder().stagedJob(job).build())), job);
+            List<StagedRowFormatted> validatedRows = rowRepository.findAll(Example.of(StagedRow.builder().stagedJob(job).build())).stream().map(row -> mapper.map(row, StagedRowFormatted.class)).collect(Collectors.toList());
             surveyIngestionService.ingestTransaction(job, validatedRows);
             stagedJobLogRepository
                     .save(StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.INGESTED).build());

@@ -63,7 +63,7 @@ class IngestionControllerIT {
 
         StagedJob job = stagedJobRepository.findById(109L).get();
         assertEquals(StatusJobType.INGESTED, job.getStatus());
-
+        
         assertEquals(initialObservationCount + 1, observationRepository.count());
     }
 

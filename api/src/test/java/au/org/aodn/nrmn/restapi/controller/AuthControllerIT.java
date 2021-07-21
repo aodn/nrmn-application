@@ -1,18 +1,8 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.restapi.RestApiApplication;
-import au.org.aodn.nrmn.restapi.controller.utils.RequestWrapper;
-import au.org.aodn.nrmn.restapi.dto.auth.LoginRequest;
-import au.org.aodn.nrmn.restapi.dto.auth.SignUpRequest;
-import au.org.aodn.nrmn.restapi.dto.payload.JwtAuthenticationResponse;
-import au.org.aodn.nrmn.restapi.model.db.SecUser;
-import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
-import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
-import io.restassured.specification.RequestSpecification;
-import lombok.val;
+import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +14,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.Collections;
-
-import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import au.org.aodn.nrmn.restapi.RestApiApplication;
+import au.org.aodn.nrmn.restapi.controller.utils.RequestWrapper;
+import au.org.aodn.nrmn.restapi.dto.auth.LoginRequest;
+import au.org.aodn.nrmn.restapi.dto.payload.JwtAuthenticationResponse;
+import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.specification.RequestSpecification;
+import lombok.val;
 
 @Testcontainers
 @SpringBootTest(classes = RestApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -41,25 +38,6 @@ public class AuthControllerIT {
     public TestRestTemplate testRestTemplate;
     @LocalServerPort
     int randomServerPort;
-
-    @Test
-    public void signup() throws Exception {
-
-        RequestWrapper<SignUpRequest, SecUser> reqBuilder = new RequestWrapper<SignUpRequest, SecUser>();
-        val signupReq = new SignUpRequest("tj@gmail.com", "FirstName TestName", "#12Trois", Collections.emptyList());
-
-        ResponseEntity<SecUser> response = reqBuilder
-                .withAppJson()
-                .withUri(_createUrl("/api/auth/signup"))
-                .withMethod(HttpMethod.POST)
-                .withEntity(signupReq)
-                .withResponseType(SecUser.class)
-                .build(testRestTemplate);
-
-        assertEquals(response.getStatusCode(), HttpStatus.CREATED);
-        assertEquals(response.getBody().getEmail(), "tj@gmail.com");
-
-    }
 
     @Test
     public void loginLogout() throws Exception {
@@ -108,21 +86,6 @@ public class AuthControllerIT {
     public void badSignin() throws Exception {
         ResponseEntity<JwtAuthenticationResponse> response = loginResponse("", "#12Trois");
 
-        assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
-    public void badSignup() throws Exception {
-        RequestWrapper<SignUpRequest, SecUser> reqBuilder = new RequestWrapper<SignUpRequest, SecUser>();
-        val signupReq = new SignUpRequest("test@gmail.com", "F", "#12Trois", Collections.emptyList());
-
-        ResponseEntity<SecUser> response = reqBuilder
-                .withAppJson()
-                .withUri(_createUrl("/api/auth/signup"))
-                .withMethod(HttpMethod.POST)
-                .withEntity(signupReq)
-                .withResponseType(SecUser.class)
-                .build(testRestTemplate);
         assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
     }
 

@@ -13,7 +13,7 @@ import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import {PropTypes} from 'prop-types';
 import {getDataJob, validateJob, updateRows, submitIngest} from '../../axios/api';
-import {measurements, measureKey} from '../../constants';
+import {measurements, extendedMeasurements} from '../../constants';
 import FindReplacePanel from './panel/FindReplacePanel';
 import ValidationPanel from './panel/ValidationPanel';
 import LinearProgressWithLabel from '../ui/LinearProgressWithLabel';
@@ -129,36 +129,9 @@ const DataSheetView = ({jobId, onIngest}) => {
     gridApi.showLoadingOverlay();
     gridApi.setFilterModel(null);
     context.errors = [];
-    context.globalErrors = [];
     validateJob(jobId, (result) => {
-      context.validationResults = result.data;
+      context.errors = result.data.errors;
 
-      result.data.errors.reduce((a, e) => {
-        e.errors.forEach((err) => {
-          if (err.columnTarget.includes(',')) {
-            const subErrors = err.columnTarget.split(',');
-            subErrors.forEach((subCol) => {
-              a.push({row: e.id, column: subCol, message: err.message, type: err.errorLevel});
-            });
-          } else {
-            a.push({row: e.id, column: err.columnTarget, message: err.message, type: err.errorLevel});
-          }
-        });
-        return a;
-      }, context.errors);
-
-      result.data.errorGlobal.reduce((a, e) => {
-        const rowData = {row: e.rowId, columnTarget: '', message: e.message, level: e.errorLevel};
-        a[e.columnTarget]?.length > 0 ? a[e.columnTarget].push(rowData) : (a[e.columnTarget] = [rowData]);
-        context.globalErrors.push({rowId: e.rowId, type: e.errorLevel, message: e.message});
-        return a;
-      }, result.data.summaries);
-
-      if (!context.errors.some((e) => e.type === 'BLOCKING')) {
-        setState(IngestState.Valid);
-      }
-
-      context.summaries = result.data.summaries;
       gridApi.hideOverlay();
       gridApi.redrawRows();
 
@@ -209,8 +182,7 @@ const DataSheetView = ({jobId, onIngest}) => {
         Object.getOwnPropertyNames(row || {})
           .filter((key) => !isNaN(parseFloat(key)))
           .forEach((numKey) => {
-            const pos = measureKey.indexOf(numKey);
-            measure[pos] = row[numKey];
+            measure[numKey] = row[numKey];
           });
         row.measureJson = measure;
       }
@@ -272,6 +244,8 @@ const DataSheetView = ({jobId, onIngest}) => {
 
   const getContextMenuItems = (e) => {
     const [cells] = e.api.getCellRanges();
+    if (!cells) return;
+
     const colId = cells.startColumn.colId;
     const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
     const label = row.data[colId];
@@ -396,26 +370,28 @@ const DataSheetView = ({jobId, onIngest}) => {
         source: res.data.job.source,
         status: res.data.job.status
       };
-      if (res.data.rows && res.data.rows.length > 0) {
+      if (res.data.rows) {
         const rowData = res.data.rows.map((row) => {
           const {measureJson} = {...row};
           Object.getOwnPropertyNames(measureJson || {}).forEach((numKey) => {
-            row[measureKey[numKey]] = measureJson[numKey];
+            row[numKey] = measureJson[numKey];
           });
           delete row.measureJson;
           return row;
         });
         api.gridOptionsWrapper.gridOptions.context.rowData = rowData;
-        api.setRowData(rowData);
+        api.setRowData(rowData.length > 0 ? rowData : null);
       }
-      setJob(job);
-      if (completion) completion();
+      if (completion) completion(job);
     });
   };
 
   const onGridReady = (p) => {
     setGridApi(p.api);
-    reload(p.api, jobId, () => setState(IngestState.Edited));
+    reload(p.api, jobId, (job) => {
+      setState(IngestState.Edited);
+      setJob(job);
+    });
   };
 
   const onFirstDataRendered = (e) => {
@@ -442,21 +418,13 @@ const DataSheetView = ({jobId, onIngest}) => {
     const row = params.context.highlighted[params.rowIndex];
     if (row && row[params.colDef.field]) return {backgroundColor: yellow[100]};
 
-    // HACK: to work around the fact that invert validation returns the column as an invert size
-    // and NOT as the row data column name.
-    let fieldName = params.colDef.field.toUpperCase();
-    if (params.data && params.data.isInvertSizing && params.data.isInvertSizing.toUpperCase() === 'YES') {
-      const invertSizeMap = measurements.find((m) => m.invertSize === params.colDef.field);
-      if (invertSizeMap) {
-        fieldName = invertSizeMap.field;
-      }
-    }
-
     // Highlight cell validations
-    const error = params.context.errors.find((e) => e.row === params.data.id && e.column.toUpperCase() === fieldName);
+    const error = params.context.errors.find(
+      (e) => e.rowIds.includes(params.data.id) && (!e.columnNames || e.columnNames.includes(params.colDef.field))
+    );
     if (error) {
-      if (error.type === 'BLOCKING') return {backgroundColor: red[100]};
-      if (error.type === 'WARNING') return {backgroundColor: orange[100]};
+      if (error.levelId === 'BLOCKING') return {backgroundColor: red[100]};
+      if (error.levelId === 'WARNING') return {backgroundColor: orange[100]};
     }
     return null;
   };
@@ -472,10 +440,11 @@ const DataSheetView = ({jobId, onIngest}) => {
     }
   };
 
-  const toolTipValueGetter = (e) => {
-    const error =
-      e.context.errors.find((r) => r.row === e.data.id && e.column.colId.toUpperCase() === r.column.toUpperCase()) ||
-      e.context.globalErrors.find((g) => e.data.id === g.rowId);
+  const toolTipValueGetter = (params) => {
+    const error = params.context.errors.find(
+      (e) => e.rowIds.includes(params.data.id) && (!e.columnNames || e.columnNames.includes(params.colDef.field))
+    );
+
     return error?.message;
   };
 
@@ -553,6 +522,7 @@ const DataSheetView = ({jobId, onIngest}) => {
     return result;
   };
 
+  const measurementColumns = job.isExtendedSize ? measurements.concat(extendedMeasurements) : measurements;
   return (
     <>
       <AlertDialog
@@ -601,102 +571,91 @@ const DataSheetView = ({jobId, onIngest}) => {
         )}
       </Box>
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
-        <AgGridReact
-          getRowNodeId={(r) => r.id}
-          className={classes.agGrid}
-          context={context}
-          immutableData={true}
-          cellFlashDelay={100}
-          cellFadeDelay={100}
-          defaultColDef={{
-            editable: true,
-            sortable: true,
-            resizable: true,
-            flex: 1,
-            minWidth: 80,
-            filter: true,
-            floatingFilter: true,
-            suppressMenu: true,
-            suppressKeyboardEvent: overrideKeyboardEvents,
-            cellStyle: chooseCellStyle,
-            enableCellChangeFlash: true,
-            tooltipValueGetter: toolTipValueGetter
-          }}
-          rowHeight={20}
-          enableBrowserTooltips
-          rowSelection="multiple"
-          enableRangeSelection={true}
-          animateRows={true}
-          enableRangeHandle={true}
-          onCellKeyDown={onCellKeyDown}
-          onPasteStart={onPasteStart}
-          onPasteEnd={onPasteEnd}
-          tabToNextCell={onTabToNextCell}
-          onCellValueChanged={onCellValueChanged}
-          onSortChanged={onSortChanged}
-          onFilterChanged={onSortChanged}
-          onRowDataUpdated={onRowDataUpdated}
-          fillHandleDirection="y"
-          getContextMenuItems={getContextMenuItems}
-          undoRedoCellEditing={false}
-          onCellEditingStopped={onCellEditingStopped}
-          frameworkComponents={{
-            validationPanel: ValidationPanel,
-            findReplacePanel: FindReplacePanel,
-            loadingOverlay: LoadingOverlay
-          }}
-          loadingOverlayComponent="loadingOverlay"
-          pivotMode={false}
-          pivotColumnGroupTotals="before"
-          sideBar={sideBar}
-          onGridReady={onGridReady}
-          onFirstDataRendered={onFirstDataRendered}
-        >
-          <AgGridColumn field="id" editable={false} hide={true} />
-          <AgGridColumn field="pos" editable={false} hide={true} sort="asc" />
-          <AgGridColumn
-            field="row"
-            headerName=""
-            suppressMovable={true}
-            editable={false}
-            valueGetter="node.rowIndex + 1"
-            minWidth={40}
-            enableCellChangeFlash={false}
-            filter={false}
-            sortable={false}
-          />
-          <AgGridColumn field="diver" headerName="Diver" pivot={true} enablePivot={false} />
-          <AgGridColumn field="buddy" headerName="Buddy" />
-          <AgGridColumn field="siteCode" headerName="Site Code" rowGroup={false} enableRowGroup={true} />
-          <AgGridColumn field="siteName" headerName="Site Name" minWidth={160} />
-          <AgGridColumn field="latitude" headerName="Latitude" />
-          <AgGridColumn field="longitude" headerName="Longitude" />
-          <AgGridColumn field="date" headerName="Date" rowGroup={false} enableRowGroup={true} />
-          <AgGridColumn field="vis" headerName="Vis" />
-          <AgGridColumn field="direction" headerName="Direction" />
-          <AgGridColumn field="time" headerName="Time" />
-          <AgGridColumn field="P-Qs" headerName="P-Qs" />
-          <AgGridColumn field="depth" headerName="Depth" rowGroup={false} enableRowGroup={true} />
-          <AgGridColumn field="method" headerName="Method" rowGroup={false} enableRowGroup={true} />
-          <AgGridColumn field="block" headerName="Block" rowGroup={false} enableRowGroup={true} />
-          <AgGridColumn field="code" headerName="Code" />
-          <AgGridColumn field="species" headerName="Species" pivot={true} enablePivot={false} />
-          <AgGridColumn field="commonName" headerName="Common Name" />
-          <AgGridColumn field="total" headerName="Total" aggFunc="count" />
-          <AgGridColumn field="inverts" headerName="Inverts" />
-          {measurements.map((m) => (
+        {job && (
+          <AgGridReact
+            getRowNodeId={(r) => r.id}
+            className={classes.agGrid}
+            context={context}
+            immutableData={true}
+            cellFlashDelay={100}
+            cellFadeDelay={100}
+            defaultColDef={{
+              editable: true,
+              sortable: true,
+              resizable: true,
+              flex: 1,
+              minWidth: 80,
+              filter: true,
+              floatingFilter: true,
+              suppressMenu: true,
+              suppressKeyboardEvent: overrideKeyboardEvents,
+              cellStyle: chooseCellStyle,
+              enableCellChangeFlash: true,
+              tooltipValueGetter: toolTipValueGetter
+            }}
+            rowHeight={20}
+            enableBrowserTooltips
+            rowSelection="multiple"
+            enableRangeSelection={true}
+            animateRows={true}
+            enableRangeHandle={true}
+            onCellKeyDown={onCellKeyDown}
+            onPasteStart={onPasteStart}
+            onPasteEnd={onPasteEnd}
+            tabToNextCell={onTabToNextCell}
+            onCellValueChanged={onCellValueChanged}
+            onSortChanged={onSortChanged}
+            onFilterChanged={onSortChanged}
+            onRowDataUpdated={onRowDataUpdated}
+            fillHandleDirection="y"
+            getContextMenuItems={getContextMenuItems}
+            undoRedoCellEditing={false}
+            onCellEditingStopped={onCellEditingStopped}
+            frameworkComponents={{
+              validationPanel: ValidationPanel,
+              findReplacePanel: FindReplacePanel,
+              loadingOverlay: LoadingOverlay
+            }}
+            loadingOverlayComponent="loadingOverlay"
+            pivotMode={false}
+            pivotColumnGroupTotals="before"
+            sideBar={sideBar}
+            onGridReady={onGridReady}
+            onFirstDataRendered={onFirstDataRendered}
+          >
+            <AgGridColumn field="id" editable={false} hide={true} />
+            <AgGridColumn field="pos" editable={false} hide={true} sort="asc" />
             <AgGridColumn
-              field={m.field}
-              key={m.field}
-              editable={true}
-              width={35}
-              headerComponentParams={{
-                template: `<div style="width: 48px; float: left; text-align:center"><div style="color: #c4d79b; border-bottom: 1px solid rgba(0, 0, 0, 0.12)">${m.fishSize}</div><div style="color: #da9694">${m.invertSize}</div></div>`
-              }}
+              field="row"
+              headerName=""
+              suppressMovable={true}
+              editable={false}
+              valueGetter="node.rowIndex + 1"
+              minWidth={40}
+              enableCellChangeFlash={false}
+              filter={false}
+              sortable={false}
             />
-          ))}
-          {job.isExtendedSize &&
-            measurements.map((m) => (
+            <AgGridColumn field="diver" headerName="Diver" pivot={true} enablePivot={false} />
+            <AgGridColumn field="buddy" headerName="Buddy" />
+            <AgGridColumn field="siteCode" headerName="Site Code" rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="siteName" headerName="Site Name" minWidth={160} />
+            <AgGridColumn field="latitude" headerName="Latitude" />
+            <AgGridColumn field="longitude" headerName="Longitude" />
+            <AgGridColumn field="date" headerName="Date" rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="vis" headerName="Vis" />
+            <AgGridColumn field="direction" headerName="Direction" />
+            <AgGridColumn field="time" headerName="Time" />
+            <AgGridColumn field="P-Qs" headerName="P-Qs" />
+            <AgGridColumn field="depth" headerName="Depth" rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="method" headerName="Method" rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="block" headerName="Block" rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="code" headerName="Code" />
+            <AgGridColumn field="species" headerName="Species" pivot={true} enablePivot={false} />
+            <AgGridColumn field="commonName" headerName="Common Name" />
+            <AgGridColumn field="total" headerName="Total" aggFunc="count" />
+            <AgGridColumn field="inverts" headerName="Inverts" />
+            {measurementColumns.map((m) => (
               <AgGridColumn
                 field={m.field}
                 key={m.field}
@@ -706,16 +665,18 @@ const DataSheetView = ({jobId, onIngest}) => {
                   template: `<div style="width: 48px; float: left; text-align:center"><div style="color: #c4d79b; border-bottom: 1px solid rgba(0, 0, 0, 0.12)">${m.fishSize}</div><div style="color: #da9694">${m.invertSize}</div></div>`
                 }}
               />
-            )) && <AgGridColumn field="isInvertSizing" headerName="Use Invert Sizing" />}
-        </AgGridReact>
+            ))}
+            {job.isExtendedSize && <AgGridColumn minWidth={120} field="isInvertSizing" headerName="Use Invert Sizing" />}
+          </AgGridReact>
+        )}
       </Box>
     </>
   );
 };
 
 DataSheetView.propTypes = {
-  jobId: PropTypes.string.required,
-  onIngest: PropTypes.func.required
+  jobId: PropTypes.string.isRequired,
+  onIngest: PropTypes.func.isRequired
 };
 
 export default DataSheetView;

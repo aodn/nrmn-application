@@ -87,10 +87,9 @@ public class ValidationProcessIT {
         stagedJob.setRows(Arrays.asList(row1, row2, row3, row4));
 
 
-        val response = validationProcess.process(stagedJob);
+        val errors = validationProcess.process(stagedJob);
 
-        assertEquals("Validation rows size does not equal job rows size", stagedJob.getRows().size(),
-                response.getErrors().size());
+        assertEquals("Validation is failing on valid rows", 0, errors.getErrors().size());
 
     }
 

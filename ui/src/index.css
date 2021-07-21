@@ -28,3 +28,9 @@
 #validation-grid .ag-tool-panel-wrapper {
   width: 350px;
 }
+
+#validation-grid .ag-tool-panel-wrapper > .ag-react-container {
+  width: 100%;
+  margin-right: 25px;
+  border-left: 2px solid #ccc;
+}
