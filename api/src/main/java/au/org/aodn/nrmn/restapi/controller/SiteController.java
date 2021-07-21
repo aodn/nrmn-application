@@ -1,28 +1,5 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.validation.Valid;
-
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
 import au.org.aodn.nrmn.restapi.controller.assembler.SiteListItemAssembler;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
@@ -33,6 +10,17 @@ import au.org.aodn.nrmn.restapi.dto.site.SiteListItem;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @Tag(name = "sites")
@@ -146,6 +134,23 @@ public class SiteController {
         }
 
         return new ValidationErrors(errors);
+    }
+
+    @GetMapping("/siteNames")
+    public ResponseEntity<HashMap<String, List<String>>> getSiteNames() {
+        List<Site> allSites = siteRepository.findAll();
+
+        List<String> siteNames = allSites.stream()
+                .map(Site::getSiteName)
+                .filter(Objects::nonNull)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+
+        HashMap<String, List<String>> siteNamesList = new HashMap<>();
+        siteNamesList.put("siteNames", siteNames);
+
+        return ResponseEntity.ok().body(siteNamesList);
     }
 
 }

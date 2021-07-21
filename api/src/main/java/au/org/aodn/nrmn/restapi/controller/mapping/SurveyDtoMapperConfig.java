@@ -33,11 +33,17 @@ public class SurveyDtoMapperConfig {
             Optional<Diver> diver = diverId.isPresent() ? diverRepository.findById(diverId.get()) : Optional.empty();
             return diver.isPresent() ? diver.get().getFullName() : "";
         };
+        Converter<Integer, String> toDiverInitial = ctx -> {
+            Optional<Integer> diverId = Optional.ofNullable(ctx.getSource());
+            Optional<Diver> diver = diverId.isPresent() ? diverRepository.findById(diverId.get()) : Optional.empty();
+            return diver.isPresent() ? diver.get().getInitials() : "";
+        };
         Converter<Integer, String> toDiverList = ctx -> String.join("\n", surveyMethodRepository.findDiversForSurvey(ctx.getSource()));
         Converter<String, String> passThrough = ctx -> Optional.ofNullable(ctx.getSource()).orElse("");
 
         modelMapper.typeMap(Survey.class, SurveyDto.class).addMappings(mapper -> {
             mapper.using(toDiverName).map(Survey::getPqDiverId, SurveyDto::setPqDiver);
+            mapper.using(toDiverInitial).map(Survey::getPqDiverId, SurveyDto::setPqDiverInitials);
             mapper.using(toBlockString).map(Survey::getSurveyId, SurveyDto::setBlock);
             mapper.using(toMethodString).map(Survey::getSurveyId, SurveyDto::setMethod);
             mapper.using(toSurveyNotDoneString).map(Survey::getSurveyId, SurveyDto::setSurveyNotDone);

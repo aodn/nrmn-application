@@ -8,12 +8,12 @@ import {selectedItemsRequested, setField} from '../middleware/entities';
 import {PropTypes} from 'prop-types';
 
 const DropDownInput = (props) => {
-  const {entity, idKey, valueKey, route, entityList, values, optional, fieldName} = props.uiSchema;
+  const {entity, idKey, valueKey, route, entityList, values, optional, fieldName, relatedAttr, relatedField} = props.uiSchema;
   const name = idKey ?? entity;
 
   const formValue = useSelector((state) => state.form.data[fieldName ?? name]);
   const formOptions = useSelector((state) => state.form.options[entityList])?.map((i) => {
-    return {id: i[idKey], label: i[valueKey]};
+    return {id: i[idKey], label: i[valueKey], relatedValue: i[relatedAttr]};
   });
 
   // use either the supplied values or options retreived from an endpoint
@@ -40,7 +40,12 @@ const DropDownInput = (props) => {
         getOptionLabel={(o) => o.label}
         getOptionSelected={(o, v) => (v ? o.id === v.id : null)}
         value={options.find((o) => o.id === formValue) ?? null}
-        onChange={(_, o) => dispatch(setField({newValue: o?.id, entity: fieldName ?? name}))}
+        onChange={(_, o) => {
+          dispatch(setField({newValue: o?.id, entity: fieldName ?? name}));
+          if(o?.relatedValue != null && relatedField) {
+            dispatch(setField({newValue: o.relatedValue, entity: relatedField}));
+          }
+        }}
         renderInput={(params) => <TextField {...params} variant="outlined" error={error} helperText={error?.message} />}
       />
     </>
