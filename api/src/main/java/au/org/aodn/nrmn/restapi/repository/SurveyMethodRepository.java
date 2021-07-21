@@ -15,10 +15,14 @@ import org.springframework.stereotype.Repository;
 public interface SurveyMethodRepository extends JpaRepository<SurveyMethod, Integer>,
  JpaSpecificationExecutor<SurveyMethod> {
 
-     @Query(value = "SELECT DISTINCT method_id from {h-schema}survey_method WHERE survey_id = :surveyId ORDER BY method_id", nativeQuery = true)
+     @Query(value = "SELECT DISTINCT method_id from {h-schema}survey_method " +
+             "WHERE survey_id = :surveyId AND survey_not_done = FALSE " +
+             "ORDER BY method_id", nativeQuery = true)
     List<String> findSurveyMethodsForSurveyId(@Param("surveyId") Integer surveyId);
 
-    @Query(value = "SELECT method_id || ': ' || block_num from {h-schema}survey_method WHERE survey_id = :surveyId AND block_num is not null ORDER BY method_id, block_num", nativeQuery = true)
+    @Query(value = "SELECT method_id || ': ' || block_num from {h-schema}survey_method " +
+            "WHERE survey_id = :surveyId AND block_num is not null AND survey_not_done = FALSE " +
+            "ORDER BY method_id, block_num", nativeQuery = true)
     List<String> findBlocksForSurveyId(@Param("surveyId") Integer surveyId);
 
     @Query(value = "SELECT method_id || ': ' || block_num from {h-schema}survey_method " +
