@@ -132,6 +132,8 @@ const DataSheetView = ({jobId, onIngest}) => {
     validateJob(jobId, (result) => {
       context.errors = result.data.errors;
 
+      setState(context.errors.some((e) => e.levelId === 'BLOCKING') ? IngestState.Edited : IngestState.Valid);
+
       gridApi.hideOverlay();
       gridApi.redrawRows();
 
