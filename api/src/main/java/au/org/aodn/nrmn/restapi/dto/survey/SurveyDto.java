@@ -37,7 +37,7 @@ public class SurveyDto {
     @Schema(title = "Direction")
     private String direction;
 
-    @Schema(title = "Method")
+    @Schema(title = "Method(s)")
     private String method;
 
     @Schema(title = "Block")
@@ -73,6 +73,18 @@ public class SurveyDto {
     @Schema(title = "Project Title")
     private String projectTitle;
 
-    @Schema(title = "Survey Not Done")
+    @Schema(title = "Survey(s) Not Done")
     private String surveyNotDone;
+
+    @Schema(title = "Location Name")
+    private String locationName;
+
+    @Schema(title = "Area")
+    private String area;
+
+    @Schema(title = "Country")
+    private String country;
+
+    @Schema(title = "Divers")
+    private String divers;
 }
