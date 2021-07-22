@@ -83,7 +83,6 @@ const context = {
   undoStack: [],
   summaries: [],
   errors: [],
-  globalErrors: [],
   pushUndo: pushUndo,
   popUndo: popUndo,
 
@@ -405,14 +404,6 @@ const DataSheetView = ({jobId, onIngest}) => {
   };
 
   const chooseCellStyle = (params) => {
-    // Highlight global validations
-    const global = params.context.globalErrors.find((g) => g.rowId === params.data.id);
-    if (global) {
-      let color = params.colDef.field === 'row' ? grey[500] : grey[900];
-      if (global.type === 'BLOCKING') return {color: color, backgroundColor: red[100]};
-      if (global.type === 'WARNING') return {color: color, backgroundColor: orange[100]};
-    }
-
     // Grey-out the first  column containing the row number
     if (params.colDef.field === 'row') return {color: grey[500]};
 

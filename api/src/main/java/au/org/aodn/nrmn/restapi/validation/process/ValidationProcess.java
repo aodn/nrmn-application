@@ -252,7 +252,7 @@ public class ValidationProcess {
         if (l5 != 0 && l95 != 0) {
             List<Integer> outOfRange = row.getMeasureJson().entrySet()
                     .stream()
-                    .filter(entry -> entry.getValue() != 0 && (l5 > 0 && range[entry.getKey()] < l5) || (l95 > 0 && range[entry.getKey()] > l95))
+                    .filter(entry -> entry.getValue() != 0 && (l5 > 0 && range[entry.getKey() - 1] < l5) || (l95 > 0 && range[entry.getKey() - 1] > l95))
                     .map(Map.Entry::getKey).collect(Collectors.toList());
 
             if (!outOfRange.isEmpty()) {
@@ -275,7 +275,7 @@ public class ValidationProcess {
         if (lMax != 0) {
 
             List<Integer> outOfRange = row.getMeasureJson().entrySet().stream()
-                    .filter(entry -> range[entry.getKey()] > lMax)
+                    .filter(entry -> range[entry.getKey() - 1] > lMax)
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toList());
 
@@ -299,8 +299,12 @@ public class ValidationProcess {
     }
 
     private Collection<ValidationCell> validateMeasurements(String programName, StagedRowFormatted row) {
-        Integer observationTotal = row.getMeasureJson().entrySet().stream().map(Map.Entry::getValue).reduce(0, Integer::sum) + (row.getInverts() != null ? row.getInverts() : 0);
         Collection<ValidationCell> errors = new ArrayList<ValidationCell>();
+
+        if (row.getMeasureJson() == null)
+            return errors;
+
+        Integer observationTotal = row.getMeasureJson().entrySet().stream().map(Map.Entry::getValue).reduce(0, Integer::sum) + (row.getInverts() != null ? row.getInverts() : 0);
 
         // VALIDATION: RLS: Debris Zero observations
         if (programName.equalsIgnoreCase("RLS") && row.getCode().equalsIgnoreCase("dez") && row.getSpecies().isPresent()) {
@@ -358,12 +362,12 @@ public class ValidationProcess {
         Site site = row.getSite();
         Collection<ValidationCell> errors = new ArrayList<ValidationCell>();
 
-            double dist = getDistance(row.getSite().getLatitude(), row.getSite().getLongitude(), row.getLatitude(), row.getLongitude());
-            if (dist > 0.2) {
-                String message = "Coordinates are further than 0.2km from the Site (" + String.format("%.2f", dist) + "km)";
-                errors.add(new ValidationCell(ValidationCategory.SPAN, ValidationLevel.WARNING, message, row.getId(), "latitude"));
-                errors.add(new ValidationCell(ValidationCategory.SPAN, ValidationLevel.WARNING, message, row.getId(), "longitude"));
-            }
+        double dist = getDistance(row.getSite().getLatitude(), row.getSite().getLongitude(), row.getLatitude(), row.getLongitude());
+        if (dist > 0.2) {
+            String message = "Coordinates are further than 0.2km from the Site (" + String.format("%.2f", dist) + "km)";
+            errors.add(new ValidationCell(ValidationCategory.SPAN, ValidationLevel.WARNING, message, row.getId(), "latitude"));
+            errors.add(new ValidationCell(ValidationCategory.SPAN, ValidationLevel.WARNING, message, row.getId(), "longitude"));
+        }
         return errors;
     }
 
@@ -371,11 +375,11 @@ public class ValidationProcess {
 
         // Validation: Surveys Too Old
         if (row.getDate().isAfter(LocalDate.from(ZonedDateTime.now())))
-            return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Date must be after " + earliest.toString(), row.getId(), "date");
+            return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Date is in the future", row.getId(), "date");
 
         // Validation: Future Survey Rule
         if (row.getDate().isBefore(earliest))
-            return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Date is in the future", row.getId(), "date");
+            return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Date must be after " + earliest.toString(), row.getId(), "date");
 
         return null;
     }
@@ -385,7 +389,7 @@ public class ValidationProcess {
         Set<String> columnNames = new HashSet<String>();
         Set<Long> rowIds = new HashSet<Long>();
 
-        for (int measureIndex : Arrays.asList(0, 1, 2, 3, 4))
+        for (int measureIndex : Arrays.asList(1, 2, 3, 4, 5))
             if (rows.stream().mapToInt(row -> row.getMeasureJson().getOrDefault(measureIndex, 0)).sum() == 0) {
                 rowIds.addAll(rows.stream().map(r -> r.getId()).collect(Collectors.toList()));
                 columnNames.add(Integer.toString(measureIndex));
@@ -398,7 +402,7 @@ public class ValidationProcess {
 
         Set<String> columnNames = new HashSet<String>();
 
-        for (int measureIndex : Arrays.asList(0, 1, 2, 3, 4))
+        for (int measureIndex : Arrays.asList(1, 2, 3, 4, 5))
             if (rows.stream().mapToInt(row -> row.getMeasureJson().getOrDefault(measureIndex, 0)).sum() < 50) {
                 columnNames.add(Integer.toString(measureIndex));
             }
@@ -407,14 +411,20 @@ public class ValidationProcess {
     }
 
     private ValidationError validateSurveyM1M2(List<StagedRowFormatted> surveyRows) {
-        if (surveyRows.stream().filter(r -> Arrays.asList(1, 2).contains(r.getMethod())).collect(Collectors.groupingBy(StagedRowFormatted::getMethod)).size() < 2)
-            return new ValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, surveyRows.get(0).getSurveyNum() + ": M1 or M2 missing", surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("method"));
+        if (surveyRows.stream().filter(r -> Arrays.asList(1, 2).contains(r.getMethod())).collect(Collectors.groupingBy(StagedRowFormatted::getMethod)).size() < 2) {
+            String surveyNum = surveyRows.get(0).getSurveyName();
+            String messageLabel = surveyNum != null ? surveyNum + ": " : "";
+            return new ValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, messageLabel + "M1 or M2 missing", surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("method"));
+        }
         return null;
     }
 
     private ValidationError validateSurveyGroup(Integer depth, List<StagedRowFormatted> surveyRows) {
-        if (surveyRows.stream().filter(r -> Arrays.asList(1, 2, 3, 4).contains(r.getSurveyNum())).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyNum)).size() < 4)
-            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, surveyRows.get(0).getSurveyName() + ": Survey incomplete", surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
+        if (surveyRows.stream().filter(r -> Arrays.asList(1, 2, 3, 4).contains(r.getSurveyNum())).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyNum)).size() < 4) {
+            String surveyName = surveyRows.get(0).getSurveyName();
+            String messageLabel = surveyName != null ? surveyName + ": " : "";
+            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, messageLabel + "Survey incomplete", surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
+        }
         return null;
     }
 
@@ -439,7 +449,7 @@ public class ValidationProcess {
             res.add(validateSurveyIsNew(surveyRows.get(0)));
 
             // VALIDATE: Has M1 M2
-            if (programName == "RLS" || !validateATRCM3457(surveyRows))
+            if (programName.equalsIgnoreCase("RLS") || !validateATRCM3457(surveyRows))
                 res.add(validateSurveyM1M2(surveyRows));
         }
 
@@ -478,16 +488,16 @@ public class ValidationProcess {
             }
 
             // Total Checksum & Missing Data
-            results.addAll(validateMeasurements(programName, row));
+            results.addAll(validateMeasurements(programName, row), false);
 
             // Row Method is valid for species
-            results.add(validateSpeciesBelowToMethod(row));
+            results.add(validateSpeciesBelowToMethod(row), false);
 
             // Validate within 200M
             results.addAll(validateWithin200M(row));
 
             // Date is not in the future or too far in the past
-            results.add(validateDateRange(programName.equalsIgnoreCase("RLS") ? DATE_MIN_RLS : DATE_MIN_ATRC, row));
+            results.add(validateDateRange(programName.equalsIgnoreCase("RLS") ? DATE_MIN_RLS : DATE_MIN_ATRC, row), false);
         }
 
         res.addAll(results.getAll());
