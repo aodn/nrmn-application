@@ -44,6 +44,8 @@ public class SurveyIngestionServiceTest {
     ObservationRepository observationRepository;
     @Mock
     StagedJobRepository jobRepository;
+    @Mock
+    private StagedJobLogRepository stagedJobLogRepository;
 
     @InjectMocks
     SurveyIngestionService surveyIngestionService;
