@@ -1,4 +1,4 @@
-import {Box, Button, Divider, Typography} from '@material-ui/core';
+import {Box, Button, Divider, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core';
 import {PropTypes} from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import ValidationSummary from './ValidationSummary';
@@ -64,8 +64,10 @@ const ValidationPanel = (props) => {
 
   const [blocking, setBlocking] = useState([]);
   const [warning, setWarning] = useState([]);
+  const [info, setInfo] = useState({});
 
   useEffect(() => {
+    setInfo(context.summary);
     if (errors && errors.length > 0) {
       setBlocking(generateErrorTree(context, errors, 'BLOCKING'));
       setWarning(generateErrorTree(context, errors, 'WARNING'));
@@ -86,7 +88,38 @@ const ValidationPanel = (props) => {
   return (
     <>
       <Box m={2} mt={1}>
-        <Button onClick={() => props.api.setFilterModel(null)}>Reset</Button>
+        <Button onClick={() => props.api.setFilterModel(null)}>Reset Filter</Button>
+      </Box>
+      <Box m={2}>
+        <Typography variant="button">Summary</Typography>
+        <Table size="small">
+          <TableBody>
+            <TableRow>
+              <TableCell>{info.rowCount}</TableCell>
+              <TableCell>rows found</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>{info.siteCount}</TableCell>
+              <TableCell>distinct sites found</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>{info.surveyCount}</TableCell>
+              <TableCell>distinct surveys found</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>{info.incompleteSurveyCount}</TableCell>
+              <TableCell>incomplete surveys found</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>{info.obsItemCount}</TableCell>
+              <TableCell>distinct observable items found</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>{info.diverCount}</TableCell>
+              <TableCell>distinct divers found</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </Box>
       <Box m={2} mt={1}>
         <Typography variant="button">{Object.keys(blocking).length > 0 ? `Blocking` : 'No Blocking ✔'}</Typography>

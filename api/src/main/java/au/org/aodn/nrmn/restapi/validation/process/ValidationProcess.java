@@ -256,7 +256,7 @@ public class ValidationProcess {
                     .map(Map.Entry::getKey).collect(Collectors.toList());
 
             if (!outOfRange.isEmpty()) {
-                String message = "Measurement is outside l5/95 [" + l5 + "," + l95 + "] for Species [" + row.getRef().getSpecies() + "]";
+                String message = "Measurement outside L5/95 [" + l5 + "," + l95 + "] for [" + row.getRef().getSpecies() + "]";
                 outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, message, row.getId(), col.toString())));
             }
         }
@@ -395,7 +395,7 @@ public class ValidationProcess {
                 columnNames.add(Integer.toString(measureIndex));
             }
 
-        return rowIds.size() > 0 ? new ValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Missing Quadrats in transect " + transect, rowIds, columnNames) : null;
+        return rowIds.size() > 0 ? new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, "Missing Quadrats in transect " + transect, rowIds, columnNames) : null;
     }
 
     private ValidationError validateMethod3QuadratsGT50(String transect, List<StagedRowFormatted> rows) {
@@ -432,13 +432,9 @@ public class ValidationProcess {
         return surveyRows.stream().filter(r -> Arrays.asList(3, 4, 5, 7).contains(r.getMethod())).count() > 0;
     }
 
-    public Collection<ValidationError> checkSurveys(String programName, Boolean isExtended, List<StagedRowFormatted> rows) {
+    public Collection<ValidationError> checkSurveys(String programName, Boolean isExtended, Map<Integer, List<StagedRowFormatted>> surveyMap) {
         Set<ValidationError> res = new HashSet<ValidationError>();
-        ValidationResultSet results = new ValidationResultSet();
-
-        Map<Integer, List<StagedRowFormatted>> surveyMap = rows.stream().filter(row -> row.getSite() != null && row.getDate() != null && row.getDepth() != null).collect(Collectors.groupingBy(StagedRowFormatted::getDepth));
-        Map<String, List<StagedRowFormatted>> method3SurveyMap = rows.stream().filter(row -> row.getMethod().equals(3)).collect(Collectors.groupingBy(StagedRowFormatted::getTransectName));
-
+ 
         for (Map.Entry<Integer, List<StagedRowFormatted>> survey : surveyMap.entrySet()) {
             List<StagedRowFormatted> surveyRows = survey.getValue();
 
@@ -453,13 +449,20 @@ public class ValidationProcess {
                 res.add(validateSurveyM1M2(surveyRows));
         }
 
+        res.remove(null);
+
+        return res;
+    }
+
+    public Collection<ValidationError> checkMethod3Transects(String programName, Boolean isExtended, Map<String, List<StagedRowFormatted>> method3SurveyMap) {
+        Set<ValidationError> res = new HashSet<ValidationError>();
+
         // Validate M3 transects
         for (String transectName : method3SurveyMap.keySet()) {
             res.add(validateMethod3Quadrats(transectName, method3SurveyMap.get(transectName)));
             res.add(validateMethod3QuadratsGT50(transectName, method3SurveyMap.get(transectName)));
         }
 
-        res.addAll(results.getAll());
         res.remove(null);
 
         return res;
@@ -507,6 +510,7 @@ public class ValidationProcess {
     }
 
     public ValidationResponse process(StagedJob job) {
+        ValidationResponse response = new ValidationResponse();
 
         Collection<StagedRow> rows = rowRepo.findRowsByJobId(job.getId());
         Collection<String> enteredSiteCodes = rows.stream().map(s -> s.getSiteCode()).collect(Collectors.toSet());
@@ -527,9 +531,23 @@ public class ValidationProcess {
                 .collect(Collectors.toList());
 
         if (validRows != null) {
+            response.setRowCount(validRows.size());
+            response.setSiteCount(validRows.stream().map(r -> r.getSite()).distinct().count());
+            response.setDiverCount(validRows.stream().map(r -> r.getDiver()).distinct().count());
+            response.setObsItemCount(validRows.stream().map(r -> r.getSpecies()).filter(o -> o.isPresent()).distinct().count());
+
             sheetErrors.addAll(checkData(programName, job.getIsExtendedSize(), validRows));
-            sheetErrors.addAll(checkSurveys(programName, job.getIsExtendedSize(), validRows));
+
+            Map<Integer, List<StagedRowFormatted>> surveyMap = validRows.stream().filter(row -> row.getSite() != null && row.getDate() != null && row.getDepth() != null).collect(Collectors.groupingBy(StagedRowFormatted::getDepth));
+            sheetErrors.addAll(checkSurveys(programName, job.getIsExtendedSize(), surveyMap));
+            response.setIncompleteSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("Survey Incomplete")).count());
+
+            Map<String, List<StagedRowFormatted>> method3SurveyMap = validRows.stream().filter(row -> row.getMethod().equals(3)).collect(Collectors.groupingBy(StagedRowFormatted::getTransectName));
+            sheetErrors.addAll(checkMethod3Transects(programName, job.getIsExtendedSize(), method3SurveyMap));
+            response.setSurveyCount(surveyMap.keySet().size());
+            response.setErrors(sheetErrors);
         }
-        return new ValidationResponse(job, sheetErrors);
+
+        return response;
     }
 }

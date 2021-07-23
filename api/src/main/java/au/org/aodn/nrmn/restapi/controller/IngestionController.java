@@ -73,8 +73,6 @@ public class IngestionController {
                     .save(StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.INGESTING).build());
             List<StagedRowFormatted> validatedRows = rowRepository.findAll(Example.of(StagedRow.builder().stagedJob(job).build())).stream().map(row -> mapper.map(row, StagedRowFormatted.class)).collect(Collectors.toList());
             surveyIngestionService.ingestTransaction(job, validatedRows);
-            stagedJobLogRepository
-                    .save(StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.INGESTED).build());
         } catch (Exception e) {
             stagedJobLogRepository.save(StagedJobLog.builder().stagedJob(job).details(e.getMessage())
                     .eventType(StagedJobEventType.ERROR).build());

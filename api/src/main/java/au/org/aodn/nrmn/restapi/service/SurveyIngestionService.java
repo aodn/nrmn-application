@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.model.db.*;
+import au.org.aodn.nrmn.restapi.model.db.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.*;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
@@ -18,6 +19,7 @@ import javax.transaction.Transactional;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -202,6 +204,14 @@ public class SurveyIngestionService {
             return survey.getSurveyId();
         }).collect(Collectors.toList());
 
+        long rowCount = validatedRows.size();
+        long siteCount = validatedRows.stream().map(r -> r.getSite()).distinct().count();
+        long surveyCount = surveyIds.size();
+        long obsItemCount = validatedRows.stream().map(r -> r.getSpecies()).filter(o -> o.isPresent()).distinct().count();
+        long diverCount = validatedRows.stream().map(r -> r.getDiver()).distinct().count();
+        List<String> messages = Arrays.asList(rowCount + " rows of data", siteCount + " sites", surveyCount + " surveys", obsItemCount + " distinct observable items", diverCount + " divers");
+        String message = messages.stream().collect(Collectors.joining("\n"));
+        stagedJobLogRepository.save(StagedJobLog.builder().stagedJob(job).details(message).eventType(StagedJobEventType.INGESTING).build());
         job.setStatus(StatusJobType.INGESTED);
         job.setSurveyIds(surveyIds);
         jobRepository.save(job);

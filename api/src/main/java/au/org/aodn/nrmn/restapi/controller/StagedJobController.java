@@ -152,7 +152,7 @@ public class StagedJobController {
             val validationResponse = validation.process(job);
             return ResponseEntity.ok().body(validationResponse);
         }).orElseGet(() -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new ValidationResponse(null, Collections.emptyList())));
+                .body(new ValidationResponse()));
     }
 
     @GetMapping("/job/{jobId}")

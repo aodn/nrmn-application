@@ -130,6 +130,9 @@ const DataSheetView = ({jobId, onIngest}) => {
     context.errors = [];
     validateJob(jobId, (result) => {
       context.errors = result.data.errors;
+      delete result.data.errors;
+      delete result.data.job;
+      context.summary = result.data;
 
       setState(context.errors.some((e) => e.levelId === 'BLOCKING') ? IngestState.Edited : IngestState.Valid);
 
