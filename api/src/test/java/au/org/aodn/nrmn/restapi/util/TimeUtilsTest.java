@@ -30,6 +30,6 @@ class TimeUtilsTest {
             "10:15:23 PM|22:15:23"
     }, delimiter = '|')
     public void shouldBeParsedCorrectly(String value, String expectedTime) {
-        assertThat(TimeUtils.parseTime(value), is(equalTo(LocalTime.parse(expectedTime, SIMPLE_FORMAT))));
+        assertThat(TimeUtils.parseTime(value).get(), is(equalTo(LocalTime.parse(expectedTime, SIMPLE_FORMAT))));
     }
 }

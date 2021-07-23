@@ -51,7 +51,7 @@ const JobView = () => {
                 </Typography>
               </Grid>
 
-              <Divider style={{margin: 15, marginTop: 0}}/>
+              <Divider style={{margin: 15, marginTop: 0}} />
 
               <Grid container>
                 <Grid item xs={4} lg={6} style={{paddingBottom: 0}}>
@@ -74,13 +74,13 @@ const JobView = () => {
                     </ListItem>
                   </List>
                 </Grid>
-                <Grid display={{ lg: 'none' }} item xs={4} lg={6} style={{paddingTop: 0}}>
+                <Grid display={{lg: 'none'}} item xs={4} lg={6} style={{paddingTop: 0}}>
                   <List dense style={{paddingTop: 0}}>
                     <ListItem>
                       <ListItemText primary="Date Created" secondary={new Date(job.created).toUTCString()} />
                     </ListItem>
                     <Hidden only="lg">
-                      <ListItem display={{ lg: 'none' }}>
+                      <ListItem display={{lg: 'none'}}>
                         <ListItemText primary="Extended Size" secondary={job.isExtendedSize ? 'Yes' : 'No'} />
                       </ListItem>
                     </Hidden>
@@ -96,31 +96,36 @@ const JobView = () => {
                   </Grid>
                 </Hidden>
 
-                {job.surveyIds &&
-                job.surveyIds.length ?
+                {job.surveyIds && job.surveyIds.length ? (
                   <Grid item xs={12}>
-                    <Typography className={classes.title} variant="h6" color="primary" style={{paddingLeft: 15, fontSize: 15, fontWeight: 400}}>
+                    <Typography
+                      className={classes.title}
+                      variant="h6"
+                      color="primary"
+                      style={{paddingLeft: 15, fontSize: 15, fontWeight: 400}}
+                    >
                       Surveys: ({job.surveyIds.length})
                     </Typography>
                     <Grid container>
                       {job.surveyIds &&
-                      job.surveyIds.length > 0 &&
-                      job.surveyIds.map((id) => (
-                        <Grid key={id} item xs={3} lg={6} >
-                          <List dense style={{paddingTop: 0}}>
-                            <ListItem>
-                              <Link to={`/data/survey/${id}`} variant="a">
-                                {id}
-                              </Link>
-                            </ListItem>
-                          </List>
-                        </Grid>
-                      ))}
+                        job.surveyIds.length > 0 &&
+                        job.surveyIds.map((id) => (
+                          <Grid key={id} item xs={3} lg={6}>
+                            <List dense style={{paddingTop: 0}}>
+                              <ListItem>
+                                <Link to={`/data/survey/${id}`} variant="a">
+                                  {id}
+                                </Link>
+                              </ListItem>
+                            </List>
+                          </Grid>
+                        ))}
                     </Grid>
                   </Grid>
-                  : <Divider />}
+                ) : (
+                  <Divider />
+                )}
               </Grid>
-
             </Paper>
           </Grid>
           <Grid item sm={12} md={12} lg={7} className={classes.paper}>
@@ -137,9 +142,18 @@ const JobView = () => {
                   <TableBody>
                     {job.logs.map((log) => (
                       <TableRow key={log.id}>
-                        <TableCell component="th" scope="row">{new Date(log.eventTime).toUTCString()}</TableCell>
+                        <TableCell component="th" scope="row">
+                          {new Date(log.eventTime).toUTCString()}
+                        </TableCell>
                         <TableCell>{log.eventType}</TableCell>
-                        <TableCell>{log.details}</TableCell>
+                        <TableCell>
+                          {log.details?.split('\n').map((e) => (
+                            <div key={e}>
+                              {e}
+                              <br />
+                            </div>
+                          ))}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.util;
 
+import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
@@ -7,32 +8,22 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
-import java.sql.Date;
-import java.util.List;
+import java.util.Optional;
 
 /**
  * Helper methods for parsing times for supported formats
  */
- 
-public class TimeUtils {
-    private static final List<DateTimeFormatter> SUPPORTED_LOCALTIME_FORMATS = Arrays.asList(
-            DateTimeFormatter.ofPattern("H:mm[:ss]"),
-            new DateTimeFormatterBuilder()
-                    .parseCaseInsensitive()
-                    .appendPattern("h:mm[:ss][[ ]a]")
-                    .toFormatter());
 
+public class TimeUtils {
+    private static final DateTimeFormatter SUPPORTED_TIME_FORMATTER = new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("[h:mm[:ss] a][H:mm[:ss]]").toFormatter();
     private static final String SUPPORTED_DATE_FORMAT = "yyyy-MM-dd";
 
-    public static LocalTime parseTime(String value) {
-        for (DateTimeFormatter supportedFormat: SUPPORTED_LOCALTIME_FORMATS) {
-            try {
-                return LocalTime.parse(value, supportedFormat);
-            } catch (DateTimeParseException e) {}
+    public static Optional<LocalTime> parseTime(String value) {
+        try {
+            return Optional.of(LocalTime.parse(value, SUPPORTED_TIME_FORMATTER));
+        } catch (DateTimeParseException e) {
+            return Optional.empty();
         }
-
-        throw new DateTimeException("Invalid time");
     }
 
     public static Date parseDate(String value) {

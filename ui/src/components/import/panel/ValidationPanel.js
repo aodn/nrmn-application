@@ -1,13 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import {Box, Button, Divider, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core';
 import {PropTypes} from 'prop-types';
-import {Button, Divider, List, ListItem, ListItemText} from '@material-ui/core';
-import {Accordion, AccordionDetails, AccordionSummary, Box} from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import {measurements} from '../../../constants';
+import React, {useEffect, useState} from 'react';
+import ValidationSummary from './ValidationSummary';
 
-const focusCell = (api, column, ids) => {
-  api.ensureColumnVisible(column);
+const focusCell = (api, columns, ids) => {
+  if (columns) for (const column of columns) api.ensureColumnVisible(column);
   if (ids) {
     const values = ids.map((id) => id.toString());
     api.setFilterModel({
@@ -19,47 +16,67 @@ const focusCell = (api, column, ids) => {
   }
 };
 
+const generateErrorTree = (ctx, errors, level) => {
+  const tree = [];
+  errors
+    .filter((e) => e.levelId === level)
+    .sort((a, b) => {
+      return a.message < b.message ? -1 : a.message > b.message ? 1 : 0;
+    })
+    .forEach((e) => {
+      tree.push(generateErrorSummary(ctx, e));
+    });
+  return tree;
+};
+
+const generateErrorSummary = (ctx, e) => {
+  const rows = ctx.rowData.filter((r) => e.rowIds.includes(r.id));
+  let summary = [];
+  if (e.columnNames && e.categoryId !== 'SPAN') {
+    for (const col of e.columnNames) {
+      let values = [];
+      rows.forEach((r) => {
+        values.push({columnName: col, rowId: r.id, value: r[col]});
+      });
+
+      summary = values.reduce((acc, val) => {
+        const existingIdx = acc.findIndex((m) => m.columnName === val.columnName && m.value === val.value);
+        if (existingIdx >= 0) {
+          const rowIds = acc[existingIdx].rowIds;
+          acc[existingIdx] = {...val, rowIds: [...rowIds, val.rowId]};
+        } else {
+          const rowIds = [val.rowId];
+          delete val.rowId;
+          acc.push({...val, rowIds});
+        }
+        return acc;
+      }, []);
+    }
+  } else {
+    summary.push({rowIds: e.rowIds, columnNames: e.columnNames});
+  }
+  return {message: e.message, count: e.rowIds.length, description: summary};
+};
+
 const ValidationPanel = (props) => {
-  const [errList, setErrList] = useState([]);
+  const context = props.api.gridOptionsWrapper.gridOptions.context;
+  const errors = context.errors;
+
+  const [blocking, setBlocking] = useState([]);
+  const [warning, setWarning] = useState([]);
+  const [info, setInfo] = useState({});
 
   useEffect(() => {
-    const errorsByMsg = props.api.gridOptionsWrapper.gridOptions.context.summaries;
-
-    const errList = Object.keys(errorsByMsg).map((label) => {
-      const b = errorsByMsg[label].find((e) => e.level === 'BLOCKING');
-      return {
-        key: label,
-        total: errorsByMsg[label].length,
-        value: errorsByMsg[label],
-        blocking: b ? true : false
-      };
-    });
-
-    if (errList && errList.length > 0) {
-      setErrList(errList);
+    setInfo(context.summary);
+    if (errors && errors.length > 0) {
+      setBlocking(generateErrorTree(context, errors, 'BLOCKING'));
+      setWarning(generateErrorTree(context, errors, 'WARNING'));
     }
-  }, [props.api.gridOptionsWrapper.gridOptions.context.summaries]);
-
-  // HACK: To work around the fact that the column returned in the validation results
-  // and the staged rows have different cases for the column names.
-  const mapColumnTargetToGridColumn = (columnTarget) => {
-    const col = columnTarget.split(',')[0].toLowerCase();
-    const matchingColumn = props.columnApi.columnController.columnDefs.find((d) => d.field.toLowerCase() === col);
-    if (!matchingColumn) {
-      // Assume invert sizing
-      const invertSizeMap = measurements.find((m) => m.invertSize === col);
-      console.assert(invertSizeMap);
-      return invertSizeMap?.field || '';
-    }
-    return matchingColumn.field;
-  };
-
-  const blocking = errList.filter((e) => e.blocking);
-  const warning = errList.filter((e) => !e.blocking);
+  }, [errors, context]);
 
   const handleItemClick = (item) => {
-    if (item.ids) {
-      focusCell(props.api, mapColumnTargetToGridColumn(item.columnTarget), item.ids);
+    if (item.rowIds) {
+      focusCell(props.api, item.columnNames || [item.columnName], item.rowIds);
     } else if (item.row) {
       props.api.setFilterModel(null);
       const rowIdx = props.api.gridOptionsWrapper.gridOptions.context.rowData.findIndex((r) => r.id === item.row);
@@ -69,55 +86,51 @@ const ValidationPanel = (props) => {
   };
 
   return (
-    <Box m={2} mr={4}>
-      <Button onClick={() => props.api.setFilterModel(null)}>Reset</Button>
-      <Box p={1}>
-        <Typography variant="button">{blocking.length > 0 ? `${blocking.length} Errors:` : 'No Errors ✔'}</Typography>
+    <>
+      <Box m={2} mt={1}>
+        <Button onClick={() => props.api.setFilterModel(null)}>Reset Filter</Button>
       </Box>
-      {blocking.map((err) => (
-        <Accordion key={err.key}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />} id="panel1c-header">
-            <Typography variant="button">{`${err.key} (${err.total})`}</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <List>
-              {err.value.map((item, i) => (
-                <ListItem key={i} onClick={() => handleItemClick(item)} style={{backgroundColor: '#ffcdd2'}} button>
-                  <ListItemText color="secondary" primary={item.message} />
-                </ListItem>
-              ))}
-            </List>
-          </AccordionDetails>
-        </Accordion>
-      ))}
+      <Box m={2}>
+        <Typography variant="button">Summary</Typography>
+        <Table size="small">
+          <TableBody>
+            <TableRow>
+              <TableCell>{info.rowCount}</TableCell>
+              <TableCell>rows found</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>{info.siteCount}</TableCell>
+              <TableCell>distinct sites found</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>{info.surveyCount}</TableCell>
+              <TableCell>distinct surveys found</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>{info.incompleteSurveyCount}</TableCell>
+              <TableCell>incomplete surveys found</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>{info.obsItemCount}</TableCell>
+              <TableCell>distinct observable items found</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>{info.diverCount}</TableCell>
+              <TableCell>distinct divers found</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </Box>
+      <Box m={2} mt={1}>
+        <Typography variant="button">{Object.keys(blocking).length > 0 ? `Blocking` : 'No Blocking ✔'}</Typography>
+        {Object.keys(blocking).length > 0 && <ValidationSummary data={blocking} onItemClick={handleItemClick} />}
+      </Box>
       <Divider />
-      {warning.length > 0 && (
-        <Box p={1}>
-          <Typography variant="button">{warning.length > 0 ? `${warning.length} Warnings:` : 'No Warnings ✔'}</Typography>
-        </Box>
-      )}
-      {warning.map((err) => (
-        <Accordion key={err.key}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />} id="panel1c-header">
-            <div>
-              <Typography>{err.key}</Typography>
-            </div>
-            <div>
-              <Typography> ({err.total}) </Typography>
-            </div>
-          </AccordionSummary>
-          <AccordionDetails>
-            <List>
-              {err.value.map((item, i) => (
-                <ListItem onClick={() => handleItemClick(item)} style={{backgroundColor: '#ffe0b2'}} key={i} button>
-                  <ListItemText color="secondary" primary={item.message} />
-                </ListItem>
-              ))}
-            </List>
-          </AccordionDetails>
-        </Accordion>
-      ))}
-    </Box>
+      <Box m={2} mt={1}>
+        <Typography variant="button">{Object.keys(warning).length > 0 ? `Warning` : 'No Warning ✔'}</Typography>
+        {Object.keys(warning).length > 0 && <ValidationSummary data={warning} onItemClick={handleItemClick} />}
+      </Box>
+    </>
   );
 };
 

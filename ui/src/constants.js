@@ -1,142 +1,142 @@
 export const measurements = Object.freeze([
   {
-    field: '2-5',
+    field: '1',
     invertSize: '0.5',
     fishSize: '2.5'
   },
   {
-    field: '5',
+    field: '2',
     invertSize: '1',
     fishSize: '5'
   },
 
   {
-    field: '7-5',
+    field: '3',
     fishSize: '7.5',
     invertSize: '1.5'
   },
   {
-    field: '10',
+    field: '4',
     fishSize: '10',
     invertSize: '2'
   },
   {
-    field: '12-5',
+    field: '5',
     fishSize: '12.5',
     invertSize: '2.5'
   },
   {
-    field: '15',
+    field: '6',
     fishSize: '15',
     invertSize: '3'
   },
   {
-    field: '20',
+    field: '7',
     fishSize: '20',
     invertSize: '3.5'
   },
   {
-    field: '25',
+    field: '8',
     fishSize: '25',
     invertSize: '4'
   },
   {
-    field: '30',
+    field: '9',
     fishSize: '30',
     invertSize: '4.5'
   },
   {
-    field: '35',
+    field: '10',
     fishSize: '35',
     invertSize: '5'
   },
   {
-    field: '40',
+    field: '11',
     fishSize: '40',
     invertSize: '5.5'
   },
   {
-    field: '50',
+    field: '12',
     fishSize: 50,
     invertSize: '6'
   },
   {
-    field: '62-5',
+    field: '13',
     fishSize: '62.5',
     invertSize: '6.5'
   },
   {
-    field: '75',
+    field: '14',
     fishSize: '75',
     invertSize: '7'
   },
   {
-    field: '87-5',
+    field: '15',
     fishSize: '87.5',
     invertSize: '7.5'
   },
   {
-    field: '100',
+    field: '16',
     fishSize: '100',
     invertSize: '8'
   },
   {
-    field: '112-5',
+    field: '17',
     fishSize: '112.5',
     invertSize: '8.5'
   },
   {
-    field: '125',
+    field: '18',
     fishSize: '125',
     invertSize: '9'
   },
   {
-    field: '137-5',
+    field: '19',
     fishSize: '137.5',
     invertSize: '9.5'
   },
   {
-    field: '150',
+    field: '20',
     fishSize: '150',
     invertSize: '10'
   },
   {
-    field: '162-5',
+    field: '21',
     fishSize: '162.5',
     invertSize: '10.5'
   },
   {
-    field: '175',
+    field: '22',
     fishSize: '175',
     invertSize: '11'
   },
   {
-    field: '187-5',
+    field: '23',
     fishSize: '187.5',
     invertSize: '11.5'
   },
   {
-    field: '200',
+    field: '24',
     fishSize: '200',
     invertSize: '12'
   },
   {
-    field: '250',
+    field: '25',
     fishSize: '250',
     invertSize: '12.5'
   },
   {
-    field: '300',
+    field: '26',
     fishSize: '300',
     invertSize: '13'
   },
   {
-    field: '350',
+    field: '27',
     fishSize: '350',
     invertSize: '13.5'
   },
   {
-    field: '400',
+    field: '28',
     fishSize: '400',
     invertSize: '14'
   }
@@ -144,110 +144,63 @@ export const measurements = Object.freeze([
 
 export const extendedMeasurements = Object.freeze([
   {
-    field: '450',
-    fishSize: '400',
+    field: '29',
+    fishSize: '450',
     invertSize: '14.5'
   },
   {
-    field: '500',
+    field: '30',
     fishSize: '500',
     invertSize: '15'
   },
   {
-    field: '550',
+    field: '31',
     fishSize: '550',
     invertSize: '16'
   },
   {
-    field: '600',
+    field: '32',
     fishSize: '600',
     invertSize: '17'
   },
   {
-    field: '650',
+    field: '33',
     fishSize: '650',
     invertSize: '18'
   },
   {
-    field: '700',
+    field: '34',
     fishSize: '700',
     invertSize: '19'
   },
   {
-    field: '750',
+    field: '35',
     fishSize: '750',
     invertSize: '20'
   },
   {
-    field: '800',
+    field: '36',
     fishSize: '800',
     invertSize: '22'
   },
   {
-    field: '850',
+    field: '37',
     fishSize: '850',
     invertSize: '24'
   },
   {
-    field: '900',
+    field: '38',
     fishSize: '900',
     invertSize: '26'
   },
   {
-    field: '950',
+    field: '39',
     fishSize: '950',
     invertSize: '28'
   },
   {
-    field: '1000',
-    fishSize: '1000'
-  },
-  {
-    field: 'isInvertSizing',
-    label: 'Use InvertSizing'
+    field: '40',
+    fishSize: '1000',
+    invertSize: '30'
   }
-]);
-
-export const measureKey = Object.freeze([
-  'Inverts',
-  '2-5',
-  '5',
-  '7-5',
-  '10',
-  '12-5',
-  '15',
-  '20',
-  '25',
-  '30',
-  '35',
-  '40',
-  '50',
-  '62-5',
-  '75',
-  '87-5',
-  '100',
-  '112-5',
-  '125',
-  '137-5',
-  '150',
-  '162-5',
-  '175',
-  '187-5',
-  '200',
-  '250',
-  '300',
-  '350',
-  '400',
-  '450',
-  '500',
-  '550',
-  '600',
-  '650',
-  '700',
-  '750',
-  '800',
-  '850',
-  '900',
-  '950',
-  '1000'
 ]);
