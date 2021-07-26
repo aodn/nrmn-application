@@ -215,8 +215,8 @@ const SpeciesSearch = () => {
                 setInfo('This species name exists in the NRMN database');
               } else {
                 setInfo();
-                dispatch(setFields(params));
               }
+              dispatch(setFields(params));
             }}
           ></DataGrid>
         </div>
