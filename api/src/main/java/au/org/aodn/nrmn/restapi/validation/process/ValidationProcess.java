@@ -540,7 +540,7 @@ public class ValidationProcess {
 
             Map<Integer, List<StagedRowFormatted>> surveyMap = validRows.stream().filter(row -> row.getSite() != null && row.getDate() != null && row.getDepth() != null).collect(Collectors.groupingBy(StagedRowFormatted::getDepth));
             sheetErrors.addAll(checkSurveys(programName, job.getIsExtendedSize(), surveyMap));
-            response.setIncompleteSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("Survey Incomplete")).count());
+            response.setIncompleteSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("Survey incomplete")).count());
 
             Map<String, List<StagedRowFormatted>> method3SurveyMap = validRows.stream().filter(row -> row.getMethod().equals(3)).collect(Collectors.groupingBy(StagedRowFormatted::getTransectName));
             sheetErrors.addAll(checkMethod3Transects(programName, job.getIsExtendedSize(), method3SurveyMap));
