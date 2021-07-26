@@ -91,7 +91,7 @@ class StagedJobControllerIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void UploadingShortCorrectIngestFileShouldbeOK() throws Exception {
         Mockito.when(provider.getClient()).thenReturn(client);
         val auth = getContext().getAuthentication();
@@ -123,7 +123,7 @@ class StagedJobControllerIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void UploadingLongCorrectIngestFileShouldbeOK() throws Exception {
         Mockito.when(provider.getClient()).thenReturn(client);
         val auth = getContext().getAuthentication();
@@ -150,7 +150,7 @@ class StagedJobControllerIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void UploadingLongCorrectIngestFileWithMissingIdsShouldbeOK() throws Exception {
         Mockito.when(provider.getClient()).thenReturn(client);
         val auth = getContext().getAuthentication();
@@ -177,7 +177,7 @@ class StagedJobControllerIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void emptyFileShouldFail() throws Exception {
         Mockito.when(provider.getClient()).thenReturn(client);
         val auth = getContext().getAuthentication();

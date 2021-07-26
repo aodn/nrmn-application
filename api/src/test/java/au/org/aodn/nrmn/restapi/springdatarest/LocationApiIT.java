@@ -49,7 +49,7 @@ public class LocationApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testCreateLocation() {
         given()
                 .spec(spec)
@@ -67,7 +67,7 @@ public class LocationApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testCreateUsingExistingInitials() {
         val existingDiver = locationTestData.persistedLocation();
 
@@ -86,7 +86,7 @@ public class LocationApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testUpdateUsingExistingInitials() {
         val diver = locationTestData.persistedLocation();
         val existingDiver = locationTestData.persistedLocation();

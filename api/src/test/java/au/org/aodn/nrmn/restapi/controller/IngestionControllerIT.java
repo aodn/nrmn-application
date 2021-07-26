@@ -43,7 +43,7 @@ class IngestionControllerIT {
     ObservationRepository observationRepository;
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void ingestWorksForValidatedJob() throws Exception {
 
         RequestWrapper<String, SecUser> reqBuilder = new RequestWrapper<String, SecUser>();
@@ -68,7 +68,7 @@ class IngestionControllerIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void ingestFailsForUnvalidatedJob() throws Exception {
 
         RequestWrapper<String, SecUser> reqBuilder = new RequestWrapper<String, SecUser>();

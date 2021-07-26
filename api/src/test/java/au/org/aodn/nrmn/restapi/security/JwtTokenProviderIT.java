@@ -24,7 +24,7 @@ class JwtTokenProviderIT {
     JwtTokenProvider provider;
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void GenerateToken() {
 
         val auth = getContext().getAuthentication();

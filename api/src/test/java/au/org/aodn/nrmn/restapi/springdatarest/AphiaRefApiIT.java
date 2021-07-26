@@ -54,7 +54,7 @@ public class AphiaRefApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testPostAphiaRefNotAllowed() {
         given()
                 .spec(spec)
@@ -78,7 +78,7 @@ public class AphiaRefApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testGetAphiaRef() {
         val aphiaRef = aphiaRefTestData.persistedAphiaRef();
 
@@ -95,7 +95,7 @@ public class AphiaRefApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testGetAphiaRefs() {
         val aphiaRef1 = aphiaRefTestData.persistedAphiaRef();
         val aphiaRef2 = aphiaRefTestData.defaultBuilder()

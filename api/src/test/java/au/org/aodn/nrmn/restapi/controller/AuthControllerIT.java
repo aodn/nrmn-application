@@ -1,19 +1,5 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
 import au.org.aodn.nrmn.restapi.RestApiApplication;
 import au.org.aodn.nrmn.restapi.controller.utils.RequestWrapper;
 import au.org.aodn.nrmn.restapi.dto.auth.LoginRequest;
@@ -25,6 +11,19 @@ import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
 import lombok.val;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers
 @SpringBootTest(classes = RestApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -41,7 +40,7 @@ public class AuthControllerIT {
 
     @Test
     public void loginLogout() throws Exception {
-        ResponseEntity<JwtAuthenticationResponse> response = loginResponse("auth@gmail.com", "#12Trois");
+        ResponseEntity<JwtAuthenticationResponse> response = loginResponse("auth@example.com", "Hnh3?gx5zE*f7TVF5tKq");
 
         assertEquals(response.getStatusCode(), HttpStatus.OK);
         assertEquals(response.getBody().getAccessToken().length() > 10, true);
@@ -56,11 +55,11 @@ public class AuthControllerIT {
     @Test
     public void testLoginLogoutTokenAuth() throws Exception {
         assertGetMissingDiverReturns(INVALID_TOKEN, HttpStatus.UNAUTHORIZED);
-        String firstLoginToken= login("auth@gmail.com", "#12Trois");
+        String firstLoginToken= login("auth@example.com", "Hnh3?gx5zE*f7TVF5tKq");
         assertGetMissingDiverReturns(firstLoginToken, HttpStatus.NOT_FOUND);
         logoutResponse(firstLoginToken);
         assertGetMissingDiverReturns(firstLoginToken, HttpStatus.UNAUTHORIZED);
-        String secondLoginToken = login("auth@gmail.com", "#12Trois");
+        String secondLoginToken = login("auth@example.com", "Hnh3?gx5zE*f7TVF5tKq");
         assertGetMissingDiverReturns(secondLoginToken, HttpStatus.NOT_FOUND);
     }
 
