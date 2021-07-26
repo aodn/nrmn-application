@@ -1,21 +1,5 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import javax.validation.Valid;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import au.org.aodn.nrmn.restapi.dto.auth.LoginRequest;
 import au.org.aodn.nrmn.restapi.dto.payload.JwtAuthenticationResponse;
 import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
@@ -28,6 +12,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping(path = "/api/auth")
@@ -44,6 +41,9 @@ public class AuthController {
 
     @Autowired
     UserActionAuditRepository userAuditRepo;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     private static Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -86,5 +86,14 @@ public class AuthController {
             SecUserRepository.removeBlackListedToken(jwt);
         }
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+    }
+
+    @PostMapping(path = "/hash", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<HashMap<String, String>> registerUser(@Valid @RequestBody String password) {
+
+        HashMap<String, String> payload = new HashMap<>();
+        payload.put("hash", passwordEncoder.encode(password));
+        return ResponseEntity.ok(payload);
+
     }
 }

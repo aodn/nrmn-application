@@ -48,7 +48,7 @@ public class SpeciesControllerIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testNrmnSearch() {
         ObservableItem species1 = getObservableItem("sea snake", "sea snakes");
         ObservableItem species2 = getObservableItem("sea snakes", "underwater bulldog");

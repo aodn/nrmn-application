@@ -47,7 +47,7 @@ public class SiteControllerIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testPostSite() {
         val testSite = siteTestData.persistedSite();
 
