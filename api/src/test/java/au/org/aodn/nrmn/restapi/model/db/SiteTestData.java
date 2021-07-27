@@ -1,8 +1,8 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import java.util.Arrays;
-
-import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,9 @@ public class SiteTestData {
 
     public SiteBuilder defaultBuilder() {
         siteNo++;
-
+        final Map<String, String> siteAttribute = new HashMap<String, String>();
+        siteAttribute.put("ProxCountry", "Antarctica");
+        siteAttribute.put("ProtectionStatus", "Fishing");
         return Site.builder()
                    .siteCode("Site " + siteNo)
                    .siteName("Site name" + siteNo)
@@ -40,10 +42,7 @@ public class SiteTestData {
                    .oldSiteCodes(Arrays.asList(new String[] {"SIT01", "SIT02"}))
                    .state("Graham Land Antarctica")
                    .country("Antarctica")
-                   .siteAttribute(ImmutableMap.<String, String>builder()
-                           .put("ProxCountry", "Antarctica")
-                           .put("ProtectionStatus", "Fishing")
-                           .build())
+                   .siteAttribute(siteAttribute)
                    .isActive(true);
     }
 }

@@ -1,15 +1,30 @@
 package au.org.aodn.nrmn.restapi.dto.stage;
 
-import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-import java.util.List;
 import java.util.Optional;
 
-@Getter
-@AllArgsConstructor
 public class UploadResponse {
-    private Optional<FileUpload> file;
-    private List<ErrorInput> errors;
+    private Optional<Long> id;
+    private String error;
+
+    public UploadResponse(){}
+
+    public UploadResponse(Optional<Long> id) {
+        this.id = id;
+    }
+    public UploadResponse(String error) {
+        this.error = error;
+    }
+
+    public UploadResponse(Optional<Long> id, String error) {
+        this.id = id;
+        this.error = error;
+    }
+
+    public Optional<Long> getId() {
+        return this.id;
+    }
+
+    public String getError() {
+        return this.error;
+    }
 }

@@ -1,21 +1,5 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import au.org.aodn.nrmn.restapi.model.db.*;
-import au.org.aodn.nrmn.restapi.model.db.enums.StagedJobEventType;
-import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
-import au.org.aodn.nrmn.restapi.repository.*;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
-import cyclops.data.tuple.Tuple2;
-import cyclops.data.tuple.Tuple4;
-import lombok.Value;
-import lombok.val;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.stereotype.Service;
-
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalTime;
@@ -28,7 +12,38 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.groupingBy;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.stereotype.Service;
+
+import au.org.aodn.nrmn.restapi.model.db.Diver;
+import au.org.aodn.nrmn.restapi.model.db.Measure;
+import au.org.aodn.nrmn.restapi.model.db.Method;
+import au.org.aodn.nrmn.restapi.model.db.Observation;
+import au.org.aodn.nrmn.restapi.model.db.Site;
+import au.org.aodn.nrmn.restapi.model.db.StagedJob;
+import au.org.aodn.nrmn.restapi.model.db.StagedJobLog;
+import au.org.aodn.nrmn.restapi.model.db.Survey;
+import au.org.aodn.nrmn.restapi.model.db.SurveyMethod;
+import au.org.aodn.nrmn.restapi.model.db.enums.StagedJobEventType;
+import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
+import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
+import au.org.aodn.nrmn.restapi.repository.MethodRepository;
+import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
+import au.org.aodn.nrmn.restapi.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
+import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
+import au.org.aodn.nrmn.restapi.repository.SurveyMethodRepository;
+import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import lombok.Value;
+import lombok.val;
 
 @Service
 public class SurveyIngestionService {
@@ -95,19 +110,19 @@ public class SurveyIngestionService {
 
         return existingSurvey.orElseGet(() -> surveyRepository.save(
                 Survey.builder()
-                      .depth(stagedRow.getDepth())
-                      .surveyNum(stagedRow.getSurveyNum())
-                      .direction(stagedRow.getDirection().toString())
-                      .site(site).surveyDate(Date.valueOf(stagedRow.getDate()))
-                      .surveyTime(Time.valueOf(stagedRow.getTime().orElse(LocalTime.NOON)))
-                      .visibility(stagedRow.getVis().orElse(null))
-                      .program(stagedRow.getRef().getStagedJob().getProgram())
-                      .protectionStatus(site.getProtectionStatus())
-                      .insideMarinePark(StringUtils.isNotBlank(site.getMpa())?"yes":"no")
-                      .longitude(stagedRow.getLongitude())
-                      .latitude(stagedRow.getLatitude())
-                      .pqDiverId(stagedRow.getPqs() != null ? stagedRow.getPqs().getDiverId() : null)
-                      .build()));
+                        .depth(stagedRow.getDepth())
+                        .surveyNum(stagedRow.getSurveyNum())
+                        .direction(stagedRow.getDirection().toString())
+                        .site(site).surveyDate(Date.valueOf(stagedRow.getDate()))
+                        .surveyTime(Time.valueOf(stagedRow.getTime().orElse(LocalTime.NOON)))
+                        .visibility(stagedRow.getVis().orElse(null))
+                        .program(stagedRow.getRef().getStagedJob().getProgram())
+                        .protectionStatus(site.getProtectionStatus())
+                        .insideMarinePark(StringUtils.isNotBlank(site.getMpa()) ? "yes" : "no")
+                        .longitude(stagedRow.getLongitude())
+                        .latitude(stagedRow.getLatitude())
+                        .pqDiverId(stagedRow.getPqs() != null ? stagedRow.getPqs().getDiverId() : null)
+                        .build()));
     }
 
     public SurveyMethod getSurveyMethod(Survey survey, StagedRowFormatted stagedRow) {
@@ -178,29 +193,26 @@ public class SurveyIngestionService {
         return observations;
     }
 
-    public Map<Tuple2, List<StagedRowFormatted>> groupRowsBySurveyMethod(List<StagedRowFormatted> surveyRows) {
+    public Map<String, List<StagedRowFormatted>> groupRowsBySurveyMethod(List<StagedRowFormatted> surveyRows) {
         return surveyRows.stream().map(r -> {
-            if (r.getSpecies().isPresent()
-                    && r.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_DEBRIS)
+            if (r.getSpecies().isPresent() && r.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_DEBRIS)
                 r.setMethod(METHOD_M12);
             return r;
-        }).collect(groupingBy(row -> new Tuple2(row.getMethod(), row.getBlock())));
+        }).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyName));
     }
 
     @Transactional
     public void ingestTransaction(StagedJob job, List<StagedRowFormatted> validatedRows) {
-        Map<Tuple4, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream().collect(
-                groupingBy(row -> new Tuple4(row.getSite(), row.getDate(), row.getDepth(), row.getSurveyNum())));
+
+        Map<String, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getTransectName));
 
         List<Integer> surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
             Survey survey = getSurvey(surveyRows.get(0));
-
             groupRowsBySurveyMethod(surveyRows).values().forEach(surveyMethodRows -> {
                 SurveyMethod surveyMethod = getSurveyMethod(survey, surveyMethodRows.get(0));
                 surveyMethodRows.forEach(row -> observationRepository
                         .saveAll(getObservations(surveyMethod, row, job.getIsExtendedSize())));
             });
-
             return survey.getSurveyId();
         }).collect(Collectors.toList());
 
@@ -209,8 +221,10 @@ public class SurveyIngestionService {
         long surveyCount = surveyIds.size();
         long obsItemCount = validatedRows.stream().map(r -> r.getSpecies()).filter(o -> o.isPresent()).distinct().count();
         long diverCount = validatedRows.stream().map(r -> r.getDiver()).distinct().count();
+
         List<String> messages = Arrays.asList(rowCount + " rows of data", siteCount + " sites", surveyCount + " surveys", obsItemCount + " distinct observable items", diverCount + " divers");
         String message = messages.stream().collect(Collectors.joining("\n"));
+
         stagedJobLogRepository.save(StagedJobLog.builder().stagedJob(job).details(message).eventType(StagedJobEventType.INGESTING).build());
         job.setStatus(StatusJobType.INGESTED);
         job.setSurveyIds(surveyIds);

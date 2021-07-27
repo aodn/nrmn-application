@@ -1,5 +1,23 @@
 package au.org.aodn.nrmn.restapi.service;
 
+import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistance;
+import static au.org.aodn.nrmn.restapi.util.TimeUtils.parseDate;
+import static au.org.aodn.nrmn.restapi.util.TimeUtils.parseTime;
+
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
@@ -11,25 +29,6 @@ import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
-import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.time.DateTimeException;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistance;
-import static au.org.aodn.nrmn.restapi.util.TimeUtils.parseDate;
-import static au.org.aodn.nrmn.restapi.util.TimeUtils.parseTime;
 
 @Service
 public class SurveyEditService {
@@ -169,16 +168,5 @@ public class SurveyEditService {
         }
 
         return new ValidationErrors(errors);
-    }
-
-    private String truncateNumber(Double number) {
-
-        if(number == null) {
-            return null;
-        }
-
-        DecimalFormat df = new DecimalFormat("#.####");
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        return String.valueOf(Double.parseDouble(df.format(number)));
     }
 }
