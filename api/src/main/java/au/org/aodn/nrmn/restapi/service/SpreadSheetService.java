@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 
-import au.org.aodn.nrmn.restapi.service.SurveyContentsHandler.ParsedSheet;
 import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -14,7 +13,6 @@ import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.StylesTable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,9 +21,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
-import cyclops.control.Future;
-import cyclops.control.Validated;
+import au.org.aodn.nrmn.restapi.service.SurveyContentsHandler.ParsedSheet;
 
 @Service
 public class SpreadSheetService {
@@ -42,11 +38,8 @@ public class SpreadSheetService {
     @Value("${app.excel.headers.long.ignore}")
     private List<String> ignoreLongHeaders;
 
-    @Autowired
-    private S3IO s3client;
-
-    public Validated<ErrorInput, ParsedSheet> stageXlsxFile(MultipartFile file,
-                                                            Boolean withExtendedSizes) {
+    public ParsedSheet stageXlsxFile(MultipartFile file,
+            Boolean withExtendedSizes) throws Exception {
 
         ZipSecureFile.setMinInflateRatio(0.0d);
 
@@ -57,7 +50,7 @@ public class SpreadSheetService {
 
             SurveyContentsHandler surveyContentsHandler = new SurveyContentsHandler(
                     (withExtendedSizes) ? longHeadersRef : shortHeadersRef,
-                    (withExtendedSizes) ? ignoreLongHeaders: ignoreShortHeaders);
+                    (withExtendedSizes) ? ignoreLongHeaders : ignoreShortHeaders);
 
             StylesTable styles = xssfReader.getStylesTable();
 
@@ -78,21 +71,13 @@ public class SpreadSheetService {
                     }
                 }
             }
+            if(surveyContentsHandler.getError() != null)
+                throw new Exception(surveyContentsHandler.getError());
             return surveyContentsHandler.getResult();
         } catch (NotOfficeXmlFileException e) {
-            return Validated.invalid(new ErrorInput(
-                    "Does not appear to be an XLSX Excel file. Please open this file in Excel and save as Excel Workbook (*.xlsx)",
-                    "excel"));
+            throw new Exception("Does not appear to be an XLSX Excel file. Please open this file in Excel and save as Excel Workbook (*.xlsx)");
         } catch (POIXMLException e) {
-            return Validated.invalid(new ErrorInput(
-                    "This document type is not supported. Please open this file in Excel and save as Excel Workbook (*.xlsx)",
-                    "excel"));
-        } catch (Exception e) {
-            return Validated.invalid(new ErrorInput(e.getMessage(), "excel"));
+            throw new Exception("This document type is not supported. Please open this file in Excel and save as Excel Workbook (*.xlsx)");
         }
-    }
-
-    public void saveToS3(MultipartFile file, Long jobId) {
-        Future.of(() -> s3client.write("/raw-survey/" + file.getOriginalFilename() + "-" + jobId + ".xlsx", file));
     }
 }

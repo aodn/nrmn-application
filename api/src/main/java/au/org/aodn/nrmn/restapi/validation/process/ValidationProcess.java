@@ -1,5 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
+import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistance;
+
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -30,7 +32,6 @@ import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationRow;
 import au.org.aodn.nrmn.restapi.model.db.Diver;
-import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
@@ -45,7 +46,6 @@ import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import au.org.aodn.nrmn.restapi.util.TimeUtils;
-import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistance;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 @Component
@@ -340,7 +340,6 @@ public class ValidationProcess {
         return null;
     }
 
-    // TODO: double-check this method
     private ValidationError validateSurveyIsNew(StagedRowFormatted row) {
         if (Arrays.asList(METHODS_TO_CHECK).contains(row.getMethod())) {
 
@@ -359,7 +358,6 @@ public class ValidationProcess {
 
     // VALIDATION: Survey coordinates match with DB
     private Collection<ValidationCell> validateWithin200M(StagedRowFormatted row) {
-        Site site = row.getSite();
         Collection<ValidationCell> errors = new ArrayList<ValidationCell>();
 
         double dist = getDistance(row.getSite().getLatitude(), row.getSite().getLongitude(), row.getLatitude(), row.getLongitude());
