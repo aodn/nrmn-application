@@ -1,32 +1,41 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import au.org.aodn.nrmn.restapi.model.db.Diver;
-import au.org.aodn.nrmn.restapi.model.db.Location;
-import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.repository.*;
-import au.org.aodn.nrmn.restapi.repository.projections.LetterCodeMapping;
-import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
-import au.org.aodn.nrmn.restapi.repository.projections.SpeciesWithAttributesCsvRow;
-import cyclops.companion.Streams;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.stereotype.Service;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.stereotype.Service;
+
+import au.org.aodn.nrmn.restapi.model.db.Diver;
+import au.org.aodn.nrmn.restapi.model.db.Location;
+import au.org.aodn.nrmn.restapi.model.db.Site;
+import au.org.aodn.nrmn.restapi.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.repository.LetterCodeRepository;
+import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.repository.projections.LetterCodeMapping;
+import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
+import au.org.aodn.nrmn.restapi.repository.projections.SpeciesWithAttributesCsvRow;
 
 @Service
 public class TemplateService {
