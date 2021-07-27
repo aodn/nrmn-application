@@ -143,7 +143,21 @@ const referenceData = [
       schemaKey: 'SurveyRow',
       route: '/data/surveys',
       endpoint: 'data/surveys',
-      headers: ['surveyId', 'siteName', 'programName', 'surveyDate', 'surveyTime', 'depth', 'surveyNum'],
+      headers: [
+        'surveyId',
+        'siteCode',
+        'siteName',
+        'programName',
+        'locationName',
+        'hasPQs',
+        'mpa',
+        'country',
+        'diverName',
+        'surveyDate',
+        'surveyTime',
+        'depth',
+        'surveyNum'
+      ],
       sort: ['siteName']
     }
   }

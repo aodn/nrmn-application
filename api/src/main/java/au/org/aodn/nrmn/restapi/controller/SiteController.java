@@ -13,16 +13,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -78,7 +75,7 @@ public class SiteController {
     }
 
     @PostMapping("/sites")
-    public ResponseEntity newSite(@Valid @RequestBody SiteDto sitePostDto) {
+    public ResponseEntity<?> newSite(@Valid @RequestBody SiteDto sitePostDto) {
         Site newSite = mapper.map(sitePostDto, Site.class);
         ValidationErrors errors = validateConstraints(newSite);
         if (!errors.getErrors().isEmpty()) {
@@ -90,7 +87,7 @@ public class SiteController {
     }
 
     @PutMapping("/sites/{id}")
-    public ResponseEntity updateSite(@PathVariable Integer id, @Valid @RequestBody SiteDto sitePutDto) {
+    public ResponseEntity<?> updateSite(@PathVariable Integer id, @Valid @RequestBody SiteDto sitePutDto) {
         Site site = siteRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         mapper.map(sitePutDto, site);
         ValidationErrors errors = validateConstraints(site);
@@ -137,6 +134,23 @@ public class SiteController {
         }
 
         return new ValidationErrors(errors);
+    }
+
+    @GetMapping("/siteNames")
+    public ResponseEntity<HashMap<String, List<String>>> getSiteNames() {
+        List<Site> allSites = siteRepository.findAll();
+
+        List<String> siteNames = allSites.stream()
+                .map(Site::getSiteName)
+                .filter(Objects::nonNull)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+
+        HashMap<String, List<String>> siteNamesList = new HashMap<>();
+        siteNamesList.put("siteNames", siteNames);
+
+        return ResponseEntity.ok().body(siteNamesList);
     }
 
 }

@@ -12,10 +12,12 @@ import javax.persistence.*;
 import java.sql.Date;
 import java.sql.Time;
 
+import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
 import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 @Entity
 @Data
+@org.hibernate.annotations.Cache(region = "entities", usage = READ_WRITE)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

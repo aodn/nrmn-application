@@ -11,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import javax.persistence.QueryHint;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +26,13 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
     @Query("SELECT s FROM Site s WHERE lower(s.siteCode) = lower(:code)")
     @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
     List<Site> findByCriteria(@Param("code") String siteCode);
+
+    @Query(value = "SELECT site_code FROM {h-schema}ep_site_list WHERE site_code IN :siteCodes", nativeQuery = true)
+    List<String> getAllSiteCodesMatching(Collection<String> siteCodes);
+    
+    @Query("SELECT s FROM Site s WHERE lower(s.siteCode) = lower(:code)")
+    @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
+    Site findBySiteCode(@Param("code") String siteCode);
 
     @Query(nativeQuery = true, value = "SELECT site_code FROM {h-schema}ep_site_list WHERE province = ?1")
     List<String> findSiteCodesByProvince(String province);

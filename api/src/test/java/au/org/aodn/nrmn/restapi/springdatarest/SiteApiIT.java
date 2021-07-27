@@ -61,7 +61,7 @@ public class SiteApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testPostSite() {
         val location = locationTestData.persistedLocation();
 
@@ -93,7 +93,7 @@ public class SiteApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testPutSite() {
         val site = siteTestData.persistedSite();
 
@@ -127,7 +127,7 @@ public class SiteApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testCreateUsingExistingSiteCode() {
         val existingSite = siteTestData.persistedSite();
 
@@ -151,7 +151,7 @@ public class SiteApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testCreateUsingExistingSiteNameAtLocation() {
         val existingSite = siteTestData.persistedSite();
 
@@ -175,7 +175,7 @@ public class SiteApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testUpdateWithExistingSiteCode() {
         val site = siteTestData.persistedSite();
         val anotherSite = siteTestData.persistedSite();
@@ -200,7 +200,7 @@ public class SiteApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testUpdateWithExistingSiteName() {
         val site = siteTestData.persistedSite();
         val anotherSite = siteTestData.persistedSite();
@@ -225,7 +225,7 @@ public class SiteApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testCreateWithMissingValues() {
         given()
                 .spec(spec)
@@ -240,7 +240,7 @@ public class SiteApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testDeleteSite() {
         val site = siteTestData.persistedSite();
 
@@ -260,7 +260,7 @@ public class SiteApiIT {
     }
 
     @Test
-    @WithUserDetails("power_user@gmail.com")
+    @WithUserDetails("power_user@example.com")
     public void testPowerUserCanGetSite() {
         val site = siteTestData.persistedSite();
 
@@ -275,7 +275,7 @@ public class SiteApiIT {
     }
 
     @Test
-    @WithUserDetails("power_user@gmail.com")
+    @WithUserDetails("power_user@example.com")
     public void testPowerUserCantCreateSite() {
         val location = locationTestData.persistedLocation();
 

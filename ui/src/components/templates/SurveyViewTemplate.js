@@ -57,6 +57,15 @@ const SurveyViewTemplate = (props) => {
             {el['latitude']}
           </Grid>
           <Grid item xs={6}>
+            {el['locationName']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['area']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['country']}
+          </Grid>
+          <Grid item xs={6}>
             {el['protectionStatus']}
           </Grid>
           <Grid item xs={6}>
@@ -71,11 +80,12 @@ const SurveyViewTemplate = (props) => {
           <Grid item xs={6}>
             {el['blockAbundanceSimulated']}
           </Grid>
-          <Grid item xs={6}></Grid>
           <Grid item xs={6}>
             {el['surveyNotDone']}
           </Grid>
-          <Grid item xs={6}></Grid>
+          <Grid item xs={6}>
+            {el['divers']}
+          </Grid>
           <Grid item xs={6}>
             {el['notes']}
           </Grid>

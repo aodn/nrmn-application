@@ -43,7 +43,7 @@ class IngestionControllerIT {
     ObservationRepository observationRepository;
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void ingestWorksForValidatedJob() throws Exception {
 
         RequestWrapper<String, SecUser> reqBuilder = new RequestWrapper<String, SecUser>();
@@ -63,12 +63,12 @@ class IngestionControllerIT {
 
         StagedJob job = stagedJobRepository.findById(109L).get();
         assertEquals(StatusJobType.INGESTED, job.getStatus());
-
+        
         assertEquals(initialObservationCount + 1, observationRepository.count());
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void ingestFailsForUnvalidatedJob() throws Exception {
 
         RequestWrapper<String, SecUser> reqBuilder = new RequestWrapper<String, SecUser>();

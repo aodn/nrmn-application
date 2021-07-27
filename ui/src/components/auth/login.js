@@ -27,7 +27,7 @@ const uiSchema = {
   }
 };
 
-var Login = () => {
+const Login = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const errors = useSelector((state) => state.auth.errors);

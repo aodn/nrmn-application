@@ -47,7 +47,7 @@ public class ObservableItemControllerIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testGetObservableItemListItems() {
         val testObservableItem = observableItemTestData.persistedObservableItem();
 

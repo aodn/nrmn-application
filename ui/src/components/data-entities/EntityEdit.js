@@ -117,13 +117,92 @@ const EntityEdit = ({entity, template, clone}) => {
         ]
       };
     } else if (key === 'supersededBy') {
-      uiSchema[key] = {'ui:field': 'searchInput', exclude: 'observableItemName'};
+      uiSchema[key] = {'ui:field': 'searchInput', exclude: 'observableItemName', clearOnBlur: true};
     } else if (item.format === 'double') {
       uiSchema[key] = {'ui:field': 'double'};
     } else if (item.type === 'boolean') {
       uiSchema[key] = {'ui:field': 'boolean'};
     } else if (key === 'oldSiteCodes') {
       uiSchema[key] = {'ui:field': 'array'};
+    } else if (entity.name === 'Survey' && key === 'siteCode') {
+      uiSchema[key] = {
+        'ui:field': 'dropdown',
+        route: 'siteListItems',
+        entity: 'Site',
+        entityList: 'siteListItems',
+        idKey: 'siteCode',
+        valueKey: 'siteCode',
+        relatedAttr: 'siteName',
+        relatedField: 'siteName'
+      };
+    } else if (key === 'siteName') {
+      uiSchema[key] = {
+        'ui:field': 'autostring',
+        route: 'siteNames',
+        entity: 'siteNames',
+        listOnly: true
+      };
+    } else if (key === 'pqDiverInitials') {
+      uiSchema[key] = {
+        'ui:field': 'dropdown',
+        route: 'divers',
+        entity: 'diver',
+        entityList: 'divers',
+        idKey: 'initials',
+        valueKey: 'fullName',
+        fieldName: 'pqDiverInitials'
+      };
+    } else if (key === 'program') {
+      uiSchema[key] = {
+        'ui:field': 'dropdown',
+        route: 'programs',
+        entity: 'program',
+        entityList: 'programs',
+        idKey: 'programId',
+        valueKey: 'programName'
+      };
+    } else if (key === 'phylum') {
+      uiSchema[key] = {
+        'ui:field': 'autostring',
+        route: 'species/taxonomyDetail',
+        entity: 'phylum',
+        listOnly: true    // Tells input to treat this custom endpoint - Avoids using @RestResource style payloads
+      };
+    } else if (key === 'class') {
+      uiSchema[key] = {
+        'ui:field': 'autostring',
+        route: 'species/taxonomyDetail',
+        entity: 'className',
+        listOnly: true
+      };
+    } else if (key === 'order') {
+      uiSchema[key] = {
+        'ui:field': 'autostring',
+        route: 'species/taxonomyDetail',
+        entity: 'order',
+        listOnly: true
+      };
+    } else if (key === 'family') {
+      uiSchema[key] = {
+        'ui:field': 'autostring',
+        route: 'species/taxonomyDetail',
+        entity: 'family',
+        listOnly: true
+      };
+    } else if (key === 'genus') {
+      uiSchema[key] = {
+        'ui:field': 'autostring',
+        route: 'species/taxonomyDetail',
+        entity: 'genus',
+        listOnly: true
+      };
+    } else if (key === 'speciesEpithet') {
+      uiSchema[key] = {
+        'ui:field': 'autostring',
+        route: 'species/taxonomyDetail',
+        entity: 'speciesEpithet',
+        listOnly: true
+      };
     } else {
       uiSchema[key] = {'ui:field': 'string', 'ui:readonly': item.readOnly ?? false};
     }

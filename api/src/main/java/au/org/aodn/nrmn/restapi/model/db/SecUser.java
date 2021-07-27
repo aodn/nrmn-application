@@ -1,12 +1,10 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.model.db.enums.SecUserStatus;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
-import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -23,10 +21,18 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
+
+import au.org.aodn.nrmn.restapi.model.db.enums.SecUserStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -78,6 +84,6 @@ public class  SecUser implements Serializable {
         name = "sec_user_roles",
         joinColumns = @JoinColumn(name = "sec_user_id", foreignKey = @ForeignKey(name = "FK_USER_SEC_ROLE")),
         inverseJoinColumns = @JoinColumn(name = "sec_role_id", foreignKey = @ForeignKey(name = "FK_ROLE_USER_SEC")))
-    private Set<SecRole> roles = new HashSet<>();
+    private Set<SecRole> roles;
 
 }

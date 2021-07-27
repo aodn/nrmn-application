@@ -20,9 +20,14 @@ import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 @Repository
 public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpecificationExecutor<Survey> {
 
-        @Query(value = "select survey_date as surveyDate, survey_time as surveyTime, depth, survey_num as surveyNum, "
-                        + "sv.survey_id as surveyId, st.site_name as siteName, pg.program_name as programName FROM {h-schema}survey "
-                        + "sv LEFT JOIN {h-schema}program_ref pg ON pg.program_id = sv.program_id LEFT JOIN {h-schema}site_ref st ON st.site_id = sv.site_id "
+        @Query(value = "select survey_date as surveyDate, survey_time as surveyTime, depth, survey_num as surveyNum, pq_catalogued as hasPQs, "
+                        + "sv.survey_id as surveyId, st.site_name as siteName, st.site_code as siteCode, st.mpa, st.country, pg.program_name as programName, "
+                        + "dv.full_name as diverName, lc.location_name as locationName "
+                        + "FROM {h-schema}survey sv "
+                        + "LEFT JOIN {h-schema}program_ref pg ON pg.program_id = sv.program_id "
+                        + "LEFT JOIN {h-schema}site_ref st ON st.site_id = sv.site_id "
+                        + "LEFT JOIN {h-schema}diver_ref dv ON sv.pq_diver_id = dv.diver_id "
+                        + "LEFT JOIN {h-schema}location_ref lc ON lc.location_id = st.location_id "
                         + "ORDER BY surveyDate DESC", countQuery = "SELECT count(*) FROM {h-schema}survey", nativeQuery = true)
         List<SurveyRow> findAllProjectedBy();
 
@@ -62,4 +67,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
                 "(?#{#f.speciesId}  IS NULL OR v.species_id  = (CAST (CAST(?#{#f.speciesId} AS character varying) AS integer))) "              + 
                 "ORDER BY surveyDate DESC", nativeQuery = true)
         List<SurveyRow> findByCriteria(@Param("f") SurveyFilterDto surveyFilter);
+
+        @Query("SELECT s FROM Survey s WHERE s.surveyId IN :ids AND s.pqCatalogued = false")
+        List<Survey> findSurveysWithoutPQ(@Param("ids") List<Integer> ids);
 }

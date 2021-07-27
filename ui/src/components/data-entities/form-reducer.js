@@ -56,6 +56,9 @@ const formSlice = createSlice({
       state.data = {...state.data, ...action.payload};
     },
     selectedItemsLoaded: (state, action) => {
+      if(!('_embedded' in action.payload)) {
+        action.payload['_embedded'] = {'.': action.payload.map(item => { return {'.': item};} )};
+      }
       const key = Object.keys(action.payload._embedded)[0];
       const newOptions = {};
       // HACK: this should not be necessary
@@ -67,6 +70,15 @@ const formSlice = createSlice({
       } else {
         newOptions[key] = action.payload._embedded[key];
       }
+      state.options = {...state.options, ...newOptions};
+    },
+    selectedListItemsLoaded: (state, action) => {
+      // Hack to work with AutoCompleteInput
+      const newOptions = {};
+      const key = action.payload.key;
+
+      newOptions[key] = action.payload.resp[key];
+
       state.options = {...state.options, ...newOptions};
     },
     entitiesSaved: (state, action) => {
@@ -104,6 +116,7 @@ export const {
   itemLoaded,
   updateFormFields,
   selectedItemsLoaded,
+  selectedListItemsLoaded,
   selectedItemEdited,
   selectedItemsEdited,
   embeddedFieldEdited

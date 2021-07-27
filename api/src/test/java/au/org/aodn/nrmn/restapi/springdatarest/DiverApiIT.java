@@ -50,7 +50,7 @@ public class DiverApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testCreateDiver() {
         given()
                 .spec(spec)
@@ -68,7 +68,7 @@ public class DiverApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testCreateUsingExistingInitials() {
         val existingDiver = diverTestData.persistedDiver();
 
@@ -87,7 +87,7 @@ public class DiverApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testUpdateUsingExistingInitials() {
         val diver = diverTestData.persistedDiver();
         val existingDiver = diverTestData.persistedDiver();

@@ -42,6 +42,15 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
     @RestResource
     Optional<ObservableItem> findById(Integer integer);
 
+    @Query("SELECT observableItemName FROM ObservableItem")
+    List<String> getAllSpeciesNames();
+
+    @Query(value = "select observable_item_name as name, superseded_by as supersededBy FROM {h-schema}observable_item_ref WHERE observable_item_name IN :speciesNames", nativeQuery = true)
+    List<ObservableItemRow> getAllSpeciesNamesMatching(Collection<String> speciesNames);
+
+    @Query("SELECT o from ObservableItem o WHERE o.observableItemName = :name")
+    ObservableItem getWithName(@Param("name") String name);
+
     @Query(value = "select distinct on (obsitem.observable_item_id) obsitem.observable_item_id as observableItemId, obsitem.observable_item_name as name, obsitem.letter_code as letterCode, obsitem.common_name as commonName "
             + "FROM {h-schema}location_ref loc "
             + "INNER JOIN {h-schema}site_ref site_raw ON site_raw.location_id = loc.location_id "
@@ -64,6 +73,9 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
                     + " AND observable_item_name ILIKE '%' || :search_term || '%' ", nativeQuery = true)
     Page<ObservableItem> fuzzySearch(Pageable pageable, @Param("search_term") String searchTerm,
             @Param("include_superseded") Boolean includeSuperseded);
+
+    @Query("SELECT oi FROM ObservableItem oi WHERE oi.observableItemName = :search_term")
+    List<ObservableItem> exactSearch(@Param("search_term") String searchTerm);
 
     @Query(value = "select observable_item_id as observableItemId, obs_item_type_name as typeName, observable_item_name as name, "
             + "common_name as commonName, phylum, class as className, \"order\", family, genus, superseded_by as "

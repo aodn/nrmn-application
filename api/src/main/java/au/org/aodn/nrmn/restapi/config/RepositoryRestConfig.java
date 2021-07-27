@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
-import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
+import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.data.web.HateoasPageableHandlerMethodArgumentResolver;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ import javax.persistence.EntityManager;
 import java.util.stream.Collectors;
 
 @Component
-public class RepositoryRestConfig extends RepositoryRestConfigurerAdapter {
+public class RepositoryRestConfig implements RepositoryRestConfigurer {
 
     @Value("${app.cors.max_age_secs}")
     private long MAX_AGE_SECS;

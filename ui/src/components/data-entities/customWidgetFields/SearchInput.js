@@ -18,13 +18,20 @@ const SearchInput = ({schema, name, uiSchema}) => {
       <Typography variant="subtitle2">{schema.title}</Typography>
       <Autocomplete
         options={searchResults?.map((i) => i.species).filter((f) => f !== exclude) ?? []}
+        clearOnBlur={uiSchema.clearOnBlur}
         freeSolo
         defaultValue={value}
         onSelect={(e) => {
-          dispatch(setField({newValue: e.target.value, entity: name}));
+          if(!uiSchema.clearOnBlur) {
+            dispatch(setField({newValue: e.target.value, entity: name}));
+          } else if(searchResults?.length > 0) {
+            dispatch(setField({newValue: e.target.value, entity: name}));
+          }
         }}
         onKeyUp={(e) => {
-          dispatch(setField({newValue: e.target.value, entity: name}));
+          if(!uiSchema.clearOnBlur) {
+            dispatch(setField({newValue: e.target.value, entity: name}));
+          }
           if (e.target.value?.length > 2)
             dispatch(searchRequested({searchType: 'NRMN', species: e.target.value, includeSuperseded: false}));
         }}

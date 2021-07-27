@@ -58,7 +58,7 @@ public class ObservableItemApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testCreateObservableItem() {
         val obsItemType = obsItemTypeTestData.persistedObsItemType();
 
@@ -85,7 +85,7 @@ public class ObservableItemApiIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testUpdateObservableItem() {
         val observableItem = observableItemTestData
                 .defaultBuilder()

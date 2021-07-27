@@ -55,7 +55,7 @@ public class SurveyControllerIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testGetSurveyList() {
 
         val testSurvey = surveyTestData.persistedSurvey();
@@ -72,7 +72,7 @@ public class SurveyControllerIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testGetSurvey() {
 
         val testSurvey = surveyTestData.persistedSurvey();
@@ -88,7 +88,7 @@ public class SurveyControllerIT {
     }
 
     @Test
-    @WithUserDetails("test@gmail.com")
+    @WithUserDetails("test@example.com")
     public void testNoSurvey() {
 
         val testSurvey = surveyTestData.persistedSurvey();
@@ -107,7 +107,7 @@ public class SurveyControllerIT {
     // Tests are commented due to the use of ep_site_list
 
     // @Test
-    // @WithUserDetails("test@gmail.com")
+    // @WithUserDetails("test@example.com")
     // public void testFilterSurveys() {
 
     //     val testSurvey = surveyTestData.persistedSurvey();
@@ -122,7 +122,7 @@ public class SurveyControllerIT {
     // }
 
     // @Test
-    // @WithUserDetails("test@gmail.com")
+    // @WithUserDetails("test@example.com")
     // public void testFilterSurveysForSite() {
 
     //     val testSurvey = surveyTestData.persistedSurvey();

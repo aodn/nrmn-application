@@ -42,7 +42,8 @@ const columns = [
     {field: 'family', headerName: 'Family', flex: 1},
     {field: 'order', headerName: 'Order', flex: 1},
     {field: 'class', headerName: 'Class', flex: 1},
-    {field: 'phylum', headerName: 'Phylum', flex: 1}
+    {field: 'phylum', headerName: 'Phylum', flex: 1},
+    {field: 'supersededBy', headerName: 'Superseded By', flex: 1}
   ],
   [
     {
@@ -58,7 +59,8 @@ const columns = [
     {field: 'family', headerName: 'Family', flex: 1},
     {field: 'order', headerName: 'Order', flex: 1},
     {field: 'class', headerName: 'Class', flex: 1},
-    {field: 'phylum', headerName: 'Phylum', flex: 1}
+    {field: 'phylum', headerName: 'Phylum', flex: 1},
+    {field: 'supersededBy', headerName: 'Superseded By', flex: 1}
   ]
 ];
 
@@ -205,15 +207,16 @@ const SpeciesSearch = () => {
             }}
             onRowClick={(params) => {
               const supersededBy = params.row.supersededBy;
+              const unacceptReason = params.row.unacceptReason;
               const isPresent = params.row.isPresent;
               if (supersededBy) {
-                setInfo(`This species has been superseded by ${supersededBy}`);
+                setInfo(`This species has been superseded by ${supersededBy}` + (unacceptReason != null ? ` (Reason: ${unacceptReason})` : ''));
               } else if (isPresent) {
                 setInfo('This species name exists in the NRMN database');
               } else {
                 setInfo();
-                dispatch(setFields(params));
               }
+              dispatch(setFields(params));
             }}
           ></DataGrid>
         </div>

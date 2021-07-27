@@ -1,34 +1,32 @@
 import React, {useState} from 'react';
-import {useDispatch} from 'react-redux';
 import {Box, Button, Paper, Typography, makeStyles} from '@material-ui/core';
 import {
   CloudUpload as CloudUploadIcon,
   CloudDownload as CloudDownloadIcon,
-  PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon,
-  SaveOutlined as SaveOutlinedIcon
+  PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon
 } from '@material-ui/icons/';
+import {red, orange, yellow, grey, lightGreen} from '@material-ui/core/colors';
 import {NavLink} from 'react-router-dom';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import {PropTypes} from 'prop-types';
-import {getDataJob, validateJob, updateRows} from '../../axios/api';
-import {measurements} from '../../constants';
+import {getDataJob, validateJob, updateRows, submitIngest} from '../../axios/api';
+import {measurements, extendedMeasurements} from '../../constants';
 import FindReplacePanel from './panel/FindReplacePanel';
 import ValidationPanel from './panel/ValidationPanel';
-import {exportRow, importRow, SubmitingestRequested} from './reducers/create-import';
 import LinearProgressWithLabel from '../ui/LinearProgressWithLabel';
 import AlertDialog from '../ui/AlertDialog';
 
-const useStyles = makeStyles((theme) => {
+const useStyles = makeStyles(() => {
   return {
     fishSize: {
-      color: '#c4d79b',
-      borderBottom: '1px solid ' + theme.palette.divider
+      color: red[200],
+      borderBottom: '1px solid'
     },
     invertSize: {
-      color: '#da9694'
+      color: lightGreen[200]
     }
   };
 });
@@ -55,19 +53,19 @@ const pushUndo = (api, delta) => {
 
 const popUndo = (api) => {
   const ctx = api.gridOptionsWrapper.gridOptions.context;
-  const delta = ctx.undoStack.pop();
+  const deltaSet = ctx.undoStack.pop();
   let rowData = ctx.rowData;
-  for (const i in delta) {
-    ctx.putRowIds.pop();
-    if (delta[i].action === 0) {
-      const j = rowData.findIndex((d) => d.id == delta[i].id);
-      rowData.splice(j, 1);
+  for (const deltaIdx in deltaSet) {
+    const deltaId = deltaSet[deltaIdx].id;
+    ctx.putRowIds.push(deltaId);
+    const rowIdx = rowData.findIndex((d) => d.id === deltaId);
+    if (Object.keys(deltaSet[deltaIdx]).length < 2) {
+      rowData.splice(rowIdx, 1);
     } else {
-      const j = rowData.findIndex((d) => d.id == delta[i].id);
-      if (j < 0) {
-        rowData.push(delta[i]);
+      if (rowIdx < 0) {
+        rowData.push(deltaSet[deltaIdx]);
       } else {
-        rowData[j] = delta[i];
+        rowData[rowIdx] = deltaSet[deltaIdx];
       }
     }
   }
@@ -114,12 +112,10 @@ const defaultSideBar = {
   defaultToolPanel: ''
 };
 
-const IngestState = {Loading: 0, Save: 1, Validate: 2, Submit: 3, ConfirmSubmit: 4};
+const IngestState = Object.freeze({Loading: 0, Edited: 1, Valid: 2, ConfirmSubmit: 3});
 
-const DataSheetView = ({jobId}) => {
+const DataSheetView = ({jobId, onIngest}) => {
   const classes = useStyles();
-  const dispatch = useDispatch();
-
   const [job, setJob] = useState({});
   const [gridApi, setGridApi] = useState(null);
   const [state, setState] = useState(IngestState.Loading);
@@ -133,35 +129,13 @@ const DataSheetView = ({jobId}) => {
     gridApi.setFilterModel(null);
     context.errors = [];
     validateJob(jobId, (result) => {
-      context.validationResults = result.data;
+      context.errors = result.data.errors;
+      delete result.data.errors;
+      delete result.data.job;
+      context.summary = result.data;
 
-      result.data.errors.reduce((a, e) => {
-        e.errors.forEach((err) => {
-          if (err.columnTarget.includes(',')) {
-            const subErrors = err.columnTarget.split(',');
-            subErrors.forEach((subCol) => {
-              a.push({row: e.id, column: subCol, message: err.message, type: err.errorLevel});
-            });
-          } else {
-            a.push({row: e.id, column: err.columnTarget, message: err.message, type: err.errorLevel});
-          }
-        });
-        return a;
-      }, context.errors);
+      setState(context.errors.some((e) => e.levelId === 'BLOCKING') ? IngestState.Edited : IngestState.Valid);
 
-      result.data.errorGlobal.reduce((a, e) => {
-        const rowData = {columnTarget: '', message: e.message, level: e.errorLevel};
-        a[e.columnTarget]?.length > 0 ? a[e.columnTarget].push(rowData) : (a[e.columnTarget] = [rowData]);
-        return a;
-      }, result.data.summaries);
-
-      if (context.errors.findIndex((e) => e.type === 'BLOCKING') < 0) {
-        setState(IngestState.Submit);
-      } else {
-        setState(IngestState.Validate);
-      }
-
-      context.summaries = result.data.summaries;
       gridApi.hideOverlay();
       gridApi.redrawRows();
 
@@ -188,20 +162,37 @@ const DataSheetView = ({jobId}) => {
     setSideBar(defaultSideBar);
     context.useOverlay = 'Submitting';
     gridApi.showLoadingOverlay();
-    dispatch(SubmitingestRequested(jobId));
+    submitIngest(
+      jobId,
+      (res) => onIngest({success: res}),
+      (err) => onIngest({error: err})
+    );
   };
 
-  const handleSave = () => {
+  const handleSaveAndValidate = () => {
     setState(IngestState.Loading);
+    setSideBar(defaultSideBar);
     context.useOverlay = 'Saving';
     gridApi.showLoadingOverlay();
     const rowUpdateDtos = [];
     let fullRefresh = false;
+
     Array.from(new Set(context.putRowIds)).forEach((rowId) => {
       const row = context.rowData.find((r) => r.id === rowId);
 
+      // Serialise the measure JSON
+      if (row) {
+        let measure = {};
+        Object.getOwnPropertyNames(row || {})
+          .filter((key) => !isNaN(parseFloat(key)))
+          .forEach((numKey) => {
+            measure[numKey] = row[numKey];
+          });
+        row.measureJson = measure;
+      }
+
       // Null row data means that the row is to be deleted
-      rowUpdateDtos.push({rowId: rowId, row: row ? importRow(row) : null});
+      rowUpdateDtos.push({rowId: rowId, row: row});
 
       // HACK: use the fact that new rows are assigned a very high string
       // to determine if we need a full reload to get the server-assigned
@@ -211,10 +202,9 @@ const DataSheetView = ({jobId}) => {
     });
     updateRows(jobId, rowUpdateDtos, () => {
       if (fullRefresh) {
-        reload(gridApi, jobId);
+        reload(gridApi, jobId, handleValidate);
       } else {
-        gridApi.hideOverlay();
-        setState(IngestState.Validate);
+        handleValidate();
       }
     });
   };
@@ -250,7 +240,6 @@ const DataSheetView = ({jobId}) => {
     });
     ctx.pushUndo(e.api, [...oldRows]);
     ctx.pendingPasteUndo = [];
-    setState(IngestState.Save);
   };
 
   const onCopyRegion = (e) => {
@@ -259,6 +248,8 @@ const DataSheetView = ({jobId}) => {
 
   const getContextMenuItems = (e) => {
     const [cells] = e.api.getCellRanges();
+    if (!cells) return;
+
     const colId = cells.startColumn.colId;
     const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
     const label = row.data[colId];
@@ -273,28 +264,12 @@ const DataSheetView = ({jobId}) => {
       });
     }
 
-    if (cells.startRow.rowIndex === cells.endRow.rowIndex && Object.keys(e.api.getFilterModel()).length < 1) {
+    const multiRowsSelected = e.api.getSelectedRows().length > 1 || cells.startRow.rowIndex !== cells.endRow.rowIndex;
+    if (!multiRowsSelected && Object.keys(e.api.getFilterModel()).length < 1) {
       if (items.length > 0) items.push('separator');
       items.push({
         name: 'Delete Row',
-        action: () => {
-          const rows = [];
-          const [cells] = e.api.getCellRanges();
-          const startIdx = Math.min(cells.startRow.rowIndex, cells.endRow.rowIndex);
-          const endIdx = Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
-          const delta = [];
-          for (let i = startIdx; i < endIdx + 1; i++) {
-            const row = e.api.getDisplayedRowAtIndex(i);
-            const data = rowData.find((d) => d.id == row.data.id);
-            delta.push({...data});
-            rowData.splice(rowData.indexOf(data), 1);
-            rows.push(row);
-          }
-          pushUndo(e.api, delta);
-          e.api.setRowData(rowData);
-          e.api.refreshCells();
-          setState(IngestState.Save);
-        }
+        action: () => deleteRow(e)
       });
       items.push({
         name: 'Clone Row',
@@ -308,8 +283,13 @@ const DataSheetView = ({jobId}) => {
           rowData.push(newData);
           e.api.setRowData(rowData);
           e.api.refreshCells();
-          setState(IngestState.Save);
         }
+      });
+    } else {
+      if (items.length > 0) items.push('separator');
+      items.push({
+        name: 'Delete Selected Rows',
+        action: () => deleteRow(e)
       });
     }
     return items;
@@ -327,7 +307,7 @@ const DataSheetView = ({jobId}) => {
       const dataIdx = rowData.findIndex((d) => d.id == row.data.id);
       const data = {...rowData[dataIdx]};
       delta.push(data);
-      var newData = {};
+      let newData = {};
       Object.keys(data).forEach(function (key) {
         newData[key] = data[key];
       });
@@ -340,7 +320,6 @@ const DataSheetView = ({jobId}) => {
     }
     pushUndo(e.api, delta);
     e.api.setRowData(rowData);
-    setState(IngestState.Save);
   };
 
   const onClearRegion = (e) => fillRegion(e, '');
@@ -353,16 +332,14 @@ const DataSheetView = ({jobId}) => {
   const onUndo = (e) => {
     popUndo(e.api);
     e.api.refreshCells();
-    setState(IngestState.Save);
   };
 
   const onCellEditingStopped = (e) => {
     if (e.oldValue === e.newValue) return;
-
     const row = {...e.data};
     row[e.column.colId] = e.oldValue;
     pushUndo(e.api, [row]);
-    setState(IngestState.Save);
+    setState(IngestState.Edited);
   };
 
   const overrideKeyboardEvents = (e) => {
@@ -388,7 +365,7 @@ const DataSheetView = ({jobId}) => {
     }
   };
 
-  const reload = (api, jobId) => {
+  const reload = (api, jobId, completion) => {
     getDataJob(jobId).then((res) => {
       const job = {
         program: res.data.job.program.programName,
@@ -397,21 +374,28 @@ const DataSheetView = ({jobId}) => {
         source: res.data.job.source,
         status: res.data.job.status
       };
-      if (res.data.rows && res.data.rows.length > 0) {
+      if (res.data.rows) {
         const rowData = res.data.rows.map((row) => {
-          return exportRow(row);
+          const {measureJson} = {...row};
+          Object.getOwnPropertyNames(measureJson || {}).forEach((numKey) => {
+            row[numKey] = measureJson[numKey];
+          });
+          delete row.measureJson;
+          return row;
         });
         api.gridOptionsWrapper.gridOptions.context.rowData = rowData;
-        api.setRowData(rowData);
+        api.setRowData(rowData.length > 0 ? rowData : null);
       }
-      setJob(job);
-      setState(IngestState.Validate);
+      if (completion) completion(job);
     });
   };
 
   const onGridReady = (p) => {
     setGridApi(p.api);
-    reload(p.api, jobId);
+    reload(p.api, jobId, (job) => {
+      setState(IngestState.Edited);
+      setJob(job);
+    });
   };
 
   const onFirstDataRendered = (e) => {
@@ -423,21 +407,21 @@ const DataSheetView = ({jobId}) => {
   };
 
   const chooseCellStyle = (params) => {
-    if (params.colDef.field === 'row') return {color: 'grey'};
+    // Grey-out the first  column containing the row number
+    if (params.colDef.field === 'row') return {color: grey[500]};
+
+    // Highlight and search results
     const row = params.context.highlighted[params.rowIndex];
-    if (row && row[params.colDef.field]) return {backgroundColor: '#fff9c4'};
-    // HACK: to work around the fact that invert validation returns the column as an invert size
-    // and NOT as the row data column name.
-    let fieldName = params.colDef.field.toUpperCase();
-    if (params.data && params.data.isInvertSizing && params.data.isInvertSizing.toUpperCase() === 'YES') {
-      const invertSizeMap = measurements.find((m) => m.invertSize === params.colDef.field);
-      if (invertSizeMap) {
-        fieldName = invertSizeMap.field;
-      }
+    if (row && row[params.colDef.field]) return {backgroundColor: yellow[100]};
+
+    // Highlight cell validations
+    const error = params.context.errors.find(
+      (e) => e.rowIds.includes(params.data.id) && (!e.columnNames || e.columnNames.includes(params.colDef.field))
+    );
+    if (error) {
+      if (error.levelId === 'BLOCKING') return {backgroundColor: red[100]};
+      if (error.levelId === 'WARNING') return {backgroundColor: orange[100]};
     }
-    const error = params.context.errors.find((e) => e.row === params.data.id && e.column.toUpperCase() === fieldName);
-    if (error?.type === 'BLOCKING') return {backgroundColor: '#ffcdd2'};
-    if (error?.type === 'WARNING') return {backgroundColor: '#fff9c4'};
     return null;
   };
 
@@ -445,22 +429,103 @@ const DataSheetView = ({jobId}) => {
     e.api.refreshCells();
   };
 
-  const toolTipValueGetter = (e) => {
-    const error = e.context.errors.find((r) => r.row === e.data.id && e.column.colId.toUpperCase() === r.column.toUpperCase());
-    if (error) {
-      return error.message;
-    } else {
-      return null;
+  const onRowDataUpdated = (e) => {
+    const ctx = e.api.gridOptionsWrapper.gridOptions.context;
+    if (ctx.putRowIds.length > 0) {
+      setState(IngestState.Edited);
     }
   };
 
+  const toolTipValueGetter = (params) => {
+    const error = params.context.errors.find(
+      (e) => e.rowIds.includes(params.data.id) && (!e.columnNames || e.columnNames.includes(params.colDef.field))
+    );
+
+    return error?.message;
+  };
+
+  const deleteRow = (e) => {
+    const rowData = e.context.rowData;
+    const [cells] = e.api.getCellRanges();
+    const startIdx = Math.min(cells.startRow.rowIndex, cells.endRow.rowIndex);
+    const endIdx = Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
+    const delta = [];
+    if (startIdx === endIdx) {
+      e.api.getSelectedRows().forEach((row) => {
+        const data = rowData.find((d) => d.id === row.id);
+        delta.push({...data});
+        rowData.splice(rowData.indexOf(data), 1);
+      });
+    } else {
+      for (let i = startIdx; i < endIdx + 1; i++) {
+        const row = e.api.getDisplayedRowAtIndex(i);
+        const data = rowData.find((d) => d.id === row.data.id);
+        delta.push({...data});
+        rowData.splice(rowData.indexOf(data), 1);
+      }
+    }
+    pushUndo(e.api, delta);
+    e.api.setRowData(rowData);
+    e.api.refreshCells();
+  };
+
+  const onCellKeyDown = (e) => {
+    const editingCells = e.api.getEditingCells();
+    if (editingCells.length === 1) {
+      e.api.gridOptionsWrapper.gridOptions.context.navigationKey = e.event.key;
+      if (['ArrowLeft', 'ArrowUp'].includes(e.event.key)) {
+        e.event.preventDefault();
+        e.api.stopEditing();
+        e.api.tabToPreviousCell();
+      }
+      if (['ArrowRight', 'ArrowDown'].includes(e.event.key)) {
+        e.event.preventDefault();
+        e.api.stopEditing();
+        e.api.tabToNextCell();
+      }
+      e.api.gridOptionsWrapper.gridOptions.context.navigationKey = '';
+    }
+  };
+
+  const onTabToNextCell = (params) => {
+    let context = gridApi.gridOptionsWrapper.gridOptions.context;
+    let result;
+
+    if (['ArrowUp', 'ArrowDown'].includes(context.navigationKey) && params.previousCellPosition) {
+      let previousCell = params.previousCellPosition,
+        lastRowIndex = previousCell.rowIndex,
+        nextRowIndex = params.backwards ? lastRowIndex - 1 : lastRowIndex + 1,
+        renderedRowCount = gridApi.getModel().getRowCount();
+
+      if (nextRowIndex < 0) nextRowIndex = -1;
+      if (nextRowIndex >= renderedRowCount) nextRowIndex = renderedRowCount - 1;
+
+      result = {
+        rowIndex: nextRowIndex,
+        column: previousCell.column,
+        floating: previousCell.floating
+      };
+    }
+
+    if (['ArrowLeft', 'ArrowRight'].includes(context.navigationKey) && params.nextCellPosition) {
+      result = {
+        rowIndex: params.nextCellPosition.rowIndex,
+        column: params.nextCellPosition.column,
+        floating: params.nextCellPosition.floating
+      };
+    }
+
+    return result;
+  };
+
+  const measurementColumns = job.isExtendedSize ? measurements.concat(extendedMeasurements) : measurements;
   return (
     <>
       <AlertDialog
         open={state === IngestState.ConfirmSubmit}
         text="Submit Sheet?"
         action="Submit"
-        onClose={() => setState(IngestState.Submit)}
+        onClose={() => setState(IngestState.Valid)}
         onConfirm={handleSubmit}
       />
       <Box pt={1} pl={1}>
@@ -485,18 +550,13 @@ const DataSheetView = ({jobId}) => {
               </Button>
             </Box>
             <Box p={1}>
-              <Button disabled={state !== IngestState.Save} onClick={handleSave} startIcon={<SaveOutlinedIcon />}>
-                Save
-              </Button>
-            </Box>
-            <Box p={1}>
-              <Button disabled={state !== IngestState.Validate} onClick={handleValidate} startIcon={<PlaylistAddCheckOutlinedIcon />}>
-                Validate
+              <Button onClick={handleSaveAndValidate} startIcon={<PlaylistAddCheckOutlinedIcon />}>
+                {`Save & Validate`}
               </Button>
             </Box>
             <Box p={1}>
               <Button
-                disabled={state !== IngestState.Submit}
+                disabled={state !== IngestState.Valid}
                 onClick={() => setState(IngestState.ConfirmSubmit)}
                 startIcon={<CloudUploadIcon />}
               >
@@ -507,98 +567,91 @@ const DataSheetView = ({jobId}) => {
         )}
       </Box>
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
-        <AgGridReact
-          getRowNodeId={(r) => r.id}
-          className={classes.agGrid}
-          context={context}
-          immutableData={true}
-          cellFlashDelay={100}
-          cellFadeDelay={100}
-          defaultColDef={{
-            editable: true,
-            sortable: true,
-            resizable: true,
-            flex: 1,
-            minWidth: 80,
-            filter: true,
-            floatingFilter: true,
-            suppressMenu: true,
-            suppressKeyboardEvent: overrideKeyboardEvents,
-            cellStyle: chooseCellStyle,
-            enableCellChangeFlash: true,
-            tooltipValueGetter: toolTipValueGetter
-          }}
-          rowHeight={20}
-          enableBrowserTooltips
-          enableRangeSelection={true}
-          animateRows={true}
-          enableRangeHandle={true}
-          onPasteStart={onPasteStart}
-          onPasteEnd={onPasteEnd}
-          onCellValueChanged={onCellValueChanged}
-          onSortChanged={onSortChanged}
-          onFilterChanged={onSortChanged}
-          fillHandleDirection="y"
-          getContextMenuItems={getContextMenuItems}
-          undoRedoCellEditing={false}
-          onCellEditingStopped={onCellEditingStopped}
-          frameworkComponents={{
-            validationPanel: ValidationPanel,
-            findReplacePanel: FindReplacePanel,
-            loadingOverlay: LoadingOverlay
-          }}
-          loadingOverlayComponent="loadingOverlay"
-          pivotMode={false}
-          pivotColumnGroupTotals="before"
-          sideBar={sideBar}
-          onGridReady={onGridReady}
-          onFirstDataRendered={onFirstDataRendered}
-        >
-          <AgGridColumn field="id" editable={false} hide={true} />
-          <AgGridColumn field="pos" editable={false} hide={true} sort="asc" />
-          <AgGridColumn
-            field="row"
-            headerName=""
-            suppressMovable={true}
-            editable={false}
-            valueGetter="node.rowIndex + 1"
-            minWidth={40}
-            enableCellChangeFlash={false}
-            filter={false}
-            sortable={false}
-          />
-          <AgGridColumn field="diver" headerName="Diver" pivot={true} enablePivot={false} />
-          <AgGridColumn field="buddy" headerName="Buddy" />
-          <AgGridColumn field="siteCode" headerName="Site Code" rowGroup={false} enableRowGroup={true} />
-          <AgGridColumn field="siteName" headerName="Site Name" minWidth={160} />
-          <AgGridColumn field="latitude" headerName="Latitude" />
-          <AgGridColumn field="longitude" headerName="Longitude" />
-          <AgGridColumn field="date" headerName="Date" rowGroup={false} enableRowGroup={true} />
-          <AgGridColumn field="vis" headerName="Vis" />
-          <AgGridColumn field="direction" headerName="Direction" />
-          <AgGridColumn field="time" headerName="Time" />
-          <AgGridColumn field="P-Qs" headerName="P-Qs" />
-          <AgGridColumn field="depth" headerName="Depth" rowGroup={false} enableRowGroup={true} />
-          <AgGridColumn field="method" headerName="Method" rowGroup={false} enableRowGroup={true} />
-          <AgGridColumn field="block" headerName="Block" rowGroup={false} enableRowGroup={true} />
-          <AgGridColumn field="code" headerName="Code" />
-          <AgGridColumn field="species" headerName="Species" pivot={true} enablePivot={false} />
-          <AgGridColumn field="commonName" headerName="Common Name" />
-          <AgGridColumn field="total" headerName="Total" aggFunc="count" />
-          <AgGridColumn field="inverts" headerName="Inverts" />
-          {measurements.map((m) => (
+        {job && (
+          <AgGridReact
+            getRowNodeId={(r) => r.id}
+            className={classes.agGrid}
+            context={context}
+            immutableData={true}
+            cellFlashDelay={100}
+            cellFadeDelay={100}
+            defaultColDef={{
+              editable: true,
+              sortable: true,
+              resizable: true,
+              flex: 1,
+              minWidth: 80,
+              filter: true,
+              floatingFilter: true,
+              suppressMenu: true,
+              suppressKeyboardEvent: overrideKeyboardEvents,
+              cellStyle: chooseCellStyle,
+              enableCellChangeFlash: true,
+              tooltipValueGetter: toolTipValueGetter
+            }}
+            rowHeight={20}
+            enableBrowserTooltips
+            rowSelection="multiple"
+            enableRangeSelection={true}
+            animateRows={true}
+            enableRangeHandle={true}
+            onCellKeyDown={onCellKeyDown}
+            onPasteStart={onPasteStart}
+            onPasteEnd={onPasteEnd}
+            tabToNextCell={onTabToNextCell}
+            onCellValueChanged={onCellValueChanged}
+            onSortChanged={onSortChanged}
+            onFilterChanged={onSortChanged}
+            onRowDataUpdated={onRowDataUpdated}
+            fillHandleDirection="y"
+            getContextMenuItems={getContextMenuItems}
+            undoRedoCellEditing={false}
+            onCellEditingStopped={onCellEditingStopped}
+            frameworkComponents={{
+              validationPanel: ValidationPanel,
+              findReplacePanel: FindReplacePanel,
+              loadingOverlay: LoadingOverlay
+            }}
+            loadingOverlayComponent="loadingOverlay"
+            pivotMode={false}
+            pivotColumnGroupTotals="before"
+            sideBar={sideBar}
+            onGridReady={onGridReady}
+            onFirstDataRendered={onFirstDataRendered}
+          >
+            <AgGridColumn field="id" editable={false} hide={true} />
+            <AgGridColumn field="pos" editable={false} hide={true} sort="asc" />
             <AgGridColumn
-              field={m.field}
-              key={m.field}
-              editable={true}
-              width={35}
-              headerComponentParams={{
-                template: `<div style="width: 48px; float: left; text-align:center"><div style="color: #c4d79b; border-bottom: 1px solid rgba(0, 0, 0, 0.12)">${m.fishSize}</div><div style="color: #da9694">${m.invertSize}</div></div>`
-              }}
+              field="row"
+              headerName=""
+              suppressMovable={true}
+              editable={false}
+              valueGetter="node.rowIndex + 1"
+              minWidth={40}
+              enableCellChangeFlash={false}
+              filter={false}
+              sortable={false}
             />
-          ))}
-          {job.isExtendedSize &&
-            measurements.map((m) => (
+            <AgGridColumn field="diver" headerName="Diver" pivot={true} enablePivot={false} />
+            <AgGridColumn field="buddy" headerName="Buddy" />
+            <AgGridColumn field="siteCode" headerName="Site Code" rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="siteName" headerName="Site Name" minWidth={160} />
+            <AgGridColumn field="latitude" headerName="Latitude" />
+            <AgGridColumn field="longitude" headerName="Longitude" />
+            <AgGridColumn field="date" headerName="Date" rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="vis" headerName="Vis" />
+            <AgGridColumn field="direction" headerName="Direction" />
+            <AgGridColumn field="time" headerName="Time" />
+            <AgGridColumn field="P-Qs" headerName="P-Qs" />
+            <AgGridColumn field="depth" headerName="Depth" rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="method" headerName="Method" rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="block" headerName="Block" rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="code" headerName="Code" />
+            <AgGridColumn field="species" headerName="Species" pivot={true} enablePivot={false} />
+            <AgGridColumn field="commonName" headerName="Common Name" />
+            <AgGridColumn field="total" headerName="Total" aggFunc="count" />
+            <AgGridColumn field="inverts" headerName="Inverts" />
+            {measurementColumns.map((m) => (
               <AgGridColumn
                 field={m.field}
                 key={m.field}
@@ -608,15 +661,18 @@ const DataSheetView = ({jobId}) => {
                   template: `<div style="width: 48px; float: left; text-align:center"><div style="color: #c4d79b; border-bottom: 1px solid rgba(0, 0, 0, 0.12)">${m.fishSize}</div><div style="color: #da9694">${m.invertSize}</div></div>`
                 }}
               />
-            )) && <AgGridColumn field="isInvertSizing" headerName="Use Invert Sizing" />}
-        </AgGridReact>
+            ))}
+            {job.isExtendedSize && <AgGridColumn minWidth={120} field="isInvertSizing" headerName="Use Invert Sizing" />}
+          </AgGridReact>
+        )}
       </Box>
     </>
   );
 };
 
 DataSheetView.propTypes = {
-  jobId: PropTypes.string
+  jobId: PropTypes.string.isRequired,
+  onIngest: PropTypes.func.isRequired
 };
 
 export default DataSheetView;

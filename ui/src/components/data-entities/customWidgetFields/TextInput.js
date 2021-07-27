@@ -13,6 +13,20 @@ const TextInput = ({name, schema, uiSchema}) => {
   const readOnlyInput = uiSchema['ui:field'] === 'readonly';
   const readOnlyModify = uiSchema['ui:readonly'] === true;
 
+  const splitField = (value) => {
+    const displayValue = value.indexOf('\n') > -1 ? 'block' : 'inherit';
+
+    if(value.length === 0) {
+      return <Typography>---</Typography>;
+    } else {
+      return value.split('\n').map(val => (
+        <Typography key={val} variant="" display={displayValue}>
+          {val}
+        </Typography>)
+      );
+    }
+  };
+
   const roField = (
     <>
       <Grid container alignItems="flex-start" direction="row" spacing={2}>
@@ -21,9 +35,7 @@ const TextInput = ({name, schema, uiSchema}) => {
         </Grid>
         <Grid item xs={7}>
           <Box pt="1px">
-            <Typography variant="subtitle3" noWrap={true}>
-              {value.length > 0 ? value : '---'}
-            </Typography>
+            {splitField(value)}
           </Box>
         </Grid>
       </Grid>

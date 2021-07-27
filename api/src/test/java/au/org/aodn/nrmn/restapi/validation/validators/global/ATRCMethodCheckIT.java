@@ -1,12 +1,10 @@
 package au.org.aodn.nrmn.restapi.validation.validators.global;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
-import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
-import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
-import au.org.aodn.nrmn.restapi.validation.validators.global.raw.ATRCMethodCheck;
-import lombok.val;
+import static org.junit.Assert.assertFalse;
+
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,119 +12,103 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.org.apache.commons.lang.SerializationUtils;
 
-import java.util.Arrays;
-
-import static org.junit.Assert.assertTrue;
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
+import au.org.aodn.nrmn.restapi.validation.process.ValidationProcess;
 
 @Testcontainers
 @SpringBootTest
 @ExtendWith(PostgresqlContainerExtension.class)
 @WithTestData
 class ATRCMethodCheckIT {
-    @Autowired
-    StagedRowRepository stagedRowRepo;
 
     @Autowired
-    StagedJobRepository jobRepo;
-    @Autowired
-    ATRCMethodCheck atrcMethodCheck;
+    ValidationProcess validationProcess;
 
     @Test
     void only12methodShouldSucceed() {
-        val job = jobRepo.findByReference("jobid-atrc").get();
-        val date = "11/09/2020";
-        val depth = "7";
-        val siteNo = "ERZ1";
+        String date = "11/09/2020";
+        String depth = "7";
+        String siteNo = "ERZ1";
 
-        val m1b1 = new StagedRow();
+        StagedRow m1b1 = new StagedRow();
         m1b1.setMethod("1");
         m1b1.setBlock("1");
         m1b1.setDate(date);
         m1b1.setDepth(depth);
         m1b1.setSiteCode(siteNo);
-        m1b1.setStagedJob(job);
 
-        val m2b1 = (StagedRow) SerializationUtils.clone(m1b1);
+        StagedRow m2b1 = (StagedRow) SerializationUtils.clone(m1b1);
         m2b1.setMethod("2");
-        val m2b2 = (StagedRow) SerializationUtils.clone(m2b1);
+        StagedRow m2b2 = (StagedRow) SerializationUtils.clone(m2b1);
         m2b1.setBlock("2");
 
-        val m1b1d8 = (StagedRow) SerializationUtils.clone(m1b1);
+        StagedRow m1b1d8 = (StagedRow) SerializationUtils.clone(m1b1);
         m1b1d8.setDepth("8");
-        val m2b1d8 = (StagedRow) SerializationUtils.clone(m1b1d8);
+        StagedRow m2b1d8 = (StagedRow) SerializationUtils.clone(m1b1d8);
         m1b1d8.setMethod("2");
-        stagedRowRepo.deleteAll();
 
-        stagedRowRepo.saveAll(Arrays.asList(m1b1, m2b1, m2b2, m1b1d8, m2b1d8));
+        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(m1b1, m2b1, m2b2, m1b1d8, m2b1d8));
 
-        val res = atrcMethodCheck.valid(job);
-
-        assertTrue(res.isValid());
+        assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("ATRC Method must be [0-5], 7 or 10")));
     }
 
 
     @Test
     void onlyMethod0345ShouldSucceed() {
-        val job = jobRepo.findByReference("jobid-atrc").get();
-        val date = "11/09/2020";
-        val depth = "7";
-        val siteNo = "ERZ1";
 
-        val m0b1 = new StagedRow();
+        String date = "11/09/2020";
+        String depth = "7";
+        String siteNo = "ERZ1";
+
+        StagedRow m0b1 = new StagedRow();
         m0b1.setMethod("0");
         m0b1.setBlock("1");
         m0b1.setDate(date);
         m0b1.setDepth(depth);
         m0b1.setSiteCode(siteNo);
-        m0b1.setStagedJob(job);
 
-        val m0b2 = (StagedRow) SerializationUtils.clone(m0b1);
+        StagedRow m0b2 = (StagedRow) SerializationUtils.clone(m0b1);
         m0b2.setBlock("2");
 
-        val m3b1 = (StagedRow) SerializationUtils.clone(m0b1);
+        StagedRow m3b1 = (StagedRow) SerializationUtils.clone(m0b1);
         m3b1.setMethod("3");
 
-        val m3b3 = (StagedRow) SerializationUtils.clone(m3b1);
+        StagedRow m3b3 = (StagedRow) SerializationUtils.clone(m3b1);
         m3b3.setBlock("3");
 
+        StagedRow m5b3 = (StagedRow) SerializationUtils.clone(m3b1);
+        m5b3.setBlock("5");
 
-        val m5b3 = (StagedRow) SerializationUtils.clone(m3b1);
-        m3b3.setBlock("5");
-        stagedRowRepo.deleteAll();
+        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(m0b1, m0b2, m3b1, m3b3, m5b3));
 
-        stagedRowRepo.saveAll(Arrays.asList(m0b1, m0b2, m3b1, m3b3, m5b3));
-
-        val res = atrcMethodCheck.valid(job);
-
-        assertTrue(res.isValid());
+        assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("ATRC Method must be [0-5], 7 or 10")));
     }
 
     @Test
     void missingM2ShouldFail() {
-        val job = jobRepo.findByReference("jobid-atrc").get();
-        val date = "11/09/2020";
-        val depth = "7";
-        val siteNo = "ERZ1";
+        String date = "11/09/2020";
+        String depth = "7";
+        String siteNo = "ERZ1";
 
-        val m1b1 = new StagedRow();
+        StagedRow m1b1 = new StagedRow();
         m1b1.setMethod("1");
         m1b1.setBlock("1");
         m1b1.setDate(date);
         m1b1.setDepth(depth);
         m1b1.setSiteCode(siteNo);
-        m1b1.setStagedJob(job);
 
-        val m1b1d10 = (StagedRow) SerializationUtils.clone(m1b1);
+        StagedRow m1b1d10 = (StagedRow) SerializationUtils.clone(m1b1);
         m1b1d10.setDepth("10");
-        val m1b1d8 = (StagedRow) SerializationUtils.clone(m1b1);
+        StagedRow m1b1d8 = (StagedRow) SerializationUtils.clone(m1b1);
         m1b1d8.setDepth("8");
-        val m2b1d8 = (StagedRow) SerializationUtils.clone(m1b1d8);
+        StagedRow m2b1d8 = (StagedRow) SerializationUtils.clone(m1b1d8);
         m1b1d8.setMethod("2");
-        stagedRowRepo.deleteAll();
-        stagedRowRepo.saveAll(Arrays.asList(m1b1, m1b1d10, m1b1d8, m2b1d8));
 
-        val res = atrcMethodCheck.valid(job);
+        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(m1b1, m1b1d10, m1b1d8, m2b1d8));
 
-        assertTrue(res.isInvalid());
+        assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("ATRC Method must be [0-5], 7 or 10")));
     }
 }

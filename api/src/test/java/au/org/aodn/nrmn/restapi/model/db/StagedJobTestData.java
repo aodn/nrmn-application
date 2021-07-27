@@ -1,15 +1,15 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import java.util.Collections;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import au.org.aodn.nrmn.restapi.model.db.StagedJob.StagedJobBuilder;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.testcontainers.shaded.org.apache.commons.lang.SerializationUtils;
-
-import java.util.Collections;
 
 @Component
 public class StagedJobTestData {

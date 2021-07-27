@@ -1,16 +1,13 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.envers.Audited;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 @Embeddable
 @Data

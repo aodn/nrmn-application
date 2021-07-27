@@ -1,15 +1,13 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import au.org.aodn.nrmn.restapi.dto.auth.LoginRequest;
-import au.org.aodn.nrmn.restapi.dto.auth.SignUpRequest;
-import au.org.aodn.nrmn.restapi.repository.SecUserRepository;
-import au.org.aodn.nrmn.restapi.service.UserService;
-import au.org.aodn.nrmn.restapi.util.LogInfo;
 import au.org.aodn.nrmn.restapi.dto.payload.JwtAuthenticationResponse;
 import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
 import au.org.aodn.nrmn.restapi.repository.SecRoleRepository;
+import au.org.aodn.nrmn.restapi.repository.SecUserRepository;
 import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.security.JwtTokenProvider;
+import au.org.aodn.nrmn.restapi.util.LogInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,10 +22,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.net.URI;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping(path = "/api/auth")
@@ -40,20 +37,19 @@ public class AuthController {
     SecRoleRepository roleRepository;
 
     @Autowired
-    UserService userService;
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    JwtTokenProvider tokenProvider;
 
     @Autowired
-    JwtTokenProvider tokenProvider;
-    @Autowired
     UserActionAuditRepository userAuditRepo;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     private static Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     @PostMapping(path = "/signout", consumes = "application/json", produces = "application/json")
-    public ResponseEntity logOutUser(
+    public ResponseEntity<Object> logOutUser(
             Authentication authentication,
             @RequestHeader(name = "Authorization") String bearerToken) {
         val timeStamp = System.currentTimeMillis();
@@ -74,7 +70,7 @@ public class AuthController {
     }
 
     @PostMapping(path = "/signin", consumes = "application/json", produces = "application/json")
-    public ResponseEntity authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         logger.info(LogInfo.withContext("login attempt"));
         userAuditRepo.save(
                 new UserActionAudit("signin", "login attempt for username: " + loginRequest.getUsername()));
@@ -92,25 +88,12 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
-    @PostMapping(path = "/signup", consumes = "application/json", produces = "application/json")
-    public ResponseEntity registerUser(@Valid @RequestBody SignUpRequest signUpRequestDto) {
+    @PostMapping(path = "/hash", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<HashMap<String, String>> registerUser(@Valid @RequestBody String password) {
 
-        userAuditRepo.save(new UserActionAudit("registerUser", signUpRequestDto.toString()));
+        HashMap<String, String> payload = new HashMap<>();
+        payload.put("hash", passwordEncoder.encode(password));
+        return ResponseEntity.ok(payload);
 
-        val validedUSer = userService.createUser(signUpRequestDto);
-        ResponseEntity<?> response = validedUSer.fold(
-                (err) -> {
-                    logger.info("Error while signup");
-                    return ResponseEntity.unprocessableEntity().body(err);
-                }
-                , (user) -> {
-                    logger.info("Successful signup");
-                    URI location = ServletUriComponentsBuilder
-                            .fromCurrentContextPath().path("/api/users/{id}")
-                            .buildAndExpand(user.getUserId()).toUri();
-                    return ResponseEntity.created(location).body(user);
-                });
-        return response;
     }
-
 }

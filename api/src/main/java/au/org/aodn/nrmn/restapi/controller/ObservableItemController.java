@@ -10,7 +10,10 @@ import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -28,6 +31,8 @@ import java.util.stream.Collectors;
 @Tag(name = "observable items")
 @RequestMapping(path = "/api/reference")
 public class ObservableItemController {
+
+    private static Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     private ObservableItemRepository observableItemRepository;
@@ -87,6 +92,21 @@ public class ObservableItemController {
             
             if(match.getLetterCode() != null && match.getLetterCode().equals(item.getLetterCode()))
                 errors.add(new ValidationError(ObservableItemDto.class.getName(), "letterCode", item.getLetterCode(), "An item with this letter code already exists."));
+        }
+
+        if(!StringUtils.isEmpty(item.getSupersededBy()) && observableItemRepository.exactSearch(item.getSupersededBy()).isEmpty()){
+
+            if(item.getObservableItemId() != null){
+                ObservableItem originalItem = observableItemRepository
+                        .findById(item.getObservableItemId()).orElseThrow(ResourceNotFoundException::new);
+                logger.info(String.format("Invalid supersededBy value: \"%s\". Setting to previous value \"%s\".",
+                        originalItem.getSupersededBy(), originalItem.getSupersededBy()));
+                item.setSupersededBy(originalItem.getSupersededBy());
+            } else {
+                logger.info(String.format("Invalid supersededBy value: \"%s\". Setting to null.", item.getSupersededBy()));
+                item.setSupersededBy(null);
+            }
+
         }
 
         if(!errors.isEmpty())
