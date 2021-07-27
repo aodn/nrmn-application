@@ -177,9 +177,9 @@ public class ValidationProcess {
 
             // Vis
             if (!StringUtils.isBlank(row.getVis())) {
-                int vis = NumberUtils.toInt(row.getVis(), INVALID_INT);
+                Double vis = NumberUtils.toDouble(row.getVis(), (double)INVALID_INT);
                 if (vis < 0)
-                    errors.add(rowId, ValidationLevel.BLOCKING, "vis", (vis == INVALID_INT) ? "Vis is not an integer" : "Vis is not positive");
+                    errors.add(rowId, ValidationLevel.BLOCKING, "vis", (vis == (double)INVALID_INT) ? "Vis is not a decimal" : "Vis is not positive");
             }
 
             // Inverts

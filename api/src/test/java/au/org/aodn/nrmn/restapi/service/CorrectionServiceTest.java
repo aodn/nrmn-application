@@ -49,7 +49,7 @@ public class CorrectionServiceTest {
                 .direction("NW")
                 .program(Program.builder().programId(0).build())
                 .site(Site.builder().siteName("A SITE").build())
-                .visibility(1);
+                .visibility(1.0);
         surveyMethodBuilder = SurveyMethod.builder()
                 .surveyNotDone(false)
                 .blockNum(2)

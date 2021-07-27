@@ -63,7 +63,7 @@ public class SurveyIngestionServiceTest {
         rowBuilder = StagedRowFormatted.builder().block(1).method(2).diver(diver)
                 .species(Optional.of(ObservableItem.builder().observableItemName("THE SPECIES").build()))
                 .site(Site.builder().siteCode("A SITE").isActive(false).build()).depth(1).surveyNum(2)
-                .direction(Directions.N).vis(Optional.of(15)).date(LocalDate.of(2003, 03, 03))
+                .direction(Directions.N).vis(Optional.of(15.5)).date(LocalDate.of(2003, 03, 03))
                 .time(Optional.of(LocalTime.of(12, 34, 56))).pqs(diver).isInvertSizing(true).code("AAA")
                 .inverts(0)
                 .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build()).ref(ref);
@@ -80,7 +80,7 @@ public class SurveyIngestionServiceTest {
         assertEquals(2, survey.getSurveyNum());
         assertEquals("A SITE", survey.getSite().getSiteCode());
         assertEquals("N", survey.getDirection());
-        assertEquals(15, survey.getVisibility());
+        assertEquals(15.5, survey.getVisibility());
         assertEquals("2003-03-03", survey.getSurveyDate().toString());
         assertEquals("12:34:56", survey.getSurveyTime().toString());
     }
