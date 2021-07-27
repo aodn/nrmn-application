@@ -50,6 +50,7 @@ public class SurveyDtoMapperConfig {
             mapper.using(passThrough).map(survey -> survey.getSite().getMpa(), SurveyDto::setArea);
             mapper.using(passThrough).map(survey -> survey.getSite().getLocation().getLocationName(), SurveyDto::setLocationName);
             mapper.using(passThrough).map(survey -> survey.getSite().getCountry(), SurveyDto::setCountry);
+            mapper.using(passThrough).map(survey -> survey.getInsideMarinePark() == null ? "Unsure" : survey.getInsideMarinePark(), SurveyDto::setInsideMarinePark);
             mapper.using(toDiverList).map(Survey::getSurveyId, SurveyDto::setDivers);
         });
     }
