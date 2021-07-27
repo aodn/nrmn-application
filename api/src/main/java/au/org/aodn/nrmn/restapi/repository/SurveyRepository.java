@@ -20,15 +20,34 @@ import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 @Repository
 public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpecificationExecutor<Survey> {
 
-        @Query(value = "select survey_date as surveyDate, survey_time as surveyTime, depth, survey_num as surveyNum, pq_catalogued as hasPQs, "
-                        + "sv.survey_id as surveyId, st.site_name as siteName, st.site_code as siteCode, st.mpa, st.country, pg.program_name as programName, "
-                        + "dv.full_name as diverName, lc.location_name as locationName "
-                        + "FROM {h-schema}survey sv "
-                        + "LEFT JOIN {h-schema}program_ref pg ON pg.program_id = sv.program_id "
-                        + "LEFT JOIN {h-schema}site_ref st ON st.site_id = sv.site_id "
-                        + "LEFT JOIN {h-schema}diver_ref dv ON sv.pq_diver_id = dv.diver_id "
-                        + "LEFT JOIN {h-schema}location_ref lc ON lc.location_id = st.location_id "
-                        + "ORDER BY surveyDate DESC", countQuery = "SELECT count(*) FROM {h-schema}survey", nativeQuery = true)
+        @Query(value = "" +
+                "WITH diver_names AS (" +
+                "    SELECT survey_id, array_to_string(array_agg(DISTINCT full_name), ', ') AS names_list" +
+                "    FROM {h-schema}diver_ref dv" +
+                "    INNER JOIN {h-schema}observation o ON o.diver_id = dv.diver_id  " +
+                "    INNER JOIN {h-schema}survey_method sm ON o.survey_method_id = sm.survey_method_id" +
+                "    GROUP BY survey_id" +
+                ")" +
+                "select " +
+                "    survey_date as surveyDate, " +
+                "    survey_time as surveyTime, " +
+                "    depth, " +
+                "    survey_num as surveyNum, " +
+                "    pq_catalogued as hasPQs, " +
+                "    sv.survey_id as surveyId, " +
+                "    st.site_name as siteName, " +
+                "    st.site_code as siteCode, " +
+                "    st.mpa, " +
+                "    st.country, " +
+                "    pg.program_name as programName, " +
+                "    names_list as diverName, " +
+                "    lc.location_name as locationName " +
+                "FROM {h-schema}survey sv " +
+                "LEFT JOIN {h-schema}program_ref pg USING (program_id)" +
+                "LEFT JOIN {h-schema}site_ref st USING (site_id)" +
+                "LEFT JOIN {h-schema}location_ref lc USING (location_id)" +
+                "LEFT JOIN diver_names dn USING (survey_id)" +
+                "ORDER BY surveyDate DESC", countQuery = "SELECT count(*) FROM {h-schema}survey", nativeQuery = true)
         List<SurveyRow> findAllProjectedBy();
 
         @Query("SELECT t FROM #{#entityName} t WHERE t.id IN :ids")
