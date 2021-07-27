@@ -124,7 +124,7 @@ const EntityEdit = ({entity, template, clone}) => {
       uiSchema[key] = {'ui:field': 'boolean'};
     } else if (key === 'oldSiteCodes') {
       uiSchema[key] = {'ui:field': 'array'};
-    } else if (key === 'siteCode') {
+    } else if (entity.name === 'Survey' && key === 'siteCode') {
       uiSchema[key] = {
         'ui:field': 'dropdown',
         route: 'siteListItems',
