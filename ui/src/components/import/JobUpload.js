@@ -85,11 +85,13 @@ const JobUpload = () => {
                       disabled={!formData.file}
                       style={{width: '100%'}}
                       onClick={() =>
-                        submitJobFile(formData, setUploadProgress).then(({response}) => {
-                          if (!response.data.errors)
-                            setUploadResponse({errors: [{message: `Server returned with status ${response.status}`}]});
-                          else setUploadResponse(response.data);
-                        })
+                        submitJobFile(formData, setUploadProgress).then(({response}) =>
+                          setUploadResponse(
+                            !response.data.error && !response.data.id
+                              ? {error: `Server returned with status ${response.status}`}
+                              : response.data
+                          )
+                        )
                       }
                     >
                       Upload
@@ -108,21 +110,16 @@ const JobUpload = () => {
                       label={`Uploading ${formData.file.name}...`}
                     />
                     {uploadProgress === 100 && (
-                      <LinearProgressWithLabel determinate={uploadResponse} done={uploadResponse} label="Verifying..." />
+                      <LinearProgressWithLabel determinate={uploadProgress} done={uploadProgress} label="Verifying..." />
                     )}
                   </Box>
                   <Box mt={3} ml={3} mr={3} mb={5}>
-                    {uploadResponse?.errors.length > 0 && (
+                    {uploadResponse?.error && (
                       <>
                         <Alert my={3} severity="error">
                           Failed to add job:
                           <br />
-                          {uploadResponse.errors.map((e) => (
-                            <>
-                              <span>{e.message}</span>
-                              <br />
-                            </>
-                          ))}
+                          <span>{uploadResponse.error}</span>
                         </Alert>
                         <Box pt={5}>
                           <NavLink onClick={resetForm} to="/upload" color="secondary">
@@ -131,13 +128,13 @@ const JobUpload = () => {
                         </Box>
                       </>
                     )}
-                    {uploadResponse?.file && (
+                    {uploadResponse?.id && (
                       <>
                         <Alert severity="info" variant="filled">
                           {formData.file.name} added.
                         </Alert>
                         <Box pt={5} px={15}>
-                          <Button style={{width: '100%'}} component={NavLink} to={`/validation/${uploadResponse.file.jobId}`}>
+                          <Button style={{width: '100%'}} component={NavLink} to={`/validation/${uploadResponse.id}`}>
                             View {formData.file.name}
                           </Button>
                         </Box>

@@ -226,21 +226,6 @@ public class SiteApiIT {
 
     @Test
     @WithUserDetails("test@example.com")
-    public void testCreateWithMissingValues() {
-        given()
-                .spec(spec)
-                .auth()
-                .oauth2(jwtToken.get())
-                .body("{\"mpa\": \"mpa\"}")
-                .post()
-                .then()
-                .assertThat()
-                .statusCode(400)
-                .body("errors.property", hasItems("siteCode", "siteName", "locationId", "state", "longitude", "latitude", "country"));
-    }
-
-    @Test
-    @WithUserDetails("test@example.com")
     public void testDeleteSite() {
         val site = siteTestData.persistedSite();
 

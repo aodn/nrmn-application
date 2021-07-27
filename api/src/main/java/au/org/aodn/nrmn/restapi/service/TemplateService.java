@@ -36,7 +36,6 @@ import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.repository.projections.LetterCodeMapping;
 import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import au.org.aodn.nrmn.restapi.repository.projections.SpeciesWithAttributesCsvRow;
-import cyclops.companion.Streams;
 
 @Service
 public class TemplateService {
@@ -160,7 +159,7 @@ public class TemplateService {
         Stream<String> siteCodesFromProvinces = provinces.stream()
                 .flatMap(p -> siteRepository.findSiteCodesByProvince(p).stream());
 
-        Stream<Site> sites = Streams.concat(siteCodesFromProvinces, siteCodes.stream())
+        Stream<Site> sites = Stream.concat(siteCodesFromProvinces, siteCodes.stream())
                 .flatMap(sc -> siteRepository.findAll(Example.of(Site.builder().siteCode(sc).build())).stream());
 
         sites = Stream.concat(sites,

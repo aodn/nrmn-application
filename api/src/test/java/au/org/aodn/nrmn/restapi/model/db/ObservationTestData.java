@@ -1,7 +1,10 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.Observation.ObservationBuilder;
-import com.google.common.collect.ImmutableMap;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,15 +21,14 @@ public class ObservationTestData {
     private MeasureTestData measureTestData;
 
     public ObservationBuilder defaultBuilder() {
+        final Map<String, String> observationAttribute = new HashMap<String, String>();
+        observationAttribute.put("Biomass", "0.7630353218");
         return Observation.builder()
             .diver(diverTestData.persistedDiver())
             .observableItem(observableItemTestData.persistedObservableItem())
             .measure(measureTestData.persistedMeasure())
             .measureValue(4)
-            .observationAttribute(
-                ImmutableMap.<String, String>builder()
-                    .put("Biomass", "0.7630353218")
-                    .build());
+            .observationAttribute(observationAttribute);
     }
 
 }

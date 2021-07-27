@@ -85,7 +85,7 @@ public class AuthControllerIT {
     public void badSignin() throws Exception {
         ResponseEntity<JwtAuthenticationResponse> response = loginResponse("", "#12Trois");
 
-        assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
     private String _createUrl(String uri) {
