@@ -292,7 +292,7 @@ public class ValidationProcess {
         ValidationResultSet errors = new ValidationResultSet();
         if (Arrays.asList(1, 2).contains(row.getMethod()) && speciesAttributes != null) {
             Long maxAbundance = speciesAttributes.getMaxAbundance();
-            if (maxAbundance != null && maxAbundance < row.getTotal())
+            if (maxAbundance != null && row.getTotal() != null && maxAbundance < row.getTotal())
                 errors.add(row.getId(), ValidationLevel.WARNING, "total", "Exceeds max abundance " + maxAbundance + " for species " + row.getRef().getSpecies() + "");
         }
         return errors.getAll();
@@ -318,11 +318,11 @@ public class ValidationProcess {
 
         // VALIDATION: Record has no data and but not flagged as 'Survey Not Done' or
         // 'No Species Found'
-        if (observationTotal < 1 && !row.getCode().equalsIgnoreCase("SND") && !(row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND))
+        if (observationTotal < 1 && row.getCode() != null && !row.getCode().equalsIgnoreCase("SND") && !(row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND))
             errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Record has no data and but not flagged as 'Survey Not Done' or 'No Species Found'", row.getId(), "total"));
-        else if ((observationTotal + row.getTotal() > 0) && row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)
+        else if (row.getTotal() != null && (observationTotal + row.getTotal() > 0) && row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)
             errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Record is 'No Species Found' but has nonzero total", row.getId(), "total"));
-        else if ((observationTotal + row.getTotal() > 0) && row.getCode().equalsIgnoreCase("SND"))
+        else if (row.getTotal() != null && (observationTotal + row.getTotal() > 0) && row.getCode().equalsIgnoreCase("SND"))
             errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Record is 'Survey Not Done' but has nonzero total", row.getId(), "total"));
 
         return errors;
