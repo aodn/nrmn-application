@@ -271,7 +271,7 @@ public class ValidationProcess {
         boolean isInvertSized = isExtended && row.getIsInvertSizing();
         double[] range = isInvertSized ? INVERT_VALUES : FISH_VALUES;
 
-        Long lMax = speciesAttributes.getLmax() != null ? speciesAttributes.getLmax() : 0;
+        Double lMax = speciesAttributes.getLmax() != null ? speciesAttributes.getLmax() : 0;
         if (lMax != 0) {
 
             List<Integer> outOfRange = row.getMeasureJson().entrySet().stream()

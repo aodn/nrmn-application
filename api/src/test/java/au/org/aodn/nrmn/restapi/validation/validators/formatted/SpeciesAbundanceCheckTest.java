@@ -48,8 +48,8 @@ class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
         }
 
         @Override
-        public Long getLmax() {
-            return 20L;
+        public Double getLmax() {
+            return 20.0;
         }
     };
 

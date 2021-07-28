@@ -15,6 +15,6 @@ public interface UiSpeciesAttributes {
 
      Long getMaxAbundance();
 
-     Long getLmax();
+     Double getLmax();
 
 }
