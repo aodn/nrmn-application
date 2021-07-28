@@ -31,22 +31,28 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 public class StagedRowFormattedMapperConfig {
 
     @Autowired
-    StagedRowFormattedMapperConfig(ObservableItemRepository observableItemRepository, StagedRowRepository stagedRowRepository,
-            ObservationRepository observationRepository, DiverRepository diverRepository, SiteRepository siteRepository, ModelMapper modelMapper) {
+    StagedRowFormattedMapperConfig(ObservableItemRepository observableItemRepository,
+            StagedRowRepository stagedRowRepository, ObservationRepository observationRepository,
+            DiverRepository diverRepository, SiteRepository siteRepository, ModelMapper modelMapper) {
 
-        Converter<String, Diver> toDiver = ctx -> { List<Diver> divers = diverRepository.findByCriteria(ctx.getSource()); return divers.size() > 0 ? divers.get(0) : null;};
+        Converter<String, Diver> toDiver = ctx -> {
+            List<Diver> divers = diverRepository.findByCriteria(ctx.getSource());
+            return divers.size() > 0 ? divers.get(0) : null;
+        };
         Converter<Long, StagedRow> toRef = ctx -> stagedRowRepository.findById(ctx.getSource()).get();
-        Converter<String, Optional<UiSpeciesAttributes>> toSpeciesAttributesOpt = ctx -> observationRepository.getSpeciesAttributesBySpeciesName(ctx.getSource());
+        Converter<String, Optional<UiSpeciesAttributes>> toSpeciesAttributesOpt = ctx -> observationRepository
+                .getSpeciesAttributesBySpeciesName(ctx.getSource());
         Converter<String, Site> toSite = ctx -> {
             List<Site> sites = siteRepository.findByCriteria(ctx.getSource());
             return sites.size() == 1 ? sites.get(0) : null;
         };
-        Converter<String, LocalDate> toDate = ctx -> LocalDate.parse(ctx.getSource(), DateTimeFormatter.ofPattern("d/M/yyyy"));
+        Converter<String, LocalDate> toDate = ctx -> LocalDate.parse(ctx.getSource(),
+                DateTimeFormatter.ofPattern("d/M/yyyy"));
         Converter<String, Optional<LocalTime>> toTime = ctx -> TimeUtils.parseTime(ctx.getSource());
         Converter<String, Integer> toDepth = ctx -> {
-            try{
+            try {
                 return Integer.parseInt(ctx.getSource().split("\\.")[0]);
-            }catch(NumberFormatException e){
+            } catch (NumberFormatException e) {
                 return null;
             }
         };
@@ -58,7 +64,14 @@ public class StagedRowFormattedMapperConfig {
             String[] splitDepth = ctx.getSource().split("\\.");
             return splitDepth.length > 1 ? Integer.parseInt(splitDepth[1]) : null;
         };
-        Converter<String, Boolean> toInvertSizing = ctx -> ctx.getSource() != null ? ctx.getSource().equalsIgnoreCase("YES") : false;
+        Converter<String, Boolean> toInvertSizing = ctx -> ctx.getSource() != null
+                ? ctx.getSource().equalsIgnoreCase("YES")
+                : false;
+
+        Converter<String, Double> toDouble = ctx -> {
+            Double dbl = NumberUtils.toDouble(ctx.getSource(), Double.NaN);
+            return (dbl != Double.NaN) ? dbl : null;
+        };
 
         Converter<String, Optional<ObservableItem>> toObservableItem = ctx -> {
             List<ObservableItem> result = observableItemRepository.findByCriteria(ctx.getSource());
@@ -78,11 +91,13 @@ public class StagedRowFormattedMapperConfig {
 
         modelMapper.typeMap(StagedRow.class, StagedRowFormatted.class).addMappings(mapper -> {
             mapper.using(toObservableItem).map(StagedRow::getSpecies, StagedRowFormatted::setSpecies);
-            mapper.using(toSpeciesAttributesOpt).map(StagedRow::getSpecies, StagedRowFormatted::setSpeciesAttributesOpt);
+            mapper.using(toSpeciesAttributesOpt).map(StagedRow::getSpecies,
+                    StagedRowFormatted::setSpeciesAttributesOpt);
             mapper.using(toMeasureJson).map(StagedRow::getMeasureJson, StagedRowFormatted::setMeasureJson);
             mapper.using(toDiver).map(StagedRow::getDiver, StagedRowFormatted::setDiver);
             mapper.using(toDiver).map(StagedRow::getPqs, StagedRowFormatted::setPqs);
-            
+            mapper.using(toDouble).map(StagedRow::getLatitude, StagedRowFormatted::setLatitude);
+            mapper.using(toDouble).map(StagedRow::getLongitude, StagedRowFormatted::setLongitude);
             mapper.using(toRef).map(StagedRow::getId, StagedRowFormatted::setRef);
             mapper.using(toSite).map(StagedRow::getSiteCode, StagedRowFormatted::setSite);
             mapper.using(toDate).map(StagedRow::getDate, StagedRowFormatted::setDate);
