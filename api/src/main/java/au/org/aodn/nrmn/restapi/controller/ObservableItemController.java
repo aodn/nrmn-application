@@ -95,17 +95,8 @@ public class ObservableItemController {
         }
 
         if(!StringUtils.isEmpty(item.getSupersededBy()) && observableItemRepository.exactSearch(item.getSupersededBy()).isEmpty()){
-
-            if(item.getObservableItemId() != null){
-                ObservableItem originalItem = observableItemRepository
-                        .findById(item.getObservableItemId()).orElseThrow(ResourceNotFoundException::new);
-                logger.info(String.format("Invalid supersededBy value: \"%s\". Setting to previous value \"%s\".",
-                        originalItem.getSupersededBy(), originalItem.getSupersededBy()));
-                item.setSupersededBy(originalItem.getSupersededBy());
-            } else {
-                logger.info(String.format("Invalid supersededBy value: \"%s\". Setting to null.", item.getSupersededBy()));
-                item.setSupersededBy(null);
-            }
+            logger.info(String.format("Invalid supersededBy value: \"%s\". Setting to null.", item.getSupersededBy()));
+            item.setSupersededBy(null);
 
         }
 
