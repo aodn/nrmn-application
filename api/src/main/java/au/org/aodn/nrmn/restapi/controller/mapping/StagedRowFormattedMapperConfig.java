@@ -68,7 +68,11 @@ public class StagedRowFormattedMapperConfig {
         };
         Converter<String, Integer> toSurveyNum = ctx -> {
             String[] splitDepth = ctx.getSource().split("\\.");
-            return splitDepth.length > 1 ? Integer.parseInt(splitDepth[1]) : null;
+            try {
+                return splitDepth.length > 1 ? Integer.parseInt(splitDepth[1]) : null;
+            } catch (NumberFormatException e) {
+                return null;
+            }
         };
         Converter<String, Boolean> toInvertSizing = ctx -> ctx.getSource() != null
                 ? ctx.getSource().equalsIgnoreCase("YES")
@@ -77,6 +81,11 @@ public class StagedRowFormattedMapperConfig {
         Converter<String, Double> toDouble = ctx -> {
             Double dbl = NumberUtils.toDouble(ctx.getSource(), Double.NaN);
             return (dbl != Double.NaN) ? dbl : null;
+        };
+
+        Converter<String, Integer> toInteger = ctx -> {
+            Integer i = NumberUtils.toInt(ctx.getSource(), Integer.MIN_VALUE);
+            return (i != Integer.MIN_VALUE) ? i : null;
         };
 
         Converter<String, Optional<ObservableItem>> toObservableItem = ctx -> {
@@ -108,6 +117,7 @@ public class StagedRowFormattedMapperConfig {
             mapper.using(toSite).map(StagedRow::getSiteCode, StagedRowFormatted::setSite);
             mapper.using(toDate).map(StagedRow::getDate, StagedRowFormatted::setDate);
             mapper.using(toDepth).map(StagedRow::getDepth, StagedRowFormatted::setDepth);
+            mapper.using(toInteger).map(StagedRow::getInverts, StagedRowFormatted::setInverts);
             mapper.using(toSurveyNum).map(StagedRow::getDepth, StagedRowFormatted::setSurveyNum);
             mapper.using(toInvertSizing).map(StagedRow::getIsInvertSizing, StagedRowFormatted::setIsInvertSizing);
             mapper.using(toTime).map(StagedRow::getTime, StagedRowFormatted::setTime);
