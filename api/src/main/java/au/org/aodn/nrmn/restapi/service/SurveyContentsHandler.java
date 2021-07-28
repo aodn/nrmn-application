@@ -1,23 +1,24 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import cyclops.control.Validated;
-import lombok.Value;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import lombok.Value;
 
 public class SurveyContentsHandler implements SheetContentsHandler {
 
     private final List<String> optionalHeaders;
     private List<String> requiredHeaders;
 
-    private Validated<ErrorInput, ParsedSheet> result;
+    private ParsedSheet result;
+    private String error;
+
     private StagedRow currentRow;
     private boolean isFirstHeaderRow = false;
     private boolean isDataRow = false;
@@ -32,11 +33,12 @@ public class SurveyContentsHandler implements SheetContentsHandler {
         this.optionalHeaders = optionalHeaders;
     }
 
-    public Validated<ErrorInput, ParsedSheet> getResult() {
-        if (this.result != null)
-            return this.result;
-        else
-            return Validated.invalid(new ErrorInput("DATA sheet not found", "excel"));
+    public ParsedSheet getResult() {
+        return this.result;
+    }
+
+    public String getError() {
+        return this.error != null ? this.error : this.getResult() == null ? "DATA sheet not found" : null;
     }
 
     @Override
@@ -65,7 +67,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             if (foundHeaders.size() > 0)
                 errors.add("Unexpected Headers: " + String.join(", ", foundHeaders));
             if (errors.size() > 0)
-                result = Validated.invalid(new ErrorInput(String.join(". ", errors), "headers"));
+                error = String.join(". ", errors);
         } else if (isDataRow) {
             if (rowHasData) {
                 currentRow.setMeasureJson(new HashMap<>(measureJson));
@@ -80,9 +82,9 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     @Override
     public void endSheet() {
         if (stagedRows.size() > 0)
-            result = Validated.valid(new ParsedSheet(stagedRows, numEmptyRows));
+            result = new ParsedSheet(stagedRows, numEmptyRows);
         else
-            result = result != null ? result : Validated.invalid(new ErrorInput("Empty DATA sheet", "sheet"));
+            error = result == null ? "Empty DATA sheet" : null;
     }
 
     @Override

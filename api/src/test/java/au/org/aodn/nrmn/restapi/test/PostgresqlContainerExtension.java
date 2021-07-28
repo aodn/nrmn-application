@@ -4,6 +4,7 @@ import org.junit.jupiter.api.extension.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 
 /* Adds a persistent postgres container for use in tests
@@ -13,13 +14,14 @@ import org.testcontainers.utility.DockerImageName;
 public class PostgresqlContainerExtension implements Extension {
 
     private static final Logger logger = LoggerFactory.getLogger(PostgresqlContainerExtension.class);
+    
+    private static final DockerImageName POSTGIS_IMAGE_NAME = DockerImageName.parse("mdillon/postgis:9.6").asCompatibleSubstituteFor("postgres");
+
+    @Container
+    static public PostgreSQLContainer<?> container = new PostgreSQLContainer<>(POSTGIS_IMAGE_NAME);
 
     static {
         try {
-            DockerImageName postgisImage = DockerImageName
-                    .parse("mdillon/postgis:9.6")
-                    .asCompatibleSubstituteFor("postgres");
-            PostgreSQLContainer container = new PostgreSQLContainer(postgisImage);
             container.start();
             System.setProperty("DB_URL", container.getJdbcUrl());
             System.setProperty("DB_USERNAME", container.getUsername());

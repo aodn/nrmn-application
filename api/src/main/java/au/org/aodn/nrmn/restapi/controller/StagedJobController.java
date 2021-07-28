@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +27,8 @@ import au.org.aodn.nrmn.restapi.dto.stage.FileUpload;
 import au.org.aodn.nrmn.restapi.dto.stage.JobResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.UploadResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
+import au.org.aodn.nrmn.restapi.model.db.Program;
+import au.org.aodn.nrmn.restapi.model.db.SecUser;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedJobLog;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
@@ -41,13 +42,14 @@ import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
+import au.org.aodn.nrmn.restapi.service.S3IO;
 import au.org.aodn.nrmn.restapi.service.SpreadSheetService;
 import au.org.aodn.nrmn.restapi.service.StagedRowService;
+import au.org.aodn.nrmn.restapi.service.SurveyContentsHandler.ParsedSheet;
 import au.org.aodn.nrmn.restapi.validation.process.ValidationProcess;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.val;
 
 @RestController
 @RequestMapping(path = "/api/stage")
@@ -80,6 +82,9 @@ public class StagedJobController {
 
     @Autowired
     private StagedJobLogRepository logRepo;
+    
+    @Autowired
+    private S3IO s3client;
 
     @PostMapping("/upload")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
@@ -87,58 +92,61 @@ public class StagedJobController {
             @RequestParam("programId") Integer programId, @RequestParam("file") MultipartFile file,
             Authentication authentication) {
 
-        userAuditRepo.save(new UserActionAudit("stage/upload", "upload excel file attempt for username: "
-                + authentication.getName() + " file: " + file.getOriginalFilename()));
-        val programOpt = programRepo.findById(programId);
-        if (!programOpt.isPresent())
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new UploadResponse(Optional.empty(),
-                    Stream.of(new ErrorInput("Program Not found", "program")).collect(Collectors.toList())));
-        val user = userRepo.findByEmail(authentication.getName());
+        userAuditRepo.save(new UserActionAudit("stage/upload", "upload excel file attempt for username: " + authentication.getName() + " file: " + file.getOriginalFilename()));
 
-        val job = StagedJob.builder().isExtendedSize(withExtendedSizes).source(SourceJobType.INGEST)
+        Optional<Program> programOpt = programRepo.findById(programId);
+        if (!programOpt.isPresent())
+            return ResponseEntity.unprocessableEntity().body(new UploadResponse(Optional.empty(), "Program Not found"));
+
+        Optional<SecUser> user = userRepo.findByEmail(authentication.getName());
+
+        StagedJob job = StagedJob.builder().isExtendedSize(withExtendedSizes).source(SourceJobType.INGEST)
                 .reference(file.getOriginalFilename()).status(StatusJobType.PENDING).program(programOpt.get())
                 .creator(user.get()).build();
         jobRepo.save(job);
 
-        val jobLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis()))
+        StagedJobLog jobLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis()))
                 .eventType(StagedJobEventType.UPLOADED).stagedJob(job)
                 .details(file.getOriginalFilename() + " uploaded by:" + authentication.getName()).build();
 
         logRepo.save(jobLog);
 
-        val validatedSheet = sheetService.stageXlsxFile(file, withExtendedSizes);
+        ResponseEntity<UploadResponse> responseEntity = null;
 
-        sheetService.saveToS3(file, job.getId());
-
-        return validatedSheet.fold(err -> {
-            job.setStatus(StatusJobType.FAILED);
-            jobRepo.save(job);
-            val errorLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis()))
-                    .eventType(StagedJobEventType.ERROR).stagedJob(job)
-                    .details(err.stream().map(ErrorInput::getMessage).collect(Collectors.joining(";"))).build();
-            logRepo.save(errorLog);
-            return ResponseEntity.unprocessableEntity()
-                    .body(new UploadResponse(Optional.empty(), err.stream().toList()));
-        }, parsedSheet -> {
+        try {
+            ParsedSheet parsedSheet = sheetService.stageXlsxFile(file, withExtendedSizes);
             job.setStatus(StatusJobType.STAGED);
             jobRepo.save(job);
 
             List<StagedRow> rowsToSave = parsedSheet.getStagedRows();
             Long numEmptyRows = parsedSheet.getNumEmptyRows();
 
-            val stagedLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis()))
-                    .eventType(StagedJobEventType.STAGED).stagedJob(job).details("Staged " + (rowsToSave.size())
-                            + " row(s)." + (numEmptyRows > 0 ? " " + numEmptyRows + " empty " + "row(s) skipped." : ""))
-                    .build();
+            String message = "Staged " + (rowsToSave.size()) + " row(s)." + (numEmptyRows > 0 ? " " + numEmptyRows + " empty " + "row(s) skipped." : "");
+            StagedJobLog stagedLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis())).eventType(StagedJobEventType.STAGED).stagedJob(job).details(message).build();
+
             logRepo.save(stagedLog);
-            stagedRowRepo.saveAll(rowsToSave.stream().map(s -> {
-                s.setStagedJob(job);
-                return s;
-            }).collect(Collectors.toList()));
-            val filesResult = new FileUpload(job.getId(), rowsToSave.size());
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new UploadResponse(Optional.of(filesResult), Collections.emptyList()));
-        });
+    
+            // s3client.write("/raw-survey/jobid-" + job.getId() + ".xlsx", file);
+
+            rowsToSave.stream().forEach(s -> s.setStagedJob(job));
+            stagedRowRepo.saveAll(rowsToSave);
+
+            FileUpload filesResult = new FileUpload(job.getId(), rowsToSave.size());
+            responseEntity = ResponseEntity.status(HttpStatus.OK).body(new UploadResponse(Optional.of(filesResult.getJobId()), null));
+
+        } catch (Exception e) {
+
+            String uploadError = e.getMessage();
+            job.setStatus(StatusJobType.FAILED);
+            jobRepo.save(job);
+
+            StagedJobLog errorLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis())).eventType(StagedJobEventType.ERROR).stagedJob(job).details(uploadError).build();
+            logRepo.save(errorLog);
+
+            responseEntity = ResponseEntity.unprocessableEntity().body(new UploadResponse(Optional.empty(), uploadError));
+        }
+
+        return responseEntity;
     }
 
     @PostMapping("/validate/{jobId}")
@@ -148,17 +156,14 @@ public class StagedJobController {
         userAuditRepo.save(new UserActionAudit("stage/validate",
                 "validate job attempt for username " + authentication.getName() + " file: " + jobId));
 
-        return jobRepo.findById(jobId).map(job -> {
-            val validationResponse = validation.process(job);
-            return ResponseEntity.ok().body(validationResponse);
-        }).orElseGet(() -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new ValidationResponse()));
+        return jobRepo.findById(jobId).map(job -> ResponseEntity.ok().body(validation.process(job)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ValidationResponse()));
     }
 
     @GetMapping("/job/{jobId}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<JobResponse> getJob(@PathVariable Long jobId) {
-        val rows = stagedRowRepo.findRowsByJobId(jobId);
+        List<StagedRow> rows = stagedRowRepo.findRowsByJobId(jobId);
         return jobRepo.findById(jobId)
                 .map(job -> ResponseEntity.ok().body(new JobResponse(job, rows, Collections.emptyList())))
                 .orElseGet(() -> ResponseEntity.badRequest().body(new JobResponse(null, Collections.emptyList(),
@@ -175,17 +180,17 @@ public class StagedJobController {
 
     @PutMapping("/job/{jobId}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<?> updateJob(@PathVariable Long jobId, Authentication authentication,
+    public ResponseEntity<String> updateJob(@PathVariable Long jobId, Authentication authentication,
             @RequestBody List<RowUpdateDto> rowUpdates) {
 
         List<Long> deletions = rowUpdates.stream().filter(u -> u.getRow() == null).map(u -> u.getRowId())
                 .collect(Collectors.toList());
-                
+
         List<StagedRow> updates = rowUpdates.stream().filter(u -> u.getRow() != null).map(u -> u.getRow())
                 .collect(Collectors.toList());
 
-        return rowService.save(jobId, deletions, updates).fold(
-                err -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(err),
-                rowUpdate -> ResponseEntity.ok().body(rowUpdate));
+        Boolean success = rowService.save(jobId, deletions, updates);
+
+        return success ? ResponseEntity.ok().body(null) : ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(null);
     }
 }

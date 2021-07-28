@@ -20,4 +20,8 @@ public class SpeciesWithAttributesCsvRow {
     private Double l95;
 
     private Long lMax;
+
+    public boolean getPrimitiveInvertSized() {
+        return isInvertSized != null && isInvertSized;
+    }
 }

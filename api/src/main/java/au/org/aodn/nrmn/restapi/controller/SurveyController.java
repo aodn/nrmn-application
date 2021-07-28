@@ -1,23 +1,29 @@
 package au.org.aodn.nrmn.restapi.controller;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyFilterDto;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
-import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.repository.projections.SurveyRow;
 import au.org.aodn.nrmn.restapi.service.SurveyEditService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @Tag(name = "surveys")
@@ -26,9 +32,6 @@ public class SurveyController {
 
     @Autowired
     private SurveyRepository surveyRepository;
-
-    @Autowired
-    private DiverRepository diverRepository;
 
     @Autowired
     private SurveyEditService surveyEditService;
