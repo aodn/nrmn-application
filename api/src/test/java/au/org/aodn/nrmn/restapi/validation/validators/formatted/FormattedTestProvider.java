@@ -28,7 +28,7 @@ public  class FormattedTestProvider {
                 .depth(1)
                 .surveyNum(2)
                 .direction(Directions.N)
-                .vis(Optional.of(15))
+                .vis(Optional.of(15.5))
                 .date(LocalDate.of(2003, 03, 03))
                 .time(Optional.of(LocalTime.of(12, 34, 56)))
                 .pqs(diver)

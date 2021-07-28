@@ -177,9 +177,9 @@ public class ValidationProcess {
 
             // Vis
             if (!StringUtils.isBlank(row.getVis())) {
-                int vis = NumberUtils.toInt(row.getVis(), INVALID_INT);
+                Double vis = NumberUtils.toDouble(row.getVis(), (double)INVALID_INT);
                 if (vis < 0)
-                    errors.add(rowId, ValidationLevel.BLOCKING, "vis", (vis == INVALID_INT) ? "Vis is not an integer" : "Vis is not positive");
+                    errors.add(rowId, ValidationLevel.BLOCKING, "vis", (vis == (double)INVALID_INT) ? "Vis is not a decimal" : "Vis is not positive");
             }
 
             // Inverts
@@ -271,7 +271,7 @@ public class ValidationProcess {
         boolean isInvertSized = isExtended && row.getIsInvertSizing();
         double[] range = isInvertSized ? INVERT_VALUES : FISH_VALUES;
 
-        Long lMax = speciesAttributes.getLmax() != null ? speciesAttributes.getLmax() : 0;
+        Double lMax = speciesAttributes.getLmax() != null ? speciesAttributes.getLmax() : 0;
         if (lMax != 0) {
 
             List<Integer> outOfRange = row.getMeasureJson().entrySet().stream()
@@ -308,12 +308,12 @@ public class ValidationProcess {
 
         // VALIDATION: RLS: Debris Zero observations
         if (programName.equalsIgnoreCase("RLS") && row.getCode().equalsIgnoreCase("dez") && row.getSpecies().isPresent()) {
-            boolean invalid = (row.getInverts() != 0 || row.getTotal() != 0 || observationTotal != 0);
+            boolean invalid = ((row.getInverts() != null && row.getInverts() != 0) || (row.getTotal() != null && row.getTotal() != 0) || observationTotal != 0);
             if (invalid)
                 errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Debris has Value/Total/Inverts not 0", row.getId(), "code"));
         }
 
-        if (!row.getTotal().equals(observationTotal))
+        if (row.getTotal() != null && !row.getTotal().equals(observationTotal))
             errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Calculated total is " + observationTotal, row.getId(), "total"));
 
         // VALIDATION: Record has no data and but not flagged as 'Survey Not Done' or
@@ -360,6 +360,9 @@ public class ValidationProcess {
     private Collection<ValidationCell> validateWithin200M(StagedRowFormatted row) {
         Collection<ValidationCell> errors = new ArrayList<ValidationCell>();
 
+        if(row.getSite() == null || row.getLatitude() == null || row.getLongitude() == null)
+            return errors;
+
         double dist = getDistance(row.getSite().getLatitude(), row.getSite().getLongitude(), row.getLatitude(), row.getLongitude());
         if (dist > 0.2) {
             String message = "Coordinates are further than 0.2km from the Site (" + String.format("%.2f", dist) + "km)";
@@ -371,6 +374,9 @@ public class ValidationProcess {
 
     private ValidationCell validateDateRange(LocalDate earliest, StagedRowFormatted row) {
 
+        if(row.getDate() == null)
+            return null;
+            
         // Validation: Surveys Too Old
         if (row.getDate().isAfter(LocalDate.from(ZonedDateTime.now())))
             return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Date is in the future", row.getId(), "date");
@@ -540,7 +546,7 @@ public class ValidationProcess {
             sheetErrors.addAll(checkSurveys(programName, job.getIsExtendedSize(), surveyMap));
             response.setIncompleteSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("Survey incomplete")).count());
 
-            Map<String, List<StagedRowFormatted>> method3SurveyMap = validRows.stream().filter(row -> row.getMethod().equals(3)).collect(Collectors.groupingBy(StagedRowFormatted::getTransectName));
+            Map<String, List<StagedRowFormatted>> method3SurveyMap = validRows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3)).collect(Collectors.groupingBy(StagedRowFormatted::getTransectName));
             sheetErrors.addAll(checkMethod3Transects(programName, job.getIsExtendedSize(), method3SurveyMap));
             response.setSurveyCount(surveyMap.keySet().size());
             response.setErrors(sheetErrors);

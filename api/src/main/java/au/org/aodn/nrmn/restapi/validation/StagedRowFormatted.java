@@ -38,7 +38,7 @@ public class StagedRowFormatted {
 
     private Optional<ObservableItem> species;
 
-    private Optional<Integer> vis;
+    private Optional<Double> vis;
 
     private Directions direction;
 

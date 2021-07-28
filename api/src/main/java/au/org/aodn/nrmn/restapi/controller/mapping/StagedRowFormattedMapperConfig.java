@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.controller.mapping;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +47,13 @@ public class StagedRowFormattedMapperConfig {
             List<Site> sites = siteRepository.findByCriteria(ctx.getSource());
             return sites.size() == 1 ? sites.get(0) : null;
         };
-        Converter<String, LocalDate> toDate = ctx -> LocalDate.parse(ctx.getSource(),
-                DateTimeFormatter.ofPattern("d/M/yyyy"));
+        Converter<String, LocalDate> toDate = ctx -> {
+            try {
+                return  LocalDate.parse(ctx.getSource(), DateTimeFormatter.ofPattern("d/M/yyyy"));
+            } catch (DateTimeParseException e) {
+                return null;
+            }
+        };
         Converter<String, Optional<LocalTime>> toTime = ctx -> TimeUtils.parseTime(ctx.getSource());
         Converter<String, Integer> toDepth = ctx -> {
             try {
