@@ -11,8 +11,9 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
+import {LicenseManager} from 'ag-grid-enterprise';
 import {PropTypes} from 'prop-types';
-import {getDataJob, validateJob, updateRows, submitIngest} from '../../axios/api';
+import {getDataJob, validateJob, updateRows, submitIngest, getResult} from '../../axios/api';
 import {measurements, extendedMeasurements} from '../../constants';
 import FindReplacePanel from './panel/FindReplacePanel';
 import ValidationPanel from './panel/ValidationPanel';
@@ -392,6 +393,13 @@ const DataSheetView = ({jobId, onIngest}) => {
 
   const onGridReady = (p) => {
     setGridApi(p.api);
+
+    getResult('config/aggrid').then((result) => {
+      if (result.data?.license) {
+        LicenseManager.setLicenseKey(result.data.license);
+      }
+    });
+
     reload(p.api, jobId, (job) => {
       setState(IngestState.Edited);
       setJob(job);

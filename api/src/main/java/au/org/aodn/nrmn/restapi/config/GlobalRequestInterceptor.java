@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,13 +18,12 @@ import java.util.UUID;
 
 
 @Component
-public class GlobalRequestInterceptor extends HandlerInterceptorAdapter {
+public class GlobalRequestInterceptor implements HandlerInterceptor {
 
     private static Logger logger = LoggerFactory.getLogger(GlobalRequestInterceptor.class);
     private final String preHandleTemplate = "ID: ${id} Username: ${username} Path: ${path} Query: ${query} Method: ${method}";
     private final String postHandleTemplate = "ID: ${id} Handler-Rendering-Time: ${handler-rendering-time} ms";
 
-    @Override
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response, Object object) throws Exception {
 
@@ -50,7 +49,6 @@ public class GlobalRequestInterceptor extends HandlerInterceptorAdapter {
         return true;
     }
 
-    @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mv) {
 
         long handlerDuration =  System.currentTimeMillis() - (Long)request.getAttribute("start-time");

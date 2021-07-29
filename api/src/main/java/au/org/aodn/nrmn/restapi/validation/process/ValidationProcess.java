@@ -256,7 +256,7 @@ public class ValidationProcess {
                     .map(Map.Entry::getKey).collect(Collectors.toList());
 
             if (!outOfRange.isEmpty()) {
-                String message = "Measurement outside L5/95 [" + l5 + "," + l95 + "] for [" + row.getRef().getSpecies() + "]";
+                String message = "Measurements outside L5/95 [" + l5 + "," + l95 + "] for [" + row.getRef().getSpecies() + "]";
                 outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, message, row.getId(), col.toString())));
             }
         }
@@ -486,8 +486,8 @@ public class ValidationProcess {
 
                 // Measure l5, l95 and lMax
                 if (validateMeasure(isExtended, row)) {
-                    results.addAll(validateMeasureRange(isExtended, row, speciesAttributes));
-                    results.addAll(validateMeasureUnderMax(isExtended, row, speciesAttributes));
+                    results.addAll(validateMeasureRange(isExtended, row, speciesAttributes), false);
+                    results.addAll(validateMeasureUnderMax(isExtended, row, speciesAttributes), false);
                 }
 
                 // Abundance check

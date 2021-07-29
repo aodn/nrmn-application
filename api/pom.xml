@@ -4,7 +4,7 @@
     <parent>
         <artifactId>nrmn</artifactId>
         <groupId>au.org.aodn.nrmn</groupId>
-        <version>0.0.300</version>
+        <version>0.0.301</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>au.org.aodn.nrmn</groupId>
@@ -151,6 +151,20 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-data-rest</artifactId>
             <version>1.4.8</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-jcache -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jcache</artifactId>
+            <version>5.5.4.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -509,7 +523,7 @@
         <repository>
             <id>jcenter-snapshots</id>
             <name>jcenter</name>
-            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
+            <url>https://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
         </repository>
     </repositories>
 
