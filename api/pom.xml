@@ -148,11 +148,21 @@
             <version>1.4.8</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-jcache -->
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-ehcache</artifactId>
-            <scope>runtime</scope>
+            <artifactId>hibernate-jcache</artifactId>
+            <version>5.5.4.Final</version>
         </dependency>
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+          </dependency>
+          
+          <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+          </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-data-rest</artifactId>
@@ -518,7 +528,7 @@
         <repository>
             <id>jcenter-snapshots</id>
             <name>jcenter</name>
-            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
+            <url>https://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
         </repository>
     </repositories>
 
