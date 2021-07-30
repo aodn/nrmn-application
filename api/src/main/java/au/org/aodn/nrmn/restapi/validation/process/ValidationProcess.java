@@ -182,8 +182,12 @@ public class ValidationProcess {
             // Vis
             if (!StringUtils.isBlank(row.getVis())) {
                 Double vis = NumberUtils.toDouble(row.getVis(), (double)INVALID_INT);
-                if (vis < 0)
+                if (vis < 0) {
                     errors.add(rowId, ValidationLevel.BLOCKING, "vis", (vis == (double)INVALID_INT) ? "Vis is not a decimal" : "Vis is not positive");
+                } else {
+                    if(vis.toString().split("\\.")[1].length() > 1)
+                        errors.add(rowId, ValidationLevel.BLOCKING, "vis", "Vis is more than one decimal place");
+                }
             }
 
             // Inverts
