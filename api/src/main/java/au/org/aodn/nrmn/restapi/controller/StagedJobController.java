@@ -126,7 +126,7 @@ public class StagedJobController {
 
             logRepo.save(stagedLog);
     
-            // s3client.write("/raw-survey/jobid-" + job.getId() + ".xlsx", file);
+            s3client.write("/raw-survey/jobid-" + job.getId() + ".xlsx", file);
 
             rowsToSave.stream().forEach(s -> s.setStagedJob(job));
             stagedRowRepo.saveAll(rowsToSave);
