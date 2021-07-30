@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -202,7 +203,7 @@ public class SurveyIngestionService {
     }
 
     @Transactional
-    public void ingestTransaction(StagedJob job, List<StagedRowFormatted> validatedRows) {
+    public void ingestTransaction(StagedJob job, Collection<StagedRowFormatted> validatedRows) {
 
         Map<String, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getTransectName));
 

@@ -27,11 +27,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationRow;
 import au.org.aodn.nrmn.restapi.model.db.Diver;
+import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
+import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
@@ -41,6 +44,7 @@ import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
@@ -52,10 +56,10 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 public class ValidationProcess {
 
     @Autowired
-    StagedRowRepository rowRepo;
+    StagedRowRepository rowRepository;
 
     @Autowired
-    SiteRepository siterepo;
+    SiteRepository siteRepository;
 
     @Autowired
     DiverRepository diverRepository;
@@ -64,10 +68,10 @@ public class ValidationProcess {
     SurveyRepository surveyRepository;
 
     @Autowired
-    ObservableItemRepository observableItemRepository;
+    ObservationRepository observationRepository;
 
     @Autowired
-    private ModelMapper mapper;
+    ObservableItemRepository observableItemRepository;
 
     private static final int INVALID_INT = Integer.MIN_VALUE;
     private static final double INVALID_DOUBLE = Double.NEGATIVE_INFINITY;
@@ -101,10 +105,10 @@ public class ValidationProcess {
         return duplicateRows;
     }
 
-    public Collection<ValidationError> checkFormatting(String programName, Boolean isExtendedSize, Collection<String> siteCodes, Collection<ObservableItemRow> species, Collection<StagedRow> rows) {
+    public Collection<ValidationError> checkFormatting(String programName, Boolean isExtendedSize, Collection<String> siteCodes, Collection<ObservableItem> species, Collection<StagedRow> rows) {
 
         Collection<String> diverNames = new ArrayList<String>();
-        for (Diver d : diverRepository.findAll()) {
+        for (Diver d : diverRepository.getAll()) {
             diverNames.add(d.getFullName().toUpperCase());
             diverNames.add(d.getInitials().toUpperCase());
         }
@@ -133,7 +137,7 @@ public class ValidationProcess {
 
             // VALIDATION: Species are not superseded
             if (row.getSpecies() != null && !row.getSpecies().equalsIgnoreCase("survey not done")) {
-                Optional<ObservableItemRow> observableItem = species.stream().filter(s -> row.getSpecies().equalsIgnoreCase(s.getName())).findAny();
+                Optional<ObservableItem> observableItem = species.stream().filter(s -> row.getSpecies().equalsIgnoreCase(s.getObservableItemName())).findAny();
                 if (observableItem.isPresent()) {
                     String supersededBy = observableItem.get().getSupersededBy();
                     if (supersededBy != null)
@@ -427,7 +431,7 @@ public class ValidationProcess {
         if (surveyRows.stream().filter(r -> Arrays.asList(1, 2, 3, 4).contains(r.getSurveyNum())).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyNum)).size() < 4) {
             String surveyName = surveyRows.get(0).getSurveyName();
             String messageLabel = surveyName != null ? surveyName + ": " : "";
-            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, messageLabel + "Survey incomplete", surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
+            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, messageLabel + "Survey group incomplete", surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
         }
         return null;
     }
@@ -443,7 +447,8 @@ public class ValidationProcess {
             List<StagedRowFormatted> surveyRows = survey.getValue();
 
             // VALIDATE: Survey Group Complete
-            res.add(validateSurveyGroup(survey.getKey(), surveyRows));
+            if (programName.equalsIgnoreCase("ATRC"))
+                res.add(validateSurveyGroup(survey.getKey(), surveyRows));
 
             // VALIDATE: Is Existing Survey
             res.add(validateSurveyIsNew(surveyRows.get(0)));
@@ -472,7 +477,7 @@ public class ValidationProcess {
         return res;
     }
 
-    public Collection<ValidationError> checkData(String programName, Boolean isExtended, List<StagedRowFormatted> rows) {
+    public Collection<ValidationError> checkData(String programName, Boolean isExtended, Collection<StagedRowFormatted> rows) {
 
         Set<ValidationError> res = new HashSet<ValidationError>();
 
@@ -513,26 +518,38 @@ public class ValidationProcess {
         return res;
     }
 
+    public Collection<ObservableItem> getSpeciesForRows(Collection<StagedRow> rows) {
+        Collection<String> enteredSpeciesNames = rows.stream().map(s -> s.getSpecies()).collect(Collectors.toSet());
+        return observableItemRepository.getAllSpeciesNamesMatching(enteredSpeciesNames);
+    }
+
+    public Collection<StagedRowFormatted> formatRowsWithSpecies(Collection<StagedRow> rows, Collection<ObservableItem> species) {
+        Map<Long, StagedRow> rowMap = rows.stream().collect(Collectors.toMap(StagedRow::getId, r -> r));
+        List<Integer> speciesIds = species.stream().map(s -> s.getObservableItemId()).collect(Collectors.toList());
+        Map<String, UiSpeciesAttributes> speciesAttributesMap = observationRepository.getSpeciesAttributesByIds(speciesIds).stream().collect(Collectors.toMap(UiSpeciesAttributes::getSpeciesName, a -> a));
+        Map<String, ObservableItem> speciesMap = species.stream().collect(Collectors.toMap(ObservableItem::getObservableItemName, o -> o));
+        Collection<Diver> divers = diverRepository.getAll().stream().collect(Collectors.toList());
+        Collection<Site> sites = siteRepository.getAll().stream().collect(Collectors.toList());
+        
+        StagedRowFormattedMapperConfig mapperConfig = new StagedRowFormattedMapperConfig();
+        ModelMapper mapper = mapperConfig.getModelMapper(speciesMap, rowMap, speciesAttributesMap, divers, sites);
+        return rows.stream().map(stagedRow -> mapper.map(stagedRow, StagedRowFormatted.class)).collect(Collectors.toList());
+    }
+
     public ValidationResponse process(StagedJob job) {
         ValidationResponse response = new ValidationResponse();
 
-        Collection<StagedRow> rows = rowRepo.findRowsByJobId(job.getId());
-        Collection<String> enteredSiteCodes = rows.stream().map(s -> s.getSiteCode()).collect(Collectors.toSet());
-        Collection<String> enteredSpeciesNames = rows.stream().map(s -> s.getSpecies()).collect(Collectors.toSet());
-
-        Collection<String> siteCodes = siterepo.getAllSiteCodesMatching(enteredSiteCodes);
-        Collection<ObservableItemRow> species = observableItemRepository.getAllSpeciesNamesMatching(enteredSpeciesNames);
+        Collection<StagedRow> rows = rowRepository.findRowsByJobId(job.getId());
+        Collection<ObservableItem> species = getSpeciesForRows(rows);
 
         String programName = job.getProgram().getProgramName();
-
+        Collection<String> enteredSiteCodes = rows.stream().map(s -> s.getSiteCode()).collect(Collectors.toSet());
+        Collection<String> siteCodes = siteRepository.getAllSiteCodesMatching(enteredSiteCodes);
         Collection<ValidationError> sheetErrors = new HashSet<ValidationError>();
 
         sheetErrors.addAll(checkFormatting(programName, job.getIsExtendedSize(), siteCodes, species, rows));
 
-        // TODO: Don't map expensive entity rows; pre-fetch them above.
-        List<StagedRowFormatted> validRows = rows.stream()
-                .map(stagedRow -> mapper.map(stagedRow, StagedRowFormatted.class))
-                .collect(Collectors.toList());
+        Collection<StagedRowFormatted> validRows = formatRowsWithSpecies(rows, species);
 
         if (validRows != null) {
             response.setRowCount(validRows.size());
