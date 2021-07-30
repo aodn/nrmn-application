@@ -4,57 +4,59 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 
 import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
-import au.org.aodn.nrmn.restapi.repository.DiverRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.util.TimeUtils;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
-@Configuration
 public class StagedRowFormattedMapperConfig {
 
-    @Autowired
-    StagedRowFormattedMapperConfig(ObservableItemRepository observableItemRepository,
-            StagedRowRepository stagedRowRepository, ObservationRepository observationRepository,
-            DiverRepository diverRepository, SiteRepository siteRepository, ModelMapper modelMapper) {
+    public ModelMapper getModelMapper(Map<String, ObservableItem> speciesMap, Map<Long, StagedRow> rowMap,
+            Map<String, UiSpeciesAttributes> speciesAttributesMap, Collection<Diver> divers, Collection<Site> sites) {
 
         Converter<String, Diver> toDiver = ctx -> {
-            List<Diver> divers = diverRepository.findByCriteria(ctx.getSource());
-            return divers.size() > 0 ? divers.get(0) : null;
+            if (ctx.getSource() == null) return null;
+            Optional<Diver> diver = divers.stream().filter(d ->
+                (d.getFullName() != null && d.getFullName().equalsIgnoreCase(ctx.getSource())) ||
+                (d.getInitials() != null && d.getInitials().equalsIgnoreCase(ctx.getSource()))).findFirst();
+            return diver.isPresent() ? diver.get() : null;
         };
-        Converter<Long, StagedRow> toRef = ctx -> stagedRowRepository.findById(ctx.getSource()).get();
-        Converter<String, Optional<UiSpeciesAttributes>> toSpeciesAttributesOpt = ctx -> observationRepository
-                .getSpeciesAttributesBySpeciesName(ctx.getSource());
+
+        Converter<Long, StagedRow> toRef = ctx -> rowMap.get(ctx.getSource());
+
+        Converter<String, Optional<UiSpeciesAttributes>> toSpeciesAttributesOpt = ctx -> {
+            UiSpeciesAttributes speciesAttributes = speciesAttributesMap.get(ctx.getSource());
+            return speciesAttributes != null ? Optional.of(speciesAttributes) : Optional.empty();
+        };
+
         Converter<String, Site> toSite = ctx -> {
-            List<Site> sites = siteRepository.findByCriteria(ctx.getSource());
-            return sites.size() == 1 ? sites.get(0) : null;
+            if (ctx.getSource() == null) return null;
+            Optional<Site> site = sites.stream().filter(d -> (d.getSiteCode() != null && d.getSiteCode().equalsIgnoreCase(ctx.getSource()))).findFirst();
+            return site.isPresent() ? site.get() : null;
         };
+
         Converter<String, LocalDate> toDate = ctx -> {
             try {
-                return  LocalDate.parse(ctx.getSource(), DateTimeFormatter.ofPattern("d/M/yyyy"));
+                return LocalDate.parse(ctx.getSource(), DateTimeFormatter.ofPattern("d/M/yyyy"));
             } catch (DateTimeParseException e) {
                 return null;
             }
         };
+
         Converter<String, Optional<LocalTime>> toTime = ctx -> TimeUtils.parseTime(ctx.getSource());
+
         Converter<String, Integer> toDepth = ctx -> {
             try {
                 return Integer.parseInt(ctx.getSource().split("\\.")[0]);
@@ -62,10 +64,12 @@ public class StagedRowFormattedMapperConfig {
                 return null;
             }
         };
+
         Converter<String, Optional<Integer>> toVis = ctx -> {
             Integer vis = NumberUtils.toInt(ctx.getSource(), Integer.MIN_VALUE);
             return (vis == Integer.MIN_VALUE) ? Optional.of(vis) : Optional.empty();
         };
+
         Converter<String, Integer> toSurveyNum = ctx -> {
             String[] splitDepth = ctx.getSource().split("\\.");
             try {
@@ -74,6 +78,7 @@ public class StagedRowFormattedMapperConfig {
                 return null;
             }
         };
+
         Converter<String, Boolean> toInvertSizing = ctx -> ctx.getSource() != null
                 ? ctx.getSource().equalsIgnoreCase("YES")
                 : false;
@@ -89,8 +94,8 @@ public class StagedRowFormattedMapperConfig {
         };
 
         Converter<String, Optional<ObservableItem>> toObservableItem = ctx -> {
-            List<ObservableItem> result = observableItemRepository.findByCriteria(ctx.getSource());
-            return (result.size() > 0) ? Optional.of(result.get(0)) : Optional.empty();
+            ObservableItem observableItem = speciesMap.get(ctx.getSource());
+            return (observableItem != null) ? Optional.of(observableItem) : Optional.empty();
         };
 
         Converter<Map<Integer, String>, Map<Integer, Integer>> toMeasureJson = ctx -> {
@@ -104,6 +109,7 @@ public class StagedRowFormattedMapperConfig {
             return measures;
         };
 
+        ModelMapper modelMapper = new ModelMapper();
         modelMapper.typeMap(StagedRow.class, StagedRowFormatted.class).addMappings(mapper -> {
             mapper.using(toObservableItem).map(StagedRow::getSpecies, StagedRowFormatted::setSpecies);
             mapper.using(toSpeciesAttributesOpt).map(StagedRow::getSpecies,
@@ -123,5 +129,6 @@ public class StagedRowFormattedMapperConfig {
             mapper.using(toTime).map(StagedRow::getTime, StagedRowFormatted::setTime);
             mapper.using(toVis).map(StagedRow::getVis, StagedRowFormatted::setVis);
         });
+        return modelMapper;
     }
 }

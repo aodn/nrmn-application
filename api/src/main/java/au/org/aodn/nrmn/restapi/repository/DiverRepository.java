@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.repository;
 
 import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +38,10 @@ public interface DiverRepository
            countQuery = "SELECT count(*) FROM {h-schema}diver_ref",
            nativeQuery = true)
     Page<Diver> findAll(Pageable pageable);
+
+    @Query("SELECT d FROM Diver d")
+    @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
+    Collection<Diver> getAll();
 
     @Override
     @RestResource

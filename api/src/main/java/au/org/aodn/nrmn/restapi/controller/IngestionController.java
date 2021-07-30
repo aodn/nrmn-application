@@ -1,18 +1,16 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedJobLog;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
@@ -25,6 +23,7 @@ import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.service.SurveyIngestionService;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.validation.process.ValidationProcess;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,10 +47,11 @@ public class IngestionController {
     
     @Autowired
     UserActionAuditRepository userActionAuditRepository;
-
+    
     @Autowired
-    private ModelMapper mapper;
+    private ValidationProcess validation;
 
+    
     @PostMapping(path = "ingest/{job_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<String> ingest(@PathVariable("job_id") Long jobId) {
@@ -69,9 +69,11 @@ public class IngestionController {
         }
 
         try {
-            stagedJobLogRepository
-                    .save(StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.INGESTING).build());
-            List<StagedRowFormatted> validatedRows = rowRepository.findAll(Example.of(StagedRow.builder().stagedJob(job).build())).stream().map(row -> mapper.map(row, StagedRowFormatted.class)).collect(Collectors.toList());
+            stagedJobLogRepository.save(StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.INGESTING).build());
+            
+            Collection<StagedRow> rows = rowRepository.findRowsByJobId(job.getId());
+            Collection<ObservableItem> species = validation.getSpeciesForRows(rows);
+            Collection<StagedRowFormatted> validatedRows = validation.formatRowsWithSpecies(rows, species);
             surveyIngestionService.ingestTransaction(job, validatedRows);
         } catch (Exception e) {
             stagedJobLogRepository.save(StagedJobLog.builder().stagedJob(job).details(e.getMessage())

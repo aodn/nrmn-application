@@ -42,11 +42,8 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
     @RestResource
     Optional<ObservableItem> findById(Integer integer);
 
-    @Query("SELECT observableItemName FROM ObservableItem")
-    List<String> getAllSpeciesNames();
-
-    @Query(value = "select observable_item_name as name, superseded_by as supersededBy FROM {h-schema}observable_item_ref WHERE observable_item_name IN :speciesNames", nativeQuery = true)
-    List<ObservableItemRow> getAllSpeciesNamesMatching(Collection<String> speciesNames);
+    @Query("SELECT o from ObservableItem o WHERE o.observableItemName IN :speciesNames")
+    List<ObservableItem> getAllSpeciesNamesMatching(Collection<String> speciesNames);
 
     @Query("SELECT o from ObservableItem o WHERE o.observableItemName = :name")
     ObservableItem getWithName(@Param("name") String name);
