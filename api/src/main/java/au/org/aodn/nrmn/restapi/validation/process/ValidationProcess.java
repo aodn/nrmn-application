@@ -48,7 +48,6 @@ import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
-import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import au.org.aodn.nrmn.restapi.util.TimeUtils;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
@@ -407,7 +406,7 @@ public class ValidationProcess {
                 columnNames.add(Integer.toString(measureIndex));
             }
 
-        return rowIds.size() > 0 ? new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, "Missing Quadrats in transect " + transect, rowIds, columnNames) : null;
+        return rowIds.size() > 0 ? new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, "Missing quadrats in transect " + transect, rowIds, columnNames) : null;
     }
 
     private ValidationError validateMethod3QuadratsGT50(String transect, List<StagedRowFormatted> rows) {
@@ -431,6 +430,13 @@ public class ValidationProcess {
         return null;
     }
 
+    private ValidationError validateSurveyTransectNumber(Integer depth, List<StagedRowFormatted> surveyRows) {
+        List<StagedRowFormatted> invalidTransectRows = surveyRows.stream().filter(r -> !Arrays.asList(1, 2, 3, 4).contains(r.getSurveyNum())).collect(Collectors.toList());
+        if (invalidTransectRows.size() > 0)
+            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, "Survey group transect invalid", invalidTransectRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
+        return null;
+    }
+
     private ValidationError validateSurveyGroup(Integer depth, List<StagedRowFormatted> surveyRows) {
         if (surveyRows.stream().filter(r -> Arrays.asList(1, 2, 3, 4).contains(r.getSurveyNum())).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyNum)).size() < 4) {
             String surveyName = surveyRows.get(0).getSurveyName();
@@ -450,9 +456,13 @@ public class ValidationProcess {
         for (Map.Entry<Integer, List<StagedRowFormatted>> survey : surveyMap.entrySet()) {
             List<StagedRowFormatted> surveyRows = survey.getValue();
 
-            // VALIDATE: Survey Group Complete
-            if (programName.equalsIgnoreCase("ATRC"))
+            if (programName.equalsIgnoreCase("ATRC")){
+                // VALIDATE: Survey group transect number valid
+                res.add(validateSurveyTransectNumber(survey.getKey(), surveyRows));
+
+                // VALIDATE: Survey Group Complete
                 res.add(validateSurveyGroup(survey.getKey(), surveyRows));
+            }
 
             // VALIDATE: Is Existing Survey
             res.add(validateSurveyIsNew(surveyRows.get(0)));

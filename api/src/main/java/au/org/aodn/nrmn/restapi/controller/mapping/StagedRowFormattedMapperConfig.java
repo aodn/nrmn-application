@@ -27,10 +27,12 @@ public class StagedRowFormattedMapperConfig {
             Map<String, UiSpeciesAttributes> speciesAttributesMap, Collection<Diver> divers, Collection<Site> sites) {
 
         Converter<String, Diver> toDiver = ctx -> {
-            if (ctx.getSource() == null) return null;
-            Optional<Diver> diver = divers.stream().filter(d ->
-                (d.getFullName() != null && d.getFullName().equalsIgnoreCase(ctx.getSource())) ||
-                (d.getInitials() != null && d.getInitials().equalsIgnoreCase(ctx.getSource()))).findFirst();
+            if (ctx.getSource() == null)
+                return null;
+            Optional<Diver> diver = divers.stream()
+                    .filter(d -> (d.getFullName() != null && d.getFullName().equalsIgnoreCase(ctx.getSource()))
+                            || (d.getInitials() != null && d.getInitials().equalsIgnoreCase(ctx.getSource())))
+                    .findFirst();
             return diver.isPresent() ? diver.get() : null;
         };
 
@@ -42,8 +44,11 @@ public class StagedRowFormattedMapperConfig {
         };
 
         Converter<String, Site> toSite = ctx -> {
-            if (ctx.getSource() == null) return null;
-            Optional<Site> site = sites.stream().filter(d -> (d.getSiteCode() != null && d.getSiteCode().equalsIgnoreCase(ctx.getSource()))).findFirst();
+            if (ctx.getSource() == null)
+                return null;
+            Optional<Site> site = sites.stream()
+                    .filter(d -> (d.getSiteCode() != null && d.getSiteCode().equalsIgnoreCase(ctx.getSource())))
+                    .findFirst();
             return site.isPresent() ? site.get() : null;
         };
 
@@ -100,12 +105,13 @@ public class StagedRowFormattedMapperConfig {
 
         Converter<Map<Integer, String>, Map<Integer, Integer>> toMeasureJson = ctx -> {
             Map<Integer, Integer> measures = new HashMap<Integer, Integer>();
-            for (Map.Entry<Integer, String> entry : ctx.getSource().entrySet()) {
-                int val = NumberUtils.toInt(entry.getValue(), Integer.MIN_VALUE);
-                if (val != Integer.MIN_VALUE)
-                    measures.put(entry.getKey(), val);
+            if (ctx.getSource() != null) {
+                for (Map.Entry<Integer, String> entry : ctx.getSource().entrySet()) {
+                    int val = NumberUtils.toInt(entry.getValue(), Integer.MIN_VALUE);
+                    if (val != Integer.MIN_VALUE)
+                        measures.put(entry.getKey(), val);
+                }
             }
-
             return measures;
         };
 
