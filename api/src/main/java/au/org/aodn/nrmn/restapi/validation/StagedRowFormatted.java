@@ -76,7 +76,7 @@ public class StagedRowFormatted {
 
     
     public String getSurveyName() {
-        return site.getSiteCode() + "/" + date + "/" + depth;
+        return site == null ? "-" : site.getSiteCode() + "/" + date + "/" + depth;
     }
 
     public String getTransectName() {
