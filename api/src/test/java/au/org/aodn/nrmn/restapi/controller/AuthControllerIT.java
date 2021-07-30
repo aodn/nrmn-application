@@ -83,7 +83,7 @@ public class AuthControllerIT {
 
     @Test
     public void badSignin() throws Exception {
-        ResponseEntity<JwtAuthenticationResponse> response = loginResponse("", "#12Trois");
+        ResponseEntity<JwtAuthenticationResponse> response = loginResponse("invalid@example.com", "#12Trois");
 
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
