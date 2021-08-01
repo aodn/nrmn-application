@@ -506,7 +506,7 @@ public class ValidationProcess {
             results.add(validateSpeciesBelowToMethod(row), false);
 
             // Validate within 200M
-            results.addAll(validateWithin200M(row));
+            results.addAll(validateWithin200M(row), false);
 
             // Date is not in the future or too far in the past
             results.add(validateDateRange(programName.equalsIgnoreCase("RLS") ? DATE_MIN_RLS : DATE_MIN_ATRC, row), false);
