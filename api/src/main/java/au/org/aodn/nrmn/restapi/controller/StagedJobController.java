@@ -1,12 +1,17 @@
 package au.org.aodn.nrmn.restapi.controller;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import au.org.aodn.nrmn.restapi.util.LogInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -50,11 +55,22 @@ import au.org.aodn.nrmn.restapi.validation.process.ValidationProcess;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(path = "/api/stage")
 @Tag(name = "staged jobs")
 public class StagedJobController {
+
+    private static final Logger logger = LoggerFactory.getLogger(StagedJobController.class);
+
+    private final String s3KeyTemplate = "/raw-survey/jobid-%s.xlsx";
 
     @Autowired
     SpreadSheetService sheetService;
@@ -85,6 +101,9 @@ public class StagedJobController {
     
     @Autowired
     private S3IO s3client;
+
+    @Value("${app.s3.bucket}")
+    private String bucketName;
 
     @PostMapping("/upload")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
@@ -125,8 +144,18 @@ public class StagedJobController {
             StagedJobLog stagedLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis())).eventType(StagedJobEventType.STAGED).stagedJob(job).details(message).build();
 
             logRepo.save(stagedLog);
-    
-            s3client.write("/raw-survey/jobid-" + job.getId() + ".xlsx", file);
+
+            String s3Key = String.format(s3KeyTemplate, job.getId());
+            s3client.write(s3Key, file);
+
+            message = String.format("Source file saved to \"%s%s\"", bucketName, s3Key);
+            stagedLog = StagedJobLog.builder()
+                    .eventTime(new Timestamp(System.currentTimeMillis()))
+                    .eventType(StagedJobEventType.STAGED)
+                    .stagedJob(job)
+                    .details(message).build();
+
+            logRepo.save(stagedLog);
 
             rowsToSave.stream().forEach(s -> s.setStagedJob(job));
             stagedRowRepo.saveAll(rowsToSave);
@@ -192,5 +221,43 @@ public class StagedJobController {
         Boolean success = rowService.save(jobId, deletions, updates);
 
         return success ? ResponseEntity.ok().body(null) : ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(null);
+    }
+
+    @GetMapping("/job/download/{jobId}")
+    public void downloadFile(final HttpServletResponse response, @PathVariable String jobId) {
+
+        String s3Key = String.format(s3KeyTemplate, jobId);
+
+        logger.info(LogInfo.withContext(
+                String.format("Downloading original sheet for job %s from %s%s", jobId, bucketName, s3Key)));
+
+        try {
+
+            GetObjectRequest objectRequest = GetObjectRequest
+                    .builder()
+                    .key(s3Key)
+                    .bucket(bucketName)
+                    .build();
+
+            ResponseBytes<GetObjectResponse> objectBytes = s3client.getClient().getObjectAsBytes(objectRequest);
+            response.getOutputStream().write(objectBytes.asByteArray());
+            response.flushBuffer();
+
+            logger.info(LogInfo.withContext(
+                    String.format("Retrieved sheet for job %s from %s%s", jobId, bucketName, s3Key)));
+
+        } catch (IOException ioException) {
+            logger.error(LogInfo.withContext(
+                    String.format("Could not download sheet for job %s from \"%s%s\".\n%s",
+                            jobId, bucketName, s3Key, ioException.getMessage())));
+        } catch (NoSuchKeyException keyException) {
+            logger.error(LogInfo.withContext(String.format(
+                    "key \"%s\" does not exist in bucket \"%s\". Could not download original file for job %s",
+                    s3Key, bucketName, jobId)));
+        } catch (SdkClientException clientException) {
+            logger.error(LogInfo.withContext(String.format(
+                    "Could not download original file for job %s. %s",
+                    jobId, clientException.getMessage())));
+        }
     }
 }
