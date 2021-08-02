@@ -9,7 +9,7 @@
     </parent>
     <groupId>au.org.aodn.nrmn</groupId>
     <artifactId>nrmn</artifactId>
-    <version>0.0.311</version>
+    <version>0.0.312</version>
     <packaging>pom</packaging>
     <name>nrmn</name>
     <description>Project for the NRMN database</description>
