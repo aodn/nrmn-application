@@ -70,7 +70,7 @@ public class StagedJobController {
 
     private static final Logger logger = LoggerFactory.getLogger(StagedJobController.class);
 
-    private final String s3KeyTemplate = "/raw-survey/jobid-%s.xlsx";
+    private final String s3KeyTemplate = "raw-survey/jobid-%s.xlsx";
 
     @Autowired
     SpreadSheetService sheetService;
@@ -148,7 +148,7 @@ public class StagedJobController {
             String s3Key = String.format(s3KeyTemplate, job.getId());
             s3client.write(s3Key, file);
 
-            message = String.format("Source file saved to \"%s%s\"", bucketName, s3Key);
+            message = String.format("Source file saved to \"%s/%s\"", bucketName, s3Key);
             stagedLog = StagedJobLog.builder()
                     .eventTime(new Timestamp(System.currentTimeMillis()))
                     .eventType(StagedJobEventType.STAGED)
@@ -244,11 +244,11 @@ public class StagedJobController {
             response.flushBuffer();
 
             logger.info(LogInfo.withContext(
-                    String.format("Retrieved sheet for job %s from %s%s", jobId, bucketName, s3Key)));
+                    String.format("Retrieved sheet for job %s from %s/%s", jobId, bucketName, s3Key)));
 
         } catch (IOException ioException) {
             logger.error(LogInfo.withContext(
-                    String.format("Could not download sheet for job %s from \"%s%s\".\n%s",
+                    String.format("Could not download sheet for job %s from \"%s/%s\".\n%s",
                             jobId, bucketName, s3Key, ioException.getMessage())));
         } catch (NoSuchKeyException keyException) {
             logger.error(LogInfo.withContext(String.format(
