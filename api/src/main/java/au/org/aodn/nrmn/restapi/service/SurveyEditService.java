@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -92,6 +93,17 @@ public class SurveyEditService {
         } catch (DateTimeException e) {
             errors.add(new ValidationError("Survey", "surveyTime", surveyDto.getSurveyTime(),
                     "The survey time must be in the format hh:mm[:ss]"));
+        }
+
+        // Visibility validation
+        if (!StringUtils.isBlank(surveyDto.getVisibility())) {
+            Double vis = NumberUtils.toDouble(surveyDto.getVisibility(), Double.NEGATIVE_INFINITY);
+            if (vis < 0) {
+                errors.add(new ValidationError("Survey", "visibility", surveyDto.getVisibility(), (vis == Double.NEGATIVE_INFINITY) ? "Vis is not a decimal" : "Vis is not positive"));
+            } else {
+                if(vis.toString().split("\\.")[1].length() > 1)
+                    errors.add(new ValidationError("Survey", "visibility", surveyDto.getVisibility(), "Vis is more than one decimal place"));
+            }
         }
 
         // Commented out as it is unclear how to validate the site name matching the site code as there is no unique
