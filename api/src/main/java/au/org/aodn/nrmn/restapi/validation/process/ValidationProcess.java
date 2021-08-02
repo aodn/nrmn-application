@@ -148,7 +148,7 @@ public class ValidationProcess {
             }
 
             // Direction
-            if (row.getDirection() == null || !EnumUtils.isValidEnum(Directions.class, row.getDirection().toUpperCase()))
+            if (row.getDirection() != null && !EnumUtils.isValidEnum(Directions.class, row.getDirection().toUpperCase()) && !row.getDirection().equalsIgnoreCase("0") && !row.getDirection().equalsIgnoreCase(""))
                 errors.add(rowId, ValidationLevel.BLOCKING, "direction", "Direction is not valid");
 
             // Latitude
