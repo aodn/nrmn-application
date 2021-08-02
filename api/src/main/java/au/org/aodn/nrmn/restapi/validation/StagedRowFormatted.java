@@ -80,6 +80,6 @@ public class StagedRowFormatted {
     }
 
     public String getTransectName() {
-        return site.getSiteCode() + "/" + date + "/" + depth + "." + surveyNum;
+        return site == null ? "-" : site.getSiteCode() + "/" + date + "/" + depth + "." + surveyNum;
     }
 }
