@@ -24,7 +24,8 @@ const generateErrorTree = (ctx, errors, level) => {
       return a.message < b.message ? -1 : a.message > b.message ? 1 : 0;
     })
     .forEach((e) => {
-      tree.push(generateErrorSummary(ctx, e));
+      const summary = generateErrorSummary(ctx, e);
+      tree.push(summary);
     });
   return tree;
 };
@@ -55,22 +56,23 @@ const generateErrorSummary = (ctx, e) => {
   } else {
     summary.push({rowIds: e.rowIds, columnNames: e.columnNames});
   }
-  return {message: e.message, count: e.rowIds.length, description: summary};
+  const key = `${e.rowIds[0]}-${e.rowIds.length}-${e.columnNames ? e.columnNames.join('-') : '--'}`;
+  return {key: key, message: e.message, count: e.rowIds.length, description: summary};
 };
 
 const ValidationPanel = (props) => {
   const context = props.api.gridOptionsWrapper.gridOptions.context;
   const errors = context.errors;
 
-  const [blocking, setBlocking] = useState([]);
-  const [warning, setWarning] = useState([]);
+  const [errorList, setErrorList] = useState({blocking: {}, warning: {}});
   const [info, setInfo] = useState({});
 
   useEffect(() => {
     setInfo(context.summary);
     if (errors && errors.length > 0) {
-      setBlocking(generateErrorTree(context, errors, 'BLOCKING'));
-      setWarning(generateErrorTree(context, errors, 'WARNING'));
+      const blocking = generateErrorTree(context, errors, 'BLOCKING');
+      const warning = generateErrorTree(context, errors, 'WARNING');
+      setErrorList({blocking, warning});
     }
   }, [errors, context]);
 
@@ -122,13 +124,13 @@ const ValidationPanel = (props) => {
         </Table>
       </Box>
       <Box m={2} mt={1}>
-        <Typography variant="button">{Object.keys(blocking).length > 0 ? `Blocking` : 'No Blocking ✔'}</Typography>
-        {Object.keys(blocking).length > 0 && <ValidationSummary data={blocking} onItemClick={handleItemClick} />}
+        <Typography variant="button">{Object.keys(errorList.blocking).length > 0 ? `Blocking` : 'No Blocking ✔'}</Typography>
+        {Object.keys(errorList.blocking).length > 0 && <ValidationSummary data={errorList.blocking} onItemClick={handleItemClick} />}
       </Box>
       <Divider />
       <Box m={2} mt={1}>
-        <Typography variant="button">{Object.keys(warning).length > 0 ? `Warning` : 'No Warning ✔'}</Typography>
-        {Object.keys(warning).length > 0 && <ValidationSummary data={warning} onItemClick={handleItemClick} />}
+        <Typography variant="button">{Object.keys(errorList.warning).length > 0 ? `Warning` : 'No Warning ✔'}</Typography>
+        {Object.keys(errorList.warning).length > 0 && <ValidationSummary data={errorList.warning} onItemClick={handleItemClick} />}
       </Box>
     </>
   );

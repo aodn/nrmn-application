@@ -93,6 +93,18 @@ const context = {
   pasteMode: false
 };
 
+const resetContext = () => {
+  context.useOverlay = 'Loading';
+  context.rowData = [];
+  context.highlighted = [];
+  context.putRowIds = [];
+  context.undoStack = [];
+  context.summaries = [];
+  context.errors = [];
+  context.pendingPasteUndo = [];
+  context.pasteMode = false;
+};
+
 const defaultSideBar = {
   toolPanels: [
     {
@@ -367,6 +379,7 @@ const DataSheetView = ({jobId, onIngest}) => {
   };
 
   const reload = (api, jobId, completion) => {
+    resetContext();
     getDataJob(jobId).then((res) => {
       const job = {
         program: res.data.job.program.programName,

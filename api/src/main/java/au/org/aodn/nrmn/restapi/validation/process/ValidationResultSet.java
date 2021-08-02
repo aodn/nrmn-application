@@ -21,6 +21,10 @@ public class ValidationResultSet {
             errorMap.put(validationRow.getKey(), new ValidationError(ValidationCategory.DATA, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
     }
 
+    public void add(Long id, ValidationLevel validationLevel, String column, String message, Boolean groupInRow) {
+        add(id, ValidationCategory.DATA, validationLevel, column, message, groupInRow);
+    }
+
     public void add(Long id, ValidationLevel validationLevel, String column, String message) {
         add(id, ValidationCategory.DATA, validationLevel, column, message, false);
     }
