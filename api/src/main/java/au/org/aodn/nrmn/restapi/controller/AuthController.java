@@ -15,6 +15,7 @@ import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,6 +45,9 @@ public class AuthController {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Value("${aggrid.license}")
+    String gridLicence;
 
     private static Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -85,7 +89,7 @@ public class AuthController {
         if (SecUserRepository.blackListedTokenPresent(jwt)) {
             SecUserRepository.removeBlackListedToken(jwt);
         }
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, gridLicence));
     }
 
     @PostMapping(path = "/hash", consumes = "application/json", produces = "application/json")
