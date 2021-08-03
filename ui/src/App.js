@@ -5,6 +5,7 @@ import Alert from '@material-ui/lab/Alert';
 import {ThemeProvider, unstable_createMuiStrictModeTheme as createMuiTheme, responsiveFontSizes} from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import {blueGrey, deepPurple} from '@material-ui/core/colors';
+import {LicenseManager} from 'ag-grid-enterprise';
 import TopBar from './components/layout/TopBar';
 import SideMenu from './components/layout/SideMenu';
 import Login from './components/auth/login';
@@ -169,6 +170,8 @@ const App = () => {
   window.setApplicationError = setApplicationError;
 
   const loggedIn = Date.now() < expires;
+
+  LicenseManager.setLicenseKey(JSON.parse(localStorage.getItem('gridLicense')));
 
   let theme = createMuiTheme({
     palette: {

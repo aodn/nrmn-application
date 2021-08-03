@@ -23,6 +23,7 @@ const authSlice = createSlice({
       state.success = true;
       state.loading = false;
       localStorage.setItem('auth', JSON.stringify(state));
+      localStorage.setItem('gridLicense', JSON.stringify(action.payload.gridLicense));
       LicenseManager.setLicenseKey(action.payload.gridLicense);
     },
     loginFailed: (state) => {
