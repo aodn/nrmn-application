@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyFilterDto;
@@ -62,8 +61,7 @@ public class SurveyController {
             return ResponseEntity.badRequest().body(errors);
         }
 
-        Survey survey = surveyRepository.findById(surveyDto.getSurveyId()).orElseThrow(ResourceNotFoundException::new);
-        surveyEditService.updateSurvey(surveyDto);
+        Survey survey = surveyEditService.updateSurvey(surveyDto);
 
         Survey persistedSurvey = surveyRepository.save(survey);
         SurveyDto updatedSurveyDto = mapper.map(persistedSurvey, SurveyDto.class);
