@@ -367,7 +367,7 @@ public class ValidationProcess {
     private Collection<ValidationCell> validateWithin200M(StagedRowFormatted row) {
         Collection<ValidationCell> errors = new ArrayList<ValidationCell>();
 
-        if(row.getSite() == null || row.getLatitude() == null || row.getLongitude() == null)
+        if(row.getSite() == null || row.getSite().getLatitude() == null || row.getSite().getLongitude() == null ||  row.getLatitude() == null || row.getLongitude() == null)
             return errors;
 
         double dist = getDistance(row.getSite().getLatitude(), row.getSite().getLongitude(), row.getLatitude(), row.getLongitude());
