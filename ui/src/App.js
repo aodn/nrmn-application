@@ -158,7 +158,8 @@ const referenceData = [
         'depth',
         'surveyNum'
       ],
-      sort: ['siteName']
+      sort: ['surveyId', 'siteCode', 'siteName', 'programName', 'locationName', 'hasPQs', 'mpa', 'country', 'diverName', 'surveyDate'],
+      initialSortModel: [{colId: 'surveyId', sort: 'desc'}]
     }
   }
 ];

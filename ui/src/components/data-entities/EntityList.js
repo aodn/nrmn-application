@@ -134,6 +134,7 @@ const EntityList = (props) => {
     setAgGridApi(agGrid.api);
     setAgGridColumnApi(agGrid.columnApi);
     agGrid.api.showLoadingOverlay();
+    agGrid.api.setSortModel(props.entity.list.initialSortModel);
   };
 
   const [dialogState, setDialogState] = useState({open: false});
