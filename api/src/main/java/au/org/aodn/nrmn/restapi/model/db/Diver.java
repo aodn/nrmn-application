@@ -51,4 +51,9 @@ public class Diver {
     @NotNull
     @NotBlank
     private String fullName;
+
+    public Diver(String initials, String fullName) {
+        this.initials = initials;
+        this.fullName = fullName;
+    }
 }

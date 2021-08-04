@@ -54,7 +54,7 @@ const referenceData = [
     idKey: 'diverId',
     can: {delete: false, clone: false},
     flexField: 'fullName',
-    endpoint: 'divers',
+    endpoint: 'diver',
     route: {base: '/reference/diver', view: '/reference/diver/:id?/:success?', edit: '/reference/diver/:id?/edit'},
     schemaKey: {add: 'Diver', edit: 'Diver', view: 'Diver'},
     template: {add: DiverTemplate, edit: DiverTemplate, view: DiverTemplate},
