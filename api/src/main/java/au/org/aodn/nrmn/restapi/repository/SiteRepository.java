@@ -27,7 +27,7 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
     @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
     List<Site> findByCriteria(@Param("code") String siteCode);
 
-    @Query(value = "SELECT site_code FROM {h-schema}ep_site_list WHERE site_code IN :siteCodes", nativeQuery = true)
+    @Query(value = "SELECT siteCode FROM Site WHERE siteCode IN :siteCodes")
     List<String> getAllSiteCodesMatching(Collection<String> siteCodes);
     
     @Query("SELECT s FROM Site s")
