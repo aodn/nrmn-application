@@ -435,7 +435,7 @@ public class ValidationProcess {
 
         // VALIDATE: If method = 0 then Block should equal 0 as well
         Map<Integer, List<StagedRowFormatted>> surveyByMethod = surveyRows.stream()
-                .filter(sr -> !(sr.getMethod() == 0 && sr.getBlock() == 0))
+                .filter(sr -> !(sr.getMethod() != null && sr.getMethod() == 0 && sr.getBlock() != null && sr.getBlock() == 0))
                 .collect(Collectors.groupingBy(StagedRowFormatted::getMethod));
 
         // VALIDATE: Both M1 and M2 present except if ATRC and has at least one method of 3,4,5,7
