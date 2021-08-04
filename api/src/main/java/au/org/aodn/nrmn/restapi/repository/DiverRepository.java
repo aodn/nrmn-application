@@ -34,7 +34,7 @@ public interface DiverRepository
 
     @Override
     @RestResource
-    @Query(value = "SELECT * FROM {h-schema}diver_ref d ORDER BY (CASE WHEN initials SIMILAR TO '%[a-zA-Z]' THEN 0 ELSE 1 END), d.initials", 
+    @Query(value = "SELECT * FROM {h-schema}diver_ref d ORDER BY (CASE WHEN initials SIMILAR TO '%[a-zA-Z]' THEN 0 ELSE 1 END), LOWER(d.initials)",
            countQuery = "SELECT count(*) FROM {h-schema}diver_ref",
            nativeQuery = true)
     Page<Diver> findAll(Pageable pageable);
@@ -44,7 +44,6 @@ public interface DiverRepository
     Collection<Diver> getAll();
 
     @Override
-    @RestResource
     <S extends Diver> S save(S s);
 
     @Override
