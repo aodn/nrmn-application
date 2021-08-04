@@ -22,6 +22,9 @@ public class SurveyDto {
     @Schema(title = "Program")
     private String program;
 
+    @Schema(title = "Program ID")
+    private Integer programId;
+
     @Schema(title = "Survey Date")
     private String surveyDate;
 
