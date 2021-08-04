@@ -305,7 +305,7 @@ public class ValidationProcess {
         return errors.getAll();
     }
 
-    private Collection<ValidationCell> validateMeasurements(String programName, StagedRowFormatted row) {
+    public Collection<ValidationCell> validateMeasurements(String programName, StagedRowFormatted row) {
         Collection<ValidationCell> errors = new ArrayList<ValidationCell>();
 
         if (row.getMeasureJson() == null)
@@ -315,9 +315,10 @@ public class ValidationProcess {
 
         // VALIDATION: RLS: Debris Zero observations
         if (programName.equalsIgnoreCase("RLS") && row.getCode().equalsIgnoreCase("dez") && row.getSpecies().isPresent()) {
-            boolean invalid = ((row.getInverts() != null && row.getInverts() != 0) || (row.getTotal() != null && row.getTotal() != 0) || observationTotal != 0);
-            if (invalid)
-                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Debris has Value/Total/Inverts not 0", row.getId(), "code"));
+            boolean notZero = ((row.getInverts() != null && row.getInverts() != 0) || (row.getTotal() != null && row.getTotal() != 0) || observationTotal != 0);
+            boolean notOne = ((row.getInverts() != null && row.getInverts() != 1) || (row.getTotal() != null && row.getTotal() != 1) || observationTotal != 1);
+            if (notZero && notOne)
+                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Debris has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
         }
 
         if (row.getTotal() != null && !row.getTotal().equals(observationTotal))
@@ -325,9 +326,9 @@ public class ValidationProcess {
 
         // VALIDATION: Record has no data and but not flagged as 'Survey Not Done' or
         // 'No Species Found'
-        if (observationTotal < 1 && row.getCode() != null && !row.getCode().equalsIgnoreCase("SND") && !(row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND))
+        if (observationTotal < 1 && row.getCode() != null && !row.getCode().equalsIgnoreCase("DEZ") && !row.getCode().equalsIgnoreCase("SND") && !(row.getSpecies().isPresent() &&  row.getSpecies().get().getObsItemType() != null  && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND))
             errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Record has no data and but not flagged as 'Survey Not Done' or 'No Species Found'", row.getId(), "total"));
-        else if (row.getTotal() != null && (observationTotal + row.getTotal() > 0) && row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)
+        else if (row.getTotal() != null && (observationTotal + row.getTotal() > 0) && row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType() != null && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)
             errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Record is 'No Species Found' but has nonzero total", row.getId(), "total"));
         else if (row.getTotal() != null && (observationTotal + row.getTotal() > 0) && row.getCode().equalsIgnoreCase("SND"))
             errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Record is 'Survey Not Done' but has nonzero total", row.getId(), "total"));
