@@ -145,15 +145,19 @@ const ValidationPanel = (props) => {
         {Object.keys(errorList.blocking).length > 0 && <ValidationSummary data={errorList.blocking} onItemClick={handleItemClick} />}
       </Box>
       <Divider />
+      {Object.keys(errorList.duplicateRows).length > 0 && (
+        <>
+          <Box m={2} mt={1}>
+            <Typography variant="button">GLOBAL</Typography>
+            <ValidationSummary data={errorList.duplicateRows} onItemClick={handleItemClick} />
+          </Box>
+          <Divider />
+        </>
+      )}
       <Box m={2} mt={1}>
         <Typography variant="button">{Object.keys(errorList.warning).length > 0 ? `Warning` : 'No Warning ✔'}</Typography>
         {Object.keys(errorList.warning).length > 0 && <ValidationSummary data={errorList.warning} onItemClick={handleItemClick} />}
       </Box>
-      {Object.keys(errorList.duplicateRows).length > 0 && (
-        <Box m={2} mt={1}>
-          <ValidationSummary data={errorList.duplicateRows} onItemClick={handleItemClick} />
-        </Box>
-      )}
     </>
   );
 };
