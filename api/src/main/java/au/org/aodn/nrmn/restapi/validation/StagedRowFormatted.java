@@ -73,13 +73,12 @@ public class StagedRowFormatted {
                 && Objects.equals(method, that.method)
                 && Objects.equals(species, that.species);
     }
-
     
-    public String getSurveyName() {
-        return site == null ? "-" : site.getSiteCode() + "/" + date + "/" + depth;
+    public String getSurvey() {
+        return site != null && site.getSiteCode() != null && date != null && depth != null ? (site.getSiteCode() + "/" + date + "/" + depth).toUpperCase() : null;
     }
 
-    public String getTransectName() {
-        return site == null ? "-" : site.getSiteCode() + "/" + date + "/" + depth + "." + surveyNum;
+    public String getSurveyGroup() {
+        return getSurvey() != null  && surveyNum != null ? (getSurvey() + "." + surveyNum).toUpperCase() : null;
     }
 }
