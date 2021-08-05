@@ -631,7 +631,7 @@ public class ValidationProcess {
             sheetErrors.addAll(checkSurveys(programName, job.getIsExtendedSize(), surveyMap));
             response.setIncompleteSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("Survey incomplete")).count());
 
-            Map<String, List<StagedRowFormatted>> method3SurveyMap = validRows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3)).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
+            Map<String, List<StagedRowFormatted>> method3SurveyMap = validRows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3) && row.getCode() != null && !row.getCode().equalsIgnoreCase("snd")).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
             sheetErrors.addAll(checkMethod3Transects(programName, job.getIsExtendedSize(), method3SurveyMap));
             response.setSurveyCount(surveyMap.keySet().size());
             response.setErrors(sheetErrors);
