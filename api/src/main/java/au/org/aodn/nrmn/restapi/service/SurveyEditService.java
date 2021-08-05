@@ -164,13 +164,12 @@ public class SurveyEditService {
         }
 
         boolean hasValidCoords = lat != null && lon != null && !lat.isNaN() && !lon.isNaN();
-        if(hasValidCoords && getDistance(lat, lon, surveyDtoSite.getLatitude(), surveyDtoSite.getLongitude()) > 0.2){
+        double dist = hasValidCoords ? getDistance(lat, lon, surveyDtoSite.getLatitude(), surveyDtoSite.getLongitude()) : 0;
+        if(dist > 0.2){
             errors.add(new ValidationError("Survey", "latitude", surveyDto.getLatitude(),
-                    String.format("The survey coordinates are not within 200m of the site. The sites latitude: %s",
-                            surveyDtoSite.getLatitude())));
+                    String.format("Coordinates are further than 0.2km from the Site (%.2fkm)", dist)));
             errors.add(new ValidationError("Survey", "longitude", surveyDto.getLongitude(),
-                    String.format("The survey coordinates are not within 200m of the site. The sites longitude: %s",
-                            surveyDtoSite.getLongitude())));
+                    String.format("Coordinates are further than 0.2km from the Site (%.2fkm)", dist)));
         }
 
         if(lat != null && !lat.isNaN() && (lat < -90 || lat > 90) ) {
