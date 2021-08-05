@@ -94,8 +94,12 @@ public class StagedRowFormattedMapperConfig {
         };
 
         Converter<String, Integer> toInteger = ctx -> {
-            Integer i = NumberUtils.toInt(ctx.getSource(), Integer.MIN_VALUE);
-            return (i != Integer.MIN_VALUE) ? i : null;
+            try {
+                Integer i = NumberUtils.toInt(ctx.getSource(), Integer.MIN_VALUE);
+                return (i != Integer.MIN_VALUE) ? i : null;
+            } catch (NumberFormatException e) {
+                return null;
+            }
         };
 
         Converter<String, Optional<ObservableItem>> toObservableItem = ctx -> {
@@ -129,6 +133,7 @@ public class StagedRowFormattedMapperConfig {
             mapper.using(toSite).map(StagedRow::getSiteCode, StagedRowFormatted::setSite);
             mapper.using(toDate).map(StagedRow::getDate, StagedRowFormatted::setDate);
             mapper.using(toDepth).map(StagedRow::getDepth, StagedRowFormatted::setDepth);
+            mapper.using(toInteger).map(StagedRow::getMethod, StagedRowFormatted::setMethod);
             mapper.using(toInteger).map(StagedRow::getInverts, StagedRowFormatted::setInverts);
             mapper.using(toSurveyNum).map(StagedRow::getDepth, StagedRowFormatted::setSurveyNum);
             mapper.using(toInvertSizing).map(StagedRow::getIsInvertSizing, StagedRowFormatted::setIsInvertSizing);
