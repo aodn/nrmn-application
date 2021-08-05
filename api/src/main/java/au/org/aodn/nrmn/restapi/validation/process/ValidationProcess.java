@@ -128,8 +128,22 @@ public class ValidationProcess {
             if (row.getDiver() == null || !diverNames.contains(row.getDiver().toUpperCase()))
                 errors.add(rowId, ValidationLevel.BLOCKING, "diver", "Diver does not exist");
 
-            if (row.getBuddy() == null || !diverNames.contains(row.getBuddy().toUpperCase()))
+            // Buddies
+            List<String> unknownBuddies = new ArrayList<String>();
+            if (row.getBuddy() != null) {
+                for(String buddy : row.getBuddy().split(",")) {
+                    if(!diverNames.contains(buddy.trim().toUpperCase()))
+                        unknownBuddies.add(buddy.trim());
+                }
+            }
+
+            if(row.getBuddy() == null || row.getBuddy().trim() == "") {
                 errors.add(rowId, ValidationLevel.WARNING, "buddy", "Diver does not exist");
+            } else if(unknownBuddies.size() == 1) {
+                errors.add(rowId, ValidationLevel.WARNING, "buddy", "Diver " + unknownBuddies.get(0) + " does not exist");
+            } else if(unknownBuddies.size() > 1) {
+                errors.add(rowId, ValidationLevel.WARNING, "buddy", "Divers " + String.join(", ", unknownBuddies) + " do not exist");
+            }
 
             if (row.getPqs() == null || !diverNames.contains(row.getPqs().toUpperCase()))
                 errors.add(rowId, ValidationLevel.WARNING, "p-qs", "Diver does not exist");
