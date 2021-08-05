@@ -17,8 +17,12 @@ public class ValidationResultSet {
     Map<String, ValidationError> errorMap = new HashMap<String, ValidationError>();
 
     public void addGlobal(Collection<ValidationRow> validationRows) {
-        for (ValidationRow validationRow : validationRows)
-            errorMap.put(validationRow.getKey(), new ValidationError(ValidationCategory.DATA, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
+        for (ValidationRow validationRow : validationRows) {
+            ValidationError value = errorMap.getOrDefault(validationRow.getMessage(), new ValidationError(ValidationCategory.GLOBAL, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
+            if (value != null)
+                value.getRowIds().addAll(validationRow.getRowIds());
+            errorMap.put(validationRow.getKey(), new ValidationError(ValidationCategory.GLOBAL, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
+        }
     }
 
     public void add(Long id, ValidationLevel validationLevel, String column, String message, Boolean groupInRow) {
