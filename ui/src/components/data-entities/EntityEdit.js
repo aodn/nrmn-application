@@ -135,13 +135,6 @@ const EntityEdit = ({entity, template, clone}) => {
         relatedAttr: 'siteName',
         relatedField: 'siteName'
       };
-    } else if (key === 'siteName') {
-      uiSchema[key] = {
-        'ui:field': 'autostring',
-        route: 'siteNames',
-        entity: 'siteNames',
-        listOnly: true
-      };
     } else if (key === 'pqDiverInitials') {
       uiSchema[key] = {
         'ui:field': 'dropdown',
