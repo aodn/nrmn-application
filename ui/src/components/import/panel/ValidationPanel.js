@@ -81,14 +81,17 @@ const ValidationPanel = (props) => {
             duplicateRowDescriptions = [...duplicateRowDescriptions, {value: `${data.siteCode}/${data.date}/${data.depth} ...`, row: r}];
           });
         });
-      const duplicateRows = [
-        {
-          key: 'duplicateRowDescriptions',
-          count: duplicateRowDescriptions.count,
-          message: 'Duplicate Rows',
-          description: duplicateRowDescriptions
-        }
-      ];
+      const duplicateRows =
+        duplicateRowDescriptions.count > 0
+          ? [
+              {
+                key: 'duplicateRowDescriptions',
+                count: duplicateRowDescriptions.count,
+                message: 'Duplicate Rows',
+                description: duplicateRowDescriptions
+              }
+            ]
+          : {};
       setErrorList({blocking, warning, duplicateRows});
     }
   }, [errors, context]);
