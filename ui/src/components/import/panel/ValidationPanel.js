@@ -19,7 +19,7 @@ const focusCell = (api, columns, ids) => {
 const generateErrorTree = (ctx, errors, level) => {
   const tree = [];
   errors
-    .filter((e) => e.levelId === level)
+    .filter((e) => e.levelId === level && e.categoryId !== 'GLOBAL')
     .sort((a, b) => {
       return a.message < b.message ? -1 : a.message > b.message ? 1 : 0;
     })
@@ -64,7 +64,7 @@ const ValidationPanel = (props) => {
   const context = props.api.gridOptionsWrapper.gridOptions.context;
   const errors = context.errors;
 
-  const [errorList, setErrorList] = useState({blocking: {}, warning: {}});
+  const [errorList, setErrorList] = useState({blocking: {}, warning: {}, duplicateRows: {}});
   const [info, setInfo] = useState({});
 
   useEffect(() => {
@@ -72,7 +72,24 @@ const ValidationPanel = (props) => {
     if (errors && errors.length > 0) {
       const blocking = generateErrorTree(context, errors, 'BLOCKING');
       const warning = generateErrorTree(context, errors, 'WARNING');
-      setErrorList({blocking, warning});
+      let duplicateRowDescriptions = [];
+      errors
+        .filter((e) => e.categoryId === 'GLOBAL')
+        .forEach((e) => {
+          const data = context.rowData.find((d) => d.id === e.rowIds[0]);
+          e.rowIds.forEach((r) => {
+            duplicateRowDescriptions = [...duplicateRowDescriptions, {value: `${data.siteCode}/${data.date}/${data.depth} ...`, row: r}];
+          });
+        });
+      const duplicateRows = [
+        {
+          key: 'duplicateRowDescriptions',
+          count: duplicateRowDescriptions.count,
+          message: 'Duplicate Rows',
+          description: duplicateRowDescriptions
+        }
+      ];
+      setErrorList({blocking, warning, duplicateRows});
     }
   }, [errors, context]);
 
@@ -128,6 +145,15 @@ const ValidationPanel = (props) => {
         {Object.keys(errorList.blocking).length > 0 && <ValidationSummary data={errorList.blocking} onItemClick={handleItemClick} />}
       </Box>
       <Divider />
+      {Object.keys(errorList.duplicateRows).length > 0 && (
+        <>
+          <Box m={2} mt={1}>
+            <Typography variant="button">GLOBAL</Typography>
+            <ValidationSummary data={errorList.duplicateRows} onItemClick={handleItemClick} />
+          </Box>
+          <Divider />
+        </>
+      )}
       <Box m={2} mt={1}>
         <Typography variant="button">{Object.keys(errorList.warning).length > 0 ? `Warning` : 'No Warning ✔'}</Typography>
         {Object.keys(errorList.warning).length > 0 && <ValidationSummary data={errorList.warning} onItemClick={handleItemClick} />}
