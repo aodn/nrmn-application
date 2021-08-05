@@ -20,13 +20,13 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     private String error;
 
     private StagedRow currentRow;
-    private boolean isFirstHeaderRow = false;
-    private boolean isDataRow = false;
+    private boolean isHeaderRow = false;
+    private boolean rowHasId = false;
     private boolean rowHasData = false;
     private HashMap<String, String> columnHeaders = new HashMap<>();
     HashMap<Integer, String> measureJson = new HashMap<>();
     List<StagedRow> stagedRows = new ArrayList<>();
-    private Long numEmptyRows = 0L;
+    private Long skippedRows = 0L;
 
     SurveyContentsHandler(List<String> requiredHeaders, List<String> optionalHeaders) {
         this.requiredHeaders = requiredHeaders;
@@ -43,10 +43,10 @@ public class SurveyContentsHandler implements SheetContentsHandler {
 
     @Override
     public void startRow(int rowNum) {
-        isFirstHeaderRow = (rowNum == 0);
-        isDataRow = (rowNum > 1);
+        rowHasId = false;
         rowHasData = false;
-        if (isDataRow) {
+        isHeaderRow = (rowNum == 0);
+        if (!isHeaderRow) {
             currentRow = StagedRow.builder().pos((rowNum - 1) * 1000).build();
             for (String col : requiredHeaders)
                 setValue(col, "");
@@ -55,7 +55,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
 
     @Override
     public void endRow(int rowNum) {
-        if (isFirstHeaderRow) {
+        if (isHeaderRow) {
             List<String> errors = new ArrayList<String>();
             List<String> foundHeaders = new ArrayList<String>(columnHeaders.values());
             List<String> missingHeaders = new ArrayList<String>(requiredHeaders);
@@ -68,12 +68,12 @@ public class SurveyContentsHandler implements SheetContentsHandler {
                 errors.add("Unexpected Headers: " + String.join(", ", foundHeaders));
             if (errors.size() > 0)
                 error = String.join(". ", errors);
-        } else if (isDataRow) {
-            if (rowHasData) {
-                currentRow.setMeasureJson(new HashMap<>(measureJson));
+        } else {
+            if (rowHasId) {
+                currentRow.setMeasureJson(new HashMap<Integer, String>(measureJson));
                 this.stagedRows.add(currentRow);
             } else {
-                numEmptyRows++;
+                if(rowHasData && rowNum > 1) skippedRows++;
             }
         }
         measureJson.clear();
@@ -82,7 +82,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     @Override
     public void endSheet() {
         if (stagedRows.size() > 0)
-            result = new ParsedSheet(stagedRows, numEmptyRows);
+            result = new ParsedSheet(stagedRows, skippedRows);
         else
             error = result == null ? "Empty DATA sheet" : null;
     }
@@ -94,20 +94,21 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             return;
 
         String columnKey = cellReference.replaceAll("[0123456789]", "");
-        if (isFirstHeaderRow) {
+        if (isHeaderRow) {
             columnHeaders.put(columnKey, formattedValue);
-        } else if (isDataRow){
+        } else {
             String col = columnHeaders.getOrDefault(columnKey, "");
             boolean cellHasData = StringUtils.isNotEmpty(formattedValue) && !formattedValue.contentEquals("null");
-            rowHasData = rowHasData || cellHasData;
             String value = cellHasData ? formattedValue : "";
             setValue(col, value);
+            rowHasData = true;
         }
     }
 
     private void setValue(String columnHeader, String formattedValue) {
         switch (columnHeader) {
             case "ID":
+                rowHasId = formattedValue.length() > 0;
                 break;
             case "Buddy":
                 currentRow.setBuddy(formattedValue);
@@ -181,6 +182,6 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     @Value
     public class ParsedSheet {
         private List<StagedRow> stagedRows;
-        private Long numEmptyRows;
+        private Long skippedRows;
     }
 }
