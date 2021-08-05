@@ -140,7 +140,7 @@ public class StagedJobController {
             List<StagedRow> rowsToSave = parsedSheet.getStagedRows();
             Long skippedRows = parsedSheet.getSkippedRows();
 
-            String message = "Staged " + (rowsToSave.size()) + " row(s)." + (skippedRows > 0 ? " " + skippedRows + " rows missing and ID but containing data were skipped." : "");
+            String message = "Staged " + (rowsToSave.size()) + " row(s)." + (skippedRows > 0 ? " " + skippedRows + " rows missing ID but containing data were skipped." : "");
             StagedJobLog stagedLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis())).eventType(StagedJobEventType.STAGED).stagedJob(job).details(message).build();
 
             logRepo.save(stagedLog);
