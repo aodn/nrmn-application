@@ -563,7 +563,7 @@ const DataSheetView = ({jobId, onIngest}) => {
               </Button>
             </Box>
             <Box p={1}>
-              <Button onClick={handleSaveAndValidate} startIcon={<PlaylistAddCheckOutlinedIcon />}>
+              <Button disabled={state === IngestState.Loading} onClick={handleSaveAndValidate} startIcon={<PlaylistAddCheckOutlinedIcon />}>
                 {`Save & Validate`}
               </Button>
             </Box>
