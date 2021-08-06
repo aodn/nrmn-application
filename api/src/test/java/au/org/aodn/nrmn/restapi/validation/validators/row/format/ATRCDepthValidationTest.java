@@ -52,27 +52,6 @@ class ATRCDepthValidationTest {
     }
     
     @Test
-    void depthWithoutTransectShouldFail() {
-        List<UiSpeciesAttributes> swaList = Arrays.asList();
-        when(observationRepository.getSpeciesAttributesByIds(anyList())).thenReturn(swaList);
-        when(diverRepository.getAll()).thenReturn(Arrays.asList());
-        when(siteRepository.getAll()).thenReturn(Arrays.asList());
-        ObservableItem oi = ObservableItem.builder().observableItemId(1).observableItemName("test").build();
-        val job = new StagedJob();
-        job.setId(1L);
-        val stage = new StagedRow();
-        stage.setDepth("8,3");
-        stage.setSiteCode("AAA");
-        stage.setDate("1/1/1");
-        stage.setTime("12:00");
-        stage.setVis("0");
-        stage.setStagedJob(job);
-        Map<Integer, List<StagedRowFormatted>> validatedRows = validationProcess.formatRowsWithSpecies(Arrays.asList(stage), Arrays.asList(oi)).stream().collect(Collectors.groupingBy(r -> (int)r.getId()));
-        Collection<ValidationError> errors = validationProcess.checkSurveys("ATRC", false, validatedRows);
-        assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Survey group transect invalid")));
-    }
-
-    @Test
     void nullDepthShouldFail() {
         val job = new StagedJob();
         job.setId(1L);

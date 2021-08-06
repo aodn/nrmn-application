@@ -106,4 +106,24 @@ public class DiverApiIT {
                 .body("errors[0].message", is(equalTo("A diver with these initials already exists.")));
     }
 
+    @Test
+    @WithUserDetails("test@example.com")
+    public void testUpdateUsingExistingFullName() {
+        val diver = diverTestData.persistedDiver();
+        val existingDiver = diverTestData.persistedDiver();
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body("{" +
+                        "\"initials\": \"AVD\"," +
+                        "\"fullName\": \"" + existingDiver.getFullName() + "\"}")
+                .put(diver.getDiverId().toString())
+                .then()
+                .assertThat()
+                .statusCode(400)
+                .body("errors[0].message", is(equalTo("A diver with the same name already exists.")));
+    }
+
 }

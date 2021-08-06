@@ -69,16 +69,28 @@ public class DiverController {
     private ValidationErrors validateConstraints(Diver diver) {
         List<ValidationError> errors = new ArrayList<>();
 
-        List<Diver> existingDiversWithInitialsName = diverRepository.findByCriteria(diver.getInitials());
+        List<Diver> existingDiversWithInitials = diverRepository.findByInitials(diver.getInitials());
 
         if(diver.getDiverId() != null) {
-            existingDiversWithInitialsName = existingDiversWithInitialsName
+            existingDiversWithInitials = existingDiversWithInitials
                     .stream().filter(d -> !d.getDiverId().equals(diver.getDiverId())).collect(Collectors.toList());
         }
 
-        if (!existingDiversWithInitialsName.isEmpty()) {
+        if (!existingDiversWithInitials.isEmpty()) {
             errors.add(new ValidationError("Diver", "initials", diver.getInitials(),
                     "A diver with these initials already exists."));
+        }
+
+        List<Diver> existingDiversWithSameName = diverRepository.findByFullName(diver.getFullName());
+
+        if(diver.getDiverId() != null) {
+            existingDiversWithSameName = existingDiversWithSameName
+                    .stream().filter(d -> !d.getDiverId().equals(diver.getDiverId())).collect(Collectors.toList());
+        }
+
+        if (!existingDiversWithSameName.isEmpty()) {
+            errors.add(new ValidationError("Diver", "fullName", diver.getInitials(),
+                    "A diver with the same name already exists."));
         }
 
         return new ValidationErrors(errors);

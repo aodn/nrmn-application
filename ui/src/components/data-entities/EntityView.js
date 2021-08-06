@@ -109,7 +109,6 @@ const EntityView = (props) => {
   const loaded = Object.keys(formData).length > 0;
   return (
     <EntityContainer name={props.entity.list.name} goBackTo={props.entity.list.route}>
-      {!alert && (
         <Grid container alignItems="flex-start" direction="row">
           <Grid item xs={10}>
             <Box fontWeight="fontWeightBold">
@@ -127,7 +126,6 @@ const EntityView = (props) => {
             </Button>
           </Grid>
         </Grid>
-      )}
       <Grid container alignItems="center" direction="column">
         {alert}
         <Box pt={4} pb={6}>

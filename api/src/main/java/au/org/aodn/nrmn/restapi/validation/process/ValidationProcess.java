@@ -128,8 +128,22 @@ public class ValidationProcess {
             if (row.getDiver() == null || !diverNames.contains(row.getDiver().toUpperCase()))
                 errors.add(rowId, ValidationLevel.BLOCKING, "diver", "Diver does not exist");
 
-            if (row.getBuddy() == null || !diverNames.contains(row.getBuddy().toUpperCase()))
+            // Buddies
+            List<String> unknownBuddies = new ArrayList<String>();
+            if (row.getBuddy() != null) {
+                for(String buddy : row.getBuddy().split(",")) {
+                    if(!diverNames.contains(buddy.trim().toUpperCase()))
+                        unknownBuddies.add(buddy.trim());
+                }
+            }
+
+            if(row.getBuddy() == null || row.getBuddy().trim() == "") {
                 errors.add(rowId, ValidationLevel.WARNING, "buddy", "Diver does not exist");
+            } else if(unknownBuddies.size() == 1) {
+                errors.add(rowId, ValidationLevel.WARNING, "buddy", "Diver " + unknownBuddies.get(0) + " does not exist");
+            } else if(unknownBuddies.size() > 1) {
+                errors.add(rowId, ValidationLevel.WARNING, "buddy", "Divers " + String.join(", ", unknownBuddies) + " do not exist");
+            }
 
             if (row.getPqs() == null || !diverNames.contains(row.getPqs().toUpperCase()))
                 errors.add(rowId, ValidationLevel.WARNING, "p-qs", "Diver does not exist");
@@ -199,6 +213,10 @@ public class ValidationProcess {
             // Total
             if (NumberUtils.toInt(row.getTotal(), INVALID_INT) == INVALID_INT)
                 errors.add(rowId, ValidationLevel.BLOCKING, "total", "Total is not an integer");
+
+            // Method
+            if (NumberUtils.toInt(row.getMethod(), INVALID_INT) == INVALID_INT)
+            errors.add(rowId, ValidationLevel.BLOCKING, "method", "Method is not an integer");
 
             // MeasureJson
             if (row.getMeasureJson() != null)
@@ -305,7 +323,7 @@ public class ValidationProcess {
         return errors.getAll();
     }
 
-    private Collection<ValidationCell> validateMeasurements(String programName, StagedRowFormatted row) {
+    public Collection<ValidationCell> validateMeasurements(String programName, StagedRowFormatted row) {
         Collection<ValidationCell> errors = new ArrayList<ValidationCell>();
 
         if (row.getMeasureJson() == null)
@@ -315,9 +333,10 @@ public class ValidationProcess {
 
         // VALIDATION: RLS: Debris Zero observations
         if (programName.equalsIgnoreCase("RLS") && row.getCode().equalsIgnoreCase("dez") && row.getSpecies().isPresent()) {
-            boolean invalid = ((row.getInverts() != null && row.getInverts() != 0) || (row.getTotal() != null && row.getTotal() != 0) || observationTotal != 0);
-            if (invalid)
-                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Debris has Value/Total/Inverts not 0", row.getId(), "code"));
+            boolean notZero = ((row.getInverts() != null && row.getInverts() != 0) || (row.getTotal() != null && row.getTotal() != 0) || observationTotal != 0);
+            boolean notOne = ((row.getInverts() != null && row.getInverts() != 1) || (row.getTotal() != null && row.getTotal() != 1) || observationTotal != 1);
+            if (notZero && notOne)
+                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Debris has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
         }
 
         if (row.getTotal() != null && !row.getTotal().equals(observationTotal))
@@ -325,9 +344,9 @@ public class ValidationProcess {
 
         // VALIDATION: Record has no data and but not flagged as 'Survey Not Done' or
         // 'No Species Found'
-        if (observationTotal < 1 && row.getCode() != null && !row.getCode().equalsIgnoreCase("SND") && !(row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND))
+        if (observationTotal < 1 && row.getCode() != null && !row.getCode().equalsIgnoreCase("DEZ") && !row.getCode().equalsIgnoreCase("SND") && !(row.getSpecies().isPresent() &&  row.getSpecies().get().getObsItemType() != null  && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND))
             errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Record has no data and but not flagged as 'Survey Not Done' or 'No Species Found'", row.getId(), "total"));
-        else if (row.getTotal() != null && (observationTotal + row.getTotal() > 0) && row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)
+        else if (row.getTotal() != null && (observationTotal + row.getTotal() > 0) && row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType() != null && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)
             errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Record is 'No Species Found' but has nonzero total", row.getId(), "total"));
         else if (row.getTotal() != null && (observationTotal + row.getTotal() > 0) && row.getCode().equalsIgnoreCase("SND"))
             errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Record is 'Survey Not Done' but has nonzero total", row.getId(), "total"));
@@ -421,22 +440,26 @@ public class ValidationProcess {
         return columnNames.size() > 0 ? new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, "Quadrats do not sum to at least 50 in transect " + transect, rowIds, columnNames) : null;
     }
 
-    private ValidationError validateSurveyTransectNumber(Integer depth, List<StagedRowFormatted> surveyRows) {
+    private ValidationError validateSurveyTransectNumber(String surveyKey, List<StagedRowFormatted> surveyRows) {
         List<StagedRowFormatted> invalidTransectRows = surveyRows.stream().filter(r -> !Arrays.asList(1, 2, 3, 4).contains(r.getSurveyNum())).collect(Collectors.toList());
         if (invalidTransectRows.size() > 0)
             return new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, "Survey group transect invalid", invalidTransectRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
         return null;
     }
 
-    private ValidationError validateSurveyComplete(String programName, Integer depth, List<StagedRowFormatted> surveyRows) {
+    private ValidationError validateSurveyComplete(String programName, String surveyKey, List<StagedRowFormatted> surveyRows) {
 
         if(surveyRows.stream().anyMatch(r -> r.getMethod() == null || r.getBlock() == null))
             return null;
 
-        // VALIDATE: If method = 0 then Block should equal 0 as well
-        Map<Integer, List<StagedRowFormatted>> surveyByMethod = surveyRows.stream()
-                .filter(sr -> !(sr.getMethod() != null && sr.getMethod() == 0 && sr.getBlock() != null && sr.getBlock() == 0))
-                .collect(Collectors.groupingBy(StagedRowFormatted::getMethod));
+        Map<Integer, List<StagedRowFormatted>> surveyByMethod = surveyRows.stream().filter(sr -> sr.getMethod() != null && sr.getBlock() != null)
+                                                                .collect(Collectors.groupingBy(StagedRowFormatted::getMethod));
+                                                                
+        // VALIDATE: If method = 0 then Block should be 0, 1 or 2
+        List<StagedRowFormatted> method0Rows = surveyByMethod.get(0);
+        if(method0Rows != null && method0Rows.stream().anyMatch(r -> !Arrays.asList(0, 1, 2).contains(r.getBlock())))
+            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, "Method 0 must have block 0, 1 or 2",
+                        method0Rows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("block"));
 
         // VALIDATE: Both M1 and M2 present except if ATRC and has at least one method of 3,4,5,7
         List<Integer> methods =  new ArrayList<Integer>(Arrays.asList(1,2));
@@ -448,34 +471,43 @@ public class ValidationProcess {
         }
 
         // VALIDATE: Each method has block 1,2 (RLS) or block 1 (ATRC)
-        for (Map.Entry<Integer, List<StagedRowFormatted>> methodRows : surveyByMethod.entrySet()) {
-            List<Integer> blocks = programName.equalsIgnoreCase("RLS") ? new ArrayList<Integer>(Arrays.asList(1,2)) : new ArrayList<Integer>(Arrays.asList(1));
-            blocks.removeAll(methodRows.getValue().stream().map(r -> r.getBlock()).collect(Collectors.toList()));
-            if(blocks.size() > 0){
-                List<String> missingBlocks = blocks.stream().map(m -> m.toString()).collect(Collectors.toList());
-                String missingMessage = missingBlocks.size() > 1 ? "blocks " + String.join(", ", missingBlocks) : "block " + missingBlocks.get(0);
-                String message = "Survey incomplete: method " + methodRows.getKey() + " is missing " + missingMessage;
+        for (Integer method : Arrays.asList(1,2)) {
+            List<StagedRowFormatted> methodRows = surveyByMethod.get(method);
+            if(methodRows == null) continue;
+
+            List<Integer> blocksRequired = programName.equalsIgnoreCase("RLS") ? new ArrayList<Integer>(Arrays.asList(1,2)) : new ArrayList<Integer>(Arrays.asList(1));
+
+            List<Integer> hasBlocks = methodRows.stream().map(r -> r.getBlock()).distinct().filter(b -> b != 0).collect(Collectors.toList());
+            List<Integer> missingBlocks = blocksRequired.stream().filter(b -> !hasBlocks.contains(b)).collect(Collectors.toList());
+            
+            if(missingBlocks.size() > 0){
+                List<String> missingBlocksMessage = missingBlocks.stream().map(m -> m.toString()).collect(Collectors.toList());
+                String missingMessage = missingBlocks.size() > 1 ? "blocks " + String.join(", ", missingBlocksMessage) : "block " + missingBlocksMessage.get(0);
+                String message = "Survey incomplete: method " + method + " is missing " + missingMessage;
                 return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, message, 
-                methodRows.getValue().stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("block"));
+                methodRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("block"));
             }
         }
 
         return null;
     }
 
-    private ValidationError validateSurveyGroup(Integer depth, List<StagedRowFormatted> surveyRows) {
-        if (surveyRows.stream().filter(r -> Arrays.asList(1, 2, 3, 4).contains(r.getSurveyNum())).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyNum)).size() < 4) {
-            String surveyName = surveyRows.get(0).getSurveyName();
-            String messageLabel = surveyName != null ? surveyName + ": " : "";
-            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, messageLabel + "Survey group incomplete", surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
+    private ValidationError validateSurveyGroup(String surveyKey, List<StagedRowFormatted> surveyRows) {
+        Map<Integer, List<StagedRowFormatted>> surveyGroup = surveyRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyNum));
+        if(!surveyGroup.keySet().containsAll(Arrays.asList(1, 2, 3, 4))) {
+            List<Integer> missingSurveys = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4));
+            missingSurveys.removeAll(surveyGroup.keySet());
+            List<String> missingSurveysMessage = missingSurveys.stream().map(s -> s.toString()).collect(Collectors.toList());
+            String message =  "Survey group incomplete: missing " + String.join(", ", missingSurveysMessage);
+            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, message, surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
         }
         return null;
     }
 
-    public Collection<ValidationError> checkSurveys(String programName, Boolean isExtended, Map<Integer, List<StagedRowFormatted>> surveyMap) {
+    public Collection<ValidationError> checkSurveys(String programName, Boolean isExtended, Map<String, List<StagedRowFormatted>> surveyMap) {
         Set<ValidationError> res = new HashSet<ValidationError>();
  
-        for (Map.Entry<Integer, List<StagedRowFormatted>> survey : surveyMap.entrySet()) {
+        for (Map.Entry<String, List<StagedRowFormatted>> survey : surveyMap.entrySet()) {
             List<StagedRowFormatted> surveyRows = survey.getValue();
             
             if (programName.equalsIgnoreCase("ATRC")){
@@ -588,20 +620,24 @@ public class ValidationProcess {
         Collection<StagedRowFormatted> validRows = formatRowsWithSpecies(rows, species);
 
         if (validRows != null) {
+            Object[] distinctSites = validRows.stream().map(r -> r.getSite().getSiteCode()).distinct().toArray();
             response.setRowCount(validRows.size());
-            response.setSiteCount(validRows.stream().map(r -> r.getSite()).distinct().count());
+            response.setSiteCount(distinctSites.length);
             response.setDiverCount(validRows.stream().map(r -> r.getDiver()).distinct().count());
             response.setObsItemCount(validRows.stream().map(r -> r.getSpecies()).filter(o -> o.isPresent()).distinct().count());
 
             sheetErrors.addAll(checkData(programName, job.getIsExtendedSize(), validRows));
 
-            Map<Integer, List<StagedRowFormatted>> surveyMap = validRows.stream().filter(row -> row.getSite() != null && row.getDate() != null && row.getDepth() != null).collect(Collectors.groupingBy(StagedRowFormatted::getDepth));
+            Map<String, List<StagedRowFormatted>> surveyMap = validRows.stream().filter(row -> row.getSurvey() != null).collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
             sheetErrors.addAll(checkSurveys(programName, job.getIsExtendedSize(), surveyMap));
             response.setIncompleteSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("Survey incomplete")).count());
 
-            Map<String, List<StagedRowFormatted>> method3SurveyMap = validRows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3)).collect(Collectors.groupingBy(StagedRowFormatted::getTransectName));
+            Map<String, List<StagedRowFormatted>> method3SurveyMap = validRows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3) && row.getCode() != null && !row.getCode().equalsIgnoreCase("snd")).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
             sheetErrors.addAll(checkMethod3Transects(programName, job.getIsExtendedSize(), method3SurveyMap));
-            response.setSurveyCount(surveyMap.keySet().size());
+
+            // Count only M1 or M2 surveys in summary total
+            Long distinctSurveys = validRows.stream().filter(r -> Arrays.asList(1,2).contains(r.getMethod())).map(r -> r.getSurveyGroup()).distinct().count();
+            response.setSurveyCount(distinctSurveys);
             response.setErrors(sheetErrors);
         }
 
