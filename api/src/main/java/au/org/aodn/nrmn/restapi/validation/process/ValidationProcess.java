@@ -620,8 +620,9 @@ public class ValidationProcess {
         Collection<StagedRowFormatted> validRows = formatRowsWithSpecies(rows, species);
 
         if (validRows != null) {
+            Object[] distinctSites = validRows.stream().map(r -> r.getSite().getSiteCode()).distinct().toArray();
             response.setRowCount(validRows.size());
-            response.setSiteCount(validRows.stream().map(r -> r.getSite()).distinct().count());
+            response.setSiteCount(distinctSites.length);
             response.setDiverCount(validRows.stream().map(r -> r.getDiver()).distinct().count());
             response.setObsItemCount(validRows.stream().map(r -> r.getSpecies()).filter(o -> o.isPresent()).distinct().count());
 
@@ -633,7 +634,10 @@ public class ValidationProcess {
 
             Map<String, List<StagedRowFormatted>> method3SurveyMap = validRows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3) && row.getCode() != null && !row.getCode().equalsIgnoreCase("snd")).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
             sheetErrors.addAll(checkMethod3Transects(programName, job.getIsExtendedSize(), method3SurveyMap));
-            response.setSurveyCount(surveyMap.keySet().size());
+
+            // Count only M1 or M2 surveys in summary total
+            Long distinctSurveys = validRows.stream().filter(r -> Arrays.asList(1,2).contains(r.getMethod())).map(r -> r.getSurveyGroup()).distinct().count();
+            response.setSurveyCount(distinctSurveys);
             response.setErrors(sheetErrors);
         }
 
