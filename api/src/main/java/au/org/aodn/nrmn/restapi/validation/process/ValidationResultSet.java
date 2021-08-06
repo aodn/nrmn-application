@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
@@ -19,9 +20,11 @@ public class ValidationResultSet {
     public void addGlobal(Collection<ValidationRow> validationRows) {
         for (ValidationRow validationRow : validationRows) {
             ValidationError value = errorMap.getOrDefault(validationRow.getMessage(), new ValidationError(ValidationCategory.GLOBAL, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
-            if (value != null)
+            if (value != null) {
                 value.getRowIds().addAll(validationRow.getRowIds());
-            errorMap.put(validationRow.getKey(), new ValidationError(ValidationCategory.GLOBAL, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
+                value.setRowIds(value.getRowIds().stream().distinct().collect(Collectors.toList()));
+            }
+            errorMap.put(validationRow.getKey(), value);
         }
     }
 

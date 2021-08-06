@@ -76,17 +76,21 @@ const ValidationPanel = (props) => {
       errors
         .filter((e) => e.categoryId === 'GLOBAL')
         .forEach((e) => {
-          const data = context.rowData.find((d) => d.id === e.rowIds[0]);
-          e.rowIds.forEach((r) => {
-            duplicateRowDescriptions = [...duplicateRowDescriptions, {value: `${data.siteCode}/${data.date}/${data.depth} ...`, row: r}];
+          const firstRowId = e.rowIds[0];
+          const data = context.rowData.find((d) => d.id === firstRowId);
+          e.rowIds.forEach(() => {
+            duplicateRowDescriptions = [
+              {value: `${data.siteCode}/${data.date}/${data.depth} ...`, row: firstRowId},
+              ...duplicateRowDescriptions
+            ];
           });
         });
       const duplicateRows =
-        duplicateRowDescriptions.count > 0
+        duplicateRowDescriptions.length > 0
           ? [
               {
                 key: 'duplicateRowDescriptions',
-                count: duplicateRowDescriptions.count,
+                count: duplicateRowDescriptions.length,
                 message: 'Duplicate Rows',
                 description: duplicateRowDescriptions
               }
