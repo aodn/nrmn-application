@@ -121,7 +121,7 @@ public class ValidationProcess {
             Long rowId = row.getId();
 
             // Site
-            if (!siteCodes.contains(row.getSiteCode()))
+            if (!siteCodes.contains(row.getSiteCode().toLowerCase()))
                 errors.add(rowId, ValidationLevel.BLOCKING, "siteCode", "Site Code does not exist");
 
             // Diver
