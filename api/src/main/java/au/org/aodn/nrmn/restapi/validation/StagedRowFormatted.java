@@ -79,6 +79,6 @@ public class StagedRowFormatted {
     }
 
     public String getSurveyGroup() {
-        return getSurvey() != null  && surveyNum != null ? (getSurvey() + "." + surveyNum).toUpperCase() : null;
+        return getSurvey() != null ? (getSurvey() + "." + surveyNum).toUpperCase() : null;
     }
 }
