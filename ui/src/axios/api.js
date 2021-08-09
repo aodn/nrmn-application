@@ -199,3 +199,7 @@ export const search = (params) => {
 export const templateZip = (params) => {
   return axiosInstance.get(`/api/template/template.zip?${params}`, {responseType: 'blob'});
 };
+
+export const originalJobFile = (jobId) => {
+  return axiosInstance.get(`/api/stage/job/download/${jobId}`, {responseType: 'blob'});
+};

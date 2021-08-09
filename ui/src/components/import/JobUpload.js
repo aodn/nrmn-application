@@ -110,7 +110,7 @@ const JobUpload = () => {
                       label={`Uploading ${formData.file.name}...`}
                     />
                     {uploadProgress === 100 && (
-                      <LinearProgressWithLabel determinate={uploadProgress} done={uploadProgress} label="Verifying..." />
+                      <LinearProgressWithLabel determinate={uploadResponse} done={uploadResponse} label="Verifying..." />
                     )}
                   </Box>
                   <Box mt={3} ml={3} mr={3} mb={5}>

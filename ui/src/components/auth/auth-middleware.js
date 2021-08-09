@@ -35,4 +35,6 @@ function* apiLogout(logoutSubmitted) {
   } catch (e) {
     console.error('ERROR: Logout failed', e);
   }
+  localStorage.clear();
+  window.location.reload();
 }

@@ -6,7 +6,7 @@
     <parent>
         <artifactId>nrmn</artifactId>
         <groupId>au.org.aodn.nrmn</groupId>
-        <version>0.0.295</version>
+        <version>0.0.342</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>nrmn-ui</artifactId>
@@ -35,13 +35,12 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>yarn install</id>
+                        <id>default-resources</id>
                         <goals>
                             <goal>yarn</goal>
                         </goals>
-                        <phase>generate-resources</phase>
                         <configuration>
-                            <arguments>install --network-timeout 1000000</arguments>
+                            <arguments>install</arguments>
                         </configuration>
                     </execution>
                     <execution>
@@ -49,7 +48,7 @@
                         <goals>
                             <goal>yarn</goal>
                         </goals>
-                        <phase>test</phase>
+                        <phase>default-testResources</phase>
                         <configuration>
                             <arguments>test</arguments>
                             <environmentVariables>
@@ -79,8 +78,8 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-resources</id>
-                        <phase>process-classes</phase>
+                        <id>default-resources</id>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -89,6 +88,7 @@
                             <resources>
                                 <resource>
                                     <directory>build</directory>
+                                    <filtering>false</filtering>
                                 </resource>
                             </resources>
                         </configuration>

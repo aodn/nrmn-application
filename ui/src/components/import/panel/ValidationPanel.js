@@ -19,12 +19,13 @@ const focusCell = (api, columns, ids) => {
 const generateErrorTree = (ctx, errors, level) => {
   const tree = [];
   errors
-    .filter((e) => e.levelId === level)
+    .filter((e) => e.levelId === level && e.categoryId !== 'GLOBAL')
     .sort((a, b) => {
       return a.message < b.message ? -1 : a.message > b.message ? 1 : 0;
     })
     .forEach((e) => {
-      tree.push(generateErrorSummary(ctx, e));
+      const summary = generateErrorSummary(ctx, e);
+      tree.push(summary);
     });
   return tree;
 };
@@ -55,22 +56,45 @@ const generateErrorSummary = (ctx, e) => {
   } else {
     summary.push({rowIds: e.rowIds, columnNames: e.columnNames});
   }
-  return {message: e.message, count: e.rowIds.length, description: summary};
+  const key = `${e.rowIds[0]}-${e.rowIds.length}-${e.columnNames ? e.columnNames.join('-') : '--'}`;
+  return {key: key, message: e.message, count: e.rowIds.length, description: summary};
 };
 
 const ValidationPanel = (props) => {
   const context = props.api.gridOptionsWrapper.gridOptions.context;
   const errors = context.errors;
 
-  const [blocking, setBlocking] = useState([]);
-  const [warning, setWarning] = useState([]);
+  const [errorList, setErrorList] = useState({blocking: {}, warning: {}, duplicateRows: {}});
   const [info, setInfo] = useState({});
 
   useEffect(() => {
     setInfo(context.summary);
     if (errors && errors.length > 0) {
-      setBlocking(generateErrorTree(context, errors, 'BLOCKING'));
-      setWarning(generateErrorTree(context, errors, 'WARNING'));
+      const blocking = generateErrorTree(context, errors, 'BLOCKING');
+      const warning = generateErrorTree(context, errors, 'WARNING');
+      let duplicateRowDescriptions = [];
+      errors
+        .filter((e) => e.categoryId === 'GLOBAL')
+        .forEach((e) => {
+          const firstRowId = e.rowIds[0];
+          const data = context.rowData.find((d) => d.id === firstRowId);
+          e.rowIds.forEach((rowId) => {
+            const description = data.siteCode && data.date && data.depth ? `${data.siteCode}/${data.date}/${data.depth} ...` : '...';
+            duplicateRowDescriptions = [{value: description, row: rowId}, ...duplicateRowDescriptions];
+          });
+        });
+      const duplicateRows =
+        duplicateRowDescriptions.length > 0
+          ? [
+              {
+                key: 'duplicateRowDescriptions',
+                count: duplicateRowDescriptions.length,
+                message: 'Duplicate Rows',
+                description: duplicateRowDescriptions
+              }
+            ]
+          : {};
+      setErrorList({blocking, warning, duplicateRows});
     }
   }, [errors, context]);
 
@@ -122,13 +146,22 @@ const ValidationPanel = (props) => {
         </Table>
       </Box>
       <Box m={2} mt={1}>
-        <Typography variant="button">{Object.keys(blocking).length > 0 ? `Blocking` : 'No Blocking ✔'}</Typography>
-        {Object.keys(blocking).length > 0 && <ValidationSummary data={blocking} onItemClick={handleItemClick} />}
+        <Typography variant="button">{Object.keys(errorList.blocking).length > 0 ? `Blocking` : 'No Blocking ✔'}</Typography>
+        {Object.keys(errorList.blocking).length > 0 && <ValidationSummary data={errorList.blocking} onItemClick={handleItemClick} />}
       </Box>
       <Divider />
+      {Object.keys(errorList.duplicateRows).length > 0 && (
+        <>
+          <Box m={2} mt={1}>
+            <Typography variant="button">GLOBAL</Typography>
+            <ValidationSummary data={errorList.duplicateRows} onItemClick={handleItemClick} />
+          </Box>
+          <Divider />
+        </>
+      )}
       <Box m={2} mt={1}>
-        <Typography variant="button">{Object.keys(warning).length > 0 ? `Warning` : 'No Warning ✔'}</Typography>
-        {Object.keys(warning).length > 0 && <ValidationSummary data={warning} onItemClick={handleItemClick} />}
+        <Typography variant="button">{Object.keys(errorList.warning).length > 0 ? `Warning` : 'No Warning ✔'}</Typography>
+        {Object.keys(errorList.warning).length > 0 && <ValidationSummary data={errorList.warning} onItemClick={handleItemClick} />}
       </Box>
     </>
   );

@@ -172,13 +172,13 @@ public class TemplateServiceTest {
         SpeciesWithAttributesCsvRow.SpeciesWithAttributesCsvRowBuilder sb = SpeciesWithAttributesCsvRow
                 .builder();
         SpeciesWithAttributesCsvRow s1 = sb.letterCode("asa").speciesName("Abudefduf saxatilis").isInvertSized(false)
-                .commonName("Sergeant major").l5(2.5).l95(15.0).lMax(20l).build();
+                .commonName("Sergeant major").l5(2.5).l95(15.0).lMax(20.0).build();
 
         SpeciesWithAttributesCsvRow s2 = sb.letterCode("aba").speciesName("Acanthurus bahianus").isInvertSized(false)
-                .commonName("Ocean surgeon").l5(5.0).l95(30.0).lMax(40l).build();
+                .commonName("Ocean surgeon").l5(5.0).l95(30.0).lMax(40.0).build();
 
         SpeciesWithAttributesCsvRow s3 = sb.letterCode("ach").speciesName("Acanthurus chirurgus").isInvertSized(false)
-                .commonName("Doctorfish").l5(7.5).l95(45.0).lMax(60l).build();
+                .commonName("Doctorfish").l5(7.5).l95(45.0).lMax(60.0).build();
 
         SpeciesWithAttributesCsvRow s4 = sb.letterCode("sps").speciesName("Species spp.").isInvertSized(null)
                 .commonName(null).l5(null).l95(null).lMax(null).build();
@@ -192,9 +192,9 @@ public class TemplateServiceTest {
 
         assertEquals(5, csvLines.size());
         assertEquals("Letter Code,Species Name,Common Name,Species Invert Sizing,L5,L95,LMax", csvLines.get(0));
-        assertEquals("asa,Abudefduf saxatilis,Sergeant major,No,2.5,15.0,20", csvLines.get(1));
-        assertEquals("aba,Acanthurus bahianus,Ocean surgeon,No,5.0,30.0,40", csvLines.get(2));
-        assertEquals("ach,Acanthurus chirurgus,Doctorfish,No,7.5,45.0,60", csvLines.get(3));
+        assertEquals("asa,Abudefduf saxatilis,Sergeant major,No,2.5,15.0,20.0", csvLines.get(1));
+        assertEquals("aba,Acanthurus bahianus,Ocean surgeon,No,5.0,30.0,40.0", csvLines.get(2));
+        assertEquals("ach,Acanthurus chirurgus,Doctorfish,No,7.5,45.0,60.0", csvLines.get(3));
         assertEquals("sps,Species spp.,,No,,,", csvLines.get(4));
     }
 
@@ -239,8 +239,8 @@ public class TemplateServiceTest {
             }
 
             @Override
-            public Long getLmax() {
-                return 20l;
+            public Double getLmax() {
+                return 20.0;
             }
         };
 
@@ -282,8 +282,8 @@ public class TemplateServiceTest {
             }
 
             @Override
-            public Long getLmax() {
-                return 40l;
+            public Double getLmax() {
+                return 40.0;
             }
         };
 
@@ -325,8 +325,8 @@ public class TemplateServiceTest {
             }
 
             @Override
-            public Long getLmax() {
-                return 60l;
+            public Double getLmax() {
+                return 60.0;
             }
         };
 

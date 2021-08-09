@@ -27,9 +27,13 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
     @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
     List<Site> findByCriteria(@Param("code") String siteCode);
 
-    @Query(value = "SELECT site_code FROM {h-schema}ep_site_list WHERE site_code IN :siteCodes", nativeQuery = true)
+    @Query(value = "SELECT LOWER(siteCode) FROM Site WHERE siteCode IN :siteCodes")
     List<String> getAllSiteCodesMatching(Collection<String> siteCodes);
     
+    @Query("SELECT s FROM Site s")
+    @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
+    Collection<Site> getAll();
+
     @Query("SELECT s FROM Site s WHERE lower(s.siteCode) = lower(:code)")
     @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
     Site findBySiteCode(@Param("code") String siteCode);
@@ -48,6 +52,16 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
 
     @Query(nativeQuery = true, value = "SELECT DISTINCT province FROM {h-schema}ep_site_list where province is not null ORDER BY province")
     List<String> findAllSiteProvinces();
+
+    @Query(nativeQuery = true, value = "" +
+            "SELECT '(' || sr.site_name || ' ' || ROUND(CAST(ST_Distance(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography)) AS numeric), 2) || 'm)' " +
+            "FROM nrmn.site_ref sr " +
+            "WHERE ST_DWithin(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography), 200) " +
+            "AND (:siteCode IS NULL OR sr.site_code <> :siteCode)")
+    List<String> sitesWithin200m(
+            @Param("siteCode") String siteCode,
+            @Param("longitude") double longitude,
+            @Param("latitude") double latitude);
 
     <T> Optional<T> findBySiteId(Integer id, Class<T> type);
 }

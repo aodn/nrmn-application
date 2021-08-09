@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.repository;
 
 import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,15 +32,26 @@ public interface DiverRepository
     @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
     List<Diver> findByCriteria(@Param("initials") String initials);
 
+    @Query("SELECT d FROM Diver d WHERE lower(d.initials) = lower(:initials)")
+    @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
+    List<Diver> findByInitials(@Param("initials") String initials);
+
+    @Query("SELECT d FROM Diver d WHERE lower(d.fullName) = lower(:fullName)")
+    @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
+    List<Diver> findByFullName(@Param("fullName") String fullName);
+
     @Override
     @RestResource
-    @Query(value = "SELECT * FROM {h-schema}diver_ref d ORDER BY (CASE WHEN initials SIMILAR TO '%[a-zA-Z]' THEN 0 ELSE 1 END), d.initials", 
+    @Query(value = "SELECT * FROM {h-schema}diver_ref d ORDER BY (CASE WHEN initials SIMILAR TO '%[a-zA-Z]' THEN 0 ELSE 1 END), LOWER(d.initials)",
            countQuery = "SELECT count(*) FROM {h-schema}diver_ref",
            nativeQuery = true)
     Page<Diver> findAll(Pageable pageable);
 
+    @Query("SELECT d FROM Diver d")
+    @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
+    Collection<Diver> getAll();
+
     @Override
-    @RestResource
     <S extends Diver> S save(S s);
 
     @Override

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 
 @Repository
 public interface StagedRowRepository extends JpaRepository<StagedRow, Long>, JpaSpecificationExecutor<StagedRow> {
@@ -41,6 +43,7 @@ public interface StagedRowRepository extends JpaRepository<StagedRow, Long>, Jpa
     List<StagedSurveyTransect> getStagedSurveyTransects(@Param("id") Long id);
 
     @Modifying
+    @Transactional
     @Query("delete from StagedRow r where r.id in ?1")
     void deleteAllByIds(@Param("ids") List<Long> ids);
 }

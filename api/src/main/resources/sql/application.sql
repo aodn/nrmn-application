@@ -154,7 +154,7 @@ CREATE TABLE nrmn.survey_aud (
     survey_num_mod boolean,
     survey_time time without time zone,
     survey_time_mod boolean,
-    visibility integer,
+    visibility float,
     visibility_mod boolean,
     program_id integer,
     program_mod boolean,

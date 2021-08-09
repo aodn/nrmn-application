@@ -1,11 +1,14 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
+import au.org.aodn.nrmn.restapi.validation.validators.formatted.FormattedTestProvider;
 import lombok.val;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.org.apache.commons.lang.SerializationUtils;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
@@ -23,7 +24,7 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 @SpringBootTest
 @ExtendWith(PostgresqlContainerExtension.class)
 @WithNoData
-public class ValidationProcessIT {
+public class ValidationProcessIT extends FormattedTestProvider {
 
     @Autowired
     private ValidationProcess validationProcess;
@@ -33,6 +34,9 @@ public class ValidationProcessIT {
 
     @Autowired
     private SecUserTestData utd;
+
+    private final String date = "11/09/2020";
+    private final String depth = "7";
 
     @Test
     public void testValidationResultsNotDuplicated() {
@@ -91,6 +95,49 @@ public class ValidationProcessIT {
 
         assertEquals("Validation is failing on valid rows", 0, errors.getErrors().size());
 
+    }
+
+    @Test
+    public void siteCodeMatchesWithSameCase() {
+        StagedRow row = StagedRow.builder()
+                .siteCode("ERZ1")
+                .method("1")
+                .block("1")
+                .date(date)
+                .depth(depth)
+                .build();
+
+        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
+
+        Assertions.assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));
+    }
+
+    @Test
+    public void siteCodeMatchesWithDifferentCase() {
+        StagedRow row = StagedRow.builder()
+                .siteCode("Erz1")
+                .method("1")
+                .block("1")
+                .date(date)
+                .depth(depth)
+                .build();
+        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
+
+        Assertions.assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));
+    }
+
+    @Test
+    public void siteCodeMatchesWithInvalidSiteCode() {
+        StagedRow row = StagedRow.builder()
+                .siteCode("AbC1")
+                .method("1")
+                .block("1")
+                .date(date)
+                .depth(depth)
+                .build();
+        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
+
+        Assertions.assertTrue(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));
     }
 
 }

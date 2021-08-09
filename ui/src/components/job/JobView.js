@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, CircularProgress, Divider, Grid, Paper, Typography} from '@material-ui/core';
+import {Box, CircularProgress, Divider, Grid, Icon, Paper, Typography} from '@material-ui/core';
 import {useParams} from 'react-router';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -14,7 +14,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Hidden from '@material-ui/core/Hidden';
 import {Link} from 'react-router-dom';
 
-import {getFullJob} from '../../axios/api';
+import {getFullJob, originalJobFile} from '../../axios/api';
+import FileDownload from 'js-file-download';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -29,7 +30,18 @@ const useStyles = makeStyles(() => ({
 const JobView = () => {
   const {id} = useParams();
   const [job, setJob] = useState();
+  const [existsOnS3, setExistsOnS3] = useState(true);
   const classes = useStyles();
+
+  const downloadZip = (jobId, fileName) => {
+    originalJobFile(jobId).then((result) => {
+      if(result.data.size > 0) {
+        FileDownload(result.data, fileName);
+      } else {
+        setExistsOnS3(false);
+      }
+    });
+  };
 
   useEffect(() => {
     if (!job) {
@@ -46,9 +58,17 @@ const JobView = () => {
           <Grid item sm={12} md={12} lg={4}>
             <Paper className={classes.paper}>
               <Grid item lg={10} md={10} style={{padding: 15}}>
-                <Typography className={classes.title} variant="h5" color="primary">
-                  {job.reference}
-                </Typography>
+                {existsOnS3 ?
+                  <Typography className={classes.title} variant="h5" color="primary">
+                    <Link variant="a"  onClick={() => downloadZip(job.id, job.reference)} >
+                      {job.reference}
+                    </Link>
+                  </Typography>
+                  :
+                  <Typography className={classes.title} variant="h5" color="primary">
+                    {job.reference}
+                    <Icon title={'File could not be found'} color="error" style={{float: 'right'}}>error</Icon>
+                  </Typography> }
               </Grid>
 
               <Divider style={{margin: 15, marginTop: 0}} />

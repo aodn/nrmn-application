@@ -47,7 +47,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
                 "LEFT JOIN {h-schema}site_ref st USING (site_id)" +
                 "LEFT JOIN {h-schema}location_ref lc USING (location_id)" +
                 "LEFT JOIN diver_names dn USING (survey_id)" +
-                "ORDER BY surveyDate DESC", countQuery = "SELECT count(*) FROM {h-schema}survey", nativeQuery = true)
+                "ORDER BY surveyId DESC", countQuery = "SELECT count(*) FROM {h-schema}survey", nativeQuery = true)
         List<SurveyRow> findAllProjectedBy();
 
         @Query("SELECT t FROM #{#entityName} t WHERE t.id IN :ids")
@@ -84,7 +84,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
                 "(?#{#f.ecoRegion}  IS NULL OR l.ecoregion   = (CAST(?#{#f.ecoRegion} AS character varying)))                            AND " +
                 "(?#{#f.methodId}   IS NULL OR m.method_id   = (CAST (CAST(?#{#f.methodId} AS character varying) AS integer)))           AND " +
                 "(?#{#f.speciesId}  IS NULL OR v.species_id  = (CAST (CAST(?#{#f.speciesId} AS character varying) AS integer))) "              + 
-                "ORDER BY surveyDate DESC", nativeQuery = true)
+                "ORDER BY surveyId DESC", nativeQuery = true)
         List<SurveyRow> findByCriteria(@Param("f") SurveyFilterDto surveyFilter);
 
         @Query("SELECT s FROM Survey s WHERE s.surveyId IN :ids AND s.pqCatalogued = false")

@@ -46,7 +46,7 @@ const ValidationSummary = (props) => {
     <TreeView defaultCollapseIcon={<ArrowDropDownIcon />} defaultExpandIcon={<ArrowRightIcon />}>
       {props.data.map((m) => (
         <TreeItem
-          nodeId={m.message}
+          nodeId={m.key}
           label={
             <div className={classes.labelRoot}>
               <Typography variant="body2" className={classes.labelText}>
@@ -57,7 +57,7 @@ const ValidationSummary = (props) => {
               </Typography>
             </div>
           }
-          key={m.message}
+          key={m.key}
         >
           {m.description.map((d) => {
             const mmHeader = mm.find((m) => m.field === d.columnName);

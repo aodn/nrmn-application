@@ -1,26 +1,29 @@
 package au.org.aodn.nrmn.restapi.dto.payload;
 
 public class JwtAuthenticationResponse {
-    private String accessToken;
+    
+    private String gridLicence;
     private String tokenType = "Bearer";
+
+    private String accessToken;
 
     public JwtAuthenticationResponse(){}
     
-    public JwtAuthenticationResponse(String accessToken) {
+    public JwtAuthenticationResponse(String accessToken, String gridLicence) {
         this.accessToken = accessToken;
+        this.gridLicence = gridLicence;
     }
-
-    public JwtAuthenticationResponse(String accessToken, String tokenType) {
-        this.accessToken = accessToken;
-        this.tokenType = tokenType;
-    }
-
+    
     public String getAccessToken() {
         return this.accessToken;
     }
 
     public String getTokenType() {
         return this.tokenType;
+    }
+    
+    public String getGridLicense() {
+        return this.gridLicence;
     }
 
 }

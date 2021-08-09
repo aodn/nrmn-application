@@ -10,7 +10,6 @@ import {NavLink} from 'react-router-dom';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import 'ag-grid-enterprise';
 import {PropTypes} from 'prop-types';
 import {getDataJob, validateJob, updateRows, submitIngest} from '../../axios/api';
 import {measurements, extendedMeasurements} from '../../constants';
@@ -90,6 +89,18 @@ const context = {
   // while in paste mode, then when onPasteEnd is called then call pushUndo
   pendingPasteUndo: [],
   pasteMode: false
+};
+
+const resetContext = () => {
+  context.useOverlay = 'Loading';
+  context.rowData = [];
+  context.highlighted = [];
+  context.putRowIds = [];
+  context.undoStack = [];
+  context.summaries = [];
+  context.errors = [];
+  context.pendingPasteUndo = [];
+  context.pasteMode = false;
 };
 
 const defaultSideBar = {
@@ -264,6 +275,26 @@ const DataSheetView = ({jobId, onIngest}) => {
       });
     }
 
+    const cloneRow = (clearData) => {
+      const [cells] = e.api.getCellRanges();
+      const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
+      const data = rowData.find((d) => d.id == row.data.id);
+      const newId = +new Date().valueOf();
+      const posMap = rowData.map((r) => r.pos).sort((a, b) => a - b);
+      const currentPosIdx = posMap.findIndex((p) => p == data.pos);
+      let newData = {};
+      Object.keys(data).forEach(function (key) {
+        newData[key] = clearData ? '' : data[key];
+      });
+      delete newData.errors;
+      newData.pos = posMap[currentPosIdx + 1] ? posMap[currentPosIdx + 1] - 1 : posMap[currentPosIdx] + 1000;
+      newData.id = newId;
+      pushUndo(e.api, [{id: newId}]);
+      rowData.push(newData);
+      e.api.setRowData(rowData);
+      e.api.refreshCells();
+    };
+
     const multiRowsSelected = e.api.getSelectedRows().length > 1 || cells.startRow.rowIndex !== cells.endRow.rowIndex;
     if (!multiRowsSelected && Object.keys(e.api.getFilterModel()).length < 1) {
       if (items.length > 0) items.push('separator');
@@ -273,17 +304,11 @@ const DataSheetView = ({jobId, onIngest}) => {
       });
       items.push({
         name: 'Clone Row',
-        action: () => {
-          const [cells] = e.api.getCellRanges();
-          const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
-          const data = rowData.find((d) => d.id == row.data.id);
-          const newId = +new Date().valueOf();
-          const newData = {...data, id: newId, pos: data.pos + 1};
-          pushUndo(e.api, [{id: newId}]);
-          rowData.push(newData);
-          e.api.setRowData(rowData);
-          e.api.refreshCells();
-        }
+        action: () => cloneRow(false)
+      });
+      items.push({
+        name: 'Insert Row',
+        action: () => cloneRow(true)
       });
     } else {
       if (items.length > 0) items.push('separator');
@@ -366,6 +391,7 @@ const DataSheetView = ({jobId, onIngest}) => {
   };
 
   const reload = (api, jobId, completion) => {
+    resetContext();
     getDataJob(jobId).then((res) => {
       const job = {
         program: res.data.job.program.programName,
@@ -392,6 +418,7 @@ const DataSheetView = ({jobId, onIngest}) => {
 
   const onGridReady = (p) => {
     setGridApi(p.api);
+
     reload(p.api, jobId, (job) => {
       setState(IngestState.Edited);
       setJob(job);
@@ -550,7 +577,7 @@ const DataSheetView = ({jobId, onIngest}) => {
               </Button>
             </Box>
             <Box p={1}>
-              <Button onClick={handleSaveAndValidate} startIcon={<PlaylistAddCheckOutlinedIcon />}>
+              <Button disabled={state === IngestState.Loading} onClick={handleSaveAndValidate} startIcon={<PlaylistAddCheckOutlinedIcon />}>
                 {`Save & Validate`}
               </Button>
             </Box>

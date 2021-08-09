@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Id;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
@@ -18,11 +19,11 @@ public class SiteDto {
     @Schema(title = "Id", accessMode = Schema.AccessMode.READ_ONLY)
     private Integer siteId;
 
-    @NotNull(message = "Site Code is required")
+    @NotEmpty(message = "Site Code is required")
     @Schema(title = "Site Code")
     private String siteCode;
 
-    @NotNull(message = "Site Name is required")
+    @NotEmpty(message = "Site Name is required")
     @Schema(title = "Site Name")
     private String siteName;
 
@@ -34,11 +35,11 @@ public class SiteDto {
     @Schema(title = "Latitude")
     private Float latitude;
 
-    @NotNull(message = "State is required")
+    @NotEmpty(message = "State is required")
     @Schema(title = "State")
     private String state;
 
-    @NotNull(message = "Country is required")
+    @NotEmpty(message = "Country is required")
     @Schema(title = "Country")
     private String country;
 

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
@@ -17,8 +18,18 @@ public class ValidationResultSet {
     Map<String, ValidationError> errorMap = new HashMap<String, ValidationError>();
 
     public void addGlobal(Collection<ValidationRow> validationRows) {
-        for (ValidationRow validationRow : validationRows)
-            errorMap.put(validationRow.getKey(), new ValidationError(ValidationCategory.DATA, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
+        for (ValidationRow validationRow : validationRows) {
+            ValidationError value = errorMap.getOrDefault(validationRow.getMessage(), new ValidationError(ValidationCategory.GLOBAL, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
+            if (value != null) {
+                value.getRowIds().addAll(validationRow.getRowIds());
+                value.setRowIds(value.getRowIds().stream().distinct().collect(Collectors.toList()));
+            }
+            errorMap.put(validationRow.getKey(), value);
+        }
+    }
+
+    public void add(Long id, ValidationLevel validationLevel, String column, String message, Boolean groupInRow) {
+        add(id, ValidationCategory.DATA, validationLevel, column, message, groupInRow);
     }
 
     public void add(Long id, ValidationLevel validationLevel, String column, String message) {

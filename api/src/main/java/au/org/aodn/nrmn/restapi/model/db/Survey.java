@@ -54,7 +54,7 @@ public class Survey {
     @Basic
     @Column(name = "visibility")
     @Schema(title = "Visibility")
-    private Integer visibility;
+    private Double visibility;
 
     @Basic
     @Column(name = "direction")

@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -193,22 +194,22 @@ public class SurveyIngestionService {
         return observations;
     }
 
-    public Map<String, List<StagedRowFormatted>> groupRowsBySurveyMethod(List<StagedRowFormatted> surveyRows) {
+    public Map<String, List<StagedRowFormatted>> groupRowsBySurvey(List<StagedRowFormatted> surveyRows) {
         return surveyRows.stream().map(r -> {
             if (r.getSpecies().isPresent() && r.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_DEBRIS)
                 r.setMethod(METHOD_M12);
             return r;
-        }).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyName));
+        }).filter(r -> r.getSurvey() != null).collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
     }
 
     @Transactional
-    public void ingestTransaction(StagedJob job, List<StagedRowFormatted> validatedRows) {
+    public void ingestTransaction(StagedJob job, Collection<StagedRowFormatted> validatedRows) {
 
-        Map<String, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getTransectName));
+        Map<String, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
 
         List<Integer> surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
             Survey survey = getSurvey(surveyRows.get(0));
-            groupRowsBySurveyMethod(surveyRows).values().forEach(surveyMethodRows -> {
+            groupRowsBySurvey(surveyRows).values().forEach(surveyMethodRows -> {
                 SurveyMethod surveyMethod = getSurveyMethod(survey, surveyMethodRows.get(0));
                 surveyMethodRows.forEach(row -> observationRepository
                         .saveAll(getObservations(surveyMethod, row, job.getIsExtendedSize())));

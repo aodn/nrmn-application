@@ -4,6 +4,7 @@ import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistance;
 import static au.org.aodn.nrmn.restapi.util.TimeUtils.parseDate;
 import static au.org.aodn.nrmn.restapi.util.TimeUtils.parseTime;
 
+import java.sql.Time;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -12,8 +13,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,20 +46,41 @@ public class SurveyEditService {
     DiverRepository diverRepository;
 
     @Autowired
+    ProgramRepository programRepository;
+
+    @Autowired
     ModelMapper mapper;
 
     public Survey updateSurvey(SurveyDto surveyDto) {
 
         Survey survey = surveyRepository.findById(surveyDto.getSurveyId()).orElseThrow(ResourceNotFoundException::new);
 
-        mapper.map(surveyDto, survey);
+        survey.setVisibility(surveyDto.getLongitude() != null ? Double.valueOf(surveyDto.getVisibility()) : null);
+        survey.setDirection(surveyDto.getDirection());
+        survey.setLongitude(surveyDto.getLongitude() != null ? Double.valueOf(surveyDto.getLongitude()) : null);
+        survey.setLatitude(surveyDto.getLongitude() != null ? Double.valueOf(surveyDto.getLatitude()) : null);
 
         Site site = siteRepository.findBySiteCode(surveyDto.getSiteCode());
-        site.setSiteName(surveyDto.getSiteName());
+        if(!site.getSiteName().equals(surveyDto.getSiteName())) {
+            site.setSiteName(surveyDto.getSiteName());
+            siteRepository.save(site);
+        }
         survey.setSite(site);
+
+        survey.setProgram(programRepository.findById(surveyDto.getProgramId()).orElseThrow(ResourceNotFoundException::new));
+        survey.setBlockAbundanceSimulated(surveyDto.getBlockAbundanceSimulated());
+        survey.setSurveyDate(parseDate(surveyDto.getSurveyDate()));
+        survey.setSurveyTime(Time.valueOf(parseTime(surveyDto.getSurveyTime()).get()));
+        survey.setDepth(Integer.valueOf(surveyDto.getDepth()));
+        survey.setSurveyNum(surveyDto.getSurveyNum());
 
         Diver pqDiver = diverRepository.findByCriteria(surveyDto.getPqDiverInitials()).get(0);
         survey.setPqDiverId(pqDiver.getDiverId());
+
+        survey.setProjectTitle(surveyDto.getProjectTitle());
+        survey.setProtectionStatus(surveyDto.getProtectionStatus());
+        survey.setInsideMarinePark(surveyDto.getInsideMarinePark());
+        survey.setNotes(surveyDto.getNotes());
 
         return survey;
     }
@@ -94,6 +118,17 @@ public class SurveyEditService {
                     "The survey time must be in the format hh:mm[:ss]"));
         }
 
+        // Visibility validation
+        if (!StringUtils.isBlank(surveyDto.getVisibility())) {
+            Double vis = NumberUtils.toDouble(surveyDto.getVisibility(), Double.NEGATIVE_INFINITY);
+            if (vis < 0) {
+                errors.add(new ValidationError("Survey", "visibility", surveyDto.getVisibility(), (vis == Double.NEGATIVE_INFINITY) ? "Vis is not a decimal" : "Vis is not positive"));
+            } else {
+                if(vis.toString().split("\\.")[1].length() > 1)
+                    errors.add(new ValidationError("Survey", "visibility", surveyDto.getVisibility(), "Vis is more than one decimal place"));
+            }
+        }
+
         // Commented out as it is unclear how to validate the site name matching the site code as there is no unique
         // site name constraint nor a way to determine if it is a valid change.
 
@@ -129,13 +164,12 @@ public class SurveyEditService {
         }
 
         boolean hasValidCoords = lat != null && lon != null && !lat.isNaN() && !lon.isNaN();
-        if(hasValidCoords && getDistance(lat, lon, surveyDtoSite.getLatitude(), surveyDtoSite.getLongitude()) > 0.2){
+        double dist = hasValidCoords ? getDistance(lat, lon, surveyDtoSite.getLatitude(), surveyDtoSite.getLongitude()) : 0;
+        if(dist > 0.2){
             errors.add(new ValidationError("Survey", "latitude", surveyDto.getLatitude(),
-                    String.format("The survey coordinates are not within 200m of the site. The sites latitude: %s",
-                            surveyDtoSite.getLatitude())));
+                    String.format("Coordinates are further than 0.2km from the Site (%.2fkm)", dist)));
             errors.add(new ValidationError("Survey", "longitude", surveyDto.getLongitude(),
-                    String.format("The survey coordinates are not within 200m of the site. The sites longitude: %s",
-                            surveyDtoSite.getLongitude())));
+                    String.format("Coordinates are further than 0.2km from the Site (%.2fkm)", dist)));
         }
 
         if(lat != null && !lat.isNaN() && (lat < -90 || lat > 90) ) {

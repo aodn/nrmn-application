@@ -15,11 +15,6 @@ const AuthState = () => {
   const loggedIn = Date.now() < expires;
   const dispatch = useDispatch();
 
-  const handleLogout = () => {
-    localStorage.clear();
-    dispatch(logoutSubmitted());
-  };
-
   if (!loggedIn) {
     return (
       <Button
@@ -53,7 +48,7 @@ const AuthState = () => {
           text="Do you want to log out?"
           action="Log Out"
           onClose={() => showConfirmLogout(false)}
-          onConfirm={handleLogout}
+          onConfirm={() => dispatch(logoutSubmitted())}
         />
       </>
     );

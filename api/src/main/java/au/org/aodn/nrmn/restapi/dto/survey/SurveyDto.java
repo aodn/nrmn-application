@@ -13,7 +13,7 @@ public class SurveyDto {
     @Schema(title = "Survey ID", accessMode = Schema.AccessMode.READ_ONLY)
     private Integer surveyId;
 
-    @Schema(title = "Site Name")
+    @Schema(title = "Site Name", accessMode = Schema.AccessMode.READ_ONLY)
     private String siteName;
 
     @Schema(title = "Site Code")
@@ -21,6 +21,9 @@ public class SurveyDto {
     
     @Schema(title = "Program")
     private String program;
+
+    @Schema(title = "Program ID")
+    private Integer programId;
 
     @Schema(title = "Survey Date")
     private String surveyDate;

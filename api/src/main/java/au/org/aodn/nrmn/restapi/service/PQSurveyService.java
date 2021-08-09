@@ -35,10 +35,7 @@ public class PQSurveyService {
         logger.info("Starting update of survey PQ zip files");
 
         String responseJson = rlsClient.get().uri(uriBuilder -> uriBuilder.path("/pq/survey_ids/").build())
-                .exchange()
-                .block()
-                .bodyToMono(String.class)
-                .block();
+                .exchangeToMono(response -> response.bodyToMono(String.class)).block();
 
         JsonNode jsonNode = null;
         try {
@@ -51,7 +48,7 @@ public class PQSurveyService {
 
         HashMap<Integer, String> surveyZipUrls = new HashMap<>();
 
-        if(jsonNode != null) {
+        if (jsonNode != null) {
             jsonNode.get("results").forEach(survey -> {
                 Integer surveyId = survey.get("survey_id").asInt();
                 String zipUrl = survey.get("urls").get(2).get("zip").asText();
@@ -59,11 +56,12 @@ public class PQSurveyService {
             });
         }
 
-        List<Survey> updatedSurveys = surveyRepository.findSurveysWithoutPQ(new ArrayList<Integer>(surveyZipUrls.keySet())).stream().map(survey -> {
-            survey.setPqCatalogued(true);
-            survey.setPqZipUrl(surveyZipUrls.get(survey.getSurveyId()));
-            return survey;
-        }).collect(Collectors.toList());
+        List<Survey> updatedSurveys = surveyRepository
+                .findSurveysWithoutPQ(new ArrayList<Integer>(surveyZipUrls.keySet())).stream().map(survey -> {
+                    survey.setPqCatalogued(true);
+                    survey.setPqZipUrl(surveyZipUrls.get(survey.getSurveyId()));
+                    return survey;
+                }).collect(Collectors.toList());
 
         surveyRepository.saveAll(updatedSurveys);
 
