@@ -280,7 +280,7 @@ const DataSheetView = ({jobId, onIngest}) => {
       const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
       const data = rowData.find((d) => d.id == row.data.id);
       const newId = +new Date().valueOf();
-      const posMap = rowData.map((r) => r.pos).sort();
+      const posMap = rowData.map((r) => r.pos).sort((a, b) => a - b);
       const currentPosIdx = posMap.findIndex((p) => p == data.pos);
       let newData = {};
       Object.keys(data).forEach(function (key) {
