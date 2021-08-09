@@ -60,16 +60,6 @@ const EntityList = (props) => {
   }, [dispatch, props.entity]);
 
   let items = entities?._embedded ? entities?._embedded[props.entity.list.key] : entities;
-  useEffect(() => {
-    if (agGridApi && agGridColumnApi) {
-      let allColumnIds = [];
-      agGridColumnApi.getAllColumns().forEach(function (column) {
-        if (props.entity.flexField !== column.colId && column.colId !== '0') allColumnIds.push(column.colId);
-      });
-      agGridColumnApi.autoSizeColumns(allColumnIds, false);
-      agGridApi.setFilterModel(restoreFilterModel(props.entity.name));
-    }
-  }, [agGridApi, agGridColumnApi, items, props.entity]);
 
   const schematoColDef = (schema, entity) => {
     const fields = entity.list.headers ?? Object.keys(schema.properties);
@@ -145,7 +135,13 @@ const EntityList = (props) => {
     setAgGridApi(agGrid.api);
     setAgGridColumnApi(agGrid.columnApi);
     agGrid.api.showLoadingOverlay();
-    agGrid.api.setSortModel(props.entity.list.initialSortModel);
+  };
+
+  const onFirstDataRendered = (agGrid) => {
+    setTimeout(() => {
+      agGridColumnApi.autoSizeColumns();
+      agGrid.api.setFilterModel(restoreFilterModel(props.entity.name));
+    }, 25);
   };
 
   const [dialogState, setDialogState] = useState({open: false});
@@ -230,6 +226,7 @@ const EntityList = (props) => {
           rowSelection="single"
           rowData={items}
           onGridReady={agGridReady}
+          onFirstDataRendered={onFirstDataRendered}
           onFilterChanged={(e) => {
             const filterModel = e.api.getFilterModel();
             saveFilterModel(props.entity.name, filterModel);
