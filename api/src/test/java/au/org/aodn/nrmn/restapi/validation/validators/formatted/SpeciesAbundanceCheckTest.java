@@ -1,15 +1,33 @@
 package au.org.aodn.nrmn.restapi.validation.validators.formatted;
 
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
-// import au.org.aodn.nrmn.restapi.validation.validators.row.formatted.SpeciesAbundanceCheck;
+import au.org.aodn.nrmn.restapi.validation.process.ValidationProcess;
 import lombok.val;
-import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Collection;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
+
+    @InjectMocks
+    ValidationProcess validationProcess;
+
+    @BeforeEach
+    void init() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     UiSpeciesAttributes specAttribute = new UiSpeciesAttributes(){
         @Override
@@ -59,9 +77,8 @@ class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
         formatted.setSpeciesAttributesOpt(Optional.of(specAttribute));
         formatted.setTotal(20);
         formatted.setMethod(1);
-        // val validationRule = new SpeciesAbundanceCheck();
-        // val res = validationRule.valid(formatted);
-        // assertTrue(res.isValid());
+        Collection<ValidationError> errors = validationProcess.validateAbundance(formatted, specAttribute);
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -70,19 +87,16 @@ class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
         formatted.setSpeciesAttributesOpt(Optional.of(specAttribute));
         formatted.setTotal(31);
         formatted.setMethod(1);
-        // val validationRule = new SpeciesAbundanceCheck();
-        // val res = validationRule.valid(formatted);
-        // assertTrue(res.isInvalid());
+        Collection<ValidationError> errors = validationProcess.validateAbundance(formatted, specAttribute);
+        assertTrue(!errors.isEmpty());
     }
     @Test
     public void outOfScopeShouldSuccess() {
         val formatted = getDefaultFormatted().build();
         formatted.setMethod(4);
         formatted.setSpeciesAttributesOpt(Optional.empty());
-
-        // val validationRule = new SpeciesAbundanceCheck();
-        // val res = validationRule.valid(formatted);
-        // assertTrue(res.isValid());
+        Collection<ValidationError> errors = validationProcess.validateAbundance(formatted, specAttribute);
+        assertTrue(errors.isEmpty());
     }
 
 
