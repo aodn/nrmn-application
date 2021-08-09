@@ -78,7 +78,7 @@ public class StagedRowFormattedMapperConfig {
         Converter<String, Integer> toSurveyNum = ctx -> {
             String[] splitDepth = ctx.getSource().split("\\.");
             try {
-                return splitDepth.length > 1 ? Integer.parseInt(splitDepth[1]) : null;
+                return splitDepth.length > 1 ? Integer.parseInt(splitDepth[1]) : 0;
             } catch (NumberFormatException e) {
                 return null;
             }
