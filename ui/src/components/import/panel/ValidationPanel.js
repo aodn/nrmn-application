@@ -80,7 +80,7 @@ const ValidationPanel = (props) => {
           const data = context.rowData.find((d) => d.id === firstRowId);
           e.rowIds.forEach((rowId) => {
             const description = data.siteCode && data.date && data.depth ? `${data.siteCode}/${data.date}/${data.depth} ...` : '...';
-            duplicateRowDescriptions = [{value: description, row: rowId}, ...duplicateRowDescriptions];
+            duplicateRowDescriptions = [...duplicateRowDescriptions, {value: description, row: rowId}];
           });
         });
       const duplicateRows =
@@ -103,8 +103,8 @@ const ValidationPanel = (props) => {
       focusCell(props.api, item.columnNames || [item.columnName], item.rowIds);
     } else if (item.row) {
       props.api.setFilterModel(null);
-      const rowIdx = props.api.gridOptionsWrapper.gridOptions.context.rowData.findIndex((r) => r.id === item.row);
-      props.api.ensureIndexVisible(rowIdx, 'middle');
+      const row = props.api.gridOptionsWrapper.gridOptions.context.rowData.find((r) => r.id === item.row);
+      props.api.ensureNodeVisible(row, 'middle');
     }
     props.api.redrawRows();
   };
