@@ -275,6 +275,26 @@ const DataSheetView = ({jobId, onIngest}) => {
       });
     }
 
+    const cloneRow = (clearData) => {
+      const [cells] = e.api.getCellRanges();
+      const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
+      const data = rowData.find((d) => d.id == row.data.id);
+      const newId = +new Date().valueOf();
+      const posMap = rowData.map((r) => r.pos).sort();
+      const currentPosIdx = posMap.findIndex((p) => p == data.pos);
+      let newData = {};
+      Object.keys(data).forEach(function (key) {
+        newData[key] = clearData ? '' : data[key];
+      });
+      delete newData.errors;
+      newData.pos = posMap[currentPosIdx + 1] ? posMap[currentPosIdx + 1] - 1 : posMap[currentPosIdx] + 1000;
+      newData.id = newId;
+      pushUndo(e.api, [{id: newId}]);
+      rowData.push(newData);
+      e.api.setRowData(rowData);
+      e.api.refreshCells();
+    };
+
     const multiRowsSelected = e.api.getSelectedRows().length > 1 || cells.startRow.rowIndex !== cells.endRow.rowIndex;
     if (!multiRowsSelected && Object.keys(e.api.getFilterModel()).length < 1) {
       if (items.length > 0) items.push('separator');
@@ -284,17 +304,11 @@ const DataSheetView = ({jobId, onIngest}) => {
       });
       items.push({
         name: 'Clone Row',
-        action: () => {
-          const [cells] = e.api.getCellRanges();
-          const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
-          const data = rowData.find((d) => d.id == row.data.id);
-          const newId = +new Date().valueOf();
-          const newData = {...data, id: newId, pos: data.pos + 1};
-          pushUndo(e.api, [{id: newId}]);
-          rowData.push(newData);
-          e.api.setRowData(rowData);
-          e.api.refreshCells();
-        }
+        action: () => cloneRow(false)
+      });
+      items.push({
+        name: 'Insert Row',
+        action: () => cloneRow(true)
       });
     } else {
       if (items.length > 0) items.push('separator');

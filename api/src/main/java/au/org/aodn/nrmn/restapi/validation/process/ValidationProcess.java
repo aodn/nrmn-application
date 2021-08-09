@@ -620,7 +620,7 @@ public class ValidationProcess {
         Collection<StagedRowFormatted> validRows = formatRowsWithSpecies(rows, species);
 
         if (validRows != null) {
-            Object[] distinctSites = validRows.stream().map(r -> r.getSite().getSiteCode()).distinct().toArray();
+            Object[] distinctSites = validRows.stream().map(r ->r.getSite() != null ? r.getSite().getSiteCode() : null).filter(s -> s!= null).distinct().toArray();
             response.setRowCount(validRows.size());
             response.setSiteCount(distinctSites.length);
             response.setDiverCount(validRows.stream().map(r -> r.getDiver()).distinct().count());

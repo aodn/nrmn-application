@@ -78,11 +78,9 @@ const ValidationPanel = (props) => {
         .forEach((e) => {
           const firstRowId = e.rowIds[0];
           const data = context.rowData.find((d) => d.id === firstRowId);
-          e.rowIds.forEach(() => {
-            duplicateRowDescriptions = [
-              {value: `${data.siteCode}/${data.date}/${data.depth} ...`, row: firstRowId},
-              ...duplicateRowDescriptions
-            ];
+          e.rowIds.forEach((rowId) => {
+            const description = data.siteCode && data.date && data.depth ? `${data.siteCode}/${data.date}/${data.depth} ...` : '...';
+            duplicateRowDescriptions = [{value: description, row: rowId}, ...duplicateRowDescriptions];
           });
         });
       const duplicateRows =
