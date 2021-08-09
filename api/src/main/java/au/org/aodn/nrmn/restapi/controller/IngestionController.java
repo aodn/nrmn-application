@@ -3,12 +3,10 @@ package au.org.aodn.nrmn.restapi.controller;
 import java.util.Collection;
 import java.util.Optional;
 
+import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
@@ -51,6 +49,8 @@ public class IngestionController {
     @Autowired
     private ValidationProcess validation;
 
+    @Autowired
+    private MaterializedViewService materializedViewService;
     
     @PostMapping(path = "ingest/{job_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
@@ -75,6 +75,7 @@ public class IngestionController {
             Collection<ObservableItem> species = validation.getSpeciesForRows(rows);
             Collection<StagedRowFormatted> validatedRows = validation.formatRowsWithSpecies(rows, species);
             surveyIngestionService.ingestTransaction(job, validatedRows);
+            materializedViewService.refreshAllMaterializedViews();
         } catch (Exception e) {
             stagedJobLogRepository.save(StagedJobLog.builder().stagedJob(job).details(e.getMessage())
                     .eventType(StagedJobEventType.ERROR).build());
