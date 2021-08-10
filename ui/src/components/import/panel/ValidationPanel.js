@@ -62,13 +62,13 @@ const generateErrorSummary = (ctx, e) => {
 
 const ValidationPanel = (props) => {
   const context = props.api.gridOptionsWrapper.gridOptions.context;
-  const errors = context.errors;
 
   const [errorList, setErrorList] = useState({blocking: {}, warning: {}, duplicateRows: {}});
   const [info, setInfo] = useState({});
 
   useEffect(() => {
     setInfo(context.summary);
+    const errors = context.errors;
     if (errors && errors.length > 0) {
       const blocking = generateErrorTree(context, errors, 'BLOCKING');
       const warning = generateErrorTree(context, errors, 'WARNING');
@@ -96,7 +96,7 @@ const ValidationPanel = (props) => {
           : {};
       setErrorList({blocking, warning, duplicateRows});
     }
-  }, [errors, context]);
+  }, [context]);
 
   const handleItemClick = (item) => {
     if (item.rowIds) {

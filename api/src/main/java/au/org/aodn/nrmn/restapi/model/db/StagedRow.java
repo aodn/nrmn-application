@@ -14,8 +14,6 @@ import javax.persistence.*;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -120,7 +118,10 @@ public class StagedRow implements Serializable {
     @Setter(AccessLevel.NONE)
     private Timestamp lastUpdated;
 
-    @Transient
-    @Builder.Default
-    private List<StagedRowError> errors = new ArrayList<>();
+    public String getContentsHash() {
+        // String measurements = measureJson.entrySet().stream().map(m -> m.getValue().length() > 0 ? m.getKey().toString() + ":" + m.getValue() + "|" : "").reduce("", (a, b) -> a + b);
+        String rowContents = siteCode + date + diver + depth + method + block + species + buddy + siteName + longitude + latitude + vis + time + direction + pqs + code + commonName + total + inverts + isInvertSizing; // + measurements;
+        return Integer.toString(rowContents.hashCode());
+    }
+
 }
