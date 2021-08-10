@@ -149,7 +149,7 @@ public class ValidationProcess {
                 Optional<ObservableItem> observableItem = species.stream().filter(s -> row.getSpecies().equalsIgnoreCase(s.getObservableItemName())).findAny();
                 if (observableItem.isPresent()) {
                     String supersededBy = observableItem.get().getSupersededBy();
-                    if (supersededBy != null && supersededBy.length() > 0)
+                    if (supersededBy != null && supersededBy.trim().length() > 0)
                         errors.add(rowId, ValidationLevel.WARNING, "species", "Superseded by " + supersededBy);
                 } else {
                     errors.add(rowId, ValidationLevel.BLOCKING, "species", "Species does not exist");
