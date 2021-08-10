@@ -1,9 +1,8 @@
 package au.org.aodn.nrmn.restapi.repository;
 
-import au.org.aodn.nrmn.restapi.model.db.AphiaRef;
+import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
@@ -11,7 +10,7 @@ import javax.transaction.Transactional;
 
 @Transactional
 @Tag(name = "materialized views")
-public interface MaterializedViewsRepository extends JpaRepository<AphiaRef, Integer>, JpaSpecificationExecutor<AphiaRef> {
+public interface MaterializedViewsRepository extends JpaRepository<ObservableItem, Integer> {
 
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW CONCURRENTLY nrmn.ep_m1'", nativeQuery = true)
     Boolean checkEpM1Running();

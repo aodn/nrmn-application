@@ -370,3 +370,6 @@ CREATE SEQUENCE IF NOT EXISTS nrmn.staged_job_log_id_seq;
 CREATE SEQUENCE IF NOT EXISTS nrmn.user_id_seq;
 
 ALTER SEQUENCE nrmn.staged_row_id_seq INCREMENT BY 100;
+
+CREATE UNIQUE INDEX idx_unique_ep_rarity_frequency_taxon ON nrmn.ep_rarity_frequency(taxon);
+CREATE UNIQUE INDEX idx_unique_ep_m1 ON nrmn.ep_m1(survey_id, recorded_species_name, size_class, block, "method", diver);
