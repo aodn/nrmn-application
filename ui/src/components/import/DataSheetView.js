@@ -80,7 +80,7 @@ const context = {
   highlighted: [],
   putRowIds: [],
   undoStack: [],
-  summaries: [],
+  summary: [],
   errors: [],
   pushUndo: pushUndo,
   popUndo: popUndo,
@@ -97,7 +97,7 @@ const resetContext = () => {
   context.highlighted = [];
   context.putRowIds = [];
   context.undoStack = [];
-  context.summaries = [];
+  context.summary = [];
   context.errors = [];
   context.pendingPasteUndo = [];
   context.pasteMode = false;
