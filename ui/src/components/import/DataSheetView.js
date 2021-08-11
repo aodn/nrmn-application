@@ -292,11 +292,17 @@ const DataSheetView = ({jobId, onIngest}) => {
       pushUndo(e.api, [{id: newId}]);
       rowData.push(newData);
       e.api.setRowData(rowData);
-      e.api.refreshCells();
+      const values = e.api.getRenderedNodes().reduce((acc, field) => acc.concat(field.id.toString()), [newId.toString()]);
+      e.api.setFilterModel({
+        id: {
+          type: 'set',
+          values: values
+        }
+      });
     };
 
     const multiRowsSelected = e.api.getSelectedRows().length > 1 || cells.startRow.rowIndex !== cells.endRow.rowIndex;
-    if (!multiRowsSelected && Object.keys(e.api.getFilterModel()).length < 1) {
+    if (!multiRowsSelected) {
       if (items.length > 0) items.push('separator');
       items.push({
         name: 'Delete Row',
