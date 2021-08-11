@@ -197,14 +197,18 @@ public class StagedJobController {
                 .map(job -> ResponseEntity.ok().body(new JobResponse(job, rows, Collections.emptyList())))
                 .orElseGet(() -> ResponseEntity.badRequest().body(new JobResponse(null, Collections.emptyList(),
                         Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob")))));
-
     }
 
     @DeleteMapping("/delete/{jobId}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<Object> deleteJob(@PathVariable Long jobId) {
-        jobRepo.deleteById(jobId);
-        return ResponseEntity.ok().build();
+        StagedJob job = jobRepo.getOne(jobId);
+        if(job != null && job.getStatus() != StatusJobType.INGESTED) {
+            jobRepo.deleteById(jobId);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
+        }
     }
 
     @PutMapping("/job/{jobId}")

@@ -38,11 +38,13 @@ const JobList = () => {
 
   const ActionCell = (params) => {
     return (
-      <Tooltip title="Delete">
-        <IconButton name="delete" onClick={() => setDeleteJobId(params.row.id)}>
-          <Delete />
-        </IconButton>
-      </Tooltip>
+      params.row.status !== 'INGESTED' && (
+        <Tooltip title="Delete">
+          <IconButton name="delete" onClick={() => setDeleteJobId(params.row.id)}>
+            <Delete />
+          </IconButton>
+        </Tooltip>
+      )
     );
   };
 
