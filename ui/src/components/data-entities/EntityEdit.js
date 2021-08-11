@@ -44,7 +44,8 @@ const EntityEdit = ({entity, template, clone}) => {
       const data = {path: `${entity.endpoint}/${params.id}`, data: e.formData};
       dispatch(updateEntityRequested(data));
     } else {
-      if (e.formData.siteAttribute) e.formData.siteAttribute = null;
+      delete e.formData.siteAttribute;
+      delete e.formData.oldSiteCodes;
       const data = {path: entity.endpoint, data: e.formData};
       dispatch(createEntityRequested(data));
     }
@@ -159,7 +160,7 @@ const EntityEdit = ({entity, template, clone}) => {
         'ui:field': 'autostring',
         route: 'species/taxonomyDetail',
         entity: 'phylum',
-        listOnly: true    // Tells input to treat this custom endpoint - Avoids using @RestResource style payloads
+        listOnly: true // Tells input to treat this custom endpoint - Avoids using @RestResource style payloads
       };
     } else if (key === 'class') {
       uiSchema[key] = {
