@@ -78,6 +78,9 @@ const SurveyViewTemplate = (props) => {
             {el['pqDiver']}
           </Grid>
           <Grid item xs={6}>
+            {el['pqZipUrl']}
+          </Grid>
+          <Grid item xs={6}>
             {el['blockAbundanceSimulated']}
           </Grid>
           <Grid item xs={6}>
