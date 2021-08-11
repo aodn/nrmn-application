@@ -45,7 +45,6 @@ const EntityEdit = ({entity, template, clone}) => {
       dispatch(updateEntityRequested(data));
     } else {
       delete e.formData.siteAttribute;
-      delete e.formData.oldSiteCodes;
       const data = {path: entity.endpoint, data: e.formData};
       dispatch(createEntityRequested(data));
     }

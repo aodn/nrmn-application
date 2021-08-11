@@ -42,6 +42,9 @@ const SiteAddTemplate = (props) => {
         <Grid item xs={6}>
           {el['protectionStatus']}
         </Grid>
+        <Grid item xs={12}>
+          {el['oldSiteCodes']}
+        </Grid>
       </Grid>
     </Box>
   );
