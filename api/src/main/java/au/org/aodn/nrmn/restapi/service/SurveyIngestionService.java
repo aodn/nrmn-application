@@ -113,7 +113,7 @@ public class SurveyIngestionService {
                 Survey.builder()
                         .depth(stagedRow.getDepth())
                         .surveyNum(stagedRow.getSurveyNum())
-                        .direction(stagedRow.getDirection().toString())
+                        .direction(stagedRow.getDirection() != null ? stagedRow.getDirection().toString() : null)
                         .site(site).surveyDate(Date.valueOf(stagedRow.getDate()))
                         .surveyTime(Time.valueOf(stagedRow.getTime().orElse(LocalTime.NOON)))
                         .visibility(stagedRow.getVis().orElse(null))
