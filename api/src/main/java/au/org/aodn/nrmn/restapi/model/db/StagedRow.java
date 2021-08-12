@@ -1,20 +1,38 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Map;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import lombok.*;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
-
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.Map;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -35,25 +53,30 @@ public class StagedRow implements Serializable {
     private Long id;
 
     @Column(name = "site_no")
-    private String siteCode;
+    @Builder.Default
+    private String siteCode = "";
 
     @Column(name = "date")
-    private String date;
+    @Builder.Default
+    private String date = "";
 
     @Column(name = "diver")
     private String diver;
 
     @Column(name = "depth")
-    private String depth;
+    @Builder.Default
+    private String depth = "";
 
     @Column(name = "method")
     private String method;
 
     @Column(name = "block")
-    private String block;
+    @Builder.Default
+    private String block = "";
 
     @Column(name = "species")
-    private String species;
+    @Builder.Default
+    private String species = "";
 
     @Column(name = "buddy")
     private String buddy;
@@ -68,10 +91,12 @@ public class StagedRow implements Serializable {
     private String latitude;
 
     @Column(name = "vis")
-    private String vis;
+    @Builder.Default
+    private String vis = "";
 
     @Column(name = "time")
-    private String time;
+    @Builder.Default
+    private String time = "";
 
     @Column(name = "direction")
     private String direction;
