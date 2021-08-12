@@ -70,8 +70,8 @@ public class StagedRowFormattedMapperConfig {
             }
         };
 
-        Converter<String, Optional<Integer>> toVis = ctx -> {
-            Integer vis = NumberUtils.toInt(ctx.getSource(), Integer.MIN_VALUE);
+        Converter<String, Optional<Double>> toVis = ctx -> {
+            Double vis = NumberUtils.toDouble(ctx.getSource(), Double.MIN_VALUE);
             return (vis == Integer.MIN_VALUE) ? Optional.of(vis) : Optional.empty();
         };
 
