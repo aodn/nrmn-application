@@ -22,7 +22,8 @@ public class StagedRowFormatted {
 
     private LocalDate date;
 
-    private Optional<LocalTime> time;
+    @Builder.Default
+    private Optional<LocalTime> time = Optional.empty();
 
     private Diver diver;
 
@@ -36,9 +37,11 @@ public class StagedRowFormatted {
 
     private Integer block;
 
-    private Optional<ObservableItem> species;
+    @Builder.Default
+    private Optional<ObservableItem> species = Optional.empty();
 
-    private Optional<Double> vis;
+    @Builder.Default
+    private Optional<Double> vis = Optional.empty();
 
     private Directions direction;
 
@@ -58,7 +61,8 @@ public class StagedRowFormatted {
 
     private Map<Integer, Integer> measureJson;
 
-    private Optional<UiSpeciesAttributes> speciesAttributesOpt;
+    @Builder.Default
+    private Optional<UiSpeciesAttributes> speciesAttributesOpt = Optional.empty();
 
     public boolean isDuplicateOf(Object o) {
         if (this == o) return true;
