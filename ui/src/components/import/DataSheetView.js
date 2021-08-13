@@ -68,6 +68,7 @@ const popUndo = (api) => {
       }
     }
   }
+  context.fullRefresh = true;
   api.setRowData(rowData);
 };
 
@@ -82,6 +83,7 @@ const context = {
   undoStack: [],
   summary: [],
   errors: [],
+  fullRefresh: false,
   pushUndo: pushUndo,
   popUndo: popUndo,
 
@@ -186,7 +188,6 @@ const DataSheetView = ({jobId, onIngest}) => {
     context.useOverlay = 'Saving';
     gridApi.showLoadingOverlay();
     const rowUpdateDtos = [];
-    let fullRefresh = false;
 
     Array.from(new Set(context.putRowIds)).forEach((rowId) => {
       const row = context.rowData.find((r) => r.id === rowId);
@@ -209,11 +210,12 @@ const DataSheetView = ({jobId, onIngest}) => {
       // to determine if we need a full reload to get the server-assigned
       // row id. A better way would be to do a full reload based on a server
       // response.
-      fullRefresh = rowId.toString().length > 10;
+      context.fullRefresh = context.fullRefresh || rowId.toString().length > 10 || row === null;
     });
     updateRows(jobId, rowUpdateDtos, () => {
-      if (fullRefresh) {
+      if (context.fullRefresh) {
         reload(gridApi, jobId, handleValidate);
+        context.fullRefresh = false;
       } else {
         handleValidate();
       }
