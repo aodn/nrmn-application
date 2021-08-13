@@ -483,7 +483,14 @@ const DataSheetView = ({jobId, onIngest}) => {
     const startIdx = Math.min(cells.startRow.rowIndex, cells.endRow.rowIndex);
     const endIdx = Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
     const delta = [];
-    if (startIdx === endIdx) {
+
+    if (startIdx === endIdx && startIdx === e.node.rowIndex) {
+      e.api.getSelectedRows().forEach(() => {
+        const data = e.node.data;
+        delta.push({...data});
+        rowData.splice(rowData.indexOf(data), 1);
+      });
+    } else if (startIdx === endIdx) {
       e.api.getSelectedRows().forEach((row) => {
         const data = rowData.find((d) => d.id === row.id);
         delta.push({...data});
