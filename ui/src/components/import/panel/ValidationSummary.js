@@ -82,7 +82,7 @@ const ValidationSummary = (props) => {
                           Check Column{d.columnNames.length > 1 ? 's' : ''} {d.columnNames.join(', ')}
                         </b>
                       ) : (
-                        <b>Region contains invalid values</b>
+                        <b>Missing value</b>
                       )}
                     </Typography>
                   </div>
