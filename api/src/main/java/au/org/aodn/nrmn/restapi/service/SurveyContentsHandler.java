@@ -69,7 +69,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             if (errors.size() > 0)
                 error = String.join(". ", errors);
         } else {
-            if (rowHasId) {
+            if (rowHasId && rowNum > 1) {
                 currentRow.setMeasureJson(new HashMap<Integer, String>(measureJson));
                 this.stagedRows.add(currentRow);
             } else {

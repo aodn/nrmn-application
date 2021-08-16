@@ -624,11 +624,11 @@ public class ValidationProcess {
         Collection<StagedRowFormatted> validRows = formatRowsWithSpecies(rows, species);
 
         if (validRows != null) {
-            Object[] distinctSites = validRows.stream().map(r ->r.getSite() != null ? r.getSite().getSiteCode() : null).filter(s -> s!= null).distinct().toArray();
+            Object[] distinctSites = validRows.stream().map(r ->r.getRef().getSiteCode().trim()).filter(s -> s!= null).distinct().toArray();
             response.setRowCount(validRows.size());
             response.setSiteCount(distinctSites.length);
-            response.setDiverCount(validRows.stream().map(r -> r.getDiver()).distinct().count());
-            response.setObsItemCount(validRows.stream().map(r -> r.getSpecies()).filter(o -> o.isPresent()).distinct().count());
+            response.setDiverCount(validRows.stream().map(r -> r.getRef().getDiver().trim()).distinct().count());
+            response.setObsItemCount(validRows.stream().map(r -> r.getRef().getSpecies().trim()).distinct().count());
 
             sheetErrors.addAll(checkData(programName, job.getIsExtendedSize(), validRows));
 
