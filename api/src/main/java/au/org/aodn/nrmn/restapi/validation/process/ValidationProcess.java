@@ -141,8 +141,11 @@ public class ValidationProcess {
                 errors.add(rowId, ValidationLevel.WARNING, "buddy", "Divers " + String.join(", ", unknownBuddies) + " do not exist");
             }
 
-            if (row.getPqs() == null || !diverNames.contains(row.getPqs().toUpperCase()))
-                errors.add(rowId, ValidationLevel.WARNING, "p-qs", "Diver does not exist");
+            if (StringUtils.isBlank(row.getPqs())) {
+                errors.add(rowId, ValidationLevel.WARNING, "P-Qs", "P-Qs Diver is blank");
+            } else if(!diverNames.contains(row.getPqs().toUpperCase())) {
+                errors.add(rowId, ValidationLevel.WARNING, "P-Qs", String.format("Diver \"%s\" does not exist", row.getPqs()));
+            }
 
             // VALIDATION: Species are not superseded
             if (row.getSpecies() != null && !row.getSpecies().equalsIgnoreCase("survey not done")) {
