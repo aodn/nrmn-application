@@ -69,7 +69,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             if (errors.size() > 0)
                 error = String.join(". ", errors);
         } else {
-            if (rowHasId) {
+            if (rowHasId && rowNum > 1) {
                 currentRow.setMeasureJson(new HashMap<Integer, String>(measureJson));
                 this.stagedRows.add(currentRow);
             } else {
@@ -108,7 +108,8 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     private void setValue(String columnHeader, String formattedValue) {
         switch (columnHeader) {
             case "ID":
-                rowHasId = formattedValue.length() > 0;
+                // For now stage all rows regardless of ID
+                rowHasId = true; // formattedValue.length() > 0;
                 break;
             case "Buddy":
                 currentRow.setBuddy(formattedValue);

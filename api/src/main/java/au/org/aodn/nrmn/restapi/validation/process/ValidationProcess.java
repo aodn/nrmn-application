@@ -465,21 +465,22 @@ public class ValidationProcess {
             return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, "Method 0 must have block 0, 1 or 2",
                         method0Rows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("block"));
 
-        // VALIDATE: Both M1 and M2 present except if ATRC and has at least one method of 3,4,5,7
-        List<Integer> methods =  new ArrayList<Integer>(Arrays.asList(1,2));
-        methods.removeAll(surveyByMethod.keySet());
-        if(methods.size() > 0 && !(programName.equalsIgnoreCase("ATRC") && surveyRows.stream().filter(r -> Arrays.asList(3, 4, 5, 7).contains(r.getMethod())).count() > 0)) {
-            List<String> missingMethods = methods.stream().map(m -> m.toString()).collect(Collectors.toList());
-            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, "Survey incomplete: missing " + String.join(", ", missingMethods), 
+        // VALIDATE: Both M1, M2 present and if ATRC has M3 and at least one method of 3,4,5,7
+        List<Integer> requiredMethods = programName.equalsIgnoreCase("ATRC") ? Arrays.asList(1,2,3) : Arrays.asList(1,2);
+        List<Integer> missingMethods =  new ArrayList<Integer>(requiredMethods);
+        missingMethods.removeAll(surveyByMethod.keySet());
+        if(missingMethods.size() > 0 && !(programName.equalsIgnoreCase("ATRC") && surveyRows.stream().filter(r -> Arrays.asList(3, 4, 5, 7).contains(r.getMethod())).count() > 0)) {
+            List<String> missingMethodsList = missingMethods.stream().map(m -> m.toString()).collect(Collectors.toList());
+            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, "Survey incomplete: missing " + String.join(", ", missingMethodsList), 
                                         surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("method"));
         }
 
-        // VALIDATE: Each method has block 1,2 (RLS) or block 1 (ATRC)
-        for (Integer method : Arrays.asList(1,2)) {
+        // VALIDATE: Each method has block 1,2 (RLS) or block 1 (ATRC) except ATRC M3 which should have block 0
+        for (Integer method : Arrays.asList(1,2,3)) {
             List<StagedRowFormatted> methodRows = surveyByMethod.get(method);
             if(methodRows == null) continue;
 
-            List<Integer> blocksRequired = programName.equalsIgnoreCase("RLS") ? new ArrayList<Integer>(Arrays.asList(1,2)) : new ArrayList<Integer>(Arrays.asList(1));
+            List<Integer> blocksRequired = programName.equalsIgnoreCase("RLS") ? new ArrayList<Integer>(Arrays.asList(1,2)) : new ArrayList<Integer>(method == 3 ? Arrays.asList(0) : Arrays.asList(1));
 
             List<Integer> hasBlocks = methodRows.stream().map(r -> r.getBlock()).distinct().filter(b -> b != 0).collect(Collectors.toList());
             List<Integer> missingBlocks = blocksRequired.stream().filter(b -> !hasBlocks.contains(b)).collect(Collectors.toList());
@@ -624,11 +625,11 @@ public class ValidationProcess {
         Collection<StagedRowFormatted> validRows = formatRowsWithSpecies(rows, species);
 
         if (validRows != null) {
-            Object[] distinctSites = validRows.stream().map(r ->r.getSite() != null ? r.getSite().getSiteCode() : null).filter(s -> s!= null).distinct().toArray();
+            Object[] distinctSites = validRows.stream().map(r ->r.getRef().getSiteCode().trim()).filter(s -> s!= null).distinct().toArray();
             response.setRowCount(validRows.size());
             response.setSiteCount(distinctSites.length);
-            response.setDiverCount(validRows.stream().map(r -> r.getDiver()).distinct().count());
-            response.setObsItemCount(validRows.stream().map(r -> r.getSpecies()).filter(o -> o.isPresent()).distinct().count());
+            response.setDiverCount(validRows.stream().map(r -> r.getRef().getDiver().trim()).distinct().count());
+            response.setObsItemCount(validRows.stream().map(r -> r.getRef().getSpecies().trim()).distinct().count());
 
             sheetErrors.addAll(checkData(programName, job.getIsExtendedSize(), validRows));
 

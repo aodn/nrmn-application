@@ -77,12 +77,12 @@ public class StagedRowFormatted {
                 && Objects.equals(method, that.method)
                 && Objects.equals(species, that.species);
     }
-    
+
     public String getSurvey() {
-        return site != null && site.getSiteCode() != null && date != null && depth != null ? (site.getSiteCode() + "/" + date + "/" + depth).toUpperCase() : null;
+        return ref.getSurvey();
     }
 
     public String getSurveyGroup() {
-        return getSurvey() != null ? (getSurvey() + "." + surveyNum).toUpperCase() : null;
+        return ref.getSurveyGroup();
     }
 }
