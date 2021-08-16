@@ -476,13 +476,14 @@ public class ValidationProcess {
         }
 
         // VALIDATE: Each method has block 1,2 (RLS) or block 1 (ATRC) except ATRC M3 which should have block 0
-        for (Integer method : Arrays.asList(1,2,3)) {
+        List<Integer> methodsRequired = programName.equalsIgnoreCase("RLS") ? Arrays.asList(1,2) : Arrays.asList(1,2,3);
+        for (Integer method : methodsRequired) {
             List<StagedRowFormatted> methodRows = surveyByMethod.get(method);
             if(methodRows == null) continue;
 
             List<Integer> blocksRequired = programName.equalsIgnoreCase("RLS") ? new ArrayList<Integer>(Arrays.asList(1,2)) : new ArrayList<Integer>(method == 3 ? Arrays.asList(0) : Arrays.asList(1));
 
-            List<Integer> hasBlocks = methodRows.stream().map(r -> r.getBlock()).distinct().filter(b -> b != 0).collect(Collectors.toList());
+            List<Integer> hasBlocks = methodRows.stream().map(r -> r.getBlock()).distinct().collect(Collectors.toList());
             List<Integer> missingBlocks = blocksRequired.stream().filter(b -> !hasBlocks.contains(b)).collect(Collectors.toList());
             
             if(missingBlocks.size() > 0){
