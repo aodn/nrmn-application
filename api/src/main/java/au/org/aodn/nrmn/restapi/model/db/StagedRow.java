@@ -149,4 +149,13 @@ public class StagedRow implements Serializable {
         return Integer.toString(rowContents.hashCode());
     }
 
+    public String getSurvey() {
+        String depthPart = depth.split("\\.")[0];
+        return (siteCode.trim() + "/" + date.trim() + "/" + depthPart).toUpperCase();
+    }
+
+    public String getSurveyGroup() {
+        return (siteCode.trim() + "/" + date.trim() + "/" + depth.trim()).toUpperCase();
+    }
+
 }
