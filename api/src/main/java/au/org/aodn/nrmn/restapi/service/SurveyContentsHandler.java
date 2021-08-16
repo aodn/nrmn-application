@@ -108,7 +108,8 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     private void setValue(String columnHeader, String formattedValue) {
         switch (columnHeader) {
             case "ID":
-                rowHasId = formattedValue.length() > 0;
+                // For now stage all rows regardless of ID
+                rowHasId = true; // formattedValue.length() > 0;
                 break;
             case "Buddy":
                 currentRow.setBuddy(formattedValue);
