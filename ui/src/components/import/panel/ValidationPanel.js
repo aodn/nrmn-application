@@ -123,10 +123,6 @@ const ValidationPanel = (props) => {
               <TableCell>rows found</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>{info.siteCount}</TableCell>
-              <TableCell>distinct sites found</TableCell>
-            </TableRow>
-            <TableRow>
               <TableCell>{info.surveyCount}</TableCell>
               <TableCell>distinct surveys found</TableCell>
             </TableRow>
@@ -135,12 +131,47 @@ const ValidationPanel = (props) => {
               <TableCell>incomplete surveys found</TableCell>
             </TableRow>
             <TableRow>
+              <TableCell>{info.siteCount}</TableCell>
+              <TableCell>distinct sites found</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell></TableCell>
+              <TableCell>
+                <small>
+                  {info.newSiteCount} new site(s) found
+                  <br />
+                  <i>
+                    {info.foundSites &&
+                      Object.keys(info.foundSites).map((key, value) => {
+                        return (
+                          <div key={key}>
+                            {key} {value ? '' : '(new)'}
+                          </div>
+                        );
+                      })}
+                  </i>
+                </small>
+              </TableCell>
+            </TableRow>
+            <TableRow>
               <TableCell>{info.obsItemCount}</TableCell>
               <TableCell>distinct observable items found</TableCell>
             </TableRow>
             <TableRow>
+              <TableCell></TableCell>
+              <TableCell>
+                <small>{info.newObsItemCount} new observable items(s) found</small>
+              </TableCell>
+            </TableRow>
+            <TableRow>
               <TableCell>{info.diverCount}</TableCell>
               <TableCell>distinct divers found</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell></TableCell>
+              <TableCell>
+                <small>{info.newDiverCount} new diver(s) found</small>
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
