@@ -61,14 +61,16 @@ public class StagedRow implements Serializable {
     private String date = "";
 
     @Column(name = "diver")
-    private String diver;
+    @Builder.Default
+    private String diver = "";
 
     @Column(name = "depth")
     @Builder.Default
     private String depth = "";
 
     @Column(name = "method")
-    private String method;
+    @Builder.Default
+    private String method = "";
 
     @Column(name = "block")
     @Builder.Default
@@ -79,16 +81,20 @@ public class StagedRow implements Serializable {
     private String species = "";
 
     @Column(name = "buddy")
-    private String buddy;
+    @Builder.Default
+    private String buddy = "";
 
     @Column(name = "site_name")
-    private String siteName;
+    @Builder.Default
+    private String siteName = "";
 
     @Column(name = "longitude")
-    private String longitude;
+    @Builder.Default
+    private String longitude = "";
 
     @Column(name = "latitude")
-    private String latitude;
+    @Builder.Default
+    private String latitude = "";
 
     @Column(name = "vis")
     @Builder.Default
@@ -99,29 +105,36 @@ public class StagedRow implements Serializable {
     private String time = "";
 
     @Column(name = "direction")
-    private String direction;
+    @Builder.Default
+    private String direction = "";
 
     @JsonProperty(value = "P-Qs")
     @Column(name = "PQs")
-    private String pqs;
+    @Builder.Default
+    private String pqs = "";
 
     @Column(name = "code")
-    private String code;
+    @Builder.Default
+    private String code = "";
 
     @Column(name = "common_name")
-    private String commonName;
+    @Builder.Default
+    private String commonName = "";
 
     @Column(name = "total")
-    private String total;
+    @Builder.Default
+    private String total = "";
 
     @Column(name = "inverts")
-    private String inverts;
+    @Builder.Default
+    private String inverts = "";
 
     @Column(name = "position")
     private Integer pos;
 
     @Column(name = "is_invert_Sizing")
-    private String isInvertSizing;
+    @Builder.Default
+    private String isInvertSizing = "";
 
     @Column(name = "measure_value", columnDefinition = "json")
     @Type(type = "jsonb")
@@ -149,12 +162,12 @@ public class StagedRow implements Serializable {
         return Integer.toString(rowContents.hashCode());
     }
 
-    public String getSurvey() {
+    public String getSurveyGroup() {
         String depthPart = depth.split("\\.")[0];
         return (siteCode.trim() + "/" + date.trim() + "/" + depthPart).toUpperCase();
     }
 
-    public String getSurveyGroup() {
+    public String getSurvey() {
         return (siteCode.trim() + "/" + date.trim() + "/" + depth.trim()).toUpperCase();
     }
 
