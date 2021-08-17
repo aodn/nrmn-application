@@ -516,6 +516,17 @@ public class ValidationProcess {
         return null;
     }
 
+    public Collection<ValidationError> validateMethod3BlockValid(List<StagedRowFormatted> surveyRows) {
+        Collection<ValidationError> errors = new ArrayList<ValidationError>();
+
+        for(StagedRowFormatted row : surveyRows) {
+            if(row.getMethod() != null && row.getMethod() == 3 && (row.getBlock() == null || row.getBlock() != 0))
+                errors.add(new ValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Method 3 block is not 0", Arrays.asList(row.getId()), Arrays.asList("block")));
+        }
+
+        return errors;
+    }
+
     private Collection<ValidationError> checkSurveys(String programName, Boolean isExtended, Map<String, List<StagedRowFormatted>> surveyMap) {
         Set<ValidationError> res = new HashSet<ValidationError>();
  
@@ -532,7 +543,9 @@ public class ValidationProcess {
 
             // VALIDATE: Survey Complete
             res.add(validateSurveyComplete(programName, survey.getKey(), surveyRows));
-
+            if (programName.equalsIgnoreCase("ATRC")){
+                res.addAll(validateMethod3BlockValid(surveyRows));
+            };
             // VALIDATE: Is Existing Survey
             res.add(validateSurveyIsNew(surveyRows.get(0)));
 
