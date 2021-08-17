@@ -461,10 +461,10 @@ public class ValidationProcess {
         Map<Integer, List<StagedRowFormatted>> surveyByMethod = surveyRows.stream().filter(sr -> sr.getMethod() != null && sr.getBlock() != null)
                                                                 .collect(Collectors.groupingBy(StagedRowFormatted::getMethod));
 
-        List<String> messages = new ArrayList<String>();
         Set<Long> rowIds = new HashSet<Long>();
         Set<String> flagColumns = new HashSet<String>();
-        
+        List<String> messages = new ArrayList<String>();
+
         // VALIDATE: If method = 0 then Block should be 0, 1 or 2
         List<StagedRowFormatted> method0Rows = surveyByMethod.get(0);
         if(method0Rows != null && method0Rows.stream().anyMatch(r -> !Arrays.asList(0, 1, 2).contains(r.getBlock())))
@@ -483,7 +483,6 @@ public class ValidationProcess {
         }
 
         // VALIDATE: Each method has block 1,2 (RLS) or block 1 (ATRC) except ATRC M3 which should have block 0
-
         List<Integer> methodsRequired = programName.equalsIgnoreCase("RLS") ? Arrays.asList(1,2) : Arrays.asList(1,2,3);
         ValidationLevel level = ValidationLevel.WARNING;
         for (Integer method : methodsRequired) {
@@ -498,7 +497,7 @@ public class ValidationProcess {
             if(missingBlocks.size() > 0){
                 if(method == 3) {
                     level = ValidationLevel.BLOCKING;
-                    messages.add("M3 " + (hasBlocks.size() > 0 ? " recorded on wrong block" :  "missing B0"));
+                    messages.add("M3 " + (hasBlocks.size() > 0 ? "recorded on wrong block" :  "missing B0"));
                 } else {
                     messages.add("M" + method + " missing B" + String.join(", ", missingBlocks.stream().map(m -> m.toString()).collect(Collectors.toList())));
                 }
@@ -536,9 +535,6 @@ public class ValidationProcess {
             if (programName.equalsIgnoreCase("ATRC")){
                 // VALIDATE: Survey group transect number valid
                 res.add(validateSurveyTransectNumber(survey.getKey(), surveyRows));
-
-                // VALIDATE: Survey Group Complete
-                res.add(validateSurveyGroup(survey.getKey(), surveyRows));
             }
 
             // VALIDATE: Survey Complete
@@ -546,7 +542,23 @@ public class ValidationProcess {
 
             // VALIDATE: Is Existing Survey
             res.add(validateSurveyIsNew(surveyRows.get(0)));
+        }
 
+        res.remove(null);
+
+        return res;
+    }
+
+    private Collection<ValidationError> checkSurveyGroups(String programName, Boolean isExtended, Map<String, List<StagedRowFormatted>> surveyGroupMap) {
+        Set<ValidationError> res = new HashSet<ValidationError>();
+ 
+        for (Map.Entry<String, List<StagedRowFormatted>> survey : surveyGroupMap.entrySet()) {
+            List<StagedRowFormatted> surveyRows = survey.getValue();
+            
+            if (programName.equalsIgnoreCase("ATRC")){
+                // VALIDATE: Survey Group Complete
+                res.add(validateSurveyGroup(survey.getKey(), surveyRows));
+            }
         }
 
         res.remove(null);
@@ -627,8 +639,34 @@ public class ValidationProcess {
         return rows.stream().map(stagedRow -> mapper.map(stagedRow, StagedRowFormatted.class)).collect(Collectors.toList());
     }
 
-    public ValidationResponse process(StagedJob job) {
+    public ValidationResponse generateSummary(Collection<StagedRowFormatted> mappedRows) {
         ValidationResponse response = new ValidationResponse();
+        
+        Collection<String> distinctSites = mappedRows.stream().map(r ->r.getRef().getSiteCode().trim()).filter(s -> s.length() > 0).distinct().collect(Collectors.toList());
+        Collection<String> distinctSitesExisting = mappedRows.stream().filter(r -> r.getSite() != null).map(r ->r.getSite().getSiteCode()).distinct().collect(Collectors.toList());
+
+        response.setRowCount(mappedRows.size());
+        response.setSiteCount(distinctSites.size());
+
+        Map<String, Boolean> foundSites = new HashMap<String, Boolean>();
+        distinctSites.stream().forEach(s -> foundSites.put(s, !distinctSitesExisting.contains(s)));
+        response.setFoundSites(foundSites);
+        response.setNewSiteCount(foundSites.values().stream().filter(e -> e == true).count());
+
+        Collection<String> distinctDivers = mappedRows.stream().map(r ->r.getRef().getDiver().trim()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
+        Collection<String> distinctDiversExisting = mappedRows.stream().filter(s -> s.getDiver() != null).map(r ->r.getDiver().getFullName()).distinct().collect(Collectors.toList());
+        response.setNewDiverCount(distinctDivers.size() - distinctDiversExisting.size());
+
+        Long distinctObsItems = mappedRows.stream().map(r ->r.getRef().getCode().trim()).filter(s -> s != null && !s.equalsIgnoreCase("snd") && !s.equalsIgnoreCase("dez") && !s.equalsIgnoreCase("nsf")).distinct().count();
+        Long distinctObsItemsExisting = mappedRows.stream().filter(r ->r.getSpecies().isPresent()).map(r -> r.getSpecies().get().getObservableItemName()).distinct().count();
+        response.setNewObsItemCount(distinctObsItems - distinctObsItemsExisting);
+
+        response.setDiverCount(mappedRows.stream().map(r -> r.getRef().getDiver().trim()).distinct().count());
+        response.setObsItemCount(mappedRows.stream().map(r -> r.getRef().getSpecies().trim()).distinct().count());
+        return response;
+    }
+
+    public ValidationResponse process(StagedJob job) {
 
         Collection<StagedRow> rows = rowRepository.findRowsByJobId(job.getId());
         Collection<ObservableItem> species = getSpeciesForRows(rows);
@@ -640,29 +678,26 @@ public class ValidationProcess {
 
         sheetErrors.addAll(checkFormatting(programName, job.getIsExtendedSize(), siteCodes, species, rows));
 
-        Collection<StagedRowFormatted> validRows = formatRowsWithSpecies(rows, species);
+        Collection<StagedRowFormatted> mappedRows = formatRowsWithSpecies(rows, species);
 
-        if (validRows != null) {
-            Object[] distinctSites = validRows.stream().map(r ->r.getRef().getSiteCode().trim()).filter(s -> s!= null).distinct().toArray();
-            response.setRowCount(validRows.size());
-            response.setSiteCount(distinctSites.length);
-            response.setDiverCount(validRows.stream().map(r -> r.getRef().getDiver().trim()).distinct().count());
-            response.setObsItemCount(validRows.stream().map(r -> r.getRef().getSpecies().trim()).distinct().count());
+        ValidationResponse response = generateSummary(mappedRows);
 
-            sheetErrors.addAll(checkData(programName, job.getIsExtendedSize(), validRows));
+        sheetErrors.addAll(checkData(programName, job.getIsExtendedSize(), mappedRows));
 
-            Map<String, List<StagedRowFormatted>> surveyMap = validRows.stream().filter(row -> row.getSurvey() != null).collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
-            sheetErrors.addAll(checkSurveys(programName, job.getIsExtendedSize(), surveyMap));
-            response.setIncompleteSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("survey incomplete:")).count());
+        Map<String, List<StagedRowFormatted>> surveyMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
+        sheetErrors.addAll(checkSurveys(programName, job.getIsExtendedSize(), surveyMap));
+        response.setIncompleteSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("survey incomplete:")).count());
 
-            Map<String, List<StagedRowFormatted>> method3SurveyMap = validRows.stream().filter(row -> row.getSurveyGroup() != null && row.getMethod() != null && row.getMethod().equals(3) && row.getCode() != null && !row.getCode().equalsIgnoreCase("snd")).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
-            sheetErrors.addAll(checkMethod3Transects(programName, job.getIsExtendedSize(), method3SurveyMap));
+        Map<String, List<StagedRowFormatted>> surveyGroupMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
+        sheetErrors.addAll(checkSurveyGroups(programName, job.getIsExtendedSize(), surveyGroupMap));
 
-            // Count only M1 or M2 surveys in summary total
-            Long distinctSurveys = validRows.stream().filter(r -> Arrays.asList(1,2).contains(r.getMethod())).map(r -> r.getSurveyGroup()).distinct().count();
-            response.setSurveyCount(distinctSurveys);
-            response.setErrors(sheetErrors);
-        }
+        Map<String, List<StagedRowFormatted>> method3SurveyMap = mappedRows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3) && row.getCode() != null && !row.getCode().equalsIgnoreCase("snd")).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
+        sheetErrors.addAll(checkMethod3Transects(programName, job.getIsExtendedSize(), method3SurveyMap));
+
+        // Count only M1 or M2 surveys in summary total
+        Long distinctSurveys = mappedRows.stream().filter(r -> Arrays.asList(1,2).contains(r.getMethod())).map(r -> r.getSurveyGroup()).distinct().count();
+        response.setSurveyCount(distinctSurveys);
+        response.setErrors(sheetErrors);
 
         return response;
     }

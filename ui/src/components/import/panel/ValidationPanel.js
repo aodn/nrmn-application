@@ -1,4 +1,4 @@
-import {Box, Button, Divider, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core';
+import {Box, Button, Divider, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@material-ui/core';
 import {PropTypes} from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import ValidationSummary from './ValidationSummary';
@@ -109,6 +109,25 @@ const ValidationPanel = (props) => {
     props.api.redrawRows();
   };
 
+  const siteTooltip = info.foundSites
+    ? Object.keys(info.foundSites).map((key) => (
+        <>
+          {key}
+          <br />
+        </>
+      ))
+    : '';
+  const newSitesTooltip = info.foundSites
+    ? Object.keys(info.foundSites)
+        .filter((key) => info.foundSites[key] === true)
+        .map((key) => (
+          <>
+            {key}
+            <br />
+          </>
+        ))
+    : '';
+
   return (
     <>
       <Box m={2} mt={1}>
@@ -123,10 +142,6 @@ const ValidationPanel = (props) => {
               <TableCell>rows found</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>{info.siteCount}</TableCell>
-              <TableCell>distinct sites found</TableCell>
-            </TableRow>
-            <TableRow>
               <TableCell>{info.surveyCount}</TableCell>
               <TableCell>distinct surveys found</TableCell>
             </TableRow>
@@ -135,12 +150,38 @@ const ValidationPanel = (props) => {
               <TableCell>incomplete surveys found</TableCell>
             </TableRow>
             <TableRow>
+              <TableCell>{info.siteCount}</TableCell>
+              <Tooltip title={siteTooltip} interactive>
+                <TableCell>distinct sites found</TableCell>
+              </Tooltip>
+            </TableRow>
+            <TableRow>
+              <TableCell></TableCell>
+              <Tooltip title={newSitesTooltip} interactive>
+                <TableCell>
+                  <small>{info.newSiteCount} new sites found</small>
+                </TableCell>
+              </Tooltip>
+            </TableRow>
+            <TableRow>
               <TableCell>{info.obsItemCount}</TableCell>
               <TableCell>distinct observable items found</TableCell>
             </TableRow>
             <TableRow>
+              <TableCell></TableCell>
+              <TableCell>
+                <small>{info.newObsItemCount} new observable items found</small>
+              </TableCell>
+            </TableRow>
+            <TableRow>
               <TableCell>{info.diverCount}</TableCell>
               <TableCell>distinct divers found</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell></TableCell>
+              <TableCell>
+                <small>{info.newDiverCount} new diver(s) found</small>
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
