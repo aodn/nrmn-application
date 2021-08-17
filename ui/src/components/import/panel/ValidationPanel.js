@@ -109,11 +109,23 @@ const ValidationPanel = (props) => {
     props.api.redrawRows();
   };
 
-  const siteTooltip = info.foundSites ? Object.keys(info.foundSites).map((key) => `${key} `) : '';
+  const siteTooltip = info.foundSites
+    ? Object.keys(info.foundSites).map((key) => (
+        <>
+          {key}
+          <br />
+        </>
+      ))
+    : '';
   const newSitesTooltip = info.foundSites
     ? Object.keys(info.foundSites)
         .filter((key) => info.foundSites[key] === true)
-        .map((key) => `${key} `)
+        .map((key) => (
+          <>
+            {key}
+            <br />
+          </>
+        ))
     : '';
 
   return (
