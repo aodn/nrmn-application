@@ -456,11 +456,15 @@ public class ValidationProcess {
         if(surveyRows.stream().anyMatch(r -> r.getMethod() == null || r.getBlock() == null))
             return null;
 
-        String messagePrefix = surveyKey + " incomplete: ";
+        String messagePrefix = surveyKey + " survey incomplete: ";
 
         Map<Integer, List<StagedRowFormatted>> surveyByMethod = surveyRows.stream().filter(sr -> sr.getMethod() != null && sr.getBlock() != null)
                                                                 .collect(Collectors.groupingBy(StagedRowFormatted::getMethod));
-                                                                
+
+        List<String> messages = new ArrayList<String>();
+        Set<Long> rowIds = new HashSet<Long>();
+        Set<String> flagColumns = new HashSet<String>();
+        
         // VALIDATE: If method = 0 then Block should be 0, 1 or 2
         List<StagedRowFormatted> method0Rows = surveyByMethod.get(0);
         if(method0Rows != null && method0Rows.stream().anyMatch(r -> !Arrays.asList(0, 1, 2).contains(r.getBlock())))
@@ -471,15 +475,15 @@ public class ValidationProcess {
         List<Integer> requiredMethods = programName.equalsIgnoreCase("ATRC") ? Arrays.asList(1,2,3) : Arrays.asList(1,2);
         List<Integer> missingMethods =  new ArrayList<Integer>(requiredMethods);
         missingMethods.removeAll(surveyByMethod.keySet());
-        if(missingMethods.size() > 0 && !(programName.equalsIgnoreCase("ATRC") && surveyRows.stream().filter(r -> Arrays.asList(3, 4, 5, 7).contains(r.getMethod())).count() > 0)) {
+        if(missingMethods.size() > 0) {
             List<String> missingMethodsList = missingMethods.stream().map(m -> m.toString()).collect(Collectors.toList());
-            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, messagePrefix + "missing M" + String.join(", M", missingMethodsList), 
-                                        surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("method"));
+            messages.add("missing M" + String.join(", M", missingMethodsList));
+            rowIds.addAll(surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()));
+            flagColumns.add("method");
         }
 
         // VALIDATE: Each method has block 1,2 (RLS) or block 1 (ATRC) except ATRC M3 which should have block 0
-        List<String> messages = new ArrayList<String>();
-        Set<Long> rowIds = new HashSet<Long>();
+
         List<Integer> methodsRequired = programName.equalsIgnoreCase("RLS") ? Arrays.asList(1,2) : Arrays.asList(1,2,3);
         ValidationLevel level = ValidationLevel.WARNING;
         for (Integer method : methodsRequired) {
@@ -492,15 +496,20 @@ public class ValidationProcess {
             List<Integer> missingBlocks = blocksRequired.stream().filter(b -> !hasBlocks.contains(b)).collect(Collectors.toList());
             
             if(missingBlocks.size() > 0){
-                if(method == 3) level = ValidationLevel.BLOCKING;
-                messages.add("M" + method + " missing B" + String.join(", ", missingBlocks.stream().map(m -> m.toString()).collect(Collectors.toList())));
+                if(method == 3) {
+                    level = ValidationLevel.BLOCKING;
+                    messages.add("M3 " + (hasBlocks.size() > 0 ? " recorded on wrong block" :  "missing B0"));
+                } else {
+                    messages.add("M" + method + " missing B" + String.join(", ", missingBlocks.stream().map(m -> m.toString()).collect(Collectors.toList())));
+                }
                 rowIds.addAll(methodRows.stream().map(r -> r.getId()).collect(Collectors.toList()));
+                flagColumns.add("block");
             }
         }
 
         if(messages.size() > 0) {
-            return new ValidationError(ValidationCategory.SPAN, level, messagePrefix + String.join(", ", messages), 
-            rowIds, Arrays.asList("block"));
+            return new ValidationError(ValidationCategory.SPAN, level, messagePrefix + String.join(". ", messages), 
+            rowIds, flagColumns);
         }
 
         return null;
@@ -644,7 +653,7 @@ public class ValidationProcess {
 
             Map<String, List<StagedRowFormatted>> surveyMap = validRows.stream().filter(row -> row.getSurvey() != null).collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
             sheetErrors.addAll(checkSurveys(programName, job.getIsExtendedSize(), surveyMap));
-            response.setIncompleteSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("incomplete:")).count());
+            response.setIncompleteSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("survey incomplete:")).count());
 
             Map<String, List<StagedRowFormatted>> method3SurveyMap = validRows.stream().filter(row -> row.getSurveyGroup() != null && row.getMethod() != null && row.getMethod().equals(3) && row.getCode() != null && !row.getCode().equalsIgnoreCase("snd")).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
             sheetErrors.addAll(checkMethod3Transects(programName, job.getIsExtendedSize(), method3SurveyMap));
