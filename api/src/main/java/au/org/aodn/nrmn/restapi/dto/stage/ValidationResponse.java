@@ -28,7 +28,7 @@ public class ValidationResponse {
     long surveyCount;
     long incompleteSurveyCount;
 
-    Map<String, Boolean> foundSites; // TODO
+    Map<String, Boolean> foundSites;
 
     Collection<ValidationError> errors;
 }
