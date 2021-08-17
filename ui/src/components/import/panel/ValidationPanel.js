@@ -1,4 +1,4 @@
-import {Box, Button, Divider, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core';
+import {Box, Button, Divider, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@material-ui/core';
 import {PropTypes} from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import ValidationSummary from './ValidationSummary';
@@ -109,6 +109,13 @@ const ValidationPanel = (props) => {
     props.api.redrawRows();
   };
 
+  const siteTooltip = info.foundSites ? Object.keys(info.foundSites).map((key) => `${key} `) : '';
+  const newSitesTooltip = info.foundSites
+    ? Object.keys(info.foundSites)
+        .filter((key) => info.foundSites[key] === true)
+        .map((key) => `${key} `)
+    : '';
+
   return (
     <>
       <Box m={2} mt={1}>
@@ -132,26 +139,17 @@ const ValidationPanel = (props) => {
             </TableRow>
             <TableRow>
               <TableCell>{info.siteCount}</TableCell>
-              <TableCell>distinct sites found</TableCell>
+              <Tooltip title={siteTooltip} interactive>
+                <TableCell>distinct sites found</TableCell>
+              </Tooltip>
             </TableRow>
             <TableRow>
               <TableCell></TableCell>
-              <TableCell>
-                <small>
-                  {info.newSiteCount} new site(s) found
-                  <br />
-                  <i>
-                    {info.foundSites &&
-                      Object.keys(info.foundSites).map((key, value) => {
-                        return (
-                          <div key={key}>
-                            {key} {value ? '' : '(new)'}
-                          </div>
-                        );
-                      })}
-                  </i>
-                </small>
-              </TableCell>
+              <Tooltip title={newSitesTooltip} interactive>
+                <TableCell>
+                  <small>{info.newSiteCount} new sites found</small>
+                </TableCell>
+              </Tooltip>
             </TableRow>
             <TableRow>
               <TableCell>{info.obsItemCount}</TableCell>
@@ -160,7 +158,7 @@ const ValidationPanel = (props) => {
             <TableRow>
               <TableCell></TableCell>
               <TableCell>
-                <small>{info.newObsItemCount} new observable items(s) found</small>
+                <small>{info.newObsItemCount} new observable items found</small>
               </TableCell>
             </TableRow>
             <TableRow>
