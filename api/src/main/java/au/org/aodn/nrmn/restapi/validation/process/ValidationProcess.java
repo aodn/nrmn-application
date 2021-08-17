@@ -481,6 +481,7 @@ public class ValidationProcess {
         List<String> messages = new ArrayList<String>();
         Set<Long> rowIds = new HashSet<Long>();
         List<Integer> methodsRequired = programName.equalsIgnoreCase("RLS") ? Arrays.asList(1,2) : Arrays.asList(1,2,3);
+        ValidationLevel level = ValidationLevel.WARNING;
         for (Integer method : methodsRequired) {
             List<StagedRowFormatted> methodRows = surveyByMethod.get(method);
             if(methodRows == null) continue;
@@ -491,13 +492,14 @@ public class ValidationProcess {
             List<Integer> missingBlocks = blocksRequired.stream().filter(b -> !hasBlocks.contains(b)).collect(Collectors.toList());
             
             if(missingBlocks.size() > 0){
+                if(method == 3) level = ValidationLevel.BLOCKING;
                 messages.add("M" + method + " missing B" + String.join(", ", missingBlocks.stream().map(m -> m.toString()).collect(Collectors.toList())));
                 rowIds.addAll(methodRows.stream().map(r -> r.getId()).collect(Collectors.toList()));
             }
         }
 
         if(messages.size() > 0) {
-            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, messagePrefix + String.join(", ", messages), 
+            return new ValidationError(ValidationCategory.SPAN, level, messagePrefix + String.join(", ", messages), 
             rowIds, Arrays.asList("block"));
         }
 
@@ -516,17 +518,6 @@ public class ValidationProcess {
         return null;
     }
 
-    public Collection<ValidationError> validateMethod3BlockValid(List<StagedRowFormatted> surveyRows) {
-        Collection<ValidationError> errors = new ArrayList<ValidationError>();
-
-        for(StagedRowFormatted row : surveyRows) {
-            if(row.getMethod() != null && row.getMethod() == 3 && (row.getBlock() == null || row.getBlock() != 0))
-                errors.add(new ValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Method 3 block is not 0", Arrays.asList(row.getId()), Arrays.asList("block")));
-        }
-
-        return errors;
-    }
-
     private Collection<ValidationError> checkSurveys(String programName, Boolean isExtended, Map<String, List<StagedRowFormatted>> surveyMap) {
         Set<ValidationError> res = new HashSet<ValidationError>();
  
@@ -543,9 +534,7 @@ public class ValidationProcess {
 
             // VALIDATE: Survey Complete
             res.add(validateSurveyComplete(programName, survey.getKey(), surveyRows));
-            if (programName.equalsIgnoreCase("ATRC")){
-                res.addAll(validateMethod3BlockValid(surveyRows));
-            };
+
             // VALIDATE: Is Existing Survey
             res.add(validateSurveyIsNew(surveyRows.get(0)));
 
