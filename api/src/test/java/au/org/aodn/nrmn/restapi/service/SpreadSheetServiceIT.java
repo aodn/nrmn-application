@@ -103,7 +103,7 @@ public class SpreadSheetServiceIT {
         ParsedSheet parsedSheet = sheetService.stageXlsxFile(new MockMultipartFile("sheets/correctShortHeader3.xlsx", file3.getInputStream()), false);
 
         val stageSurveys = parsedSheet.getStagedRows();
-        assertEquals(stageSurveys.size(), 2);
+        assertEquals(23, stageSurveys.size());
         val obs1 = stageSurveys.get(0);
 
         // Test Double

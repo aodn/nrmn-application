@@ -23,10 +23,10 @@ const SurveyEditTemplate = (props) => {
           {el['direction']}
         </Grid>
         <Grid item xs={6}>
-          {el['longitude']}
+          {el['latitude']}
         </Grid>
         <Grid item xs={6}>
-          {el['latitude']}
+          {el['longitude']}
         </Grid>
         <Grid item xs={6}>
           {el['siteName']}

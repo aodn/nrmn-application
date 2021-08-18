@@ -94,10 +94,11 @@ public class ObservableItemController {
                 errors.add(new ValidationError(ObservableItemDto.class.getName(), "letterCode", item.getLetterCode(), "An item with this letter code already exists."));
         }
 
-        if(!StringUtils.isEmpty(item.getSupersededBy()) && observableItemRepository.exactSearch(item.getSupersededBy()).isEmpty()){
+        if(StringUtils.isEmpty(item.getSupersededBy())) {
+            item.setSupersededBy(null);
+        } else if(observableItemRepository.exactSearch(item.getSupersededBy()).isEmpty()){
             logger.info(String.format("Invalid supersededBy value: \"%s\". Setting to null.", item.getSupersededBy()));
             item.setSupersededBy(null);
-
         }
 
         if(!errors.isEmpty())

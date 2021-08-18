@@ -137,12 +137,6 @@ export const getDataJob = (jobId) =>
     .then((res) => res)
     .catch((err) => err);
 
-export const postJobValidation = (jobId) =>
-  axiosInstance
-    .post('/api/stage/validate/' + jobId)
-    .then((res) => res)
-    .catch((err) => err);
-
 export const validateJob = (jobId, completion) => {
   return axiosInstance.post(`/api/stage/validate/${jobId}`).then(completion);
 };

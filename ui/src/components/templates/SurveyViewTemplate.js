@@ -51,10 +51,10 @@ const SurveyViewTemplate = (props) => {
             {el['method']}
           </Grid>
           <Grid item xs={6}>
-            {el['longitude']}
+            {el['latitude']}
           </Grid>
           <Grid item xs={6}>
-            {el['latitude']}
+            {el['longitude']}
           </Grid>
           <Grid item xs={6}>
             {el['locationName']}
@@ -76,6 +76,9 @@ const SurveyViewTemplate = (props) => {
           </Grid>
           <Grid item xs={6}>
             {el['pqDiver']}
+          </Grid>
+          <Grid item xs={6}>
+            {el['pqZipUrl']}
           </Grid>
           <Grid item xs={6}>
             {el['blockAbundanceSimulated']}

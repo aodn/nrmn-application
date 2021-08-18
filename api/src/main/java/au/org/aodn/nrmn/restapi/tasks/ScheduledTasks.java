@@ -11,7 +11,7 @@ public class ScheduledTasks {
     @Autowired
     private PQSurveyService pqSurveyService;
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?", zone = "Australia/Sydney")
     public void updateSurveyPQFields() {
         pqSurveyService.updatePQSurveyFlags();
     }

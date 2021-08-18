@@ -1,4 +1,4 @@
-import {Box, Button, Divider, Table, TableBody, TableCell, TableRow, Typography} from '@material-ui/core';
+import {Box, Button, Divider, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@material-ui/core';
 import {PropTypes} from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import ValidationSummary from './ValidationSummary';
@@ -62,13 +62,13 @@ const generateErrorSummary = (ctx, e) => {
 
 const ValidationPanel = (props) => {
   const context = props.api.gridOptionsWrapper.gridOptions.context;
-  const errors = context.errors;
 
   const [errorList, setErrorList] = useState({blocking: {}, warning: {}, duplicateRows: {}});
   const [info, setInfo] = useState({});
 
   useEffect(() => {
     setInfo(context.summary);
+    const errors = context.errors;
     if (errors && errors.length > 0) {
       const blocking = generateErrorTree(context, errors, 'BLOCKING');
       const warning = generateErrorTree(context, errors, 'WARNING');
@@ -80,7 +80,7 @@ const ValidationPanel = (props) => {
           const data = context.rowData.find((d) => d.id === firstRowId);
           e.rowIds.forEach((rowId) => {
             const description = data.siteCode && data.date && data.depth ? `${data.siteCode}/${data.date}/${data.depth} ...` : '...';
-            duplicateRowDescriptions = [{value: description, row: rowId}, ...duplicateRowDescriptions];
+            duplicateRowDescriptions = [...duplicateRowDescriptions, {value: description, row: rowId}];
           });
         });
       const duplicateRows =
@@ -96,18 +96,37 @@ const ValidationPanel = (props) => {
           : {};
       setErrorList({blocking, warning, duplicateRows});
     }
-  }, [errors, context]);
+  }, [context]);
 
   const handleItemClick = (item) => {
     if (item.rowIds) {
       focusCell(props.api, item.columnNames || [item.columnName], item.rowIds);
     } else if (item.row) {
       props.api.setFilterModel(null);
-      const rowIdx = props.api.gridOptionsWrapper.gridOptions.context.rowData.findIndex((r) => r.id === item.row);
-      props.api.ensureIndexVisible(rowIdx, 'middle');
+      const row = props.api.gridOptionsWrapper.gridOptions.context.rowData.find((r) => r.id === item.row);
+      props.api.ensureNodeVisible(row, 'middle');
     }
     props.api.redrawRows();
   };
+
+  const siteTooltip = info.foundSites
+    ? Object.keys(info.foundSites).map((key) => (
+        <>
+          {key}
+          <br />
+        </>
+      ))
+    : '';
+  const newSitesTooltip = info.foundSites
+    ? Object.keys(info.foundSites)
+        .filter((key) => info.foundSites[key] === true)
+        .map((key) => (
+          <>
+            {key}
+            <br />
+          </>
+        ))
+    : '';
 
   return (
     <>
@@ -123,10 +142,6 @@ const ValidationPanel = (props) => {
               <TableCell>rows found</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>{info.siteCount}</TableCell>
-              <TableCell>distinct sites found</TableCell>
-            </TableRow>
-            <TableRow>
               <TableCell>{info.surveyCount}</TableCell>
               <TableCell>distinct surveys found</TableCell>
             </TableRow>
@@ -135,12 +150,38 @@ const ValidationPanel = (props) => {
               <TableCell>incomplete surveys found</TableCell>
             </TableRow>
             <TableRow>
+              <TableCell>{info.siteCount}</TableCell>
+              <Tooltip title={siteTooltip} interactive>
+                <TableCell>distinct sites found</TableCell>
+              </Tooltip>
+            </TableRow>
+            <TableRow>
+              <TableCell></TableCell>
+              <Tooltip title={newSitesTooltip} interactive>
+                <TableCell>
+                  <small>{info.newSiteCount} new sites found</small>
+                </TableCell>
+              </Tooltip>
+            </TableRow>
+            <TableRow>
               <TableCell>{info.obsItemCount}</TableCell>
               <TableCell>distinct observable items found</TableCell>
             </TableRow>
             <TableRow>
+              <TableCell></TableCell>
+              <TableCell>
+                <small>{info.newObsItemCount} new observable items found</small>
+              </TableCell>
+            </TableRow>
+            <TableRow>
               <TableCell>{info.diverCount}</TableCell>
               <TableCell>distinct divers found</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell></TableCell>
+              <TableCell>
+                <small>{info.newDiverCount} new diver(s) found</small>
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>

@@ -68,6 +68,7 @@ const popUndo = (api) => {
       }
     }
   }
+  context.fullRefresh = true;
   api.setRowData(rowData);
 };
 
@@ -80,8 +81,9 @@ const context = {
   highlighted: [],
   putRowIds: [],
   undoStack: [],
-  summaries: [],
+  summary: [],
   errors: [],
+  fullRefresh: false,
   pushUndo: pushUndo,
   popUndo: popUndo,
 
@@ -97,7 +99,7 @@ const resetContext = () => {
   context.highlighted = [];
   context.putRowIds = [];
   context.undoStack = [];
-  context.summaries = [];
+  context.summary = [];
   context.errors = [];
   context.pendingPasteUndo = [];
   context.pasteMode = false;
@@ -186,7 +188,6 @@ const DataSheetView = ({jobId, onIngest}) => {
     context.useOverlay = 'Saving';
     gridApi.showLoadingOverlay();
     const rowUpdateDtos = [];
-    let fullRefresh = false;
 
     Array.from(new Set(context.putRowIds)).forEach((rowId) => {
       const row = context.rowData.find((r) => r.id === rowId);
@@ -209,11 +210,12 @@ const DataSheetView = ({jobId, onIngest}) => {
       // to determine if we need a full reload to get the server-assigned
       // row id. A better way would be to do a full reload based on a server
       // response.
-      fullRefresh = rowId.toString().length > 10;
+      context.fullRefresh = context.fullRefresh || rowId.toString().length > 10 || row === null;
     });
     updateRows(jobId, rowUpdateDtos, () => {
-      if (fullRefresh) {
+      if (context.fullRefresh) {
         reload(gridApi, jobId, handleValidate);
+        context.fullRefresh = false;
       } else {
         handleValidate();
       }
@@ -292,11 +294,17 @@ const DataSheetView = ({jobId, onIngest}) => {
       pushUndo(e.api, [{id: newId}]);
       rowData.push(newData);
       e.api.setRowData(rowData);
-      e.api.refreshCells();
+      const values = e.api.getRenderedNodes().reduce((acc, field) => acc.concat(field.id.toString()), [newId.toString()]);
+      e.api.setFilterModel({
+        id: {
+          type: 'set',
+          values: values
+        }
+      });
     };
 
     const multiRowsSelected = e.api.getSelectedRows().length > 1 || cells.startRow.rowIndex !== cells.endRow.rowIndex;
-    if (!multiRowsSelected && Object.keys(e.api.getFilterModel()).length < 1) {
+    if (!multiRowsSelected) {
       if (items.length > 0) items.push('separator');
       items.push({
         name: 'Delete Row',
@@ -477,7 +485,14 @@ const DataSheetView = ({jobId, onIngest}) => {
     const startIdx = Math.min(cells.startRow.rowIndex, cells.endRow.rowIndex);
     const endIdx = Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
     const delta = [];
-    if (startIdx === endIdx) {
+
+    if (startIdx === endIdx && startIdx === e.node.rowIndex) {
+      e.api.getSelectedRows().forEach(() => {
+        const data = e.node.data;
+        delta.push({...data});
+        rowData.splice(rowData.indexOf(data), 1);
+      });
+    } else if (startIdx === endIdx) {
       e.api.getSelectedRows().forEach((row) => {
         const data = rowData.find((d) => d.id === row.id);
         delta.push({...data});

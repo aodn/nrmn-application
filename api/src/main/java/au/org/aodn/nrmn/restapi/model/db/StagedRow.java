@@ -1,22 +1,38 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Map;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import lombok.*;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
-
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -37,68 +53,88 @@ public class StagedRow implements Serializable {
     private Long id;
 
     @Column(name = "site_no")
-    private String siteCode;
+    @Builder.Default
+    private String siteCode = "";
 
     @Column(name = "date")
-    private String date;
+    @Builder.Default
+    private String date = "";
 
     @Column(name = "diver")
-    private String diver;
+    @Builder.Default
+    private String diver = "";
 
     @Column(name = "depth")
-    private String depth;
+    @Builder.Default
+    private String depth = "";
 
     @Column(name = "method")
-    private String method;
+    @Builder.Default
+    private String method = "";
 
     @Column(name = "block")
-    private String block;
+    @Builder.Default
+    private String block = "";
 
     @Column(name = "species")
-    private String species;
+    @Builder.Default
+    private String species = "";
 
     @Column(name = "buddy")
-    private String buddy;
+    @Builder.Default
+    private String buddy = "";
 
     @Column(name = "site_name")
-    private String siteName;
+    @Builder.Default
+    private String siteName = "";
 
     @Column(name = "longitude")
-    private String longitude;
+    @Builder.Default
+    private String longitude = "";
 
     @Column(name = "latitude")
-    private String latitude;
+    @Builder.Default
+    private String latitude = "";
 
     @Column(name = "vis")
-    private String vis;
+    @Builder.Default
+    private String vis = "";
 
     @Column(name = "time")
-    private String time;
+    @Builder.Default
+    private String time = "";
 
     @Column(name = "direction")
-    private String direction;
+    @Builder.Default
+    private String direction = "";
 
     @JsonProperty(value = "P-Qs")
     @Column(name = "PQs")
-    private String pqs;
+    @Builder.Default
+    private String pqs = "";
 
     @Column(name = "code")
-    private String code;
+    @Builder.Default
+    private String code = "";
 
     @Column(name = "common_name")
-    private String commonName;
+    @Builder.Default
+    private String commonName = "";
 
     @Column(name = "total")
-    private String total;
+    @Builder.Default
+    private String total = "";
 
     @Column(name = "inverts")
-    private String inverts;
+    @Builder.Default
+    private String inverts = "";
 
     @Column(name = "position")
     private Integer pos;
 
     @Column(name = "is_invert_Sizing")
-    private String isInvertSizing;
+    @Builder.Default
+    private String isInvertSizing = "";
 
     @Column(name = "measure_value", columnDefinition = "json")
     @Type(type = "jsonb")
@@ -120,7 +156,19 @@ public class StagedRow implements Serializable {
     @Setter(AccessLevel.NONE)
     private Timestamp lastUpdated;
 
-    @Transient
-    @Builder.Default
-    private List<StagedRowError> errors = new ArrayList<>();
+    public String getContentsHash() {
+        // String measurements = measureJson.entrySet().stream().map(m -> m.getValue().length() > 0 ? m.getKey().toString() + ":" + m.getValue() + "|" : "").reduce("", (a, b) -> a + b);
+        String rowContents = siteCode + date + diver + depth + method + block + species + buddy + siteName + longitude + latitude + vis + time + direction + pqs + code + commonName + total + inverts + isInvertSizing; // + measurements;
+        return Integer.toString(rowContents.hashCode());
+    }
+
+    public String getSurveyGroup() {
+        String depthPart = depth.split("\\.")[0];
+        return (siteCode.trim() + "/" + date.trim() + "/" + depthPart).toUpperCase();
+    }
+
+    public String getSurvey() {
+        return (siteCode.trim() + "/" + date.trim() + "/" + depth.trim()).toUpperCase();
+    }
+
 }
