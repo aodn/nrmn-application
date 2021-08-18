@@ -657,11 +657,12 @@ public class ValidationProcess {
         response.setDiverCount(distinctDiverCount);
         response.setNewDiverCount(distinctDiverCount - distinctDiversExistingCount);
 
-        Long distinctObsItems = mappedRows.stream().map(r ->r.getRef().getCode().trim()).filter(s -> s != null && !s.equalsIgnoreCase("snd") && !s.equalsIgnoreCase("dez") && !s.equalsIgnoreCase("nsf")).distinct().count();
+        List<String> obsItemNames = mappedRows.stream().map(r -> r.getRef().getSpecies().trim().toUpperCase()).distinct().collect(Collectors.toList());
+        int distinctObsItems = obsItemNames.size();
         Long distinctObsItemsExisting = mappedRows.stream().filter(r ->r.getSpecies().isPresent()).map(r -> r.getSpecies().get().getObservableItemName()).distinct().count();
         response.setNewObsItemCount(distinctObsItems - distinctObsItemsExisting);
 
-        response.setObsItemCount(mappedRows.stream().map(r -> r.getRef().getSpecies().trim()).distinct().count());
+        response.setObsItemCount(distinctObsItems);
         return response;
     }
 
@@ -693,8 +694,7 @@ public class ValidationProcess {
         Map<String, List<StagedRowFormatted>> method3SurveyMap = mappedRows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3) && row.getCode() != null && !row.getCode().equalsIgnoreCase("snd")).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
         sheetErrors.addAll(checkMethod3Transects(programName, job.getIsExtendedSize(), method3SurveyMap));
 
-        // Count only M1 or M2 surveys in summary total
-        Long distinctSurveys = mappedRows.stream().filter(r -> Arrays.asList(1,2).contains(r.getMethod())).map(r -> r.getSurveyGroup()).distinct().count();
+        Long distinctSurveys = mappedRows.stream().filter(r -> Arrays.asList(1,2).contains(r.getMethod())).map(r -> r.getSurvey()).distinct().count();
         response.setSurveyCount(distinctSurveys);
         response.setErrors(sheetErrors);
 
