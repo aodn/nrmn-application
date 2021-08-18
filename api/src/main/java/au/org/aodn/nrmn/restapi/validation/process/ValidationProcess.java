@@ -641,11 +641,10 @@ public class ValidationProcess {
 
     public ValidationResponse generateSummary(Collection<StagedRowFormatted> mappedRows) {
         ValidationResponse response = new ValidationResponse();
-        
-        Collection<String> distinctSites = mappedRows.stream().map(r ->r.getRef().getSiteCode().trim()).filter(s -> s.length() > 0).distinct().collect(Collectors.toList());
-        Collection<String> distinctSitesExisting = mappedRows.stream().filter(r -> r.getSite() != null).map(r ->r.getSite().getSiteCode()).distinct().collect(Collectors.toList());
-
         response.setRowCount(mappedRows.size());
+
+        Collection<String> distinctSites = mappedRows.stream().map(r ->r.getRef().getSiteCode().trim().toUpperCase()).filter(s -> s.length() > 0).distinct().collect(Collectors.toList());
+        Collection<String> distinctSitesExisting = mappedRows.stream().filter(r -> r.getSite() != null).map(r ->r.getSite().getSiteCode().toUpperCase()).distinct().collect(Collectors.toList());
         response.setSiteCount(distinctSites.size());
 
         Map<String, Boolean> foundSites = new HashMap<String, Boolean>();
@@ -653,16 +652,17 @@ public class ValidationProcess {
         response.setFoundSites(foundSites);
         response.setNewSiteCount(foundSites.values().stream().filter(e -> e == true).count());
 
-        Collection<String> distinctDivers = mappedRows.stream().map(r ->r.getRef().getDiver().trim()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
-        Collection<String> distinctDiversExisting = mappedRows.stream().filter(s -> s.getDiver() != null).map(r ->r.getDiver().getFullName()).distinct().collect(Collectors.toList());
-        response.setNewDiverCount(distinctDivers.size() - distinctDiversExisting.size());
+        Long distinctDiverCount = mappedRows.stream().map(d -> d.getRef().getDiver().toUpperCase()).filter(d -> d.length() > 0).distinct().count();
+        Long distinctDiversExistingCount = mappedRows.stream().filter(s -> s.getDiver() != null).map(d -> d.getDiver().getDiverId()).distinct().count();
+        response.setDiverCount(distinctDiverCount);
+        response.setNewDiverCount(distinctDiverCount - distinctDiversExistingCount);
 
-        Long distinctObsItems = mappedRows.stream().map(r ->r.getRef().getCode().trim()).filter(s -> s != null && !s.equalsIgnoreCase("snd") && !s.equalsIgnoreCase("dez") && !s.equalsIgnoreCase("nsf")).distinct().count();
+        List<String> obsItemNames = mappedRows.stream().map(r -> r.getRef().getSpecies().trim().toUpperCase()).distinct().collect(Collectors.toList());
+        int distinctObsItems = obsItemNames.size();
         Long distinctObsItemsExisting = mappedRows.stream().filter(r ->r.getSpecies().isPresent()).map(r -> r.getSpecies().get().getObservableItemName()).distinct().count();
         response.setNewObsItemCount(distinctObsItems - distinctObsItemsExisting);
 
-        response.setDiverCount(mappedRows.stream().map(r -> r.getRef().getDiver().trim()).distinct().count());
-        response.setObsItemCount(mappedRows.stream().map(r -> r.getRef().getSpecies().trim()).distinct().count());
+        response.setObsItemCount(distinctObsItems);
         return response;
     }
 
@@ -694,8 +694,7 @@ public class ValidationProcess {
         Map<String, List<StagedRowFormatted>> method3SurveyMap = mappedRows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3) && row.getCode() != null && !row.getCode().equalsIgnoreCase("snd")).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
         sheetErrors.addAll(checkMethod3Transects(programName, job.getIsExtendedSize(), method3SurveyMap));
 
-        // Count only M1 or M2 surveys in summary total
-        Long distinctSurveys = mappedRows.stream().filter(r -> Arrays.asList(1,2).contains(r.getMethod())).map(r -> r.getSurveyGroup()).distinct().count();
+        Long distinctSurveys = mappedRows.stream().filter(r -> Arrays.asList(1,2).contains(r.getMethod())).map(r -> r.getSurvey()).distinct().count();
         response.setSurveyCount(distinctSurveys);
         response.setErrors(sheetErrors);
 
