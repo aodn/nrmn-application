@@ -652,15 +652,15 @@ public class ValidationProcess {
         response.setFoundSites(foundSites);
         response.setNewSiteCount(foundSites.values().stream().filter(e -> e == true).count());
 
-        Long distinctDiverCount = mappedRows.stream().filter(d -> d.getRef().getDiver().length() > 0).distinct().count();
-        Long distinctDiversExistingCount = mappedRows.stream().filter(s -> s.getDiver() != null).distinct().count();
+        Long distinctDiverCount = mappedRows.stream().map(d -> d.getRef().getDiver().toUpperCase()).filter(d -> d.length() > 0).distinct().count();
+        Long distinctDiversExistingCount = mappedRows.stream().filter(s -> s.getDiver() != null).map(d -> d.getDiver().getDiverId()).distinct().count();
+        response.setDiverCount(distinctDiverCount);
         response.setNewDiverCount(distinctDiverCount - distinctDiversExistingCount);
 
         Long distinctObsItems = mappedRows.stream().map(r ->r.getRef().getCode().trim()).filter(s -> s != null && !s.equalsIgnoreCase("snd") && !s.equalsIgnoreCase("dez") && !s.equalsIgnoreCase("nsf")).distinct().count();
         Long distinctObsItemsExisting = mappedRows.stream().filter(r ->r.getSpecies().isPresent()).map(r -> r.getSpecies().get().getObservableItemName()).distinct().count();
         response.setNewObsItemCount(distinctObsItems - distinctObsItemsExisting);
 
-        response.setDiverCount(mappedRows.stream().map(r -> r.getRef().getDiver().trim()).distinct().count());
         response.setObsItemCount(mappedRows.stream().map(r -> r.getRef().getSpecies().trim()).distinct().count());
         return response;
     }
