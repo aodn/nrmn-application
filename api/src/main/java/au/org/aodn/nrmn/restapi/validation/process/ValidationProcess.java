@@ -641,11 +641,10 @@ public class ValidationProcess {
 
     public ValidationResponse generateSummary(Collection<StagedRowFormatted> mappedRows) {
         ValidationResponse response = new ValidationResponse();
-        
-        Collection<String> distinctSites = mappedRows.stream().map(r ->r.getRef().getSiteCode().trim()).filter(s -> s.length() > 0).distinct().collect(Collectors.toList());
-        Collection<String> distinctSitesExisting = mappedRows.stream().filter(r -> r.getSite() != null).map(r ->r.getSite().getSiteCode()).distinct().collect(Collectors.toList());
-
         response.setRowCount(mappedRows.size());
+
+        Collection<String> distinctSites = mappedRows.stream().map(r ->r.getRef().getSiteCode().trim().toUpperCase()).filter(s -> s.length() > 0).distinct().collect(Collectors.toList());
+        Collection<String> distinctSitesExisting = mappedRows.stream().filter(r -> r.getSite() != null).map(r ->r.getSite().getSiteCode().toUpperCase()).distinct().collect(Collectors.toList());
         response.setSiteCount(distinctSites.size());
 
         Map<String, Boolean> foundSites = new HashMap<String, Boolean>();
@@ -653,9 +652,9 @@ public class ValidationProcess {
         response.setFoundSites(foundSites);
         response.setNewSiteCount(foundSites.values().stream().filter(e -> e == true).count());
 
-        Collection<String> distinctDivers = mappedRows.stream().map(r ->r.getRef().getDiver().trim()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
-        Collection<String> distinctDiversExisting = mappedRows.stream().filter(s -> s.getDiver() != null).map(r ->r.getDiver().getFullName()).distinct().collect(Collectors.toList());
-        response.setNewDiverCount(distinctDivers.size() - distinctDiversExisting.size());
+        Long distinctDiverCount = mappedRows.stream().filter(d -> d.getRef().getDiver().length() > 0).distinct().count();
+        Long distinctDiversExistingCount = mappedRows.stream().filter(s -> s.getDiver() != null).distinct().count();
+        response.setNewDiverCount(distinctDiverCount - distinctDiversExistingCount);
 
         Long distinctObsItems = mappedRows.stream().map(r ->r.getRef().getCode().trim()).filter(s -> s != null && !s.equalsIgnoreCase("snd") && !s.equalsIgnoreCase("dez") && !s.equalsIgnoreCase("nsf")).distinct().count();
         Long distinctObsItemsExisting = mappedRows.stream().filter(r ->r.getSpecies().isPresent()).map(r -> r.getSpecies().get().getObservableItemName()).distinct().count();
