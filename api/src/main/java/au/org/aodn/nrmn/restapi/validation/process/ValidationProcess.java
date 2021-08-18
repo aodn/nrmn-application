@@ -657,10 +657,11 @@ public class ValidationProcess {
         response.setDiverCount(distinctDiverCount);
         response.setNewDiverCount(distinctDiverCount - distinctDiversExistingCount);
 
-        List<String> obsItemNames = mappedRows.stream().map(r -> r.getRef().getSpecies().trim().toUpperCase()).distinct().collect(Collectors.toList());
+        List<String> obsItemNames = mappedRows.stream().map(r -> r.getRef().getSpecies().trim().toUpperCase()).filter(r -> r.length() > 0).distinct().collect(Collectors.toList());
         int distinctObsItems = obsItemNames.size();
         Long distinctObsItemsExisting = mappedRows.stream().filter(r ->r.getSpecies().isPresent()).map(r -> r.getSpecies().get().getObservableItemName()).distinct().count();
-        response.setNewObsItemCount(distinctObsItems - distinctObsItemsExisting);
+        Long distinctNotPresentObsItem = mappedRows.stream().map(r -> r.getRef().getCode().trim().toUpperCase()).filter(r -> r.equalsIgnoreCase("SND")).distinct().count();
+        response.setNewObsItemCount(distinctObsItems - distinctObsItemsExisting - distinctNotPresentObsItem);
 
         response.setObsItemCount(distinctObsItems);
         return response;
@@ -672,7 +673,7 @@ public class ValidationProcess {
         Collection<ObservableItem> species = getSpeciesForRows(rows);
 
         String programName = job.getProgram().getProgramName();
-        Collection<String> enteredSiteCodes = rows.stream().map(s -> s.getSiteCode()).collect(Collectors.toSet());
+        Collection<String> enteredSiteCodes = rows.stream().map(s -> s.getSiteCode().toUpperCase()).collect(Collectors.toSet());
         Collection<String> siteCodes = siteRepository.getAllSiteCodesMatching(enteredSiteCodes);
         Collection<ValidationError> sheetErrors = new HashSet<ValidationError>();
 
