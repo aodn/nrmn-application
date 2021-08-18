@@ -371,7 +371,7 @@ public class ValidationProcess {
     }
 
     private ValidationError validateSurveyIsNew(StagedRowFormatted row) {
-        if (Arrays.asList(METHODS_TO_CHECK).contains(row.getMethod())) {
+        if (row.getDate() != null && Arrays.asList(METHODS_TO_CHECK).contains(row.getMethod())) {
 
             Date surveyDate = Date.from(row.getDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
             List<Survey> existingSurveys = surveyRepository.findBySiteDepthSurveyNumDate(row.getSite(), row.getDepth(), row.getSurveyNum(), surveyDate);
