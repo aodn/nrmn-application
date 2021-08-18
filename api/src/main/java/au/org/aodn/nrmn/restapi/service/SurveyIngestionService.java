@@ -205,7 +205,7 @@ public class SurveyIngestionService {
     @Transactional
     public void ingestTransaction(StagedJob job, Collection<StagedRowFormatted> validatedRows) {
 
-        Map<String, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
+        Map<String, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
 
         List<Integer> surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
             Survey survey = getSurvey(surveyRows.get(0));
