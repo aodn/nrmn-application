@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Example;
 import software.amazon.awssdk.utils.ImmutableMap;
 
 import javax.persistence.EntityManager;
@@ -71,7 +70,6 @@ public class SurveyIngestionServiceTest {
 
     @Test
     void getSurveyForNewSurvey() {
-        when(surveyRepository.findOne(any(Example.class))).thenReturn(Optional.empty());
         when(surveyRepository.save(any())).then(s -> s.getArgument(0));
         when(siteRepo.save(any())).then(s -> s.getArgument(0));
 
@@ -97,7 +95,6 @@ public class SurveyIngestionServiceTest {
         StagedRowFormatted row1 = rowBuilder.build();
 
         Survey survey1 = surveyIngestionService.getSurvey(row1);
-        when(surveyRepository.findOne(any(Example.class))).thenReturn(Optional.of(survey1));
 
         StagedRowFormatted row2 = rowBuilder.block(2).method(1)
                 .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build()).build();
