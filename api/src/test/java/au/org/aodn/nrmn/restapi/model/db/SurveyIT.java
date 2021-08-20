@@ -3,7 +3,6 @@ package au.org.aodn.nrmn.restapi.model.db;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +32,9 @@ class SurveyIT {
 
     @Test
     public void testMapping() {
-        val survey = surveyTestData.persistedSurvey();
+        Survey survey = surveyTestData.persistedSurvey();
         entityManager.clear();
-        val persistedSurvey = surveyRepository.findById(survey.getSurveyId()).get();
+        Survey persistedSurvey = surveyRepository.findById(survey.getSurveyId()).get();
         assertEquals(survey, persistedSurvey);
     }
 }

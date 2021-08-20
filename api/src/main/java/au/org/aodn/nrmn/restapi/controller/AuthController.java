@@ -11,7 +11,6 @@ import au.org.aodn.nrmn.restapi.util.LogInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +59,7 @@ public class AuthController {
     public ResponseEntity<Object> logOutUser(
             Authentication authentication,
             @RequestHeader(name = "Authorization") String bearerToken) {
-        val timeStamp = System.currentTimeMillis();
+        long timeStamp = System.currentTimeMillis();
         userAuditRepo.save(
                 new UserActionAudit(
                         "Logout",
@@ -82,14 +81,14 @@ public class AuthController {
         logger.info(LogInfo.withContext("login attempt"));
         userAuditRepo.save(
                 new UserActionAudit("signin", "login attempt for username: " + loginRequest.getUsername()));
-        val authentication = authenticationManager.authenticate(
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
                         loginRequest.getPassword()
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        val jwt = tokenProvider.generateToken(authentication);
+        String jwt = tokenProvider.generateToken(authentication);
         if (SecUserRepository.blackListedTokenPresent(jwt)) {
             SecUserRepository.removeBlackListedToken(jwt);
         }

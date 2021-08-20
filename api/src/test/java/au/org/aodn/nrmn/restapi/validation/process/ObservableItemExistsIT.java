@@ -18,7 +18,6 @@ import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
-import lombok.val;
 
 @Testcontainers
 @SpringBootTest
@@ -31,9 +30,9 @@ class ObservableItemExistsIT {
 
     @Test
     void notFoundSpeciesShouldFail() {
-        val job = new StagedJob();
+        StagedJob job = new StagedJob();
         job.setId(1L);
-        val row = new StagedRow();
+        StagedRow row = new StagedRow();
         row.setSpecies("Species 20");
         row.setStagedJob(job);
         Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
@@ -42,9 +41,9 @@ class ObservableItemExistsIT {
 
     @Test
     void existingSpeciesShouldBeOk() {
-        val job = new StagedJob();
+        StagedJob job = new StagedJob();
         job.setId(1L);
-        val row = new StagedRow();
+        StagedRow row = new StagedRow();
         row.setSpecies("Specie 56");
         row.setStagedJob(job);
         Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(), Arrays.asList(ObservableItem.builder().observableItemName("Specie 56").build()), Arrays.asList(row));
@@ -53,9 +52,9 @@ class ObservableItemExistsIT {
 
     @Test
     void surveyNotFoundShouldBeOk() {
-        val job = new StagedJob();
+        StagedJob job = new StagedJob();
         job.setId(1L);
-        val row = new StagedRow();
+        StagedRow row = new StagedRow();
         row.setSpecies("Survey not done");
         row.setStagedJob(job);
         Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));

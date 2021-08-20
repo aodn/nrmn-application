@@ -2,7 +2,9 @@ package au.org.aodn.nrmn.restapi.validation.springdatarest;
 
 import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
-import lombok.val;
+
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Component;
@@ -22,9 +24,9 @@ public class BeforeSaveDiverValidator implements Validator {
 
     @Override
     public void validate(Object object, Errors errors) {
-        val diver = (Diver) object;
-        val diverExample = Example.of(Diver.builder().initials(diver.getInitials()).build());
-        val existingDiverWithInitials = diverRepository.findOne(diverExample);
+        Diver diver = (Diver) object;
+        Example<Diver> diverExample = Example.of(Diver.builder().initials(diver.getInitials()).build());
+        Optional<Diver> existingDiverWithInitials = diverRepository.findOne(diverExample);
 
         if (existingDiverWithInitials.isPresent() && existingDiverWithInitials.get().getDiverId() != diver.getDiverId()) {
             errors.rejectValue("initials", "diver.initials.exists", "A diver with those initials already exists.");

@@ -10,12 +10,12 @@ import java.util.HashMap;
 import org.junit.jupiter.api.Test;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
-import lombok.val;
+import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 class Method3QuadratsSumTest extends FormattedTestProvider {
     @Test
     void quadratsSumUnder50ShouldFail() {
-        val r1 = getDefaultFormatted().build();
+        StagedRowFormatted r1 = getDefaultFormatted().build();
         r1.setMethod(3);
         r1.setMeasureJson(new HashMap<Integer, Integer>() {
             {
@@ -24,7 +24,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        val r2 = getDefaultFormatted().build();
+        StagedRowFormatted r2 = getDefaultFormatted().build();
         r2.setMethod(3);
         r2.setMeasureJson(new HashMap<Integer, Integer>() {
             {
@@ -33,7 +33,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        val r3 = getDefaultFormatted().build();
+        StagedRowFormatted r3 = getDefaultFormatted().build();
         r3.setMethod(3);
         r3.setMeasureJson(new HashMap<Integer, Integer>() {
             {
@@ -42,7 +42,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        val r4 = getDefaultFormatted().build();
+        StagedRowFormatted r4 = getDefaultFormatted().build();
         r4.setMethod(3);
         r4.setMeasureJson(new HashMap<Integer, Integer>() {
             {
@@ -50,9 +50,9 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
                 put(3, 7);
             }
         });
-        val date = LocalDate.now();
+        LocalDate date = LocalDate.now();
 
-        val a1 = getDefaultFormatted().build();
+        StagedRowFormatted a1 = getDefaultFormatted().build();
 
         a1.setMethod(3);
         a1.setDate(date);
@@ -63,7 +63,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        val a2 = getDefaultFormatted().build();
+        StagedRowFormatted a2 = getDefaultFormatted().build();
         a2.setMethod(3);
         a2.setDate(date);
         a2.setMeasureJson(new HashMap<Integer, Integer>() {
@@ -72,7 +72,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        val a3 = getDefaultFormatted().build();
+        StagedRowFormatted a3 = getDefaultFormatted().build();
         a3.setMethod(3);
         a3.setDate(date);
         a3.setMeasureJson(new HashMap<Integer, Integer>() {
@@ -81,7 +81,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        val a4 = getDefaultFormatted().build();
+        StagedRowFormatted a4 = getDefaultFormatted().build();
         a4.setMethod(3);
         a4.setDate(date);
         a4.setMeasureJson(new HashMap<Integer, Integer>() {
@@ -96,7 +96,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
 
     @Test
     void quadratsSumUnder50ShouldSuccess() {
-        val r1 = getDefaultFormatted().build();
+        StagedRowFormatted r1 = getDefaultFormatted().build();
         r1.setMethod(3);
         r1.setMeasureJson(new HashMap<Integer, Integer>() {
             {
@@ -105,7 +105,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        val r2 = getDefaultFormatted().build();
+        StagedRowFormatted r2 = getDefaultFormatted().build();
         r2.setMethod(3);
         r2.setMeasureJson(new HashMap<Integer, Integer>() {
             {
@@ -115,7 +115,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        val r3 = getDefaultFormatted().build();
+        StagedRowFormatted r3 = getDefaultFormatted().build();
         r3.setMethod(3);
         r3.setMeasureJson(new HashMap<Integer, Integer>() {
             {
@@ -124,7 +124,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        val r4 = getDefaultFormatted().build();
+        StagedRowFormatted r4 = getDefaultFormatted().build();
         r4.setMethod(3);
         r4.setMeasureJson(new HashMap<Integer, Integer>() {
             {
@@ -133,9 +133,9 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
                 put(3, 70);
             }
         });
-        val date = LocalDate.now();
+        LocalDate date = LocalDate.now();
 
-        val a1 = getDefaultFormatted().build();
+        StagedRowFormatted a1 = getDefaultFormatted().build();
 
         a1.setMethod(3);
         a1.setDate(date);
@@ -146,7 +146,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        val a2 = getDefaultFormatted().build();
+        StagedRowFormatted a2 = getDefaultFormatted().build();
         a2.setMethod(3);
         a2.setDate(date);
         a2.setMeasureJson(new HashMap<Integer, Integer>() {
@@ -156,7 +156,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        val a3 = getDefaultFormatted().build();
+        StagedRowFormatted a3 = getDefaultFormatted().build();
         a3.setMethod(3);
         a3.setDate(date);
         a3.setMeasureJson(new HashMap<Integer, Integer>() {
@@ -167,7 +167,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        val a4 = getDefaultFormatted().build();
+        StagedRowFormatted a4 = getDefaultFormatted().build();
         a4.setMethod(3);
         a4.setDate(date);
         a4.setMeasureJson(new HashMap<Integer, Integer>() {

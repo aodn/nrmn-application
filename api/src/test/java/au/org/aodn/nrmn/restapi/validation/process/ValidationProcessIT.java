@@ -1,12 +1,12 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
-import au.org.aodn.nrmn.restapi.model.db.*;
-import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
-import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
-import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
-import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
-import lombok.val;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,9 +15,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.org.apache.commons.lang.SerializationUtils;
 
-import java.util.*;
-
-import static org.springframework.test.util.AssertionErrors.assertEquals;
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
+import au.org.aodn.nrmn.restapi.model.db.Program;
+import au.org.aodn.nrmn.restapi.model.db.ProgramTestData;
+import au.org.aodn.nrmn.restapi.model.db.SecUser;
+import au.org.aodn.nrmn.restapi.model.db.SecUserTestData;
+import au.org.aodn.nrmn.restapi.model.db.StagedJob;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
+import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
+import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 
 @Testcontainers
 @SpringBootTest
@@ -39,9 +48,9 @@ public class ValidationProcessIT extends FormattedTestProvider {
 
     @Test
     public void testValidationResultsNotDuplicated() {
-        val program = ptd.persistedProgram();
-        val user = utd.persistedUser();
-        val stagedJob = StagedJob.builder()
+        Program program = ptd.persistedProgram();
+        SecUser user = utd.persistedUser();
+        StagedJob stagedJob = StagedJob.builder()
                 .program(program)
                 .reference("survey.xls")
                 .source(SourceJobType.INGEST)
@@ -53,7 +62,7 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .logs(Collections.emptyList())
                 .build();
 
-        val row1 = StagedRow.builder()
+        StagedRow row1 = StagedRow.builder()
                 .block("1")
                 .method("1")
                 .buddy("Row1")
@@ -68,17 +77,17 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .stagedJob(stagedJob)
                 .build();
 
-        val row2 = (StagedRow) SerializationUtils.clone(row1);
+        StagedRow row2 = (StagedRow) SerializationUtils.clone(row1);
         row2.setMethod("2");
 
 
-        val row3 = (StagedRow) SerializationUtils.clone(row1);
+        StagedRow row3 = (StagedRow) SerializationUtils.clone(row1);
         row3.setBlock("2");
 
-        val row4 = (StagedRow) SerializationUtils.clone(row2);
+        StagedRow row4 = (StagedRow) SerializationUtils.clone(row2);
         row4.setBlock("2");
 
-        val measures = new HashMap<Integer, String>() {{
+        HashMap<Integer, String> measures = new HashMap<Integer, String>() {{
             put(1, "3");
             put(2, "4");
         }};
@@ -90,7 +99,7 @@ public class ValidationProcessIT extends FormattedTestProvider {
         stagedJob.setRows(Arrays.asList(row1, row2, row3, row4));
 
 
-        val errors = validationProcess.process(stagedJob);
+        ValidationResponse errors = validationProcess.process(stagedJob);
 
         assertEquals("Validation is failing on valid rows", 0, errors.getErrors().size());
 

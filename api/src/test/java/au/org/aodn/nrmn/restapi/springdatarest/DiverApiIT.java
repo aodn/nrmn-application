@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.springdatarest;
 
+import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.DiverTestData;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
@@ -8,7 +9,6 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
-import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -70,7 +70,7 @@ public class DiverApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testCreateUsingExistingInitials() {
-        val existingDiver = diverTestData.persistedDiver();
+        Diver existingDiver = diverTestData.persistedDiver();
 
         given()
                 .spec(spec)
@@ -89,8 +89,8 @@ public class DiverApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testUpdateUsingExistingInitials() {
-        val diver = diverTestData.persistedDiver();
-        val existingDiver = diverTestData.persistedDiver();
+        Diver diver = diverTestData.persistedDiver();
+        Diver existingDiver = diverTestData.persistedDiver();
 
         given()
                 .spec(spec)
@@ -109,8 +109,8 @@ public class DiverApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testUpdateUsingExistingFullName() {
-        val diver = diverTestData.persistedDiver();
-        val existingDiver = diverTestData.persistedDiver();
+        Diver diver = diverTestData.persistedDiver();
+        Diver existingDiver = diverTestData.persistedDiver();
 
         given()
                 .spec(spec)

@@ -1,19 +1,32 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
+import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
+import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
+
+import java.sql.Date;
+import java.sql.Time;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import org.hibernate.envers.Audited;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.envers.Audited;
-
-import javax.persistence.*;
-import java.sql.Date;
-import java.sql.Time;
-
-import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
-import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 @Entity
 @Data

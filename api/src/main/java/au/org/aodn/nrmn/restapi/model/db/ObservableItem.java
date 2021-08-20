@@ -1,17 +1,39 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import lombok.*;
+import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
+
+import java.util.Map;
+import java.util.Set;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.SecondaryTable;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
-import javax.persistence.*;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.util.Map;
-import java.util.Set;
-
-import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data

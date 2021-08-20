@@ -1,6 +1,23 @@
 package au.org.aodn.nrmn.restapi.springdatarest;
 
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.security.test.context.support.WithUserDetails;
+
+import au.org.aodn.nrmn.restapi.model.db.ObsItemType;
 import au.org.aodn.nrmn.restapi.model.db.ObsItemTypeTestData;
+import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItemTestData;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
@@ -10,19 +27,6 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
-import lombok.val;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.security.test.context.support.WithUserDetails;
-
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.core.IsEqual.equalTo;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(PostgresqlContainerExtension.class)
@@ -60,7 +64,7 @@ public class ObservableItemApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testCreateObservableItem() {
-        val obsItemType = obsItemTypeTestData.persistedObsItemType();
+        ObsItemType obsItemType = obsItemTypeTestData.persistedObsItemType();
 
         given()
                 .spec(spec)
@@ -87,7 +91,7 @@ public class ObservableItemApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testUpdateObservableItem() {
-        val observableItem = observableItemTestData
+        ObservableItem observableItem = observableItemTestData
                 .defaultBuilder()
                 .isInvertSized(true)
                 .build();
@@ -110,7 +114,7 @@ public class ObservableItemApiIT {
                 .assertThat()
                 .statusCode(200);
 
-        val updatedItem = observableItemRepository.findById(observableItem.getObservableItemId());
+        Optional<ObservableItem> updatedItem = observableItemRepository.findById(observableItem.getObservableItemId());
 
         assertThat(updatedItem.get().getIsInvertSized(), equalTo(true));
     }

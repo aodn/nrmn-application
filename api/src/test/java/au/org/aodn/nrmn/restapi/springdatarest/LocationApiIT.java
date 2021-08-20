@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.springdatarest;
 
+import au.org.aodn.nrmn.restapi.model.db.Location;
 import au.org.aodn.nrmn.restapi.model.db.LocationTestData;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
@@ -8,7 +9,6 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
-import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,7 +69,7 @@ public class LocationApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testCreateUsingExistingInitials() {
-        val existingDiver = locationTestData.persistedLocation();
+        Location existingDiver = locationTestData.persistedLocation();
 
         given()
                 .spec(spec)
@@ -88,8 +88,8 @@ public class LocationApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testUpdateUsingExistingInitials() {
-        val diver = locationTestData.persistedLocation();
-        val existingDiver = locationTestData.persistedLocation();
+        Location diver = locationTestData.persistedLocation();
+        Location existingDiver = locationTestData.persistedLocation();
 
         given()
                 .spec(spec)
