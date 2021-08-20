@@ -11,9 +11,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import lombok.val;
-
-
 @Component
 public class GenerateApplicationTables implements ApplicationListener<ApplicationReadyEvent> {
 
@@ -30,7 +27,7 @@ public class GenerateApplicationTables implements ApplicationListener<Applicatio
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
 
-        val profiles = this.environment.getActiveProfiles();
+        String[] profiles = this.environment.getActiveProfiles();
         logger.info("profiles found : {}", Arrays.toString(profiles));
     }
 }

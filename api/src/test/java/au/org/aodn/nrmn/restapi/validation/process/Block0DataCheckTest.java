@@ -20,7 +20,6 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import lombok.val;
 
 @ExtendWith(MockitoExtension.class)
 class Block0DataCheckTest {
@@ -44,9 +43,9 @@ class Block0DataCheckTest {
     
     @Test
     void block0MethodOutOfRangeShouldFail() {
-        val job = new StagedJob();
+        StagedJob job = new StagedJob();
         job.setId(1L);
-        val row = new StagedRow();
+        StagedRow row = new StagedRow();
         row.setBlock("0");
         row.setMethod("2");
         row.setStagedJob(job);
@@ -56,9 +55,9 @@ class Block0DataCheckTest {
 
     @Test
     void block0MethodInRangeShouldSucceed() {
-        val job = new StagedJob();
+        StagedJob job = new StagedJob();
         job.setId(1L);
-        val row = new StagedRow();
+        StagedRow row = new StagedRow();
         row.setBlock("0");
         row.setMethod("5");
         row.setStagedJob(job);

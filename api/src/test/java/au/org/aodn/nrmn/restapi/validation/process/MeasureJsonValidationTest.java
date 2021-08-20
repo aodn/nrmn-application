@@ -19,7 +19,6 @@ import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
-import lombok.val;
 
 @ExtendWith(MockitoExtension.class)
 class MeasureJsonValidationTest {
@@ -39,9 +38,9 @@ class MeasureJsonValidationTest {
      @Test
     void measureJsonWithIntShouldSuccess() {
 
-        val job = new StagedJob();
+        StagedJob job = new StagedJob();
         job.setId(1L);
-        val row = new StagedRow();
+        StagedRow row = new StagedRow();
         row.setMeasureJson(
                 new HashMap<Integer, String>() {
                     {
@@ -58,10 +57,9 @@ class MeasureJsonValidationTest {
 
     @Test
     void measureJsonWithNaNtShouldFail() {
-
-        val job = new StagedJob();
+        StagedJob job = new StagedJob();
         job.setId(1L);
-        val row = new StagedRow();
+        StagedRow row = new StagedRow();
         row.setMeasureJson(
                 new HashMap<Integer, String>() {
                     {

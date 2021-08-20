@@ -12,12 +12,12 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.model.db.ObsItemType;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import lombok.val;
+import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 class MissingDataCheckTest extends FormattedTestProvider {
     @Test
     public void noSpeciesFoundWithNoObservationsShouldSucceed() {
-        val formatted = getDefaultFormatted().build();
+        StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMeasureJson(ImmutableMap.<Integer, Integer>builder().build());
         formatted.setTotal(0);
         formatted.setCode("nsf");
@@ -32,7 +32,7 @@ class MissingDataCheckTest extends FormattedTestProvider {
 
     @Test
     public void sndWithNoObservationsShouldSucceed() {
-        val formatted = getDefaultFormatted().build();
+        StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMeasureJson(ImmutableMap.<Integer, Integer>builder().build());
         formatted.setTotal(0);
         formatted.setCode("snd");
@@ -43,7 +43,7 @@ class MissingDataCheckTest extends FormattedTestProvider {
 
     @Test
     public void speciesWithInvertsShouldSucceed() {
-        val formatted = getDefaultFormatted().build();
+        StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMeasureJson(ImmutableMap.<Integer, Integer>builder().build());
         formatted.setInverts(4);
         formatted.setCode("pla");
@@ -56,7 +56,7 @@ class MissingDataCheckTest extends FormattedTestProvider {
 
     @Test
     public void speciesWithNoObservationsShouldFail() {
-        val formatted = getDefaultFormatted().build();
+        StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMeasureJson(ImmutableMap.<Integer, Integer>builder().build());
         formatted.setTotal(0);
         formatted.setCode("pla");

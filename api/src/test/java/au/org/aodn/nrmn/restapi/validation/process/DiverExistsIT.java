@@ -18,7 +18,6 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
-import lombok.val;
 
 @Testcontainers
 @SpringBootTest
@@ -34,9 +33,9 @@ class DiverExistsIT {
 
     @Test
     void notFoundDiverShouldFail() {
-        val job = new StagedJob();
+        StagedJob job = new StagedJob();
         job.setId(1L);
-        val row = new StagedRow();
+        StagedRow row = new StagedRow();
         row.setDiver("NOP");
         row.setStagedJob(job);
         Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
@@ -45,9 +44,9 @@ class DiverExistsIT {
 
     @Test
     void existingDiverShouldBeOk() {
-        val job = new StagedJob();
+        StagedJob job = new StagedJob();
         job.setId(1L);
-        val row = new StagedRow();
+        StagedRow row = new StagedRow();
         row.setStagedJob(job);
         row.setDiver("TJR");
         Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));

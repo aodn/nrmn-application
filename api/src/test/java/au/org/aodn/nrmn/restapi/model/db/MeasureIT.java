@@ -3,7 +3,6 @@ package au.org.aodn.nrmn.restapi.model.db;
 import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +33,9 @@ class MeasureIT {
 
     @Test
     public void testMapping() {
-        val measure = measureTestData.persistedMeasure();
+        Measure measure = measureTestData.persistedMeasure();
         entityManager.clear();
-        val persistedMeasure = measureRepository.findById(measure.getMeasureId()).get();
+        Measure persistedMeasure = measureRepository.findById(measure.getMeasureId()).get();
         assertEquals(measure, persistedMeasure);
     }
 }

@@ -23,7 +23,6 @@ import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
-import lombok.val;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
         pattern = ".*TestData"))
@@ -43,10 +42,10 @@ class StagedJobIT {
 
     @Test
     public void testMapping() {
-        val startTime = LocalDateTime.now();
-        val stagedJob = stagedJobTestData.persistedStagedJob();
+        LocalDateTime startTime = LocalDateTime.now();
+        StagedJob stagedJob = stagedJobTestData.persistedStagedJob();
         entityManager.clear();
-        val retrievedStagedJob = stagedJobRepository.findById(stagedJob.getId()).get();
+        StagedJob retrievedStagedJob = stagedJobRepository.findById(stagedJob.getId()).get();
         assertEquals(stagedJob.toString(), retrievedStagedJob.toString());
         assertThat(retrievedStagedJob.getCreated().toLocalDateTime(),
                 is(both(greaterThanOrEqualTo(startTime)).and(lessThanOrEqualTo(LocalDateTime.now()))));
@@ -56,11 +55,11 @@ class StagedJobIT {
 
     @Test
     public void testLastUpdated() {
-        val stagedJob = stagedJobTestData.persistedStagedJob();
+        StagedJob stagedJob = stagedJobTestData.persistedStagedJob();
         stagedJob.setStatus(StatusJobType.FAILED);
         entityManager.clear();
         stagedJobRepository.saveAndFlush(stagedJob);
-        val retrievedStagedJob = stagedJobRepository.findById(stagedJob.getId()).get();
+        StagedJob retrievedStagedJob = stagedJobRepository.findById(stagedJob.getId()).get();
         assertThat(retrievedStagedJob.getLastUpdated().toLocalDateTime(),
                 is(both(greaterThanOrEqualTo(stagedJob.getCreated().toLocalDateTime())).and(lessThanOrEqualTo(LocalDateTime.now()))));
     }

@@ -24,7 +24,6 @@ import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
-import lombok.val;
 
 @ExtendWith(MockitoExtension.class)
 class NoSpeciesFoundMeasurementsTest {
@@ -37,9 +36,9 @@ class NoSpeciesFoundMeasurementsTest {
         
     @Test
     void outOfScopeShouldSuccess( ) {
-        val job = new StagedJob();
+        StagedJob job = new StagedJob();
         job.setId(1L);
-        val row = new StagedRow();
+        StagedRow row = new StagedRow();
         row.setStagedJob(job);
         row.setMeasureJson(ImmutableMap.<Integer, String>builder().put(1, "2").build());
         row.setSpecies("Pictilabrus laticlavius");

@@ -3,7 +3,6 @@ package au.org.aodn.nrmn.restapi.model.db;
 import au.org.aodn.nrmn.restapi.model.db.StagedJobLog.StagedJobLogBuilder;
 import au.org.aodn.nrmn.restapi.model.db.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +16,7 @@ public class StagedJobLogTestData {
     private StagedJobLogRepository stagedJobLogRepository;
 
     public StagedJobLog persistedStagedJobLog() {
-        val stagedJobLog = defaultBuilder().build();
+        StagedJobLog stagedJobLog = defaultBuilder().build();
        return stagedJobLogRepository.saveAndFlush(stagedJobLog);
     }
 

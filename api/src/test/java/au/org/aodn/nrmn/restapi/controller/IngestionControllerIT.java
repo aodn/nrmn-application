@@ -10,7 +10,6 @@ import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.security.JwtTokenProvider;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +19,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -48,8 +48,8 @@ class IngestionControllerIT {
 
         RequestWrapper<String, SecUser> reqBuilder = new RequestWrapper<String, SecUser>();
 
-        val auth = getContext().getAuthentication();
-        val token = jwtProvider.generateToken(auth);
+        Authentication auth = getContext().getAuthentication();
+        String token = jwtProvider.generateToken(auth);
 
         long initialObservationCount = observationRepository.count();
 
@@ -73,8 +73,8 @@ class IngestionControllerIT {
 
         RequestWrapper<String, SecUser> reqBuilder = new RequestWrapper<String, SecUser>();
 
-        val auth = getContext().getAuthentication();
-        val token = jwtProvider.generateToken(auth);
+        Authentication auth = getContext().getAuthentication();
+        String token = jwtProvider.generateToken(auth);
 
         long initialObservationCount = observationRepository.count();
 

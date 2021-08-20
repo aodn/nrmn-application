@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.InputStream;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,10 +14,10 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.service.SurveyContentsHandler.ParsedSheet;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
-import lombok.val;
 
 @Testcontainers
 @SpringBootTest
@@ -29,9 +30,9 @@ public class SpreadSheetServiceIT {
 
     @Test
     public void correctShortheaderShouldBeValid() throws Exception {
-        val rottnestInput = getClass().getClassLoader().getResourceAsStream("sheets/correctShortHeader.xlsx");
+        InputStream rottnestInput = getClass().getClassLoader().getResourceAsStream("sheets/correctShortHeader.xlsx");
 
-        val validSheet = sheetService.stageXlsxFile(
+        ParsedSheet validSheet = sheetService.stageXlsxFile(
                 new MockMultipartFile("sheets/correctShortHeader.xlsx", rottnestInput), false);
         assertTrue(validSheet != null);
     }
@@ -40,7 +41,7 @@ public class SpreadSheetServiceIT {
     public void correctLongheaderShouldBeValid() throws Exception {
         InputStream rottnestInput = getClass().getClassLoader()
                 .getResourceAsStream("sheets/correctLongHeader.xlsx");
-        val validSheet = sheetService.stageXlsxFile(
+                ParsedSheet validSheet = sheetService.stageXlsxFile(
                 new MockMultipartFile("sheets/correctLongHeader.xlsx", rottnestInput), true);
         assertTrue(validSheet != null);
     }
@@ -99,12 +100,12 @@ public class SpreadSheetServiceIT {
 
     @Test
     void validFileShouldBeCorrectlyTransformToStageSurvey() throws Exception {
-        val file3 = new FileSystemResource("src/test/resources/sheets/correctShortHeader3.xlsx");
+        FileSystemResource file3 = new FileSystemResource("src/test/resources/sheets/correctShortHeader3.xlsx");
         ParsedSheet parsedSheet = sheetService.stageXlsxFile(new MockMultipartFile("sheets/correctShortHeader3.xlsx", file3.getInputStream()), false);
 
-        val stageSurveys = parsedSheet.getStagedRows();
+        List<StagedRow> stageSurveys = parsedSheet.getStagedRows();
         assertEquals(23, stageSurveys.size());
-        val obs1 = stageSurveys.get(0);
+        StagedRow obs1 = stageSurveys.get(0);
 
         // Test Double
         assertEquals(obs1.getLatitude(), "-41.253706");
@@ -120,9 +121,9 @@ public class SpreadSheetServiceIT {
 
     @Test
     void datesShouldNeverBeFormattedMDY() throws Exception {
-        val file = new FileSystemResource("src/test/resources/sheets/dateFormats.xlsx");
-        val mockFile = new MockMultipartFile("sheets/dateFormats.xlsx", file.getInputStream());
-        val stageSurveys = sheetService.stageXlsxFile(mockFile, false).getStagedRows();
+        FileSystemResource file = new FileSystemResource("src/test/resources/sheets/dateFormats.xlsx");
+        MockMultipartFile mockFile = new MockMultipartFile("sheets/dateFormats.xlsx", file.getInputStream());
+        List<StagedRow> stageSurveys = sheetService.stageXlsxFile(mockFile, false).getStagedRows();
 
         // Test that dates are formatted the same way as they appear in the sheet.
         assertEquals("12/12/2019", stageSurveys.get(0).getDate());

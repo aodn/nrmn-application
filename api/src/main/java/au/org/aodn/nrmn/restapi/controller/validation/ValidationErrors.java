@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.controller.validation;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Value;
 
 import java.util.List;
 

@@ -10,7 +10,6 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +45,7 @@ public class AuthControllerIT {
         assertEquals(response.getBody().getAccessToken().length() > 10, true);
         assertEquals(response.getBody().getTokenType(), "Bearer");
 
-        val token = response.getBody().getAccessToken();
+        String token = response.getBody().getAccessToken();
 
         ResponseEntity<Void> resp = logoutResponse(token);
         assertEquals(resp.getStatusCode(), HttpStatus.OK);
@@ -93,8 +92,8 @@ public class AuthControllerIT {
     }
 
     private ResponseEntity<JwtAuthenticationResponse> loginResponse(String username, String password) throws Exception {
-        val logReq = new LoginRequest(username, password);
-        val reqBuilder = new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
+        LoginRequest logReq = new LoginRequest(username, password);
+        RequestWrapper<LoginRequest, JwtAuthenticationResponse> reqBuilder = new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
 
         return reqBuilder
                 .withAppJson()
@@ -106,7 +105,7 @@ public class AuthControllerIT {
     }
 
     private ResponseEntity<Void> logoutResponse(String token) throws Exception {
-        val logOutReq = new RequestWrapper<Void, Void>();
+        RequestWrapper<Void, Void> logOutReq = new RequestWrapper<Void, Void>();
         return logOutReq
                 .withAppJson()
                 .withMethod(HttpMethod.POST)
@@ -116,7 +115,7 @@ public class AuthControllerIT {
     }
 
     private String login(String username, String password) throws Exception {
-        val response = loginResponse(username, password);
+        ResponseEntity<JwtAuthenticationResponse> response = loginResponse(username, password);
         return response.getBody().getAccessToken();
     }
 

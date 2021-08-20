@@ -2,7 +2,6 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.Diver.DiverBuilder;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +14,7 @@ public class DiverTestData {
     private int diverNo = 0;
 
     public Diver persistedDiver() {
-        val diver = defaultBuilder().build();
+        Diver diver = defaultBuilder().build();
         diverRepository.saveAndFlush(diver);
         return diver;
     }

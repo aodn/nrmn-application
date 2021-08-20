@@ -35,7 +35,6 @@ import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.repository.projections.LetterCodeMapping;
 import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import au.org.aodn.nrmn.restapi.repository.projections.SpeciesWithAttributesCsvRow;
-import lombok.val;
 
 @ExtendWith(MockitoExtension.class)
 public class TemplateServiceTest {
@@ -399,7 +398,7 @@ public class TemplateServiceTest {
             }
         };
 
-        val lcm1 = new LetterCodeMapping() {
+        LetterCodeMapping lcm1 = new LetterCodeMapping() {
 
             @Override
             public Long getObservableItemId() {
@@ -412,7 +411,7 @@ public class TemplateServiceTest {
             }
         };
 
-        val lcm2 = new LetterCodeMapping() {
+        LetterCodeMapping lcm2 = new LetterCodeMapping() {
 
             @Override
             public Long getObservableItemId() {
@@ -425,7 +424,7 @@ public class TemplateServiceTest {
             }
         };
 
-        val lcm3 = new LetterCodeMapping() {
+        LetterCodeMapping lcm3 = new LetterCodeMapping() {
 
             @Override
             public Long getObservableItemId() {
@@ -439,8 +438,8 @@ public class TemplateServiceTest {
         };
 
         Site site1 = Site.builder().siteId(1).build();
-        val siteIds = Arrays.asList(site1.getSiteId());
-        val obsIds = Arrays.asList(123);
+        List<Integer> siteIds = Arrays.asList(site1.getSiteId());
+        List<Integer> obsIds = Arrays.asList(123);
         when(observableItemRepository.getAllWithMethodForSites(2, siteIds))
                 .thenReturn(Arrays.asList(o1).stream().collect(Collectors.toList()));
         when(observationRepository.getSpeciesAttributesByIds(obsIds)).thenReturn(swaList);
@@ -449,7 +448,7 @@ public class TemplateServiceTest {
         HashMap<Long, String> letterCodeMap = new HashMap<Long, String>();
         letterCodeMappings.forEach(
                 m -> letterCodeMap.put(Long.valueOf(m.getObservableItemId()), m.getLetterCode()));
-        val speciesWithAttributes = templateService.getSpeciesForTemplate(2, siteIds, letterCodeMap);
+        List<SpeciesWithAttributesCsvRow> speciesWithAttributes = templateService.getSpeciesForTemplate(2, siteIds, letterCodeMap);
         // Add one for 'survey not done' added by the service
         assertEquals(swaList.size() + 1, speciesWithAttributes.size());
         assertEquals("Abudefduf saxatilis", speciesWithAttributes.get(0).getSpeciesName());

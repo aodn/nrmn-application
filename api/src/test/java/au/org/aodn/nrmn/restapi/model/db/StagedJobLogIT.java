@@ -1,9 +1,14 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
-import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
-import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
-import lombok.val;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +19,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
-import java.time.LocalDateTime;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
+import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
     pattern = ".*TestData"))
@@ -38,11 +41,11 @@ class StagedJobLogIT {
 
     @Test
     public void testMapping() {
-        val startTime = LocalDateTime.now();
-        val stagedJobLog = stagedJobLogTestData.persistedStagedJobLog();
+        LocalDateTime startTime = LocalDateTime.now();
+        StagedJobLog stagedJobLog = stagedJobLogTestData.persistedStagedJobLog();
         entityManager.clear();
 
-        val retrievedStagedJobLog = stagedJobLogRepository.findById(stagedJobLog.getId()).get();
+        StagedJobLog retrievedStagedJobLog = stagedJobLogRepository.findById(stagedJobLog.getId()).get();
         assertEquals(stagedJobLog.toString(), retrievedStagedJobLog.toString());
         assertThat(retrievedStagedJobLog.getEventTime().toLocalDateTime(),
             is(both(greaterThanOrEqualTo(startTime)).and(lessThanOrEqualTo(LocalDateTime.now()))));

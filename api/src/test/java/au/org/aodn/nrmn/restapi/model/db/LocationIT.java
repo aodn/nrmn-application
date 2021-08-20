@@ -3,7 +3,6 @@ package au.org.aodn.nrmn.restapi.model.db;
 import au.org.aodn.nrmn.restapi.repository.LocationRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +33,9 @@ class LocationIT {
 
     @Test
     public void testMapping() {
-        val location = locationTestData.persistedLocation();
+        Location location = locationTestData.persistedLocation();
         entityManager.clear();
-        val persistedLocation = locationRepository.findById(location.getLocationId()).get();
+        Location persistedLocation = locationRepository.findById(location.getLocationId()).get();
         assertEquals(location, persistedLocation);
     }
 
