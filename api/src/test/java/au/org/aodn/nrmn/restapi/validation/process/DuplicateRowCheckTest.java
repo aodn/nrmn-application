@@ -1,0 +1,95 @@
+package au.org.aodn.nrmn.restapi.validation.process;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.repository.DiverRepository;
+
+@ExtendWith(MockitoExtension.class)
+class DuplicateRowCheckTest {
+
+    @InjectMocks
+    ValidationProcess validationProcess;
+
+    
+    @Mock
+    DiverRepository diverRepository;
+    
+    @BeforeEach
+    void init() {
+        MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    void duplicateRowShouldFail() {
+        StagedRow r1 = StagedRow.builder().block("1").pos(1).measureJson(new HashMap<Integer, String>() {{
+            put(1, "3");
+            put(2, "4");
+        }}).build();
+        StagedRow r2 = StagedRow.builder().block("1").pos(2).measureJson(new HashMap<Integer, String>() {{
+            put(1, "3");
+            put(2, "4");
+        }}).build();
+        StagedRow r3 = StagedRow.builder().block("1").pos(3).measureJson(new HashMap<Integer, String>() {{
+            put(1, "3");
+            put(2, "4");
+        }}).build();
+
+        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
+        assertTrue(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Rows duplicated")));
+    }
+
+    @Test
+    void duplicateRowValidationShouldIgnoreMeasurements() {
+        StagedRow r1 = StagedRow.builder().block("1").pos(1).measureJson(new HashMap<Integer, String>() {{
+            put(1, "35");
+            put(2, "421");
+        }}).build();
+        StagedRow r2 = StagedRow.builder().block("1").pos(2).measureJson(new HashMap<Integer, String>() {{
+            put(1, "3");
+            put(2, "4");
+            put(4, "7");
+            put(5, "999");
+        }}).build();
+        StagedRow r3 = StagedRow.builder().block("1").pos(3).measureJson(new HashMap<Integer, String>() {{
+            put(3, "3");
+            put(5, "47");
+        }}).build();
+
+        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
+        assertTrue(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Rows duplicated")));
+    }
+
+    @Test
+    void nonDuplicatedRowsShouldSucceed() {
+        StagedRow r1 = StagedRow.builder().block("1").pos(1).measureJson(new HashMap<Integer, String>() {{
+            put(1, "3");
+            put(2, "4");
+        }}).build();
+        StagedRow r2 = StagedRow.builder().block("2").pos(2).measureJson(new HashMap<Integer, String>() {{
+            put(1, "3");
+            put(2, "4");
+        }}).build();
+        StagedRow r3 = StagedRow.builder().block("4").pos(3).measureJson(new HashMap<Integer, String>() {{
+            put(1, "3");
+            put(2, "4");
+        }}).build();
+
+        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
+        assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Rows duplicated")));
+    }
+}

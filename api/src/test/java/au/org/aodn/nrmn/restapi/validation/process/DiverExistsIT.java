@@ -1,0 +1,56 @@
+package au.org.aodn.nrmn.restapi.validation.process;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.model.db.StagedJob;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
+import lombok.val;
+
+@Testcontainers
+@SpringBootTest
+@WithTestData
+@ExtendWith(PostgresqlContainerExtension.class)
+class DiverExistsIT {
+
+    @Autowired
+    ValidationProcess validationProcess;
+
+    @Autowired
+    DiverRepository diverRepo;
+
+    @Test
+    void notFoundDiverShouldFail() {
+        val job = new StagedJob();
+        job.setId(1L);
+        val row = new StagedRow();
+        row.setDiver("NOP");
+        row.setStagedJob(job);
+        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
+        assertTrue(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Diver does not exist")));
+    }
+
+    @Test
+    void existingDiverShouldBeOk() {
+        val job = new StagedJob();
+        job.setId(1L);
+        val row = new StagedRow();
+        row.setStagedJob(job);
+        row.setDiver("TJR");
+        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
+        assertFalse(res.stream().anyMatch(e -> e.getColumnNames().contains("diver") && e.getMessage().equalsIgnoreCase("Diver does not exist")));
+    }
+}
