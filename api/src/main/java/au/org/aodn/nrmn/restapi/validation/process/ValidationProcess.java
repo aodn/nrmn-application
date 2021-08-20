@@ -183,7 +183,7 @@ public class ValidationProcess {
             }
 
             // Time
-            if (row.getTime() == null || !TimeUtils.parseTime(row.getTime()).isPresent())
+            if (row.getTime().length() > 0 && !TimeUtils.parseTime(row.getTime()).isPresent())
                 errors.add(rowId, ValidationLevel.WARNING, "time", "Time format is not valid");
 
             // Block
@@ -360,7 +360,7 @@ public class ValidationProcess {
 
     private ValidationCell validateSpeciesBelowToMethod(StagedRowFormatted row) {
 
-        if (row.getSpecies().isPresent()) {
+        if (row.getSpecies().isPresent() && row.getSpecies().get().getMethods() != null) {
             Set<Integer> methodIds = row.getSpecies().get().getMethods().stream().map(m -> m.getMethodId()).collect(Collectors.toSet());
 
             if (!methodIds.contains(row.getMethod()))
@@ -378,7 +378,7 @@ public class ValidationProcess {
 
             if (!existingSurveys.isEmpty()) {
                 Survey existingSurvey = existingSurveys.stream().findFirst().get();
-                String message = "Survey " + existingSurvey.getSurveyId() + " includes [" + row.getSite().getSiteCode() + ", " + row.getDate() + ", " + row.getDepth() + "]" + row.getMethod();
+                String message = "Survey exists: " + existingSurvey.getSurveyId() + " includes [" + row.getSite().getSiteCode() + ", " + row.getDate() + ", " + row.getDepth() + "]" + row.getMethod();
                 return new ValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, message, Arrays.asList(row.getId()), Arrays.asList("siteCode"));
             }
 
