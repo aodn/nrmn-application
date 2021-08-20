@@ -2,7 +2,6 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.Program.ProgramBuilder;
 import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +14,7 @@ public class ProgramTestData {
     private int programNo = 0;
 
     public Program persistedProgram() {
-        val program = defaultBuilder().build();
+        Program program = defaultBuilder().build();
         programRepository.saveAndFlush(program);
         return program;
     }

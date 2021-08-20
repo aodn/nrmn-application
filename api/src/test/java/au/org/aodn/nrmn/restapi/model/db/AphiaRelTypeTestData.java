@@ -2,7 +2,6 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.AphiaRelType.AphiaRelTypeBuilder;
 import au.org.aodn.nrmn.restapi.repository.AphiaRelTypeRepository;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +14,7 @@ public class AphiaRelTypeTestData {
     private int aphiaRelTypeNo = 0;
 
     public AphiaRelType persistedAphiaRelType() {
-        val aphiaRelType = defaultBuilder().build();
+        AphiaRelType aphiaRelType = defaultBuilder().build();
         aphiaRelTypeRepository.saveAndFlush(aphiaRelType);
         return aphiaRelType;
     }

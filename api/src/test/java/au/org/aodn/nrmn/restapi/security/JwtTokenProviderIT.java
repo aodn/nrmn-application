@@ -2,11 +2,11 @@ package au.org.aodn.nrmn.restapi.security;
 
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -27,8 +27,8 @@ class JwtTokenProviderIT {
     @WithUserDetails("test@example.com")
     public void GenerateToken() {
 
-        val auth = getContext().getAuthentication();
-        val token = provider.generateToken(auth);
+        Authentication auth = getContext().getAuthentication();
+        String token = provider.generateToken(auth);
         assertTrue(token.length() > 20);
         assertEquals(provider.getUserIdFromJWT(token), 123456);
 

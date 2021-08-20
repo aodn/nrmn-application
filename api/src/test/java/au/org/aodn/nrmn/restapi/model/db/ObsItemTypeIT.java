@@ -3,7 +3,6 @@ package au.org.aodn.nrmn.restapi.model.db;
 import au.org.aodn.nrmn.restapi.repository.ObsItemTypeRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +33,9 @@ class ObsItemTypeIT {
 
     @Test
     public void testMapping() {
-        val obsItemType = obsItemTypeTestData.persistedObsItemType();
+        ObsItemType obsItemType = obsItemTypeTestData.persistedObsItemType();
         entityManager.clear();
-        val persistedObsItemType = obsItemTypeRepository.findById(obsItemType.getObsItemTypeId()).get();
+        ObsItemType persistedObsItemType = obsItemTypeRepository.findById(obsItemType.getObsItemTypeId()).get();
         assertEquals(obsItemType, persistedObsItemType);
     }
 }

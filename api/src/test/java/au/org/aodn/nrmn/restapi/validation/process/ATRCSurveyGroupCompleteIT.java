@@ -22,7 +22,6 @@ import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
-import lombok.val;
 
 @Testcontainers
 @SpringBootTest
@@ -71,11 +70,11 @@ class ATRCSurveyGroupCompleteIT {
 
     @Test
     void groupWithIncompleteSurveyNumsShouldFail() {
-        val job = jobRepo.findByReference("jobid-atrc").get();
-        val date = "11/09/2020";
-        val siteNo = "ERZ1";
+        StagedJob job = jobRepo.findByReference("jobid-atrc").get();
+        String date = "11/09/2020";
+        String siteNo = "ERZ1";
 
-        val sn1 = new StagedRow();
+        StagedRow sn1 = new StagedRow();
         sn1.setDate(date);
         sn1.setDepth("7.1");
         sn1.setBlock("1");
@@ -83,7 +82,7 @@ class ATRCSurveyGroupCompleteIT {
         sn1.setSiteCode(siteNo);
         sn1.setStagedJob(job);
 
-        val sn2 = (StagedRow) SerializationUtils.clone(sn1);
+        StagedRow sn2 = (StagedRow) SerializationUtils.clone(sn1);
         sn2.setDepth("7.2");
         stagedRowRepo.deleteAll();
 
@@ -98,11 +97,11 @@ class ATRCSurveyGroupCompleteIT {
 
     @Test
     void groupWithCompleteSurveyBlocksShouldSucceed() {
-        val job = jobRepo.findByReference("jobid-atrc").get();
-        val date = "11/09/2020";
-        val siteNo = "ERZ1";
+        StagedJob job = jobRepo.findByReference("jobid-atrc").get();
+        String date = "11/09/2020";
+        String siteNo = "ERZ1";
 
-        val sn1b1 = new StagedRow();
+        StagedRow sn1b1 = new StagedRow();
         sn1b1.setDate(date);
         sn1b1.setDepth("7.1");
         sn1b1.setMethod("1");
@@ -110,22 +109,22 @@ class ATRCSurveyGroupCompleteIT {
         sn1b1.setSiteCode(siteNo);
         sn1b1.setStagedJob(job);
 
-        val sn1b2 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn1b2 = (StagedRow) SerializationUtils.clone(sn1b1);
         sn1b2.setBlock("2");
 
-        val sn2b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn2b1 = (StagedRow) SerializationUtils.clone(sn1b1);
         sn2b1.setDepth("7.2");
-        val sn2b2 = (StagedRow) SerializationUtils.clone(sn2b1);
+        StagedRow sn2b2 = (StagedRow) SerializationUtils.clone(sn2b1);
         sn2b2.setBlock("2");
 
-        val sn3b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn3b1 = (StagedRow) SerializationUtils.clone(sn1b1);
         sn3b1.setDepth("7.3");
-        val sn3b2 = (StagedRow) SerializationUtils.clone(sn3b1);
+        StagedRow sn3b2 = (StagedRow) SerializationUtils.clone(sn3b1);
         sn3b2.setBlock("2");
 
-        val sn4b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn4b1 = (StagedRow) SerializationUtils.clone(sn1b1);
         sn4b1.setDepth("7.4");
-        val sn4b2 = (StagedRow) SerializationUtils.clone(sn4b1);
+        StagedRow sn4b2 = (StagedRow) SerializationUtils.clone(sn4b1);
         sn4b2.setBlock("2");
 
         Location location = Location.builder().locationName("LOC1").isActive(false).build();
@@ -139,11 +138,11 @@ class ATRCSurveyGroupCompleteIT {
 
     @Test
     void groupWithIncompleteSurveyBlocksShouldFail() {
-        val job = jobRepo.findByReference("jobid-atrc").get();
-        val date = "11/09/2020";
-        val siteNo = "ERZ1";
+        StagedJob job = jobRepo.findByReference("jobid-atrc").get();
+        String date = "11/09/2020";
+        String siteNo = "ERZ1";
 
-        val sn1b1 = new StagedRow();
+        StagedRow sn1b1 = new StagedRow();
         sn1b1.setDate(date);
         sn1b1.setDepth("7.1");
         sn1b1.setMethod("1");
@@ -151,21 +150,21 @@ class ATRCSurveyGroupCompleteIT {
         sn1b1.setSiteCode(siteNo);
         sn1b1.setStagedJob(job);
 
-        val sn1b2 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn1b2 = (StagedRow) SerializationUtils.clone(sn1b1);
         sn1b2.setBlock("2");
 
-        val sn2b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn2b1 = (StagedRow) SerializationUtils.clone(sn1b1);
         sn2b1.setDepth("7.2");
-        val sn2b2 = (StagedRow) SerializationUtils.clone(sn2b1);
+        StagedRow sn2b2 = (StagedRow) SerializationUtils.clone(sn2b1);
         sn2b2.setBlock("2");
 
-        val sn3b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn3b1 = (StagedRow) SerializationUtils.clone(sn1b1);
         sn3b1.setDepth("7.3");
-        val sn3b2 = (StagedRow) SerializationUtils.clone(sn3b1);
+        StagedRow sn3b2 = (StagedRow) SerializationUtils.clone(sn3b1);
         sn3b2.setBlock("2");
 
         // Incomplete - missing block 2
-        val sn4b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn4b1 = (StagedRow) SerializationUtils.clone(sn1b1);
         sn4b1.setDepth("7.4");
 
         Location location = Location.builder().locationName("LOC1").isActive(false).build();

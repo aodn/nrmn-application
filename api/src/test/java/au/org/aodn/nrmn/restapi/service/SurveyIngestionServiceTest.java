@@ -1,17 +1,12 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import au.org.aodn.nrmn.restapi.model.db.*;
-import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
-import au.org.aodn.nrmn.restapi.repository.*;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
-import software.amazon.awssdk.utils.ImmutableMap;
+import static au.org.aodn.nrmn.restapi.service.SurveyIngestionService.MEASURE_TYPE_FISH_SIZE_CLASS;
+import static au.org.aodn.nrmn.restapi.service.SurveyIngestionService.MEASURE_TYPE_SINGLE_ITEM;
+import static au.org.aodn.nrmn.restapi.service.SurveyIngestionService.OBS_ITEM_TYPE_DEBRIS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -20,12 +15,41 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import static au.org.aodn.nrmn.restapi.service.SurveyIngestionService.MEASURE_TYPE_FISH_SIZE_CLASS;
-import static au.org.aodn.nrmn.restapi.service.SurveyIngestionService.MEASURE_TYPE_SINGLE_ITEM;
-import static au.org.aodn.nrmn.restapi.service.SurveyIngestionService.OBS_ITEM_TYPE_DEBRIS;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import javax.persistence.EntityManager;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import au.org.aodn.nrmn.restapi.model.db.Diver;
+import au.org.aodn.nrmn.restapi.model.db.Measure;
+import au.org.aodn.nrmn.restapi.model.db.MeasureType;
+import au.org.aodn.nrmn.restapi.model.db.Method;
+import au.org.aodn.nrmn.restapi.model.db.ObsItemType;
+import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
+import au.org.aodn.nrmn.restapi.model.db.Observation;
+import au.org.aodn.nrmn.restapi.model.db.Program;
+import au.org.aodn.nrmn.restapi.model.db.Site;
+import au.org.aodn.nrmn.restapi.model.db.StagedJob;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.Survey;
+import au.org.aodn.nrmn.restapi.model.db.SurveyMethod;
+import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
+import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
+import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
+import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
+import au.org.aodn.nrmn.restapi.repository.SurveyMethodRepository;
+import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import software.amazon.awssdk.utils.ImmutableMap;
 
 @ExtendWith(MockitoExtension.class)
 public class SurveyIngestionServiceTest {

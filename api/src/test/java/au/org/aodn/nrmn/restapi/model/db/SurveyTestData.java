@@ -2,7 +2,6 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.Survey.SurveyBuilder;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +21,7 @@ public class SurveyTestData {
     private ProgramTestData programTestData;
 
     public Survey persistedSurvey() {
-        val survey = defaultBuilder().build();
+        Survey survey = defaultBuilder().build();
         surveyRepository.saveAndFlush(survey);
         return survey;
     }

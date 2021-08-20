@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
-import lombok.val;
+import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 @ExtendWith(MockitoExtension.class)
 class TotalCheckSumTest extends FormattedTestProvider  {
@@ -29,7 +29,7 @@ class TotalCheckSumTest extends FormattedTestProvider  {
 
     @Test
     public void validSumShouldSuccess() {
-        val row = getDefaultFormatted().build();
+        StagedRowFormatted row = getDefaultFormatted().build();
         row.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 1).put(4, 2).build());
         row.setTotal(3);
         Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", row);
@@ -38,7 +38,7 @@ class TotalCheckSumTest extends FormattedTestProvider  {
 
     @Test
     public void validSumWithInvertsShouldSuccess() {
-        val row = getDefaultFormatted().build();
+        StagedRowFormatted row = getDefaultFormatted().build();
         row.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 1).put(4, 2).build());
         row.setInverts(2);
         row.setTotal(5);
@@ -48,7 +48,7 @@ class TotalCheckSumTest extends FormattedTestProvider  {
 
     @Test
     public void InValidSumShouldFailed() {
-        val row = getDefaultFormatted().build();
+        StagedRowFormatted row = getDefaultFormatted().build();
         row.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(0, 1).put(3, 1).put(4, 2).build());
         row.setTotal(3);
         Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", row);
@@ -57,7 +57,7 @@ class TotalCheckSumTest extends FormattedTestProvider  {
 
     @Test
     public void debrisZeroSumInvertsTotalZeroShouldSuccess() {
-        val row = getDezFormatted().build();
+        StagedRowFormatted row = getDezFormatted().build();
         row.setInverts(0);
         row.setTotal(0);
         Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", row);
@@ -66,7 +66,7 @@ class TotalCheckSumTest extends FormattedTestProvider  {
 
     @Test
     public void debrisZeroSumInvertsTotalOneShouldSuccess() {
-        val row = getDezFormatted().build();
+        StagedRowFormatted row = getDezFormatted().build();
         row.setInverts(1);
         row.setTotal(1);
         Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", row);
@@ -75,7 +75,7 @@ class TotalCheckSumTest extends FormattedTestProvider  {
 
     @Test
     public void debrisZeroSumInvertsTotalMismatchShouldFail() {
-        val row = getDezFormatted().build();
+        StagedRowFormatted row = getDezFormatted().build();
         row.setInverts(0);
         row.setTotal(1);
         Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", row);

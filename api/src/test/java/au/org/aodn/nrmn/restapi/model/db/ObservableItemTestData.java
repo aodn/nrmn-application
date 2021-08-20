@@ -2,7 +2,6 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem.ObservableItemBuilder;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +17,7 @@ public class ObservableItemTestData {
     private int observableItemNo = 0;
 
     public ObservableItem persistedObservableItem() {
-        val observableItem = defaultBuilder().build();
+        ObservableItem observableItem = defaultBuilder().build();
         observableItemRepository.saveAndFlush(observableItem);
         return observableItem;
     }

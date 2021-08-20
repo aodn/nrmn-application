@@ -44,7 +44,6 @@ import au.org.aodn.nrmn.restapi.repository.SurveyMethodRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import lombok.Value;
-import lombok.val;
 
 @Service
 public class SurveyIngestionService {
@@ -96,14 +95,14 @@ public class SurveyIngestionService {
 
     public Survey getSurvey(StagedRowFormatted stagedRow) {
 
-        val site = stagedRow.getSite();
+        Site site = stagedRow.getSite();
 
         if (!site.getIsActive()) {
             site.setIsActive(true);
             siteRepo.save(site);
         }
 
-        val survey = Survey.builder().depth(stagedRow.getDepth()).surveyNum(stagedRow.getSurveyNum())
+        Survey survey = Survey.builder().depth(stagedRow.getDepth()).surveyNum(stagedRow.getSurveyNum())
                 .site(Site.builder().siteCode(site.getSiteCode()).build()).surveyDate(Date.valueOf(stagedRow.getDate()))
                 .build();
 
@@ -129,7 +128,7 @@ public class SurveyIngestionService {
     public SurveyMethod getSurveyMethod(Survey survey, StagedRowFormatted stagedRow) {
         boolean surveyNotDone = stagedRow.getCode().toLowerCase().equals("snd");
         Method method = entityManager.getReference(Method.class, stagedRow.getMethod());
-        val surveyMethod = SurveyMethod.builder().survey(survey).method(method).blockNum(stagedRow.getBlock())
+        SurveyMethod surveyMethod = SurveyMethod.builder().survey(survey).method(method).blockNum(stagedRow.getBlock())
                 .surveyNotDone(surveyNotDone).build();
         return surveyMethodRepository.save(surveyMethod);
     }

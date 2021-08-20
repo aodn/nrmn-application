@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import au.org.aodn.nrmn.restapi.model.db.Site.SiteBuilder;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import lombok.val;
 
 @Component
 public class SiteTestData {
@@ -23,7 +22,7 @@ public class SiteTestData {
     private int siteNo = 0;
 
     public Site persistedSite() {
-        val site = defaultBuilder().build();
+        Site site = defaultBuilder().build();
         siteRepository.saveAndFlush(site);
         return site;
     }

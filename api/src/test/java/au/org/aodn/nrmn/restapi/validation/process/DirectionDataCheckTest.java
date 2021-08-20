@@ -20,7 +20,6 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import lombok.val;
 
 @ExtendWith(MockitoExtension.class)
 class DirectionDataCheckTest {
@@ -42,9 +41,9 @@ class DirectionDataCheckTest {
     }
     @Test
     void invalidDirectionShouldFail() {
-        val job = new StagedJob();
+        StagedJob job = new StagedJob();
         job.setId(1L);
-        val row = new StagedRow();
+        StagedRow row = new StagedRow();
         row.setStagedJob(job);
         row.setDirection("ED");
         Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
@@ -53,9 +52,9 @@ class DirectionDataCheckTest {
 
     @Test
     void validDirectionShouldSucceed() {
-        val job = new StagedJob();
+        StagedJob job = new StagedJob();
         job.setId(1L);
-        val row = new StagedRow();
+        StagedRow row = new StagedRow();
         row.setStagedJob(job);
         row.setDirection("NE");
         Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));

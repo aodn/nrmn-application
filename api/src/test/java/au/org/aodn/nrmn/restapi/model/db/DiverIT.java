@@ -3,7 +3,6 @@ package au.org.aodn.nrmn.restapi.model.db;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +33,9 @@ class DiverIT {
 
     @Test
     public void testMapping() {
-        val diver = diverTestData.persistedDiver();
+        Diver diver = diverTestData.persistedDiver();
         entityManager.clear();
-        val persistedDiver = diverRepository.findById(diver.getDiverId()).get();
+        Diver persistedDiver = diverRepository.findById(diver.getDiverId()).get();
         assertEquals(diver, persistedDiver);
     }
 }

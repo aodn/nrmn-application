@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller;
 
+import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItemTestData;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
@@ -8,7 +9,6 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
-import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +49,7 @@ public class ObservableItemControllerIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testGetObservableItemListItems() {
-        val testObservableItem = observableItemTestData.persistedObservableItem();
+        ObservableItem testObservableItem = observableItemTestData.persistedObservableItem();
 
         given()
                 .spec(spec)

@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
-import lombok.val;
+import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 @ExtendWith(MockitoExtension.class)
 class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
@@ -72,7 +72,7 @@ class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
 
     @Test
     public void TotalUnderMaxAbundanceShouldSuccess() {
-        val formatted = getDefaultFormatted().build();
+        StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setSpeciesAttributesOpt(Optional.of(specAttribute));
         formatted.setTotal(20);
         formatted.setMethod(1);
@@ -82,7 +82,7 @@ class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
 
     @Test
     public void TotalAboveMaxAbundanceShouldFailed() {
-        val formatted = getDefaultFormatted().build();
+        StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setSpeciesAttributesOpt(Optional.of(specAttribute));
         formatted.setTotal(31);
         formatted.setMethod(1);
@@ -91,7 +91,7 @@ class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
     }
     @Test
     public void outOfScopeShouldSuccess() {
-        val formatted = getDefaultFormatted().build();
+        StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMethod(4);
         formatted.setSpeciesAttributesOpt(Optional.empty());
         Collection<ValidationError> errors = validationProcess.validateAbundance(formatted, specAttribute);

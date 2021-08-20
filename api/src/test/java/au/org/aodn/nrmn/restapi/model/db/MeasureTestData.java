@@ -2,7 +2,6 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import au.org.aodn.nrmn.restapi.model.db.Measure.MeasureBuilder;
 import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +15,7 @@ public class MeasureTestData {
     private MeasureTypeTestData measureTypeTestData;
 
     public Measure persistedMeasure() {
-        val measure = defaultBuilder().build();
+        Measure measure = defaultBuilder().build();
         measureRepository.saveAndFlush(measure);
         return measure;
     }

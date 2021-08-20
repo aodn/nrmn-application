@@ -3,7 +3,6 @@ package au.org.aodn.nrmn.restapi.model.db;
 import au.org.aodn.nrmn.restapi.repository.MethodRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +33,9 @@ class MethodIT {
 
     @Test
     public void testMapping() {
-        val method = methodTestData.persistedMethod();
+        Method method = methodTestData.persistedMethod();
         entityManager.clear();
-        val persistedMethod = methodRepository.findById(method.getMethodId()).get();
+        Method persistedMethod = methodRepository.findById(method.getMethodId()).get();
         assertEquals(method, persistedMethod);
 
     }

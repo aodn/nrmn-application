@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller;
 
+import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.model.db.SurveyTestData;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
@@ -8,7 +9,6 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
-import lombok.val;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -58,7 +58,7 @@ public class SurveyControllerIT {
     @WithUserDetails("test@example.com")
     public void testGetSurveyList() {
 
-        val testSurvey = surveyTestData.persistedSurvey();
+        Survey testSurvey = surveyTestData.persistedSurvey();
 
         given()
                 .spec(getDataSpec)
@@ -75,7 +75,7 @@ public class SurveyControllerIT {
     @WithUserDetails("test@example.com")
     public void testGetSurvey() {
 
-        val testSurvey = surveyTestData.persistedSurvey();
+        Survey testSurvey = surveyTestData.persistedSurvey();
 
         given().spec(getDataSpec)
                .auth()
@@ -91,7 +91,7 @@ public class SurveyControllerIT {
     @WithUserDetails("test@example.com")
     public void testNoSurvey() {
 
-        val testSurvey = surveyTestData.persistedSurvey();
+        Survey testSurvey = surveyTestData.persistedSurvey();
 
         assertFalse(testSurvey.getSurveyId().toString().equals(NON_EXISTENT_SURVEY_ID));
 

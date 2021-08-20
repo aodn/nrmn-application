@@ -1,16 +1,15 @@
 package au.org.aodn.nrmn.restapi.springdatarest;
 
-import au.org.aodn.nrmn.restapi.model.db.LocationTestData;
-import au.org.aodn.nrmn.restapi.model.db.SiteTestData;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import au.org.aodn.nrmn.restapi.test.JwtToken;
-import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
-import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
-import io.restassured.specification.RequestSpecification;
-import lombok.val;
+import static au.org.aodn.nrmn.restapi.test.ApiUrl.entityRef;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,12 +19,18 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.security.test.context.support.WithUserDetails;
 
-import static au.org.aodn.nrmn.restapi.test.ApiUrl.entityRef;
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import au.org.aodn.nrmn.restapi.model.db.Location;
+import au.org.aodn.nrmn.restapi.model.db.LocationTestData;
+import au.org.aodn.nrmn.restapi.model.db.Site;
+import au.org.aodn.nrmn.restapi.model.db.SiteTestData;
+import au.org.aodn.nrmn.restapi.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.test.JwtToken;
+import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
+import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.specification.RequestSpecification;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ExtendWith(PostgresqlContainerExtension.class)
@@ -63,7 +68,7 @@ public class SiteApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testPostSite() {
-        val location = locationTestData.persistedLocation();
+        Location location = locationTestData.persistedLocation();
 
         Integer siteId = given()
                 .spec(spec)
@@ -84,7 +89,7 @@ public class SiteApiIT {
                 .extract()
                 .path("siteId");
 
-        val updatedSite = siteRepository.findById(siteId).get();
+        Site updatedSite = siteRepository.findById(siteId).get();
 
         assertThat(updatedSite.getSiteCode(), is(equalTo("TAS377")));
         assertThat(updatedSite.getCountry(), is(equalTo("Australia")));
@@ -95,7 +100,7 @@ public class SiteApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testPutSite() {
-        val site = siteTestData.persistedSite();
+        Site site = siteTestData.persistedSite();
 
         given()
                 .spec(spec)
@@ -120,7 +125,7 @@ public class SiteApiIT {
                 .assertThat()
                 .statusCode(200);
 
-        val updatedSite = siteRepository.findById(site.getSiteId()).get();
+        Site updatedSite = siteRepository.findById(site.getSiteId()).get();
 
         assertThat(updatedSite.getSiteCode(), is(equalTo("TAS377")));
         assertThat(updatedSite.getSiteAttribute().get("OldSiteCodes"), is(equalTo("2102,7617")));
@@ -129,7 +134,7 @@ public class SiteApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testCreateUsingExistingSiteCode() {
-        val existingSite = siteTestData.persistedSite();
+        Site existingSite = siteTestData.persistedSite();
 
         given()
                 .spec(spec)
@@ -154,7 +159,7 @@ public class SiteApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testCreateExactLatLong() {
-        val existingSite = siteTestData.persistedSite();
+        Site existingSite = siteTestData.persistedSite();
 
         given()
                 .spec(spec)
@@ -178,7 +183,7 @@ public class SiteApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testCreateCloseLat() {
-        val existingSite = siteTestData.persistedSite();
+        Site existingSite = siteTestData.persistedSite();
 
         given()
                 .spec(spec)
@@ -203,7 +208,7 @@ public class SiteApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testCreateCloseLong() {
-        val existingSite = siteTestData.persistedSite();
+        Site existingSite = siteTestData.persistedSite();
 
         given()
                 .spec(spec)
@@ -228,7 +233,7 @@ public class SiteApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testCreateUsingExistingSiteNameAtLocation() {
-        val existingSite = siteTestData.persistedSite();
+        Site existingSite = siteTestData.persistedSite();
 
         given()
                 .spec(spec)
@@ -252,8 +257,8 @@ public class SiteApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testUpdateWithExistingSiteCode() {
-        val site = siteTestData.persistedSite();
-        val anotherSite = siteTestData.persistedSite();
+        Site site = siteTestData.persistedSite();
+        Site anotherSite = siteTestData.persistedSite();
 
         given()
                 .spec(spec)
@@ -277,8 +282,8 @@ public class SiteApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testUpdateWithExistingSiteName() {
-        val site = siteTestData.persistedSite();
-        val anotherSite = siteTestData.persistedSite();
+        Site site = siteTestData.persistedSite();
+        Site anotherSite = siteTestData.persistedSite();
 
         given()
                 .spec(spec)
@@ -302,7 +307,7 @@ public class SiteApiIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testDeleteSite() {
-        val site = siteTestData.persistedSite();
+        Site site = siteTestData.persistedSite();
 
         given()
                 .spec(spec)
@@ -314,7 +319,7 @@ public class SiteApiIT {
                 .assertThat()
                 .statusCode(204);
 
-        val persistedSite = siteRepository.findById(site.getSiteId());
+                Optional<Site> persistedSite = siteRepository.findById(site.getSiteId());
 
         assertFalse(persistedSite.isPresent());
     }
@@ -322,7 +327,7 @@ public class SiteApiIT {
     @Test
     @WithUserDetails("power_user@example.com")
     public void testPowerUserCanGetSite() {
-        val site = siteTestData.persistedSite();
+        Site site = siteTestData.persistedSite();
 
         given()
                 .spec(spec)
@@ -337,7 +342,7 @@ public class SiteApiIT {
     @Test
     @WithUserDetails("power_user@example.com")
     public void testPowerUserCantCreateSite() {
-        val location = locationTestData.persistedLocation();
+        Location location = locationTestData.persistedLocation();
 
         given()
                 .spec(spec)

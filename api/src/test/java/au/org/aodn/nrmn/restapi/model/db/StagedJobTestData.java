@@ -9,7 +9,6 @@ import au.org.aodn.nrmn.restapi.model.db.StagedJob.StagedJobBuilder;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
-import lombok.val;
 
 @Component
 public class StagedJobTestData {
@@ -24,14 +23,14 @@ public class StagedJobTestData {
     private ProgramTestData programTestData;
 
     public StagedJob persistedStagedJob() {
-        val stagedJob = defaultBuilder().build();
+        StagedJob stagedJob = defaultBuilder().build();
         stagedJobRepository.saveAndFlush(stagedJob);
         return stagedJob;
     }
 
     public StagedJobBuilder defaultBuilder() {
-        val program = programTestData.persistedProgram();
-        val user = userTestData.persistedUser();
+        Program program = programTestData.persistedProgram();
+        SecUser user = userTestData.persistedUser();
         return StagedJob.builder()
                         .program(program)
                         .reference("survey.xls")
@@ -44,11 +43,11 @@ public class StagedJobTestData {
     }
 
     public StagedJob persistedJobWithReference(String reference) {
-        val stagedJob = defaultBuilder()
+        StagedJob stagedJob = defaultBuilder()
                 .reference(reference)
                 .build();
 
-                val row1 = StagedRow.builder()
+                StagedRow row1 = StagedRow.builder()
                         .block("1")
                         .method("1")
                         .buddy("Nadia")

@@ -10,7 +10,6 @@ import au.org.aodn.nrmn.restapi.model.db.SecUser.SecUserBuilder;
 import au.org.aodn.nrmn.restapi.model.db.enums.SecUserStatus;
 import au.org.aodn.nrmn.restapi.repository.SecRoleRepository;
 import au.org.aodn.nrmn.restapi.repository.SecUserRepository;
-import lombok.val;
 
 @Component
 public class SecUserTestData {
@@ -26,12 +25,12 @@ public class SecUserTestData {
     private int userNo = 0;
 
     public SecUser persistedUser() {
-        val user = defaultBuilder().build();
+        SecUser user = defaultBuilder().build();
         return userRepo.saveAndFlush(user);
     }
 
     public SecUserBuilder defaultBuilder() {
-        val role = roleTestData.persistedRole();
+        SecRole role = roleTestData.persistedRole();
 
         return SecUser.builder()
                 .email("builder" + ++userNo + "@test.com")

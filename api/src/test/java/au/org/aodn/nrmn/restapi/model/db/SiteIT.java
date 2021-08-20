@@ -3,7 +3,6 @@ package au.org.aodn.nrmn.restapi.model.db;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +33,9 @@ class SiteIT {
 
     @Test
     public void testMapping() {
-        val site = siteTestData.persistedSite();
+        Site site = siteTestData.persistedSite();
         entityManager.clear();
-        val persistedSite = siteRepository.findById(site.getSiteId()).get();
+        Site persistedSite = siteRepository.findById(site.getSiteId()).get();
         assertEquals(site, persistedSite);
     }
 
