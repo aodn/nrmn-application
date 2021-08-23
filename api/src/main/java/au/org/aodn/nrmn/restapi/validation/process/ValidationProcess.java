@@ -207,6 +207,8 @@ public class ValidationProcess {
                 int inverts = NumberUtils.toInt(row.getInverts(), INVALID_INT);
                 if (inverts == INVALID_INT)
                     errors.add(rowId, ValidationLevel.BLOCKING, "inverts", "Inverts is not an integer");
+            } else {
+                errors.add(rowId, ValidationLevel.BLOCKING, "inverts", "Inverts is empty");
             }
 
             // Total
