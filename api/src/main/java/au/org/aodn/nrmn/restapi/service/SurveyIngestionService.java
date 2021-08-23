@@ -153,7 +153,7 @@ public class SurveyIngestionService {
 
         Stream<MeasureValue> unsized = Stream.empty();
 
-        if (!stagedRow.getCode().equalsIgnoreCase("snd") && stagedRow.getInverts() > 0) {
+        if (!stagedRow.getCode().equalsIgnoreCase("snd") && stagedRow.getInverts() != null && stagedRow.getInverts() > 0) {
             unsized = Stream.of(new MeasureValue(0, stagedRow.getInverts()));
         }
 
