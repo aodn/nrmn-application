@@ -106,76 +106,77 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     }
 
     private void setValue(String columnHeader, String formattedValue) {
+        String value = formattedValue != null ? formattedValue.trim() : "";
         switch (columnHeader) {
             case "ID":
                 // For now stage all rows regardless of ID
-                rowHasId = true; // formattedValue.length() > 0;
+                rowHasId = true; // value.length() > 0;
                 break;
             case "Buddy":
-                currentRow.setBuddy(formattedValue);
+                currentRow.setBuddy(value);
                 break;
             case "Diver":
-                currentRow.setDiver(formattedValue);
+                currentRow.setDiver(value);
                 break;
             case "Site No.":
-                currentRow.setSiteCode(formattedValue);
+                currentRow.setSiteCode(value);
                 break;
             case "Site Name":
-                currentRow.setSiteName(formattedValue);
+                currentRow.setSiteName(value);
                 break;
             case "Latitude":
-                currentRow.setLatitude(formattedValue);
+                currentRow.setLatitude(value);
                 break;
             case "Longitude":
-                currentRow.setLongitude(formattedValue);
+                currentRow.setLongitude(value);
                 break;
             case "Date":
-                currentRow.setDate(formattedValue);
+                currentRow.setDate(value);
                 break;
             case "vis":
-                currentRow.setVis(formattedValue);
+                currentRow.setVis(value);
                 break;
             case "Direction":
-                currentRow.setDirection(formattedValue);
+                currentRow.setDirection(value);
                 break;
             case "Time":
-                currentRow.setTime(formattedValue);
+                currentRow.setTime(value);
                 break;
             case "P-Qs":
-                currentRow.setPqs(formattedValue);
+                currentRow.setPqs(value);
                 break;
             case "Depth":
-                currentRow.setDepth(formattedValue);
+                currentRow.setDepth(value);
                 break;
             case "Method":
-                currentRow.setMethod(formattedValue);
+                currentRow.setMethod(value);
                 break;
             case "Block":
-                currentRow.setBlock(formattedValue);
+                currentRow.setBlock(value);
                 break;
             case "Code":
-                currentRow.setCode(formattedValue);
+                currentRow.setCode(value);
                 break;
             case "Species":
-                currentRow.setSpecies(formattedValue);
+                currentRow.setSpecies(value);
                 break;
             case "Common name":
-                currentRow.setCommonName(formattedValue);
+                currentRow.setCommonName(value);
                 break;
             case "Total":
-                currentRow.setTotal(formattedValue);
+                currentRow.setTotal(value);
                 break;
             case "Use InvertSizing":
-                currentRow.setIsInvertSizing(formattedValue);
+                currentRow.setIsInvertSizing(value);
                 break;
             case "Inverts":
-                currentRow.setInverts(formattedValue);
+                currentRow.setInverts(value);
                 break;
             default:
-                if (formattedValue.length() > 0 && requiredHeaders.contains(columnHeader)
+                if (value.length() > 0 && requiredHeaders.contains(columnHeader)
                         && columnHeader.matches("\\d.*"))
                     measureJson.put(requiredHeaders.indexOf(columnHeader) - requiredHeaders.indexOf("Inverts"),
-                            formattedValue);
+                            value);
                 break;
         }
     }
