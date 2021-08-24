@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -18,6 +19,7 @@ import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
+import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import au.org.aodn.nrmn.restapi.util.TimeUtils;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
@@ -61,6 +63,8 @@ public class StagedRowFormattedMapperConfig {
         };
 
         Converter<String, Optional<LocalTime>> toTime = ctx -> TimeUtils.parseTime(ctx.getSource());
+
+        Converter<String, Directions> toDirection = ctx -> EnumUtils.getEnumIgnoreCase(Directions.class, ctx.getSource().trim());
 
         Converter<String, Integer> toDepth = ctx -> {
             try {
@@ -126,6 +130,7 @@ public class StagedRowFormattedMapperConfig {
                     StagedRowFormatted::setSpeciesAttributesOpt);
             mapper.using(toMeasureJson).map(StagedRow::getMeasureJson, StagedRowFormatted::setMeasureJson);
             mapper.using(toDiver).map(StagedRow::getDiver, StagedRowFormatted::setDiver);
+            mapper.using(toDirection).map(StagedRow::getDirection, StagedRowFormatted::setDirection);
             mapper.using(toDiver).map(StagedRow::getPqs, StagedRowFormatted::setPqs);
             mapper.using(toDouble).map(StagedRow::getLatitude, StagedRowFormatted::setLatitude);
             mapper.using(toDouble).map(StagedRow::getLongitude, StagedRowFormatted::setLongitude);
