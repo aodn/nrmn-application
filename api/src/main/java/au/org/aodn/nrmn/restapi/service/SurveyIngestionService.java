@@ -193,12 +193,12 @@ public class SurveyIngestionService {
         return observations;
     }
 
-    public Map<String, List<StagedRowFormatted>> groupRowsBySurvey(List<StagedRowFormatted> surveyRows) {
+    public Map<String, List<StagedRowFormatted>> groupRowsBySurveyMethod(List<StagedRowFormatted> surveyRows) {
         return surveyRows.stream().map(r -> {
             if (r.getSpecies().isPresent() && r.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_DEBRIS)
                 r.setMethod(METHOD_M12);
             return r;
-        }).filter(r -> r.getSurvey() != null).collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
+        }).filter(r -> r.getSurveyWithMethod() != null).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyWithMethod));
     }
 
     @Transactional
@@ -208,7 +208,7 @@ public class SurveyIngestionService {
 
         List<Integer> surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
             Survey survey = getSurvey(surveyRows.get(0));
-            groupRowsBySurvey(surveyRows).values().forEach(surveyMethodRows -> {
+            groupRowsBySurveyMethod(surveyRows).values().forEach(surveyMethodRows -> {
                 SurveyMethod surveyMethod = getSurveyMethod(survey, surveyMethodRows.get(0));
                 surveyMethodRows.forEach(row -> observationRepository
                         .saveAll(getObservations(surveyMethod, row, job.getIsExtendedSize())));
