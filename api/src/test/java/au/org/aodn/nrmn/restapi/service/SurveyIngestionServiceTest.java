@@ -335,16 +335,4 @@ public class SurveyIngestionServiceTest {
         assertEquals(true, surveyMethod.getSurveyNotDone());
 
     }
-
-    @Test
-    void getObservationsDebrisSavedAsM12() {
-
-        ObservableItem debrisItem = ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(5).build()).build();
-        StagedRowFormatted row = rowBuilder.isInvertSizing(true).species(Optional.of(debrisItem)).build();
-
-        StagedRowFormatted groupedRow = surveyIngestionService.groupRowsBySurveyMethod(Arrays.asList(row)).values().iterator().next().get(0);
-
-        // Debris are entered as M2 but stored as M12
-        assertEquals(12, groupedRow.getMethod());
-    }
 }
