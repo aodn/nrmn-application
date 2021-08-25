@@ -87,8 +87,8 @@ public class StagedRowFormatted {
                 && Objects.equals(species, that.species);
     }
 
-    public String getSurveyWithMethod() {
-        return method != null ? ref.getSurvey() + '-' + method : null;
+    public String getMethodBlock() {
+        return method.toString() + '-' + block.toString();
     }
 
     public String getSurvey() {
