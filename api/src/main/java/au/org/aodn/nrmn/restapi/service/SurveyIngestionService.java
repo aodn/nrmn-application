@@ -198,7 +198,7 @@ public class SurveyIngestionService {
             if (r.getSpecies().isPresent() && r.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_DEBRIS)
                 r.setMethod(METHOD_M12);
             return r;
-        }).filter(r -> r.getSurveyWithMethod() != null).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyWithMethod));
+        }).filter(r -> r.getMethodBlock() != null).collect(Collectors.groupingBy(StagedRowFormatted::getMethodBlock));
     }
 
     @Transactional
@@ -210,8 +210,7 @@ public class SurveyIngestionService {
             Survey survey = getSurvey(surveyRows.get(0));
             groupRowsBySurveyMethod(surveyRows).values().forEach(surveyMethodRows -> {
                 SurveyMethod surveyMethod = getSurveyMethod(survey, surveyMethodRows.get(0));
-                surveyMethodRows.forEach(row -> observationRepository
-                        .saveAll(getObservations(surveyMethod, row, job.getIsExtendedSize())));
+                surveyMethodRows.forEach(row -> observationRepository.saveAll(getObservations(surveyMethod, row, job.getIsExtendedSize())));
             });
             return survey.getSurveyId();
         }).collect(Collectors.toList());
