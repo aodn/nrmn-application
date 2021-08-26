@@ -76,7 +76,7 @@ public class StagedRowFormattedMapperConfig {
 
         Converter<String, Optional<Double>> toVis = ctx -> {
             Double vis = NumberUtils.toDouble(ctx.getSource(), Double.MIN_VALUE);
-            return (vis == Integer.MIN_VALUE) ? Optional.of(vis) : Optional.empty();
+            return (vis != Double.MIN_VALUE) ? Optional.of(vis) : Optional.empty();
         };
 
         Converter<String, Integer> toSurveyNum = ctx -> {

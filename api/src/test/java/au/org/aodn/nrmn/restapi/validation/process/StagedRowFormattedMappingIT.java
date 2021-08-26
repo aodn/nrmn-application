@@ -2,9 +2,12 @@ package au.org.aodn.nrmn.restapi.validation.process;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +23,7 @@ import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
+import au.org.aodn.nrmn.restapi.util.TimeUtils;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 @Testcontainers
@@ -58,10 +62,10 @@ class StagedRowFormattedMappingIT {
         row.setInverts("0");
         row.setSpecies("Specie 56");
         row.setBuddy("EVP");
-        row.setVis("1");
         row.setDirection("NE");
         row.setPqs("EVP");
         row.setCode("1");
+        row.setVis("10.0");
         row.setTotal("2");
         row.setStagedJob(job);
         row.setMeasureJson(new HashMap<Integer, String>() {{
@@ -75,12 +79,20 @@ class StagedRowFormattedMappingIT {
 
         assertEquals(1, validatedRows.size());
         StagedRowFormatted formattedRow = (StagedRowFormatted)validatedRows.toArray()[0];
+        assertEquals("EYR71", formattedRow.getSite().getSiteCode());
+        assertEquals("South East Slade Point", formattedRow.getSite().getSiteName());
+        assertEquals(154, formattedRow.getLongitude());
+        assertEquals(-35, formattedRow.getLatitude());
+        assertEquals(LocalDate.parse("16/11/2020", DateTimeFormatter.ofPattern("d/M/yyyy")), formattedRow.getDate());
+        assertEquals(TimeUtils.parseTime("11:32"), formattedRow.getTime());
+        assertEquals("TJR", formattedRow.getDiver().getInitials());
+        assertEquals("Tanjona Julien Rafidison", formattedRow.getDiver().getFullName());
         assertEquals(1, formattedRow.getBlock());
         assertEquals(Directions.NE, formattedRow.getDirection());
-        assertEquals("Tanjona Julien Rafidison", formattedRow.getDiver().getFullName());
         assertEquals(102, formattedRow.getSpecies().get().getAphiaId());
         assertEquals(1, formattedRow.getMeasureJson().get(13));
-
+        assertEquals(Optional.of(10.0), formattedRow.getVis());
+        assertEquals(4, formattedRow.getSurveyNum());
+        assertEquals(7, formattedRow.getDepth());
     }
-
 }
