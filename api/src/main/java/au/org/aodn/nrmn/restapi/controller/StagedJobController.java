@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.controller;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,7 @@ import au.org.aodn.nrmn.restapi.dto.stage.FileUpload;
 import au.org.aodn.nrmn.restapi.dto.stage.JobResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.UploadResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationRow;
 import au.org.aodn.nrmn.restapi.model.db.Program;
 import au.org.aodn.nrmn.restapi.model.db.SecUser;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
@@ -138,9 +140,23 @@ public class StagedJobController {
             jobRepo.save(job);
 
             List<StagedRow> rowsToSave = parsedSheet.getStagedRows();
-            Long skippedRows = parsedSheet.getSkippedRows();
+            int totalRowsCount = parsedSheet.getStagedRows().size();
 
-            String message = "Staged " + (rowsToSave.size()) + " row(s)." + (skippedRows > 0 ? " " + skippedRows + " rows missing ID but containing data were skipped." : "");
+            // remove rows that are missing diver / site / date / depth
+            rowsToSave.removeIf(r -> r.getDiver().isEmpty() && r.getSiteCode().isEmpty() && r.getDate().isEmpty() && r.getDepth().isEmpty());
+            int totalValidRowsCount = rowsToSave.size();
+
+            // remove duplicate rows from the end of the sheet
+            Long lastRowId = rowsToSave.get(rowsToSave.size() - 1).getId();
+            Optional<ValidationRow> rowsToTruncate = validation.checkDuplicateRows(rowsToSave).stream().filter(v -> v.getRowIds().contains(lastRowId)).findAny();
+            if(rowsToTruncate.isPresent()) {
+                Collection<Long> rowIdsToRemove = rowsToTruncate.get().getRowIds();
+                rowIdsToRemove.remove(lastRowId);
+                rowsToSave.removeIf(r -> rowIdsToRemove.contains(r.getId()));
+            }
+
+            int invalidRows = totalValidRowsCount - rowsToSave.size();
+            String message = "Saved " + (rowsToSave.size()) + " rows. Skipped " + (totalRowsCount - totalValidRowsCount) + " empty rows and " + invalidRows + " duplicate rows.";
             StagedJobLog stagedLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis())).eventType(StagedJobEventType.STAGED).stagedJob(job).details(message).build();
 
             logRepo.save(stagedLog);
@@ -148,20 +164,20 @@ public class StagedJobController {
             String s3Key = String.format(s3KeyTemplate, job.getId());
             s3client.write(s3Key, file);
 
-            message = String.format("Source file saved to \"%s/%s\"", bucketName, s3Key);
-            stagedLog = StagedJobLog.builder()
+            logRepo.save(StagedJobLog.builder()
                     .eventTime(new Timestamp(System.currentTimeMillis()))
                     .eventType(StagedJobEventType.STAGED)
                     .stagedJob(job)
-                    .details(message).build();
+                    .details(String.format("Source file saved to \"%s/%s\"", bucketName, s3Key)).build());
 
-            logRepo.save(stagedLog);
-
-            rowsToSave.stream().forEach(s -> s.setStagedJob(job));
+            rowsToSave.stream().forEach(s -> {
+                s.setStagedJob(job);
+                s.setId(null);
+            });
             stagedRowRepo.saveAll(rowsToSave);
 
             FileUpload filesResult = new FileUpload(job.getId(), rowsToSave.size());
-            responseEntity = ResponseEntity.status(HttpStatus.OK).body(new UploadResponse(Optional.of(filesResult.getJobId()), null));
+            responseEntity = ResponseEntity.status(HttpStatus.OK).body(new UploadResponse(Optional.of(filesResult.getJobId()), null, message));
 
         } catch (Exception e) {
 
