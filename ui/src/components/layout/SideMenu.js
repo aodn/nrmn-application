@@ -5,6 +5,7 @@ import {NavLink} from 'react-router-dom';
 import {PropTypes} from 'prop-types';
 
 const SideMenu = ({entities, open, onClose}) => {
+  const version = process.env.REACT_APP_VERSION && process.env.REACT_APP_VERSION.split('.');
   return (
     <Drawer variant="temporary" anchor="left" open={open} onClose={onClose}>
       <Box ml={3}>
@@ -51,7 +52,7 @@ const SideMenu = ({entities, open, onClose}) => {
       </List>
       <List>
         <Divider />
-        {process.env.REACT_APP_VERSION && <ListSubheader>{`Version ${process.env.REACT_APP_VERSION}`}</ListSubheader>}
+        {version && <ListSubheader>{`Version ${version[0]}.${version[1]}`}</ListSubheader>}
       </List>
     </Drawer>
   );
