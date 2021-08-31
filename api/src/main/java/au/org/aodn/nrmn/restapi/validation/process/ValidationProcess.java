@@ -203,11 +203,9 @@ public class ValidationProcess {
                 }
 
             // Inverts
-            if (!StringUtils.isBlank(row.getInverts())) {
-                int inverts = NumberUtils.toInt(row.getInverts(), INVALID_INT);
-                if (inverts == INVALID_INT)
-                    errors.add(rowId, ValidationLevel.BLOCKING, "inverts", "Inverts is not an integer");
-            }
+            int inverts = NumberUtils.toInt(row.getInverts(), INVALID_INT);
+            if (inverts == INVALID_INT)
+                errors.add(rowId, ValidationLevel.BLOCKING, "inverts", "Inverts is not an integer");
 
             // Total
             if (NumberUtils.toInt(row.getTotal(), INVALID_INT) == INVALID_INT)
