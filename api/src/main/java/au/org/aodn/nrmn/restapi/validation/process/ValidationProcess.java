@@ -24,6 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -71,6 +73,8 @@ public class ValidationProcess {
 
     @Autowired
     ObservableItemRepository observableItemRepository;
+    
+    private static Logger logger = LoggerFactory.getLogger(ValidationProcess.class);
 
     private static final int INVALID_INT = Integer.MIN_VALUE;
     private static final double INVALID_DOUBLE = Double.NEGATIVE_INFINITY;
@@ -101,6 +105,8 @@ public class ValidationProcess {
     }
 
     public Collection<ValidationError> checkFormatting(String programName, Boolean isExtendedSize, Collection<String> siteCodes, Collection<ObservableItem> species, Collection<StagedRow> rows) {
+
+        logger.info("checkFormatting: ");
 
         Collection<String> diverNames = new ArrayList<String>();
         for (Diver d : diverRepository.getAll()) {
@@ -281,7 +287,8 @@ public class ValidationProcess {
 
             if (!outOfRange.isEmpty()) {
                 String message = "Measurements outside L5/95 [" + l5 + "," + l95 + "] for [" + row.getRef().getSpecies() + "]";
-                outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, message, row.getId(), col.toString())));
+                String value = "[" + l5 + "," + l95 + "] for [" + row.getRef().getSpecies() + "]";
+                outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, message, value, row.getId(), col.toString())));
             }
         }
         return errors;
@@ -305,7 +312,8 @@ public class ValidationProcess {
 
             if (!outOfRange.isEmpty()) {
                 String message = "Measurement is above Lmax [" + lMax + "] for Species [" + row.getRef().getSpecies() + "]";
-                outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, message, row.getId(), col.toString())));
+                String value = "[" + lMax + "] for Species [" + row.getRef().getSpecies() + "]";
+                outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, message, value, row.getId(), col.toString())));
             }
         }
         return errors;
@@ -339,7 +347,7 @@ public class ValidationProcess {
         // VALIDATION: RLS: Debris Zero observations
         if (programName.equalsIgnoreCase("RLS") && row.getCode() != null && row.getCode().equalsIgnoreCase("dez") && row.getSpecies().isPresent()) {
             if (!validateRowZeroOrOneInvertsTotal(row, observationTotal))
-                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Debris has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
+                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Debris has Value/Total/Inverts not 0 or 1", null, row.getId(), "total"));
         }
 
         // VALIDATION: Record has no data and but not flagged as 'Survey Not Done' or
@@ -348,18 +356,18 @@ public class ValidationProcess {
             
             // VALIDATION: At least one value recorded in any of the size class columns or in the column Inverts
             if(row.getInverts() != null ) {
-                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Record has no data and but not flagged as 'Survey Not Done' or 'No Species Found'", row.getId(), "total"));
+                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Record has no data and but not flagged as 'Survey Not Done' or 'No Species Found'", row.getCode(), row.getId(), "total"));
             } else {
-                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Record has no data and no value recorded for inverts", row.getId(), "inverts"));
+                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Record has no data and no value recorded for inverts", row.getCode(), row.getId(), "inverts"));
             }
         } else if (row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType() != null && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND && !validateRowZeroOrOneInvertsTotal(row, observationTotal)){
-            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "'No Species Found' has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
+            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "'No Species Found' has Value/Total/Inverts not 0 or 1", null, row.getId(), "total"));
         } else if (row.getCode() != null && row.getCode().equalsIgnoreCase("SND") && !validateRowZeroOrOneInvertsTotal(row, observationTotal)) {
-            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "'Survey Not Done' has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
+            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "'Survey Not Done' has Value/Total/Inverts not 0 or 1", null, row.getId(), "total"));
         }
         // VALIDATION: Abundance CheckSums
         if (errors.size() < 1 && row.getTotal() != null && !row.getTotal().equals(observationTotal))
-            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Calculated total is " + observationTotal, row.getId(), "total"));
+            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Calculated total is " + observationTotal, observationTotal.toString(), row.getId(), "total"));
 
         return errors;
     }
@@ -370,7 +378,7 @@ public class ValidationProcess {
             Set<Integer> methodIds = row.getSpecies().get().getMethods().stream().map(m -> m.getMethodId()).collect(Collectors.toSet());
 
             if (!methodIds.contains(row.getMethod()))
-                return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Method " + row.getMethod() + " invalid for species " + row.getSpecies().get().getObservableItemName(), row.getId(), "method");
+                return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Method " + row.getMethod() + " invalid for species " + row.getSpecies().get().getObservableItemName(), null, row.getId(), "method");
 
         }
         return null;
@@ -385,7 +393,7 @@ public class ValidationProcess {
             if (!existingSurveys.isEmpty()) {
                 Survey existingSurvey = existingSurveys.stream().findFirst().get();
                 String message = "Survey exists: " + existingSurvey.getSurveyId() + " includes [" + row.getSite().getSiteCode() + ", " + row.getDate() + ", " + row.getDepth() + "]" + row.getMethod();
-                return new ValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, message, Arrays.asList(row.getId()), Arrays.asList("siteCode"));
+                return new ValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, message, null, Arrays.asList(row.getId()), Arrays.asList("siteCode"));
             }
 
         }
@@ -401,9 +409,10 @@ public class ValidationProcess {
 
         double dist = getDistance(row.getSite().getLatitude(), row.getSite().getLongitude(), row.getLatitude(), row.getLongitude());
         if (dist > 0.2) {
-            String message = "Coordinates are further than 0.2km from the Site (" + String.format("%.2f", dist) + "km)";
-            errors.add(new ValidationCell(ValidationCategory.SPAN, ValidationLevel.WARNING, message, row.getId(), "latitude"));
-            errors.add(new ValidationCell(ValidationCategory.SPAN, ValidationLevel.WARNING, message, row.getId(), "longitude"));
+            String message = "Coordinates are further than 0.2km from the Site";
+            String value = String.format("%.2f", dist) + "km";
+            errors.add(new ValidationCell(ValidationCategory.SPAN, ValidationLevel.WARNING, message, value, row.getId(), "latitude"));
+            errors.add(new ValidationCell(ValidationCategory.SPAN, ValidationLevel.WARNING, message, value, row.getId(), "longitude"));
         }
         return errors;
     }
@@ -415,11 +424,11 @@ public class ValidationProcess {
             
         // Validation: Surveys Too Old
         if (row.getDate().isAfter(LocalDate.from(ZonedDateTime.now())))
-            return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Date is in the future", row.getId(), "date");
+            return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Date is in the future", row.getRef().getDate(), row.getId(), "date");
 
         // Validation: Future Survey Rule
         if (row.getDate().isBefore(earliest))
-            return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Date must be after " + earliest.toString(), row.getId(), "date");
+            return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Date must be after " + earliest.toString(), row.getRef().getDate(), row.getId(), "date");
 
         return null;
     }
@@ -435,7 +444,7 @@ public class ValidationProcess {
                 columnNames.add(Integer.toString(measureIndex));
             }
 
-        return rowIds.size() > 0 ? new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, "Missing quadrats in transect " + transect, rowIds, columnNames) : null;
+        return rowIds.size() > 0 ? new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, "Missing quadrats in transect " + transect, null, rowIds, columnNames) : null;
     }
 
     public ValidationError validateMethod3QuadratsGT50(String transect, List<StagedRowFormatted> rows) {
@@ -447,13 +456,13 @@ public class ValidationProcess {
                 columnNames.add(Integer.toString(measureIndex));
             }
         List<Long> rowIds = rows.stream().map(r -> r.getId()).collect(Collectors.toList());
-        return columnNames.size() > 0 ? new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, "Quadrats do not sum to at least 50 in transect " + transect, rowIds, columnNames) : null;
+        return columnNames.size() > 0 ? new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, "Quadrats do not sum to at least 50 in transect " + transect, null, rowIds, columnNames) : null;
     }
 
     public ValidationError validateSurveyTransectNumber(String surveyKey, List<StagedRowFormatted> surveyRows) {
         List<StagedRowFormatted> invalidTransectRows = surveyRows.stream().filter(r -> !Arrays.asList(1, 2, 3, 4).contains(r.getSurveyNum())).collect(Collectors.toList());
         if (invalidTransectRows.size() > 0)
-            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, "Survey group transect invalid", invalidTransectRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
+            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, "Survey group transect invalid", null, invalidTransectRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
         return null;
     }
 
@@ -474,7 +483,7 @@ public class ValidationProcess {
         // VALIDATE: If method = 0 then Block should be 0, 1 or 2
         List<StagedRowFormatted> method0Rows = surveyByMethod.get(0);
         if(method0Rows != null && method0Rows.stream().anyMatch(r -> !Arrays.asList(0, 1, 2).contains(r.getBlock())))
-            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, "Method 0 must have block 0, 1 or 2",
+            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, "Method 0 must have block 0, 1 or 2",null, 
                         method0Rows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("block"));
 
         // VALIDATE: Both M1, M2 present and if ATRC has M3 and at least one method of 3,4,5,7
@@ -513,7 +522,7 @@ public class ValidationProcess {
         }
 
         if(messages.size() > 0) {
-            return new ValidationError(ValidationCategory.SPAN, level, messagePrefix + String.join(". ", messages), 
+            return new ValidationError(ValidationCategory.SPAN, level, messagePrefix + String.join(". ", messages), null, 
             rowIds, flagColumns);
         }
 
@@ -527,7 +536,7 @@ public class ValidationProcess {
             missingSurveys.removeAll(surveyGroup.keySet());
             List<String> missingSurveysMessage = missingSurveys.stream().map(s -> s.toString()).collect(Collectors.toList());
             String message =  "Survey group incomplete: missing " + String.join(", ", missingSurveysMessage);
-            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, message, surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
+            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, message, null, surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
         }
         return null;
     }
@@ -645,36 +654,46 @@ public class ValidationProcess {
         return rows.stream().map(stagedRow -> mapper.map(stagedRow, StagedRowFormatted.class)).collect(Collectors.toList());
     }
 
-    public ValidationResponse generateSummary(Collection<StagedRowFormatted> mappedRows) {
+    public ValidationResponse generateSummary(Collection<ValidationError> errors, Collection<StagedRowFormatted> mappedRows) {
         ValidationResponse response = new ValidationResponse();
         response.setRowCount(mappedRows.size());
 
-        Collection<String> distinctSites = mappedRows.stream().map(r ->r.getRef().getSiteCode().trim().toUpperCase()).filter(s -> s.length() > 0).distinct().collect(Collectors.toList());
-        Collection<String> distinctSitesExisting = mappedRows.stream().filter(r -> r.getSite() != null).map(r ->r.getSite().getSiteCode().toUpperCase()).distinct().collect(Collectors.toList());
-        response.setSiteCount(distinctSites.size());
+        // long distinctSiteCount;
+        // long existingSiteCount;
+        // Collection<String> mismatchedSites;
+        // Collection<String> foundSites;
 
-        Map<String, Boolean> foundSites = new HashMap<String, Boolean>();
-        distinctSites.stream().forEach(s -> foundSites.put(s, !distinctSitesExisting.contains(s)));
-        response.setFoundSites(foundSites);
-        response.setNewSiteCount(foundSites.values().stream().filter(e -> e == true).count());
+        Set<String> distinctSites = mappedRows.stream().map(r ->r.getRef().getSiteCode().trim().toUpperCase()).filter(s -> s.length() > 0).distinct().collect(Collectors.toSet());
+        Set<String> existingSites = mappedRows.stream().filter(r -> r.getSite() != null).map(r ->r.getSite().getSiteCode().toUpperCase()).distinct().collect(Collectors.toSet());
+        Set<String> foundSites = distinctSites.stream().collect(Collectors.toSet());
+        foundSites.removeAll(existingSites);
 
-        Long distinctDiverCount = mappedRows.stream().map(d -> d.getRef().getDiver().toUpperCase()).filter(d -> d.length() > 0).distinct().count();
-        Long distinctDiversExistingCount = mappedRows.stream().filter(s -> s.getDiver() != null).map(d -> d.getDiver().getDiverId()).distinct().count();
-        response.setDiverCount(distinctDiverCount);
-        response.setNewDiverCount(distinctDiverCount - distinctDiversExistingCount);
+        List<ValidationError> mismatchedSiteRows = errors.stream().filter(e -> e.getMessage().contains("Coordinates are further than 0.2km from the Site")).collect(Collectors.toList());
+        Set<Long> mismatchedSiteRowIds = mismatchedSiteRows.stream().map(r -> (long)(r.getRowIds().toArray())[0]).collect(Collectors.toSet());
+        mappedRows.stream().filter(r -> mismatchedSiteRowIds.contains(r.getId()));
 
-        List<String> obsItemNames = mappedRows.stream().map(r -> r.getRef().getSpecies().trim().toUpperCase()).filter(r -> r.length() > 0).distinct().collect(Collectors.toList());
-        int distinctObsItems = obsItemNames.size();
-        Long distinctObsItemsExisting = mappedRows.stream().filter(r ->r.getSpecies().isPresent()).map(r -> r.getSpecies().get().getObservableItemName()).distinct().count();
-        Long distinctNotPresentObsItem = mappedRows.stream().map(r -> r.getRef().getCode().trim().toUpperCase()).filter(r -> r.equalsIgnoreCase("SND")).distinct().count();
-        response.setNewObsItemCount(distinctObsItems - distinctObsItemsExisting - distinctNotPresentObsItem);
+        response.setDistinctSiteCount(distinctSites.size());
+        response.setExistingSiteCount(existingSites.size());
 
-        response.setObsItemCount(distinctObsItems);
+        // Long distinctDiverCount = mappedRows.stream().map(d -> d.getRef().getDiver().toUpperCase()).filter(d -> d.length() > 0).distinct().count();
+        // Long distinctDiversExistingCount = mappedRows.stream().filter(s -> s.getDiver() != null).map(d -> d.getDiver().getDiverId()).distinct().count();
+        // response.setDiverCount(distinctDiverCount);
+        // response.setNewDiverCount(distinctDiverCount - distinctDiversExistingCount);
+
+        // List<String> obsItemNames = mappedRows.stream().map(r -> r.getRef().getSpecies().trim().toUpperCase()).filter(r -> r.length() > 0).distinct().collect(Collectors.toList());
+        // int distinctObsItems = obsItemNames.size();
+        // Long distinctObsItemsExisting = mappedRows.stream().filter(r ->r.getSpecies().isPresent()).map(r -> r.getSpecies().get().getObservableItemName()).distinct().count();
+        // Long distinctNotPresentObsItem = mappedRows.stream().map(r -> r.getRef().getCode().trim().toUpperCase()).filter(r -> r.equalsIgnoreCase("SND")).distinct().count();
+        // response.setNewObsItemCount(distinctObsItems - distinctObsItemsExisting - distinctNotPresentObsItem);
+
+        // response.setObsItemCount(distinctObsItems);
         return response;
     }
 
     public ValidationResponse process(StagedJob job) {
 
+        logger.info("Validation", "Job %s  ID %d", job.getReference(), job.getId());
+        
         Collection<StagedRow> rows = rowRepository.findRowsByJobId(job.getId());
         Collection<ObservableItem> species = getSpeciesForRows(rows);
 
@@ -687,9 +706,9 @@ public class ValidationProcess {
 
         Collection<StagedRowFormatted> mappedRows = formatRowsWithSpecies(rows, species);
 
-        ValidationResponse response = generateSummary(mappedRows);
-
         sheetErrors.addAll(checkData(programName, job.getIsExtendedSize(), mappedRows));
+
+        ValidationResponse response = generateSummary(sheetErrors, mappedRows);
 
         Map<String, List<StagedRowFormatted>> surveyMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
         sheetErrors.addAll(checkSurveys(programName, job.getIsExtendedSize(), surveyMap));

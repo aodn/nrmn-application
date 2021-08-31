@@ -15,6 +15,7 @@ import {getDataJob, validateJob, updateRows, submitIngest} from '../../axios/api
 import {measurements, extendedMeasurements} from '../../constants';
 import FindReplacePanel from './panel/FindReplacePanel';
 import ValidationPanel from './panel/ValidationPanel';
+import SummaryPanel from './panel/SummaryPanel';
 import LinearProgressWithLabel from '../ui/LinearProgressWithLabel';
 import AlertDialog from '../ui/AlertDialog';
 
@@ -154,8 +155,15 @@ const DataSheetView = ({jobId, onIngest}) => {
 
       setSideBar((sideBar) => {
         return {
-          defaultToolPanel: 'validation',
+          defaultToolPanel: 'summary',
           toolPanels: [
+            {
+              id: 'summary',
+              labelDefault: 'Summary',
+              labelKey: 'summary',
+              iconKey: 'columns',
+              toolPanel: 'summaryPanel'
+            },
             {
               id: 'validation',
               labelDefault: 'Validation',
@@ -650,6 +658,7 @@ const DataSheetView = ({jobId, onIngest}) => {
             undoRedoCellEditing={false}
             onCellEditingStopped={onCellEditingStopped}
             frameworkComponents={{
+              summaryPanel: SummaryPanel,
               validationPanel: ValidationPanel,
               findReplacePanel: FindReplacePanel,
               loadingOverlay: LoadingOverlay

@@ -13,6 +13,7 @@ public class ValidationCell {
     private ValidationCategory categoryId;
     private ValidationLevel levelId;
     private String message;
+    private String value;
     private Long rowId;
     private String columnName;
 }

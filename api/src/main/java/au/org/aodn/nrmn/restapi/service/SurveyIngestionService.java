@@ -44,6 +44,8 @@ import au.org.aodn.nrmn.restapi.repository.SurveyMethodRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import lombok.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class SurveyIngestionService {
@@ -92,6 +94,8 @@ public class SurveyIngestionService {
     StagedJobLogRepository stagedJobLogRepository;
     @Autowired
     StagedJobRepository jobRepository;
+
+    private static Logger logger = LoggerFactory.getLogger(SurveyIngestionService.class);
 
     public Survey getSurvey(StagedRowFormatted stagedRow) {
 
@@ -199,6 +203,8 @@ public class SurveyIngestionService {
 
     @Transactional
     public void ingestTransaction(StagedJob job, Collection<StagedRowFormatted> validatedRows) {
+        
+        logger.info("SurveyIngest", "Ingest job " + job.getId() + ". Rows " + validatedRows.size());
 
         Map<String, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
 

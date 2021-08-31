@@ -1,7 +1,6 @@
 package au.org.aodn.nrmn.restapi.dto.stage;
 
 import java.util.Collection;
-import java.util.Map;
 
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import lombok.Getter;
@@ -16,8 +15,10 @@ public class ValidationResponse {
     
     long rowCount;
 
-    long siteCount;
-    long newSiteCount;
+    long distinctSiteCount;
+    long existingSiteCount;
+    Collection<String> mismatchedSites;
+    Collection<String> foundSites;
 
     long diverCount;
     long newDiverCount;
@@ -28,7 +29,6 @@ public class ValidationResponse {
     long surveyCount;
     long incompleteSurveyCount;
 
-    Map<String, Boolean> foundSites;
 
     Collection<ValidationError> errors;
 }

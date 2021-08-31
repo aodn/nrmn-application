@@ -19,7 +19,7 @@ public class ValidationResultSet {
 
     public void addGlobal(Collection<ValidationRow> validationRows) {
         for (ValidationRow validationRow : validationRows) {
-            ValidationError value = errorMap.getOrDefault(validationRow.getMessage(), new ValidationError(ValidationCategory.GLOBAL, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
+            ValidationError value = errorMap.getOrDefault(validationRow.getMessage(), new ValidationError(ValidationCategory.GLOBAL, validationRow.getLevelId(), validationRow.getMessage(), null, validationRow.getRowIds(), null));
             if (value != null) {
                 value.getRowIds().addAll(validationRow.getRowIds());
                 value.setRowIds(value.getRowIds().stream().distinct().collect(Collectors.toList()));
@@ -28,33 +28,24 @@ public class ValidationResultSet {
         }
     }
 
-    public void add(Long id, ValidationLevel validationLevel, String column, String message, Boolean groupInRow) {
-        add(id, ValidationCategory.DATA, validationLevel, column, message, groupInRow);
-    }
-
     public void add(Long id, ValidationLevel validationLevel, String column, String message) {
-        add(id, ValidationCategory.DATA, validationLevel, column, message, false);
+        add(id, ValidationCategory.DATA, validationLevel, column, message, null, false);
     }
 
-    private void add(Long id, ValidationCategory validationCategory, ValidationLevel validationLevel, String column, String message, Boolean groupInRow) {
+    private void add(Long id, ValidationCategory validationCategory, ValidationLevel validationLevel, String column, String message, String value, Boolean groupInRow) {
         String key = (groupInRow) ? message + Long.toString(id) : message + column;
-        ValidationError value = errorMap.getOrDefault(key,
-                new ValidationError(validationCategory, validationLevel, message, new HashSet<>(Arrays.asList(id)), new HashSet<>(Arrays.asList(column))));
-        if (value != null) {
-            value.getRowIds().add(id);
-            value.getColumnNames().add(column);
+        ValidationError error = errorMap.getOrDefault(key,
+                new ValidationError(validationCategory, validationLevel, message, value, new HashSet<>(Arrays.asList(id)), new HashSet<>(Arrays.asList(column))));
+        if (error != null) {
+            error.getRowIds().add(id);
+            error.getColumnNames().add(column);
         }
-        errorMap.put(key, value);
+        errorMap.put(key, error);
     }
 
     public void add(ValidationCell cell, Boolean groupInRow) {
         if(cell != null)
-            add(cell.getRowId(), cell.getCategoryId(), cell.getLevelId(), cell.getColumnName(), cell.getMessage(), groupInRow);
-    }
-
-    public void add(ValidationCell cell) {
-        if(cell != null)
-            add(cell.getRowId(), cell.getCategoryId(), cell.getLevelId(), cell.getColumnName(), cell.getMessage(), true);
+            add(cell.getRowId(), cell.getCategoryId(), cell.getLevelId(), cell.getColumnName(), cell.getMessage(), cell.getValue(), groupInRow);
     }
 
     public void addAll(Collection<ValidationCell> cells) {
@@ -63,7 +54,7 @@ public class ValidationResultSet {
 
     public void addAll(Collection<ValidationCell> cells, Boolean groupInRow) {
         for (ValidationCell cell : cells) {
-            add(cell.getRowId(), cell.getCategoryId(), cell.getLevelId(), cell.getColumnName(), cell.getMessage(), groupInRow);
+            add(cell.getRowId(), cell.getCategoryId(), cell.getLevelId(), cell.getColumnName(), cell.getMessage(), cell.getValue(), groupInRow);
         }
     }
 

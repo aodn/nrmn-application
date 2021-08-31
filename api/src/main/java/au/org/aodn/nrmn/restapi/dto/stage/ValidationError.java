@@ -15,6 +15,7 @@ public class ValidationError {
     private ValidationCategory categoryId;
     private ValidationLevel levelId;
     private String message;
+    private String value;
     private Collection<Long> rowIds;
     private Collection<String> columnNames;
 }
