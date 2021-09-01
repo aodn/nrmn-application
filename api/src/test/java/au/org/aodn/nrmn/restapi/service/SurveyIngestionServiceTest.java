@@ -146,7 +146,8 @@ public class SurveyIngestionServiceTest {
         Method theMethod = Method.builder().methodId(2).methodName("The Method").isActive(true).build();
         when(entityManager.getReference(Method.class, 2)).thenReturn(theMethod);
         when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
-        StagedRowFormatted row = rowBuilder.code("snd").build();
+        StagedRow inputRow = StagedRow.builder().species("Survey Not Done").build();
+        StagedRowFormatted row = rowBuilder.ref(inputRow).build();
         Survey survey = Survey.builder().surveyId(1).build();
         SurveyMethod surveyMethod = surveyIngestionService.getSurveyMethod(survey, row);
         assertEquals(true, surveyMethod.getSurveyNotDone());
@@ -308,7 +309,8 @@ public class SurveyIngestionServiceTest {
 
         Program program = Program.builder().programId(1).build();
         StagedJob stagedJob = StagedJob.builder().id(1L).program(program).build();
-        StagedRow stagedRow = StagedRow.builder().stagedJob(stagedJob).build();
+        StagedRow stagedRow = StagedRow.builder().stagedJob(stagedJob).species("Survey Not Done").build();
+
         StagedRowFormatted formattedRow = StagedRowFormatted
                 .builder()
                 .ref(stagedRow)

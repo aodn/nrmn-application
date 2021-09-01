@@ -126,7 +126,7 @@ public class SurveyIngestionService {
     }
 
     public SurveyMethod getSurveyMethod(Survey survey, StagedRowFormatted stagedRow) {
-        boolean surveyNotDone = stagedRow.getRef().getSpecies().toLowerCase().equals("Survey Not Done");
+        boolean surveyNotDone = stagedRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done");
         Method method = entityManager.getReference(Method.class, stagedRow.getMethod());
         SurveyMethod surveyMethod = SurveyMethod.builder().survey(survey).method(method).blockNum(stagedRow.getBlock())
                 .surveyNotDone(surveyNotDone).build();
