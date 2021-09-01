@@ -19,6 +19,7 @@ class MissingDataCheckTest extends FormattedTestProvider {
     public void noSpeciesFoundWithNoObservationsShouldSucceed() {
         StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMeasureJson(ImmutableMap.<Integer, Integer>builder().build());
+        formatted.setInverts(0);
         formatted.setTotal(0);
         formatted.setCode("nsf");
 
@@ -34,6 +35,7 @@ class MissingDataCheckTest extends FormattedTestProvider {
     public void sndWithNoObservationsShouldSucceed() {
         StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMeasureJson(ImmutableMap.<Integer, Integer>builder().build());
+        formatted.setInverts(0);
         formatted.setTotal(0);
         formatted.setCode("snd");
         formatted.setSpecies(Optional.of(ObservableItem.builder().observableItemName("Survey Not Done").build()));
