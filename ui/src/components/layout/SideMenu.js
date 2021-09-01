@@ -52,8 +52,7 @@ const SideMenu = ({entities, open, onClose}) => {
       </List>
       <List>
         <Divider />
-        {version && <ListSubheader>{`Version ${version[0]}.${version[1]}`}</ListSubheader>}
-        <small>Build {version[2]}</small>
+        {version && <ListSubheader>{`Version ${version[0]}.${version[1]} (${version[2]})`}</ListSubheader>}
       </List>
     </Drawer>
   );
