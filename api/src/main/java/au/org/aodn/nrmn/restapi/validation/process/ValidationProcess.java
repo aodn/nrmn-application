@@ -337,14 +337,14 @@ public class ValidationProcess {
         Integer observationTotal = row.getMeasureJson().entrySet().stream().map(Map.Entry::getValue).reduce(0, Integer::sum) + (row.getInverts() != null ? row.getInverts() : 0);
 
         // VALIDATION: RLS: Debris Zero observations
-        if (programName.equalsIgnoreCase("RLS") && row.getCode() != null && row.getCode().equalsIgnoreCase("dez") && row.getSpecies().isPresent()) {
+        if (programName.equalsIgnoreCase("RLS") && row.getCode() != null && row.isDebrisZero() && row.getSpecies().isPresent()) {
             if (!validateRowZeroOrOneInvertsTotal(row, observationTotal))
                 errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Debris has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
         }
 
         // VALIDATION: Record has no data and but not flagged as 'Survey Not Done' or
         // 'No Species Found'
-        if (observationTotal < 1 && row.getCode() != null && !row.getCode().equalsIgnoreCase("DEZ") && !row.getCode().equalsIgnoreCase("SND") && !(row.getSpecies().isPresent() &&  row.getSpecies().get().getObsItemType() != null  && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)) {
+        if (observationTotal < 1 && row.getCode() != null && !row.isDebrisZero() && !row.isSurveyNotDone() && !(row.getSpecies().isPresent() &&  row.getSpecies().get().getObsItemType() != null  && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)) {
             
             // VALIDATION: At least one value recorded in any of the size class columns or in the column Inverts
             if(row.getInverts() != null ) {
@@ -354,7 +354,7 @@ public class ValidationProcess {
             }
         } else if (row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType() != null && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND && !validateRowZeroOrOneInvertsTotal(row, observationTotal)){
             errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "'No Species Found' has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
-        } else if (row.getCode() != null && row.getCode().equalsIgnoreCase("SND") && !validateRowZeroOrOneInvertsTotal(row, observationTotal)) {
+        } else if (row.isSurveyNotDone() && !validateRowZeroOrOneInvertsTotal(row, observationTotal)) {
             errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "'Survey Not Done' has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
         }
         // VALIDATION: Abundance CheckSums
