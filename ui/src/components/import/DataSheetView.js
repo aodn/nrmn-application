@@ -5,7 +5,7 @@ import {
   CloudDownload as CloudDownloadIcon,
   PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon
 } from '@material-ui/icons/';
-import {red, orange, yellow, grey, lightGreen} from '@material-ui/core/colors';
+import {blue, red, orange, yellow, grey, lightGreen} from '@material-ui/core/colors';
 import {NavLink} from 'react-router-dom';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
@@ -70,6 +70,7 @@ const popUndo = (api) => {
   }
   context.fullRefresh = true;
   api.setRowData(rowData);
+  ctx.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
 };
 
 // |context| is where all custom properties and helper functions
@@ -96,6 +97,7 @@ const context = {
 const resetContext = () => {
   context.useOverlay = 'Loading';
   context.rowData = [];
+  context.rowPos = [];
   context.highlighted = [];
   context.putRowIds = [];
   context.undoStack = [];
@@ -294,6 +296,7 @@ const DataSheetView = ({jobId, onIngest}) => {
       pushUndo(e.api, [{id: newId}]);
       rowData.push(newData);
       e.api.setRowData(rowData);
+      e.context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
       const values = e.api.getRenderedNodes().reduce((acc, field) => acc.concat(field.id.toString()), [newId.toString()]);
       e.api.setFilterModel({
         id: {
@@ -418,6 +421,7 @@ const DataSheetView = ({jobId, onIngest}) => {
           return row;
         });
         api.gridOptionsWrapper.gridOptions.context.rowData = rowData;
+        api.gridOptionsWrapper.gridOptions.context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
         api.setRowData(rowData.length > 0 ? rowData : null);
       }
       if (completion) completion(job);
@@ -456,6 +460,7 @@ const DataSheetView = ({jobId, onIngest}) => {
     if (error) {
       if (error.levelId === 'BLOCKING') return {backgroundColor: red[100]};
       if (error.levelId === 'WARNING') return {backgroundColor: orange[100]};
+      if (error.levelId === 'DUPLICATE') return {backgroundColor: blue[100]};
     }
     return null;
   };
@@ -476,7 +481,17 @@ const DataSheetView = ({jobId, onIngest}) => {
       (e) => e.rowIds.includes(params.data.id) && (!e.columnNames || e.columnNames.includes(params.colDef.field))
     );
 
+    if (error?.levelId === 'DUPLICATE') {
+      const rowPositions = error.rowIds.map((r) => params.context.rowData.find((d) => d.id === r)?.pos).filter((r) => r);
+      const duplicates = rowPositions.map((r) => params.context.rowPos.indexOf(r) + 1);
+      return duplicates.length > 1 ? 'Rows are duplicated: ' + duplicates.join(', ') : 'Duplicate rows have been removed';
+    }
+
     return error?.message;
+  };
+
+  const rowValueGetter = (params) => {
+    return params.context.rowPos.indexOf(params.data.pos) + 1;
   };
 
   const deleteRow = (e) => {
@@ -508,6 +523,7 @@ const DataSheetView = ({jobId, onIngest}) => {
     }
     pushUndo(e.api, delta);
     e.api.setRowData(rowData);
+    e.context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
     e.api.refreshCells();
   };
 
@@ -668,7 +684,7 @@ const DataSheetView = ({jobId, onIngest}) => {
               headerName=""
               suppressMovable={true}
               editable={false}
-              valueGetter="node.rowIndex + 1"
+              valueGetter={rowValueGetter}
               minWidth={40}
               enableCellChangeFlash={false}
               filter={false}

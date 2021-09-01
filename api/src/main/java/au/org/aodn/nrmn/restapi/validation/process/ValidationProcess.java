@@ -94,8 +94,10 @@ public class ValidationProcess {
         });
         Collection<ValidationRow> duplicateRows = new ArrayList<ValidationRow>();
         mappedRows.forEach((r, v) -> {
-            if (v.size() > 1)
-                duplicateRows.add(new ValidationRow(r, v, ValidationLevel.WARNING, "Rows duplicated"));
+            if (v.size() > 1) {
+                List<Long> rowIds = v.stream().limit(50).collect(Collectors.toList());
+                duplicateRows.add(new ValidationRow(r, rowIds, ValidationLevel.DUPLICATE, "Rows duplicated"));
+            }
         });
         return duplicateRows;
     }
@@ -203,11 +205,9 @@ public class ValidationProcess {
                 }
 
             // Inverts
-            if (!StringUtils.isBlank(row.getInverts())) {
-                int inverts = NumberUtils.toInt(row.getInverts(), INVALID_INT);
-                if (inverts == INVALID_INT)
-                    errors.add(rowId, ValidationLevel.BLOCKING, "inverts", "Inverts is not an integer");
-            }
+            int inverts = NumberUtils.toInt(row.getInverts(), INVALID_INT);
+            if (inverts == INVALID_INT)
+                errors.add(rowId, ValidationLevel.BLOCKING, "inverts", "Inverts is not an integer");
 
             // Total
             if (NumberUtils.toInt(row.getTotal(), INVALID_INT) == INVALID_INT)
@@ -323,9 +323,9 @@ public class ValidationProcess {
     }
 
     private Boolean validateRowZeroOrOneInvertsTotal(StagedRowFormatted row, Integer observationTotal) {
-        boolean notZero = ((row.getInverts() != null && row.getInverts() != 0) || (row.getTotal() != null && row.getTotal() != 0) || observationTotal != 0);
-        boolean notOne = ((row.getInverts() != null && row.getInverts() != 1) || (row.getTotal() != null && row.getTotal() != 1) || observationTotal != 1);
-        return !(notZero && notOne);
+        if(row.getInverts() == null || row.getTotal() == null) return false;
+        if(!(row.getInverts() == row.getTotal() && row.getTotal() == observationTotal)) return false;
+        return observationTotal == 0 || observationTotal == 1;
     }
 
     public Collection<ValidationCell> validateMeasurements(String programName, StagedRowFormatted row) {
@@ -337,14 +337,14 @@ public class ValidationProcess {
         Integer observationTotal = row.getMeasureJson().entrySet().stream().map(Map.Entry::getValue).reduce(0, Integer::sum) + (row.getInverts() != null ? row.getInverts() : 0);
 
         // VALIDATION: RLS: Debris Zero observations
-        if (programName.equalsIgnoreCase("RLS") && row.getCode() != null && row.getCode().equalsIgnoreCase("dez") && row.getSpecies().isPresent()) {
+        if (programName.equalsIgnoreCase("RLS") && row.isDebrisZero() && row.getSpecies().isPresent()) {
             if (!validateRowZeroOrOneInvertsTotal(row, observationTotal))
                 errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Debris has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
         }
 
         // VALIDATION: Record has no data and but not flagged as 'Survey Not Done' or
         // 'No Species Found'
-        if (observationTotal < 1 && row.getCode() != null && !row.getCode().equalsIgnoreCase("DEZ") && !row.getCode().equalsIgnoreCase("SND") && !(row.getSpecies().isPresent() &&  row.getSpecies().get().getObsItemType() != null  && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)) {
+        if (observationTotal < 1 && !row.isDebrisZero() && !row.isSurveyNotDone() && !(row.getSpecies().isPresent() &&  row.getSpecies().get().getObsItemType() != null  && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)) {
             
             // VALIDATION: At least one value recorded in any of the size class columns or in the column Inverts
             if(row.getInverts() != null ) {
@@ -354,7 +354,7 @@ public class ValidationProcess {
             }
         } else if (row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType() != null && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND && !validateRowZeroOrOneInvertsTotal(row, observationTotal)){
             errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "'No Species Found' has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
-        } else if (row.getCode() != null && row.getCode().equalsIgnoreCase("SND") && !validateRowZeroOrOneInvertsTotal(row, observationTotal)) {
+        } else if (row.isSurveyNotDone() && !validateRowZeroOrOneInvertsTotal(row, observationTotal)) {
             errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "'Survey Not Done' has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
         }
         // VALIDATION: Abundance CheckSums
@@ -666,7 +666,7 @@ public class ValidationProcess {
         List<String> obsItemNames = mappedRows.stream().map(r -> r.getRef().getSpecies().trim().toUpperCase()).filter(r -> r.length() > 0).distinct().collect(Collectors.toList());
         int distinctObsItems = obsItemNames.size();
         Long distinctObsItemsExisting = mappedRows.stream().filter(r ->r.getSpecies().isPresent()).map(r -> r.getSpecies().get().getObservableItemName()).distinct().count();
-        Long distinctNotPresentObsItem = mappedRows.stream().map(r -> r.getRef().getCode().trim().toUpperCase()).filter(r -> r.equalsIgnoreCase("SND")).distinct().count();
+        Long distinctNotPresentObsItem = mappedRows.stream().map(r -> r.getRef().getSpecies().trim().toUpperCase()).filter(r -> r.equalsIgnoreCase("SURVEY NOT DONE")).distinct().count();
         response.setNewObsItemCount(distinctObsItems - distinctObsItemsExisting - distinctNotPresentObsItem);
 
         response.setObsItemCount(distinctObsItems);
@@ -698,7 +698,7 @@ public class ValidationProcess {
         Map<String, List<StagedRowFormatted>> surveyGroupMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
         sheetErrors.addAll(checkSurveyGroups(programName, job.getIsExtendedSize(), surveyGroupMap));
 
-        Map<String, List<StagedRowFormatted>> method3SurveyMap = mappedRows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3) && row.getCode() != null && !row.getCode().equalsIgnoreCase("snd")).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
+        Map<String, List<StagedRowFormatted>> method3SurveyMap = mappedRows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3) && !row.getRef().getSpecies().equalsIgnoreCase("Survey Not Done")).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
         sheetErrors.addAll(checkMethod3Transects(programName, job.getIsExtendedSize(), method3SurveyMap));
 
         Long distinctSurveys = mappedRows.stream().filter(r -> Arrays.asList(1,2).contains(r.getMethod())).map(r -> r.getSurvey()).distinct().count();

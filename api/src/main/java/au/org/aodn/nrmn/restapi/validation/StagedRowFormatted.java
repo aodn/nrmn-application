@@ -87,6 +87,15 @@ public class StagedRowFormatted {
                 && Objects.equals(species, that.species);
     }
 
+    
+    public Boolean isDebrisZero() {
+        return (code.equalsIgnoreCase("DEZ") || (ref != null && ref.getSpecies().equalsIgnoreCase("Debris - Zero")));
+    }
+
+    public Boolean isSurveyNotDone() {
+        return (code.equalsIgnoreCase("SND") || (ref != null && ref.getSpecies().equalsIgnoreCase("Survey Not Done")));
+    }
+
     public String getMethodBlock() {
         return method.toString() + '-' + block.toString();
     }

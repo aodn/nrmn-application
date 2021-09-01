@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,7 +51,7 @@ class DuplicateRowCheckTest {
         }}).build();
 
         Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
-        assertTrue(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Rows duplicated")));
+        assertTrue(res.stream().anyMatch(e -> e.getLevelId() == ValidationLevel.DUPLICATE));
     }
 
     @Test
@@ -71,7 +72,7 @@ class DuplicateRowCheckTest {
         }}).build();
 
         Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
-        assertTrue(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Rows duplicated")));
+        assertTrue(res.stream().anyMatch(e -> e.getLevelId() == ValidationLevel.DUPLICATE));
     }
 
     @Test
@@ -90,6 +91,6 @@ class DuplicateRowCheckTest {
         }}).build();
 
         Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
-        assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Rows duplicated")));
+        assertFalse(res.stream().anyMatch(e -> e.getLevelId() == ValidationLevel.DUPLICATE));
     }
 }

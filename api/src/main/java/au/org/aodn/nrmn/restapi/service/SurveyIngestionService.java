@@ -126,7 +126,7 @@ public class SurveyIngestionService {
     }
 
     public SurveyMethod getSurveyMethod(Survey survey, StagedRowFormatted stagedRow) {
-        boolean surveyNotDone = stagedRow.getCode().toLowerCase().equals("snd");
+        boolean surveyNotDone = stagedRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done");
         Method method = entityManager.getReference(Method.class, stagedRow.getMethod());
         SurveyMethod surveyMethod = SurveyMethod.builder().survey(survey).method(method).blockNum(stagedRow.getBlock())
                 .surveyNotDone(surveyNotDone).build();
@@ -153,7 +153,7 @@ public class SurveyIngestionService {
 
         Stream<MeasureValue> unsized = Stream.empty();
 
-        if (!stagedRow.getCode().equalsIgnoreCase("snd") && stagedRow.getInverts() != null && stagedRow.getInverts() > 0) {
+        if (!stagedRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done") && stagedRow.getInverts() != null && stagedRow.getInverts() > 0) {
             unsized = Stream.of(new MeasureValue(0, stagedRow.getInverts()));
         }
 

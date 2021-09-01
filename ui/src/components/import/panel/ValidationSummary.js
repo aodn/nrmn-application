@@ -59,7 +59,7 @@ const ValidationSummary = (props) => {
           }
           key={m.key}
         >
-          {m.description.map((d) => {
+          {m.description.slice(0, 50).map((d) => {
             const mmHeader = mm.find((m) => m.field === d.columnName);
             let label = mmHeader ? `${mmHeader.fishSize}/${mmHeader.invertSize}` : d.columnName;
             return (
@@ -72,9 +72,9 @@ const ValidationSummary = (props) => {
                   <div className={classes.labelRoot}>
                     <Typography key={i++} variant="body2" className={classes.labelText}>
                       {d.value ? (
-                        <div>
+                        <span>
                           <b>{label}</b> {d.value}
-                        </div>
+                        </span>
                       ) : d.label ? (
                         <b>{label} is empty</b>
                       ) : d.columnNames ? (
