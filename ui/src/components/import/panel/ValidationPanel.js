@@ -44,7 +44,7 @@ const generateErrorSummary = (ctx, e) => {
         const existingIdx = acc.findIndex((m) => m.columnName === val.columnName && m.value === val.value);
         if (existingIdx >= 0) {
           const rowIds = acc[existingIdx].rowIds;
-          acc[existingIdx] = {...val, rowIds: [...rowIds, val.rowId]};
+          if (rowIds.length < 50) acc[existingIdx] = {...val, rowIds: [...rowIds, val.rowId]};
         } else {
           const rowIds = [val.rowId];
           delete val.rowId;

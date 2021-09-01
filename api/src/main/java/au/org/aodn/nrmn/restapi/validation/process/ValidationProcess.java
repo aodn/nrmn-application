@@ -94,8 +94,10 @@ public class ValidationProcess {
         });
         Collection<ValidationRow> duplicateRows = new ArrayList<ValidationRow>();
         mappedRows.forEach((r, v) -> {
-            if (v.size() > 1)
-                duplicateRows.add(new ValidationRow(r, v, ValidationLevel.WARNING, "Rows duplicated"));
+            if (v.size() > 1) {
+                List<Long> rowIds = v.stream().limit(50).collect(Collectors.toList());
+                duplicateRows.add(new ValidationRow(r, rowIds, ValidationLevel.DUPLICATE, "Rows duplicated"));
+            }
         });
         return duplicateRows;
     }
