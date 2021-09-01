@@ -158,7 +158,7 @@ public class StagedJobController {
                 if (rowsToTruncate.isPresent() && rowsToTruncate.get().getRowIds().size() >= 3) {
                     Collection<Long> rowIdsToRemove = rowsToTruncate.get().getRowIds();
                     // keep the last row if the data should finish with a true zero
-                    if (Arrays.asList("SND", "DEZ", "NSF").contains(lastRow.getCode().toUpperCase()))
+                    if (Arrays.asList("SURVEY NOT DONE", "DEBRIS - ZERO", "NO SURVEY FOUND").contains(lastRow.getSpecies().toUpperCase()))
                         rowIdsToRemove.remove(lastRowId);
                     rowsToSave.removeIf(r -> rowIdsToRemove.contains(r.getId()));
                 }
