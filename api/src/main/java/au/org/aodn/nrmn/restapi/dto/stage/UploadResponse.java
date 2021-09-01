@@ -5,6 +5,7 @@ import java.util.Optional;
 public class UploadResponse {
     private Optional<Long> id;
     private String error;
+    private String message;
 
     public UploadResponse(){}
 
@@ -20,11 +21,21 @@ public class UploadResponse {
         this.error = error;
     }
 
+    public UploadResponse(Optional<Long> id, String error, String message) {
+        this.id = id;
+        this.error = error;
+        this.message = message;
+    }
+
     public Optional<Long> getId() {
         return this.id;
     }
 
     public String getError() {
         return this.error;
+    }
+
+    public String getMessage() {
+        return this.message;
     }
 }

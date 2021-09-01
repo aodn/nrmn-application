@@ -21,12 +21,9 @@ public class SurveyContentsHandler implements SheetContentsHandler {
 
     private StagedRow currentRow;
     private boolean isHeaderRow = false;
-    private boolean rowHasId = false;
-    private boolean rowHasData = false;
     private HashMap<String, String> columnHeaders = new HashMap<>();
     HashMap<Integer, String> measureJson = new HashMap<>();
     List<StagedRow> stagedRows = new ArrayList<>();
-    private Long skippedRows = 0L;
 
     SurveyContentsHandler(List<String> requiredHeaders, List<String> optionalHeaders) {
         this.requiredHeaders = requiredHeaders;
@@ -43,8 +40,6 @@ public class SurveyContentsHandler implements SheetContentsHandler {
 
     @Override
     public void startRow(int rowNum) {
-        rowHasId = false;
-        rowHasData = false;
         isHeaderRow = (rowNum == 0);
         if (!isHeaderRow) {
             currentRow = StagedRow.builder().pos((rowNum - 1) * 1000).build();
@@ -69,11 +64,9 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             if (errors.size() > 0)
                 error = String.join(". ", errors);
         } else {
-            if (rowHasId && rowNum > 1) {
+            if (rowNum > 1) {
                 currentRow.setMeasureJson(new HashMap<Integer, String>(measureJson));
                 this.stagedRows.add(currentRow);
-            } else {
-                if(rowHasData && rowNum > 1) skippedRows++;
             }
         }
         measureJson.clear();
@@ -82,7 +75,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     @Override
     public void endSheet() {
         if (stagedRows.size() > 0)
-            result = new ParsedSheet(stagedRows, skippedRows);
+            result = new ParsedSheet(stagedRows);
         else
             error = result == null ? "Empty DATA sheet" : null;
     }
@@ -101,7 +94,6 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             boolean cellHasData = StringUtils.isNotEmpty(formattedValue) && !formattedValue.contentEquals("null");
             String value = cellHasData ? formattedValue : "";
             setValue(col, value);
-            rowHasData = true;
         }
     }
 
@@ -109,8 +101,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
         String value = formattedValue != null ? formattedValue.trim() : "";
         switch (columnHeader) {
             case "ID":
-                // For now stage all rows regardless of ID
-                rowHasId = true; // value.length() > 0;
+                currentRow.setId(Long.valueOf(currentRow.getPos()));
                 break;
             case "Buddy":
                 currentRow.setBuddy(value);
@@ -184,6 +175,5 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     @Value
     public class ParsedSheet {
         private List<StagedRow> stagedRows;
-        private Long skippedRows;
     }
 }

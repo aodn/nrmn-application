@@ -131,7 +131,9 @@ const JobUpload = () => {
                     {uploadResponse?.id && (
                       <>
                         <Alert severity="info" variant="filled">
-                          {formData.file.name} added.
+                          Staged {formData.file.name}
+                          <br />
+                          {uploadResponse.message}
                         </Alert>
                         <Box pt={5} px={15}>
                           <Button style={{width: '100%'}} component={NavLink} to={`/validation/${uploadResponse.id}`}>
