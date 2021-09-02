@@ -95,7 +95,7 @@ public class ValidationProcess {
         Collection<ValidationRow> duplicateRows = new ArrayList<ValidationRow>();
         mappedRows.forEach((r, v) -> {
             if (v.size() > 1) {
-                List<Long> rowIds = v.stream().limit(50).collect(Collectors.toList());
+                List<Long> rowIds = v.stream().collect(Collectors.toList());
                 duplicateRows.add(new ValidationRow(r, rowIds, ValidationLevel.DUPLICATE, "Rows duplicated"));
             }
         });
@@ -336,9 +336,8 @@ public class ValidationProcess {
 
         Integer observationTotal = row.getMeasureJson().entrySet().stream().map(Map.Entry::getValue).reduce(0, Integer::sum) + (row.getInverts() != null ? row.getInverts() : 0);
 
-        // VALIDATION: RLS: Debris Zero observations
-        if (programName.equalsIgnoreCase("RLS") && row.isDebrisZero() && row.getSpecies().isPresent()) {
-            if (!validateRowZeroOrOneInvertsTotal(row, observationTotal))
+        // VALIDATION: Debris Zero observations
+        if (row.isDebrisZero() && !validateRowZeroOrOneInvertsTotal(row, observationTotal)) {
                 errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Debris has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
         }
 
