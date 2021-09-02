@@ -55,10 +55,10 @@ public class SurveyEditService {
 
         Survey survey = surveyRepository.findById(surveyDto.getSurveyId()).orElseThrow(ResourceNotFoundException::new);
 
-        survey.setVisibility(surveyDto.getLongitude() != null ? Double.valueOf(surveyDto.getVisibility()) : null);
+        survey.setVisibility(surveyDto.getVisibility() != null ? Double.valueOf(surveyDto.getVisibility()) : null);
         survey.setDirection(surveyDto.getDirection());
         survey.setLongitude(surveyDto.getLongitude() != null ? Double.valueOf(surveyDto.getLongitude()) : null);
-        survey.setLatitude(surveyDto.getLongitude() != null ? Double.valueOf(surveyDto.getLatitude()) : null);
+        survey.setLatitude(surveyDto.getLatitude() != null ? Double.valueOf(surveyDto.getLatitude()) : null);
 
         Site site = siteRepository.findBySiteCode(surveyDto.getSiteCode());
         if(!site.getSiteName().equals(surveyDto.getSiteName())) {
