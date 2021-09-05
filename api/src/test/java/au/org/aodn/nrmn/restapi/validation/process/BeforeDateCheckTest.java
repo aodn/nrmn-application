@@ -66,7 +66,7 @@ class BeforeDateCheckTest {
         row.setStagedJob(job);
 
         StagedRowFormatted rowFormatted = new StagedRowFormatted();
-        rowFormatted.setDate(LocalDate.parse("2020-01-01"));
+        rowFormatted.setDate(LocalDate.parse("1991-01-01"));
         rowFormatted.setRef(row);
 
         Collection<ValidationError> errors = validationProcess.checkData("ATRC", false, Arrays.asList(rowFormatted));

@@ -78,7 +78,7 @@ public class ValidationProcess {
     private static final Integer[] METHODS_TO_CHECK = { 0, 1, 2, 7, 10 };
     private static final Pattern VALID_DEPTH_SURVEY_NUM = Pattern.compile("^[0-9]+(\\.[0-9])?$");
     private static final LocalDate DATE_MIN_RLS = LocalDate.parse("2006-01-01");
-    private static final LocalDate DATE_MIN_ATRC = LocalDate.parse("1992-01-01");
+    private static final LocalDate DATE_MIN_ATRC = LocalDate.parse("1991-01-01");
 
     private static final double[] FISH_VALUES = { 2.5, 5, 7.5, 10, 12.5, 15, 20, 25, 30, 35, 40, 50, 62.5, 75, 87.5, 100, 112.5, 125, 137.5, 150, 162.5, 175, 187.5, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000 };
     private static final double[] INVERT_VALUES = { 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 16, 17, 18, 19, 20, 22, 24, 26, 28, 30 };
@@ -162,7 +162,7 @@ public class ValidationProcess {
             }
 
             // Direction
-            if (row.getDirection() != null && !EnumUtils.isValidEnumIgnoreCase(Directions.class, row.getDirection().trim()) && !row.getDirection().equalsIgnoreCase("0") && !row.getDirection().equalsIgnoreCase(""))
+            if (row.getDirection() != null && !EnumUtils.isValidEnumIgnoreCase(Directions.class, row.getDirection().trim()) && !Arrays.asList("0", "").contains(row.getDirection().trim()))
                 errors.add(rowId, ValidationLevel.BLOCKING, "direction", "Direction is not valid");
 
             // Latitude
