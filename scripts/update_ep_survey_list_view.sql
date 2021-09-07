@@ -1054,3 +1054,5 @@ with cte_to_force_joins_evaluated_first as(
             else (replace(meas.measure_name, 'cm', ''))::numeric
         end
 ) select * from cte_to_force_joins_evaluated_first;
+
+select refresh_materialized_views();
