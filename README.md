@@ -79,9 +79,11 @@ revisited now those table definitions have stabilised (also refer https://github
 
 ### Updating Database Schema
 
-Scripts to modify the database schema are stored in scripts/db-update once applied. Do not modify application.sql. The naming scheme denotes the order 
+Scripts to modify the database schema are stored in scripts/db-update once applied. Do not modify application.sql. Script names should have the form `00-Script_Description.sql` where 00 is incremented for each script and consist of a single update.
 
 ### Restoring an Empty Database
+
+Restore the nrmn_migration using the scripts provided, then apply `application.sql` and then the scripts in the `scripts/db-update` directory.
 
 database | server | current usage | updating/refreshing
 --- | --- | --- | ---
