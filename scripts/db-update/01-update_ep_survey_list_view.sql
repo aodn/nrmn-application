@@ -1055,4 +1055,4 @@ with cte_to_force_joins_evaluated_first as(
         end
 ) select * from cte_to_force_joins_evaluated_first;
 
-select refresh_materialized_views();
+select nrmn.refresh_materialized_views();

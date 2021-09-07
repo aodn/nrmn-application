@@ -57,7 +57,6 @@ And then deploy the application to a tomcat instance e.g. in intellij
 
 ![image](https://user-images.githubusercontent.com/1860215/123058279-ff8d0600-d44b-11eb-9a7d-efd216fd41f4.png)
 
-
 Note:
 
 This uses the spring.datasource database connection details specified in [application.properties](api/src/main/resources/application.properties)
@@ -66,6 +65,28 @@ You can override these on the command line to point to a different database by a
 
     -Dspring.datasource.url=... -Dspring.datasource.username=... -Dspring.datasource.password=...
 
-### Updating test databases
+### Database Schema
 
-This is currently a manual process as described in [Updating_Databases.md](Updating_Databases.md)
+The base NRMN database is DDL currently maintained in two places
+
+* [NRMN/db-migrate](https://github.com/aodn/NRMN/tree/master/db-migrate) - amalgamated ATRC/RLS
+  database ddl/migration code
+* [application.sql](api/src/main/resources/sql/application.sql) - ddl
+  to support nrmn-application functionality
+
+This made it simpler when developing application related table changes but should probably be
+revisited now those table definitions have stabilised (also refer https://github.com/aodn/backlog/issues/2479)
+
+### Updating Database Schema
+
+Scripts to modify the database schema are stored in scripts/db-update once applied. Do not modify application.sql. Script names should have the form `00-Script_Description.sql` where 00 is incremented for each script and consist of a single update.
+
+### Restoring an Empty Database
+
+Restore the nrmn_migration using the scripts provided, then apply `application.sql` and then the scripts in the `scripts/db-update` directory.
+
+database | server | current usage | updating/refreshing
+--- | --- | --- | ---
+nrmn_dev | 17-nec-hob | nrmn_migration + application.sql + scripts from scripts/db-update in order | run /var/lib/postgresql/refresh_nrmn_dev.sh on 17-nec-hob as postgres user
+nrmn_edge | 17-nec-hob | nrmn_migration + application.sql + scripts from scripts/db-update in order | run /var/lib/postgresql/refresh_nrmn_edge.sh on 17-nec-hob as postgres user
+nrmn_systest | 13-aws-syd | nrmn_migration + application.sql + scripts from scripts/db-update in order | copy nrmn_migration.dump generated above from /var/lib/postgresql/ on 17-nec-hob to /var/lib/postgresql/ on 13-aws-syd <br><br> run /var/lib/postgresql/refresh_nrmn_systest.sh on 13-aws-syd as postgres user
