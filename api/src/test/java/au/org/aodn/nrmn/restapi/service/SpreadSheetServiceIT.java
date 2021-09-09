@@ -134,4 +134,13 @@ public class SpreadSheetServiceIT {
         assertEquals("14/03/2019", stageSurveys.get(5).getDate());
         assertEquals("14/03/2019", stageSurveys.get(6).getDate());
     }
+
+    @Test
+    void blankBuddyInvertsShouldBeZero() throws Exception {
+        FileSystemResource file = new FileSystemResource("src/test/resources/sheets/blankBuddyInverts.xlsx");
+        MockMultipartFile mockFile = new MockMultipartFile("sheets/blankBuddyInverts.xlsx", file.getInputStream());
+        List<StagedRow> stageSurveys = sheetService.stageXlsxFile(mockFile, true).getStagedRows();
+        assertEquals("0", stageSurveys.get(1).getInverts());
+        assertEquals("0", stageSurveys.get(6).getBuddy());
+    }
 }

@@ -104,7 +104,10 @@ public class SurveyContentsHandler implements SheetContentsHandler {
                 currentRow.setId(Long.valueOf(currentRow.getPos()));
                 break;
             case "Buddy":
-                currentRow.setBuddy(value);
+                currentRow.setBuddy(value.isEmpty() ? "0" : value);
+                break;
+            case "Inverts":
+                currentRow.setInverts(value.isEmpty() ? "0" : value);
                 break;
             case "Diver":
                 currentRow.setDiver(value);
@@ -159,9 +162,6 @@ public class SurveyContentsHandler implements SheetContentsHandler {
                 break;
             case "Use InvertSizing":
                 currentRow.setIsInvertSizing(value);
-                break;
-            case "Inverts":
-                currentRow.setInverts(value);
                 break;
             default:
                 if (value.length() > 0 && requiredHeaders.contains(columnHeader)
