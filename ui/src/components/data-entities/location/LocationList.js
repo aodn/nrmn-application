@@ -17,7 +17,7 @@ const LocationList = () => {
     if (gridApi) getEntity('locationList').then((res) => gridApi.setRowData(res.data));
   }, [gridApi]);
 
-  if (redirect) return <Redirect to={`/reference/location/${redirect}`} />;
+  if (redirect) return <Redirect to={`/reference/location/${redirect}/edit`} />;
 
   return (
     <>
@@ -43,23 +43,23 @@ const LocationList = () => {
           suppressCellSelection={true}
           defaultColDef={{sortable: true, resizable: true, filter: true, floatingFilter: true}}
         >
-          <AgGridColumn field="" headerName="" maxWidth={10} />
+          <AgGridColumn
+            width={40}
+            field="id"
+            headerName=""
+            suppressMovable={true}
+            filter={false}
+            resizable={false}
+            sortable={false}
+            valueFormatter={() => '✎'}
+            cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
+            onCellClicked={(e) => setRedirect(e.value)}
+          />
           <AgGridColumn maxWidth={80} field="isActive" headerName="Active" />
           <AgGridColumn flex={1} field="locationName" sort="asc" />
           <AgGridColumn flex={2} field="ecoRegions" />
           <AgGridColumn flex={2} field="countries" />
           <AgGridColumn flex={2} field="areas" />
-          <AgGridColumn
-            maxWidth={80}
-            field="id"
-            headerName=""
-            suppressMovable={true}
-            filter={false}
-            sortable={false}
-            valueFormatter={() => '>>'}
-            cellStyle={{textAlign: 'center', textDecoration: 'underline', cursor: 'pointer'}}
-            onCellClicked={(e) => setRedirect(e.value)}
-          />
         </AgGridReact>
       </Box>
     </>
