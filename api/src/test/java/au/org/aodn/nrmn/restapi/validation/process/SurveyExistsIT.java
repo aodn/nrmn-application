@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.format.DateTimeFormatter;
@@ -66,6 +67,7 @@ class SurveyExistsIT {
         stagedRowRepo.saveAll(Arrays.asList(sn1));
         ValidationResponse response = validationProcess.process(job);
         assertFalse(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey exists:")));
+        assertEquals(0, response.getExistingSurveyCount());
     }
 
     @Test
@@ -82,6 +84,7 @@ class SurveyExistsIT {
         stagedRowRepo.saveAll(Arrays.asList(sn1));
         ValidationResponse response = validationProcess.process(job);
         assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey exists:")));
+        assertEquals(1, response.getExistingSurveyCount());
     }
 
     @Test
@@ -98,5 +101,6 @@ class SurveyExistsIT {
         stagedRowRepo.saveAll(Arrays.asList(sn1));
         ValidationResponse response = validationProcess.process(job);
         assertFalse(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey exists:")));
+        assertEquals(0, response.getExistingSurveyCount());
     }
 }

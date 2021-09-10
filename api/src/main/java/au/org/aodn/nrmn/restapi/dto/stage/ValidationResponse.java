@@ -26,6 +26,7 @@ public class ValidationResponse {
     long newObsItemCount;
 
     long surveyCount;
+    long existingSurveyCount;
     long incompleteSurveyCount;
 
     Map<String, Boolean> foundSites;
