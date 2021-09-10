@@ -53,6 +53,9 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
     @Query(nativeQuery = true, value = "SELECT DISTINCT province FROM {h-schema}ep_site_list where province is not null ORDER BY province")
     List<String> findAllSiteProvinces();
 
+    @Query(nativeQuery = true, value = "SELECT DISTINCT country FROM {h-schema}ep_site_list where country is not null ORDER BY country")
+    List<String> findAllCountries();
+
     @Query(nativeQuery = true, value = "" +
             "SELECT '(' || sr.site_name || ' ' || ROUND(CAST(ST_Distance(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography)) AS numeric), 2) || 'm)' " +
             "FROM nrmn.site_ref sr " +

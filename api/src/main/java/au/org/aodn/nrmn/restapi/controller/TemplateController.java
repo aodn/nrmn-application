@@ -32,11 +32,12 @@ public class TemplateController {
                                @RequestParam(defaultValue = "") List<Integer> locations,
                                @RequestParam(defaultValue = "") List<String> provinces,
                                @RequestParam(defaultValue = "") List<String> states,
+                               @RequestParam(defaultValue = "") List<String> countries,
                                @RequestParam(defaultValue = "") List<String> siteCodes) throws IOException {
         logger.info(LogInfo.withContext(String.format("downloading template zip")));
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        templateService.writeZip(outputStream, locations, provinces, states, siteCodes);
+        templateService.writeZip(outputStream, locations, provinces, states, countries, siteCodes);
 
         try {
             response.getOutputStream().write(outputStream.toByteArray());

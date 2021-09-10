@@ -28,7 +28,8 @@ const options = [
   {entity: 'locations', label: 'Location'},
   {entity: 'siteProvinces', label: 'MEOW Province'},
   {entity: 'siteStates', label: 'State'},
-  {entity: 'siteCodes', label: 'Site Code'}
+  {entity: 'siteCodes', label: 'Site Code'},
+  {entity: 'countries', label: 'Country'}
 ];
 
 const ExtractTemplateData = () => {
@@ -72,7 +73,13 @@ const ExtractTemplateData = () => {
         a[o.entity] = downloadParams.filter((f) => f.type === o.entity).map((f) => f.value);
         return a;
       }, {});
-      downloadZip({locations: p.locations, siteCodes: p.siteCodes, states: p.siteStates, provinces: p.siteProvinces});
+      downloadZip({
+        locations: p.locations,
+        siteCodes: p.siteCodes,
+        states: p.siteStates,
+        countries: p.countries,
+        provinces: p.siteProvinces
+      });
     }
   }, [downloadParams]);
 
