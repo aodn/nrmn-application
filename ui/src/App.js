@@ -23,6 +23,7 @@ import LocationTemplate from './components/templates/LocationTemplate';
 import SiteEditTemplate from './components/templates/SiteEditTemplate';
 import SiteAddTemplate from './components/templates/SiteAddTemplate';
 import SiteViewTemplate from './components/templates/SiteViewTemplate';
+import LocationList from './components/data-entities/location/LocationList';
 import ObservableItemTemplate from './components/templates/ObservableItemTemplate';
 import ObservableItemViewTemplate from './components/templates/ObservableItemViewTemplate';
 import ObservableItemEditTemplate from './components/templates/ObservableItemEditTemplate';
@@ -246,6 +247,7 @@ const App = () => {
             {/** Authenticated Pages */}
             <Route exact path="/jobs" component={JobList} />
             <Route exact path="/jobs/:id/view" component={JobView} />
+            <Route exact path="/reference/locations" component={LocationList} />
             <Route exact path="/validation/:jobId" component={ValidationPage} />
             <Route exact path="/upload" component={JobUpload} />
             <Route exact path="/data/extract" component={ExtractTemplateData} />

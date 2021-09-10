@@ -9,28 +9,25 @@ import AlertDialog from '../ui/AlertDialog';
 const disabledHeader = {headerName: ' ', filterable: false, sortable: false, disableColumnMenu: true};
 
 const JobList = () => {
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [jobs, setJobs] = useState(null);
   const [deleteJobId, setDeleteJobId] = useState(null);
 
   useEffect(() => {
-    if (loading)
-      getEntity('stagedJobs').then((result) => {
-        // HACK: fix the api to return the correct format instead
-        const stagedJobs = result.data?._embedded?.stagedJobs || [];
-        const jobRows = stagedJobs.map((j) => {
-          return {
-            ...j,
-            program: j.program.programName,
-            creator: j.creator.email,
-            created: j.created,
-            updated: j.updated ? new Date(j.updated).toLocaleDateString('en-AU') : '---'
-          };
-        });
-        setJobs(jobRows);
-        setLoading(false);
+    getEntity('stagedJobs').then((result) => {
+      // HACK: fix the api to return the correct format instead
+      const stagedJobs = result.data?._embedded?.stagedJobs || [];
+      const jobRows = stagedJobs.map((j) => {
+        return {
+          ...j,
+          program: j.program.programName,
+          creator: j.creator.email,
+          created: j.created,
+          updated: j.updated ? new Date(j.updated).toLocaleDateString('en-AU') : '---'
+        };
       });
-  }, [jobs, loading]);
+      setJobs(jobRows);
+    });
+  }, []);
 
   const TimeStampCell = (params) => {
     return new Date(params.value).toLocaleDateString('en-AU') + ' ' + new Date(params.value).toLocaleTimeString('en-AU');
@@ -67,6 +64,7 @@ const JobList = () => {
     );
   };
 
+  const loading = !jobs;
   return (
     <>
       <AlertDialog
@@ -110,7 +108,7 @@ const JobList = () => {
         density="compact"
         loading={loading}
         hideFooter={loading}
-        rows={jobs}
+        rows={jobs || []}
       />
     </>
   );
