@@ -141,6 +141,8 @@ public class TemplateServiceTest {
                 .location(Location.builder().locationId(335).locationName("Southish").build()).build();
         Site testSite336 = builder.siteCode("VIC336").state("Victoria")
                 .location(Location.builder().locationId(336).locationName("Southish").build()).build();
+        Site testSite337 = builder.siteCode("QLD337").state("Queensland").country("Australia")
+                .location(Location.builder().locationId(337).locationName("Northish").build()).build();
 
         when(siteRepository.findSiteCodesByProvince("Antipodes")).thenReturn(Arrays.asList("TAS333"));
         when(siteRepository.findAll(Example.of(Site.builder().siteCode("TAS333").build())))
@@ -149,21 +151,24 @@ public class TemplateServiceTest {
         when(siteRepository.findAll(Example.of(Site.builder().siteCode("TAS334").build())))
                 .thenReturn(Arrays.asList(testSite334));
 
-        when(siteRepository.findAll(Example
-                .of(Site.builder().location(Location.builder().locationId(335).build()).build())))
+        when(siteRepository.findAll(Example.of(Site.builder().location(Location.builder().locationId(335).build()).build())))
                         .thenReturn(Arrays.asList(testSite335));
 
         when(siteRepository.findAll(Example.of(Site.builder().state("Victoria").build())))
                 .thenReturn(Arrays.asList(testSite336));
 
-        Set<Site> sites = templateService.getSitesForTemplate(Arrays.asList(335), Arrays.asList("Antipodes"),
-                Arrays.asList("Victoria"), Arrays.asList("TAS334"));
+        when(siteRepository.findAll(Example.of(Site.builder().country("Australia").build())))
+                .thenReturn(Arrays.asList(testSite337));
 
-        assertEquals(4, sites.size());
+        Set<Site> sites = templateService.getSitesForTemplate(Arrays.asList(335), Arrays.asList("Antipodes"),
+                Arrays.asList("Victoria"), Arrays.asList("Australia"), Arrays.asList("TAS334"));
+
+        assertEquals(5, sites.size());
         assert (sites.contains(testSite333));
         assert (sites.contains(testSite334));
         assert (sites.contains(testSite335));
         assert (sites.contains(testSite336));
+        assert (sites.contains(testSite337));
     }
 
     @Test
