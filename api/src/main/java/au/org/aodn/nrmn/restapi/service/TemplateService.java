@@ -63,7 +63,7 @@ public class TemplateService {
     private ObservationRepository observationRepository;
 
     public void writeZip(OutputStream outputStream, Collection<Integer> locations, Collection<String> provinces,
-            Collection<String> states, Collection<String> siteCodes) throws IOException {
+            Collection<String> states, Collection<String> countries, Collection<String> siteCodes) throws IOException {
 
         ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
         Writer writer = new OutputStreamWriter(zipOutputStream, "UTF-8");
@@ -74,7 +74,7 @@ public class TemplateService {
         zipOutputStream.closeEntry();
 
         zipOutputStream.putNextEntry(new ZipEntry("sites.csv"));
-        Set<Site> sites = getSitesForTemplate(locations, provinces, states, siteCodes);
+        Set<Site> sites = getSitesForTemplate(locations, provinces, states, countries, siteCodes);
         writeSitesCsv(writer, sites);
         writer.flush();
         zipOutputStream.closeEntry();
@@ -154,7 +154,7 @@ public class TemplateService {
     }
 
     public Set<Site> getSitesForTemplate(Collection<Integer> locations, Collection<String> provinces,
-            Collection<String> states, Collection<String> siteCodes) {
+            Collection<String> states, Collection<String> countries, Collection<String> siteCodes) {
 
         Stream<String> siteCodesFromProvinces = provinces.stream()
                 .flatMap(p -> siteRepository.findSiteCodesByProvince(p).stream());
@@ -169,6 +169,9 @@ public class TemplateService {
 
         sites = Stream.concat(sites, states.stream()
                 .flatMap(s -> siteRepository.findAll(Example.of(Site.builder().state(s).build())).stream()));
+
+        sites = Stream.concat(sites, countries.stream()
+                .flatMap(s -> siteRepository.findAll(Example.of(Site.builder().country(s).build())).stream()));
 
         return sites.collect(toSet());
     }
