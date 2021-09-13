@@ -9,7 +9,6 @@ import {
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {PropTypes} from 'prop-types';
-import React, {useState} from 'react';
 import {NavLink} from 'react-router-dom';
 import {getDataJob, submitIngest, updateRows, validateJob} from '../../axios/api';
 import {extendedMeasurements, measurements} from '../../constants';
