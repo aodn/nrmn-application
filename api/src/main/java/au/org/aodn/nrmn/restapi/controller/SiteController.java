@@ -80,6 +80,11 @@ public class SiteController {
         return ResponseEntity.ok(siteRepository.findAllSiteProvinces());
     }
 
+    @GetMapping(path = "/countries")
+    public ResponseEntity<List<String>> getAllCountries() {
+        return ResponseEntity.ok(siteRepository.findAllCountries());
+    }
+
     @GetMapping("/sites/{id}")
     public SiteGetDto findOne(@PathVariable Integer id) {
         Site site = siteRepository.findById(id)

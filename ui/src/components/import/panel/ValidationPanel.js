@@ -146,6 +146,10 @@ const ValidationPanel = (props) => {
               <TableCell>distinct surveys found</TableCell>
             </TableRow>
             <TableRow>
+              <TableCell>{info.existingSurveyCount}</TableCell>
+              <TableCell>existing surveys found</TableCell>
+            </TableRow>
+            <TableRow>
               <TableCell>{info.incompleteSurveyCount}</TableCell>
               <TableCell>incomplete surveys found</TableCell>
             </TableRow>
