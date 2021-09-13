@@ -29,7 +29,7 @@ public class SpreadSheetServiceIT {
     SpreadSheetService sheetService;
 
     @Test
-    public void correctShortheaderShouldBeValid() throws Exception {
+    public void correctShortHeadersShouldBeValid() throws Exception {
         InputStream rottnestInput = getClass().getClassLoader().getResourceAsStream("sheets/correctShortHeader.xlsx");
 
         ParsedSheet validSheet = sheetService.stageXlsxFile(
@@ -38,7 +38,7 @@ public class SpreadSheetServiceIT {
     }
 
     @Test
-    public void correctLongheaderShouldBeValid() throws Exception {
+    public void correctLongHeadersShouldBeValid() throws Exception {
         InputStream rottnestInput = getClass().getClassLoader()
                 .getResourceAsStream("sheets/correctLongHeader.xlsx");
                 ParsedSheet validSheet = sheetService.stageXlsxFile(
@@ -47,7 +47,7 @@ public class SpreadSheetServiceIT {
     }
 
     @Test
-    public void correctLongheaderIngestedAsShortShouldBeInvalid() throws Exception {
+    public void correctLongHeadersIngestedAsShortShouldBeInvalid() throws Exception {
         InputStream rottnestInput = getClass().getClassLoader()
                 .getResourceAsStream("sheets/correctLongHeader.xlsx");
         String error = null;
@@ -61,7 +61,7 @@ public class SpreadSheetServiceIT {
     }
 
     @Test
-    public void missingDataSheethouldBeInvalid() throws Exception {
+    public void missingDataSheetShouldBeInvalid() throws Exception {
         InputStream rottnestInput = getClass().getClassLoader().getResourceAsStream("sheets/missingDataSheet.xlsx");
         String error = null;
         try {
@@ -73,7 +73,7 @@ public class SpreadSheetServiceIT {
     }
 
     @Test
-    public void missingColumnsSheethouldBeInvalid() throws Exception {
+    public void missingColumnsSheetShouldBeInvalid() throws Exception {
         InputStream rottnestInput = getClass().getClassLoader().getResourceAsStream("sheets/missingColumnsHeader.xlsx");
         String error = null;
         try {
@@ -85,13 +85,39 @@ public class SpreadSheetServiceIT {
     }
 
     @Test
-    public void mismatchedColumnsSheethouldBeInvalid() throws Exception {
+    public void mismatchedColumnsSheetShouldBeInvalid() throws Exception {
 
         InputStream rottnestInput = getClass().getClassLoader()
                 .getResourceAsStream("sheets/mismatchedColumnsHeader.xlsx");
         String error = null;
         try {
             sheetService.stageXlsxFile(new MockMultipartFile("sheets/mismatchedColumnsHeader.xlsx", rottnestInput), false);
+        } catch (Exception e) {
+            error = e.getMessage();
+        }
+        assertTrue(error != null);
+    }
+
+    @Test
+    public void missingInvertsRowShouldBeInvalid() throws Exception {
+
+        InputStream rottnestInput = getClass().getClassLoader().getResourceAsStream("sheets/missingRow2.xlsx");
+        String error = null;
+        try {
+            sheetService.stageXlsxFile(new MockMultipartFile("sheets/missingRow2.xlsx", rottnestInput), false);
+        } catch (Exception e) {
+            error = e.getMessage();
+        }
+        assertTrue(error != null);
+    }
+
+    @Test
+    public void shortInvertsRowShouldBeInvalid() throws Exception {
+
+        InputStream rottnestInput = getClass().getClassLoader().getResourceAsStream("sheets/missingRshortRow2w2.xlsx");
+        String error = null;
+        try {
+            sheetService.stageXlsxFile(new MockMultipartFile("sheets/shortRow2.xlsx", rottnestInput), true);
         } catch (Exception e) {
             error = e.getMessage();
         }
