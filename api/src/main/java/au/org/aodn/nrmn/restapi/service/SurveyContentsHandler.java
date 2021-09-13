@@ -1,8 +1,10 @@
 package au.org.aodn.nrmn.restapi.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
@@ -13,21 +15,28 @@ import lombok.Value;
 
 public class SurveyContentsHandler implements SheetContentsHandler {
 
-    private final List<String> optionalHeaders;
-    private List<String> requiredHeaders;
+    private final List<String> header1Required;
+    private final List<String> header1Optional;
+    private final List<String> header2Required;
 
-    private ParsedSheet result;
     private String error;
+    private ParsedSheet result;
 
     private StagedRow currentRow;
     private boolean isHeaderRow = false;
-    private HashMap<String, String> columnHeaders = new HashMap<>();
-    HashMap<Integer, String> measureJson = new HashMap<>();
-    List<StagedRow> stagedRows = new ArrayList<>();
+    private boolean isHeader2Row = false;
 
-    SurveyContentsHandler(List<String> requiredHeaders, List<String> optionalHeaders) {
-        this.requiredHeaders = requiredHeaders;
-        this.optionalHeaders = optionalHeaders;
+    private HashMap<String, String> header1 = new HashMap<>();
+    private HashMap<String, String> header2 = new HashMap<>();
+    HashMap<Integer, String> measureJson = new HashMap<>();
+
+    List<StagedRow> stagedRows = new ArrayList<>();
+    List<String> columnKeys = new ArrayList<>();
+
+    SurveyContentsHandler(List<String> requiredHeaders, List<String> optionalHeaders, List<String> header2Required) {
+        this.header1Required = requiredHeaders;
+        this.header1Optional = optionalHeaders;
+        this.header2Required = header2Required;
     }
 
     public ParsedSheet getResult() {
@@ -41,9 +50,10 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     @Override
     public void startRow(int rowNum) {
         isHeaderRow = (rowNum == 0);
-        if (!isHeaderRow) {
+        isHeader2Row = (rowNum == 1);
+        if (!isHeaderRow && !isHeader2Row) {
             currentRow = StagedRow.builder().pos((rowNum - 1) * 1000).build();
-            for (String col : requiredHeaders)
+            for (String col : header1Required)
                 setValue(col, "");
         }
     }
@@ -52,17 +62,35 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     public void endRow(int rowNum) {
         if (isHeaderRow) {
             List<String> errors = new ArrayList<String>();
-            List<String> foundHeaders = new ArrayList<String>(columnHeaders.values());
-            List<String> missingHeaders = new ArrayList<String>(requiredHeaders);
+            List<String> foundHeaders = new ArrayList<String>(header1.values());
+            List<String> missingHeaders = new ArrayList<String>(header1Required);
             missingHeaders.removeAll(foundHeaders);
             if (missingHeaders.size() > 0)
-                errors.add("Missing Headers: " + String.join(", ", missingHeaders));
-            foundHeaders.removeAll(requiredHeaders);
-            foundHeaders.removeAll(optionalHeaders);
+                errors.add("Row 1 missing headers: " + String.join(", ", missingHeaders));
+            foundHeaders.removeAll(header1Required);
+            foundHeaders.removeAll(header1Optional);
             if (foundHeaders.size() > 0)
-                errors.add("Unexpected Headers: " + String.join(", ", foundHeaders));
-            if (errors.size() > 0)
+                errors.add("Row 1 has unexpected headers: " + String.join(", ", foundHeaders));
+            if (errors.size() > 0) {
                 error = String.join(". ", errors);
+            } else {
+                String[] headers = header1.keySet().toArray(new String[0]);
+                Arrays.sort(headers, (str1, str2) -> str1.length() - str2.length());
+                columnKeys = Arrays.asList(headers);
+            }
+        } else if(isHeader2Row && columnKeys.size() > 0) {
+            // Check that the first 10 columns are blank
+            Long invalidColumns = columnKeys.subList(0, 10).stream().filter(k -> header2.get(k) != null).count();
+            if(invalidColumns > 0) {
+                error = "Row 2 is not a blank formatted row.";
+            } else {
+                // Check that the columns between U - BH have the correct header format
+                List<String> foundHeaders = columnKeys.subList(20, 20 + header2Required.size()).stream().map(c -> header2.get(c)).collect(Collectors.toList());
+                List<String> missingHeaders = new ArrayList<String>(header2Required);
+                missingHeaders.removeAll(foundHeaders);
+                if (missingHeaders.size() > 0)
+                    error = "Row 2 missing headers: " + String.join(", ", missingHeaders) + ".";
+            }
         } else {
             if (rowNum > 1) {
                 currentRow.setMeasureJson(new HashMap<Integer, String>(measureJson));
@@ -88,9 +116,11 @@ public class SurveyContentsHandler implements SheetContentsHandler {
 
         String columnKey = cellReference.replaceAll("[0123456789]", "");
         if (isHeaderRow) {
-            columnHeaders.put(columnKey, formattedValue);
+            header1.put(columnKey, formattedValue);
+        }else if(isHeader2Row) {
+            header2.put(columnKey, formattedValue);
         } else {
-            String col = columnHeaders.getOrDefault(columnKey, "");
+            String col = header1.getOrDefault(columnKey, "");
             boolean cellHasData = StringUtils.isNotEmpty(formattedValue) && !formattedValue.contentEquals("null");
             String value = cellHasData ? formattedValue : "";
             setValue(col, value);
@@ -164,9 +194,9 @@ public class SurveyContentsHandler implements SheetContentsHandler {
                 currentRow.setIsInvertSizing(value);
                 break;
             default:
-                if (value.length() > 0 && requiredHeaders.contains(columnHeader)
+                if (value.length() > 0 && header1Required.contains(columnHeader)
                         && columnHeader.matches("\\d.*"))
-                    measureJson.put(requiredHeaders.indexOf(columnHeader) - requiredHeaders.indexOf("Inverts"),
+                    measureJson.put(header1Required.indexOf(columnHeader) - header1Required.indexOf("Inverts"),
                             value);
                 break;
         }

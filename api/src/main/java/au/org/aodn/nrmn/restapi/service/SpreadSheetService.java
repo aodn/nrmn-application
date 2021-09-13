@@ -26,17 +26,23 @@ import au.org.aodn.nrmn.restapi.service.SurveyContentsHandler.ParsedSheet;
 @Service
 public class SpreadSheetService {
 
-    @Value("${app.excel.headers.short}")
-    private List<String> shortHeadersRef;
+    @Value("${app.excel.header1.short}")
+    private List<String> header1Short;
 
-    @Value("${app.excel.headers.short.ignore}")
-    private List<String> ignoreShortHeaders;
+    @Value("${app.excel.header1.short.ignore}")
+    private List<String> header1ShortIgnore;
 
-    @Value("${app.excel.headers.long}")
-    private List<String> longHeadersRef;
+    @Value("${app.excel.header1.long}")
+    private List<String> header1Long;
 
-    @Value("${app.excel.headers.long.ignore}")
-    private List<String> ignoreLongHeaders;
+    @Value("${app.excel.header1.long.ignore}")
+    private List<String> header1LongIgnore;
+
+    @Value("${app.excel.header2.short}")
+    private List<String> header2Short;
+
+    @Value("${app.excel.header2.long}")
+    private List<String> header2Long;
 
     public ParsedSheet stageXlsxFile(MultipartFile file,
             Boolean withExtendedSizes) throws Exception {
@@ -49,8 +55,9 @@ public class SpreadSheetService {
             XSSFReader xssfReader = new XSSFReader(opcPackage);
 
             SurveyContentsHandler surveyContentsHandler = new SurveyContentsHandler(
-                    (withExtendedSizes) ? longHeadersRef : shortHeadersRef,
-                    (withExtendedSizes) ? ignoreLongHeaders : ignoreShortHeaders);
+                    (withExtendedSizes) ? header1Long : header1Short,
+                    (withExtendedSizes) ? header1LongIgnore : header1ShortIgnore,
+                    (withExtendedSizes) ? header2Long : header2Short);
 
             StylesTable styles = xssfReader.getStylesTable();
 
