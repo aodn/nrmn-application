@@ -1,22 +1,21 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Button, Paper, Typography, makeStyles} from '@material-ui/core';
+import {Box, Button, makeStyles, Typography} from '@material-ui/core';
+import {blue, grey, lightGreen, orange, red, yellow} from '@material-ui/core/colors';
 import {
-  CloudUpload as CloudUploadIcon,
   CloudDownload as CloudDownloadIcon,
+  CloudUpload as CloudUploadIcon,
   PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon
 } from '@material-ui/icons/';
-import {blue, red, orange, yellow, grey, lightGreen} from '@material-ui/core/colors';
-import {NavLink} from 'react-router-dom';
 import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {PropTypes} from 'prop-types';
-import {getDataJob, validateJob, updateRows, submitIngest} from '../../axios/api';
-import {measurements, extendedMeasurements} from '../../constants';
+import {NavLink} from 'react-router-dom';
+import {getDataJob, submitIngest, updateRows, validateJob} from '../../axios/api';
+import {extendedMeasurements, measurements} from '../../constants';
+import LoadingOverlay from '../overlays/LoadingOverlay';
+import AlertDialog from '../ui/AlertDialog';
 import FindReplacePanel from './panel/FindReplacePanel';
 import ValidationPanel from './panel/ValidationPanel';
-import LinearProgressWithLabel from '../ui/LinearProgressWithLabel';
-import AlertDialog from '../ui/AlertDialog';
 
 const useStyles = makeStyles(() => {
   return {
@@ -29,15 +28,6 @@ const useStyles = makeStyles(() => {
     }
   };
 });
-
-const LoadingOverlay = (e) => {
-  const ctx = e.api.gridOptionsWrapper.gridOptions.context;
-  return (
-    <Box component={Paper} width={500} p={3}>
-      <LinearProgressWithLabel determinate={false} label={`${ctx.useOverlay}...`} />
-    </Box>
-  );
-};
 
 // |delta| is an array of rowData
 const pushUndo = (api, delta) => {
