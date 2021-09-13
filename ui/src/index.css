@@ -1,7 +1,10 @@
 .ag-cell[role="gridcell"] {
-  border-right: 1px solid #ccc;
   padding: 0 2px;
   line-height: 20px;
+}
+
+#validation-grid  .ag-cell[role="gridcell"] {
+  border-right: 1px solid #ccc;
 }
 
 .ag-header-cell[role="columnheader"] {

@@ -1,34 +1,27 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Button, Typography} from '@material-ui/core';
-import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import {Redirect, NavLink} from 'react-router-dom';
-import {getEntity} from '../../../axios/api';
+import {Box, Typography} from '@material-ui/core';
+import {Redirect} from 'react-router-dom';
+import {getResult} from '../../../axios/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
-import {Add} from '@material-ui/icons';
-
+import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
-const LocationList = () => {
+const SurveyList = () => {
   const [gridApi, setGridApi] = useState(null);
   const [redirect, setRedirect] = useState(null);
 
   useEffect(() => {
-    if (gridApi) getEntity('locationList').then((res) => gridApi.setRowData(res.data));
+    if (gridApi) getResult('data/surveys').then((res) => gridApi.setRowData(res.data));
   }, [gridApi]);
 
-  if (redirect) return <Redirect to={`/reference/location/${redirect}`} />;
+  if (redirect) return <Redirect to={`/data/survey/${redirect}`} />;
 
   return (
     <>
       <Box display="flex" flexDirection="row" p={1} pb={1}>
         <Box flexGrow={1}>
-          <Typography variant="h4">Locations</Typography>
-        </Box>
-        <Box>
-          <Button to="/reference/location" component={NavLink} startIcon={<Add />}>
-            New Location
-          </Button>
+          <Typography variant="h4">Surveys</Typography>
         </Box>
       </Box>
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
@@ -37,7 +30,7 @@ const LocationList = () => {
           animateRows={true}
           enableCellTextSelection={true}
           onGridReady={(e) => setGridApi(e.api)}
-          context={{useOverlay: 'Loading Locations'}}
+          context={{useOverlay: 'Loading Surveys'}}
           frameworkComponents={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
           suppressCellSelection={true}
@@ -45,7 +38,7 @@ const LocationList = () => {
         >
           <AgGridColumn
             width={40}
-            field="id"
+            field="surveyId"
             headerName=""
             suppressMovable={true}
             filter={false}
@@ -53,23 +46,30 @@ const LocationList = () => {
             sortable={false}
             valueFormatter={() => '✎'}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
-            onCellClicked={(e) => setRedirect(`${e.data.id}/edit`)}
+            onCellClicked={(e) => setRedirect(`${e.data.surveyId}/edit`)}
           />
           <AgGridColumn
-            flex={1}
-            field="locationName"
-            sort="asc"
+            width={110}
+            field="surveyId"
+            headerName="Survey ID"
+            sort="desc"
             cellStyle={{cursor: 'pointer'}}
-            onCellClicked={(e) => setRedirect(e.data.id)}
+            onCellClicked={(e) => setRedirect(e.data.surveyId)}
           />
-          <AgGridColumn maxWidth={80} field="isActive" headerName="Active" />
-          <AgGridColumn flex={2} field="ecoRegions" />
-          <AgGridColumn flex={2} field="countries" />
-          <AgGridColumn flex={2} field="areas" />
+          <AgGridColumn width={100} field="siteCode" />
+          <AgGridColumn width={100} field="surveyDate" />
+          <AgGridColumn width={100} field="depth" />
+          <AgGridColumn flex={1} field="siteName" />
+          <AgGridColumn width={100} field="programName" headerName="Program" />
+          <AgGridColumn flex={1} field="locationName" />
+          <AgGridColumn width={100} field="hasPQs" />
+          <AgGridColumn flex={1} field="mpa" />
+          <AgGridColumn flex={1} field="country" />
+          <AgGridColumn flex={1} field="diverName" />
         </AgGridReact>
       </Box>
     </>
   );
 };
 
-export default LocationList;
+export default SurveyList;

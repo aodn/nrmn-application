@@ -33,11 +33,9 @@ const SurveyViewTemplate = (props) => {
             {el['projectTitle']}
           </Grid>
           <Grid item xs={6}>
-            {el['depth']}
+            {el['decimalDepth']}
           </Grid>
-          <Grid item xs={6}>
-            {el['surveyNum']}
-          </Grid>
+          <Grid item xs={6}></Grid>
           <Grid item xs={6}>
             {el['visibility']}
           </Grid>

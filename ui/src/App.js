@@ -19,17 +19,18 @@ import JobList from './components/job/JobList';
 import JobView from './components/job/JobView';
 import AppContent from './components/containers/AppContent';
 import DiverTemplate from './components/data-entities/DiverTemplate';
-import LocationTemplate from './components/templates/LocationTemplate';
 import SiteEditTemplate from './components/templates/SiteEditTemplate';
 import SiteAddTemplate from './components/templates/SiteAddTemplate';
 import SiteViewTemplate from './components/templates/SiteViewTemplate';
 import LocationList from './components/data-entities/location/LocationList';
+import SurveyList from './components/data-entities/survey/SurveyList';
 import ObservableItemTemplate from './components/templates/ObservableItemTemplate';
 import ObservableItemViewTemplate from './components/templates/ObservableItemViewTemplate';
 import ObservableItemEditTemplate from './components/templates/ObservableItemEditTemplate';
+import LocationTemplate from './components/templates/LocationTemplate';
+import ExtractTemplateData from './components/datasheets/ExtractTemplateData';
 import SurveyViewTemplate from './components/templates/SurveyViewTemplate';
 import SurveyEditTemplate from './components/templates/SurveyEditTemplate';
-import ExtractTemplateData from './components/datasheets/ExtractTemplateData';
 
 const referenceData = [
   {
@@ -251,6 +252,7 @@ const App = () => {
             <Route exact path="/validation/:jobId" component={ValidationPage} />
             <Route exact path="/upload" component={JobUpload} />
             <Route exact path="/data/extract" component={ExtractTemplateData} />
+            <Route exact path="/data/surveys" component={SurveyList} />
             <Redirect exact from="/list/stagedJob" to="/jobs" />
             {referenceData.map((e) => (
               <Route exact key={e.route.base} path={e.route.base} render={() => <EntityEdit entity={e} template={e.template.add} />} />

@@ -38,6 +38,7 @@ public class SurveyDtoMapperConfig {
             Optional<Diver> diver = diverId.isPresent() ? diverRepository.findById(diverId.get()) : Optional.empty();
             return diver.isPresent() ? diver.get().getInitials() : "";
         };
+        Converter<Survey, String> toDecimalDepthString = ctx -> String.format("%d.%d", ctx.getSource().getDepth(), ctx.getSource().getSurveyNum());
         Converter<Integer, String> toDiverList = ctx -> String.join("\n", surveyMethodRepository.findDiversForSurvey(ctx.getSource()));
         Converter<String, String> passThrough = ctx -> Optional.ofNullable(ctx.getSource()).orElse("");
 
@@ -47,6 +48,7 @@ public class SurveyDtoMapperConfig {
             mapper.using(toBlockString).map(Survey::getSurveyId, SurveyDto::setBlock);
             mapper.using(toMethodString).map(Survey::getSurveyId, SurveyDto::setMethod);
             mapper.using(toSurveyNotDoneString).map(Survey::getSurveyId, SurveyDto::setSurveyNotDone);
+            mapper.using(toDecimalDepthString).map(survey -> survey, SurveyDto::setDecimalDepth);
             mapper.using(passThrough).map(survey -> survey.getSite().getMpa(), SurveyDto::setArea);
             mapper.using(passThrough).map(survey -> survey.getSite().getLocation().getLocationName(), SurveyDto::setLocationName);
             mapper.using(passThrough).map(survey -> survey.getSite().getCountry(), SurveyDto::setCountry);
