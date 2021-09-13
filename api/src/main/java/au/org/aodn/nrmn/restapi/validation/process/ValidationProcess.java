@@ -667,7 +667,7 @@ public class ValidationProcess {
         Long distinctObsItemsExisting = mappedRows.stream().filter(r ->r.getSpecies().isPresent()).map(r -> r.getSpecies().get().getObservableItemName()).distinct().count();
         Long distinctNotPresentObsItem = mappedRows.stream().map(r -> r.getRef().getSpecies().trim().toUpperCase()).filter(r -> r.equalsIgnoreCase("SURVEY NOT DONE")).distinct().count();
         response.setNewObsItemCount(distinctObsItems - distinctObsItemsExisting - distinctNotPresentObsItem);
-
+        
         response.setObsItemCount(distinctObsItems);
         return response;
     }
@@ -693,6 +693,7 @@ public class ValidationProcess {
         Map<String, List<StagedRowFormatted>> surveyMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
         sheetErrors.addAll(checkSurveys(programName, job.getIsExtendedSize(), surveyMap));
         response.setIncompleteSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("survey incomplete:")).count());
+        response.setExistingSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("Survey exists:")).count());
 
         Map<String, List<StagedRowFormatted>> surveyGroupMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
         sheetErrors.addAll(checkSurveyGroups(programName, job.getIsExtendedSize(), surveyGroupMap));

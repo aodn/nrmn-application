@@ -1,3 +1,4 @@
+import React, {useEffect, useState} from 'react';
 import {Box, Button, makeStyles, Typography} from '@material-ui/core';
 import {blue, grey, lightGreen, orange, red, yellow} from '@material-ui/core/colors';
 import {
@@ -126,12 +127,21 @@ const DataSheetView = ({jobId, onIngest}) => {
   const [state, setState] = useState(IngestState.Loading);
   const [sideBar, setSideBar] = useState(defaultSideBar);
 
+  useEffect(() => {
+    if (gridApi && state === IngestState.Loading) {
+      // HACK: workaround ag-grid bug preventing consistent column auto-sizing. See https://github.com/ag-grid/ag-grid/issues/2662.
+      // AG Grid version 26 has a 'pure' React grid implementation should remove the need for these imperative calls entirely:
+      // https://blog.ag-grid.com/whats-new-in-ag-grid-26/
+      setTimeout(() => {
+        gridApi.showLoadingOverlay();
+      }, 25);
+    }
+  }, [gridApi, state]);
+
   const handleValidate = () => {
-    setState(IngestState.Loading);
     context.useOverlay = 'Validating';
+    setState(IngestState.Loading);
     setSideBar(defaultSideBar);
-    gridApi.showLoadingOverlay();
-    gridApi.setFilterModel(null);
     context.errors = [];
     validateJob(jobId, (result) => {
       context.errors = result.data.errors;
@@ -140,9 +150,6 @@ const DataSheetView = ({jobId, onIngest}) => {
       context.summary = result.data;
 
       setState(context.errors.some((e) => e.levelId === 'BLOCKING') ? IngestState.Edited : IngestState.Valid);
-
-      gridApi.hideOverlay();
-      gridApi.redrawRows();
 
       setSideBar((sideBar) => {
         return {
@@ -159,14 +166,16 @@ const DataSheetView = ({jobId, onIngest}) => {
           ]
         };
       });
+
+      gridApi.hideOverlay();
+      gridApi.redrawRows();
     });
   };
 
   const handleSubmit = () => {
+    context.useOverlay = 'Submitting';
     setState(IngestState.Loading);
     setSideBar(defaultSideBar);
-    context.useOverlay = 'Submitting';
-    gridApi.showLoadingOverlay();
     submitIngest(
       jobId,
       (res) => onIngest({success: res}),
@@ -175,10 +184,10 @@ const DataSheetView = ({jobId, onIngest}) => {
   };
 
   const handleSaveAndValidate = () => {
+    context.useOverlay = 'Saving';
     setState(IngestState.Loading);
     setSideBar(defaultSideBar);
-    context.useOverlay = 'Saving';
-    gridApi.showLoadingOverlay();
+
     const rowUpdateDtos = [];
 
     Array.from(new Set(context.putRowIds)).forEach((rowId) => {
@@ -420,19 +429,10 @@ const DataSheetView = ({jobId, onIngest}) => {
 
   const onGridReady = (p) => {
     setGridApi(p.api);
-
     reload(p.api, jobId, (job) => {
       setState(IngestState.Edited);
       setJob(job);
     });
-  };
-
-  const onFirstDataRendered = (e) => {
-    // HACK: workaround ag-grid bug preventing consistent column auto-sizing
-    // see https://github.com/ag-grid/ag-grid/issues/2662
-    setTimeout(() => {
-      e.columnApi.autoSizeAllColumns();
-    }, 25);
   };
 
   const chooseCellStyle = (params) => {
@@ -464,6 +464,7 @@ const DataSheetView = ({jobId, onIngest}) => {
     if (ctx.putRowIds.length > 0) {
       setState(IngestState.Edited);
     }
+    e.columnApi.autoSizeAllColumns();
   };
 
   const toolTipValueGetter = (params) => {
@@ -627,8 +628,7 @@ const DataSheetView = ({jobId, onIngest}) => {
               editable: true,
               sortable: true,
               resizable: true,
-              flex: 1,
-              minWidth: 80,
+              minWidth: 70,
               filter: true,
               floatingFilter: true,
               suppressMenu: true,
@@ -665,7 +665,6 @@ const DataSheetView = ({jobId, onIngest}) => {
             pivotColumnGroupTotals="before"
             sideBar={sideBar}
             onGridReady={onGridReady}
-            onFirstDataRendered={onFirstDataRendered}
           >
             <AgGridColumn field="id" editable={false} hide={true} />
             <AgGridColumn field="pos" editable={false} hide={true} sort="asc" />
