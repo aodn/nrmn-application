@@ -33,13 +33,13 @@ public interface LocationRepository extends JpaRepository<Location, Integer>, Jp
     Optional<Location> findById(Integer integer);
 
     @Query(value = "SELECT distinct loc.location_id as id, loc.location_name as locationName, " +
-        "CASE loc.is_active WHEN true THEN 'Active' ELSE 'Inactive' END as isActive, " +
+        "CASE loc.is_active WHEN true THEN 'Active' ELSE 'Inactive' END as status, " +
         "string_agg(DISTINCT sit.country, ', ' ORDER BY sit.country) AS countries, "+
         "string_agg(DISTINCT sit.state, ', ' ORDER BY sit.state) AS areas, "+
         "string_agg(DISTINCT meo.ecoregion, ', ' ORDER BY meo.ecoregion) AS ecoRegions "+
-        "FROM nrmn.site_ref sit " +
-        "JOIN nrmn.location_ref loc ON loc.location_id = sit.location_id " +
-        "JOIN nrmn.meow_ecoregions meo ON st_contains(meo.geom, sit.geom) " +
+        "FROM nrmn.location_ref loc " +
+        "LEFT JOIN nrmn.site_ref sit ON loc.location_id = sit.location_id " +
+        "LEFT JOIN nrmn.meow_ecoregions meo ON st_contains(meo.geom, sit.geom) " +
         "LEFT JOIN nrmn.survey sur ON sur.site_id = sit.site_id " +
         "GROUP BY loc.location_id, locationName", nativeQuery = true)
     Collection<LocationExtendedMapping> getAllWithRegions();
