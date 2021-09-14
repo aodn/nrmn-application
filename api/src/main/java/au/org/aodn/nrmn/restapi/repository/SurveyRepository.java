@@ -31,9 +31,8 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
                 "select " +
                 "    survey_date as surveyDate, " +
                 "    survey_time as surveyTime, " +
-                "    depth, " +
-                "    survey_num as surveyNum, " +
-                "    pq_catalogued as hasPQs, " +
+                "    concat(depth, '.', survey_num) as depth, " +
+                "    COALESCE(pq_catalogued, false) as hasPQs, " +
                 "    sv.survey_id as surveyId, " +
                 "    st.site_name as siteName, " +
                 "    st.site_code as siteCode, " +

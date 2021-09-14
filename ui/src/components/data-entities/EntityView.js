@@ -109,23 +109,23 @@ const EntityView = (props) => {
   const loaded = Object.keys(formData).length > 0;
   return (
     <EntityContainer name={props.entity.list.name} goBackTo={props.entity.list.route}>
-        <Grid container alignItems="flex-start" direction="row">
-          <Grid item xs={10}>
-            <Box fontWeight="fontWeightBold">
-              <Typography variant="h4">{props.entity.name} Details</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={2}>
-            <Button
-              style={{width: '100%'}}
-              component={Link}
-              to={`${props.entity.route.base}/${params.id}/edit`}
-              startIcon={<Edit>edit</Edit>}
-            >
-              Edit
-            </Button>
-          </Grid>
+      <Grid container alignItems="flex-start" direction="row">
+        <Grid item xs={10}>
+          <Box fontWeight="fontWeightBold">
+            <Typography variant="h4">{props.entity.name} Details</Typography>
+          </Box>
         </Grid>
+        <Grid item xs={2}>
+          <Button
+            style={{width: '100%'}}
+            component={Link}
+            to={`${props.entity.route.base}/${params.id}/edit`}
+            startIcon={<Edit>edit</Edit>}
+          >
+            Edit
+          </Button>
+        </Grid>
+      </Grid>
       <Grid container alignItems="center" direction="column">
         {alert}
         <Box pt={4} pb={6}>
