@@ -21,7 +21,7 @@ const LocationList = () => {
       dispatch(resetState());
       getEntity('locationList').then((res) => gridApi.setRowData(res.data));
     }
-  }, [gridApi]);
+  }, [dispatch, gridApi]);
 
   if (redirect) return <Redirect to={`/reference/location/${redirect}`} />;
 

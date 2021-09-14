@@ -19,7 +19,7 @@ const SurveyList = () => {
       dispatch(resetState());
       getResult('data/surveys').then((res) => gridApi.setRowData(res.data));
     }
-  }, [gridApi]);
+  }, [dispatch, gridApi]);
 
   if (redirect) return <Redirect to={`/data/survey/${redirect}`} />;
 
