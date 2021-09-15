@@ -5,17 +5,23 @@ import {Redirect, NavLink} from 'react-router-dom';
 import {getEntity} from '../../../axios/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {Add} from '@material-ui/icons';
+import {resetState} from '../form-reducer';
+import {useDispatch} from 'react-redux';
 
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
 const LocationList = () => {
+  const dispatch = useDispatch();
   const [gridApi, setGridApi] = useState(null);
   const [redirect, setRedirect] = useState(null);
 
   useEffect(() => {
-    if (gridApi) getEntity('locationList').then((res) => gridApi.setRowData(res.data));
-  }, [gridApi]);
+    if (gridApi) {
+      dispatch(resetState());
+      getEntity('locationList').then((res) => gridApi.setRowData(res.data));
+    }
+  }, [dispatch, gridApi]);
 
   if (redirect) return <Redirect to={`/reference/location/${redirect}`} />;
 
@@ -62,7 +68,7 @@ const LocationList = () => {
             cellStyle={{cursor: 'pointer'}}
             onCellClicked={(e) => setRedirect(e.data.id)}
           />
-          <AgGridColumn maxWidth={80} field="isActive" headerName="Active" />
+          <AgGridColumn maxWidth={80} field="status" />
           <AgGridColumn flex={2} field="ecoRegions" />
           <AgGridColumn flex={2} field="countries" />
           <AgGridColumn flex={2} field="areas" />

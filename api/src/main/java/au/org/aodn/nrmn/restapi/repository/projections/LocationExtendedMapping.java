@@ -6,5 +6,5 @@ public interface LocationExtendedMapping {
     String getCountries();
     String getAreas();
     String getEcoRegions();
-    String getIsActive();
+    String getStatus();
 }

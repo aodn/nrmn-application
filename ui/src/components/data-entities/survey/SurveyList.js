@@ -3,17 +3,23 @@ import {Box, Typography} from '@material-ui/core';
 import {Redirect} from 'react-router-dom';
 import {getResult} from '../../../axios/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
+import {resetState} from '../form-reducer';
+import {useDispatch} from 'react-redux';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
 const SurveyList = () => {
+  const dispatch = useDispatch();
   const [gridApi, setGridApi] = useState(null);
   const [redirect, setRedirect] = useState(null);
 
   useEffect(() => {
-    if (gridApi) getResult('data/surveys').then((res) => gridApi.setRowData(res.data));
-  }, [gridApi]);
+    if (gridApi) {
+      dispatch(resetState());
+      getResult('data/surveys').then((res) => gridApi.setRowData(res.data));
+    }
+  }, [dispatch, gridApi]);
 
   if (redirect) return <Redirect to={`/data/survey/${redirect}`} />;
 
