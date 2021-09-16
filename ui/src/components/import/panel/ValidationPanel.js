@@ -184,7 +184,7 @@ const ValidationPanel = (props) => {
             <TableRow>
               <TableCell></TableCell>
               <TableCell>
-                <small>{info.newDiverCount} new diver(s) found</small>
+                <small>{info.newDiverCount} new divers found</small>
               </TableCell>
             </TableRow>
           </TableBody>
