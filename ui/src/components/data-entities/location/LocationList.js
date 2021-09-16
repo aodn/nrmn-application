@@ -15,6 +15,11 @@ const LocationList = () => {
   const dispatch = useDispatch();
   const [gridApi, setGridApi] = useState(null);
   const [redirect, setRedirect] = useState(null);
+  const [disableResetFilter, setResetFilterDisabled] = useState(true);
+
+  const saveFilterModel = (filterModel) => {
+    window[`AgGrid-FilterModel-location`] = JSON.stringify(filterModel);
+  };
 
   useEffect(() => {
     if (gridApi) {
@@ -30,6 +35,11 @@ const LocationList = () => {
       <Box display="flex" flexDirection="row" p={1} pb={1}>
         <Box flexGrow={1}>
           <Typography variant="h4">Locations</Typography>
+        </Box>
+        <Box mr={2}>
+          <Button disabled={disableResetFilter} onClick={() => gridApi.setFilterModel(null)} color="primary" variant={'contained'}>
+            Reset Filter
+          </Button>
         </Box>
         <Box>
           <Button to="/reference/location" component={NavLink} startIcon={<Add />}>
@@ -47,7 +57,12 @@ const LocationList = () => {
           frameworkComponents={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
           suppressCellSelection={true}
-          defaultColDef={{sortable: true, resizable: true, filter: true, floatingFilter: true}}
+          onFilterChanged={(e) => {
+            const filterModel = e.api.getFilterModel();
+            saveFilterModel(filterModel);
+            setResetFilterDisabled(Object.keys(filterModel)?.length < 1);
+          }}
+          defaultColDef={{sortable: true, resizable: true, filter: 'text', floatingFilter: true}}
         >
           <AgGridColumn
             width={40}
