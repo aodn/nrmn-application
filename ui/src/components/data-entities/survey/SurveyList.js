@@ -40,7 +40,7 @@ const SurveyList = () => {
           frameworkComponents={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
           suppressCellSelection={true}
-          defaultColDef={{sortable: true, resizable: true, filter: true, floatingFilter: true}}
+          defaultColDef={{sortable: true, resizable: true, filter: 'text', floatingFilter: true}}
         >
           <AgGridColumn
             width={40}
