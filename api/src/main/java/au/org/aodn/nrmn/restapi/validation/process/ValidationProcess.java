@@ -659,14 +659,19 @@ public class ValidationProcess {
         response.setNewSiteCount(foundSites.values().stream().filter(e -> e == true).count());
 
         Collection<String> distinctDivers = mappedRows.stream().map(d -> d.getRef().getDiver().toUpperCase()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
+        Collection<String> distinctPQDivers = mappedRows.stream().map(d -> d.getRef().getPqs().toUpperCase()).filter(d -> d.length() > 0 && !d.equalsIgnoreCase("0")).distinct().collect(Collectors.toList());
+
         Collection<String> distinctBuddies = mappedRows.stream().flatMap(r -> Stream.of(r.getRef().getBuddy().split(","))).map(d -> d.trim().toUpperCase()).distinct().collect(Collectors.toList());
         distinctDivers.removeAll(distinctBuddies);
-        int distinctDiverCount = distinctDivers.size();
 
+        int distinctDiverCount = distinctDivers.size();
         Long distinctDiversExistingCount = mappedRows.stream().filter(s -> s.getDiver() != null).map(d -> d.getDiver().getDiverId()).distinct().count();
 
-        response.setDiverCount(distinctDiverCount + distinctBuddies.size());
-        response.setNewDiverCount(distinctDiverCount - distinctDiversExistingCount + unknownBuddyCount);
+        int distinctPQDiversCount = distinctPQDivers.size();
+        Long distinctPQDiversExistingCount = mappedRows.stream().filter(s -> s.getPqs() != null && s.getDiver().getDiverId() != 0).map(d -> d.getDiver().getDiverId()).distinct().count();
+
+        response.setDiverCount(distinctDiverCount + distinctPQDiversCount + distinctBuddies.size());
+        response.setNewDiverCount((distinctDiverCount - distinctDiversExistingCount) + (distinctPQDiversCount - distinctPQDiversExistingCount) + unknownBuddyCount);
 
         List<String> obsItemNames = mappedRows.stream().map(r -> r.getRef().getSpecies().trim().toUpperCase()).filter(r -> r.length() > 0).distinct().collect(Collectors.toList());
         int distinctObsItems = obsItemNames.size();
