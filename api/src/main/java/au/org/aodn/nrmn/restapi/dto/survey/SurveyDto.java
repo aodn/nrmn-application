@@ -97,6 +97,6 @@ public class SurveyDto {
     @Schema(title = "Divers")
     private String divers;
 
-    @Schema(title = "Decimal Depth")
+    @Schema(title = "Depth")
     private String decimalDepth;
 }
