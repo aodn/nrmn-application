@@ -21,17 +21,11 @@ pipeline {
                         sh 'git clean -xffd -e ui/node_modules'
                     }
                 }
-                stage('set_version_build') {
-                    when { not { branch "master" } }
-                    steps {
-                        sh './bumpversion.sh build'
-                    }
-                }
                 stage('set_version_release') {
                     when { branch "master" }
                     steps {
                         withCredentials([usernamePassword(credentialsId: env.GIT_CREDENTIALS_ID, passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                            sh './bumpversion.sh release'
+                            sh './bumpversion.sh'
                         }
                     }
                 }
