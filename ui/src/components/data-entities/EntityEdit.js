@@ -111,9 +111,9 @@ const EntityEdit = ({entity, template, clone}) => {
         entity: key,
         optional: true,
         values: [
-          {id: 'Yes', label: 'Yes'},
-          {id: 'No', label: 'No'},
-          {id: 'Unsure', label: 'Unsure'}
+          {id: 'yes', label: 'yes'},
+          {id: 'no', label: 'no'},
+          {id: 'unsure', label: 'unsure'}
         ]
       };
     } else if (key === 'supersededBy') {
