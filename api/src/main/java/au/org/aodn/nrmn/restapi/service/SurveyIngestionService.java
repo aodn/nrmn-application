@@ -118,7 +118,7 @@ public class SurveyIngestionService {
                         .visibility(stagedRow.getVis().orElse(null))
                         .program(stagedRow.getRef().getStagedJob().getProgram())
                         .protectionStatus(site.getProtectionStatus())
-                        .insideMarinePark(StringUtils.isNotBlank(site.getMpa()) ? "yes" : "no")
+                        .insideMarinePark(StringUtils.isNotBlank(site.getMpa()) ? "Yes" : "No")
                         .longitude(stagedRow.getLongitude())
                         .latitude(stagedRow.getLatitude())
                         .pqDiverId(stagedRow.getPqs() != null ? stagedRow.getPqs().getDiverId() : null)
