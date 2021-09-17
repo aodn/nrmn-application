@@ -1,2 +1,4 @@
--- UI was setting the value of inside_marine_park to uppercase Yes, No, or Unsure.
-UPDATE nrmn.survey SET inside_marine_park=LOWER(inside_marine_park) WHERE inside_marine_park <> LOWER(inside_marine_park);
+-- UI was setting the value of inside_marine_park to lowercase instead of uppercase values
+UPDATE nrmn.survey SET inside_marine_park='Yes' where inside_marine_park = 'yes';
+UPDATE nrmn.survey SET inside_marine_park='No' where inside_marine_park = 'no';
+UPDATE nrmn.survey SET inside_marine_park='Unsure' where inside_marine_park = 'unsure';
