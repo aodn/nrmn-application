@@ -668,7 +668,7 @@ public class ValidationProcess {
         Long distinctDiversExistingCount = mappedRows.stream().filter(s -> s.getDiver() != null).map(d -> d.getDiver().getDiverId()).distinct().count();
 
         int distinctPQDiversCount = distinctPQDivers.size();
-        Long distinctPQDiversExistingCount = mappedRows.stream().filter(s -> s.getPqs() != null && s.getDiver().getDiverId() != 0).map(d -> d.getDiver().getDiverId()).distinct().count();
+        Long distinctPQDiversExistingCount = mappedRows.stream().filter(s -> s.getPqs() != null && s.getDiver() != null && s.getDiver().getDiverId() != 0).map(d -> d.getDiver().getDiverId()).distinct().count();
 
         response.setDiverCount(distinctDiverCount + distinctPQDiversCount + distinctBuddies.size());
         response.setNewDiverCount((distinctDiverCount - distinctDiversExistingCount) + (distinctPQDiversCount - distinctPQDiversExistingCount) + unknownBuddyCount);
