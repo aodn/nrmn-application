@@ -645,7 +645,7 @@ public class ValidationProcess {
         return rows.stream().map(stagedRow -> mapper.map(stagedRow, StagedRowFormatted.class)).collect(Collectors.toList());
     }
 
-    public ValidationResponse generateSummary(Collection<StagedRowFormatted> mappedRows, Integer unknownBuddyCount) {
+    public ValidationResponse generateSummary(Collection<StagedRowFormatted> mappedRows) {
         ValidationResponse response = new ValidationResponse();
         response.setRowCount(mappedRows.size());
 
@@ -658,20 +658,31 @@ public class ValidationProcess {
         response.setFoundSites(foundSites);
         response.setNewSiteCount(foundSites.values().stream().filter(e -> e == true).count());
 
-        Collection<String> distinctDivers = mappedRows.stream().map(d -> d.getRef().getDiver().toUpperCase()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
+        // Diver Count
+
+        Collection<String> distinctSurveyDivers = mappedRows.stream().map(d -> d.getRef().getDiver().toUpperCase()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
         Collection<String> distinctPQDivers = mappedRows.stream().map(d -> d.getRef().getPqs().toUpperCase()).filter(d -> d.length() > 0 && !d.equalsIgnoreCase("0")).distinct().collect(Collectors.toList());
+        Collection<String> distinctBuddies = mappedRows.stream().flatMap(r -> Stream.of(r.getRef().getBuddy().split(","))).map(d -> d.trim().toUpperCase()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
+        distinctSurveyDivers.addAll(distinctPQDivers);
+        distinctSurveyDivers.addAll(distinctBuddies);
+        Collection<String> distinctDivers = distinctSurveyDivers.stream().distinct().collect(Collectors.toList());
 
-        Collection<String> distinctBuddies = mappedRows.stream().flatMap(r -> Stream.of(r.getRef().getBuddy().split(","))).map(d -> d.trim().toUpperCase()).distinct().collect(Collectors.toList());
-        distinctDivers.removeAll(distinctBuddies);
+        int totalDistictDivers = distinctDivers.size();
 
-        int distinctDiverCount = distinctDivers.size();
-        Long distinctDiversExistingCount = mappedRows.stream().filter(s -> s.getDiver() != null).map(d -> d.getDiver().getDiverId()).distinct().count();
+        Collection<String> diverNames = new ArrayList<String>();
+        for (Diver d : diverRepository.getAll()) {
+            diverNames.add(d.getFullName().toUpperCase());
+            diverNames.add(d.getInitials().toUpperCase());
+        }
 
-        int distinctPQDiversCount = distinctPQDivers.size();
-        Long distinctPQDiversExistingCount = mappedRows.stream().filter(s -> s.getPqs() != null && s.getDiver() != null && s.getDiver().getDiverId() != 0).map(d -> d.getDiver().getDiverId()).distinct().count();
+        distinctDivers.removeIf(d -> diverNames.contains(d));
 
-        response.setDiverCount(distinctDiverCount + distinctPQDiversCount + distinctBuddies.size());
-        response.setNewDiverCount((distinctDiverCount - distinctDiversExistingCount) + (distinctPQDiversCount - distinctPQDiversExistingCount) + unknownBuddyCount);
+        int totalNewDivers = distinctDivers.size();
+
+        response.setDiverCount(totalDistictDivers);
+        response.setNewDiverCount(totalNewDivers);
+        
+        // End Diver Count
 
         List<String> obsItemNames = mappedRows.stream().map(r -> r.getRef().getSpecies().trim().toUpperCase()).filter(r -> r.length() > 0).distinct().collect(Collectors.toList());
         int distinctObsItems = obsItemNames.size();
@@ -697,8 +708,7 @@ public class ValidationProcess {
 
         Collection<StagedRowFormatted> mappedRows = formatRowsWithSpecies(rows, species);
 
-        Integer unknownBuddyCount = sheetErrors.stream().filter(e -> e.getColumnNames() != null && e.getColumnNames().contains("buddy")).map(e -> e.getErrorCount()).reduce(0, Integer::sum);
-        ValidationResponse response = generateSummary(mappedRows, unknownBuddyCount);
+        ValidationResponse response = generateSummary(mappedRows);
 
         sheetErrors.addAll(checkData(programName, job.getIsExtendedSize(), mappedRows));
 
