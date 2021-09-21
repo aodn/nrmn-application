@@ -51,6 +51,9 @@ public class SurveyEditService {
     @Autowired
     ModelMapper mapper;
 
+    private static final int RLS_PROGRAM_ID = 1;
+    private static final int ATRC_PROGRAM_ID = 2;
+
     public Survey updateSurvey(SurveyDto surveyDto) {
 
         Survey survey = surveyRepository.findById(surveyDto.getSurveyId()).orElseThrow(ResourceNotFoundException::new);
@@ -104,10 +107,18 @@ public class SurveyEditService {
                         "A survey date cannot be in the future."));
             }
 
-            if (surveyDate.before(Date.from(LocalDate.of(2006, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant()))) {
-                errors.add(new ValidationError("Survey", "surveyDate", surveyDto.getSurveyDate(),
-                        "A survey date cannot be before January 1st, 2006."));
+            if(surveyDto.getProgramId() != null && surveyDto.getProgramId() == RLS_PROGRAM_ID && 
+                surveyDate.before(Date.from(LocalDate.of(2006, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant()))) {
+                    errors.add(new ValidationError("Survey", "surveyDate", surveyDto.getSurveyDate(),
+                            "A survey date cannot be before January 1st, 2006."));
             }
+            
+            if(surveyDto.getProgramId() != null && surveyDto.getProgramId() == ATRC_PROGRAM_ID && 
+                surveyDate.before(Date.from(LocalDate.of(1991, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant()))) {
+                    errors.add(new ValidationError("Survey", "surveyDate", surveyDto.getSurveyDate(),
+                            "A survey date cannot be before January 1st, 1991."));
+            }
+
         }
 
         // Time validations
@@ -183,9 +194,9 @@ public class SurveyEditService {
         }
 
         // Direction Validation
-        if (!EnumUtils.isValidEnum(Directions.class, surveyDto.getDirection())) {
+        if (surveyDto.getDirection() !=null && surveyDto.getDirection().length() > 0 && !EnumUtils.isValidEnum(Directions.class, surveyDto.getDirection())) {
             errors.add(new ValidationError("Survey", "direction", surveyDto.getDirection(),
-                    surveyDto.getDirection() + " is invalid, expected: N,NE,E,SE,S,SW,W,NW"));
+                    surveyDto.getDirection() + " is invalid, expected: N,NE,E,SE,S,SW,W,NW or blank"));
         }
 
         // Ensure site/date/depth.surveyNum is unique
