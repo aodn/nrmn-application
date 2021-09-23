@@ -659,25 +659,25 @@ public class ValidationProcess {
         response.setNewSiteCount(foundSites.values().stream().filter(e -> e == true).count());
 
         // Diver Count
+        Collection<Diver> divers = diverRepository.getAll();
 
         Collection<String> distinctSurveyDivers = mappedRows.stream().map(d -> d.getRef().getDiver().toUpperCase()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
         Collection<String> distinctPQDivers = mappedRows.stream().map(d -> d.getRef().getPqs().toUpperCase()).filter(d -> d.length() > 0 && !d.equalsIgnoreCase("0")).distinct().collect(Collectors.toList());
         Collection<String> distinctBuddies = mappedRows.stream().flatMap(r -> Stream.of(r.getRef().getBuddy().split(","))).map(d -> d.trim().toUpperCase()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
         distinctSurveyDivers.addAll(distinctPQDivers);
         distinctSurveyDivers.addAll(distinctBuddies);
-        Collection<String> distinctDivers = distinctSurveyDivers.stream().distinct().collect(Collectors.toList());
 
-        int totalDistictDivers = distinctDivers.size();
+        // Map diver full names to initials and then use the distinct count of initials to determine the number of distinct divers
+        Collection<String> distinctDiverInitials = distinctSurveyDivers.stream().map(s -> {
+            Optional<Diver> diver = divers.stream().filter(d -> d.getFullName() != null && d.getFullName().equalsIgnoreCase(s)).findFirst();
+            return diver.isPresent() ? diver.get().getInitials() : s;
+        }).distinct().collect(Collectors.toList());
 
-        Collection<String> diverNames = new ArrayList<String>();
-        for (Diver d : diverRepository.getAll()) {
-            diverNames.add(d.getFullName().toUpperCase());
-            diverNames.add(d.getInitials().toUpperCase());
-        }
+        int totalDistictDivers = distinctDiverInitials.size();
 
-        distinctDivers.removeIf(d -> diverNames.contains(d));
+        distinctDiverInitials.removeIf(n -> divers.stream().anyMatch(d -> d.getInitials() != null && d.getInitials().equalsIgnoreCase(n)));
 
-        int totalNewDivers = distinctDivers.size();
+        int totalNewDivers = distinctDiverInitials.size();
 
         response.setDiverCount(totalDistictDivers);
         response.setNewDiverCount(totalNewDivers);
