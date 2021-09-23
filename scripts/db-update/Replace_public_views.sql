@@ -69,7 +69,7 @@ WHERE epsl.survey_id NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl 
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE program='ATRC');
+	WHERE pde.program_id=2);
 
 
 
@@ -125,7 +125,7 @@ AND epm1.site_code NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl 
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE program='ATRC');
+	WHERE pde.program_id=2);
 
 -- M2 Inverts
 -- 1) 2-decimal coordinate precision
@@ -166,7 +166,7 @@ WHERE epm2i.site_code NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl 
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE program='ATRC');
+	WHERE pde.program_id=2);
 
 -- M2 Cryptic fish
 -- 1) 2-decimal coordinate precision
@@ -224,7 +224,7 @@ AND epm2cf.site_code NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl 
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE program='ATRC');
+	WHERE pde.program_id=2);
 
 -- M0 Off transect sightings
 -- 1) 2-decimal coordinate precision
@@ -263,7 +263,7 @@ WHERE epm0.site_code NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl 
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE program='ATRC');
+	WHERE pde.program_id=2);
 
 -- M3 In situ quadrats
 -- 1) 2-decimal coordinate precision
@@ -302,7 +302,7 @@ WHERE epm3.site_code NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl 
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE program='ATRC');
+	WHERE pde.program_id=2);
 
 -- M4 Macrocystis counts
 -- 1) 2-decimal coordinate precision
@@ -341,7 +341,7 @@ WHERE epm4.site_code NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl 
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE program='ATRC');
+	WHERE pde.program_id=2);
 
 --M5 Limpet quadrats
 -- 1) 2-decimal coordinate precision
@@ -380,7 +380,7 @@ WHERE epm5.site_code NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl 
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE program='ATRC');
+	WHERE pde.program_id=2);
 
 -- M11 Off-transect measurements
 -- 1) 2-decimal coordinate precision
@@ -419,7 +419,7 @@ WHERE epm11.site_code NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl 
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE program='ATRC');
+	WHERE pde.program_id=2);
 
 -- M13 Photo Quadrat scores
 -- 1) 2-decimal coordinate precision
@@ -457,4 +457,4 @@ AND epm13.site_code NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl 
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE program='ATRC');
+	WHERE pde.program_id=2);
