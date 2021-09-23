@@ -30,6 +30,7 @@ WHERE EXISTS (SELECT 1 FROM nrmn.survey WHERE survey.site_id = sr.site_id)
 -- 1) 2-decimal coordinate precision
 -- 2) remove name of diver
 -- 3) exclude invalid directions
+DROP VIEW IF EXISTS nrmn.ep_survey_list_public;
 CREATE OR REPLACE VIEW nrmn.ep_survey_list_public AS
 SELECT
 	survey_id,
@@ -71,8 +72,6 @@ WHERE epsl.survey_id NOT IN (
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
 	WHERE pde.program_id=2);
 
-
-
 -- Species list
 -- 1) 2-decimal coordinate precision
 -- 2) exclude species with no current taxonomic name
@@ -87,6 +86,7 @@ SELECT * FROM nrmn.ep_species_list;
 -- 3) Exclude Recorded Species name and Taxon KEEP Species Name (ie ()bracket and []bracket) and Reporting Species name)
 -- 4) include Actinopterygii, Chondrichthyes, Elasmobranchii, Aves, Mammalia, Reptilia, Cephalopoda, Cnidaria, Ctenophora
 -- 5) include "No species found"
+DROP VIEW IF EXISTS nrmn.ep_m1_public;
 CREATE OR REPLACE VIEW nrmn.ep_m1_public AS
 SELECT
 	survey_id,
@@ -131,6 +131,7 @@ AND epm1.site_code NOT IN (
 -- 1) 2-decimal coordinate precision
 -- 2) remove name of Divers
 -- 3) Exclude Recorded Species name and Taxon KEEP Species Name (ie ()bracket and []bracket) and Reporting Species name)
+DROP VIEW IF EXISTS nrmn.ep_m2_inverts_public;
 CREATE OR REPLACE VIEW  nrmn.ep_m2_inverts_public AS
 SELECT survey_id,
     country,
@@ -173,6 +174,7 @@ WHERE epm2i.site_code NOT IN (
 -- 2) remove name of Divers
 -- 3) Exclude Recorded Species name and Taxon KEEP Species Name (ie ()bracket and []bracket) and Reporting Species name)
 -- 4) Elasmobranchii rolled up to Chondrychthyes
+DROP VIEW IF EXISTS nrmn.ep_m2_cryptic_fish_public;
 CREATE OR REPLACE VIEW nrmn.ep_m2_cryptic_fish_public AS
 SELECT
 	survey_id,
@@ -230,6 +232,7 @@ AND epm2cf.site_code NOT IN (
 -- 1) 2-decimal coordinate precision
 -- 2) remove name of Divers
 -- 3) Exclude Recorded Species name and Taxon KEEP Species Name (ie ()bracket and []bracket) and Reporting Species name)
+DROP VIEW IF EXISTS nrmn.ep_m0_off_transect_sighting_public;
 CREATE OR REPLACE VIEW nrmn.ep_m0_off_transect_sighting_public AS
 SELECT
 	survey_id,
@@ -269,6 +272,7 @@ WHERE epm0.site_code NOT IN (
 -- 1) 2-decimal coordinate precision
 -- 2) remove name of Divers
 -- 3) Exclude Recorded Species name and Taxon KEEP Species Name (ie ()bracket and []bracket) and Reporting Species name)
+DROP VIEW IF EXISTS nrmn.ep_m3_isq_public;
 CREATE OR REPLACE VIEW nrmn.ep_m3_isq_public AS
 SELECT
 	survey_id,
@@ -308,6 +312,7 @@ WHERE epm3.site_code NOT IN (
 -- 1) 2-decimal coordinate precision
 -- 2) remove name of Divers
 -- 3) Exclude Recorded Species name and Taxon KEEP Species Name (ie ()bracket and []bracket) and Reporting Species name)
+DROP VIEW IF EXISTS nrmn.ep_m4_macrocystis_count_public;
 CREATE OR REPLACE VIEW nrmn.ep_m4_macrocystis_count_public AS
 SELECT
 	survey_id,
@@ -347,6 +352,7 @@ WHERE epm4.site_code NOT IN (
 -- 1) 2-decimal coordinate precision
 -- 2) remove name of Divers
 -- 3) Exclude Recorded Species name and Taxon KEEP Species Name (ie ()bracket and []bracket) and Reporting Species name)
+DROP VIEW IF EXISTS nrmn.ep_m5_limpet_quadrats_public;
 CREATE OR REPLACE VIEW nrmn.ep_m5_limpet_quadrats_public as
 SELECT
 	survey_id,
@@ -386,6 +392,7 @@ WHERE epm5.site_code NOT IN (
 -- 1) 2-decimal coordinate precision
 -- 2) remove name of Divers
 -- 3) Exclude Recorded Species name and Taxon KEEP Species Name (ie ()bracket and []bracket) and Reporting Species name)
+DROP VIEW IF EXISTS nrmn.ep_m11_off_transect_measurement_public;
 CREATE OR REPLACE VIEW nrmn.ep_m11_off_transect_measurement_public AS
 SELECT
 	survey_id,
@@ -425,6 +432,7 @@ WHERE epm11.site_code NOT IN (
 -- 1) 2-decimal coordinate precision
 -- 2) remove name of Divers
 -- 3) remove name of PQ scorer (Currently not implemented in private endpoint)
+DROP VIEW IF EXISTS nrmn.ep_m13_pq_scores_public;
 CREATE OR REPLACE VIEW nrmn.ep_m13_pq_scores_public AS
 SELECT
  	survey_id,
