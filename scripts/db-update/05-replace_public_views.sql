@@ -68,10 +68,11 @@ SELECT
 	survey_notes
 FROM nrmn.ep_survey_list epsl
 WHERE epsl.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl 
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE pde.program_id=2);
+	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
+	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id 
+	WHERE pde.program_id='2');
 
 -- Species list
 -- 1) 2-decimal coordinate precision
@@ -123,10 +124,11 @@ FROM nrmn.ep_m1 epm1
 WHERE phylum IN ('Actinopterygii','Chondrichthyes','Elasmobranchii','Aves',
 'Mammalia','Reptilia','Cephalopoda', 'Cnidaria', 'Ctenophora')
 AND epm1.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl 
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE pde.program_id=2);
+	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
+	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id 
+	WHERE pde.program_id='2');
 
 -- M2 Inverts
 -- 1) 2-decimal coordinate precision
@@ -165,10 +167,11 @@ SELECT survey_id,
     biomass
 FROM nrmn.ep_m2_inverts epm2i
 WHERE epm2i.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl 
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE pde.program_id=2);
+	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
+	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id 
+	WHERE pde.program_id='2');
 
 -- M2 Cryptic fish
 -- 1) 2-decimal coordinate precision
@@ -224,10 +227,11 @@ WHERE family IN('Agonidae','Ambassidae','Anarhichadidae','Antennariidae','Aploac
 'Tripterygiidae','Uranoscopidae','Urolophidae','Zaproridae','Zoarcidae')
 OR species_name NOT SIMILAR TO '(Trachinops|Anthias|Caesioperca|Lepidoperca)%'
 AND epm2cf.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl 
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE pde.program_id=2);
+	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
+	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id 
+	WHERE pde.program_id='2');
 
 -- M0 Off transect sightings
 -- 1) 2-decimal coordinate precision
@@ -264,10 +268,11 @@ SELECT
     total
 FROM nrmn.ep_m0_off_transect_sighting epm0
 WHERE epm0.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl 
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE pde.program_id=2);
+	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
+	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id 
+	WHERE pde.program_id='2');
 
 -- M3 In situ quadrats
 -- 1) 2-decimal coordinate precision
@@ -304,10 +309,11 @@ SELECT
 	total
 FROM nrmn.ep_m3_isq epm3
 WHERE epm3.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl 
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE pde.program_id=2);
+	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
+	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id 
+	WHERE pde.program_id='2');
 
 -- M4 Macrocystis counts
 -- 1) 2-decimal coordinate precision
@@ -344,10 +350,11 @@ SELECT
     total
 from nrmn.ep_m4_macrocystis_count epm4
 WHERE epm4.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl 
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE pde.program_id=2);
+	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
+	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id 
+	WHERE pde.program_id='2');
 
 --M5 Limpet quadrats
 -- 1) 2-decimal coordinate precision
@@ -384,10 +391,11 @@ SELECT
 	total
 FROM nrmn.ep_m5_limpet_quadrats epm5
 WHERE epm5.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl 
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE pde.program_id=2);
+	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
+	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id 
+	WHERE pde.program_id='2');
 
 -- M11 Off-transect measurements
 -- 1) 2-decimal coordinate precision
@@ -424,10 +432,11 @@ SELECT
     total
 FROM nrmn.ep_m11_off_transect_measurement epm11
 WHERE epm11.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl 
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE pde.program_id=2);
+	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
+	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id 
+	WHERE pde.program_id='2');
 
 -- M13 Photo Quadrat scores
 -- 1) 2-decimal coordinate precision
@@ -463,7 +472,8 @@ SELECT
 FROM nrmn.ep_m13_pq_scores epm13
 WHERE category <> 'Tape'
 AND epm13.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl 
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code 
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id 
-	WHERE pde.program_id=2);
+	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
+	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id 
+	WHERE pde.program_id='2');
