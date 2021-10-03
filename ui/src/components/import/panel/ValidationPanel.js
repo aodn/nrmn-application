@@ -102,9 +102,12 @@ const ValidationPanel = (props) => {
     if (item.rowIds) {
       focusCell(props.api, item.columnNames || [item.columnName], item.rowIds);
     } else if (item.row) {
-      props.api.setFilterModel(null);
       const row = props.api.gridOptionsWrapper.gridOptions.context.rowData.find((r) => r.id === item.row);
-      props.api.ensureNodeVisible(row, 'middle');
+      let visible = false;
+      props.api.forEachNodeAfterFilter((n) => (visible = n.data.id === row.id || visible));
+      if (visible) {
+        props.api.ensureNodeVisible(row, 'middle');
+      }
     }
     props.api.redrawRows();
   };
@@ -130,9 +133,6 @@ const ValidationPanel = (props) => {
 
   return (
     <>
-      <Box m={2} mt={1}>
-        <Button onClick={() => props.api.setFilterModel(null)}>Reset Filter</Button>
-      </Box>
       <Box m={2}>
         <Typography variant="button">Summary</Typography>
         <Table size="small">

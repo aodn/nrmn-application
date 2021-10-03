@@ -123,6 +123,7 @@ const DataSheetView = ({jobId, onIngest}) => {
   const classes = useStyles();
   const [job, setJob] = useState({});
   const [gridApi, setGridApi] = useState(null);
+  const [isFiltered, setIsFiltered] = useState(false);
   const [state, setState] = useState(IngestState.Loading);
   const [sideBar, setSideBar] = useState(defaultSideBar);
 
@@ -136,6 +137,10 @@ const DataSheetView = ({jobId, onIngest}) => {
       }, 25);
     }
   }, [gridApi, state]);
+
+  useEffect(() => {
+    if (gridApi && !isFiltered) gridApi.setFilterModel(null);
+  }, [gridApi, isFiltered]);
 
   const handleValidate = () => {
     context.useOverlay = 'Validating';
@@ -458,6 +463,12 @@ const DataSheetView = ({jobId, onIngest}) => {
     e.api.refreshCells();
   };
 
+  const onFilterChanged = (e) => {
+    e.api.refreshCells();
+    const filterModel = e.api.getFilterModel();
+    setIsFiltered(Object.getOwnPropertyNames(filterModel).length > 0);
+  };
+
   const onRowDataUpdated = (e) => {
     const ctx = e.api.gridOptionsWrapper.gridOptions.context;
     if (ctx.putRowIds.length > 0) {
@@ -589,6 +600,11 @@ const DataSheetView = ({jobId, onIngest}) => {
                 job.reference
               } `}</Typography>
             </Box>
+            <Box m={2} mt={1}>
+              <Button disabled={!isFiltered} onClick={() => setIsFiltered()}>
+                Reset Filter
+              </Button>
+            </Box>
             <Box p={1}>
               <Button
                 onClick={() => gridApi.exportDataAsExcel({sheetName: 'DATA', author: 'NRMN', fileName: `export_${job.reference}`})}
@@ -648,7 +664,7 @@ const DataSheetView = ({jobId, onIngest}) => {
             tabToNextCell={onTabToNextCell}
             onCellValueChanged={onCellValueChanged}
             onSortChanged={onSortChanged}
-            onFilterChanged={onSortChanged}
+            onFilterChanged={onFilterChanged}
             onRowDataUpdated={onRowDataUpdated}
             fillHandleDirection="y"
             getContextMenuItems={getContextMenuItems}
