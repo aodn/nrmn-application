@@ -158,7 +158,7 @@ public class StagedRow implements Serializable {
 
     public String getContentsHash() {
         // String measurements = measureJson.entrySet().stream().map(m -> m.getValue().length() > 0 ? m.getKey().toString() + ":" + m.getValue() + "|" : "").reduce("", (a, b) -> a + b);
-        String rowContents = siteCode + date + diver + depth + method + block + species + buddy + siteName + longitude + latitude + vis + time + direction + pqs + code + commonName + total + inverts + isInvertSizing; // + measurements;
+        String rowContents = siteCode + date + diver + depth + method + block + species + buddy + siteName + longitude + latitude + vis + time + direction + pqs + code + commonName + inverts + isInvertSizing; // + total + measurements;
         return Integer.toString(rowContents.hashCode());
     }
 
