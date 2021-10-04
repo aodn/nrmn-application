@@ -3,13 +3,13 @@
 -- 2) only site with at least one survey done
 CREATE OR REPLACE VIEW nrmn.ep_site_list_public AS
 SELECT
-        sr.country,
+    sr.country,
 	epl.area,
 	epl.location,
 	sr.site_code,
-        epl.site_name,
+    epl.site_name,
 	old_site_codes,
-        round(epl.latitude::numeric, 2) AS latitude,
+    round(epl.latitude::numeric, 2) AS latitude,
 	round(epl.longitude::numeric, 2) AS longitude,
 	epl.realm,
 	epl.province,
@@ -43,8 +43,8 @@ SELECT
 	"has pq scores in db",
 	"has rugosity scores in db",
 	"has pqs catalogued in db",
-        visibility,
-        hour,
+    visibility,
+    hour,
 	CASE WHEN direction ~* '(N|S|W|E|NE|SE|SW|NW|NNE|ENE|ESE|SSE|SSW|WSW|WNW|NNW)'THEN direction
              WHEN direction ~* '(east|west|north|south)' THEN direction
              ELSE NULL
@@ -91,7 +91,7 @@ SELECT
 	location,
 	site_code,
 	site_name,
-        round(latitude::numeric, 2) AS latitude,
+    round(latitude::numeric, 2) AS latitude,
 	round(longitude::numeric, 2) AS longitude,
 	survey_date,
 	depth,
@@ -102,15 +102,15 @@ SELECT
 	round(survey_latitude::numeric, 2) AS survey_latitude,
 	round(survey_longitude::numeric, 2) AS survey_longitude,
 	"method",
-        "block",
+    "block",
 	phylum,
 	"class",
 	"order",
 	family,
-        species_name,
+    species_name,
 	reporting_name,
 	size_class,
-        total,
+    total,
 	biomass
 FROM nrmn.ep_m1 epm1
 WHERE phylum IN ('Actinopterygii','Chondrichthyes','Elasmobranchii',
@@ -180,8 +180,8 @@ SELECT
 	location,
 	site_code,
 	site_name,
-        round(latitude::numeric, 2) AS latitude,
-        round(longitude::numeric, 2) AS longitude,
+    round(latitude::numeric, 2) AS latitude,
+    round(longitude::numeric, 2) AS longitude,
 	survey_date,
 	depth,
 	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
@@ -190,8 +190,8 @@ SELECT
 	hour,
 	round(survey_latitude::numeric, 2) AS survey_latitude,
 	round(survey_longitude::numeric, 2) AS survey_longitude,
-        "method",
-        "block",
+    "method",
+    "block",
 	phylum,
 	CASE WHEN "class" = 'Elasmobranchii' THEN 'Chondrichthyes'
 	     ELSE "class"
@@ -201,7 +201,7 @@ SELECT
 	species_name,
 	reporting_name,
 	size_class,
-        total,
+    total,
 	biomass
 FROM nrmn.ep_m2_cryptic_fish epm2cf
 WHERE family IN('Agonidae','Ambassidae','Anarhichadidae','Antennariidae','Aploactinidae','Apogonidae','Ariidae',
@@ -238,8 +238,8 @@ SELECT
 	location,
 	site_code,
 	site_name,
-        round(latitude::numeric, 2) AS latitude,
-        round(longitude::numeric, 2) AS longitude,
+    round(latitude::numeric, 2) AS latitude,
+    round(longitude::numeric, 2) AS longitude,
 	survey_date,
 	depth,
 	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
@@ -249,7 +249,7 @@ SELECT
 	round(survey_latitude::numeric, 2) AS survey_latitude,
 	round(survey_longitude::numeric, 2) AS survey_longitude,
 	"method",
-        "block",
+    "block",
 	phylum,
 	"class",
 	"order",
@@ -257,8 +257,8 @@ SELECT
 	species_name,
 	reporting_name,
 	size_class,
-        total,
-        biomass
+    total,
+    biomass
 FROM nrmn.ep_m0_off_transect_sighting epm0
 WHERE epm0.site_code NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
@@ -281,8 +281,8 @@ SELECT
 	location,
 	site_code,
 	site_name,
-        round(latitude::numeric, 2) AS latitude,
-        round(longitude::numeric, 2) AS longitude,
+    round(latitude::numeric, 2) AS latitude,
+    round(longitude::numeric, 2) AS longitude,
 	survey_date,
 	depth,
 	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
@@ -301,126 +301,6 @@ SELECT
 	total
 FROM nrmn.ep_m3_isq epm3
 WHERE epm3.site_code NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id
-	WHERE pde.program_id=2);
-
--- M4 Macrocystis counts
--- 1) 2-decimal coordinate precision
--- 2) remove name of Divers
--- 3) Exclude Recorded Species name and Taxon KEEP Species Name (ie ()bracket and []bracket) and Reporting Species name)
-DROP VIEW IF EXISTS nrmn.ep_m4_macrocystis_count_public;
-CREATE OR REPLACE VIEW nrmn.ep_m4_macrocystis_count_public AS
-SELECT
-	survey_id,
-	country,
-	area,
-	ecoregion,
-	realm,
-	location
-	site_code,
-	site_name,
-        round(latitude::numeric, 2) AS latitude,
-        round(longitude::numeric, 2) AS longitude,
-	survey_date,
-	depth,
-	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
-	program,
-	visibility,
-	hour,
-	round(survey_latitude::numeric, 2) AS survey_latitude,
-	round(survey_longitude::numeric, 2) AS survey_longitude,
-	phylum,
-	"class",
-	"order",
-	family,
-        species_name,
-	reporting_name,
-        block,
-        total
-from nrmn.ep_m4_macrocystis_count epm4
-WHERE epm4.site_code NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id
-	WHERE pde.program_id=2);
-
---M5 Limpet quadrats
--- 1) 2-decimal coordinate precision
--- 2) remove name of Divers
--- 3) Exclude Recorded Species name and Taxon KEEP Species Name (ie ()bracket and []bracket) and Reporting Species name)
-DROP VIEW IF EXISTS nrmn.ep_m5_limpet_quadrats_public;
-CREATE OR REPLACE VIEW nrmn.ep_m5_limpet_quadrats_public as
-SELECT
-	survey_id,
-	country,
-	area,
-	ecoregion,
-	realm,
-	location
-	site_code,
-	site_name,
-        round(latitude::numeric, 2) AS latitude,
-        round(longitude::numeric, 2) AS longitude,
-	survey_date,
-	depth,
-	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
-	program,
-	visibility,
-	hour,
-	round(survey_latitude::numeric, 2) AS survey_latitude,
-	round(survey_longitude::numeric, 2) AS survey_longitude,
-	phylum,
-	"class",
-	"order",
-	family,
-        species_name,
-	reporting_name,
-	quadrat,
-	total
-FROM nrmn.ep_m5_limpet_quadrats epm5
-WHERE epm5.site_code NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id
-	WHERE pde.program_id=2);
-
--- M11 Off-transect measurements
--- 1) 2-decimal coordinate precision
--- 2) remove name of Divers
--- 3) Exclude Recorded Species name and Taxon KEEP Species Name (ie ()bracket and []bracket) and Reporting Species name)
-DROP VIEW IF EXISTS nrmn.ep_m11_off_transect_measurement_public;
-CREATE OR REPLACE VIEW nrmn.ep_m11_off_transect_measurement_public AS
-SELECT
-	survey_id,
-	country,
-	area,
-	ecoregion,
-	realm,
-	location
-	site_code,
-	site_name,
-        round(latitude::numeric, 2) AS latitude,
-        round(longitude::numeric, 2) AS longitude,
-	survey_date,
-	depth,
-	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
-	program,
-	visibility,
-	hour,
-	round(survey_latitude::numeric, 2) AS survey_latitude,
-	round(survey_longitude::numeric, 2) AS survey_longitude,
-	phylum,
-	"class",
-	"order",
-	family,
-        species_name,
-        reporting_name,
-	size_class,
-        total
-FROM nrmn.ep_m11_off_transect_measurement epm11
-WHERE epm11.site_code NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id
