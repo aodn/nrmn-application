@@ -167,6 +167,7 @@ const referenceData = [
 
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [filterModel, setFilterModel] = React.useState({});
   const expires = useSelector((state) => state.auth.expires);
   const [applicationError, setApplicationError] = useState(null);
   window.setApplicationError = setApplicationError;
@@ -248,7 +249,11 @@ const App = () => {
             {/** Authenticated Pages */}
             <Route exact path="/jobs" component={JobList} />
             <Route exact path="/jobs/:id/view" component={JobView} />
-            <Route exact path="/reference/locations" component={LocationList} />
+            <Route
+              exact
+              path="/reference/locations"
+              render={() => <LocationList setFilterModel={setFilterModel} filterModel={filterModel} />}
+            />
             <Route exact path="/validation/:jobId" component={ValidationPage} />
             <Route exact path="/upload" component={JobUpload} />
             <Route exact path="/data/extract" component={ExtractTemplateData} />
