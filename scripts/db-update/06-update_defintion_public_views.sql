@@ -55,24 +55,17 @@ SELECT
 	max_rugosity,
 	surface,
 	ST_SetSrid(ST_MakePoint(round (longitude::numeric, 2), round (latitude::numeric, 2)),4326)::geometry AS geom,
-	program,
+	"program",
 	pq_zip_url,
 	old_site_codes,
 	methods
 FROM nrmn.ep_survey_list epsl
 WHERE epsl.survey_id NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
 	WHERE pde.program_id=2);
-
--- Species list
--- 1) 2-decimal coordinate precision
--- 2) exclude species with no current taxonomic name
--- **Criteria already met in ep_species_list**
-CREATE OR REPLACE VIEW nrmn.ep_species_list_public AS
-SELECT * FROM nrmn.ep_species_list;
-
 
 -- M1 Fish
 -- 1) 2-decimal coordinate precision
@@ -117,8 +110,9 @@ WHERE phylum IN ('Actinopterygii','Chondrichthyes','Elasmobranchii',
 'Mammalia','Reptilia','Cephalopoda', 'Cnidaria', 'Ctenophora')
 AND epm1.survey_id NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
 	WHERE pde.program_id=2);
 
 -- M2 Inverts
@@ -160,8 +154,9 @@ SELECT
 FROM nrmn.ep_m2_inverts epm2i
 WHERE epm2i.survey_id NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
 	WHERE pde.program_id=2);
 
 -- M2 Cryptic fish
@@ -219,8 +214,9 @@ WHERE family IN('Agonidae','Ambassidae','Anarhichadidae','Antennariidae','Aploac
 OR species_name NOT SIMILAR TO '(Trachinops|Anthias|Caesioperca|Lepidoperca)%'
 AND epm2cf.site_code NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
 	WHERE pde.program_id=2);
 
 -- M0 Off transect sightings
@@ -262,8 +258,9 @@ SELECT
 FROM nrmn.ep_m0_off_transect_sighting epm0
 WHERE epm0.site_code NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
 	WHERE pde.program_id=2);
 
 -- M3 In situ quadrats
@@ -302,8 +299,9 @@ SELECT
 FROM nrmn.ep_m3_isq epm3
 WHERE epm3.site_code NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
 	WHERE pde.program_id=2);
 
 -- M13 Photo Quadrat scores
@@ -341,6 +339,7 @@ FROM nrmn.ep_m13_pq_scores epm13
 WHERE category <> 'Tape'
 AND epm13.site_code NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
 	WHERE pde.program_id=2);
