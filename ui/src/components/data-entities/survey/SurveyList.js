@@ -3,25 +3,21 @@ import {Box, Typography} from '@material-ui/core';
 import {Redirect} from 'react-router-dom';
 import {getResult} from '../../../axios/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
-import {resetState} from '../form-reducer';
-import {useDispatch} from 'react-redux';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
 const SurveyList = () => {
-  const dispatch = useDispatch();
   const [gridApi, setGridApi] = useState(null);
   const [redirect, setRedirect] = useState(null);
 
   useEffect(() => {
     if (gridApi) {
-      dispatch(resetState());
       getResult('data/surveys').then((res) => gridApi.setRowData(res.data));
     }
-  }, [dispatch, gridApi]);
+  }, [gridApi]);
 
-  if (redirect) return <Redirect to={`/data/survey/${redirect}`} />;
+  if (redirect) return <Redirect push to={`/data/survey/${redirect}`} />;
 
   return (
     <>
@@ -32,7 +28,7 @@ const SurveyList = () => {
       </Box>
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
         <AgGridReact
-          rowHeight={25}
+          rowHeight={24}
           animateRows={true}
           enableCellTextSelection={true}
           onGridReady={(e) => setGridApi(e.api)}
@@ -40,7 +36,7 @@ const SurveyList = () => {
           frameworkComponents={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
           suppressCellSelection={true}
-          defaultColDef={{sortable: true, resizable: true, filter: 'text', floatingFilter: true}}
+          defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
         >
           <AgGridColumn
             width={40}
@@ -52,7 +48,13 @@ const SurveyList = () => {
             sortable={false}
             valueFormatter={() => '✎'}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
-            onCellClicked={(e) => setRedirect(`${e.data.surveyId}/edit`)}
+            onCellClicked={(e) => {
+              if (e.event.ctrlKey) {
+                window.open(`/reference/survey/${e.data.surveyId}/edit`, '_blank').focus();
+              } else {
+                setRedirect(`${e.data.surveyId}/edit`);
+              }
+            }}
           />
           <AgGridColumn
             width={110}
