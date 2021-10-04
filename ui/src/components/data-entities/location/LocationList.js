@@ -5,30 +5,23 @@ import {Redirect, NavLink} from 'react-router-dom';
 import {getEntity} from '../../../axios/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {Add} from '@material-ui/icons';
-import {resetState} from '../form-reducer';
-import {useDispatch} from 'react-redux';
+import PropTypes from 'prop-types';
 
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
-const LocationList = () => {
-  const dispatch = useDispatch();
+const LocationList = ({filterModel, setFilterModel}) => {
   const [gridApi, setGridApi] = useState(null);
   const [redirect, setRedirect] = useState(null);
   const [disableResetFilter, setResetFilterDisabled] = useState(true);
 
-  const saveFilterModel = (filterModel) => {
-    window[`AgGrid-FilterModel-location`] = JSON.stringify(filterModel);
-  };
-
   useEffect(() => {
     if (gridApi) {
-      dispatch(resetState());
       getEntity('locationList').then((res) => gridApi.setRowData(res.data));
     }
-  }, [dispatch, gridApi]);
+  }, [gridApi]);
 
-  if (redirect) return <Redirect to={`/reference/location/${redirect}`} />;
+  if (redirect) return <Redirect push to={`/reference/location/${redirect}`} />;
 
   return (
     <>
@@ -49,20 +42,20 @@ const LocationList = () => {
       </Box>
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
         <AgGridReact
-          rowHeight={25}
-          animateRows={true}
+          rowHeight={24}
           enableCellTextSelection={true}
           onGridReady={(e) => setGridApi(e.api)}
           context={{useOverlay: 'Loading Locations'}}
           frameworkComponents={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
           suppressCellSelection={true}
+          onFirstDataRendered={() => gridApi.setFilterModel(filterModel)}
+          defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
           onFilterChanged={(e) => {
-            const filterModel = e.api.getFilterModel();
-            saveFilterModel(filterModel);
-            setResetFilterDisabled(Object.keys(filterModel)?.length < 1);
+            const newFilterModel = e.api.getFilterModel();
+            setFilterModel(newFilterModel);
+            setResetFilterDisabled(Object.keys(newFilterModel)?.length < 1);
           }}
-          defaultColDef={{sortable: true, resizable: true, filter: 'text', floatingFilter: true}}
         >
           <AgGridColumn
             width={40}
@@ -74,7 +67,18 @@ const LocationList = () => {
             sortable={false}
             valueFormatter={() => '✎'}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
-            onCellClicked={(e) => setRedirect(`${e.data.id}/edit`)}
+            onCellClicked={(e) => {
+              if (e.event.ctrlKey) {
+                window.open(`/reference/location/${e.data.id}/edit`, '_blank').focus();
+              } else {
+                setRedirect(`${e.data.id}/edit`);
+              }
+            }}
+            onFilterChanged={(e) => {
+              const filterModel = e.api.getFilterModel();
+              setFilterModel('Location', filterModel);
+              setResetFilterDisabled(Object.keys(filterModel)?.length < 1);
+            }}
           />
           <AgGridColumn
             flex={1}
@@ -91,6 +95,11 @@ const LocationList = () => {
       </Box>
     </>
   );
+};
+
+LocationList.propTypes = {
+  filterModel: PropTypes.any,
+  setFilterModel: PropTypes.any
 };
 
 export default LocationList;
