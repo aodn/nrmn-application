@@ -63,11 +63,13 @@ const ValidationPanel = (props) => {
   const context = props.api.gridOptionsWrapper.gridOptions.context;
 
   const [errorList, setErrorList] = useState({blocking: {}, warning: {}, duplicateRows: {}});
-  const [info, setInfo] = useState({});
+  const [summary, setSummary] = useState({});
 
   useEffect(() => {
-    setInfo(context.summary);
-    const errors = context.errors;
+    setSummary(context.summary);
+    const errors = context.errors.sort((a, b) => {
+      return a.message < b.message ? -1 : a.message > b.message ? 1 : 0;
+    });
     if (errors && errors.length > 0) {
       const blocking = generateErrorTree(context, errors, 'BLOCKING');
       const warning = generateErrorTree(context, errors, 'WARNING');
@@ -94,7 +96,7 @@ const ValidationPanel = (props) => {
               }
             ]
           : {};
-      setErrorList({blocking, warning, duplicateRows});
+      setErrorList({blocking, warning, duplicateRows, info});
     }
   }, [context]);
 
@@ -112,17 +114,17 @@ const ValidationPanel = (props) => {
     props.api.redrawRows();
   };
 
-  const siteTooltip = info.foundSites
-    ? Object.keys(info.foundSites).map((key) => (
+  const siteTooltip = summary.foundSites
+    ? Object.keys(summary.foundSites).map((key) => (
         <>
           {key}
           <br />
         </>
       ))
     : '';
-  const newSitesTooltip = info.foundSites
-    ? Object.keys(info.foundSites)
-        .filter((key) => info.foundSites[key] === true)
+  const newSitesTooltip = summary.foundSites
+    ? Object.keys(summary.foundSites)
+        .filter((key) => summary.foundSites[key] === true)
         .map((key) => (
           <>
             {key}
@@ -138,23 +140,23 @@ const ValidationPanel = (props) => {
         <Table size="small">
           <TableBody>
             <TableRow>
-              <TableCell>{info.rowCount}</TableCell>
+              <TableCell>{summary.rowCount}</TableCell>
               <TableCell>rows found</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>{info.surveyCount}</TableCell>
+              <TableCell>{summary.surveyCount}</TableCell>
               <TableCell>distinct surveys found</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>{info.existingSurveyCount}</TableCell>
+              <TableCell>{summary.existingSurveyCount}</TableCell>
               <TableCell>existing surveys found</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>{info.incompleteSurveyCount}</TableCell>
+              <TableCell>{summary.incompleteSurveyCount}</TableCell>
               <TableCell>incomplete surveys found</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>{info.siteCount}</TableCell>
+              <TableCell>{summary.siteCount}</TableCell>
               <Tooltip title={siteTooltip} interactive>
                 <TableCell>distinct sites found</TableCell>
               </Tooltip>
@@ -163,28 +165,28 @@ const ValidationPanel = (props) => {
               <TableCell></TableCell>
               <Tooltip title={newSitesTooltip} interactive>
                 <TableCell>
-                  <small>{info.newSiteCount} new sites found</small>
+                  <small>{summary.newSiteCount} new sites found</small>
                 </TableCell>
               </Tooltip>
             </TableRow>
             <TableRow>
-              <TableCell>{info.obsItemCount}</TableCell>
+              <TableCell>{summary.obsItemCount}</TableCell>
               <TableCell>distinct observable items found</TableCell>
             </TableRow>
             <TableRow>
               <TableCell></TableCell>
               <TableCell>
-                <small>{info.newObsItemCount} new observable items found</small>
+                <small>{summary.newObsItemCount} new observable items found</small>
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>{info.diverCount}</TableCell>
+              <TableCell>{summary.diverCount}</TableCell>
               <TableCell>distinct divers found</TableCell>
             </TableRow>
             <TableRow>
               <TableCell></TableCell>
               <TableCell>
-                <small>{info.newDiverCount} new divers found</small>
+                <small>{summary.newDiverCount} new divers found</small>
               </TableCell>
             </TableRow>
           </TableBody>
@@ -208,6 +210,15 @@ const ValidationPanel = (props) => {
         <Typography variant="button">{Object.keys(errorList.warning).length > 0 ? `Warning` : 'No Warning ✔'}</Typography>
         {Object.keys(errorList.warning).length > 0 && <ValidationSummary data={errorList.warning} onItemClick={handleItemClick} />}
       </Box>
+      {errorList.info && Object.keys(errorList.info).length > 0 && (
+        <>
+          <Divider />
+          <Box m={2} mt={1}>
+            <Typography variant="button">Info</Typography>
+            <ValidationSummary data={errorList.info} onItemClick={handleItemClick} />
+          </Box>
+        </>
+      )}
     </>
   );
 };

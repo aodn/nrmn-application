@@ -451,12 +451,19 @@ const DataSheetView = ({jobId, onIngest}) => {
     const error = params.context.errors.find(
       (e) => e.rowIds.includes(params.data.id) && (!e.columnNames || e.columnNames.includes(params.colDef.field))
     );
-    if (error) {
-      if (error.levelId === 'BLOCKING') return {backgroundColor: red[100]};
-      if (error.levelId === 'WARNING') return {backgroundColor: orange[100]};
-      if (error.levelId === 'DUPLICATE') return {backgroundColor: blue[100]};
+
+    switch (error?.levelId) {
+      case 'BLOCKING':
+        return {backgroundColor: red[100]};
+      case 'WARNING':
+        return {backgroundColor: orange[100]};
+      case 'DUPLICATE':
+        return {backgroundColor: blue[100]};
+      case 'INFO':
+        return {backgroundColor: grey[100]};
+      default:
+        return null;
     }
-    return null;
   };
 
   const onSortChanged = (e) => {
