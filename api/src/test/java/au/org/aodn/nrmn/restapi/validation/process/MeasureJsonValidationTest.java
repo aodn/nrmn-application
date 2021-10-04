@@ -52,7 +52,7 @@ class MeasureJsonValidationTest {
         );
         row.setStagedJob(job);
         Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
-        assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Not a valid measurement")));
+        assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Measurement is not valid")));
     }
 
     @Test
@@ -71,6 +71,6 @@ class MeasureJsonValidationTest {
         );
         row.setStagedJob(job);
         Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
-        assertTrue(res.stream().filter(e -> e.getMessage().equalsIgnoreCase("Not a valid measurement")).count() == 2);
+        assertTrue(res.stream().filter(e -> e.getMessage().equalsIgnoreCase("Measurement is not valid")).count() == 2);
     }
 }

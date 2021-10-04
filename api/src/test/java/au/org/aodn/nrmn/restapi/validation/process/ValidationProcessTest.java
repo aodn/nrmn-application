@@ -210,7 +210,7 @@ class ValidationProcessTest {
         row.setIsInvertSizing("no");
         row.setStagedJob(job);
         Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", true, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
-        assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("Must be 'Yes' or 'No'")));
+        assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("must be 'Yes' or 'No'")));
     }
 
     @Test
@@ -221,7 +221,7 @@ class ValidationProcessTest {
         row.setIsInvertSizing("yes");
         row.setStagedJob(job);
         Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", true, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
-        assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("Must be 'Yes' or 'No'")));
+        assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("must be 'Yes' or 'No'")));
     }
 
     @Test
@@ -232,7 +232,7 @@ class ValidationProcessTest {
         row.setIsInvertSizing("True");
         row.setStagedJob(job);
         Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", true, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
-        assertTrue(errors.stream().anyMatch(e -> e.getMessage().contains("Must be 'Yes' or 'No'")));
+        assertTrue(errors.stream().anyMatch(e -> e.getMessage().contains("must be 'Yes' or 'No'")));
     }
 
     @Test
@@ -243,7 +243,7 @@ class ValidationProcessTest {
         row.setIsInvertSizing("false");
         row.setStagedJob(job);
         Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", true, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
-        assertTrue(errors.stream().anyMatch(e -> e.getMessage().contains("Must be 'Yes' or 'No'")));
+        assertTrue(errors.stream().anyMatch(e -> e.getMessage().contains("must be 'Yes' or 'No'")));
     }
 
     @Test
@@ -254,6 +254,6 @@ class ValidationProcessTest {
         row.setIsInvertSizing("");
         row.setStagedJob(job);
         Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", true, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
-        assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("Must be 'Yes' or 'No'")));
+        assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("must be 'Yes' or 'No'")));
     }
 }

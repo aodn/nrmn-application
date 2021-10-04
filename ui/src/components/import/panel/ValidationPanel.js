@@ -19,7 +19,7 @@ const focusCell = (api, columns, ids) => {
 const generateErrorTree = (ctx, errors, level) => {
   const tree = [];
   errors
-    .filter((e) => e.levelId === level && e.categoryId !== 'GLOBAL')
+    .filter((e) => e.levelId === level)
     .sort((a, b) => {
       return a.message < b.message ? -1 : a.message > b.message ? 1 : 0;
     })
@@ -56,8 +56,7 @@ const generateErrorSummary = (ctx, e) => {
   } else {
     summary.push({rowIds: e.rowIds, columnNames: e.columnNames});
   }
-  const key = `${e.rowIds[0]}-${e.rowIds.length}-${e.columnNames ? e.columnNames.join('-') : '--'}`;
-  return {key: key, message: e.message, count: e.rowIds.length, description: summary};
+  return {key: `error-${e.id}`, message: e.message, count: e.rowIds.length, description: summary};
 };
 
 const ValidationPanel = (props) => {
@@ -72,9 +71,10 @@ const ValidationPanel = (props) => {
     if (errors && errors.length > 0) {
       const blocking = generateErrorTree(context, errors, 'BLOCKING');
       const warning = generateErrorTree(context, errors, 'WARNING');
+      const info = generateErrorTree(context, errors, 'INFO');
       let duplicateRowDescriptions = [];
       errors
-        .filter((e) => e.categoryId === 'GLOBAL')
+        .filter((e) => e.levelId === 'DUPLICATE')
         .forEach((e) => {
           const firstRowId = e.rowIds[0];
           const data = context.rowData.find((d) => d.id === firstRowId);
