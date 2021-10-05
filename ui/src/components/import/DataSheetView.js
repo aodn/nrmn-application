@@ -92,8 +92,10 @@ const resetContext = () => {
   context.putRowIds = [];
   context.undoStack = [];
   context.summary = [];
+  context.errorList = {};
   context.errors = [];
   context.pendingPasteUndo = [];
+  context.focusedRows = [];
   context.pasteMode = false;
 };
 
@@ -117,12 +119,46 @@ const defaultSideBar = {
   defaultToolPanel: ''
 };
 
+const generateErrorTree = (rowData, rowPos, errors) => {
+  const tree = {blocking: [], warning: [], info: [], duplicate: []};
+  errors
+    .sort((a, b) => (a.message < b.message ? -1 : a.message > b.message ? 1 : 0))
+    .forEach((e) => {
+      const rows = rowData.filter((r) => e.rowIds.includes(r.id));
+      let summary = [];
+      if (e.columnNames && e.categoryId !== 'SPAN') {
+        const col = e.columnNames[0];
+        summary = rows.reduce((acc, r) => {
+          const rowPosition = rowData.find((d) => d.id === r.id)?.pos;
+          const rowNumber = rowPos.indexOf(rowPosition) + 1;
+          const existingIdx = acc.findIndex((m) => m.columnName === col && m.value === r[col]);
+          if (existingIdx >= 0)
+            acc[existingIdx] = {
+              columnName: col,
+              value: r[col],
+              rowIds: [...acc[existingIdx].rowIds, r.id],
+              rowNumbers: [...acc[existingIdx].rowNumbers, rowNumber]
+            };
+          else acc.push({columnName: col, value: r[col], rowIds: [r.id], rowNumbers: [rowNumber]});
+          return acc;
+        }, []);
+      } else {
+        const rowPositions = e.rowIds.map((r) => rowData.find((d) => d.id === r)?.pos).filter((r) => r);
+        const rowNumbers = rowPositions.map((r) => rowPos.indexOf(r) + 1);
+        summary = [{rowIds: e.rowIds, columnNames: e.columnNames, rowNumbers}];
+      }
+      tree[e.levelId.toLowerCase()].push({key: `err-${e.id}`, message: e.message, count: e.rowIds.length, description: summary});
+    });
+  return tree;
+};
+
 const IngestState = Object.freeze({Loading: 0, Edited: 1, Valid: 2, ConfirmSubmit: 3});
 
 const DataSheetView = ({jobId, onIngest}) => {
   const classes = useStyles();
   const [job, setJob] = useState({});
   const [gridApi, setGridApi] = useState(null);
+  const [isFiltered, setIsFiltered] = useState(false);
   const [state, setState] = useState(IngestState.Loading);
   const [sideBar, setSideBar] = useState(defaultSideBar);
 
@@ -137,6 +173,17 @@ const DataSheetView = ({jobId, onIngest}) => {
     }
   }, [gridApi, state]);
 
+  useEffect(() => {
+    if (gridApi && !isFiltered) gridApi.setFilterModel(null);
+  }, [gridApi, isFiltered]);
+
+  useEffect(() => {
+    if (gridApi) {
+      gridApi.hideOverlay();
+      gridApi.redrawRows();
+    }
+  }, [gridApi, sideBar]);
+
   const handleValidate = () => {
     context.useOverlay = 'Validating';
     setState(IngestState.Loading);
@@ -147,6 +194,7 @@ const DataSheetView = ({jobId, onIngest}) => {
       delete result.data.errors;
       delete result.data.job;
       context.summary = result.data;
+      context.errorList = generateErrorTree(context.rowData, context.rowPos, context.errors);
 
       setState(context.errors.some((e) => e.levelId === 'BLOCKING') ? IngestState.Edited : IngestState.Valid);
 
@@ -165,9 +213,6 @@ const DataSheetView = ({jobId, onIngest}) => {
           ]
         };
       });
-
-      gridApi.hideOverlay();
-      gridApi.redrawRows();
     });
   };
 
@@ -446,16 +491,33 @@ const DataSheetView = ({jobId, onIngest}) => {
     const error = params.context.errors.find(
       (e) => e.rowIds.includes(params.data.id) && (!e.columnNames || e.columnNames.includes(params.colDef.field))
     );
-    if (error) {
-      if (error.levelId === 'BLOCKING') return {backgroundColor: red[100]};
-      if (error.levelId === 'WARNING') return {backgroundColor: orange[100]};
-      if (error.levelId === 'DUPLICATE') return {backgroundColor: blue[100]};
+
+    switch (error?.levelId) {
+      case 'BLOCKING':
+        return {backgroundColor: red[100]};
+      case 'WARNING':
+        return {backgroundColor: orange[100]};
+      case 'DUPLICATE':
+        if (context.focusedRows?.includes(params.data.id)) {
+          return {backgroundColor: blue[100], fontWeight: 'bold'};
+        } else {
+          return {backgroundColor: blue[100]};
+        }
+      case 'INFO':
+        return {backgroundColor: grey[100]};
+      default:
+        return null;
     }
-    return null;
   };
 
   const onSortChanged = (e) => {
     e.api.refreshCells();
+  };
+
+  const onFilterChanged = (e) => {
+    e.api.refreshCells();
+    const filterModel = e.api.getFilterModel();
+    setIsFiltered(Object.getOwnPropertyNames(filterModel).length > 0);
   };
 
   const onRowDataUpdated = (e) => {
@@ -589,6 +651,11 @@ const DataSheetView = ({jobId, onIngest}) => {
                 job.reference
               } `}</Typography>
             </Box>
+            <Box m={2} mt={1}>
+              <Button disabled={!isFiltered} onClick={() => setIsFiltered()}>
+                Reset Filter
+              </Button>
+            </Box>
             <Box p={1}>
               <Button
                 onClick={() => gridApi.exportDataAsExcel({sheetName: 'DATA', author: 'NRMN', fileName: `export_${job.reference}`})}
@@ -648,7 +715,7 @@ const DataSheetView = ({jobId, onIngest}) => {
             tabToNextCell={onTabToNextCell}
             onCellValueChanged={onCellValueChanged}
             onSortChanged={onSortChanged}
-            onFilterChanged={onSortChanged}
+            onFilterChanged={onFilterChanged}
             onRowDataUpdated={onRowDataUpdated}
             fillHandleDirection="y"
             getContextMenuItems={getContextMenuItems}

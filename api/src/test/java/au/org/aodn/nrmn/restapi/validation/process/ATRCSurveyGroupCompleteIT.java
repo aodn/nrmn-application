@@ -173,10 +173,10 @@ class ATRCSurveyGroupCompleteIT {
         stagedRowRepo.saveAll(Arrays.asList(sn1b1, sn1b2, sn2b1, sn2b2, sn3b1, sn3b2, sn4b1));
 
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("ERZ1/11/09/2020/7.1 survey incomplete: missing M2, M3")));
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("ERZ1/11/09/2020/7.2 survey incomplete: missing M2, M3")));
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("ERZ1/11/09/2020/7.3 survey incomplete: missing M2, M3")));
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("ERZ1/11/09/2020/7.4 survey incomplete: missing M2, M3")));
+        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey ERZ1/11/09/2020/7.1 Missing M2, M3")));
+        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey ERZ1/11/09/2020/7.2 Missing M2, M3")));
+        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey ERZ1/11/09/2020/7.3 Missing M2, M3")));
+        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey ERZ1/11/09/2020/7.4 Missing M2, M3")));
     }
 
 }

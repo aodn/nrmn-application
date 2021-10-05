@@ -189,7 +189,9 @@ const App = () => {
       warning: {main: '#d32f2f'}
     },
     typography: {
-      fontFamily: `"Roboto", "Helvetica", "Arial", sans-serif`
+      body2: {
+        fontSize: '12px'
+      }
     },
     props: {
       MuiTextField: {

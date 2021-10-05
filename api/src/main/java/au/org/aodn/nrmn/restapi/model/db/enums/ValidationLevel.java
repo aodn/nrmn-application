@@ -1,5 +1,5 @@
 package au.org.aodn.nrmn.restapi.model.db.enums;
 
 public enum ValidationLevel {
-    WARNING, BLOCKING, DUPLICATE
+    BLOCKING, WARNING, DUPLICATE, INFO
 }
