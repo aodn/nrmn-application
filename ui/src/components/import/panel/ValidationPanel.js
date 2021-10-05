@@ -10,6 +10,7 @@ const ValidationPanel = (props) => {
 
   const handleItemClick = (item) => {
     const rowId = item.row || item.rowIds[0];
+    context.focusedRows = item.rowIds || [item.row];
     const row = context.rowData.find((r) => r.id === rowId);
     let visible = false;
     props.api.forEachNodeAfterFilter((n) => (visible = n.data.id === row.id || visible));

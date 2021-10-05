@@ -95,6 +95,7 @@ const resetContext = () => {
   context.errorList = {};
   context.errors = [];
   context.pendingPasteUndo = [];
+  context.focusedRows = [];
   context.pasteMode = false;
 };
 
@@ -497,7 +498,11 @@ const DataSheetView = ({jobId, onIngest}) => {
       case 'WARNING':
         return {backgroundColor: orange[100]};
       case 'DUPLICATE':
-        return {backgroundColor: blue[100]};
+        if (context.focusedRows?.includes(params.data.id)) {
+          return {backgroundColor: blue[100], fontWeight: 'bold'};
+        } else {
+          return {backgroundColor: blue[100]};
+        }
       case 'INFO':
         return {backgroundColor: grey[100]};
       default:
