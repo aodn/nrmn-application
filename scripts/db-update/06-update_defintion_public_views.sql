@@ -251,7 +251,7 @@ SELECT
 	"order",
 	family,
 	species_name,
-	reporting_name,,
+	reporting_name,
     total
 FROM nrmn.ep_m0_off_transect_sighting epm0
 WHERE epm0.survey_id NOT IN (
