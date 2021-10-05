@@ -13,7 +13,7 @@ const LinearProgressWithLabel = (props) => {
 
         {props.value && (
           <Box minWidth={35}>
-            <Typography variant="body2" color="textSecondary">
+            <Typography variant="body1" color="textSecondary">
               {props.done ? 'Done' : props.value >= 0 ? `${Math.round(props.value)}%` : ''}
             </Typography>
           </Box>

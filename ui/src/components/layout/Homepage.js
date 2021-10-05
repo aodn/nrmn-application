@@ -30,7 +30,7 @@ const Homepage = () => {
           <Typography color="textPrimary" variant="h6">
             NRMN is an IMOS sub-facility. Its roles:
           </Typography>
-          <Typography color="textPrimary" variant="body2" component="div">
+          <Typography color="textPrimary" variant="body1" component="div">
             <ul>
               <li>
                 Collate, clean, store and make rapidly available, all data obtained during shallow reef surveys conducted by the National

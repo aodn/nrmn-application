@@ -87,17 +87,20 @@ public class ValidationProcess {
     // VALIDATION: Rows duplicated
     public Collection<ValidationRow> checkDuplicateRows(Collection<StagedRow> rows) {
         Map<String, List<Long>> mappedRows = new HashMap<String, List<Long>>();
+        Map<String, String> mappedSpecies = new HashMap<String, String>();
         rows.stream().forEach(r -> {
             String rowHash = r.getContentsHash();
             List<Long> rowIds = mappedRows.getOrDefault(rowHash, new ArrayList<Long>());
             rowIds.add(r.getId());
+            if(!mappedSpecies.containsKey(rowHash))
+                mappedSpecies.put(rowHash, r.getSpecies());
             mappedRows.put(rowHash, rowIds);
         });
         Collection<ValidationRow> duplicateRows = new ArrayList<ValidationRow>();
         mappedRows.forEach((r, v) -> {
             if (v.size() > 1) {
                 List<Long> rowIds = v.stream().collect(Collectors.toList());
-                duplicateRows.add(new ValidationRow(r, rowIds, ValidationLevel.DUPLICATE, "Rows duplicated"));
+                duplicateRows.add(new ValidationRow(r, rowIds, ValidationLevel.DUPLICATE, mappedSpecies.get(r)));
             }
         });
         return duplicateRows;

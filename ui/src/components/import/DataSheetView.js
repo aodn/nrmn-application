@@ -92,6 +92,7 @@ const resetContext = () => {
   context.putRowIds = [];
   context.undoStack = [];
   context.summary = [];
+  context.errorList = {};
   context.errors = [];
   context.pendingPasteUndo = [];
   context.pasteMode = false;
@@ -115,6 +116,39 @@ const defaultSideBar = {
     }
   ],
   defaultToolPanel: ''
+};
+
+const generateErrorTree = (rowData, rowPos, errors) => {
+  const tree = {blocking: [], warning: [], info: [], duplicate: []};
+  errors
+    .sort((a, b) => (a.message < b.message ? -1 : a.message > b.message ? 1 : 0))
+    .forEach((e) => {
+      const rows = rowData.filter((r) => e.rowIds.includes(r.id));
+      let summary = [];
+      if (e.columnNames && e.categoryId !== 'SPAN') {
+        const col = e.columnNames[0];
+        summary = rows.reduce((acc, r) => {
+          const rowPosition = rowData.find((d) => d.id === r.id)?.pos;
+          const rowNumber = rowPos.indexOf(rowPosition) + 1;
+          const existingIdx = acc.findIndex((m) => m.columnName === col && m.value === r[col]);
+          if (existingIdx >= 0)
+            acc[existingIdx] = {
+              columnName: col,
+              value: r[col],
+              rowIds: [...acc[existingIdx].rowIds, r.id],
+              rowNumbers: [...acc[existingIdx].rowNumbers, rowNumber]
+            };
+          else acc.push({columnName: col, value: r[col], rowIds: [r.id], rowNumbers: [rowNumber]});
+          return acc;
+        }, []);
+      } else {
+        const rowPositions = e.rowIds.map((r) => rowData.find((d) => d.id === r)?.pos).filter((r) => r);
+        const rowNumbers = rowPositions.map((r) => rowPos.indexOf(r) + 1);
+        summary = [{rowIds: e.rowIds, columnNames: e.columnNames, rowNumbers}];
+      }
+      tree[e.levelId.toLowerCase()].push({key: `err-${e.id}`, message: e.message, count: e.rowIds.length, description: summary});
+    });
+  return tree;
 };
 
 const IngestState = Object.freeze({Loading: 0, Edited: 1, Valid: 2, ConfirmSubmit: 3});
@@ -142,6 +176,13 @@ const DataSheetView = ({jobId, onIngest}) => {
     if (gridApi && !isFiltered) gridApi.setFilterModel(null);
   }, [gridApi, isFiltered]);
 
+  useEffect(() => {
+    if (gridApi) {
+      gridApi.hideOverlay();
+      gridApi.redrawRows();
+    }
+  }, [gridApi, sideBar]);
+
   const handleValidate = () => {
     context.useOverlay = 'Validating';
     setState(IngestState.Loading);
@@ -152,6 +193,7 @@ const DataSheetView = ({jobId, onIngest}) => {
       delete result.data.errors;
       delete result.data.job;
       context.summary = result.data;
+      context.errorList = generateErrorTree(context.rowData, context.rowPos, context.errors);
 
       setState(context.errors.some((e) => e.levelId === 'BLOCKING') ? IngestState.Edited : IngestState.Valid);
 
@@ -170,9 +212,6 @@ const DataSheetView = ({jobId, onIngest}) => {
           ]
         };
       });
-
-      gridApi.hideOverlay();
-      gridApi.redrawRows();
     });
   };
 
