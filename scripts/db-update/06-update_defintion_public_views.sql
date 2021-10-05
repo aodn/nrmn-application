@@ -1,6 +1,7 @@
 -- SITE_LIST:
 -- 1) 2-decimal coordinate precision
 -- 2) only site with at least one survey done
+DROP VIEW IF EXISTS nrmn.ep_site_list_public;
 CREATE OR REPLACE VIEW nrmn.ep_site_list_public AS
 SELECT
     sr.country,
@@ -19,7 +20,7 @@ SELECT
 	epl.programs
 FROM nrmn.ep_site_list epl
 JOIN nrmn.site_ref sr ON sr.site_code = epl.site_code
-WHERE EXISTS (SELECT 1 FROM nrmn.survey WHERE survey.site_id = sr.site_id)
+WHERE EXISTS (SELECT 1 FROM nrmn.survey WHERE survey.site_id = sr.site_id);
 
 
 -- SURVEY_LIST :
@@ -212,7 +213,7 @@ WHERE family IN('Agonidae','Ambassidae','Anarhichadidae','Antennariidae','Aploac
 'Synanceiidae','Syngnathidae','Synodontidae','Tetrabrachiidae','Tetrarogidae','Torpedinidae','Trachichthyidae',
 'Tripterygiidae','Uranoscopidae','Urolophidae','Zaproridae','Zoarcidae')
 OR species_name NOT SIMILAR TO '(Trachinops|Anthias|Caesioperca|Lepidoperca)%'
-AND epm2cf.site_code NOT IN (
+AND epm2cf.survey_id NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
 	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
@@ -256,7 +257,7 @@ SELECT
     total,
     biomass
 FROM nrmn.ep_m0_off_transect_sighting epm0
-WHERE epm0.site_code NOT IN (
+WHERE epm0.survey_id NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
 	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
@@ -297,7 +298,7 @@ SELECT
 	quadrat,
 	total
 FROM nrmn.ep_m3_isq epm3
-WHERE epm3.site_code NOT IN (
+WHERE epm3.survey_id NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
 	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
@@ -337,7 +338,7 @@ SELECT
         percent_cover
 FROM nrmn.ep_m13_pq_scores epm13
 WHERE category <> 'Tape'
-AND epm13.site_code NOT IN (
+AND epm13.survey_id NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
 	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
