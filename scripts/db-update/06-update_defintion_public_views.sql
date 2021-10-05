@@ -200,7 +200,7 @@ SELECT
     total,
 	biomass
 FROM nrmn.ep_m2_cryptic_fish epm2cf
-WHERE family IN('Agonidae','Ambassidae','Anarhichadidae','Antennariidae','Aploactinidae','Apogonidae','Ariidae',
+WHERE (family IN('Agonidae','Ambassidae','Anarhichadidae','Antennariidae','Aploactinidae','Apogonidae','Ariidae',
 'Aulopidae','Bathymasteridae','Batrachoididae','Blenniidae','Bothidae','Bovichtidae','Brachaeluridae',
 'Brachionichthyidae','Bythitidae','Callionymidae','Caracanthidae','Carapidae','Centriscidae','Chaenopsidae',
 'Chironemidae','Cirrhitidae','Clinidae','Congridae','Congrogadidae','Cottidae','Creediidae','Cryptacanthodidae',
@@ -212,7 +212,7 @@ WHERE family IN('Agonidae','Ambassidae','Anarhichadidae','Antennariidae','Aploac
 'Rajidae','Rhinobatidae','Scorpaenidae','Serranidae','Scyliorhinidae','Soleidae','Solenostomidae','Stichaeidae',
 'Synanceiidae','Syngnathidae','Synodontidae','Tetrabrachiidae','Tetrarogidae','Torpedinidae','Trachichthyidae',
 'Tripterygiidae','Uranoscopidae','Urolophidae','Zaproridae','Zoarcidae')
-OR species_name NOT SIMILAR TO '(Trachinops|Anthias|Caesioperca|Lepidoperca)%'
+AND species_name NOT SIMILAR TO '(Trachinops|Anthias|Caesioperca|Lepidoperca)%')
 AND epm2cf.survey_id NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
 	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
