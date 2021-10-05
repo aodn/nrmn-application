@@ -387,7 +387,7 @@ public class ValidationProcess {
 
             if (!existingSurveys.isEmpty()) {
                 Survey existingSurvey = existingSurveys.stream().findFirst().get();
-                String message = "Survey exists: " + existingSurvey.getSurveyId() + " includes [" + row.getSite().getSiteCode() + ", " + row.getDate() + ", " + row.getDepth() + "]" + row.getMethod();
+                String message = "Survey exists: " + existingSurvey.getSurveyId() + " includes [" + row.getSite().getSiteCode() + ", " + row.getDate() + ", " + row.getDepth() + "]";
                 return new ValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, message, Arrays.asList(row.getId()), Arrays.asList("siteCode"));
             }
 
