@@ -75,6 +75,7 @@ where sm.method_id = 2
 and (
 	(oi.phylum = 'Arthropoda' and oi.class ='Malacostraca' and oi.family <>'Palaemonidae')
 	or (oi.phylum = 'Mollusca' and oi.class IN ('Gastropoda', 'Cephalopoda'))
+	or (oi.phylum = 'Mollusca' and oi.family IN ('Tridacnidae','Cardiidae'))
 	or (oi.phylum = 'Echinodermata' and (oi.class IN ('Asteroidea', 'Holuthuria', 'Echinoidea')
 	                                     or (oi.class = 'Ophiuroidea' and oi."order" ='Phrynophiurida')))
 	or (oi.phylum = 'Platyhelminthes')
