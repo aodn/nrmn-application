@@ -150,20 +150,7 @@ public class SiteController {
             errors.add(new ValidationError("Site", "siteName", site.getSiteName(), 
             "A site with this name already exists in this location."));
         }
-
-        List<String> siteNamesWithin200m = siteRepository.sitesWithin200m(
-                site.getSiteCode(), site.getLongitude(), site.getLatitude());
-
-        if (siteNamesWithin200m.size() > 0) {
-
-            errors.add(new ValidationError("Site", "longitude", site.getLongitude().toString(),
-            String.format("A site already exists within 200m of this location %s", siteNamesWithin200m.get(0))));
-
-            errors.add(new ValidationError("Site", "latitude", site.getLatitude().toString(),
-                    String.format("A site already exists within 200m of this location %s", siteNamesWithin200m.get(0))));
-
-        }
-
+        
         return new ValidationErrors(errors);
     }
 
