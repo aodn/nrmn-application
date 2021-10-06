@@ -6,6 +6,8 @@ import {
   CloudUpload as CloudUploadIcon,
   PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon
 } from '@material-ui/icons/';
+import UndoIcon from '@material-ui/icons/Undo';
+import ResetIcon from '@material-ui/icons/LayersClear';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {PropTypes} from 'prop-types';
@@ -38,6 +40,7 @@ const pushUndo = (api, delta) => {
       return {...d};
     })
   );
+  return ctx.undoStack.length;
 };
 
 const popUndo = (api) => {
@@ -61,6 +64,7 @@ const popUndo = (api) => {
   context.fullRefresh = true;
   api.setRowData(rowData);
   ctx.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
+  return ctx.undoStack.length;
 };
 
 // |context| is where all custom properties and helper functions
@@ -90,7 +94,7 @@ const resetContext = () => {
   context.rowPos = [];
   context.highlighted = [];
   context.putRowIds = [];
-  context.undoStack = [];
+  // context.undoStack = [];
   context.summary = [];
   context.errorList = {};
   context.errors = [];
@@ -159,17 +163,30 @@ const DataSheetView = ({jobId, onIngest}) => {
   const [job, setJob] = useState({});
   const [gridApi, setGridApi] = useState(null);
   const [isFiltered, setIsFiltered] = useState(false);
+  const [undoSize, setUndoSize] = useState(0);
   const [state, setState] = useState(IngestState.Loading);
   const [sideBar, setSideBar] = useState(defaultSideBar);
+
+  useEffect(() => {
+    const undoKeyboardHandler = (event) => {
+      if (event.ctrlKey && event.key === 'z') {
+        event.preventDefault();
+        event.stopPropagation();
+        onUndo({api: gridApi});
+      }
+    };
+    document.body.addEventListener('keydown', undoKeyboardHandler);
+    return () => {
+      document.body.removeEventListener('keydown', undoKeyboardHandler);
+    };
+  });
 
   useEffect(() => {
     if (gridApi && state === IngestState.Loading) {
       // HACK: workaround ag-grid bug preventing consistent column auto-sizing. See https://github.com/ag-grid/ag-grid/issues/2662.
       // AG Grid version 26 has a 'pure' React grid implementation should remove the need for these imperative calls entirely:
       // https://blog.ag-grid.com/whats-new-in-ag-grid-26/
-      setTimeout(() => {
-        gridApi.showLoadingOverlay();
-      }, 25);
+      setTimeout(() => gridApi.showLoadingOverlay(), 25);
     }
   }, [gridApi, state]);
 
@@ -296,7 +313,7 @@ const DataSheetView = ({jobId, onIngest}) => {
         });
       oldRows.push(oldRow);
     });
-    ctx.pushUndo(e.api, [...oldRows]);
+    setUndoSize(ctx.pushUndo(e.api, [...oldRows]));
     ctx.pendingPasteUndo = [];
   };
 
@@ -336,7 +353,7 @@ const DataSheetView = ({jobId, onIngest}) => {
       delete newData.errors;
       newData.pos = posMap[currentPosIdx + 1] ? posMap[currentPosIdx + 1] - 1 : posMap[currentPosIdx] + 1000;
       newData.id = newId;
-      pushUndo(e.api, [{id: newId}]);
+      setUndoSize(pushUndo(e.api, [{id: newId}]));
       rowData.push(newData);
       e.api.setRowData(rowData);
       e.context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
@@ -397,7 +414,7 @@ const DataSheetView = ({jobId, onIngest}) => {
       });
       rowData[dataIdx] = newData;
     }
-    pushUndo(e.api, delta);
+    setUndoSize(pushUndo(e.api, delta));
     e.api.setRowData(rowData);
   };
 
@@ -409,7 +426,8 @@ const DataSheetView = ({jobId, onIngest}) => {
   };
 
   const onUndo = (e) => {
-    popUndo(e.api);
+    if (undoSize < 1) return;
+    setUndoSize(popUndo(e.api));
     e.api.refreshCells();
   };
 
@@ -417,7 +435,7 @@ const DataSheetView = ({jobId, onIngest}) => {
     if (e.oldValue === e.newValue) return;
     const row = {...e.data};
     row[e.column.colId] = e.oldValue;
-    pushUndo(e.api, [row]);
+    setUndoSize(pushUndo(e.api, [row]));
     setState(IngestState.Edited);
   };
 
@@ -434,10 +452,6 @@ const DataSheetView = ({jobId, onIngest}) => {
       }
       if (e.event.key === 'x' && e.event.type === 'keydown') {
         onCutRegion(e);
-        return true;
-      }
-      if (e.event.key === 'z' && e.event.type === 'keydown') {
-        onUndo(e);
         return true;
       }
       return false;
@@ -543,7 +557,7 @@ const DataSheetView = ({jobId, onIngest}) => {
   };
 
   const rowValueGetter = (params) => {
-    return params.context.rowPos.indexOf(params.data.pos) + 1;
+    return params.context.rowPos ? params.context.rowPos.indexOf(params.data.pos) + 1 : 0;
   };
 
   const deleteRow = (e) => {
@@ -573,7 +587,7 @@ const DataSheetView = ({jobId, onIngest}) => {
         rowData.splice(rowData.indexOf(data), 1);
       }
     }
-    pushUndo(e.api, delta);
+    setUndoSize(pushUndo(e.api, delta));
     e.api.setRowData(rowData);
     e.context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
     e.api.refreshCells();
@@ -651,17 +665,22 @@ const DataSheetView = ({jobId, onIngest}) => {
                 job.reference
               } `}</Typography>
             </Box>
-            <Box m={2} mt={1}>
-              <Button disabled={!isFiltered} onClick={() => setIsFiltered()}>
+            <Box m={1} ml={0}>
+              <Button disabled={undoSize < 1} startIcon={<UndoIcon />} onClick={() => onUndo({api: gridApi})}>
+                Undo
+              </Button>
+            </Box>
+            <Box m={1} ml={0}>
+              <Button startIcon={<ResetIcon />} disabled={!isFiltered} onClick={() => setIsFiltered()}>
                 Reset Filter
               </Button>
             </Box>
-            <Box p={1}>
+            <Box m={1} ml={0}>
               <Button
                 onClick={() => gridApi.exportDataAsExcel({sheetName: 'DATA', author: 'NRMN', fileName: `export_${job.reference}`})}
                 startIcon={<CloudDownloadIcon />}
               >
-                Export to Excel
+                Export
               </Button>
             </Box>
             <Box p={1}>
