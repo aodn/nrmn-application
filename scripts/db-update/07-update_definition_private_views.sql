@@ -154,6 +154,7 @@ from invert_sized m2
 
 
 /* Endpoint "M0 off transect sightings" #173 */
+drop view if exists  nrmn.ep_m0_off_transect_sighting cascade;
 create or replace view nrmn.ep_m0_off_transect_sighting as
 select
 	sm.survey_id,
@@ -175,7 +176,7 @@ select
 	sur.survey_latitude,
 	sur.survey_longitude,
 	div.full_name as diver,
-	sm.method_id as "method",
+	sm.method_id "method",
 	sm.block_num as block,
 	oi.phylum,
 	oi."class",
@@ -185,13 +186,27 @@ select
 	coalesce(oi.superseded_by, oi.observable_item_name) as species_name,
 	oi.taxon,
 	oi.reporting_name,
-	sum(obs.measure_value) as total
+	case
+		when meas.measure_name in ('Unsized', 'Item', 'No specimen found') then 0
+		else (replace(meas.measure_name, 'cm', ''))::numeric
+	end size_class,
+	sum(obs.measure_value) as total,
+	sum(
+		nrmn.obs_biomass(
+			oi.a,
+			oi.b,
+			oi.cf, (
+			case when meas.measure_name ~ 'cm$' then replace(meas.measure_name, 'cm', '') else '0' end )::float,
+			(obs.measure_value)::int,true
+		)
+	) as biomass
 from nrmn.observation obs
 	inner join nrmn.survey_method sm on sm.survey_method_id = obs.survey_method_id
 	inner join nrmn.ep_survey_list sur on sur.survey_id = sm.survey_id
 	inner join nrmn.ep_site_list sit on sit.site_code = sur.site_code
 	inner join nrmn.diver_ref div ON div.diver_id = obs.diver_id
 	inner join nrmn.ep_observable_items oi on oi.observable_item_id = obs.observable_item_id
+	inner join nrmn.measure_ref meas ON meas.measure_id = obs.measure_id
 where sm.method_id = 0
 group by sm.survey_id,
 	sur.country,
@@ -221,9 +236,14 @@ group by sm.survey_id,
 	oi.observable_item_name,
 	coalesce(oi.superseded_by, oi.observable_item_name) ,
 	oi.taxon,
-	oi.reporting_name;
+	oi.reporting_name,
+	case
+		when meas.measure_name in ('Unsized', 'Item', 'No specimen found') then 0
+		else (replace(meas.measure_name, 'cm', ''))::numeric
+	end;
 
 /* Endpoint "M3 in-situ quadrats" #175 */
+drop view if exists nrmn.ep_m3_isq cascade;
 create or replace view nrmn.ep_m3_isq as
 select
 	sm.survey_id,
@@ -254,7 +274,7 @@ select
 	oi.taxon,
 	oi.reporting_name,
 	oi.report_group,
-    oi.habitat_groups,
+	oi.habitat_groups,
 	mr.measure_name quadrat,
 	sum(obs.measure_value) as total
 from nrmn.observation obs
@@ -284,7 +304,6 @@ group by sm.survey_id,
 	sur.survey_latitude,
 	sur.survey_longitude,
 	div.full_name,
-	mr.measure_name,
 	oi.phylum,
 	oi.class,
 	oi."order",
@@ -292,8 +311,10 @@ group by sm.survey_id,
 	oi.observable_item_name,
 	coalesce(oi.superseded_by, oi.observable_item_name),
 	oi.taxon,
-	oi.reporting_name;
-
+	oi.reporting_name,
+	oi.report_group,
+	oi.habitat_groups,
+	mr.measure_name;
 
 /* Endpoint: species survey #185 */
 create or replace view nrmn.ep_species_survey as
