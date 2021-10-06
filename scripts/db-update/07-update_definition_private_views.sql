@@ -253,6 +253,8 @@ select
 	coalesce(oi.superseded_by, oi.observable_item_name) as species_name,
 	oi.taxon,
 	oi.reporting_name,
+	oi.report_group,
+    oi.habitat_groups,
 	mr.measure_name quadrat,
 	sum(obs.measure_value) as total
 from nrmn.observation obs
