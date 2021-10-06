@@ -1,4 +1,5 @@
 /* Endpoint "M2 Inverts" #171 */
+DROP MATERIALIZED VIEW nrmn.ep_m2_inverts CASCADE;
 create materialized view nrmn.ep_m2_inverts as
 with fish_classes as (
 	select case
