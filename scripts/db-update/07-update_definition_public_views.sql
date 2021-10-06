@@ -292,6 +292,8 @@ SELECT
 	family,
 	species_name,
 	reporting_name,
+	report_group,
+	habitat_groups,
 	quadrat,
 	total
 FROM nrmn.ep_m3_isq epm3
@@ -317,8 +319,8 @@ SELECT
 	location,
 	site_code,
 	site_name,
-        round(latitude::numeric, 2) AS latitude,
-        round(longitude::numeric, 2) AS longitude,
+    round(latitude::numeric, 2) AS latitude,
+    round(longitude::numeric, 2) AS longitude,
 	survey_date,
 	depth,
 	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
@@ -331,8 +333,8 @@ SELECT
 	category,
 	major_category,
 	num_points,
-        total_points,
-        percent_cover
+    total_points,
+    percent_cover
 FROM nrmn.ep_m13_pq_scores epm13
 WHERE category <> 'Tape'
 AND epm13.survey_id NOT IN (
