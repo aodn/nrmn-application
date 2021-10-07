@@ -245,6 +245,7 @@ SELECT
 	hour,
 	round(survey_latitude::numeric, 2) AS survey_latitude,
 	round(survey_longitude::numeric, 2) AS survey_longitude,
+	"method",
     "block",
 	phylum,
 	"class",
@@ -252,7 +253,9 @@ SELECT
 	family,
 	species_name,
 	reporting_name,
-    total
+    size_class,
+    total,
+    biomass
 FROM nrmn.ep_m0_off_transect_sighting epm0
 WHERE epm0.survey_id NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
