@@ -318,6 +318,7 @@ group by sm.survey_id,
 	mr.measure_name;
 
 /* Endpoint: species survey #185 */
+drop view if exists nrmn.ep_species_survey;
 create or replace view nrmn.ep_species_survey as
 select obs.observable_item_id as species_id
 	  ,sur.survey_id
@@ -337,6 +338,7 @@ where oi.obs_item_type_name in ('Species', 'Undescribed Species');
 
 
 /*endpoint: species survey observation #186*/
+drop view if exists nrmn.ep_species_survey_observation;
 create or replace view nrmn.ep_species_survey_observation as
 select
 	oi.observable_item_id species_id
