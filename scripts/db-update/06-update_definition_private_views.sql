@@ -83,7 +83,6 @@ and (
 	or (phylum = 'Chordata' and oi.family = 'Pyuridae')
 	or (oi.observable_item_name = 'No species found')
 )
-
 group by sm.survey_id,
 	sur.country,
 	sur.area,
