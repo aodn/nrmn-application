@@ -66,9 +66,9 @@ public class SiteController {
     }
 
     @GetMapping("/sitesAroundLocation")
-    List<String> getSiteAroundLocation(@RequestParam(required = false) String exclude, @RequestParam(required = true) String latitude, @RequestParam(required = true) String longitude )
+    List<String> getSiteAroundLocation(@RequestParam(required = false) Integer exclude, @RequestParam(required = true) String latitude, @RequestParam(required = true) String longitude )
     {
-        return siteRepository.sitesWithin200m(exclude != null ? exclude : "", Double.parseDouble(longitude), Double.parseDouble(latitude));
+        return siteRepository.sitesWithin200m(exclude != null ? exclude : -1, Double.parseDouble(longitude), Double.parseDouble(latitude));
     }
 
     @GetMapping(path = "/siteCodes")

@@ -1,44 +1,69 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useReducer, useState} from 'react';
 import {useParams, NavLink, Redirect} from 'react-router-dom';
-import config from 'react-global-configuration';
-import Form from '@rjsf/material-ui';
 import {Box, Button, CircularProgress, Grid, Typography} from '@material-ui/core';
 import {Save} from '@material-ui/icons';
 import Alert from '@material-ui/lab/Alert';
 import PropTypes from 'prop-types';
 
-import LoadingBanner from '../layout/loadingBanner';
 import EntityContainer from '../containers/EntityContainer';
 
 import CustomTextInput from '../input/CustomTextInput';
-import CustomArrayInput from '../input/CustomArrayInput';
-import CustomNumberInput from '../input/CustomNumberInput';
 import CustomDropDownInput from '../input/CustomDropDownInput';
 import CustomAutoCompleteInput from '../input/CustomAutoCompleteInput';
 
-import SiteAddTemplate from '../templates/SiteAddTemplate';
-import SiteEditTemplate from '../templates/SiteEditTemplate';
-import {getResult, entityEdit, entitySave} from '../../axios/api';
+import {getResult, getSiteEdit, entityEdit, entitySave} from '../../axios/api';
+
+const numericOptions = [
+  {id: 1, label: '1'},
+  {id: 2, label: '2'},
+  {id: 3, label: '3'},
+  {id: 4, label: '4'}
+];
 
 const SiteEdit = ({clone}) => {
-  const params = useParams();
+  const siteId = useParams()?.id;
 
-  const schemaDefinition = config.get('api') || {};
-
-  const [formData, setFormData] = useState({});
   const [saved, setSaved] = useState(false);
   const [errors, setErrors] = useState([]);
+  const [options, setOptions] = useState({});
 
-  const edit = !clone && typeof params.id !== 'undefined';
+  const [checkCoords, setCheckCoords] = useState();
+  const [coordWarning, setCoordWarning] = useState();
+
+  const edit = !clone && typeof siteId !== 'undefined';
+
+  const formReducer = (state, action) => {
+    if (action.form) return {...state, ...action.form};
+    switch (action.field) {
+      default:
+        return {...state, [action.field]: action.value};
+    }
+  };
+
+  const [site, dispatch] = useReducer(formReducer, {});
+
+  useEffect(() => getSiteEdit().then((options) => setOptions(options)), []);
 
   useEffect(() => {
-    if (params.id !== undefined) getResult(`sites/${params.id}`).then((res) => setFormData(res.data));
-  }, [params.id, saved]);
+    if (siteId) getResult(`sites/${siteId}`).then((res) => dispatch({form: res.data}));
+  }, [siteId]);
+
+  const latLongBlur = () => {
+    if (site.latitude && site.longitude) {
+      setCheckCoords({latitude: site.latitude, longitude: site.longitude});
+    }
+  };
+
+  useEffect(() => {
+    if (checkCoords) {
+      const query = `sitesAroundLocation?latitude=${site.latitude}&longitude=${site.longitude}` + (siteId ? `&exclude=${siteId}` : '');
+      getResult(query).then((res) => setCoordWarning(res?.data?.join(', ')));
+    }
+  }, [checkCoords, site.latitude, site.longitude, siteId]);
 
   const handleSubmit = (e) => {
     if (edit) {
-      entityEdit(`sites/${params.id}`, e.formData).then((res) => {
-        setFormData(e.formData);
+      entityEdit(`sites/${siteId}`, site).then((res) => {
         if (res.data.siteId) {
           setSaved(res.data);
         } else {
@@ -48,7 +73,7 @@ const SiteEdit = ({clone}) => {
     } else {
       delete e.formData.siteAttribute;
       entitySave(`sites`, e.formData).then((res) => {
-        setFormData(e.formData);
+        dispatch({form: e.formData});
         if (res.data.siteId) {
           setSaved(res.data);
         } else {
@@ -59,63 +84,13 @@ const SiteEdit = ({clone}) => {
   };
 
   const title = (edit === true ? 'Edit ' : clone === true ? 'Clone ' : 'New ') + 'Site';
-  const entityDef = {...schemaDefinition['SiteGetDto']};
-  const entitySchema = {title: title, ...entityDef};
-  const JSSchema = {components: {schemas: schemaDefinition}, ...entitySchema};
-
-  const uiSchema = {};
-  for (const key in entitySchema.properties) {
-    const item = entitySchema.properties[key];
-    if (key === 'mpa') {
-      uiSchema[key] = {'ui:field': 'autostring', route: 'marineProtectedAreas'};
-    } else if (key === 'protectionStatus') {
-      uiSchema[key] = {'ui:field': 'autostring', route: 'protectionStatuses'};
-    } else if (key === 'locationId') {
-      uiSchema[key] = {
-        'ui:field': 'dropdown',
-        route: 'locations?projection=selection',
-        entity: 'location',
-        entityList: 'locations',
-        idKey: 'locationId',
-        valueKey: 'locationName'
-      };
-    } else if (key === 'relief' || key === 'slope' || key === 'waveExposure' || key === 'currents') {
-      uiSchema[key] = {
-        'ui:field': 'dropdown',
-        entity: key,
-        optional: true,
-        values: [
-          {id: 1, label: '1'},
-          {id: 2, label: '2'},
-          {id: 3, label: '3'},
-          {id: 4, label: '4'}
-        ]
-      };
-    } else if (key === 'oldSiteCodes') {
-      uiSchema[key] = {'ui:field': 'array'};
-    } else {
-      uiSchema[key] = {'ui:field': 'string', 'ui:readonly': item.readOnly ?? false};
-    }
-  }
-
-  const fields = {
-    string: CustomTextInput,
-    array: CustomArrayInput,
-    double: CustomNumberInput,
-    dropdown: CustomDropDownInput,
-    autostring: CustomAutoCompleteInput
-  };
 
   if (saved) {
     const id = saved['siteId'];
     return <Redirect to={`/reference/site/${id}/${edit ? 'saved' : 'new'}`} />;
   }
 
-  return params.id && Object.keys(formData).length === 0 ? (
-    <Grid container direction="row" justify="flex-start" alignItems="center">
-      <LoadingBanner variant="h5" msg="Loading Site.." />
-    </Grid>
-  ) : (
+  return (
     <EntityContainer name="Sites" goBackTo="/reference/sites">
       <Grid container alignItems="flex-start" direction="row">
         <Grid item xs={10}>
@@ -125,7 +100,7 @@ const SiteEdit = ({clone}) => {
         </Grid>
       </Grid>
       <Grid container direction="column" justify="flex-start" alignItems="center">
-        {params.loading ? (
+        {siteId && Object.keys(site).length === 0 ? (
           <CircularProgress size={20} />
         ) : (
           <Box pt={2} pb={6} padding={2} width="90%">
@@ -136,32 +111,116 @@ const SiteEdit = ({clone}) => {
                 </Alert>
               </Box>
             ) : null}
-            <Form
-              onError={params.onError}
-              schema={JSSchema}
-              uiSchema={uiSchema}
-              onSubmit={handleSubmit}
-              showErrorList={false}
-              fields={fields}
-              noValidate
-              formData={formData}
-              formContext={errors}
-              ObjectFieldTemplate={edit ? SiteEditTemplate : SiteAddTemplate}
-            >
-              <Box display="flex" justifyContent="center" mt={5}>
-                <Button disabled={params.loading} component={NavLink} to="/reference/sites">
-                  Cancel
-                </Button>
-                <Button
-                  style={{width: '50%', marginLeft: '5%', marginRight: '20%'}}
-                  type="submit"
-                  startIcon={<Save></Save>}
-                  disabled={params.loading}
-                >
-                  Save Site
-                </Button>
-              </Box>
-            </Form>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <CustomTextInput label="Site Code" formData={site.siteCode} onChange={(t) => dispatch({field: 'siteCode', value: t})} />
+              </Grid>
+              <Grid item xs={6}>
+                <CustomTextInput label="Site Name" formData={site.siteName} onChange={(t) => dispatch({field: 'siteName', value: t})} />
+              </Grid>
+              <Grid item xs={6}>
+                <CustomDropDownInput
+                  label="Locations"
+                  options={options.locations}
+                  formData={site.locationId}
+                  onChange={(t) => dispatch({field: 'locationId', value: t})}
+                />
+              </Grid>
+            </Grid>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <CustomTextInput label="State" formData={site.state} onChange={(t) => dispatch({field: 'state', value: t})} />
+              </Grid>
+              <Grid item xs={6}>
+                <CustomTextInput label="Country" formData={site.country} onChange={(t) => dispatch({field: 'country', value: t})} />
+              </Grid>
+              <Grid item xs={6}>
+                <CustomTextInput
+                  label="Latitude"
+                  type="number"
+                  formData={site.latitude}
+                  onBlur={latLongBlur}
+                  onChange={(t) => dispatch({field: 'latitude', value: t})}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <CustomTextInput
+                  label="Longitude"
+                  type="number"
+                  formData={site.longitude}
+                  onBlur={latLongBlur}
+                  onChange={(t) => dispatch({field: 'longitude', value: t})}
+                />
+              </Grid>
+              {coordWarning && (
+                <Grid item xs={12}>
+                  <Alert severity="warning">Warning: Within 200M of {coordWarning}.</Alert>
+                </Grid>
+              )}
+              <Grid item xs={6}>
+                <CustomAutoCompleteInput
+                  label="Marine Protected Area"
+                  options={options.marineProtectedAreas}
+                  formData={site.mpa}
+                  onChange={(t) => dispatch({field: 'mpa', value: t})}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <CustomAutoCompleteInput
+                  label="Protection Status"
+                  options={options.protectionStatuses}
+                  formData={site.protectionStatus}
+                  onChange={(t) => dispatch({field: 'protectionStatus', value: t})}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <CustomDropDownInput
+                  label="Relief"
+                  options={numericOptions}
+                  formData={site.relief}
+                  onChange={(t) => dispatch({field: 'relief', value: t})}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <CustomDropDownInput
+                  label="Slope"
+                  options={numericOptions}
+                  formData={site.slope}
+                  onChange={(t) => dispatch({field: 'slope', value: t})}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <CustomDropDownInput
+                  label="Wave Exposure"
+                  options={numericOptions}
+                  formData={site.waveExposure}
+                  onChange={(t) => dispatch({field: 'waveExposure', value: t})}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <CustomDropDownInput
+                  label="Currents"
+                  options={numericOptions}
+                  formData={site.currents}
+                  onChange={(t) => dispatch({field: 'currents', value: t})}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <CustomTextInput
+                  label="Old Site Codes"
+                  formData={site.oldSiteCodes}
+                  onChange={(t) => dispatch({field: 'oldSiteCodes', value: t})}
+                />
+              </Grid>
+            </Grid>
+            <Box display="flex" justifyContent="center" mt={5}>
+              <Button component={NavLink} to="/reference/sites">
+                Cancel
+              </Button>
+              <Button style={{width: '50%', marginLeft: '5%', marginRight: '20%'}} onClick={handleSubmit} startIcon={<Save></Save>}>
+                Save Site
+              </Button>
+            </Box>
           </Box>
         )}
       </Grid>

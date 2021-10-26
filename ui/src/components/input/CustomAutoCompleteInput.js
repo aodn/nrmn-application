@@ -1,19 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {CircularProgress, TextField, Typography} from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import {PropTypes} from 'prop-types';
-import {getResult} from '../../axios/api';
 
-const CustomAutoCompleteInput = ({schema, uiSchema, onChange, formData, error}) => {
-  const [options, setOptions] = useState([]);
-
-  useEffect(() => {
-    getResult(uiSchema.route).then((res) => setOptions(res.data._embedded[uiSchema.route].map((d) => d.name)));
-  }, [uiSchema.route]);
-
+const CustomAutoCompleteInput = ({label, options, onChange, formData, error}) => {
   return options ? (
     <>
-      <Typography variant="subtitle2">{schema.title}</Typography>
+      <Typography variant="subtitle2">{label}</Typography>
       <Autocomplete
         options={options}
         freeSolo
@@ -24,18 +17,18 @@ const CustomAutoCompleteInput = ({schema, uiSchema, onChange, formData, error}) 
     </>
   ) : (
     <>
-      <Typography variant="subtitle2">{schema.title}</Typography>
+      <Typography variant="subtitle2">{label}</Typography>
       <CircularProgress size={30} />
     </>
   );
 };
 
 CustomAutoCompleteInput.propTypes = {
+  label: PropTypes.string,
   onChange: PropTypes.func,
   error: PropTypes.object,
   formData: PropTypes.string,
-  uiSchema: PropTypes.object,
-  schema: PropTypes.object
+  options: PropTypes.array
 };
 
 export default CustomAutoCompleteInput;
