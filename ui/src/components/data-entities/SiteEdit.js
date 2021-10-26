@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 
 import EntityContainer from '../containers/EntityContainer';
 
+import CustomArrayInput from '../input/CustomArrayInput';
 import CustomTextInput from '../input/CustomTextInput';
 import CustomDropDownInput from '../input/CustomDropDownInput';
 import CustomAutoCompleteInput from '../input/CustomAutoCompleteInput';
@@ -45,8 +46,15 @@ const SiteEdit = ({clone}) => {
   useEffect(() => getSiteEdit().then((options) => setOptions(options)), []);
 
   useEffect(() => {
-    if (siteId) getResult(`sites/${siteId}`).then((res) => dispatch({form: res.data}));
-  }, [siteId]);
+    if (siteId)
+      getResult(`sites/${siteId}`).then((res) => {
+        if (clone) {
+          delete res.data.siteAttribute;
+          delete res.data.siteId;
+        }
+        dispatch({form: res.data});
+      });
+  }, [siteId, clone, edit]);
 
   const latLongBlur = () => {
     if (site.latitude && site.longitude) {
@@ -55,13 +63,13 @@ const SiteEdit = ({clone}) => {
   };
 
   useEffect(() => {
-    if (checkCoords) {
-      const query = `sitesAroundLocation?latitude=${site.latitude}&longitude=${site.longitude}` + (siteId ? `&exclude=${siteId}` : '');
+    if (checkCoords && !isNaN(parseFloat(site.latitude)) && !isNaN(parseFloat(site.longitude))) {
+      const query = `sitesAroundLocation?latitude=${site.latitude}&longitude=${site.longitude}` + (edit ? `&exclude=${siteId}` : '');
       getResult(query).then((res) => setCoordWarning(res?.data?.join(', ')));
     }
-  }, [checkCoords, site.latitude, site.longitude, siteId]);
+  }, [checkCoords, site.latitude, site.longitude, siteId, edit]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = () => {
     if (edit) {
       entityEdit(`sites/${siteId}`, site).then((res) => {
         if (res.data.siteId) {
@@ -71,9 +79,7 @@ const SiteEdit = ({clone}) => {
         }
       });
     } else {
-      delete e.formData.siteAttribute;
-      entitySave(`sites`, e.formData).then((res) => {
-        dispatch({form: e.formData});
+      entitySave(`sites`, site).then((res) => {
         if (res.data.siteId) {
           setSaved(res.data);
         } else {
@@ -113,14 +119,28 @@ const SiteEdit = ({clone}) => {
             ) : null}
             <Grid container spacing={2}>
               <Grid item xs={6}>
-                <CustomTextInput label="Site Code" formData={site.siteCode} onChange={(t) => dispatch({field: 'siteCode', value: t})} />
+                <CustomTextInput
+                  label="Site Code"
+                  formData={site.siteCode}
+                  field="siteCode"
+                  errors={errors}
+                  onChange={(t) => dispatch({field: 'siteCode', value: t})}
+                />
               </Grid>
               <Grid item xs={6}>
-                <CustomTextInput label="Site Name" formData={site.siteName} onChange={(t) => dispatch({field: 'siteName', value: t})} />
+                <CustomTextInput
+                  label="Site Name"
+                  formData={site.siteName}
+                  field="siteName"
+                  errors={errors}
+                  onChange={(t) => dispatch({field: 'siteName', value: t})}
+                />
               </Grid>
               <Grid item xs={6}>
                 <CustomDropDownInput
-                  label="Locations"
+                  label="Location"
+                  field="locationId"
+                  errors={errors}
                   options={options.locations}
                   formData={site.locationId}
                   onChange={(t) => dispatch({field: 'locationId', value: t})}
@@ -129,10 +149,22 @@ const SiteEdit = ({clone}) => {
             </Grid>
             <Grid container spacing={2}>
               <Grid item xs={6}>
-                <CustomTextInput label="State" formData={site.state} onChange={(t) => dispatch({field: 'state', value: t})} />
+                <CustomTextInput
+                  label="State"
+                  formData={site.state}
+                  field="state"
+                  errors={errors}
+                  onChange={(t) => dispatch({field: 'state', value: t})}
+                />
               </Grid>
               <Grid item xs={6}>
-                <CustomTextInput label="Country" formData={site.country} onChange={(t) => dispatch({field: 'country', value: t})} />
+                <CustomTextInput
+                  label="Country"
+                  formData={site.country}
+                  field="country"
+                  errors={errors}
+                  onChange={(t) => dispatch({field: 'country', value: t})}
+                />
               </Grid>
               <Grid item xs={6}>
                 <CustomTextInput
@@ -140,6 +172,8 @@ const SiteEdit = ({clone}) => {
                   type="number"
                   formData={site.latitude}
                   onBlur={latLongBlur}
+                  field="latitude"
+                  errors={errors}
                   onChange={(t) => dispatch({field: 'latitude', value: t})}
                 />
               </Grid>
@@ -149,6 +183,8 @@ const SiteEdit = ({clone}) => {
                   type="number"
                   formData={site.longitude}
                   onBlur={latLongBlur}
+                  field="longitude"
+                  errors={errors}
                   onChange={(t) => dispatch({field: 'longitude', value: t})}
                 />
               </Grid>
@@ -173,42 +209,50 @@ const SiteEdit = ({clone}) => {
                   onChange={(t) => dispatch({field: 'protectionStatus', value: t})}
                 />
               </Grid>
+              {siteId && (
+                <>
+                  <Grid item xs={6}>
+                    <CustomDropDownInput
+                      label="Relief"
+                      optional
+                      options={numericOptions}
+                      formData={site.relief}
+                      onChange={(t) => dispatch({field: 'relief', value: t})}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <CustomDropDownInput
+                      label="Slope"
+                      optional
+                      options={numericOptions}
+                      formData={site.slope}
+                      onChange={(t) => dispatch({field: 'slope', value: t})}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <CustomDropDownInput
+                      label="Wave Exposure"
+                      optional
+                      options={numericOptions}
+                      formData={site.waveExposure}
+                      onChange={(t) => dispatch({field: 'waveExposure', value: t})}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <CustomDropDownInput
+                      label="Currents"
+                      optional
+                      options={numericOptions}
+                      formData={site.currents}
+                      onChange={(t) => dispatch({field: 'currents', value: t})}
+                    />
+                  </Grid>
+                </>
+              )}
               <Grid item xs={6}>
-                <CustomDropDownInput
-                  label="Relief"
-                  options={numericOptions}
-                  formData={site.relief}
-                  onChange={(t) => dispatch({field: 'relief', value: t})}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <CustomDropDownInput
-                  label="Slope"
-                  options={numericOptions}
-                  formData={site.slope}
-                  onChange={(t) => dispatch({field: 'slope', value: t})}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <CustomDropDownInput
-                  label="Wave Exposure"
-                  options={numericOptions}
-                  formData={site.waveExposure}
-                  onChange={(t) => dispatch({field: 'waveExposure', value: t})}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <CustomDropDownInput
-                  label="Currents"
-                  options={numericOptions}
-                  formData={site.currents}
-                  onChange={(t) => dispatch({field: 'currents', value: t})}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <CustomTextInput
+                <CustomArrayInput
                   label="Old Site Codes"
-                  formData={site.oldSiteCodes}
+                  values={site.oldSiteCodes}
                   onChange={(t) => dispatch({field: 'oldSiteCodes', value: t})}
                 />
               </Grid>

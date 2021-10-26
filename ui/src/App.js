@@ -19,8 +19,6 @@ import JobList from './components/job/JobList';
 import JobView from './components/job/JobView';
 import AppContent from './components/containers/AppContent';
 import DiverTemplate from './components/data-entities/DiverTemplate';
-import SiteEditTemplate from './components/templates/SiteEditTemplate';
-import SiteAddTemplate from './components/templates/SiteAddTemplate';
 import SiteViewTemplate from './components/templates/SiteViewTemplate';
 import LocationList from './components/data-entities/location/LocationList';
 import SurveyList from './components/data-entities/survey/SurveyList';
@@ -78,7 +76,7 @@ const referenceData = [
     endpoint: 'sites',
     route: {base: '/reference/site', view: '/reference/site/:id?/:success?', edit: '/reference/site/:id?/edit'},
     schemaKey: {add: 'SiteGetDto', edit: 'SiteGetDto', view: 'SiteGetDto'},
-    template: {add: SiteAddTemplate, edit: SiteEditTemplate, view: SiteViewTemplate},
+    template: {add: SiteViewTemplate, edit: SiteViewTemplate, view: SiteViewTemplate},
     list: {
       name: 'Sites',
       showNew: true,
@@ -262,6 +260,7 @@ const App = () => {
             <Route exact path="/data/extract" component={ExtractTemplateData} />
             <Route exact path="/data/surveys" component={SurveyList} />
             <Route exact path="/reference/site/:id?/edit" component={SiteEdit} />
+            <Route exact path="/reference/site/:id?/clone" render={() => <SiteEdit clone />} />
             <Route exact path="/reference/site" component={SiteEdit} />
             <Redirect exact from="/list/stagedJob" to="/jobs" />
             {referenceData.map((e) => (

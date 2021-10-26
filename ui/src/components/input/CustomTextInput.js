@@ -2,9 +2,9 @@ import React from 'react';
 import {Box, Grid, TextField, Typography} from '@material-ui/core';
 import {PropTypes} from 'prop-types';
 
-const CustomTextInput = ({name, type, readOnlyInput, readOnlyModify, formData, formContext, onChange, onBlur, label}) => {
+const CustomTextInput = ({field, type, readOnlyInput, readOnlyModify, formData, errors, onChange, onBlur, label}) => {
   const value = typeof formData === 'number' || typeof formData === 'boolean' ? formData.toString() : formData ?? '';
-  const error = formContext ? formContext.find((f) => f.property === name) : null;
+  const error = errors?.find((f) => f.property === field);
 
   const splitField = (value) => {
     const displayValue = value.indexOf('\n') > -1 ? 'block' : 'inherit';
@@ -57,11 +57,10 @@ const CustomTextInput = ({name, type, readOnlyInput, readOnlyModify, formData, f
 };
 
 CustomTextInput.propTypes = {
-  name: PropTypes.string,
-  title: PropTypes.string,
+  field: PropTypes.string,
   type: PropTypes.string,
   formData: PropTypes.string,
-  formContext: PropTypes.array,
+  errors: PropTypes.array,
   onChange: PropTypes.func,
   label: PropTypes.string,
   onBlur: PropTypes.func,

@@ -3,7 +3,9 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import {Typography, CircularProgress, TextField} from '@material-ui/core';
 import {PropTypes} from 'prop-types';
 
-const CustomDropDownInput = ({label, error, optional, options, formData, onChange}) => {
+const CustomDropDownInput = ({label, field, errors, optional, options, formData, onChange}) => {
+  const error = errors?.find((f) => f.property === field);
+
   if (!options || options.length < 1) {
     return (
       <>
@@ -32,7 +34,8 @@ const CustomDropDownInput = ({label, error, optional, options, formData, onChang
 
 CustomDropDownInput.propTypes = {
   label: PropTypes.String,
-  error: PropTypes.object,
+  field: PropTypes.String,
+  errors: PropTypes.array,
   uiSchema: PropTypes.object,
   formData: PropTypes.string,
   onChange: PropTypes.func,
