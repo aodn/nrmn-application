@@ -31,6 +31,7 @@ import LocationTemplate from './components/templates/LocationTemplate';
 import ExtractTemplateData from './components/datasheets/ExtractTemplateData';
 import SurveyViewTemplate from './components/templates/SurveyViewTemplate';
 import SurveyEditTemplate from './components/templates/SurveyEditTemplate';
+import SiteEdit from './components/data-entities/SiteEdit';
 
 const referenceData = [
   {
@@ -260,6 +261,8 @@ const App = () => {
             <Route exact path="/upload" component={JobUpload} />
             <Route exact path="/data/extract" component={ExtractTemplateData} />
             <Route exact path="/data/surveys" component={SurveyList} />
+            <Route exact path="/reference/site/:id?/edit" component={SiteEdit} />
+            <Route exact path="/reference/site" component={SiteEdit} />
             <Redirect exact from="/list/stagedJob" to="/jobs" />
             {referenceData.map((e) => (
               <Route exact key={e.route.base} path={e.route.base} render={() => <EntityEdit entity={e} template={e.template.add} />} />
