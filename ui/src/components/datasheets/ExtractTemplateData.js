@@ -29,7 +29,7 @@ const options = [
   {entity: 'siteProvinces', label: 'MEOW Province'},
   {entity: 'siteStates', label: 'State'},
   {entity: 'siteCodes', label: 'Site Code'},
-  {entity: 'countries', label: 'Country'}
+  {entity: 'siteCountries', label: 'Country'}
 ];
 
 const ExtractTemplateData = () => {

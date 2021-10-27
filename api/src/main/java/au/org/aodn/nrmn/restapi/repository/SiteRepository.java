@@ -53,7 +53,7 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
     @Query(nativeQuery = true, value = "SELECT DISTINCT province FROM {h-schema}ep_site_list where province is not null ORDER BY province")
     List<String> findAllSiteProvinces();
 
-    @Query(nativeQuery = true, value = "SELECT DISTINCT country FROM {h-schema}ep_site_list where country is not null ORDER BY country")
+    @Query(value = "SELECT DISTINCT country FROM Site WHERE country is not null ORDER BY country")
     List<String> findAllCountries();
 
     @Query(nativeQuery = true, value = "" +
