@@ -86,7 +86,9 @@ export const getSiteEdit = () => {
   const locations = axiosInstance.get('/api/locations?projection=selection');
   const marineProtectedAreas = axiosInstance.get('/api/marineProtectedAreas');
   const protectionStatuses = axiosInstance.get('/api/protectionStatuses');
-  return axios.all([locations, marineProtectedAreas, protectionStatuses]).then(
+  const states = axiosInstance.get('/api/siteStates');
+  const countries = axiosInstance.get('/api/siteCountries');
+  return axios.all([locations, marineProtectedAreas, protectionStatuses, states, countries]).then(
     axios.spread((...responses) => {
       const locations =
         responses[0]?.data._embedded.locations.map((l) => {
@@ -94,7 +96,9 @@ export const getSiteEdit = () => {
         }) || [];
       const marineProtectedAreas = responses[1]?.data._embedded.marineProtectedAreas.map((m) => m.name) || [];
       const protectionStatuses = responses[2]?.data._embedded.protectionStatuses.map((m) => m.name) || [];
-      return {locations, marineProtectedAreas, protectionStatuses};
+      const states = responses[3]?.data || [];
+      const countries = responses[4]?.data || [];
+      return {locations, marineProtectedAreas, protectionStatuses, states, countries};
     })
   );
 };

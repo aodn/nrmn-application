@@ -87,7 +87,7 @@ public class SiteController {
         return ResponseEntity.ok(siteRepository.findAllSiteProvinces());
     }
 
-    @GetMapping(path = "/countries")
+    @GetMapping(path = "/siteCountries")
     public ResponseEntity<List<String>> getAllCountries() {
         return ResponseEntity.ok(siteRepository.findAllCountries());
     }

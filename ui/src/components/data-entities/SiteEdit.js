@@ -149,8 +149,9 @@ const SiteEdit = ({clone}) => {
             </Grid>
             <Grid container spacing={2}>
               <Grid item xs={6}>
-                <CustomTextInput
+                <CustomAutoCompleteInput
                   label="State"
+                  options={options.states}
                   formData={site.state}
                   field="state"
                   errors={errors}
@@ -158,8 +159,9 @@ const SiteEdit = ({clone}) => {
                 />
               </Grid>
               <Grid item xs={6}>
-                <CustomTextInput
+                <CustomAutoCompleteInput
                   label="Country"
+                  options={options.countries}
                   formData={site.country}
                   field="country"
                   errors={errors}

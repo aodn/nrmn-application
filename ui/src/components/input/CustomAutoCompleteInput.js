@@ -3,7 +3,9 @@ import {CircularProgress, TextField, Typography} from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import {PropTypes} from 'prop-types';
 
-const CustomAutoCompleteInput = ({label, options, onChange, formData, error}) => {
+const CustomAutoCompleteInput = ({label, field, options, onChange, formData, errors}) => {
+  const error = errors?.find((f) => f.property === field);
+
   return options ? (
     <>
       <Typography variant="subtitle2">{label}</Typography>
@@ -25,8 +27,9 @@ const CustomAutoCompleteInput = ({label, options, onChange, formData, error}) =>
 
 CustomAutoCompleteInput.propTypes = {
   label: PropTypes.string,
+  field: PropTypes.string,
   onChange: PropTypes.func,
-  error: PropTypes.object,
+  errors: PropTypes.array,
   formData: PropTypes.string,
   options: PropTypes.array
 };
