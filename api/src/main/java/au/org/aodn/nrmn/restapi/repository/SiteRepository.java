@@ -57,14 +57,11 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
     List<String> findAllCountries();
 
     @Query(nativeQuery = true, value = "" +
-            "SELECT '(' || sr.site_name || ' ' || ROUND(CAST(ST_Distance(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography)) AS numeric), 2) || 'm)' " +
+            "SELECT sr.site_code || ' ' || '(' || sr.site_name || ' ' || ROUND(CAST(ST_Distance(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography)) AS numeric), 2) || 'm)' " +
             "FROM nrmn.site_ref sr " +
             "WHERE ST_DWithin(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography), 200) " +
-            "AND (:siteCode IS NULL OR sr.site_code <> :siteCode)")
-    List<String> sitesWithin200m(
-            @Param("siteCode") String siteCode,
-            @Param("longitude") double longitude,
-            @Param("latitude") double latitude);
+            "AND (sr.site_id <> :siteId)")
+    List<String> sitesWithin200m(Integer siteId, double longitude, double latitude);
 
     <T> Optional<T> findBySiteId(Integer id, Class<T> type);
 }

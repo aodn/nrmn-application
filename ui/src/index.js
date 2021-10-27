@@ -9,11 +9,11 @@ import './index.css';
 
 window.setApplicationError = (message, error) => {
   if (message) {
-    document.write(`<h1>National Reef Monitoring Network</h1>`);
-    document.write(`<p>The server may be experiencing problems. Please wait a moment and try again.<br>`);
-    document.write(`If this problem persists, please contact info@aodn.org.au.</p>`);
-    document.write(`<b>Error: ${message}</b><br>`);
-    document.write('<hr><small>');
+    document.write(`<h1>National Reef Monitoring Network</h1> 
+    <p>The server may be experiencing problems. Please wait a moment and try again.<br>
+    If this problem persists, please contact info@aodn.org.au.</p>
+    <b>Error: ${message}</b><br>
+    <hr><small>`);
     document.write(JSON.stringify(error));
   }
 };

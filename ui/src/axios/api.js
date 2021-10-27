@@ -82,6 +82,23 @@ export const getFullJob = (id) => {
     });
 };
 
+export const getSiteEdit = () => {
+  const locations = axiosInstance.get('/api/locations?projection=selection');
+  const marineProtectedAreas = axiosInstance.get('/api/marineProtectedAreas');
+  const protectionStatuses = axiosInstance.get('/api/protectionStatuses');
+  return axios.all([locations, marineProtectedAreas, protectionStatuses]).then(
+    axios.spread((...responses) => {
+      const locations =
+        responses[0]?.data._embedded.locations.map((l) => {
+          return {id: l.locationId, label: l.locationName};
+        }) || [];
+      const marineProtectedAreas = responses[1]?.data._embedded.marineProtectedAreas.map((m) => m.name) || [];
+      const protectionStatuses = responses[2]?.data._embedded.protectionStatuses.map((m) => m.name) || [];
+      return {locations, marineProtectedAreas, protectionStatuses};
+    })
+  );
+};
+
 export const deleteJob = (jobId) => {
   return axiosInstance.delete('/api/stage/delete/' + jobId);
 };

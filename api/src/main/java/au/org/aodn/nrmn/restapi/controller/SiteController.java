@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -62,6 +63,12 @@ public class SiteController {
     @GetMapping("/sites")
     List<Site> findAll() {
         return siteRepository.findAll();
+    }
+
+    @GetMapping("/sitesAroundLocation")
+    List<String> getSiteAroundLocation(@RequestParam(required = false) Integer exclude, @RequestParam(required = true) String latitude, @RequestParam(required = true) String longitude )
+    {
+        return siteRepository.sitesWithin200m(exclude != null ? exclude : -1, Double.parseDouble(longitude), Double.parseDouble(latitude));
     }
 
     @GetMapping(path = "/siteCodes")
