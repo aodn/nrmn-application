@@ -113,6 +113,6 @@ class RLSMethodBlockAssociationIT {
         stagedRowRepo.saveAll(Arrays.asList(m1b1, m1b2, m2b1));
 
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey ERZ1/11/09/2020/7 M2 missing B2")));
+        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7 M2 missing B2")));
     }
 }
