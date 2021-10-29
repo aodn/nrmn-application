@@ -78,7 +78,7 @@ class RLSMethodCheckIT {
         stagedRowRepo.saveAll(Arrays.asList(m1b1, m2b1, m2b2, m1b1d8, m2b1d8));
 
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey ERZ1/11/09/2020/7")));
+        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7")));
     }
 
 
@@ -150,6 +150,6 @@ class RLSMethodCheckIT {
         stagedRowRepo.saveAll(Arrays.asList(m1b1, m1b1d10, m1b1d8));
 
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey ERZ1/11/09/2020/7 Missing M2")));
+        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7 Missing M2")));
     }
 }
