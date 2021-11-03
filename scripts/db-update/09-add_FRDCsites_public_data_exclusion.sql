@@ -1,0 +1,36 @@
+WITH stg1 AS (
+select 2 as program_id,site_id from nrmn.site_ref where site_code in (
+'ADV',
+'LPN',
+'RR',
+'SBIR02',
+'SBIR06',
+'SBIR07',
+'SBIR09',
+'SBIR13',
+'SBIR14',
+'SBIR15',
+'SBIR16',
+'SBIR17',
+'SBIR18N',
+'SBIR18S',
+'SBIR19',
+'SBIR20',
+'SBIR21',
+'SBIR22',
+'SBIR23',
+'SBIR24',
+'SBIR26',
+'TAS158',
+'TAS161',
+'TAS162',
+'TAS164',
+'TAS170',
+'TAS173',
+'TAS174',
+'TAS179',
+'TAS185',
+'TAS415'))
+
+INSERT INTO nrmn.public_data_exclusion (program_id,site_id)
+SELECT * FROM stg1
