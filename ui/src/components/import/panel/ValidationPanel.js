@@ -8,16 +8,15 @@ const ValidationPanel = (props) => {
   const summary = context.summary;
   const errorList = context.errorList;
 
-  const handleItemClick = (item, noFilter) => {
+  const handleItemClick = (item) => {
     const rowId = item.row || item.rowIds[0];
-    context.focusedRows = noFilter ? (item.rowIds || [item.row]) : [];
+    context.focusedRows = item.rowIds || [item.row];
     const row = context.rowData.find((r) => r.id === rowId);
     let visible = false;
     props.api.forEachNodeAfterFilter((n) => (visible = n.data.id === row.id || visible));
     if (visible) props.api.ensureNodeVisible(row, 'middle');
     if (item.columnName) props.api.ensureColumnVisible(item.columnName);
     if (item.columnNames) for (const column of item.columnNames) props.api.ensureColumnVisible(column);
-    props.api.setFilterModel(noFilter ? null : {id: {type: 'set',values: item.rowIds.map((id) => id.toString())}});
     props.api.redrawRows();
   };
 
@@ -102,7 +101,7 @@ const ValidationPanel = (props) => {
         <>
           <Box m={2} mt={1}>
             <Typography variant="button">DUPLICATE</Typography>
-            <ValidationSummary data={errorList.duplicate} onItemClick={(item) => handleItemClick(item, true)} />
+            <ValidationSummary data={errorList.duplicate} onItemClick={handleItemClick} />
           </Box>
           <Divider />
         </>
