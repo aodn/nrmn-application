@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
@@ -17,7 +16,6 @@ public class SurveyContentsHandler implements SheetContentsHandler {
 
     private final List<String> header1Required;
     private final List<String> header1Optional;
-    private final List<String> header2Required;
 
     private String error;
     private ParsedSheet result;
@@ -33,10 +31,9 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     List<StagedRow> stagedRows = new ArrayList<>();
     List<String> columnKeys = new ArrayList<>();
 
-    SurveyContentsHandler(List<String> requiredHeaders, List<String> optionalHeaders, List<String> header2Required) {
+    SurveyContentsHandler(List<String> requiredHeaders, List<String> optionalHeaders) {
         this.header1Required = requiredHeaders;
         this.header1Optional = optionalHeaders;
-        this.header2Required = header2Required;
     }
 
     public ParsedSheet getResult() {
@@ -81,16 +78,8 @@ public class SurveyContentsHandler implements SheetContentsHandler {
         } else if(isHeader2Row && columnKeys.size() > 0) {
             // Check that the first 10 columns are blank
             Long invalidColumns = columnKeys.subList(0, 10).stream().filter(k -> header2.get(k) != null).count();
-            if(invalidColumns > 0) {
-                error = "Row 2 is not a blank formatted row.";
-            } else {
-                // Check that the columns between U - BH have the correct header format
-                List<String> foundHeaders = columnKeys.subList(20, 20 + header2Required.size()).stream().map(c -> header2.get(c)).collect(Collectors.toList());
-                List<String> missingHeaders = new ArrayList<String>(header2Required);
-                missingHeaders.removeAll(foundHeaders);
-                if (missingHeaders.size() > 0)
-                    error = "Row 2 missing headers: " + String.join(", ", missingHeaders) + ".";
-            }
+            if(invalidColumns > 0)
+                error = "Cell range A2-G2 is not blank.";
         } else {
             if (rowNum > 1) {
                 currentRow.setMeasureJson(new HashMap<Integer, String>(measureJson));
