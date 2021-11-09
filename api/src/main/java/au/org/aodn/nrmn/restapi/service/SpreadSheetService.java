@@ -38,12 +38,6 @@ public class SpreadSheetService {
     @Value("${app.excel.header1.long.ignore}")
     private List<String> header1LongIgnore;
 
-    @Value("${app.excel.header2.short}")
-    private List<String> header2Short;
-
-    @Value("${app.excel.header2.long}")
-    private List<String> header2Long;
-
     public ParsedSheet stageXlsxFile(MultipartFile file,
             Boolean withExtendedSizes) throws Exception {
 
@@ -56,8 +50,7 @@ public class SpreadSheetService {
 
             SurveyContentsHandler surveyContentsHandler = new SurveyContentsHandler(
                     (withExtendedSizes) ? header1Long : header1Short,
-                    (withExtendedSizes) ? header1LongIgnore : header1ShortIgnore,
-                    (withExtendedSizes) ? header2Long : header2Short);
+                    (withExtendedSizes) ? header1LongIgnore : header1ShortIgnore);
 
             StylesTable styles = xssfReader.getStylesTable();
 
