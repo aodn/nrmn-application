@@ -46,7 +46,6 @@ public class ObservableItemDto {
     private String genus;
 
     @Schema(title = "Species Epithet")
-    @NotNull(message =  "Species Epithet is required.")
     private String speciesEpithet;
 
     @Schema(title = "Letter Code")
