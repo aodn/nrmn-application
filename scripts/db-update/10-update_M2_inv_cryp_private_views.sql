@@ -81,7 +81,7 @@ and (
 	                                     or (oi.class = 'Ophiuroidea' and oi."order" ='Phrynophiurida')))
 	or (oi.phylum = 'Platyhelminthes')
 	or (oi.phylum = 'Cnidaria' and (coalesce(oi.superseded_by, oi.observable_item_name)='Phlyctenactis tuberculosa'))
-	or (oi.phylum = 'Cnidaria' and (oi.class IN ('Hydrozoa','Cubozoa')
+	or (oi.phylum = 'Cnidaria' and (oi.class IN ('Hydrozoa','Cubozoa'))
 	or (phylum = 'Chordata' and oi.family = 'Pyuridae')
 	or (phylum = ' Echiura')
 	or (phylum = 'Ctenophora')
@@ -157,6 +157,7 @@ from invert_sized m2
 	 inner join bounded_fish_classes bfc on m2.size_class > bfc.lower_bound and m2.size_class <= bfc.upper_bound;
 
 	 /* Endpoint "M2 Cryptic Fish" #170 */
+DROP MATERIALIZED VIEW nrmn.ep_m2_inverts CASCADE;
 create materialized view nrmn.ep_m2_cryptic_fish as
 with cte_to_force_joins_evaluated_first as(
 select
