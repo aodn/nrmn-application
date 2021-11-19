@@ -81,7 +81,7 @@ and (
 	                                     or (oi.class = 'Ophiuroidea' and oi."order" ='Phrynophiurida')))
 	or (oi.phylum = 'Platyhelminthes')
 	or (oi.phylum = 'Cnidaria' and (coalesce(oi.superseded_by, oi.observable_item_name)='Phlyctenactis tuberculosa'))
-	or (oi.phylum = 'Cnidaria' and (oi.class IN ('Hydrozoa','Cubozoa'))
+	or (oi.phylum = 'Cnidaria' and (oi.class IN ('Hydrozoa','Cubozoa')))
 	or (phylum = 'Chordata' and oi.family = 'Pyuridae')
 	or (phylum = ' Echiura')
 	or (phylum = 'Ctenophora')
@@ -157,7 +157,7 @@ from invert_sized m2
 	 inner join bounded_fish_classes bfc on m2.size_class > bfc.lower_bound and m2.size_class <= bfc.upper_bound;
 
 	 /* Endpoint "M2 Cryptic Fish" #170 */
-DROP MATERIALIZED VIEW nrmn.ep_m2_inverts CASCADE;
+DROP MATERIALIZED VIEW nrmn.ep_m2_cryptic_fish CASCADE;
 create materialized view nrmn.ep_m2_cryptic_fish as
 with cte_to_force_joins_evaluated_first as(
 select
@@ -252,3 +252,93 @@ group by sm.survey_id,
 	sm.method_id
 ) select * from cte_to_force_joins_evaluated_first;
 
+-- M2 Inverts
+-- 1) 2-decimal coordinate precision
+-- 2) remove name of Divers
+-- 3) Exclude Recorded Species name and Taxon KEEP Species Name (ie ()bracket and []bracket) and Reporting Species name)
+DROP VIEW IF EXISTS nrmn.ep_m2_inverts_public;
+CREATE OR REPLACE VIEW  nrmn.ep_m2_inverts_public AS
+SELECT
+       survey_id,
+       country,
+       area,
+       ecoregion,
+       realm,
+       location,
+       site_code,
+       site_name,
+       round(latitude::numeric, 2) AS latitude,
+       round(longitude::numeric, 2) AS longitude,
+       survey_date,
+       depth,
+       ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
+       program,
+       visibility,
+       hour,
+       round(survey_latitude::numeric, 2) AS survey_latitude,
+       round(survey_longitude::numeric, 2) AS survey_longitude,
+       "method",
+       "block",
+       phylum,
+       "class",
+       "order",
+       family,
+       species_name,
+       reporting_name,
+       size_class,
+       total,
+       biomass
+FROM nrmn.ep_m2_inverts epm2i
+WHERE epm2i.survey_id NOT IN (
+	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
+	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
+	WHERE pde.program_id=2);
+
+-- M2 Cryptic fish
+-- 1) 2-decimal coordinate precision
+-- 2) remove name of Divers
+-- 3) Exclude Recorded Species name and Taxon KEEP Species Name (ie ()bracket and []bracket) and Reporting Species name)
+-- 4) Elasmobranchii rolled up to Chondrychthyes
+DROP VIEW IF EXISTS nrmn.ep_m2_cryptic_fish_public;
+CREATE OR REPLACE VIEW nrmn.ep_m2_cryptic_fish_public AS
+SELECT
+	survey_id,
+	country,
+	area,
+	ecoregion,
+	realm,
+	location,
+	site_code,
+	site_name,
+    round(latitude::numeric, 2) AS latitude,
+    round(longitude::numeric, 2) AS longitude,
+	survey_date,
+	depth,
+	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
+	program,
+	visibility,
+	hour,
+	round(survey_latitude::numeric, 2) AS survey_latitude,
+	round(survey_longitude::numeric, 2) AS survey_longitude,
+    "method",
+    "block",
+	phylum,
+	CASE WHEN "class" = 'Elasmobranchii' THEN 'Chondrichthyes'
+	     ELSE "class"
+	END "class",
+	"order",
+	family,
+	species_name,
+	reporting_name,
+	size_class,
+    total,
+	biomass
+FROM nrmn.ep_m2_cryptic_fish epm2cf
+WHERE epm2cf.survey_id NOT IN (
+	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
+	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
+	WHERE pde.program_id=2);
