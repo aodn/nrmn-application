@@ -13,7 +13,10 @@ TRUNCATE TABLE nrmn.methods_species;
 -- M1
 INSERT INTO nrmn.methods_species(observable_item_id,method_id)
 SELECT observable_item_id,'1'::integer from nrmn.observable_item_ref  obs
-WHERE obs."class" IN ('Actinopterygii','Reptilia','Elasmobranchii','Mammalia','Cephalopoda','Aves');
+WHERE obs."class" IN ('Actinopterygii','Reptilia','Elasmobranchii','Mammalia','Cephalopoda','Aves')
+EXCEPT
+SELECT observable_item_id,'1'::integer from nrmn.observable_item_ref
+WHERE observable_item_name IN ('Unidentified cryptic fish','Unidentified fish (cryptic)');
 --M2 inverts
 INSERT INTO nrmn.methods_species(observable_item_id,method_id)
 SELECT observable_item_id,'2'::integer from nrmn.observable_item_ref  obs
@@ -30,7 +33,7 @@ WHERE family IN ('Agonidae','Ambassidae','Anarhichadidae','Antennariidae','Aploa
 'Brachionichthyidae','Bythitidae','Callionymidae','Caracanthidae','Carapidae','Centriscidae','Chaenopsidae',
 'Chironemidae','Cirrhitidae','Clinidae','Congridae','Congrogadidae','Cottidae','Creediidae','Cryptacanthodidae',
 'Cyclopteridae','Cynoglossidae','Dasyatidae','Diodontidae','Eleotridae','Gnathanacanthidae','Gobiesocidae','Gobiidae',
-'Grammistidae','Hemiscylliidae','Heterodontidae','Holocentridae','Hypnidae','Labrisomidae','Leptoscopidae','Liparidae',
+'Grammistidae','Hemiscylliidae','Heterodontidae','Hexagrammidae','Holocentridae','Hypnidae','Labrisomidae','Leptoscopidae','Liparidae',
 'Lotidae','Monocentridae','Moridae','Muraenidae','Nototheniidae','Ophichthidae','Ophidiidae','Opistognathidae',
 'Orectolobidae','Paralichthyidae','Parascylliidae','Pataecidae','Pegasidae','Pempheridae','Pholidae','Pinguipedidae',
 'Platycephalidae','Plesiopidae','Pleuronectidae','Plotosidae','Priacanthidae','Pseudochromidae',
@@ -38,6 +41,7 @@ WHERE family IN ('Agonidae','Ambassidae','Anarhichadidae','Antennariidae','Aploa
 'Stichaeidae','Synanceiidae','Syngnathidae','Synodontidae',
 'Tetrabrachiidae','Tetrarogidae','Torpedinidae','Trachichthyidae','Tripterygiidae','Uranoscopidae','Urolophidae',
 'Zaproridae','Zoarcidae')
+OR observable_item_name IN ('Unidentified cryptic fish','Unidentified fish (cryptic)')
  EXCEPT
  SELECT observable_item_id,'2'::integer from nrmn.observable_item_ref
  WHERE genus IN ('Trachinops','Anthias','Caesioperca','Lepidoperca');
