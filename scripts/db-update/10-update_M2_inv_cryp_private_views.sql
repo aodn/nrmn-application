@@ -210,7 +210,8 @@ from nrmn.observation obs
 	inner join nrmn.diver_ref div ON div.diver_id = obs.diver_id
 	inner join nrmn.ep_observable_items oi on oi.observable_item_id = obs.observable_item_id
 	inner join nrmn.measure_ref meas ON meas.measure_id = obs.measure_id
-where sm.method_id = 2
+	inner join nrmn.methods_species ms ON ms.observable_item_id = obs.observable_item_id
+where sm.method_id = 2 and ms.method_id = 2
 and (
 	(oi.class in ('Actinopterygii', 'Elasmobranchii'))
 	or (oi.observable_item_name = 'No species found')
