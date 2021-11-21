@@ -292,6 +292,7 @@ const DataSheetView = ({jobId, onIngest}) => {
     if (e.context.pasteMode) {
       e.context.pendingPasteUndo.push({id: e.data.id, field: e.colDef.field, value: e.oldValue});
     }
+    setUndoSize(e.context.undoStack.length);
   };
 
   const onPasteEnd = (e) => {
@@ -353,7 +354,7 @@ const DataSheetView = ({jobId, onIngest}) => {
       delete newData.errors;
       newData.pos = posMap[currentPosIdx + 1] ? posMap[currentPosIdx + 1] - 1 : posMap[currentPosIdx] + 1000;
       newData.id = newId;
-      setUndoSize(pushUndo(e.api, [{id: newId}]));
+      pushUndo(e.api, [{id: newId}]);
       rowData.push(newData);
       e.api.setRowData(rowData);
       e.context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
@@ -414,7 +415,7 @@ const DataSheetView = ({jobId, onIngest}) => {
       });
       rowData[dataIdx] = newData;
     }
-    setUndoSize(pushUndo(e.api, delta));
+    pushUndo(e.api, delta);
     e.api.setRowData(rowData);
   };
 
@@ -427,7 +428,7 @@ const DataSheetView = ({jobId, onIngest}) => {
 
   const onUndo = (e) => {
     if (undoSize < 1) return;
-    setUndoSize(popUndo(e.api));
+    popUndo(e.api);
     e.api.refreshCells();
   };
 
@@ -540,6 +541,7 @@ const DataSheetView = ({jobId, onIngest}) => {
       setState(IngestState.Edited);
     }
     e.columnApi.autoSizeAllColumns();
+    setUndoSize(ctx.undoStack.length);
   };
 
   const toolTipValueGetter = (params) => {
@@ -587,7 +589,7 @@ const DataSheetView = ({jobId, onIngest}) => {
         rowData.splice(rowData.indexOf(data), 1);
       }
     }
-    setUndoSize(pushUndo(e.api, delta));
+    pushUndo(e.api, delta);
     e.api.setRowData(rowData);
     e.context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
     e.api.refreshCells();
