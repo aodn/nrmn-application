@@ -30,6 +30,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,6 +78,15 @@ public class ObservableItemController {
     public ObservableItemGetDto updateObservableItem(@PathVariable Integer id,
                                                      @Valid @RequestBody ObservableItemPutDto observableItemPutDto) {
         ObservableItem observableItem = observableItemRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+
+        // Only allow the species name to be changed within 72 hours of creation
+        if(!observableItem.getObservableItemName().equals(observableItemPutDto.getObservableItemName())  &&
+            (observableItem.getCreated() == null || ChronoUnit.HOURS.between(observableItem.getCreated(), LocalDateTime.now()) >= 72)) {
+                List<ValidationError> errors = new ArrayList<ValidationError>();
+                errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName", "", "Species Name editing not allowed more than 72 hours after creation."));
+                throw new ValidationException(errors);
+        }
+
         mapper.map(observableItemPutDto, observableItem);
         validate(observableItem);
         ObservableItem persistedObservableItem = observableItemRepository.save(observableItem);

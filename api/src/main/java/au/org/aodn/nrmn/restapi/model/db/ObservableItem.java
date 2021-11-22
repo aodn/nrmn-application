@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,7 +26,9 @@ import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
@@ -51,6 +54,16 @@ public class ObservableItem {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "observable_item_ref_observable_item_id")
     @Column(name = "observable_item_id", unique = true, updatable = false, nullable = false)
     private Integer observableItemId;
+    
+    @NotAudited
+    @CreationTimestamp 
+    @Column(name = "created", updatable = false)
+    private LocalDateTime created;
+
+    @NotAudited
+    @UpdateTimestamp
+    @Column(name = "updated")
+    private LocalDateTime updated;
 
     @Basic
     @Column(name = "observable_item_name")
@@ -62,7 +75,7 @@ public class ObservableItem {
     @JoinColumn(name = "obs_item_type_id", referencedColumnName = "obs_item_type_id", nullable = false)
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     private ObsItemType obsItemType;
-
+    
     @Basic
     @Column(name = "common_name")
     private String commonName;
