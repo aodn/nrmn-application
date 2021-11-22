@@ -103,6 +103,21 @@ export const getSiteEdit = () => {
   );
 };
 
+export const getObservableItemEdit = () => {
+  const speciesEpithets = axiosInstance.get('/api/species/taxonomyDetail');
+  const reportGroups = axiosInstance.get('/api/reportGroups');
+  const habitatGroups = axiosInstance.get('/api/habitatGroups');
+  return axios.all([speciesEpithets, reportGroups, habitatGroups]).then(
+    axios.spread((...responses) => {
+      return {
+        ...responses[0].data,
+        reportGroups: responses[1].data._embedded.reportGroups.map((i) => i.name),
+        habitatGroups: responses[2].data._embedded.habitatGroups.map((i) => i.name)
+      };
+    })
+  );
+};
+
 export const deleteJob = (jobId) => {
   return axiosInstance.delete('/api/stage/delete/' + jobId);
 };

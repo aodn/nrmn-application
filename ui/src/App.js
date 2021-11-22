@@ -22,9 +22,9 @@ import DiverTemplate from './components/data-entities/DiverTemplate';
 import SiteViewTemplate from './components/templates/SiteViewTemplate';
 import LocationList from './components/data-entities/location/LocationList';
 import SurveyList from './components/data-entities/survey/SurveyList';
+import ObservableItemEdit from './components/data-entities/ObservableItemEdit';
 import ObservableItemTemplate from './components/templates/ObservableItemTemplate';
 import ObservableItemViewTemplate from './components/templates/ObservableItemViewTemplate';
-import ObservableItemEditTemplate from './components/templates/ObservableItemEditTemplate';
 import LocationTemplate from './components/templates/LocationTemplate';
 import ExtractTemplateData from './components/datasheets/ExtractTemplateData';
 import SurveyViewTemplate from './components/templates/SurveyViewTemplate';
@@ -99,7 +99,7 @@ const referenceData = [
       edit: '/reference/observableItem/:id?/edit'
     },
     schemaKey: {add: 'ObservableItemDto', edit: 'ObservableItemPutDto', view: 'ObservableItemGetDto'},
-    template: {add: ObservableItemTemplate, edit: ObservableItemEditTemplate, view: ObservableItemViewTemplate},
+    template: {add: ObservableItemTemplate, edit: ObservableItemEdit, view: ObservableItemViewTemplate},
     list: {
       name: 'Observable Items',
       showNew: true,
@@ -259,6 +259,7 @@ const App = () => {
             <Route exact path="/upload" component={JobUpload} />
             <Route exact path="/data/extract" component={ExtractTemplateData} />
             <Route exact path="/data/surveys" component={SurveyList} />
+            <Route exact path="/reference/observableItem/:id?/edit" component={ObservableItemEdit} />
             <Route exact path="/reference/site/:id?/edit" component={SiteEdit} />
             <Route exact path="/reference/site/:id?/clone" render={() => <SiteEdit clone />} />
             <Route exact path="/reference/site" component={SiteEdit} />

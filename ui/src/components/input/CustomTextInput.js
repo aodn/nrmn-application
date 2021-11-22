@@ -64,8 +64,8 @@ CustomTextInput.propTypes = {
   onChange: PropTypes.func,
   label: PropTypes.string,
   onBlur: PropTypes.func,
-  readOnlyModify: PropTypes.boolean,
-  readOnlyInput: PropTypes.boolean
+  readOnlyModify: PropTypes.bool,
+  readOnlyInput: PropTypes.bool
 };
 
 export default CustomTextInput;
