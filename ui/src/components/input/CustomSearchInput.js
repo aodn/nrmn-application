@@ -19,7 +19,7 @@ const CustomSearchInput = ({label, exclude, formData, onChange}) => {
       );
       return () => cancelTokenSource.cancel();
     }
-  }, [searchTerm, minMatchCharacters]);
+  }, [searchTerm, minMatchCharacters, exclude]);
 
   return (
     <>
