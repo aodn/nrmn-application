@@ -79,11 +79,11 @@ public class ObservableItemController {
                                                      @Valid @RequestBody ObservableItemPutDto observableItemPutDto) {
         ObservableItem observableItem = observableItemRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
 
-        // Only allow the species name to be changed within 1 minute of creation
+        // Only allow the species name to be changed within 72 hours of creation
         if(!observableItem.getObservableItemName().equals(observableItemPutDto.getObservableItemName())  &&
-            (observableItem.getCreated() == null || ChronoUnit.MINUTES.between(observableItem.getCreated(), LocalDateTime.now()) >= 1)) {
+            (observableItem.getCreated() == null || ChronoUnit.HOURS.between(observableItem.getCreated(), LocalDateTime.now()) >= 72)) {
                 List<ValidationError> errors = new ArrayList<ValidationError>();
-                errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName", "", "Editing not allowed after 1 minute"));
+                errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName", "", "Species Name editing not allowed more than 72 hours after creation."));
                 throw new ValidationException(errors);
         }
 
