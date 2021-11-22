@@ -524,7 +524,9 @@ CREATE TABLE nrmn.observable_item_ref (
     habitat_groups character varying(50),
     letter_code character varying(20),
     is_invert_sized boolean DEFAULT false,
-    obs_item_attribute jsonb
+    obs_item_attribute jsonb,
+    created timestamp,
+    updated timestamp
 );
 
 

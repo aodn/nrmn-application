@@ -26,11 +26,11 @@ import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -55,11 +55,13 @@ public class ObservableItem {
     @Column(name = "observable_item_id", unique = true, updatable = false, nullable = false)
     private Integer observableItemId;
     
-    @CreatedDate
+    @NotAudited
+    @CreationTimestamp 
     @Column(name = "created", updatable = false)
     private LocalDateTime created;
 
-    @LastModifiedDate
+    @NotAudited
+    @UpdateTimestamp
     @Column(name = "updated")
     private LocalDateTime updated;
 

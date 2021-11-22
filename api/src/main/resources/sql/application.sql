@@ -100,8 +100,6 @@ CREATE TABLE nrmn.observable_item_ref_aud (
     obs_item_type_mod boolean,
     species_epithet varchar(255),
     species_epithet_mod boolean,
-    created date,
-    updated date,
     CONSTRAINT observable_item_ref_aud_pkey PRIMARY KEY (observable_item_id, rev)
 );
 
@@ -119,10 +117,6 @@ CREATE TABLE nrmn.survey_method_aud (
     method_mod boolean,
     survey_id integer,
     survey_mod boolean,
-    created date,
-    created_mod boolean,
-    updated date,
-    updated_mod boolean,
     CONSTRAINT survey_method_aud_pkey PRIMARY KEY (survey_method_id, rev)
 );
 
