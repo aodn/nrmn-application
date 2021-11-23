@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Typography} from '@material-ui/core';
+import {Box, Button, Typography} from '@material-ui/core';
 import {Redirect} from 'react-router-dom';
 import {getResult} from '../../../axios/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
@@ -7,9 +7,19 @@ import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
+const saveFilterModel = (entityName, filterModel) => {
+  window[`AgGrid-FilterModel-${entityName}`] = JSON.stringify(filterModel);
+};
+
+const restoreFilterModel = (entityName) => {
+  const serialisedFilter = window[`AgGrid-FilterModel-${entityName}`];
+  return serialisedFilter ? JSON.parse(serialisedFilter) : null;
+};
+
 const SurveyList = () => {
   const [gridApi, setGridApi] = useState(null);
   const [redirect, setRedirect] = useState(null);
+  const [disableResetFilter, setResetFilterDisabled] = useState(true);
 
   useEffect(() => {
     if (gridApi) {
@@ -19,11 +29,24 @@ const SurveyList = () => {
 
   if (redirect) return <Redirect push to={`/data/survey/${redirect}`} />;
 
+  const onFirstDataRendered = (e) => setTimeout(() => e.api.setFilterModel(restoreFilterModel('survey')), 25);
+
   return (
     <>
       <Box display="flex" flexDirection="row" p={1} pb={1}>
         <Box flexGrow={1}>
           <Typography variant="h4">Surveys</Typography>
+        </Box>
+        <Box mr={4}>
+          <Button
+            style={{width: '100%'}}
+            disabled={disableResetFilter}
+            onClick={() => gridApi.setFilterModel(null)}
+            color="primary"
+            variant={'contained'}
+          >
+            Reset Filter
+          </Button>
         </Box>
       </Box>
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
@@ -36,6 +59,12 @@ const SurveyList = () => {
           frameworkComponents={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
           suppressCellSelection={true}
+          onFirstDataRendered={onFirstDataRendered}
+          onFilterChanged={(e) => {
+            const filterModel = e.api.getFilterModel();
+            saveFilterModel('survey', filterModel);
+            setResetFilterDisabled(Object.keys(filterModel)?.length < 1);
+          }}
           defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
         >
           <AgGridColumn
@@ -50,7 +79,7 @@ const SurveyList = () => {
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => {
               if (e.event.ctrlKey) {
-                window.open(`/reference/survey/${e.data.surveyId}/edit`, '_blank').focus();
+                window.open(`/data/survey/${e.data.surveyId}/edit`, '_blank').focus();
               } else {
                 setRedirect(`${e.data.surveyId}/edit`);
               }
