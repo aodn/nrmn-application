@@ -491,14 +491,14 @@ public class ValidationProcess {
             flagColumns.add("method");
         }
 
-        // VALIDATE: Each method has block 1,2 (RLS) or block 1 (ATRC) except ATRC M3 which should have block 0
+        // VALIDATE: M1, M2 each has B1, B2 and if ATRC M3 has B0
         List<Integer> methodsRequired = programName.equalsIgnoreCase("RLS") ? Arrays.asList(1,2) : Arrays.asList(1,2,3);
         ValidationLevel level = ValidationLevel.WARNING;
         for (Integer method : methodsRequired) {
             List<StagedRowFormatted> methodRows = surveyByMethod.get(method);
             if(methodRows == null) continue;
 
-            List<Integer> blocksRequired = programName.equalsIgnoreCase("RLS") ? new ArrayList<Integer>(Arrays.asList(1,2)) : new ArrayList<Integer>(method == 3 ? Arrays.asList(0) : Arrays.asList(1));
+            List<Integer> blocksRequired = programName.equalsIgnoreCase("RLS") ? new ArrayList<Integer>(Arrays.asList(1,2)) : new ArrayList<Integer>(method == 3 ? Arrays.asList(0) : Arrays.asList(1,2));
 
             List<Integer> hasBlocks = methodRows.stream().map(r -> r.getBlock()).distinct().collect(Collectors.toList());
             List<Integer> missingBlocks = blocksRequired.stream().filter(b -> !hasBlocks.contains(b)).collect(Collectors.toList());
