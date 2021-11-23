@@ -106,7 +106,8 @@ const formSlice = createSlice({
               r.species.toUpperCase().includes('SP.') ||
               r.species.toUpperCase().includes('SPP.') ||
               r.species.includes('(') ||
-              r.species.includes('[');
+              r.species.includes('[') ||
+              !r.species.includes(' ');
             if (!isGenericName) speciesEpithet = r.species.replace(`${r.genus} `, '');
           }
           return {id: id, ...r, speciesEpithet};
