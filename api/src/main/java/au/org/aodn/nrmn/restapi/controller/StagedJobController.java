@@ -152,7 +152,7 @@ public class StagedJobController {
 
             if (lastRow.getTotal().equalsIgnoreCase("0")) {
                 Long lastRowId = lastRow.getId();
-                Optional<ValidationRow> rowsToTruncate = validation.checkDuplicateRows(rowsToSave).stream().filter(v -> v.getRowIds().contains(lastRowId)).findAny();
+                Optional<ValidationRow> rowsToTruncate = validation.checkDuplicateRows(true, rowsToSave).stream().filter(v -> v.getRowIds().contains(lastRowId)).findAny();
 
                 // only apply if there are three or more duplicate rows (detect 3 duplicate rows rule)
                 if (rowsToTruncate.isPresent() && rowsToTruncate.get().getRowIds().size() >= 3) {
