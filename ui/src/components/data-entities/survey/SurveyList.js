@@ -91,7 +91,13 @@ const SurveyList = () => {
             headerName="Survey ID"
             sort="desc"
             cellStyle={{cursor: 'pointer'}}
-            onCellClicked={(e) => setRedirect(e.data.surveyId)}
+            onCellClicked={(e) => {
+              if (e.event.ctrlKey) {
+                window.open(`/data/survey/${e.data.surveyId}`, '_blank').focus();
+              } else {
+                setRedirect(e.data.surveyId);
+              }
+            }}
           />
           <AgGridColumn width={100} field="siteCode" />
           <AgGridColumn width={100} field="surveyDate" />
