@@ -379,6 +379,11 @@ public class ValidationProcess {
         return null;
     }
 
+    private ValidationCell validateInvertsZeroOnM3(StagedRowFormatted row) {
+        return (row.getMethod() != null && row.getInverts() != null && row.getMethod() == 3 && row.getInverts() > 0) ? 
+            new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Method 3 has value for inverts", row.getId(), "inverts") : null;
+    }
+
     private ValidationError validateSurveyIsNew(StagedRowFormatted row) {
         if (row.getDate() != null && Arrays.asList(METHODS_TO_CHECK).contains(row.getMethod())) {
 
@@ -620,6 +625,9 @@ public class ValidationProcess {
             // Validate within 200M
             results.addAll(validateWithin200M(row), false);
 
+            // Validate M3 has no inverts
+            results.add(validateInvertsZeroOnM3(row), false);
+            
             // Date is not in the future or too far in the past
             results.add(validateDateRange(programName.equalsIgnoreCase("RLS") ? DATE_MIN_RLS : DATE_MIN_ATRC, row), false);
         }
