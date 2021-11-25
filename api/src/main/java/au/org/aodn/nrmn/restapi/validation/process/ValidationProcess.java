@@ -379,9 +379,9 @@ public class ValidationProcess {
         return null;
     }
 
-    private ValidationCell validateInvertsZeroOnM3(StagedRowFormatted row) {
-        return (row.getMethod() != null && row.getInverts() != null && row.getMethod() == 3 && row.getInverts() > 0) ? 
-            new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Method 3 has value for inverts", row.getId(), "inverts") : null;
+    private ValidationCell validateInvertsZeroOnM3M4M5(StagedRowFormatted row) {
+        return (row.getMethod() != null && row.getInverts() != null && Arrays.asList(3,4,5).contains(row.getMethod())&& row.getInverts() > 0) ? 
+            new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Method " + row.getMethod() + " has value for inverts", row.getId(), "inverts") : null;
     }
 
     private ValidationError validateSurveyIsNew(StagedRowFormatted row) {
@@ -625,8 +625,8 @@ public class ValidationProcess {
             // Validate within 200M
             results.addAll(validateWithin200M(row), false);
 
-            // Validate M3 has no inverts
-            results.add(validateInvertsZeroOnM3(row), false);
+            // Validate M3, M4 and M5 rows have zero inverts
+            results.add(validateInvertsZeroOnM3M4M5(row), false);
             
             // Date is not in the future or too far in the past
             results.add(validateDateRange(programName.equalsIgnoreCase("RLS") ? DATE_MIN_RLS : DATE_MIN_ATRC, row), false);
