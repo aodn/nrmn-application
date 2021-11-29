@@ -155,3 +155,47 @@ total,
 biomass
 from invert_sized m2
 	 inner join bounded_fish_classes bfc on m2.size_class > bfc.lower_bound and m2.size_class <= bfc.upper_bound;
+
+-- M2 Inverts
+-- 1) 2-decimal coordinate precision
+-- 2) remove name of Divers
+-- 3) Exclude Recorded Species name and Taxon KEEP Species Name (ie ()bracket and []bracket) and Reporting Species name)
+DROP VIEW IF EXISTS nrmn.ep_m2_inverts_public;
+CREATE OR REPLACE VIEW  nrmn.ep_m2_inverts_public AS
+SELECT
+       survey_id,
+       country,
+       area,
+       ecoregion,
+       realm,
+       location,
+       site_code,
+       site_name,
+       round(latitude::numeric, 2) AS latitude,
+       round(longitude::numeric, 2) AS longitude,
+       survey_date,
+       depth,
+       ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
+       program,
+       visibility,
+       hour,
+       round(survey_latitude::numeric, 2) AS survey_latitude,
+       round(survey_longitude::numeric, 2) AS survey_longitude,
+       "method",
+       "block",
+       phylum,
+       "class",
+       "order",
+       family,
+       species_name,
+       reporting_name,
+       size_class,
+       total,
+       biomass
+FROM nrmn.ep_m2_inverts epm2i
+WHERE epm2i.survey_id NOT IN (
+	SELECT survey_id FROM nrmn.ep_survey_list esl
+	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
+	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
+	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
+	WHERE pde.program_id=2);
