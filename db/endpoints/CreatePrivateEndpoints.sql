@@ -1,6 +1,6 @@
 /* site list */
 DROP MATERIALIZED VIEW nrmn.ep_site_list CASCADE;
-CREATE materialized VIEW nrmn.ep_site_list AS
+CREATE MATERIALIZED VIEW nrmn.ep_site_list AS
 SELECT
 	sit.country,
 	sit.state AS area,
@@ -49,7 +49,6 @@ GROUP BY
 	sit.protection_status;
 
 /* survey list */
-DROP MATERIALIZED VIEW nrmn.ep_survey_list CASCADE;
 CREATE MATERIALIZED VIEW nrmn.ep_survey_list AS
 with divers AS (
 	SELECT DISTINCT sm.survey_id, STRING_AGG ( DISTINCT div.full_name, ', ' ORDER BY div.full_name) AS full_names
@@ -102,7 +101,7 @@ FROM nrmn.survey sur
 
 /* rarity indices "abundance" */
 DROP MATERIALIZED VIEW nrmn.ep_rarity_abundance CASCADE;
-create materialized view nrmn.ep_rarity_abundance as
+CREATE MATERIALIZED VIEW nrmn.ep_rarity_abundance AS
 with taxa as (
 	select
 	    oi.observable_item_id,
@@ -139,7 +138,7 @@ group by  taxon;
 
 /* Rarity extents (intemediary table) */
 DROP MATERIALIZED VIEW nrmn.ep_rarity_extents CASCADE;
-create materialized view nrmn.ep_rarity_extents as
+CREATE MATERIALIZED VIEW nrmn.ep_rarity_extents AS
 with taxa as (
 /*
 select all taxa as observable_items of (undescribed) species
@@ -282,8 +281,7 @@ from taxon_extents a
 	 inner join unshifted_meancoords b ON b.taxon = a.taxon;
 
 /* rarity_range */
-DROP MATERIALIZED VIEW nrmn.ep_rarity_range CASCADE;
-create materialized view nrmn.ep_rarity_range as
+CREATE MATERIALIZED VIEW nrmn.ep_rarity_range AS
 with taxa as (
 /*
 select all taxa as observable_items of (undescribed) species
@@ -348,8 +346,7 @@ from
 	stddev_coords_by_taxon;
 
 /* rarity frequency */
-DROP MATERIALIZED VIEW nrmn.ep_rarity_frequency CASCADE;
-create materialized view nrmn.ep_rarity_frequency as
+CREATE MATERIALIZED VIEW nrmn.ep_rarity_frequency AS
 select
 	taxon,
 	st_numgeometries(points) FoundAtSitesWithinExtent,
@@ -363,8 +360,7 @@ group by
 	st_numgeometries(points);
 
 /* Endpoint "observable items" */
-DROP MATERIALIZED VIEW nrmn.ep_observable_items CASCADE;
-create materialized view nrmn.ep_observable_items as
+CREATE MATERIALIZED VIEW nrmn.ep_observable_items AS
 with supersedings as (
 	select oi.superseded_by currentname,
 		STRING_AGG ( oi.observable_item_name, ', ' order by oi.observable_item_name) as names,
@@ -420,8 +416,7 @@ from nrmn.observable_item_ref oi
 	 left join nrmn.ep_rarity_frequency rfreq on rfreq.taxon = oi.observable_item_name;
 
 /* Endpoint "M1 Fish all" #164 */
-DROP MATERIALIZED VIEW nrmn.ep_m1 CASCADE;
-create materialized view nrmn.ep_m1 as
+CREATE MATERIALIZED VIEW  nrmn.ep_m1 AS
 with cte_to_force_joins_evaluated_first as(
 select
 	sm.survey_id,
@@ -511,8 +506,7 @@ group by sm.survey_id,
 ) select * from cte_to_force_joins_evaluated_first;
 
 	 /* Endpoint "M2 Cryptic Fish" #170 */
-DROP MATERIALIZED VIEW nrmn.ep_m2_cryptic_fish CASCADE;
-create materialized view nrmn.ep_m2_cryptic_fish as
+CREATE MATERIALIZED VIEW nrmn.ep_m2_cryptic_fish AS
 with cte_to_force_joins_evaluated_first as(
 select
 	sm.survey_id,
@@ -607,8 +601,7 @@ group by sm.survey_id,
 ) select * from cte_to_force_joins_evaluated_first;
 
 /* Endpoint "M2 Inverts" #171 */
-DROP MATERIALIZED VIEW nrmn.ep_m2_inverts CASCADE;
-create materialized view nrmn.ep_m2_inverts as
+CREATE MATERIALIZED VIEW nrmn.ep_m2_inverts AS
 with fish_classes as (
 	select case
 			when mea.measure_name in ('Unsized', 'No specimen found') then 0
@@ -765,7 +758,7 @@ from invert_sized m2
 	 inner join bounded_fish_classes bfc on m2.size_class > bfc.lower_bound and m2.size_class <= bfc.upper_bound;
 
 /* Endpoint "M12 Debris" #172 */
-create or replace view nrmn.ep_m12_debris as
+CREATE OR REPLACE VIEW nrmn.ep_m12_debris AS
 select
 	sm.survey_id,
 	sur.country,
@@ -798,8 +791,7 @@ from nrmn.observation obs
 where sm.method_id = 12;
 
 /* Endpoint "M0 off transect sightings" #173 */
-drop view if exists  nrmn.ep_m0_off_transect_sighting cascade;
-create or replace view nrmn.ep_m0_off_transect_sighting as
+CREATE OR REPLACE VIEW nrmn.ep_m0_off_transect_sighting AS
 select
 	sm.survey_id,
 	sur.country,
@@ -887,8 +879,7 @@ group by sm.survey_id,
 	end;
 
 /* Endpoint "M3 in-situ quadrats" #175 */
-drop view if exists nrmn.ep_m3_isq cascade;
-create or replace view nrmn.ep_m3_isq as
+CREATE OR REPLACE VIEW nrmn.ep_m3_isq AS
 select
 	sm.survey_id,
 	sur.country,
@@ -961,7 +952,7 @@ group by sm.survey_id,
 	mr.measure_name;
 
 /* Endpoint "species list" #178 */
-create or replace view nrmn.ep_species_list as
+CREATE OR REPLACE VIEW nrmn.ep_species_list AS
 select
 	oi.observable_item_id as species_id,
 	oi.observable_item_name as recorded_species_name,
@@ -1018,8 +1009,7 @@ or epoi.class in ('Anthozoa','Ascidiacea','Echiuroidea','Phaeophyceae', 'Aves')
 or epoi.observable_item_name ~ 'spp.$');
 
 /* Endpoint: species survey #185 */
-drop view if exists nrmn.ep_species_survey;
-create or replace view nrmn.ep_species_survey as
+CREATE OR REPLACE VIEW nrmn.ep_species_survey AS
 select obs.observable_item_id as species_id
 	  ,sur.survey_id
 	  ,round(sur.latitude::numeric, 2) AS latitude
@@ -1038,8 +1028,7 @@ where oi.obs_item_type_name in ('Species', 'Undescribed Species');
 
 
 /*endpoint: species survey observation #186*/
-drop view if exists nrmn.ep_species_survey_observation;
-create or replace view nrmn.ep_species_survey_observation as
+CREATE OR REPLACE VIEW nrmn.ep_species_survey_observation AS
 select
 	oi.observable_item_id species_id
 	,sur.survey_id
@@ -1083,7 +1072,7 @@ and not oi.class in ('Anthozoa','Ascidiacea','Echiuroidea','Phaeophyceae', 'Aves
 
 
 /* Endpoint pq scores #188 */
-create or replace view nrmn.ep_m13_pq_scores as
+CREATE OR REPLACE VIEW nrmn.ep_m13_pq_scores AS
 select
     sur.survey_id,
 	sur.country,
@@ -1119,7 +1108,7 @@ from nrmn.pq_score pq
 
 
 /* Endpoint: Off transect measurements #189 */
-create or replace view nrmn.ep_m11_off_transect_measurement as
+CREATE OR REPLACE VIEW nrmn.ep_m11_off_transect_measurement AS
 select
 	sm.survey_id,
 	sur.country,
@@ -1164,7 +1153,7 @@ from nrmn.observation obs
 where sm.method_id = 11;
 
 /* Endpoint: M4 Macrocystis count #190 */
-create or replace view nrmn.ep_m4_macrocystis_count as
+CREATE OR REPLACE VIEW nrmn.ep_m4_macrocystis_count AS
 select
 	sm.survey_id,
 	sur.country,
@@ -1233,7 +1222,7 @@ group by sm.survey_id,
 	oi.reporting_name;
 
 /* Endpoint: M5 Limpet Quadrats #191 */
-create or replace view nrmn.ep_m5_limpet_quadrats as
+CREATE OR REPLACE VIEW nrmn.ep_m5_limpet_quadrats AS
 select
 	sm.survey_id,
 	sur.country,
@@ -1302,7 +1291,7 @@ group by sm.survey_id,
 	oi.reporting_name;
 
 /* endpoint M7 Lobster counts jurien bay #192 */
-create or replace view nrmn.ep_m7_lobster_count as
+CREATE OR REPLACE VIEW nrmn.ep_m7_lobster_count AS
 select
 	sm.survey_id,
 	sur.country,
@@ -1379,7 +1368,7 @@ group by sm.survey_id,
 	end;
 
 /* Endpoint "Lobster Haliotis" #302 */
-create or replace view nrmn.ep_lobster_haliotis as
+CREATE OR REPLACE VIEW nrmn.ep_lobster_haliotis AS
 with cte_to_force_joins_evaluated_first as(
     select
         sm.survey_id,
@@ -1505,7 +1494,6 @@ GROUP BY
     observable_item_id;
 
 /* Endpoint species_attributes for template data and validation checks */
-DROP MATERIALIZED VIEW nrmn.ui_species_attributes CASCADE;
 CREATE MATERIALIZED VIEW nrmn.ui_species_attributes AS
 SELECT
     oir.observable_item_id,
