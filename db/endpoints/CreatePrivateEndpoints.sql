@@ -292,7 +292,7 @@ but no spp.
 	    nrmn.taxonomic_name (coalesce(oi.superseded_by, observable_item_name)) taxon
 	from
 	    nrmn.observable_item_ref oi
-		inner join obs_item_type_ref oit on oit.obs_item_type_id = oi.obs_item_type_id
+		inner join nrmn.obs_item_type_ref oit on oit.obs_item_type_id = oi.obs_item_type_id
 	where
 		oit.obs_item_type_name in ('Species', 'Undescribed Species')
 		and not nrmn.taxonomic_name (coalesce(oi.superseded_by, observable_item_name)) ~ 'spp.$'
