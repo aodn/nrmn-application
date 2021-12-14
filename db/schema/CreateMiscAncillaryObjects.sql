@@ -220,19 +220,18 @@ coalesce(superseded_by,observable_item_name) ='Phlyctenactis tuberculosa';
 --Update has to be applied after updating M1, as it targets Fishes(Actinopterygii,Elasmobranchii) at family level
 INSERT INTO nrmn.methods_species(observable_item_id,method_id)
 SELECT observable_item_id,'2'::integer from nrmn.observable_item_ref
-WHERE family IN ('Agonidae','Ambassidae','Anarhichadidae','Antennariidae','Aploactinidae','Apogonidae','Ariidae',
-'Aulopidae','Bathymasteridae','Batrachoididae','Blenniidae','Bothidae','Bovichtidae','Brachaeluridae',
-'Brachionichthyidae','Bythitidae','Callionymidae','Caracanthidae','Carapidae','Centriscidae','Chaenopsidae',
-'Chironemidae','Cirrhitidae','Clinidae','Congridae','Congrogadidae','Cottidae','Creediidae','Cryptacanthodidae',
-'Cyclopteridae','Cynoglossidae','Dasyatidae','Diodontidae','Eleotridae','Gnathanacanthidae','Gobiesocidae','Gobiidae',
-'Grammistidae','Hemiscylliidae','Heterodontidae','Hexagrammidae','Holocentridae','Hypnidae','Labrisomidae','Leptoscopidae','Liparidae',
-'Lotidae','Monocentridae','Moridae','Muraenidae','Nototheniidae','Ophichthidae','Ophidiidae','Opistognathidae',
-'Orectolobidae','Paralichthyidae','Parascylliidae','Pataecidae','Pegasidae','Pempheridae','Pholidae','Pinguipedidae',
-'Platycephalidae','Plesiopidae','Pleuronectidae','Plotosidae','Priacanthidae','Pseudochromidae',
-'Psychrolutidae','Rajidae','Rhinobatidae','Scorpaenidae','Serranidae','Scyliorhinidae','Soleidae','Solenostomidae',
-'Stichaeidae','Synanceiidae','Syngnathidae','Synodontidae',
-'Tetrabrachiidae','Tetrarogidae','Torpedinidae','Trachichthyidae','Tripterygiidae','Uranoscopidae','Urolophidae',
-'Zaproridae','Zoarcidae')
+WHERE family IN ('Agonidae','Anarhichadidae','Antennariidae','Aploactinidae','Apogonidae','Ariidae','Bathymasteridae',
+'Batrachoididae','Blenniidae','Bothidae','Bovichtidae','Brachaeluridae','Brachionichthyidae','Bythitidae',
+'Callionymidae','Caracanthidae','Carapidae','Chaenopsidae','Chironemidae','Cirrhitidae','Clinidae','Congridae',
+'Congrogadidae','Cottidae','Creediidae','Cryptacanthodidae','Cyclopteridae','Cynoglossidae','Dasyatidae','Diodontidae',
+'Eleotridae','Gnathanacanthidae','Gobiesocidae','Gobiidae','Grammistidae','Hemiscylliidae','Heterodontidae',
+'Hexagrammidae','Holocentridae','Hypnidae','Labrisomidae','Leptoscopidae','Liparidae','Lotidae','Monocentridae',
+'Moridae','Muraenidae','Nototheniidae','Ophichthidae','Ophidiidae','Opistognathidae','Orectolobidae','Paralichthyidae',
+'Parascylliidae','Pataecidae','Pegasidae','Pempheridae','Phycidae','Pholidae','Pinguipedidae','Platycephalidae',
+'Plesiopidae','Pleuronectidae','Plotosidae','Priacanthidae','Pseudochromidae','Psychrolutidae','Rajidae',
+'Rhinobatidae','Scorpaenidae','Serranidae','Scyliorhinidae','Soleidae','Solenostomidae','Stichaeidae','Synanceiidae',
+'Syngnathidae','Synodontidae','Tetrabrachiidae','Tetrarogidae','Torpedinidae','Trachichthyidae','Tripterygiidae',
+'Uranoscopidae','Urolophidae','Zaproridae','Zoarcidae')
 OR observable_item_name IN ('Unidentified cryptic fish','Unidentified fish (cryptic)')
  EXCEPT
  SELECT observable_item_id,'2'::integer from nrmn.observable_item_ref
