@@ -192,8 +192,7 @@ SET search_path = nrmn,public;
 
 DROP FUNCTION nrmn.assign_species_to_method();
 
-CREATE OR REPLACE FUNCTION nrmn.assign_species_to_method(
-	)
+CREATE OR REPLACE FUNCTION nrmn.assign_species_to_method()
     RETURNS integer
     LANGUAGE 'plpgsql'
     COST 100
@@ -220,19 +219,20 @@ coalesce(superseded_by,observable_item_name) ='Phlyctenactis tuberculosa';
 --Update has to be applied after updating M1, as it targets Fishes(Actinopterygii,Elasmobranchii) at family level
 INSERT INTO nrmn.methods_species(observable_item_id,method_id)
 SELECT observable_item_id,'2'::integer from nrmn.observable_item_ref
-WHERE family IN ('Agonidae','Anarhichadidae','Antennariidae','Aploactinidae','Apogonidae','Ariidae','Bathymasteridae',
-'Batrachoididae','Blenniidae','Bothidae','Bovichtidae','Brachaeluridae','Brachionichthyidae','Bythitidae',
-'Callionymidae','Caracanthidae','Carapidae','Chaenopsidae','Chironemidae','Cirrhitidae','Clinidae','Congridae',
-'Congrogadidae','Cottidae','Creediidae','Cryptacanthodidae','Cyclopteridae','Cynoglossidae','Dasyatidae','Diodontidae',
-'Eleotridae','Gnathanacanthidae','Gobiesocidae','Gobiidae','Grammistidae','Hemiscylliidae','Heterodontidae',
-'Hexagrammidae','Holocentridae','Hypnidae','Labrisomidae','Leptoscopidae','Liparidae','Lotidae','Monocentridae',
-'Moridae','Muraenidae','Nototheniidae','Ophichthidae','Ophidiidae','Opistognathidae','Orectolobidae','Paralichthyidae',
-'Parascylliidae','Pataecidae','Pegasidae','Pempheridae','Phycidae','Pholidae','Pinguipedidae','Platycephalidae',
-'Plesiopidae','Pleuronectidae','Plotosidae','Priacanthidae','Pseudochromidae','Psychrolutidae','Rajidae',
-'Rhinobatidae','Scorpaenidae','Serranidae','Scyliorhinidae','Soleidae','Solenostomidae','Stichaeidae','Synanceiidae',
-'Syngnathidae','Synodontidae','Tetrabrachiidae','Tetrarogidae','Torpedinidae','Trachichthyidae','Tripterygiidae',
-'Uranoscopidae','Urolophidae','Zaproridae','Zoarcidae')
-OR observable_item_name IN ('Unidentified cryptic fish','Unidentified fish (cryptic)')
+WHERE (family IN ('Agonidae','Anarhichadidae','Anguillidae','Antennariidae','Aploactinidae','Apogonidae','Ariidae',
+'Bathymasteridae','Batrachoididae','Blenniidae','Bothidae','Bovichtidae','Brachaeluridae','Brachionichthyidae',
+'Bythitidae','Callionymidae','Caracanthidae','Carapidae','Chaenopsidae','Chironemidae','Cirrhitidae','Clinidae',
+'Congiopodidae','Congridae','Congrogadidae','Cottidae','Creediidae','Cryptacanthodidae','Cyclopteridae','Cynoglossidae',
+'Dasyatidae','Diodontidae','Eleotridae','Gnathanacanthidae','Gobiesocidae','Gobiidae','Grammistidae','Harpagiferidae',
+'Hemiscylliidae','Heterodontidae','Hexagrammidae','Holocentridae','Hypnidae','Labrisomidae','Latidae','Leptoscopidae',
+'Liparidae','Lotidae','Monocentridae','Moridae','Muraenidae','Nototheniidae','Ophichthidae','Ophidiidae',
+'Opistognathidae','Orectolobidae','Paralichthyidae','Parascylliidae','Pataecidae','Pegasidae','Pempheridae',
+'Percophidae','Phycidae','Pholidae','Pholidichthyidae','Pinguipedidae','Platycephalidae','Plesiopidae','Pleuronectidae',
+'Plotosidae','Priacanthidae','Pseudochromidae','Psychrolutidae','Rajidae','Rhinobatidae','Scorpaenidae','Serranidae',
+'Scyliorhinidae','Soleidae','Solenostomidae','Stichaeidae','Synanceiidae','Syngnathidae','Synodontidae',
+'Tetrabrachiidae','Tetrarogidae','Torpedinidae','Trachichthyidae','Trachinidae','Tripterygiidae','Uranoscopidae',
+'Urolophidae','Urotrygonidae','Zaproridae','Zoarcidae')
+OR observable_item_name IN ('Unidentified cryptic fish','Unidentified fish (cryptic)'))
  EXCEPT
  SELECT observable_item_id,'2'::integer from nrmn.observable_item_ref
  WHERE genus IN ('Trachinops','Anthias','Caesioperca','Lepidoperca');
@@ -281,6 +281,7 @@ END IF;
 END;
 $BODY$;
 
+SELECT nrmn.assign_species_to_method();
 
 CREATE OR REPLACE FUNCTION nrmn.set_is_invert_species()
 returns integer as $$
@@ -295,6 +296,8 @@ END IF;
 END; $$
 LANGUAGE PLPGSQL
 SET search_path = nrmn,public;
+
+SELECT nrmn.set_is_invert_species();
 
 CREATE OR REPLACE FUNCTION nrmn.refresh_materialized_views ()
     RETURNS VOID
