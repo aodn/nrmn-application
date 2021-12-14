@@ -33,5 +33,3 @@ CREATE index ix_pqs_2 ON pq_score(survey_method_id);
 CREATE index ix_pqcr_1 ON pq_cat_res_ref(resolution_id, category_id);
 
 CREATE index ix_obsitem_1 ON observable_item_ref(superseded_by);
-
-CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_ep_m1 ON nrmn.ep_m1(survey_id, recorded_species_name, size_class, block, "method", diver);
