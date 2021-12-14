@@ -30,6 +30,7 @@ import ExtractTemplateData from './components/datasheets/ExtractTemplateData';
 import SurveyViewTemplate from './components/templates/SurveyViewTemplate';
 import SurveyEditTemplate from './components/templates/SurveyEditTemplate';
 import SiteEdit from './components/data-entities/SiteEdit';
+import ObservableItemAdd from './components/data-entities/ObservableItemAdd';
 
 const referenceData = [
   {
@@ -259,6 +260,7 @@ const App = () => {
             <Route exact path="/upload" component={JobUpload} />
             <Route exact path="/data/extract" component={ExtractTemplateData} />
             <Route exact path="/data/surveys" component={SurveyList} />
+            <Route exact path="/reference/observableItem" component={ObservableItemAdd} />
             <Route exact path="/reference/observableItem/:id?/edit" component={ObservableItemEdit} />
             <Route exact path="/reference/site/:id?/edit" component={SiteEdit} />
             <Route exact path="/reference/site/:id?/clone" render={() => <SiteEdit clone />} />

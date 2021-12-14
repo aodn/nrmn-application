@@ -196,7 +196,7 @@ public class SurveyEditService {
         // Direction Validation
         if (surveyDto.getDirection() !=null && surveyDto.getDirection().length() > 0 && !EnumUtils.isValidEnum(Directions.class, surveyDto.getDirection())) {
             errors.add(new ValidationError("Survey", "direction", surveyDto.getDirection(),
-                    surveyDto.getDirection() + " is invalid, expected: N,NE,E,SE,S,SW,W,NW or blank"));
+                    surveyDto.getDirection() + " is invalid, expected: N,NE,E,SE,S,SW,W,NW, O or blank"));
         }
 
         // Ensure site/date/depth.surveyNum is unique
