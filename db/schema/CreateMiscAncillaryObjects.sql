@@ -319,6 +319,7 @@ BEGIN
     RETURN;
 END
 $$;
+SELECT nrmn.refresh_materialized_views ()
 
 CREATE OR REPLACE FUNCTION nrmn.set_species_attributes ()
     RETURNS VOID
@@ -332,3 +333,4 @@ BEGIN
 END
 $$;
 SET search_path = nrmn,public;
+
