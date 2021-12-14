@@ -103,6 +103,25 @@ export const getSiteEdit = () => {
   );
 };
 
+export const getObservableItemAdd = () => {
+  const taxonomyDetail = axiosInstance.get('/api/species/taxonomyDetail');
+  const obsItemTypes = axiosInstance.get('/api/obsItemTypes');
+  const reportGroups = axiosInstance.get('/api/reportGroups');
+  const habitatGroups = axiosInstance.get('/api/habitatGroups');
+  return axios.all([taxonomyDetail, obsItemTypes, reportGroups, habitatGroups]).then(
+    axios.spread((...responses) => {
+      return {
+        ...responses[0].data,
+        obsItemTypes: responses[1].data._embedded.obsItemTypes.map((i) => {
+          return {id: i.obsItemTypeId, label: i.obsItemTypeName};
+        }),
+        reportGroups: responses[2].data._embedded.reportGroups.map((i) => i.name),
+        habitatGroups: responses[3].data._embedded.habitatGroups.map((i) => i.name)
+      };
+    })
+  );
+};
+
 export const getObservableItemEdit = () => {
   const speciesEpithets = axiosInstance.get('/api/species/taxonomyDetail');
   const reportGroups = axiosInstance.get('/api/reportGroups');
