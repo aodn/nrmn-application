@@ -191,7 +191,6 @@ LANGUAGE PLPGSQL
 SET search_path = nrmn,public;
 
 DROP FUNCTION nrmn.assign_species_to_method();
-
 CREATE OR REPLACE FUNCTION nrmn.assign_species_to_method()
     RETURNS integer
     LANGUAGE 'plpgsql'
@@ -281,7 +280,6 @@ END IF;
 END;
 $BODY$;
 
-SELECT nrmn.assign_species_to_method();
 
 CREATE OR REPLACE FUNCTION nrmn.set_is_invert_species()
 returns integer as $$
@@ -297,7 +295,6 @@ END; $$
 LANGUAGE PLPGSQL
 SET search_path = nrmn,public;
 
-SELECT nrmn.set_is_invert_species();
 
 CREATE OR REPLACE FUNCTION nrmn.refresh_materialized_views ()
     RETURNS VOID
@@ -319,7 +316,6 @@ BEGIN
     RETURN;
 END
 $$;
-SELECT nrmn.refresh_materialized_views ()
 
 CREATE OR REPLACE FUNCTION nrmn.set_species_attributes ()
     RETURNS VOID
@@ -334,3 +330,5 @@ END
 $$;
 SET search_path = nrmn,public;
 
+-- Execute function after update
+SELECT nrmn.set_species_attributes();

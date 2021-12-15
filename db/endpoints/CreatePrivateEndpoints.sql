@@ -1494,6 +1494,7 @@ GROUP BY
     observable_item_id;
 
 /* Endpoint species_attributes for template data and validation checks */
+DROP MATERIALIZED VIEW IF EXISTS nrmn.ui_species_attributes CASCADE;
 CREATE MATERIALIZED VIEW nrmn.ui_species_attributes AS
 SELECT
     oir.observable_item_id,
