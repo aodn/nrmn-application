@@ -563,8 +563,7 @@ from nrmn.observation obs
 where sm.method_id = 2 and ms.method_id = 2
 and (
 	(oi.class in ('Actinopterygii', 'Elasmobranchii'))
-	or (oi.observable_item_name = 'No species found')
-)
+	or (oi.observable_item_name = 'No species found') or (oi.class='Reptilia' AND oi."order"='Squamata'))
 group by sm.survey_id,
 	sur.country,
 	sur.area,
