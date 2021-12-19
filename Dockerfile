@@ -2,7 +2,7 @@ FROM ubuntu:16.04
 
 ARG BUILDER_UID=9999
 
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
 ENV HOME /home/builder
 ENV JAVA_TOOL_OPTIONS -Duser.home=/home/builder
 
@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libnetcdf11 \
     libgsl2 \
     libudunits2-0 \
-    openjdk-8-jdk \
+    openjdk-11-jdk \
     python3-dev \
     maven \
 	wget \
