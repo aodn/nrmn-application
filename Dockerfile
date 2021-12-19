@@ -5,18 +5,22 @@ ARG BUILDER_UID=9999
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
 ENV HOME /home/builder
 ENV JAVA_TOOL_OPTIONS -Duser.home=/home/builder
-RUN add-apt-repository ppa:openjdk-r/ppa
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    software-properties-common \
     git-core \
     libxml2-utils \
     libnetcdf11 \
     libgsl2 \
     libudunits2-0 \
-    openjdk-11-jdk \
     python3-dev \
     maven \
 	wget \
     && rm -rf /var/lib/apt/lists/*
+
+RUN add-apt-repository ppa:openjdk-r/ppa
+
+RUN apt-get update && apt-get install -y --no-install-recommends openjdk-11-jdk
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 
