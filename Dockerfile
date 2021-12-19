@@ -5,7 +5,7 @@ ARG BUILDER_UID=9999
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
 ENV HOME /home/builder
 ENV JAVA_TOOL_OPTIONS -Duser.home=/home/builder
-
+RUN add-apt-repository ppa:openjdk-r/ppa
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git-core \
     libxml2-utils \
