@@ -400,16 +400,18 @@ public class ValidationProcess {
         return null;
     }
 
-    // VALIDATION: Survey coordinates match with DB
-    private Collection<ValidationCell> validateWithin200M(StagedRowFormatted row) {
+    // VALIDATION: Survey coordinates match site coordinates
+    private Collection<ValidationCell> validateSurveyAtSite(StagedRowFormatted row) {
         Collection<ValidationCell> errors = new ArrayList<ValidationCell>();
 
         if(row.getSite() == null || row.getSite().getLatitude() == null || row.getSite().getLongitude() == null ||  row.getLatitude() == null || row.getLongitude() == null)
             return errors;
 
         double dist = getDistance(row.getSite().getLatitude(), row.getSite().getLongitude(), row.getLatitude(), row.getLongitude());
-        if (dist > 0.2) {
-            String message = "Coordinates are further than 0.2km from the Site (" + String.format("%.2f", dist) + "km)";
+
+        // Survey coordinates differ from site location by ~1m
+        if (dist > 0.000001) {
+            String message = "Coordinates differ from Site (" + String.format("%.4f", dist) + "km)";
             errors.add(new ValidationCell(ValidationCategory.SPAN, ValidationLevel.WARNING, message, row.getId(), "latitude"));
             errors.add(new ValidationCell(ValidationCategory.SPAN, ValidationLevel.WARNING, message, row.getId(), "longitude"));
         }
@@ -622,8 +624,8 @@ public class ValidationProcess {
             // Row Method is valid for species
             results.add(validateSpeciesBelowToMethod(row), false);
 
-            // Validate within 200M
-            results.addAll(validateWithin200M(row), false);
+            // Validate survey is at site location
+            results.addAll(validateSurveyAtSite(row), false);
 
             // Validate M3, M4 and M5 rows have zero inverts
             results.add(validateInvertsZeroOnM3M4M5(row), false);

@@ -12,27 +12,24 @@ import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
-class Within200MSiteCheckTest extends FormattedTestProvider {
+class SurveyAtSiteTest extends FormattedTestProvider {
 
     @Test
-    void within200MShouldSuccess() {
+    void sameCoordsShouldSucceed() {
         StagedRowFormatted formatted = getDefaultFormatted().build();
 
-        // Hobart IMAS: -42.886410468013004, 147.33520415427964
-        formatted.setLatitude( -42.886410468013004);
+        formatted.setLatitude(-42.886410468013004);
         formatted.setLongitude(147.33520415427964);
 
-        //Hobart Blue Eye SeaFood: 42.88654698514, 147.33479357370092
-        formatted.setSite(Site.builder().siteCode("A SITE").latitude( -42.88654698514).longitude(147.33479357370092).build());
+        formatted.setSite(Site.builder().siteCode("A SITE").latitude( -42.886410468013004).longitude(147.33520415427964).build());
         Collection<ValidationError> errors = validationProcess.checkData("ATRC", false, Arrays.asList(formatted));
-        assertFalse(errors.stream().anyMatch(p -> p.getMessage().contains("Coordinates are further than 0.2km from the Site")));
+        assertFalse(errors.stream().anyMatch(p -> p.getMessage().startsWith("Coordinates differ")));
     }
 
     @Test
-    void outside200MShouldFail() {
+    void differentCoordsShouldFail() {
         StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMethod(1);
-        // formatted.setSpecies(Optional.of(ObservableItem.builder().observableItemName("THE SPECIES").methods(methods).build()));
 
         //hobart IMAS -42.886410468013004, 147.33520415427964
         formatted.setLatitude( -42.886410468013004);
@@ -44,7 +41,7 @@ class Within200MSiteCheckTest extends FormattedTestProvider {
                 .longitude(147.3293531695972).build());
 
         Collection<ValidationError> errors = validationProcess.checkData("ATRC", false, Arrays.asList(formatted));
-        assertTrue(errors.stream().anyMatch(p -> p.getMessage().contains("Coordinates are further than 0.2km from the Site")));
+        assertTrue(errors.stream().anyMatch(p -> p.getMessage().startsWith("Coordinates differ")));
     }
 
 }
