@@ -62,6 +62,8 @@ const SiteEdit = ({clone}) => {
     }
   };
 
+  useEffect(latLongBlur, [site.latitude, site.longitude]);
+
   useEffect(() => {
     if (checkCoords && !isNaN(parseFloat(site.latitude)) && !isNaN(parseFloat(site.longitude))) {
       const query = `sitesAroundLocation?latitude=${site.latitude}&longitude=${site.longitude}` + (edit ? `&exclude=${siteId}` : '');
