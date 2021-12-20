@@ -59,7 +59,7 @@ VALUES (55, 551, 812331345, '2017-11-28', '00:00:00', 25, 1, 10, 'N',
 
 
 INSERT INTO nrmn.diver_ref(diver_id, initials, full_name)
-VALUES (51, 'TJR', 'Tanjona Julien Rafidison');
+VALUES (51, 'JEP', 'Juan Espanol Pagina');
 INSERT INTO nrmn.diver_ref(diver_id, initials, full_name)
 VALUES (70, 'AZS', 'Alex Zum Smith');
 INSERT INTO nrmn.diver_ref(diver_id, initials, full_name)
@@ -158,7 +158,7 @@ VALUES (551, 1, '{}',51, 3, 333,121),
 INSERT INTO nrmn.staged_row(pqs, block, buddy, code, created, date, depth, direction, diver,
                             inverts, is_invert_sizing, last_updated, latitude, longitude, 
                             measure_value, method, site_name, site_no, species, time, total, vis, staged_job_id)
-VALUES ('TJR', 1, 'AZS', 'AAA', '09/09/2009', '03/03/2003', 3.3, 'NW', 'TJR',
+VALUES ('JEP', 1, 'AZS', 'AAA', '09/09/2009', '03/03/2003', 3.3, 'NW', 'JEP',
         0, false, '01/01/2001', -5, 35, 
         '{
           "1": "5"

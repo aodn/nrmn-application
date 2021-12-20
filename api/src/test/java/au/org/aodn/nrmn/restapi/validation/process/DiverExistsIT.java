@@ -48,7 +48,18 @@ class DiverExistsIT {
         job.setId(1L);
         StagedRow row = new StagedRow();
         row.setStagedJob(job);
-        row.setDiver("TJR");
+        row.setDiver("JEP");
+        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
+        assertFalse(res.stream().anyMatch(e -> e.getColumnNames().contains("diver") && e.getMessage().equalsIgnoreCase("Diver does not exist")));
+    }
+
+    @Test
+    void diverNameWithAccentShouldBeOk() {
+        StagedJob job = new StagedJob();
+        job.setId(1L);
+        StagedRow row = new StagedRow();
+        row.setStagedJob(job);
+        row.setDiver("Juán Español Página");
         Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
         assertFalse(res.stream().anyMatch(e -> e.getColumnNames().contains("diver") && e.getMessage().equalsIgnoreCase("Diver does not exist")));
     }
