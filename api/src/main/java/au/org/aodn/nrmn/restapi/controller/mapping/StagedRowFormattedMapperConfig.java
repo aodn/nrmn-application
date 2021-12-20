@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller.mapping;
 
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -32,7 +33,7 @@ public class StagedRowFormattedMapperConfig {
             if (ctx.getSource() == null)
                 return null;
             Optional<Diver> diver = divers.stream()
-                    .filter(d -> (d.getFullName() != null && d.getFullName().equalsIgnoreCase(ctx.getSource()))
+                    .filter(d -> (d.getFullName() != null && Normalizer.normalize(d.getFullName(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").equalsIgnoreCase(ctx.getSource()))
                             || (d.getInitials() != null && d.getInitials().equalsIgnoreCase(ctx.getSource())))
                     .findFirst();
             return diver.isPresent() ? diver.get() : null;

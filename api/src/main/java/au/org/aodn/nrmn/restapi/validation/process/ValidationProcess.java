@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.validation.process;
 
 import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistance;
 
+import java.text.Normalizer;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -110,8 +111,8 @@ public class ValidationProcess {
 
         Collection<String> diverNames = new ArrayList<String>();
         for (Diver d : diverRepository.getAll()) {
-            diverNames.add(d.getFullName().toUpperCase());
-            diverNames.add(d.getInitials().toUpperCase());
+            diverNames.add(Normalizer.normalize(d.getFullName(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").toUpperCase());
+            diverNames.add(Normalizer.normalize(d.getInitials(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").toUpperCase());
         }
 
         ValidationResultSet errors = new ValidationResultSet();
@@ -127,14 +128,14 @@ public class ValidationProcess {
                 errors.add(rowId, ValidationLevel.BLOCKING, "siteCode", "Site Code does not exist");
 
             // Diver
-            if (row.getDiver() == null || !diverNames.contains(row.getDiver().toUpperCase()))
+            if (row.getDiver() == null || !diverNames.contains(Normalizer.normalize(row.getDiver(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").toUpperCase()))
                 errors.add(rowId, ValidationLevel.BLOCKING, "diver", "Diver does not exist");
 
             // Buddies
             List<String> unknownBuddies = new ArrayList<String>();
             if (row.getBuddy() != null) {
                 for(String buddy : row.getBuddy().split(",")) {
-                    if(!diverNames.contains(buddy.trim().toUpperCase()))
+                    if(!diverNames.contains(Normalizer.normalize(buddy.trim(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").toUpperCase()))
                         unknownBuddies.add(buddy.trim());
                 }
             }
@@ -149,7 +150,7 @@ public class ValidationProcess {
 
             if (StringUtils.isBlank(row.getPqs())) {
                 errors.add(rowId, ValidationLevel.WARNING, "P-Qs", "P-Qs Diver is blank");
-            } else if(!diverNames.contains(row.getPqs().toUpperCase())) {
+            } else if(!diverNames.contains(Normalizer.normalize(row.getPqs(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").toUpperCase())) {
                 errors.add(rowId, ValidationLevel.WARNING, "P-Qs", String.format("Diver \"%s\" does not exist", row.getPqs()));
             }
 
@@ -686,13 +687,13 @@ public class ValidationProcess {
             return diver.isPresent() ? diver.get().getInitials() : s;
         }).distinct().collect(Collectors.toList());
 
-        int totalDistictDivers = distinctDiverInitials.size();
+        int totalDistinctDivers = distinctDiverInitials.size();
 
         distinctDiverInitials.removeIf(n -> divers.stream().anyMatch(d -> d.getInitials() != null && d.getInitials().equalsIgnoreCase(n)));
 
         int totalNewDivers = distinctDiverInitials.size();
 
-        response.setDiverCount(totalDistictDivers);
+        response.setDiverCount(totalDistinctDivers);
         response.setNewDiverCount(totalNewDivers);
         
         // End Diver Count

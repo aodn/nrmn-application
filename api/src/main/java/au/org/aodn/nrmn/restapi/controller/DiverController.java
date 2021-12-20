@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -89,7 +90,8 @@ public class DiverController {
                     "A diver with these initials already exists."));
         }
 
-        List<Diver> existingDiversWithSameName = diverRepository.findByFullName(diver.getFullName());
+        String diverFullName = Normalizer.normalize(diver.getFullName(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+        List<Diver> existingDiversWithSameName = diverRepository.findByFullName(diverFullName);
 
         if(diver.getDiverId() != null) {
             existingDiversWithSameName = existingDiversWithSameName

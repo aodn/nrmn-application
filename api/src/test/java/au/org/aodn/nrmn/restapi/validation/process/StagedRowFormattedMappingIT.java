@@ -55,7 +55,7 @@ class StagedRowFormattedMappingIT {
         row.setLatitude("-35");
         row.setDate("16/11/2020");
         row.setTime("11:32");
-        row.setDiver("TJR");
+        row.setDiver("JEP");
         row.setDepth("7.4");
         row.setMethod("1");
         row.setBlock("1");
@@ -85,8 +85,8 @@ class StagedRowFormattedMappingIT {
         assertEquals(-35, formattedRow.getLatitude());
         assertEquals(LocalDate.parse("16/11/2020", DateTimeFormatter.ofPattern("d/M/yyyy")), formattedRow.getDate());
         assertEquals(TimeUtils.parseTime("11:32"), formattedRow.getTime());
-        assertEquals("TJR", formattedRow.getDiver().getInitials());
-        assertEquals("Tanjona Julien Rafidison", formattedRow.getDiver().getFullName());
+        assertEquals("JEP", formattedRow.getDiver().getInitials());
+        assertEquals("Juan Espanol Pagina", formattedRow.getDiver().getFullName());
         assertEquals(1, formattedRow.getBlock());
         assertEquals(Directions.NE, formattedRow.getDirection());
         assertEquals(102, formattedRow.getSpecies().get().getAphiaId());
