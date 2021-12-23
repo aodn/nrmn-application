@@ -86,6 +86,6 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
                 "ORDER BY surveyId DESC", nativeQuery = true)
         List<SurveyRow> findByCriteria(@Param("f") SurveyFilterDto surveyFilter);
 
-        @Query("SELECT s FROM Survey s WHERE s.surveyId IN :ids AND s.pqCatalogued = false")
+        @Query("SELECT s FROM Survey s WHERE s.surveyId IN :ids AND (s.pqCatalogued = FALSE OR s.pqCatalogued IS NULL)")
         List<Survey> findSurveysWithoutPQ(@Param("ids") List<Integer> ids);
 }
