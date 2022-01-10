@@ -662,9 +662,12 @@ const DataSheetView = ({jobId, onIngest}) => {
         </Box>
         {job && job.status === 'STAGED' && (
           <Box display="flex" flexDirection="row">
-            <Box ml={1} p={2} flexGrow={1}>
-              <Typography>{`${job.status} ${job.source} ${job.program} ${job.isExtendedSize ? 'Extended Size' : ''}  ${
-                job.reference
+            <Box p={1} flexGrow={1}>
+              <Typography noWrap variant="subtitle2">
+                {job.reference}
+              </Typography>
+              <Typography variant="body2">{`${job.status} ${job.source} ${job.program} ${
+                job.isExtendedSize ? 'Extended Size' : ''
               } `}</Typography>
             </Box>
             <Box m={1} ml={0}>
@@ -672,7 +675,7 @@ const DataSheetView = ({jobId, onIngest}) => {
                 Undo
               </Button>
             </Box>
-            <Box m={1} ml={0}>
+            <Box m={1} ml={0} minWidth={150}>
               <Button startIcon={<ResetIcon />} disabled={!isFiltered} onClick={() => setIsFiltered()}>
                 Reset Filter
               </Button>
@@ -685,12 +688,12 @@ const DataSheetView = ({jobId, onIngest}) => {
                 Export
               </Button>
             </Box>
-            <Box p={1}>
+            <Box p={1} minWidth={180}>
               <Button disabled={state === IngestState.Loading} onClick={handleSaveAndValidate} startIcon={<PlaylistAddCheckOutlinedIcon />}>
                 {`Save & Validate`}
               </Button>
             </Box>
-            <Box p={1}>
+            <Box p={1} mr={2}>
               <Button
                 disabled={state !== IngestState.Valid}
                 onClick={() => setState(IngestState.ConfirmSubmit)}
