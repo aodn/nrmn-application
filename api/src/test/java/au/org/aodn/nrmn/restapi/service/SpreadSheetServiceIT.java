@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.InputStream;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class SpreadSheetServiceIT {
             error = e.getMessage();
         }
         // Reject the sheet for having unexpected headers
-        assertTrue(error != null);
+        assertTrue(StringUtils.isNotEmpty(error));
     }
 
     @Test
@@ -69,7 +70,7 @@ public class SpreadSheetServiceIT {
         } catch (Exception e) {
             error = e.getMessage();
         }
-        assertTrue(error != null);
+        assertTrue(StringUtils.isNotEmpty(error));
     }
 
     @Test
@@ -81,7 +82,7 @@ public class SpreadSheetServiceIT {
         } catch (Exception e) {
             error = e.getMessage();
         }
-        assertTrue(error != null);
+        assertTrue(StringUtils.isNotEmpty(error));
     }
 
     @Test
@@ -95,7 +96,7 @@ public class SpreadSheetServiceIT {
         } catch (Exception e) {
             error = e.getMessage();
         }
-        assertTrue(error != null);
+        assertTrue(StringUtils.isNotEmpty(error));
     }
 
     @Test
@@ -108,7 +109,7 @@ public class SpreadSheetServiceIT {
         } catch (Exception e) {
             error = e.getMessage();
         }
-        assertTrue(error != null);
+        assertTrue(StringUtils.isNotEmpty(error));
     }
 
     @Test
@@ -121,7 +122,7 @@ public class SpreadSheetServiceIT {
         } catch (Exception e) {
             error = e.getMessage();
         }
-        assertTrue(error != null);
+        assertTrue(StringUtils.isNotEmpty(error));
     }
 
     @Test

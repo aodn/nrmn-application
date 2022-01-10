@@ -56,7 +56,7 @@ class DirectionDataCheckTest {
         job.setId(1L);
         StagedRow row = new StagedRow();
         row.setStagedJob(job);
-        row.setDirection("  NE  ");
+        row.setDirection("NE");
         Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().equals("Direction is not valid")));
     }

@@ -133,14 +133,15 @@ public class ValidationProcess {
 
             // Buddies
             List<String> unknownBuddies = new ArrayList<String>();
-            if (row.getBuddy() != null) {
-                for(String buddy : row.getBuddy().split(",")) {
-                    if(!diverNames.contains(Normalizer.normalize(buddy.trim(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").toUpperCase()))
-                        unknownBuddies.add(buddy.trim());
+            if (StringUtils.isNotEmpty(row.getBuddy())) {
+                for(String buddyComponent : row.getBuddy().split(",")) {
+                    String buddy = buddyComponent.trim();
+                    if(!diverNames.contains(Normalizer.normalize(buddy, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").toUpperCase()))
+                        unknownBuddies.add(buddy);
                 }
             }
 
-            if(row.getBuddy() == null || row.getBuddy().trim() == "") {
+            if(StringUtils.isEmpty(row.getBuddy())) {
                 errors.add(rowId, ValidationLevel.WARNING, "buddy", "Diver does not exist", 0);
             } else if(unknownBuddies.size() == 1) {
                 errors.add(rowId, ValidationLevel.WARNING, "buddy", "Diver " + unknownBuddies.get(0) + " does not exist", 1);
@@ -155,11 +156,11 @@ public class ValidationProcess {
             }
 
             // VALIDATION: Species are not superseded
-            if (row.getSpecies() != null && !row.getSpecies().equalsIgnoreCase("survey not done")) {
+            if (StringUtils.isNotEmpty(row.getSpecies()) && !row.getSpecies().equalsIgnoreCase("survey not done")) {
                 Optional<ObservableItem> observableItem = species.stream().filter(s -> row.getSpecies().equalsIgnoreCase(s.getObservableItemName())).findAny();
                 if (observableItem.isPresent()) {
                     String supersededBy = observableItem.get().getSupersededBy();
-                    if (supersededBy != null && supersededBy.trim().length() > 0)
+                    if (StringUtils.isNotEmpty(supersededBy))
                         errors.add(rowId, ValidationLevel.WARNING, "species", "Superseded by " + supersededBy);
                 } else {
                     errors.add(rowId, ValidationLevel.BLOCKING, "species", "Species does not exist");
@@ -167,7 +168,7 @@ public class ValidationProcess {
             }
 
             // Direction
-            if (row.getDirection() != null && !EnumUtils.isValidEnumIgnoreCase(Directions.class, row.getDirection().trim()) && !Arrays.asList("0", "").contains(row.getDirection().trim()))
+            if (StringUtils.isNotEmpty(row.getDirection()) && !EnumUtils.isValidEnumIgnoreCase(Directions.class, row.getDirection()) && !Arrays.asList("0", "").contains(row.getDirection()))
                 errors.add(rowId, ValidationLevel.BLOCKING, "direction", "Direction is not valid");
 
             // Latitude
@@ -663,7 +664,7 @@ public class ValidationProcess {
         ValidationResponse response = new ValidationResponse();
         response.setRowCount(mappedRows.size());
 
-        Collection<String> distinctSites = mappedRows.stream().map(r ->r.getRef().getSiteCode().trim().toUpperCase()).filter(s -> s.length() > 0).distinct().collect(Collectors.toList());
+        Collection<String> distinctSites = mappedRows.stream().map(r ->r.getRef().getSiteCode().toUpperCase()).filter(s -> s.length() > 0).distinct().collect(Collectors.toList());
         Collection<String> distinctSitesExisting = mappedRows.stream().filter(r -> r.getSite() != null).map(r ->r.getSite().getSiteCode().toUpperCase()).distinct().collect(Collectors.toList());
         response.setSiteCount(distinctSites.size());
 
@@ -677,13 +678,13 @@ public class ValidationProcess {
 
         Collection<String> distinctSurveyDivers = mappedRows.stream().map(d -> d.getRef().getDiver().toUpperCase()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
         Collection<String> distinctPQDivers = mappedRows.stream().map(d -> d.getRef().getPqs().toUpperCase()).filter(d -> d.length() > 0 && !d.equalsIgnoreCase("0")).distinct().collect(Collectors.toList());
-        Collection<String> distinctBuddies = mappedRows.stream().flatMap(r -> Stream.of(r.getRef().getBuddy().split(","))).map(d -> d.trim().toUpperCase()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
+        Collection<String> distinctBuddies = mappedRows.stream().flatMap(r -> Stream.of(r.getRef().getBuddy().split(","))).map(d -> d.toUpperCase()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
         distinctSurveyDivers.addAll(distinctPQDivers);
         distinctSurveyDivers.addAll(distinctBuddies);
 
         // Map diver full names to initials and then use the distinct count of initials to determine the number of distinct divers
         Collection<String> distinctDiverInitials = distinctSurveyDivers.stream().map(s -> {
-            Optional<Diver> diver = divers.stream().filter(d -> d.getFullName() != null && d.getFullName().equalsIgnoreCase(s)).findFirst();
+            Optional<Diver> diver = divers.stream().filter(d -> StringUtils.isNotEmpty(d.getFullName()) && d.getFullName().equalsIgnoreCase(s)).findFirst();
             return diver.isPresent() ? diver.get().getInitials() : s;
         }).distinct().collect(Collectors.toList());
 
@@ -698,10 +699,10 @@ public class ValidationProcess {
         
         // End Diver Count
 
-        List<String> obsItemNames = mappedRows.stream().map(r -> r.getRef().getSpecies().trim().toUpperCase()).filter(r -> r.length() > 0).distinct().collect(Collectors.toList());
+        List<String> obsItemNames = mappedRows.stream().map(r -> r.getRef().getSpecies().toUpperCase()).filter(r -> r.length() > 0).distinct().collect(Collectors.toList());
         int distinctObsItems = obsItemNames.size();
         Long distinctObsItemsExisting = mappedRows.stream().filter(r ->r.getSpecies().isPresent()).map(r -> r.getSpecies().get().getObservableItemName()).distinct().count();
-        Long distinctNotPresentObsItem = mappedRows.stream().map(r -> r.getRef().getSpecies().trim().toUpperCase()).filter(r -> r.equalsIgnoreCase("SURVEY NOT DONE")).distinct().count();
+        Long distinctNotPresentObsItem = mappedRows.stream().map(r -> r.getRef().getSpecies().toUpperCase()).filter(r -> r.equalsIgnoreCase("SURVEY NOT DONE")).distinct().count();
         response.setNewObsItemCount(distinctObsItems - distinctObsItemsExisting - distinctNotPresentObsItem);
         
         response.setObsItemCount(distinctObsItems);
