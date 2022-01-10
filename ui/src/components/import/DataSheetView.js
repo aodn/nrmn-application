@@ -722,7 +722,8 @@ const DataSheetView = ({jobId, onIngest}) => {
               suppressKeyboardEvent: overrideKeyboardEvents,
               cellStyle: chooseCellStyle,
               enableCellChangeFlash: true,
-              tooltipValueGetter: toolTipValueGetter
+              tooltipValueGetter: toolTipValueGetter,
+              valueParser: ({newValue}) => (newValue ? newValue.trim() : '')
             }}
             rowHeight={20}
             enableBrowserTooltips
