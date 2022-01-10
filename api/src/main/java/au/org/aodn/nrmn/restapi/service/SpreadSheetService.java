@@ -4,6 +4,9 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -19,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import au.org.aodn.nrmn.restapi.service.SurveyContentsHandler.ParsedSheet;
 
@@ -60,14 +62,17 @@ public class SpreadSheetService {
             ContentHandler handler = new XSSFSheetXMLHandler(styles, sharedStrings, surveyContentsHandler,
                     surveyCellFormatter, false);
 
-            XMLReader parser = XMLReaderFactory.createXMLReader();
-            parser.setContentHandler(handler);
+            SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+            parserFactory.setNamespaceAware(true);
+            SAXParser parser = parserFactory.newSAXParser();
+            XMLReader xmlReader = parser.getXMLReader();
+            xmlReader.setContentHandler(handler);
 
             Iterator<InputStream> sheets = xssfReader.getSheetsData();
             while ((sheets instanceof SheetIterator) && sheets.hasNext()) {
                 try (InputStream i = sheets.next()) {
                     if (((SheetIterator) (sheets)).getSheetName().toUpperCase().contentEquals("DATA")) {
-                        parser.parse(new InputSource(i));
+                        xmlReader.parse(new InputSource(i));
                     }
                 }
             }

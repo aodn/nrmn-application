@@ -134,7 +134,8 @@ public class ValidationProcess {
             // Buddies
             List<String> unknownBuddies = new ArrayList<String>();
             if (StringUtils.isNotEmpty(row.getBuddy())) {
-                for(String buddy : row.getBuddy().split(",")) {
+                for(String buddyComponent : row.getBuddy().split(",")) {
+                    String buddy = buddyComponent.trim();
                     if(!diverNames.contains(Normalizer.normalize(buddy, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").toUpperCase()))
                         unknownBuddies.add(buddy);
                 }
