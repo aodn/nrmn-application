@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -33,8 +34,8 @@ public class StagedRowFormattedMapperConfig {
             if (ctx.getSource() == null)
                 return null;
             Optional<Diver> diver = divers.stream()
-                    .filter(d -> (d.getFullName() != null && Normalizer.normalize(d.getFullName(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").equalsIgnoreCase(ctx.getSource()))
-                            || (d.getInitials() != null && d.getInitials().equalsIgnoreCase(ctx.getSource())))
+                    .filter(d -> (StringUtils.isNotEmpty(d.getFullName()) && Normalizer.normalize(d.getFullName(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").equalsIgnoreCase(ctx.getSource()))
+                            || (StringUtils.isNotEmpty(d.getInitials()) && d.getInitials().equalsIgnoreCase(ctx.getSource())))
                     .findFirst();
             return diver.isPresent() ? diver.get() : null;
         };
@@ -50,7 +51,7 @@ public class StagedRowFormattedMapperConfig {
             if (ctx.getSource() == null)
                 return null;
             Optional<Site> site = sites.stream()
-                    .filter(d -> (d.getSiteCode() != null && d.getSiteCode().equalsIgnoreCase(ctx.getSource())))
+                    .filter(d -> (StringUtils.isNotEmpty(d.getSiteCode()) && d.getSiteCode().equalsIgnoreCase(ctx.getSource())))
                     .findFirst();
             return site.isPresent() ? site.get() : null;
         };
@@ -65,7 +66,7 @@ public class StagedRowFormattedMapperConfig {
 
         Converter<String, Optional<LocalTime>> toTime = ctx -> TimeUtils.parseTime(ctx.getSource());
 
-        Converter<String, Directions> toDirection = ctx -> EnumUtils.getEnumIgnoreCase(Directions.class, ctx.getSource().trim());
+        Converter<String, Directions> toDirection = ctx -> EnumUtils.getEnumIgnoreCase(Directions.class, ctx.getSource());
 
         Converter<String, Integer> toDepth = ctx -> {
             try {
@@ -89,7 +90,7 @@ public class StagedRowFormattedMapperConfig {
             }
         };
 
-        Converter<String, Boolean> toInvertSizing = ctx -> ctx.getSource() != null
+        Converter<String, Boolean> toInvertSizing = ctx -> StringUtils.isNotEmpty(ctx.getSource())
                 ? ctx.getSource().equalsIgnoreCase("YES")
                 : false;
 

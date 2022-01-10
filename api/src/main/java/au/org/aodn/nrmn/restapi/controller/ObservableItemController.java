@@ -106,10 +106,10 @@ public class ObservableItemController {
             if(match.getObservableItemId().equals(item.getObservableItemId()))
                 continue;
 
-            if(match.getObservableItemName() != null && match.getObservableItemName().equals(item.getObservableItemName()))
+            if(StringUtils.isNotEmpty(match.getObservableItemName()) && match.getObservableItemName().equals(item.getObservableItemName()))
                 errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName", item.getObservableItemName(), "An item with this name already exists."));
             
-            if(match.getLetterCode() != null && match.getLetterCode().equals(item.getLetterCode()))
+            if(StringUtils.isNotEmpty(match.getLetterCode()) && match.getLetterCode().equals(item.getLetterCode()))
                 errors.add(new ValidationError(ObservableItemDto.class.getName(), "letterCode", item.getLetterCode(), "An item with this letter code already exists."));
         }
 

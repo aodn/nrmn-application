@@ -3,6 +3,8 @@ package au.org.aodn.nrmn.restapi.service;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.service.model.SpeciesRecord;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Example;
@@ -47,7 +49,7 @@ public class WormsService {
                     .orElse(new SpeciesRecord[0]);
             return Arrays.stream(matchingSpecies)
                     .map(m -> {
-                        m.setIsPresent(m.getScientificName() != null
+                        m.setIsPresent(StringUtils.isNotEmpty(m.getScientificName())
                                 ? observableItemRepository.count(Example.of(
                                         ObservableItem.builder().observableItemName(m.getScientificName()).build())) > 0
                                 : false);

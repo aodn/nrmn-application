@@ -165,11 +165,11 @@ public class StagedRow implements Serializable {
 
     public String getSurveyGroup() {
         String depthPart = depth.split("\\.")[0];
-        return (siteCode.trim() + "/" + date.trim() + "/" + depthPart).toUpperCase();
+        return (siteCode + "/" + date + "/" + depthPart).toUpperCase();
     }
 
     public String getSurvey() {
-        return (siteCode.trim() + "/" + date.trim() + "/" + depth.trim()).toUpperCase();
+        return (siteCode + "/" + date + "/" + depth).toUpperCase();
     }
 
 }

@@ -7,13 +7,15 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
+
 @Data
 public class SurveyFilterDto {
 
     public SurveyFilterDto(String startDate, String endDate) {
         this.filterSet = Stream.of(startDate, endDate).noneMatch(Objects::isNull);
-        this.startDateTimestamp = startDate != null ? Timestamp.from(Instant.parse(startDate)) : Timestamp.from(Instant.ofEpochSecond(0));
-        this.endDateTimestamp = endDate != null ? Timestamp.from(Instant.parse(endDate)) : Timestamp.from(Instant.now());
+        this.startDateTimestamp = StringUtils.isNotEmpty(startDate) ? Timestamp.from(Instant.parse(startDate)) : Timestamp.from(Instant.ofEpochSecond(0));
+        this.endDateTimestamp = StringUtils.isNotEmpty(endDate) ? Timestamp.from(Instant.parse(endDate)) : Timestamp.from(Instant.now());
     }
     
     public Boolean isSet() { return filterSet; }

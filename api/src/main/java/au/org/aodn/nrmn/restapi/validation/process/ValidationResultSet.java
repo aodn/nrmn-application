@@ -48,7 +48,7 @@ public class ValidationResultSet {
     }
 
     public void add(ValidationCell cell, Boolean groupInRow) {
-        if(cell != null)
+        if (cell != null)
             add(cell.getRowId(), cell.getCategoryId(), cell.getLevelId(), cell.getColumnName(), cell.getMessage(), groupInRow, 1);
     }
 
