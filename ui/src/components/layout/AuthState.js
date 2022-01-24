@@ -10,6 +10,7 @@ import AlertDialog from '../ui/AlertDialog';
 const AuthState = () => {
   const expires = useSelector((state) => state.auth.expires);
   const username = useSelector((state) => state.auth.username);
+  const isAdmin = useSelector((state) => state.auth.roles)?.includes('ROLE_ADMIN');
   const history = useHistory();
   const [confirmLogout, showConfirmLogout] = useState(false);
   const loggedIn = Date.now() < expires;
@@ -42,6 +43,7 @@ const AuthState = () => {
           onClick={() => showConfirmLogout(true)}
         >
           {username}
+          {isAdmin && <span style={{color: 'yellow', marginLeft: 5}}>(ADMIN)</span>}
         </Button>
         <AlertDialog
           open={confirmLogout}
