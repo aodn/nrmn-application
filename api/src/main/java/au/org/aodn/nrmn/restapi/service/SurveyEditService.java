@@ -77,8 +77,11 @@ public class SurveyEditService {
         survey.setDepth(Integer.valueOf(surveyDto.getDepth()));
         survey.setSurveyNum(surveyDto.getSurveyNum());
 
-        Diver pqDiver = diverRepository.findByCriteria(surveyDto.getPqDiverInitials()).get(0);
-        survey.setPqDiverId(pqDiver.getDiverId());
+        List<Diver> diver = diverRepository.findByCriteria(surveyDto.getPqDiverInitials());
+        if (diver.size() > 0) {
+          Diver pqDiver = diver.get(0);
+          survey.setPqDiverId(pqDiver.getDiverId());
+        }
 
         survey.setProjectTitle(surveyDto.getProjectTitle());
         survey.setProtectionStatus(surveyDto.getProtectionStatus());
@@ -123,7 +126,8 @@ public class SurveyEditService {
 
         // Time validations
         try {
-            parseTime(surveyDto.getSurveyTime());
+          if (StringUtils.isEmpty(surveyDto.getSurveyTime()))
+            surveyDto.getSurveyTime();
         } catch (DateTimeException e) {
             errors.add(new ValidationError("Survey", "surveyTime", surveyDto.getSurveyTime(),
                     "The survey time must be in the format hh:mm[:ss]"));

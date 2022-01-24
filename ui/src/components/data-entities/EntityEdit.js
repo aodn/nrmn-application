@@ -138,6 +138,7 @@ const EntityEdit = ({entity, template, clone}) => {
     } else if (key === 'pqDiverInitials') {
       uiSchema[key] = {
         'ui:field': 'dropdown',
+        optional: true,
         route: 'divers',
         entity: 'diver',
         entityList: 'divers',
