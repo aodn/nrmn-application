@@ -27,6 +27,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
@@ -710,6 +712,8 @@ public class ValidationProcess {
     }
 
     public ValidationResponse process(StagedJob job) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean hasAdminRole = authentication != null ? authentication.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN")) : false;
 
         Collection<StagedRow> rows = rowRepository.findRowsByJobId(job.getId());
         Collection<ObservableItem> species = getSpeciesForRows(rows);
@@ -725,6 +729,11 @@ public class ValidationProcess {
 
         ValidationResponse response = generateSummary(mappedRows);
 
+        if(hasAdminRole) {
+            response.setErrors(sheetErrors);
+            return response;
+        }
+        
         sheetErrors.addAll(checkData(programName, job.getIsExtendedSize(), mappedRows));
 
         Map<String, List<StagedRowFormatted>> surveyMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
