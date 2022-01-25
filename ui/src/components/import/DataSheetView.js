@@ -143,7 +143,7 @@ const generateErrorTree = (rowData, rowPos, errors) => {
               rowIds: [...acc[existingIdx].rowIds, r.id],
               rowNumbers: [...acc[existingIdx].rowNumbers, rowNumber]
             };
-          else acc.push({columnName: col, value: r[col], rowIds: [r.id], rowNumbers: [rowNumber]});
+          else acc.push({columnName: col, value: r[col], rowIds: [r.id], rowNumbers: [rowNumber], isInvertSize: r.isInvertSizing === 'Yes'});
           return acc;
         }, []);
       } else {

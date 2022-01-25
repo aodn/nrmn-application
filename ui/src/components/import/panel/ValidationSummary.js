@@ -24,7 +24,7 @@ const ValidationSummary = (props) => {
         >
           {m.description.map((d) => {
             const mmHeader = mm.find((m) => m.field === d.columnName);
-            let label = mmHeader ? `${mmHeader.fishSize}/${mmHeader.invertSize}` : d.columnName;
+            let label = mmHeader ? `${(d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize)}cm` : d.columnName;
             return (
               <TreeItem
                 nodeId={`${m.key}-${d.columnName}`}
