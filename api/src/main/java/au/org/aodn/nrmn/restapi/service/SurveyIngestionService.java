@@ -25,6 +25,7 @@ import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.Measure;
 import au.org.aodn.nrmn.restapi.model.db.Method;
 import au.org.aodn.nrmn.restapi.model.db.Observation;
+import au.org.aodn.nrmn.restapi.model.db.Program;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedJobLog;
@@ -93,7 +94,7 @@ public class SurveyIngestionService {
     @Autowired
     StagedJobRepository jobRepository;
 
-    public Survey getSurvey(StagedRowFormatted stagedRow) {
+    public Survey getSurvey(Program program, StagedRowFormatted stagedRow) {
 
         Site site = stagedRow.getSite();
 
@@ -102,7 +103,7 @@ public class SurveyIngestionService {
             siteRepo.save(site);
         }
 
-        Survey survey = Survey.builder().depth(stagedRow.getDepth()).surveyNum(stagedRow.getSurveyNum())
+        Survey survey = Survey.builder().program(program).depth(stagedRow.getDepth()).surveyNum(stagedRow.getSurveyNum())
                 .site(Site.builder().siteCode(site.getSiteCode()).build()).surveyDate(Date.valueOf(stagedRow.getDate()))
                 .build();
 
@@ -203,7 +204,7 @@ public class SurveyIngestionService {
         Map<String, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
 
         List<Integer> surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
-            Survey survey = getSurvey(surveyRows.get(0));
+            Survey survey = getSurvey(job.getProgram(), surveyRows.get(0));
             groupRowsByMethodBlock(surveyRows).values().forEach(methodBlockRows -> {
                 SurveyMethod surveyMethod = getSurveyMethod(survey, methodBlockRows.get(0));
                 methodBlockRows.forEach(row -> observationRepository.saveAll(getObservations(surveyMethod, row, job.getIsExtendedSize())));

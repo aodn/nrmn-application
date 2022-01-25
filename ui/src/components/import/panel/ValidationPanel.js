@@ -1,4 +1,5 @@
 import React from 'react';
+import {useSelector} from 'react-redux';
 import {Box, Divider, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@material-ui/core';
 import {PropTypes} from 'prop-types';
 import ValidationSummary from './ValidationSummary';
@@ -7,17 +8,18 @@ const ValidationPanel = (props) => {
   const context = props.api.gridOptionsWrapper.gridOptions.context;
   const summary = context.summary;
   const errorList = context.errorList;
+  const isAdmin = useSelector((state) => state.auth.roles)?.includes('ROLE_ADMIN');
 
   const handleItemClick = (item, noFilter) => {
     const rowId = item.row || item.rowIds[0];
-    context.focusedRows = noFilter ? (item.rowIds || [item.row]) : [];
+    context.focusedRows = noFilter ? item.rowIds || [item.row] : [];
     const row = context.rowData.find((r) => r.id === rowId);
     let visible = false;
     props.api.forEachNodeAfterFilter((n) => (visible = n.data.id === row.id || visible));
     if (visible) props.api.ensureNodeVisible(row, 'middle');
     if (item.columnName) props.api.ensureColumnVisible(item.columnName);
     if (item.columnNames) for (const column of item.columnNames) props.api.ensureColumnVisible(column);
-    props.api.setFilterModel(noFilter ? null : {id: {type: 'set',values: item.rowIds.map((id) => id.toString())}});
+    props.api.setFilterModel(noFilter ? null : {id: {type: 'set', values: item.rowIds.map((id) => id.toString())}});
     props.api.redrawRows();
   };
 
@@ -93,10 +95,18 @@ const ValidationPanel = (props) => {
           </TableBody>
         </Table>
       </Box>
-      <Box m={2} mt={1}>
-        <Typography variant="button">{Object.keys(errorList.blocking).length > 0 ? `Blocking` : 'No Blocking ✔'}</Typography>
-        {Object.keys(errorList.blocking).length > 0 && <ValidationSummary data={errorList.blocking} onItemClick={handleItemClick} />}
-      </Box>
+      {isAdmin ? (
+        <Box m={2} mt={1}>
+          <Typography style={{color: 'red'}} variant="button">
+            Blocking validations disabled. Proceed with caution!
+          </Typography>
+        </Box>
+      ) : (
+        <Box m={2} mt={1}>
+          <Typography variant="button">{Object.keys(errorList.blocking).length > 0 ? `Blocking` : 'No Blocking ✔'}</Typography>
+          {Object.keys(errorList.blocking).length > 0 && <ValidationSummary data={errorList.blocking} onItemClick={handleItemClick} />}
+        </Box>
+      )}
       <Divider />
       {errorList.duplicate && Object.keys(errorList.duplicate).length > 0 && (
         <>

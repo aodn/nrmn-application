@@ -95,8 +95,7 @@ public class SurveyIngestionServiceTest {
     void getSurveyForNewSurvey() {
         when(surveyRepository.save(any())).then(s -> s.getArgument(0));
         when(siteRepo.save(any())).then(s -> s.getArgument(0));
-
-        Survey survey = surveyIngestionService.getSurvey(rowBuilder.build());
+        Survey survey = surveyIngestionService.getSurvey(new Program(), rowBuilder.build());
         assertEquals(1, survey.getDepth());
         assertEquals(2, survey.getSurveyNum());
         assertEquals("A SITE", survey.getSite().getSiteCode());
@@ -117,12 +116,12 @@ public class SurveyIngestionServiceTest {
 
         StagedRowFormatted row1 = rowBuilder.build();
 
-        Survey survey1 = surveyIngestionService.getSurvey(row1);
+        Survey survey1 = surveyIngestionService.getSurvey(new Program(), row1);
 
         StagedRowFormatted row2 = rowBuilder.block(2).method(1)
                 .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build()).build();
 
-        Survey survey2 = surveyIngestionService.getSurvey(row2);
+        Survey survey2 = surveyIngestionService.getSurvey(new Program(), row2);
 
         assertEquals(survey1, survey2);
     }
