@@ -97,7 +97,7 @@ public class SurveyIngestionServiceTest {
     void getSurveyForNewSurvey() {
         when(surveyRepository.save(any())).then(s -> s.getArgument(0));
         when(siteRepo.save(any())).then(s -> s.getArgument(0));
-        Survey survey = surveyIngestionService.getSurvey(new Program(), OptionalDouble.empty(), rowBuilder.build());
+        Survey survey = surveyIngestionService.getSurvey(new Program(), OptionalDouble.of(15.5), rowBuilder.build());
         assertEquals(1, survey.getDepth());
         assertEquals(2, survey.getSurveyNum());
         assertEquals("A SITE", survey.getSite().getSiteCode());
