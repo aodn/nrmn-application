@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -94,7 +95,7 @@ public class SurveyIngestionService {
     @Autowired
     StagedJobRepository jobRepository;
 
-    public Survey getSurvey(Program program, StagedRowFormatted stagedRow) {
+    public Survey getSurvey(Program program, OptionalDouble visAvg, StagedRowFormatted stagedRow) {
 
         Site site = stagedRow.getSite();
 
@@ -116,7 +117,7 @@ public class SurveyIngestionService {
                         .direction(stagedRow.getDirection() != null ? stagedRow.getDirection().toString() : null)
                         .site(site).surveyDate(Date.valueOf(stagedRow.getDate()))
                         .surveyTime(Time.valueOf(stagedRow.getTime().orElse(LocalTime.NOON)))
-                        .visibility(stagedRow.getVis().orElse(null))
+                        .visibility(visAvg.isPresent() ? visAvg.getAsDouble() : null)
                         .program(stagedRow.getRef().getStagedJob().getProgram())
                         .protectionStatus(site.getProtectionStatus())
                         .insideMarinePark(StringUtils.isNotBlank(site.getMpa()) ? "Yes" : "No")
@@ -204,7 +205,8 @@ public class SurveyIngestionService {
         Map<String, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
 
         List<Integer> surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
-            Survey survey = getSurvey(job.getProgram(), surveyRows.get(0));
+            OptionalDouble visAvg = surveyRows.stream().filter(r -> r.getVis().isPresent()).mapToDouble(r -> r.getVis().get()).average();
+            Survey survey = getSurvey(job.getProgram(), visAvg, surveyRows.get(0));
             groupRowsByMethodBlock(surveyRows).values().forEach(methodBlockRows -> {
                 SurveyMethod surveyMethod = getSurveyMethod(survey, methodBlockRows.get(0));
                 methodBlockRows.forEach(row -> observationRepository.saveAll(getObservations(surveyMethod, row, job.getIsExtendedSize())));

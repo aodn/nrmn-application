@@ -9,9 +9,11 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.stream.IntStream;
 
 import javax.persistence.EntityManager;
@@ -95,7 +97,7 @@ public class SurveyIngestionServiceTest {
     void getSurveyForNewSurvey() {
         when(surveyRepository.save(any())).then(s -> s.getArgument(0));
         when(siteRepo.save(any())).then(s -> s.getArgument(0));
-        Survey survey = surveyIngestionService.getSurvey(new Program(), rowBuilder.build());
+        Survey survey = surveyIngestionService.getSurvey(new Program(), OptionalDouble.of(15.5), rowBuilder.build());
         assertEquals(1, survey.getDepth());
         assertEquals(2, survey.getSurveyNum());
         assertEquals("A SITE", survey.getSite().getSiteCode());
@@ -116,12 +118,12 @@ public class SurveyIngestionServiceTest {
 
         StagedRowFormatted row1 = rowBuilder.build();
 
-        Survey survey1 = surveyIngestionService.getSurvey(new Program(), row1);
+        Survey survey1 = surveyIngestionService.getSurvey(new Program(), OptionalDouble.empty(), row1);
 
         StagedRowFormatted row2 = rowBuilder.block(2).method(1)
                 .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build()).build();
 
-        Survey survey2 = surveyIngestionService.getSurvey(new Program(), row2);
+        Survey survey2 = surveyIngestionService.getSurvey(new Program(), OptionalDouble.empty(), row2);
 
         assertEquals(survey1, survey2);
     }
@@ -310,7 +312,7 @@ public class SurveyIngestionServiceTest {
         StagedJob stagedJob = StagedJob.builder().id(1L).program(program).build();
         StagedRow stagedRow = StagedRow.builder().stagedJob(stagedJob).species("Survey Not Done").build();
 
-        StagedRowFormatted formattedRow = StagedRowFormatted
+        StagedRowFormatted formattedRow1 = StagedRowFormatted
                 .builder()
                 .ref(stagedRow)
                 .site(Site.builder().siteCode("test1").isActive(true).build())
@@ -327,7 +329,24 @@ public class SurveyIngestionServiceTest {
                 .measureJson(Collections.emptyMap())
                 .build();
 
-        surveyIngestionService.ingestTransaction(stagedJob, Collections.singletonList(formattedRow));
+        StagedRowFormatted formattedRow2 = StagedRowFormatted
+                .builder()
+                .ref(stagedRow)
+                .site(Site.builder().siteCode("test1").isActive(true).build())
+                .date(LocalDate.parse("2018-12-27"))
+                .time(Optional.empty())
+                .depth(10)
+                .surveyNum(1)
+                .direction(Directions.N)
+                .vis(Optional.empty())
+                .method(2)
+                .block(1)
+                .code("snd")
+                .species(Optional.empty())
+                .measureJson(Collections.emptyMap())
+                .build();
+
+        surveyIngestionService.ingestTransaction(stagedJob, Arrays.asList(formattedRow1, formattedRow2));
 
         ArgumentCaptor<SurveyMethod> surveyMethodCaptor = ArgumentCaptor.forClass(SurveyMethod.class);
         Mockito.verify(surveyMethodRepository).save(surveyMethodCaptor.capture());
