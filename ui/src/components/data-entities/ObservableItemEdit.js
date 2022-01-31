@@ -1,7 +1,7 @@
 import React, {useEffect, useReducer, useState} from 'react';
 import {useParams, NavLink, Redirect} from 'react-router-dom';
 import {Box, Button, CircularProgress, Divider, Grid, Typography} from '@material-ui/core';
-import {Save} from '@material-ui/icons';
+import {Save, Delete} from '@material-ui/icons';
 import Alert from '@material-ui/lab/Alert';
 import PropTypes from 'prop-types';
 
@@ -11,7 +11,7 @@ import CustomAutoCompleteInput from '../input/CustomAutoCompleteInput';
 import CustomTextInput from '../input/CustomTextInput';
 import CustomSearchInput from '../input/CustomSearchInput';
 
-import {getResult, getObservableItemEdit, entityEdit} from '../../axios/api';
+import {getResult, getObservableItemEdit, entityEdit, entityDelete} from '../../axios/api';
 
 const ObservableItemEdit = () => {
   const observableItemId = useParams()?.id;
@@ -62,6 +62,16 @@ const ObservableItemEdit = () => {
     });
   };
 
+  const handleDelete = () => {
+    entityDelete(`reference/observableItem`, observableItemId).then((res) => {
+      if (res.data.error) {
+        setErrors([{banner: 'Unable to delete. Observable Item has linked observations.'}]);
+      } else {
+        setSaved({observableItemId: '-1'});
+      }
+    });
+  };
+
   if (saved) {
     const id = saved['observableItemId'];
     return <Redirect to={`/reference/observableItem/${id}/saved`} />;
@@ -75,6 +85,9 @@ const ObservableItemEdit = () => {
             <Typography variant="h4">Edit Observable Item</Typography>
           </Box>
         </Grid>
+        <Button style={{ float: 'right'}} onClick={handleDelete} startIcon={<Delete></Delete>}>
+          Delete
+        </Button>
       </Grid>
       <Grid container direction="column" justify="flex-start" alignItems="center">
         {observableItemId && Object.keys(item).length === 0 ? (
@@ -84,7 +97,7 @@ const ObservableItemEdit = () => {
             {errors.length > 0 ? (
               <Box py={2}>
                 <Alert severity="error" variant="filled">
-                  Please review this form for errors and try again.
+                  {errors[0]?.banner ? errors[0].banner : 'Please review this form for errors and try again.'}
                 </Alert>
               </Box>
             ) : null}

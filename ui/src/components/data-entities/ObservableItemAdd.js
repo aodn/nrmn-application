@@ -90,7 +90,7 @@ const ObservableItemAdd = () => {
                 formData={item.aphiaId}
                 field="aphiaId"
                 errors={errors}
-                onChange={(t) => dispatch({field: 'aphiaId', value: t})}
+                onChange={(t) => dispatch({field: 'aphiaId', value: isNaN(parseInt(t)) ? '' : parseInt(t)})}
               />
             </Grid>
             <Grid item xs={6}>

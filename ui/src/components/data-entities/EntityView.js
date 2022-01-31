@@ -21,7 +21,7 @@ const EntityView = (props) => {
 
   useEffect(() => {
     dispatch(resetState());
-    dispatch(itemRequested(`${props.entity.endpoint}/${params.id}`));
+    if(params.id !== '-1') dispatch(itemRequested(`${props.entity.endpoint}/${params.id}`));
   }, [dispatch, params.id, props.entity.endpoint]);
 
   const entityDef = schemaDefinition[props.entity.schemaKey.view];
@@ -101,7 +101,7 @@ const EntityView = (props) => {
     ) : params.success ? (
       <Box margin={2} width="50%">
         <Alert severity="info" variant="filled">
-          {props.entity.name} {params.success === 'new' ? 'Created' : 'Updated'}
+          {props.entity.name} {params.success === 'new' ? 'Created' : params.id === '-1' ? 'Deleted' : 'Updated'}
         </Alert>
       </Box>
     ) : null;
@@ -116,14 +116,14 @@ const EntityView = (props) => {
           </Box>
         </Grid>
         <Grid item xs={2}>
-          <Button
+          {params.id !== '-1' && <Button
             style={{width: '100%'}}
             component={Link}
             to={`${props.entity.route.base}/${params.id}/edit`}
             startIcon={<Edit>edit</Edit>}
           >
             Edit
-          </Button>
+          </Button>}
         </Grid>
       </Grid>
       <Grid container alignItems="center" direction="column">
