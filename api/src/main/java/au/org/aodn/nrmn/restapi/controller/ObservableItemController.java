@@ -104,6 +104,9 @@ public class ObservableItemController {
 
         List<ValidationError> errors = new ArrayList<ValidationError>();
 
+        if(StringUtils.isEmpty(item.getObservableItemName()))
+            errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName", item.getObservableItemName(), "Species Name Required."));
+
         ObservableItem probe = ObservableItem.builder().commonName(item.getCommonName()).letterCode(item.getLetterCode()).observableItemName(item.getObservableItemName()).build();
         Example<ObservableItem> example = Example.of(probe, ExampleMatcher.matchingAny());
 
