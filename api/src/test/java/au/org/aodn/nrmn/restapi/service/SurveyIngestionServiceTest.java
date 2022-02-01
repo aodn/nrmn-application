@@ -321,7 +321,7 @@ public class SurveyIngestionServiceTest {
                 .depth(10)
                 .surveyNum(1)
                 .direction(Directions.N)
-                .vis(Optional.empty())
+                .vis(Optional.of(2.75))
                 .method(2)
                 .block(1)
                 .code("snd")
@@ -338,7 +338,7 @@ public class SurveyIngestionServiceTest {
                 .depth(10)
                 .surveyNum(1)
                 .direction(Directions.N)
-                .vis(Optional.empty())
+                .vis(Optional.of(2.75))
                 .method(2)
                 .block(1)
                 .code("snd")
@@ -347,6 +347,11 @@ public class SurveyIngestionServiceTest {
                 .build();
 
         surveyIngestionService.ingestTransaction(stagedJob, Arrays.asList(formattedRow1, formattedRow2));
+
+        ArgumentCaptor<Survey> surveyCaptor = ArgumentCaptor.forClass(Survey.class);
+        Mockito.verify(surveyRepository).save(surveyCaptor.capture());
+        Survey survey = surveyCaptor.getValue();
+        assertEquals(2.8, survey.getVisibility());
 
         ArgumentCaptor<SurveyMethod> surveyMethodCaptor = ArgumentCaptor.forClass(SurveyMethod.class);
         Mockito.verify(surveyMethodRepository).save(surveyMethodCaptor.capture());
