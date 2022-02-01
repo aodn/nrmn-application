@@ -12,7 +12,14 @@ const ValidationSummary = (props) => {
   const mm = measurements.concat(extendedMeasurements);
   return (
     <TreeView defaultCollapseIcon={<ArrowDropDownIcon />} defaultExpandIcon={<ArrowRightIcon />}>
-      {props.data.map((m) => (
+      {props.data
+      .filter(m => {
+        // HACK: Hide L5/L95 warnings without a size class
+        const isL5L95 = m?.message?.includes('Measurements outside L5');
+        const isMissingInverts = typeof m?.description[0]?.isInvertSize === 'undefined';
+        return isL5L95 && isMissingInverts ? false : true;
+      })
+      .map((m) => (
         <TreeItem
           key={m.key}
           nodeId={m.key}
@@ -24,7 +31,8 @@ const ValidationSummary = (props) => {
         >
           {m.description.map((d) => {
             const mmHeader = mm.find((m) => m.field === d.columnName);
-            let label = mmHeader ? `${(d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize)}cm` : d.columnName;
+            const label = mmHeader ? `${(d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize)}cm` : d.columnName;
+
             return (
               <TreeItem
                 nodeId={`${m.key}-${d.columnName}`}
