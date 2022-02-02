@@ -136,7 +136,7 @@ const generateErrorTree = (rowData, rowPos, errors) => {
           const rowPosition = rowData.find((d) => d.id === r.id)?.pos;
           const rowNumber = rowPos.indexOf(rowPosition) + 1;
           const existingIdx = acc.findIndex((m) => m.columnName === col && m.value === r[col]);
-          if (existingIdx >= 0)
+          if (existingIdx >= 0 && isNaN(parseInt(acc[existingIdx].columnName)))
             acc[existingIdx] = {
               columnName: col,
               value: r[col],
