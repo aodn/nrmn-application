@@ -677,16 +677,16 @@ public class ValidationProcess {
 
         // Diver Count
         Collection<Diver> divers = diverRepository.getAll();
-
-        Collection<String> distinctSurveyDivers = mappedRows.stream().map(d -> d.getRef().getDiver().toUpperCase()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
-        Collection<String> distinctPQDivers = mappedRows.stream().map(d -> d.getRef().getPqs().toUpperCase()).filter(d -> d.length() > 0 && !d.equalsIgnoreCase("0")).distinct().collect(Collectors.toList());
-        Collection<String> distinctBuddies = mappedRows.stream().flatMap(r -> Stream.of(r.getRef().getBuddy().split(","))).map(d -> d.toUpperCase()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
+        
+        Collection<String> distinctSurveyDivers = mappedRows.stream().map(d -> Normalizer.normalize(d.getRef().getDiver(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").toUpperCase()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
+        Collection<String> distinctPQDivers = mappedRows.stream().map(d -> Normalizer.normalize(d.getRef().getPqs(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").toUpperCase()).filter(d -> d.length() > 0 && !d.equalsIgnoreCase("0")).distinct().collect(Collectors.toList());
+        Collection<String> distinctBuddies = mappedRows.stream().flatMap(r -> Stream.of(r.getRef().getBuddy().split(","))).map(d -> Normalizer.normalize(d, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").toUpperCase()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
         distinctSurveyDivers.addAll(distinctPQDivers);
         distinctSurveyDivers.addAll(distinctBuddies);
 
         // Map diver full names to initials and then use the distinct count of initials to determine the number of distinct divers
         Collection<String> distinctDiverInitials = distinctSurveyDivers.stream().map(s -> {
-            Optional<Diver> diver = divers.stream().filter(d -> StringUtils.isNotEmpty(d.getFullName()) && d.getFullName().equalsIgnoreCase(s)).findFirst();
+            Optional<Diver> diver = divers.stream().filter(d -> StringUtils.isNotEmpty(d.getFullName()) && Normalizer.normalize(d.getFullName(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").equalsIgnoreCase(s)).findFirst();
             return diver.isPresent() ? diver.get().getInitials() : s;
         }).distinct().collect(Collectors.toList());
 
