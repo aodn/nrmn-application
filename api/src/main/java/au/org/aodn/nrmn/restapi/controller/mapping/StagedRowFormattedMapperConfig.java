@@ -34,10 +34,11 @@ public class StagedRowFormattedMapperConfig {
             if (ctx.getSource() == null)
                 return null;
             Optional<Diver> diver = divers.stream()
-                    .filter(d -> (StringUtils.isNotEmpty(d.getFullName()) && Normalizer.normalize(d.getFullName(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").equalsIgnoreCase(ctx.getSource()))
+                    .filter(d -> (StringUtils.isNotEmpty(d.getFullName()) && d.getFullName().equalsIgnoreCase(Normalizer.normalize(ctx.getSource(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "")))
                             || (StringUtils.isNotEmpty(d.getInitials()) && d.getInitials().equalsIgnoreCase(ctx.getSource())))
                     .findFirst();
-            return diver.isPresent() ? diver.get() : null;
+            Diver returnDiver = diver.isPresent() ? diver.get() : null;
+            return returnDiver;
         };
 
         Converter<Long, StagedRow> toRef = ctx -> rowMap.get(ctx.getSource());
