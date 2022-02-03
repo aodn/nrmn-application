@@ -34,7 +34,7 @@ public class StagedRowFormattedMapperConfig {
             if (ctx.getSource() == null)
                 return null;
             Optional<Diver> diver = divers.stream()
-                    .filter(d -> (StringUtils.isNotEmpty(d.getFullName()) && d.getFullName().equalsIgnoreCase(Normalizer.normalize(ctx.getSource(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "")))
+                    .filter(d -> (StringUtils.isNotEmpty(d.getFullName()) && Normalizer.normalize(d.getFullName(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").equalsIgnoreCase(Normalizer.normalize(ctx.getSource(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "")))
                             || (StringUtils.isNotEmpty(d.getInitials()) && d.getInitials().equalsIgnoreCase(ctx.getSource())))
                     .findFirst();
             Diver returnDiver = diver.isPresent() ? diver.get() : null;
