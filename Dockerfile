@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgsl23 \
     libudunits2-0 \
     python3-dev \
+    python3-pip \
     maven \
 	wget \
     && rm -rf /var/lib/apt/lists/*
