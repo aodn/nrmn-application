@@ -263,3 +263,5 @@ CREATE TABLE nrmn.methods_species (
 
 ALTER TABLE nrmn.observable_item_ref ADD COLUMN created TIMESTAMP;
 ALTER TABLE nrmn.observable_item_ref ADD COLUMN updated TIMESTAMP;
+
+ALTER TABLE nrmn.observable_item_ref ADD COLUMN mapped_id integer;
