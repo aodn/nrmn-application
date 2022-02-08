@@ -12,7 +12,7 @@ UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"or
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Littorinimorpha',family ='Ovulidae' WHERE observable_item_id = 5048;
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Nudibranchia',family ='Chromodorididae' WHERE observable_item_id = 2789;
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Neogastropoda',family ='Muricidae' WHERE observable_item_id = 4876;
-UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='nan',family ='Trochidae' WHERE observable_item_id = 4783;
+UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',family ='Trochidae' WHERE observable_item_id = 4783;
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Neogastropoda',family ='Muricidae' WHERE observable_item_id = 4133;
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Cephalaspidea',family ='Aglajidae' WHERE observable_item_id = 1304;
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Littorinimorpha',family ='Strombidae' WHERE observable_item_id = 4136;
@@ -35,7 +35,7 @@ UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"or
 UPDATE nrmn.observable_item_ref SET phylum ='Echinodermata',"class" ='Echinoidea',"order"='Echinoida',family ='Echinometridae' WHERE observable_item_id = 942;
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Neogastropoda',family ='Muricidae' WHERE observable_item_id = 2698;
 UPDATE nrmn.observable_item_ref SET phylum ='Echinodermata',"class" ='Crinoidea',"order"='Comatulida',family ='Comasteridae' WHERE observable_item_id = 4099;
-UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Bivalvia',"order"='nan',family ='nan' WHERE observable_item_id = 765;
+UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Bivalvia' WHERE observable_item_id = 765;
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Neogastropoda',family ='Muricidae' WHERE observable_item_id = 5230;
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Neogastropoda',family ='Muricidae' WHERE observable_item_id = 2993;
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Neogastropoda',family ='Conidae' WHERE observable_item_id = 2786;
@@ -107,7 +107,7 @@ UPDATE nrmn.observable_item_ref SET phylum ='Arthropoda',"class" ='Malacostraca'
 UPDATE nrmn.observable_item_ref SET phylum ='Echinodermata',"class" ='Asteroidea',"order"='Spinulosida',family ='Asterinidae' WHERE observable_item_id = 4785;
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Neogastropoda',family ='Muricidae' WHERE observable_item_id = 2994;
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Bivalvia',"order"='Pterioida',family ='Pteriidae' WHERE observable_item_id = 4156;
-UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='nan',family ='Turbinidae' WHERE observable_item_id = 5133;
+UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',family ='Turbinidae' WHERE observable_item_id = 5133;
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Nudibranchia',family ='Chromodorididae' WHERE observable_item_id = 4191;
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Neogastropoda',family ='Fasciolariidae' WHERE observable_item_id = 2996;
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Neogastropoda',family ='Olividae' WHERE observable_item_id = 2677;
@@ -133,9 +133,9 @@ UPDATE nrmn.observable_item_ref SET phylum ='Echinodermata',"class" ='Asteroidea
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Littorinimorpha',family ='Cassidae' WHERE observable_item_id = 4837;
 UPDATE nrmn.observable_item_ref SET phylum ='Mollusca',"class" ='Gastropoda',"order"='Vetigastropoda',family ='Turbinidae' WHERE observable_item_id = 5129;
 UPDATE nrmn.observable_item_ref SET phylum ='Chordata',"class" ='Reptilia',"order"='Testudines',family ='Cheloniidae' WHERE observable_item_id = 5169;
-UPDATE nrmn.observable_item_ref SET phylum ='Algae',"class" ='nan',"order"='nan',family ='nan' WHERE observable_item_id = 7715;
-UPDATE nrmn.observable_item_ref SET phylum ='Substrate',"class" ='nan',"order"='nan',family ='nan' WHERE observable_item_id = 6570;
-UPDATE nrmn.observable_item_ref SET phylum ='Substrate',"class" ='nan',"order"='nan',family ='nan' WHERE observable_item_id = 6615;
+UPDATE nrmn.observable_item_ref SET phylum ='Algae' WHERE observable_item_id = 7715;
+UPDATE nrmn.observable_item_ref SET phylum ='Substrate' WHERE observable_item_id = 6570;
+UPDATE nrmn.observable_item_ref SET phylum ='Substrate' WHERE observable_item_id = 6615;
 UPDATE nrmn.observable_item_ref SET phylum ='Chordata',"class" ='Actinopterygii',"order"='Perciformes',family ='Pomacentridae' WHERE observable_item_id = 4747;
 UPDATE nrmn.observable_item_ref SET phylum ='Chordata',"class" ='Actinopterygii',"order"='Perciformes',family ='Tripterygiidae' WHERE observable_item_id = 6771;
 UPDATE nrmn.observable_item_ref SET phylum ='Chordata',"class" ='Actinopterygii',"order"='Perciformes',family ='Tripterygiidae' WHERE observable_item_id = 6770;
@@ -299,4 +299,4 @@ UPDATE nrmn.observable_item_ref SET phylum ='Chordata',"class" ='Actinopterygii'
 UPDATE nrmn.observable_item_ref SET phylum ='Chordata',"class" ='Actinopterygii',"order"='Perciformes',family ='Apogonidae' WHERE observable_item_id = 5729;
 UPDATE nrmn.observable_item_ref SET phylum ='Chordata',"class" ='Actinopterygii',"order"='Scorpaeniformes',family ='Scorpaenidae' WHERE observable_item_id = 4771;
 UPDATE nrmn.observable_item_ref SET phylum ='Chordata',"class" ='Actinopterygii',"order"='Perciformes',family ='Labridae' WHERE observable_item_id = 1179;
-UPDATE nrmn.observable_item_ref SET phylum ='nan',"class" ='nan',"order"='nan',family ='nan' WHERE observable_item_id = 6767;
+
