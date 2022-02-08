@@ -1,6 +1,6 @@
 BEGIN TRANSACTION;
 
-CREATE OR REPLACE FUNCTION trg_mapped_id_func() RETURNS trigger 
+CREATE OR REPLACE FUNCTION nrmn.trg_mapped_id_func() RETURNS trigger 
 LANGUAGE plpgsql AS
 $func$
 BEGIN
@@ -10,6 +10,6 @@ END
 $func$;
 
 DROP TRIGGER IF EXISTS trg_mapped_id ON nrmn.observable_item_ref;
-CREATE TRIGGER trg_mapped_id BEFORE INSERT ON nrmn.observable_item_ref FOR EACH ROW EXECUTE PROCEDURE trg_mapped_id_func();
+CREATE TRIGGER trg_mapped_id BEFORE INSERT ON nrmn.observable_item_ref FOR EACH ROW EXECUTE PROCEDURE nrmn.trg_mapped_id_func();
 
 BEGIN TRANSACTION;
