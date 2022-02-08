@@ -1087,8 +1087,9 @@ select epoi.observable_item_id as species_id,
 	common_phylum_name,
 	null as geom,
 	epoi.superseded_ids,
-	epoi.superseded_names from nrmn.ep_observable_items epoi,
+	epoi.superseded_names,
 	epoi.mapped_id
+	from nrmn.ep_observable_items epoi
 where  epoi.obs_item_type_name in ('Species', 'Undescribed Species')
 and exists (select 1 from nrmn.observation obs where obs.observable_item_id = epoi.observable_item_id)
 and epoi.superseded_by is null
