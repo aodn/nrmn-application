@@ -401,7 +401,8 @@ select
 	nrmn.taxonomic_name (coalesce(oi.superseded_by, observable_item_name), false) as reporting_name,
     oi.report_group,
     oi.habitat_groups,
-    oi.obs_item_attribute::jsonb ->> 'OtherGroups' other_groups
+    oi.obs_item_attribute::jsonb ->> 'OtherGroups' other_groups,
+    oi.mapped_id
 from nrmn.observable_item_ref oi
 	 inner join nrmn.obs_item_type_ref oit ON oit.obs_item_type_id = oi.obs_item_type_id
 	 left join supersedings on oi.observable_item_name = supersedings.CurrentName
@@ -1059,7 +1060,8 @@ select
 	common_phylum_name,
 	null as geom,
 	oi.superseded_ids,
-	oi.superseded_names
+	oi.superseded_names,
+	oi.mapped_id
 from nrmn.ep_observable_items oi
 where oi.obs_item_type_name in ('Species', 'Undescribed Species')
 and exists (select 1 from nrmn.observation obs where obs.observable_item_id = oi.observable_item_id)
@@ -1085,7 +1087,8 @@ select epoi.observable_item_id as species_id,
 	common_phylum_name,
 	null as geom,
 	epoi.superseded_ids,
-	epoi.superseded_names from nrmn.ep_observable_items epoi
+	epoi.superseded_names from nrmn.ep_observable_items epoi,
+	epoi.mapped_id
 where  epoi.obs_item_type_name in ('Species', 'Undescribed Species')
 and exists (select 1 from nrmn.observation obs where obs.observable_item_id = epoi.observable_item_id)
 and epoi.superseded_by is null
