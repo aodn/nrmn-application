@@ -1108,6 +1108,7 @@ select obs.observable_item_id as species_id
 	  ,sur.area
 	  ,sur.geom
 	  ,sur.program
+	  ,mapped_id
 from nrmn.ep_survey_list sur
 	 inner join nrmn.survey_method sm on sur.survey_id = sm.survey_id
 	 inner join nrmn.observation obs on obs.survey_method_id = sm.survey_method_id
@@ -1147,6 +1148,7 @@ select
 			case when meas.measure_name ~ 'cm$' then replace(meas.measure_name, 'cm', '') else '0' end )::float,
 			(obs.measure_value)::int,true
 		) biomass
+	,mapped_id
 from nrmn.ep_site_list sit
 	inner join nrmn.ep_survey_list sur on sit.site_code = sur.site_code
 	inner join nrmn.survey_method sm on sur.survey_id = sm.survey_id
