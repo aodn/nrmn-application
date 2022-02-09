@@ -12,4 +12,4 @@ $func$;
 DROP TRIGGER IF EXISTS trg_mapped_id ON nrmn.observable_item_ref;
 CREATE TRIGGER trg_mapped_id BEFORE INSERT ON nrmn.observable_item_ref FOR EACH ROW EXECUTE PROCEDURE nrmn.trg_mapped_id_func();
 
-BEGIN TRANSACTION;
+END TRANSACTION;
