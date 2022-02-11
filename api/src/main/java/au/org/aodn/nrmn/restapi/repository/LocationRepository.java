@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.repository;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -36,11 +36,12 @@ public interface LocationRepository extends JpaRepository<Location, Integer>, Jp
         "CASE loc.is_active WHEN true THEN 'Active' ELSE 'Inactive' END as status, " +
         "string_agg(DISTINCT sit.country, ', ' ORDER BY sit.country) AS countries, "+
         "string_agg(DISTINCT sit.state, ', ' ORDER BY sit.state) AS areas, "+
+        "string_agg(DISTINCT sit.site_code, ', ' ORDER BY sit.site_code) AS siteCodes, " +
         "string_agg(DISTINCT meo.ecoregion, ', ' ORDER BY meo.ecoregion) AS ecoRegions "+
         "FROM nrmn.location_ref loc " +
         "LEFT JOIN nrmn.site_ref sit ON loc.location_id = sit.location_id " +
         "LEFT JOIN nrmn.meow_ecoregions meo ON st_contains(meo.geom, sit.geom) " +
         "LEFT JOIN nrmn.survey sur ON sur.site_id = sit.site_id " +
         "GROUP BY loc.location_id, locationName", nativeQuery = true)
-    Collection<LocationExtendedMapping> getAllWithRegions();
+    List<LocationExtendedMapping> getAllWithRegions();
 }

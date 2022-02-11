@@ -74,11 +74,6 @@ const LocationList = ({filterModel, setFilterModel}) => {
                 setRedirect(`${e.data.id}/edit`);
               }
             }}
-            onFilterChanged={(e) => {
-              const filterModel = e.api.getFilterModel();
-              setFilterModel('Location', filterModel);
-              setResetFilterDisabled(Object.keys(filterModel)?.length < 1);
-            }}
           />
           <AgGridColumn
             flex={1}
