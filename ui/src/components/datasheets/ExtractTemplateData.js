@@ -1,177 +1,143 @@
-import React, {useState, useEffect} from 'react';
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Grid,
-  IconButton,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Tooltip,
-  Typography
-} from '@material-ui/core';
+import {Box, Button, Chip, CircularProgress, TextField, Typography} from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import {RemoveCircleOutline, AddCircleOutline} from '@material-ui/icons';
-
+import React, {useEffect, useState} from 'react';
+import {getEntity, templateZip} from '../../axios/api';
 import qs from 'qs';
 import FileDownload from 'js-file-download';
 
-import {getResult, templateZip} from '../../axios/api';
-
-const options = [
-  {entity: 'locations', label: 'Location'},
-  {entity: 'siteProvinces', label: 'MEOW Province'},
-  {entity: 'siteStates', label: 'State'},
-  {entity: 'siteCodes', label: 'Site Code'},
-  {entity: 'siteCountries', label: 'Country'}
-];
-
 const ExtractTemplateData = () => {
+  const [locations, setLocations] = useState([]);
+  const [ecoRegions, setEcoRegions] = useState([]);
+  const [countries, setCountries] = useState([]);
   const [areas, setAreas] = useState([]);
-  const [filters, setFilters] = useState([]);
-  const [selected, setSelected] = useState(null);
 
-  const [entity, setEntity] = useState(null);
-  const [downloadParams, setDownloadParams] = useState(null);
+  const [siteCodes, setSiteCodes] = useState([]);
+  const [siteLocation, setSiteLocation] = useState(null);
+
+  const [ecoRegion, setEcoRegion] = useState([]);
+  const [country, setCountry] = useState([]);
+  const [area, setArea] = useState([]);
+
+  const [download, setDownload] = useState(false);
+  const [stagedLocations, setStagedLocations] = useState([]);
+  const [templateLocations, setTemplateLocations] = useState([]);
+
+  useEffect(() => {
+    getEntity('locationList').then((res) => {
+      const locations = [];
+      const groups = {ecoRegions: [], countries: [], areas: [], siteCodes: []};
+      res.data.forEach((d) => {
+        locations[d.id] = d.locationName;
+        ['locations', 'ecoRegions', 'countries', 'areas', 'siteCodes'].forEach((prop) => {
+          d[prop]
+            ?.split(',')
+            .map((a) => a.trim())
+            .forEach((a) => {
+              groups[prop][a] = groups[prop][a] ? [...groups[prop][a], d.id] : [d.id];
+            });
+        });
+      });
+      setLocations(locations);
+      setEcoRegions(groups.ecoRegions);
+      setCountries(groups.countries);
+      setAreas(groups.areas);
+      setSiteCodes(groups.siteCodes);
+    });
+  }, []);
+
+  useEffect(() => {
+    const set_1 = new Set(ecoRegion);
+    const set_2 = new Set(country);
+    const set_3 = new Set(area);
+
+    var intersect = new Set([...set_1, ...set_2, ...set_3]);
+    if (set_1.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_1.has(i)));
+    if (set_2.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_2.has(i)));
+    if (set_3.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_3.has(i)));
+
+    var intersect_arr = Array.from(intersect);
+    intersect_arr = siteLocation && !intersect_arr.includes(siteLocation) ? [...intersect_arr, siteLocation] : intersect_arr;
+    setStagedLocations(intersect_arr.filter((l) => !templateLocations.includes(l)));
+  }, [siteLocation, ecoRegion, country, area, templateLocations]);
+
+  useEffect(() => download && downloadZip({locations: templateLocations}), [download, templateLocations]);
 
   const downloadZip = (params) => {
     templateZip(qs.stringify(params, {indices: false})).then((result) => {
       FileDownload(result.data, `template.zip`);
-      setDownloadParams(null);
+      setDownload(false);
     });
   };
 
-  useEffect(() => {
-    if (entity)
-      getResult(entity).then((result) => {
-        if (result.data) {
-          if (entity === 'locations')
-            setAreas(
-              result.data._embedded.locations.map((l) => {
-                return {type: entity, value: l.locationId, label: l.locationName};
-              })
-            );
-          else
-            setAreas(
-              result.data.map((c) => {
-                return {type: entity, value: c, label: c};
-              })
-            );
-        }
-      });
-  }, [entity]);
-
-  useEffect(() => {
-    if (downloadParams) {
-      const p = options.reduce((a, o) => {
-        a[o.entity] = downloadParams.filter((f) => f.type === o.entity).map((f) => f.value);
-        return a;
-      }, {});
-      downloadZip({
-        locations: p.locations,
-        siteCodes: p.siteCodes,
-        states: p.siteStates,
-        countries: p.countries,
-        provinces: p.siteProvinces
-      });
-    }
-  }, [downloadParams]);
-
-  const filterTable = (
-    <TableContainer component={Paper}>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>Filter Options</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {filters.map((f) => (
-            <TableRow key={f.value}>
-              <TableCell>{options.find((o) => o.entity === f.type).label}</TableCell>
-              <TableCell>{f.label}</TableCell>
-              <TableCell style={{borderBottom: 'grey'}}>
-                <Tooltip title="Remove" xs={1}>
-                  <IconButton size="small" onClick={() => setFilters([...filters.filter((ff) => ff.value !== f.value)])}>
-                    <RemoveCircleOutline />
-                  </IconButton>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
-
   return (
-    <Grid container justify="center">
-      <Box width={900} boxShadow={1} padding={4} bgcolor="white">
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Typography variant="h4">Template Data</Typography>
-          </Grid>
-          <Grid item xs={2} />
-          <Grid item xs={4}>
-            <Typography variant="subtitle2">Area Type</Typography>
-            <Autocomplete
-              disableClearable
-              filterSelectedOptions
-              options={options}
-              getOptionLabel={(o) => o.label}
-              getOptionSelected={(o, v) => o.entity === v.entity}
-              onChange={(_, o) => {
-                setAreas(null);
-                setEntity(o.entity);
-              }}
-              renderInput={(params) => <TextField {...params} variant="outlined" />}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <Typography variant="subtitle2">Area</Typography>
-            {!areas ? (
-              <CircularProgress size={25} />
-            ) : (
-              <Autocomplete
-                filterSelectedOptions
-                options={areas}
-                getOptionLabel={(o) => o.label}
-                onChange={(_, o) => setSelected(o)}
-                renderInput={(params) => <TextField {...params} variant="outlined" />}
-              />
-            )}
-          </Grid>
-          <Grid item xs={1}>
-            <Box pt={3} ml={-2}>
-              <IconButton
-                disabled={!selected}
-                onClick={() => {
-                  if (selected && filters.filter((f) => f.value === selected.value).length < 1) setFilters([selected, ...filters]);
-                }}
-              >
-                <AddCircleOutline />
-              </IconButton>
-            </Box>
-          </Grid>
-          <Grid item xs={2} />
-          <Grid item xs={8}>
-            {filters.length > 0 && filterTable}
-          </Grid>
-          <Grid item xs={4} />
-          <Grid item xs={4}>
-            <Button style={{width: '100%'}} onClick={() => setDownloadParams(filters)} disabled={downloadParams || filters.length < 1}>
-              {downloadParams ? <CircularProgress size={25} /> : 'Download Sheets'}
-            </Button>
-          </Grid>
-        </Grid>
+    <>
+      <Box p={1}>
+        <Typography variant="h4">Template Data</Typography>
       </Box>
-    </Grid>
+      <Box m={5}>
+        <Typography variant="subtitle2">Site Code</Typography>
+        <Autocomplete
+          options={Object.keys(siteCodes).sort()}
+          getOptionLabel={(e) => `${e} - ${locations[siteCodes[e][0]]}`}
+          onChange={(_, e) => setSiteLocation(e ? siteCodes[e][0] : null)}
+          renderInput={(params) => <TextField {...params} variant="outlined" />}
+        />
+        <hr></hr>
+        <Typography variant="subtitle2">Eco Region</Typography>
+        <Autocomplete
+          filterSelectedOptions
+          options={Object.keys(ecoRegions).sort()}
+          onChange={(e) => (e.target.textContent !== '' ? setEcoRegion(ecoRegions[e.target.textContent]) : setEcoRegion([]))}
+          renderInput={(params) => <TextField {...params} variant="outlined" />}
+        />
+        <Typography variant="subtitle2">Country</Typography>
+        <Autocomplete
+          filterSelectedOptions
+          options={Object.keys(countries).sort()}
+          onChange={(e) => (e.target.textContent !== '' ? setCountry(countries[e.target.textContent]) : setCountry([]))}
+          renderInput={(params) => <TextField {...params} variant="outlined" />}
+        />
+        <Typography variant="subtitle2">Area/State</Typography>
+        <Autocomplete
+          filterSelectedOptions
+          options={Object.keys(areas).sort()}
+          onChange={(e) => (e.target.textContent !== '' ? setArea(areas[e.target.textContent]) : setArea([]))}
+          renderInput={(params) => <TextField {...params} variant="outlined" />}
+        />
+        <Box p={1}>
+          {stagedLocations.map((l) => (
+            <Chip
+              key={l}
+              style={{margin: 5}}
+              label={locations[l]}
+              onClick={() => setTemplateLocations(Array.from(new Set([...templateLocations, l])))}
+            />
+          ))}
+        </Box>
+        <Button
+          disabled={stagedLocations.length < 1}
+          onClick={() => setTemplateLocations(Array.from(new Set([...templateLocations, ...stagedLocations])))}
+        >
+          Add All Locations
+        </Button>
+        <hr></hr>
+        <Typography variant="subtitle2">Generate Template for Locations</Typography>
+        <Box p={1}>
+          {templateLocations &&
+            templateLocations.map((l) => (
+              <Chip
+                key={l}
+                style={{margin: 5}}
+                label={locations[l]}
+                onDelete={() => setTemplateLocations((state) => [...state.filter((id) => id !== l)])}
+              />
+            ))}
+        </Box>
+        <Button style={{width: '100%'}} onClick={() => setDownload(true)} disabled={download || templateLocations.length < 1}>
+          {download ? <CircularProgress size={25} /> : 'Download Sheets'}
+        </Button>
+      </Box>
+    </>
   );
 };
 
