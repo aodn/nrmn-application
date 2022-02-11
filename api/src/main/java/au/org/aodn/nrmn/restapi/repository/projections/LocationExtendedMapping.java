@@ -7,4 +7,5 @@ public interface LocationExtendedMapping {
     String getAreas();
     String getEcoRegions();
     String getStatus();
+    String getSiteCodes();
 }

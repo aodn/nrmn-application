@@ -85,6 +85,11 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${basedir}/target/classes/static</outputDirectory>
+                            <nonFilteredFileExtensions>
+                              <nonFilteredFileExtension>xls</nonFilteredFileExtension>
+                              <nonFilteredFileExtension>xlsx</nonFilteredFileExtension>
+                              <nonFilteredFileExtension>csv</nonFilteredFileExtension>
+                            </nonFilteredFileExtensions>
                             <resources>
                                 <resource>
                                     <directory>build</directory>

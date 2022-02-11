@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +20,8 @@ public class LocationController {
     private LocationRepository locationRepository;
     
     @GetMapping("/locationList")
-    public Collection<LocationExtendedMapping> getLocationsWithRegions() {
-        Collection<LocationExtendedMapping> locations = locationRepository.getAllWithRegions();
+    public List<LocationExtendedMapping> getLocationsWithRegions() {
+        List<LocationExtendedMapping> locations = locationRepository.getAllWithRegions();
         return locations;
     }
 }

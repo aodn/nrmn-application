@@ -144,24 +144,22 @@ public class TemplateServiceTest {
         Site testSite337 = builder.siteCode("QLD337").state("Queensland").country("Australia")
                 .location(Location.builder().locationId(337).locationName("Northish").build()).build();
 
-        when(siteRepository.findSiteCodesByProvince("Antipodes")).thenReturn(Arrays.asList("TAS333"));
-        when(siteRepository.findAll(Example.of(Site.builder().siteCode("TAS333").build())))
+        when(siteRepository.findAll(Example.of(Site.builder().location(Location.builder().locationId(333).build()).build())))
                 .thenReturn(Arrays.asList(testSite333));
 
-        when(siteRepository.findAll(Example.of(Site.builder().siteCode("TAS334").build())))
+        when(siteRepository.findAll(Example.of(Site.builder().location(Location.builder().locationId(334).build()).build())))
                 .thenReturn(Arrays.asList(testSite334));
 
         when(siteRepository.findAll(Example.of(Site.builder().location(Location.builder().locationId(335).build()).build())))
                         .thenReturn(Arrays.asList(testSite335));
 
-        when(siteRepository.findAll(Example.of(Site.builder().state("Victoria").build())))
+        when(siteRepository.findAll(Example.of(Site.builder().location(Location.builder().locationId(336).build()).build())))
                 .thenReturn(Arrays.asList(testSite336));
 
-        when(siteRepository.findAll(Example.of(Site.builder().country("Australia").build())))
+        when(siteRepository.findAll(Example.of(Site.builder().location(Location.builder().locationId(337).build()).build())))
                 .thenReturn(Arrays.asList(testSite337));
 
-        Set<Site> sites = templateService.getSitesForTemplate(Arrays.asList(335), Arrays.asList("Antipodes"),
-                Arrays.asList("Victoria"), Arrays.asList("Australia"), Arrays.asList("TAS334"));
+        Set<Site> sites = templateService.getSitesForTemplate(Arrays.asList(333,334,335,336,337));
 
         assertEquals(5, sites.size());
         assert (sites.contains(testSite333));

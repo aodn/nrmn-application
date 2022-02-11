@@ -40,12 +40,9 @@ import au.org.aodn.nrmn.restapi.repository.projections.SpeciesWithAttributesCsvR
 @Service
 public class TemplateService {
     private static final CSVFormat DIVERS_FORMAT = CSVFormat.DEFAULT.withHeader("Initials", "Full Name");
-    private static final CSVFormat SITES_FORMAT = CSVFormat.DEFAULT.withHeader("Site", "Site Name", "Latitude",
-            "Longitude", "Region");
-    private static final CSVFormat M1_M2_FORMAT = CSVFormat.DEFAULT.withHeader("Letter Code", "Species Name",
-            "Common Name", "Species Invert Sizing", "L5", "L95", "LMax");
-    private static final CSVFormat M3_FORMAT = CSVFormat.DEFAULT.withHeader("Letter Code", "Species Name",
-            "Common Name");
+    private static final CSVFormat SITES_FORMAT = CSVFormat.DEFAULT.withHeader("Site", "Site Name", "Latitude", "Longitude", "Region");
+    private static final CSVFormat M1_M2_FORMAT = CSVFormat.DEFAULT.withHeader("Letter Code", "Species Name", "Common Name", "Species Invert Sizing", "L5", "L95", "LMax");
+    private static final CSVFormat M3_FORMAT = CSVFormat.DEFAULT.withHeader("Letter Code", "Species Name", "Common Name");
 
     @Autowired
     DiverRepository diverRepository;
@@ -62,8 +59,7 @@ public class TemplateService {
     @Autowired
     private ObservationRepository observationRepository;
 
-    public void writeZip(OutputStream outputStream, Collection<Integer> locations, Collection<String> provinces,
-            Collection<String> states, Collection<String> countries, Collection<String> siteCodes) throws IOException {
+    public void writeZip(OutputStream outputStream, Collection<Integer> locations) throws IOException {
 
         ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
         Writer writer = new OutputStreamWriter(zipOutputStream, "UTF-8");
@@ -74,7 +70,7 @@ public class TemplateService {
         zipOutputStream.closeEntry();
 
         zipOutputStream.putNextEntry(new ZipEntry("sites.csv"));
-        Set<Site> sites = getSitesForTemplate(locations, provinces, states, countries, siteCodes);
+        Set<Site> sites = getSitesForTemplate(locations);
         writeSitesCsv(writer, sites);
         writer.flush();
         zipOutputStream.closeEntry();
@@ -153,25 +149,11 @@ public class TemplateService {
                 toString(site.getLongitude()), site.getLocation().getLocationName());
     }
 
-    public Set<Site> getSitesForTemplate(Collection<Integer> locations, Collection<String> provinces,
-            Collection<String> states, Collection<String> countries, Collection<String> siteCodes) {
+    public Set<Site> getSitesForTemplate(Collection<Integer> locations) {
 
-        Stream<String> siteCodesFromProvinces = provinces.stream()
-                .flatMap(p -> siteRepository.findSiteCodesByProvince(p).stream());
-
-        Stream<Site> sites = Stream.concat(siteCodesFromProvinces, siteCodes.stream())
-                .flatMap(sc -> siteRepository.findAll(Example.of(Site.builder().siteCode(sc).build())).stream());
-
-        sites = Stream.concat(sites,
-                locations.stream().flatMap(l -> siteRepository
-                        .findAll(Example.of(Site.builder().location(Location.builder().locationId(l).build()).build()))
-                        .stream()));
-
-        sites = Stream.concat(sites, states.stream()
-                .flatMap(s -> siteRepository.findAll(Example.of(Site.builder().state(s).build())).stream()));
-
-        sites = Stream.concat(sites, countries.stream()
-                .flatMap(s -> siteRepository.findAll(Example.of(Site.builder().country(s).build())).stream()));
+        Stream<Site> sites = locations.stream().flatMap(l -> 
+          siteRepository.findAll(Example.of(Site.builder().location(Location.builder().locationId(l).build()).build()))
+          .stream());
 
         return sites.collect(toSet());
     }
