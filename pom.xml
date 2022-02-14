@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.5.RELEASE</version>
+        <version>2.5.9</version>
         <relativePath />
     </parent>
     <groupId>au.org.aodn.nrmn</groupId>
@@ -23,8 +23,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
-        <checkstyle.version>3.1.1</checkstyle.version>
-        <checkstyle.puppycrawl.version>8.31</checkstyle.puppycrawl.version>
+        <checkstyle.version>3.1.2</checkstyle.version>
+        <checkstyle.puppycrawl.version>9.3</checkstyle.puppycrawl.version>
         <main.basedir>${project.basedir}</main.basedir>
     </properties>
 
@@ -42,7 +42,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.2.0</version>
                     <configuration>
                         <ignoreNonCompile>true</ignoreNonCompile>
                     </configuration>

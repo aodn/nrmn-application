@@ -35,6 +35,11 @@ public class DiverController {
     @Autowired
     private DiverRepository diverRepository;
 
+    @GetMapping("/divers")
+    List<Diver> findAll() {
+        return diverRepository.findAll();
+    }
+
     @GetMapping("/diver/{id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public DiverDto findOne(@PathVariable Integer id) {

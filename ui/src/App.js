@@ -18,10 +18,10 @@ import Homepage from './components/layout/Homepage';
 import JobList from './components/job/JobList';
 import JobView from './components/job/JobView';
 import AppContent from './components/containers/AppContent';
-import DiverTemplate from './components/data-entities/DiverTemplate';
 import SiteViewTemplate from './components/templates/SiteViewTemplate';
 import LocationList from './components/data-entities/location/LocationList';
 import SurveyList from './components/data-entities/survey/SurveyList';
+import DiverList from './components/data-entities/diver/DiverList';
 import ObservableItemEdit from './components/data-entities/ObservableItemEdit';
 import ObservableItemTemplate from './components/templates/ObservableItemTemplate';
 import ObservableItemViewTemplate from './components/templates/ObservableItemViewTemplate';
@@ -29,8 +29,11 @@ import LocationTemplate from './components/templates/LocationTemplate';
 import ExtractTemplateData from './components/datasheets/ExtractTemplateData';
 import SurveyViewTemplate from './components/templates/SurveyViewTemplate';
 import SurveyEditTemplate from './components/templates/SurveyEditTemplate';
+import DiverTemplate from './components/data-entities/DiverTemplate';
 import SiteEdit from './components/data-entities/SiteEdit';
 import ObservableItemAdd from './components/data-entities/ObservableItemAdd';
+import LocationView from './components/data-entities/location/LocationView';
+import LocationAdd from './components/data-entities/location/LocationAdd';
 
 const referenceData = [
   {
@@ -55,7 +58,6 @@ const referenceData = [
     name: 'Diver',
     idKey: 'diverId',
     can: {delete: false, clone: false},
-    flexField: 'fullName',
     endpoint: 'diver',
     route: {base: '/reference/diver', view: '/reference/diver/:id?/:success?', edit: '/reference/diver/:id?/edit'},
     schemaKey: {add: 'Diver', edit: 'Diver', view: 'Diver'},
@@ -256,15 +258,24 @@ const App = () => {
               path="/reference/locations"
               render={() => <LocationList setFilterModel={setFilterModel} filterModel={filterModel} />}
             />
-            <Route exact path="/validation/:jobId" component={ValidationPage} />
+            <Route
+              exact
+              path="/reference/divers"
+              render={() => <DiverList setFilterModel={setFilterModel} filterModel={filterModel} />}
+            />
             <Route exact path="/upload" component={JobUpload} />
-            <Route exact path="/data/extract" component={ExtractTemplateData} />
             <Route exact path="/data/surveys" component={SurveyList} />
+            <Route exact path="/data/extract" component={ExtractTemplateData} />
+            <Route exact path="/validation/:jobId" component={ValidationPage} />
             <Route exact path="/reference/observableItem" component={ObservableItemAdd} />
             <Route exact path="/reference/observableItem/:id?/edit" component={ObservableItemEdit} />
             <Route exact path="/reference/site/:id?/edit" component={SiteEdit} />
             <Route exact path="/reference/site/:id?/clone" render={() => <SiteEdit clone />} />
             <Route exact path="/reference/site" component={SiteEdit} />
+            <Route exact path="/reference/location" component={LocationAdd} />
+            <Route exact path="/reference/location/:id?" component={LocationView} />
+            <Route exact path="/reference/location/:id?/edit" component={LocationAdd} />
+            <Route exact path="/reference/location/:id?/:verb?" component={LocationView} />
             <Redirect exact from="/list/stagedJob" to="/jobs" />
             {referenceData.map((e) => (
               <Route exact key={e.route.base} path={e.route.base} render={() => <EntityEdit entity={e} template={e.template.add} />} />

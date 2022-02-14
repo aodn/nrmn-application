@@ -17,7 +17,7 @@ const LocationList = ({filterModel, setFilterModel}) => {
 
   useEffect(() => {
     if (gridApi) {
-      getEntity('locationList').then((res) => gridApi.setRowData(res.data));
+      getEntity('locations').then((res) => gridApi.setRowData(res.data));
     }
   }, [gridApi]);
 

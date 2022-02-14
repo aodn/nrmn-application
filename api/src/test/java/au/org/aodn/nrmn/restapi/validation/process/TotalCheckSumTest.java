@@ -5,11 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
@@ -21,11 +19,6 @@ class TotalCheckSumTest extends FormattedTestProvider  {
 
     @InjectMocks
     ValidationProcess validationProcess;
-
-    @BeforeEach
-    void init() {
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
     public void validSumShouldSuccess() {

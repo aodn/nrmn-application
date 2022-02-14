@@ -14,12 +14,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Example;
 
@@ -56,11 +54,6 @@ public class TemplateServiceTest {
 
     @Mock
     ObservableItemRepository observableItemRepository;
-
-    @BeforeEach
-    void init() {
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
     void getDiversCsv() throws IOException {
@@ -187,8 +180,8 @@ public class TemplateServiceTest {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
-        templateService.writeSpeciesCsv(printWriter, CSVFormat.DEFAULT.withHeader("Letter Code", "Species Name",
-                "Common Name", "Species Invert Sizing", "L5", "L95", "LMax"), Arrays.asList(s1, s2, s3, s4));
+        CSVFormat templateCsv = CSVFormat.Builder.create().setHeader("Letter Code", "Species Name", "Common Name", "Species Invert Sizing", "L5", "L95", "LMax").build();
+        templateService.writeSpeciesCsv(printWriter, templateCsv, Arrays.asList(s1, s2, s3, s4));
         List<String> csvLines = Arrays.stream(stringWriter.toString().split("\n")).map(String::trim)
                 .collect(Collectors.toList());
 

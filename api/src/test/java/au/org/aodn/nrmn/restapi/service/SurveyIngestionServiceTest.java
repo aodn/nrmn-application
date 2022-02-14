@@ -25,7 +25,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import au.org.aodn.nrmn.restapi.model.db.Diver;
@@ -77,7 +76,6 @@ public class SurveyIngestionServiceTest {
 
     @BeforeEach
     void init() {
-        MockitoAnnotations.initMocks(this);
 
         StagedRow ref = StagedRow.builder()
                 .stagedJob(StagedJob.builder().program(Program.builder().programName("PROJECT").build()).build())
