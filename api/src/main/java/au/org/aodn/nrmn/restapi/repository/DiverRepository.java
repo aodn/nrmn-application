@@ -8,8 +8,6 @@ import java.util.Optional;
 
 import javax.persistence.QueryHint;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -42,10 +40,8 @@ public interface DiverRepository
 
     @Override
     @RestResource
-    @Query(value = "SELECT * FROM {h-schema}diver_ref d ORDER BY (CASE WHEN initials SIMILAR TO '%[a-zA-Z]' THEN 0 ELSE 1 END), LOWER(d.initials)",
-           countQuery = "SELECT count(*) FROM {h-schema}diver_ref",
-           nativeQuery = true)
-    Page<Diver> findAll(Pageable pageable);
+    @Query(value = "SELECT * FROM {h-schema}diver_ref d ORDER BY (CASE WHEN initials SIMILAR TO '%[a-zA-Z]' THEN 0 ELSE 1 END), LOWER(d.initials)", countQuery = "SELECT count(*) FROM {h-schema}diver_ref", nativeQuery = true)
+    List<Diver> findAll();
 
     @Query("SELECT d FROM Diver d")
     @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })

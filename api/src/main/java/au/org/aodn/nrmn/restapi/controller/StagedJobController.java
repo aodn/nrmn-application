@@ -228,7 +228,7 @@ public class StagedJobController {
             @DeleteMapping("/delete/{jobId}")
             @Operation(security = { @SecurityRequirement(name = "bearer-key") })
             public ResponseEntity<Object> deleteJob(@PathVariable Long jobId) {
-                StagedJob job = jobRepo.getOne(jobId);
+                StagedJob job = jobRepo.getById(jobId);
                 if(job != null && job.getStatus() != StatusJobType.INGESTED) {
                     jobRepo.deleteById(jobId);
                     return ResponseEntity.ok().build();

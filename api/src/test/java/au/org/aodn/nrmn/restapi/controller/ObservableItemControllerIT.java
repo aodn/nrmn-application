@@ -59,7 +59,7 @@ public class ObservableItemControllerIT {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("_embedded.tupleBackedMaps.observableItemId",
+                .body("observableItemId",
                  hasItems(testObservableItem.getObservableItemId()));
     }
 }

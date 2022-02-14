@@ -39,10 +39,10 @@ import au.org.aodn.nrmn.restapi.repository.projections.SpeciesWithAttributesCsvR
 
 @Service
 public class TemplateService {
-    private static final CSVFormat DIVERS_FORMAT = CSVFormat.DEFAULT.withHeader("Initials", "Full Name");
-    private static final CSVFormat SITES_FORMAT = CSVFormat.DEFAULT.withHeader("Site", "Site Name", "Latitude", "Longitude", "Region");
-    private static final CSVFormat M1_M2_FORMAT = CSVFormat.DEFAULT.withHeader("Letter Code", "Species Name", "Common Name", "Species Invert Sizing", "L5", "L95", "LMax");
-    private static final CSVFormat M3_FORMAT = CSVFormat.DEFAULT.withHeader("Letter Code", "Species Name", "Common Name");
+    private static final CSVFormat DIVERS_FORMAT = CSVFormat.Builder.create().setHeader("Initials", "Full Name").build();
+    private static final CSVFormat SITES_FORMAT = CSVFormat.Builder.create().setHeader("Site", "Site Name", "Latitude", "Longitude", "Region").build();
+    private static final CSVFormat M1_M2_FORMAT = CSVFormat.Builder.create().setHeader("Letter Code", "Species Name", "Common Name", "Species Invert Sizing", "L5", "L95", "LMax").build();
+    private static final CSVFormat M3_FORMAT = CSVFormat.Builder.create().setHeader("Letter Code", "Species Name", "Common Name").build();
 
     @Autowired
     DiverRepository diverRepository;

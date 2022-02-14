@@ -1,19 +1,17 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.restapi.controller.assembler.SiteListItemAssembler;
-import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
-import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
-import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
-import au.org.aodn.nrmn.restapi.dto.site.SiteDto;
-import au.org.aodn.nrmn.restapi.dto.site.SiteGetDto;
-import au.org.aodn.nrmn.restapi.dto.site.SiteListItem;
-import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,14 +25,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
+import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
+import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
+import au.org.aodn.nrmn.restapi.dto.site.SiteDto;
+import au.org.aodn.nrmn.restapi.dto.site.SiteGetDto;
+import au.org.aodn.nrmn.restapi.dto.site.SiteListItem;
+import au.org.aodn.nrmn.restapi.model.db.Site;
+import au.org.aodn.nrmn.restapi.repository.SiteRepository;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(name = "sites")
@@ -47,17 +46,9 @@ public class SiteController {
     @Autowired
     private ModelMapper mapper;
 
-    @Autowired
-    private SiteListItemAssembler assembler;
-
     @GetMapping("/siteListItems")
-    public CollectionModel<SiteListItem> list() {
-        return CollectionModel.of(
-                siteRepository.findAll()
-                              .stream()
-                              .map(site -> assembler.toModel(site))
-                              .collect(Collectors.toList())
-        );
+    public ResponseEntity<List<SiteListItem>> list() {
+        return ResponseEntity.ok(siteRepository.findAll().stream().map(site -> mapper.map(site, SiteListItem.class)).collect(Collectors.toList()));
     }
 
     @GetMapping("/sites")

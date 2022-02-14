@@ -4,15 +4,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.hateoas.Links;
-import org.springframework.hateoas.RepresentationModel;
 
 /* Site list page entry */
 
 @Data
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SiteListItem extends RepresentationModel<SiteListItem> {
+public class SiteListItem {
     @Schema(hidden = true)
     Integer siteId;
 
@@ -39,11 +37,4 @@ public class SiteListItem extends RepresentationModel<SiteListItem> {
 
     @Schema(title = "Is Active")
     Boolean isActive;
-
-    @Schema(hidden = true)
-    @Override
-    public Links getLinks() {
-        return super.getLinks();
-    }
-
 }

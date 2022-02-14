@@ -1,15 +1,12 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
-import au.org.aodn.nrmn.restapi.controller.exception.ValidationException;
-import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
-import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemDto;
-import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemGetDto;
-import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemPutDto;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.validation.Valid;
+
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -17,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,13 +26,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
+import au.org.aodn.nrmn.restapi.controller.exception.ValidationException;
+import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemDto;
+import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemGetDto;
+import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemPutDto;
+import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
+import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(name = "observable items")
@@ -52,12 +51,8 @@ public class ObservableItemController {
     private ModelMapper mapper;
     
     @GetMapping(path = "/observableItems")
-    public CollectionModel<ObservableItemRow> list() {
-        return CollectionModel.of(
-                observableItemRepository.findAllProjectedBy()
-                .stream()
-                .collect(Collectors.toList())
-        );
+    public ResponseEntity<List<ObservableItemRow>> list() {
+        return ResponseEntity.ok(observableItemRepository.findAllProjectedBy());
     }
 
     @PostMapping("/observableItem")

@@ -1,18 +1,16 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
@@ -30,11 +28,6 @@ class DuplicateRowCheckTest {
     @Mock
     DiverRepository diverRepository;
     
-    @BeforeEach
-    void init() {
-        MockitoAnnotations.initMocks(this);
-    }
-
     @Test
     void duplicateRowShouldFail() {
         StagedRow r1 = StagedRow.builder().block("1").pos(1).measureJson(new HashMap<Integer, String>() {{

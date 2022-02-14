@@ -1,16 +1,15 @@
 package au.org.aodn.nrmn.restapi.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
-import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
-import org.springframework.data.web.HateoasPageableHandlerMethodArgumentResolver;
-import org.springframework.stereotype.Component;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
-import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
+import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 @Component
 public class RepositoryRestConfig implements RepositoryRestConfigurer {
@@ -22,7 +21,7 @@ public class RepositoryRestConfig implements RepositoryRestConfigurer {
     private EntityManager entityManager;
 
     @Override
-    public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
+    public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
         /* expose all id's */
         config.exposeIdsFor(entityManager.getMetamodel()
             .getEntities()
@@ -35,19 +34,9 @@ public class RepositoryRestConfig implements RepositoryRestConfigurer {
         config.disableDefaultExposure();
         
         /* configure CORS for spring data rest */
-        config.getCorsRegistry().addMapping("/**")
+        cors.addMapping("/**")
             .allowedOrigins("*")
             .allowedMethods("HEAD", "OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE")
             .maxAge(MAX_AGE_SECS);
-    }
-    
-    @Bean
-    public HateoasPageableHandlerMethodArgumentResolver customResolver(
-        /* default to all records for listing reference data if paging parameters not specified */
-        HateoasPageableHandlerMethodArgumentResolver pageableResolver) {
-        pageableResolver.setOneIndexedParameters(true);
-        pageableResolver.setFallbackPageable(PageRequest.of(0, Integer.MAX_VALUE));
-        pageableResolver.setMaxPageSize(Integer.MAX_VALUE);
-        return pageableResolver;
     }
 } 

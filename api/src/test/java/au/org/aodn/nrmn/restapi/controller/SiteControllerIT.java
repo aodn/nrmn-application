@@ -59,7 +59,7 @@ public class SiteControllerIT {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("_embedded.siteListItems.siteId", hasItems(testSite.getSiteId()));
+                .body("siteId", hasItems(testSite.getSiteId()));
     }
 
 }

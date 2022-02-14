@@ -83,7 +83,7 @@ export const getFullJob = (id) => {
 };
 
 export const getSiteEdit = () => {
-  const locations = axiosInstance.get('/api/locations?projection=selection');
+  const locations = axiosInstance.get('/api/locations');
   const marineProtectedAreas = axiosInstance.get('/api/marineProtectedAreas');
   const protectionStatuses = axiosInstance.get('/api/protectionStatuses');
   const states = axiosInstance.get('/api/siteStates');
@@ -91,7 +91,7 @@ export const getSiteEdit = () => {
   return axios.all([locations, marineProtectedAreas, protectionStatuses, states, countries]).then(
     axios.spread((...responses) => {
       const locations =
-        responses[0]?.data._embedded.locations.map((l) => {
+        responses[0].data.map((l) => {
           return {id: l.locationId, label: l.locationName};
         }) || [];
       const marineProtectedAreas = responses[1]?.data._embedded.marineProtectedAreas.map((m) => m.name) || [];
