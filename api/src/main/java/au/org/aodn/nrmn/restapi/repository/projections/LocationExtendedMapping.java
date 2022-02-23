@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.repository.projections;
 
 public interface LocationExtendedMapping {
-    String getId();
+    Integer getId();
     String getLocationName();
     String getCountries();
     String getAreas();
