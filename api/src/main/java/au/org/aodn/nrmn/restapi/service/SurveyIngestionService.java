@@ -203,12 +203,11 @@ public class SurveyIngestionService {
     public void ingestTransaction(StagedJob job, Collection<StagedRowFormatted> validatedRows) {
 
         Map<String, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
-        int scale = (int) Math.pow(10, 1);
         List<Integer> surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
             
             OptionalDouble visAvg = surveyRows.stream().filter(r -> r.getVis().isPresent()).mapToDouble(r -> r.getVis().get()).average();
             if(visAvg.isPresent())
-                visAvg = OptionalDouble.of((double) Math.round(visAvg.getAsDouble() * scale) / scale);
+                visAvg = OptionalDouble.of((double)Math.round(visAvg.getAsDouble()));
 
             Survey survey = getSurvey(job.getProgram(), visAvg, surveyRows.get(0));
             groupRowsByMethodBlock(surveyRows).values().forEach(methodBlockRows -> {
