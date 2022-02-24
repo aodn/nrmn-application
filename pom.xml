@@ -12,7 +12,7 @@
     <version>0.0.0</version>
     <packaging>pom</packaging>
     <name>nrmn</name>
-    <description>Project for the NRMN database</description>
+    <description>National Reef Monitoring Network web application</description>
 
     <modules>
         <module>ui</module>

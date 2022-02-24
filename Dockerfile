@@ -1,35 +1,38 @@
-FROM ubuntu:20.04
+FROM amazoncorretto:11-al2-jdk
 
 ARG BUILDER_UID=9999
-ARG DEBIAN_FRONTEND=noninteractive
 
-ENV TZ="Australia"
-ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
-ENV HOME /home/builder
-ENV JAVA_TOOL_OPTIONS -Duser.home=/home/builder
+ENV TZ="Australia" \
+    NVM_DIR="/opt/nvm" \
+    MAVEN_HOME="/opt/maven" \
+    MAVEN_VERSION=3.8.4 \
+    NODE_VERSION=16.14.0 \
+    HOME="/home/builder" \
+    JAVA_TOOL_OPTIONS="-Duser.home=/home/builder"
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    software-properties-common \
-    git-core \
-    libxml2-utils \
-    libnetcdf15 \
-    libgsl23 \
-    libudunits2-0 \
-    python3-dev \
-    python3-pip \
-    maven \
-	wget \
-    && rm -rf /var/lib/apt/lists/*
+RUN yum install --quiet --assumeyes git python3 python3-pip apache-maven shadow-utils tar
 
-RUN add-apt-repository ppa:openjdk-r/ppa
+# Install Node
+RUN mkdir -p $NVM_DIR
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
+RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
+RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
+ENV PATH="/opt/nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
+RUN npm install -g yarn@1.22.4
 
-RUN apt-get update && apt-get install -y --no-install-recommends openjdk-11-jdk
+# Install Maven
+RUN set -ex \
+    && mkdir -p $MAVEN_HOME \
+    && curl -LSso /var/tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz https://apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
+    && tar xzf /var/tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz -C $MAVEN_HOME --strip-components=1 \
+    && rm /var/tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz \
+    && update-alternatives --install /usr/bin/mvn mvn /opt/maven/bin/mvn 10000
 
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
-
-RUN pip install \
-    bump2version==1.0.1
-
-RUN useradd --create-home --no-log-init --shell /bin/bash --uid $BUILDER_UID builder
+RUN pip3 install bump2version==1.0.1
+RUN /usr/sbin/useradd --create-home --no-log-init --shell /bin/bash --uid $BUILDER_UID builder
+RUN chown -R builder:builder /home/builder
 USER builder
 WORKDIR /home/builder
+
+ # EOF

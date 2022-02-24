@@ -56,18 +56,15 @@ const formSlice = createSlice({
       state.data = {...state.data, ...action.payload};
     },
     selectedItemsLoaded: (state, action) => {
-      const newOptions = {};
       if (!('_embedded' in action.payload)) {
-        if(action.payload[0]?.diverId)
-          newOptions['divers'] = action.payload;
-
-        if(action.payload[0]?.siteId)
-          newOptions['siteListItems'] = action.payload;
-
-        state.options = {...state.options, ...newOptions};
-        return;
+        action.payload['_embedded'] = {
+          '.': action.payload.map((item) => {
+            return {'.': item};
+          })
+        };
       }
       const key = Object.keys(action.payload._embedded)[0];
+      const newOptions = {};
       // HACK: this should not be necessary
       if (key === 'marineProtectedAreas' || key === 'protectionStatuses' || key === 'reportGroups' || key === 'habitatGroups') {
         newOptions[key] = action.payload._embedded[key].reduce((f, v) => {
