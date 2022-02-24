@@ -301,7 +301,7 @@ public class SurveyIngestionServiceTest {
     }
 
     @Test
-    void ingestSurveyNotDone() {
+    void ingestSurvey() {
         when(surveyRepository.save(any())).then(s -> s.getArgument(0));
         when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
         when(observationRepository.saveAll(any())).then(s -> s.getArgument(0));
@@ -319,7 +319,7 @@ public class SurveyIngestionServiceTest {
                 .depth(10)
                 .surveyNum(1)
                 .direction(Directions.N)
-                .vis(Optional.of(2.75))
+                .vis(Optional.of(2.5))
                 .method(2)
                 .block(1)
                 .code("snd")
@@ -336,7 +336,7 @@ public class SurveyIngestionServiceTest {
                 .depth(10)
                 .surveyNum(1)
                 .direction(Directions.N)
-                .vis(Optional.of(2.75))
+                .vis(Optional.of(2.5))
                 .method(2)
                 .block(1)
                 .code("snd")
@@ -349,7 +349,7 @@ public class SurveyIngestionServiceTest {
         ArgumentCaptor<Survey> surveyCaptor = ArgumentCaptor.forClass(Survey.class);
         Mockito.verify(surveyRepository).save(surveyCaptor.capture());
         Survey survey = surveyCaptor.getValue();
-        assertEquals(2.8, survey.getVisibility());
+        assertEquals(3.0, survey.getVisibility());
 
         ArgumentCaptor<SurveyMethod> surveyMethodCaptor = ArgumentCaptor.forClass(SurveyMethod.class);
         Mockito.verify(surveyMethodRepository).save(surveyMethodCaptor.capture());
