@@ -9,7 +9,7 @@ pipeline {
         stage('container') {
             agent {
                 dockerfile {
-                    args '--volume ${HOME}/.m2:/home/builder/.m2 --volume ${HOME}/.cache:/home/builder/.cache'
+                    args '--volume ${HOME}/.m2:/home/builder/.m2 --volume ${HOME}/.cache:/home/builder/.cachejournal/ --volume ${HOME}/bin:${HOME}/bin'
                     additionalBuildArgs '--build-arg BUILDER_UID=$(id -u)'
                 }
             }
