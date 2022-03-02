@@ -9,16 +9,14 @@ pipeline {
         stage('container') {
             agent {
                 dockerfile {
-                    args '-v ${HOME}/.m2:/home/builder/.m2 -v ${HOME}/.cache:/home/builder/.cache -v ${HOME}/bin:${HOME}/bin'
+                    args '--volume ${HOME}/.m2:/home/builder/.m2 --volume ${HOME}/.cache:/home/builder/.cache'
                     additionalBuildArgs '--build-arg BUILDER_UID=$(id -u)'
                 }
             }
             stages {
                 stage('clean') {
                     steps {
-                        sh 'rm -rf ui/node api/target'
-                        sh 'git reset --hard'
-                        sh 'git clean -xffd -e ui/node_modules'
+                        sh 'git clean --force --force -xd --exclude=ui/node_modules'
                     }
                 }
                 stage('set_version_release') {
@@ -31,7 +29,8 @@ pipeline {
                 }
                 stage('build') {
                     steps {
-                        sh 'mvn -B clean package'
+                        sh 'yarn --cwd ui --frozen-lockfile'
+                        sh 'mvn --batch-mode --threads 2 clean package'
                     }
                 }
             }

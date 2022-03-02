@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  dev:
+    image: nrmn-build
+    build:
+      context: .
+      args:
+        BUILDER_UID: 1000
+    stdin_open: true
+    tty: true
+    working_dir: /app
+    volumes:
+      - './:/app'
+      - '${HOME}/.m2:/home/builder/.m2'
+

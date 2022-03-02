@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>nrmn</artifactId>
@@ -10,69 +8,47 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>nrmn-ui</artifactId>
-
-    <properties>
-        <node.version>v16.13.2</node.version>
-        <yarn.version>v1.22.4</yarn.version>
-        <frontend-maven-plugin.version>1.11.3</frontend-maven-plugin.version>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <version>${frontend-maven-plugin.version}</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
-                        <id>install node</id>
+                        <id>yarn-test</id>
                         <goals>
-                            <goal>install-node-and-yarn</goal>
+                            <goal>exec</goal>
                         </goals>
+                        <phase>test</phase>
                         <configuration>
-                            <nodeVersion>${node.version}</nodeVersion>
-                            <yarnVersion>${yarn.version}</yarnVersion>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>default-resources</id>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>install</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>yarn test</id>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                        <phase>default-testResources</phase>
-                        <configuration>
-                            <arguments>test</arguments>
+                            <executable>yarn</executable>
+                            <arguments>
+                                <argument>test</argument>
+                            </arguments>
                             <environmentVariables>
                                 <CI>false</CI>
                             </environmentVariables>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>yarn build</id>
+                        <id>yarn-build</id>
                         <goals>
-                            <goal>yarn</goal>
+                            <goal>exec</goal>
                         </goals>
                         <phase>compile</phase>
                         <configuration>
-                            <arguments>build</arguments>
+                            <executable>yarn</executable>
+                            <arguments>
+                                <argument>build</argument>
+                            </arguments>
                             <environmentVariables>
                                 <REACT_APP_VERSION>${project.version}</REACT_APP_VERSION>
+                                <BUILD_PATH>${basedir}/target/classes/static</BUILD_PATH>
                             </environmentVariables>
                         </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <nodeVersion>${node.version}</nodeVersion>
-                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -86,9 +62,9 @@
                         <configuration>
                             <outputDirectory>${basedir}/target/classes/static</outputDirectory>
                             <nonFilteredFileExtensions>
-                              <nonFilteredFileExtension>xls</nonFilteredFileExtension>
-                              <nonFilteredFileExtension>xlsx</nonFilteredFileExtension>
-                              <nonFilteredFileExtension>csv</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>xls</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>xlsx</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>csv</nonFilteredFileExtension>
                             </nonFilteredFileExtensions>
                             <resources>
                                 <resource>
@@ -102,5 +78,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
