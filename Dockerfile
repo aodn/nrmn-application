@@ -34,5 +34,3 @@ RUN /usr/sbin/useradd --create-home --no-log-init --shell /bin/bash --uid $BUILD
 RUN chown -R builder:builder /home/builder
 USER builder
 WORKDIR /home/builder
-
- # EOF
