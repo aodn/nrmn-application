@@ -52,7 +52,7 @@
     ]
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "5.13.0",
+    "@testing-library/jest-dom": "5.16.2",
     "@testing-library/react": "11.2.7",
     "clsx": "^1.1.1",
     "craco-eslint-webpack-plugin": "^1.0.0",
