@@ -10,7 +10,7 @@ updates:
     schedule:
       interval: "daily"
       
-  - package-ecosystem: "yarn"
+  - package-ecosystem: "npm"
     directory: "/ui"
     schedule:
       interval: "daily"
