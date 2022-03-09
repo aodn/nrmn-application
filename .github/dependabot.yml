@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      
+  - package-ecosystem: "maven"
+    directory: "/api"
+    schedule:
+      interval: "daily"
+      
+  - package-ecosystem: "yarn"
+    directory: "/ui"
+    schedule:
+      interval: "daily"
