@@ -4,12 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-      
-  - package-ecosystem: "maven"
-    directory: "/api"
-    schedule:
-      interval: "daily"
-      
+
   - package-ecosystem: "npm"
     directory: "/ui"
     schedule:
