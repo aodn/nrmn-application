@@ -25,7 +25,7 @@
     "react-dom": "17.0.2",
     "react-global-configuration": "1.4.1",
     "react-hotkeys-hook": "^3.3.1",
-    "react-redux": "7.2.4",
+    "react-redux": "7.2.6",
     "react-router": "^5.2.0",
     "react-router-dom": "5.2.0",
     "react-scripts": "4.0.3",
