@@ -8,6 +8,7 @@ import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,14 +37,24 @@ public class DiverApiIT {
     @Autowired
     private JwtToken jwtToken;
 
-    private RequestSpecification spec;
+    private RequestSpecification diverSpec;
+
+    private RequestSpecification diversSpec;
 
     @BeforeEach
     public void setup() {
-        spec = new RequestSpecBuilder()
+        diverSpec = new RequestSpecBuilder()
                 .setBaseUri(String.format("http://localhost:%s", port))
                 .setBasePath("/api/diver")
-                .setContentType("application/json")
+                .setContentType(ContentType.JSON)
+                .addFilter(new ResponseLoggingFilter())
+                .addFilter(new RequestLoggingFilter())
+                .build();
+
+        diversSpec = new RequestSpecBuilder()
+                .setBaseUri(String.format("http://localhost:%s", port))
+                .setBasePath("/api/divers")
+                .setContentType(ContentType.JSON)
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter())
                 .build();
@@ -53,7 +64,7 @@ public class DiverApiIT {
     @WithUserDetails("test@example.com")
     public void testCreateDiver() {
         given()
-                .spec(spec)
+                .spec(diverSpec)
                 .auth()
                 .oauth2(jwtToken.get())
                 .body("{" +
@@ -73,7 +84,7 @@ public class DiverApiIT {
         Diver existingDiver = diverTestData.persistedDiver();
 
         given()
-                .spec(spec)
+                .spec(diverSpec)
                 .auth()
                 .oauth2(jwtToken.get())
                 .body("{" +
@@ -83,7 +94,7 @@ public class DiverApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("A diver with these initials already exists.")));
+                .body("[0].message", is(equalTo("A diver already has these initials.")));
     }
 
     @Test
@@ -92,18 +103,17 @@ public class DiverApiIT {
         Diver diver = diverTestData.persistedDiver();
         Diver existingDiver = diverTestData.persistedDiver();
 
-        given()
-                .spec(spec)
+        given().spec(diversSpec)
                 .auth()
                 .oauth2(jwtToken.get())
-                .body("{" +
-                        "\"initials\": \"" + existingDiver.getInitials() + "\"," +
-                        "\"fullName\": \"Avid Diver\"}")
-                .put(diver.getDiverId().toString())
+                .body("[{\"diverId\": " + diver.getDiverId() +
+                        ",\"initials\": \"" + existingDiver.getInitials() +
+                        "\",\"fullName\": \"Avid Diver\"}]")
+                .put()
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("A diver with these initials already exists.")));
+                .body("[0].message", is(equalTo("A diver already has these initials.")));
     }
 
     @Test
@@ -113,17 +123,17 @@ public class DiverApiIT {
         Diver existingDiver = diverTestData.persistedDiver();
 
         given()
-                .spec(spec)
+                .spec(diversSpec)
                 .auth()
                 .oauth2(jwtToken.get())
-                .body("{" +
-                        "\"initials\": \"AVD\"," +
-                        "\"fullName\": \"" + existingDiver.getFullName() + "\"}")
-                .put(diver.getDiverId().toString())
+                .body("[{\"diverId\": " + diver.getDiverId() +
+                        ",\"initials\": \"AVD\"" +
+                        ",\"fullName\": \"" + existingDiver.getFullName() + "\"}]")
+                .put()
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("A diver with the same name already exists.")));
+                .body("[0].message", is(equalTo("A diver with the same name already exists.")));
     }
 
 }

@@ -33,7 +33,7 @@ public class LocationController {
 
     @Autowired
     private LocationRepository locationRepository;
-    
+
     @GetMapping("/locationList")
     public List<LocationExtendedMapping> getLocationsWithRegions() {
         List<LocationExtendedMapping> locations = locationRepository.getAllWithRegions();
