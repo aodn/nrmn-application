@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 public class LoginRequest {
 
     @NotNull(message = "Email address is mandatory as a username")
-    @Email( regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$", message = "Username must be a email address")
+    @Email(regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$", message = "Username must be a email address")
     private String username;
 
     @NotBlank

@@ -8,6 +8,7 @@ import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ public class ObservableItemControllerIT {
 
     @Autowired
     private ObservableItemTestData observableItemTestData;
-    
+
     @Autowired
     private JwtToken jwtToken;
 
@@ -40,7 +41,7 @@ public class ObservableItemControllerIT {
         spec = new RequestSpecBuilder()
                 .setBaseUri(String.format("http://localhost:%s", port))
                 .setBasePath("/api/reference/observableItems")
-                .setContentType("application/json")
+                .setContentType(ContentType.JSON)
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter())
                 .build();
@@ -60,6 +61,6 @@ public class ObservableItemControllerIT {
                 .assertThat()
                 .statusCode(200)
                 .body("observableItemId",
-                 hasItems(testObservableItem.getObservableItemId()));
+                        hasItems(testObservableItem.getObservableItemId()));
     }
 }

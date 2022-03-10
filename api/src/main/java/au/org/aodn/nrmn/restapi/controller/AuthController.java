@@ -34,6 +34,7 @@ import java.util.HashMap;
 @RequestMapping(path = "/api/auth")
 @Tag(name = "authorisation")
 public class AuthController {
+
     @Autowired
     AuthenticationManager authenticationManager;
 
@@ -54,7 +55,7 @@ public class AuthController {
 
     private static Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @PostMapping(path = "/signout", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> logOutUser(
             Authentication authentication,
@@ -65,15 +66,13 @@ public class AuthController {
                         "Logout",
                         "logout attempt for username: " + authentication.getName()
                                 + " token: " + bearerToken));
-       return tokenProvider.getAuthorizationBearer(bearerToken).map(token -> {
+        return tokenProvider.getAuthorizationBearer(bearerToken).map(token -> {
             if (!SecUserRepository.blackListedTokenPresent(token)) {
                 SecUserRepository.addBlackListedToken(timeStamp, token);
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().build();
-        }).orElseGet(() ->  ResponseEntity.noContent().build());
-
-
+        }).orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @PostMapping(path = "/signin", consumes = "application/json", produces = "application/json")
@@ -84,9 +83,7 @@ public class AuthController {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
+                        loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = tokenProvider.generateToken(authentication);
         if (SecUserRepository.blackListedTokenPresent(jwt)) {

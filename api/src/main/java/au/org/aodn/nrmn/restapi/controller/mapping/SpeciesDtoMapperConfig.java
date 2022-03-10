@@ -14,10 +14,10 @@ public class SpeciesDtoMapperConfig {
     @Autowired
     SpeciesDtoMapperConfig(ModelMapper modelMapper) {
         modelMapper.typeMap(ObservableItem.class, SpeciesDto.class)
-                   .addMapping(ObservableItem::getObservableItemName, SpeciesDto::setScientificName);
+                .addMapping(ObservableItem::getObservableItemName, SpeciesDto::setScientificName);
 
         modelMapper.typeMap(SpeciesRecord.class, SpeciesDto.class)
-                   .setPostConverter(customMappings());
+                .setPostConverter(customMappings());
     }
 
     private Converter<SpeciesRecord, SpeciesDto> customMappings() {

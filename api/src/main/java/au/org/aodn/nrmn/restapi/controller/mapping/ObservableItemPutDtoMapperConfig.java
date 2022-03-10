@@ -16,8 +16,9 @@ import org.springframework.context.annotation.Configuration;
 public class ObservableItemPutDtoMapperConfig {
 
     @Autowired
-    ObservableItemPutDtoMapperConfig(ObsItemTypeRepository obsItemTypeRepository, ModelMapper modelMapper) { 
-        Converter<Integer, ObsItemType> toObsItemType = ctx -> ctx.getSource() == null ? null : obsItemTypeRepository.findById(ctx.getSource()).orElseThrow(ResourceNotFoundException::new);
+    ObservableItemPutDtoMapperConfig(ObsItemTypeRepository obsItemTypeRepository, ModelMapper modelMapper) {
+        Converter<Integer, ObsItemType> toObsItemType = ctx -> ctx.getSource() == null ? null
+                : obsItemTypeRepository.findById(ctx.getSource()).orElseThrow(ResourceNotFoundException::new);
         modelMapper.typeMap(ObservableItemPutDto.class, ObservableItem.class).addMappings(mapper -> {
             mapper.using(toObsItemType).map(ObservableItemPutDto::getObsItemTypeId, ObservableItem::setObsItemType);
         });

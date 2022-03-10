@@ -21,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * REST API exception handling - extends/overrides default spring MVC error handling (ResponseEntityExceptionHandler)
+ * REST API exception handling - extends/overrides default spring MVC error
+ * handling (ResponseEntityExceptionHandler)
  * to return JSON validation errors responses
  */
 
@@ -37,17 +38,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         List<ValidationError> errors = new ArrayList<>();
         String objectName = ex.getBindingResult().getObjectName();
         ex.getBindingResult()
-          .getFieldErrors()
-          .stream()
-          .forEach(fieldError -> {
-              ValidationError error = ValidationError.builder()
-                                                     .entity(objectName)
-                                                     .property(fieldError.getField())
-                                                     .invalidValue(String.valueOf(fieldError.getRejectedValue()))
-                                                     .message(fieldError.getDefaultMessage())
-                                                     .build();
-              errors.add(error);
-          });
+                .getFieldErrors()
+                .stream()
+                .forEach(fieldError -> {
+                    ValidationError error = ValidationError.builder()
+                            .entity(objectName)
+                            .property(fieldError.getField())
+                            .invalidValue(String.valueOf(fieldError.getRejectedValue()))
+                            .message(fieldError.getDefaultMessage())
+                            .build();
+                    errors.add(error);
+                });
         return new ResponseEntity<>(new ValidationErrors(errors), HttpStatus.BAD_REQUEST);
     }
 
@@ -56,16 +57,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(TransactionSystemException.class)
     protected ResponseEntity<?> handleTransactionException(TransactionSystemException ex) throws Throwable {
         Throwable cause = ex.getCause();
-        if (!(cause instanceof RollbackException)) throw cause;
-        if (!(cause.getCause() instanceof ConstraintViolationException)) throw cause.getCause();
+        if (!(cause instanceof RollbackException))
+            throw cause;
+        if (!(cause.getCause() instanceof ConstraintViolationException))
+            throw cause.getCause();
         List<ValidationError> errors = new ArrayList<>();
         ConstraintViolationException validationException = (ConstraintViolationException) cause.getCause();
         validationException.getConstraintViolations().stream().forEach(fieldError -> {
             ValidationError error = ValidationError.builder()
-                                                   .entity(fieldError.getRootBeanClass().getSimpleName())
-                                                   .property(String.valueOf(fieldError.getPropertyPath()))
-                                                   .message(fieldError.getMessage())
-                                                   .build();
+                    .entity(fieldError.getRootBeanClass().getSimpleName())
+                    .property(String.valueOf(fieldError.getPropertyPath()))
+                    .message(fieldError.getMessage())
+                    .build();
             errors.add(error);
         });
         return new ResponseEntity<>(new ValidationErrors(errors), HttpStatus.BAD_REQUEST);

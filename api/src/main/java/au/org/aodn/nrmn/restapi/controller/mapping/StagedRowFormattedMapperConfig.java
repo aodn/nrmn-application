@@ -34,8 +34,12 @@ public class StagedRowFormattedMapperConfig {
             if (ctx.getSource() == null)
                 return null;
             Optional<Diver> diver = divers.stream()
-                    .filter(d -> (StringUtils.isNotEmpty(d.getFullName()) && Normalizer.normalize(d.getFullName(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").equalsIgnoreCase(Normalizer.normalize(ctx.getSource(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "")))
-                            || (StringUtils.isNotEmpty(d.getInitials()) && d.getInitials().equalsIgnoreCase(ctx.getSource())))
+                    .filter(d -> (StringUtils.isNotEmpty(d.getFullName()) && Normalizer
+                            .normalize(d.getFullName(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "")
+                            .equalsIgnoreCase(Normalizer.normalize(ctx.getSource(), Normalizer.Form.NFD)
+                                    .replaceAll("[^\\p{ASCII}]", "")))
+                            || (StringUtils.isNotEmpty(d.getInitials())
+                                    && d.getInitials().equalsIgnoreCase(ctx.getSource())))
                     .findFirst();
             Diver returnDiver = diver.isPresent() ? diver.get() : null;
             return returnDiver;
@@ -52,7 +56,8 @@ public class StagedRowFormattedMapperConfig {
             if (ctx.getSource() == null)
                 return null;
             Optional<Site> site = sites.stream()
-                    .filter(d -> (StringUtils.isNotEmpty(d.getSiteCode()) && d.getSiteCode().equalsIgnoreCase(ctx.getSource())))
+                    .filter(d -> (StringUtils.isNotEmpty(d.getSiteCode())
+                            && d.getSiteCode().equalsIgnoreCase(ctx.getSource())))
                     .findFirst();
             return site.isPresent() ? site.get() : null;
         };
@@ -67,7 +72,8 @@ public class StagedRowFormattedMapperConfig {
 
         Converter<String, Optional<LocalTime>> toTime = ctx -> TimeUtils.parseTime(ctx.getSource());
 
-        Converter<String, Directions> toDirection = ctx -> EnumUtils.getEnumIgnoreCase(Directions.class, ctx.getSource());
+        Converter<String, Directions> toDirection = ctx -> EnumUtils.getEnumIgnoreCase(Directions.class,
+                ctx.getSource());
 
         Converter<String, Integer> toDepth = ctx -> {
             try {

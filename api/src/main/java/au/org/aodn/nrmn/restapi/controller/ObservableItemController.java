@@ -49,7 +49,7 @@ public class ObservableItemController {
 
     @Autowired
     private ModelMapper mapper;
-    
+
     @GetMapping(path = "/observableItems")
     public ResponseEntity<List<ObservableItemRow>> list() {
         return ResponseEntity.ok(observableItemRepository.findAllProjectedBy());
@@ -63,10 +63,12 @@ public class ObservableItemController {
         ObservableItem persistedObservableItem = observableItemRepository.save(newObservableItem);
         return mapper.map(persistedObservableItem, ObservableItemDto.class);
     }
-    
+
     @GetMapping("/observableItem/{id}")
     public ResponseEntity<ObservableItemGetDto> findOne(@PathVariable Integer id) {
-        return observableItemRepository.findById(id).map(item -> ResponseEntity.ok(mapper.map(item, ObservableItemGetDto.class))).orElseGet(() -> ResponseEntity.notFound().build());
+        var obsItem = observableItemRepository.findById(id);
+        return obsItem.map(item -> ResponseEntity.ok(mapper.map(item, ObservableItemGetDto.class)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/observableItem/{id}")
@@ -78,20 +80,23 @@ public class ObservableItemController {
     @PutMapping("/observableItem/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ObservableItemGetDto updateObservableItem(@PathVariable Integer id,
-                                                     @Valid @RequestBody ObservableItemPutDto observableItemPutDto) {
-        ObservableItem observableItem = observableItemRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+            @Valid @RequestBody ObservableItemPutDto observableItemPutDto) {
+        var observableItem = observableItemRepository.findById(id)
+                .orElseThrow(ResourceNotFoundException::new);
 
         // Only allow the species name to be changed within 72 hours of creation
-        if(!observableItem.getObservableItemName().equals(observableItemPutDto.getObservableItemName())  &&
-            (observableItem.getCreated() == null || ChronoUnit.HOURS.between(observableItem.getCreated(), LocalDateTime.now()) >= 72)) {
-                List<ValidationError> errors = new ArrayList<ValidationError>();
-                errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName", "", "Species Name editing not allowed more than 72 hours after creation."));
-                throw new ValidationException(errors);
+        if (!observableItem.getObservableItemName().equals(observableItemPutDto.getObservableItemName()) &&
+                (observableItem.getCreated() == null
+                        || ChronoUnit.HOURS.between(observableItem.getCreated(), LocalDateTime.now()) >= 72)) {
+            List<ValidationError> errors = new ArrayList<ValidationError>();
+            errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName", "",
+                    "Species Name editing not allowed more than 72 hours after creation."));
+            throw new ValidationException(errors);
         }
 
         mapper.map(observableItemPutDto, observableItem);
         validate(observableItem);
-        ObservableItem persistedObservableItem = observableItemRepository.save(observableItem);
+        var persistedObservableItem = observableItemRepository.save(observableItem);
         return mapper.map(persistedObservableItem, ObservableItemGetDto.class);
     }
 
@@ -99,33 +104,38 @@ public class ObservableItemController {
 
         List<ValidationError> errors = new ArrayList<ValidationError>();
 
-        if(StringUtils.isEmpty(item.getObservableItemName()))
-            errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName", item.getObservableItemName(), "Species Name Required."));
+        if (StringUtils.isEmpty(item.getObservableItemName()))
+            errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName",
+                    item.getObservableItemName(), "Species Name Required."));
 
-        ObservableItem probe = ObservableItem.builder().commonName(item.getCommonName()).letterCode(item.getLetterCode()).observableItemName(item.getObservableItemName()).build();
+        ObservableItem probe = ObservableItem.builder().commonName(item.getCommonName())
+                .letterCode(item.getLetterCode()).observableItemName(item.getObservableItemName()).build();
         Example<ObservableItem> example = Example.of(probe, ExampleMatcher.matchingAny());
 
         List<ObservableItem> allMatches = observableItemRepository.findAll(example);
-        for(ObservableItem match: allMatches) {
+        for (ObservableItem match : allMatches) {
 
-            if(match.getObservableItemId().equals(item.getObservableItemId()))
+            if (match.getObservableItemId().equals(item.getObservableItemId()))
                 continue;
 
-            if(StringUtils.isNotEmpty(match.getObservableItemName()) && match.getObservableItemName().equals(item.getObservableItemName()))
-                errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName", item.getObservableItemName(), "An item with this name already exists."));
-            
-            if(StringUtils.isNotEmpty(match.getLetterCode()) && match.getLetterCode().equals(item.getLetterCode()))
-                errors.add(new ValidationError(ObservableItemDto.class.getName(), "letterCode", item.getLetterCode(), "An item with this letter code already exists."));
+            if (StringUtils.isNotEmpty(match.getObservableItemName())
+                    && match.getObservableItemName().equals(item.getObservableItemName()))
+                errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName",
+                        item.getObservableItemName(), "An item with this name already exists."));
+
+            if (StringUtils.isNotEmpty(match.getLetterCode()) && match.getLetterCode().equals(item.getLetterCode()))
+                errors.add(new ValidationError(ObservableItemDto.class.getName(), "letterCode", item.getLetterCode(),
+                        "An item with this letter code already exists."));
         }
 
-        if(StringUtils.isEmpty(item.getSupersededBy())) {
+        if (StringUtils.isEmpty(item.getSupersededBy())) {
             item.setSupersededBy(null);
-        } else if(observableItemRepository.exactSearch(item.getSupersededBy()).isEmpty()){
+        } else if (observableItemRepository.exactSearch(item.getSupersededBy()).isEmpty()) {
             logger.info(String.format("Invalid supersededBy value: \"%s\". Setting to null.", item.getSupersededBy()));
             item.setSupersededBy(null);
         }
 
-        if(!errors.isEmpty())
+        if (!errors.isEmpty())
             throw new ValidationException(errors);
     }
 }

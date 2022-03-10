@@ -32,6 +32,8 @@ import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
 import au.org.aodn.nrmn.restapi.dto.site.RowUpdateDto;
 import au.org.aodn.nrmn.restapi.dto.stage.FileUpload;
 import au.org.aodn.nrmn.restapi.dto.stage.JobResponse;
+import au.org.aodn.nrmn.restapi.dto.stage.StagedJobDto;
+import au.org.aodn.nrmn.restapi.dto.stage.StagedJobRowDto;
 import au.org.aodn.nrmn.restapi.dto.stage.UploadResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationRow;
@@ -114,22 +116,26 @@ public class StagedJobController {
             @RequestParam("programId") Integer programId, @RequestParam("file") MultipartFile file,
             Authentication authentication) {
 
-        userAuditRepo.save(new UserActionAudit("stage/upload", "upload excel file attempt for username: " + authentication.getName() + " file: " + file.getOriginalFilename()));
+        userAuditRepo.save(new UserActionAudit("stage/upload", "upload excel file attempt for username: "
+                + authentication.getName() + " file: " + file.getOriginalFilename()));
 
         Optional<Program> programOpt = programRepo.findById(programId);
         if (!programOpt.isPresent())
-            return ResponseEntity.unprocessableEntity().body(new UploadResponse(Optional.empty(), "Program Not found"));
+            return ResponseEntity.unprocessableEntity()
+                    .body(new UploadResponse(Optional.empty(), "Program Not found"));
 
         Optional<SecUser> user = userRepo.findByEmail(authentication.getName());
 
         StagedJob job = StagedJob.builder().isExtendedSize(withExtendedSizes).source(SourceJobType.INGEST)
-                .reference(file.getOriginalFilename()).status(StatusJobType.PENDING).program(programOpt.get())
+                .reference(file.getOriginalFilename()).status(StatusJobType.PENDING)
+                .program(programOpt.get())
                 .creator(user.get()).build();
         jobRepo.save(job);
 
         StagedJobLog jobLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis()))
                 .eventType(StagedJobEventType.UPLOADED).stagedJob(job)
-                .details(file.getOriginalFilename() + " uploaded by:" + authentication.getName()).build();
+                .details(file.getOriginalFilename() + " uploaded by:" + authentication.getName())
+                .build();
 
         logRepo.save(jobLog);
 
@@ -144,7 +150,9 @@ public class StagedJobController {
             int totalRowsCount = parsedSheet.getStagedRows().size();
 
             // remove rows that are missing diver / site / date / depth
-            rowsToSave.removeIf(r -> r.getDiver().isEmpty() && r.getSiteCode().isEmpty() && r.getDate().isEmpty() && r.getDepth().isEmpty());
+            rowsToSave.removeIf(r -> r.getDiver().isEmpty() && r.getSiteCode().isEmpty()
+                    && r.getDate().isEmpty()
+                    && r.getDepth().isEmpty());
             int totalValidRowsCount = rowsToSave.size();
 
             // remove duplicate rows from the end of the sheet
@@ -152,143 +160,195 @@ public class StagedJobController {
 
             if (lastRow.getTotal().equalsIgnoreCase("0")) {
                 Long lastRowId = lastRow.getId();
-                Optional<ValidationRow> rowsToTruncate = validation.checkDuplicateRows(true, rowsToSave).stream().filter(v -> v.getRowIds().contains(lastRowId)).findAny();
+                Optional<ValidationRow> rowsToTruncate = validation.checkDuplicateRows(true, rowsToSave)
+                        .stream()
+                        .filter(v -> v.getRowIds().contains(lastRowId)).findAny();
 
-                // only apply if there are three or more duplicate rows (detect 3 duplicate rows rule)
+                // only apply if there are three or more duplicate rows (detect 3 duplicate rows
+                // rule)
                 if (rowsToTruncate.isPresent() && rowsToTruncate.get().getRowIds().size() >= 3) {
                     Collection<Long> rowIdsToRemove = rowsToTruncate.get().getRowIds();
                     // keep the last row if the data should finish with a true zero
-                    if (Arrays.asList("SURVEY NOT DONE", "DEBRIS - ZERO", "NO SPECIES FOUND").contains(lastRow.getSpecies().toUpperCase()))
+                    if (Arrays.asList("SURVEY NOT DONE", "DEBRIS - ZERO", "NO SPECIES FOUND")
+                            .contains(lastRow.getSpecies().toUpperCase()))
                         rowIdsToRemove.remove(lastRowId);
                     rowsToSave.removeIf(r -> rowIdsToRemove.contains(r.getId()));
                 }
             }
 
             int invalidRows = totalValidRowsCount - rowsToSave.size();
-            String message = "Saved " + (rowsToSave.size()) + " rows. Skipped " + (totalRowsCount - totalValidRowsCount) + " empty rows and " + invalidRows + " duplicate rows.";
-            StagedJobLog stagedLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis())).eventType(StagedJobEventType.STAGED).stagedJob(job)
+            String message = "Saved " + (rowsToSave.size()) + " rows. Skipped "
+                    + (totalRowsCount - totalValidRowsCount)
+                    + " empty rows and " + invalidRows + " duplicate rows.";
+            StagedJobLog stagedLog = StagedJobLog.builder()
+                    .eventTime(new Timestamp(System.currentTimeMillis()))
+                    .eventType(StagedJobEventType.STAGED).stagedJob(job)
                     .details(message).build();
 
-                    logRepo.save(stagedLog);
+            logRepo.save(stagedLog);
 
-                    String s3Key = String.format(s3KeyTemplate, job.getId());
-                    s3client.write(s3Key, file);
-        
-                    logRepo.save(StagedJobLog.builder()
-                            .eventTime(new Timestamp(System.currentTimeMillis()))
-                            .eventType(StagedJobEventType.STAGED)
-                            .stagedJob(job)
-                            .details(String.format("Source file saved to \"%s/%s\"", bucketName, s3Key)).build());
-        
-                    rowsToSave.stream().forEach(s -> {
-                        s.setStagedJob(job);
-                        s.setId(null);
-                    });
-                    stagedRowRepo.saveAll(rowsToSave);
-        
-                    FileUpload filesResult = new FileUpload(job.getId(), rowsToSave.size());
-                    responseEntity = ResponseEntity.status(HttpStatus.OK).body(new UploadResponse(Optional.of(filesResult.getJobId()), null, message));
-        
-                } catch (Exception e) {
-        
-                    String uploadError = e.getMessage();
-                    job.setStatus(StatusJobType.FAILED);
-                    jobRepo.save(job);
-        
-                    StagedJobLog errorLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis())).eventType(StagedJobEventType.ERROR).stagedJob(job).details(uploadError).build();
-                    logRepo.save(errorLog);
-        
-                    responseEntity = ResponseEntity.unprocessableEntity().body(new UploadResponse(Optional.empty(), uploadError));
-                }
-        
-                return responseEntity;
-            }
-        
-            @PostMapping("/validate/{jobId}")
-            @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-            public ResponseEntity<?> validateJob(@PathVariable Long jobId, Authentication authentication) {
-        
-                userAuditRepo.save(new UserActionAudit("stage/validate",
-                        "validate job attempt for username " + authentication.getName() + " file: " + jobId));
-        
-                return jobRepo.findById(jobId).map(job -> ResponseEntity.ok().body(validation.process(job)))
-                        .orElseGet(() -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ValidationResponse()));
-            }
-        
-            @GetMapping("/job/{jobId}")
-            @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-            public ResponseEntity<JobResponse> getJob(@PathVariable Long jobId) {
-                List<StagedRow> rows = stagedRowRepo.findRowsByJobId(jobId);
-                return jobRepo.findById(jobId)
-                        .map(job -> ResponseEntity.ok().body(new JobResponse(job, rows, Collections.emptyList())))
-                        .orElseGet(() -> ResponseEntity.badRequest().body(new JobResponse(null, Collections.emptyList(),
-                                Collections.singletonList(new ErrorInput("StagedJob Not found", "StagedJob")))));
-            }
-        
-            @DeleteMapping("/delete/{jobId}")
-            @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-            public ResponseEntity<Object> deleteJob(@PathVariable Long jobId) {
-                StagedJob job = jobRepo.getById(jobId);
-                if(job != null && job.getStatus() != StatusJobType.INGESTED) {
-                    jobRepo.deleteById(jobId);
-                    return ResponseEntity.ok().build();
-                } else {
-                    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
-                }
-            }
-        
-            @PutMapping("/job/{jobId}")
-            @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-            public ResponseEntity<String> updateJob(@PathVariable Long jobId, Authentication authentication,
-                    @RequestBody List<RowUpdateDto> rowUpdates) {
-        
-                List<Long> deletions = rowUpdates.stream().filter(u -> u.getRow() == null).map(u -> u.getRowId())
-                        .collect(Collectors.toList());
-        
-                List<StagedRow> updates = rowUpdates.stream().filter(u -> u.getRow() != null).map(u -> u.getRow())
-                        .collect(Collectors.toList());
-        
-                Boolean success = rowService.save(jobId, deletions, updates);
-        
-                return success ? ResponseEntity.ok().body(null) : ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(null);
-            }
-        
-            @GetMapping("/job/download/{jobId}")
-            public void downloadFile(final HttpServletResponse response, @PathVariable String jobId) {
-        
-                String s3Key = String.format(s3KeyTemplate, jobId);
-        
-                logger.info(LogInfo.withContext(
-                        String.format("Downloading original sheet for job %s from %s%s", jobId, bucketName, s3Key)));
-        
-                try {
-        
-                    GetObjectRequest objectRequest = GetObjectRequest
-                            .builder()
-                            .key(s3Key)
-                            .bucket(bucketName)
-                            .build();
-        
-                    ResponseBytes<GetObjectResponse> objectBytes = s3client.getClient().getObjectAsBytes(objectRequest);
-                    response.getOutputStream().write(objectBytes.asByteArray());
-                    response.flushBuffer();
-        
-                    logger.info(LogInfo.withContext(
-                            String.format("Retrieved sheet for job %s from %s/%s", jobId, bucketName, s3Key)));
-        
-                } catch (IOException ioException) {
-                    logger.error(LogInfo.withContext(
-                            String.format("Could not download sheet for job %s from \"%s/%s\".\n%s",
-                                    jobId, bucketName, s3Key, ioException.getMessage())));
-                } catch (NoSuchKeyException keyException) {
-                    logger.error(LogInfo.withContext(String.format(
-                            "key \"%s\" does not exist in bucket \"%s\". Could not download original file for job %s",
-                            s3Key, bucketName, jobId)));
-                } catch (SdkClientException clientException) {
-                    logger.error(LogInfo.withContext(String.format(
-                            "Could not download original file for job %s. %s",
-                            jobId, clientException.getMessage())));
-                }
-            }
+            String s3Key = String.format(s3KeyTemplate, job.getId());
+            s3client.write(s3Key, file);
+
+            logRepo.save(StagedJobLog.builder()
+                    .eventTime(new Timestamp(System.currentTimeMillis()))
+                    .eventType(StagedJobEventType.STAGED)
+                    .stagedJob(job)
+                    .details(String.format("Source file saved to \"%s/%s\"", bucketName, s3Key))
+                    .build());
+
+            rowsToSave.stream().forEach(s -> {
+                s.setStagedJob(job);
+                s.setId(null);
+            });
+            stagedRowRepo.saveAll(rowsToSave);
+
+            FileUpload filesResult = new FileUpload(job.getId(), rowsToSave.size());
+            responseEntity = ResponseEntity.status(HttpStatus.OK)
+                    .body(new UploadResponse(Optional.of(filesResult.getJobId()), null, message));
+
+        } catch (Exception e) {
+
+            String uploadError = e.getMessage();
+            job.setStatus(StatusJobType.FAILED);
+            jobRepo.save(job);
+
+            StagedJobLog errorLog = StagedJobLog.builder()
+                    .eventTime(new Timestamp(System.currentTimeMillis()))
+                    .eventType(StagedJobEventType.ERROR).stagedJob(job).details(uploadError)
+                    .build();
+            logRepo.save(errorLog);
+
+            responseEntity = ResponseEntity.unprocessableEntity()
+                    .body(new UploadResponse(Optional.empty(), uploadError));
         }
-        
+
+        return responseEntity;
+    }
+
+    @PostMapping("/validate/{jobId}")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public ResponseEntity<?> validateJob(@PathVariable Long jobId, Authentication authentication) {
+
+        userAuditRepo.save(new UserActionAudit("stage/validate",
+                "validate job attempt for username " + authentication.getName() + " file: " + jobId));
+
+        return jobRepo.findById(jobId).map(job -> ResponseEntity.ok(validation.process(job)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                        .body(new ValidationResponse()));
+    }
+
+    @GetMapping("/jobs")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public ResponseEntity<List<StagedJobRowDto>> getJobs() {
+        List<StagedJobRowDto> rows = jobRepo.findAll().stream()
+                .map(j -> StagedJobRowDto.builder().id(j.getId())
+                        .reference(j.getReference())
+                        .program(j.getProgram().getProgramName())
+                        .source(j.getSource().toString())
+                        .isExtendedSize(j.getIsExtendedSize())
+                        .status(j.getStatus().toString())
+                        .creator(j.getCreator().getEmail().toString())
+                        .created(j.getCreated()).build())
+                .collect(Collectors.toList());
+        return ResponseEntity.ok().body(rows);
+    }
+
+    @GetMapping("/stagedJob/{jobId}")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public ResponseEntity<StagedJobDto> getStagedJob(@PathVariable Long jobId) {
+        var j = jobRepo.getById(jobId);
+        var dto = StagedJobDto.builder()
+                .id(j.getId())
+                .programName(j.getProgram().getProgramName())
+                .reference(j.getReference())
+                .status(j.getStatus())
+                .source(j.getSource())
+                .creatorEmail(j.getCreator().getEmail())
+                .created(j.getCreated())
+                .surveyIds(j.getSurveyIds()).logs(j.getLogs()).build();
+        return ResponseEntity.ok().body(dto);
+    }
+
+    @GetMapping("/job/{jobId}")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public ResponseEntity<JobResponse> getJob(@PathVariable Long jobId) {
+        var rows = stagedRowRepo.findRowsByJobId(jobId);
+        return jobRepo.findById(jobId)
+                .map(job -> ResponseEntity.ok(new JobResponse(job, rows, Collections.emptyList())))
+                .orElseGet(() -> ResponseEntity.badRequest().body(new JobResponse(null,
+                        Collections.emptyList(),
+                        Collections.singletonList(
+                                new ErrorInput("StagedJob Not found", "StagedJob")))));
+    }
+
+    @DeleteMapping("/delete/{jobId}")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public ResponseEntity<Object> deleteJob(@PathVariable Long jobId) {
+        var job = jobRepo.getById(jobId);
+        if (job != null && job.getStatus() != StatusJobType.INGESTED) {
+            jobRepo.deleteById(jobId);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
+        }
+    }
+
+    @PutMapping("/job/{jobId}")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public ResponseEntity<String> updateJob(@PathVariable Long jobId, Authentication authentication,
+            @RequestBody List<RowUpdateDto> rowUpdates) {
+
+        List<Long> deletions = rowUpdates.stream().filter(u -> u.getRow() == null).map(u -> u.getRowId())
+                .collect(Collectors.toList());
+
+        List<StagedRow> updates = rowUpdates.stream().filter(u -> u.getRow() != null).map(u -> u.getRow())
+                .collect(Collectors.toList());
+
+        Boolean success = rowService.save(jobId, deletions, updates);
+
+        return success ? ResponseEntity.ok().body(null)
+                : ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(null);
+    }
+
+    @GetMapping("/job/download/{jobId}")
+    public void downloadFile(final HttpServletResponse response, @PathVariable String jobId) {
+
+        String s3Key = String.format(s3KeyTemplate, jobId);
+
+        logger.info(LogInfo.withContext(
+                String.format("Downloading original sheet for job %s from %s%s", jobId, bucketName,
+                        s3Key)));
+
+        try {
+
+            GetObjectRequest objectRequest = GetObjectRequest
+                    .builder()
+                    .key(s3Key)
+                    .bucket(bucketName)
+                    .build();
+
+            ResponseBytes<GetObjectResponse> objectBytes = s3client.getClient()
+                    .getObjectAsBytes(objectRequest);
+            response.getOutputStream().write(objectBytes.asByteArray());
+            response.flushBuffer();
+
+            logger.info(LogInfo.withContext(
+                    String.format("Retrieved sheet for job %s from %s/%s", jobId, bucketName,
+                            s3Key)));
+
+        } catch (IOException ioException) {
+            logger.error(LogInfo.withContext(
+                    String.format("Could not download sheet for job %s from \"%s/%s\".\n%s",
+                            jobId, bucketName, s3Key, ioException.getMessage())));
+        } catch (NoSuchKeyException keyException) {
+            logger.error(LogInfo.withContext(String.format(
+                    "key \"%s\" does not exist in bucket \"%s\". Could not download original file for job %s",
+                    s3Key, bucketName, jobId)));
+        } catch (SdkClientException clientException) {
+            logger.error(LogInfo.withContext(String.format(
+                    "Could not download original file for job %s. %s",
+                    jobId, clientException.getMessage())));
+        }
+    }
+}

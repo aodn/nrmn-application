@@ -8,6 +8,7 @@ import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -34,8 +35,6 @@ public class SurveyControllerIT {
     @Autowired
     private SurveyTestData surveyTestData;
     private String NON_EXISTENT_SURVEY_ID = "123123123";
-    // private String NON_EXISTENT_SITE_ID = "123123123";
-    // private String queryPreamble = "surveys?startDate=2004-01-01T18:35:24.00Z&endDate=2005-01-01T18:35:24.00Z";
 
     @Autowired
     private JwtToken jwtToken;
@@ -46,12 +45,12 @@ public class SurveyControllerIT {
     public void setup() {
 
         getDataSpec = new RequestSpecBuilder()
-            .setBaseUri(String.format("http://localhost:%s", port))
-            .setBasePath("/api/data/")
-            .setContentType("application/json")
-            .addFilter(new ResponseLoggingFilter())
-            .addFilter(new RequestLoggingFilter())
-            .build();
+                .setBaseUri(String.format("http://localhost:%s", port))
+                .setBasePath("/api/data/")
+                .setContentType(ContentType.JSON)
+                .addFilter(new ResponseLoggingFilter())
+                .addFilter(new RequestLoggingFilter())
+                .build();
     }
 
     @Test
@@ -78,13 +77,13 @@ public class SurveyControllerIT {
         Survey testSurvey = surveyTestData.persistedSurvey();
 
         given().spec(getDataSpec)
-               .auth()
-               .oauth2(jwtToken.get())
-               .get("survey/" + testSurvey.getSurveyId().toString())
-               .then()
-               .assertThat()
-               .statusCode(200)
-               .body("surveyId", equalTo(testSurvey.getSurveyId()));
+                .auth()
+                .oauth2(jwtToken.get())
+                .get("survey/" + testSurvey.getSurveyId().toString())
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .body("surveyId", equalTo(testSurvey.getSurveyId()));
     }
 
     @Test
@@ -96,12 +95,12 @@ public class SurveyControllerIT {
         assertFalse(testSurvey.getSurveyId().toString().equals(NON_EXISTENT_SURVEY_ID));
 
         given().spec(getDataSpec)
-               .auth()
-               .oauth2(jwtToken.get())
-               .get("survey/" + NON_EXISTENT_SURVEY_ID)
-               .then()
-               .assertThat()
-               .statusCode(404);
+                .auth()
+                .oauth2(jwtToken.get())
+                .get("survey/" + NON_EXISTENT_SURVEY_ID)
+                .then()
+                .assertThat()
+                .statusCode(404);
     }
 
     // Tests are commented due to the use of ep_site_list
@@ -110,38 +109,38 @@ public class SurveyControllerIT {
     // @WithUserDetails("test@example.com")
     // public void testFilterSurveys() {
 
-    //     val testSurvey = surveyTestData.persistedSurvey();
+    // val testSurvey = surveyTestData.persistedSurvey();
 
-    //     given().spec(getDataSpec)
-    //            .auth()
-    //            .oauth2(jwtToken.get())
-    //            .get("surveys?surveyId=" + testSurvey.getSurveyId())
-    //            .then()
-    //            .assertThat()
-    //            .body("[0].surveyId", equalTo(testSurvey.getSurveyId()));
+    // given().spec(getDataSpec)
+    // .auth()
+    // .oauth2(jwtToken.get())
+    // .get("surveys?surveyId=" + testSurvey.getSurveyId())
+    // .then()
+    // .assertThat()
+    // .body("[0].surveyId", equalTo(testSurvey.getSurveyId()));
     // }
 
     // @Test
     // @WithUserDetails("test@example.com")
     // public void testFilterSurveysForSite() {
 
-    //     val testSurvey = surveyTestData.persistedSurvey();
-    //     val siteId = testSurvey.getSite().getSiteId();
+    // val testSurvey = surveyTestData.persistedSurvey();
+    // val siteId = testSurvey.getSite().getSiteId();
 
-    //     given().spec(getDataSpec)
-    //            .auth()
-    //            .oauth2(jwtToken.get())
-    //            .get(queryPreamble + "&siteId=" + siteId)
-    //            .then()
-    //            .assertThat()
-    //            .body("[0].surveyId", equalTo(testSurvey.getSurveyId()));
+    // given().spec(getDataSpec)
+    // .auth()
+    // .oauth2(jwtToken.get())
+    // .get(queryPreamble + "&siteId=" + siteId)
+    // .then()
+    // .assertThat()
+    // .body("[0].surveyId", equalTo(testSurvey.getSurveyId()));
 
-    //     given().spec(getDataSpec)
-    //            .auth()
-    //            .oauth2(jwtToken.get())
-    //            .get(queryPreamble + "&siteId=" + NON_EXISTENT_SITE_ID)
-    //            .then()
-    //            .assertThat()
-    //            .body("size()", equalTo(0));
+    // given().spec(getDataSpec)
+    // .auth()
+    // .oauth2(jwtToken.get())
+    // .get(queryPreamble + "&siteId=" + NON_EXISTENT_SITE_ID)
+    // .then()
+    // .assertThat()
+    // .body("size()", equalTo(0));
     // }
 }
