@@ -47,7 +47,16 @@ const ObservableItemAdd = () => {
     lengthWeightCf: null
   });
 
-  useEffect(() => getResult('species/taxonomyDetail').then((options) => setOptions(options.data), []), []);
+  useEffect(
+    () =>
+      getResult('species/taxonomyDetail').then((options) => {
+        options.data.obsItemTypes = options.data.obsItemTypes.map((i) => {
+          return {id: i.obsItemTypeId, label: i.obsItemTypeName};
+        });
+        setOptions(options.data);
+      }, []),
+    []
+  );
 
   const handleSubmit = () => {
     entitySave(`reference/observableItem`, item).then((res) => {
