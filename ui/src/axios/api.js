@@ -1,5 +1,4 @@
 import axiosInstance from './index.js';
-import axios from 'axios';
 import store from '../components/store'; // will be useful to access to axios.all and axios.spread
 
 function getToken() {
@@ -61,82 +60,6 @@ export const getResult = (entity) => axiosInstance.get('/api/' + entity);
 
 export const getEntity = (entity) => getResult(entity).then((res) => res);
 
-export const getFullJob = (id) => {
-  const jobReq = axiosInstance.get('/api/stagedJobs/' + id);
-  const logsReq = axiosInstance.get('/api/stagedJobs/' + id + '/logs');
-  const programReq = axiosInstance.get('/api/stagedJobs/' + id + '/program');
-  return axios
-    .all([jobReq, logsReq, programReq])
-    .then(
-      axios.spread((...responses) => {
-        const job = responses[0].data || {};
-        const logs = responses[1]?.data._embedded.stagedJobLogs || [];
-        const program = responses[2].data || {};
-        const fullJob = {...job, program: program, logs: logs};
-        return fullJob;
-      })
-    )
-    .catch((err) => {
-      console.error(err);
-      return {error: err};
-    });
-};
-
-export const getSiteEdit = () => {
-  const locations = axiosInstance.get('/api/locations');
-  const marineProtectedAreas = axiosInstance.get('/api/marineProtectedAreas');
-  const protectionStatuses = axiosInstance.get('/api/protectionStatuses');
-  const states = axiosInstance.get('/api/siteStates');
-  const countries = axiosInstance.get('/api/siteCountries');
-  return axios.all([locations, marineProtectedAreas, protectionStatuses, states, countries]).then(
-    axios.spread((...responses) => {
-      const locations =
-        responses[0].data.map((l) => {
-          return {id: l.locationId, label: l.locationName};
-        }) || [];
-      const marineProtectedAreas = responses[1]?.data._embedded.marineProtectedAreas.map((m) => m.name) || [];
-      const protectionStatuses = responses[2]?.data._embedded.protectionStatuses.map((m) => m.name) || [];
-      const states = responses[3]?.data || [];
-      const countries = responses[4]?.data || [];
-      return {locations, marineProtectedAreas, protectionStatuses, states, countries};
-    })
-  );
-};
-
-export const getObservableItemAdd = () => {
-  const taxonomyDetail = axiosInstance.get('/api/species/taxonomyDetail');
-  const obsItemTypes = axiosInstance.get('/api/obsItemTypes');
-  const reportGroups = axiosInstance.get('/api/reportGroups');
-  const habitatGroups = axiosInstance.get('/api/habitatGroups');
-  return axios.all([taxonomyDetail, obsItemTypes, reportGroups, habitatGroups]).then(
-    axios.spread((...responses) => {
-      return {
-        ...responses[0].data,
-        obsItemTypes: responses[1].data._embedded.obsItemTypes.map((i) => {
-          return {id: i.obsItemTypeId, label: i.obsItemTypeName};
-        }),
-        reportGroups: responses[2].data._embedded.reportGroups.map((i) => i.name),
-        habitatGroups: responses[3].data._embedded.habitatGroups.map((i) => i.name)
-      };
-    })
-  );
-};
-
-export const getObservableItemEdit = () => {
-  const speciesEpithets = axiosInstance.get('/api/species/taxonomyDetail');
-  const reportGroups = axiosInstance.get('/api/reportGroups');
-  const habitatGroups = axiosInstance.get('/api/habitatGroups');
-  return axios.all([speciesEpithets, reportGroups, habitatGroups]).then(
-    axios.spread((...responses) => {
-      return {
-        ...responses[0].data,
-        reportGroups: responses[1].data._embedded.reportGroups.map((i) => i.name),
-        habitatGroups: responses[2].data._embedded.habitatGroups.map((i) => i.name)
-      };
-    })
-  );
-};
-
 export const deleteJob = (jobId) => {
   return axiosInstance.delete('/api/stage/delete/' + jobId);
 };
@@ -173,15 +96,6 @@ export const entityDelete = (url, id) => {
     })
     .then((res) => res)
     .catch((err) => err);
-};
-
-export const entityRelation = (entity, urls) => {
-  const config = {
-    headers: {
-      'Content-Type': 'text/uri-list'
-    }
-  };
-  return axiosInstance.put(entity, urls, config).then;
 };
 
 export const getDataJob = (jobId) =>

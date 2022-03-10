@@ -11,7 +11,7 @@ import CustomAutoCompleteInput from '../input/CustomAutoCompleteInput';
 import CustomTextInput from '../input/CustomTextInput';
 import CustomSearchInput from '../input/CustomSearchInput';
 
-import {getResult, getObservableItemEdit, entityEdit, entityDelete} from '../../axios/api';
+import {getResult, entityEdit, entityDelete} from '../../axios/api';
 
 const ObservableItemEdit = () => {
   const observableItemId = useParams()?.id;
@@ -35,7 +35,7 @@ const ObservableItemEdit = () => {
     supersededBy: '',
     letterCode: '',
     reportGroup: '',
-    habitatGroup: '',
+    habitatGroups: '',
     phylum: '',
     class: '',
     order: '',
@@ -46,7 +46,7 @@ const ObservableItemEdit = () => {
     lengthWeightCf: ''
   });
 
-  useEffect(() => getObservableItemEdit().then((options) => setOptions(options)), []);
+  useEffect(() => getResult('species/taxonomyDetail').then((options) => setOptions(options.data), []), []);
 
   useEffect(() => {
     if (observableItemId) getResult(`reference/observableItem/${observableItemId}`).then((res) => dispatch({form: res.data}));
@@ -85,7 +85,7 @@ const ObservableItemEdit = () => {
             <Typography variant="h4">Edit Observable Item</Typography>
           </Box>
         </Grid>
-        <Button style={{ float: 'right'}} onClick={handleDelete} startIcon={<Delete></Delete>}>
+        <Button style={{float: 'right'}} onClick={handleDelete} startIcon={<Delete></Delete>}>
           Delete
         </Button>
       </Grid>
@@ -123,7 +123,7 @@ const ObservableItemEdit = () => {
               <Grid item xs={6}>
                 <CustomAutoCompleteInput
                   label="Species Epithet"
-                  options={options.speciesEpithet}
+                  options={options.taxonomy?.speciesEpithet}
                   formData={item.speciesEpithet}
                   field="speciesEpithet"
                   errors={errors}
@@ -160,12 +160,12 @@ const ObservableItemEdit = () => {
               </Grid>
               <Grid item xs={6}>
                 <CustomAutoCompleteInput
-                  label="Habitat Group"
-                  formData={item.habitatGroup}
+                  label="Habitat Groups"
+                  formData={item.habitatGroups}
                   options={options.habitatGroups}
-                  field="habitatGroup"
+                  field="habitatGroups"
                   errors={errors}
-                  onChange={(t) => dispatch({field: 'habitatGroup', value: t})}
+                  onChange={(t) => dispatch({field: 'habitatGroups', value: t})}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -175,7 +175,7 @@ const ObservableItemEdit = () => {
                 <CustomAutoCompleteInput
                   label="Phylum"
                   formData={item.phylum}
-                  options={options.phylum}
+                  options={options.taxonomy?.phylum}
                   field="phylum"
                   errors={errors}
                   onChange={(t) => dispatch({field: 'phylum', value: t})}
@@ -185,7 +185,7 @@ const ObservableItemEdit = () => {
                 <CustomAutoCompleteInput
                   label="Class"
                   formData={item.class}
-                  options={options.className}
+                  options={options.taxonomy?.className}
                   field="class"
                   errors={errors}
                   onChange={(t) => dispatch({field: 'class', value: t})}
@@ -195,7 +195,7 @@ const ObservableItemEdit = () => {
                 <CustomAutoCompleteInput
                   label="Order"
                   formData={item.order}
-                  options={options.order}
+                  options={options.taxonomy?.order}
                   field="order"
                   errors={errors}
                   onChange={(t) => dispatch({field: 'order', value: t})}
@@ -205,7 +205,7 @@ const ObservableItemEdit = () => {
                 <CustomAutoCompleteInput
                   label="Family"
                   formData={item.family}
-                  options={options.family}
+                  options={options.taxonomy?.family}
                   field="family"
                   errors={errors}
                   onChange={(t) => dispatch({field: 'family', value: t})}
@@ -215,7 +215,7 @@ const ObservableItemEdit = () => {
                 <CustomAutoCompleteInput
                   label="Genus"
                   formData={item.genus}
-                  options={options.genus}
+                  options={options.taxonomy?.genus}
                   field="genus"
                   errors={errors}
                   onChange={(t) => dispatch({field: 'genus', value: t})}

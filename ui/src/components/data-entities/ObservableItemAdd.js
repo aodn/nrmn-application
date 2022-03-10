@@ -12,7 +12,7 @@ import CustomAutoCompleteInput from '../input/CustomAutoCompleteInput';
 import CustomTextInput from '../input/CustomTextInput';
 import CustomSearchInput from '../input/CustomSearchInput';
 
-import {getObservableItemAdd, entitySave} from '../../axios/api';
+import {getResult, entitySave} from '../../axios/api';
 
 const ObservableItemAdd = () => {
   const [savedId, setSavedId] = useState(false);
@@ -47,7 +47,7 @@ const ObservableItemAdd = () => {
     lengthWeightCf: null
   });
 
-  useEffect(() => getObservableItemAdd().then((options) => setOptions(options)), []);
+  useEffect(() => getResult('species/taxonomyDetail').then((options) => setOptions(options.data), []), []);
 
   const handleSubmit = () => {
     entitySave(`reference/observableItem`, item).then((res) => {
@@ -125,7 +125,7 @@ const ObservableItemAdd = () => {
               <CustomAutoCompleteInput
                 label="Phylum"
                 formData={item.phylum}
-                options={options.phylum}
+                options={options.taxonomy?.phylum}
                 field="phylum"
                 errors={errors}
                 onChange={(t) => dispatch({field: 'phylum', value: t})}
@@ -135,7 +135,7 @@ const ObservableItemAdd = () => {
               <CustomAutoCompleteInput
                 label="Class"
                 formData={item.class}
-                options={options.className}
+                options={options.taxonomy?.className}
                 field="class"
                 errors={errors}
                 onChange={(t) => dispatch({field: 'class', value: t})}
@@ -145,7 +145,7 @@ const ObservableItemAdd = () => {
               <CustomAutoCompleteInput
                 label="Order"
                 formData={item.order}
-                options={options.order}
+                options={options.taxonomy?.order}
                 field="order"
                 errors={errors}
                 onChange={(t) => dispatch({field: 'order', value: t})}
@@ -155,7 +155,7 @@ const ObservableItemAdd = () => {
               <CustomAutoCompleteInput
                 label="Family"
                 formData={item.family}
-                options={options.family}
+                options={options.taxonomy?.family}
                 field="family"
                 errors={errors}
                 onChange={(t) => dispatch({field: 'family', value: t})}
@@ -165,7 +165,7 @@ const ObservableItemAdd = () => {
               <CustomAutoCompleteInput
                 label="Genus"
                 formData={item.genus}
-                options={options.genus}
+                options={options.taxonomy?.genus}
                 field="className"
                 errors={errors}
                 onChange={(t) => dispatch({field: 'genus', value: t})}
@@ -175,7 +175,7 @@ const ObservableItemAdd = () => {
               <CustomAutoCompleteInput
                 label="Species Epithet"
                 formData={item.speciesEpithet}
-                options={options.speciesEpithet}
+                options={options.taxonomy?.speciesEpithet}
                 field="speciesEpithet"
                 errors={errors}
                 onChange={(t) => dispatch({field: 'speciesEpithet', value: t})}
