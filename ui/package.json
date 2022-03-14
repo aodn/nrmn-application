@@ -8,7 +8,7 @@
     "@material-ui/data-grid": "^4.0.0-alpha.35",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.56",
-    "@reduxjs/toolkit": "1.5.1",
+    "@reduxjs/toolkit": "1.8.0",
     "@rjsf/core": "2.5.1",
     "@rjsf/material-ui": "2.5.1",
     "@types/react-router-dom": "^5.3.3",
