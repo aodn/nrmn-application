@@ -91,7 +91,7 @@ public class DiverController {
                     .stream().filter(d -> !d.getDiverId().equals(diver.getDiverId())).collect(Collectors.toList());
 
         if (!existingDiversWithInitials.isEmpty())
-            errors.add(RowError.builder().id(diver.getDiverId()).message("A diver already has these initials.")
+            errors.add(RowError.builder().id(diver.getDiverId()).property("initials").message("A diver already has these initials.")
                     .build());
 
         String diverFullName = Normalizer.normalize(diver.getFullName(), Normalizer.Form.NFD)
@@ -103,7 +103,7 @@ public class DiverController {
                     .stream().filter(d -> !d.getDiverId().equals(diver.getDiverId())).collect(Collectors.toList());
 
         if (!existingDiversWithSameName.isEmpty())
-            errors.add(RowError.builder().id(diver.getDiverId()).message("A diver with the same name already exists.")
+            errors.add(RowError.builder().id(diver.getDiverId()).property("fullName").message("A diver with the same name already exists.")
                     .build());
 
         return errors;

@@ -7,5 +7,6 @@ import lombok.Value;
 @Builder
 public class RowError {
     Integer id;
+    String property;
     String message;
 }

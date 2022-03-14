@@ -85,7 +85,7 @@ public class LocationApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("A location with that name already exists.")));
+                .body("[0].message", is(equalTo("A location with that name already exists.")));
     }
 
     @Test
@@ -105,6 +105,6 @@ public class LocationApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("A location with that name already exists.")));
+                .body("[0].message", is(equalTo("A location with that name already exists.")));
     }
 }
