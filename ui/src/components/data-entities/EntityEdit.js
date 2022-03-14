@@ -149,7 +149,7 @@ const EntityEdit = ({entity, template, clone}) => {
     } else if (key === 'program') {
       uiSchema[key] = {
         'ui:field': 'dropdown',
-        route: 'programs',
+        route: 'data/programs',
         entity: 'program',
         entityList: 'programs',
         idKey: 'programId',

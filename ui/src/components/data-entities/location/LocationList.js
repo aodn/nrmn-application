@@ -16,9 +16,7 @@ const LocationList = ({filterModel, setFilterModel}) => {
   const [disableResetFilter, setResetFilterDisabled] = useState(true);
 
   useEffect(() => {
-    if (gridApi) {
-      getEntity('locations').then((res) => gridApi.setRowData(res.data));
-    }
+    if (gridApi) getEntity('locations').then((res) => gridApi.setRowData(res.data));
   }, [gridApi]);
 
   if (redirect) return <Redirect push to={`/reference/location/${redirect}`} />;

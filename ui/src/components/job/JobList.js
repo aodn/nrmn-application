@@ -13,19 +13,8 @@ const JobList = () => {
   const [deleteJobId, setDeleteJobId] = useState(null);
 
   useEffect(() => {
-    getEntity('stagedJobs?size=99').then((result) => {
-      // HACK: fix the api to return the correct format instead
-      const stagedJobs = result.data?._embedded?.stagedJobs || [];
-      const jobRows = stagedJobs.map((j) => {
-        return {
-          ...j,
-          program: j.program.programName,
-          creator: j.creator.email,
-          created: j.created,
-          updated: j.updated ? new Date(j.updated).toLocaleDateString('en-AU') : '---'
-        };
-      });
-      setJobs(jobRows);
+    getEntity('stage/jobs').then((result) => {
+      setJobs(result.data);
     });
   }, []);
 

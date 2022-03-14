@@ -14,7 +14,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Hidden from '@material-ui/core/Hidden';
 import {Link} from 'react-router-dom';
 
-import {getFullJob, originalJobFile} from '../../axios/api';
+import {getEntity, originalJobFile} from '../../axios/api';
 import FileDownload from 'js-file-download';
 
 const useStyles = makeStyles(() => ({
@@ -35,7 +35,7 @@ const JobView = () => {
 
   const downloadZip = (jobId, fileName) => {
     originalJobFile(jobId).then((result) => {
-      if(result.data.size > 0) {
+      if (result.data.size > 0) {
         FileDownload(result.data, fileName);
       } else {
         setExistsOnS3(false);
@@ -44,11 +44,7 @@ const JobView = () => {
   };
 
   useEffect(() => {
-    if (!job) {
-      getFullJob(id).then((res) => {
-        setJob(res);
-      });
-    }
+    if (!job) getEntity('stage/stagedJob/' + id).then((res) => setJob(res.data));
   }, [job, id]);
 
   return (
@@ -58,17 +54,20 @@ const JobView = () => {
           <Grid item sm={12} md={12} lg={4}>
             <Paper className={classes.paper}>
               <Grid item lg={10} md={10} style={{padding: 15}}>
-                {existsOnS3 ?
+                {existsOnS3 ? (
                   <Typography className={classes.title} variant="h5" color="primary">
-                    <Link variant="a"  onClick={() => downloadZip(job.id, job.reference)} >
+                    <Link variant="a" onClick={() => downloadZip(job.id, job.reference)}>
                       {job.reference}
                     </Link>
                   </Typography>
-                  :
+                ) : (
                   <Typography className={classes.title} variant="h5" color="primary">
                     {job.reference}
-                    <Icon title={'File could not be found'} color="error" style={{float: 'right'}}>error</Icon>
-                  </Typography> }
+                    <Icon title={'File could not be found'} color="error" style={{float: 'right'}}>
+                      error
+                    </Icon>
+                  </Typography>
+                )}
               </Grid>
 
               <Divider style={{margin: 15, marginTop: 0}} />
@@ -77,7 +76,7 @@ const JobView = () => {
                 <Grid item xs={4} lg={6} style={{paddingBottom: 0}}>
                   <List dense style={{paddingBottom: 0}}>
                     <ListItem>
-                      <ListItemText primary="Program" secondary={job.program.programName} />
+                      <ListItemText primary="Program" secondary={job.programName} />
                     </ListItem>
                     <ListItem>
                       <ListItemText primary="Source" secondary={job.source} />
@@ -90,7 +89,7 @@ const JobView = () => {
                       <ListItemText primary="Status" secondary={job.status} />
                     </ListItem>
                     <ListItem>
-                      <ListItemText primary="Creator" secondary={job.creator.email} />
+                      <ListItemText primary="Creator" secondary={job.creatorEmail} />
                     </ListItem>
                   </List>
                 </Grid>

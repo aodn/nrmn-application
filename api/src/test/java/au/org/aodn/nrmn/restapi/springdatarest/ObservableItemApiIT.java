@@ -26,6 +26,7 @@ import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -55,7 +56,7 @@ public class ObservableItemApiIT {
         spec = new RequestSpecBuilder()
                 .setBaseUri(String.format("http://localhost:%s", port))
                 .setBasePath("/api/reference/observableItem")
-                .setContentType("application/json")
+                .setContentType(ContentType.JSON)
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter())
                 .build();
@@ -76,7 +77,7 @@ public class ObservableItemApiIT {
                         "\"class\": \"ACTINOPTERYGII\"," +
                         "\"commonName\": \"Conger eel\"," +
                         "\"letterCode\": \"CVER\"," +
-                        "\"obsItemTypeId\":"  + obsItemType.getObsItemTypeId()  +
+                        "\"obsItemTypeId\":" + obsItemType.getObsItemTypeId() +
                         "}")
                 .post()
                 .then()
@@ -107,7 +108,7 @@ public class ObservableItemApiIT {
                         "\"observableItemName\": \"" + observableItem.getObservableItemName() + "\"," +
                         "\"speciesEpithet\": \"" + observableItem.getObservableItemName() + "\"," +
                         "\"isInvertSized\": \"" + observableItem.getIsInvertSized() + "\"," +
-                        "\"obsItemTypeId\":"  + observableItem.getObsItemType().getObsItemTypeId()  +
+                        "\"obsItemTypeId\":" + observableItem.getObsItemType().getObsItemTypeId() +
                         "}")
                 .put(observableItem.getObservableItemId().toString())
                 .then()

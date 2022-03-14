@@ -94,7 +94,6 @@ const resetContext = () => {
   context.rowPos = [];
   context.highlighted = [];
   context.putRowIds = [];
-  // context.undoStack = [];
   context.summary = [];
   context.errorList = {};
   context.errors = [];
@@ -143,7 +142,8 @@ const generateErrorTree = (rowData, rowPos, errors) => {
               rowIds: [...acc[existingIdx].rowIds, r.id],
               rowNumbers: [...acc[existingIdx].rowNumbers, rowNumber]
             };
-          else acc.push({columnName: col, value: r[col], rowIds: [r.id], rowNumbers: [rowNumber], isInvertSize: r.isInvertSizing === 'Yes'});
+          else
+            acc.push({columnName: col, value: r[col], rowIds: [r.id], rowNumbers: [rowNumber], isInvertSize: r.isInvertSizing === 'Yes'});
           return acc;
         }, []);
       } else {

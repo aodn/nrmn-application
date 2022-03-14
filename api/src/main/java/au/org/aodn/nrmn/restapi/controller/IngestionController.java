@@ -33,28 +33,28 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/ingestion")
 @Tag(name = "ingestion")
 public class IngestionController {
-    
+
     @Autowired
     StagedJobRepository jobRepository;
-    
+
     @Autowired
     StagedRowRepository rowRepository;
 
     @Autowired
     SurveyIngestionService surveyIngestionService;
-    
+
     @Autowired
     StagedJobLogRepository stagedJobLogRepository;
-    
+
     @Autowired
     UserActionAuditRepository userActionAuditRepository;
-    
+
     @Autowired
     private ValidationProcess validation;
 
     @Autowired
     private MaterializedViewService materializedViewService;
-    
+
     @PostMapping(path = "ingest/{job_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<String> ingest(@PathVariable("job_id") Long jobId) {
@@ -72,8 +72,9 @@ public class IngestionController {
         }
 
         try {
-            stagedJobLogRepository.save(StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.INGESTING).build());
-            
+            stagedJobLogRepository
+                    .save(StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.INGESTING).build());
+
             Collection<StagedRow> rows = rowRepository.findRowsByJobId(job.getId());
             Collection<ObservableItem> species = validation.getSpeciesForRows(rows);
             Collection<StagedRowFormatted> validatedRows = validation.formatRowsWithSpecies(rows, species);

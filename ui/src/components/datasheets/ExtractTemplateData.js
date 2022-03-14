@@ -23,7 +23,7 @@ const ExtractTemplateData = () => {
   const [templateLocations, setTemplateLocations] = useState([]);
 
   useEffect(() => {
-    getEntity('locationList').then((res) => {
+    getEntity('locations').then((res) => {
       const locations = [];
       const groups = {ecoRegions: [], countries: [], areas: [], siteCodes: []};
       res.data.forEach((d) => {

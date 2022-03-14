@@ -14,14 +14,18 @@ import org.springframework.context.annotation.Configuration;
 public class ObservableItemGetDtoMapperConfig {
 
     @Autowired
-    ObservableItemGetDtoMapperConfig(ObservableItemRepository observableItemRepository, ModelMapper modelMapper) { 
-        modelMapper.typeMap(ObservableItem.class, ObservableItemGetDto.class).setPostConverter(customMappings(observableItemRepository));
+    ObservableItemGetDtoMapperConfig(ObservableItemRepository observableItemRepository, ModelMapper modelMapper) {
+        modelMapper.typeMap(ObservableItem.class, ObservableItemGetDto.class)
+                .setPostConverter(customMappings(observableItemRepository));
     }
-    private Converter<ObservableItem, ObservableItemGetDto> customMappings(ObservableItemRepository observableItemRepository) {
+
+    private Converter<ObservableItem, ObservableItemGetDto> customMappings(
+            ObservableItemRepository observableItemRepository) {
         return context -> {
             ObservableItem observableItem = context.getSource();
             ObservableItemGetDto observableItemGetDto = context.getDestination();
-            ObservableItemSuperseded superseded = observableItemRepository.findSupersededForId(observableItem.getObservableItemId());
+            ObservableItemSuperseded superseded = observableItemRepository
+                    .findSupersededForId(observableItem.getObservableItemId());
             observableItemGetDto.setSupersededIds(superseded.getSupersededIds());
             observableItemGetDto.setSupersededNames(superseded.getSupersededNames());
             return observableItemGetDto;

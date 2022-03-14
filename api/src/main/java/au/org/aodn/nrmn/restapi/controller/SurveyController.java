@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyFilterDto;
+import au.org.aodn.nrmn.restapi.model.db.Program;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
+import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.repository.projections.SurveyRow;
 import au.org.aodn.nrmn.restapi.service.SurveyEditService;
@@ -33,6 +35,9 @@ public class SurveyController {
     private SurveyRepository surveyRepository;
 
     @Autowired
+    private ProgramRepository programRepository;
+
+    @Autowired
     private SurveyEditService surveyEditService;
 
     @Autowired
@@ -40,19 +45,24 @@ public class SurveyController {
 
     @GetMapping(path = "/surveys")
     public ResponseEntity<List<SurveyRow>> listMatching(SurveyFilterDto surveyFilter) {
-        if(surveyFilter.isSet())
-            return ResponseEntity.ok(surveyRepository.findByCriteria(surveyFilter).stream().collect(Collectors.toList()));
+        if (surveyFilter.isSet())
+            return ResponseEntity
+                    .ok(surveyRepository.findByCriteria(surveyFilter).stream().collect(Collectors.toList()));
         else
             return ResponseEntity.ok(surveyRepository.findAllProjectedBy().stream().collect(Collectors.toList()));
     }
-    
+
+    @GetMapping(path = "/programs")
+    public ResponseEntity<List<Program>> getSurveyPrograms() {
+        return ResponseEntity.ok(programRepository.findAll());
+    }
+
     @GetMapping("/survey/{id}")
     public ResponseEntity<SurveyDto> findOne(@PathVariable Integer id) {
-        return surveyRepository.findById(id).map(survey -> 
-            ResponseEntity.ok(mapper.map(survey, SurveyDto.class)))
-        .orElseGet(() -> ResponseEntity.notFound().build());
+        return surveyRepository.findById(id).map(survey -> ResponseEntity.ok(mapper.map(survey, SurveyDto.class)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
-    
+
     @PutMapping("/survey/{id}")
     public ResponseEntity<?> findOne(@Valid @RequestBody SurveyDto surveyDto) {
 
@@ -65,7 +75,7 @@ public class SurveyController {
 
         Survey persistedSurvey = surveyRepository.save(survey);
         SurveyDto updatedSurveyDto = mapper.map(persistedSurvey, SurveyDto.class);
-        return ResponseEntity.ok().body(updatedSurveyDto);
+        return ResponseEntity.ok(updatedSurveyDto);
 
     }
 }

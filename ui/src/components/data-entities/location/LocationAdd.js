@@ -4,8 +4,8 @@ import Typography from '@material-ui/core/Typography';
 import Save from '@material-ui/icons/Save';
 import React, { useEffect, useReducer, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import NavLink from 'react-router-dom/NavLink';
-import Redirect from 'react-router-dom/Redirect';
+import { NavLink } from 'react-router-dom';
+import { Redirect }from 'react-router-dom';
 import { entitySave, entityEdit, getEntity } from '../../../axios/api';
 import EntityContainer from '../../containers/EntityContainer';
 import CustomCheckboxInput from '../../input/CustomCheckboxInput';
@@ -35,13 +35,15 @@ const LocationAdd = () => {
       if (res.data.locationId) {
         setSavedId(res.data.locationId);
       } else {
-        setErrors(res.data.errors);
+        setErrors(res.data);
       }
     });
   };
 
   useEffect(() => {
-    if (locationId) getEntity(`locations/${locationId}`).then((res) => dispatch({form: res.data}));
+    if (locationId) getEntity(`location/${locationId}`).then((res) => {
+      dispatch({form: res.data});
+    });
   }, [locationId]);
 
   if (savedId) return <Redirect to={`/reference/location/${savedId}/new`} />;

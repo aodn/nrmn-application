@@ -148,23 +148,6 @@ public class SurveyEditService {
             }
         }
 
-        // Commented out as it is unclear how to validate the site name matching the site code as there is no unique
-        // site name constraint nor a way to determine if it is a valid change.
-
-//        // Site code and site name exist and match
-//        if (!surveyDtoSite.getSiteName().equals(surveyDto.getSiteName())) {
-//
-//            List<Site> siteNameExistsAlready = siteRepository.findAll().stream()
-//                    .filter(site -> site.getSiteName().equals(surveyDto.getSiteName())).collect(Collectors.toList());
-//
-//            if(siteNameExistsAlready.size() > 0) {
-//            errors.add(new ValidationError("Site", "siteName", surveyDto.getSiteName(),
-//                    String.format("The site name \"%s\" already exists for site code \"%s\"",
-//                            surveyDto.getSiteName(), siteNameExistsAlready.get(0).getSiteCode())));
-//            }
-//
-//        }
-
         // Lat and Lon match site
         Double lat = null;
         Double lon = null;

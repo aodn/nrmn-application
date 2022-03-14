@@ -18,7 +18,7 @@ const LocationView = () => {
 
   useEffect(() => {
     if (locationId)
-      getResult(`locations/${locationId}`).then((res) => {
+      getResult(`location/${locationId}`).then((res) => {
         setLocation(res.data);
       });
   }, [locationId]);

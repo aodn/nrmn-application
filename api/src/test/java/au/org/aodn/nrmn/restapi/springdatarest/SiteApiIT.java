@@ -29,6 +29,7 @@ import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -58,7 +59,7 @@ public class SiteApiIT {
         spec = new RequestSpecBuilder()
                 .setBaseUri(String.format("http://localhost:%s", port))
                 .setBasePath("/api/sites")
-                .setContentType("application/json")
+                .setContentType(ContentType.JSON)
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter())
                 .build();
@@ -118,7 +119,7 @@ public class SiteApiIT {
                         "    \"ProtectionStatus\": \"Fishing\"," +
                         "    \"ProxCountry\": \"Australia\"" +
                         "}," +
-                         "\"locationId\": " + site.getLocation().getLocationId() + "}")
+                        "\"locationId\": " + site.getLocation().getLocationId() + "}")
                 .put(site.getSiteId().toString())
                 .then()
                 .assertThat()
@@ -214,7 +215,7 @@ public class SiteApiIT {
                 .auth()
                 .oauth2(jwtToken.get())
                 .body("{" +
-                        "\"siteCode\": \"" + site.getSiteCode()  + "\"," +
+                        "\"siteCode\": \"" + site.getSiteCode() + "\"," +
                         "\"siteName\": \"" + anotherSite.getSiteName() + "\"," +
                         "\"longitude\": " + site.getLongitude() + "," +
                         "\"latitude\": " + site.getLatitude() + "," +
@@ -238,12 +239,12 @@ public class SiteApiIT {
                 .auth()
                 .oauth2(jwtToken.get())
                 .delete(site.getSiteId()
-                            .toString())
+                        .toString())
                 .then()
                 .assertThat()
                 .statusCode(204);
 
-                Optional<Site> persistedSite = siteRepository.findById(site.getSiteId());
+        Optional<Site> persistedSite = siteRepository.findById(site.getSiteId());
 
         assertFalse(persistedSite.isPresent());
     }

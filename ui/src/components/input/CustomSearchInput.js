@@ -28,7 +28,7 @@ const CustomSearchInput = ({label, exclude, formData, onChange}) => {
         options={results}
         clearOnBlur
         freeSolo
-        defaultValue={formData}
+        value={formData}
         onSelect={(e) => onChange(e.target.value)}
         onKeyUp={(e) => setSearchTerm(e.target.value)}
         renderInput={(params) => <TextField {...params} color="primary" variant="outlined" />}

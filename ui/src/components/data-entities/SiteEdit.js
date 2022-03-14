@@ -12,7 +12,7 @@ import CustomTextInput from '../input/CustomTextInput';
 import CustomDropDownInput from '../input/CustomDropDownInput';
 import CustomAutoCompleteInput from '../input/CustomAutoCompleteInput';
 
-import {getResult, getSiteEdit, entityEdit, entitySave} from '../../axios/api';
+import {getResult, entityEdit, entitySave} from '../../axios/api';
 
 const numericOptions = [
   {id: 1, label: '1'},
@@ -43,7 +43,7 @@ const SiteEdit = ({clone}) => {
 
   const [site, dispatch] = useReducer(formReducer, {});
 
-  useEffect(() => getSiteEdit().then((options) => setOptions(options)), []);
+  useEffect(() => getResult('siteOptions').then((res) => setOptions(res.data)), []);
 
   useEffect(() => {
     if (siteId)
@@ -143,7 +143,9 @@ const SiteEdit = ({clone}) => {
                   label="Location"
                   field="locationId"
                   errors={errors}
-                  options={options.locations}
+                  options={options.locations?.map((l) => {
+                    return {id: l.locationId, label: l.locationName};
+                  })}
                   formData={site.locationId}
                   onChange={(t) => dispatch({field: 'locationId', value: t})}
                 />
@@ -153,7 +155,7 @@ const SiteEdit = ({clone}) => {
               <Grid item xs={6}>
                 <CustomAutoCompleteInput
                   label="State"
-                  options={options.states}
+                  options={options.siteStates}
                   formData={site.state}
                   field="state"
                   errors={errors}
@@ -163,7 +165,7 @@ const SiteEdit = ({clone}) => {
               <Grid item xs={6}>
                 <CustomAutoCompleteInput
                   label="Country"
-                  options={options.countries}
+                  options={options.siteCountries}
                   formData={site.country}
                   field="country"
                   errors={errors}
