@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {useParams, NavLink, Redirect} from 'react-router-dom';
+import {useParams, NavLink, Navigate} from 'react-router-dom';
 import config from 'react-global-configuration';
 import Form from '@rjsf/material-ui';
 import {Box, Button, CircularProgress, Grid, Typography} from '@material-ui/core';
@@ -213,7 +213,7 @@ const EntityEdit = ({entity, template, clone}) => {
 
   if (saved) {
     const id = saved[entity.idKey];
-    return <Redirect to={`${entity.route.base}/${id}/${edit ? 'saved' : 'new'}`} />;
+    return <Navigate to={`${entity.route.base}/${id}/${edit ? 'saved' : 'new'}`} />;
   }
 
   return params.id && Object.keys(formData).length === 0 ? (
