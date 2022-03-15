@@ -677,7 +677,7 @@ and (
 	(oi.phylum = 'Arthropoda' and oi.class ='Malacostraca')
 	or (oi.phylum = 'Arthropoda' and oi.class='Pycnogonida' )
 	or (oi.phylum = 'Mollusca' and oi.class IN ('Gastropoda', 'Cephalopoda'))
-	or (oi.phylum = 'Mollusca' and oi.family IN ('Tridacnidae','Cardiidae','Pectinidae'))
+	or (oi.phylum = 'Mollusca' and oi.family IN ('Tridacnidae','Cardiidae','Pectinidae','Pteriidae','Pinnidae'))
 	or (oi.phylum = 'Echinodermata' and (oi.class IN ('Asteroidea', 'Holothuroidea', 'Echinoidea','Crinoidea')
 	                                     or (oi.class = 'Ophiuroidea' and oi."order" ='Phrynophiurida')))
 	or (oi.phylum = 'Platyhelminthes')
