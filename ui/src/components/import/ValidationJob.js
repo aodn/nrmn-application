@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Redirect, useParams} from 'react-router';
+import {Navigate, useParams} from 'react-router';
 import {Box} from '@material-ui/core';
 import DataSheetView from './DataSheetView';
 import Alert from '@material-ui/lab/Alert';
@@ -9,7 +9,7 @@ const ValidationJob = () => {
   const [ingestState, setIngestState] = useState({});
 
   if (ingestState.success) {
-    return <Redirect to={`/jobs/${jobId}/view`}></Redirect>;
+    return <Navigate to={`/jobs/${jobId}/view`} />;
   }
 
   if (ingestState.error) {

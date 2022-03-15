@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
-import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
+import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
 import Alert from '@material-ui/lab/Alert';
 import {ThemeProvider, unstable_createMuiStrictModeTheme as createMuiTheme, responsiveFontSizes} from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
@@ -42,7 +42,7 @@ const referenceData = [
     can: {delete: false, clone: false},
     flexField: 'locationName',
     endpoint: 'locations',
-    route: {base: '/reference/location', view: '/reference/location/:id?/:success?', edit: '/reference/location/:id?/edit'},
+    route: {base: '/reference/location', view: '/reference/location/:id', edit: '/reference/location/:id/edit'},
     schemaKey: {add: 'Location', edit: 'Location', view: 'Location'},
     template: {add: LocationTemplate, edit: LocationTemplate, view: LocationTemplate},
     list: {
@@ -59,7 +59,7 @@ const referenceData = [
     idKey: 'diverId',
     can: {delete: false, clone: false},
     endpoint: 'diver',
-    route: {base: '/reference/diver', view: '/reference/diver/:id?/:success?', edit: '/reference/diver/:id?/edit'},
+    route: {base: '/reference/diver', view: '/reference/diver/:id', edit: '/reference/diver/:id/edit'},
     schemaKey: {add: 'Diver', edit: 'Diver', view: 'Diver'},
     template: {add: DiverTemplate, edit: DiverTemplate, view: DiverTemplate},
     list: {
@@ -77,7 +77,7 @@ const referenceData = [
     can: {delete: true, clone: true},
     flexField: null,
     endpoint: 'sites',
-    route: {base: '/reference/site', view: '/reference/site/:id?/:success?', edit: '/reference/site/:id?/edit'},
+    route: {base: '/reference/site', view: '/reference/site/:id', edit: '/reference/site/:id/edit'},
     schemaKey: {add: 'SiteGetDto', edit: 'SiteGetDto', view: 'SiteGetDto'},
     template: {add: SiteViewTemplate, edit: SiteViewTemplate, view: SiteViewTemplate},
     list: {
@@ -98,8 +98,8 @@ const referenceData = [
     endpoint: 'reference/observableItem',
     route: {
       base: '/reference/observableItem',
-      view: '/reference/observableItem/:id?/:success?',
-      edit: '/reference/observableItem/:id?/edit'
+      view: '/reference/observableItem/:id',
+      edit: '/reference/observableItem/:id/edit'
     },
     schemaKey: {add: 'ObservableItemDto', edit: 'ObservableItemPutDto', view: 'ObservableItemGetDto'},
     template: {add: ObservableItemTemplate, edit: ObservableItemEdit, view: ObservableItemViewTemplate},
@@ -136,8 +136,8 @@ const referenceData = [
     endpoint: 'data/survey',
     route: {
       base: '/data/survey',
-      view: '/data/survey/:id?/:success?',
-      edit: '/data/survey/:id?/edit'
+      view: '/data/survey/:id',
+      edit: '/data/survey/:id/edit'
     },
     schemaKey: {edit: 'SurveyDto', view: 'SurveyDto'},
     template: {edit: SurveyEditTemplate, view: SurveyViewTemplate},
@@ -242,64 +242,64 @@ const App = () => {
               </Alert>
             </Box>
           )}
-          <Switch>
-            <Route exact path="/home" component={Homepage} />
+          <Routes>
+            <Route path="/home" element={<Homepage />} />
 
-            <Redirect exact from="/" to="/home" />
-
-            {!loggedIn && <Login />}
-            <Redirect exact from="/login" to="/home" />
+            <Route path="/" element={<Navigate to="/home" />} />
 
             {/** Authenticated Pages */}
-            <Route exact path="/jobs" component={JobList} />
-            <Route exact path="/jobs/:id/view" component={JobView} />
-            <Route
-              exact
-              path="/reference/locations"
-              render={() => <LocationList setFilterModel={setFilterModel} filterModel={filterModel} />}
-            />
-            <Route
-              exact
-              path="/reference/divers"
-              render={() => <DiverList setFilterModel={setFilterModel} filterModel={filterModel} />}
-            />
-            <Route exact path="/upload" component={JobUpload} />
-            <Route exact path="/data/surveys" component={SurveyList} />
-            <Route exact path="/data/extract" component={ExtractTemplateData} />
-            <Route exact path="/validation/:jobId" component={ValidationPage} />
-            <Route exact path="/reference/observableItem" component={ObservableItemAdd} />
-            <Route exact path="/reference/observableItem/:id?/edit" component={ObservableItemEdit} />
-            <Route exact path="/reference/site/:id?/edit" component={SiteEdit} />
-            <Route exact path="/reference/site/:id?/clone" render={() => <SiteEdit clone />} />
-            <Route exact path="/reference/site" component={SiteEdit} />
-            <Route exact path="/reference/location" component={LocationAdd} />
-            <Route exact path="/reference/location/:id?" component={LocationView} />
-            <Route exact path="/reference/location/:id?/edit" component={LocationAdd} />
-            <Route exact path="/reference/location/:id?/:verb?" component={LocationView} />
-            <Redirect exact from="/list/stagedJob" to="/jobs" />
-            {referenceData.map((e) => (
-              <Route exact key={e.route.base} path={e.route.base} render={() => <EntityEdit entity={e} template={e.template.add} />} />
-            ))}
-            {referenceData.map((e) => (
-              <Route exact key={e.route.edit} path={e.route.edit} render={() => <EntityEdit entity={e} template={e.template.edit} />} />
-            ))}
-            {referenceData
-              .filter((e) => e.can.clone)
-              .map((e) => (
-                <Route
-                  exact
-                  key={`${e.route.base}/:id?/clone`}
-                  path={`${e.route.base}/:id?/clone`}
-                  render={() => <EntityEdit entity={e} template={e.template.add} clone />}
-                />
+            {loggedIn ? <>
+              <Route path="/login" element={<Navigate to="/home" />} />
+              <Route path="/jobs" element={<JobList />} />
+              <Route path="/jobs/:id/view" element={<JobView />} />
+              <Route
+                exact
+                path="/reference/locations"
+                element={<LocationList setFilterModel={setFilterModel} filterModel={filterModel} />}
+              />
+              <Route
+                exact
+                path="/reference/divers"
+                element={<DiverList setFilterModel={setFilterModel} filterModel={filterModel} />}
+              />
+              <Route path="/upload" element={<JobUpload />} />
+              <Route path="/data/surveys" element={<SurveyList />} />
+              <Route path="/data/extract" element={<ExtractTemplateData />} />
+              <Route path="/validation/:jobId" element={<ValidationPage />} />
+              <Route path="/reference/observableItem" element={<ObservableItemAdd />} />
+              <Route path="/reference/observableItem/:id/edit" element={<ObservableItemEdit />} />
+              <Route path="/reference/site/:id/edit" element={<SiteEdit />} />
+              <Route path="/reference/site/:id/clone" element={<SiteEdit clone />} />
+              <Route path="/reference/site" element={<SiteEdit />} />
+              <Route path="/reference/location" element={<LocationAdd />} />
+              <Route path="/reference/location/:id" element={<LocationView />} />
+              <Route path="/reference/location/:id/edit" element={<LocationAdd />} />
+              <Route path="/reference/location/:id/:verb" element={<LocationView />} />
+              {referenceData.map((e) => (
+                <Route key={e.route.base} path={e.route.base} element={<EntityEdit entity={e} template={e.template.add} />} />
               ))}
-            {referenceData.map((e) => (
-              <Route exact key={e.route.view} path={e.route.view} render={() => <EntityView entity={e} template={e.template.view} />} />
-            ))}
-            {referenceData.map((e) => (
-              <Route exact key={e.list.route} path={e.list.route} render={() => <EntityList entity={e} />} />
-            ))}
-          </Switch>
+              {referenceData.map((e) => (
+                <Route key={e.route.edit} path={e.route.edit} element={<EntityEdit entity={e} template={e.template.edit} />} />
+              ))}
+              {referenceData
+                .filter((e) => e.can.clone)
+                .map((e) => (
+                  <Route
+                    exact
+                    key={`${e.route.base}/:id/clone`}
+                    path={`${e.route.base}/:id/clone`}
+                    element={<EntityEdit entity={e} template={e.template.add} clone />}
+                  />
+                ))}
+              {referenceData.map((e) => (
+                <Route key={e.route.view} path={e.route.view} element={<EntityView entity={e} template={e.template.view} />} />
+              ))}
+              {referenceData.map((e) => (
+                <Route key={e.list.route} path={e.list.route} element={<EntityList entity={e} />} />
+              ))}
+              <Route path="*" element={<Navigate to="/home" />} />
+            </> : <Route path="*" element={<Login/>} />}
+          </Routes>
         </AppContent>
       </Router>
     </ThemeProvider>

@@ -48,7 +48,7 @@ const mockState = {
 
 const testEntity = {
   name: 'TestEntity',
-  route: {base: '/reference/test', view: '/reference/test/:id?/:success?', edit: '/reference/test/:id?/edit'},
+  route: {base: '/reference/test', view: '/reference/test/:id??', edit: '/reference/test/:id?/edit'},
   schemaKey: 'TestEntity',
   endpoint: 'tests',
   template: {add: null, edit: null, view: null},

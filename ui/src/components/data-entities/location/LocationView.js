@@ -5,14 +5,14 @@ import {Edit} from '@material-ui/icons';
 import Alert from '@material-ui/lab/Alert';
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router';
-import {Link} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import {getResult} from '../../../axios/api';
 import EntityContainer from '../../containers/EntityContainer';
 import CustomTextInput from '../../input/CustomTextInput';
 
 const LocationView = () => {
   const locationId = useParams()?.id;
-  const locationVerb = useParams()?.verb;
+  const {state} = useLocation();
 
   const [location, setLocation] = useState();
 
@@ -26,11 +26,11 @@ const LocationView = () => {
   return location ? (
     <EntityContainer name="location" goBackTo="/reference/locations">
       <Grid container alignItems="flex-start" direction="row" spacing={2}>
-        {locationVerb && (
+        {state?.message && (
           <Grid item xs={12}>
             <Box>
               <Alert severity="info" variant="filled">
-                Location {locationVerb === 'new' ? 'Created' : 'Updated'}
+                {state.message}
               </Alert>
             </Box>
           </Grid>

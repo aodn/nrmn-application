@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Box, Button, Typography} from '@material-ui/core';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import {Redirect, NavLink} from 'react-router-dom';
+import {Navigate, NavLink} from 'react-router-dom';
 import {getEntity} from '../../../axios/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {Add} from '@material-ui/icons';
@@ -19,7 +19,7 @@ const LocationList = ({filterModel, setFilterModel}) => {
     if (gridApi) getEntity('locations').then((res) => gridApi.setRowData(res.data));
   }, [gridApi]);
 
-  if (redirect) return <Redirect push to={`/reference/location/${redirect}`} />;
+  if (redirect) return <Navigate push to={`/reference/location/${redirect}`} />;
 
   return (
     <>

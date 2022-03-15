@@ -1,5 +1,5 @@
 import React, {useEffect, useReducer, useState} from 'react';
-import {useParams, NavLink, Redirect} from 'react-router-dom';
+import {useParams, NavLink, Navigate} from 'react-router-dom';
 import {Box, Button, CircularProgress, Divider, Grid, Typography} from '@material-ui/core';
 import {Save, Delete} from '@material-ui/icons';
 import Alert from '@material-ui/lab/Alert';
@@ -74,7 +74,7 @@ const ObservableItemEdit = () => {
 
   if (saved) {
     const id = saved['observableItemId'];
-    return <Redirect to={`/reference/observableItem/${id}/saved`} />;
+    return <Navigate to={`/reference/observableItem/${id}`} state={{message: 'Observable Item Updated'}} />;
   }
 
   return (
