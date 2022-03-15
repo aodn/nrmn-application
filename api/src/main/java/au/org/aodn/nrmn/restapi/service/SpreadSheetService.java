@@ -11,6 +11,7 @@ import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
@@ -44,6 +45,7 @@ public class SpreadSheetService {
             Boolean withExtendedSizes) throws Exception {
 
         ZipSecureFile.setMinInflateRatio(0.0d);
+        IOUtils.setByteArrayMaxOverride(300000000);
 
         try (InputStream inputStream = file.getInputStream()) {
 
