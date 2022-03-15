@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Button, CircularProgress, Divider, Grid, Icon, Paper, Typography} from '@material-ui/core';
+import {Box, Button, CircularProgress, Divider, Grid, Paper, Typography} from '@material-ui/core';
 import {useParams} from 'react-router';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
