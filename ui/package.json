@@ -10,7 +10,7 @@
     "@material-ui/lab": "^4.0.0-alpha.56",
     "@reduxjs/toolkit": "1.8.0",
     "@rjsf/core": "2.5.1",
-    "@rjsf/material-ui": "2.5.1",
+    "@rjsf/material-ui": "3.0.0",
     "@types/react-router-dom": "^5.3.3",
     "ag-grid-community": "25.3.0",
     "ag-grid-enterprise": "^25.3.0",
