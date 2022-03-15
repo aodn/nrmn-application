@@ -1,12 +1,17 @@
-NRMN Application
-================
+National Reef Monitoring Network Data Portal
+=
 
-This repository contains the source code for the NRMN application.  
+The National Reef Monitoring Network (NRMN) Data Portal is a web application for collation, validation, and storage of all data obtained during shallow reef surveys conducted by the NRMN. NRMN is a sub-facility of the Integrated Marine Observing System [IMOS](https://imos.org.au/).
 
-ddl and migration code for the core NRMN reference data and surveys can be found in the 
-[NRMN repository](https://github.com/aodn/NRMN/tree/master/db-migrate).
+The application consists of the following components:
 
-ddl for additional tables required to support application functionality can be found in [application.sql](api/src/main/resources/sql/application.sql)
+* A Spring Boot based backend with a REST API
+* A React user interface
+* A Postgres database
+
+The NRMN Data Portal is deployed at [NRMN - Data Portal](https://nrmn.aodn.org.au/).
+
+This repository contains the source code for the NRMN application backend, the user interface and DDL code for initialisation of the database.
 
 ### Structure
 
@@ -19,6 +24,12 @@ project | descriptiuon
 api | maven sub-module used to build the spring boot backend (the api)
 ui | maven sub-module project used to build the react front-end
 app | maven submodule to assemble the api and ui artifacts built by the api and ui sub-modules into the application war containing both
+
+ddl and migration code for the core NRMN reference data and surveys can be found in the 
+[NRMN repository](https://github.com/aodn/NRMN/tree/master/db-migrate).
+
+ddl for additional tables required to support application functionality can be found in [application.sql](api/src/main/resources/sql/application.sql)
+
 
 ### To build
 
