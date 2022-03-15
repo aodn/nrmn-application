@@ -5,7 +5,7 @@ ARG BUILDER_UID=9999
 ENV TZ="Australia" \
     NVM_DIR="/opt/nvm" \
     MAVEN_HOME="/opt/maven" \
-    MAVEN_VERSION=3.8.4 \
+    MAVEN_VERSION=3.8.5 \
     NODE_VERSION=16.14.0 \
     HOME="/home/builder" \
     JAVA_TOOL_OPTIONS="-Duser.home=/home/builder"
