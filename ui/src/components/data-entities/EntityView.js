@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Link, useParams} from 'react-router-dom';
+import {Link, useParams, useLocation} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import config from 'react-global-configuration';
 import {PropTypes} from 'prop-types';
@@ -15,6 +15,7 @@ import EntityContainer from '../containers/EntityContainer';
 
 const EntityView = (props) => {
   const params = useParams();
+  const {state} = useLocation();
   const dispatch = useDispatch();
   const formData = useSelector((state) => state.form.data);
   const schemaDefinition = config.get('api') || {};
@@ -87,25 +88,6 @@ const EntityView = (props) => {
     StringField: TextInput
   };
 
-  function getErrors(errors) {
-    return errors.map((item, key) => {
-      return <div key={key}>{item}</div>;
-    });
-  }
-
-  let alert =
-    params.errors && params.errors.length > 0 ? (
-      <Alert severity="error" variant="filled">
-        {getErrors(params.errors)}
-      </Alert>
-    ) : params.success ? (
-      <Box margin={2} width="50%">
-        <Alert severity="info" variant="filled">
-          {props.entity.name} {params.success === 'new' ? 'Created' : params.id === '-1' ? 'Deleted' : 'Updated'}
-        </Alert>
-      </Box>
-    ) : null;
-
   const loaded = Object.keys(formData).length > 0;
   return (
     <EntityContainer name={props.entity.list.name} goBackTo={props.entity.list.route}>
@@ -127,7 +109,12 @@ const EntityView = (props) => {
         </Grid>
       </Grid>
       <Grid container alignItems="center" direction="column">
-        {alert}
+        {state?.message && (
+        <Box margin={2} width="50%">
+          <Alert severity="info" variant="filled">
+         {state.message}
+          </Alert>
+        </Box>)}
         <Box pt={4} pb={6}>
           {loaded && (
             <Form

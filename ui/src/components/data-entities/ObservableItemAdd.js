@@ -1,5 +1,5 @@
 import React, {useEffect, useReducer, useState} from 'react';
-import {Redirect, NavLink} from 'react-router-dom';
+import {Navigate, NavLink} from 'react-router-dom';
 import {Box, Button, Grid, Typography} from '@material-ui/core';
 import {Save} from '@material-ui/icons';
 import Alert from '@material-ui/lab/Alert';
@@ -68,7 +68,7 @@ const ObservableItemAdd = () => {
     });
   };
 
-  if (savedId) return <Redirect to={`/reference/observableItem/${savedId}/new`} />;
+  if (savedId) return <Navigate to={`/reference/observableItem/${savedId}`} state={{message: 'Observable Item Saved'}} />;
 
   return (
     <EntityContainer

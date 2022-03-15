@@ -1,5 +1,5 @@
 import React, {useEffect, useReducer, useState} from 'react';
-import {useParams, NavLink, Redirect} from 'react-router-dom';
+import {useParams, NavLink, Navigate} from 'react-router-dom';
 import {Box, Button, CircularProgress, Grid, Typography} from '@material-ui/core';
 import {Save} from '@material-ui/icons';
 import Alert from '@material-ui/lab/Alert';
@@ -95,7 +95,7 @@ const SiteEdit = ({clone}) => {
 
   if (saved) {
     const id = saved['siteId'];
-    return <Redirect to={`/reference/site/${id}/${edit ? 'saved' : 'new'}`} />;
+    return <Navigate to={`/reference/site/${id}/${edit ? 'saved' : 'new'}`} />;
   }
 
   return (

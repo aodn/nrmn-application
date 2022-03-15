@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
-import {useHistory} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {AccountCircle} from '@material-ui/icons';
 import {Button} from '@material-ui/core';
 import {useDispatch} from 'react-redux';
@@ -11,7 +11,7 @@ const AuthState = () => {
   const expires = useSelector((state) => state.auth.expires);
   const username = useSelector((state) => state.auth.username);
   const isAdmin = useSelector((state) => state.auth.roles)?.includes('ROLE_ADMIN');
-  const history = useHistory();
+  const navigate = useNavigate();
   const [confirmLogout, showConfirmLogout] = useState(false);
   const loggedIn = Date.now() < expires;
   const dispatch = useDispatch();
@@ -23,9 +23,7 @@ const AuthState = () => {
         variant="text"
         color="inherit"
         size="small"
-        onClick={() => {
-          history.push('/login');
-        }}
+        onClick={() => navigate('/login', {push: true})}
       >
         Log In
       </Button>
@@ -50,7 +48,7 @@ const AuthState = () => {
           text="Do you want to log out?"
           action="Log Out"
           onClose={() => showConfirmLogout(false)}
-          onConfirm={() => dispatch(logoutSubmitted())}
+          onConfirm={() => {showConfirmLogout(false); dispatch(logoutSubmitted());}}
         />
       </>
     );

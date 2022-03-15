@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import config from 'react-global-configuration';
-import {useHistory} from 'react-router';
+import {useNavigate} from 'react-router';
 import {NavLink} from 'react-router-dom';
 import {PropTypes} from 'prop-types';
 
@@ -46,7 +46,7 @@ const restoreFilterModel = (entityName) => {
 };
 
 const EntityList = (props) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const entities = useSelector((state) => state.form.entities);
   const errors = useSelector((state) => state.form.errors);
@@ -148,7 +148,7 @@ const EntityList = (props) => {
 
   const onRowClick = (e, history, entity) => {
     if (e.node.isSelected() && !e.colDef.cellRendererFramework) {
-      history.push(`${entity.route.base}/${e.data[entity.idKey]}`);
+      history(`${entity.route.base}/${e.data[entity.idKey]}`, {push: true});
     }
   };
 
@@ -232,7 +232,7 @@ const EntityList = (props) => {
             saveFilterModel(props.entity.name, filterModel);
             setResetFilterDisabled(Object.keys(filterModel)?.length < 1);
           }}
-          onCellClicked={(e) => onRowClick(e, history, props.entity)}
+          onCellClicked={(e) => onRowClick(e, navigate, props.entity)}
           frameworkComponents={{
             customLoadingOverlay: CustomLoadingOverlay
           }}

@@ -5,7 +5,7 @@ import Save from '@material-ui/icons/Save';
 import React, { useEffect, useReducer, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
-import { Redirect }from 'react-router-dom';
+import { Navigate }from 'react-router-dom';
 import { entitySave, entityEdit, getEntity } from '../../../axios/api';
 import EntityContainer from '../../containers/EntityContainer';
 import CustomCheckboxInput from '../../input/CustomCheckboxInput';
@@ -46,7 +46,7 @@ const LocationAdd = () => {
     });
   }, [locationId]);
 
-  if (savedId) return <Redirect to={`/reference/location/${savedId}/new`} />;
+  if (savedId) return <Navigate to={`/reference/location/${savedId}`} state={{message: 'Location Saved'}}/>;
 
   return (
     <EntityContainer name="location" goBackTo="/reference/locations">

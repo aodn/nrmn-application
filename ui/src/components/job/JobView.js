@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, CircularProgress, Divider, Grid, Icon, Paper, Typography} from '@material-ui/core';
+import {Box, Button, CircularProgress, Divider, Grid, Paper, Typography} from '@material-ui/core';
 import {useParams} from 'react-router';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -54,24 +54,12 @@ const JobView = () => {
           <Grid item sm={12} md={12} lg={4}>
             <Paper className={classes.paper}>
               <Grid item lg={10} md={10} style={{padding: 15}}>
-                {existsOnS3 ? (
-                  <Typography className={classes.title} variant="h5" color="primary">
-                    <Link variant="a" onClick={() => downloadZip(job.id, job.reference)}>
-                      {job.reference}
-                    </Link>
-                  </Typography>
-                ) : (
-                  <Typography className={classes.title} variant="h5" color="primary">
-                    {job.reference}
-                    <Icon title={'File could not be found'} color="error" style={{float: 'right'}}>
-                      error
-                    </Icon>
-                  </Typography>
-                )}
+                <Typography className={classes.title} variant="h5" color="primary">
+                  {job.reference}
+                </Typography>
+                {existsOnS3 && <Button onClick={() => downloadZip(job.id, job.reference)}>Download</Button>}
               </Grid>
-
               <Divider style={{margin: 15, marginTop: 0}} />
-
               <Grid container>
                 <Grid item xs={4} lg={6} style={{paddingBottom: 0}}>
                   <List dense style={{paddingBottom: 0}}>

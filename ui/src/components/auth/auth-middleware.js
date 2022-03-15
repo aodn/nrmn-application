@@ -36,5 +36,4 @@ function* apiLogout(logoutSubmitted) {
     console.error('ERROR: Logout failed', e);
   }
   localStorage.clear();
-  window.location.reload();
 }

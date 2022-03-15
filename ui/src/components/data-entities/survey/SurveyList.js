@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Box, Button, Typography} from '@material-ui/core';
-import {Redirect} from 'react-router-dom';
+import {Navigate} from 'react-router-dom';
 import {getResult} from '../../../axios/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
@@ -22,12 +22,11 @@ const SurveyList = () => {
   const [disableResetFilter, setResetFilterDisabled] = useState(true);
 
   useEffect(() => {
-    if (gridApi) {
+    if (gridApi)
       getResult('data/surveys').then((res) => gridApi.setRowData(res.data));
-    }
   }, [gridApi]);
 
-  if (redirect) return <Redirect push to={`/data/survey/${redirect}`} />;
+  if (redirect) return <Navigate to={`/data/survey/${redirect}`} />;
 
   const onFirstDataRendered = (e) => setTimeout(() => e.api.setFilterModel(restoreFilterModel('survey')), 25);
 
