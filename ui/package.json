@@ -20,7 +20,7 @@
     "jwt-decode": "^3.1.2",
     "material-ui-dropzone": "^3.5.0",
     "prop-types": "^15.7.2",
-    "qs": "^6.10.1",
+    "qs": "^6.10.3",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-global-configuration": "1.4.1",
