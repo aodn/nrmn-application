@@ -59,7 +59,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-no-console-log": "^2.0.0",
     "eslint-plugin-react": "^7.29.4",
-    "eslint-plugin-react-hooks": "^4.2.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
     "eslint-webpack-plugin": "^2.6.0",
     "history": "^5.0.0",
     "jest": "^27.5.1",
