@@ -6,7 +6,7 @@ ENV TZ="Australia" \
     NVM_DIR="/opt/nvm" \
     MAVEN_HOME="/opt/maven" \
     MAVEN_VERSION=3.8.5 \
-    NODE_VERSION=16.14.0 \
+    NODE_VERSION=16.14.2 \
     HOME="/home/builder" \
     JAVA_TOOL_OPTIONS="-Duser.home=/home/builder"
 

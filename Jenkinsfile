@@ -16,6 +16,7 @@ pipeline {
             stages {
                 stage('clean') {
                     steps {
+                        sh 'git reset --hard'
                         sh 'git clean --force --force -xd --exclude=ui/node_modules'
                     }
                 }
