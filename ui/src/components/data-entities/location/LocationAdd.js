@@ -1,12 +1,12 @@
-import { Grid } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import Save from '@material-ui/icons/Save';
-import React, { useEffect, useReducer, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { NavLink } from 'react-router-dom';
-import { Navigate }from 'react-router-dom';
-import { entitySave, entityEdit, getEntity } from '../../../axios/api';
+import {Grid} from '@mui/material';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Save from '@mui/icons-material/Save';
+import React, {useEffect, useReducer, useState} from 'react';
+import {useParams} from 'react-router-dom';
+import {NavLink} from 'react-router-dom';
+import {Navigate} from 'react-router-dom';
+import {entitySave, entityEdit, getEntity} from '../../../axios/api';
 import EntityContainer from '../../containers/EntityContainer';
 import CustomCheckboxInput from '../../input/CustomCheckboxInput';
 import CustomTextInput from '../../input/CustomTextInput';
@@ -41,16 +41,17 @@ const LocationAdd = () => {
   };
 
   useEffect(() => {
-    if (locationId) getEntity(`location/${locationId}`).then((res) => {
-      dispatch({form: res.data});
-    });
+    if (locationId)
+      getEntity(`location/${locationId}`).then((res) => {
+        dispatch({form: res.data});
+      });
   }, [locationId]);
 
-  if (savedId) return <Navigate to={`/reference/location/${savedId}`} state={{message: 'Location Saved'}}/>;
+  if (savedId) return <Navigate to={`/reference/location/${savedId}`} state={{message: 'Location Saved'}} />;
 
   return (
     <EntityContainer name="location" goBackTo="/reference/locations">
-      <Grid container alignItems="flex-start" direction="row" spacing={2} >
+      <Grid container alignItems="flex-start" direction="row" spacing={2}>
         <Grid item xs={12}>
           <Typography variant="h4">{locationId ? 'Edit' : 'New'} Location</Typography>
         </Grid>
@@ -72,12 +73,12 @@ const LocationAdd = () => {
           />
         </Grid>
         <Grid item xs={12}>
-            <Button component={NavLink} to="/reference/locations">
-              Cancel
-            </Button>
-            <Button style={{width: '50%', marginLeft: '20px'}} type="submit" startIcon={<Save />} onClick={handleSubmit}>
-              Save Location
-            </Button>
+          <Button variant="outlined" component={NavLink} to="/reference/locations">
+            Cancel
+          </Button>
+          <Button variant="contained" style={{width: '50%', marginLeft: '20px'}} type="submit" startIcon={<Save />} onClick={handleSubmit}>
+            Save Location
+          </Button>
         </Grid>
       </Grid>
     </EntityContainer>

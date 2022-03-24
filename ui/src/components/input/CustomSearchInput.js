@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {TextField, Typography} from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import {TextField, Typography} from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 import {PropTypes} from 'prop-types';
 import {search} from '../../axios/api';
 import axios from 'axios';
@@ -31,7 +31,7 @@ const CustomSearchInput = ({label, exclude, formData, onChange}) => {
         value={formData}
         onSelect={(e) => onChange(e.target.value)}
         onKeyUp={(e) => setSearchTerm(e.target.value)}
-        renderInput={(params) => <TextField {...params} color="primary" variant="outlined" />}
+        renderInput={(params) => <TextField {...params} size="small" color="primary" variant="outlined" />}
       />
     </>
   );

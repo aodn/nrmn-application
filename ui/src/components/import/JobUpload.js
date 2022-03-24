@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
-import {Box, Button, Checkbox, FormControlLabel, Grid, MenuItem, Select, Typography} from '@material-ui/core';
+import {Box, Button, Checkbox, FormControlLabel, Grid, MenuItem, Select, Typography} from '@mui/material';
 import LinearProgressWithLabel from '../ui/LinearProgressWithLabel';
-import Alert from '@material-ui/lab/Alert';
-import {DropzoneArea} from 'material-ui-dropzone';
+import Alert from '@mui/material/Alert';
 import {submitJobFile} from '../../axios/api';
 import {NavLink} from 'react-router-dom';
 
@@ -31,7 +30,7 @@ const JobUpload = () => {
           </NavLink>
         )}
       </Box>
-      <Grid container justify="center">
+      <Grid container justifyContent="center">
         <Box style={{background: 'white', width: 800}} boxShadow={1} margin={3} padding={3}>
           <Grid container alignItems="flex-start" direction="row">
             <Grid item xs={12}>
@@ -43,17 +42,10 @@ const JobUpload = () => {
               <>
                 <Grid item xs={12}>
                   <Box padding={3}>
-                    <DropzoneArea
-                      showFileNames
-                      showAlerts={false}
-                      dropzoneText={!formData.file ? 'Drop an XLSX file here or click to select' : ''}
-                      style={{height: '20px'}}
-                      acceptedFiles={['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
-                      filesLimit={1}
-                      maxFileSize={104857600}
-                      previewGridProps={{container: {spacing: 10, direction: 'column', alignContent: 'center'}}}
+                    <input
+                      type="file"
                       onChange={(p) => {
-                        setFormData({...formData, file: p?.[0]});
+                        setFormData({...formData, file: p.target.files[0]});
                       }}
                     />
                   </Box>
@@ -82,6 +74,7 @@ const JobUpload = () => {
                 <Grid item xs={12}>
                   <Box p={3}>
                     <Button
+                      variant="contained"
                       disabled={!formData.file}
                       style={{width: '100%'}}
                       onClick={() =>
@@ -136,12 +129,12 @@ const JobUpload = () => {
                           {uploadResponse.message}
                         </Alert>
                         <Box pt={5} px={15}>
-                          <Button style={{width: '100%'}} component={NavLink} to={`/validation/${uploadResponse.id}`}>
+                          <Button variant="contained" style={{width: '100%'}} component={NavLink} to={`/validation/${uploadResponse.id}`}>
                             View {formData.file.name}
                           </Button>
                         </Box>
                         <Box py={3} px={15}>
-                          <Button style={{width: '100%'}} component={NavLink} to="/jobs">
+                          <Button variant="outlined" style={{width: '100%'}} component={NavLink} to="/jobs">
                             View All Jobs
                           </Button>
                         </Box>

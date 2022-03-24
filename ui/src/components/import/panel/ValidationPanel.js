@@ -1,6 +1,5 @@
 import React from 'react';
-import {useSelector} from 'react-redux';
-import {Box, Divider, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@material-ui/core';
+import {Box, Divider, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@mui/material';
 import {PropTypes} from 'prop-types';
 import ValidationSummary from './ValidationSummary';
 
@@ -8,7 +7,9 @@ const ValidationPanel = (props) => {
   const context = props.api.gridOptionsWrapper.gridOptions.context;
   const summary = context.summary;
   const errorList = context.errorList;
-  const isAdmin = useSelector((state) => state.auth.roles)?.includes('ROLE_ADMIN');
+  // FIXME:
+  // const isAdmin = useSelector((state) => state.auth.roles)?.includes('ROLE_ADMIN');
+  const isAdmin = false;
 
   const handleItemClick = (item, noFilter) => {
     const rowId = item.row || item.rowIds[0];

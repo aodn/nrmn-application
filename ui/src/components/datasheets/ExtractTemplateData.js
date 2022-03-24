@@ -1,9 +1,10 @@
-import {Box, Button, Chip, CircularProgress, TextField, Typography} from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import {Box, Button, Chip, TextField, Typography} from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 import React, {useEffect, useState} from 'react';
 import {getEntity, templateZip} from '../../axios/api';
 import qs from 'qs';
 import FileDownload from 'js-file-download';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const ExtractTemplateData = () => {
   const [locations, setLocations] = useState([]);
@@ -77,6 +78,7 @@ const ExtractTemplateData = () => {
       <Box m={5}>
         <Typography variant="subtitle2">Site Code</Typography>
         <Autocomplete
+          size="small"
           options={Object.keys(siteCodes).sort()}
           getOptionLabel={(e) => `${e} - ${locations[siteCodes[e][0]]}`}
           onChange={(_, e) => setSiteLocation(e ? siteCodes[e][0] : null)}
@@ -85,6 +87,7 @@ const ExtractTemplateData = () => {
         <hr></hr>
         <Typography variant="subtitle2">Eco Region</Typography>
         <Autocomplete
+          size="small"
           filterSelectedOptions
           options={Object.keys(ecoRegions).sort()}
           onChange={(e) => (e.target.textContent !== '' ? setEcoRegion(ecoRegions[e.target.textContent]) : setEcoRegion([]))}
@@ -92,6 +95,7 @@ const ExtractTemplateData = () => {
         />
         <Typography variant="subtitle2">Country</Typography>
         <Autocomplete
+          size="small"
           filterSelectedOptions
           options={Object.keys(countries).sort()}
           onChange={(e) => (e.target.textContent !== '' ? setCountry(countries[e.target.textContent]) : setCountry([]))}
@@ -99,6 +103,7 @@ const ExtractTemplateData = () => {
         />
         <Typography variant="subtitle2">Area/State</Typography>
         <Autocomplete
+          size="small"
           filterSelectedOptions
           options={Object.keys(areas).sort()}
           onChange={(e) => (e.target.textContent !== '' ? setArea(areas[e.target.textContent]) : setArea([]))}
@@ -115,6 +120,7 @@ const ExtractTemplateData = () => {
           ))}
         </Box>
         <Button
+          variant="outlined"
           disabled={stagedLocations.length < 1}
           onClick={() => setTemplateLocations(Array.from(new Set([...templateLocations, ...stagedLocations])))}
         >
@@ -133,9 +139,9 @@ const ExtractTemplateData = () => {
               />
             ))}
         </Box>
-        <Button style={{width: '100%'}} onClick={() => setDownload(true)} disabled={download || templateLocations.length < 1}>
-          {download ? <CircularProgress size={25} /> : 'Download Sheets'}
-        </Button>
+        <LoadingButton variant="contained" onClick={() => setDownload(true)} loading={download} disabled={templateLocations.length < 1}>
+          Download Sheets
+        </LoadingButton>
       </Box>
     </>
   );

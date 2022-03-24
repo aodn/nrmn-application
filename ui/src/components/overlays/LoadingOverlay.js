@@ -1,5 +1,5 @@
 import React from 'react';
-import {Box, Paper} from '@material-ui/core';
+import {Box, Paper} from '@mui/material';
 import LinearProgressWithLabel from '../ui/LinearProgressWithLabel';
 
 const LoadingOverlay = (e) => {

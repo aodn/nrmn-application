@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Button, makeStyles, Typography} from '@material-ui/core';
-import {blue, grey, lightGreen, orange, red, yellow} from '@material-ui/core/colors';
+import {Box, Button, Typography} from '@mui/material';
+import {blue, grey, orange, red, yellow} from '@mui/material/colors';
 import {
   CloudDownload as CloudDownloadIcon,
   CloudUpload as CloudUploadIcon,
   PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon
-} from '@material-ui/icons/';
-import UndoIcon from '@material-ui/icons/Undo';
-import ResetIcon from '@material-ui/icons/LayersClear';
+} from '@mui/icons-material/';
+import UndoIcon from '@mui/icons-material/Undo';
+import ResetIcon from '@mui/icons-material/LayersClear';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {PropTypes} from 'prop-types';
@@ -18,18 +18,6 @@ import LoadingOverlay from '../overlays/LoadingOverlay';
 import AlertDialog from '../ui/AlertDialog';
 import FindReplacePanel from './panel/FindReplacePanel';
 import ValidationPanel from './panel/ValidationPanel';
-
-const useStyles = makeStyles(() => {
-  return {
-    fishSize: {
-      color: red[200],
-      borderBottom: '1px solid'
-    },
-    invertSize: {
-      color: lightGreen[200]
-    }
-  };
-});
 
 // |delta| is an array of rowData
 const pushUndo = (api, delta) => {
@@ -159,7 +147,6 @@ const generateErrorTree = (rowData, rowPos, errors) => {
 const IngestState = Object.freeze({Loading: 0, Edited: 1, Valid: 2, ConfirmSubmit: 3});
 
 const DataSheetView = ({jobId, onIngest}) => {
-  const classes = useStyles();
   const [job, setJob] = useState({});
   const [gridApi, setGridApi] = useState(null);
   const [isFiltered, setIsFiltered] = useState(false);
@@ -689,12 +676,18 @@ const DataSheetView = ({jobId, onIngest}) => {
               </Button>
             </Box>
             <Box p={1} minWidth={180}>
-              <Button disabled={state === IngestState.Loading} onClick={handleSaveAndValidate} startIcon={<PlaylistAddCheckOutlinedIcon />}>
+              <Button
+                variant="contained"
+                disabled={state === IngestState.Loading}
+                onClick={handleSaveAndValidate}
+                startIcon={<PlaylistAddCheckOutlinedIcon />}
+              >
                 {`Save & Validate`}
               </Button>
             </Box>
             <Box p={1} mr={2}>
               <Button
+                variant="contained"
                 disabled={state !== IngestState.Valid}
                 onClick={() => setState(IngestState.ConfirmSubmit)}
                 startIcon={<CloudUploadIcon />}
@@ -708,8 +701,7 @@ const DataSheetView = ({jobId, onIngest}) => {
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
         {job && (
           <AgGridReact
-            getRowNodeId={(r) => r.id}
-            className={classes.agGrid}
+            getRowId={(r) => r.data.id}
             context={context}
             immutableData={true}
             cellFlashDelay={100}
@@ -746,7 +738,7 @@ const DataSheetView = ({jobId, onIngest}) => {
             getContextMenuItems={getContextMenuItems}
             undoRedoCellEditing={false}
             onCellEditingStopped={onCellEditingStopped}
-            frameworkComponents={{
+            components={{
               validationPanel: ValidationPanel,
               findReplacePanel: FindReplacePanel,
               loadingOverlay: LoadingOverlay

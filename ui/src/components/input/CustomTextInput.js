@@ -1,5 +1,5 @@
 import React from 'react';
-import {Box, Grid, TextField, Typography} from '@material-ui/core';
+import {Box, Grid, TextField, Typography} from '@mui/material';
 import {PropTypes} from 'prop-types';
 
 const CustomTextInput = ({field, type, readOnlyInput, readOnlyModify, formData, errors, onChange, onBlur, label}) => {
@@ -7,12 +7,12 @@ const CustomTextInput = ({field, type, readOnlyInput, readOnlyModify, formData, 
   const error = errors?.find((f) => f.property === field);
 
   const splitField = (value) => {
-    const displayValue = value.indexOf('\n') > -1 ? 'block' : 'inherit';
+    const displayValue = value.indexOf('\n') > -1 ? 'block' : 'initial';
     if (value.length === 0) {
       return <Typography>---</Typography>;
     } else {
       return value.split('\n').map((val) => (
-        <Typography key={val} variant="" display={displayValue}>
+        <Typography key={val} variant="inherit" display={displayValue}>
           {val}
         </Typography>
       ));
@@ -37,6 +37,7 @@ const CustomTextInput = ({field, type, readOnlyInput, readOnlyModify, formData, 
       <Typography variant="subtitle2">{label}</Typography>
       <TextField
         fullWidth
+        size="small"
         color="primary"
         type={type ?? 'string'}
         inputProps={{
@@ -59,7 +60,7 @@ const CustomTextInput = ({field, type, readOnlyInput, readOnlyModify, formData, 
 CustomTextInput.propTypes = {
   field: PropTypes.string,
   type: PropTypes.string,
-  formData: PropTypes.string,
+  formData: PropTypes.any,
   errors: PropTypes.array,
   onChange: PropTypes.func,
   label: PropTypes.string,

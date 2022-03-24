@@ -1,8 +1,8 @@
 import React, {useEffect, useReducer, useState} from 'react';
 import {useParams, NavLink, Navigate} from 'react-router-dom';
-import {Box, Button, CircularProgress, Grid, Typography} from '@material-ui/core';
-import {Save} from '@material-ui/icons';
-import Alert from '@material-ui/lab/Alert';
+import {Box, Button, CircularProgress, Grid, Typography} from '@mui/material';
+import {Save} from '@mui/icons-material';
+import Alert from '@mui/material/Alert';
 import PropTypes from 'prop-types';
 
 import EntityContainer from '../containers/EntityContainer';
@@ -47,7 +47,7 @@ const SiteEdit = ({clone}) => {
 
   useEffect(() => {
     if (siteId)
-      getResult(`sites/${siteId}`).then((res) => {
+      getResult(`site/${siteId}`).then((res) => {
         if (clone) {
           delete res.data.siteAttribute;
           delete res.data.siteId;
@@ -73,7 +73,7 @@ const SiteEdit = ({clone}) => {
 
   const handleSubmit = () => {
     if (edit) {
-      entityEdit(`sites/${siteId}`, site).then((res) => {
+      entityEdit(`site/${siteId}`, site).then((res) => {
         if (res.data.siteId) {
           setSaved(res.data);
         } else {
@@ -81,7 +81,7 @@ const SiteEdit = ({clone}) => {
         }
       });
     } else {
-      entitySave(`sites`, site).then((res) => {
+      entitySave(`site`, site).then((res) => {
         if (res.data.siteId) {
           setSaved(res.data);
         } else {
@@ -107,7 +107,7 @@ const SiteEdit = ({clone}) => {
           </Box>
         </Grid>
       </Grid>
-      <Grid container direction="column" justify="flex-start" alignItems="center">
+      <Grid container direction="column" justifyContent="flex-start" alignItems="center">
         {siteId && Object.keys(site).length === 0 ? (
           <CircularProgress size={20} />
         ) : (
@@ -264,10 +264,15 @@ const SiteEdit = ({clone}) => {
               </Grid>
             </Grid>
             <Box display="flex" justifyContent="center" mt={5}>
-              <Button component={NavLink} to="/reference/sites">
+              <Button variant="outlined" component={NavLink} to="/reference/sites">
                 Cancel
               </Button>
-              <Button style={{width: '50%', marginLeft: '5%', marginRight: '20%'}} onClick={handleSubmit} startIcon={<Save></Save>}>
+              <Button
+                variant="contained"
+                style={{width: '50%', marginLeft: '5%', marginRight: '20%'}}
+                onClick={handleSubmit}
+                startIcon={<Save></Save>}
+              >
                 Save Site
               </Button>
             </Box>

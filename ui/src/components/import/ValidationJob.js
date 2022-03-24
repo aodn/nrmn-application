@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {Navigate, useParams} from 'react-router';
-import {Box} from '@material-ui/core';
+import {Box} from '@mui/material';
 import DataSheetView from './DataSheetView';
-import Alert from '@material-ui/lab/Alert';
+import Alert from '@mui/material/Alert';
 
 const ValidationJob = () => {
   const {jobId} = useParams();

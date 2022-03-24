@@ -1,6 +1,6 @@
 import React from 'react';
-import {CircularProgress, TextField, Typography} from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import {CircularProgress, TextField, Typography} from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 import {PropTypes} from 'prop-types';
 
 const CustomAutoCompleteInput = ({label, field, options, onChange, formData, errors}) => {
@@ -14,7 +14,9 @@ const CustomAutoCompleteInput = ({label, field, options, onChange, formData, err
         freeSolo
         value={formData}
         onBlur={(e) => onChange(e.target.value)}
-        renderInput={(params) => <TextField {...params} color="primary" variant="outlined" error={error} helperText={error?.message} />}
+        renderInput={(params) => (
+          <TextField {...params} size="small" color="primary" variant="outlined" error={error} helperText={error?.message} />
+        )}
       />
     </>
   ) : (

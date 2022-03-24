@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 import {PropTypes} from 'prop-types';
-import {Search as SearchIcon, FindReplace as FindReplaceIcon} from '@material-ui/icons/';
-import {Box, Button, Checkbox, FormControlLabel, makeStyles, TextField} from '@material-ui/core';
+import {Search as SearchIcon, FindReplace as FindReplaceIcon} from '@mui/icons-material/';
+import {Box, Button, Checkbox, FormControlLabel, TextField} from '@mui/material';
+import {makeStyles} from '@mui/styles';
 
 const useStyles = makeStyles(() => {
   return {
@@ -46,7 +47,7 @@ const FindReplacePanel = (props) => {
   const classes = useStyles();
 
   // where all grid data and metadata is stored
-  const context = props.agGridReact.gridOptions.context;
+  const context = props.api.context;
 
   const reset = () => {
     setInProgress(false);
