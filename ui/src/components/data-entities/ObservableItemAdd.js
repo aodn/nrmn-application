@@ -1,8 +1,8 @@
 import React, {useEffect, useReducer, useState} from 'react';
 import {Navigate, NavLink} from 'react-router-dom';
-import {Box, Button, Grid, Typography} from '@material-ui/core';
-import {Save} from '@material-ui/icons';
-import Alert from '@material-ui/lab/Alert';
+import {Box, Button, Grid, Typography} from '@mui/material';
+import {Save} from '@mui/icons-material';
+import Alert from '@mui/material/Alert';
 import PropTypes from 'prop-types';
 import SpeciesSearch from '../search/SpeciesSearch';
 
@@ -78,12 +78,10 @@ const ObservableItemAdd = () => {
     >
       <Grid container alignItems="flex-start" direction="row">
         <Grid item xs={10}>
-          <Box fontWeight="fontWeightBold">
-            <Typography variant="h4">New Observable Item</Typography>
-          </Box>
+          <Typography variant="h5">New Observable Item</Typography>
         </Grid>
       </Grid>
-      <Grid container direction="column" justify="flex-start" alignItems="center">
+      <Grid container direction="column" justifyContent="flex-start" alignItems="center">
         <Box pt={2} pb={6} padding={2} width="90%">
           {errors.length > 0 ? (
             <Box py={2}>
@@ -233,10 +231,15 @@ const ObservableItemAdd = () => {
             </Grid>
           </Grid>
           <Box display="flex" justifyContent="center" mt={5}>
-            <Button component={NavLink} to="/reference/observableItems">
+            <Button variant="outlined" component={NavLink} to="/reference/observableItems">
               Cancel
             </Button>
-            <Button style={{width: '50%', marginLeft: '5%', marginRight: '20%'}} onClick={handleSubmit} startIcon={<Save></Save>}>
+            <Button
+              variant="contained"
+              style={{width: '50%', marginLeft: '5%', marginRight: '20%'}}
+              onClick={handleSubmit}
+              startIcon={<Save></Save>}
+            >
               Save observable Item
             </Button>
           </Box>

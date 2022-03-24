@@ -1,59 +1,34 @@
-import {Box, Button, IconButton, Tooltip, Typography} from '@material-ui/core';
-import {DataGrid} from '@material-ui/data-grid';
-import {CloudUploadOutlined, Delete, Info, GridOn} from '@material-ui/icons';
+import {Box, Button, Typography} from '@mui/material';
+import {CloudUploadOutlined} from '@mui/icons-material';
+import 'ag-grid-community/dist/styles/ag-theme-material.css';
+import 'ag-grid-enterprise';
+import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import React, {useEffect, useState} from 'react';
+import {Navigate} from 'react-router';
 import {NavLink} from 'react-router-dom';
 import {deleteJob, getEntity} from '../../axios/api';
+import LoadingOverlay from '../overlays/LoadingOverlay';
 import AlertDialog from '../ui/AlertDialog';
 
-const disabledHeader = {headerName: ' ', filterable: false, sortable: false, disableColumnMenu: true};
+const TimeStampCell = (params) => {
+  return params.value
+    ? new Date(params.value).toLocaleDateString('en-AU') +
+        ' ' +
+        new Date(params.value).toLocaleTimeString('en-AU', {hour12: false, hour: '2-digit', minute: '2-digit'})
+    : '';
+};
 
 const JobList = () => {
-  const [jobs, setJobs] = useState(null);
   const [deleteJobId, setDeleteJobId] = useState(null);
+  const [rowData, setRowData] = useState(null);
+  const [redirect, setRedirect] = useState(null);
 
   useEffect(() => {
-    getEntity('stage/jobs').then((result) => {
-      setJobs(result.data);
-    });
+    getEntity('stage/jobs').then((res) => setRowData(res.data));
   }, []);
 
-  const TimeStampCell = (params) => {
-    return new Date(params.value).toLocaleDateString('en-AU') + ' ' + new Date(params.value).toLocaleTimeString('en-AU');
-  };
+  if (redirect) return <Navigate to={redirect} />;
 
-  const ActionCell = (params) => {
-    return (
-      params.row.status !== 'INGESTED' && (
-        <Tooltip title="Delete">
-          <IconButton name="delete" onClick={() => setDeleteJobId(params.row.id)}>
-            <Delete />
-          </IconButton>
-        </Tooltip>
-      )
-    );
-  };
-
-  const LinkCell = (params) => {
-    return (
-      <>
-        <Tooltip title="Info">
-          <IconButton component={NavLink} to={`/jobs/${params.row.id}/view`}>
-            <Info />
-          </IconButton>
-        </Tooltip>
-        {params.row.status === 'STAGED' && (
-          <Tooltip title="View Staged Sheet">
-            <IconButton component={NavLink} to={`/validation/${params.row.id}`}>
-              <GridOn />
-            </IconButton>
-          </Tooltip>
-        )}
-      </>
-    );
-  };
-
-  const loading = !jobs;
   return (
     <>
       <AlertDialog
@@ -62,10 +37,9 @@ const JobList = () => {
         action="Delete"
         onClose={() => setDeleteJobId(null)}
         onConfirm={() => {
-          const id = deleteJobId;
-          setDeleteJobId(null);
           deleteJob(deleteJobId).then(() => {
-            setJobs((jobs) => jobs.filter((j) => j.id !== id));
+            setDeleteJobId(null);
+            setRowData([...rowData.filter((d) => d.id !== deleteJobId)]);
           });
         }}
       />
@@ -74,31 +48,84 @@ const JobList = () => {
           <Typography variant="h4">Jobs</Typography>
         </Box>
         <Box>
-          <Button to="/upload" component={NavLink} startIcon={<CloudUploadOutlined />}>
+          <Button variant="contained" to="/upload" component={NavLink} startIcon={<CloudUploadOutlined />}>
             Upload XLSX File
           </Button>
         </Box>
       </Box>
-      <DataGrid
-        columns={[
-          {...disabledHeader, field: 'id', width: 100, renderCell: LinkCell},
-          {field: 'reference', headerName: 'Reference', flex: 2},
-          {field: 'isExtendedSize', headerName: 'Extended', width: 140},
-          {field: 'status', headerName: 'Status', width: 120},
-          {field: 'program', headerName: 'Program', width: 140},
-          {field: 'source', headerName: 'Type', width: 120},
-          {field: 'creator', headerName: 'Creator', flex: 1},
-          {field: 'created', headerName: 'Uploaded', width: 170, renderCell: TimeStampCell},
-          {...disabledHeader, field: 'actions', width: 70, renderCell: ActionCell}
-        ]}
-        sortModel={[{field: 'created', sort: 'desc'}]}
-        autoPageSize
-        disableSelectionOnClick
-        density="compact"
-        loading={loading}
-        hideFooter={loading}
-        rows={jobs || []}
-      />
+      <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
+        <AgGridReact
+          rowHeight={24}
+          pagination={false}
+          rowData={rowData}
+          enableCellTextSelection={true}
+          context={{useOverlay: 'Loading Jobs'}}
+          components={{loadingOverlay: LoadingOverlay}}
+          loadingOverlayComponent="loadingOverlay"
+          suppressCellFocus={true}
+          isGroupOpenByDefault={(params) => params.key === 'STAGED'}
+          autoGroupColumnDef={{sortable: true, sort: 'asc', width: 150}}
+          groupDisplayType="singleColumn"
+          defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true, suppressMenu: true}}
+        >
+          <AgGridColumn
+            width={40}
+            field="id"
+            headerName=""
+            suppressMovable={true}
+            suppressMenu={true}
+            filter={false}
+            resizable={false}
+            sortable={false}
+            valueFormatter={(e) => (e.data?.id ? '🛈' : '')}
+            cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
+            onCellClicked={(e) => {
+              if (!e.data.id) return;
+              if (e.event.ctrlKey) {
+                window.open(`/jobs/${e.data.id}/view`, '_blank').focus();
+              } else {
+                setRedirect(`/jobs/${e.data.id}/view`);
+              }
+            }}
+          />
+          <AgGridColumn
+            flex={1}
+            field="reference"
+            cellStyle={{cursor: 'pointer'}}
+            onCellClicked={(e) => {
+              if (e.data.status === 'STAGED') {
+                const target = `/validation/${e.data.id}`;
+                e.event.ctrlKey ? window.open(target, '_blank').focus() : setRedirect(target);
+              }
+            }}
+          />
+          <AgGridColumn width={80} field="isExtendedSize" headerName="Extended" />
+          <AgGridColumn
+            width={80}
+            field="status"
+            rowGroup={true}
+            hide={true}
+            comparator={(a, b) => {
+              const status = ['STAGED', 'FAILED', 'INGESTED'];
+              return status.indexOf(a) - status.indexOf(b);
+            }}
+          />
+          <AgGridColumn width={100} field="program" />
+          <AgGridColumn width={200} field="creator" />
+          <AgGridColumn width={200} field="created" sort="desc" valueFormatter={TimeStampCell} />
+          <AgGridColumn
+            width={60}
+            suppressMovable={true}
+            suppressMenu={true}
+            filter={false}
+            resizable={false}
+            sortable={false}
+            valueFormatter={(e) => (e.data && e.data.status !== 'INGESTED' ? 'Delete' : '')}
+            cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
+            onCellClicked={(e) => setDeleteJobId(e.data.id)}
+          />
+        </AgGridReact>
+      </Box>
     </>
   );
 };

@@ -1,19 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Button, Typography} from '@material-ui/core';
+import {Box, Button, Typography} from '@mui/material';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Navigate, NavLink} from 'react-router-dom';
 import {getEntity} from '../../../axios/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
-import {Add} from '@material-ui/icons';
-import PropTypes from 'prop-types';
+import {Add} from '@mui/icons-material';
 
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
-const LocationList = ({filterModel, setFilterModel}) => {
+const LocationList = () => {
   const [gridApi, setGridApi] = useState(null);
   const [redirect, setRedirect] = useState(null);
-  const [disableResetFilter, setResetFilterDisabled] = useState(true);
 
   useEffect(() => {
     if (gridApi) getEntity('locations').then((res) => gridApi.setRowData(res.data));
@@ -27,13 +25,8 @@ const LocationList = ({filterModel, setFilterModel}) => {
         <Box flexGrow={1}>
           <Typography variant="h4">Locations</Typography>
         </Box>
-        <Box mr={2}>
-          <Button disabled={disableResetFilter} onClick={() => gridApi.setFilterModel(null)} color="primary" variant={'contained'}>
-            Reset Filter
-          </Button>
-        </Box>
         <Box>
-          <Button to="/reference/location" component={NavLink} startIcon={<Add />}>
+          <Button variant="contained" to="/reference/location" component={NavLink} startIcon={<Add />}>
             New Location
           </Button>
         </Box>
@@ -41,19 +34,14 @@ const LocationList = ({filterModel, setFilterModel}) => {
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
         <AgGridReact
           rowHeight={24}
+          pagination={true}
           enableCellTextSelection={true}
           onGridReady={(e) => setGridApi(e.api)}
           context={{useOverlay: 'Loading Locations'}}
-          frameworkComponents={{loadingOverlay: LoadingOverlay}}
+          components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
-          suppressCellSelection={true}
-          onFirstDataRendered={() => gridApi.setFilterModel(filterModel)}
+          suppressCellFocus={true}
           defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
-          onFilterChanged={(e) => {
-            const newFilterModel = e.api.getFilterModel();
-            setFilterModel(newFilterModel);
-            setResetFilterDisabled(Object.keys(newFilterModel)?.length < 1);
-          }}
         >
           <AgGridColumn
             width={40}
@@ -88,11 +76,6 @@ const LocationList = ({filterModel, setFilterModel}) => {
       </Box>
     </>
   );
-};
-
-LocationList.propTypes = {
-  filterModel: PropTypes.any,
-  setFilterModel: PropTypes.any
 };
 
 export default LocationList;

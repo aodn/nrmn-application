@@ -1,8 +1,8 @@
 import React, {useEffect, useReducer, useState} from 'react';
 import {useParams, NavLink, Navigate} from 'react-router-dom';
-import {Box, Button, CircularProgress, Divider, Grid, Typography} from '@material-ui/core';
-import {Save, Delete} from '@material-ui/icons';
-import Alert from '@material-ui/lab/Alert';
+import {Box, Button, CircularProgress, Divider, Grid, Typography} from '@mui/material';
+import {Save, Delete} from '@mui/icons-material';
+import Alert from '@mui/material/Alert';
 import PropTypes from 'prop-types';
 
 import EntityContainer from '../containers/EntityContainer';
@@ -89,7 +89,7 @@ const ObservableItemEdit = () => {
           Delete
         </Button>
       </Grid>
-      <Grid container direction="column" justify="flex-start" alignItems="center">
+      <Grid container direction="column" justifyContent="flex-start" alignItems="center">
         {observableItemId && Object.keys(item).length === 0 ? (
           <CircularProgress size={20} />
         ) : (

@@ -1,8 +1,8 @@
-import {Button, Grid} from '@material-ui/core';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-import {Edit} from '@material-ui/icons';
-import Alert from '@material-ui/lab/Alert';
+import {Button, Grid} from '@mui/material';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import {Edit} from '@mui/icons-material';
+import Alert from '@mui/material/Alert';
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router';
 import {Link, useLocation} from 'react-router-dom';

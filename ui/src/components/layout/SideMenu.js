@@ -1,10 +1,10 @@
 import React from 'react';
-import {Box, Divider, Drawer, IconButton, List, ListSubheader, Typography, ListItem, ListItemText} from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
+import {Box, Divider, Drawer, IconButton, List, ListSubheader, Typography, ListItem, ListItemText} from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 import {NavLink} from 'react-router-dom';
 import {PropTypes} from 'prop-types';
 
-const SideMenu = ({entities, open, onClose}) => {
+const SideMenu = ({open, onClose}) => {
   const version = process.env.REACT_APP_VERSION && process.env.REACT_APP_VERSION.split('.');
   return (
     <Drawer variant="temporary" anchor="left" open={open} onClose={onClose}>
@@ -44,11 +44,18 @@ const SideMenu = ({entities, open, onClose}) => {
         <ListSubheader>
           <Typography variant="button">Reference Data</Typography>
         </ListSubheader>
-        {entities.map((e) => (
-          <ListItem button onClick={onClose} key={e.list.name} component={NavLink} to={e.list.route}>
-            <ListItemText primary={e.list.name} />
-          </ListItem>
-        ))}
+        <ListItem button onClick={onClose} component={NavLink} to={'/reference/locations'}>
+          <ListItemText primary="Locations" />
+        </ListItem>
+        <ListItem button onClick={onClose} component={NavLink} to={'/reference/divers'}>
+          <ListItemText primary="Divers" />
+        </ListItem>
+        <ListItem button onClick={onClose} component={NavLink} to={'/reference/sites'}>
+          <ListItemText primary="Sites" />
+        </ListItem>
+        <ListItem button onClick={onClose} component={NavLink} to={'/reference/observableItems'}>
+          <ListItemText primary="Observable Items" />
+        </ListItem>
       </List>
       <List>
         <Divider />
@@ -59,7 +66,6 @@ const SideMenu = ({entities, open, onClose}) => {
 };
 
 SideMenu.propTypes = {
-  entities: PropTypes.array,
   open: PropTypes.bool,
   onClose: PropTypes.func
 };

@@ -1,6 +1,6 @@
 import React from 'react';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import {Typography, CircularProgress, TextField} from '@material-ui/core';
+import Autocomplete from '@mui/material/Autocomplete';
+import {Typography, CircularProgress, TextField} from '@mui/material';
 import {PropTypes} from 'prop-types';
 
 const CustomDropDownInput = ({label, field, errors, optional, options, formData, onChange}) => {
@@ -26,21 +26,21 @@ const CustomDropDownInput = ({label, field, errors, optional, options, formData,
         getOptionSelected={(o, v) => (v ? o.id === v.id : null)}
         value={options.find((o) => o.id === formData) ?? null}
         onChange={(_, o) => onChange(o?.id)}
-        renderInput={(params) => <TextField {...params} variant="outlined" error={error} helperText={error?.message} />}
+        renderInput={(params) => <TextField {...params} size="small" variant="outlined" error={error} helperText={error?.message} />}
       />
     </>
   );
 };
 
 CustomDropDownInput.propTypes = {
-  label: PropTypes.String,
-  field: PropTypes.String,
+  label: PropTypes.string,
+  field: PropTypes.string,
   errors: PropTypes.array,
   uiSchema: PropTypes.object,
-  formData: PropTypes.string,
+  formData: PropTypes.any,
   onChange: PropTypes.func,
   options: PropTypes.array,
-  optional: PropTypes.boolean
+  optional: PropTypes.bool
 };
 
 export default CustomDropDownInput;

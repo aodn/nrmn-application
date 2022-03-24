@@ -1,15 +1,12 @@
+import {LicenseManager} from 'ag-grid-enterprise';
+import jwtDecode from 'jwt-decode';
 import axiosInstance from './index.js';
-import store from '../components/store'; // will be useful to access to axios.all and axios.spread
-
-function getToken() {
-  const {accessToken, tokenType} = store.getState().auth;
-  return `${tokenType} ${accessToken}`;
-}
 
 axiosInstance.interceptors.request.use(
   (config) => {
     window.setApplicationError(null);
-    config.headers.authorization = getToken();
+    const {accessToken, tokenType} = JSON.parse(localStorage.getItem('auth')) || {};
+    if (accessToken && tokenType) config.headers.authorization = `${tokenType} ${accessToken}`;
     return config;
   },
   (error) => Promise.reject(error)
@@ -25,51 +22,44 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-export const userLogin = (params) => {
-  return axiosInstance.post(
-    '/api/auth/signin',
-    {
-      username: params.username,
-      password: params.password
-    },
-    {
-      validateStatus: () => true
-    }
-  );
+export const userLogin = (params, onResult) => {
+  return axiosInstance
+    .post(
+      '/api/auth/signin',
+      {
+        username: params.username,
+        password: params.password
+      },
+      {
+        validateStatus: () => true
+      }
+    )
+    .then((res) => {
+      if (res.data.accessToken) {
+        const jwt = jwtDecode(res.data.accessToken);
+        let state = {};
+        state.expires = jwt.exp * 1000;
+        state.username = params.username;
+        state.accessToken = res.data.accessToken;
+        state.tokenType = res.data.tokenType;
+        state.roles = jwt.roles;
+        localStorage.setItem('auth', JSON.stringify(state));
+        localStorage.setItem('gridLicense', JSON.stringify(res.data.gridLicense));
+        LicenseManager.setLicenseKey(res.data.gridLicense);
+        onResult(state, null);
+      } else {
+        onResult({expires: 0}, res.data.error);
+      }
+    });
 };
 
-export const userLogout = () => {
-  return axiosInstance.post('/api/auth/signout', {});
-};
-
-export const userRegistration = (userDetails) => {
-  return axiosInstance.post('/api/auth/signup', userDetails);
-};
-
-export const user = (params) => {
-  const config = {
-    headers: {Authorization: getToken()},
-    params: params
-  };
-  return axiosInstance.get('/api/user', config);
-};
-
-export const apiDefinition = () => axiosInstance.get('/v3/api-docs').then((res) => res);
+export const userLogout = () => axiosInstance.post('/api/auth/signout', {});
 
 export const getResult = (entity) => axiosInstance.get('/api/' + entity);
 
 export const getEntity = (entity) => getResult(entity).then((res) => res);
 
-export const deleteJob = (jobId) => {
-  return axiosInstance.delete('/api/stage/delete/' + jobId);
-};
-
-export const getSelectedEntityItems = (paths) =>
-  axiosInstance.all([axiosInstance.get('/api/' + paths[0]), paths[1] ? axiosInstance.get(paths[1]) : null]).then((resp) => {
-    let response = resp[0].data;
-    response.selected = resp[1] ? resp[1].data : null;
-    return response;
-  });
+export const deleteJob = (jobId) => axiosInstance.delete('/api/stage/delete/' + jobId);
 
 export const entitySave = (entity, params) => {
   return axiosInstance

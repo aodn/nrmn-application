@@ -110,14 +110,14 @@ public class SiteController {
         return ResponseEntity.ok(siteRepository.findAllCountries());
     }
 
-    @GetMapping("/sites/{id}")
+    @GetMapping("/site/{id}")
     public SiteGetDto findOne(@PathVariable Integer id) {
         Site site = siteRepository.findById(id)
                 .orElseThrow(ResourceNotFoundException::new);
         return mapper.map(site, SiteGetDto.class);
     }
 
-    @PostMapping("/sites")
+    @PostMapping("/site")
     public ResponseEntity<?> newSite(@Valid @RequestBody SiteDto sitePostDto) {
         Site newSite = mapper.map(sitePostDto, Site.class);
         ValidationErrors errors = validateConstraints(newSite);
@@ -129,7 +129,7 @@ public class SiteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(persistedSiteDto);
     }
 
-    @PutMapping("/sites/{id}")
+    @PutMapping("/site/{id}")
     public ResponseEntity<?> updateSite(@PathVariable Integer id, @Valid @RequestBody SiteDto sitePutDto) {
         Site site = siteRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         mapper.map(sitePutDto, site);
@@ -142,7 +142,7 @@ public class SiteController {
         return ResponseEntity.ok(updatedSiteDto);
     }
 
-    @DeleteMapping("/sites/{id}")
+    @DeleteMapping("/site/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") Integer id) {
         siteRepository.deleteById(id);

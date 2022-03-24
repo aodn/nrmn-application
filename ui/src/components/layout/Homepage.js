@@ -1,11 +1,10 @@
 import React from 'react';
-import {Link, Typography} from '@material-ui/core';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Box from '@material-ui/core/Box';
+import {Link, Typography} from '@mui/material';
+import {makeStyles} from '@mui/styles';
+import Box from '@mui/material/Box';
 
 const useStyles = makeStyles(() => ({
   supporters: {
-    color: '#fff',
     backgroundColor: '#546e7aab',
     '& img': {
       width: '140px',
@@ -42,15 +41,12 @@ const Homepage = () => {
             <p>
               <strong>Australia’s Integrated Marine Observing System (IMOS)</strong> is enabled by the National Collaborative Research
               Infrastructure Strategy (NCRIS). It is operated by a consortium of institutions as an unincorporated joint venture, with the{' '}
-              <Link color="secondary" href="https://www.utas.edu.au/">
-                University of Tasmania
-              </Link>{' '}
-              as Lead Agent.
+              <Link href="https://www.utas.edu.au/">University of Tasmania</Link> as Lead Agent.
             </p>
             <p>
               <strong>
                 Public data from the NRMN is available via the{' '}
-                <Link color="secondary" rel="noreferrer" target="_blank" href="https://portal.aodn.org.au/">
+                <Link rel="noreferrer" target="_blank" href="https://portal.aodn.org.au/">
                   AODN Portal
                 </Link>
                 .

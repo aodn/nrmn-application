@@ -1,73 +1,24 @@
 import React, {useEffect, useState} from 'react';
-import clsx from 'clsx';
-import {AppBar, Box, Button, Divider, Grid, Tab, Tabs, TextField, Typography} from '@material-ui/core';
-import {DataGrid} from '@material-ui/data-grid';
-import {Search} from '@material-ui/icons';
-import Alert from '@material-ui/lab/Alert';
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import {Box, Divider, Paper, Grid, Tab, Tabs, TextField, Typography} from '@mui/material';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import TablePagination from '@mui/material/TablePagination';
+import {Search} from '@mui/icons-material';
+import Alert from '@mui/material/Alert';
 import TabPanel from '../containers/TabPanel';
 import {search} from '../../axios/api';
 import PropTypes from 'prop-types';
-
-const useStyles = makeStyles({
-  root: {
-    '& .superseded': {
-      color: '#999999',
-      fontStyle: 'italic'
-    },
-    '& .present': {
-      fontStyle: 'bold'
-    },
-    '& .MuiTablePagination-caption': {
-      display: 'none'
-    }
-  }
-});
-
-const columns = [
-  [
-    {field: 'isPresent', headerName: 'NRMN', flex: 0.75},
-    {field: 'status', headerName: 'Status', flex: 1},
-    {
-      field: 'species',
-      headerName: 'Species',
-      flex: 2,
-      cellClassName: (params) =>
-        clsx('root', {
-          superseded: params.row.supersededBy
-        })
-    },
-    {field: 'genus', headerName: 'Genus', flex: 1},
-    {field: 'family', headerName: 'Family', flex: 1},
-    {field: 'order', headerName: 'Order', flex: 1},
-    {field: 'class', headerName: 'Class', flex: 1},
-    {field: 'phylum', headerName: 'Phylum', flex: 1},
-    {field: 'supersededBy', headerName: 'Superseded By', flex: 1}
-  ],
-  [
-    {
-      field: 'species',
-      headerName: 'Species',
-      flex: 2,
-      cellClassName: (params) =>
-        clsx('root', {
-          superseded: params.row.supersededBy
-        })
-    },
-    {field: 'genus', headerName: 'Genus', flex: 1},
-    {field: 'family', headerName: 'Family', flex: 1},
-    {field: 'order', headerName: 'Order', flex: 1},
-    {field: 'class', headerName: 'Class', flex: 1},
-    {field: 'phylum', headerName: 'Phylum', flex: 1},
-    {field: 'supersededBy', headerName: 'Superseded By', flex: 1}
-  ]
-];
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const SpeciesSearch = ({onRowClick}) => {
-  const classes = useStyles();
   const [tabIndex, setTabIndex] = useState(0);
   const [searchTerm, setSearchTerm] = useState(null);
   const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
   const [gridData, setGridData] = useState(null);
   const [currentSearch, setCurrentSearch] = useState({});
   const [info, setInfo] = useState(null);
@@ -80,16 +31,16 @@ const SpeciesSearch = ({onRowClick}) => {
   const handleChange = (_, newValue) => {
     setSearchTerm(null);
     setGridData(null);
+    setInfo(null);
     setSearchRequested(null);
     setCurrentSearch(null);
     setPage(0);
     setTabIndex(newValue);
   };
 
-  const pageSize = 50;
-
   useEffect(() => {
     if (!searchRequested) return;
+    setInfo(null);
     setGridData(null);
     setSearchError(null);
     if (currentSearch?.species !== searchRequested.species) setPage(0);
@@ -122,17 +73,26 @@ const SpeciesSearch = ({onRowClick}) => {
       .catch((err) => setSearchError(err.message));
   }, [searchRequested, currentSearch]);
 
+  const handleChangePage = (_, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
   return (
-    <Box ml={6} style={{background: 'white'}} boxShadow={1} margin={3} width="80%">
+    <Box style={{background: 'white'}} boxShadow={1} width="90%">
       <Box pl={6} py={2}>
         <Typography variant="h4">Species Lookup</Typography>
       </Box>
-      <AppBar position="static">
+      <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
         <Tabs value={tabIndex} onChange={handleChange}>
           <Tab label="WoRMS" style={{minWidth: '50%', textTransform: 'none'}} />
           <Tab label="NRMN" style={{minWidth: '50%'}} />
         </Tabs>
-      </AppBar>
+      </Box>
       {searchError ? (
         <Box pt={2} mx={2}>
           <Alert severity="error" variant="filled">
@@ -146,6 +106,8 @@ const SpeciesSearch = ({onRowClick}) => {
           <Grid item xs={5}>
             <TextField
               fullWidth
+              size="small"
+              disabled={loading}
               onChange={(e) => setSearchTerm(e.target.value.trim())}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') setSearchRequested({searchType: 'WORMS', species: searchTerm, includeSuperseded: true});
@@ -154,8 +116,10 @@ const SpeciesSearch = ({onRowClick}) => {
           </Grid>
           <Grid item xs={1}></Grid>
           <Grid item xs={4}>
-            <Button
-              disabled={loading || !(searchTerm?.length > 3)}
+            <LoadingButton
+              variant="outlined"
+              disabled={!(searchTerm?.length > 3)}
+              loading={loading}
               startIcon={<Search></Search>}
               onClick={() => {
                 setPage(1);
@@ -164,7 +128,7 @@ const SpeciesSearch = ({onRowClick}) => {
               style={{textTransform: 'none'}}
             >
               Search WoRMS
-            </Button>
+            </LoadingButton>
           </Grid>
         </Grid>
       </TabPanel>
@@ -181,6 +145,8 @@ const SpeciesSearch = ({onRowClick}) => {
           <Grid item xs={5}>
             <TextField
               fullWidth
+              size="small"
+              disabled={loading}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') setSearchRequested({searchType: 'NRMN', species: searchTerm, includeSuperseded: true});
               }}
@@ -189,71 +155,96 @@ const SpeciesSearch = ({onRowClick}) => {
           </Grid>
           <Grid item xs={1}></Grid>
           <Grid item xs={3}>
-            <Button
+            <LoadingButton
+              variant="outlined"
               disabled={loading || !(searchTerm?.length > 3)}
+              loading={loading}
               startIcon={<Search></Search>}
               onClick={() => setSearchRequested({searchType: 'NRMN', species: searchTerm, includeSuperseded: true})}
               style={{textTransform: 'none'}}
             >
               Search NRMN
-            </Button>
+            </LoadingButton>
           </Grid>
         </Grid>
       </TabPanel>
-      {loading || gridData !== null ? (
-        <div style={{height: '640px', backgroundColor: 'white'}}>
-          <DataGrid
-            className={classes.root}
+      {gridData ? (
+        <>
+          <TableContainer component={Paper}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Is Present</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Species</TableCell>
+                  <TableCell>Phylum</TableCell>
+                  <TableCell>Family</TableCell>
+                  <TableCell>Class</TableCell>
+                  <TableCell>Order</TableCell>
+                  <TableCell>Genus</TableCell>
+                  <TableCell>Species Epithet</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {gridData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                  <TableRow
+                    key={row.aphiaId}
+                    style={{cursor: 'pointer'}}
+                    onClick={() => {
+                      const supersededBy = row.supersededBy;
+                      const unacceptReason = row.unacceptReason;
+                      const isPresent = row.isPresent;
+                      if (supersededBy) {
+                        setInfo(
+                          `This species has been superseded by ${supersededBy}` +
+                            (unacceptReason != null ? ` (Reason: ${unacceptReason})` : '')
+                        );
+                      } else if (isPresent) {
+                        setInfo('This species name exists in the NRMN database');
+                      } else {
+                        setInfo();
+                        onRowClick({
+                          aphiaId: row.aphiaId,
+                          phylum: row.phylum,
+                          family: row.family,
+                          class: row.class,
+                          order: row.order,
+                          genus: row.genus,
+                          speciesEpithet: row.speciesEpithet
+                        });
+                      }
+                    }}
+                  >
+                    <TableCell>{row.isPresent ? 'True' : 'False'}</TableCell>
+                    <TableCell>{row.status}</TableCell>
+                    {row.supersededBy ? (
+                      <TableCell>
+                        <i>{row.species}</i>
+                      </TableCell>
+                    ) : (
+                      <TableCell>{row.species}</TableCell>
+                    )}
+                    <TableCell>{row.phylum}</TableCell>
+                    <TableCell>{row.family}</TableCell>
+                    <TableCell>{row.class}</TableCell>
+                    <TableCell>{row.order}</TableCell>
+                    <TableCell>{row.genus}</TableCell>
+                    <TableCell>{row.speciesEpithet}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            component="div"
+            rowsPerPageOptions={[]}
+            count={gridData?.length ?? 0}
+            rowsPerPage={rowsPerPage}
             page={page}
-            pageSize={pageSize}
-            rowCount={
-              gridData === null ? 0 : gridData.length < pageSize ? pageSize * page + gridData.length : pageSize * page + gridData.length + 1
-            }
-            hide
-            paginationMode="server"
-            disabled={loading}
-            disableSelectionOnClick
-            hideFooterRowCount
-            rowsPerPageOptions={[50]}
-            density="compact"
-            style={{fontSize: 4}}
-            rows={gridData === null ? [] : gridData}
-            columns={columns[tabIndex]}
-            loading={loading}
-            onPageChange={(params) => {
-              setSearchRequested({
-                searchType: tabIndex === 0 ? 'WORMS' : 'NRMN',
-                species: searchTerm,
-                includeSuperseded: true,
-                page: params.page
-              });
-              setPage(params.page);
-            }}
-            onRowClick={(params) => {
-              const supersededBy = params.row.supersededBy;
-              const unacceptReason = params.row.unacceptReason;
-              const isPresent = params.row.isPresent;
-              if (supersededBy) {
-                setInfo(
-                  `This species has been superseded by ${supersededBy}` + (unacceptReason != null ? ` (Reason: ${unacceptReason})` : '')
-                );
-              } else if (isPresent) {
-                setInfo('This species name exists in the NRMN database');
-              } else {
-                setInfo();
-                onRowClick({
-                  aphiaId: params.row.aphiaId,
-                  phylum: params.row.phylum,
-                  family: params.row.family,
-                  class: params.row.class,
-                  order: params.row.order,
-                  genus: params.row.genus,
-                  speciesEpithet: params.row.speciesEpithet
-                });
-              }
-            }}
-          ></DataGrid>
-        </div>
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </>
       ) : (
         <Divider />
       )}

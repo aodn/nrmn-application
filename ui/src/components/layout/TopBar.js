@@ -1,18 +1,18 @@
 import React from 'react';
-import {AppBar, Box, Toolbar, IconButton} from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
+import {AppBar, Box, Toolbar, IconButton} from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 import AuthState from './AuthState';
-import {Typography} from '@material-ui/core';
+import {Typography} from '@mui/material';
 import {PropTypes} from 'prop-types';
 
 const TopBar = ({onMenuClick}) => {
   return (
-    <AppBar position="relative">
-      <Toolbar style={{minHeight: '48px'}}>
+    <AppBar>
+      <Toolbar style={{minHeight: '10px'}}>
         <IconButton color="inherit" onClick={onMenuClick} edge="start">
           <MenuIcon />
         </IconButton>
-        <Box flexGrow={1} display="flex" alignItems="center" justifyContent="center" spacing={2}>
+        <Box flexGrow={1} display="flex" alignItems="center" justifyContent="center" spacing={1}>
           <img style={{paddingRight: '10px'}} src="/logos/imos.png" alt="IMOS Logo" />
           <Typography variant="button">National Reef Monitoring Network</Typography>
         </Box>

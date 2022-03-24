@@ -58,7 +58,7 @@ public class SiteApiIT {
     public void setup() {
         spec = new RequestSpecBuilder()
                 .setBaseUri(String.format("http://localhost:%s", port))
-                .setBasePath("/api/sites")
+                .setBasePath("/api/site")
                 .setContentType(ContentType.JSON)
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter())

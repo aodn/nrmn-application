@@ -1,5 +1,5 @@
 import React from 'react';
-import {Checkbox, FormControlLabel, Typography} from '@material-ui/core';
+import {Checkbox, FormControlLabel, Typography} from '@mui/material';
 import {PropTypes} from 'prop-types';
 
 const CustomCheckboxInput = ({label, formData, onChange}) => {
@@ -14,7 +14,7 @@ const CustomCheckboxInput = ({label, formData, onChange}) => {
 
 CustomCheckboxInput.propTypes = {
   label: PropTypes.string,
-  formData: PropTypes.boolean,
+  formData: PropTypes.bool,
   onChange: PropTypes.func
 };
 

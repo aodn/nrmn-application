@@ -32,6 +32,7 @@
             </configuration>
           </execution>
           <execution>
+            <?m2e ignore?>
             <id>yarn-build</id>
             <goals>
               <goal>exec</goal>
@@ -43,7 +44,7 @@
                 <argument>build</argument>
               </arguments>
               <environmentVariables>
-                <REACT_APP_VERSION>${project.version}</REACT_APP_VERSION>
+              <REACT_APP_VERSION>${project.version}</REACT_APP_VERSION>
                 <BUILD_PATH>${basedir}/target/classes/static</BUILD_PATH>
               </environmentVariables>
             </configuration>

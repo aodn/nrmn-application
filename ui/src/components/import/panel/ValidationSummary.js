@@ -1,9 +1,9 @@
 import React from 'react';
-import Typography from '@material-ui/core/Typography';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
-import TreeItem from '@material-ui/lab/TreeItem';
-import TreeView from '@material-ui/lab/TreeView';
+import Typography from '@mui/material/Typography';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import TreeItem from '@mui/lab/TreeItem';
+import TreeView from '@mui/lab/TreeView';
 import {PropTypes} from 'prop-types';
 
 import {measurements, extendedMeasurements} from '../../../constants';
@@ -24,7 +24,7 @@ const ValidationSummary = (props) => {
         >
           {m.description.map((d) => {
             const mmHeader = mm.find((m) => m.field === d.columnName);
-            const label = mmHeader ? `${(d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize)}cm` : d.columnName;
+            const label = mmHeader ? `${d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
 
             return (
               <TreeItem
