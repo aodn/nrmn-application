@@ -5,14 +5,14 @@ import {Save} from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
 import PropTypes from 'prop-types';
 
-import EntityContainer from '../containers/EntityContainer';
+import EntityContainer from '../../containers/EntityContainer';
 
-import CustomArrayInput from '../input/CustomArrayInput';
-import CustomTextInput from '../input/CustomTextInput';
-import CustomDropDownInput from '../input/CustomDropDownInput';
-import CustomAutoCompleteInput from '../input/CustomAutoCompleteInput';
+import CustomArrayInput from '../../input/CustomArrayInput';
+import CustomTextInput from '../../input/CustomTextInput';
+import CustomDropDownInput from '../../input/CustomDropDownInput';
+import CustomAutoCompleteInput from '../../input/CustomAutoCompleteInput';
 
-import {getResult, entityEdit, entitySave} from '../../axios/api';
+import {getResult, entityEdit, entitySave} from '../../../api/api';
 
 const numericOptions = [
   {id: 1, label: '1'},

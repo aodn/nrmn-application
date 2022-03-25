@@ -6,8 +6,8 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Typography from '@mui/material/Typography';
 import {PropTypes} from 'prop-types';
 import {Paper, TextField} from '@mui/material';
-import {userLogin} from '../../axios/api';
-import {AuthContext} from '../../auth-context';
+import {userLogin} from '../../api/api';
+import {AuthContext} from '../../contexts/auth-context';
 
 const LoginForm = () => {
   const [error, setError] = useState(null);

@@ -6,7 +6,7 @@ import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
 import {PropTypes} from 'prop-types';
 
-import {measurements, extendedMeasurements} from '../../../constants';
+import {measurements, extendedMeasurements} from '../../../common/constants';
 
 const ValidationSummary = (props) => {
   const mm = measurements.concat(extendedMeasurements);

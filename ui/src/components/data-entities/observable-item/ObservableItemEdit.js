@@ -5,13 +5,13 @@ import {Save, Delete} from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
 import PropTypes from 'prop-types';
 
-import EntityContainer from '../containers/EntityContainer';
+import EntityContainer from '../../containers/EntityContainer';
 
-import CustomAutoCompleteInput from '../input/CustomAutoCompleteInput';
-import CustomTextInput from '../input/CustomTextInput';
-import CustomSearchInput from '../input/CustomSearchInput';
+import CustomAutoCompleteInput from '../../input/CustomAutoCompleteInput';
+import CustomTextInput from '../../input/CustomTextInput';
+import CustomSearchInput from '../../input/CustomSearchInput';
 
-import {getResult, entityEdit, entityDelete} from '../../axios/api';
+import {getResult, entityEdit, entityDelete} from '../../../api/api';
 
 const ObservableItemEdit = () => {
   const observableItemId = useParams()?.id;

@@ -4,15 +4,15 @@ import {Box, Button, Grid, Typography} from '@mui/material';
 import {Save} from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
 import PropTypes from 'prop-types';
-import SpeciesSearch from '../search/SpeciesSearch';
+import SpeciesSearch from '../../search/SpeciesSearch';
 
-import EntityContainer from '../containers/EntityContainer';
-import CustomDropDownInput from '../input/CustomDropDownInput';
-import CustomAutoCompleteInput from '../input/CustomAutoCompleteInput';
-import CustomTextInput from '../input/CustomTextInput';
-import CustomSearchInput from '../input/CustomSearchInput';
+import EntityContainer from '../../containers/EntityContainer';
+import CustomDropDownInput from '../../input/CustomDropDownInput';
+import CustomAutoCompleteInput from '../../input/CustomAutoCompleteInput';
+import CustomTextInput from '../../input/CustomTextInput';
+import CustomSearchInput from '../../input/CustomSearchInput';
 
-import {getResult, entitySave} from '../../axios/api';
+import {getResult, entitySave} from '../../../api/api';
 
 const ObservableItemAdd = () => {
   const [savedId, setSavedId] = useState(false);

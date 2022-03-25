@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Box, Typography} from '@mui/material';
 import {Navigate} from 'react-router-dom';
-import {getResult} from '../../../axios/api';
+import {getResult} from '../../../api/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';

@@ -10,7 +10,7 @@ import TablePagination from '@mui/material/TablePagination';
 import {Search} from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
 import TabPanel from '../containers/TabPanel';
-import {search} from '../../axios/api';
+import {search} from '../../api/api';
 import PropTypes from 'prop-types';
 import LoadingButton from '@mui/lab/LoadingButton';
 

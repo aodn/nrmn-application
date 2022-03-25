@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {NavLink} from 'react-router-dom';
 import {grey, red} from '@mui/material/colors';
-import {getResult, entityEdit} from '../../../axios/api';
+import {getResult, entityEdit} from '../../../api/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Add, Save} from '@mui/icons-material';

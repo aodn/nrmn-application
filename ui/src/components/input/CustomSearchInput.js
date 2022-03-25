@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {TextField, Typography} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import {PropTypes} from 'prop-types';
-import {search} from '../../axios/api';
+import {search} from '../../api/api';
 import axios from 'axios';
 
 const CustomSearchInput = ({label, exclude, formData, onChange}) => {

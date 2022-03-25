@@ -6,7 +6,7 @@ import React, {useEffect, useReducer, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {NavLink} from 'react-router-dom';
 import {Navigate} from 'react-router-dom';
-import {entitySave, entityEdit, getEntity} from '../../../axios/api';
+import {entitySave, entityEdit, getEntity} from '../../../api/api';
 import EntityContainer from '../../containers/EntityContainer';
 import CustomCheckboxInput from '../../input/CustomCheckboxInput';
 import CustomTextInput from '../../input/CustomTextInput';

@@ -6,7 +6,7 @@ import Alert from '@mui/material/Alert';
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router';
 import {Link, useLocation} from 'react-router-dom';
-import {getResult} from '../../../axios/api';
+import {getResult} from '../../../api/api';
 import EntityContainer from '../../containers/EntityContainer';
 import CustomTextInput from '../../input/CustomTextInput';
 

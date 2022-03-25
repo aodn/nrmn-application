@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
 import {Navigate, NavLink} from 'react-router-dom';
-import {getResult} from '../../axios/api';
-import LoadingOverlay from '../overlays/LoadingOverlay';
+import {getResult} from '../../../api/api';
+import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Add} from '@mui/icons-material';
-import {entityDelete} from '../../axios/api';
+import {entityDelete} from '../../../api/api';
 
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';

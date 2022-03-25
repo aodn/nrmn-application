@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Box, Divider, Grid, Typography, Paper, Button} from '@mui/material';
-import {getEntity} from '../../axios/api';
+import {getEntity} from '../../../api/api';
 import {useParams} from 'react-router';
 import {Edit} from '@mui/icons-material';
 import {NavLink} from 'react-router-dom';

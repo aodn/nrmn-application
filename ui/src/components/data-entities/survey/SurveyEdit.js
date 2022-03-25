@@ -3,7 +3,7 @@ import {Save} from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
 import React, {useEffect, useReducer, useState} from 'react';
 import {Navigate, NavLink, useParams} from 'react-router-dom';
-import {entityEdit, getResult} from '../../../axios/api';
+import {entityEdit, getResult} from '../../../api/api';
 import EntityContainer from '../../containers/EntityContainer';
 import CustomCheckboxInput from '../../input/CustomCheckboxInput';
 import CustomDropDownInput from '../../input/CustomDropDownInput';

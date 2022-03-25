@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Box, Button, Checkbox, FormControlLabel, Grid, MenuItem, Select, Typography} from '@mui/material';
 import LinearProgressWithLabel from '../ui/LinearProgressWithLabel';
 import Alert from '@mui/material/Alert';
-import {submitJobFile} from '../../axios/api';
+import {submitJobFile} from '../../api/api';
 import {NavLink} from 'react-router-dom';
 
 const JobUpload = () => {

@@ -6,7 +6,7 @@ import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import React, {useEffect, useState} from 'react';
 import {Navigate} from 'react-router';
 import {NavLink} from 'react-router-dom';
-import {deleteJob, getEntity} from '../../axios/api';
+import {deleteJob, getEntity} from '../../api/api';
 import LoadingOverlay from '../overlays/LoadingOverlay';
 import AlertDialog from '../ui/AlertDialog';
 

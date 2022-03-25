@@ -3,9 +3,9 @@ import {Edit} from '@mui/icons-material';
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router';
 import {NavLink} from 'react-router-dom';
-import {getEntity} from '../../axios/api';
-import EntityContainer from '../containers/EntityContainer';
-import CustomTextInput from '../input/CustomTextInput';
+import {getEntity} from '../../../api/api';
+import EntityContainer from '../../containers/EntityContainer';
+import CustomTextInput from '../../input/CustomTextInput';
 
 const SiteView = () => {
   const id = useParams()?.id;

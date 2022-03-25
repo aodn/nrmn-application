@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import Save from '@mui/icons-material/Save';
 import React, {useReducer, useState} from 'react';
 import {Navigate, NavLink, useParams} from 'react-router-dom';
-import {entitySave} from '../../../axios/api';
+import {entitySave} from '../../../api/api';
 import EntityContainer from '../../containers/EntityContainer';
 import CustomTextInput from '../../input/CustomTextInput';
 

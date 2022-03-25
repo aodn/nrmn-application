@@ -3,8 +3,8 @@ import {useNavigate} from 'react-router-dom';
 import {AccountCircle} from '@mui/icons-material';
 import {Button} from '@mui/material';
 import AlertDialog from '../ui/AlertDialog';
-
-import {AuthContext} from '../../auth-context';
+import {userLogout} from '../../api/api';
+import {AuthContext} from '../../contexts/auth-context';
 
 const AuthState = () => {
   const navigate = useNavigate();
@@ -29,9 +29,11 @@ const AuthState = () => {
               action="Log Out"
               onClose={() => showConfirmLogout(false)}
               onConfirm={() => {
-                showConfirmLogout(false);
-                localStorage.removeItem('auth');
-                setAuth({expires: 0});
+                userLogout().then(() => {
+                  showConfirmLogout(false);
+                  localStorage.removeItem('auth');
+                  setAuth({expires: 0});
+                });
               }}
             />
           </>

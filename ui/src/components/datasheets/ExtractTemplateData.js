@@ -1,8 +1,7 @@
 import {Box, Button, Chip, TextField, Typography} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import React, {useEffect, useState} from 'react';
-import {getEntity, templateZip} from '../../axios/api';
-import qs from 'qs';
+import {getEntity, templateZip} from '../../api/api';
 import FileDownload from 'js-file-download';
 import LoadingButton from '@mui/lab/LoadingButton';
 
@@ -61,10 +60,10 @@ const ExtractTemplateData = () => {
     setStagedLocations(intersect_arr.filter((l) => !templateLocations.includes(l)));
   }, [siteLocation, ecoRegion, country, area, templateLocations]);
 
-  useEffect(() => download && downloadZip({locations: templateLocations}), [download, templateLocations]);
+  useEffect(() => download && downloadZip(templateLocations), [download, templateLocations]);
 
-  const downloadZip = (params) => {
-    templateZip(qs.stringify(params, {indices: false})).then((result) => {
+  const downloadZip = (locationIds) => {
+    templateZip(`locations=${locationIds.join(',')}`).then((result) => {
       FileDownload(result.data, `template.zip`);
       setDownload(false);
     });
@@ -79,6 +78,7 @@ const ExtractTemplateData = () => {
         <Typography variant="subtitle2">Site Code</Typography>
         <Autocomplete
           size="small"
+          loading={siteCodes.length < 1}
           options={Object.keys(siteCodes).sort()}
           getOptionLabel={(e) => `${e} - ${locations[siteCodes[e][0]]}`}
           onChange={(_, e) => setSiteLocation(e ? siteCodes[e][0] : null)}
