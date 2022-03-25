@@ -30,7 +30,7 @@ pipeline {
                 }
                 stage('build') {
                     steps {
-                        sh 'yarn --cwd ui --frozen-lockfile'
+                        sh 'yarn --cwd web --frozen-lockfile'
                         sh 'mvn --batch-mode --threads 2 clean package'
                     }
                 }
