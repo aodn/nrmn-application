@@ -1,9 +1,7 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -59,15 +57,10 @@ public class SiteController {
     @Autowired
     private ModelMapper mapper;
 
-    @GetMapping("/siteListItems")
+    @GetMapping("/sites")
     public ResponseEntity<List<SiteListItem>> list() {
         return ResponseEntity.ok(siteRepository.findAll().stream().map(site -> mapper.map(site, SiteListItem.class))
                 .collect(Collectors.toList()));
-    }
-
-    @GetMapping("/sites")
-    List<Site> findAll() {
-        return siteRepository.findAll();
     }
 
     @GetMapping("/siteOptions")
@@ -88,26 +81,6 @@ public class SiteController {
             @RequestParam(required = true) String latitude, @RequestParam(required = true) String longitude) {
         return siteRepository.sitesWithin200m(exclude != null ? exclude : -1, Double.parseDouble(longitude),
                 Double.parseDouble(latitude));
-    }
-
-    @GetMapping(path = "/siteCodes")
-    public ResponseEntity<List<String>> getAllSiteAreas() {
-        return ResponseEntity.ok(siteRepository.findAllSiteCodes());
-    }
-
-    @GetMapping(path = "/siteStates")
-    public ResponseEntity<List<String>> getAllSiteStates() {
-        return ResponseEntity.ok(siteRepository.findAllSiteStates());
-    }
-
-    @GetMapping(path = "/siteProvinces")
-    public ResponseEntity<List<String>> getAllSiteProvinces() {
-        return ResponseEntity.ok(siteRepository.findAllSiteProvinces());
-    }
-
-    @GetMapping(path = "/siteCountries")
-    public ResponseEntity<List<String>> getAllCountries() {
-        return ResponseEntity.ok(siteRepository.findAllCountries());
     }
 
     @GetMapping("/site/{id}")
@@ -179,22 +152,4 @@ public class SiteController {
 
         return new ValidationErrors(errors);
     }
-
-    @GetMapping("/siteNames")
-    public ResponseEntity<HashMap<String, List<String>>> getSiteNames() {
-        List<Site> allSites = siteRepository.findAll();
-
-        List<String> siteNames = allSites.stream()
-                .map(Site::getSiteName)
-                .filter(Objects::nonNull)
-                .distinct()
-                .sorted()
-                .collect(Collectors.toList());
-
-        HashMap<String, List<String>> siteNamesList = new HashMap<>();
-        siteNamesList.put("siteNames", siteNames);
-
-        return ResponseEntity.ok().body(siteNamesList);
-    }
-
 }
