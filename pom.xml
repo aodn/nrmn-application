@@ -15,9 +15,9 @@
     <description>National Reef Monitoring Network web application</description>
 
     <modules>
-        <module>ui</module>
-        <module>api</module>
         <module>app</module>
+        <module>api</module>
+        <module>web</module>
     </modules>
 
     <properties>

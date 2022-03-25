@@ -1,6 +1,5 @@
 {
-  "name": "nrmn-ui",
-  "version": "0.1.0",
+  "name": "nrmn-web",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.8.2",

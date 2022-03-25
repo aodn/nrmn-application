@@ -24,7 +24,7 @@
          </dependency>
         <dependency>
             <groupId>au.org.aodn.nrmn</groupId>
-            <artifactId>nrmn-ui</artifactId>
+            <artifactId>nrmn-web</artifactId>
             <version>0.0.0</version>
         </dependency>
     </dependencies>

@@ -7,7 +7,7 @@
     <version>0.0.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>nrmn-ui</artifactId>
+  <artifactId>nrmn-web</artifactId>
   <build>
     <plugins>
       <plugin>
