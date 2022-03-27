@@ -15,7 +15,7 @@ const SurveyEdit = () => {
   const [saved, setSaved] = useState(false);
   const [errors, setErrors] = useState([]);
   const [divers, setDivers] = useState([]);
-  const [siteListItems, setSiteListItems] = useState([]);
+  const [sites, setSites] = useState([]);
   const [programs, setPrograms] = useState([]);
 
   const formReducer = (state, action) => {
@@ -64,8 +64,8 @@ const SurveyEdit = () => {
 
   useEffect(
     () =>
-      getResult('siteListItems').then((res) => {
-        setSiteListItems(res.data);
+      getResult('sites').then((res) => {
+        setSites(res.data);
       }),
     []
   );
@@ -162,7 +162,7 @@ const SurveyEdit = () => {
                 <CustomTextInput
                   readOnlyModify
                   label="Site Name"
-                  formData={siteListItems?.find((i) => i.siteCode === item.siteCode)?.siteName}
+                  formData={sites?.find((i) => i.siteCode === item.siteCode)?.siteName}
                   field="siteName"
                 />
               </Grid>
@@ -170,7 +170,7 @@ const SurveyEdit = () => {
                 <CustomDropDownInput
                   label="Site Code"
                   formData={item.siteCode}
-                  options={siteListItems?.map((l) => {
+                  options={sites?.map((l) => {
                     return {id: l.siteCode, label: l.siteCode};
                   })}
                   field="siteCode"

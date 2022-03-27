@@ -1,7 +1,6 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,18 +32,15 @@ import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
 public class Location {
     @Id
     @SequenceGenerator(name = "location_ref_location_id", sequenceName = "location_ref_location_id", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="location_ref_location_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "location_ref_location_id")
     @Column(name = "location_id", unique = true, updatable = false, nullable = false)
-    @Schema(title = "Id", accessMode = Schema.AccessMode.READ_ONLY, hidden = true)
     private Integer locationId;
 
     @Column(name = "location_name")
     @NotNull
-    @Schema(title = "Name")
     private String locationName;
 
     @Column(name = "is_active")
     @NotNull
-    @Schema(title = "Is Active", defaultValue = "true")
     private Boolean isActive;
 }

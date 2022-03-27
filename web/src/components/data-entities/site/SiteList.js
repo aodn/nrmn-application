@@ -16,7 +16,7 @@ const SiteList = () => {
   const [dialogState, setDialogState] = useState({open: false});
 
   useEffect(() => {
-    if (gridApi) getResult('siteListItems').then((res) => gridApi.setRowData(res.data));
+    if (gridApi) getResult('sites').then((res) => gridApi.setRowData(res.data));
   }, [gridApi]);
 
   if (redirect) return <Navigate to={`/reference/site/${redirect}`} />;
