@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS nrmn;
+
 CREATE TABLE nrmn.diver_ref (
   diver_id int,
   initials varchar(10),
@@ -263,5 +265,4 @@ CREATE TABLE nrmn.methods_species (
 
 ALTER TABLE nrmn.observable_item_ref ADD COLUMN created TIMESTAMP;
 ALTER TABLE nrmn.observable_item_ref ADD COLUMN updated TIMESTAMP;
-
-ALTER TABLE nrmn.observable_item_ref ADD COLUMN mapped_id integer;
+ALTER TABLE nrmn.observable_item_ref ADD COLUMN mapped_id INTEGER;
