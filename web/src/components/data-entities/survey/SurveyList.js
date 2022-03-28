@@ -8,11 +8,11 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
 const SurveyList = () => {
-  const [gridData, setGridData] = useState(null);
+  const [rowData, setRowData] = useState([]);
   const [redirect, setRedirect] = useState(null);
 
   useEffect(() => {
-    getResult('data/surveys').then((res) => setGridData(res.data));
+    getResult('data/surveys').then((res) => setRowData(res.data));
   }, []);
 
   if (redirect) return <Navigate to={`/data/survey/${redirect}`} />;
@@ -30,7 +30,7 @@ const SurveyList = () => {
         animateRows={true}
         enableCellTextSelection={true}
         pagination={true}
-        rowData={gridData}
+        rowData={rowData}
         context={{useOverlay: 'Loading Surveys'}}
         components={{loadingOverlay: LoadingOverlay}}
         loadingOverlayComponent="loadingOverlay"
