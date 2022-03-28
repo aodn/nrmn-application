@@ -17,7 +17,7 @@ pipeline {
                 stage('clean') {
                     steps {
                         sh 'git reset --hard'
-                        sh 'git clean --force --force -xd --exclude=ui/node_modules'
+                        sh 'git clean --force --force -xd --exclude=web/node_modules'
                     }
                 }
                 stage('set_version_release') {
