@@ -177,7 +177,7 @@ CREATE AGGREGATE nrmn.l95 (size_class numeric, total_count numeric) (
     INITCOND = '{}'
 );
 
-CREATE OR REPLACE FUNCTION abbreviated_species_code(species_name varchar, code_length integer)
+CREATE OR REPLACE FUNCTION nrmn.abbreviated_species_code(species_name varchar, code_length integer)
 RETURNS varchar as $$
 BEGIN
     return CASE
@@ -190,14 +190,13 @@ END; $$
 LANGUAGE PLPGSQL
 SET search_path = nrmn,public;
 
-DROP FUNCTION nrmn.assign_species_to_method();
 CREATE OR REPLACE FUNCTION nrmn.assign_species_to_method()
     RETURNS integer
     LANGUAGE 'plpgsql'
     COST 100
     VOLATILE PARALLEL UNSAFE
     SET search_path=nrmn, public
-AS $BODY$
+    AS $BODY$
 BEGIN
 TRUNCATE TABLE nrmn.methods_species;
 -- M1
@@ -278,6 +277,7 @@ WHERE obs_item_type_id IN (1,2,5);
 IF (select count(*) from nrmn.methods_species)>0
 THEN RETURN 1;
 END IF;
+RETURN 0;
 END;
 $BODY$;
 
@@ -292,6 +292,7 @@ WHERE "class" IN ('Anopla','Aplacophora','Ascidiacea','Asteroidea','Bivalvia','C
 IF (select count(*) from nrmn.observable_item_ref where is_invert_sized = true)>0
 THEN RETURN 1;
 END IF;
+RETURN 0;
 END; $$
 LANGUAGE PLPGSQL
 SET search_path = nrmn,public;
@@ -318,7 +319,7 @@ BEGIN
 END
 $$;
 
-CREATE OR REPLACE FUNCTION nrmn.set_species_attributes ()
+CREATE OR REPLACE FUNCTION nrmn.set_species_attributes()
     RETURNS VOID
     SECURITY DEFINER
     LANGUAGE plpgsql
@@ -326,10 +327,13 @@ CREATE OR REPLACE FUNCTION nrmn.set_species_attributes ()
 BEGIN
     PERFORM nrmn.assign_species_to_method();
     PERFORM nrmn.set_is_invert_species();
-    RETURN;
 END
 $$;
 SET search_path = nrmn,public;
 
 -- Execute function after update
-SELECT nrmn.set_species_attributes();
+DO $$
+BEGIN
+  PERFORM nrmn.set_species_attributes();
+END;
+$$;
