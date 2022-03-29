@@ -4,7 +4,7 @@ import axiosInstance from './index.js';
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    window.setApplicationError(null);
+    window.setApplicationError && window.setApplicationError(null);
     const {accessToken, tokenType} = JSON.parse(localStorage.getItem('auth')) || {};
     if (accessToken && tokenType) config.headers.authorization = `${tokenType} ${accessToken}`;
     return config;
@@ -17,7 +17,7 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    window.setApplicationError(error?.message || JSON.stringify(error), error);
+    window.setApplicationError && window.setApplicationError(error?.message || JSON.stringify(error), error);
     console.error({error});
   }
 );
@@ -43,8 +43,12 @@ export const userLogin = (params, onResult) => {
         state.accessToken = res.data.accessToken;
         state.tokenType = res.data.tokenType;
         state.roles = jwt.roles;
-        localStorage.setItem('auth', JSON.stringify(state));
-        localStorage.setItem('gridLicense', JSON.stringify(res.data.gridLicense));
+        try {
+          localStorage.setItem('auth', JSON.stringify(state));
+          localStorage.setItem('gridLicense', JSON.stringify(res.data.gridLicense));
+        } catch (_) {
+          console.error('Browser has no local storage');
+        }
         LicenseManager.setLicenseKey(res.data.gridLicense);
         onResult(state, null);
       } else {
