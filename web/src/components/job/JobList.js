@@ -14,7 +14,7 @@ const TimeStampCell = (params) => {
   return params.value
     ? new Date(params.value).toLocaleDateString('en-AU') +
         ' ' +
-        new Date(params.value).toLocaleTimeString('en-AU', {hour12: false, hour: '2-digit', minute: '2-digit'})
+        new Date(params.value).toLocaleTimeString('en-AU', {hour: 'numeric', minute: '2-digit'})
     : '';
 };
 
