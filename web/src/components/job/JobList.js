@@ -85,9 +85,9 @@ const JobList = () => {
             onCellClicked={(e) => {
               if (!e.data.id) return;
               if (e.event.ctrlKey) {
-                window.open(`/jobs/${e.data.id}/view`, '_blank').focus();
+                window.open(`/data/job/${e.data.id}/view`, '_blank').focus();
               } else {
-                setRedirect(`/jobs/${e.data.id}/view`);
+                setRedirect(`/data/job/${e.data.id}/view`);
               }
             }}
           />
@@ -97,7 +97,7 @@ const JobList = () => {
             cellStyle={{cursor: 'pointer'}}
             onCellClicked={(e) => {
               if (e.data.status === 'STAGED') {
-                const target = `/validation/${e.data.id}`;
+                const target = `/data/job/${e.data.id}/edit`;
                 e.event.ctrlKey ? window.open(target, '_blank').focus() : setRedirect(target);
               }
             }}

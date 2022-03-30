@@ -52,7 +52,7 @@ const LocationAdd = () => {
   if (savedId) return <Navigate to={`/reference/location/${savedId}`} state={{message: 'Location Saved'}} />;
 
   return (
-    <EntityContainer name="location" goBackTo="/reference/locations">
+    <EntityContainer name="Locations" goBackTo="/reference/locations">
       <Grid container alignItems="flex-start" direction="row" spacing={2}>
         <Grid item xs={12}>
           <Typography variant="h4">{locationId ? 'Edit' : 'New'} Location</Typography>

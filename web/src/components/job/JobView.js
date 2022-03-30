@@ -39,7 +39,7 @@ const JobView = () => {
   }, [job, id]);
 
   return (
-    <EntityContainer name="Jobs" goBackTo="/jobs">
+    <EntityContainer name="Jobs" goBackTo="/data/jobs">
       {job ? (
         <Grid container>
           <Grid item xs={12}>

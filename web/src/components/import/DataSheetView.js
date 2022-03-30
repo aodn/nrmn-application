@@ -11,7 +11,7 @@ import ResetIcon from '@mui/icons-material/LayersClear';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {PropTypes} from 'prop-types';
-import {NavLink} from 'react-router-dom';
+import {useParams, NavLink} from 'react-router-dom';
 import {getDataJob, submitIngest, updateRows, validateJob} from '../../api/api';
 import {extendedMeasurements, measurements} from '../../common/constants';
 import LoadingOverlay from '../overlays/LoadingOverlay';
@@ -146,7 +146,8 @@ const generateErrorTree = (rowData, rowPos, errors) => {
 
 const IngestState = Object.freeze({Loading: 0, Edited: 1, Valid: 2, ConfirmSubmit: 3});
 
-const DataSheetView = ({jobId, onIngest}) => {
+const DataSheetView = ({onIngest}) => {
+  const {id} = useParams();
   const [job, setJob] = useState({});
   const [gridApi, setGridApi] = useState();
   const [isFiltered, setIsFiltered] = useState(false);
@@ -193,7 +194,7 @@ const DataSheetView = ({jobId, onIngest}) => {
     setState(IngestState.Loading);
     setSideBar(defaultSideBar);
     context.errors = [];
-    validateJob(jobId, (result) => {
+    validateJob(id, (result) => {
       context.errors = result.data.errors;
       delete result.data.errors;
       delete result.data.job;
@@ -225,7 +226,7 @@ const DataSheetView = ({jobId, onIngest}) => {
     setState(IngestState.Loading);
     setSideBar(defaultSideBar);
     submitIngest(
-      jobId,
+      id,
       (res) => onIngest({success: res}),
       (err) => onIngest({error: err})
     );
@@ -261,9 +262,9 @@ const DataSheetView = ({jobId, onIngest}) => {
       // response.
       context.fullRefresh = context.fullRefresh || rowId.toString().length > 10 || row === null;
     });
-    updateRows(jobId, rowUpdateDtos, () => {
+    updateRows(id, rowUpdateDtos, () => {
       if (context.fullRefresh) {
-        reload(gridApi, jobId, handleValidate);
+        reload(gridApi, id, handleValidate);
         context.fullRefresh = false;
       } else {
         handleValidate();
@@ -446,9 +447,9 @@ const DataSheetView = ({jobId, onIngest}) => {
     }
   };
 
-  const reload = (api, jobId, completion) => {
+  const reload = (api, id, completion) => {
     resetContext();
-    getDataJob(jobId).then((res) => {
+    getDataJob(id).then((res) => {
       const job = {
         program: res.data.job.program.programName,
         reference: res.data.job.reference,
@@ -475,7 +476,7 @@ const DataSheetView = ({jobId, onIngest}) => {
 
   const onGridReady = (p) => {
     setGridApi(p.api);
-    reload(p.api, jobId, (job) => {
+    reload(p.api, id, (job) => {
       setState(IngestState.Edited);
       setJob(job);
     });
@@ -703,7 +704,6 @@ const DataSheetView = ({jobId, onIngest}) => {
           <AgGridReact
             getRowId={(r) => r.data.id}
             context={context}
-            immutableData={true}
             cellFlashDelay={100}
             cellFadeDelay={100}
             defaultColDef={{
@@ -801,7 +801,6 @@ const DataSheetView = ({jobId, onIngest}) => {
 };
 
 DataSheetView.propTypes = {
-  jobId: PropTypes.string.isRequired,
   onIngest: PropTypes.func.isRequired
 };
 

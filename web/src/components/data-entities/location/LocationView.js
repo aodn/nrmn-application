@@ -26,7 +26,7 @@ const LocationView = () => {
   }, [locationId]);
 
   return location ? (
-    <EntityContainer name="location" goBackTo="/reference/locations">
+    <EntityContainer name="Locations" goBackTo="/reference/locations">
       <Grid container alignItems="flex-start" direction="row" spacing={2}>
         {state?.message && (
           <Grid item xs={12}>
