@@ -9,8 +9,4 @@ const axiosInstance = axios.create({
   headers: {'Content-Type': 'application/json'}
 });
 
-axiosInstance.all = function all(promises) {
-  return Promise.all(promises);
-};
-
 export default axiosInstance;
