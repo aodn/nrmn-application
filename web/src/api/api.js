@@ -2,9 +2,15 @@ import {LicenseManager} from 'ag-grid-enterprise';
 import jwtDecode from 'jwt-decode';
 import axiosInstance from './index.js';
 
+// define setApplicationError if this method is not present
+// eg. in unit tests
+if(typeof window.setApplicationError === 'undefined') {
+  window.setApplicationError = () => {};
+}
+
 axiosInstance.interceptors.request.use(
   (config) => {
-    window.setApplicationError && window.setApplicationError(null);
+    window.setApplicationError(null);
     const {accessToken, tokenType} = JSON.parse(localStorage.getItem('auth')) || {};
     if (accessToken && tokenType) config.headers.authorization = `${tokenType} ${accessToken}`;
     return config;
@@ -17,7 +23,7 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    window.setApplicationError && window.setApplicationError(error?.message || JSON.stringify(error), error);
+    window.setApplicationError(error?.message || JSON.stringify(error), error);
     console.error({error});
   }
 );
