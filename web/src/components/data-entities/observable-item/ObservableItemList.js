@@ -12,8 +12,8 @@ import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 
 const ObservableItemList = () => {
-  const [rowData, setRowData] = useState([]);
-  const [redirect, setRedirect] = useState(null);
+  const [rowData, setRowData] = useState();
+  const [redirect, setRedirect] = useState();
 
   useEffect(() => {
     async function fetchObservableItems() {
@@ -42,7 +42,7 @@ const ObservableItemList = () => {
         pagination={true}
         enableCellTextSelection={true}
         rowData={rowData}
-        context={{useOverlay: 'Loading Surveys'}}
+        context={{useOverlay: 'Loading Observable Items'}}
         components={{loadingOverlay: LoadingOverlay}}
         loadingOverlayComponent="loadingOverlay"
         suppressCellFocus={true}

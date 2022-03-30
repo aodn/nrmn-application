@@ -5,11 +5,11 @@ import DataSheetView from './DataSheetView';
 import Alert from '@mui/material/Alert';
 
 const ValidationJob = () => {
-  const {jobId} = useParams();
+  const {jobId: id} = useParams();
   const [ingestState, setIngestState] = useState({});
 
   if (ingestState.success) {
-    return <Navigate to={`/jobs/${jobId}/view`} />;
+    return <Navigate to={`/data/jobs/${id}/view`} />;
   }
 
   if (ingestState.error) {
@@ -26,7 +26,7 @@ const ValidationJob = () => {
       </Box>
     );
   }
-  return <DataSheetView jobId={jobId} onIngest={setIngestState} />;
+  return <DataSheetView jobId={id} onIngest={setIngestState} />;
 };
 
 export default ValidationJob;

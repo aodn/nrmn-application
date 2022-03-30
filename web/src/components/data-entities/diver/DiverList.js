@@ -10,9 +10,9 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
 const DiverList = () => {
-  const [gridApi, setGridApi] = useState(null);
+  const [gridApi, setGridApi] = useState();
   const [delta, setDelta] = useState([]);
-  const [rowData, setRowData] = useState([]);
+  const [rowData, setRowData] = useState();
   const [errors, setErrors] = useState([]);
 
   useEffect(() => {

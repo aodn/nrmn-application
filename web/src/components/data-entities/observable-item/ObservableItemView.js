@@ -9,7 +9,12 @@ const ObservableItemView = () => {
   const id = useParams()?.id;
   const [data, setData] = useState({});
 
-  useEffect(() => getEntity(`reference/observableItem/${id}`).then((res) => setData(res.data)), [id]);
+  useEffect(() => {
+    async function fetchObservableItem() {
+      await getEntity(`reference/observableItem/${id}`).then((res) => setData(res.data));
+    }
+    fetchObservableItem();
+  }, [id]);
 
   return (
     <Grid container alignItems="center" justifyContent="center" style={{minHeight: '70vh'}}>

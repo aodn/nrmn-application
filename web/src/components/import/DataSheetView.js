@@ -148,7 +148,7 @@ const IngestState = Object.freeze({Loading: 0, Edited: 1, Valid: 2, ConfirmSubmi
 
 const DataSheetView = ({jobId, onIngest}) => {
   const [job, setJob] = useState({});
-  const [gridApi, setGridApi] = useState(null);
+  const [gridApi, setGridApi] = useState();
   const [isFiltered, setIsFiltered] = useState(false);
   const [undoSize, setUndoSize] = useState(0);
   const [state, setState] = useState(IngestState.Loading);
@@ -168,14 +168,14 @@ const DataSheetView = ({jobId, onIngest}) => {
     };
   });
 
-  useEffect(() => {
-    if (gridApi && state === IngestState.Loading) {
-      // HACK: workaround ag-grid bug preventing consistent column auto-sizing. See https://github.com/ag-grid/ag-grid/issues/2662.
-      // AG Grid version 26 has a 'pure' React grid implementation should remove the need for these imperative calls entirely:
-      // https://blog.ag-grid.com/whats-new-in-ag-grid-26/
-      setTimeout(() => gridApi.showLoadingOverlay(), 25);
-    }
-  }, [gridApi, state]);
+  // useEffect(() => {
+  //   if (gridApi && state === IngestState.Loading) {
+  //     // HACK: workaround ag-grid bug preventing consistent column auto-sizing. See https://github.com/ag-grid/ag-grid/issues/2662.
+  //     // AG Grid version 26 has a 'pure' React grid implementation should remove the need for these imperative calls entirely:
+  //     // https://blog.ag-grid.com/whats-new-in-ag-grid-26/
+  //     setTimeout(() => gridApi.showLoadingOverlay(), 25);
+  //   }
+  // }, [gridApi, state]);
 
   useEffect(() => {
     if (gridApi && !isFiltered) gridApi.setFilterModel(null);
@@ -643,7 +643,7 @@ const DataSheetView = ({jobId, onIngest}) => {
       />
       <Box pt={1} pl={1}>
         <Box width={200}>
-          <NavLink to="/jobs" color="secondary">
+          <NavLink to="/data/jobs" color="secondary">
             <Typography>{'<< Back to Jobs'}</Typography>
           </NavLink>
         </Box>

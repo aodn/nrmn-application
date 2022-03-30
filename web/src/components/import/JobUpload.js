@@ -9,7 +9,7 @@ const JobUpload = () => {
   const emptyForm = {file: '', withExtendedSizes: false, programId: 1};
   const [formData, setFormData] = useState(emptyForm);
   const [uploadProgress, setUploadProgress] = useState(-1);
-  const [uploadResponse, setUploadResponse] = useState(null);
+  const [uploadResponse, setUploadResponse] = useState();
 
   const resetForm = () => {
     setFormData(emptyForm);
@@ -21,7 +21,7 @@ const JobUpload = () => {
     <>
       <Box m={1}>
         {uploadProgress < 0 ? (
-          <NavLink to="/jobs" color="secondary">
+          <NavLink to="/data/jobs" color="secondary">
             <Typography>{'<< Back to Jobs'}</Typography>
           </NavLink>
         ) : (

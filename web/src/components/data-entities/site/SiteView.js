@@ -11,7 +11,12 @@ const SiteView = () => {
   const id = useParams()?.id;
   const [data, setData] = useState({});
 
-  useEffect(() => getEntity(`site/${id}`).then((res) => setData(res.data)), [id]);
+  useEffect(() => {
+    async function fetchSite() {
+      await getEntity(`site/${id}`).then((res) => setData(res.data));
+    }
+    if (id) fetchSite();
+  }, [id]);
 
   return (
     <EntityContainer name="Sites" goBackTo="/reference/sites">

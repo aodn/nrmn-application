@@ -11,12 +11,15 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
 const SiteList = () => {
-  const [gridApi, setGridApi] = useState(null);
-  const [redirect, setRedirect] = useState(null);
+  const [gridApi, setGridApi] = useState();
+  const [redirect, setRedirect] = useState();
   const [dialogState, setDialogState] = useState({open: false});
 
   useEffect(() => {
-    if (gridApi) getResult('sites').then((res) => gridApi.setRowData(res.data));
+    async function fetchSites() {
+      await getResult('sites').then((res) => gridApi.setRowData(res.data));
+    }
+    if (gridApi) fetchSites();
   }, [gridApi]);
 
   if (redirect) return <Navigate to={`/reference/site/${redirect}`} />;
@@ -67,7 +70,7 @@ const SiteList = () => {
           pagination={true}
           enableCellTextSelection={true}
           onGridReady={(e) => setGridApi(e.api)}
-          context={{useOverlay: 'Loading Surveys'}}
+          context={{useOverlay: 'Loading Sites'}}
           components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
           suppressCellFocus={true}

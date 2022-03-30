@@ -10,8 +10,8 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
 const LocationList = () => {
-  const [gridApi, setGridApi] = useState(null);
-  const [redirect, setRedirect] = useState(null);
+  const [gridApi, setGridApi] = useState();
+  const [redirect, setRedirect] = useState();
 
   useEffect(() => {
     async function fetchLocations() {

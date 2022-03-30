@@ -11,7 +11,12 @@ const SurveyView = () => {
   const id = useParams()?.id;
   const [data, setData] = useState({});
 
-  useEffect(() => getEntity(`data/survey/${id}`).then((res) => setData(res.data)), [id]);
+  useEffect(() => {
+    async function getSurvey() {
+      await getEntity(`data/survey/${id}`).then((res) => setData(res.data));
+    }
+    if (id) getSurvey();
+  }, [id]);
 
   return (
     <EntityContainer name="Surveys" goBackTo="/data/surveys">

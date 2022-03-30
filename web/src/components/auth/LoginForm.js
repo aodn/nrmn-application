@@ -10,7 +10,7 @@ import {userLogin} from '../../api/api';
 import {AuthContext} from '../../contexts/auth-context';
 
 const LoginForm = () => {
-  const [formState, setFormState] = useState(null);
+  const [formState, setFormState] = useState();
   const [loading, setLoading] = useState(false);
 
   const onSubmit = (event, setAuth) => {
@@ -20,8 +20,8 @@ const LoginForm = () => {
     const form = {username: username?.value, password: password?.value};
     userLogin(form, (result, error) => {
       setFormState(error ? {error} : {result});
-      if (!error) setAuth(result);
       setLoading(false);
+      if (!error) setAuth(result);
     });
   };
 

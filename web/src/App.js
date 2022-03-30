@@ -36,7 +36,7 @@ const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [auth, setAuth] = useState(JSON.parse(localStorage.getItem('auth')) || {expires: 0, username: null});
 
-  const [applicationError, setApplicationError] = useState(null);
+  const [applicationError, setApplicationError] = useState();
   window.setApplicationError = setApplicationError;
 
   const loggedIn = Date.now() < auth.expires;
@@ -92,12 +92,11 @@ const App = () => {
                     <Route path="/data/survey/:id" element={<SurveyView />} />
                     <Route path="/data/survey/:id/edit" element={<SurveyEdit />} />
 
-                    <Route path="/jobs" element={<JobList />} />
-                    <Route path="/jobs/:id/view" element={<JobView />} />
-                    <Route path="/validation/:jobId" element={<ValidationPage />} />
+                    <Route path="/data/jobs" element={<JobList />} />
+                    <Route path="/data/job/:id/view" element={<JobView />} />
+                    <Route path="/data/job/:id/edit" element={<ValidationPage />} />
 
-                    <Route path="/upload" element={<JobUpload />} />
-
+                    <Route path="/data/upload" element={<JobUpload />} />
                     <Route path="/data/extract" element={<ExtractTemplateData />} />
 
                     <Route path="/reference/locations" element={<LocationList />} />

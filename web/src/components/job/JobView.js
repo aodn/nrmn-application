@@ -32,7 +32,10 @@ const JobView = () => {
   };
 
   useEffect(() => {
-    if (!job) getEntity('stage/stagedJob/' + id).then((res) => setJob(res.data));
+    async function fetchJob() {
+      await getEntity('stage/stagedJob/' + id).then((res) => setJob(res.data));
+    }
+    if (id) fetchJob();
   }, [job, id]);
 
   return (
