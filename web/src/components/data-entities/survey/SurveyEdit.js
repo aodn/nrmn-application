@@ -47,40 +47,42 @@ const SurveyEdit = () => {
   });
 
   useEffect(() => {
-    if (surveyId) getResult(`data/survey/${surveyId}`).then((res) => dispatch({form: res.data}));
+    async function fetchSurvey() {
+      await getResult(`data/survey/${surveyId}`).then((res) => dispatch({form: res.data}));
+    }
+    if (surveyId) fetchSurvey();
   }, [surveyId]);
 
-  useEffect(
-    () =>
-      getResult('data/programs').then((res) =>
+  useEffect(() => {
+    async function fetchPrograms() {
+      await getResult('data/programs').then((res) =>
         setPrograms(
           res.data?.map((p) => {
             return {id: p.programId, label: p.programName};
           })
         )
-      ),
-    []
-  );
+      );
+    }
+    fetchPrograms();
 
-  useEffect(
-    () =>
-      getResult('sites').then((res) => {
+    async function fetchSites() {
+      await getResult('sites').then((res) => {
         setSites(res.data);
-      }),
-    []
-  );
+      });
+    }
+    fetchSites();
 
-  useEffect(
-    () =>
-      getResult('divers').then((res) => {
+    async function fetchDivers() {
+      await getResult('divers').then((res) => {
         setDivers(
           res.data?.map((d) => {
             return {id: d.initials, label: d.fullName};
           })
         );
-      }),
-    []
-  );
+      });
+    }
+    fetchDivers();
+  }, []);
 
   const handleSubmit = () => {
     entityEdit(`data/survey/${surveyId}`, item).then((res) => {

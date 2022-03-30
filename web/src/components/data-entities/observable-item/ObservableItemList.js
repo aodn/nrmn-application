@@ -16,7 +16,10 @@ const ObservableItemList = () => {
   const [redirect, setRedirect] = useState(null);
 
   useEffect(() => {
-    getResult('reference/observableItems').then((res) => setRowData(res.data));
+    async function fetchObservableItems() {
+      await getResult('reference/observableItems').then((res) => setRowData(res.data));
+    }
+    fetchObservableItems();
   }, []);
 
   if (redirect) return <Navigate to={`/reference/observableItem/${redirect}`} />;

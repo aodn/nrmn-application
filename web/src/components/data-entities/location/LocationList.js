@@ -14,7 +14,10 @@ const LocationList = () => {
   const [redirect, setRedirect] = useState(null);
 
   useEffect(() => {
-    if (gridApi) getEntity('locations').then((res) => gridApi.setRowData(res.data));
+    async function fetchLocations() {
+      await getEntity('locations').then((res) => gridApi.setRowData(res.data));
+    }
+    if (gridApi) fetchLocations();
   }, [gridApi]);
 
   if (redirect) return <Navigate push to={`/reference/location/${redirect}`} />;

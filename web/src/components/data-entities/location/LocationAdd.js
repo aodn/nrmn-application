@@ -41,10 +41,12 @@ const LocationAdd = () => {
   };
 
   useEffect(() => {
-    if (locationId)
-      getEntity(`location/${locationId}`).then((res) => {
+    async function fetchLocation() {
+      await getEntity(`location/${locationId}`).then((res) => {
         dispatch({form: res.data});
       });
+    }
+    if (locationId) fetchLocation();
   }, [locationId]);
 
   if (savedId) return <Navigate to={`/reference/location/${savedId}`} state={{message: 'Location Saved'}} />;

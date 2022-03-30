@@ -46,10 +46,18 @@ const ObservableItemEdit = () => {
     lengthWeightCf: ''
   });
 
-  useEffect(() => getResult('species/taxonomyDetail').then((options) => setOptions(options.data), []), []);
+  useEffect(() => {
+    async function fetchTaxonomyDetail() {
+      await getResult('species/taxonomyDetail').then((options) => setOptions(options.data));
+    }
+    fetchTaxonomyDetail();
+  }, []);
 
   useEffect(() => {
-    if (observableItemId) getResult(`reference/observableItem/${observableItemId}`).then((res) => dispatch({form: res.data}));
+    async function fetchObservableItem() {
+      await getResult(`reference/observableItem/${observableItemId}`).then((res) => dispatch({form: res.data}));
+    }
+    if (observableItemId) fetchObservableItem();
   }, [observableItemId]);
 
   const handleSubmit = () => {

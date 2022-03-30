@@ -17,10 +17,12 @@ const LocationView = () => {
   const [location, setLocation] = useState();
 
   useEffect(() => {
-    if (locationId)
-      getResult(`location/${locationId}`).then((res) => {
+    async function fetchLocation() {
+      await getResult(`location/${locationId}`).then((res) => {
         setLocation(res.data);
       });
+    }
+    if (locationId) fetchLocation();
   }, [locationId]);
 
   return location ? (
