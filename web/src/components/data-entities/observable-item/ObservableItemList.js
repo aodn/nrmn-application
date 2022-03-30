@@ -12,7 +12,7 @@ import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 
 const ObservableItemList = () => {
-  const [rowData, setRowData] = useState(null);
+  const [rowData, setRowData] = useState([]);
   const [redirect, setRedirect] = useState(null);
 
   useEffect(() => {

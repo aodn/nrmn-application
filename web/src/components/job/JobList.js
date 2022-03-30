@@ -19,13 +19,11 @@ const TimeStampCell = (params) => {
 };
 
 const JobList = () => {
-  const [deleteJobId, setDeleteJobId] = useState(null);
-  const [rowData, setRowData] = useState(null);
+  const [rowData, setRowData] = useState([]);
   const [redirect, setRedirect] = useState(null);
+  const [deleteJobId, setDeleteJobId] = useState(null);
 
-  useEffect(() => {
-    getEntity('stage/jobs').then((res) => setRowData(res.data));
-  }, []);
+  useEffect(() => getEntity('stage/jobs').then((res) => setRowData(res.data)), []);
 
   if (redirect) return <Navigate to={redirect} />;
 

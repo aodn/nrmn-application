@@ -10,17 +10,18 @@ import {userLogin} from '../../api/api';
 import {AuthContext} from '../../contexts/auth-context';
 
 const LoginForm = () => {
-  const [error, setError] = useState(null);
+  const [formState, setFormState] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const onSubmit = (event, setAuth) => {
     event.preventDefault();
     setLoading(true);
-    const form = {username: event.target.username.value, password: event.target.password.value};
-    userLogin(form, (res, err) => {
-      setError(err);
+    const {username, password} = event.target.elements;
+    const form = {username: username?.value, password: password?.value};
+    userLogin(form, (result, error) => {
+      setFormState(error ? {error} : {result});
+      if (!error) setAuth(result);
       setLoading(false);
-      setAuth(res);
     });
   };
 
@@ -30,20 +31,38 @@ const LoginForm = () => {
         <Grid container alignItems="center" justifyContent="center" style={{minHeight: '70vh'}}>
           <Paper>
             <Box paddingX={20} paddingY={5}>
-              <Typography variant="h4">Sign in</Typography>
+              <Typography variant="h4">Login</Typography>
               <hr />
-              {error ? <Alert severity="error">{error}</Alert> : <Alert severity="info">Please sign in to view this page</Alert>}
-              <form onSubmit={(e) => onSubmit(e, setAuth)}>
+              <Alert data-testid="alert" severity={formState?.error ? 'error' : 'info'}>
+                {formState?.error ? formState.error : formState?.result ? formState.result.username : 'Please login in to view this page'}
+              </Alert>
+              <form role="form" onSubmit={(e) => onSubmit(e, setAuth)}>
                 <Box my={2}>
                   <Typography variant="subtitle2">Email</Typography>
-                  <TextField size="small" name="username" type="username" fullWidth color="primary" disabled={loading} />
+                  <TextField
+                    size="small"
+                    name="username"
+                    type="username"
+                    placeholder="email"
+                    fullWidth
+                    color="primary"
+                    disabled={loading}
+                  />
                 </Box>
                 <Box my={2}>
                   <Typography variant="subtitle2">Password</Typography>
-                  <TextField size="small" name="password" type="password" fullWidth color="primary" disabled={loading} />
+                  <TextField
+                    size="small"
+                    name="password"
+                    type="password"
+                    placeholder="password"
+                    fullWidth
+                    color="primary"
+                    disabled={loading}
+                  />
                 </Box>
                 <Box my={2}>
-                  <LoadingButton variant="contained" type="submit" fullWidth loading={loading}>
+                  <LoadingButton data-testid="submit" variant="contained" type="submit" fullWidth loading={loading}>
                     Submit
                   </LoadingButton>
                 </Box>

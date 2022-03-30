@@ -6,7 +6,7 @@ import {PropTypes} from 'prop-types';
 const CustomDropDownInput = ({label, field, errors, optional, options, formData, onChange}) => {
   const error = errors?.find((f) => f.property === field);
 
-  if (!options || options.length < 1) {
+  if (!options) {
     return (
       <>
         <Typography variant="subtitle2">{label}</Typography>

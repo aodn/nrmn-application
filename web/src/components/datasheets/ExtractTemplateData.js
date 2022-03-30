@@ -11,7 +11,7 @@ const ExtractTemplateData = () => {
   const [countries, setCountries] = useState([]);
   const [areas, setAreas] = useState([]);
 
-  const [siteCodes, setSiteCodes] = useState([]);
+  const [siteCodes, setSiteCodes] = useState(null);
   const [siteLocation, setSiteLocation] = useState(null);
 
   const [ecoRegion, setEcoRegion] = useState([]);
@@ -78,8 +78,8 @@ const ExtractTemplateData = () => {
         <Typography variant="subtitle2">Site Code</Typography>
         <Autocomplete
           size="small"
-          loading={siteCodes.length < 1}
-          options={Object.keys(siteCodes).sort()}
+          loading={!siteCodes}
+          options={siteCodes ? Object.keys(siteCodes).sort() : []}
           getOptionLabel={(e) => `${e} - ${locations[siteCodes[e][0]]}`}
           onChange={(_, e) => setSiteLocation(e ? siteCodes[e][0] : null)}
           renderInput={(params) => <TextField {...params} variant="outlined" />}

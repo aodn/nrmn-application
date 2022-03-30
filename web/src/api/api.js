@@ -2,6 +2,12 @@ import {LicenseManager} from 'ag-grid-enterprise';
 import jwtDecode from 'jwt-decode';
 import axiosInstance from './index.js';
 
+// define setApplicationError if this method is not present
+// eg. in unit tests
+if(typeof window.setApplicationError === 'undefined') {
+  window.setApplicationError = () => {};
+}
+
 axiosInstance.interceptors.request.use(
   (config) => {
     window.setApplicationError(null);
@@ -43,8 +49,12 @@ export const userLogin = (params, onResult) => {
         state.accessToken = res.data.accessToken;
         state.tokenType = res.data.tokenType;
         state.roles = jwt.roles;
-        localStorage.setItem('auth', JSON.stringify(state));
-        localStorage.setItem('gridLicense', JSON.stringify(res.data.gridLicense));
+        try {
+          localStorage.setItem('auth', JSON.stringify(state));
+          localStorage.setItem('gridLicense', JSON.stringify(res.data.gridLicense));
+        } catch (_) {
+          console.error('Browser has no local storage');
+        }
         LicenseManager.setLicenseKey(res.data.gridLicense);
         onResult(state, null);
       } else {
