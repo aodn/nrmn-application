@@ -75,7 +75,9 @@ const App = () => {
                     If this problem persists, please contact info@aodn.org.au.
                   </Alert>
                 </Box>
-                <Button onClick={() => window.location.reload()}>Refresh Page</Button>
+                <Button variant="outlined" onClick={() => window.location.reload()}>
+                  Refresh Page
+                </Button>
               </Box>
             ) : (
               <Routes>

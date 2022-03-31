@@ -43,7 +43,7 @@ const LoginForm = () => {
                     size="small"
                     name="username"
                     type="username"
-                    placeholder="email"
+                    placeholder="Email"
                     fullWidth
                     color="primary"
                     disabled={loading}
@@ -55,7 +55,7 @@ const LoginForm = () => {
                     size="small"
                     name="password"
                     type="password"
-                    placeholder="password"
+                    placeholder="Password"
                     fullWidth
                     color="primary"
                     disabled={loading}
