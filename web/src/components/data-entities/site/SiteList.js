@@ -34,10 +34,11 @@ const SiteList = () => {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button autoFocus onClick={() => setDialogState({open: false})}>
+        <Button variant="outlined" autoFocus onClick={() => setDialogState({open: false})}>
           Cancel
         </Button>
         <Button
+          variant="contained"
           onClick={() => {
             entityDelete('site', dialogState.item.siteId).then(() => {
               gridApi.applyTransaction({remove: [dialogState.item]});

@@ -25,7 +25,7 @@ const SiteView = () => {
           <Typography variant="h4">Site Details</Typography>
         </Box>
         <Box>
-          <Button component={NavLink} to={`/reference/site/${id}/edit`} startIcon={<Edit>edit</Edit>}>
+          <Button variant="outlined" component={NavLink} to={`/reference/site/${id}/edit`} startIcon={<Edit>edit</Edit>}>
             Edit
           </Button>
         </Box>

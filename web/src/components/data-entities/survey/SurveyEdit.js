@@ -291,7 +291,7 @@ const SurveyEdit = () => {
               </Grid>
             </Grid>
             <Box display="flex" justifyContent="center" mt={5}>
-              <Button component={NavLink} to="/data/surveys">
+              <Button variant="outlined" component={NavLink} to="/data/surveys">
                 Cancel
               </Button>
               <Button variant="contained" onClick={handleSubmit} startIcon={<Save></Save>}>

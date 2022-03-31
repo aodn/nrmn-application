@@ -31,7 +31,7 @@ const ObservableItemList = () => {
           <Typography variant="h4">Observable Items</Typography>
         </Box>
         <Box mr={4}>
-          <Button style={{width: '100%'}} to="/reference/observableItem" component={NavLink} variant={'contained'} startIcon={<Add></Add>}>
+          <Button style={{width: '100%'}} to="/reference/observableItem" component={NavLink} variant="contained" startIcon={<Add></Add>}>
             New Observable Item
           </Button>
         </Box>
