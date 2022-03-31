@@ -1,6 +1,7 @@
-import {Button, CircularProgress, Divider, Grid, Typography} from '@mui/material';
+import {Box, Button, CircularProgress, Divider, Grid, Typography} from '@mui/material';
 import Hidden from '@mui/material/Hidden';
 import List from '@mui/material/List';
+import Chip from '@mui/material/Chip';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Table from '@mui/material/Table';
@@ -12,7 +13,6 @@ import TableRow from '@mui/material/TableRow';
 import FileDownload from 'js-file-download';
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router';
-import {Link} from 'react-router-dom';
 import {getEntity, originalJobFile} from '../../api/api';
 import EntityContainer from '../containers/EntityContainer';
 
@@ -43,14 +43,16 @@ const JobView = () => {
       {job ? (
         <Grid container>
           <Grid item xs={12}>
-            <Grid item lg={10} md={10} style={{padding: 15}}>
-              <Typography variant="h5">{job.reference}</Typography>
+            <Box m={2}>
+              <Box my={2}>
+                <Typography variant="h5">{job.reference}</Typography>
+              </Box>
               {existsOnS3 && (
                 <Button variant="outlined" onClick={() => downloadZip(job.id, job.reference)}>
                   Download
                 </Button>
               )}
-            </Grid>
+            </Box>
             <Divider style={{margin: 15, marginTop: 0}} />
             <Grid container>
               <Grid item xs={4} lg={6} style={{paddingBottom: 0}}>
@@ -94,28 +96,17 @@ const JobView = () => {
                   </List>
                 </Grid>
               </Hidden>
-
-              {job.surveyIds && job.surveyIds.length ? (
-                <>
+              {job.surveyIds?.length ? (
+                <Grid item xs={12}>
                   <Typography variant="h6" color="primary" style={{paddingLeft: 15, fontSize: 15, fontWeight: 400}}>
                     Surveys: ({job.surveyIds.length})
                   </Typography>
                   <Grid container xs={12}>
-                    {job.surveyIds &&
-                      job.surveyIds.length > 0 &&
-                      job.surveyIds.map((id) => (
-                        <Grid key={id} item xs={1}>
-                          <List dense style={{paddingTop: 0}}>
-                            <ListItem>
-                              <Link to={`/data/survey/${id}`} variant="a">
-                                {id}
-                              </Link>
-                            </ListItem>
-                          </List>
-                        </Grid>
-                      ))}
+                    {job.surveyIds.map((id) => (
+                      <Chip key={id} style={{margin: 5}} label={id} component="a" href={`/data/survey/${id}`} clickable />
+                    ))}
                   </Grid>
-                </>
+                </Grid>
               ) : (
                 <Divider />
               )}
@@ -136,7 +127,9 @@ const JobView = () => {
                     {job.logs.map((log) => (
                       <TableRow key={log.id}>
                         <TableCell component="th" scope="row">
-                          {new Date(log.eventTime).toUTCString()}
+                          {new Date(log.eventTime).toLocaleDateString('en-AU') +
+                            ' ' +
+                            new Date(log.eventTime).toLocaleTimeString('en-AU', {hour: 'numeric', minute: '2-digit'})}
                         </TableCell>
                         <TableCell>{log.eventType}</TableCell>
                         <TableCell>
