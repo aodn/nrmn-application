@@ -2,16 +2,6 @@ import React, {useState} from 'react';
 import {PropTypes} from 'prop-types';
 import {Search as SearchIcon, FindReplace as FindReplaceIcon} from '@mui/icons-material/';
 import {Box, Button, Checkbox, FormControlLabel, TextField} from '@mui/material';
-import {makeStyles} from '@mui/styles';
-
-const useStyles = makeStyles(() => {
-  return {
-    status: {paddingLeft: '20px', fontStyle: 'italic'},
-    button: {width: '100%', marginTop: '8px', marginLeft: '0px'},
-    checkbox: {marginLeft: '5px'},
-    textField: {width: '100%'}
-  };
-});
 
 const clone = (obj) => {
   var obj1 = {};
@@ -44,10 +34,8 @@ const FindReplacePanel = (props) => {
 
   const [initialPosition, setInitialPosition] = useState({});
 
-  const classes = useStyles();
-
   // where all grid data and metadata is stored
-  const context = props.api.context;
+  const context = props.api.gridOptionsWrapper.gridOptions.context;
 
   const reset = () => {
     setInProgress(false);
@@ -83,8 +71,8 @@ const FindReplacePanel = (props) => {
     context.findResults = [];
     context.highlighted = [];
     props.api.forEachNodeAfterFilterAndSort((node) => {
-      for (let columnIdx in node.columnApi.columnController.columnDefs) {
-        const columnDef = node.columnApi.columnController.columnDefs[columnIdx];
+      for (let columnIdx in props.api.columnModel.columnDefs) {
+        const columnDef = props.api.columnModel.columnDefs[columnIdx];
         const fieldValue = node.data[columnDef.field];
         if ((matchColumn && !selectedColumns.includes(columnDef.field)) || !fieldValue || columnDef.editable === false) continue;
         const idx = stringCompare(fieldValue.toString(), findString, matchCase, matchCell);
@@ -160,32 +148,33 @@ const FindReplacePanel = (props) => {
 
   return (
     <Box m={2} mr={4}>
-      <Button onClick={reset}>Reset</Button>
+      <Button variant="outlined" onClick={reset}>
+        Reset
+      </Button>
       <TextField
+        size="small"
         placeholder="Find.."
         autoFocus={false}
-        className={classes.textField}
+        sx={{marginTop: 2, width: '100%'}}
         value={findString}
         onKeyDown={onKeyDown}
-        onChange={(e) => {
-          setFindString(e.target.value);
-        }}
+        onChange={(e) => setFindString(e.target.value)}
       />
-      <Button className={classes.button} startIcon={<SearchIcon />} onClick={onFind}>
+      <Button variant="outlined" sx={{marginTop: 2, width: '100%'}} startIcon={<SearchIcon />} onClick={onFind}>
         Find
       </Button>
       <TextField
+        size="small"
         placeholder="Replace With.."
-        className={classes.textField}
+        sx={{marginTop: 2, width: '100%'}}
         value={replaceString}
         autoFocus={false}
         onKeyDown={onKeyDown}
-        onChange={(e) => {
-          setReplaceString(e.target.value);
-        }}
+        onChange={(e) => setReplaceString(e.target.value)}
       />
       <Button
-        className={classes.button}
+        variant="outlined"
+        sx={{marginTop: 2, width: '100%'}}
         startIcon={<FindReplaceIcon />}
         onKeyDown={onKeyDown}
         onClick={replaceAll ? onReplaceAll : onReplace}
@@ -195,25 +184,25 @@ const FindReplacePanel = (props) => {
       </Button>
       <FormControlLabel
         label="Match case"
-        className={classes.checkbox}
+        sx={{marginTop: 2, width: '100%'}}
         control={<Checkbox disabled={inProgress} checked={matchCase} onChange={(e) => setMatchCase(e.target.checked)} />}
       />
       <FormControlLabel
         label="Only this column"
-        className={classes.checkbox}
+        sx={{width: '100%'}}
         control={<Checkbox disabled={inProgress} checked={matchColumn} onChange={(e) => setMatchColumn(e.target.checked)} />}
       />
       <FormControlLabel
         label="Match whole cell"
-        className={classes.checkbox}
+        sx={{width: '100%'}}
         control={<Checkbox disabled={inProgress} checked={matchCell} onChange={(e) => setMatchCell(e.target.checked)} />}
       />
       <FormControlLabel
         label="Replace All"
-        className={classes.checkbox}
+        sx={{width: '100%'}}
         control={<Checkbox checked={replaceAll} onChange={(e) => setReplaceAll(e.target.checked)} />}
       />
-      <Box className={classes.status}>{status}</Box>
+      <Box sx={{marginTop: 2, width: '100%'}}>{status}</Box>
     </Box>
   );
 };

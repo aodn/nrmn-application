@@ -36,7 +36,7 @@ const JobView = () => {
       await getEntity('stage/stagedJob/' + id).then((res) => setJob(res.data));
     }
     if (id) fetchJob();
-  }, [job, id]);
+  }, [id]);
 
   return (
     <EntityContainer name="Jobs" goBackTo="/data/jobs">

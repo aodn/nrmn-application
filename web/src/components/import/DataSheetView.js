@@ -169,14 +169,14 @@ const DataSheetView = ({onIngest}) => {
     };
   });
 
-  // useEffect(() => {
-  //   if (gridApi && state === IngestState.Loading) {
-  //     // HACK: workaround ag-grid bug preventing consistent column auto-sizing. See https://github.com/ag-grid/ag-grid/issues/2662.
-  //     // AG Grid version 26 has a 'pure' React grid implementation should remove the need for these imperative calls entirely:
-  //     // https://blog.ag-grid.com/whats-new-in-ag-grid-26/
-  //     setTimeout(() => gridApi.showLoadingOverlay(), 25);
-  //   }
-  // }, [gridApi, state]);
+  useEffect(() => {
+    if (gridApi && state === IngestState.Loading) {
+      // HACK: workaround ag-grid bug preventing consistent column auto-sizing. See https://github.com/ag-grid/ag-grid/issues/2662.
+      // AG Grid version 26 has a 'pure' React grid implementation should remove the need for these imperative calls entirely:
+      // https://blog.ag-grid.com/whats-new-in-ag-grid-26/
+      setTimeout(() => gridApi.showLoadingOverlay(), 25);
+    }
+  }, [gridApi, state]);
 
   useEffect(() => {
     if (gridApi && !isFiltered) gridApi.setFilterModel(null);
@@ -659,17 +659,18 @@ const DataSheetView = ({onIngest}) => {
               } `}</Typography>
             </Box>
             <Box m={1} ml={0}>
-              <Button disabled={undoSize < 1} startIcon={<UndoIcon />} onClick={() => onUndo({api: gridApi})}>
+              <Button variant="outlined" disabled={undoSize < 1} startIcon={<UndoIcon />} onClick={() => onUndo({api: gridApi})}>
                 Undo
               </Button>
             </Box>
             <Box m={1} ml={0} minWidth={150}>
-              <Button startIcon={<ResetIcon />} disabled={!isFiltered} onClick={() => setIsFiltered()}>
+              <Button variant="outlined" startIcon={<ResetIcon />} disabled={!isFiltered} onClick={() => setIsFiltered()}>
                 Reset Filter
               </Button>
             </Box>
             <Box m={1} ml={0}>
               <Button
+                variant="outlined"
                 onClick={() => gridApi.exportDataAsExcel({sheetName: 'DATA', author: 'NRMN', fileName: `export_${job.reference}`})}
                 startIcon={<CloudDownloadIcon />}
               >
