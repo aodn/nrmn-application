@@ -225,11 +225,7 @@ const DataSheetView = ({onIngest}) => {
     context.useOverlay = 'Submitting';
     setState(IngestState.Loading);
     setSideBar(defaultSideBar);
-    submitIngest(
-      id,
-      (res) => onIngest({success: res}),
-      (err) => onIngest({error: err})
-    );
+    submitIngest(id, (res) => onIngest(res));
   };
 
   const handleSaveAndValidate = () => {

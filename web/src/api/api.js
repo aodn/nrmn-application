@@ -4,7 +4,7 @@ import axiosInstance from './index.js';
 
 // define setApplicationError if this method is not present
 // eg. in unit tests
-if(typeof window.setApplicationError === 'undefined') {
+if (typeof window.setApplicationError === 'undefined') {
   window.setApplicationError = () => {};
 }
 
@@ -134,7 +134,7 @@ export const submitJobFile = (params, onProgress) => {
     .catch((err) => ({err}));
 };
 
-export const submitIngest = (jobId, success, error) => {
+export const submitIngest = (jobId, onResult) => {
   return axiosInstance
     .post(
       '/api/ingestion/ingest/' + jobId,
@@ -143,8 +143,7 @@ export const submitIngest = (jobId, success, error) => {
         validateStatus: () => true
       }
     )
-    .then((res) => success(res))
-    .catch((err) => error(err));
+    .then((res) => onResult(res));
 };
 
 export const search = (params) => {
