@@ -5,28 +5,26 @@ import DataSheetView from './DataSheetView';
 import Alert from '@mui/material/Alert';
 
 const ValidationJob = () => {
-  const {jobId: id} = useParams();
+  const {id} = useParams();
   const [ingestState, setIngestState] = useState({});
 
-  if (ingestState.success) {
-    return <Navigate to={`/data/jobs/${id}/view`} />;
+  if (ingestState.data && ingestState.status === 200) {
+    return <Navigate to={`/data/job/${id}/view`} />;
   }
 
-  if (ingestState.error) {
-    return (
-      <Box mb={2}>
-        <Alert severity="error" variant="filled">
-          <p>
-            Sheet failed to ingest. No survey data has been inserted.
-            <br />
-            If this problem persists, please contact info@aodn.org.au.
-          </p>
-          <p>Error: {ingestState.error}</p>
-        </Alert>
-      </Box>
-    );
-  }
-  return <DataSheetView jobId={id} onIngest={setIngestState} />;
+  return (
+    <>
+      {ingestState.data && (
+        <Box mx={2}>
+          <Alert severity="error" variant="outlined">
+            <p>Sheet failed to ingest. No survey data has been inserted.</p>
+            <p>Error: {ingestState.data}</p>
+          </Alert>
+        </Box>
+      )}
+      <DataSheetView jobId={id} onIngest={setIngestState} />
+    </>
+  );
 };
 
 export default ValidationJob;
