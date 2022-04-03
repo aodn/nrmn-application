@@ -39,7 +39,7 @@ const DiverAdd = () => {
   if (savedId) return <Navigate to={`/reference/divers`} state={{message: 'Diver Saved'}} />;
 
   return (
-    <EntityContainer name="diver" goBackTo="/reference/divers">
+    <EntityContainer name="Divers" goBackTo="/reference/divers">
       <Grid container alignItems="flex-start" direction="row" spacing={2}>
         <Grid item xs={12}>
           <Typography variant="h4">{diverId ? 'Edit' : 'New'} diver</Typography>

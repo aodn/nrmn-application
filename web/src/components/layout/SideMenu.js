@@ -28,10 +28,10 @@ const SideMenu = ({open, onClose}) => {
           <ListItem button onClick={onClose} component={NavLink} to="/data/surveys">
             <ListItemText primary="List Surveys" />
           </ListItem>
-          <ListItem button onClick={onClose} component={NavLink} to="/jobs">
+          <ListItem button onClick={onClose} component={NavLink} to="/data/jobs">
             <ListItemText primary="List Jobs" />
           </ListItem>
-          <ListItem button onClick={onClose} component={NavLink} to="/upload">
+          <ListItem button onClick={onClose} component={NavLink} to="/data/upload">
             <ListItemText primary="Add Job" />
           </ListItem>
           <ListItem button onClick={onClose} component={NavLink} to="/data/extract">

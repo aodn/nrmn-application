@@ -41,16 +41,18 @@ const LocationAdd = () => {
   };
 
   useEffect(() => {
-    if (locationId)
-      getEntity(`location/${locationId}`).then((res) => {
+    async function fetchLocation() {
+      await getEntity(`location/${locationId}`).then((res) => {
         dispatch({form: res.data});
       });
+    }
+    if (locationId) fetchLocation();
   }, [locationId]);
 
   if (savedId) return <Navigate to={`/reference/location/${savedId}`} state={{message: 'Location Saved'}} />;
 
   return (
-    <EntityContainer name="location" goBackTo="/reference/locations">
+    <EntityContainer name="Locations" goBackTo="/reference/locations">
       <Grid container alignItems="flex-start" direction="row" spacing={2}>
         <Grid item xs={12}>
           <Typography variant="h4">{locationId ? 'Edit' : 'New'} Location</Typography>

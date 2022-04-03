@@ -16,15 +16,15 @@ import LoadingButton from '@mui/lab/LoadingButton';
 
 const SpeciesSearch = ({onRowClick}) => {
   const [tabIndex, setTabIndex] = useState(0);
-  const [searchTerm, setSearchTerm] = useState(null);
+  const [searchTerm, setSearchTerm] = useState();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
-  const [gridData, setGridData] = useState(null);
+  const [gridData, setGridData] = useState();
   const [currentSearch, setCurrentSearch] = useState({});
-  const [info, setInfo] = useState(null);
+  const [info, setInfo] = useState();
 
-  const [searchRequested, setSearchRequested] = useState(null);
-  const [searchError, setSearchError] = useState(null);
+  const [searchRequested, setSearchRequested] = useState();
+  const [searchError, setSearchError] = useState();
 
   const loading = searchRequested && !gridData && !searchError;
 
@@ -39,38 +39,40 @@ const SpeciesSearch = ({onRowClick}) => {
   };
 
   useEffect(() => {
-    if (!searchRequested) return;
-    setInfo(null);
-    setGridData(null);
-    setSearchError(null);
-    if (currentSearch?.species !== searchRequested.species) setPage(0);
-    search(searchRequested)
-      .then((res) => {
-        if (res.data.error) {
-          setSearchError(res.data.error);
-          return;
-        }
-        setCurrentSearch(searchRequested);
-        setGridData(
-          res?.data
-            ? res.data.map((r, id) => {
-                // if not a generic name then remove the genus from the species to produce the species epithet
-                let speciesEpithet = '';
-                if (r.species) {
-                  const isGenericName =
-                    r.species.toUpperCase().includes('SP.') ||
-                    r.species.toUpperCase().includes('SPP.') ||
-                    r.species.includes('(') ||
-                    r.species.includes('[') ||
-                    !r.species.includes(' ');
-                  if (!isGenericName) speciesEpithet = r.species.replace(`${r.genus} `, '');
-                }
-                return {id: id, ...r, speciesEpithet};
-              })
-            : null
-        );
-      })
-      .catch((err) => setSearchError(err.message));
+    async function fetchSearchResults() {
+      setInfo(null);
+      setGridData(null);
+      setSearchError(null);
+      if (currentSearch?.species !== searchRequested.species) setPage(0);
+      await search(searchRequested)
+        .then((res) => {
+          if (res.data.error) {
+            setSearchError(res.data.error);
+            return;
+          }
+          setCurrentSearch(searchRequested);
+          setGridData(
+            res?.data
+              ? res.data.map((r, id) => {
+                  // if not a generic name then remove the genus from the species to produce the species epithet
+                  let speciesEpithet = '';
+                  if (r.species) {
+                    const isGenericName =
+                      r.species.toUpperCase().includes('SP.') ||
+                      r.species.toUpperCase().includes('SPP.') ||
+                      r.species.includes('(') ||
+                      r.species.includes('[') ||
+                      !r.species.includes(' ');
+                    if (!isGenericName) speciesEpithet = r.species.replace(`${r.genus} `, '');
+                  }
+                  return {id: id, ...r, speciesEpithet};
+                })
+              : null
+          );
+        })
+        .catch((err) => setSearchError(err.message));
+    }
+    if (searchRequested) fetchSearchResults();
   }, [searchRequested, currentSearch]);
 
   const handleChangePage = (_, newPage) => {

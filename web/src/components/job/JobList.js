@@ -20,23 +20,28 @@ const TimeStampCell = (params) => {
 
 const JobList = () => {
   const [rowData, setRowData] = useState([]);
-  const [redirect, setRedirect] = useState(null);
-  const [deleteJobId, setDeleteJobId] = useState(null);
+  const [redirect, setRedirect] = useState();
+  const [deleteJobId, setDeleteJobId] = useState();
 
-  useEffect(() => getEntity('stage/jobs').then((res) => setRowData(res.data)), []);
+  useEffect(() => {
+    async function fetchJobs() {
+      await getEntity('stage/jobs').then((res) => setRowData(res.data));
+    }
+    fetchJobs();
+  }, []);
 
   if (redirect) return <Navigate to={redirect} />;
 
   return (
     <>
       <AlertDialog
-        open={deleteJobId !== null}
+        open={deleteJobId ? true : false}
         text="Delete Job?"
         action="Delete"
-        onClose={() => setDeleteJobId(null)}
+        onClose={() => setDeleteJobId()}
         onConfirm={() => {
           deleteJob(deleteJobId).then(() => {
-            setDeleteJobId(null);
+            setDeleteJobId();
             setRowData([...rowData.filter((d) => d.id !== deleteJobId)]);
           });
         }}
@@ -46,7 +51,7 @@ const JobList = () => {
           <Typography variant="h4">Jobs</Typography>
         </Box>
         <Box>
-          <Button variant="contained" to="/upload" component={NavLink} startIcon={<CloudUploadOutlined />}>
+          <Button variant="contained" to="/data/upload" component={NavLink} startIcon={<CloudUploadOutlined />}>
             Upload XLSX File
           </Button>
         </Box>
@@ -80,9 +85,9 @@ const JobList = () => {
             onCellClicked={(e) => {
               if (!e.data.id) return;
               if (e.event.ctrlKey) {
-                window.open(`/jobs/${e.data.id}/view`, '_blank').focus();
+                window.open(`/data/job/${e.data.id}/view`, '_blank').focus();
               } else {
-                setRedirect(`/jobs/${e.data.id}/view`);
+                setRedirect(`/data/job/${e.data.id}/view`);
               }
             }}
           />
@@ -92,7 +97,7 @@ const JobList = () => {
             cellStyle={{cursor: 'pointer'}}
             onCellClicked={(e) => {
               if (e.data.status === 'STAGED') {
-                const target = `/validation/${e.data.id}`;
+                const target = `/data/job/${e.data.id}/edit`;
                 e.event.ctrlKey ? window.open(target, '_blank').focus() : setRedirect(target);
               }
             }}

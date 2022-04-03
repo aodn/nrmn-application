@@ -32,11 +32,14 @@ const JobView = () => {
   };
 
   useEffect(() => {
-    if (!job) getEntity('stage/stagedJob/' + id).then((res) => setJob(res.data));
-  }, [job, id]);
+    async function fetchJob() {
+      await getEntity('stage/stagedJob/' + id).then((res) => setJob(res.data));
+    }
+    if (id) fetchJob();
+  }, [id]);
 
   return (
-    <EntityContainer name="Jobs" goBackTo="/jobs">
+    <EntityContainer name="Jobs" goBackTo="/data/jobs">
       {job ? (
         <Grid container>
           <Grid item xs={12}>
