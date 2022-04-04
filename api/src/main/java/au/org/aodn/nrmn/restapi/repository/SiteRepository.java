@@ -64,7 +64,7 @@ public interface SiteRepository
             "WHERE ST_DWithin(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography), 200) "
             +
             "AND (sr.site_id <> :siteId) " +
-            "AND ROUND(CAST(ST_Distance(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(95.25632, 5.88147) AS geography)) AS numeric), 2) > 10")
+            "AND ROUND(CAST(ST_Distance(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography)) AS numeric), 2) > 10")
     List<String> sitesWithin200m(Integer siteId, double longitude, double latitude);
 
     <T> Optional<T> findBySiteId(Integer id, Class<T> type);
