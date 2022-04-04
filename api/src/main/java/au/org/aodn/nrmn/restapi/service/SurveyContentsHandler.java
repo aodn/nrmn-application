@@ -75,10 +75,10 @@ public class SurveyContentsHandler implements SheetContentsHandler {
                 Arrays.sort(headers, (str1, str2) -> str1.length() - str2.length());
                 columnKeys = Arrays.asList(headers);
             }
-        } else if(isHeader2Row && columnKeys.size() > 0) {
+        } else if (isHeader2Row && columnKeys.size() > 0) {
             // Check that the first 10 columns are blank
             Long invalidColumns = columnKeys.subList(0, 10).stream().filter(k -> header2.get(k) != null).count();
-            if(invalidColumns > 0)
+            if (invalidColumns > 0)
                 error = "Cell range A2-G2 is not blank.";
         } else {
             if (rowNum > 1) {
@@ -106,7 +106,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
         String columnKey = cellReference.replaceAll("[0123456789]", "");
         if (isHeaderRow) {
             header1.put(columnKey, formattedValue);
-        }else if(isHeader2Row) {
+        } else if (isHeader2Row) {
             header2.put(columnKey, formattedValue);
         } else {
             String col = header1.getOrDefault(columnKey, "");
@@ -114,6 +114,15 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             String value = cellHasData ? formattedValue : "";
             setValue(col, value);
         }
+    }
+
+    private String truncateDecimalString(String decimalString) {
+        int idx = decimalString.indexOf('.');
+        int endIdx = idx + 6;
+        if (idx >= 0 && endIdx < decimalString.length())
+            return decimalString.substring(0, endIdx);
+        else
+            return decimalString;
     }
 
     private void setValue(String columnHeader, String formattedValue) {
@@ -138,10 +147,10 @@ public class SurveyContentsHandler implements SheetContentsHandler {
                 currentRow.setSiteName(value);
                 break;
             case "Latitude":
-                currentRow.setLatitude(value);
+                currentRow.setLatitude(truncateDecimalString(value));
                 break;
             case "Longitude":
-                currentRow.setLongitude(value);
+                currentRow.setLongitude(truncateDecimalString(value));
                 break;
             case "Date":
                 currentRow.setDate(value);
