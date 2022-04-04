@@ -41,7 +41,7 @@ const LocationView = () => {
           <Typography variant="h4">Location Details</Typography>
         </Grid>
         <Grid item xs={2}>
-          <Button component={Link} to={`/reference/location/${locationId}/edit`} startIcon={<Edit>edit</Edit>}>
+          <Button variant="outlined" component={Link} to={`/reference/location/${locationId}/edit`} startIcon={<Edit>edit</Edit>}>
             Edit
           </Button>
         </Grid>

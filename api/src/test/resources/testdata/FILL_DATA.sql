@@ -55,9 +55,6 @@ INSERT INTO nrmn.survey (program_id, site_id, survey_id, survey_date, survey_tim
 VALUES (55, 551, 812331345, '2017-11-28', '00:00:00', 25, 1, 10, 'N',
         null, null, 'Unsure', true);
 
-
-
-
 INSERT INTO nrmn.diver_ref(diver_id, initials, full_name)
 VALUES (51, 'JEP', 'Juan Espanol Pagina');
 INSERT INTO nrmn.diver_ref(diver_id, initials, full_name)

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -123,6 +124,18 @@ public class SiteController {
 
     private ValidationErrors validateConstraints(Site site) {
         List<ValidationError> errors = new ArrayList<>();
+
+        if (StringUtils.isBlank(site.getSiteName()))
+            errors.add(new ValidationError("Site", "siteName", "", "Site Name must not be empty."));
+
+        if (StringUtils.isBlank(site.getSiteCode()))
+            errors.add(new ValidationError("Site", "siteCode", "", "Site Code must not be empty."));
+
+        if (site.getLocation() == null)
+            errors.add(new ValidationError("Site", "locationId", "", "Please select a location."));
+
+        if (errors.size() > 0)
+            return new ValidationErrors(errors);
 
         Example<Site> siteWithCodeExample = Example.of(
                 Site.builder()

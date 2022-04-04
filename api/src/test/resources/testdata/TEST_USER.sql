@@ -1,9 +1,4 @@
 INSERT INTO
-    nrmn.sec_role
-(NAME, version)
-VALUES ('ROLE_ADMIN', 1), ('ROLE_DATA_OFFICER', 1), ('ROLE_POWER_USER', 1);
-
-INSERT INTO
     nrmn.sec_user (id, email_address, full_name,hashed_password, status, version)
     VALUES( 123456, 'test@example.com', 'General Test User','$2a$10$2WByZ2x9phDATumnKHVgruMb5W2n/RfQGc2Em3.dCgSi2UAKxEHNu', 'ACTIVE', 1);
 

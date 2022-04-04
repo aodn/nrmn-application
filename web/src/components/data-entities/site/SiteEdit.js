@@ -1,8 +1,7 @@
 import React, {useEffect, useReducer, useState} from 'react';
 import {useParams, NavLink, Navigate} from 'react-router-dom';
-import {Box, Button, CircularProgress, Grid, Typography} from '@mui/material';
+import {Alert, Box, Button, CircularProgress, Grid, Typography} from '@mui/material';
 import {Save} from '@mui/icons-material';
-import Alert from '@mui/material/Alert';
 import PropTypes from 'prop-types';
 
 import EntityContainer from '../../containers/EntityContainer';
@@ -105,7 +104,7 @@ const SiteEdit = ({clone}) => {
 
   if (saved) {
     const id = saved['siteId'];
-    return <Navigate to={`/reference/site/${id}/${edit ? 'saved' : 'new'}`} />;
+    return <Navigate to={`/reference/site/${id}`} state={{message: edit ? 'Site Updated' : 'Site Saved'}} />;
   }
 
   return (
