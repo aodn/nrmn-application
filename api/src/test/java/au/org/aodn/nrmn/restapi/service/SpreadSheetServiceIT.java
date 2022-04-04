@@ -137,8 +137,8 @@ public class SpreadSheetServiceIT {
         StagedRow obs1 = stageSurveys.get(0);
 
         // Test Double
-        assertEquals(obs1.getLatitude(), "-41.253706");
-        assertEquals(obs1.getLongitude(), "148.339749");
+        assertEquals(obs1.getLatitude(), "-41.25370");
+        assertEquals(obs1.getLongitude(), "148.33974");
 
         // Test Map filling
         assertEquals(obs1.getMeasureJson().size(), 4);
