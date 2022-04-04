@@ -1,7 +1,20 @@
-import {Box, Button, Divider, Grid, Table, TableCell, TableRow, TableBody, TableContainer, TableHead, Typography} from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  Divider,
+  Grid,
+  Table,
+  TableCell,
+  TableRow,
+  TableBody,
+  TableContainer,
+  TableHead,
+  Typography
+} from '@mui/material';
 import {Edit} from '@mui/icons-material';
 import React, {useEffect, useState} from 'react';
-import {useParams} from 'react-router';
+import {useLocation, useParams} from 'react-router';
 import {NavLink} from 'react-router-dom';
 import {getEntity} from '../../../api/api';
 import EntityContainer from '../../containers/EntityContainer';
@@ -9,6 +22,7 @@ import CustomTextInput from '../../input/CustomTextInput';
 
 const SiteView = () => {
   const id = useParams()?.id;
+  const {state} = useLocation();
   const [data, setData] = useState({});
 
   useEffect(() => {
@@ -30,6 +44,13 @@ const SiteView = () => {
           </Button>
         </Box>
       </Box>
+      {state?.message && (
+        <Box mx={5} flexGrow={1}>
+          <Alert severity="info" variant="filled">
+            {state.message}
+          </Alert>
+        </Box>
+      )}
       <Box p={2}>
         <Grid container spacing={2}>
           <Grid item xs={6}>
@@ -39,7 +60,7 @@ const SiteView = () => {
             <CustomTextInput readOnlyInput label="Site Name" formData={data.siteName} />
           </Grid>
           <Grid item xs={6}>
-            <CustomTextInput readOnlyInput label="Location" formData={data.Location} />
+            <CustomTextInput readOnlyInput label="Location" formData={data.locationName} />
           </Grid>
           <Grid item xs={6}>
             <CustomTextInput readOnlyInput label="Is Active" formData={data.isActive ? 'True' : 'False'} />

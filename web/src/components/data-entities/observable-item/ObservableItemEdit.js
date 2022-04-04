@@ -17,6 +17,7 @@ const ObservableItemEdit = () => {
   const observableItemId = useParams()?.id;
 
   const [saved, setSaved] = useState(false);
+  const [deleted, setDeleted] = useState(false);
   const [errors, setErrors] = useState([]);
   const [options, setOptions] = useState({});
 
@@ -75,7 +76,7 @@ const ObservableItemEdit = () => {
       if (res.data.error) {
         setErrors([{banner: 'Unable to delete. Observable Item has linked observations.'}]);
       } else {
-        setSaved({observableItemId: '-1'});
+        setDeleted(true);
       }
     });
   };
@@ -83,6 +84,10 @@ const ObservableItemEdit = () => {
   if (saved) {
     const id = saved['observableItemId'];
     return <Navigate to={`/reference/observableItem/${id}`} state={{message: 'Observable Item Updated'}} />;
+  }
+
+  if (deleted) {
+    return <Navigate to={`/reference/observableItem/-1`} state={{message: 'Observable Item Deleted'}} />;
   }
 
   return (

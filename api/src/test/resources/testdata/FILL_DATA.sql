@@ -1,3 +1,5 @@
+INSERT INTO nrmn.sec_role (NAME, version) VALUES ('ROLE_ADMIN', 1), ('ROLE_DATA_OFFICER', 1), ('ROLE_POWER_USER', 1);
+
 INSERT INTO nrmn.location_ref(location_id, location_name, is_active)
 VALUES (29, 'SA - Western', True);
 
@@ -54,9 +56,6 @@ INSERT INTO nrmn.survey (program_id, site_id, survey_id, survey_date, survey_tim
                          direction, notes, project_title, inside_marine_park, block_abundance_simulated)
 VALUES (55, 551, 812331345, '2017-11-28', '00:00:00', 25, 1, 10, 'N',
         null, null, 'Unsure', true);
-
-
-
 
 INSERT INTO nrmn.diver_ref(diver_id, initials, full_name)
 VALUES (51, 'JEP', 'Juan Espanol Pagina');

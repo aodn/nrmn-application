@@ -23,8 +23,13 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    window.setApplicationError(error?.message || JSON.stringify(error), error);
-    console.error({error});
+    if (error?.response?.status === 401) {
+      localStorage.removeItem('auth');
+      window.location.reload();
+    } else {
+      window.setApplicationError(error?.message || JSON.stringify(error), error);
+      console.error({error});
+    }
   }
 );
 
