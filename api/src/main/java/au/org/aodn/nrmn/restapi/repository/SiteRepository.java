@@ -20,22 +20,23 @@ import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 
 @RepositoryRestResource
 @Tag(name = "sites")
-public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecificationExecutor<Site>, EntityCriteria<Site> {
+public interface SiteRepository
+        extends JpaRepository<Site, Integer>, JpaSpecificationExecutor<Site>, EntityCriteria<Site> {
 
     @Override
     @Query("SELECT s FROM Site s WHERE lower(s.siteCode) = lower(:code)")
-    @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
+    @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
     List<Site> findByCriteria(@Param("code") String siteCode);
 
     @Query(value = "SELECT LOWER(siteCode) FROM Site WHERE siteCode IN :siteCodes")
     List<String> getAllSiteCodesMatching(Collection<String> siteCodes);
-    
+
     @Query("SELECT s FROM Site s")
     @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
     Collection<Site> getAll();
 
     @Query("SELECT s FROM Site s WHERE lower(s.siteCode) = lower(:code)")
-    @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
+    @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
     Site findBySiteCode(@Param("code") String siteCode);
 
     @Query(nativeQuery = true, value = "SELECT site_code FROM {h-schema}ep_site_list WHERE province = ?1")
@@ -57,10 +58,13 @@ public interface SiteRepository extends JpaRepository<Site, Integer>, JpaSpecifi
     List<String> findAllCountries();
 
     @Query(nativeQuery = true, value = "" +
-            "SELECT sr.site_code || ' ' || '(' || sr.site_name || ' ' || ROUND(CAST(ST_Distance(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography)) AS numeric), 2) || 'm)' " +
+            "SELECT sr.site_code || ' ' || '(' || sr.site_name || ' ' || ROUND(CAST(ST_Distance(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography)) AS numeric), 2) || 'm)' "
+            +
             "FROM nrmn.site_ref sr " +
-            "WHERE ST_DWithin(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography), 200) " +
-            "AND (sr.site_id <> :siteId)")
+            "WHERE ST_DWithin(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography), 200) "
+            +
+            "AND (sr.site_id <> :siteId) " +
+            "AND ROUND(CAST(ST_Distance(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(95.25632, 5.88147) AS geography)) AS numeric), 2) > 10")
     List<String> sitesWithin200m(Integer siteId, double longitude, double latitude);
 
     <T> Optional<T> findBySiteId(Integer id, Class<T> type);
