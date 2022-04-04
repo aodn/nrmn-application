@@ -17,14 +17,16 @@ const LocationView = () => {
   const [location, setLocation] = useState();
 
   useEffect(() => {
-    if (locationId)
-      getResult(`location/${locationId}`).then((res) => {
+    async function fetchLocation() {
+      await getResult(`location/${locationId}`).then((res) => {
         setLocation(res.data);
       });
+    }
+    if (locationId) fetchLocation();
   }, [locationId]);
 
   return location ? (
-    <EntityContainer name="location" goBackTo="/reference/locations">
+    <EntityContainer name="Locations" goBackTo="/reference/locations">
       <Grid container alignItems="flex-start" direction="row" spacing={2}>
         {state?.message && (
           <Grid item xs={12}>
@@ -39,7 +41,7 @@ const LocationView = () => {
           <Typography variant="h4">Location Details</Typography>
         </Grid>
         <Grid item xs={2}>
-          <Button component={Link} to={`/reference/location/${locationId}/edit`} startIcon={<Edit>edit</Edit>}>
+          <Button variant="outlined" component={Link} to={`/reference/location/${locationId}/edit`} startIcon={<Edit>edit</Edit>}>
             Edit
           </Button>
         </Grid>

@@ -23,10 +23,11 @@ const CustomDropDownInput = ({label, field, errors, optional, options, formData,
         filterSelectedOptions
         options={options}
         getOptionLabel={(o) => o.label}
-        getOptionSelected={(o, v) => (v ? o.id === v.id : null)}
         value={options.find((o) => o.id === formData) ?? null}
         onChange={(_, o) => onChange(o?.id)}
-        renderInput={(params) => <TextField {...params} size="small" variant="outlined" error={error} helperText={error?.message} />}
+        renderInput={(params) => (
+          <TextField {...params} size="small" variant="outlined" error={error ? true : false} helperText={error?.message} />
+        )}
       />
     </>
   );

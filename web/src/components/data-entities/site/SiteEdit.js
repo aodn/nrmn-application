@@ -1,8 +1,7 @@
 import React, {useEffect, useReducer, useState} from 'react';
 import {useParams, NavLink, Navigate} from 'react-router-dom';
-import {Box, Button, CircularProgress, Grid, Typography} from '@mui/material';
+import {Alert, Box, Button, CircularProgress, Grid, Typography} from '@mui/material';
 import {Save} from '@mui/icons-material';
-import Alert from '@mui/material/Alert';
 import PropTypes from 'prop-types';
 
 import EntityContainer from '../../containers/EntityContainer';
@@ -43,10 +42,15 @@ const SiteEdit = ({clone}) => {
 
   const [site, dispatch] = useReducer(formReducer, {});
 
-  useEffect(() => getResult('siteOptions').then((res) => setOptions(res.data)), []);
+  useEffect(() => {
+    async function fetchSiteOptions() {
+      await getResult('siteOptions').then((res) => setOptions(res.data));
+    }
+    fetchSiteOptions();
+  }, []);
 
   useEffect(() => {
-    if (siteId)
+    async function fetchSite() {
       getResult(`site/${siteId}`).then((res) => {
         if (clone) {
           delete res.data.siteAttribute;
@@ -54,6 +58,8 @@ const SiteEdit = ({clone}) => {
         }
         dispatch({form: res.data});
       });
+    }
+    if (siteId) fetchSite();
   }, [siteId, clone, edit]);
 
   const latLongBlur = () => {
@@ -65,9 +71,12 @@ const SiteEdit = ({clone}) => {
   useEffect(latLongBlur, [site.latitude, site.longitude]);
 
   useEffect(() => {
-    if (checkCoords && !isNaN(parseFloat(site.latitude)) && !isNaN(parseFloat(site.longitude))) {
+    async function fetchSiteNear() {
       const query = `sitesAroundLocation?latitude=${site.latitude}&longitude=${site.longitude}` + (edit ? `&exclude=${siteId}` : '');
-      getResult(query).then((res) => setCoordWarning(res?.data?.join(', ')));
+      await getResult(query).then((res) => setCoordWarning(res?.data?.join(', ')));
+    }
+    if (checkCoords && !isNaN(parseFloat(site.latitude)) && !isNaN(parseFloat(site.longitude))) {
+      fetchSiteNear();
     }
   }, [checkCoords, site.latitude, site.longitude, siteId, edit]);
 
@@ -95,7 +104,7 @@ const SiteEdit = ({clone}) => {
 
   if (saved) {
     const id = saved['siteId'];
-    return <Navigate to={`/reference/site/${id}/${edit ? 'saved' : 'new'}`} />;
+    return <Navigate to={`/reference/site/${id}`} state={{message: edit ? 'Site Updated' : 'Site Saved'}} />;
   }
 
   return (

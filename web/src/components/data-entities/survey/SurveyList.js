@@ -8,11 +8,14 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
 const SurveyList = () => {
-  const [rowData, setRowData] = useState([]);
-  const [redirect, setRedirect] = useState(null);
+  const [rowData, setRowData] = useState();
+  const [redirect, setRedirect] = useState();
 
   useEffect(() => {
-    getResult('data/surveys').then((res) => setRowData(res.data));
+    async function fetchSurveys() {
+      await getResult('data/surveys').then((res) => setRowData(res.data));
+    }
+    fetchSurveys();
   }, []);
 
   if (redirect) return <Navigate to={`/data/survey/${redirect}`} />;

@@ -44,7 +44,7 @@ const CustomTextInput = ({field, type, readOnlyInput, readOnlyModify, formData, 
           readOnly: readOnlyModify,
           style: readOnlyModify ? {color: '#545454'} : null
         }}
-        error={error}
+        error={error ? true : false}
         disabled={readOnlyModify}
         helperText={error?.message}
         value={value}

@@ -47,16 +47,17 @@ const ObservableItemAdd = () => {
     lengthWeightCf: null
   });
 
-  useEffect(
-    () =>
-      getResult('species/taxonomyDetail').then((options) => {
+  useEffect(() => {
+    async function fetchTaxonomyDetail() {
+      await getResult('species/taxonomyDetail').then((options) => {
         options.data.obsItemTypes = options.data.obsItemTypes.map((i) => {
           return {id: i.obsItemTypeId, label: i.obsItemTypeName};
         });
         setOptions(options.data);
-      }, []),
-    []
-  );
+      });
+    }
+    fetchTaxonomyDetail();
+  }, []);
 
   const handleSubmit = () => {
     entitySave(`reference/observableItem`, item).then((res) => {
@@ -240,7 +241,7 @@ const ObservableItemAdd = () => {
               onClick={handleSubmit}
               startIcon={<Save></Save>}
             >
-              Save observable Item
+              Save Observable Item
             </Button>
           </Box>
         </Box>

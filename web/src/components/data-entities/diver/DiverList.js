@@ -10,14 +10,21 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
 const DiverList = () => {
-  const [gridApi, setGridApi] = useState(null);
+  const [gridApi, setGridApi] = useState();
   const [delta, setDelta] = useState([]);
-  const [rowData, setRowData] = useState([]);
+  const [rowData, setRowData] = useState();
   const [errors, setErrors] = useState([]);
 
-  useEffect(() => getResult('divers').then((res) => setRowData(res.data)), []);
+  useEffect(() => {
+    async function fetchDivers() {
+      await getResult('divers').then((res) => setRowData(res.data));
+    }
+    fetchDivers();
+  }, []);
 
-  useEffect(() => gridApi && gridApi.redrawRows(), [gridApi, delta, errors]);
+  useEffect(() => {
+    if (gridApi) gridApi.redrawRows();
+  }, [gridApi, delta, errors]);
 
   const onCellValueChanged = (e) => {
     setDelta((data) => {

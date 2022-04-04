@@ -1,7 +1,20 @@
-import {Box, Button, Divider, Grid, Table, TableCell, TableRow, TableBody, TableContainer, TableHead, Typography} from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  Divider,
+  Grid,
+  Table,
+  TableCell,
+  TableRow,
+  TableBody,
+  TableContainer,
+  TableHead,
+  Typography
+} from '@mui/material';
 import {Edit} from '@mui/icons-material';
 import React, {useEffect, useState} from 'react';
-import {useParams} from 'react-router';
+import {useLocation, useParams} from 'react-router';
 import {NavLink} from 'react-router-dom';
 import {getEntity} from '../../../api/api';
 import EntityContainer from '../../containers/EntityContainer';
@@ -9,9 +22,15 @@ import CustomTextInput from '../../input/CustomTextInput';
 
 const SiteView = () => {
   const id = useParams()?.id;
+  const {state} = useLocation();
   const [data, setData] = useState({});
 
-  useEffect(() => getEntity(`site/${id}`).then((res) => setData(res.data)), [id]);
+  useEffect(() => {
+    async function fetchSite() {
+      await getEntity(`site/${id}`).then((res) => setData(res.data));
+    }
+    if (id) fetchSite();
+  }, [id]);
 
   return (
     <EntityContainer name="Sites" goBackTo="/reference/sites">
@@ -20,11 +39,18 @@ const SiteView = () => {
           <Typography variant="h4">Site Details</Typography>
         </Box>
         <Box>
-          <Button component={NavLink} to={`/reference/site/${id}/edit`} startIcon={<Edit>edit</Edit>}>
+          <Button variant="outlined" component={NavLink} to={`/reference/site/${id}/edit`} startIcon={<Edit>edit</Edit>}>
             Edit
           </Button>
         </Box>
       </Box>
+      {state?.message && (
+        <Box mx={5} flexGrow={1}>
+          <Alert severity="info" variant="filled">
+            {state.message}
+          </Alert>
+        </Box>
+      )}
       <Box p={2}>
         <Grid container spacing={2}>
           <Grid item xs={6}>
@@ -34,7 +60,7 @@ const SiteView = () => {
             <CustomTextInput readOnlyInput label="Site Name" formData={data.siteName} />
           </Grid>
           <Grid item xs={6}>
-            <CustomTextInput readOnlyInput label="Location" formData={data.Location} />
+            <CustomTextInput readOnlyInput label="Location" formData={data.locationName} />
           </Grid>
           <Grid item xs={6}>
             <CustomTextInput readOnlyInput label="Is Active" formData={data.isActive ? 'True' : 'False'} />

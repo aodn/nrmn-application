@@ -12,11 +12,14 @@ import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 
 const ObservableItemList = () => {
-  const [rowData, setRowData] = useState([]);
-  const [redirect, setRedirect] = useState(null);
+  const [rowData, setRowData] = useState();
+  const [redirect, setRedirect] = useState();
 
   useEffect(() => {
-    getResult('reference/observableItems').then((res) => setRowData(res.data));
+    async function fetchObservableItems() {
+      await getResult('reference/observableItems').then((res) => setRowData(res.data));
+    }
+    fetchObservableItems();
   }, []);
 
   if (redirect) return <Navigate to={`/reference/observableItem/${redirect}`} />;
@@ -28,7 +31,7 @@ const ObservableItemList = () => {
           <Typography variant="h4">Observable Items</Typography>
         </Box>
         <Box mr={4}>
-          <Button style={{width: '100%'}} to="/reference/observableItem" component={NavLink} variant={'contained'} startIcon={<Add></Add>}>
+          <Button style={{width: '100%'}} to="/reference/observableItem" component={NavLink} variant="contained" startIcon={<Add></Add>}>
             New Observable Item
           </Button>
         </Box>
@@ -39,7 +42,7 @@ const ObservableItemList = () => {
         pagination={true}
         enableCellTextSelection={true}
         rowData={rowData}
-        context={{useOverlay: 'Loading Surveys'}}
+        context={{useOverlay: 'Loading Observable Items'}}
         components={{loadingOverlay: LoadingOverlay}}
         loadingOverlayComponent="loadingOverlay"
         suppressCellFocus={true}

@@ -11,8 +11,8 @@ const ExtractTemplateData = () => {
   const [countries, setCountries] = useState([]);
   const [areas, setAreas] = useState([]);
 
-  const [siteCodes, setSiteCodes] = useState(null);
-  const [siteLocation, setSiteLocation] = useState(null);
+  const [siteCodes, setSiteCodes] = useState();
+  const [siteLocation, setSiteLocation] = useState();
 
   const [ecoRegion, setEcoRegion] = useState([]);
   const [country, setCountry] = useState([]);
@@ -23,26 +23,29 @@ const ExtractTemplateData = () => {
   const [templateLocations, setTemplateLocations] = useState([]);
 
   useEffect(() => {
-    getEntity('locations').then((res) => {
-      const locations = [];
-      const groups = {ecoRegions: [], countries: [], areas: [], siteCodes: []};
-      res.data.forEach((d) => {
-        locations[d.id] = d.locationName;
-        ['locations', 'ecoRegions', 'countries', 'areas', 'siteCodes'].forEach((prop) => {
-          d[prop]
-            ?.split(',')
-            .map((a) => a.trim())
-            .forEach((a) => {
-              groups[prop][a] = groups[prop][a] ? [...groups[prop][a], d.id] : [d.id];
-            });
+    async function fetchLocations() {
+      await getEntity('locations').then((res) => {
+        const locations = [];
+        const groups = {ecoRegions: [], countries: [], areas: [], siteCodes: []};
+        res.data.forEach((d) => {
+          locations[d.id] = d.locationName;
+          ['locations', 'ecoRegions', 'countries', 'areas', 'siteCodes'].forEach((prop) => {
+            d[prop]
+              ?.split(',')
+              .map((a) => a.trim())
+              .forEach((a) => {
+                groups[prop][a] = groups[prop][a] ? [...groups[prop][a], d.id] : [d.id];
+              });
+          });
         });
+        setLocations(locations);
+        setEcoRegions(groups.ecoRegions);
+        setCountries(groups.countries);
+        setAreas(groups.areas);
+        setSiteCodes(groups.siteCodes);
       });
-      setLocations(locations);
-      setEcoRegions(groups.ecoRegions);
-      setCountries(groups.countries);
-      setAreas(groups.areas);
-      setSiteCodes(groups.siteCodes);
-    });
+    }
+    fetchLocations();
   }, []);
 
   useEffect(() => {
@@ -60,14 +63,15 @@ const ExtractTemplateData = () => {
     setStagedLocations(intersect_arr.filter((l) => !templateLocations.includes(l)));
   }, [siteLocation, ecoRegion, country, area, templateLocations]);
 
-  useEffect(() => download && downloadZip(templateLocations), [download, templateLocations]);
-
-  const downloadZip = (locationIds) => {
-    templateZip(`locations=${locationIds.join(',')}`).then((result) => {
-      FileDownload(result.data, `template.zip`);
-      setDownload(false);
-    });
-  };
+  useEffect(() => {
+    async function fetchDownload() {
+      templateZip(`locations=${templateLocations.join(',')}`).then((result) => {
+        FileDownload(result.data, `template.zip`);
+        setDownload(false);
+      });
+    }
+    if (download && templateLocations.length > 0) fetchDownload();
+  }, [download, templateLocations]);
 
   return (
     <>

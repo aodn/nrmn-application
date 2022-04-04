@@ -17,6 +17,7 @@ const ObservableItemEdit = () => {
   const observableItemId = useParams()?.id;
 
   const [saved, setSaved] = useState(false);
+  const [deleted, setDeleted] = useState(false);
   const [errors, setErrors] = useState([]);
   const [options, setOptions] = useState({});
 
@@ -46,10 +47,18 @@ const ObservableItemEdit = () => {
     lengthWeightCf: ''
   });
 
-  useEffect(() => getResult('species/taxonomyDetail').then((options) => setOptions(options.data), []), []);
+  useEffect(() => {
+    async function fetchTaxonomyDetail() {
+      await getResult('species/taxonomyDetail').then((options) => setOptions(options.data));
+    }
+    fetchTaxonomyDetail();
+  }, []);
 
   useEffect(() => {
-    if (observableItemId) getResult(`reference/observableItem/${observableItemId}`).then((res) => dispatch({form: res.data}));
+    async function fetchObservableItem() {
+      await getResult(`reference/observableItem/${observableItemId}`).then((res) => dispatch({form: res.data}));
+    }
+    if (observableItemId) fetchObservableItem();
   }, [observableItemId]);
 
   const handleSubmit = () => {
@@ -67,7 +76,7 @@ const ObservableItemEdit = () => {
       if (res.data.error) {
         setErrors([{banner: 'Unable to delete. Observable Item has linked observations.'}]);
       } else {
-        setSaved({observableItemId: '-1'});
+        setDeleted(true);
       }
     });
   };
@@ -75,6 +84,10 @@ const ObservableItemEdit = () => {
   if (saved) {
     const id = saved['observableItemId'];
     return <Navigate to={`/reference/observableItem/${id}`} state={{message: 'Observable Item Updated'}} />;
+  }
+
+  if (deleted) {
+    return <Navigate to={`/reference/observableItem/-1`} state={{message: 'Observable Item Deleted'}} />;
   }
 
   return (
@@ -85,7 +98,7 @@ const ObservableItemEdit = () => {
             <Typography variant="h4">Edit Observable Item</Typography>
           </Box>
         </Grid>
-        <Button style={{float: 'right'}} onClick={handleDelete} startIcon={<Delete></Delete>}>
+        <Button variant="outlined" style={{float: 'right'}} onClick={handleDelete} startIcon={<Delete></Delete>}>
           Delete
         </Button>
       </Grid>
@@ -256,11 +269,16 @@ const ObservableItemEdit = () => {
               </Grid>
             </Grid>
             <Box display="flex" justifyContent="center" mt={5}>
-              <Button component={NavLink} to="/reference/observableItems">
+              <Button variant="outlined" component={NavLink} to="/reference/observableItems">
                 Cancel
               </Button>
-              <Button style={{width: '50%', marginLeft: '5%', marginRight: '20%'}} onClick={handleSubmit} startIcon={<Save></Save>}>
-                Save observable Item
+              <Button
+                variant="contained"
+                style={{width: '50%', marginLeft: '5%', marginRight: '20%'}}
+                onClick={handleSubmit}
+                startIcon={<Save></Save>}
+              >
+                Save Observable Item
               </Button>
             </Box>
           </Box>

@@ -27,8 +27,8 @@ afterAll(() => server.close());
 
 test('login success', async () => {
   const {getByPlaceholderText, getByText} = render(<LoginForm />);
-  const username = getByPlaceholderText('email');
-  const password = getByPlaceholderText('password');
+  const username = getByPlaceholderText('Email');
+  const password = getByPlaceholderText('Password');
   fireEvent.change(username, {target: {value: TEST_USERNAME}});
   fireEvent.change(password, {target: {value: TEST_PASSWORD}});
   fireEvent.click(getByText('Submit'));

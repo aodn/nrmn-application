@@ -1,15 +1,26 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Box, Button, Checkbox, FormControlLabel, Grid, MenuItem, Select, Typography} from '@mui/material';
 import LinearProgressWithLabel from '../ui/LinearProgressWithLabel';
 import Alert from '@mui/material/Alert';
 import {submitJobFile} from '../../api/api';
 import {NavLink} from 'react-router-dom';
+import axiosInstance from '../../api';
 
 const JobUpload = () => {
-  const emptyForm = {file: '', withExtendedSizes: false, programId: 1};
+  const emptyForm = {file: null, withExtendedSizes: false, programId: null};
   const [formData, setFormData] = useState(emptyForm);
+  const [programs, setPrograms] = useState();
   const [uploadProgress, setUploadProgress] = useState(-1);
-  const [uploadResponse, setUploadResponse] = useState(null);
+  const [uploadResponse, setUploadResponse] = useState();
+
+  useEffect(() => {
+    async function fetchPrograms() {
+      await axiosInstance.get('/api/data/programs').then((p) => {
+        setPrograms(p.data);
+      });
+    }
+    fetchPrograms();
+  }, []);
 
   const resetForm = () => {
     setFormData(emptyForm);
@@ -21,11 +32,11 @@ const JobUpload = () => {
     <>
       <Box m={1}>
         {uploadProgress < 0 ? (
-          <NavLink to="/jobs" color="secondary">
+          <NavLink to="/data/jobs" color="secondary">
             <Typography>{'<< Back to Jobs'}</Typography>
           </NavLink>
         ) : (
-          <NavLink onClick={resetForm} to="/upload" color="secondary">
+          <NavLink onClick={resetForm} to="/data/upload" color="secondary">
             <Typography>{'<< Back to Upload'}</Typography>
           </NavLink>
         )}
@@ -51,20 +62,26 @@ const JobUpload = () => {
                   </Box>
                 </Grid>
                 <Grid item xs={6}>
-                  <Box pl={3} py={1}>
+                  <Box px={3}>
+                    <Typography variant="subtitle2">Program Name</Typography>
                     <Select
-                      variant="outlined"
-                      style={{height: '40px'}}
-                      defaultValue={1}
+                      fullWidth
+                      labelId="program-name-label"
+                      size="small"
+                      disabled={!programs}
+                      displayEmpty={false}
                       onChange={(e) => setFormData({...formData, programId: e.target.value})}
                     >
-                      <MenuItem value={1}>RLS Program File</MenuItem>
-                      <MenuItem value={2}>ATRC Program File</MenuItem>
+                      {programs?.map((p) => (
+                        <MenuItem key={p.programId} value={p.programId}>
+                          {p.programName}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </Box>
                 </Grid>
                 <Grid item xs={6}>
-                  <Box py={1}>
+                  <Box py={2}>
                     <FormControlLabel
                       control={<Checkbox onChange={(e) => setFormData({...formData, withExtendedSizes: e.target.checked})} />}
                       label="With Extended Sizes"
@@ -75,7 +92,7 @@ const JobUpload = () => {
                   <Box p={3}>
                     <Button
                       variant="contained"
-                      disabled={!formData.file}
+                      disabled={!formData.file || !formData.programId}
                       style={{width: '100%'}}
                       onClick={() =>
                         submitJobFile(formData, setUploadProgress).then(({response}) =>
@@ -115,7 +132,7 @@ const JobUpload = () => {
                           <span>{uploadResponse.error}</span>
                         </Alert>
                         <Box pt={5}>
-                          <NavLink onClick={resetForm} to="/upload" color="secondary">
+                          <NavLink onClick={resetForm} to="/data/upload" color="secondary">
                             <Typography>{'<< Back to Upload'}</Typography>
                           </NavLink>
                         </Box>
@@ -129,12 +146,17 @@ const JobUpload = () => {
                           {uploadResponse.message}
                         </Alert>
                         <Box pt={5} px={15}>
-                          <Button variant="contained" style={{width: '100%'}} component={NavLink} to={`/validation/${uploadResponse.id}`}>
+                          <Button
+                            variant="contained"
+                            style={{width: '100%'}}
+                            component={NavLink}
+                            to={`/data/job/${uploadResponse.id}/edit`}
+                          >
                             View {formData.file.name}
                           </Button>
                         </Box>
                         <Box py={3} px={15}>
-                          <Button variant="outlined" style={{width: '100%'}} component={NavLink} to="/jobs">
+                          <Button variant="outlined" style={{width: '100%'}} component={NavLink} to="/data/jobs">
                             View All Jobs
                           </Button>
                         </Box>
