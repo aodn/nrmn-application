@@ -58,13 +58,10 @@ public interface SiteRepository
     List<String> findAllCountries();
 
     @Query(nativeQuery = true, value = "" +
-            "SELECT sr.site_code || ' ' || '(' || sr.site_name || ' ' || ROUND(CAST(ST_Distance(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography)) AS numeric), 2) || 'm)' "
-            +
+            "SELECT sr.site_code || ' ' || '(' || sr.site_name || ' ' || ROUND(CAST(ST_Distance(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography)) AS numeric), 2) || 'm)' " +
             "FROM nrmn.site_ref sr " +
-            "WHERE ST_DWithin(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography), 200) "
-            +
-            "AND (sr.site_id <> :siteId) " +
-            "AND ROUND(CAST(ST_Distance(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography)) AS numeric), 2) > 10")
+            "WHERE ST_DWithin(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography), 200) " +
+            "AND (sr.site_id <> :siteId)")
     List<String> sitesWithin200m(Integer siteId, double longitude, double latitude);
 
     <T> Optional<T> findBySiteId(Integer id, Class<T> type);
