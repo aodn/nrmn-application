@@ -42,7 +42,7 @@ public class SpreadSheetServiceIT {
     public void correctLongHeadersShouldBeValid() throws Exception {
         InputStream rottnestInput = getClass().getClassLoader()
                 .getResourceAsStream("sheets/correctLongHeader.xlsx");
-                ParsedSheet validSheet = sheetService.stageXlsxFile(
+        ParsedSheet validSheet = sheetService.stageXlsxFile(
                 new MockMultipartFile("sheets/correctLongHeader.xlsx", rottnestInput), true);
         assertTrue(validSheet != null);
     }
@@ -92,7 +92,8 @@ public class SpreadSheetServiceIT {
                 .getResourceAsStream("sheets/mismatchedColumnsHeader.xlsx");
         String error = null;
         try {
-            sheetService.stageXlsxFile(new MockMultipartFile("sheets/mismatchedColumnsHeader.xlsx", rottnestInput), false);
+            sheetService.stageXlsxFile(new MockMultipartFile("sheets/mismatchedColumnsHeader.xlsx", rottnestInput),
+                    false);
         } catch (Exception e) {
             error = e.getMessage();
         }
@@ -128,15 +129,16 @@ public class SpreadSheetServiceIT {
     @Test
     void validFileShouldBeCorrectlyTransformToStageSurvey() throws Exception {
         FileSystemResource file3 = new FileSystemResource("src/test/resources/sheets/correctShortHeader3.xlsx");
-        ParsedSheet parsedSheet = sheetService.stageXlsxFile(new MockMultipartFile("sheets/correctShortHeader3.xlsx", file3.getInputStream()), false);
+        ParsedSheet parsedSheet = sheetService
+                .stageXlsxFile(new MockMultipartFile("sheets/correctShortHeader3.xlsx", file3.getInputStream()), false);
 
         List<StagedRow> stageSurveys = parsedSheet.getStagedRows();
         assertEquals(23, stageSurveys.size());
         StagedRow obs1 = stageSurveys.get(0);
 
         // Test Double
-        assertEquals(obs1.getLatitude(), "-41.253706");
-        assertEquals(obs1.getLongitude(), "148.339749");
+        assertEquals(obs1.getLatitude(), "-41.25370");
+        assertEquals(obs1.getLongitude(), "148.33974");
 
         // Test Map filling
         assertEquals(obs1.getMeasureJson().size(), 4);
@@ -170,4 +172,21 @@ public class SpreadSheetServiceIT {
         assertEquals("0", stageSurveys.get(1).getInverts());
         assertEquals("0", stageSurveys.get(6).getBuddy());
     }
+
+    @Test
+    void locationShouldBeTrucatedTo5Decimals() throws Exception {
+        FileSystemResource file = new FileSystemResource("src/test/resources/sheets/locationFormat.xlsx");
+        MockMultipartFile mockFile = new MockMultipartFile("sheets/locationFormat.xlsx", file.getInputStream());
+        List<StagedRow> stageSurveys = sheetService.stageXlsxFile(mockFile, false).getStagedRows();
+
+        assertEquals("-123.12345", stageSurveys.get(0).getLatitude());
+        assertEquals("12.1234", stageSurveys.get(0).getLongitude());
+
+        assertEquals("-12.12345", stageSurveys.get(3).getLatitude());
+        assertEquals("12.12345", stageSurveys.get(3).getLongitude());
+
+        assertEquals("-1", stageSurveys.get(6).getLatitude());
+        assertEquals("1", stageSurveys.get(6).getLongitude());
+    }
+
 }

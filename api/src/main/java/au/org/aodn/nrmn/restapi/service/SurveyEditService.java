@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistance;
+import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistanceLatLongMeters;
 import static au.org.aodn.nrmn.restapi.util.TimeUtils.parseDate;
 import static au.org.aodn.nrmn.restapi.util.TimeUtils.parseTime;
 
@@ -166,12 +166,12 @@ public class SurveyEditService {
         }
 
         boolean hasValidCoords = lat != null && lon != null && !lat.isNaN() && !lon.isNaN();
-        double dist = hasValidCoords ? getDistance(lat, lon, surveyDtoSite.getLatitude(), surveyDtoSite.getLongitude()) : 0;
-        if(dist > 0.2){
+        double distMeters = hasValidCoords ? getDistanceLatLongMeters(lat, lon, surveyDtoSite.getLatitude(), surveyDtoSite.getLongitude()) : 0;
+        if(distMeters > 200){
             errors.add(new ValidationError("Survey", "latitude", surveyDto.getLatitude(),
-                    String.format("Coordinates are further than 0.2km from the Site (%.2fkm)", dist)));
+                    String.format("Coordinates are further than 200m from the Site (%.2fm)", distMeters)));
             errors.add(new ValidationError("Survey", "longitude", surveyDto.getLongitude(),
-                    String.format("Coordinates are further than 0.2km from the Site (%.2fkm)", dist)));
+                    String.format("Coordinates are further than 200m from the Site (%.2fm)", distMeters)));
         }
 
         if(lat != null && !lat.isNaN() && (lat < -90 || lat > 90) ) {

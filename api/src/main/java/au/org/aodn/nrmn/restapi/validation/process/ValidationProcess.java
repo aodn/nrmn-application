@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
-import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistance;
+import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistanceLatLongMeters;
 
 import java.text.Normalizer;
 import java.text.ParseException;
@@ -411,14 +411,14 @@ public class ValidationProcess {
         if(row.getSite() == null || row.getSite().getLatitude() == null || row.getSite().getLongitude() == null ||  row.getLatitude() == null || row.getLongitude() == null)
             return errors;
 
-        double dist = getDistance(row.getSite().getLatitude(), row.getSite().getLongitude(), row.getLatitude(), row.getLongitude());
+        double distMeters = getDistanceLatLongMeters(row.getSite().getLatitude(), row.getSite().getLongitude(), row.getLatitude(), row.getLongitude());
 
-        // Survey coordinates differ from site location by ~1m
-        if (dist > 0.000001) {
-            String message = "Coordinates differ from Site (" + String.format("%.4f", dist) + "km)";
-            errors.add(new ValidationCell(ValidationCategory.SPAN, ValidationLevel.WARNING, message, row.getId(), "latitude"));
-            errors.add(new ValidationCell(ValidationCategory.SPAN, ValidationLevel.WARNING, message, row.getId(), "longitude"));
+        // Warn if survey is more than 10 meters away from site
+        if (distMeters > 10) {
+            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Survey coordinates are more than 10m from site coordinates", row.getId(), "latitude"));
+            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Survey coordinates are more than 10m from site coordinates", row.getId(), "longitude"));
         }
+        
         return errors;
     }
 

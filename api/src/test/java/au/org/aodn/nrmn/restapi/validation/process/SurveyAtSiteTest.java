@@ -23,7 +23,8 @@ class SurveyAtSiteTest extends FormattedTestProvider {
 
         formatted.setSite(Site.builder().siteCode("A SITE").latitude( -42.886410468013004).longitude(147.33520415427964).build());
         Collection<ValidationError> errors = validationProcess.checkData("ATRC", false, Arrays.asList(formatted));
-        assertFalse(errors.stream().anyMatch(p -> p.getMessage().startsWith("Coordinates differ")));
+        assertFalse(errors.stream().anyMatch(p -> p.getMessage().startsWith("Survey coordinates") && p.getColumnNames().contains("latitude")));
+        assertFalse(errors.stream().anyMatch(p -> p.getMessage().startsWith("Survey coordinates") && p.getColumnNames().contains("longitude")));
     }
 
     @Test
@@ -41,7 +42,8 @@ class SurveyAtSiteTest extends FormattedTestProvider {
                 .longitude(147.3293531695972).build());
 
         Collection<ValidationError> errors = validationProcess.checkData("ATRC", false, Arrays.asList(formatted));
-        assertTrue(errors.stream().anyMatch(p -> p.getMessage().startsWith("Coordinates differ")));
+        assertTrue(errors.stream().anyMatch(p -> p.getMessage().startsWith("Survey coordinates") && p.getColumnNames().contains("latitude")));
+        assertTrue(errors.stream().anyMatch(p -> p.getMessage().startsWith("Survey coordinates") && p.getColumnNames().contains("longitude")));
     }
 
 }
