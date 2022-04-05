@@ -13,6 +13,10 @@ The NRMN Data Portal is deployed at [NRMN - Data Portal](https://nrmn.aodn.org.a
 
 This repository contains the source code for the NRMN application backend, the user interface and DDL code for initialisation of the database.
 
+### Licensing
+
+This project is licensed under the terms of the GNU GPLv3 license.
+
 ### Structure
 
 This repository contains a multi-module maven project used to build both the front-end react application, the backend end 
