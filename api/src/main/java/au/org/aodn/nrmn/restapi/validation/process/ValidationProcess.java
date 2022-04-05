@@ -415,8 +415,9 @@ public class ValidationProcess {
 
         // Warn if survey is more than 10 meters away from site
         if (distMeters > 10) {
-            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Survey coordinates are more than 10m from site coordinates", row.getId(), "latitude"));
-            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Survey coordinates are more than 10m from site coordinates", row.getId(), "longitude"));
+            String message = "Survey coordinates more than 10m from site (" + String.format("%.1f", distMeters) + "m)";
+            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, message, row.getId(), "latitude"));
+            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, message, row.getId(), "longitude"));
         }
         
         return errors;
