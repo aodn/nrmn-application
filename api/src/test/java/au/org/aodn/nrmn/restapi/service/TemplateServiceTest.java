@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -439,12 +438,9 @@ public class TemplateServiceTest {
         when(observableItemRepository.getAllWithMethodForSites(2, siteIds))
                 .thenReturn(Arrays.asList(o1).stream().collect(Collectors.toList()));
         when(observationRepository.getSpeciesAttributesByIds(obsIds)).thenReturn(swaList);
-        when(letterCodeRepository.getForSiteIds(siteIds)).thenReturn(Arrays.asList(lcm1, lcm2, lcm3));
-        List<LetterCodeMapping> letterCodeMappings = letterCodeRepository.getForSiteIds(siteIds);
-        HashMap<Long, String> letterCodeMap = new HashMap<Long, String>();
-        letterCodeMappings.forEach(
-                m -> letterCodeMap.put(Long.valueOf(m.getObservableItemId()), m.getLetterCode()));
-        List<SpeciesWithAttributesCsvRow> speciesWithAttributes = templateService.getSpeciesForTemplate(2, siteIds, letterCodeMap);
+        when(letterCodeRepository.getForMethodWithSiteIds(2, siteIds)).thenReturn(Arrays.asList(lcm1, lcm2, lcm3));
+        List<SpeciesWithAttributesCsvRow> speciesWithAttributes = templateService.getSpeciesForTemplate(2, siteIds);
+        
         // Add one for 'survey not done' added by the service
         assertEquals(swaList.size() + 1, speciesWithAttributes.size());
         assertEquals("Abudefduf saxatilis", speciesWithAttributes.get(0).getSpeciesName());

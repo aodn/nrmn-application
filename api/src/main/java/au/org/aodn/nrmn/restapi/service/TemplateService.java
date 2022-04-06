@@ -54,7 +54,7 @@ public class TemplateService {
     ObservableItemRepository observableItemRepository;
 
     @Autowired
-    LetterCodeRepository LetterCodeRepository;
+    LetterCodeRepository letterCodeRepository;
 
     @Autowired
     private ObservationRepository observationRepository;
@@ -76,18 +76,15 @@ public class TemplateService {
         zipOutputStream.closeEntry();
 
         List<Integer> siteIds = sites.stream().map(s -> s.getSiteId()).collect(Collectors.toList());
-        List<LetterCodeMapping> letterCodeMappings = LetterCodeRepository.getForSiteIds(siteIds);
-        HashMap<Long, String> letterCodeMap = new HashMap<Long, String>();
-        letterCodeMappings.forEach(m -> letterCodeMap.put(Long.valueOf(m.getObservableItemId()), m.getLetterCode()));
 
-        List<SpeciesWithAttributesCsvRow> speciesWithAttributes = getSpeciesForTemplate(1, siteIds, letterCodeMap);
+        List<SpeciesWithAttributesCsvRow> speciesWithAttributes = getSpeciesForTemplate(1, siteIds);
         zipOutputStream.putNextEntry(new ZipEntry("m1species.csv"));
         writeSpeciesCsv(writer, M1_M2_FORMAT, speciesWithAttributes);
         writer.flush();
         zipOutputStream.closeEntry();
 
         zipOutputStream.putNextEntry(new ZipEntry("m2species.csv"));
-        writeSpeciesCsv(writer, M1_M2_FORMAT, getSpeciesForTemplate(2, siteIds, letterCodeMap));
+        writeSpeciesCsv(writer, M1_M2_FORMAT, getSpeciesForTemplate(2, siteIds));
         writer.flush();
         zipOutputStream.closeEntry();
 
@@ -173,8 +170,12 @@ public class TemplateService {
                 toString(species.getLMax()));
     }
 
-    public List<SpeciesWithAttributesCsvRow> getSpeciesForTemplate(Integer mode, Collection<Integer> siteIds,
-            HashMap<Long, String> letterCodeMap) {
+    public List<SpeciesWithAttributesCsvRow> getSpeciesForTemplate(Integer mode, List<Integer> siteIds) {
+
+        HashMap<Long, String> letterCodeMap = new HashMap<Long, String>();
+        List<LetterCodeMapping> letterCodeMappings = letterCodeRepository.getForMethodWithSiteIds(mode, siteIds);
+        letterCodeMappings.forEach(m -> letterCodeMap.put(Long.valueOf(m.getObservableItemId()), m.getLetterCode()));
+
         List<ObservableItemRow> observableItemRows = observableItemRepository.getAllWithMethodForSites(mode, siteIds);
 
         List<Integer> observableItemIds = observableItemRows.stream().map(ObservableItemRow::getObservableItemId)

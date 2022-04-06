@@ -22,7 +22,8 @@ public interface LetterCodeRepository extends JpaRepository<Survey, Integer>, Jp
             + "INNER JOIN {h-schema}survey_method surmet ON surmet.survey_id = sur.survey_id "
             + "INNER JOIN {h-schema}observation obs ON obs.survey_method_id = surmet.survey_method_id "
             + "INNER JOIN {h-schema}observable_item_ref obsitem ON obsitem.observable_item_id = obs.observable_item_id "
-            + "WHERE site_raw.site_id in (:siteIds) "
+            + "INNER JOIN {h-schema}methods_species ms ON obsitem.observable_item_id = ms.observable_item_id "
+            + "WHERE site_raw.site_id in (:siteIds) AND ms.method_id = :methodId "
             + "GROUP BY obsitem.observable_item_id, species_name, common_name),"
             + "stage1 AS (SELECT *, {h-schema}abbreviated_species_code(species_name, 3) AS code_len3 FROM stage0),"
             + "stage2 AS (SELECT *, ROW_NUMBER() OVER (partition by code_len3 order by abundance desc) AS code_len3_rank FROM stage1),"
@@ -36,5 +37,5 @@ public interface LetterCodeRepository extends JpaRepository<Survey, Integer>, Jp
             + "FROM {h-schema}observable_item_ref oir JOIN stage7 s7 on s7.observable_item_id = oir.observable_item_id "
             + "JOIN {h-schema}obs_item_type_ref oitr ON oitr.obs_item_type_id = oir.obs_item_type_id "
             + "WHERE oitr.obs_item_type_id = ANY (ARRAY[1, 2]) ORDER BY letterCode", nativeQuery = true)
-    List<LetterCodeMapping> getForSiteIds(@Param("siteIds") List<Integer> siteIds);
+    List<LetterCodeMapping> getForMethodWithSiteIds(@Param("methodId") Integer methodId, @Param("siteIds") List<Integer> siteIds);
 }
