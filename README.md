@@ -21,20 +21,23 @@ This project is licensed under the terms of the GNU GPLv3 license.
 This repository contains a multi-module maven project used to build both the front-end react application, the backend end 
 spring boot application and the war containing both that can be deployed on tomcat. The maven project is structured as follows:
 
-project | descriptiuon
+Project | Description
 --- | ---
 . | multi-module maven project containing all sub-modules used to build the project and containing common settings
+db | SQL scripts containing the data and application DDL and scripts to insert data for testing
 api | maven sub-module used to build the spring boot backend (the api)
-ui | maven sub-module project used to build the react front-end
+web | maven sub-module project used to build the react front-end
 app | maven submodule to assemble the api and ui artifacts built by the api and ui sub-modules into the application war containing both
 
-ddl and migration code for the core NRMN reference data and surveys can be found in the 
-[NRMN repository](https://github.com/aodn/NRMN/tree/master/db-migrate).
+The base NRMN database is DDL currently maintained in two places
 
-ddl for additional tables required to support application functionality can be found in [application.sql](api/src/main/resources/sql/application.sql)
+* [NRMN/db-migrate](https://github.com/aodn/NRMN/tree/master/db-migrate) - amalgamated ATRC/RLS database ddl/migration code
+* [application.sql](api/src/main/resources/sql/application.sql) - ddl to support nrmn-application functionality
 
+This made it simpler when developing application related table changes but should probably be
+revisited now those table definitions have stabilised (also refer https://github.com/aodn/backlog/issues/2479)
 
-## Build
+## Building
 
 Build requires Java 11 with Maven and Node v16 with Yarn v1.x. A Dockerfile is also provided with the necessary prerequisites. 
 
@@ -42,9 +45,13 @@ Build requires Java 11 with Maven and Node v16 with Yarn v1.x. A Dockerfile is a
     docker run -it -v $PWD:/home/builder/src nrmn-builder yarn --cwd src/web
     docker run -it -v $PWD:/home/builder/src nrmn-builder mvn -f src clean package
 
-### Run
+## Developing
 
-Restore a copy of the nrmn_dev.nrmn schema on 17-nec-hob to a local database as follows:
+### Creating an empty database
+
+This application required PostreSQL 11 + the PostGIS extension. Database connection details specified in [application.properties](api/src/main/resources/application.properties).
+
+* Create an empty development database:
 
     sudo su - postgres
     createdb nrmn_dev
@@ -53,56 +60,38 @@ Restore a copy of the nrmn_dev.nrmn schema on 17-nec-hob to a local database as 
     psql -d nrmn_dev -c "CREATE EXTENSION postgis;"
     exit
 
-Find the latest backup for nrmn_dev e.g.
+* Apply the DDL against this database using the following scripts in order:
 
-    aws --profile production-developer s3 ls imos-backups/backups/17-nec-hob.emii.org.au/pgsql/
+    db/schema/CreateTables.sql
+    db/schema/CreateMiscAncillaryObjects.sql
+    db/schema/ApplyConstraints.sql
+    db/schema/BasicIndexing.sql
+    db/endpoints/CreatePrivateEndpoints.sql
+    db/endpoints/CreatePublicEndpoints.sql
+    db/endpoints/EndpointIndexes.sql
 
-Retrieve it e.g. for the latest backup when this page was written:
+Then add the application tables:
+    
+    api/src/main/resources/sql/application.sql
 
-    aws --profile production-developer s3 cp s3://imos-backups/backups/17-nec-hob.emii.org.au/pgsql/2021.06.23.00.00.43/nrmn_dev/nrmn.dump /tmp
+Also add any sample data if required:
 
-(or you could just create a backup directly from the database using pg_dump)
+    api/src/test/resources/testdata/FILL_DATA.sql
+    api/src/test/resources/testdata/FILL_ROLES.sql
 
-Then restore it to your empty database:
+Finally run all of the scripts in `db/schema-update/` in order.
 
-    pg_restore --host "localhost" --port "5432" --username "nrmn_dev" --no-password --dbname "nrmn_dev" --no-owner --no-privileges --no-tablespaces --verbose "/tmp/nrmn.dump"
+### Developing with Codium / Visual Studio Code
 
-And then deploy the application to a tomcat instance e.g. in intellij 
+Instructions are based on VSCode v1.66 running on Linux. and assume that Chrome / Chromium is installed.
 
-![image](https://user-images.githubusercontent.com/1860215/123058197-ec7a3600-d44b-11eb-957a-965542d581aa.png)
+1. Install the extension [https://marketplace.visualstudio.com/items?itemName=GabrielBB.vscode-lombok](Lombok Annotations Support) and [https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack](Extension Pack for Java).
+2. Open the nrmn-application repository as a folder
+3. Go to Debug & Run and choose App from the list of configurations and start debugging
 
-![image](https://user-images.githubusercontent.com/1860215/123058279-ff8d0600-d44b-11eb-9a7d-efd216fd41f4.png)
+- The first time the application is run may take some time as Yarn and Maven will download build dependencies.
+- To verify the debugger is working correctly place breakpoints in appropriate places in `LoginForm.js` and `AuthController.java` and Log In.
 
-Note:
-
-This uses the spring.datasource database connection details specified in [application.properties](api/src/main/resources/application.properties)
-
-You can override these on the command line to point to a different database by adding the following arguments to the startup options for tomcat 
-
-    -Dspring.datasource.url=... -Dspring.datasource.username=... -Dspring.datasource.password=...
-
-## Database Schema
-
-The base NRMN database is DDL currently maintained in two places
-
-* [NRMN/db-migrate](https://github.com/aodn/NRMN/tree/master/db-migrate) - amalgamated ATRC/RLS
-  database ddl/migration code
-* [application.sql](api/src/main/resources/sql/application.sql) - ddl
-  to support nrmn-application functionality
-
-This made it simpler when developing application related table changes but should probably be
-revisited now those table definitions have stabilised (also refer https://github.com/aodn/backlog/issues/2479)
-
-## Updating Database Schema
+### Updating Database Schema
 
 Scripts to modify the database schema are stored in scripts/db-update once applied. Do not modify application.sql. Script names should have the form `00-Script_Description.sql` where 00 is incremented for each script and consist of a single update.
-
-## Restoring an Empty Database
-
-Restore the nrmn_migration using the scripts provided, then apply `application.sql` and then the scripts in the `scripts/db-update` directory.
-
-database | server | current usage | updating/refreshing
---- | --- | --- | ---
-nrmn_dev | 17-nec-hob | nrmn_migration + application.sql + scripts from scripts/db-update in order | run /var/lib/postgresql/refresh_nrmn_dev.sh on 17-nec-hob as postgres user
-nrmn_edge | 17-nec-hob | nrmn_migration + application.sql + scripts from scripts/db-update in order | run /var/lib/postgresql/refresh_nrmn_edge.sh on 17-nec-hob as postgres user
-nrmn_systest | 13-aws-syd | nrmn_migration + application.sql + scripts from scripts/db-update in order | copy nrmn_migration.dump generated above from /var/lib/postgresql/ on 17-nec-hob to /var/lib/postgresql/ on 13-aws-syd <br><br> run /var/lib/postgresql/refresh_nrmn_systest.sh on 13-aws-syd as postgres user

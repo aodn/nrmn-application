@@ -1,0 +1,42 @@
+{
+  "version": "0.2.0",
+  "compounds": [
+    {
+      "name": "app",
+      "configurations": ["api", "web"]
+    }
+  ],
+  "configurations": [
+    {
+      "type": "java",
+      "name": "api",
+      "request": "launch",
+      "mainClass": "au.org.aodn.nrmn.restapi.RestApiApplication",
+      "cwd": "${workspaceFolder}/api",
+      "args": "--spring.profiles.active=dev",
+      "env": {
+        "AWS_PROFILE": "nonproduction-admin"
+      }
+    },
+    {
+      "preLaunchTask": "React Dev Server",
+      "name": "web",
+      "request": "launch",
+      "type": "pwa-chrome",
+      "url": "http://localhost:3000/",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${env:HOME}/.config/chromium-debug"
+    },
+    {
+      "type": "node",
+      "name": "jest",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "cwd": "${workspaceFolder}/web",
+      "runtimeExecutable": "yarn",
+      "args": ["-s", "test", "--runInBand", "--watchAll=false"]
+    }
+  ]
+}
