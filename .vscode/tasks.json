@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+      {
+          "label": "React Dev Server",
+          "type": "shell",
+          "command": "yarn --cwd ${workspaceFolder}/web && yarn --cwd ${workspaceFolder}/web start",
+          "options": {"env": {"BROWSER": "none"}}
+      }
+  ]
+}
