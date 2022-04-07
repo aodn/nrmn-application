@@ -1,5 +1,4 @@
-National Reef Monitoring Network Data Portal
-=
+# National Reef Monitoring Network Data Portal
 
 The National Reef Monitoring Network (NRMN) Data Portal is a web application for collation, validation, and storage of all data obtained during shallow reef surveys conducted by the NRMN. NRMN is a sub-facility of the Integrated Marine Observing System [IMOS](https://imos.org.au/).
 
@@ -13,11 +12,11 @@ The NRMN Data Portal is deployed at [NRMN - Data Portal](https://nrmn.aodn.org.a
 
 This repository contains the source code for the NRMN application backend, the user interface and DDL code for initialisation of the database.
 
-### Licensing
+## Licensing
 
 This project is licensed under the terms of the GNU GPLv3 license.
 
-### Structure
+## Structure
 
 This repository contains a multi-module maven project used to build both the front-end react application, the backend end 
 spring boot application and the war containing both that can be deployed on tomcat. The maven project is structured as follows:
@@ -35,13 +34,15 @@ ddl and migration code for the core NRMN reference data and surveys can be found
 ddl for additional tables required to support application functionality can be found in [application.sql](api/src/main/resources/sql/application.sql)
 
 
-### To build
+## Build
 
-```
-mvn clean package 
-```
+Build requires Java 11 with Maven and Node v16 with Yarn v1.x. A Dockerfile is also provided with the necessary prerequisites. 
 
-### To run
+    docker build --tag nrmn-builder --build-arg BUILDER_UID=$(id -u) .
+    docker run -it -v $PWD:/home/builder/src nrmn-builder yarn --cwd src/web
+    docker run -it -v $PWD:/home/builder/src nrmn-builder mvn -f src clean package
+
+### Run
 
 Restore a copy of the nrmn_dev.nrmn schema on 17-nec-hob to a local database as follows:
 
@@ -80,7 +81,7 @@ You can override these on the command line to point to a different database by a
 
     -Dspring.datasource.url=... -Dspring.datasource.username=... -Dspring.datasource.password=...
 
-### Database Schema
+## Database Schema
 
 The base NRMN database is DDL currently maintained in two places
 
@@ -92,11 +93,11 @@ The base NRMN database is DDL currently maintained in two places
 This made it simpler when developing application related table changes but should probably be
 revisited now those table definitions have stabilised (also refer https://github.com/aodn/backlog/issues/2479)
 
-### Updating Database Schema
+## Updating Database Schema
 
 Scripts to modify the database schema are stored in scripts/db-update once applied. Do not modify application.sql. Script names should have the form `00-Script_Description.sql` where 00 is incremented for each script and consist of a single update.
 
-### Restoring an Empty Database
+## Restoring an Empty Database
 
 Restore the nrmn_migration using the scripts provided, then apply `application.sql` and then the scripts in the `scripts/db-update` directory.
 
