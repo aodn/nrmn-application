@@ -77,12 +77,12 @@ Finally run all of the scripts in `db/schema-update/` in order.
 
 Instructions are based on VSCode v1.66 running on Linux. and assume that Chrome / Chromium is installed.
 
-1. Install the extension [https://marketplace.visualstudio.com/items?itemName=GabrielBB.vscode-lombok](Lombok Annotations Support) and [https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack](Extension Pack for Java).
+1. Install the extension [Lombok Annotations Support](https://marketplace.visualstudio.com/items?itemName=GabrielBB.vscode-lombok) and [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack).
 2. Open the nrmn-application repository as a folder
 3. Go to Debug & Run and choose App from the list of configurations and start debugging
-
-- The first time the application is run may take some time as Yarn and Maven will download build dependencies.
-- To verify the debugger is working correctly place breakpoints in appropriate places in `LoginForm.js` and `AuthController.java` and Log In.
+4. The first time the application is run may take some time as Yarn and Maven will download build dependencies.
+5. Verify the debugger is working correctly by adding breakpoints in appropriate places in `LoginForm.js` and `AuthController.java`.
+6. On Log In both the JS and Java breakpoints should be hit synchronously.
 
 ### Updating Database Schema
 
