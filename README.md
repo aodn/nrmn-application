@@ -19,23 +19,15 @@ This project is licensed under the terms of the GNU GPLv3 license.
 ## Structure
 
 This repository contains a multi-module maven project used to build both the front-end react application, the backend end 
-spring boot application and the war containing both that can be deployed on tomcat. The maven project is structured as follows:
+spring boot application and the war. The maven project is structured as follows:
 
 Project | Description
 --- | ---
 . | multi-module maven project containing all sub-modules used to build the project and containing common settings
-db | SQL scripts containing the data and application DDL and scripts to insert data for testing
-api | maven sub-module used to build the spring boot backend (the api)
+api | maven sub-module used to build the spring boot backend
 web | maven sub-module project used to build the react front-end
-app | maven submodule to assemble the api and ui artifacts built by the api and ui sub-modules into the application war containing both
-
-The base NRMN database is DDL currently maintained in two places
-
-* [NRMN/db-migrate](https://github.com/aodn/NRMN/tree/master/db-migrate) - amalgamated ATRC/RLS database ddl/migration code
-* [application.sql](api/src/main/resources/sql/application.sql) - ddl to support nrmn-application functionality
-
-This made it simpler when developing application related table changes but should probably be
-revisited now those table definitions have stabilised (also refer https://github.com/aodn/backlog/issues/2479)
+app | maven project to assemble the api and web artifacts in a single application WAR
+db | SQL scripts containing the data and application DDL and scripts to insert data for testing
 
 ## Building
 
@@ -51,7 +43,7 @@ Build requires Java 11 with Maven and Node v16 with Yarn v1.x. A Dockerfile is a
 
 This application required PostreSQL 11 + the PostGIS extension. Database connection details specified in [application.properties](api/src/main/resources/application.properties).
 
-* Create an empty development database:
+Create an empty development database:
 
     sudo su - postgres
     createdb nrmn_dev
@@ -60,7 +52,7 @@ This application required PostreSQL 11 + the PostGIS extension. Database connect
     psql -d nrmn_dev -c "CREATE EXTENSION postgis;"
     exit
 
-* Apply the DDL against this database using the following scripts in order:
+Apply the DDL against this database using the following scripts in order:
 
     db/schema/CreateTables.sql
     db/schema/CreateMiscAncillaryObjects.sql
