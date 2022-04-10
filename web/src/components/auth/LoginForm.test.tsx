@@ -1,15 +1,23 @@
 import LoginForm from './LoginForm';
-import {rest} from 'msw';
+import {DefaultRequestBody, rest} from 'msw';
 import {setupServer} from 'msw/node';
 import {render, fireEvent, waitFor} from '@testing-library/react';
+import {beforeAll, afterAll, afterEach, test, expect} from "@jest/globals";
 import '@testing-library/jest-dom';
 
 const UNAUTHORIZED = 'Unauthorised';
 const TEST_USERNAME = 'test@example.com';
 const TEST_PASSWORD = 'abc123';
 
+type LoginRequest<T extends DefaultRequestBody> = T & {
+  body: {
+    username: string;
+    password: string;
+  };
+};
+
 const server = setupServer(
-  rest.post('/api/auth/signin', (req, res, ctx) => {
+  rest.post('/api/auth/signin', (req : LoginRequest<any>, res, ctx) => {
     if (req.body?.username === TEST_USERNAME && req.body?.password === TEST_PASSWORD)
       return res(
         ctx.json({
@@ -33,7 +41,7 @@ test('login success', async () => {
   fireEvent.change(password, {target: {value: TEST_PASSWORD}});
   fireEvent.click(getByText('Submit'));
   await waitFor(() => {
-    expect(getByText(TEST_USERNAME)).toBeInTheDocument();
+    expect(getByText(TEST_USERNAME));
   });
 });
 
@@ -41,6 +49,6 @@ test('login failure', async () => {
   const {getByText} = render(<LoginForm />);
   fireEvent.click(getByText('Submit'));
   await waitFor(() => {
-    expect(getByText(UNAUTHORIZED)).toBeInTheDocument();
+    expect(getByText(UNAUTHORIZED));
   });
 });
