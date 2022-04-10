@@ -2,7 +2,7 @@ import LoginForm from './LoginForm';
 import {DefaultRequestBody, rest} from 'msw';
 import {setupServer} from 'msw/node';
 import {render, fireEvent, waitFor} from '@testing-library/react';
-import {beforeAll, afterAll, afterEach, test, expect} from "@jest/globals";
+import {describe, beforeAll, afterAll, afterEach, test, expect} from "@jest/globals";
 import '@testing-library/jest-dom';
 
 const UNAUTHORIZED = 'Unauthorised';
@@ -33,22 +33,26 @@ beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-test('login success', async () => {
-  const {getByPlaceholderText, getByText} = render(<LoginForm />);
-  const username = getByPlaceholderText('Email');
-  const password = getByPlaceholderText('Password');
-  fireEvent.change(username, {target: {value: TEST_USERNAME}});
-  fireEvent.change(password, {target: {value: TEST_PASSWORD}});
-  fireEvent.click(getByText('Submit'));
-  await waitFor(() => {
-    expect(getByText(TEST_USERNAME));
-  });
-});
+describe('<LoginForm/>', () => {
 
-test('login failure', async () => {
-  const {getByText} = render(<LoginForm />);
-  fireEvent.click(getByText('Submit'));
-  await waitFor(() => {
-    expect(getByText(UNAUTHORIZED));
+  test('login success', async () => {
+    const {getByPlaceholderText, getByText} = render(<LoginForm />);
+    const username = getByPlaceholderText('Email');
+    const password = getByPlaceholderText('Password');
+    fireEvent.change(username, {target: {value: TEST_USERNAME}});
+    fireEvent.change(password, {target: {value: TEST_PASSWORD}});
+    fireEvent.click(getByText('Submit'));
+    await waitFor(() => {
+      expect(getByText(TEST_USERNAME));
+    });
   });
+
+  test('login failure', async () => {
+    const {getByText} = render(<LoginForm />);
+    fireEvent.click(getByText('Submit'));
+    await waitFor(() => {
+      expect(getByText(UNAUTHORIZED));
+    });
+  });
+
 });
