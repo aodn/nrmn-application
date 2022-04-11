@@ -20,7 +20,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000", "https://*.aodn.org.au")
+                .allowedOrigins("http://localhost:3000", "https://*.aodn.org.au","http://*.dev.aodn.org.au")
                 .allowedMethods("HEAD", "OPTIONS", "GET", "POST", "PUT", "DELETE")
                 .maxAge(MAX_AGE_SECS);
     }
