@@ -29,7 +29,7 @@
     },
     {
       "type": "node",
-      "name": "jest",
+      "name": "vscode-jest-tests",
       "request": "launch",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
