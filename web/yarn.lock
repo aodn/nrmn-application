@@ -1590,15 +1590,6 @@
     react-is "^17.0.2"
     react-transition-group "^4.4.2"
 
-"@mui/private-theming@^5.4.4", "@mui/private-theming@^5.6.0":
-  version "5.6.0"
-  resolved "https://registry.yarnpkg.com/@mui/private-theming/-/private-theming-5.6.0.tgz#b907e055a0a19caf554d5b43209a143edaa9b398"
-  integrity sha512-62jUFaMGfW3nvq/worcOAEiY++rWd44tpWShq4o97DybWmmWvEFYlBIuHEcXrtBIK/cloaQw8jqelQIFZeiVdw==
-  dependencies:
-    "@babel/runtime" "^7.17.2"
-    "@mui/utils" "^5.6.0"
-    prop-types "^15.7.2"
-
 "@mui/private-theming@^5.6.0":
   version "5.6.0"
   resolved "https://registry.yarnpkg.com/@mui/private-theming/-/private-theming-5.6.0.tgz#b907e055a0a19caf554d5b43209a143edaa9b398"
@@ -4320,10 +4311,10 @@ eslint-plugin-no-console-log@^2.0.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-no-console-log/-/eslint-plugin-no-console-log-2.0.0.tgz#7ae3bb8dd37e22f95e8473bbc4d554c18ff90637"
   integrity sha1-euO7jdN+IvlehHO7xNVUwY/5Bjc=
 
-eslint-plugin-react-hooks@^4.3.0:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.3.0.tgz#318dbf312e06fab1c835a4abef00121751ac1172"
-  integrity sha512-XslZy0LnMn+84NEG9jSGR6eGqaZB3133L8xewQo3fQagbQuGt7a63gf+P1NGKZavEYEC3UXaWEAA/AqDkuN6xA==
+eslint-plugin-react-hooks@^4.3.0, eslint-plugin-react-hooks@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.4.0.tgz#71c39e528764c848d8253e1aa2c7024ed505f6c4"
+  integrity sha512-U3RVIfdzJaeKDQKEJbz5p3NW8/L80PCATJAfuojwbaEL+gBjfGdhUcGde+WGUW46Q5sr/NgxevsIiDtNXrvZaQ==
 
 eslint-plugin-react@^7.27.1, eslint-plugin-react@^7.29.4:
   version "7.29.4"
