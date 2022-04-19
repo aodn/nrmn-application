@@ -27,6 +27,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${frontend.pages.whitelist}")
     private String[] frontendPagesWhitelist;
 
+    @Value("${security.disable-csrf}")
+    private boolean csrfDisabled;
+
     @Autowired
     CustomUserDetailsService customUserDetailsService;
 
@@ -58,11 +61,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
+        // Allow CSRF protection to be disabled in development
+        if (csrfDisabled)
+            http.csrf().disable();
+
         http
                 .cors()
                 .and()
-                .csrf()
-                .disable()
                 .exceptionHandling()
                 .authenticationEntryPoint(unauthorizedHandler)
                 .and()
