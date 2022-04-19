@@ -4,12 +4,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.shaded.org.apache.commons.lang.SerializationUtils;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.Location;
@@ -56,11 +56,11 @@ class ATRCSurveyGroupCompleteIT {
         sn1.setMethod("2");
         sn1.setSiteCode(siteNo);
         sn1.setStagedJob(job);
-        StagedRow sn2 = (StagedRow)SerializationUtils.clone(sn1);
+        StagedRow sn2 = (StagedRow) SerializationUtils.clone(sn1);
         sn2.setDepth("7.2");
-        StagedRow sn3 = (StagedRow)SerializationUtils.clone(sn1);
+        StagedRow sn3 = (StagedRow) SerializationUtils.clone(sn1);
         sn3.setDepth("7.3");
-        StagedRow sn4 = (StagedRow)SerializationUtils.clone(sn1);
+        StagedRow sn4 = (StagedRow) SerializationUtils.clone(sn1);
         sn4.setDepth("7.4");
         stagedRowRepo.deleteAll();
         stagedRowRepo.saveAll(Arrays.asList(sn1, sn2, sn3, sn4));
@@ -173,10 +173,14 @@ class ATRCSurveyGroupCompleteIT {
         stagedRowRepo.saveAll(Arrays.asList(sn1b1, sn1b2, sn2b1, sn2b2, sn3b1, sn3b2, sn4b1));
 
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7.1 Missing M2, M3")));
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7.2 Missing M2, M3")));
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7.3 Missing M2, M3")));
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7.4 Missing M2, M3")));
+        assertTrue(response.getErrors().stream()
+                .anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7.1 Missing M2, M3")));
+        assertTrue(response.getErrors().stream()
+                .anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7.2 Missing M2, M3")));
+        assertTrue(response.getErrors().stream()
+                .anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7.3 Missing M2, M3")));
+        assertTrue(response.getErrors().stream()
+                .anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7.4 Missing M2, M3")));
     }
 
 }

@@ -7,13 +7,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.shaded.org.apache.commons.lang.SerializationUtils;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
@@ -80,24 +80,24 @@ public class ValidationProcessIT extends FormattedTestProvider {
         StagedRow row2 = (StagedRow) SerializationUtils.clone(row1);
         row2.setMethod("2");
 
-
         StagedRow row3 = (StagedRow) SerializationUtils.clone(row1);
         row3.setBlock("2");
 
         StagedRow row4 = (StagedRow) SerializationUtils.clone(row2);
         row4.setBlock("2");
 
-        HashMap<Integer, String> measures = new HashMap<Integer, String>() {{
-            put(1, "3");
-            put(2, "4");
-        }};
+        HashMap<Integer, String> measures = new HashMap<Integer, String>() {
+            {
+                put(1, "3");
+                put(2, "4");
+            }
+        };
         row1.setMeasureJson(measures);
         row2.setMeasureJson(measures);
         row3.setMeasureJson(measures);
         row4.setMeasureJson(measures);
 
         stagedJob.setRows(Arrays.asList(row1, row2, row3, row4));
-
 
         ValidationResponse errors = validationProcess.process(stagedJob);
 
@@ -115,7 +115,8 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .depth(depth)
                 .build();
 
-        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
+        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false,
+                Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
 
         Assertions.assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));
     }
@@ -129,7 +130,8 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .date(date)
                 .depth(depth)
                 .build();
-        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
+        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false,
+                Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
 
         Assertions.assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));
     }
@@ -143,7 +145,8 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .date(date)
                 .depth(depth)
                 .build();
-        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
+        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false,
+                Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
 
         Assertions.assertTrue(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));
     }
