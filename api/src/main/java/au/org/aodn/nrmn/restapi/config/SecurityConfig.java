@@ -27,7 +27,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${frontend.pages.whitelist}")
     private String[] frontendPagesWhitelist;
 
-    @Value("${security.disable-csrf}")
+    @Value("${app.disable-csrf}")
     private boolean csrfDisabled;
 
     @Autowired
