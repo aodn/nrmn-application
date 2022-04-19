@@ -11,12 +11,13 @@ import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
+
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.shaded.org.apache.commons.lang.SerializationUtils;
 
 import java.util.Arrays;
 
@@ -47,12 +48,12 @@ class RLSMethodBlockAssociationIT {
     @Test
     void expectedAssociationShouldSucceed() {
         stagedRowRepo.deleteAll();
-        
+
         Location location = Location.builder().locationName("LOC1").isActive(false).build();
         locationRepository.save(location);
-        
+
         siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
-        
+
         StagedJob job = jobRepo.findByReference("jobid-rls").get();
         String date = "11/09/2020";
         String depth = "7";
@@ -87,7 +88,7 @@ class RLSMethodBlockAssociationIT {
 
         Location location = Location.builder().locationName("LOC1").isActive(false).build();
         locationRepository.save(location);
-        
+
         siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
 
         StagedJob job = jobRepo.findByReference("jobid-rls").get();
@@ -109,10 +110,11 @@ class RLSMethodBlockAssociationIT {
         StagedRow m2b1 = (StagedRow) SerializationUtils.clone(m1b1);
         m2b1.setMethod("2");
         // Missing Block 2
-        
+
         stagedRowRepo.saveAll(Arrays.asList(m1b1, m1b2, m2b1));
 
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7 M2 missing B2")));
+        assertTrue(response.getErrors().stream()
+                .anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7 M2 missing B2")));
     }
 }
