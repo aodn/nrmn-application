@@ -43,11 +43,13 @@ jobs:
       with:
         languages: ${{ matrix.language }}
 
-    - if: matrix.language == 'javascript' 
-      working-directory: './web'
-      run: |
-        yarn
-        yarn build
+# Not checking javascript as it takes much longer and is reporting
+# on the minimised files which makes it unactionable.
+#    - if: matrix.language == 'javascript' 
+#      working-directory: './web'
+#      run: |
+#        yarn
+#        yarn build
 
     - if: matrix.language == 'java'
       working-directory: './api'
