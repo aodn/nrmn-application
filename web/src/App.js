@@ -23,6 +23,7 @@ import SiteView from './components/data-entities/site/SiteView';
 import SurveyEdit from './components/data-entities/survey/SurveyEdit';
 import SurveyList from './components/data-entities/survey/SurveyList';
 import SurveyView from './components/data-entities/survey/SurveyView';
+import SurveyCorrect from './components/data-entities/survey/SurveyCorrect';
 import ExtractTemplateData from './components/datasheets/ExtractTemplateData';
 import JobUpload from './components/import/JobUpload';
 import ValidationPage from './components/import/ValidationJob';
@@ -93,6 +94,7 @@ const App = () => {
                     <Route path="/data/surveys" element={<SurveyList />} />
                     <Route path="/data/survey/:id" element={<SurveyView />} />
                     <Route path="/data/survey/:id/edit" element={<SurveyEdit />} />
+                    <Route path="/data/survey/:id/correct" element={<SurveyCorrect />} />
 
                     <Route path="/data/jobs" element={<JobList />} />
                     <Route path="/data/job/:id/view" element={<JobView />} />

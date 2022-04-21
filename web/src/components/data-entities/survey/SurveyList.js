@@ -48,6 +48,7 @@ const SurveyList = () => {
           filter={false}
           resizable={false}
           sortable={false}
+          tooltipValueGetter={() => 'Edit Survey'}
           valueFormatter={() => '✎'}
           cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
           onCellClicked={(e) => {
@@ -55,6 +56,25 @@ const SurveyList = () => {
               window.open(`/data/survey/${e.data.surveyId}/edit`, '_blank').focus();
             } else {
               setRedirect(`${e.data.surveyId}/edit`);
+            }
+          }}
+        />
+        <AgGridColumn
+          width={40}
+          field="surveyId"
+          headerName=""
+          suppressMovable={true}
+          filter={false}
+          tooltipValueGetter={() => 'Correct Survey'}
+          resizable={false}
+          sortable={false}
+          valueFormatter={() => '🛠'}
+          cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
+          onCellClicked={(e) => {
+            if (e.event.ctrlKey) {
+              window.open(`/data/survey/${e.data.surveyId}/correct`, '_blank').focus();
+            } else {
+              setRedirect(`${e.data.surveyId}/correct`);
             }
           }}
         />

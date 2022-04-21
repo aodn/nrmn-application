@@ -111,6 +111,14 @@ export const getDataJob = (jobId) =>
     .then((res) => res)
     .catch((err) => err);
 
+export const getCorrections = (surveyId) =>
+  axiosInstance
+    .get('/api/correction/correct/' + surveyId, {
+      validateStatus: () => true
+    })
+    .then((res) => res)
+    .catch((err) => err);
+
 export const validateJob = (jobId, completion) => {
   return axiosInstance.post(`/api/stage/validate/${jobId}`).then(completion);
 };
