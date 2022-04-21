@@ -31,7 +31,7 @@ import javax.validation.Valid;
 import java.util.HashMap;
 
 @RestController
-@RequestMapping(path = "/api/auth")
+@RequestMapping(path = "/api/v1/auth")
 @Tag(name = "authorisation")
 public class AuthController {
 

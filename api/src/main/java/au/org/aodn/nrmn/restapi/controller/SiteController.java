@@ -40,7 +40,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(name = "sites")
-@RequestMapping(path = "/api")
+@RequestMapping(path = "/api/v1")
 public class SiteController {
 
     @Autowired

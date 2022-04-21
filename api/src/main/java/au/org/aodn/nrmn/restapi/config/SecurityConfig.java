@@ -92,11 +92,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-ui.html",
                         "/manifest.json")
                 .permitAll()
-                .antMatchers("/api/auth/**")
+                .antMatchers("/api/v1/auth/**")
                 .permitAll()
                 .antMatchers(HttpMethod.GET, frontendPagesWhitelist)
                 .permitAll()
-                .antMatchers(HttpMethod.GET, "/api/**")
+                .antMatchers(HttpMethod.GET, "/api/v1/**")
                 .hasAnyRole("POWER_USER", "ADMIN", "DATA_OFFICER")
                 .anyRequest()
                 .hasAnyRole("ADMIN", "DATA_OFFICER");

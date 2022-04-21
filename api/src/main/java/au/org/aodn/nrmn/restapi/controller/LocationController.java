@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(name = "Locations")
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class LocationController {
 
     @Autowired
@@ -52,7 +52,6 @@ public class LocationController {
         Location updatedLocation = locationRepository.save(locationDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedLocation);
     }
-
 
     @GetMapping("/location/{id}")
     public ResponseEntity<?> getLocation(@PathVariable Integer id) {

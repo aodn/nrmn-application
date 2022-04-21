@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(name = "surveys")
-@RequestMapping(path = "/api/data")
+@RequestMapping(path = "/api/v1/data")
 public class SurveyController {
 
     @Autowired

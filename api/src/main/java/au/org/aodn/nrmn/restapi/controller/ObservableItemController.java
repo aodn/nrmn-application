@@ -39,7 +39,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(name = "observable items")
-@RequestMapping(path = "/api/reference")
+@RequestMapping(path = "/api/v1/reference")
 public class ObservableItemController {
 
     private static Logger logger = LoggerFactory.getLogger(AuthController.class);
