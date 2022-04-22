@@ -70,7 +70,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(path = "/api/v1/stage")
-@Tag(name = "staged jobs")
+@Tag(name = "Staged Jobs")
 public class StagedJobController {
 
     private static final Logger logger = LoggerFactory.getLogger(StagedJobController.class);

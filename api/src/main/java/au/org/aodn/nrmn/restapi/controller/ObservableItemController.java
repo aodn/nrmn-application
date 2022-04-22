@@ -38,7 +38,7 @@ import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@Tag(name = "observable items")
+@Tag(name = "Reference Data - Observable Items")
 @RequestMapping(path = "/api/v1/reference")
 public class ObservableItemController {
 

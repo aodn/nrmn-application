@@ -39,7 +39,7 @@ import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@Tag(name = "sites")
+@Tag(name = "Reference Data - Sites")
 @RequestMapping(path = "/api/v1")
 public class SiteController {
 

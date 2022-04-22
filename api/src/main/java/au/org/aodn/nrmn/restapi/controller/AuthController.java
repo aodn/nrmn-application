@@ -33,7 +33,7 @@ import java.util.HashMap;
 
 @RestController
 @RequestMapping(path = "/api")
-@Tag(name = "authorisation")
+@Tag(name = "User Authentication")
 public class AuthController {
 
     @Autowired

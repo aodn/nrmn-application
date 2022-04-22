@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@Tag(name = "diver")
+@Tag(name = "Reference Data - Divers")
 @RequestMapping(path = "/api/v1")
 public class DiverController {
 

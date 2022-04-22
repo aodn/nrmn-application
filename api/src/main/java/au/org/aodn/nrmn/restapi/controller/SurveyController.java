@@ -27,7 +27,7 @@ import au.org.aodn.nrmn.restapi.service.SurveyEditService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@Tag(name = "surveys")
+@Tag(name = "Surveys")
 @RequestMapping(path = "/api/v1/data")
 public class SurveyController {
 

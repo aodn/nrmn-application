@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@Tag(name = "Locations")
+@Tag(name = "Reference Data - Locations")
 @RequestMapping("/api/v1")
 public class LocationController {
 

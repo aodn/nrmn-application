@@ -16,23 +16,23 @@
     <testcontainers.version>1.17.1</testcontainers.version>
   </properties>
   <dependencyManagement>
-  <dependencies>
-    <dependency>
-      <groupId>software.amazon.awssdk</groupId>
-      <artifactId>bom</artifactId>
-      <version>2.17.173</version>
-      <type>pom</type>
-      <scope>import</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.rest-assured</groupId>
-      <artifactId>rest-assured-bom</artifactId>
-      <version>5.0.1</version>
-      <type>pom</type>
-      <scope>import</scope>
-    </dependency>
-  </dependencies>
-</dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>bom</artifactId>
+        <version>2.17.173</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.rest-assured</groupId>
+        <artifactId>rest-assured-bom</artifactId>
+        <version>5.0.1</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -118,6 +118,11 @@
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-webmvc-core</artifactId>
+      <version>1.6.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-ui</artifactId>
       <version>1.6.7</version>
     </dependency>
     <dependency>
