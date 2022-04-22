@@ -33,8 +33,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping(path = "/api/ingestion")
-@Tag(name = "ingestion")
+@RequestMapping(path = "/api/v1/ingestion")
+@Tag(name = "Survey Ingestion")
 public class IngestionController {
 
     @Autowired

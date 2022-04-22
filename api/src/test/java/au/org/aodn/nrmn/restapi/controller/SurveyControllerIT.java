@@ -46,7 +46,7 @@ public class SurveyControllerIT {
 
         getDataSpec = new RequestSpecBuilder()
                 .setBaseUri(String.format("http://localhost:%s", port))
-                .setBasePath("/api/data/")
+                .setBasePath("/api/v1/data/")
                 .setContentType(ContentType.JSON)
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter())

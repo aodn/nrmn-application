@@ -31,7 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(name = "Species")
-@RequestMapping("/api/species")
+@RequestMapping("/api/v1/species")
 public class SpeciesController {
 
     @Autowired

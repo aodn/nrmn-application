@@ -66,7 +66,7 @@ public class AuthControllerIT {
     private void assertGetMissingDiverReturns(String token, HttpStatus statusCode) {
         RequestSpecification spec = new RequestSpecBuilder()
                 .setBaseUri(_createUrl(""))
-                .setBasePath("/api/divers")
+                .setBasePath("/api/v1/divers")
                 .setContentType(ContentType.JSON)
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter())
@@ -98,7 +98,7 @@ public class AuthControllerIT {
 
         return reqBuilder
                 .withAppJson()
-                .withUri(_createUrl("/api/auth/signin"))
+                .withUri(_createUrl("/api/v1/auth/signin"))
                 .withMethod(HttpMethod.POST)
                 .withEntity(logReq)
                 .withResponseType(JwtAuthenticationResponse.class)
@@ -111,7 +111,7 @@ public class AuthControllerIT {
                 .withAppJson()
                 .withMethod(HttpMethod.POST)
                 .withToken(token)
-                .withUri(_createUrl("/api/auth/signout"))
+                .withUri(_createUrl("/api/v1/auth/signout"))
                 .build(testRestTemplate);
     }
 

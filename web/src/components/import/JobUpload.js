@@ -15,7 +15,7 @@ const JobUpload = () => {
 
   useEffect(() => {
     async function fetchPrograms() {
-      await axiosInstance.get('/api/data/programs').then((p) => {
+      await axiosInstance.get('/api/v1/data/programs').then((p) => {
         setPrograms(p.data);
       });
     }

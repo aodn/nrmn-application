@@ -69,8 +69,8 @@ import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping(path = "/api/stage")
-@Tag(name = "staged jobs")
+@RequestMapping(path = "/api/v1/stage")
+@Tag(name = "Staged Jobs")
 public class StagedJobController {
 
     private static final Logger logger = LoggerFactory.getLogger(StagedJobController.class);

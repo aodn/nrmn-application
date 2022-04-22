@@ -21,6 +21,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -31,8 +32,8 @@ import javax.validation.Valid;
 import java.util.HashMap;
 
 @RestController
-@RequestMapping(path = "/api/auth")
-@Tag(name = "authorisation")
+@RequestMapping(path = "/api")
+@Tag(name = "User Authentication")
 public class AuthController {
 
     @Autowired
@@ -50,13 +51,16 @@ public class AuthController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Value("${app.api.version}")
+    private String appVersion;
+
     @Value("${aggrid.license}")
     String gridLicence;
 
     private static Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    @PostMapping(path = "/signout", consumes = "application/json", produces = "application/json")
+    @PostMapping(path = "/v1/auth/signout", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> logOutUser(
             Authentication authentication,
             @RequestHeader(name = "Authorization") String bearerToken) {
@@ -75,7 +79,7 @@ public class AuthController {
         }).orElseGet(() -> ResponseEntity.noContent().build());
     }
 
-    @PostMapping(path = "/signin", consumes = "application/json", produces = "application/json")
+    @PostMapping(path = "/v1/auth/signin", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         logger.info(LogInfo.withContext("login attempt"));
         userAuditRepo.save(
@@ -92,12 +96,18 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, gridLicence));
     }
 
-    @PostMapping(path = "/hash", consumes = "application/json", produces = "application/json")
+    @PostMapping(path = "/v1/auth/hash", consumes = "application/json", produces = "application/json")
     public ResponseEntity<HashMap<String, String>> registerUser(@Valid @RequestBody String password) {
 
         HashMap<String, String> payload = new HashMap<>();
         payload.put("hash", passwordEncoder.encode(password));
         return ResponseEntity.ok(payload);
+
+    }
+
+    @GetMapping({ "/v1/version", "/v2/version" })
+    public ResponseEntity<String> getVersion() {
+        return ResponseEntity.ok(appVersion);
 
     }
 }
