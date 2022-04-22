@@ -5,6 +5,7 @@ import {getCorrections} from '../../../api/api';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {extendedMeasurements, measurements} from '../../../common/constants';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
+import SummaryPanel from './panel/SummaryPanel';
 
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
@@ -30,6 +31,19 @@ const headers = [
   {label: 'Survey Not Done', visible: true}
 ];
 
+const defaultSideBar = {
+  toolPanels: [
+    {
+      id: 'summaryPanel',
+      labelDefault: 'Summary',
+      labelKey: 'summary',
+      iconKey: 'columns',
+      toolPanel: 'summaryPanel'
+    }
+  ],
+  defaultToolPanel: 'summaryPanel'
+};
+
 const measurementColumns = measurements.concat(extendedMeasurements);
 
 const SurveyCorrect = () => {
@@ -44,6 +58,8 @@ const SurveyCorrect = () => {
       });
       setRowData(unpackedData);
     });
+
+  const onModelUpdated = () => {};
 
   return (
     <>
@@ -71,22 +87,22 @@ const SurveyCorrect = () => {
               valueParser: ({newValue}) => (newValue ? newValue.trim() : '')
             }}
             rowHeight={20}
+            sideBar={defaultSideBar}
             enableBrowserTooltips
             rowSelection="multiple"
             enableRangeSelection={true}
             animateRows={true}
+            onModelUpdated={onModelUpdated}
             enableRangeHandle={true}
             fillHandleDirection="y"
             undoRedoCellEditing={false}
             loadingOverlayComponent="loadingOverlay"
             pivotMode={false}
             context={{useOverlay: 'Loading Survey Correction'}}
-            components={{loadingOverlay: LoadingOverlay}}
+            components={{loadingOverlay: LoadingOverlay, summaryPanel: SummaryPanel}}
             pivotColumnGroupTotals="before"
             onGridReady={onGridReady}
-            onRowDataUpdated={(e) => {
-              e.columnApi.autoSizeAllColumns();
-            }}
+            onRowDataUpdated={(e) => e.columnApi.autoSizeAllColumns()}
           >
             {headers.map((header, idx) => (
               <AgGridColumn key={idx} field={idx.toString()} headerName={header.label} hide={!header.visible} />
