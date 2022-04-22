@@ -9,7 +9,7 @@ const testLabel : string = "Alert Sample Text";
 describe('<AlertDialog/>', () => {
 
   it("does not render when not open", async () => {
-    const dialog = render(<AlertDialog text={testLabel} />);
+    const dialog = render(<AlertDialog open={false} text={testLabel} />);
     expect(dialog.queryByText(testLabel)).toBeNull();
   });
 
