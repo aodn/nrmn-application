@@ -40,7 +40,7 @@ public class ObservableItemControllerIT {
     public void setup() {
         spec = new RequestSpecBuilder()
                 .setBaseUri(String.format("http://localhost:%s", port))
-                .setBasePath("/api/reference/observableItems")
+                .setBasePath("/api/v1/reference/observableItems")
                 .setContentType(ContentType.JSON)
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter())

@@ -36,7 +36,7 @@ axiosInstance.interceptors.response.use(
 export const userLogin = (params, onResult) => {
   return axiosInstance
     .post(
-      '/api/auth/signin',
+      '/api/v1/auth/signin',
       {
         username: params.username,
         password: params.password
@@ -68,17 +68,17 @@ export const userLogin = (params, onResult) => {
     });
 };
 
-export const userLogout = () => axiosInstance.post('/api/auth/signout', {});
+export const userLogout = () => axiosInstance.post('/api/v1/auth/signout', {});
 
-export const getResult = (entity) => axiosInstance.get('/api/' + entity);
+export const getResult = (entity) => axiosInstance.get('/api/v1/' + entity);
 
 export const getEntity = (entity) => getResult(entity).then((res) => res);
 
-export const deleteJob = (jobId) => axiosInstance.delete('/api/stage/delete/' + jobId);
+export const deleteJob = (jobId) => axiosInstance.delete('/api/v1/stage/delete/' + jobId);
 
 export const entitySave = (entity, params) => {
   return axiosInstance
-    .post('/api/' + entity, params, {
+    .post('/api/v1/' + entity, params, {
       validateStatus: () => true
     })
     .then((res) => res)
@@ -87,7 +87,7 @@ export const entitySave = (entity, params) => {
 
 export const entityEdit = (entity, params) => {
   return axiosInstance
-    .put('/api/' + entity, params, {
+    .put('/api/v1/' + entity, params, {
       validateStatus: () => true
     })
     .then((res) => res)
@@ -105,7 +105,7 @@ export const entityDelete = (url, id) => {
 
 export const getDataJob = (jobId) =>
   axiosInstance
-    .get('/api/stage/job/' + jobId, {
+    .get('/api/v1/stage/job/' + jobId, {
       validateStatus: () => true
     })
     .then((res) => res)
@@ -142,7 +142,7 @@ export const submitJobFile = (params, onProgress) => {
     }
   };
   return axiosInstance
-    .post('/api/stage/upload', data, config)
+    .post('/api/v1/stage/upload', data, config)
     .then((response) => ({response}))
     .catch((err) => ({err}));
 };
@@ -150,7 +150,7 @@ export const submitJobFile = (params, onProgress) => {
 export const submitIngest = (jobId, onResult) => {
   return axiosInstance
     .post(
-      '/api/ingestion/ingest/' + jobId,
+      '/api/v1/ingestion/ingest/' + jobId,
       {},
       {
         validateStatus: () => true

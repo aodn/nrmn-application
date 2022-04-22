@@ -43,7 +43,7 @@ public class SpeciesControllerIT {
     @BeforeEach
     public void setup() {
         spec = new RequestSpecBuilder().setBaseUri(String.format("http://localhost:%s", port))
-                .setBasePath("/api/species").addFilter(new ResponseLoggingFilter())
+                .setBasePath("/api/v1/species").addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter()).build();
     }
 

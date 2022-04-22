@@ -18,8 +18,8 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/template")
-@Tag(name = "template")
+@RequestMapping(path = "/api/v1/template")
+@Tag(name = "Template Export")
 public class TemplateController {
     private static Logger logger = LoggerFactory.getLogger(AuthController.class);
     @Autowired

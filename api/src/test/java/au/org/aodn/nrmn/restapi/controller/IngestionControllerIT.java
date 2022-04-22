@@ -54,7 +54,7 @@ class IngestionControllerIT {
         long initialObservationCount = observationRepository.count();
 
         ResponseEntity<SecUser> response = reqBuilder
-                .withUri(_createUrl("/api/ingestion/ingest/109"))
+                .withUri(_createUrl("/api/v1/ingestion/ingest/109"))
                 .withMethod(HttpMethod.POST)
                 .withToken(token)
                 .build(testRestTemplate);
@@ -63,7 +63,7 @@ class IngestionControllerIT {
 
         StagedJob job = stagedJobRepository.findById(109L).get();
         assertEquals(StatusJobType.INGESTED, job.getStatus());
-        
+
         assertEquals(initialObservationCount + 1, observationRepository.count());
     }
 
@@ -79,7 +79,7 @@ class IngestionControllerIT {
         long initialObservationCount = observationRepository.count();
 
         ResponseEntity<SecUser> response = reqBuilder
-                .withUri(_createUrl("/api/ingestion/ingest/120"))
+                .withUri(_createUrl("/api/v1/ingestion/ingest/120"))
                 .withMethod(HttpMethod.POST)
                 .withToken(token)
                 .build(testRestTemplate);

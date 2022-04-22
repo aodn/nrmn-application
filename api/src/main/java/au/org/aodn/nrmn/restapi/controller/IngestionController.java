@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.Optional;
 
 import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,8 +33,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping(path = "/api/ingestion")
-@Tag(name = "ingestion")
+@RequestMapping(path = "/api/v1/ingestion")
+@Tag(name = "Survey Ingestion")
 public class IngestionController {
 
     @Autowired
@@ -54,6 +57,8 @@ public class IngestionController {
 
     @Autowired
     private MaterializedViewService materializedViewService;
+
+    private static Logger logger = LoggerFactory.getLogger(IngestionController.class);
 
     @PostMapping(path = "ingest/{job_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
@@ -81,9 +86,12 @@ public class IngestionController {
             surveyIngestionService.ingestTransaction(job, validatedRows);
             materializedViewService.refreshAllMaterializedViews();
         } catch (Exception e) {
-            stagedJobLogRepository.save(StagedJobLog.builder().stagedJob(job).details(e.getMessage())
-                    .eventType(StagedJobEventType.ERROR).build());
-            return ResponseEntity.badRequest().body(e.getMessage());
+            logger.error("Ingestion Failed: %s", e.getMessage());
+            stagedJobLogRepository
+                    .save(StagedJobLog.builder().stagedJob(job).details("Application error ingesting sheet.")
+                            .eventType(StagedJobEventType.ERROR).build());
+            return ResponseEntity.badRequest()
+                    .body("Sheet failed to ingest. No survey data has been inserted.");
         }
         return ResponseEntity.ok("Job " + jobId + " successfully ingested.");
     }

@@ -44,7 +44,7 @@ public class LocationApiIT {
 
         locationSpec = new RequestSpecBuilder()
                 .setBaseUri(String.format("http://localhost:%s", port))
-                .setBasePath("/api/location")
+                .setBasePath("/api/v1/location")
                 .setContentType(ContentType.JSON)
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter())

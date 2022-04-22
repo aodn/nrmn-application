@@ -17,7 +17,7 @@ type LoginRequest<T extends DefaultRequestBody> = T & {
 };
 
 const server = setupServer(
-  rest.post('/api/auth/signin', (req : LoginRequest<any>, res, ctx) => {
+  rest.post('/api/v1/auth/signin', (req : LoginRequest<any>, res, ctx) => {
     if (req.body?.username === TEST_USERNAME && req.body?.password === TEST_PASSWORD)
       return res(
         ctx.json({

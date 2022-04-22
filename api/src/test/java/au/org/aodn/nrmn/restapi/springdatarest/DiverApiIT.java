@@ -45,7 +45,7 @@ public class DiverApiIT {
     public void setup() {
         diverSpec = new RequestSpecBuilder()
                 .setBaseUri(String.format("http://localhost:%s", port))
-                .setBasePath("/api/diver")
+                .setBasePath("/api/v1/diver")
                 .setContentType(ContentType.JSON)
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter())
@@ -53,7 +53,7 @@ public class DiverApiIT {
 
         diversSpec = new RequestSpecBuilder()
                 .setBaseUri(String.format("http://localhost:%s", port))
-                .setBasePath("/api/divers")
+                .setBasePath("/api/v1/divers")
                 .setContentType(ContentType.JSON)
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter())
