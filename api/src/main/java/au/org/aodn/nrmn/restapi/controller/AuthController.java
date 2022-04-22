@@ -51,7 +51,7 @@ public class AuthController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    @Value("${app.version}")
+    @Value("${app.api.version}")
     private String appVersion;
 
     @Value("${aggrid.license}")
