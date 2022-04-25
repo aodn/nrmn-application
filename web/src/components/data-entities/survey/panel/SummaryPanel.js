@@ -2,7 +2,7 @@ import React from 'react';
 import {PropTypes} from 'prop-types';
 import {Box, Button} from '@mui/material';
 
-const SummaryPanel = (props) => {
+const SummaryPanel = () => {
   return (
     <Box m={2} mr={4}>
       <Button variant="contained">Validate</Button>
