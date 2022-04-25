@@ -5,7 +5,7 @@
     "@emotion/react": "^11.8.2",
     "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.5.1",
-    "@mui/lab": "^5.0.0-alpha.74",
+    "@mui/lab": "^5.0.0-alpha.78",
     "@mui/material": "^5.6.2",
     "@mui/styles": "^5.6.2",
     "ag-grid-community": "27.1.0",
