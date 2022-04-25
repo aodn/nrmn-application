@@ -118,12 +118,12 @@
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-webmvc-core</artifactId>
-      <version>1.6.7</version>
+      <version>1.6.8</version>
     </dependency>
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-ui</artifactId>
-      <version>1.6.7</version>
+      <version>1.6.8</version>
     </dependency>
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
@@ -148,13 +148,13 @@
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-impl</artifactId>
-      <version>0.11.2</version>
+      <version>0.11.3</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-jackson</artifactId>
-      <version>0.11.2</version>
+      <version>0.11.3</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
