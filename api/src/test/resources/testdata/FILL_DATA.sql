@@ -133,7 +133,7 @@ INSERT INTO nrmn.survey_method(survey_method_id, block_num,
 
 INSERT INTO nrmn.measure_type_ref(measure_type_id, measure_type_name, is_active)
 VALUES (1,'Fish Size Class',true),
-(2,'In Situ Quadrat',t),
+(2,'In Situ Quadrat',true),
 (3,'Macrocystis Block',true),
 (4,'Invert Size Class',true),
 (5,'Single Item',true),
