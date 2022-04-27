@@ -60,7 +60,7 @@ class StagedRowFormattedMappingIT {
         row.setMethod("1");
         row.setBlock("1");
         row.setInverts("0");
-        row.setSpecies("Specie 56");
+        row.setSpecies("Species 56");
         row.setBuddy("EVP");
         row.setDirection("NE");
         row.setPqs("EVP");
@@ -68,17 +68,21 @@ class StagedRowFormattedMappingIT {
         row.setVis("10.0");
         row.setTotal("2");
         row.setStagedJob(job);
-        row.setMeasureJson(new HashMap<Integer, String>() {{
-            put(1, "1");
-            put(2, "12");
-            put(13, "1");
-        }});
-        
-        Collection<ObservableItem> species = observableItemRepository.getAllSpeciesNamesMatching(Arrays.asList(row.getSpecies()));
-        Collection<StagedRowFormatted> validatedRows = validationProcess.formatRowsWithSpecies(Arrays.asList(row), species);
+        row.setMeasureJson(new HashMap<Integer, String>() {
+            {
+                put(1, "1");
+                put(2, "12");
+                put(13, "1");
+            }
+        });
+
+        Collection<ObservableItem> species = observableItemRepository
+                .getAllSpeciesNamesMatching(Arrays.asList(row.getSpecies()));
+        Collection<StagedRowFormatted> validatedRows = validationProcess.formatRowsWithSpecies(Arrays.asList(row),
+                species);
 
         assertEquals(1, validatedRows.size());
-        StagedRowFormatted formattedRow = (StagedRowFormatted)validatedRows.toArray()[0];
+        StagedRowFormatted formattedRow = (StagedRowFormatted) validatedRows.toArray()[0];
         assertEquals("EYR71", formattedRow.getSite().getSiteCode());
         assertEquals("South East Slade Point", formattedRow.getSite().getSiteName());
         assertEquals(154, formattedRow.getLongitude());
