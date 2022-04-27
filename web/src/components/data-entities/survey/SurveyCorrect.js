@@ -20,7 +20,7 @@ const SurveyCorrect = () => {
       loadingOverlay: LoadingOverlay,
       summaryPanel: SummaryPanel
     };
-  });
+  }, []);
 
   const defaultColDef = useMemo(() => {
     return {
@@ -34,7 +34,7 @@ const SurveyCorrect = () => {
       valueParser: ({newValue}) => (newValue ? newValue.trim() : ''),
       width: 'auto'
     };
-  });
+  }, []);
 
   const defaultSideBar = useMemo(() => {
     return {
@@ -49,7 +49,7 @@ const SurveyCorrect = () => {
       ],
       defaultToolPanel: 'summaryPanel'
     };
-  });
+  }, []);
 
   const headers = useMemo(() => {
     return [
@@ -72,7 +72,7 @@ const SurveyCorrect = () => {
       {label: 'Block', hide: false},
       {label: 'Survey Not Done', hide: false}
     ];
-  });
+  }, []);
 
   const onGridReady = () =>
     getCorrections(surveyId).then((res) => {
