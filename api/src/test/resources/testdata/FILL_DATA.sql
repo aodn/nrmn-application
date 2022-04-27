@@ -107,7 +107,7 @@ VALUES (120, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP , 'jobid-unvalidated', 'INGEST
 INSERT INTO nrmn.aphia_ref (aphia_id,
                             valid_name,
                             is_extinct)
-VALUES (102, 'Specie 56', false),(103, 'Specie 57', false);
+VALUES (102, 'Species 56', false),(103, 'Species 57', false);
 
 INSERT INTO nrmn.aphia_rel_type_ref (aphia_rel_type_id, aphia_rel_type_name)
 VALUES (1, 'is');
@@ -117,8 +117,8 @@ VALUES (1, 'Species', true);
 
 INSERT INTO nrmn.observable_item_ref (observable_item_id, obs_item_type_id, aphia_id, aphia_rel_type_id,
                                       observable_item_name)
-VALUES (333, 1, 102, 1, 'Specie 56'),
-       (331, 1, 103, 1, 'Specie 57');
+VALUES (333, 1, 102, 1, 'Species 56'),
+       (331, 1, 103, 1, 'Species 57');
 
 INSERT INTO nrmn.method_ref(method_id, method_name, is_active)
 VALUES (1, 'Standard fish', true), (2, 'Big fish', true);
@@ -133,12 +133,12 @@ INSERT INTO nrmn.survey_method(survey_method_id, block_num,
 
 INSERT INTO nrmn.measure_type_ref(measure_type_id, measure_type_name, is_active)
 VALUES (1,'Fish Size Class',true),
-(2,'In Sitrueu Quadratrue',true),
-(3,'Macrocystrueis Block',true),
-(4,'Invertrue Size Class',true),
-(5,'Single Itrueem',true),
+(2,'In Situ Quadrat',t),
+(3,'Macrocystis Block',true),
+(4,'Invert Size Class',true),
+(5,'Single Item',true),
 (6,'Absence',true),
-(7,'Limpetrue Quadratrue',true);
+(7,'Limpet Quadrat',true);
 
 INSERT INTO nrmn.measure_ref(measure_id, measure_type_id, measure_name, seq_no, is_active)
 VALUES (1,1,'Unsized',0,true),
@@ -256,6 +256,6 @@ VALUES ('JEP', 1, 'AZS', 'AAA', '09/09/2009', '03/03/2003', 3.3, 'NW', 'JEP',
         0, false, '01/01/2001', -5, 35, 
         '{
           "1": "5"
-        }', 1, 'Castillo', 'CEU4', 'Specie 56', '11:11', 5, 11, 109);
+        }', 1, 'Castillo', 'CEU4', 'Species 56', '11:11', 5, 11, 109);
 
 REFRESH MATERIALIZED VIEW nrmn.ui_species_attributes;
