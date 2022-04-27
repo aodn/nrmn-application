@@ -24,12 +24,12 @@ const SurveyCorrect = () => {
 
   const defaultColDef = useMemo(() => {
     return {
-      editable: false,
+      editable: true,
       enableCellChangeFlash: false,
       filter: false,
       floatingFilter: false,
       resizable: false,
-      sortable: false,
+      sortable: true,
       suppressMenu: false,
       valueParser: ({newValue}) => (newValue ? newValue.trim() : ''),
       width: 'auto'
@@ -74,8 +74,10 @@ const SurveyCorrect = () => {
     ];
   }, []);
 
-  const onGridReady = () =>
+  const onGridReady = ({api}) =>
     getCorrections(surveyId).then((res) => {
+      api.hideOverlay();
+      if (res.status !== 200) return;
       const unpackedData = res.data.map((d) => {
         return {...d, 18: JSON.parse(d.at(-1))};
       });
@@ -115,7 +117,7 @@ const SurveyCorrect = () => {
           {headers.map((header, idx) => (
             <AgGridColumn key={idx} field={idx.toString()} headerName={header.label} hide={header.hide} />
           ))}
-          <AgGridColumn field="18.0" headerName="Unsized" />
+          <AgGridColumn field={headers.length + '.0'} headerName="Unsized" />
           {allMeasurements.map((_, idx) => {
             const id = headers.length + '.' + idx;
             return <AgGridColumn field={id} headerComponent={SurveyMeasurementHeader} key={id} width={35} />;
