@@ -96,7 +96,7 @@ export const entityEdit = (entity, params) => {
 
 export const entityDelete = (url, id) => {
   return axiosInstance
-    .delete(`/api/${url}/${id}`, {
+    .delete(`/api/v1/${url}/${id}`, {
       validateStatus: () => true
     })
     .then((res) => res)
@@ -113,18 +113,18 @@ export const getDataJob = (jobId) =>
 
 export const getCorrections = (surveyId) =>
   axiosInstance
-    .get('/api/correction/correct/' + surveyId, {
+    .get('/api/v1/correction/correct/' + surveyId, {
       validateStatus: () => true
     })
     .then((res) => res)
     .catch((err) => err);
 
 export const validateJob = (jobId, completion) => {
-  return axiosInstance.post(`/api/stage/validate/${jobId}`).then(completion);
+  return axiosInstance.post(`/api/v1/stage/validate/${jobId}`).then(completion);
 };
 
 export const updateRows = (jobId, rows, completion) => {
-  return axiosInstance.put(`/api/stage/job/${jobId}`, rows).then((res) => completion(res));
+  return axiosInstance.put(`/api/v1/stage/job/${jobId}`, rows).then((res) => completion(res));
 };
 
 export const submitJobFile = (params, onProgress) => {
@@ -160,7 +160,7 @@ export const submitIngest = (jobId, onResult) => {
 };
 
 export const search = (params) => {
-  const url = `/api/species?searchType=${escape(params.searchType)}&species=${escape(params.species)}&includeSuperseded=${
+  const url = `/api/v1/species?searchType=${escape(params.searchType)}&species=${escape(params.species)}&includeSuperseded=${
     params.includeSuperseded
   }${params.page ? '&page=' + params.page : ''}`;
 
@@ -172,9 +172,9 @@ export const search = (params) => {
 };
 
 export const templateZip = (params) => {
-  return axiosInstance.get(`/api/template/template.zip?${params}`, {responseType: 'blob'});
+  return axiosInstance.get(`/api/v1/template/template.zip?${params}`, {responseType: 'blob'});
 };
 
 export const originalJobFile = (jobId) => {
-  return axiosInstance.get(`/api/stage/job/download/${jobId}`, {responseType: 'blob'});
+  return axiosInstance.get(`/api/v1/stage/job/download/${jobId}`, {responseType: 'blob'});
 };
