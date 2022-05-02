@@ -46,13 +46,13 @@ const SurveyCorrect = () => {
           toolPanel: 'summaryPanel'
         }
       ],
-      defaultToolPanel: 'summaryPanel'
+      defaultToolPanel: ''
     };
   }, []);
 
   const headers = useMemo(() => {
     return [
-      {label: 'ID', hide: false},
+      {label: 'ID', hide: true},
       {label: 'Survey', hide: true},
       {label: 'Diver ID', hide: true},
       {label: 'Diver', hide: false},
@@ -114,6 +114,17 @@ const SurveyCorrect = () => {
           rowSelection="multiple"
           sideBar={defaultSideBar}
         >
+          <AgGridColumn
+            field="row"
+            headerName=""
+            suppressMovable={true}
+            editable={false}
+            valueGetter={(params) => rowData.indexOf(params.data) + 1}
+            minWidth={40}
+            enableCellChangeFlash={false}
+            filter={false}
+            sortable={false}
+          />
           {headers.map((header, idx) =>
             header.isBoolean ? (
               <AgGridColumn
