@@ -31,6 +31,8 @@ import JobView from './components/job/JobView';
 import Homepage from './components/layout/Homepage';
 import SideMenu from './components/layout/SideMenu';
 import TopBar from './components/layout/TopBar';
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-material.css';
 
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
