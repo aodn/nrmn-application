@@ -36,7 +36,7 @@ axiosInstance.interceptors.response.use(
 export const userLogin = (params, onResult) => {
   return axiosInstance
     .post(
-      '/api/v1/auth/signin',
+      'auth/signin',
       {
         username: params.username,
         password: params.password
@@ -68,17 +68,17 @@ export const userLogin = (params, onResult) => {
     });
 };
 
-export const userLogout = () => axiosInstance.post('/api/v1/auth/signout', {});
+export const userLogout = () => axiosInstance.post('auth/signout', {});
 
-export const getResult = (entity) => axiosInstance.get('/api/v1/' + entity);
+export const getResult = (entity) => axiosInstance.get(entity);
 
 export const getEntity = (entity) => getResult(entity).then((res) => res);
 
-export const deleteJob = (jobId) => axiosInstance.delete('/api/v1/stage/delete/' + jobId);
+export const deleteJob = (jobId) => axiosInstance.delete('stage/delete/' + jobId);
 
 export const entitySave = (entity, params) => {
   return axiosInstance
-    .post('/api/v1/' + entity, params, {
+    .post(entity, params, {
       validateStatus: () => true
     })
     .then((res) => res)
@@ -87,7 +87,7 @@ export const entitySave = (entity, params) => {
 
 export const entityEdit = (entity, params) => {
   return axiosInstance
-    .put('/api/v1/' + entity, params, {
+    .put(entity, params, {
       validateStatus: () => true
     })
     .then((res) => res)
@@ -96,7 +96,7 @@ export const entityEdit = (entity, params) => {
 
 export const entityDelete = (url, id) => {
   return axiosInstance
-    .delete(`/api/v1/${url}/${id}`, {
+    .delete(`${url}/${id}`, {
       validateStatus: () => true
     })
     .then((res) => res)
@@ -105,7 +105,7 @@ export const entityDelete = (url, id) => {
 
 export const getDataJob = (jobId) =>
   axiosInstance
-    .get('/api/v1/stage/job/' + jobId, {
+    .get('stage/job/' + jobId, {
       validateStatus: () => true
     })
     .then((res) => res)
@@ -120,11 +120,11 @@ export const getCorrections = (surveyId) =>
     .catch((err) => err);
 
 export const validateJob = (jobId, completion) => {
-  return axiosInstance.post(`/api/v1/stage/validate/${jobId}`).then(completion);
+  return axiosInstance.post(`stage/validate/${jobId}`).then(completion);
 };
 
 export const updateRows = (jobId, rows, completion) => {
-  return axiosInstance.put(`/api/v1/stage/job/${jobId}`, rows).then((res) => completion(res));
+  return axiosInstance.put(`stage/job/${jobId}`, rows).then((res) => completion(res));
 };
 
 export const submitJobFile = (params, onProgress) => {
@@ -142,7 +142,7 @@ export const submitJobFile = (params, onProgress) => {
     }
   };
   return axiosInstance
-    .post('/api/v1/stage/upload', data, config)
+    .post('stage/upload', data, config)
     .then((response) => ({response}))
     .catch((err) => ({err}));
 };
@@ -150,7 +150,7 @@ export const submitJobFile = (params, onProgress) => {
 export const submitIngest = (jobId, onResult) => {
   return axiosInstance
     .post(
-      '/api/v1/ingestion/ingest/' + jobId,
+      'ingestion/ingest/' + jobId,
       {},
       {
         validateStatus: () => true
@@ -160,7 +160,7 @@ export const submitIngest = (jobId, onResult) => {
 };
 
 export const search = (params) => {
-  const url = `/api/v1/species?searchType=${escape(params.searchType)}&species=${escape(params.species)}&includeSuperseded=${
+  const url = `species?searchType=${escape(params.searchType)}&species=${escape(params.species)}&includeSuperseded=${
     params.includeSuperseded
   }${params.page ? '&page=' + params.page : ''}`;
 
@@ -172,9 +172,9 @@ export const search = (params) => {
 };
 
 export const templateZip = (params) => {
-  return axiosInstance.get(`/api/v1/template/template.zip?${params}`, {responseType: 'blob'});
+  return axiosInstance.get(`template/template.zip?${params}`, {responseType: 'blob'});
 };
 
 export const originalJobFile = (jobId) => {
-  return axiosInstance.get(`/api/v1/stage/job/download/${jobId}`, {responseType: 'blob'});
+  return axiosInstance.get(`stage/job/download/${jobId}`, {responseType: 'blob'});
 };
