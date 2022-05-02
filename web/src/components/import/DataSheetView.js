@@ -8,7 +8,6 @@ import {
 } from '@mui/icons-material/';
 import UndoIcon from '@mui/icons-material/Undo';
 import ResetIcon from '@mui/icons-material/LayersClear';
-import 'ag-grid-community/dist/styles/ag-grid.css';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {PropTypes} from 'prop-types';
 import {useParams, NavLink} from 'react-router-dom';
