@@ -31,8 +31,7 @@ const SurveyCorrect = () => {
       resizable: false,
       sortable: true,
       suppressMenu: false,
-      valueParser: ({newValue}) => (newValue ? newValue.trim() : ''),
-      width: 'auto'
+      valueParser: ({newValue}) => (newValue ? newValue.trim() : '')
     };
   }, []);
 
@@ -53,7 +52,7 @@ const SurveyCorrect = () => {
 
   const headers = useMemo(() => {
     return [
-      {label: 'Observation', hide: false},
+      {label: 'ID', hide: false},
       {label: 'Survey', hide: true},
       {label: 'Diver ID', hide: true},
       {label: 'Diver', hide: false},
@@ -70,7 +69,8 @@ const SurveyCorrect = () => {
       {label: 'Letter Code', hide: false},
       {label: 'Method', hide: false},
       {label: 'Block', hide: false},
-      {label: 'Survey Not Done', hide: false}
+      {label: 'Survey Not Done', hide: false, isBoolean: true},
+      {label: 'Use Invert Sizing', hide: false, isBoolean: true}
     ];
   }, []);
 
@@ -79,7 +79,7 @@ const SurveyCorrect = () => {
       api.hideOverlay();
       if (res.status !== 200) return;
       const unpackedData = res.data.map((d) => {
-        return {...d, 18: JSON.parse(d.at(-1))};
+        return {...d, 19: JSON.parse(d.at(-1))};
       });
       setRowData(unpackedData);
     });
@@ -114,9 +114,21 @@ const SurveyCorrect = () => {
           rowSelection="multiple"
           sideBar={defaultSideBar}
         >
-          {headers.map((header, idx) => (
-            <AgGridColumn key={idx} field={idx.toString()} headerName={header.label} hide={header.hide} />
-          ))}
+          {headers.map((header, idx) =>
+            header.isBoolean ? (
+              <AgGridColumn
+                key={idx}
+                field={idx.toString()}
+                headerName={header.label}
+                hide={header.hide}
+                cellEditor="agSelectCellEditor"
+                cellEditorParams={{values: [true, false]}}
+                valueFormatter={(e) => (e.value === true ? 'Yes' : 'No')}
+              />
+            ) : (
+              <AgGridColumn key={idx} field={idx.toString()} headerName={header.label} hide={header.hide} cellEditor="agTextCellEditor" />
+            )
+          )}
           <AgGridColumn field={headers.length + '.0'} headerName="Unsized" />
           {allMeasurements.map((_, idx) => {
             const id = headers.length + '.' + idx;
