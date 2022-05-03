@@ -6,7 +6,6 @@ import {getEntity} from '../../../api/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {Add} from '@mui/icons-material';
 
-import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
 const LocationList = () => {

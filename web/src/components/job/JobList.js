@@ -1,6 +1,5 @@
 import {Box, Button, Typography} from '@mui/material';
 import {CloudUploadOutlined} from '@mui/icons-material';
-import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import React, {useEffect, useState} from 'react';

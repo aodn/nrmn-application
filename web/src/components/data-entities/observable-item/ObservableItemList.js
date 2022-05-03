@@ -9,7 +9,6 @@ import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Add} from '@mui/icons-material';
 
 import 'ag-grid-enterprise';
-import 'ag-grid-community/dist/styles/ag-theme-material.css';
 
 const ObservableItemList = () => {
   const [rowData, setRowData] = useState();

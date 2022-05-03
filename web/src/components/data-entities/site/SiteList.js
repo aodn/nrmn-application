@@ -7,7 +7,6 @@ import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Add} from '@mui/icons-material';
 import {entityDelete} from '../../../api/api';
 
-import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
 const SiteList = () => {

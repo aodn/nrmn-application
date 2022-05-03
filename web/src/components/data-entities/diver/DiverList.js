@@ -6,7 +6,6 @@ import {getResult, entityEdit} from '../../../api/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Add, Save} from '@mui/icons-material';
-import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 
 const DiverList = () => {
