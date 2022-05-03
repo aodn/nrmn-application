@@ -1,0 +1,946 @@
+category_id;major_category_name;description;Changes (to new major_category)
+1;Other;Acanthastrea;Stony corals
+2;Other;Acanthastrea brevis;Massive corals
+3;Other;Acanthastrea echinata;Massive corals
+4;Other;Acanthastrea Hemispherical;Massive corals
+5;Other;Acanthastrea hemprichii;Massive corals
+6;Other;Acanthastrea hillae;Massive corals
+7;Stony corals;Acanthastrea spp.;Stony corals
+8;Macroalgae;Acrocarpia paniculata;Other fucoids
+9;Other;Acropora;Stony corals
+10;Other;Acropora abrolhosensis;Branching Acropora
+11;Other;Acropora abrotanoides;Tabular Acropora corals
+12;Other;Acropora aculeus;Corymbose Acropora corals
+13;Other;Acropora aculeus (dead);Dead coral
+14;Other;Acropora anthocercis;Corymbose Acropora corals
+15;Other;Acropora Arborescent table;Tabular Acropora corals
+16;Other;Acropora austera;Branching Acropora
+17;Other;Acropora austera (dead);Dead coral
+18;Other;Acropora Bottlebrush;Bottlebrush Acropora corals
+19;Other;Acropora Bushy arborescent;Branching Acropora
+20;Other;Acropora Bushy arborescent (bleached);Branching Acropora_Bleached
+21;Other;Acropora bushyensis;Corymbose Acropora corals
+22;Other;Acropora carduus;Bottlebrush Acropora corals
+23;Other;Acropora caroliniana;Corymbose Acropora corals
+24;Other;Acropora cerealis;Corymbose Acropora corals
+25;Stony corals;Acropora clathrata;Tabular Acropora corals
+26;Other;Acropora Compact table;Tabular Acropora corals
+27;Other;Acropora Compact table (bleached);Tabular Acropora corals_Bleached
+28;Other;Acropora Compact table (dead);Dead coral
+29;Other;Acropora Corymbose;Corymbose Acropora corals
+30;Other;Acropora Corymbose (bleached);Corymbose Acropora corals_Bleached
+31;Other;Acropora Corymbose (dead);Dead coral
+32;Other;Acropora Corymbose Flagged For Review;Corymbose Acropora corals
+33;Other;Acropora cytherea;Tabular Acropora corals
+34;Other;Acropora cytherea (bleached);Tabular Acropora corals_Bleached
+35;Other;Acropora cytherea (dead);Dead coral
+36;Other;Acropora (dead);Dead coral
+37;Other;Acropora Digitate;Digitate corals
+38;Other;Acropora digitifera;Digitate corals
+39;Other;Acropora divaricata;Corymbose Acropora corals
+40;Other;Acropora donei;Tabular Acropora corals
+41;Other;Acropora efflorescens;Foliose/Plate corals
+42;Other;Acropora elseyi;Bottlebrush Acropora corals
+43;Other;Acropora Encrusting;Encrusting corals
+44;Other;Acropora Flagged For Review;Stony corals
+45;Other;Acropora Flagged For Review,(dead);Dead coral
+46;Other;Acropora florida;Tabular Acropora corals
+47;Other;Acropora florida (dead);Dead coral
+48;Other;Acropora gemmifera;Digitate corals
+49;Stony corals;Acropora glauca;Corymbose Acropora corals
+50;Stony corals;Acropora glauca (bleached);Corymbose Acropora corals_Bleached
+51;Other;Acropora globiceps;Digitate corals
+52;Other;Acropora grandis;Branching Acropora
+53;Other;Acropora granulosa;Corymbose Acropora corals
+54;Other;Acropora horrida;Branching Acropora
+55;Other;Acropora humilis;Digitate corals
+56;Other;Acropora humilis (bleached);Digitate corals_Bleached
+57;Other;Acropora hyacinthus;Tabular Acropora corals
+58;Other;Acropora hyacinthus (dead);Dead coral
+59;Other;Acropora intermedia;Branching Acropora
+60;Other;Acropora latistella;Corymbose Acropora corals
+61;Other;Acropora listeri;Corymbose Acropora corals
+62;Other;Acropora loisetteae;Branching Acropora
+63;Other;Acropora longicyathus;Bottlebrush Acropora corals
+64;Other;Acropora loripes;Corymbose Acropora corals
+65;Other;Acropora loripes (bleached);Corymbose Acropora corals_Bleached
+66;Other;Acropora lutkeni;Corymbose Acropora corals
+67;Other;Acropora microclados;Tabular Acropora corals
+68;Other;Acropora microphthalma;Branching Acropora
+69;Other;Acropora microphthalma (dead);Dead coral
+70;Other;Acropora millepora;Corymbose Acropora corals
+71;Other;Acropora millepora (bleached);Corymbose Acropora corals_Bleached
+72;Other;Acropora monticulosa;Digitate corals
+73;Other;Acropora muricata;Branching Acropora
+74;Other;Acropora muricata (bleached);Branching Acropora_Bleached
+75;Other;Acropora nana;Corymbose Acropora corals
+76;Other;Acropora nasuta;Corymbose Acropora corals
+77;Stony corals;Isopora palifera;Columnar corals
+78;Stony corals;Isopora palifera (bleached);Columnar corals_Bleached
+79;Stony corals;Isopora palifera (dead);Dead coral
+80;Other;Acropora palmerae;Encrusting corals
+81;Other;Acropora paniculata;Tabular Acropora corals
+82;Other;Acropora papillare;Tabular Acropora corals
+83;Other;Acropora papillare (dead);Dead coral
+84;Other;Acropora Perforated plate;Tabular Acropora corals
+85;Other;Acropora polystoma;Corymbose Acropora corals
+86;Other;Acropora polystoma (dead);Dead coral
+87;Other;Acropora pulchra;Branching Acropora
+88;Other;Acropora robusta;Tabular Acropora corals
+89;Other;Acropora samoensis;Digitate corals
+90;Other;Acropora sarmentosa;Corymbose Acropora corals
+91;Other;Acropora secale;Corymbose Acropora corals
+92;Other;Acropora selago;Corymbose Acropora corals
+93;Other;Acropora seriata;Tabular Acropora corals
+94;Stony corals;Acropora solitaryensis;Tabular Acropora corals
+95;Other;Acropora spicifera;Tabular Acropora corals
+96;Other;Acropora spicifera (dead);Dead coral
+97;Stony corals;Acropora spp.;Stony corals
+98;Stony corals;Acropora spp. (bleached);Stony corals_Bleached
+99;Stony corals;Acropora spp. (dead);Dead coral
+100;Other;Acropora Staghorn;Branching Acropora
+101;Other;Acropora Staghorn (bleached);Branching Acropora_Bleached
+102;Other;Acropora Staghorn (dead);Dead coral
+103;Other;Acropora striata;Bottlebrush Acropora corals
+104;Other;Acropora subglabra;Bottlebrush Acropora corals
+105;Other;Acropora subglabra (bleached);Bottlebrush Acropora corals_Bleached
+106;Other;Acropora subulata;Corymbose Acropora corals
+107;Other;Acropora sukarnoi;Tabular Acropora corals
+108;Other;Acropora tenuis;Corymbose Acropora corals
+109;Other;Acropora turaki;Bottlebrush Acropora corals
+110;Other;Acropora valenciennesi;Tabular Acropora corals
+111;Other;Acropora valida;Corymbose Acropora corals
+112;Other;Acropora valida (bleached);Corymbose Acropora corals_Bleached
+113;Other;Acropora vaughani;Branching Acropora
+114;Other;Acropora verweyi;Corymbose Acropora corals
+115;Stony corals;Acropora yongei;Branching Acropora
+116;Stony corals;Acropora yongei (bleached);Branching Acropora_Bleached
+117;Stony corals;Acropora yongei (dead);Dead coral
+118;Stony corals;Ahermatypic corals;Ahermatypic corals
+119;Cnidaria;Aiptasia sp.;Colonial Anemones, Zoanthids and Corallimorphs
+120;Black & Octocorals;Alcyonarian sp.;Soft corals and gorgonians
+121;Macroalgae;Algal fuzz/slime (not trapping sediment);Slime (not trapping sediment)
+122;Macroalgae;Turfing algae (<2 cm high algal/sediment mat on rock);Turfing algae (<2 cm high algal/sediment mat on rock)
+123;Other;Alveopora catalai;Branching corals
+124;Other;Alveopora spongiosa;Encrusting corals
+125;Other;Alveopora Submassive;Sub-massive corals
+126;Seagrasses;Amphibolis antarctica;Seagrass (straplike)
+127;Macroalgae;Amphiroa anceps;Geniculate coralline algae
+128;Macroalgae;Amphiroa spp.;Geniculate coralline algae
+129;Cnidaria;Anemone spp.;Solitary Anemones
+130;Cnidaria;Anemones;Solitary Anemones
+131;Cnidaria;Anemones & Zoanthids;Colonial Anemones, Zoanthids and Corallimorphs
+132;Macroalgae;Apjohnia laetevirens;Medium foliose green algae
+133;Macroalgae;Arthrocardia wardii;Geniculate coralline algae
+134;Ascidians;Ascidians;Ascidians (unstalked)
+135;Ascidians;Ascidians (stalked);Ascidians (stalked)
+136;Ascidians;Ascidians (unstalked);Ascidians (unstalked)
+137;Macroalgae;Asparagopsis armata;Medium foliose red algae
+138;Macroalgae;Asparogopsis taxiformis;Medium foliose red algae
+139;Other;Astrea annuligera;Massive corals
+140;Stony corals;Astrea curta;Massive corals
+141;Other;Astreopora;Stony corals
+142;Other;Astreopora Encrusting;Encrusting corals
+143;Other;Astreopora expansa;Foliose/Plate corals
+144;Other;Astreopora gracilis;Sub-massive corals
+145;Other;Astreopora Hemispherical;Massive corals
+146;Other;Astreopora incrustans;Encrusting corals
+147;Other;Astreopora listeri;Massive corals
+148;Other;Astreopora myriophthalma;Massive corals
+149;Other;Astreopora ocellata;Massive corals
+150;Other;Astreopora Solid plates;Foliose/Plate corals
+151;Stony corals;Astreopora spp.;Stony corals
+152;Other;Astreopora Submassive;Sub-massive corals
+153;Other;Astreopora Submassive (bleached);Sub-massive corals_Bleached
+154;Macroalgae;Ballia callitricha;Medium foliose red algae
+155;Substrate;Bare Rock;Bare Rock
+156;Crustaceans;Barnacles;Barnacles
+157;Macroalgae;Bellotia eriophorum;Medium foliose brown algae
+158;Tape, wand, shadow;Biota;Unscorable
+159;Molluscs;Bivalve spp.;Sessile bivalves
+160;Black & Octocorals;Black & Octocorals;Black & Octocorals
+161;Stony corals;Bleached coral;Stony corals_Bleached
+162;Ascidians;Botrylloides leachi;Ascidians (unstalked)
+163;Macroalgae;Botryocladia sonderi;Medium foliose red algae
+164;Macroalgae;Botryocladia spp.;Medium foliose red algae
+165;Stony corals;Bottlebrush Acropora corals (bleached);Bottlebrush Acropora corals_Bleached
+166;Stony corals;Bottlebrush Acropora corals (live);Bottlebrush Acropora corals
+167;Stony corals;Bottlebrush Acropora corals (recently dead);Dead coral
+168;Stony corals;Bottlebrush corals;Bottlebrush Acropora corals
+169;Macroalgae;Medium foliose brown algae;Medium foliose brown algae
+170;Macroalgae;Medium foliose red algae;Medium foliose red algae
+171;Stony corals;Branching Acropora;Branching Acropora
+172;Stony corals;Branching Acropora (bleached);Branching Acropora_Bleached
+173;Stony corals;Branching Acropora (dead);Dead coral
+174;Stony corals;Branching corals (bleached);Branching corals_Bleached
+175;Stony corals;Branching corals (live);Branching corals
+176;Other;Branching corals (dead);Dead coral
+177;Stony corals;Branching corals (recently dead);Dead coral
+178;Stony corals;Branching Pocillopora (bleached);Branching Pocillopora_Bleached
+179;Stony corals;Branching Pocillopora (live);Branching Pocillopora
+180;Stony corals;Branching Pocillopora (recently dead);Dead coral
+181;Macroalgae;Brown algal spp. (filamentous);Filamentous brown algae_epiphyte
+182;Macroalgae;Brown algal spp. (turf);Turfing algae (<2 cm high algal/sediment mat on rock)
+183;Macroalgae;Brown foliose epiphyte;Medium foliose brown algae
+184;Macroalgae;Brown turf sediment matrix;Turfing algae (<2 cm high algal/sediment mat on rock)
+185;Macroalgae;Bryopsis gemellipara;Medium foliose green algae
+186;Bryozoa;Bryozoa;Bryozoa
+187;Bryozoa;Bryozoan (hard);Bryozoan (hard)
+188;Bryozoa;Bryozoan (soft);Bryozoan (soft)
+189;Bryozoa;Bugula dentata;Bryozoan (soft)
+190;Macroalgae;Callophycus harveyana;Medium foliose red algae
+191;Macroalgae;Callophycus oppositifolius;Medium foliose red algae
+192;Macroalgae;Callophycus spp.;Medium foliose red algae
+193;Macroalgae;Callophyllis rangerifica;Medium foliose red algae
+194;Macroalgae;Callophyllis spp.;Medium foliose red algae
+195;Black & Octocorals;Capnella erectis;Soft corals and gorgonians
+196;Black & Octocorals;Capnella gaboensis;Soft corals and gorgonians
+197;Black & Octocorals;Capnella spp.;Soft corals and gorgonians
+198;Black & Octocorals;Carijoa spp.;Soft corals and gorgonians
+199;Macroalgae;Carpoglossum confluens;Other fucoids
+200;Macroalgae;Caulerpa spp.;Caulerpa
+201;Macroalgae;Caulerpa brownii;Caulerpa
+202;Macroalgae;Caulerpa cactoides;Caulerpa
+203;Macroalgae;Caulerpa cupressoides;Caulerpa
+204;Macroalgae;Caulerpa flexilis;Caulerpa
+205;Macroalgae;Caulerpa flexilis var. muelleri;Caulerpa
+206;Macroalgae;Caulerpa geminata;Caulerpa
+207;Macroalgae;Caulerpa hodgkinsoniae;Caulerpa
+208;Macroalgae;Caulerpa longifolia;Caulerpa
+209;Macroalgae;Caulerpa obscura;Caulerpa
+210;Macroalgae;Caulerpa peltata;Caulerpa
+211;Macroalgae;Caulerpa racemosa;Caulerpa
+212;Macroalgae;Caulerpa remotifolia;Caulerpa
+213;Macroalgae;Caulerpa scalpelliformis;Caulerpa
+214;Macroalgae;Caulerpa simplisciuscula;Caulerpa
+215;Macroalgae;Caulerpa taxifolia;Caulerpa
+216;Macroalgae;Caulerpa trifaria;Caulerpa
+217;Macroalgae;Caulerpa vesiculifera;Caulerpa
+218;Macroalgae;Caulocystis cephalornithos;Other fucoids
+219;Macroalgae;Caulocystis uvifera;Other fucoids
+220;Macroalgae;Ceramium spp.;Filamentous red algae_epiphyte
+221;Macroalgae;Chaetomorpha billarderi;Filamentous green algae_epiphyte
+222;Macroalgae;Chaetomorpha coliformis;Filamentous green algae_epiphyte
+223;Macroalgae;Chaetomorpha epiphyte;Filamentous green algae_epiphyte
+224;Macroalgae;Chaetomorpha spp.;Filamentous green algae_epiphyte
+225;Macroalgae;Champia spp.;Medium foliose red algae
+226;Macroalgae;Chlorodesmis major;Medium foliose green algae
+227;Macroalgae;Chondria armata;Medium foliose red algae
+228;Macroalgae;Chondria incrassata;Medium foliose red algae
+229;Black & Octocorals;Cladiella spp.;Soft corals and gorgonians
+230;Macroalgae;Cladophora feredayi;Medium foliose green algae
+231;Macroalgae;Cladophora feredayi Epiphyte;Filamentous green algae_epiphyte
+232;Macroalgae;Cladophora prolifera;Medium foliose green algae
+233;Macroalgae;Cladophora spp.;Filamentous green algae_epiphyte
+234;Macroalgae;Cladostephus spongiosus;Medium foliose brown algae
+235;Macroalgae;Claudea elegans;Medium foliose red algae
+236;Ascidians;Clavelina spp.;Ascidians (unstalked)
+237;Cnidaria;Cnidaria;Cnidaria
+238;Cnidaria;Cnidarians;Cnidaria
+239;Substrate;Cobble;Cobble
+240;Macroalgae;Codium (dichotomous branched) spp.;Medium foliose green algae
+241;Macroalgae;Codium bulbopilum;Medium foliose green algae
+242;Macroalgae;Codium dimorphum;Medium foliose green algae
+243;Macroalgae;Codium duthieae;Medium foliose green algae
+244;Macroalgae;Codium fragile;Medium foliose green algae
+245;Macroalgae;Codium lucasi;Medium foliose green algae
+246;Macroalgae;Codium platyclados;Medium foliose green algae
+247;Macroalgae;Codium pomoides;Medium foliose green algae
+248;Macroalgae;Codium spongiosum;Medium foliose green algae
+249;Macroalgae;Codium spp.;Medium foliose green algae
+250;Other;Coeloseris mayeri;Massive corals
+251;Cnidaria;Colonial Anemones, Zoanthids and Corallimorphs;Colonial Anemones, Zoanthids and Corallimorphs
+252;Other;Colonial Anemones, Zoanthids and Corallimorphs (bleached);Colonial Anemones, Zoanthids and Corallimorphs_Bleached
+253;Macroalgae;Colpomenia spp.;Medium foliose brown algae
+254;Stony corals;Columnar corals (live);Columnar corals
+255;Stony corals;Columnar corals (bleached);Columnar corals_Bleached
+256;Other;Columnar corals (live) (bleached);Columnar corals_Bleached
+257;Stony corals;Columnar corals (recently dead);Dead coral
+258;Stony corals;Coral (dead);Dead coral
+259;Substrate;Coral rubble;Coral rubble
+260;Other;Coral Species;Stony corals
+261;Stony corals;Coral spp.;Stony corals
+262;Macroalgae;Corallina officinalis;Geniculate coralline algae
+263;Macroalgae;Corallina sp.;Geniculate coralline algae
+264;Macroalgae;Coralline algae (rhodolith);Crustose coralline algae
+265;Macroalgae;Coralline turf;Turfing algae (<2 cm high algal/sediment mat on rock)
+266;Macroalgae;Coralline turf and sediment matrix;Turfing algae (<2 cm high algal/sediment mat on rock)
+267;Macroalgae;Geniculate coralline algae;Geniculate coralline algae
+268;Stony corals;Corals;Stony corals
+269;Stony corals;Corymbose Acropora corals (bleached);Corymbose Acropora corals_Bleached
+270;Stony corals;Corymbose Acropora corals (live);Corymbose Acropora corals
+271;Stony corals;Corymbose Acropora corals (recently dead);Dead coral
+272;Other;Coscinaraea columna;Sub-massive corals
+273;Other;Coscinaraea Encrusting;Encrusting corals
+274;Other;Coscinaraea exesa;Columnar corals
+275;Other;Coscinaraea Submassive;Sub-massive corals
+276;Stony corals;Coscinarea spp.;Stony corals
+277;Algae;Cpodium pomoides;Medium foliose green algae
+278;Crustaceans;Crustacea;Crustacea
+279;Macroalgae;Crustose coralline algae;Crustose coralline algae
+280;Macroalgae;Crustose red epiphyte;Crustose coralline algae
+281;Other;Ctenactis;Large-polyp stony corals (free-living)
+282;Other;Ctenactis (bleached);Large-polyp stony corals (free-living)_Bleached
+283;Other;Ctenactis crassa;Large-polyp stony corals (free-living)
+284;Other;Ctenactis echinata;Large-polyp stony corals (free-living)
+285;Stony corals;Culicia spp.;Ahermatypic corals
+286;Macroalgae;Curdiea spp.;Medium foliose red algae
+287;Macroalgae;Cutleria multifida;Filamentous brown algae_epiphyte
+288;Macroalgae;cyanobacterial mat/slime;Slime (not trapping sediment)
+289;Other;Cycloseris patelliformis;Large-polyp stony corals (free-living)
+290;Other;Cyphastrea;Stony corals
+291;Stony corals;Cyphastrea serailia;Sub-massive corals
+292;Other;Cyphastrea chalcidicum;Sub-massive corals
+293;Other;Cyphastrea Encrusting;Encrusting corals
+294;Other;Cyphastrea Hemispherical;Massive corals
+295;Other;Cyphastrea microphthalma;Sub-massive corals
+296;Other;Cyphastrea serailia (dead);Dead coral
+297;Stony corals;Cyphastrea sp;Stony corals
+298;Other;Cyphastrea Submassive;Sub-massive corals
+299;Other;Cyphastrea Submassive (dead);Dead coral
+300;Macroalgae;Cystophora botryocystis;Other fucoids
+301;Macroalgae;Cystophora brownii;Other fucoids
+302;Macroalgae;Cystophora expansa;Other fucoids
+303;Macroalgae;Cystophora grevillei;Other fucoids
+304;Macroalgae;Cystophora monilifera;Other fucoids
+305;Macroalgae;Cystophora moniliformis;Other fucoids
+306;Macroalgae;Cystophora pectinata;Other fucoids
+307;Macroalgae;Cystophora platylobium;Other fucoids
+308;Macroalgae;Cystophora racemosa;Other fucoids
+309;Macroalgae;Cystophora retorta;Other fucoids
+310;Macroalgae;Cystophora retroflexa;Other fucoids
+311;Macroalgae;Cystophora siliquosa;Other fucoids
+312;Macroalgae;Cystophora spp.;Other fucoids
+313;Macroalgae;Cystophora subfarcinata;Other fucoids
+314;Macroalgae;Cystophora torulosa;Other fucoids
+315;Macroalgae;Cystophora xiphocarpa;Other fucoids
+316;Macroalgae;Cystoseira trinodis;Other fucoids
+317;Macroalgae;Dasya pilosa;Medium foliose red algae
+318;Stony corals;Coral;Stony corals
+319;Stony corals;Foliose corals (recently dead);Dead coral
+320;Stony corals;Massive corals (recently dead);Dead coral
+321;Stony corals;Tabular Acropora Coral;Tabular Acropora corals
+322;Substrate;Dead coralline;Bare Rock
+323;Macroalgae;Delisea plumosa;Medium foliose red algae
+324;Macroalgae;Delisea pulchra;Medium foliose red algae
+325;Macroalgae;Delisea spp.;Medium foliose red algae
+326;Black & Octocorals;Dendronephthya spp.;Soft corals and gorgonians
+327;Macroalgae;Desmarestia and Himantothallus;Desmarestia and Himantothallus
+328;Macroalgae;Desmarestia ligulata;Desmarestia and Himantothallus
+329;Macroalgae;Dictymenia sp.;Medium foliose red algae
+330;Macroalgae;Dictyomenia harveyana;Medium foliose red algae
+331;Macroalgae;Dictyopteris muelleri;Medium foliose brown algae
+332;Macroalgae;Dictyopteris spp.;Medium foliose brown algae
+333;Macroalgae;Dictyosphaeria sericea;Medium foliose green algae
+334;Macroalgae;Dictyota sp. (fine);Medium foliose brown algae
+335;Macroalgae;Dictyota sp. (wide);Medium foliose brown algae
+336;Macroalgae;Dictyota spp.;Medium foliose brown algae
+337;Macroalgae;Dictyotalean algae;Medium foliose brown algae
+338;Macroalgae;Dictyotales sp.;Medium foliose brown algae
+339;Ascidians;Didemnid spp.;Ascidians (unstalked)
+340;Stony corals;Digitate corals (live);Digitate corals
+341;Stony corals;Digitate corals (bleached);Digitate corals_Bleached
+342;Stony corals;Digitate corals (recently dead);Dead coral
+343;Macroalgae;Dilophus marginatus;Medium foliose brown algae
+344;Macroalgae;Dilophus spp.;Medium foliose brown algae
+345;Other;Diploastrea heliopora;Massive corals
+346;Macroalgae;Distromium flabellatum;Medium foliose brown algae
+347;Tape, wand, shadow;Drift;Unscorable
+348;Macroalgae;Durvillaea potatorum;Durvillaea
+349;Mobile invertebrate;Echinoderm;Unscorable
+350;Other;Echinophyllia;Stony corals
+351;Stony corals;Echinophyllia aspera;Encrusting corals
+352;Stony corals;Echinophyllia aspera (bleached);Encrusting corals_Bleached
+353;Other;Echinophyllia Encrusting;Encrusting corals
+354;Other;Echinophyllia orpheensis;Sub-massive corals
+355;Other;Echinopora;Stony corals
+356;Other;Echinopora ashmorensis;Branching corals
+357;Other;Echinopora Encrusting;Encrusting corals
+358;Other;Echinopora Encrusting (dead);Dead coral
+359;Other;Echinopora Foliose;Foliose/Plate corals
+360;Other;Echinopora gemmacea;Encrusting corals
+361;Other;Echinopora gemmacea (bleached);Encrusting corals_Bleached
+362;Other;Echinopora horrida;Branching corals
+363;Other;Echinopora lamellosa;Foliose/Plate corals
+364;Other;Echinopora mammiformis;Foliose/Plate corals
+365;Other;Echinopora Submassive;Sub-massive corals
+366;Macroalgae;Ecklonia radiata;Ecklonia radiata
+367;Macroalgae;Encrusting brown algae;Encrusting leathery algae
+368;Bryozoa;Bryozoan (encrusting);Bryozoan (hard)
+369;Stony corals;Encrusting corals (live);Encrusting corals
+370;Stony corals;Encrusting corals (bleached);Encrusting corals_Bleached
+371;Stony corals;Encrusting corals (dead);Dead coral
+372;Stony corals;Encrusting corals (recently dead);Dead coral
+373;Macroalgae;Encrusting green algae;Encrusting leathery algae
+374;Macroalgae;Encrusting leathery algae;Encrusting leathery algae
+375;Macroalgae;Encrusting red algae;Encrusting leathery algae
+376;Macroalgae;Encyothalia cliftoni;Medium foliose red algae
+377;Macroalgae;Enteromorpha epiphyte;Filamentous green algae_epiphyte
+378;Macroalgae;Enteromorpha spp.;Medium foliose green algae
+379;Macroalgae;Epiphyte;Filamentous red algae_epiphyte
+380;Macroalgae;Erythremenia minuta;Medium foliose red algae
+381;Macroalgae;Erythroclonium sonderi;Medium foliose red algae
+382;Black & Octocorals;Erythropodium hicksoni;Soft corals and gorgonians
+383;Black & Octocorals;Erythropodium sp.;Soft corals and gorgonians
+384;Other;Euphyllia ancora;Sub-massive corals
+385;Other;Euphyllia Flabello-meandroid;Sub-massive corals
+386;Other;Euphyllia glabrescens;Sub-massive corals
+387;Macroalgae;Euptilota articulata;Medium foliose red algae
+388;Other;Favia;Massive corals
+389;Other;Favia amicorum;Massive corals
+390;Other;Favia danai;Massive corals
+391;Other;Favia (dead);Dead coral
+392;Other;Favia favus;Massive corals
+393;Other;Favia helianthoides;Massive corals
+394;Other;Favia Hemispherical;Massive corals
+395;Other;Favia laxa;Massive corals
+396;Other;Favia lizardensis;Massive corals
+397;Other;Favia maritima;Massive corals
+398;Other;Favia matthaii;Massive corals
+399;Other;Favia pallida;Massive corals
+400;Other;Favia rotumana;Massive corals
+401;Other;Favia speciosa;Massive corals
+402;Stony corals;Favia spp.;Massive corals
+403;Other;Favia stelligera;Sub-massive corals
+404;Other;Favia Submassive;Sub-massive corals
+405;Stony corals;Faviid coral spp.;Encrusting corals
+406;Stony corals;Faviid coral spp. (bleached);Encrusting corals_Bleached
+407;Stony corals;Faviid coral spp. (dead);Dead coral
+408;Other;Favites;Sub-massive corals
+409;Other;Favites abdita;Sub-massive corals
+410;Stony corals;Favites and Goniastrea spp.;Encrusting corals
+411;Other;Favites complanata;Massive corals
+412;Other;Favites Encrusting;Encrusting corals
+413;Other;Favites flexuosa;Massive corals
+414;Other;Favites halicora;Sub-massive corals
+415;Other;Favites Hemispherical;Massive corals
+416;Other;Favites pentagona;Sub-massive corals
+417;Other;Favites russelli;Sub-massive corals
+418;Other;Favites Submassive;Sub-massive corals
+419;Macroalgae;Filamentous epiphytic algae;Filamentous algae_epiphyte
+420;Macroalgae;Filamentous green algae;Filamentous green algae_epiphyte
+421;Macroalgae;Filamentous red algae;Filamentous red algae_epiphyte
+422;Macroalgae;Filamentous rock-attached algae;Filamentous rock-attached algae
+423;Worms;Filograna implexa;Polychaete
+424;Stony corals;Foliose corals (live);Foliose/Plate corals
+425;Stony corals;Foliose corals (bleached);Foliose/Plate corals_Bleached
+426;Macroalgae;Medium foliose green algae;Medium foliose green algae
+427;Other;Fungia;Large-polyp stony corals (free-living)
+428;Other;Fungia (bleached);Large-polyp stony corals (free-living)_Bleached
+429;Other;Fungia concinna;Large-polyp stony corals (free-living)
+430;Other;Fungia danai;Large-polyp stony corals (free-living)
+431;Other;Fungia (dead);Dead coral
+432;Other;Fungia fungites;Large-polyp stony corals (free-living)
+433;Other;Fungia granulosa;Large-polyp stony corals (free-living)
+434;Other;Fungia horrida;Large-polyp stony corals (free-living)
+435;Other;Fungia scutaria;Large-polyp stony corals (free-living)
+436;Macroalgae;Galaxaura sp.;Medium foliose red algae
+437;Other;Galaxea;Stony corals
+438;Other;Galaxea astreata;Sub-massive corals
+439;Other;Galaxea Encrusting;Encrusting corals
+440;Other;Galaxea fascicularis;Encrusting corals
+441;Other;Galaxea Hemispherical;Massive corals
+442;Other;Galaxea horrescens;Branching corals
+443;Other;Galaxea Submassive;Sub-massive corals
+444;Other;Gardineroseris planulata;Sub-massive corals
+445;Macroalgae;Gelidiaceae sp.;Medium foliose red algae
+446;Macroalgae;Gelidium australe;Medium foliose red algae
+447;Macroalgae;Gelidium glandulaefolium;Medium foliose red algae
+448;Macroalgae;Gelidium spp.;Medium foliose red algae
+449;Macroalgae;Gelinaria ulvoidea;Medium foliose red algae
+450;Macroalgae;Gigartina crassicaulis;Medium foliose red algae
+451;Macroalgae;Gigartina muelleriana;Medium foliose red algae
+452;Macroalgae;Gigartina spp.;Medium foliose red algae
+453;Macroalgae;Gloiosaccion brownii;Medium foliose red algae
+454;Other;Goniastrea;Stony corals
+455;Other;Goniastrea aspera;Massive corals
+456;Other;Goniastrea australensis;Massive corals
+457;Other;Goniastrea edwardsi;Massive corals
+458;Other;Goniastrea Hemispherical;Massive corals
+459;Other;Goniastrea Hemispherical (bleached);Massive corals_Bleached
+460;Other;Goniastrea pectinata;Sub-massive corals
+461;Other;Goniastrea pectinata (bleached);Sub-massive corals_Bleached
+462;Other;Goniastrea retiformis;Massive corals
+463;Other;Goniastrea Submassive;Sub-massive corals
+464;Other;Goniastrea Submassive Flagged For Review;Sub-massive corals
+465;Other;Goniopora;Stony corals
+466;Stony corals;Goniopora & Alveopora spp.;Sub-massive corals
+467;Other;Goniopora Columnar or digitate;Columnar corals
+468;Other;Goniopora Encrusting;Encrusting corals
+469;Other;Goniopora Hemispherical;Massive corals
+470;Other;Goniopora somaliensis;Encrusting corals
+471;Other;Goniopora Submassive;Sub-massive corals
+472;Other;Goniopora tenuidens;Massive corals
+473;Black & Octocorals;Gorgonians;Soft corals and gorgonians
+474;Macroalgae;Gracilaria spp.;Medium foliose red algae
+475;Macroalgae;Grateloupia spp.;Medium foliose red algae
+476;Substrate;Gravel;Pebbles/gravel/shell
+477;Macroalgae;Green algal spp.(filamentous);Filamentous green algae_epiphyte
+478;Macroalgae;Green algal spp.(turf);Turfing algae (<2 cm high algal/sediment mat on rock)
+479;Macroalgae;Green calcified algae;Green calcified algae (Halimeda)
+480;Macroalgae;Green calcified algae (Halimeda);Green calcified algae (Halimeda)
+481;Macroalgae;Green foliose epiphyte;Medium foliose green algae
+482;Macroalgae;Green turf;Turfing algae (<2 cm high algal/sediment mat on rock)
+483;Macroalgae;Green turf sediment matrix;Turfing algae (<2 cm high algal/sediment mat on rock)
+484;Macroalgae;Griffithsia spp.;Medium foliose red algae
+485;Macroalgae;Halicnide similans;Medium foliose red algae
+486;Macroalgae;Halimeda cuneata;Green calcified algae (Halimeda)
+487;Macroalgae;Halimeda discoidea;Green calcified algae (Halimeda)
+488;Macroalgae;Halimeda spp.;Green calcified algae (Halimeda)
+489;Macroalgae;Haliptilon roseum;Geniculate coralline algae
+490;Macroalgae;Haliptilon roseum epiphyte;Geniculate coralline algae
+491;Other;Halomitra pileus;Large-polyp stony corals (free-living)
+492;Seagrasses;Halophila australis;Seagrass (Halophila)
+493;Seagrasses;Halophila ovata;Seagrass (Halophila)
+494;Macroalgae;Haloplegma preissii;Medium foliose red algae
+495;Macroalgae;Halopteris paniculata;Medium foliose brown algae
+496;Macroalgae;Halopteris spp.;Medium foliose brown algae
+497;Other;Heliopora coerulea;Heliopora coerulea (blue coral)
+498;Coral;Heliopora coerulea (blue coral);Heliopora coerulea (blue coral)
+499;Other;Heliopora coerulea (bleached);Heliopora coerulea (blue coral)_Bleached
+500;Other;Heliopora coerulea (dead);Dead coral
+501;Macroalgae;Hemineura frondosa;Medium foliose red algae
+502;Ascidians;Herdmania grandis;Ascidians (unstalked)
+503;Ascidians;Herdmania momus;Ascidians (unstalked)
+504;Stony corals;Hermatypic corals;Stony corals
+505;Other;Herpolitha limax;Large-polyp stony corals (free-living)
+506;Seagrasses;Heterozostera spp.;Seagrass (straplike)
+507;Macroalgae;Hincksia spp.;Filamentous brown algae_epiphyte
+508;Macroalgae;Homoeostrichus olsenii;Medium foliose brown algae
+509;Macroalgae;Hormophysa cuneiformis;Medium foliose brown algae
+510;Macroalgae;Hormosira banksii;Medium foliose brown algae
+511;Other;Hydnophora Branching;Branching corals
+512;Other;Hydnophora exesa;Encrusting corals
+513;Other;Hydnophora microconos;Massive corals
+514;Other;Hydnophora rigida;Branching corals
+515;Macroalgae;Hydroclathrus clathratus;Medium foliose brown algae
+516;Hydrocoral;Hydrocoral;Hydrocoral
+517;Hydrocoral;Hydrocoral (bleached);Hydrocoral_Bleached
+518;Hydrocoral;Hydrocoral (dead);Dead coral
+519;Cnidaria;Hydroids;Hydroids
+520;Macroalgae;Hypnea ramentacea;Filamentous red algae_epiphyte
+521;Other;Isopora;Stony corals
+522;Other;Isopora Branching;Branching corals
+523;Other;Isopora brueggemanni;Branching corals
+524;Other;Isopora brueggemanni (dead);Dead coral
+525;Stony corals;Isopora cuneata;Encrusting corals
+526;Other;Isopora cylindrica;Branching corals
+527;Other;Isopora elizabethensis;Branching corals
+528;Other;Isopora Encrusting;Encrusting corals
+529;Other;Isopora Encrusting (bleached);Encrusting corals_Bleached
+530;Other;Isopora Submassive;Sub-massive corals
+531;Macroalgae;Jania spp.;Geniculate coralline algae
+532;Macroalgae;Jania spp.epiphyte;Geniculate coralline algae
+533;Macroalgae;Jeannerettia lobata;Medium foliose red algae
+534;Macroalgae;Kallymenia spp.;Medium foliose red algae
+535;Macroalgae;Large brown fucoid kelps;Other fucoids
+536;Macroalgae;Large brown laminarian kelps;Large brown laminarian kelps
+537;Macroalgae;Large brown laminarian kelps (+ Durvillaea);Large brown laminarian kelps
+538;Stony corals;Large-polyp stony corals (free-living) (live);Large-polyp stony corals (free-living)
+539;Stony corals;Large-polyp stony corals (bleached);Large-polyp stony corals (free-living)_Bleached
+540;Stony corals;Large-polyp stony corals (dead);Dead coral
+541;Stony corals;Large-polyp stony corals (free-living);Large-polyp stony corals (free-living)
+542;Stony corals;Large-polyp stony corals (free-living) (bleached);Large-polyp stony corals (free-living)_Bleached
+543;Stony corals;Large-polyp stony corals (free-living) (recently dead);Dead coral
+544;Macroalgae;Laurencia spp.;Medium foliose red algae
+545;Macroalgae;Leathesia difformis;Medium foliose brown algae
+546;Black & Octocorals;Lemnalia spp.;Soft corals and gorgonians
+547;Macroalgae;Lenormandia marginata;Medium foliose red algae
+548;Macroalgae;Lenormandia muelleri;Medium foliose red algae
+549;Macroalgae;Lenormandia smithiae;Medium foliose red algae
+550;Macroalgae;Lenormandia spp.;Medium foliose red algae
+551;Other;Leptastrea;Stony corals
+552;Other;Leptastrea bottae;Massive corals
+553;Other;Leptastrea Encrusting;Encrusting corals
+554;Other;Leptastrea inaequalis;Massive corals
+555;Other;Leptastrea pruinosa;Encrusting corals
+556;Other;Leptastrea purpurea;Encrusting corals
+557;Other;Leptastrea Submassive;Sub-massive corals
+558;Other;Leptoria phrygia;Sub-massive corals
+559;Other;Leptoseris Encrusting;Encrusting corals
+560;Other;Leptoseris Flagged For Review;Stony corals
+561;Other;Leptoseris mycetoseroides;Encrusting corals
+562;Other;Leptoseris yabei;Foliose/Plate corals
+563;Macroalgae;Lessonia corrugata;Large brown laminarian kelps
+564;Macroalgae;Liagora spp.;Medium foliose red algae
+565;Mobile invertebrate;Limpet;Unscorable
+566;Other;Lithophyllon undulatum;Encrusting corals
+567;Macroalgae;Lobophora variegata;Medium foliose brown algae
+568;Other;Lobophyllia hemprichii;Sub-massive corals
+569;Black & Octocorals;Lobophytum sp.;Soft corals and gorgonians
+570;Macroalgae;Lobospira bicuspidata;Medium foliose brown algae
+571;Tape, wand, shadow;locality variation;Unscorable
+572;Macroalgae;Macroalgae;Other fucoids
+573;Macroalgae;Macroalgae_canopy forming;Other fucoids
+574;Macroalgae;Macrocystis pyrifera;Macrocystis
+575;Cnidaria;Macrorhynchia phillipina;Hydroids
+576;Forams;Marginopora vertebralis;Forams
+577;Macroalgae;Martensia australis;Medium foliose red algae
+578;Macroalgae;Martensia spp.;Medium foliose red algae
+579;Stony corals;Massive corals (bleached);Massive corals_Bleached
+580;Stony corals;Massive corals (dead);Dead coral
+581;Stony corals;Massive corals (Live);Massive corals
+582;Macroalgae;Melanthalia spp.;Medium foliose red algae
+583;Other;Merulina ampliata;Foliose/Plate corals
+584;Other;Merulina scabricula;Foliose/Plate corals
+585;Other;Merulina scabricula (bleached);Foliose/Plate corals_Bleached
+586;Macroalgae;Metagoniolithon radiatum;Geniculate coralline algae
+587;Macroalgae;Metagoniolithon stelliferum;Geniculate coralline algae
+588;Macroalgae;Metamastophora flabellata;Geniculate coralline algae
+589;Hydrocoral;Millepora sp;Hydrocoral
+590;Other;Millepora;Hydrocoral
+591;Hydrocoral;Millepora & Distichopora spp.;Hydrocoral
+592;Other;Millepora branching;Hydrocoral
+593;Other;Millepora dichotoma;Hydrocoral
+594;Other;Millepora exaesa;Hydrocoral
+595;Other;Millepora exaesa (bleached);Foliose/Plate corals_Bleached
+596;Other;Millepora intricata;Hydrocoral
+597;Other;Millepora tenera;Hydrocoral
+598;Mobile invertebrate;Mobile Invertebrate;Unscorable
+599;Mobile invertebrate;Mollusc;Unscorable
+600;Mobile invertebrate;Molluscs;Molluscs
+601;Stony corals;Montastrea spp.;Massive corals
+602;Stony corals;Montastrea spp. (bleached);Encrusting corals_Bleached
+603;Other;Montigyra Hemispherical;Massive corals
+604;Other;Montipora;Stony corals
+605;Other;Montipora aequituberculata;Foliose/Plate corals
+606;Other;Montipora caliculata;Sub-massive corals
+607;Other;Montipora capricornis;Foliose/Plate corals
+608;Other;Montipora Columnar or digitate;Columnar corals
+609;Other;Montipora confusa;Columnar corals
+610;Other;Montipora corbettensis;Foliose/Plate corals
+611;Other;Montipora crassituberculata;Foliose/Plate corals
+612;Other;Montipora danae;Encrusting corals
+613;Other;Montipora digitata;Branching corals
+614;Other;Montipora efflorescens;Sub-massive corals
+615;Other;Montipora Encrusting;Encrusting corals
+616;Other;Montipora Encrusting (bleached);Encrusting corals_Bleached
+617;Other;Montipora foliosa;Foliose/Plate corals
+618;Other;Montipora Foliose;Foliose/Plate corals
+619;Other;Montipora foveolata;Sub-massive corals
+620;Other;Montipora grisea;Encrusting corals
+621;Other;Montipora Hemispherical;Massive corals
+622;Other;Montipora Hemispherical (bleached);Massive corals_Bleached
+623;Other;Montipora hispida;Foliose/Plate corals
+624;Other;Montipora hispida (bleached);Foliose/Plate corals_Bleached
+625;Other;Montipora hoffmeisteri;Sub-massive corals
+626;Other;Montipora incrassata;Sub-massive corals
+627;Other;Montipora informis;Encrusting corals
+628;Other;Montipora meandrina;Sub-massive corals
+629;Other;Montipora monasteriata;Encrusting corals
+630;Other;Montipora myriophthalma;Encrusting corals
+631;Other;Montipora nodosa;Sub-massive corals
+632;Other;Montipora peltiformis;Foliose/Plate corals
+633;Other;Montipora Solid plates;Foliose/Plate corals
+634;Stony corals;Montipora spp.;Stony corals
+635;Other;Montipora stellata;Branching corals
+636;Other;Montipora Submassive;Sub-massive corals
+637;Other;Montipora Submassive (bleached);Sub-massive corals_Bleached
+638;Other;Montipora tuberculosa;Encrusting corals
+639;Other;Montipora turgescens;Encrusting corals
+640;Other;Montipora undata;Encrusting corals
+641;Other;Montipora venosa;Sub-massive corals
+642;Other;Montipora verrucosa;Encrusting corals
+643;Black & Octocorals;Mopsella spp.;Soft corals and gorgonians
+644;Molluscs;Mussels;Sessile bivalves
+645;Stony corals;Mussidae spp.;Massive corals
+646;Stony corals;Mussidae spp. (dead);Dead coral
+647;Stony corals;Mycedium elephantotus;Foliose/Plate corals
+648;Other;Mycedium mancaoi;Foliose/Plate corals
+649;Macroalgae;Myriodesma sp. (wide leaves);Other fucoids
+650;Macroalgae;Myriogramme gunniana;Medium foliose red algae
+651;Molluscs;Mytlus galloprovincialis;Sessile bivalves
+652;Other;New species record;Stony corals
+653;Macroalgae;Nitospinosa tasmanica;Medium foliose red algae
+654;Tape, wand, shadow;No Score Recorded;Unscorable
+655;Black & Octocorals;Organ-pipe coral (Tubipora);Organ-pipe coral (Tubipora)
+656;Stony corals;Other branching/erect corals (bleached);Branching corals_Bleached
+657;Stony corals;Other branching/erect corals (Live);Branching corals
+658;Macroalgae;Other fucoids;Other fucoids
+659;Macroalgae;other green 1;Medium foliose green algae
+660;Tape, wand, shadow;other invertebrates;Unscorable
+661;Macroalgae;Other red 1;Medium foliose red algae
+662;Macroalgae;other red 2;Medium foliose red algae
+663;Macroalgae;other red 3;Medium foliose red algae
+664;Other;Oulophyllia;Massive corals
+665;Other;Oulophyllia bennettae;Massive corals
+666;Other;Oulophyllia crispa;Massive corals
+667;Tape, wand, shadow;Outside recorded distribution;Unscorable
+668;Other;Oxypora;Foliose/Plate corals
+669;Other;Oxypora crassispinosa;Foliose/Plate corals
+670;Other;Oxypora Encrusting;Encrusting corals
+671;Other;Oxypora lacera;Foliose/Plate corals
+672;Molluscs;Oysters;Sessile bivalves
+673;Macroalgae;Pachydictyon paniculatum;Medium foliose brown algae
+674;Other;Pachyseris;Stony corals
+675;Other;Pachyseris Encrusting;Encrusting corals
+676;Other;Pachyseris rugosa;Sub-massive corals
+677;Other;Pachyseris speciosa;Foliose/Plate corals
+678;Other;Pachyseris speciosa (dead);Dead coral
+679;Other;Pachyseris Submassive;Sub-massive corals
+680;Macroalgae;Padina spp.;Medium foliose brown algae
+681;Cnidaria;Palythoa spp.;Colonial Anemones, Zoanthids and Corallimorphs
+682;Cnidaria;Parazoanthus sp. (yellow);Colonial Anemones, Zoanthids and Corallimorphs
+683;Other;Pavona bipartita;Sub-massive corals
+684;Other;Pavona cactus;Branching corals
+685;Other;Pavona clavus;Columnar corals
+686;Other;Pavona decussata;Foliose/Plate corals
+687;Other;Pavona duerdeni;Sub-massive corals
+688;Other;Pavona explanulata;Encrusting corals
+689;Other;Pavona maldivensis;Columnar corals
+690;Stony corals;Pavona minuta;Encrusting corals
+691;Stony corals;Pavona sp.;Encrusting corals
+692;Stony corals;Pavona spp.;Stony corals
+693;Other;Pavona Submassive;Sub-massive corals
+694;Other;Pavona varians;Encrusting corals
+695;Other;Pavona venosa;Sub-massive corals
+696;Substrate;Pebble;Pebbles/gravel/shell
+697;Substrate;Pebbles/gravel;Pebbles/gravel/shell
+698;Substrate;Pebbles/unconsolidated rocky bottom/coral rubble;Pebbles/gravel/shell
+699;Other;Pectinia alcicornis;Foliose/Plate corals
+700;Other;Pectinia Encrusting;Encrusting corals
+701;Other;Pectinia lactuca;Sub-massive corals
+702;Other;Pectinia paeonia;Sub-massive corals
+703;Other;Pectinia teres;Branching corals
+704;Macroalgae;Perithalia caudata;Medium foliose brown algae
+705;Macroalgae;Peyssonnelia spp. (flat);Encrusting leathery algae
+706;Macroalgae;Phacelocarpus spp.;Medium foliose red algae
+707;Macroalgae;Phyllospora comosa;Phyllospora comosa
+708;Other;Phymastrea;Stony corals
+709;Other;Phymastrea magnistellata;Massive corals
+710;Other;Phymastrea valenciennesi;Sub-massive corals
+711;Macroalgae;Phymatolithon masonianum;Crustose coralline algae
+712;Physical;Physical;Bare Rock
+713;Other;Physogyra lichtensteini;Massive corals
+714;Other;Platygyra;Massive corals
+715;Other;Platygyra contorta;Sub-massive corals
+716;Other;Platygyra daedalea;Massive corals
+717;Other;Platygyra Encrusting;Encrusting corals
+718;Other;Platygyra Hemispherical;Massive corals
+719;Other;Platygyra lamellina;Massive corals
+720;Other;Platygyra pini;Massive corals
+721;Other;Platygyra ryukyuensis;Massive corals
+722;Other;Platygyra sinensis;Massive corals
+723;Stony corals;Platygyra spp.;Massive corals
+724;Other;Platygyra Submassive;Sub-massive corals
+725;Other;Platygyra verweyi;Massive corals
+726;Stony corals;Plesiastrea spp.;Stony corals
+727;Stony corals;Plesiastrea spp. (bleached);Encrusting corals_Bleached
+728;Stony corals;Plesiastrea versipora;Massive corals
+729;Macroalgae;Plocamium angustum;Medium foliose red algae
+730;Macroalgae;Plocamium dilatatum;Medium foliose red algae
+731;Macroalgae;Plocamium mertensii;Medium foliose red algae
+732;Macroalgae;Plocamium preissianum;Medium foliose red algae
+733;Macroalgae;Plocamium spp.;Medium foliose red algae
+734;Stony corals;Pocillopora;Branching Pocillopora
+735;Stony corals;Pocillopora (bleached);Branching Pocillopora_Bleached
+736;Stony corals;Pocillopora (dead);Dead coral
+737;Stony corals;Pocillopora damicornis;Branching Pocillopora
+738;Stony corals;Pocillopora damicornis (bleached);Branching Pocillopora_Bleached
+739;Stony corals;Pocillopora damicornis (dead);Dead coral
+740;Other;Pocillopora eydouxi;Branching Pocillopora
+741;Other;Pocillopora eydouxi (dead);Dead coral
+742;Other;Pocillopora meandrina;Branching Pocillopora
+743;Stony corals;Pocillopora spp.;Branching Pocillopora
+744;Other;Pocillopora verrucosa;Branching Pocillopora
+745;Other;Pocillopora verrucosa (bleached);Branching Pocillopora_Bleached
+746;Other;Pocillopora verrucosa (dead);Dead coral
+747;Other;Podabacia crustacea;Foliose/Plate corals
+748;Worms;Polychaete;Polychaete
+874;Sponges;Sponges (hollow);Sponges (hollow)
+749;Macroalgae;Polysiphonia sp. either blandia or infestans;Filamentous red algae_epiphyte
+750;Other;Porites;Stony corals
+751;Other;Porites annae;Sub-massive corals
+752;Other;Porites annae (bleached);Sub-massive corals_Bleached
+753;Other;Porites Branching;Branching corals
+754;Other;Porites cylindrica;Branching corals
+755;Other;Porites cylindrica (bleached);Branching corals_Bleached
+756;Other;Porites Encrusting;Encrusting corals
+757;Other;Porites Encrusting (dead);Dead coral
+758;Other;Porites Foliose;Foliose/Plate corals
+759;Other;Porites Hemispherical;Massive corals
+760;Stony corals;Porites heronensis;Columnar corals
+761;Stony corals;Porites heronensis (bleached);Columnar corals_Bleached
+762;Stony corals;Porites heronensis (dead);Dead coral
+763;Other;Porites lichen;Foliose/Plate corals
+764;Other;Porites lichen (dead);Dead coral
+765;Other;Porites Massive;Massive corals
+766;Other;Porites monticulosa;Foliose/Plate corals
+767;Other;Porites nigrescens;Branching corals
+768;Other;Porites rugosa;Branching corals
+769;Other;Porites rus;Sub-massive corals
+770;Other;Porites rus (bleached);Sub-massive corals_Bleached
+771;Other;Porites Solid plates;Foliose/Plate corals
+772;Stony corals;Porites spp.;Stony corals
+773;Stony corals;Porites spp. (bleached);Stony corals_Bleached
+774;Stony corals;Porites spp. (dead);Dead coral
+775;Other;Porites Submassive;Sub-massive corals
+776;Other;Porites vaughani;Encrusting corals
+777;Seagrasses;Posidonia australis;Seagrass (straplike)
+778;Seagrasses;Posidonia spp.;Seagrass (straplike)
+779;Other;Psammocora contigua;Branching corals
+780;Other;Psammocora Encrusting;Encrusting corals
+781;Other;Psammocora haimiana;Columnar corals
+782;Other;Psammocora nierstraszi;Encrusting corals
+783;Other;Psammocora obtusangula;Branching corals
+784;Other;Psammocora profundacella;Encrusting corals
+785;Other;Psammocora Submassive;Sub-massive corals
+786;Black & Octocorals;Pteronisis spp.;Soft corals and gorgonians
+787;Macroalgae;Pterocladia lucida;Medium foliose red algae
+788;Macroalgae;Pterocladia spp.;Medium foliose red algae
+789;Macroalgae;Ptilonia australica;Medium foliose red algae
+790;Ascidians;Pyura gibbosa;Ascidians (stalked)
+791;Ascidians;Pyura spinifera;Ascidians (stalked)
+792;Cnidaria;Ralpharia magnifica;Hydroids
+793;Other;Recently (dead);Dead coral
+794;Macroalgae;Red algal spp. (turf);Turfing algae (<2 cm high algal/sediment mat on rock)
+795;Macroalgae;Red algal spp. (filamentous);Filamentous red algae_epiphyte
+796;Macroalgae;Red cabbage algae;Medium foliose red algae
+797;Macroalgae;Red coralline algae;Crustose coralline algae
+798;Macroalgae;Red foliose epiphyte;Medium foliose red algae
+799;Macroalgae;Red turf sediment matrix;Turfing algae (<2 cm high algal/sediment mat on rock)
+800;Macroalgae;Rhodoliths;Crustose coralline algae
+801;Macroalgae;Rhodophyllis multipartita;Medium foliose red algae
+802;Macroalgae;Rhodymenia spp.;Medium foliose red algae
+803;Ascidians;Ritterella pednuculata;Ascidians (unstalked)
+804;Substrate;Rock;Bare Rock
+805;Substrate;Rock (bare);Bare Rock
+806;Substrate;Rubble;Coral rubble
+807;Worms;Sabellid worms;Polychaete
+808;Substrate;Sand;Sand
+809;Macroalgae;Sand/turf/mix;Turfing algae (<2 cm high algal/sediment mat on rock)
+810;Other;Sandalolitha robusta;Large-polyp stony corals (free-living)
+811;Other;Sandalolitha robusta (bleached);Large-polyp stony corals (free-living)_Bleached
+812;Macroalgae;Sarcodia ciliata;Medium foliose red algae
+813;Macroalgae;Sarcomenia delesseriodes;Medium foliose red algae
+814;Black & Octocorals;Sarcophyton spp.;Soft corals and gorgonians
+815;Macroalgae;Sargassum decipiens;Other fucoids
+816;Macroalgae;Sargassum fallax;Other fucoids
+817;Macroalgae;Sargassum heteromorphum;Other fucoids
+818;Macroalgae;Sargassum lacerifolium;Other fucoids
+819;Macroalgae;Sargassum linearifolium;Other fucoids
+820;Macroalgae;Sargassum sonderi;Other fucoids
+821;Macroalgae;Sargassum spinuligerum;Other fucoids
+822;Macroalgae;Sargassum spp.;Other fucoids
+823;Macroalgae;Sargassum varians;Other fucoids
+824;Macroalgae;Sargassum verruculosum;Other fucoids
+825;Macroalgae;Sargassum vestium;Other fucoids
+826;Macroalgae;Scaberia agardhii;Other fucoids
+827;Molluscs;Scallops;Sessile bivalves
+828;Other;Scapophyllia cylindrica;Columnar corals
+829;Stony corals;Scolymia australis;Large-polyp stony corals (free-living)
+830;Macroalgae;Scytothalia dorycarpa;Other fucoids
+831;Black & Octocorals;Sea pens;Soft corals and gorgonians
+832;Black & Octocorals;Sea whips;Soft corals and gorgonians
+833;Seagrasses;Seagrasses;Seagrasses
+834;Seagrasses;Seagrass (Halophila);Seagrass (Halophila)
+835;Seagrasses;Seagrass (straplike);Seagrass (straplike)
+836;Substrate;Sediment;Sand
+837;Substrate;Sediment matrix;Sand
+838;Macroalgae;Sediment Turf Matrix;Turfing algae (<2 cm high algal/sediment mat on rock)
+839;Macroalgae;Seirococcus axillaris;Other fucoids
+840;Other;Seriatopora;Branching corals
+841;Other;Seriatopora aculeata;Branching corals
+842;Other;Seriatopora caliendrum;Branching corals
+843;Other;Seriatopora caliendrum (bleached);Branching corals_Bleached
+844;Other;Seriatopora caliendrum (dead);Dead coral
+845;Stony corals;Seriatopora hystrix;Branching corals
+846;Stony corals;Seriatopora hystrix (bleached);Branching corals_Bleached
+847;Stony corals;Seriatopora hystrix (dead);Dead coral
+848;Worms;Serpulid worms;Polychaete
+849;Molluscs;Sessile bivalves;Sessile bivalves
+850;Molluscs;Sessile gastropods;Sessile gastropods
+851;Molluscs;Sessile mollusc;Molluscs
+852;Tape, wand, shadow;shadow;Unscorable
+853;Substrate;Silt;Sand
+854;Black & Octocorals;Sinularia spp.;Soft corals and gorgonians
+855;Macroalgae;Small <2cm algal cover (not trapping sediment);Small <2cm foliose algal cover (not trapping sediment)
+856;Black & Octocorals;Soft corals;Soft corals and gorgonians
+857;Black & Octocorals;Soft corals and gorgonians;Soft corals and gorgonians
+858;Black & Octocorals;Soft corals and gorgonians (bleached);Soft corals and gorgonians_Bleached
+859;Black & Octocorals;Soft corals and gorgonians (dead);Soft corals and gorgonians
+860;Bryozoa;Soft erect bryozoans;Bryozoan (soft)
+861;Other;Solid plate corals;Foliose/Plate corals
+862;Other;Solid plate corals (bleached);Foliose/Plate corals_Bleached
+863;Cnidaria;Solitary Anemones;Solitary Anemones
+864;Macroalgae;Sonderopelta coriacea;Medium foliose red algae
+865;Worms;Spirorbid worms;Polychaete
+866;Sponges;Sponges (encrusting);Sponges (encrusting)
+867;Sponges;Sponges (erect);Sponges (erect)
+868;Sponges;Sponge (plate);Sponges (erect)
+869;Sponges;Sponge spp. (encrusting);Sponges (encrusting)
+870;Sponges;Sponge spp. (erect);Sponges (erect)
+871;Sponges;Sponge spp. (hollow);Sponges (hollow)
+872;Sponges;Sponge spp. (massive);Sponges (massive)
+873;Sponges;Sponges;Sponges (encrusting)
+875;Sponges;Sponges (massive);Sponges (massive)
+876;Other;Sponges Flagged For Review;Sponges (encrusting)
+877;Macroalgae;Sporochnus spp.;Medium foliose brown algae
+878;Stony corals;Staghorn Acropora (bleached);Branching Acropora_Bleached
+879;Stony corals;Staghorn Acropora (live);Branching Acropora
+880;Stony corals;Staghorn Acropora (recently dead);Dead coral
+881;Stony corals;Staghorn Acropora;Branching Acropora
+882;Macroalgae;Stenogramme interrupta;Medium foliose red algae
+883;Sponges;Strepsichordaia caliciformis;Sponges (erect)
+884;Hydrocoral;Stylaster brunneus;Hydrocoral
+885;Other;Stylocoeniella guentheri;Sub-massive corals
+886;Other;Stylocoeniella guentheri Bleached,Flagged For Review,(dead);Dead coral
+887;Other;Stylophora Branching;Branching corals
+888;Stony corals;Stylophora pistillata;Branching corals
+889;Other;Stylophora pistillata (bleached);Branching corals_Bleached
+890;Stony corals;Stylophora spp.;Stony corals
+891;Stony corals;Sub-massive corals;Sub-massive corals
+892;Stony corals;Sub-massive corals (bleached);Sub-massive corals_Bleached
+893;Stony corals;Sub-massive corals (live);Sub-massive corals
+894;Stony corals;Sub-massive corals (recently dead);Dead coral
+895;Substrate;Substrate;Unscorable
+896;Ascidians;Sycozoa cerebriformis;Ascidians (unstalked)
+897;Ascidians;Sycozoa spp.;Ascidians (unstalked)
+898;Other;Symphyllia;Massive corals
+899;Other;Symphyllia hemispherica;Massive corals
+900;Other;Symphyllia Hemispherical;Massive corals
+901;Other;Symphyllia radians;Massive corals
+902;Other;Symphyllia recta;Massive corals
+903;Other;Symphyllia Submassive;Sub-massive corals
+904;Macroalgae;Synarthrophyton patena;Geniculate coralline algae
+905;Macroalgae;Synarthrophyton patena epiphyte;Geniculate coralline algae
+906;Stony corals;Tabular Acropora Coral (bleached);Tabular Acropora corals_Bleached
+907;Stony corals;Tabular Acropora Coral (live);Tabular Acropora corals
+908;Stony corals;Tabular Acropora Coral (recently dead);Dead coral
+909;Stony corals;Tabular Coral (bleached);Tabular Acropora corals_Bleached
+910;Stony corals;Tabular Coral (dead);Dead coral
+911;Stony corals;Tabular Coral (Live);Tabular Acropora corals
+912;Tape, wand, shadow;Tape;Unscorable
+913;Tape, wand, shadow;Tape Wand Shadow;Unscorable
+914;Tape, wand, shadow;Tape, wand, shadow;Unscorable
+915;Sponges;Tethya spp.;Sponges (massive)
+916;Macroalgae;Thamnoclonium dichotomum;Medium foliose red algae
+917;Bryozoa;Triphyllozoon sp.;Bryozoan (hard)
+918;Other;Tubastrea;Ahermatypic corals
+919;Other;Tubastrea faulkneri;Ahermatypic corals
+920;Black & Octocorals;Tubipora musica;Organ-pipe coral (Tubipora)
+921;Other;Turbinaria;Foliose/Plate corals
+922;Other;Turbinaria Encrusting;Encrusting corals
+923;Other;Turbinaria Foliose;Foliose/Plate corals
+924;Other;Turbinaria frondens;Foliose/Plate corals
+925;Other;Turbinaria irregularis;Encrusting corals
+926;Other;Turbinaria mesenterina;Foliose/Plate corals
+927;Other;Turbinaria peltata;Foliose/Plate corals
+928;Other;Turbinaria reniformis;Foliose/Plate corals
+929;Stony corals;Turbinaria spp.;Foliose/Plate corals
+930;Stony corals;Turbinaria spp. (dead);Dead coral
+931;Other;Turbinaria stellulata;Massive corals
+932;Macroalgae;Ulva spp.;Medium foliose green algae
+933;Macroalgae;Undaria pinatifida;Large brown laminarian kelps
+934;Tape, wand, shadow;Unsure;Unscorable
+935;Mobile invertebrate;Urchin;Unscorable
+936;Macroalgae;Ventricaria spp.;Medium foliose green algae
+937;Worms;Worms;Worms
+938;Black & Octocorals;Xenia spp.;Soft corals and gorgonians
+939;Macroalgae;Xiphophora gladiata;Other fucoids
+940;Macroalgae;Xiphophora spp.;Other fucoids
+941;Cnidaria;Zoanthus robustus;Colonial Anemones, Zoanthids and Corallimorphs
+942;Cnidaria;Zoanthus spp.;Colonial Anemones, Zoanthids and Corallimorphs
+943;Macroalgae;Zonaria spiralis;Medium foliose brown algae
+944;Macroalgae;Zonaria spp.;Medium foliose brown algae
+945;Seagrasses;Zostera spp.;Seagrass (straplike)
