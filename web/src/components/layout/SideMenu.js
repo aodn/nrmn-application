@@ -3,9 +3,11 @@ import {Box, Divider, Drawer, IconButton, List, ListSubheader, Typography, ListI
 import MenuIcon from '@mui/icons-material/Menu';
 import {NavLink} from 'react-router-dom';
 import {PropTypes} from 'prop-types';
+import {AuthContext} from '../../contexts/auth-context';
 
 const SideMenu = ({open, onClose}) => {
-  const version = process.env.REACT_APP_VERSION && process.env.REACT_APP_VERSION.split('.');
+  const version = process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION.split('.') : [0, 0, 0];
+
   return (
     <Drawer variant="temporary" anchor="left" open={open} onClose={onClose}>
       <Box ml={3}>
@@ -59,8 +61,17 @@ const SideMenu = ({open, onClose}) => {
       </List>
       <List>
         <Divider />
-        {version && <ListSubheader>{`Version ${version[0]}.${version[1]} (${version[2]})`}</ListSubheader>}
+        <ListSubheader>{`Version ${version[0]}.${version[1]} (${version[2]})`}</ListSubheader>
       </List>
+      <AuthContext.Consumer>
+        {({auth}) => (
+          <Box ml={2}>
+            {auth.features.map((label, i) => (
+              <small key={i}>{label}</small>
+            ))}
+          </Box>
+        )}
+      </AuthContext.Consumer>
     </Drawer>
   );
 };
