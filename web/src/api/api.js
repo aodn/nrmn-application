@@ -54,6 +54,7 @@ export const userLogin = (params, onResult) => {
         state.accessToken = res.data.accessToken;
         state.tokenType = res.data.tokenType;
         state.roles = jwt.roles;
+        state.features = res.data.features;
         try {
           localStorage.setItem('auth', JSON.stringify(state));
           localStorage.setItem('gridLicense', JSON.stringify(res.data.gridLicense));

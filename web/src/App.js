@@ -94,7 +94,7 @@ const App = () => {
                     <Route path="/data/surveys" element={<SurveyList />} />
                     <Route path="/data/survey/:id" element={<SurveyView />} />
                     <Route path="/data/survey/:id/edit" element={<SurveyEdit />} />
-                    <Route path="/data/survey/:id/correct" element={<SurveyCorrect />} />
+                    {auth.features.includes('corrections') && <Route path="/data/survey/:id/correct" element={<SurveyCorrect />} />}
 
                     <Route path="/data/jobs" element={<JobList />} />
                     <Route path="/data/job/:id/view" element={<JobView />} />
