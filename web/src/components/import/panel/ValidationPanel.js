@@ -7,9 +7,6 @@ const ValidationPanel = (props) => {
   const context = props.api.gridOptionsWrapper.gridOptions.context;
   const summary = context.summary;
   const errorList = context.errorList;
-  // FIXME:
-  // const isAdmin = useSelector((state) => state.auth.roles)?.includes('ROLE_ADMIN');
-  const isAdmin = false;
 
   const handleItemClick = (item, noFilter) => {
     const rowId = item.row || item.rowIds[0];
@@ -96,7 +93,7 @@ const ValidationPanel = (props) => {
           </TableBody>
         </Table>
       </Box>
-      {isAdmin ? (
+      {context.isAdmin ? (
         <Box m={2} mt={1}>
           <Typography style={{color: 'red'}} variant="button">
             Blocking validations disabled. Proceed with caution!

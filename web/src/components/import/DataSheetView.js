@@ -145,7 +145,7 @@ const generateErrorTree = (rowData, rowPos, errors) => {
 
 const IngestState = Object.freeze({Loading: 0, Edited: 1, Valid: 2, ConfirmSubmit: 3});
 
-const DataSheetView = ({onIngest}) => {
+const DataSheetView = ({onIngest, isAdmin}) => {
   const {id} = useParams();
   const [job, setJob] = useState({});
   const [gridApi, setGridApi] = useState();
@@ -444,6 +444,7 @@ const DataSheetView = ({onIngest}) => {
 
   const reload = (api, id, completion) => {
     resetContext();
+    context.isAdmin = isAdmin;
     getDataJob(id).then((res) => {
       const job = {
         program: res.data.job.program.programName,
@@ -685,7 +686,7 @@ const DataSheetView = ({onIngest}) => {
             <Box p={1} mr={2}>
               <Button
                 variant="contained"
-                disabled={state !== IngestState.Valid}
+                disabled={state !== IngestState.Valid && !isAdmin}
                 onClick={() => setState(IngestState.ConfirmSubmit)}
                 startIcon={<CloudUploadIcon />}
               >
@@ -797,7 +798,8 @@ const DataSheetView = ({onIngest}) => {
 };
 
 DataSheetView.propTypes = {
-  onIngest: PropTypes.func.isRequired
+  onIngest: PropTypes.func.isRequired,
+  isAdmin: PropTypes.bool.isRequired
 };
 
 export default DataSheetView;
