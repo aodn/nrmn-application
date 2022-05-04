@@ -1,4 +1,4 @@
-import {Box, Typography} from '@mui/material';
+import {Box, Button, Typography} from '@mui/material';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
@@ -9,11 +9,13 @@ import {allMeasurements} from '../../../common/constants';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import SummaryPanel from './panel/SummaryPanel';
 import SurveyMeasurementHeader from './SurveyMeasurementHeader';
+import {PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon} from '@mui/icons-material/';
 
 const SurveyCorrect = () => {
   const surveyId = useParams()?.id;
 
-  const [rowData, setRowData] = useState(null);
+  const [rowData, setRowData] = useState();
+  const [gridApi, setGridApi] = useState();
 
   const components = useMemo(() => {
     return {
@@ -52,37 +54,49 @@ const SurveyCorrect = () => {
 
   const headers = useMemo(() => {
     return [
-      {label: 'ID', hide: true},
-      {label: 'Survey', hide: true},
-      {label: 'Diver ID', hide: true},
-      {label: 'Diver', hide: false},
-      {label: 'Site Code', hide: true},
-      {label: 'Depth', hide: false},
-      {label: 'Survey Date', hide: false},
-      {label: 'Survey Time', hide: false},
-      {label: 'Visibility', hide: false},
-      {label: 'Direction', hide: false},
-      {label: 'Latitude', hide: false},
-      {label: 'Longitude', hide: false},
-      {label: 'observable_item_id', hide: true},
-      {label: 'Species Name', hide: false},
-      {label: 'Letter Code', hide: false},
-      {label: 'Method', hide: false},
-      {label: 'Block', hide: false},
-      {label: 'Survey Not Done', hide: false, isBoolean: true},
-      {label: 'Use Invert Sizing', hide: false, isBoolean: true}
+      {field: 'id', label: '', hide: false},
+      {field: 'surveyId', label: 'Survey', hide: true},
+      {field: 'diverId', label: 'Diver ID', hide: true},
+      {field: 'initials', label: 'Diver', hide: false},
+      {field: 'siteCode', label: 'Site Code', hide: true},
+      {field: 'depth', label: 'Depth', hide: false},
+      {field: 'surveyDate', label: 'Survey Date', hide: false},
+      {field: 'surveyTime', label: 'Survey Time', hide: false},
+      {field: 'visibility', label: 'Visibility', hide: false}
+      // {label: 'Direction', hide: false},
+      // {label: 'Latitude', hide: false},
+      // {label: 'Longitude', hide: false},
+      // {label: 'observable_item_id', hide: true},
+      // {label: 'Species Name', hide: false},
+      // {label: 'Letter Code', hide: false},
+      // {label: 'Method', hide: false},
+      // {label: 'Block', hide: false},
+      // {label: 'Survey Not Done', hide: false, isBoolean: true},
+      // {label: 'Use Invert Sizing', hide: false, isBoolean: true}
     ];
   }, []);
 
-  const onGridReady = ({api}) =>
+  const onGridReady = ({api}) => {
+    setGridApi(api);
     getCorrections(surveyId).then((res) => {
       api.hideOverlay();
       if (res.status !== 200) return;
-      const unpackedData = res.data.map((d) => {
-        return {...d, 19: JSON.parse(d.at(-1))};
+      const unpackedData = res.data.map((data, idx) => {
+        const measurements = JSON.parse(data.measurementJson);
+        delete data.measurementJson;
+        return {id: idx + 1, ...data, measurements};
       });
       setRowData(unpackedData);
     });
+  };
+
+  const onSaveValidate = () => {
+    const packedData = [];
+    gridApi.forEachNode((rowNode, index) => {
+      const data = rowNode.data;
+      packedData.push({id: index, ...data, 19: JSON.stringify(data[19])});
+    });
+  };
 
   const onModelUpdated = () => {};
 
@@ -91,6 +105,11 @@ const SurveyCorrect = () => {
       <Box display="flex" flexDirection="row" p={1} pb={1}>
         <Box flexGrow={1}>
           <Typography variant="h4">Survey Correction</Typography>
+        </Box>
+        <Box p={1} minWidth={180}>
+          <Button onClick={onSaveValidate} variant="contained" startIcon={<PlaylistAddCheckOutlinedIcon />}>
+            {`Save & Validate`}
+          </Button>
         </Box>
       </Box>
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
@@ -114,17 +133,6 @@ const SurveyCorrect = () => {
           rowSelection="multiple"
           sideBar={defaultSideBar}
         >
-          <AgGridColumn
-            field="row"
-            headerName=""
-            suppressMovable={true}
-            editable={false}
-            valueGetter={(params) => rowData.indexOf(params.data) + 1}
-            minWidth={40}
-            enableCellChangeFlash={false}
-            filter={false}
-            sortable={false}
-          />
           {headers.map((header, idx) =>
             header.isBoolean ? (
               <AgGridColumn
@@ -137,13 +145,13 @@ const SurveyCorrect = () => {
                 valueFormatter={(e) => (e.value === true ? 'Yes' : 'No')}
               />
             ) : (
-              <AgGridColumn key={idx} field={idx.toString()} headerName={header.label} hide={header.hide} cellEditor="agTextCellEditor" />
+              <AgGridColumn key={idx} field={header.field} headerName={header.label} hide={header.hide} cellEditor="agTextCellEditor" />
             )
           )}
-          <AgGridColumn field={headers.length + '.0'} headerName="Unsized" />
+          <AgGridColumn field={'measurements.0'} headerName="Unsized" />
           {allMeasurements.map((_, idx) => {
-            const id = headers.length + '.' + idx;
-            return <AgGridColumn field={id} headerComponent={SurveyMeasurementHeader} key={id} width={35} />;
+            const field = `measurements.${idx + 1}`;
+            return <AgGridColumn field={field} headerComponent={SurveyMeasurementHeader} key={idx} width={35} />;
           })}
         </AgGridReact>
       </Box>

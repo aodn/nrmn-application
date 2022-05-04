@@ -3,7 +3,7 @@ import {PropTypes} from 'prop-types';
 import {allMeasurements} from '../../../common/constants';
 
 const SurveyMeasurementHeader = ({column}) => {
-  const id = parseInt(column.colId.split('.')[1]);
+  const id = parseInt(column.colId.split('.')[1]) - 1;
   const header = allMeasurements[id];
 
   return (

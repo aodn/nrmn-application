@@ -8,15 +8,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowDto;
 import au.org.aodn.nrmn.restapi.model.db.Observation;
 
 @Repository
 public interface CorrectionRowRepository
         extends JpaRepository<Observation, Long>, JpaSpecificationExecutor<Observation> {
 
-    @Query(value = "select min(c.observation_id) as observation_id, c.survey_id, " +
-            "c.diver_id, c.initials, " +
-            "c.site_code, c.depth, c.survey_date, c.survey_time, c.visibility, " +
+    @Query(value = "select cast(jsonb_agg(c.observation_id) as text) as observationIds, c.survey_id as surveyId, " +
+            "c.diver_id as diverId, c.initials, " +
+            "c.site_code as siteCode, c.depth, c.survey_date as surveyDate, c.survey_time as surveyTime, c.visibility, "
+            +
             "c.direction, " +
             "c.latitude, c.longitude, " +
             "c.observable_item_id, c.observable_item_name, c.letter_code, " +
@@ -55,5 +57,5 @@ public interface CorrectionRowRepository
             "c.latitude, c.longitude, " +
             "c.observable_item_id, c.observable_item_name, c.letter_code, " +
             "c.method_id, c.block_num, c.survey_not_done, c.measure_type_id", nativeQuery = true)
-    List<Object> findRowsBySurveyId(@Param("surveyId") Long surveyId);
+    List<CorrectionRowDto> findRowsBySurveyId(@Param("surveyId") Long surveyId);
 }
