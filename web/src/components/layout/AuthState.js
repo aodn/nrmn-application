@@ -21,7 +21,7 @@ const AuthState = () => {
           <>
             <Button variant="contained" disableElevation startIcon={<AccountCircle />} onClick={() => showConfirmLogout(true)}>
               {auth.username}
-              {auth.isAdmin && <span style={{color: 'yellow', marginLeft: 5}}>(ADMIN)</span>}
+              {auth.roles.includes('ROLE_ADMIN') && <span style={{color: 'yellow', marginLeft: 5}}>(ADMIN)</span>}
             </Button>
             <AlertDialog
               open={confirmLogout}
