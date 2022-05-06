@@ -21,6 +21,8 @@ const SurveyEdit = () => {
   const formReducer = (state, action) => {
     if (action.form) return {...state, ...action.form};
     switch (action.field) {
+      case 'siteCode':
+        return {...state, siteCode: action.value, siteName: sites?.find((i) => i.siteCode === action.value)?.siteName};
       default:
         return {...state, [action.field]: action.value};
     }
@@ -161,12 +163,7 @@ const SurveyEdit = () => {
                 />
               </Grid>
               <Grid item xs={6}>
-                <CustomTextInput
-                  readOnlyModify
-                  label="Site Name"
-                  formData={sites?.find((i) => i.siteCode === item.siteCode)?.siteName}
-                  field="siteName"
-                />
+                <CustomTextInput readOnlyModify label="Site Name" formData={item.siteName} field="siteName" />
               </Grid>
               <Grid item xs={6}>
                 <CustomDropDownInput
@@ -294,9 +291,11 @@ const SurveyEdit = () => {
               <Button variant="outlined" component={NavLink} to="/data/surveys">
                 Cancel
               </Button>
-              <Button variant="contained" onClick={handleSubmit} startIcon={<Save></Save>}>
-                Save Survey
-              </Button>
+              <Box ml={5}>
+                <Button variant="contained" onClick={handleSubmit} startIcon={<Save></Save>}>
+                  Save Survey
+                </Button>
+              </Box>
             </Box>
           </Box>
         )}
