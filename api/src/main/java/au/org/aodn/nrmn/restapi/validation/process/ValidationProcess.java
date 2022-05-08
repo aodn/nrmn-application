@@ -253,6 +253,11 @@ public class ValidationProcess {
                     errors.add(rowId, ValidationLevel.BLOCKING, "method", "ATRC Method 7 must be recorded on block 2");
             }
 
+            // Validation: Use Invert Sizing is blank
+            if (StringUtils.isBlank(row.getIsInvertSizing())) {
+                errors.add(rowId, ValidationLevel.WARNING, "isInvertSizing", "Use Invert Sizing is blank");
+            }
+
             // Validation: Species Invert Sizing
             if (isExtendedSize && !StringUtils.isBlank(row.getIsInvertSizing()) &&
                     !(row.getIsInvertSizing().equalsIgnoreCase("YES") || row.getIsInvertSizing().equalsIgnoreCase("NO")))
