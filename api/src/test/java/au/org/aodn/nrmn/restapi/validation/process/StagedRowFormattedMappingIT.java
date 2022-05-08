@@ -53,7 +53,7 @@ class StagedRowFormattedMappingIT {
         row.setSiteName("South East Slade Point");
         row.setLongitude("154");
         row.setLatitude("-35");
-        row.setDate("16/11/2020");
+        row.setDate("16/11/20");
         row.setTime("11:32");
         row.setDiver("JEP");
         row.setDepth("7.4");

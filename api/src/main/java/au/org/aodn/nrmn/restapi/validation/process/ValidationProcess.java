@@ -184,7 +184,7 @@ public class ValidationProcess {
 
             // Date
             try {
-                LocalDate.parse(row.getDate(), DateTimeFormatter.ofPattern("d/M/yyyy"));
+                LocalDate.parse(row.getDate(), TimeUtils.getRowDateFormatter());
             } catch (DateTimeParseException e) {
                 errors.add(rowId, ValidationLevel.BLOCKING, "date", "Date format is not valid");
             }
