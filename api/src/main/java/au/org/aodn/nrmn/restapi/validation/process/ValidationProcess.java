@@ -288,7 +288,7 @@ public class ValidationProcess {
                     .map(Map.Entry::getKey).collect(Collectors.toList());
 
             if (!outOfRange.isEmpty()) {
-                String message = "Measurements outside L5/95 [" + l5 + "," + l95 + "] for [" + row.getRef().getSpecies() + "]";
+                String message = (isInvertSized ? "Invert measurements" : "Measurements") + " outside L5/95 [" + l5 + "," + l95 + "] for [" + row.getRef().getSpecies() + "]";
                 outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.INFO, message, row.getId(), col.toString())));
             }
         }
@@ -312,7 +312,7 @@ public class ValidationProcess {
                     .collect(Collectors.toList());
 
             if (!outOfRange.isEmpty()) {
-                String message = "Measurement is above Lmax [" + lMax + "] for Species [" + row.getRef().getSpecies() + "]";
+                String message = (isInvertSized ? "Invert measurement " : "Measurement ") + " is above Lmax [" + lMax + "] for Species [" + row.getRef().getSpecies() + "]";
                 outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.INFO, message, row.getId(), col.toString())));
             }
         }
