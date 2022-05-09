@@ -16,6 +16,9 @@ import java.util.Optional;
 
 public class TimeUtils {
     private static final DateTimeFormatter SUPPORTED_TIME_FORMATTER = new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("[h:mm[:ss] a][H:mm[:ss]]").toFormatter();
+    
+    private static final DateTimeFormatter ROW_DATE_TIME_FORMATTER = new DateTimeFormatterBuilder().appendPattern("d/M/[yyyy][yy]").toFormatter();
+
     private static final String SUPPORTED_DATE_FORMAT = "yyyy-MM-dd";
 
     public static Optional<LocalTime> parseTime(String value) {
@@ -24,6 +27,10 @@ public class TimeUtils {
         } catch (DateTimeParseException e) {
             return Optional.empty();
         }
+    }
+
+    public static DateTimeFormatter getRowDateFormatter(){
+        return ROW_DATE_TIME_FORMATTER;
     }
 
     public static Date parseDate(String value) {

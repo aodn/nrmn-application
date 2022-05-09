@@ -1,12 +1,12 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
 import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistanceLatLongMeters;
-
 import java.text.Normalizer;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,17 +20,14 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
@@ -187,8 +184,8 @@ public class ValidationProcess {
 
             // Date
             try {
-                DateUtils.parseDateStrictly(row.getDate(), "d/M/y");
-            } catch (ParseException e) {
+                LocalDate.parse(row.getDate(), TimeUtils.getRowDateFormatter());
+            } catch (DateTimeParseException e) {
                 errors.add(rowId, ValidationLevel.BLOCKING, "date", "Date format is not valid");
             }
 

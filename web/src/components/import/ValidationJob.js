@@ -20,8 +20,7 @@ const ValidationJob = () => {
           {ingestState.data && (
             <Box mx={2}>
               <Alert severity="error" variant="outlined">
-                <p>Sheet failed to ingest. No survey data has been inserted.</p>
-                <p>Error: {ingestState.data}</p>
+                <p>{ingestState.data}</p>
               </Alert>
             </Box>
           )}
