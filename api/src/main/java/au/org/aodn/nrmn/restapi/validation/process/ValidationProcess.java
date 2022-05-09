@@ -498,7 +498,7 @@ public class ValidationProcess {
         missingMethods.removeAll(surveyByMethod.keySet());
         if(missingMethods.size() > 0) {
             List<String> missingMethodsList = missingMethods.stream().map(m -> m.toString()).collect(Collectors.toList());
-            messages.add(" missing M" + String.join(", M", missingMethodsList));
+            messages.add("missing M" + String.join(", M", missingMethodsList));
             rowIds.addAll(surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()));
             flagColumns.add("method");
         }
@@ -528,8 +528,7 @@ public class ValidationProcess {
         }
 
         if(messages.size() > 0) {
-            return new ValidationError(ValidationCategory.SPAN, level, messagePrefix + String.join(". ", messages), 
-            rowIds, flagColumns);
+            return new ValidationError(ValidationCategory.SPAN, level, messagePrefix + " " + String.join(". ", messages), rowIds, flagColumns);
         }
 
         return null;
