@@ -173,14 +173,13 @@ class ATRCSurveyGroupCompleteIT {
         stagedRowRepo.saveAll(Arrays.asList(sn1b1, sn1b2, sn2b1, sn2b2, sn3b1, sn3b2, sn4b1));
 
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(response.getErrors().stream()
-                .anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7.1 Missing M2, M3")));
-        assertTrue(response.getErrors().stream()
-                .anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7.2 Missing M2, M3")));
-        assertTrue(response.getErrors().stream()
-                .anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7.3 Missing M2, M3")));
-        assertTrue(response.getErrors().stream()
-                .anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7.4 Missing M2, M3")));
+        var errors = response.getErrors().stream().map(e -> e.getMessage()).filter(m -> m.contains("incomplete")).sorted().toArray();
+
+        assertTrue(errors.length == 4);
+        assertTrue(errors[0].equals("Survey incomplete: [ERZ1, 2020-09-11, 7.1] missing M2, M3"));
+        assertTrue(errors[1].equals("Survey incomplete: [ERZ1, 2020-09-11, 7.2] missing M2, M3"));
+        assertTrue(errors[2].equals("Survey incomplete: [ERZ1, 2020-09-11, 7.3] missing M2, M3"));
+        assertTrue(errors[3].equals("Survey incomplete: [ERZ1, 2020-09-11, 7.4] missing M2, M3. M1 missing B2"));
     }
 
 }

@@ -86,12 +86,17 @@ public class IngestionController {
             surveyIngestionService.ingestTransaction(job, validatedRows);
             materializedViewService.refreshAllMaterializedViews();
         } catch (Exception e) {
-            logger.error("Ingestion Failed: %s", e.getMessage());
-            stagedJobLogRepository
-                    .save(StagedJobLog.builder().stagedJob(job).details("Application error ingesting sheet.")
-                            .eventType(StagedJobEventType.ERROR).build());
-            return ResponseEntity.badRequest()
-                    .body("Sheet failed to ingest. No survey data has been inserted.");
+
+            logger.error("Ingestion Failed", e);
+
+            var log = StagedJobLog.builder()
+                                .stagedJob(job)
+                                .details("Application error ingesting sheet.")
+                                .eventType(StagedJobEventType.ERROR).build();
+
+            stagedJobLogRepository.save(log);
+
+            return ResponseEntity.badRequest().body("Sheet failed to ingest. No survey data has been inserted.");
         }
         return ResponseEntity.ok("Job " + jobId + " successfully ingested.");
     }

@@ -54,7 +54,7 @@ class ATRCDepthValidationTest {
     job.setId(1L);
     StagedRowFormatted stage = new StagedRowFormatted();
     stage.setSurveyNum(9);
-    ValidationError error = validationProcess.validateSurveyTransectNumber("", Arrays.asList(stage));
+    ValidationError error = validationProcess.validateSurveyTransectNumber(Arrays.asList(stage));
     assertTrue(error.getMessage().equals("Survey group transect invalid"));
   }
 
@@ -66,7 +66,7 @@ class ATRCDepthValidationTest {
     row.setDepth(7);
     row.setSurveyNum(3);
     row.setMethod(1);
-    ValidationError error = validationProcess.validateSurveyTransectNumber("", Arrays.asList(row));
+    ValidationError error = validationProcess.validateSurveyTransectNumber(Arrays.asList(row));
     assertTrue(error == null);
   }
 }

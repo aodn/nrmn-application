@@ -3,19 +3,16 @@ package au.org.aodn.nrmn.restapi.controller.mapping;
 import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
-
 import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.Site;
@@ -64,7 +61,7 @@ public class StagedRowFormattedMapperConfig {
 
         Converter<String, LocalDate> toDate = ctx -> {
             try {
-                return LocalDate.parse(ctx.getSource(), DateTimeFormatter.ofPattern("d/M/yyyy"));
+                return LocalDate.parse(ctx.getSource(), TimeUtils.getRowDateFormatter());
             } catch (DateTimeParseException e) {
                 return null;
             }
