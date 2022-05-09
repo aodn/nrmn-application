@@ -93,7 +93,7 @@ class RLSMethodBlockAssociationIT {
 
         StagedJob job = jobRepo.findByReference("jobid-rls").get();
         String date = "11/09/2020";
-        String depth = "7";
+        String depth = "7.1";
         String siteNo = "ERZ1";
 
         StagedRow m1b1 = new StagedRow();
@@ -115,6 +115,6 @@ class RLSMethodBlockAssociationIT {
 
         ValidationResponse response = validationProcess.process(job);
         assertTrue(response.getErrors().stream()
-                .anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7 M2 missing B2")));
+                .anyMatch(e -> e.getMessage().startsWith("Survey incomplete: [ERZ1, 2020-09-11, 7.1] M2 missing B2")));
     }
 }

@@ -107,4 +107,8 @@ public class StagedRowFormatted {
     public String getSurveyGroup() {
         return ref.getSurveyGroup();
     }
+
+    public String getDecimalSurvey() {
+        return String.format("[%s, %s, %s.%d]", getRef().getSiteCode(),  getDate(), getDepth(), getSurveyNum());
+    }
 }
