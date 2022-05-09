@@ -79,7 +79,7 @@ class RLSMethodCheckIT {
 
         ValidationResponse response = validationProcess.process(job);
         assertTrue(response.getErrors().stream()
-                .anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7")));
+                .anyMatch(e -> e.getMessage().contains("Survey incomplete")));
     }
 
     @Test
@@ -152,6 +152,6 @@ class RLSMethodCheckIT {
 
         ValidationResponse response = validationProcess.process(job);
         assertTrue(response.getErrors().stream()
-                .anyMatch(e -> e.getMessage().startsWith("Survey incomplete: ERZ1/11/09/2020/7 Missing M2")));
+                .anyMatch(e -> e.getMessage().contains("missing M2")));
     }
 }

@@ -396,7 +396,7 @@ public class ValidationProcess {
 
             if (!existingSurveys.isEmpty()) {
                 Survey existingSurvey = existingSurveys.stream().findFirst().get();
-                String message = "Survey exists: " + existingSurvey.getSurveyId() + " includes [" + row.getSite().getSiteCode() + ", " + row.getDate() + ", " + row.getDepth() + "]";
+                String message = "Survey exists: " + existingSurvey.getSurveyId() + " includes " +row.getDecimalSurvey();
                 return new ValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, message, Arrays.asList(row.getId()), Arrays.asList("siteCode"));
             }
 
@@ -465,19 +465,19 @@ public class ValidationProcess {
         return columnNames.size() > 0 ? new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, "Quadrats do not sum to at least 50 in transect " + transect, rowIds, columnNames) : null;
     }
 
-    public ValidationError validateSurveyTransectNumber(String surveyKey, List<StagedRowFormatted> surveyRows) {
+    public ValidationError validateSurveyTransectNumber(List<StagedRowFormatted> surveyRows) {
         List<StagedRowFormatted> invalidTransectRows = surveyRows.stream().filter(r -> !Arrays.asList(1, 2, 3, 4).contains(r.getSurveyNum())).collect(Collectors.toList());
         if (invalidTransectRows.size() > 0)
             return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, "Survey group transect invalid", invalidTransectRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
         return null;
     }
 
-    private ValidationError validateSurveyComplete(String programName, String surveyKey, List<StagedRowFormatted> surveyRows) {
+    private ValidationError validateSurveyComplete(String programName, List<StagedRowFormatted> surveyRows) {
 
         if(surveyRows.stream().anyMatch(r -> r.getMethod() == null || r.getBlock() == null))
             return null;
 
-        String messagePrefix = "Survey incomplete: " + surveyKey + " ";
+        String messagePrefix = "Survey incomplete: " + surveyRows.get(0).getDecimalSurvey();
 
         Map<Integer, List<StagedRowFormatted>> surveyByMethod = surveyRows.stream().filter(sr -> sr.getMethod() != null && sr.getBlock() != null)
                                                                 .collect(Collectors.groupingBy(StagedRowFormatted::getMethod));
@@ -498,7 +498,7 @@ public class ValidationProcess {
         missingMethods.removeAll(surveyByMethod.keySet());
         if(missingMethods.size() > 0) {
             List<String> missingMethodsList = missingMethods.stream().map(m -> m.toString()).collect(Collectors.toList());
-            messages.add("Missing M" + String.join(", M", missingMethodsList));
+            messages.add(" missing M" + String.join(", M", missingMethodsList));
             rowIds.addAll(surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()));
             flagColumns.add("method");
         }
@@ -535,7 +535,7 @@ public class ValidationProcess {
         return null;
     }
 
-    public ValidationError validateSurveyGroup(String surveyKey, List<StagedRowFormatted> surveyRows) {
+    public ValidationError validateSurveyGroup(List<StagedRowFormatted> surveyRows) {
         Map<Integer, List<StagedRowFormatted>> surveyGroup = surveyRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyNum));
         if(!surveyGroup.keySet().containsAll(Arrays.asList(1, 2, 3, 4))) {
             List<Integer> missingSurveys = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4));
@@ -555,11 +555,11 @@ public class ValidationProcess {
             
             if (programName.equalsIgnoreCase("ATRC")){
                 // VALIDATE: Survey group transect number valid
-                res.add(validateSurveyTransectNumber(survey.getKey(), surveyRows));
+                res.add(validateSurveyTransectNumber(surveyRows));
             }
 
             // VALIDATE: Survey Complete
-            res.add(validateSurveyComplete(programName, survey.getKey(), surveyRows));
+            res.add(validateSurveyComplete(programName, surveyRows));
 
             // VALIDATE: Is Existing Survey
             res.add(validateSurveyIsNew(surveyRows.get(0)));
@@ -578,7 +578,7 @@ public class ValidationProcess {
             
             if (programName.equalsIgnoreCase("ATRC")){
                 // VALIDATE: Survey Group Complete
-                res.add(validateSurveyGroup(survey.getKey(), surveyRows));
+                res.add(validateSurveyGroup(surveyRows));
             }
         }
 
