@@ -1,6 +1,6 @@
 'use strict';
 
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {Navigate, NavLink} from 'react-router-dom';
 import {getResult} from '../../../api/api';
@@ -13,6 +13,15 @@ import 'ag-grid-enterprise';
 const ObservableItemList = () => {
   const [rowData, setRowData] = useState();
   const [redirect, setRedirect] = useState();
+  const gridRef = useRef(null);
+
+  // Auto size function to be call each time data changed, so the grid always autofit
+  const autoSizeAll = useCallback((skipHeader) => {
+    const allColumnIds = [];
+    gridRef.current.columnApi.getAllColumns().forEach((column) => {
+        allColumnIds.push(column.getId());
+    });
+    gridRef.current.columnApi.autoSizeColumns(allColumnIds, skipHeader);}, []);
 
   useEffect(() => {
     async function fetchObservableItems() {
@@ -36,10 +45,12 @@ const ObservableItemList = () => {
         </Box>
       </Box>
       <AgGridReact
+        ref={gridRef}
         className="ag-theme-material"
         rowHeight={24}
         pagination={true}
         enableCellTextSelection={true}
+        onRowDataChanged={autoSizeAll(false)}
         rowData={rowData}
         context={{useOverlay: 'Loading Observable Items'}}
         components={{loadingOverlay: LoadingOverlay}}
@@ -48,7 +59,6 @@ const ObservableItemList = () => {
         defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
       >
         <AgGridColumn
-          width={40}
           field="observableItemId"
           headerName=""
           suppressMovable={true}
@@ -66,7 +76,6 @@ const ObservableItemList = () => {
           }}
         />
         <AgGridColumn
-          width={70}
           field="observableItemId"
           headerName="ID"
           sort="desc"
@@ -79,17 +88,17 @@ const ObservableItemList = () => {
             }
           }}
         />
-        <AgGridColumn width={100} field="typeName" headerName="Type" />
-        <AgGridColumn flex={1} field="name" />
-        <AgGridColumn flex={1} field="commonName" />
-        <AgGridColumn width={100} field="supersededBy" />
-        <AgGridColumn width={100} field="supersededNames" />
-        <AgGridColumn width={100} field="supersededIDs" />
-        <AgGridColumn width={100} field="phylum" />
-        <AgGridColumn width={100} field="class" />
-        <AgGridColumn width={100} field="order" />
-        <AgGridColumn width={100} field="family" />
-        <AgGridColumn width={100} field="genus" />
+        <AgGridColumn field="typeName" headerName="Type" />
+        <AgGridColumn field="name" />
+        <AgGridColumn field="commonName" />
+        <AgGridColumn field="supersededBy" />
+        <AgGridColumn field="supersededNames" />
+        <AgGridColumn field="supersededIDs" />
+        <AgGridColumn field="phylum" />
+        <AgGridColumn field="class" />
+        <AgGridColumn field="order" />
+        <AgGridColumn field="family" />
+        <AgGridColumn field="genus" />
       </AgGridReact>
     </>
   );
