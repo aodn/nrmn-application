@@ -1,23 +1,34 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Navigate, NavLink} from 'react-router-dom';
 import {getEntity} from '../../../api/api';
+import {useRef} from 'react';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {Add} from '@mui/icons-material';
-
 import 'ag-grid-enterprise';
 
 const LocationList = () => {
-  const [gridApi, setGridApi] = useState();
   const [redirect, setRedirect] = useState();
+  const [rowData, setRowData] = useState();
+  const lGridRef = useRef(null);
 
-  useEffect(() => {
+  // Auto size function to be call each time data changed, so the grid always autofit
+  const autoSizeAll = (skipHeader) => {
+    if(lGridRef.current != null) {
+      lGridRef.current.columnApi.autoSizeAllColumns(skipHeader);
+    }};
+
+  const onGridReady = useCallback(() => {
     async function fetchLocations() {
-      await getEntity('locations').then((res) => gridApi.setRowData(res.data));
+      await getEntity('locations').then(
+          (res) => {
+            setRowData(res.data);
+            autoSizeAll(false);
+          });
     }
-    if (gridApi) fetchLocations();
-  }, [gridApi]);
+    fetchLocations();
+  }, []);
 
   if (redirect) return <Navigate push to={`/reference/location/${redirect}`} />;
 
@@ -35,10 +46,12 @@ const LocationList = () => {
       </Box>
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
         <AgGridReact
+          ref={lGridRef}
           rowHeight={24}
           pagination={true}
           enableCellTextSelection={true}
-          onGridReady={(e) => setGridApi(e.api)}
+          onGridReady={onGridReady()}
+          rowData={rowData}
           context={{useOverlay: 'Loading Locations'}}
           components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
@@ -71,9 +84,9 @@ const LocationList = () => {
             onCellClicked={(e) => setRedirect(e.data.id)}
           />
           <AgGridColumn maxWidth={80} field="status" />
-          <AgGridColumn flex={2} field="ecoRegions" />
-          <AgGridColumn flex={2} field="countries" />
-          <AgGridColumn flex={2} field="areas" />
+          <AgGridColumn field="ecoRegions" />
+          <AgGridColumn field="countries" />
+          <AgGridColumn field="areas" />
         </AgGridReact>
       </Box>
     </>
