@@ -1,6 +1,6 @@
 'use strict';
 
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {Navigate, NavLink} from 'react-router-dom';
 import {getResult} from '../../../api/api';
@@ -13,19 +13,22 @@ import 'ag-grid-enterprise';
 const ObservableItemList = () => {
   const [rowData, setRowData] = useState();
   const [redirect, setRedirect] = useState();
-  const gridRef = useRef(null);
+  const oGridRef = useRef(null);
 
   // Auto size function to be call each time data changed, so the grid always autofit
-  const autoSizeAll = useCallback((skipHeader) => {
-    const allColumnIds = [];
-    gridRef.current.columnApi.getAllColumns().forEach((column) => {
-        allColumnIds.push(column.getId());
-    });
-    gridRef.current.columnApi.autoSizeColumns(allColumnIds, skipHeader);}, []);
+  const autoSizeAll = (skipHeader) => {
+    if(oGridRef.current != null) {
+        oGridRef.current.columnApi.autoSizeAllColumns(skipHeader);
+    }};
 
-  useEffect(() => {
+  const onGridReady = useCallback(() => {
     async function fetchObservableItems() {
-      await getResult('reference/observableItems').then((res) => setRowData(res.data));
+      await getResult('reference/observableItems').then(
+          (res) => {
+              setRowData(res.data);
+              autoSizeAll(false);
+          }
+      );
     }
     fetchObservableItems();
   }, []);
@@ -45,12 +48,12 @@ const ObservableItemList = () => {
         </Box>
       </Box>
       <AgGridReact
-        ref={gridRef}
+        ref={oGridRef}
         className="ag-theme-material"
         rowHeight={24}
         pagination={true}
         enableCellTextSelection={true}
-        onRowDataChanged={autoSizeAll(false)}
+        onGridReady={onGridReady()}
         rowData={rowData}
         context={{useOverlay: 'Loading Observable Items'}}
         components={{loadingOverlay: LoadingOverlay}}
