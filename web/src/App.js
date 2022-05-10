@@ -37,7 +37,7 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css';
 
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [auth, setAuth] = useState(JSON.parse(localStorage.getItem('auth')) || {expires: 0, username: null});
+  const [auth, setAuth] = useState(JSON.parse(localStorage.getItem('auth')) || {expires: 0, username: null, features:[]});
 
   const [applicationError, setApplicationError] = useState();
   window.setApplicationError = setApplicationError;
