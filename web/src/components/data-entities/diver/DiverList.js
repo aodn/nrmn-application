@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState, useCallback, useRef} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {NavLink} from 'react-router-dom';
 import {grey, red} from '@mui/material/colors';
@@ -9,26 +9,38 @@ import {Add, Save} from '@mui/icons-material';
 import 'ag-grid-enterprise';
 
 const DiverList = () => {
-  const [gridApi, setGridApi] = useState();
   const [delta, setDelta] = useState([]);
   const [rowData, setRowData] = useState();
   const [errors, setErrors] = useState([]);
+  const dGridRef = useRef(null);
 
-  useEffect(() => {
+  // Auto size function to be call each time data changed, so the grid always autofit
+  const autoSizeAll = (skipHeader) => {
+      if(dGridRef.current != null) {
+          dGridRef.current.columnApi.autoSizeAllColumns(skipHeader);
+      }};
+
+  const onGridReady = useCallback(() => {
     async function fetchDivers() {
-      await getResult('divers').then((res) => setRowData(res.data));
+      await getResult('divers').then(
+          (res) => {
+              setRowData(res.data);
+              autoSizeAll(false);
+          });
     }
     fetchDivers();
   }, []);
 
-  useEffect(() => {
-    if (gridApi) gridApi.redrawRows();
-  }, [gridApi, delta, errors]);
+  // Why need this extra redraw?
+  // useEffect(() => {
+  //   if (gridApi) gridApi.redrawRows();
+  // }, [gridApi, delta, errors]);
 
   const onCellValueChanged = (e) => {
     setDelta((data) => {
       const newData = {...data};
       newData[e.data.diverId] = e.data;
+      autoSizeAll(false);
       return newData;
     });
   };
@@ -69,6 +81,7 @@ const DiverList = () => {
         </Box>
       </Box>
       <AgGridReact
+        ref={dGridRef}
         className="ag-theme-material"
         getRowId={(r) => r.data.diverId}
         rowHeight={20}
@@ -80,21 +93,20 @@ const DiverList = () => {
         context={{useOverlay: 'Loading Divers', delta, errors}}
         components={{loadingOverlay: LoadingOverlay}}
         loadingOverlayComponent="loadingOverlay"
-        onGridReady={(e) => setGridApi(e.api)}
+        onGridReady={onGridReady()}
         defaultColDef={{
           editable: true,
           sortable: true,
           resizable: true,
           suppressMenu: true,
-          minWidth: 70,
           floatingFilter: true,
           filter: 'agTextColumnFilter',
           cellStyle: chooseCellStyle,
           tooltipValueGetter: tooltipValueGetter
         }}
       >
-        <AgGridColumn width={80} field="initials" />
-        <AgGridColumn flex={1} field="fullName" />
+        <AgGridColumn field="initials" />
+        <AgGridColumn field="fullName" />
       </AgGridReact>
     </>
   );
