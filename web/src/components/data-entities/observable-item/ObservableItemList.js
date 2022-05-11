@@ -11,7 +11,6 @@ import {Add} from '@mui/icons-material';
 import 'ag-grid-enterprise';
 
 const ObservableItemList = () => {
-  const [rowData, setRowData] = useState();
   const [redirect, setRedirect] = useState();
   const oGridRef = useRef(null);
 
@@ -21,17 +20,23 @@ const ObservableItemList = () => {
         oGridRef.current.columnApi.autoSizeAllColumns(skipHeader);
     }};
 
-  const onGridReady = useCallback(() => {
-    async function fetchObservableItems() {
+  const onGridReady = (event) => {
+    async function fetchObservableItems(event) {
       await getResult('reference/observableItems').then(
           (res) => {
-              setRowData(res.data);
-              autoSizeAll(false);
+              // Use setRowData in api will not trigger onGridReady but onDataChange event.
+              // if you use useState and connect row to setRowData then you will
+              // keep fire onGridReady as row change
+              event.api.setRowData(res.data);
           }
       );
     }
-    fetchObservableItems();
-  }, []);
+    fetchObservableItems(event).then(r => {
+        // Now we have the data to do auto sizing, however it only auto size visible rows, so when user
+        // scroll we need to auto size again
+        autoSizeAll(false);
+    });
+  };
 
   if (redirect) return <Navigate to={`/reference/observableItem/${redirect}`} />;
 
@@ -53,8 +58,8 @@ const ObservableItemList = () => {
         rowHeight={24}
         pagination={true}
         enableCellTextSelection={true}
-        onGridReady={onGridReady()}
-        rowData={rowData}
+        onGridReady={onGridReady}
+        onBodyScroll={ (event) => autoSizeAll(false)}
         context={{useOverlay: 'Loading Observable Items'}}
         components={{loadingOverlay: LoadingOverlay}}
         loadingOverlayComponent="loadingOverlay"

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef, useCallback} from 'react';
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
 import {Navigate, NavLink} from 'react-router-dom';
 import {getResult} from '../../../api/api';
@@ -10,16 +10,27 @@ import {entityDelete} from '../../../api/api';
 import 'ag-grid-enterprise';
 
 const SiteList = () => {
-  const [gridApi, setGridApi] = useState();
+  const [rowData, setRowData] = useState();
   const [redirect, setRedirect] = useState();
   const [dialogState, setDialogState] = useState({open: false});
+  const sGridRef = useRef(null);
 
-  useEffect(() => {
+    // Auto size function to be call each time data changed, so the grid always autofit
+    const autoSizeAll = (skipHeader) => {
+        if(sGridRef.current != null) {
+            sGridRef.current.columnApi.autoSizeAllColumns(skipHeader);
+        }};
+
+  const onGridReady = useCallback(() => {
     async function fetchSites() {
-      await getResult('sites').then((res) => gridApi.setRowData(res.data));
+      await getResult('sites').then(
+          (res) => {
+              setRowData(res.data);
+              autoSizeAll(false);
+          });
     }
-    if (gridApi) fetchSites();
-  }, [gridApi]);
+    fetchSites();
+  }, []);
 
   if (redirect) return <Navigate to={`/reference/site/${redirect}`} />;
 
@@ -38,9 +49,9 @@ const SiteList = () => {
         </Button>
         <Button
           variant="contained"
-          onClick={() => {
-            entityDelete('site', dialogState.item.siteId).then(() => {
-              gridApi.applyTransaction({remove: [dialogState.item]});
+          onClick={(e) => {
+            entityDelete('site', dialogState.item.siteId).then(
+                (i) => {e.api.applyTransaction({remove: [dialogState.item]});
               setDialogState({open: false});
             });
           }}
@@ -66,10 +77,12 @@ const SiteList = () => {
       </Box>
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
         <AgGridReact
+          ref={sGridRef}
           rowHeight={24}
           pagination={true}
+          rowData={rowData}
           enableCellTextSelection={true}
-          onGridReady={(e) => setGridApi(e.api)}
+          onGridReady={onGridReady()}
           context={{useOverlay: 'Loading Sites'}}
           components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
@@ -107,13 +120,13 @@ const SiteList = () => {
               }
             }}
           />
-          <AgGridColumn flex={1} field="siteName" />
-          <AgGridColumn flex={1} field="locationName" />
-          <AgGridColumn flex={1} field="state" />
-          <AgGridColumn flex={1} field="country" />
-          <AgGridColumn width={100} field="latitude" />
-          <AgGridColumn width={100} field="longitude" />
-          <AgGridColumn width={50} suppressMenu={true} field="isActive" headerName="Active" />
+          <AgGridColumn field="siteName" />
+          <AgGridColumn field="locationName" />
+          <AgGridColumn field="state" />
+          <AgGridColumn field="country" />
+          <AgGridColumn field="latitude" />
+          <AgGridColumn field="longitude" />
+          <AgGridColumn suppressMenu={true} field="isActive" headerName="Active" />
           <AgGridColumn
             width={40}
             field="siteId"
