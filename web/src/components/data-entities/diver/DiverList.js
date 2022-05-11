@@ -10,7 +10,6 @@ import 'ag-grid-enterprise';
 
 const DiverList = () => {
   const [delta, setDelta] = useState([]);
-  const [rowData, setRowData] = useState();
   const [errors, setErrors] = useState([]);
   const dGridRef = useRef(null);
 
@@ -20,16 +19,22 @@ const DiverList = () => {
           dGridRef.current.columnApi.autoSizeAllColumns(skipHeader);
       }};
 
-  const onGridReady = useCallback(() => {
-    async function fetchDivers() {
+  const onGridReady = (event) => {
+    async function fetchDivers(event) {
       await getResult('divers').then(
           (res) => {
-              setRowData(res.data);
-              autoSizeAll(false);
+              // Use setRowData in api will not trigger onGridReady but onDataChange event.
+              // if you use useState and connect row to setRowData then you will
+              // keep fire onGridReady as row change
+              event.api.setRowData(res.data);
           });
     }
-    fetchDivers();
-  }, []);
+    fetchDivers(event).then(() => {
+        // Now we have the data to do auto sizing, however the build in function only auto size visible rows,
+        // so when user scroll we need to auto size again
+        autoSizeAll(false);
+    });
+  };
 
   // Why need this extra redraw?
   // useEffect(() => {
@@ -85,7 +90,6 @@ const DiverList = () => {
         className="ag-theme-material"
         getRowId={(r) => r.data.diverId}
         rowHeight={20}
-        rowData={rowData}
         fillHandleDirection="y"
         pagination={true}
         enableBrowserTooltips
@@ -93,7 +97,8 @@ const DiverList = () => {
         context={{useOverlay: 'Loading Divers', delta, errors}}
         components={{loadingOverlay: LoadingOverlay}}
         loadingOverlayComponent="loadingOverlay"
-        onGridReady={onGridReady()}
+        onGridReady={onGridReady}
+        onBodyScroll={ (event) => autoSizeAll(false)}
         defaultColDef={{
           editable: true,
           sortable: true,
