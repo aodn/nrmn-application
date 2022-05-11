@@ -66,7 +66,7 @@ const SideMenu = ({open, onClose}) => {
       <AuthContext.Consumer>
         {({auth}) => (
           <Box ml={2}>
-            {auth.features.map((label, i) => (
+            {auth?.features?.map((label, i) => (
               <small key={i}>{label}</small>
             ))}
           </Box>
