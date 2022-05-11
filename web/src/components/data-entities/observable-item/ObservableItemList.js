@@ -31,9 +31,9 @@ const ObservableItemList = () => {
           }
       );
     }
-    fetchObservableItems(event).then(r => {
-        // Now we have the data to do auto sizing, however it only auto size visible rows, so when user
-        // scroll we need to auto size again
+    fetchObservableItems(event).then(() => {
+        // Now we have the data to do auto sizing, however the build in function only auto size visible rows,
+        // so when user scroll we need to auto size again
         autoSizeAll(false);
     });
   };

@@ -10,7 +10,6 @@ import 'ag-grid-enterprise';
 
 const LocationList = () => {
   const [redirect, setRedirect] = useState();
-  const [rowData, setRowData] = useState();
   const lGridRef = useRef(null);
 
   // Auto size function to be call each time data changed, so the grid always autofit
@@ -19,16 +18,22 @@ const LocationList = () => {
       lGridRef.current.columnApi.autoSizeAllColumns(skipHeader);
     }};
 
-  const onGridReady = useCallback(() => {
-    async function fetchLocations() {
+  const onGridReady = (event) => {
+    async function fetchLocations(event) {
       await getEntity('locations').then(
           (res) => {
-            setRowData(res.data);
-            autoSizeAll(false);
+              // Use setRowData in api will not trigger onGridReady but onDataChange event.
+              // if you use useState and connect row to setRowData then you will
+              // keep fire onGridReady as row change
+              event.api.setRowData(res.data);
           });
     }
-    fetchLocations();
-  }, []);
+    fetchLocations(event).then(() => {
+        // Now we have the data to do auto sizing, however the build in function only auto size visible rows,
+        // so when user scroll we need to auto size again
+        autoSizeAll(false);
+    });
+  };
 
   if (redirect) return <Navigate push to={`/reference/location/${redirect}`} />;
 
@@ -50,8 +55,8 @@ const LocationList = () => {
           rowHeight={24}
           pagination={true}
           enableCellTextSelection={true}
-          onGridReady={onGridReady()}
-          rowData={rowData}
+          onGridReady={onGridReady}
+          onBodyScroll={ (event) => autoSizeAll(false)}
           context={{useOverlay: 'Loading Locations'}}
           components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
