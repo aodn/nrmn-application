@@ -204,3 +204,10 @@ export const extendedMeasurements = Object.freeze([
     invertSize: '30'
   }
 ]);
+
+export const constants = Object.freeze({
+  diverList : {
+    URL: 'divers'
+  }
+});
+

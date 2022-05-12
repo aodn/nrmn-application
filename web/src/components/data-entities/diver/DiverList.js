@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useRef} from 'react';
+import React, {useState, useRef} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {NavLink} from 'react-router-dom';
 import {grey, red} from '@mui/material/colors';
@@ -6,6 +6,7 @@ import {getResult, entityEdit} from '../../../api/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Add, Save} from '@mui/icons-material';
+import { constants } from '../../../common/constants';
 import 'ag-grid-enterprise';
 
 const DiverList = () => {
@@ -22,18 +23,22 @@ const DiverList = () => {
 
     const onGridReady = (event) => {
         async function fetchDivers(event) {
-            await getResult('divers').then(
+            await getResult(constants.diverList.URL).then(
                 (res) => {
                     // Use setRowData in api will not trigger onGridReady but onDataChange event.
                     // if you use useState and connect row to setRowData then you will
                     // keep fire onGridReady as row change
+                    console.debug('Loading diver dataset..');
+                    console.debug(res);
                     event.api.setRowData(res.data);
+                    console.debug('Done loading diver dataset..');
                 });
         }
 
         fetchDivers(event).then(() => {
             // Now we have the data to do auto sizing, however the build in function only auto size visible rows,
             // so when user scroll we need to auto size again
+            console.debug('Auto sizing after dataset loaded');
             autoSizeAll(false);
         });
     };
@@ -89,6 +94,7 @@ const DiverList = () => {
                 </Box>
             </Box>
             <AgGridReact
+                suppressColumnVirtualisation={process.env.NODE_ENV === 'test'}
                 ref={dGridRef}
                 className="ag-theme-material"
                 getRowId={(r) => r.data.diverId}
