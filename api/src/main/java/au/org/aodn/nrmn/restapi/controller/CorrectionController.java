@@ -1,7 +1,9 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowPutDto;
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
@@ -58,26 +61,24 @@ public class CorrectionController {
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> validateSurveyCorrection(@PathVariable("survey_id") Long surveyId, Authentication authentication, @RequestBody List<CorrectionRowPutDto> rowUpdates) {
         
-        String logMessage =  "validate correction username: " + authentication.getName() + " survey: " + surveyId;
-        // Validate
-        // Q: Do I have the species name (or whatever is used?)
-        // A: I have the observableItemId (!)
+        String logMessage =  "validate/correction username: " + authentication.getName() + " survey: " + surveyId;
+        userAuditRepo.save(new UserActionAudit("correct/survey", logMessage));
 
-        // get the UiSpeciesAttributes for the species provided
         List<Integer> observableItemIds = rowUpdates.stream().map(r -> r.getObservableItemId()).collect(Collectors.toList());
         var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
         observationRepository.getSpeciesAttributesByIds(observableItemIds).stream().forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
 
         var observationIdsToReplace = new ArrayList<Integer>();
+        Collection<ValidationError> errors = new HashSet<ValidationError>();
         for(var row: rowUpdates) {
             observationIdsToReplace.addAll(row.getObservationIds());
-            var errors = measurementValidationService.validate(speciesAttributes, row.getObservableItemId(), row.getMethodId(), row.getMeasurements());
+            errors.addAll(measurementValidationService.validate(speciesAttributes, row));
         }
 
         logger.info("observations: " + observationIdsToReplace.toString());
         
-        userAuditRepo.save(new UserActionAudit("correct/survey", logMessage));
-
-        return ResponseEntity.ok().body(new ValidationResponse());
+        var response = new ValidationResponse();
+        response.setErrors(errors);
+        return ResponseEntity.ok().body(response);
     }
 }

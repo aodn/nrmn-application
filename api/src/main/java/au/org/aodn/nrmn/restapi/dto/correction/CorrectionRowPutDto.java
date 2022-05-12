@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class CorrectionRowPutDto {
+    Long id;
     Collection<Integer> observationIds;
     Long surveyId;
     Long diverId;
