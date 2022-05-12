@@ -21,9 +21,9 @@ public interface CorrectionRowRepository
             +
             "c.direction, " +
             "c.latitude, c.longitude, " +
-            "c.observable_item_id, c.observable_item_name, c.letter_code, " +
-            "c.method_id, c.block_num, c.survey_not_done, " +
-            "(CASE WHEN measure_type_id = 4 THEN true ELSE false END) as use_invert_sizing, " +
+            "c.observable_item_id as observableItemId, c.observable_item_name as observableItemName, c.letter_code as letterCode, " +
+            "c.method_id as methodId, c.block_num as blockNum, c.survey_not_done as surveyNotDone, " +
+            "(CASE WHEN measure_type_id = 4 THEN true ELSE false END) as useInvertSizing, " +
             "cast(jsonb_object_agg(c.seq_no, c.measure_sum) as text) as measurementJson " +
             "from ( " +
             "select " +

@@ -120,6 +120,10 @@ export const getCorrections = (surveyId) =>
     .then((res) => res)
     .catch((err) => err);
 
+export const validateSurveyCorrection = (surveyId, rows) => {
+  return axiosInstance.put('correction/validate/' + surveyId, rows);
+};
+
 export const validateJob = (jobId, completion) => {
   return axiosInstance.post(`stage/validate/${jobId}`).then(completion);
 };

@@ -11,6 +11,24 @@ public interface CorrectionRowDto {
 
     String getSiteCode();
 
+    String getDirection();
+
+    String getLatitude();
+
+    String getLongitude();
+
+    Boolean getUseInvertSizing();
+
+    String getObservableItemId();
+
+    String getObservableItemName();
+
+    String getLetterCode();
+
+    String getMethodId();
+
+    String getBlockNum();
+
     Integer getDepth();
 
     String getSurveyDate();
