@@ -116,9 +116,9 @@ INSERT INTO nrmn.obs_item_type_ref (obs_item_type_id, obs_item_type_name, is_act
 VALUES (1, 'Species', true);
 
 INSERT INTO nrmn.observable_item_ref (observable_item_id, obs_item_type_id, aphia_id, aphia_rel_type_id,
-                                      observable_item_name)
-VALUES (333, 1, 102, 1, 'Species 56'),
-       (331, 1, 103, 1, 'Species 57');
+                                      observable_item_name, letter_code)
+VALUES (333, 1, 102, 1, 'Species 56', 'S56'),
+       (331, 1, 103, 1, 'Species 57', 'S57');
 
 INSERT INTO nrmn.method_ref(method_id, method_name, is_active)
 VALUES (1, 'Standard fish', true), (2, 'Big fish', true);

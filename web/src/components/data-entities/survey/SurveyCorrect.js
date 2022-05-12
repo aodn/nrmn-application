@@ -4,7 +4,7 @@ import 'ag-grid-enterprise';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import React, {useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
-import {getCorrections} from '../../../api/api';
+import {getCorrections, validateSurveyCorrection} from '../../../api/api';
 import {allMeasurements} from '../../../common/constants';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import SummaryPanel from './panel/SummaryPanel';
@@ -26,12 +26,12 @@ const SurveyCorrect = () => {
 
   const defaultColDef = useMemo(() => {
     return {
-      editable: true,
+      editable: false,
       enableCellChangeFlash: false,
       filter: false,
       floatingFilter: false,
       resizable: false,
-      sortable: true,
+      sortable: false,
       suppressMenu: false,
       valueParser: ({newValue}) => (newValue ? newValue.trim() : '')
     };
@@ -62,17 +62,17 @@ const SurveyCorrect = () => {
       {field: 'depth', label: 'Depth', hide: false},
       {field: 'surveyDate', label: 'Survey Date', hide: false},
       {field: 'surveyTime', label: 'Survey Time', hide: false},
-      {field: 'visibility', label: 'Visibility', hide: false}
-      // {label: 'Direction', hide: false},
-      // {label: 'Latitude', hide: false},
-      // {label: 'Longitude', hide: false},
-      // {label: 'observable_item_id', hide: true},
-      // {label: 'Species Name', hide: false},
-      // {label: 'Letter Code', hide: false},
-      // {label: 'Method', hide: false},
-      // {label: 'Block', hide: false},
-      // {label: 'Survey Not Done', hide: false, isBoolean: true},
-      // {label: 'Use Invert Sizing', hide: false, isBoolean: true}
+      {field: 'visibility', label: 'Visibility', hide: false},
+      {field: 'direction', label: 'Direction', hide: false},
+      {field: 'latitude', label: 'Latitude', hide: false},
+      {field: 'longitude', label: 'Longitude', hide: false},
+      {field: 'observableItemId', hide: true},
+      {field: 'observableItemName', label: 'Species Name', hide: false},
+      {field: 'letterCode', label: 'Letter Code', hide: false},
+      {field: 'methodId', label: 'Method', hide: false},
+      {field: 'blockNum', label: 'Block', hide: false},
+      {field: 'surveyNotDone', label: 'Survey Not Done', hide: false, isBoolean: true},
+      {field: 'useInvertSizing', label: 'Use Invert Sizing', hide: false, isBoolean: true}
     ];
   }, []);
 
@@ -83,8 +83,9 @@ const SurveyCorrect = () => {
       if (res.status !== 200) return;
       const unpackedData = res.data.map((data, idx) => {
         const measurements = JSON.parse(data.measurementJson);
+        const observationIds = JSON.parse(data.observationIds);
         delete data.measurementJson;
-        return {id: idx + 1, ...data, measurements};
+        return {id: idx + 1, ...data, observationIds, measurements};
       });
       setRowData(unpackedData);
     });
@@ -96,6 +97,7 @@ const SurveyCorrect = () => {
       const data = rowNode.data;
       packedData.push({id: index, ...data, 19: JSON.stringify(data[19])});
     });
+    validateSurveyCorrection(surveyId, packedData);
   };
 
   const onModelUpdated = () => {};
@@ -108,7 +110,7 @@ const SurveyCorrect = () => {
         </Box>
         <Box p={1} minWidth={180}>
           <Button onClick={onSaveValidate} variant="contained" startIcon={<PlaylistAddCheckOutlinedIcon />}>
-            {`Save & Validate`}
+            {`Validate`}
           </Button>
         </Box>
       </Box>
@@ -151,7 +153,7 @@ const SurveyCorrect = () => {
           <AgGridColumn field={'measurements.0'} headerName="Unsized" />
           {allMeasurements.map((_, idx) => {
             const field = `measurements.${idx + 1}`;
-            return <AgGridColumn field={field} headerComponent={SurveyMeasurementHeader} key={idx} width={35} />;
+            return <AgGridColumn editable field={field} headerComponent={SurveyMeasurementHeader} key={idx} width={35} />;
           })}
         </AgGridReact>
       </Box>
