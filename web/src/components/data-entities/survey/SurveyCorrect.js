@@ -139,7 +139,7 @@ const SurveyCorrect = () => {
             header.isBoolean ? (
               <AgGridColumn
                 key={idx}
-                field={idx.toString()}
+                field={header.field}
                 headerName={header.label}
                 hide={header.hide}
                 cellEditor="agSelectCellEditor"
