@@ -56,9 +56,9 @@ const SiteList = () => {
                 </Button>
                 <Button
                     variant="contained"
-                    onClick={(e) => {
+                    onClick={() => {
                         entityDelete('site', dialogState.item.siteId).then(
-                            (i) => {
+                            () => {
                                 sGridRef.current.api.applyTransaction({remove: [dialogState.item]});
                                 setDialogState({open: false});
                             });
@@ -91,7 +91,7 @@ const SiteList = () => {
                     pagination={true}
                     enableCellTextSelection={true}
                     onGridReady={onGridReady}
-                    onBodyScroll={ autoSizeAll(false) }
+                    onBodyScroll={autoSizeAll(false)}
                     context={{useOverlay: 'Loading Sites'}}
                     components={{loadingOverlay: LoadingOverlay}}
                     loadingOverlayComponent="loadingOverlay"
