@@ -23,6 +23,7 @@ import SiteView from './components/data-entities/site/SiteView';
 import SurveyEdit from './components/data-entities/survey/SurveyEdit';
 import SurveyList from './components/data-entities/survey/SurveyList';
 import SurveyView from './components/data-entities/survey/SurveyView';
+import SurveyCorrect from './components/data-entities/survey/SurveyCorrect';
 import ExtractTemplateData from './components/datasheets/ExtractTemplateData';
 import JobUpload from './components/import/JobUpload';
 import ValidationPage from './components/import/ValidationJob';
@@ -36,7 +37,7 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css';
 
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [auth, setAuth] = useState(JSON.parse(localStorage.getItem('auth')) || {expires: 0, username: null});
+  const [auth, setAuth] = useState(JSON.parse(localStorage.getItem('auth')) || {expires: 0, username: null, features:[]});
 
   const [applicationError, setApplicationError] = useState();
   window.setApplicationError = setApplicationError;
@@ -45,7 +46,7 @@ const App = () => {
 
   LicenseManager.setLicenseKey(JSON.parse(localStorage.getItem('gridLicense')));
 
-  const theme = useMemo(
+  const productionTheme = useMemo(
     () =>
       responsiveFontSizes(
         createTheme({
@@ -59,12 +60,26 @@ const App = () => {
     []
   );
 
+  const verificationTheme = useMemo(
+    () =>
+      responsiveFontSizes(
+        createTheme({
+          palette: {
+            mode: 'light',
+            primary: {main: '#7B6154', light: '#AADFFA', dark: '546E7B'},
+            secondary: {main: '#563FF2', light: '#7D69FF', dark: '5844DB'}
+          }
+        })
+      ),
+    []
+  );
+
   return (
-    <ThemeProvider theme={theme}>
-      <AuthContext.Provider value={{auth: auth, setAuth: setAuth}}>
+    <AuthContext.Provider value={{auth: auth, setAuth: setAuth}}>
+      <ThemeProvider theme={auth?.features?.includes('verification') ? verificationTheme : productionTheme}>
         <Router>
           <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)}></SideMenu>
-          <TopBar onMenuClick={() => setMenuOpen(true)}></TopBar>
+          <TopBar onMenuClick={() => setMenuOpen(true)}>{auth?.features?.includes('verification') ? 'NRMN Verification' : 'National Reef Monitoring Network'}</TopBar>
           <AppContent>
             {applicationError ? (
               <Box m={10}>
@@ -95,6 +110,7 @@ const App = () => {
                     <Route path="/data/surveys" element={<SurveyList />} />
                     <Route path="/data/survey/:id" element={<SurveyView />} />
                     <Route path="/data/survey/:id/edit" element={<SurveyEdit />} />
+                    {auth?.features?.includes('corrections') && <Route path="/data/survey/:id/correct" element={<SurveyCorrect />} />}
 
                     <Route path="/data/jobs" element={<JobList />} />
                     <Route path="/data/job/:id/view" element={<JobView />} />
@@ -131,8 +147,8 @@ const App = () => {
             )}
           </AppContent>
         </Router>
-      </AuthContext.Provider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </AuthContext.Provider>
   );
 };
 

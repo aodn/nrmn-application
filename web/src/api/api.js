@@ -54,6 +54,7 @@ export const userLogin = (params, onResult) => {
         state.accessToken = res.data.accessToken;
         state.tokenType = res.data.tokenType;
         state.roles = jwt.roles;
+        state.features = res.data.features;
         try {
           localStorage.setItem('auth', JSON.stringify(state));
           localStorage.setItem('gridLicense', JSON.stringify(res.data.gridLicense));
@@ -110,6 +111,18 @@ export const getDataJob = (jobId) =>
     })
     .then((res) => res)
     .catch((err) => err);
+
+export const getCorrections = (surveyId) =>
+  axiosInstance
+    .get('correction/correct/' + surveyId, {
+      validateStatus: () => true
+    })
+    .then((res) => res)
+    .catch((err) => err);
+
+export const validateSurveyCorrection = (surveyId, rows) => {
+  return axiosInstance.put('correction/validate/' + surveyId, rows);
+};
 
 export const validateJob = (jobId, completion) => {
   return axiosInstance.post(`stage/validate/${jobId}`).then(completion);

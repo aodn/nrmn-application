@@ -54,6 +54,9 @@ public class AuthController {
     @Value("${app.api.version}")
     private String appVersion;
 
+    @Value("${app.features}")
+    String[] features;
+
     @Value("${aggrid.license}")
     String gridLicence;
 
@@ -93,7 +96,7 @@ public class AuthController {
         if (SecUserRepository.blackListedTokenPresent(jwt)) {
             SecUserRepository.removeBlackListedToken(jwt);
         }
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, gridLicence));
+        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, gridLicence, features));
     }
 
     @PostMapping(path = "/v1/auth/hash", consumes = "application/json", produces = "application/json")

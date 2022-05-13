@@ -1,3 +1,11 @@
+export const unsized = [
+  {
+    field: '0',
+    invertSize: '',
+    fishSize: 'Unsized'
+  }
+];
+
 export const measurements = Object.freeze([
   {
     field: '1',
@@ -204,6 +212,8 @@ export const extendedMeasurements = Object.freeze([
     invertSize: '30'
   }
 ]);
+
+export const allMeasurements = [...measurements, ...extendedMeasurements];
 
 export const constants = Object.freeze({
   diverList : {

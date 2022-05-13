@@ -35,7 +35,8 @@ class ObservableItemExistsIT {
         StagedRow row = new StagedRow();
         row.setSpecies("Species 20");
         row.setStagedJob(job);
-        Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(),
+                Arrays.asList(), Arrays.asList(row));
         assertTrue(errors.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Species does not exist")));
     }
 
@@ -44,9 +45,10 @@ class ObservableItemExistsIT {
         StagedJob job = new StagedJob();
         job.setId(1L);
         StagedRow row = new StagedRow();
-        row.setSpecies("Specie 56");
+        row.setSpecies("Species 56");
         row.setStagedJob(job);
-        Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(), Arrays.asList(ObservableItem.builder().observableItemName("Specie 56").build()), Arrays.asList(row));
+        Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(),
+                Arrays.asList(ObservableItem.builder().observableItemName("Species 56").build()), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Species does not exist")));
     }
 
@@ -57,7 +59,8 @@ class ObservableItemExistsIT {
         StagedRow row = new StagedRow();
         row.setSpecies("Survey not done");
         row.setStagedJob(job);
-        Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(),
+                Arrays.asList(), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Species does not exist")));
     }
 }

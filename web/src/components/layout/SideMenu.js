@@ -1,11 +1,14 @@
 import React from 'react';
-import {Box, Divider, Drawer, IconButton, List, ListSubheader, Typography, ListItem, ListItemText} from '@mui/material';
+import {Box, Divider, Drawer, IconButton, List, ListItem, ListItemText, ListSubheader, Stack, Typography} from '@mui/material';
+import Chip from '@mui/material/Chip';
 import MenuIcon from '@mui/icons-material/Menu';
 import {NavLink} from 'react-router-dom';
 import {PropTypes} from 'prop-types';
+import {AuthContext} from '../../contexts/auth-context';
 
 const SideMenu = ({open, onClose}) => {
-  const version = process.env.REACT_APP_VERSION && process.env.REACT_APP_VERSION.split('.');
+  const version = process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION.split('.') : [0, 0, 0];
+
   return (
     <Drawer variant="temporary" anchor="left" open={open} onClose={onClose}>
       <Box ml={3}>
@@ -39,7 +42,7 @@ const SideMenu = ({open, onClose}) => {
           </ListItem>
         </List>
       </List>
-      <Divider />
+      <Divider/>
       <List>
         <ListSubheader>
           <Typography variant="button">Reference Data</Typography>
@@ -57,10 +60,17 @@ const SideMenu = ({open, onClose}) => {
           <ListItemText primary="Observable Items" />
         </ListItem>
       </List>
-      <List>
-        <Divider />
-        {version && <ListSubheader>{`Version ${version[0]}.${version[1]} (${version[2]})`}</ListSubheader>}
-      </List>
+      <Divider/>
+      <AuthContext.Consumer>
+        {({auth}) => (
+          <Stack direction="column" spacing={1} m={2}>
+            <Chip color="primary" size="small" label={`Version ${version[0]}.${version[1]} (${version[2]})`}/>
+            {auth?.features?.map((label, i) => (
+              <Chip key={i} color="primary" variant="outlined" size="small" label={label}/>
+            ))}
+          </Stack>
+        )}
+      </AuthContext.Consumer>
     </Drawer>
   );
 };
