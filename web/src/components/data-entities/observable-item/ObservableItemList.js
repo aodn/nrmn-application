@@ -11,105 +11,108 @@ import {Add} from '@mui/icons-material';
 import 'ag-grid-enterprise';
 
 const ObservableItemList = () => {
-  const [redirect, setRedirect] = useState();
-  const oGridRef = useRef(null);
+    const [redirect, setRedirect] = useState();
+    const oGridRef = useRef(null);
 
-  // Auto size function to be call each time data changed, so the grid always autofit
-  const autoSizeAll = (skipHeader) => {
-    if(oGridRef.current != null) {
-        oGridRef.current.columnApi.autoSizeAllColumns(skipHeader);
-    }};
+    // Auto size function to be call each time data changed, so the grid always autofit
+    const autoSizeAll = (skipHeader) => {
+        if (oGridRef.current != null) {
+            oGridRef.current.columnApi.autoSizeAllColumns(skipHeader);
+        }
+    };
 
-  const onGridReady = (event) => {
-    async function fetchObservableItems(event) {
-      await getResult('reference/observableItems').then(
-          (res) => {
-              // Use setRowData in api will not trigger onGridReady but onDataChange event.
-              // if you use useState and connect row to setRowData then you will
-              // keep fire onGridReady as row change
-              event.api.setRowData(res.data);
-          }
-      );
-    }
-    fetchObservableItems(event).then(() => {
-        // Now we have the data to do auto sizing, however the build in function only auto size visible rows,
-        // so when user scroll we need to auto size again
-        autoSizeAll(false);
-    });
-  };
+    const onGridReady = (event) => {
+        async function fetchObservableItems(event) {
+            await getResult('reference/observableItems').then(
+                (res) => {
+                    // Use setRowData in api will not trigger onGridReady but onDataChange event.
+                    // if you use useState and connect row to setRowData then you will
+                    // keep fire onGridReady as row change
+                    event.api.setRowData(res.data);
+                }
+            );
+        }
 
-  if (redirect) return <Navigate to={`/reference/observableItem/${redirect}`} />;
+        fetchObservableItems(event).then(() => {
+            // Now we have the data to do auto sizing, however the build in function only auto size visible rows,
+            // so when user scroll we need to auto size again
+            autoSizeAll(false);
+        });
+    };
 
-  return (
-    <>
-      <Box display="flex" flexDirection="row" pt={1}>
-        <Box p={1} pl={2} flexGrow={1}>
-          <Typography variant="h4">Observable Items</Typography>
-        </Box>
-        <Box mr={4}>
-          <Button style={{width: '100%'}} to="/reference/observableItem" component={NavLink} variant="contained" startIcon={<Add></Add>}>
-            New Observable Item
-          </Button>
-        </Box>
-      </Box>
-      <AgGridReact
-        ref={oGridRef}
-        className="ag-theme-material"
-        rowHeight={24}
-        pagination={true}
-        enableCellTextSelection={true}
-        onGridReady={onGridReady}
-        onBodyScroll={ autoSizeAll(false) }
-        context={{useOverlay: 'Loading Observable Items'}}
-        components={{loadingOverlay: LoadingOverlay}}
-        loadingOverlayComponent="loadingOverlay"
-        suppressCellFocus={true}
-        defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
-      >
-        <AgGridColumn
-          field="observableItemId"
-          headerName=""
-          suppressMovable={true}
-          filter={false}
-          resizable={false}
-          sortable={false}
-          valueFormatter={() => '✎'}
-          cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
-          onCellClicked={(e) => {
-            if (e.event.ctrlKey) {
-              window.open(`/reference/observableItem/${e.data.observableItemId}/edit`, '_blank').focus();
-            } else {
-              setRedirect(`${e.data.observableItemId}/edit`);
-            }
-          }}
-        />
-        <AgGridColumn
-          field="observableItemId"
-          headerName="ID"
-          sort="desc"
-          cellStyle={{cursor: 'pointer'}}
-          onCellClicked={(e) => {
-            if (e.event.ctrlKey) {
-              window.open(`/reference/observableItem/${e.data.observableItemId}`, '_blank').focus();
-            } else {
-              setRedirect(e.data.observableItemId);
-            }
-          }}
-        />
-        <AgGridColumn field="typeName" headerName="Type" />
-        <AgGridColumn field="name" />
-        <AgGridColumn field="commonName" />
-        <AgGridColumn field="supersededBy" />
-        <AgGridColumn field="supersededNames" />
-        <AgGridColumn field="supersededIDs" />
-        <AgGridColumn field="phylum" />
-        <AgGridColumn field="class" />
-        <AgGridColumn field="order" />
-        <AgGridColumn field="family" />
-        <AgGridColumn field="genus" />
-      </AgGridReact>
-    </>
-  );
+    if (redirect) return <Navigate to={`/reference/observableItem/${redirect}`}/>;
+
+    return (
+        <>
+            <Box display="flex" flexDirection="row" pt={1}>
+                <Box p={1} pl={2} flexGrow={1}>
+                    <Typography variant="h4">Observable Items</Typography>
+                </Box>
+                <Box mr={4}>
+                    <Button style={{width: '100%'}} to="/reference/observableItem" component={NavLink}
+                            variant="contained" startIcon={<Add></Add>}>
+                        New Observable Item
+                    </Button>
+                </Box>
+            </Box>
+            <AgGridReact
+                ref={oGridRef}
+                className="ag-theme-material"
+                rowHeight={24}
+                pagination={true}
+                enableCellTextSelection={true}
+                onGridReady={onGridReady}
+                onBodyScroll={autoSizeAll(false)}
+                context={{useOverlay: 'Loading Observable Items'}}
+                components={{loadingOverlay: LoadingOverlay}}
+                loadingOverlayComponent="loadingOverlay"
+                suppressCellFocus={true}
+                defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
+            >
+                <AgGridColumn
+                    field="observableItemId"
+                    headerName=""
+                    suppressMovable={true}
+                    filter={false}
+                    resizable={false}
+                    sortable={false}
+                    valueFormatter={() => '✎'}
+                    cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
+                    onCellClicked={(e) => {
+                        if (e.event.ctrlKey) {
+                            window.open(`/reference/observableItem/${e.data.observableItemId}/edit`, '_blank').focus();
+                        } else {
+                            setRedirect(`${e.data.observableItemId}/edit`);
+                        }
+                    }}
+                />
+                <AgGridColumn
+                    field="observableItemId"
+                    headerName="ID"
+                    sort="desc"
+                    cellStyle={{cursor: 'pointer'}}
+                    onCellClicked={(e) => {
+                        if (e.event.ctrlKey) {
+                            window.open(`/reference/observableItem/${e.data.observableItemId}`, '_blank').focus();
+                        } else {
+                            setRedirect(e.data.observableItemId);
+                        }
+                    }}
+                />
+                <AgGridColumn field="typeName" headerName="Type"/>
+                <AgGridColumn field="name"/>
+                <AgGridColumn field="commonName"/>
+                <AgGridColumn field="supersededBy"/>
+                <AgGridColumn field="supersededNames"/>
+                <AgGridColumn field="supersededIDs"/>
+                <AgGridColumn field="phylum"/>
+                <AgGridColumn field="class"/>
+                <AgGridColumn field="order"/>
+                <AgGridColumn field="family"/>
+                <AgGridColumn field="genus"/>
+            </AgGridReact>
+        </>
+    );
 };
 
 export default ObservableItemList;

@@ -22,7 +22,7 @@ describe('<DiverList/>', () => {
         mockGetResult.mockRestore();
     });
 
-    it('grid columns auto sizing after data load', async() =>{
+    it('grid columns auto sizing after data load', async () => {
         // Load sample data.
         const canned = require('./diver.json');
 
