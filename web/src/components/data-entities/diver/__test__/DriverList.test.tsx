@@ -4,8 +4,7 @@ import {describe} from '@jest/globals';
 import {logRoles, render, screen, waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import DriverList from '../DiverList';
-import {Router} from 'react-router-dom';
-import {createMemoryHistory} from 'history';
+import {BrowserRouter} from 'react-router-dom';
 import * as axiosInstance from '../../../../api/api';
 import {AxiosResponse} from 'axios';
 
@@ -43,10 +42,8 @@ describe('<DiverList/>', () => {
             }));
         });
 
-        const history = createMemoryHistory();
-
         // Need to wrap with a Router otherwise the useLocation() error shows, the result will auto set to screen object
-        render(<Router location={history.location} navigator={history}><DriverList/></Router>);
+        render(<BrowserRouter><DriverList/></BrowserRouter>);
 
         // Wait for screen to complete render, react test library do not recommend you to touch the component
         // internal, so indirectly test it via screen display. Andrew Altieri is the first diver on the first page
@@ -60,6 +57,7 @@ describe('<DiverList/>', () => {
                 // Without adjust the size of browser the number of row display is 12, since we have two column so it is 24
                 expect(gridcells).toHaveLength(24);
                 expect(screen.getByText('Ana Gloria Guzman')).toBeInTheDocument();   // Last diver on the screen
+                expect(screen.getByText('Ana Gloria Guzman')).toHaveStyle({width: '48px'});   // Last diver on the screen
             });
     });
 });
