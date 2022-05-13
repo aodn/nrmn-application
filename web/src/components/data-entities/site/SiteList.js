@@ -91,7 +91,7 @@ const SiteList = () => {
                     pagination={true}
                     enableCellTextSelection={true}
                     onGridReady={onGridReady}
-                    onBodyScroll={(event) => autoSizeAll(false)}
+                    onBodyScroll={ autoSizeAll(false) }
                     context={{useOverlay: 'Loading Sites'}}
                     components={{loadingOverlay: LoadingOverlay}}
                     loadingOverlayComponent="loadingOverlay"

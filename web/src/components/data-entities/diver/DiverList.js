@@ -107,7 +107,7 @@ const DiverList = () => {
                 components={{loadingOverlay: LoadingOverlay}}
                 loadingOverlayComponent="loadingOverlay"
                 onGridReady={onGridReady}
-                onBodyScroll={(event) => autoSizeAll(false)}
+                onBodyScroll={autoSizeAll(false)}
                 defaultColDef={{
                     editable: true,
                     sortable: true,

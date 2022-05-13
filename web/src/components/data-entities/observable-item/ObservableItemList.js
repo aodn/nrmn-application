@@ -1,6 +1,6 @@
 'use strict';
 
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {Navigate, NavLink} from 'react-router-dom';
 import {getResult} from '../../../api/api';
@@ -59,7 +59,7 @@ const ObservableItemList = () => {
         pagination={true}
         enableCellTextSelection={true}
         onGridReady={onGridReady}
-        onBodyScroll={ (event) => autoSizeAll(false)}
+        onBodyScroll={ autoSizeAll(false) }
         context={{useOverlay: 'Loading Observable Items'}}
         components={{loadingOverlay: LoadingOverlay}}
         loadingOverlayComponent="loadingOverlay"
