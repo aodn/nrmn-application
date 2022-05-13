@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useState} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Navigate, NavLink} from 'react-router-dom';
@@ -56,7 +56,7 @@ const LocationList = () => {
           pagination={true}
           enableCellTextSelection={true}
           onGridReady={onGridReady}
-          onBodyScroll={ (event) => autoSizeAll(false)}
+          onBodyScroll={ autoSizeAll(false) }
           context={{useOverlay: 'Loading Locations'}}
           components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
