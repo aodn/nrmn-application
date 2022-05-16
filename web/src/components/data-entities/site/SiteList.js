@@ -142,7 +142,7 @@ const SiteList = () => {
             filter={false}
             resizable={false}
             sortable={false}
-            cellRenderer={() => <Delete/>}
+            cellRenderer={(e) => e.data.isActive ? <></> : <Delete/>}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => {
               setDialogState({
