@@ -214,10 +214,3 @@ export const extendedMeasurements = Object.freeze([
 ]);
 
 export const allMeasurements = [...measurements, ...extendedMeasurements];
-
-export const constants = Object.freeze({
-  diverList : {
-    URL: 'divers'
-  }
-});
-

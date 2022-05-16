@@ -14,7 +14,7 @@ const LocationList = () => {
 
     // Auto size function to be call each time data changed, so the grid always autofit
     const autoSizeAll = (skipHeader) => {
-        if (gridRef.current) {
+        if (gridRef?.current) {
             gridRef.current.columnApi.autoSizeAllColumns(skipHeader);
         }
     };
