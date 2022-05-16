@@ -1,6 +1,6 @@
 // @ts-ignore
 import React from 'react';
-import AlertDialog from './AlertDialog';
+import AlertDialog from '../AlertDialog';
 import { render, fireEvent } from '@testing-library/react';
 import { describe, it, test, expect } from '@jest/globals';
 import '@testing-library/jest-dom';

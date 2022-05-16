@@ -10,12 +10,12 @@ import 'ag-grid-enterprise';
 
 const LocationList = () => {
     const [redirect, setRedirect] = useState();
-    const lGridRef = useRef(null);
+    const gridRef = useRef(null);
 
     // Auto size function to be call each time data changed, so the grid always autofit
     const autoSizeAll = (skipHeader) => {
-        if (lGridRef.current != null) {
-            lGridRef.current.columnApi.autoSizeAllColumns(skipHeader);
+        if (gridRef.current) {
+            gridRef.current.columnApi.autoSizeAllColumns(skipHeader);
         }
     };
 
@@ -31,8 +31,6 @@ const LocationList = () => {
         }
 
         fetchLocations(event).then(() => {
-            // Now we have the data to do auto sizing, however the build in function only auto size visible rows,
-            // so when user scroll we need to auto size again
             autoSizeAll(false);
         });
     };
@@ -53,7 +51,7 @@ const LocationList = () => {
             </Box>
             <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
                 <AgGridReact
-                    ref={lGridRef}
+                    ref={gridRef}
                     rowHeight={24}
                     pagination={true}
                     enableCellTextSelection={true}

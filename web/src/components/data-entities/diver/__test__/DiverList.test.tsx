@@ -7,6 +7,7 @@ import DriverList from '../DiverList';
 import {BrowserRouter} from 'react-router-dom';
 import * as axiosInstance from '../../../../api/api';
 import {AxiosResponse} from 'axios';
+import {constants} from '../../../../common/constants';
 
 jest.setTimeout(10000);
 
@@ -24,22 +25,24 @@ describe('<DiverList/>', () => {
 
     it('grid columns auto sizing after data load', async () => {
         // Load sample data.
-        const canned = require('./diver.json');
+        const canned = require('./testdata1.json');
 
         // Override function so that it return the data we set.
         mockGetResult.mockImplementation((url) => {
-            console.debug('Mocked getResult called');
-            const raw = {
-                config: undefined,
-                data: canned,
-                headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
-                status: 200,
-                statusText: url
-            };
+            if(url === constants.diverList.URL) {
+                console.debug('Mocked getResult called');
+                const raw = {
+                    config: undefined,
+                    data: canned,
+                    headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+                    status: 200,
+                    statusText: url
+                };
 
-            return new Promise<AxiosResponse>((resolve => {
-                resolve(raw);
-            }));
+                return new Promise<AxiosResponse>((resolve => {
+                    resolve(raw);
+                }));
+            }
         });
 
         // Need to wrap with a Router otherwise the useLocation() error shows, the result will auto set to screen object
@@ -47,7 +50,7 @@ describe('<DiverList/>', () => {
 
         // Wait for screen to complete render, react test library do not recommend you to touch the component
         // internal, so indirectly test it via screen display. Andrew Altieri is the first diver on the first page
-        await waitFor(() => screen.findByText('Andrew Altieri'))
+        await waitFor(() => screen.findByText('TEST1'))
             .then(() => {
                 // For debug to tell exactly what is inside.
                 logRoles(screen.getByRole('grid'));
@@ -56,8 +59,8 @@ describe('<DiverList/>', () => {
 
                 // Without adjust the size of browser the number of row display is 12, since we have two column so it is 24
                 expect(gridcells).toHaveLength(24);
-                expect(screen.getByText('Ana Gloria Guzman')).toBeInTheDocument();   // Last diver on the screen
-                expect(screen.getByText('Ana Gloria Guzman')).toHaveStyle({width: '48px'});   // Last diver on the screen
+                expect(screen.getByText('TEST11')).toBeInTheDocument();   // Last diver on the screen
+                expect(screen.getByText('TEST11')).toHaveStyle({width: '48px'});   // Last diver on the screen
             });
     });
 });
