@@ -6,7 +6,6 @@ import {getResult, entityEdit} from '../../../api/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Add, Save} from '@mui/icons-material';
-import {constants} from '../../../common/constants';
 import 'ag-grid-enterprise';
 
 const DiverList = () => {
@@ -16,14 +15,14 @@ const DiverList = () => {
 
     // Auto size function to be call each time data changed, so the grid always autofit
     const autoSizeAll = (skipHeader) => {
-        if (gridRef.current) {
+        if (gridRef?.current) {
             gridRef.current.columnApi.autoSizeAllColumns(skipHeader);
         }
     };
 
     const onGridReady = (event) => {
         async function fetchDivers(event) {
-            await getResult(constants.diverList.URL).then(
+            await getResult('divers').then(
                 (res) => {
                     // Use setRowData in api will not trigger onGridReady but onDataChange event.
                     // if you use useState and connect row to setRowData then you will
