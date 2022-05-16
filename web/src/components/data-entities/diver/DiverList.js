@@ -12,12 +12,12 @@ import 'ag-grid-enterprise';
 const DiverList = () => {
     const [delta, setDelta] = useState([]);
     const [errors, setErrors] = useState([]);
-    const dGridRef = useRef(null);
+    const gridRef = useRef(null);
 
     // Auto size function to be call each time data changed, so the grid always autofit
     const autoSizeAll = (skipHeader) => {
-        if (dGridRef.current != null) {
-            dGridRef.current.columnApi.autoSizeAllColumns(skipHeader);
+        if (gridRef.current) {
+            gridRef.current.columnApi.autoSizeAllColumns(skipHeader);
         }
     };
 
@@ -28,25 +28,14 @@ const DiverList = () => {
                     // Use setRowData in api will not trigger onGridReady but onDataChange event.
                     // if you use useState and connect row to setRowData then you will
                     // keep fire onGridReady as row change
-                    console.debug('Loading diver dataset..');
-                    console.debug(res);
                     event.api.setRowData(res.data);
-                    console.debug('Done loading diver dataset..');
                 });
         }
 
         fetchDivers(event).then(() => {
-            // Now we have the data to do auto sizing, however the build in function only auto size visible rows,
-            // so when user scroll we need to auto size again
-            console.debug('Auto sizing after dataset loaded');
             autoSizeAll(false);
         });
     };
-
-    // Why need this extra redraw?
-    // useEffect(() => {
-    //   if (gridApi) gridApi.redrawRows();
-    // }, [gridApi, delta, errors]);
 
     const onCellValueChanged = (e) => {
         setDelta((data) => {
@@ -95,7 +84,7 @@ const DiverList = () => {
             </Box>
             <AgGridReact
                 suppressColumnVirtualisation={process.env.NODE_ENV === 'test'}
-                ref={dGridRef}
+                ref={gridRef}
                 className="ag-theme-material"
                 getRowId={(r) => r.data.diverId}
                 rowHeight={20}

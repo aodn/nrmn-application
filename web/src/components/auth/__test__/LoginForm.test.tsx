@@ -1,4 +1,4 @@
-import LoginForm from './LoginForm';
+import LoginForm from '../LoginForm';
 import {DefaultRequestBody, rest} from 'msw';
 import {setupServer} from 'msw/node';
 import {render, fireEvent, waitFor} from '@testing-library/react';

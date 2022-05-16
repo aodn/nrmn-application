@@ -12,12 +12,12 @@ import 'ag-grid-enterprise';
 
 const ObservableItemList = () => {
     const [redirect, setRedirect] = useState();
-    const oGridRef = useRef(null);
+    const gridRef = useRef(null);
 
     // Auto size function to be call each time data changed, so the grid always autofit
     const autoSizeAll = (skipHeader) => {
-        if (oGridRef.current != null) {
-            oGridRef.current.columnApi.autoSizeAllColumns(skipHeader);
+        if (gridRef.current) {
+            gridRef.current.columnApi.autoSizeAllColumns(skipHeader);
         }
     };
 
@@ -34,8 +34,6 @@ const ObservableItemList = () => {
         }
 
         fetchObservableItems(event).then(() => {
-            // Now we have the data to do auto sizing, however the build in function only auto size visible rows,
-            // so when user scroll we need to auto size again
             autoSizeAll(false);
         });
     };
@@ -56,7 +54,7 @@ const ObservableItemList = () => {
                 </Box>
             </Box>
             <AgGridReact
-                ref={oGridRef}
+                ref={gridRef}
                 className="ag-theme-material"
                 rowHeight={24}
                 pagination={true}

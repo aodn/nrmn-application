@@ -12,12 +12,12 @@ import 'ag-grid-enterprise';
 const SiteList = () => {
     const [redirect, setRedirect] = useState();
     const [dialogState, setDialogState] = useState({open: false});
-    const sGridRef = useRef(null);
+    const gridRef = useRef(null);
 
     // Auto size function to be call each time data changed, so the grid always autofit
     const autoSizeAll = (skipHeader) => {
-        if (sGridRef.current != null) {
-            sGridRef.current.columnApi.autoSizeAllColumns(skipHeader);
+        if (gridRef.current) {
+            gridRef.current.columnApi.autoSizeAllColumns(skipHeader);
         }
     };
 
@@ -33,8 +33,6 @@ const SiteList = () => {
         }
 
         fetchSites(event).then(() => {
-            // Now we have the data to do auto sizing, however the build in function only auto size visible rows,
-            // so when user scroll we need to auto size again
             autoSizeAll(false);
         });
     };
@@ -59,7 +57,7 @@ const SiteList = () => {
                     onClick={() => {
                         entityDelete('site', dialogState.item.siteId).then(
                             () => {
-                                sGridRef.current.api.applyTransaction({remove: [dialogState.item]});
+                                gridRef.current.api.applyTransaction({remove: [dialogState.item]});
                                 setDialogState({open: false});
                             });
                     }}
@@ -86,7 +84,7 @@ const SiteList = () => {
             </Box>
             <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
                 <AgGridReact
-                    ref={sGridRef}
+                    ref={gridRef}
                     rowHeight={24}
                     pagination={true}
                     enableCellTextSelection={true}
