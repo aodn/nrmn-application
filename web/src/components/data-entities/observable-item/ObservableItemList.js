@@ -34,7 +34,7 @@ const ObservableItemList = () => {
         }
 
         fetchObservableItems(event).then(() => {
-            autoSizeAll(false);
+            autoSizeAll(event,false);
         });
     };
 
@@ -98,7 +98,7 @@ const ObservableItemList = () => {
                     }}
                 />
                 <AgGridColumn field="typeName" headerName="Type"/>
-                <AgGridColumn field="name"/>
+                <AgGridColumn cellStyle={{'min-width': '200px'}} field="name"/>
                 <AgGridColumn field="commonName"/>
                 <AgGridColumn field="supersededBy"/>
                 <AgGridColumn field="supersededNames"/>

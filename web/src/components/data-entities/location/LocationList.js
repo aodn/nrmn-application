@@ -87,16 +87,15 @@ const LocationList = () => {
                         }}
                     />
                     <AgGridColumn
-                        flex={1}
                         field="locationName"
                         sort="asc"
                         cellStyle={{cursor: 'pointer'}}
                         onCellClicked={(e) => setRedirect(e.data.id)}
                     />
                     <AgGridColumn maxWidth={80} field="status"/>
-                    <AgGridColumn field="ecoRegions"/>
+                    <AgGridColumn cellStyle={{'min-width': '600px'}} field="ecoRegions"/>
                     <AgGridColumn field="countries"/>
-                    <AgGridColumn field="areas"/>
+                    <AgGridColumn cellStyle={{'min-width': '600px'}} field="areas"/>
                 </AgGridReact>
             </Box>
         </>

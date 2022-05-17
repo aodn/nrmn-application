@@ -70,7 +70,6 @@ const DiverList = () => {
                 </Box>
             </Box>
             <AgGridReact
-                suppressColumnVirtualisation={process.env.NODE_ENV === 'test'}
                 ref={gridRef}
                 className="ag-theme-material"
                 getRowId={(r) => r.data.diverId}

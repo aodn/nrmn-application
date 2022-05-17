@@ -102,7 +102,6 @@ const SiteList = () => {
                     }}
                 >
                     <AgGridColumn
-                        width={40}
                         field="siteId"
                         headerName=""
                         suppressMovable={true}
@@ -121,7 +120,6 @@ const SiteList = () => {
                         }}
                     />
                     <AgGridColumn
-                        width={100}
                         field="siteCode"
                         cellStyle={{cursor: 'pointer'}}
                         onCellClicked={(e) => {
@@ -132,15 +130,14 @@ const SiteList = () => {
                             }
                         }}
                     />
-                    <AgGridColumn field="siteName"/>
-                    <AgGridColumn field="locationName"/>
+                    <AgGridColumn cellStyle={{'min-width': '500px'}} field="siteName"/>
+                    <AgGridColumn cellStyle={{'min-width': '200px'}} field="locationName"/>
                     <AgGridColumn field="state"/>
-                    <AgGridColumn field="country"/>
+                    <AgGridColumn cellStyle={{'min-width': '200px'}} field="country"/>
                     <AgGridColumn field="latitude"/>
                     <AgGridColumn field="longitude"/>
                     <AgGridColumn suppressMenu={true} field="isActive" headerName="Active"/>
                     <AgGridColumn
-                        width={40}
                         field="siteId"
                         headerName=""
                         suppressMovable={true}
@@ -159,7 +156,6 @@ const SiteList = () => {
                         }}
                     />
                     <AgGridColumn
-                        width={60}
                         field="observableItemId"
                         headerName=""
                         suppressMovable={true}
