@@ -13,26 +13,15 @@ const DiverList = () => {
     const [errors, setErrors] = useState([]);
     const gridRef = useRef(null);
 
-    // Auto size function to be call each time data changed, so the grid always autofit
-    const autoSizeAll = (skipHeader) => {
-        if (gridRef?.current) {
-            gridRef.current.columnApi.autoSizeAllColumns(skipHeader);
-        }
-    };
-
     const onGridReady = (event) => {
         async function fetchDivers(event) {
             await getResult('divers').then(
                 (res) => {
-                    // Use setRowData in api will not trigger onGridReady but onDataChange event.
-                    // if you use useState and connect row to setRowData then you will
-                    // keep fire onGridReady as row change
                     event.api.setRowData(res.data);
                 });
         }
 
         fetchDivers(event).then(() => {
-            autoSizeAll(false);
         });
     };
 
@@ -40,7 +29,6 @@ const DiverList = () => {
         setDelta((data) => {
             const newData = {...data};
             newData[e.data.diverId] = e.data;
-            autoSizeAll(false);
             return newData;
         });
     };
@@ -94,8 +82,7 @@ const DiverList = () => {
                 context={{useOverlay: 'Loading Divers', delta, errors}}
                 components={{loadingOverlay: LoadingOverlay}}
                 loadingOverlayComponent="loadingOverlay"
-                onGridReady={onGridReady}
-                onBodyScroll={autoSizeAll(false)}
+                onGridReady={e => onGridReady(e)}
                 defaultColDef={{
                     editable: true,
                     sortable: true,
@@ -108,7 +95,7 @@ const DiverList = () => {
                 }}
             >
                 <AgGridColumn field="initials"/>
-                <AgGridColumn field="fullName"/>
+                <AgGridColumn flex={1} field="fullName"/>
             </AgGridReact>
         </>
     );

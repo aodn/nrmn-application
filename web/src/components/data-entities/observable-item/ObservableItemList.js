@@ -15,9 +15,9 @@ const ObservableItemList = () => {
     const gridRef = useRef(null);
 
     // Auto size function to be call each time data changed, so the grid always autofit
-    const autoSizeAll = (skipHeader) => {
-        if (gridRef?.current) {
-            gridRef.current.columnApi.autoSizeAllColumns(skipHeader);
+    const autoSizeAll = (evt, skipHeader) => {
+        if (evt) {
+            evt.columnApi.autoSizeAllColumns(skipHeader);
         }
     };
 
@@ -59,8 +59,8 @@ const ObservableItemList = () => {
                 rowHeight={24}
                 pagination={true}
                 enableCellTextSelection={true}
-                onGridReady={onGridReady}
-                onBodyScroll={autoSizeAll(false)}
+                onGridReady={e => onGridReady(e)}
+                onBodyScroll={e => autoSizeAll(e, false)}
                 context={{useOverlay: 'Loading Observable Items'}}
                 components={{loadingOverlay: LoadingOverlay}}
                 loadingOverlayComponent="loadingOverlay"
