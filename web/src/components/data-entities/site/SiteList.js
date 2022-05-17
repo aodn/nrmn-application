@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
 import {Navigate, NavLink} from 'react-router-dom';
 import {getResult} from '../../../api/api';
@@ -166,6 +166,7 @@ const SiteList = () => {
                         cellRenderer={(e) => e.data.isActive ? <></> : <Delete/>}
                         cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
                         onCellClicked={(e) => {
+                            !e.data.isActive &&
                             setDialogState({
                                 open: true,
                                 item: e.data
