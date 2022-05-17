@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
 import {Navigate, NavLink} from 'react-router-dom';
 import {getResult} from '../../../api/api';
