@@ -8,10 +8,12 @@ import {PropTypes} from 'prop-types';
 import {Paper, TextField} from '@mui/material';
 import {userLogin} from '../../api/api';
 import {AuthContext} from '../../contexts/auth-context';
+import Chip from '@mui/material/Chip';
 
 const LoginForm = () => {
   const [formState, setFormState] = useState();
   const [loading, setLoading] = useState(false);
+  const version = process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION.split('.') : [0, 0, 0];
 
   const onSubmit = (event, setAuth) => {
     event.preventDefault();
@@ -30,6 +32,7 @@ const LoginForm = () => {
       {({setAuth}) => (
         <Grid container alignItems="center" justifyContent="center" style={{minHeight: '70vh'}}>
           <Paper>
+            <Chip color="primary" size="small" label={`Version ${version[0]}.${version[1]} (${version[2]})`}/>
             <Box paddingX={20} paddingY={5}>
               <Typography variant="h4">Login</Typography>
               <hr />

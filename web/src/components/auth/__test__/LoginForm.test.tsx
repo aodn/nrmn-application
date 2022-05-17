@@ -55,4 +55,9 @@ describe('<LoginForm/>', () => {
     });
   });
 
+  test('version display at login box', async () => {
+    process.env.REACT_APP_VERSION = '1.2.3';
+    const {getByText} = render(<LoginForm />);
+    expect(getByText('Version 1.2 (3)')).toBeTruthy();
+  });
 });
