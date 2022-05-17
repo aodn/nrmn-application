@@ -4,7 +4,7 @@ import {Navigate, NavLink} from 'react-router-dom';
 import {getResult} from '../../../api/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import {Add} from '@mui/icons-material';
+import {Add, CopyAll, Delete, Edit} from '@mui/icons-material';
 import {entityDelete} from '../../../api/api';
 
 import 'ag-grid-enterprise';
@@ -85,7 +85,7 @@ const SiteList = () => {
             filter={false}
             resizable={false}
             sortable={false}
-            valueFormatter={() => '✎'}
+            cellRenderer={() => <Edit/> }
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => {
               if (e.event.ctrlKey) {
@@ -123,7 +123,7 @@ const SiteList = () => {
             filter={false}
             resizable={false}
             sortable={false}
-            valueFormatter={() => 'Clone'}
+            cellRenderer={() => <CopyAll/>}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => {
               if (e.event.ctrlKey) {
@@ -142,9 +142,7 @@ const SiteList = () => {
             filter={false}
             resizable={false}
             sortable={false}
-            valueFormatter={(e) => {
-              return e.data.isActive ? '' : 'Delete';
-            }}
+            cellRenderer={(e) => e.data.isActive ? <></> : <Delete/>}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => {
               setDialogState({
