@@ -145,6 +145,7 @@ const SiteList = () => {
             cellRenderer={(e) => e.data.isActive ? <></> : <Delete/>}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => {
+              !e.data.isActive &&
               setDialogState({
                 open: true,
                 item: e.data
