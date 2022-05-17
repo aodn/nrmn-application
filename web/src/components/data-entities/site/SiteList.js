@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef, useCallback} from 'react';
+import React, {useState, useRef} from 'react';
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
 import {Navigate, NavLink} from 'react-router-dom';
 import {getResult} from '../../../api/api';
@@ -37,7 +37,7 @@ const SiteList = () => {
         });
     };
 
-  if (redirect) return <Navigate to={`/reference/site/${redirect}`} />;
+    if (redirect) return <Navigate to={`/reference/site/${redirect}`}/>;
 
     const dialog = (
         <Dialog disableBackdropClick disableEscapeKeyDown maxWidth="xs" open>

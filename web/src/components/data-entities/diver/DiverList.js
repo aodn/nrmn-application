@@ -13,6 +13,13 @@ const DiverList = () => {
     const [errors, setErrors] = useState([]);
     const gridRef = useRef(null);
 
+    // Auto size function to be call each time data changed, so the grid always autofit
+    const autoSizeAll = (skipHeader) => {
+        if (gridRef?.current) {
+            gridRef.current.columnApi.autoSizeAllColumns(skipHeader);
+        }
+    };
+
     const onGridReady = (event) => {
         async function fetchDivers(event) {
             await getResult('divers').then(
