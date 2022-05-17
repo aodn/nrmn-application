@@ -30,9 +30,8 @@ const LoginForm = () => {
   return (
     <AuthContext.Consumer>
       {({setAuth}) => (
-        <Grid container alignItems="center" justifyContent="center" style={{minHeight: '70vh'}}>
+        <Grid container alignItems="center" direction="column"  justifyContent="center" style={{minHeight: '70vh'}}>
           <Paper>
-            <Chip color="primary" size="small" label={`Version ${version[0]}.${version[1]} (${version[2]})`}/>
             <Box paddingX={20} paddingY={5}>
               <Typography variant="h4">Login</Typography>
               <hr />
@@ -72,6 +71,9 @@ const LoginForm = () => {
               </form>
             </Box>
           </Paper>
+          <Box m={2}>
+            <Chip variant="outlined" color="primary" size="small" label={`Version ${version[0]}.${version[1]} (${version[2]})`}/>
+          </Box>
         </Grid>
       )}
     </AuthContext.Consumer>
