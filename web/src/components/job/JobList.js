@@ -8,6 +8,7 @@ import {NavLink} from 'react-router-dom';
 import {deleteJob, getEntity} from '../../api/api';
 import LoadingOverlay from '../overlays/LoadingOverlay';
 import AlertDialog from '../ui/AlertDialog';
+import {GridOn, Delete, Info} from '@mui/icons-material';
 
 const TimeStampCell = (params) => {
   return params.value
@@ -79,7 +80,7 @@ const JobList = () => {
             filter={false}
             resizable={false}
             sortable={false}
-            valueFormatter={(e) => (e.data?.id ? '🛈' : '')}
+            cellRenderer={(e) => (e.data?.id ? <Info/> : <></>)}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => {
               if (!e.data.id) return;
@@ -94,6 +95,9 @@ const JobList = () => {
             flex={1}
             field="reference"
             cellStyle={{cursor: 'pointer'}}
+            cellRenderer={(e) => (e.data?.status === 'STAGED' ?
+              <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', }}><GridOn/><span>{e.data?.reference}</span></div>
+                : <>{e.data?.reference}</>)}
             onCellClicked={(e) => {
               if (e.data.status === 'STAGED') {
                 const target = `/data/job/${e.data.id}/edit`;
@@ -122,7 +126,7 @@ const JobList = () => {
             filter={false}
             resizable={false}
             sortable={false}
-            valueFormatter={(e) => (e.data && e.data.status !== 'INGESTED' ? 'Delete' : '')}
+            cellRenderer={(e) => (e.data && e.data.status !== 'INGESTED' ? <Delete/> : <></>)}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => setDeleteJobId(e.data.id)}
           />
