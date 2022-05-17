@@ -1,23 +1,39 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Navigate, NavLink} from 'react-router-dom';
 import {getEntity} from '../../../api/api';
+import {useRef} from 'react';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {Add} from '@mui/icons-material';
 
 import 'ag-grid-enterprise';
 
 const LocationList = () => {
-  const [gridApi, setGridApi] = useState();
   const [redirect, setRedirect] = useState();
+  const gridRef = useRef(null);
 
-  useEffect(() => {
-    async function fetchLocations() {
-      await getEntity('locations').then((res) => gridApi.setRowData(res.data));
+  // Auto size function to be call each time data changed, so the grid always autofit
+  const autoSizeAll = (evt, skipHeader) => {
+    if (evt) {
+      evt.columnApi.autoSizeAllColumns(skipHeader);
     }
-    if (gridApi) fetchLocations();
-  }, [gridApi]);
+  };
+
+  const onGridReady = (event) => {
+    async function fetchLocations(event) {
+      await getEntity('locations').then((res) => {
+        // Use setRowData in api will not trigger onGridReady but onDataChange event.
+        // if you use useState and connect row to setRowData then you will
+        // keep fire onGridReady as row change
+        event.api.setRowData(res.data);
+      });
+    }
+
+    fetchLocations(event).then(() => {
+      autoSizeAll(event, false);
+    });
+  };
 
   if (redirect) return <Navigate push to={`/reference/location/${redirect}`} />;
 
@@ -35,15 +51,22 @@ const LocationList = () => {
       </Box>
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
         <AgGridReact
+          ref={gridRef}
           rowHeight={24}
           pagination={true}
           enableCellTextSelection={true}
-          onGridReady={(e) => setGridApi(e.api)}
+          onGridReady={(e) => onGridReady(e)}
+          onBodyScroll={(e) => autoSizeAll(e, false)}
           context={{useOverlay: 'Loading Locations'}}
           components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
           suppressCellFocus={true}
-          defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
+          defaultColDef={{
+            sortable: true,
+            resizable: true,
+            filter: 'agTextColumnFilter',
+            floatingFilter: true
+          }}
         >
           <AgGridColumn
             width={40}
@@ -63,17 +86,11 @@ const LocationList = () => {
               }
             }}
           />
-          <AgGridColumn
-            flex={1}
-            field="locationName"
-            sort="asc"
-            cellStyle={{cursor: 'pointer'}}
-            onCellClicked={(e) => setRedirect(e.data.id)}
-          />
+          <AgGridColumn field="locationName" sort="asc" cellStyle={{cursor: 'pointer'}} onCellClicked={(e) => setRedirect(e.data.id)} />
           <AgGridColumn maxWidth={80} field="status" />
-          <AgGridColumn flex={2} field="ecoRegions" />
-          <AgGridColumn flex={2} field="countries" />
-          <AgGridColumn flex={2} field="areas" />
+          <AgGridColumn cellStyle={{'min-width': '600px'}} field="ecoRegions" />
+          <AgGridColumn field="countries" />
+          <AgGridColumn cellStyle={{'min-width': '600px'}} field="areas" />
         </AgGridReact>
       </Box>
     </>

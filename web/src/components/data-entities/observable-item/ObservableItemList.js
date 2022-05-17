@@ -1,6 +1,6 @@
 'use strict';
 
-import React, {useEffect, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {Navigate, NavLink} from 'react-router-dom';
 import {getResult} from '../../../api/api';
@@ -11,15 +11,30 @@ import {Add} from '@mui/icons-material';
 import 'ag-grid-enterprise';
 
 const ObservableItemList = () => {
-  const [rowData, setRowData] = useState();
   const [redirect, setRedirect] = useState();
+  const gridRef = useRef(null);
 
-  useEffect(() => {
-    async function fetchObservableItems() {
-      await getResult('reference/observableItems').then((res) => setRowData(res.data));
+  // Auto size function to be call each time data changed, so the grid always autofit
+  const autoSizeAll = (evt, skipHeader) => {
+    if (evt) {
+      evt.columnApi.autoSizeAllColumns(skipHeader);
     }
-    fetchObservableItems();
-  }, []);
+  };
+
+  const onGridReady = (event) => {
+    async function fetchObservableItems(event) {
+      await getResult('reference/observableItems').then((res) => {
+        // Use setRowData in api will not trigger onGridReady but onDataChange event.
+        // if you use useState and connect row to setRowData then you will
+        // keep fire onGridReady as row change
+        event.api.setRowData(res.data);
+      });
+    }
+
+    fetchObservableItems(event).then(() => {
+      autoSizeAll(event, false);
+    });
+  };
 
   if (redirect) return <Navigate to={`/reference/observableItem/${redirect}`} />;
 
@@ -36,11 +51,13 @@ const ObservableItemList = () => {
         </Box>
       </Box>
       <AgGridReact
+        ref={gridRef}
         className="ag-theme-material"
         rowHeight={24}
         pagination={true}
         enableCellTextSelection={true}
-        rowData={rowData}
+        onGridReady={(e) => onGridReady(e)}
+        onBodyScroll={(e) => autoSizeAll(e, false)}
         context={{useOverlay: 'Loading Observable Items'}}
         components={{loadingOverlay: LoadingOverlay}}
         loadingOverlayComponent="loadingOverlay"
@@ -48,7 +65,6 @@ const ObservableItemList = () => {
         defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
       >
         <AgGridColumn
-          width={40}
           field="observableItemId"
           headerName=""
           suppressMovable={true}
@@ -66,7 +82,6 @@ const ObservableItemList = () => {
           }}
         />
         <AgGridColumn
-          width={70}
           field="observableItemId"
           headerName="ID"
           sort="desc"
@@ -79,17 +94,17 @@ const ObservableItemList = () => {
             }
           }}
         />
-        <AgGridColumn width={100} field="typeName" headerName="Type" />
-        <AgGridColumn flex={1} field="name" />
-        <AgGridColumn flex={1} field="commonName" />
-        <AgGridColumn width={100} field="supersededBy" />
-        <AgGridColumn width={100} field="supersededNames" />
-        <AgGridColumn width={100} field="supersededIDs" />
-        <AgGridColumn width={100} field="phylum" />
-        <AgGridColumn width={100} field="class" />
-        <AgGridColumn width={100} field="order" />
-        <AgGridColumn width={100} field="family" />
-        <AgGridColumn width={100} field="genus" />
+        <AgGridColumn field="typeName" headerName="Type" />
+        <AgGridColumn cellStyle={{'min-width': '200px'}} field="name" />
+        <AgGridColumn field="commonName" />
+        <AgGridColumn field="supersededBy" />
+        <AgGridColumn field="supersededNames" />
+        <AgGridColumn field="supersededIDs" />
+        <AgGridColumn field="phylum" />
+        <AgGridColumn field="class" />
+        <AgGridColumn field="order" />
+        <AgGridColumn field="family" />
+        <AgGridColumn field="genus" />
       </AgGridReact>
     </>
   );
