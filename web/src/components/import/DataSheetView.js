@@ -628,6 +628,38 @@ const DataSheetView = ({onIngest, isAdmin}) => {
     return result;
   };
 
+  const onClickExcelExport = (api, name) => {
+    api.exportDataAsExcel({
+      sheetName: 'DATA',
+      author: 'NRMN',
+      columnKeys: [
+        'id','diver','buddy','siteCode','siteName','latitude','longitude','date','vis','direction','time',
+        'P-Qs','depth','method','block','code','species','commonName','total','inverts','1','2',
+        '3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28'],
+      fileName: `export_${name}`
+    });
+  };
+
+  const styleForExcelExport = [
+    {
+      id: 'readonly',
+      alignment: {
+        horizontal: 'Center'
+      },
+      interior: {
+        pattern: 'Gray25'
+      },
+      protection: {
+        protected: true
+      }
+    },
+    {
+      id: 'editable',
+      protection: {
+        protected: false
+      }
+    }];
+
   const measurementColumns = job.isExtendedSize ? measurements.concat(extendedMeasurements) : measurements;
   return (
     <>
@@ -667,7 +699,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             <Box m={1} ml={0}>
               <Button
                 variant="outlined"
-                onClick={() => gridApi.exportDataAsExcel({sheetName: 'DATA', author: 'NRMN', fileName: `export_${job.reference}`})}
+                onClick={ () => onClickExcelExport(gridApi, job.reference) }
                 startIcon={<CloudDownloadIcon />}
               >
                 Export
@@ -701,6 +733,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
           <AgGridReact
             getRowId={(r) => r.data.id}
             context={context}
+            excelStyles={styleForExcelExport}
             cellFlashDelay={100}
             cellFadeDelay={100}
             defaultColDef={{
@@ -746,7 +779,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             sideBar={sideBar}
             onGridReady={onGridReady}
           >
-            <AgGridColumn field="id" editable={false} hide={true} />
+            <AgGridColumn field="id" headerName="ID" cellClass={'readonly'} editable={false} hide={true} />
             <AgGridColumn field="pos" editable={false} hide={true} sort="asc" />
             <AgGridColumn
               field="row"

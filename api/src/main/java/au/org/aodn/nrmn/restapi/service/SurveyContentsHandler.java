@@ -140,7 +140,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             case "Diver":
                 currentRow.setDiver(value);
                 break;
-            case "Site No.":
+            case "Site Code":
                 currentRow.setSiteCode(value);
                 break;
             case "Site Name":
@@ -155,7 +155,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             case "Date":
                 currentRow.setDate(value);
                 break;
-            case "vis":
+            case "Vis":
                 currentRow.setVis(value);
                 break;
             case "Direction":
@@ -182,7 +182,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
             case "Species":
                 currentRow.setSpecies(value);
                 break;
-            case "Common name":
+            case "Common Name":
                 currentRow.setCommonName(value);
                 break;
             case "Total":
