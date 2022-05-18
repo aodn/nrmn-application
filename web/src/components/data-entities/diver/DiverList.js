@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {NavLink} from 'react-router-dom';
 import {grey, red} from '@mui/material/colors';
@@ -9,21 +9,19 @@ import {Add, Save} from '@mui/icons-material';
 import 'ag-grid-enterprise';
 
 const DiverList = () => {
-  const [gridApi, setGridApi] = useState();
   const [delta, setDelta] = useState([]);
-  const [rowData, setRowData] = useState();
   const [errors, setErrors] = useState([]);
+  const gridRef = useRef(null);
 
-  useEffect(() => {
-    async function fetchDivers() {
-      await getResult('divers').then((res) => setRowData(res.data));
+  const onGridReady = (event) => {
+    async function fetchDivers(event) {
+      await getResult('divers').then((res) => {
+        event.api.setRowData(res.data);
+      });
     }
-    fetchDivers();
-  }, []);
 
-  useEffect(() => {
-    if (gridApi) gridApi.redrawRows();
-  }, [gridApi, delta, errors]);
+    fetchDivers(event).then(() => {});
+  };
 
   const onCellValueChanged = (e) => {
     setDelta((data) => {
@@ -69,10 +67,10 @@ const DiverList = () => {
         </Box>
       </Box>
       <AgGridReact
+        ref={gridRef}
         className="ag-theme-material"
         getRowId={(r) => r.data.diverId}
         rowHeight={20}
-        rowData={rowData}
         fillHandleDirection="y"
         pagination={true}
         enableBrowserTooltips
@@ -80,20 +78,19 @@ const DiverList = () => {
         context={{useOverlay: 'Loading Divers', delta, errors}}
         components={{loadingOverlay: LoadingOverlay}}
         loadingOverlayComponent="loadingOverlay"
-        onGridReady={(e) => setGridApi(e.api)}
+        onGridReady={(e) => onGridReady(e)}
         defaultColDef={{
           editable: true,
           sortable: true,
           resizable: true,
           suppressMenu: true,
-          minWidth: 70,
           floatingFilter: true,
           filter: 'agTextColumnFilter',
           cellStyle: chooseCellStyle,
           tooltipValueGetter: tooltipValueGetter
         }}
       >
-        <AgGridColumn width={80} field="initials" />
+        <AgGridColumn field="initials" />
         <AgGridColumn flex={1} field="fullName" />
       </AgGridReact>
     </>

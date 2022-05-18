@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
 import {Navigate, NavLink} from 'react-router-dom';
 import {getResult} from '../../../api/api';
@@ -10,16 +10,31 @@ import {entityDelete} from '../../../api/api';
 import 'ag-grid-enterprise';
 
 const SiteList = () => {
-  const [gridApi, setGridApi] = useState();
   const [redirect, setRedirect] = useState();
   const [dialogState, setDialogState] = useState({open: false});
+  const gridRef = useRef(null);
 
-  useEffect(() => {
-    async function fetchSites() {
-      await getResult('sites').then((res) => gridApi.setRowData(res.data));
+  // Auto size function to be call each time data changed, so the grid always autofit
+  const autoSizeAll = (evt, skipHeader) => {
+    if (evt) {
+      evt.columnApi.autoSizeAllColumns(skipHeader);
     }
-    if (gridApi) fetchSites();
-  }, [gridApi]);
+  };
+
+  const onGridReady = (event) => {
+    async function fetchSites(event) {
+      await getResult('sites').then((res) => {
+        // Use setRowData in api will not trigger onGridReady but onDataChange event.
+        // if you use useState and connect row to setRowData then you will
+        // keep fire onGridReady as row change
+        event.api.setRowData(res.data);
+      });
+    }
+
+    fetchSites(event).then(() => {
+      autoSizeAll(event, false);
+    });
+  };
 
   if (redirect) return <Navigate to={`/reference/site/${redirect}`} />;
 
@@ -40,7 +55,7 @@ const SiteList = () => {
           variant="contained"
           onClick={() => {
             entityDelete('site', dialogState.item.siteId).then(() => {
-              gridApi.applyTransaction({remove: [dialogState.item]});
+              gridRef.current.api.applyTransaction({remove: [dialogState.item]});
               setDialogState({open: false});
             });
           }}
@@ -66,18 +81,24 @@ const SiteList = () => {
       </Box>
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
         <AgGridReact
+          ref={gridRef}
           rowHeight={24}
           pagination={true}
           enableCellTextSelection={true}
-          onGridReady={(e) => setGridApi(e.api)}
+          onGridReady={(e) => onGridReady(e)}
+          onBodyScroll={(e) => autoSizeAll(e, false)}
           context={{useOverlay: 'Loading Sites'}}
           components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
           suppressCellFocus={true}
-          defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
+          defaultColDef={{
+            sortable: true,
+            resizable: true,
+            filter: 'agTextColumnFilter',
+            floatingFilter: true
+          }}
         >
           <AgGridColumn
-            width={40}
             field="siteId"
             headerName=""
             suppressMovable={true}
@@ -85,7 +106,7 @@ const SiteList = () => {
             filter={false}
             resizable={false}
             sortable={false}
-            cellRenderer={() => <Edit/> }
+            cellRenderer={() => <Edit />}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => {
               if (e.event.ctrlKey) {
@@ -96,7 +117,6 @@ const SiteList = () => {
             }}
           />
           <AgGridColumn
-            width={100}
             field="siteCode"
             cellStyle={{cursor: 'pointer'}}
             onCellClicked={(e) => {
@@ -107,15 +127,14 @@ const SiteList = () => {
               }
             }}
           />
-          <AgGridColumn flex={1} field="siteName" />
-          <AgGridColumn flex={1} field="locationName" />
-          <AgGridColumn flex={1} field="state" />
-          <AgGridColumn flex={1} field="country" />
-          <AgGridColumn width={100} field="latitude" />
-          <AgGridColumn width={100} field="longitude" />
-          <AgGridColumn width={50} suppressMenu={true} field="isActive" headerName="Active" />
+          <AgGridColumn cellStyle={{'min-width': '500px'}} field="siteName" />
+          <AgGridColumn cellStyle={{'min-width': '200px'}} field="locationName" />
+          <AgGridColumn field="state" />
+          <AgGridColumn cellStyle={{'min-width': '200px'}} field="country" />
+          <AgGridColumn field="latitude" />
+          <AgGridColumn field="longitude" />
+          <AgGridColumn suppressMenu={true} field="isActive" headerName="Active" />
           <AgGridColumn
-            width={40}
             field="siteId"
             headerName=""
             suppressMovable={true}
@@ -123,7 +142,7 @@ const SiteList = () => {
             filter={false}
             resizable={false}
             sortable={false}
-            cellRenderer={() => <CopyAll/>}
+            cellRenderer={() => <CopyAll />}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => {
               if (e.event.ctrlKey) {
@@ -134,7 +153,6 @@ const SiteList = () => {
             }}
           />
           <AgGridColumn
-            width={60}
             field="observableItemId"
             headerName=""
             suppressMovable={true}
@@ -142,13 +160,14 @@ const SiteList = () => {
             filter={false}
             resizable={false}
             sortable={false}
-            cellRenderer={(e) => e.data.isActive ? <></> : <Delete/>}
+            cellRenderer={(e) => (e.data.isActive ? <></> : <Delete />)}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => {
-              setDialogState({
-                open: true,
-                item: e.data
-              });
+              !e.data.isActive &&
+                setDialogState({
+                  open: true,
+                  item: e.data
+                });
             }}
           />
         </AgGridReact>

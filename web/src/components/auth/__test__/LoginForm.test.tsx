@@ -1,4 +1,4 @@
-import LoginForm from './LoginForm';
+import LoginForm from '../LoginForm';
 import {DefaultRequestBody, rest} from 'msw';
 import {setupServer} from 'msw/node';
 import {render, fireEvent, waitFor} from '@testing-library/react';
@@ -55,4 +55,9 @@ describe('<LoginForm/>', () => {
     });
   });
 
+  test('version display at login box', async () => {
+    process.env.REACT_APP_VERSION = '1.2.3';
+    const {getByText} = render(<LoginForm />);
+    expect(getByText('Version 1.2 (3)')).toBeTruthy();
+  });
 });
