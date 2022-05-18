@@ -22,6 +22,14 @@ const JobList = () => {
   const [rowData, setRowData] = useState([]);
   const [redirect, setRedirect] = useState();
   const [deleteJobId, setDeleteJobId] = useState();
+  const iconViewBoxDimension = '-2 -2 30 30';
+
+  const onCellClicked = (e) => {
+    if (e.data.status === 'STAGED') {
+      const target = `/data/job/${e.data.id}/edit`;
+      e.event.ctrlKey ? window.open(target, '_blank').focus() : setRedirect(target);
+    }
+  };
 
   useEffect(() => {
     async function fetchJobs() {
@@ -80,7 +88,7 @@ const JobList = () => {
             filter={false}
             resizable={false}
             sortable={false}
-            cellRenderer={(e) => (e.data?.id ? <Info/> : <></>)}
+            cellRenderer={(e) => (e.data?.id ? <Info viewBox={iconViewBoxDimension}/> : <></>)}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => {
               if (!e.data.id) return;
@@ -92,18 +100,16 @@ const JobList = () => {
             }}
           />
           <AgGridColumn
+            width={40}
+            cellStyle={{cursor: 'pointer'}}
+            cellRenderer={(e) => (e.data?.status === 'STAGED' ? <GridOn htmlColor={'#808080'} viewBox={iconViewBoxDimension}/> : <></>)}
+            onCellClicked={onCellClicked}
+          />
+          <AgGridColumn
             flex={1}
             field="reference"
             cellStyle={{cursor: 'pointer'}}
-            cellRenderer={(e) => (e.data?.status === 'STAGED' ?
-              <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', }}><GridOn/><span>{e.data?.reference}</span></div>
-                : <>{e.data?.reference}</>)}
-            onCellClicked={(e) => {
-              if (e.data.status === 'STAGED') {
-                const target = `/data/job/${e.data.id}/edit`;
-                e.event.ctrlKey ? window.open(target, '_blank').focus() : setRedirect(target);
-              }
-            }}
+            onCellClicked={onCellClicked}
           />
           <AgGridColumn width={80} field="isExtendedSize" headerName="Extended" />
           <AgGridColumn
@@ -126,7 +132,7 @@ const JobList = () => {
             filter={false}
             resizable={false}
             sortable={false}
-            cellRenderer={(e) => (e.data && e.data.status !== 'INGESTED' ? <Delete/> : <></>)}
+            cellRenderer={(e) => (e.data && e.data.status !== 'INGESTED' ? <Delete viewBox={iconViewBoxDimension}/> : <></>)}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => setDeleteJobId(e.data.id)}
           />
