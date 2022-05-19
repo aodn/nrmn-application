@@ -640,26 +640,6 @@ const DataSheetView = ({onIngest, isAdmin}) => {
     });
   };
 
-  const styleForExcelExport = [
-    {
-      id: 'readonly',
-      alignment: {
-        horizontal: 'Center'
-      },
-      interior: {
-        pattern: 'Gray25'
-      },
-      protection: {
-        protected: true
-      }
-    },
-    {
-      id: 'editable',
-      protection: {
-        protected: false
-      }
-    }];
-
   const measurementColumns = job.isExtendedSize ? measurements.concat(extendedMeasurements) : measurements;
   return (
     <>
@@ -733,7 +713,6 @@ const DataSheetView = ({onIngest, isAdmin}) => {
           <AgGridReact
             getRowId={(r) => r.data.id}
             context={context}
-            excelStyles={styleForExcelExport}
             cellFlashDelay={100}
             cellFadeDelay={100}
             defaultColDef={{
@@ -779,7 +758,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             sideBar={sideBar}
             onGridReady={onGridReady}
           >
-            <AgGridColumn field="id" headerName="ID" cellClass={'readonly'} editable={false} hide={true} />
+            <AgGridColumn field="id" headerName="ID" editable={false} hide={true} />
             <AgGridColumn field="pos" editable={false} hide={true} sort="asc" />
             <AgGridColumn
               field="row"
@@ -814,6 +793,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             {measurementColumns.map((m) => (
               <AgGridColumn
                 field={m.field}
+                headerName={m.fishSize}
                 key={m.field}
                 editable={true}
                 width={35}
