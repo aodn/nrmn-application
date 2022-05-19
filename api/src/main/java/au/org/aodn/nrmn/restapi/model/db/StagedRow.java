@@ -180,7 +180,11 @@ public class StagedRow implements Serializable {
     }
 
     public String getSurvey() {
-        return (siteCode + "/" + dateNormalised() + "/" + depth).toUpperCase();
+        return String.format("[%s, %s, %s]", siteCode,  dateNormalised(), depthPart).toUpperCase();
+    }
+
+    public String getSurvey() {
+        return String.format("[%s, %s, %s]", siteCode,  dateNormalised(), depth).toUpperCase();
     }
 
 }
