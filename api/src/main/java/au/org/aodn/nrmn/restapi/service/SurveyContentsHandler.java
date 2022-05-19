@@ -31,7 +31,50 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     List<StagedRow> stagedRows = new ArrayList<>();
     List<String> columnKeys = new ArrayList<>();
 
+    public enum Fields {
+        UNKNOWN("UNKNOWN"),
+        ID("ID"), BUDDY("Buddy"), INVERTS("Inverts"), DIVER("Diver"), SITE_CODE("Site Code"),
+        SITE_NO("Site No."), SITE_NAME("Site Name"), LATITUDE("Latitude"), LONGITUDE("Longitude"),
+        DATE("Date"), VIS("Vis"), DIRECTION("Direction"), TIME("Time"), P_QS("P-Qs"), DEPTH("Depth"),
+        METHOD("Method"), BLOCK("Block"), CODE("Code"), SPECIES("Species"), COMMON_NAME("Common Name"),
+        TOTAL("Total"), USE_INVERT_SIZING("Use InvertSizing"), TWO_FIVE("2.5"), FIVE("5"),
+        SEVEN_FIVE("7.5"), TEN("10"), TWELVE_FIVE("12.5"), FIFTEEN("15"), TWENTY("20"),
+        TWENTY_FIVE("25"), THIRTY("30"), THIRTY_FIVE("35"), FORTY("40"), FIFTY("50"),
+        SIXTY_TWO_FIVE("62.5"), SEVENTY_FIVE("75"), EIGHTY_SEVEN_FIVE("87.5"), HUNDRED("100"),
+        HUNDRED_TWELVE_FIVE("112.5"), HUNDRED_TWENTY_FIVE("125"), HUNDRED_THIRTY_SEVEN_FIVE("137.5"),
+        HUNDRED_FIFTY("150"), HUNDRED_SIXTY_TWO_FIVE("162.5"), HUNDRED_SEVENTY_FIVE("175"),
+        HUNDRED_EIGHTY_SEVEN_FIVE("187.5"), TWO_HUNDRED("200"), TWO_HUNDRED_FIFTY("250"), THREE_HUNDRED("300"),
+        THREE_HUNDRED_FIFTY("350"), FOUR_HUNDRED("400"), FOUR_HUNDRED_FIFTY("450"), FIVE_HUNDRED("500"),
+        FIFE_HUNDRED_FIFTY("550"), SIX_HUNDRED("600"), SIX_HUNDRED_FIFTY("650"), SEVEN_HUNDRED("700"),
+        SEVEN_HUNDRED_FIFTY("750"), EIGHT_HUNDRED("800"), EIGHT_HUNDRED_FIFTY("850"), NINE_HUNDRED("900"),
+        NINE_HUNDRED_FIFTY("950"), THOUSAND("1000"), M2_INVERT_SIZING_SPECIES("M2 Invert Sizing Species"),
+        L5("L5"), L95("L95"), LMAX("Lmax");
+
+        private final String val;
+
+        Fields(String v) {
+            this.val = v;
+        }
+
+        public static Fields getEnum(String v) {
+            return Arrays.stream(Fields.values())
+                    // Avoid UI export and excel header cases diff
+                    .filter(p -> p.val.equalsIgnoreCase(v))
+                    .findFirst()
+                    .orElse(UNKNOWN);
+        }
+    }
+
     SurveyContentsHandler(List<String> requiredHeaders, List<String> optionalHeaders) {
+        // Make sure header values set is correct and known, otherwise it will result in missing fields value
+        for(String s: requiredHeaders) {
+            assert Fields.getEnum(s) != Fields.UNKNOWN : "Field name " + s + " is not defined";
+        }
+
+        for(String s: optionalHeaders) {
+            assert Fields.getEnum(s) != Fields.UNKNOWN : "Field name " + s + " is not defined";
+        }
+
         this.header1Required = requiredHeaders;
         this.header1Optional = optionalHeaders;
     }
@@ -127,68 +170,69 @@ public class SurveyContentsHandler implements SheetContentsHandler {
 
     private void setValue(String columnHeader, String formattedValue) {
         String value = formattedValue != null ? formattedValue.trim() : "";
-        switch (columnHeader) {
-            case "ID":
+        switch (Fields.getEnum(columnHeader)) {
+            case ID:
                 currentRow.setId(Long.valueOf(currentRow.getPos()));
                 break;
-            case "Buddy":
+            case BUDDY:
                 currentRow.setBuddy(value.isEmpty() ? "0" : value);
                 break;
-            case "Inverts":
+            case INVERTS:
                 currentRow.setInverts(value.isEmpty() ? "0" : value);
                 break;
-            case "Diver":
+            case DIVER:
                 currentRow.setDiver(value);
                 break;
-            case "Site Code":
+            case SITE_CODE:
+            case SITE_NO:
                 currentRow.setSiteCode(value);
                 break;
-            case "Site Name":
+            case SITE_NAME:
                 currentRow.setSiteName(value);
                 break;
-            case "Latitude":
+            case LATITUDE:
                 currentRow.setLatitude(truncateDecimalString(value));
                 break;
-            case "Longitude":
+            case LONGITUDE:
                 currentRow.setLongitude(truncateDecimalString(value));
                 break;
-            case "Date":
+            case DATE:
                 currentRow.setDate(value);
                 break;
-            case "Vis":
+            case VIS:
                 currentRow.setVis(value);
                 break;
-            case "Direction":
+            case DIRECTION:
                 currentRow.setDirection(value);
                 break;
-            case "Time":
+            case TIME:
                 currentRow.setTime(value);
                 break;
-            case "P-Qs":
+            case P_QS:
                 currentRow.setPqs(value);
                 break;
-            case "Depth":
+            case DEPTH:
                 currentRow.setDepth(value);
                 break;
-            case "Method":
+            case METHOD:
                 currentRow.setMethod(value);
                 break;
-            case "Block":
+            case BLOCK:
                 currentRow.setBlock(value);
                 break;
-            case "Code":
+            case CODE:
                 currentRow.setCode(value);
                 break;
-            case "Species":
+            case SPECIES:
                 currentRow.setSpecies(value);
                 break;
-            case "Common Name":
+            case COMMON_NAME:
                 currentRow.setCommonName(value);
                 break;
-            case "Total":
+            case TOTAL:
                 currentRow.setTotal(value);
                 break;
-            case "Use InvertSizing":
+            case USE_INVERT_SIZING:
                 currentRow.setIsInvertSizing(value);
                 break;
             default:
