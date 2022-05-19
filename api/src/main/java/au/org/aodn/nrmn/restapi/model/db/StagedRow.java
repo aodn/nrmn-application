@@ -176,10 +176,6 @@ public class StagedRow implements Serializable {
 
     public String getSurveyGroup() {
         String depthPart = depth.split("\\.")[0];
-        return (siteCode + "/" + dateNormalised() + "/" + depthPart).toUpperCase();
-    }
-
-    public String getSurvey() {
         return String.format("[%s, %s, %s]", siteCode,  dateNormalised(), depthPart).toUpperCase();
     }
 
