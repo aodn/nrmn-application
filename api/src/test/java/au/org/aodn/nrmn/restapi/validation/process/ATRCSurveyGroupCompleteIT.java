@@ -137,6 +137,56 @@ class ATRCSurveyGroupCompleteIT {
     }
 
     @Test
+    void groupWithDifferentDateFormatShouldSucceed() {
+        StagedJob job = jobRepo.findByReference("jobid-atrc").get();
+        String date1 = "11/09/2020";
+        String date2 = "11/09/20";
+
+        String siteNo = "ERZ1";
+
+        StagedRow sn1b1 = new StagedRow();
+        sn1b1.setDate(date1);
+        sn1b1.setDepth("7.1");
+        sn1b1.setMethod("1");
+        sn1b1.setBlock("1");
+        sn1b1.setSiteCode(siteNo);
+        sn1b1.setStagedJob(job);
+
+        StagedRow sn1b2 = (StagedRow) SerializationUtils.clone(sn1b1);
+        sn1b2.setDate(date1);
+        sn1b2.setBlock("2");
+
+        StagedRow sn2b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        sn2b1.setDate(date1);
+        sn2b1.setDepth("7.2");
+        StagedRow sn2b2 = (StagedRow) SerializationUtils.clone(sn2b1);
+        sn2b2.setDate(date2);
+        sn2b2.setBlock("2");
+
+        StagedRow sn3b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        sn3b1.setDate(date2);
+        sn3b1.setDepth("7.3");
+        StagedRow sn3b2 = (StagedRow) SerializationUtils.clone(sn3b1);
+        sn3b2.setDate(date2);
+        sn3b2.setBlock("2");
+
+        StagedRow sn4b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        sn4b1.setDate(date2);
+        sn4b1.setDepth("7.4");
+        StagedRow sn4b2 = (StagedRow) SerializationUtils.clone(sn4b1);
+        sn4b2.setBlock("2");
+
+        Location location = Location.builder().locationName("LOC1").isActive(false).build();
+        locationRepository.save(location);
+        siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
+        stagedRowRepo.saveAll(Arrays.asList(sn1b1, sn1b2, sn2b1, sn2b2, sn3b1, sn3b2, sn4b1, sn4b2));
+
+        ValidationResponse response = validationProcess.process(job);
+        assertTrue(!response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey group incomplete")));
+    }
+
+
+    @Test
     void groupWithIncompleteSurveyBlocksShouldFail() {
         StagedJob job = jobRepo.findByReference("jobid-atrc").get();
         String date = "11/09/2020";

@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.model.db;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -24,6 +25,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
+import au.org.aodn.nrmn.restapi.util.TimeUtils;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -156,20 +158,29 @@ public class StagedRow implements Serializable {
     @Setter(AccessLevel.NONE)
     private Timestamp lastUpdated;
 
+    private String dateNormalised() {
+        try {
+            LocalDate d = LocalDate.parse(date, TimeUtils.getRowDateFormatter());
+            return d != null ? d.toString() : date;
+        } catch (Exception e) {
+            return date;
+        }
+    }
+
     public String getContentsHash(boolean includeTotal) {
         // String measurements = measureJson.entrySet().stream().map(m -> m.getValue().length() > 0 ? m.getKey().toString() + ":" + m.getValue() + "|" : "").reduce("", (a, b) -> a + b);
-        String rowContents = siteCode + date + diver + depth + method + block + species + buddy + siteName + longitude + latitude + vis + time + direction + pqs + code + commonName + inverts + isInvertSizing; // + total + measurements;
+        String rowContents = siteCode + dateNormalised() + diver + depth + method + block + species + buddy + siteName + longitude + latitude + vis + time + direction + pqs + code + commonName + inverts + isInvertSizing; // + total + measurements;
         if(includeTotal) rowContents += total;
         return Integer.toString(rowContents.hashCode());
     }
 
     public String getSurveyGroup() {
         String depthPart = depth.split("\\.")[0];
-        return (siteCode + "/" + date + "/" + depthPart).toUpperCase();
+        return (siteCode + "/" + dateNormalised() + "/" + depthPart).toUpperCase();
     }
 
     public String getSurvey() {
-        return (siteCode + "/" + date + "/" + depth).toUpperCase();
+        return (siteCode + "/" + dateNormalised() + "/" + depth).toUpperCase();
     }
 
 }
