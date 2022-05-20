@@ -1,8 +1,5 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.InputStream;
 import java.util.List;
 
@@ -19,6 +16,8 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.service.SurveyContentsHandler.ParsedSheet;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 @SpringBootTest
@@ -142,10 +141,25 @@ public class SpreadSheetServiceIT {
 
         // Test Map filling
         assertEquals(obs1.getMeasureJson().size(), 4);
-        assertEquals(obs1.getMeasureJson().get(21), "4");
+        assertEquals("5", obs1.getMeasureJson().get(SurveyContentsHandler.Field.TWO_FIVE.getPosition()), "Row 3 measurement 2.5 should be");
+        assertEquals("2", obs1.getMeasureJson().get(SurveyContentsHandler.Field.TEN.getPosition()), "Row 3 measurement 10 should be");
+        assertEquals("5", obs1.getMeasureJson().get(SurveyContentsHandler.Field.TWELVE_FIVE.getPosition()), "Row 3 measurement 12.5 should be");
+        assertEquals("4", obs1.getMeasureJson().get(SurveyContentsHandler.Field.HUNDRED_SIXTY_TWO_FIVE.getPosition()), "Row 3 measurement 162.5 should be");
+        assertFalse(obs1.getMeasureJson().containsKey(SurveyContentsHandler.Field.TWO_HUNDRED.getPosition()), "Row 3 no measurement at 200");
 
         // Test Macro
         assertEquals(obs1.getSpecies(), "Caesioperca rasor");
+
+        // Test second row
+        StagedRow obs2 = stageSurveys.get(1);
+        assertEquals("-41.25370", obs2.getLatitude(), "Row 4 latitude");
+        assertEquals("148.33974", obs2.getLongitude(), "Row 4 longitude");
+
+        assertEquals(obs1.getMeasureJson().size(), 4);
+        assertFalse(obs2.getMeasureJson().containsKey(SurveyContentsHandler.Field.TWO_FIVE.getPosition()), "Row 4 no measurement at 2.5");
+        assertEquals("3", obs2.getMeasureJson().get(SurveyContentsHandler.Field.TEN.getPosition()), "Row 4 measurement 10 should be");
+        assertEquals("5", obs2.getMeasureJson().get(SurveyContentsHandler.Field.HUNDRED_TWELVE_FIVE.getPosition()), "Row 4 measurement 112.5 should be");
+        assertEquals("3", obs2.getMeasureJson().get(SurveyContentsHandler.Field.TWO_HUNDRED.getPosition()), "Row 4 measurement 200 should be");
     }
 
     @Test

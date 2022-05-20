@@ -773,7 +773,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             />
             <AgGridColumn field="diver" headerName="Diver" pivot={true} enablePivot={false} />
             <AgGridColumn field="buddy" headerName="Buddy" />
-            <AgGridColumn field="siteCode" headerName="Site Code" rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="siteCode" headerName="Site No." rowGroup={false} enableRowGroup={true} />
             <AgGridColumn field="siteName" headerName="Site Name" minWidth={160} />
             <AgGridColumn field="latitude" headerName="Latitude" />
             <AgGridColumn field="longitude" headerName="Longitude" />
