@@ -628,14 +628,18 @@ const DataSheetView = ({onIngest, isAdmin}) => {
     return result;
   };
 
-  const onClickExcelExport = (api, name) => {
+  const onClickExcelExport = (api, name, isExtended) => {
+    const columns = [
+      'id','diver','buddy','siteCode','siteName','latitude','longitude','date','vis','direction','time',
+      'P-Qs','depth','method','block','code','species','commonName','total','inverts','1','2',
+      '3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28'];
+
+    const extendedColumns = ['29','30','31','32','33','34','35','36','37','38','39','40','isInvertSizing'];
+
     api.exportDataAsExcel({
       sheetName: 'DATA',
       author: 'NRMN',
-      columnKeys: [
-        'id','diver','buddy','siteCode','siteName','latitude','longitude','date','vis','direction','time',
-        'P-Qs','depth','method','block','code','species','commonName','total','inverts','1','2',
-        '3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28'],
+      columnKeys: isExtended ? [...columns, ...extendedColumns]: columns,
       fileName: `export_${name}`
     });
   };
@@ -679,7 +683,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             <Box m={1} ml={0}>
               <Button
                 variant="outlined"
-                onClick={ () => onClickExcelExport(gridApi, job.reference) }
+                onClick={ () => onClickExcelExport(gridApi, job.reference, job.isExtendedSize) }
                 startIcon={<CloudDownloadIcon />}
               >
                 Export
@@ -802,7 +806,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
                 }}
               />
             ))}
-            {job.isExtendedSize && <AgGridColumn minWidth={120} field="isInvertSizing" headerName="Use Invert Sizing" />}
+            {job.isExtendedSize && <AgGridColumn minWidth={120} field="isInvertSizing" headerName="Use InvertSizing" />}
           </AgGridReact>
         )}
       </Box>

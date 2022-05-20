@@ -135,7 +135,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     @Override
     public void endRow(int rowNum) {
         if (isHeaderRow) {
-            List<String> errors = new ArrayList<String>();
+            List<String> errors = new ArrayList<>();
             List<Field> foundHeaders = new ArrayList<>(header1.values());
             List<Field> missingHeaders = new ArrayList<>(header1Required);
             missingHeaders.removeAll(foundHeaders);
