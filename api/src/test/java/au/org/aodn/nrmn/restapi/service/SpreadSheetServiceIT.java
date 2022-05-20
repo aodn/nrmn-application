@@ -124,6 +124,18 @@ public class SpreadSheetServiceIT {
         }
         assertTrue(StringUtils.isNotEmpty(error));
     }
+    /**
+     * Excel row2 must be blank according to the import file spec, if not blank throw exception
+     */
+    @Test
+    void rejectFileWhenRow2IsNotEmpty() {
+        Exception e = assertThrows(Exception.class, () -> {
+            FileSystemResource file3 = new FileSystemResource("src/test/resources/sheets/row2NotEmpty.xlsx");
+            ParsedSheet parsedSheet = sheetService
+                    .stageXlsxFile(new MockMultipartFile("sheets/row2NotEmpty.xlsx", file3.getInputStream()), false);
+        });
+        assertEquals("Cell range A2-G2 is not blank.", e.getMessage(), "Non empty row 2 warning");
+    }
 
     @Test
     void validFileShouldBeCorrectlyTransformToStageSurvey() throws Exception {
