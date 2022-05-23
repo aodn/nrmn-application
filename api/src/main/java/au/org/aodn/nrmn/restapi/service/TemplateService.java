@@ -62,9 +62,10 @@ public class TemplateService {
     public void writeZip(OutputStream outputStream, Collection<Integer> locations) throws IOException {
 
         ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
-        Writer writer = new OutputStreamWriter(zipOutputStream, "UTF-8");
+        Writer writer = new OutputStreamWriter(zipOutputStream, StandardCharsets.UTF_8);
 
         zipOutputStream.putNextEntry(new ZipEntry("divers.csv"));
+        writer.write('\ufeff');
         writeDiversCsv(writer, getDiversForTemplate());
         writer.flush();
         zipOutputStream.closeEntry();
