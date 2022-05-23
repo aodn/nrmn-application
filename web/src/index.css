@@ -3,6 +3,10 @@
   line-height: 20px;
 }
 
+.ag-theme-material .ag-cell-inline-editing {
+  height: 36px;
+}
+
 #validation-grid  .ag-cell[role="gridcell"] {
   border-right: 1px solid #ccc;
 }
@@ -37,3 +41,5 @@
   margin-right: 25px;
   border-left: 2px solid #ccc;
 }
+
+
