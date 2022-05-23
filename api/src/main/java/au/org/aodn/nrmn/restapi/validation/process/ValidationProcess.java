@@ -250,7 +250,7 @@ public class ValidationProcess {
             }
 
             // Validation: Use Invert Sizing is blank
-            if (StringUtils.isBlank(row.getIsInvertSizing())) {
+            if (isExtendedSize && StringUtils.isBlank(row.getIsInvertSizing())) {
                 errors.add(rowId, ValidationLevel.WARNING, "isInvertSizing", "Use Invert Sizing is blank");
             }
 
