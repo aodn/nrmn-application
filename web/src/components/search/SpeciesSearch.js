@@ -52,8 +52,6 @@ const SpeciesSearch = ({onRowClick}) => {
   const [info, setInfo] = useState();
   const [maxRows, setMaxRows] = useState(-1);
 
-  const [searching, setSearching] = useState(false);
-
   const [searchRequested, setSearchRequested] = useState();
   const [searchError, setSearchError] = useState();
 
@@ -71,6 +69,9 @@ const SpeciesSearch = ({onRowClick}) => {
   };
 
   useEffect(() => {
+    if (currentSearch?.species === searchRequested?.species && currentSearch?.page === searchRequested?.page) {
+      return;
+    }
     async function fetchSearchResults() {
       setInfo(null);
       setSearchError(null);
@@ -117,10 +118,10 @@ const SpeciesSearch = ({onRowClick}) => {
         .catch((err) => setSearchError(err.message));
     }
     if (searchRequested) fetchSearchResults();
-  }, [searchRequested, currentSearch]);
+  }, [searchRequested, currentSearch, rowsPerPage, gridData]);
 
   const handleChangePage = (_, newPage) => {
-    if(gridData.length / rowsPerPage < newPage + 1)
+    if(page < newPage && gridData.length / rowsPerPage < newPage + 1)
       setSearchRequested({searchType: tabIndex === 0 ? 'WORMS' : 'NRMN', species: searchTerm, includeSuperseded: true, page: newPage});
     else
       setPage(newPage);
@@ -286,7 +287,6 @@ const SpeciesSearch = ({onRowClick}) => {
           </TableContainer>
           <TablePagination
             component="div"
-            hidden={searching}
             rowsPerPageOptions={[]}
             count={maxRows}
             rowsPerPage={rowsPerPage}
