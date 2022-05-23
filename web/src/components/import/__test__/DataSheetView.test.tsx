@@ -19,8 +19,8 @@ describe('<DataSheetView/>', () => {
   afterEach(() => {
     mockGetDataJob.mockRestore();
   });
-
-  test('Non extend data column correct', async () => {
+  // The export function follows the column of the grid, if the grid is right, the export fields are correct
+  test('Non extend data column correct, hence export column match', async () => {
     const canned = require('./job16.json');
     const ingest = (res) => {};
 
@@ -66,7 +66,7 @@ describe('<DataSheetView/>', () => {
         });
       })
       .finally(() => {
-        // Data loaded, need refresh to trigger HTML update
+        // Data loaded after initial render, need refresh to trigger HTML update
         rerender(<BrowserRouter><DataSheetView onIngest={i => ingest(i)} isAdmin={false}/></BrowserRouter>);
 
         expect(screen.getByText('Shell substrate')).toBeInTheDocument();
