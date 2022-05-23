@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Box, Divider, Paper, Grid, Tab, Tabs, TextField, Typography} from '@mui/material';
+import {makeStyles} from '@mui/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -14,7 +15,34 @@ import {search} from '../../api/api';
 import PropTypes from 'prop-types';
 import LoadingButton from '@mui/lab/LoadingButton';
 
+const useStyles = makeStyles(({ palette, typography }) => ({
+  root: {
+    '& .MuiTable-root': {
+      '& .MuiTableHead-root': {
+        '& .MuiTableRow-head': {
+          '& .MuiTableCell-head': {
+            fontSize: typography.table.fontSize,
+            background: palette.primary.rowHeader
+          },
+        },
+      },
+      '& .MuiTableRow-root': {
+        '&:nth-child(even)': {
+          backgroundColor: palette.primary.rowHighlight,
+        },
+      },
+      '& .MuiTableCell-root': {
+        fontSize: typography.table.fontSize,
+        padding: typography.table.padding,
+        color: palette.text.textPrimary,
+      },
+    },
+  },
+}));
+
 const SpeciesSearch = ({onRowClick}) => {
+  const classes = useStyles();
+
   const [tabIndex, setTabIndex] = useState(0);
   const [searchTerm, setSearchTerm] = useState();
   const [page, setPage] = useState(0);
@@ -172,8 +200,8 @@ const SpeciesSearch = ({onRowClick}) => {
       </TabPanel>
       {gridData ? (
         <>
-          <TableContainer component={Paper}>
-            <Table size="small">
+          <TableContainer classes={classes} component={Paper}>
+            <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>Is Present</TableCell>

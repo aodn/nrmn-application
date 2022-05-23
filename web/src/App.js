@@ -50,10 +50,15 @@ const App = () => {
     () =>
       responsiveFontSizes(
         createTheme({
+          typography: {
+            table: {
+              fontSize: 11,
+              padding: 6
+          }},
           palette: {
             mode: 'light',
-            primary: {main: '#546E7B', light: '#AADFFA', dark: '546E7B'},
-            secondary: {main: '#563FF2', light: '#7D69FF', dark: '5844DB'}
+            primary: {main: '#546E7B', light: '#AADFFA', dark: '#546E7B', rowHeader: '#E4EAED', rowHighlight: '#F2F6F7'},
+            secondary: {main: '#563FF2', light: '#7D69FF', dark: '#5844DB',  rowHeader: '#E4EAED', rowHighlight: '#F2F6F7'}
           }
         })
       ),
@@ -64,10 +69,14 @@ const App = () => {
     () =>
       responsiveFontSizes(
         createTheme({
+          typography: {
+            table: {
+              fontSize: 11,
+          }},
           palette: {
             mode: 'light',
-            primary: {main: '#7B6154', light: '#AADFFA', dark: '546E7B'},
-            secondary: {main: '#563FF2', light: '#7D69FF', dark: '5844DB'}
+            primary: {main: '#7B6154', light: '#AADFFA', dark: '#546E7B', rowHeader: '#E4EAED', rowHighlight: '#F2F6F7'},
+            secondary: {main: '#563FF2', light: '#7D69FF', dark: '#5844DB', rowHeader: '#E4EAED', rowHighlight: '#F2F6F7'}
           }
         })
       ),

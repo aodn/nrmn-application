@@ -250,7 +250,7 @@ public class ValidationProcess {
             }
 
             // Validation: Use Invert Sizing is blank
-            if (StringUtils.isBlank(row.getIsInvertSizing())) {
+            if (isExtendedSize && StringUtils.isBlank(row.getIsInvertSizing())) {
                 errors.add(rowId, ValidationLevel.WARNING, "isInvertSizing", "Use Invert Sizing is blank");
             }
 
@@ -745,7 +745,7 @@ public class ValidationProcess {
         Map<String, List<StagedRowFormatted>> surveyGroupMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
         sheetErrors.addAll(checkSurveyGroups(programName, job.getIsExtendedSize(), surveyGroupMap));
 
-        Map<String, List<StagedRowFormatted>> method3SurveyMap = mappedRows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3) && !row.getRef().getSpecies().equalsIgnoreCase("Survey Not Done")).collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
+        Map<String, List<StagedRowFormatted>> method3SurveyMap = mappedRows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3) && !row.getRef().getSpecies().equalsIgnoreCase("Survey Not Done")).collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
         sheetErrors.addAll(checkMethod3Transects(programName, job.getIsExtendedSize(), method3SurveyMap));
 
         Long distinctSurveys = mappedRows.stream().filter(r -> Arrays.asList(1,2).contains(r.getMethod())).map(r -> r.getSurvey()).distinct().count();

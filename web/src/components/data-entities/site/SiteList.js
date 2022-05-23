@@ -127,10 +127,10 @@ const SiteList = () => {
               }
             }}
           />
-          <AgGridColumn cellStyle={{'min-width': '500px'}} field="siteName" />
-          <AgGridColumn cellStyle={{'min-width': '200px'}} field="locationName" />
+          <AgGridColumn minWidth={500} field="siteName" />
+          <AgGridColumn minWidth={200} field="locationName" />
           <AgGridColumn field="state" />
-          <AgGridColumn cellStyle={{'min-width': '200px'}} field="country" />
+          <AgGridColumn minWidth={200} field="country" />
           <AgGridColumn field="latitude" />
           <AgGridColumn field="longitude" />
           <AgGridColumn suppressMenu={true} field="isActive" headerName="Active" />
