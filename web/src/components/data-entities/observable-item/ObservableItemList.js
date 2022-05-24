@@ -13,6 +13,7 @@ import 'ag-grid-enterprise';
 const ObservableItemList = () => {
   const [redirect, setRedirect] = useState();
   const gridRef = useRef(null);
+  const lastFilters = Object.create(null);
 
   // Auto size function to be call each time data changed, so the grid always autofit
   const autoSizeAll = (evt, skipHeader) => {
@@ -34,6 +35,13 @@ const ObservableItemList = () => {
     fetchObservableItems(event).then(() => {
       autoSizeAll(event, false);
     });
+  };
+
+  const onFilterChanged = (event) => {
+    if(!event?.afterDataChange) {
+      const col = event.event.columns[0];
+      col.getApi().getFilterInstance(col.colId);
+    }
   };
 
   if (redirect) return <Navigate to={`/reference/observableItem/${redirect}`} />;
@@ -58,6 +66,7 @@ const ObservableItemList = () => {
         enableCellTextSelection={true}
         onGridReady={(e) => onGridReady(e)}
         onBodyScroll={(e) => autoSizeAll(e, false)}
+        onFilterChanged={(e) => onFilterChanged(e)}
         context={{useOverlay: 'Loading Observable Items'}}
         components={{loadingOverlay: LoadingOverlay}}
         loadingOverlayComponent="loadingOverlay"
