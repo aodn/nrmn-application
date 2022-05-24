@@ -285,6 +285,6 @@ class ValidationProcessTest {
 
         Collection<ValidationCell> errors = validationProcess.validateMeasurements("testing", stagedRowFormatted);
         assertTrue(errors.stream().filter(f -> f.getLevelId() == ValidationLevel.BLOCKING && f.getMessage().contains("Calculated total is 21")).findAny().isPresent(),
-                "BOCKING error for total mismatch");
+                "BLOCKING error for total mismatch");
     }
 }
