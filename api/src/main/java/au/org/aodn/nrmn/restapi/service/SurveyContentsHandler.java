@@ -15,8 +15,8 @@ import lombok.Value;
 
 public class SurveyContentsHandler implements SheetContentsHandler {
 
-    private final List<Field> header1Required;
-    private final List<Field> header1Optional;
+    private final List<Field> requiredSurveyFields;
+    private final List<Field> optionalSurveyFields;
 
     private String error;
     private ParsedSheet result;
@@ -98,18 +98,18 @@ public class SurveyContentsHandler implements SheetContentsHandler {
 
     SurveyContentsHandler(List<String> requiredHeaders, List<String> optionalHeaders) {
         // Make sure header values set is correct and known, otherwise it will result in missing fields value
-        this.header1Required = new ArrayList<>();
+        this.requiredSurveyFields = new ArrayList<>();
         for(String s: requiredHeaders) {
             Field f = Field.getEnum(s);
             assert f != Field.UNKNOWN : "Require field name " + s + " is not defined";
-            this.header1Required.add(f);
+            this.requiredSurveyFields.add(f);
         }
 
-        this.header1Optional = new ArrayList<>();
+        this.optionalSurveyFields = new ArrayList<>();
         for(String s: optionalHeaders) {
             Field f = Field.getEnum(s);
             assert f != Field.UNKNOWN : "Optional field name " + s + " is not defined";
-            this.header1Optional.add(f);
+            this.optionalSurveyFields.add(f);
         }
     }
 
@@ -127,7 +127,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
         isHeader2Row = (rowNum == 1);
         if (!isHeaderRow && !isHeader2Row) {
             currentRow = StagedRow.builder().pos((rowNum - 1) * 1000).build();
-            for (Field col : header1Required)
+            for (Field col : requiredSurveyFields)
                 setValue(col, "");
         }
     }
@@ -137,12 +137,12 @@ public class SurveyContentsHandler implements SheetContentsHandler {
         if (isHeaderRow) {
             List<String> errors = new ArrayList<>();
             List<Field> foundHeaders = new ArrayList<>(header1.values());
-            List<Field> missingHeaders = new ArrayList<>(header1Required);
+            List<Field> missingHeaders = new ArrayList<>(requiredSurveyFields);
             missingHeaders.removeAll(foundHeaders);
             if (missingHeaders.size() > 0)
                 errors.add("Row 1 missing headers: " + String.join(", ", missingHeaders.stream().map(s -> s.toString()).collect(Collectors.toList())));
-            foundHeaders.removeAll(header1Required);
-            foundHeaders.removeAll(header1Optional);
+            foundHeaders.removeAll(requiredSurveyFields);
+            foundHeaders.removeAll(optionalSurveyFields);
             if (foundHeaders.size() > 0)
                 errors.add("Row 1 has unexpected headers: " + String.join(", ", foundHeaders.stream().map(s -> s.toString()).collect(Collectors.toList())));
             if (errors.size() > 0) {
@@ -272,7 +272,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
                 // Do nothing as field not known by the handler and if it is required field will be error out later.
                 break;
             default:
-                if (value.length() > 0 && header1Required.contains(columnHeader) && columnHeader.isMeasurement()) {
+                if (value.length() > 0 && requiredSurveyFields.contains(columnHeader) && columnHeader.isMeasurement()) {
                     measureJson.put(columnHeader.getPosition(), value);
                 }
                 break;

@@ -131,8 +131,7 @@ public class SpreadSheetServiceIT {
     void rejectFileWhenRow2IsNotEmpty() {
         Exception e = assertThrows(Exception.class, () -> {
             FileSystemResource file3 = new FileSystemResource("src/test/resources/sheets/row2NotEmpty.xlsx");
-            ParsedSheet parsedSheet = sheetService
-                    .stageXlsxFile(new MockMultipartFile("sheets/row2NotEmpty.xlsx", file3.getInputStream()), false);
+            sheetService.stageXlsxFile(new MockMultipartFile("sheets/row2NotEmpty.xlsx", file3.getInputStream()), false);
         });
         assertEquals("Cell range A2-G2 is not blank.", e.getMessage(), "Non empty row 2 warning");
     }
