@@ -5,7 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
+import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -263,5 +267,24 @@ class ValidationProcessTest {
         Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", job.getIsExtendedSize(), Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("must be 'Yes' or 'No'")));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("Use Invert Sizing is blank")));
+    }
+    /**
+     *  Calculated total issue is a blocking error not warning
+     */
+    @Test
+    void calculatedTotalIsAnError() {
+        StagedRowFormatted stagedRowFormatted = StagedRowFormatted
+                .builder()
+                .measureJson(new HashMap<>())
+                .total(1)
+                .code("NAT")        // Some code that will not trigger Debris zero blocking
+                .build();
+
+        stagedRowFormatted.getMeasureJson().put(1, 10);
+        stagedRowFormatted.getMeasureJson().put(2, 11);
+
+        Collection<ValidationCell> errors = validationProcess.validateMeasurements("testing", stagedRowFormatted);
+        assertTrue(errors.stream().filter(f -> f.getLevelId() == ValidationLevel.BLOCKING && f.getMessage().contains("Calculated total is 21")).findAny().isPresent(),
+                "BOCKING error for total mismatch");
     }
 }
