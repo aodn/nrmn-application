@@ -639,6 +639,8 @@ const DataSheetView = ({onIngest, isAdmin}) => {
     const headers = [];
 
     requiredColumns.forEach((x) => {
+      // Get the row display name from the fields, this is because we turn on skipColumnHeaders so that
+      // we can add empty row
       headers.push({ data: { value: api.getColumnDefs().filter(y => y.field === x)[0].headerName, type: 'String' } });
     });
 
@@ -647,7 +649,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
       author: 'NRMN',
       columnKeys: requiredColumns,
       skipColumnHeaders: true,
-      prependContent: [headers, []],
+      prependContent: [headers, []],  // This make row 2 an empty row due to file standard
       fileName: `export_${name}`
     });
   };

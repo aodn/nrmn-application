@@ -24,7 +24,7 @@ const ValidationJob = () => {
               </Alert>
             </Box>
           )}
-          <DataSheetView isAdmin={auth.roles.includes('ROLE_ADMIN')} jobId={id} onIngest={setIngestState} />;
+          <DataSheetView isAdmin={auth.roles.includes('ROLE_ADMIN')} jobId={id} onIngest={setIngestState} />
         </>
       )}
     </AuthContext.Consumer>
