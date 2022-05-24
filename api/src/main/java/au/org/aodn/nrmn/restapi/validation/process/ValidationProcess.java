@@ -367,7 +367,7 @@ public class ValidationProcess {
         }
         // VALIDATION: Abundance CheckSums
         if (errors.size() < 1 && row.getTotal() != null && !row.getTotal().equals(observationTotal))
-            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Calculated total is " + observationTotal, row.getId(), "total"));
+            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Calculated total is " + observationTotal, row.getId(), "total"));
 
         return errors;
     }
