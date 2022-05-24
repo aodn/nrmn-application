@@ -635,11 +635,19 @@ const DataSheetView = ({onIngest, isAdmin}) => {
       '3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28'];
 
     const extendedColumns = ['29','30','31','32','33','34','35','36','37','38','39','40','isInvertSizing'];
+    const requiredColumns = isExtended ? [...columns, ...extendedColumns]: columns;
+    const headers = [];
+
+    requiredColumns.forEach((x) => {
+      headers.push({ data: { value: api.getColumnDefs().filter(y => y.field === x)[0].headerName, type: 'String' } });
+    });
 
     api.exportDataAsExcel({
       sheetName: 'DATA',
       author: 'NRMN',
-      columnKeys: isExtended ? [...columns, ...extendedColumns]: columns,
+      columnKeys: requiredColumns,
+      skipColumnHeaders: true,
+      prependContent: [headers, []],
       fileName: `export_${name}`
     });
   };
