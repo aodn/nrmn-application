@@ -44,7 +44,8 @@ const App = () => {
 
   const loggedIn = Date.now() < auth.expires;
 
-  LicenseManager.setLicenseKey(JSON.parse(localStorage.getItem('gridLicense')));
+  const licenceKey = JSON.parse(localStorage.getItem('gridLicense'));
+  if(licenceKey) LicenseManager.setLicenseKey(licenceKey);
 
   const productionTheme = useMemo(
     () =>

@@ -2,18 +2,19 @@
 import React from 'react';
 import { render, waitFor, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import {describe} from '@jest/globals';
+import {describe, beforeAll, afterEach, jest} from "@jest/globals";
 import {BrowserRouter} from 'react-router-dom';
 import * as axiosInstance from '../../../api/api';
 import {AxiosResponse} from 'axios';
 import DataSheetView from '../DataSheetView';
 import {extendedMeasurements, measurements} from '../../../common/constants';
-
+import '@testing-library/jest-dom/extend-expect'
+import { SpyInstance } from 'jest-mock';
 
 describe('<DataSheetView/>', () => {
 
-  let mockGetDataJob;
-  const ingest = (res) => {};
+  let mockGetDataJob: SpyInstance<Promise<any>, [jobId?: any]>;
+  const ingest = () => {};
 
   const columns = [
     'ID','Diver','Buddy','Site No.','Site Name','Latitude','Longitude','Date','Vis','Direction','Time',
@@ -23,6 +24,8 @@ describe('<DataSheetView/>', () => {
 
   beforeAll(() => {
     mockGetDataJob = jest.spyOn(axiosInstance, 'getDataJob');
+    // silence errors caused by not setting an AG Grid licence
+    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -34,7 +37,6 @@ describe('<DataSheetView/>', () => {
 
     // Override function so that it return the data we set.
     mockGetDataJob.mockImplementation((url) => {
-      console.log('Loading job16');
       const raw = {
         config: undefined,
         data: canned,
@@ -49,25 +51,23 @@ describe('<DataSheetView/>', () => {
     });
 
     // Need to wrap with a Router otherwise the useLocation() error shows, the result will auto set to screen object
-    const {rerender} = render(<BrowserRouter><DataSheetView onIngest={i => ingest(i)} isAdmin={false}/></BrowserRouter>);
+    const {rerender} = render(<BrowserRouter><DataSheetView onIngest={ingest} isAdmin={false}/></BrowserRouter>);
 
     await waitFor(() => screen.findByText('user_noextend.xlsx'))
       .then(() => {
 
         // verify default columns exist
         columns.forEach(x => {
-          console.log('Verify column found: ' + x);
           expect(screen.queryAllByText(x).length).toBeGreaterThanOrEqual(1);
         });
 
       })
       .finally(() => {
         // Data loaded after initial render, need refresh to trigger HTML update
-        rerender(<BrowserRouter><DataSheetView onIngest={i => ingest(i)} isAdmin={false}/></BrowserRouter>);
+        rerender(<BrowserRouter><DataSheetView onIngest={ingest} isAdmin={false}/></BrowserRouter>);
 
         // non extend job and hence you will not have the following column
         extendedColumns.forEach(x => {
-          console.log('Verify column not found: ' + x);
           expect(screen.queryAllByText(x).length).toEqual(0);
         });
 
@@ -82,7 +82,6 @@ describe('<DataSheetView/>', () => {
 
     // Override function so that it return the data we set.
     mockGetDataJob.mockImplementation((url) => {
-      console.log('Loading job17');
       const raw = {
         config: undefined,
         data: nonextend,
@@ -97,24 +96,22 @@ describe('<DataSheetView/>', () => {
     });
 
     // Need to wrap with a Router otherwise the useLocation() error shows, the result will auto set to screen object
-    const {rerender} = render(<BrowserRouter><DataSheetView onIngest={i => ingest(i)} isAdmin={false}/></BrowserRouter>);
+    const {rerender} = render(<BrowserRouter><DataSheetView onIngest={ingest} isAdmin={false}/></BrowserRouter>);
 
     await waitFor(() => screen.findByText('user_extend.xlsx'))
       .then(() => {
 
         // verify default columns exist
         columns.forEach(x => {
-          console.log('Verify column found: ' + x);
           expect(screen.queryAllByText(x).length).toBeGreaterThanOrEqual(1);
         });
       })
       .finally(() => {
         // Data loaded after initial render, need refresh to trigger HTML update
-        rerender(<BrowserRouter><DataSheetView onIngest={i => ingest(i)} isAdmin={false}/></BrowserRouter>);
+        rerender(<BrowserRouter><DataSheetView onIngest={ingest} isAdmin={false}/></BrowserRouter>);
 
         // Extend job and hence you will have the following column
         extendedColumns.forEach(x => {
-          console.log('Verify column found: ' + x);
           expect(screen.queryAllByText(x).length).toBeGreaterThanOrEqual(1);
         });
 
