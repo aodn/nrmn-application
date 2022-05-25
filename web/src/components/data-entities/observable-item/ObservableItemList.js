@@ -95,7 +95,7 @@ const ObservableItemList = () => {
           }}
         />
         <AgGridColumn field="typeName" headerName="Type" />
-        <AgGridColumn cellStyle={{'min-width': '200px'}} field="name" />
+        <AgGridColumn minWidth={200} field="name" />
         <AgGridColumn field="commonName" />
         <AgGridColumn field="supersededBy" />
         <AgGridColumn field="supersededNames" />

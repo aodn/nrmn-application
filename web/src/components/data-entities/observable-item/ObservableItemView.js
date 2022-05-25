@@ -114,15 +114,24 @@ const ObservableItemView = () => {
                 <CustomTextInput readOnlyInput label="Length-Weight cf" formData={data.lengthWeightCf} />
               </Grid>
               <Grid item xs={12}>
-                <Box p={2} pl={8}>
-                  {data.obsItemAttribute ? (
-                    data.obsItemAttribute
-                  ) : (
+                {data.obsItemAttribute && Object.keys(data.obsItemAttribute).length > 0 ? (
+                  <>
+                    <Box ml={10} my={2}>
+                      <Typography variant="subtitle2" component="i">Other Attributes</Typography>
+                    </Box>
+                    {Object.keys(data.obsItemAttribute).map((v) => (
+                      <Grid item key={v} xs={7}>
+                        <CustomTextInput readOnlyInput label={v} formData={data.obsItemAttribute[v]} />
+                      </Grid>
+                    ))}
+                  </>
+                ) : (
+                  <Box ml={10} my={2}>
                     <Typography variant="subtitle2" component="i">
                       No Other Attributes
                     </Typography>
-                  )}
-                </Box>
+                  </Box>
+                )}
               </Grid>
             </Grid>
           </Box>
