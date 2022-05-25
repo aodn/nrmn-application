@@ -1,0 +1,172 @@
+{
+  "job": {
+    "id": 60,
+    "reference": "user_extend.xlsx",
+    "isExtendedSize": true,
+    "status": "STAGED",
+    "source": "INGEST",
+    "program": {
+      "programId": 1,
+      "programName": "RLS",
+      "isActive": true
+    },
+    "created": "2022-05-20T05:52:35.517+00:00",
+    "lastUpdated": "2022-05-20T05:52:36.872+00:00",
+    "creator": {
+      "userId": 321460,
+      "version": 1,
+      "fullName": "AODN User",
+      "email": "info@aodn.org.au"
+    },
+    "logs": [
+      {
+        "id": 203,
+        "eventTime": "2022-05-20T05:52:35.522+00:00",
+        "eventType": "UPLOADED",
+        "details": "export_FRDC131 2019-2021 Reef Biodiversity Database(1).xlsx uploaded by:info@aodn.org.au"
+      },
+      {
+        "id": 204,
+        "eventTime": "2022-05-20T05:52:36.882+00:00",
+        "eventType": "STAGED",
+        "details": "Saved 6081 rows. Skipped 0 empty rows and 0 duplicate rows."
+      },
+      {
+        "id": 205,
+        "eventTime": "2022-05-20T05:52:38.158+00:00",
+        "eventType": "STAGED",
+        "details": "Source file saved to \"nrmn-dev/raw-survey/jobid-60.xlsx\""
+      }
+    ],
+    "surveyIds": null
+  },
+  "rows": [
+    {
+      "id": 80723,
+      "siteCode": "sbir15",
+      "date": "18/03/2021",
+      "diver": "ESO",
+      "depth": "5.4",
+      "method": "3",
+      "block": "0",
+      "species": "Dilophus",
+      "buddy": "GWA",
+      "siteName": "Interesting Bay",
+      "longitude": "97.71252",
+      "latitude": "-53.18906",
+      "vis": "10",
+      "time": "10:00",
+      "direction": "1",
+      "code": "dil",
+      "commonName": "0",
+      "total": "3",
+      "inverts": "0",
+      "pos": 5622000,
+      "isInvertSizing": "No",
+      "measureJson": {
+        "2": "3"
+      },
+      "created": "2022-05-20T05:52:39.026+00:00",
+      "lastUpdated": "2022-05-20T05:52:39.026+00:00",
+      "survey": "SBIR15/18/03/2021/5.4",
+      "surveyGroup": "SBIR15/18/03/2021/5",
+      "P-Qs": "0"
+    },
+    {
+      "id": 80724,
+      "siteCode": "sbir15",
+      "date": "18/03/2021",
+      "diver": "ESO",
+      "depth": "5.1",
+      "method": "3",
+      "block": "0",
+      "species": "Mytilus",
+      "buddy": "GWA",
+      "siteName": "Boring Bay",
+      "longitude": "117.7",
+      "latitude": "-41.18",
+      "vis": "10",
+      "time": "10:00",
+      "direction": "1",
+      "code": "mgal",
+      "commonName": "Blue mussel",
+      "total": "53",
+      "inverts": "0",
+      "pos": 5623000,
+      "isInvertSizing": "No",
+      "measureJson": {
+        "3": "38",
+        "4": "15"
+      },
+      "created": "2022-05-20T05:52:39.026+00:00",
+      "lastUpdated": "2022-05-20T05:52:39.026+00:00",
+      "survey": "SBIR15/18/03/2021/5.1",
+      "surveyGroup": "SBIR15/18/03/2021/5",
+      "P-Qs": "0"
+    },
+    {
+      "id": 81044,
+      "siteCode": "s14",
+      "date": "30/03/2021",
+      "diver": "ESO",
+      "depth": "5.4",
+      "method": "3",
+      "block": "0",
+      "species": "Unidentified",
+      "buddy": "ger",
+      "siteName": "Sad Bay",
+      "longitude": "127.4194",
+      "latitude": "-13.2487",
+      "vis": "10",
+      "time": "11:30",
+      "direction": "1",
+      "code": "usp",
+      "commonName": "Sponges",
+      "total": "5",
+      "inverts": "0",
+      "pos": 5943000,
+      "isInvertSizing": "No",
+      "measureJson": {
+        "2": "4",
+        "4": "1"
+      },
+      "created": "2022-05-20T05:52:39.032+00:00",
+      "lastUpdated": "2022-05-20T05:52:39.032+00:00",
+      "survey": "SBIR14/30/03/2021/5.4",
+      "surveyGroup": "SBIR14/30/03/2021/5",
+      "P-Qs": "0"
+    },
+    {
+      "id": 81045,
+      "siteCode": "sbi4",
+      "date": "30/03/2021",
+      "diver": "ESO",
+      "depth": "5.3",
+      "method": "3",
+      "block": "0",
+      "species": "Unidentified sponges",
+      "buddy": "ger",
+      "siteName": "Happy Bay",
+      "longitude": "142.4194",
+      "latitude": "-41.2487",
+      "vis": "10",
+      "time": "11:30",
+      "direction": "1",
+      "code": "usp",
+      "commonName": "Sponges",
+      "total": "6",
+      "inverts": "0",
+      "pos": 5944000,
+      "isInvertSizing": "No",
+      "measureJson": {
+        "3": "6"
+      },
+      "created": "2022-05-20T05:52:39.032+00:00",
+      "lastUpdated": "2022-05-20T05:52:39.032+00:00",
+      "survey": "SBIR14/30/03/2021/5.3",
+      "surveyGroup": "SBIR14/30/03/2021/5",
+      "P-Qs": "0"
+    }
+  ],
+  "errorInputs": []
+}
