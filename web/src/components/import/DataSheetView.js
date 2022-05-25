@@ -628,6 +628,31 @@ const DataSheetView = ({onIngest, isAdmin}) => {
     return result;
   };
 
+  const onClickExcelExport = (api, name, isExtended) => {
+    const columns = [
+      'id','diver','buddy','siteCode','siteName','latitude','longitude','date','vis','direction','time',
+      'P-Qs','depth','method','block','code','species','commonName','total','inverts', ...measurements.map((m) => m.field)];
+
+    const extendedColumns = [...extendedMeasurements.map((m) => m.field),'isInvertSizing'];
+    const requiredColumns = isExtended ? [...columns, ...extendedColumns]: columns;
+    const headers = [];
+
+    requiredColumns.forEach((x) => {
+      // Get the row display name from the fields, this is because we turn on skipColumnHeaders so that
+      // we can add empty row, '' is used to force type to string.
+      headers.push({ data: { value: '' + api.getColumnDefs().filter(y => y.field === x)[0].headerName, type: 'String' } });
+    });
+
+    api.exportDataAsExcel({
+      sheetName: 'DATA',
+      author: 'NRMN',
+      columnKeys: requiredColumns,
+      skipColumnHeaders: true,
+      prependContent: [headers, []],  // This make row 2 an empty row due to file standard
+      fileName: `export_${name}`
+    });
+  };
+
   const measurementColumns = job.isExtendedSize ? measurements.concat(extendedMeasurements) : measurements;
   return (
     <>
@@ -667,7 +692,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             <Box m={1} ml={0}>
               <Button
                 variant="outlined"
-                onClick={() => gridApi.exportDataAsExcel({sheetName: 'DATA', author: 'NRMN', fileName: `export_${job.reference}`})}
+                onClick={ () => onClickExcelExport(gridApi, job.reference, job.isExtendedSize) }
                 startIcon={<CloudDownloadIcon />}
               >
                 Export
@@ -746,7 +771,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             sideBar={sideBar}
             onGridReady={onGridReady}
           >
-            <AgGridColumn field="id" editable={false} hide={true} />
+            <AgGridColumn field="id" headerName="ID" editable={false} hide={true} />
             <AgGridColumn field="pos" editable={false} hide={true} sort="asc" />
             <AgGridColumn
               field="row"
@@ -761,7 +786,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             />
             <AgGridColumn field="diver" headerName="Diver" pivot={true} enablePivot={false} />
             <AgGridColumn field="buddy" headerName="Buddy" />
-            <AgGridColumn field="siteCode" headerName="Site Code" rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="siteCode" headerName="Site No." rowGroup={false} enableRowGroup={true} />
             <AgGridColumn field="siteName" headerName="Site Name" minWidth={160} />
             <AgGridColumn field="latitude" headerName="Latitude" />
             <AgGridColumn field="longitude" headerName="Longitude" />
@@ -781,6 +806,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             {measurementColumns.map((m) => (
               <AgGridColumn
                 field={m.field}
+                headerName={m.fishSize}
                 key={m.field}
                 editable={true}
                 width={35}
@@ -789,7 +815,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
                 }}
               />
             ))}
-            {job.isExtendedSize && <AgGridColumn minWidth={120} field="isInvertSizing" headerName="Use Invert Sizing" />}
+            {job.isExtendedSize && <AgGridColumn minWidth={120} field="isInvertSizing" headerName="Use InvertSizing" />}
           </AgGridReact>
         )}
       </Box>

@@ -65,7 +65,7 @@ export const measurements = Object.freeze([
   },
   {
     field: '12',
-    fishSize: 50,
+    fishSize: '50',
     invertSize: '6'
   },
   {
