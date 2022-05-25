@@ -1,0 +1,168 @@
+{
+  "job": {
+    "id": 61,
+    "reference": "user_noextend.xlsx",
+    "isExtendedSize": false,
+    "status": "STAGED",
+    "source": "INGEST",
+    "program": {
+      "programId": 1,
+      "programName": "RLS",
+      "isActive": true
+    },
+    "created": "2022-05-20T05:55:09.950+00:00",
+    "lastUpdated": "2022-05-20T05:55:10.947+00:00",
+    "creator": {
+      "userId": 231431,
+      "version": 1,
+      "fullName": "AODN User",
+      "email": "info@aodn.org.au"
+    },
+    "logs": [
+      {
+        "id": 206,
+        "eventTime": "2022-05-20T05:55:09.954+00:00",
+        "eventType": "UPLOADED",
+        "details": "user_noextend.xlsx uploaded by:info@aodn.org.au"
+      },
+      {
+        "id": 207,
+        "eventTime": "2022-05-20T05:55:10.951+00:00",
+        "eventType": "STAGED",
+        "details": "Saved 6 rows. Skipped 0 empty rows and 0 duplicate rows."
+      },
+      {
+        "id": 208,
+        "eventTime": "2022-05-20T05:55:11.335+00:00",
+        "eventType": "STAGED",
+        "details": "Source file saved to \"nrmn-dev/raw-survey/jobid-61.xlsx\""
+      }
+    ],
+    "surveyIds": null
+  },
+  "rows": [
+    {
+      "id": 83460,
+      "siteCode": "TAS179",
+      "date": "29/03/2019",
+      "diver": "CW",
+      "depth": "3.4",
+      "method": "3",
+      "block": "0",
+      "species": "Shell",
+      "buddy": "SK",
+      "siteName": "Iron Pot",
+      "longitude": "47.41668",
+      "latitude": "-4.05960",
+      "vis": "3",
+      "time": "15:00",
+      "direction": "NW",
+      "code": "shel",
+      "commonName": "Shell substrate",
+      "total": "8",
+      "inverts": "0",
+      "pos": 2278000,
+      "isInvertSizing": "",
+      "measureJson": {
+        "2": "8"
+      },
+      "created": "2021-05-20T05:55:11.912+00:00",
+      "lastUpdated": "2021-05-20T05:55:11.912+00:00",
+      "survey": "TAS179/29/03/2019/5.4",
+      "surveyGroup": "TAS179/29/03/2019/5",
+      "P-Qs": "5.4"
+    },
+    {
+      "id": 83897,
+      "siteCode": "SBIR19",
+      "date": "14/02/2021",
+      "diver": "SK",
+      "depth": "5.3",
+      "method": "2",
+      "block": "1",
+      "species": "Haliotis rubra",
+      "buddy": "EO/OJ",
+      "siteName": "North Head",
+      "longitude": "14.63333",
+      "latitude": "-4.07472",
+      "vis": "5",
+      "time": "9:10",
+      "direction": "N",
+      "code": "hru",
+      "commonName": "Blacklip abalone",
+      "total": "1",
+      "inverts": "0",
+      "pos": 2715000,
+      "isInvertSizing": "",
+      "measureJson": {},
+      "created": "2021-05-20T05:55:11.919+00:00",
+      "lastUpdated": "2021-05-20T05:55:11.919+00:00",
+      "survey": "SBIR19/14/02/2020/5.3",
+      "surveyGroup": "SBIR19/14/02/2020/5",
+      "P-Qs": "5.3"
+    },
+    {
+      "id": 84344,
+      "siteCode": "SBIR20",
+      "date": "13/02/2020",
+      "diver": "ESO",
+      "depth": "5.2",
+      "method": "3",
+      "block": "0",
+      "species": "Lessonia corrugata",
+      "buddy": "SK",
+      "siteName": "Creeses",
+      "longitude": "127.69553",
+      "latitude": "-42.13084",
+      "vis": "5",
+      "time": "15:00",
+      "direction": "N",
+      "code": "lcor",
+      "commonName": "Strapweed",
+      "total": "1",
+      "inverts": "0",
+      "pos": 3162000,
+      "isInvertSizing": "",
+      "measureJson": {
+        "2": "1"
+      },
+      "created": "2022-04-20T05:55:11.958+00:00",
+      "lastUpdated": "2022-04-20T05:55:11.958+00:00",
+      "survey": "SBIR20/13/02/2020/5.2",
+      "surveyGroup": "SBIR20/13/02/2020/5",
+      "P-Qs": "5.2"
+    },
+    {
+      "id": 84345,
+      "siteCode": "SBIR20",
+      "date": "13/02/2020",
+      "diver": "ESO",
+      "depth": "5.2",
+      "method": "3",
+      "block": "0",
+      "species": "Zonaria spp.",
+      "buddy": "SK",
+      "siteName": "Creeses",
+      "longitude": "140.69263",
+      "latitude": "-47.10584",
+      "vis": "5",
+      "time": "15:00",
+      "direction": "N",
+      "code": "zon",
+      "commonName": "0",
+      "total": "1",
+      "inverts": "0",
+      "pos": 3163000,
+      "isInvertSizing": "",
+      "measureJson": {
+        "3": "1"
+      },
+      "created": "2022-05-20T05:55:11.958+00:00",
+      "lastUpdated": "2022-05-20T05:55:11.958+00:00",
+      "survey": "SBIR20/13/02/2020/5.2",
+      "surveyGroup": "SBIR20/13/02/2020/5",
+      "P-Qs": "5.2"
+    }
+  ],
+  "errorInputs": []
+}

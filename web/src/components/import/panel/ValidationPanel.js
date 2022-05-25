@@ -64,13 +64,13 @@ const ValidationPanel = (props) => {
             </TableRow>
             <TableRow>
               <TableCell>{summary.siteCount}</TableCell>
-              <Tooltip title={siteTooltip} interactive>
+              <Tooltip title={siteTooltip}>
                 <TableCell>distinct sites found</TableCell>
               </Tooltip>
             </TableRow>
             <TableRow>
               <TableCell></TableCell>
-              <Tooltip title={newSitesTooltip} interactive>
+              <Tooltip title={newSitesTooltip}>
                 <TableCell>{summary.newSiteCount} new sites found</TableCell>
               </Tooltip>
             </TableRow>

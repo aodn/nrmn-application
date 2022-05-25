@@ -1,11 +1,9 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.InputStream;
 import java.util.List;
 
+import au.org.aodn.nrmn.restapi.enumeration.SurveyField;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +17,8 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.service.SurveyContentsHandler.ParsedSheet;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 @SpringBootTest
@@ -125,6 +125,17 @@ public class SpreadSheetServiceIT {
         }
         assertTrue(StringUtils.isNotEmpty(error));
     }
+    /**
+     * Excel row2 must be blank according to the import file spec, if not blank throw exception
+     */
+    @Test
+    void rejectFileWhenRow2IsNotEmpty() {
+        Exception e = assertThrows(Exception.class, () -> {
+            FileSystemResource file3 = new FileSystemResource("src/test/resources/sheets/row2NotEmpty.xlsx");
+            sheetService.stageXlsxFile(new MockMultipartFile("sheets/row2NotEmpty.xlsx", file3.getInputStream()), false);
+        });
+        assertEquals("Cell range A2-G2 is not blank.", e.getMessage(), "Non empty row 2 warning");
+    }
 
     @Test
     void validFileShouldBeCorrectlyTransformToStageSurvey() throws Exception {
@@ -142,10 +153,25 @@ public class SpreadSheetServiceIT {
 
         // Test Map filling
         assertEquals(obs1.getMeasureJson().size(), 4);
-        assertEquals(obs1.getMeasureJson().get(21), "4");
+        assertEquals("5", obs1.getMeasureJson().get(SurveyField.TWO_FIVE.getPosition()), "Row 3 measurement 2.5 should be");
+        assertEquals("2", obs1.getMeasureJson().get(SurveyField.TEN.getPosition()), "Row 3 measurement 10 should be");
+        assertEquals("5", obs1.getMeasureJson().get(SurveyField.TWELVE_FIVE.getPosition()), "Row 3 measurement 12.5 should be");
+        assertEquals("4", obs1.getMeasureJson().get(SurveyField.HUNDRED_SIXTY_TWO_FIVE.getPosition()), "Row 3 measurement 162.5 should be");
+        assertFalse(obs1.getMeasureJson().containsKey(SurveyField.TWO_HUNDRED.getPosition()), "Row 3 no measurement at 200");
 
         // Test Macro
         assertEquals(obs1.getSpecies(), "Caesioperca rasor");
+
+        // Test second row
+        StagedRow obs2 = stageSurveys.get(1);
+        assertEquals("-41.25370", obs2.getLatitude(), "Row 4 latitude");
+        assertEquals("148.33974", obs2.getLongitude(), "Row 4 longitude");
+
+        assertEquals(obs1.getMeasureJson().size(), 4);
+        assertFalse(obs2.getMeasureJson().containsKey(SurveyField.TWO_FIVE.getPosition()), "Row 4 no measurement at 2.5");
+        assertEquals("3", obs2.getMeasureJson().get(SurveyField.TEN.getPosition()), "Row 4 measurement 10 should be");
+        assertEquals("5", obs2.getMeasureJson().get(SurveyField.HUNDRED_TWELVE_FIVE.getPosition()), "Row 4 measurement 112.5 should be");
+        assertEquals("3", obs2.getMeasureJson().get(SurveyField.TWO_HUNDRED.getPosition()), "Row 4 measurement 200 should be");
     }
 
     @Test
