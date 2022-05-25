@@ -15,7 +15,12 @@ const siteTestData = [
 
 const server = setupServer(rest.get('/api/v1/sites', (_, res, ctx) => res(ctx.json(siteTestData))));
 
-beforeAll(() => server.listen());
+beforeAll(() => {
+  // silence errors caused by not setting an AG Grid licence
+  jest.spyOn(console, 'error').mockImplementation(() => {});
+  server.listen();
+});
+
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 

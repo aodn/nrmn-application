@@ -55,7 +55,7 @@ public class LocationController {
 
     @GetMapping("/location/{id}")
     public ResponseEntity<?> getLocation(@PathVariable Integer id) {
-        var res = locationRepository.getById(id);
+        var res = locationRepository.getReferenceById(id);
         return ResponseEntity.ok(new LocationDto(res));
     }
 
