@@ -631,17 +631,16 @@ const DataSheetView = ({onIngest, isAdmin}) => {
   const onClickExcelExport = (api, name, isExtended) => {
     const columns = [
       'id','diver','buddy','siteCode','siteName','latitude','longitude','date','vis','direction','time',
-      'P-Qs','depth','method','block','code','species','commonName','total','inverts','1','2',
-      '3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28'];
+      'P-Qs','depth','method','block','code','species','commonName','total','inverts', ...measurements.map((m) => m.field)];
 
-    const extendedColumns = ['29','30','31','32','33','34','35','36','37','38','39','40','isInvertSizing'];
+    const extendedColumns = [...extendedMeasurements.map((m) => m.field),'isInvertSizing'];
     const requiredColumns = isExtended ? [...columns, ...extendedColumns]: columns;
     const headers = [];
 
     requiredColumns.forEach((x) => {
       // Get the row display name from the fields, this is because we turn on skipColumnHeaders so that
-      // we can add empty row
-      headers.push({ data: { value: api.getColumnDefs().filter(y => y.field === x)[0].headerName, type: 'String' } });
+      // we can add empty row, '' is used to force type to string.
+      headers.push({ data: { value: '' + api.getColumnDefs().filter(y => y.field === x)[0].headerName, type: 'String' } });
     });
 
     api.exportDataAsExcel({
