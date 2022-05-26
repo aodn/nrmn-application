@@ -1,13 +1,13 @@
 import {afterAll, afterEach, beforeAll, describe} from '@jest/globals';
 import '@testing-library/jest-dom';
-import {fireEvent, getByText, render, waitFor} from '@testing-library/react';
+import {fireEvent, render, waitFor} from '@testing-library/react';
 import {rest} from 'msw';
 import {setupServer} from 'msw/node';
 import React from 'react';
 import SpeciesSearch from '../SpeciesSearch';
 
 const visibleProps = ['class', 'family', 'genus', 'order', 'phylum', 'species', 'status'];
-const props = [...visibleProps, 'supersededBy', 'unacceptReason'];
+const props = [...visibleProps, 'supersededBy', 'unacceptReason', 'aphiaId'];
 
 const pages = Array.from({length: 3}, (_, i) => i).map((p) =>
   Array.from({length: 50}, (_, i) => i).map((i) => {
