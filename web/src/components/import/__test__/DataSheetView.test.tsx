@@ -2,13 +2,13 @@
 import React from 'react';
 import { render, waitFor, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import {describe, beforeAll, afterEach, jest} from "@jest/globals";
+import {describe, beforeAll, afterEach, jest} from '@jest/globals';
 import {BrowserRouter} from 'react-router-dom';
 import * as axiosInstance from '../../../api/api';
 import {AxiosResponse} from 'axios';
 import DataSheetView from '../DataSheetView';
 import {extendedMeasurements, measurements} from '../../../common/constants';
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom/extend-expect';
 import { SpyInstance } from 'jest-mock';
 
 describe('<DataSheetView/>', () => {

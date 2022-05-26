@@ -47,16 +47,16 @@ const SideMenu = ({open, onClose}) => {
         <ListSubheader>
           <Typography variant="button">Reference Data</Typography>
         </ListSubheader>
-        <ListItem button onClick={onClose} component={NavLink} to={'/reference/locations'}>
+        <ListItem button onClick={onClose} component={NavLink} to={'/reference/locations'} state={{resetFilters: true}}>
           <ListItemText primary="Locations" />
         </ListItem>
-        <ListItem button onClick={onClose} component={NavLink} to={'/reference/divers'}>
+        <ListItem button onClick={onClose} component={NavLink} to={'/reference/divers'} state={{resetFilters: true}}>
           <ListItemText primary="Divers" />
         </ListItem>
-        <ListItem button onClick={onClose} component={NavLink} to={'/reference/sites'}>
+        <ListItem button onClick={onClose} component={NavLink} to={'/reference/sites'} state={{resetFilters: true}}>
           <ListItemText primary="Sites" />
         </ListItem>
-        <ListItem button onClick={onClose} component={NavLink} to={'/reference/observableItems'}>
+        <ListItem button onClick={onClose} component={NavLink} to={'/reference/observableItems'} state={{resetFilters: true}}>
           <ListItemText primary="Observable Items" />
         </ListItem>
       </List>
