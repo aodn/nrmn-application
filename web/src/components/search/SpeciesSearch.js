@@ -15,29 +15,29 @@ import {search} from '../../api/api';
 import PropTypes from 'prop-types';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-const useStyles = makeStyles(({ palette, typography }) => ({
+const useStyles = makeStyles(({palette, typography}) => ({
   root: {
     '& .MuiTable-root': {
       '& .MuiTableHead-root': {
         '& .MuiTableRow-head': {
           '& .MuiTableCell-head': {
-            fontSize: typography.table.fontSize,
-            background: palette.primary.rowHeader
-          },
-        },
+            fontSize: typography?.table.fontSize,
+            background: palette?.primary.rowHeader
+          }
+        }
       },
       '& .MuiTableRow-root': {
         '&:nth-child(even)': {
-          backgroundColor: palette.primary.rowHighlight,
-        },
+          backgroundColor: palette?.primary.rowHighlight
+        }
       },
       '& .MuiTableCell-root': {
-        fontSize: typography.table.fontSize,
-        padding: typography.table.padding,
-        color: palette.text.textPrimary,
-      },
-    },
-  },
+        fontSize: typography?.table.fontSize,
+        padding: typography?.table.padding,
+        color: palette?.text.textPrimary
+      }
+    }
+  }
 }));
 
 const SpeciesSearch = ({onRowClick}) => {
@@ -87,32 +87,31 @@ const SpeciesSearch = ({onRowClick}) => {
           }
           setCurrentSearch(searchRequested);
           const data = res?.data
-              ? res.data.map((r, id) => {
-                  // if not a generic name then remove the genus from the species to produce the species epithet
-                  let speciesEpithet = '';
-                  if (r.species) {
-                    const isGenericName =
-                      r.species.toUpperCase().includes('SP.') ||
-                      r.species.toUpperCase().includes('SPP.') ||
-                      r.species.includes('(') ||
-                      r.species.includes('[') ||
-                      !r.species.includes(' ');
-                    if (!isGenericName) speciesEpithet = r.species.replace(`${r.genus} `, '');
-                  }
-                  return {id: id, ...r, speciesEpithet};
-                })
-              : null;
+            ? res.data.map((r, id) => {
+                // if not a generic name then remove the genus from the species to produce the species epithet
+                let speciesEpithet = '';
+                if (r.species) {
+                  const isGenericName =
+                    r.species.toUpperCase().includes('SP.') ||
+                    r.species.toUpperCase().includes('SPP.') ||
+                    r.species.includes('(') ||
+                    r.species.includes('[') ||
+                    !r.species.includes(' ');
+                  if (!isGenericName) speciesEpithet = r.species.replace(`${r.genus} `, '');
+                }
+                return {id: id, ...r, speciesEpithet};
+              })
+            : null;
 
-          if(data?.length === 0) {
-            if(!gridData) setGridData([]);
+          if (data?.length === 0) {
+            if (!gridData) setGridData([]);
             setMaxRows(gridData?.length ?? 0);
           }
 
-          if(data?.length > 0) {
+          if (data?.length > 0) {
             setGridData(gridData ? [...gridData, ...data] : data);
             setPage(searchRequested.page);
-            if(data?.length < rowsPerPage)
-              setMaxRows(data.length);
+            if (data?.length < rowsPerPage) setMaxRows(data.length);
           }
         })
         .catch((err) => setSearchError(err.message));
@@ -121,10 +120,9 @@ const SpeciesSearch = ({onRowClick}) => {
   }, [searchRequested, currentSearch, rowsPerPage, gridData]);
 
   const handleChangePage = (_, newPage) => {
-    if(page < newPage && gridData.length / rowsPerPage < newPage + 1)
+    if (page < newPage && gridData.length / rowsPerPage < newPage + 1)
       setSearchRequested({searchType: tabIndex === 0 ? 'WORMS' : 'NRMN', species: searchTerm, includeSuperseded: true, page: newPage});
-    else
-      setPage(newPage);
+    else setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -157,6 +155,7 @@ const SpeciesSearch = ({onRowClick}) => {
             <TextField
               fullWidth
               size="small"
+              placeholder="WoRMS Search"
               disabled={loading}
               onChange={(e) => setSearchTerm(e.target.value.trim())}
               onKeyDown={(e) => {
@@ -171,6 +170,7 @@ const SpeciesSearch = ({onRowClick}) => {
               disabled={!(searchTerm?.length > 3)}
               loading={loading}
               startIcon={<Search></Search>}
+              data-testid="search-button"
               onClick={() => {
                 setPage(1);
                 setSearchRequested({searchType: 'WORMS', species: searchTerm, includeSuperseded: true, page: 0});
