@@ -102,16 +102,16 @@ const ObservableItemList = () => {
           }}
         />
         <AgGridColumn field="typeName" headerName="Type" />
-        <AgGridColumn minWidth={200} field="name" />
-        <AgGridColumn field="commonName" />
-        <AgGridColumn field="supersededBy" />
-        <AgGridColumn field="supersededNames" />
-        <AgGridColumn field="supersededIDs" />
-        <AgGridColumn field="phylum" />
-        <AgGridColumn field="class" />
-        <AgGridColumn field="order" />
-        <AgGridColumn field="family" />
-        <AgGridColumn field="genus" />
+        <AgGridColumn minWidth={200} field="name" headerName="Name"/>
+        <AgGridColumn field="commonName" headerName="Common Name"/>
+        <AgGridColumn field="supersededBy" headerName="Superseded By"/>
+        <AgGridColumn field="supersededNames" headerName="Superseded Names"/>
+        <AgGridColumn field="supersededIDs" headerName="Superseded IDs"/>
+        <AgGridColumn field="phylum" headerName="Phylum"/>
+        <AgGridColumn field="class" headerName="Class"/>
+        <AgGridColumn field="order" headerName="Order"/>
+        <AgGridColumn field="family" headerName="Family"/>
+        <AgGridColumn field="genus" headerName="Genus"/>
       </AgGridReact>
     </>
   );
