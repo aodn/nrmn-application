@@ -1,3 +1,5 @@
+// @ts-ignore
+import React from 'react';
 import ObservableItemView from '../ObservableItemView';
 import {rest} from 'msw';
 import {setupServer} from 'msw/node';

@@ -1,12 +1,12 @@
 module.exports = exports = {
+  parser: '@babel/eslint-parser',
   env: {
     node: true,
     jest: true,
     es6: true,
     browser: true
   },
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'babel', 'standard'],
+  extends: ['eslint:recommended', 'plugin:react/recommended', 'prettier'],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
@@ -20,7 +20,7 @@ module.exports = exports = {
     babelOptions: {
       presets: ['@babel/preset-react']
     },
-    ecmaVersion: 'latest',
+    ecmaVersion: 2018,
     requireConfigFile: false,
     sourceType: 'module'
   },

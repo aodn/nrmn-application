@@ -12,7 +12,7 @@ import '@testing-library/jest-dom/extend-expect';
 
 describe('<DataSheetView/>', () => {
 
-  let mockGetDataJob: jest.SpyInstance<Promise<any>, [jobId?: any]>;
+  let mockGetDataJob;
   const ingest = () => {};
 
   const columns = [

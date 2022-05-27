@@ -93,11 +93,11 @@ const LocationList = () => {
               }
             }}
           />
-          <AgGridColumn field="locationName" sort="asc" cellStyle={{cursor: 'pointer'}} onCellClicked={(e) => setRedirect(e.data.id)} />
-          <AgGridColumn maxWidth={80} field="status" />
-          <AgGridColumn minWidth={600} field="ecoRegions" />
-          <AgGridColumn field="countries" />
-          <AgGridColumn minWidth={600} field="areas" />
+          <AgGridColumn field="locationName" headerName="Location Name" sort="asc" cellStyle={{cursor: 'pointer'}} onCellClicked={(e) => setRedirect(e.data.id)} />
+          <AgGridColumn maxWidth={80} field="status" headerName="Status"/>
+          <AgGridColumn minWidth={600} field="ecoRegions" headerName="Eco Regions"/>
+          <AgGridColumn field="countries" headerName="Countries"/>
+          <AgGridColumn minWidth={600} field="areas" headerName="Areas"/>
         </AgGridReact>
       </Box>
     </>

@@ -1,18 +1,15 @@
-import { FilterChangedEvent } from 'ag-grid-community';
-import { MutableRefObject } from 'react';
-
-function stateStorage() {
-  return localStorage;
+function getFiltersForId(id) {
+  return localStorage.getItem(id + '-filters');;
 }
 
 // Component must set the id property if it needs to use this function
-function stateFilterEventHandler(ref: MutableRefObject, event: FilterChangedEvent) {
-  stateStorage().setItem(ref.current.props.id + '-filters', JSON.stringify(event.api.getFilterModel()));
+function stateFilterEventHandler(ref, event) {
+  localStorage.setItem(ref.current.props.id + '-filters', JSON.stringify(event.api.getFilterModel()));
 };
 
 // Component must set the id property if it needs to use this function
-function restoreStateFilters(ref: MutableRefObject) {
-  const filtersJson = stateStorage().getItem(ref.current.props.id + '-filters');
+function restoreStateFilters(ref) {
+  const filtersJson = getFiltersForId(ref.current.props.id);
 
   if(filtersJson) {
     const filtersObject = JSON.parse(filtersJson);
@@ -23,6 +20,7 @@ function restoreStateFilters(ref: MutableRefObject) {
 export {
   stateFilterEventHandler,
   restoreStateFilters,
+  getFiltersForId,
 };
 
 
