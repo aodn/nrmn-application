@@ -6,7 +6,7 @@ import {getEntity} from '../../../api/api';
 import {useRef} from 'react';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {Add} from '@mui/icons-material';
-import { stateFilterEventHandler, restoreStateFilters } from '../../../common/state-event-handler/StateFilterHandler';
+import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 
 import 'ag-grid-enterprise';
 
@@ -34,7 +34,7 @@ const LocationList = () => {
 
     fetchLocations(event).then(() => {
       if(!(location?.state?.resetFilters)) {
-        restoreStateFilters(gridRef);
+        stateFilterHandler.restoreStateFilters(gridRef);
       }
       autoSizeAll(event, false);
     });
@@ -63,7 +63,7 @@ const LocationList = () => {
           enableCellTextSelection={true}
           onGridReady={(e) => onGridReady(e)}
           onBodyScroll={(e) => autoSizeAll(e, false)}
-          onFilterChanged={(e) => stateFilterEventHandler(gridRef, e)}
+          onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
           context={{useOverlay: 'Loading Locations'}}
           components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"

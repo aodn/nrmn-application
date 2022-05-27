@@ -6,7 +6,7 @@ import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Add, CopyAll, Delete, Edit} from '@mui/icons-material';
 import {entityDelete} from '../../../api/api';
-import { restoreStateFilters, stateFilterEventHandler } from '../../../common/state-event-handler/StateFilterHandler';
+import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 
 import 'ag-grid-enterprise';
 
@@ -35,7 +35,7 @@ const SiteList = () => {
 
     fetchSites(event).then(() => {
       if(!(location?.state?.resetFilters)) {
-        restoreStateFilters(gridRef);
+        stateFilterHandler.restoreStateFilters(gridRef);
       }
       autoSizeAll(event, false);
     });
@@ -93,7 +93,7 @@ const SiteList = () => {
           enableCellTextSelection={true}
           onGridReady={(e) => onGridReady(e)}
           onBodyScroll={(e) => autoSizeAll(e, false)}
-          onFilterChanged={(e) => stateFilterEventHandler(gridRef, e)}
+          onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
           context={{useOverlay: 'Loading Sites'}}
           components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"

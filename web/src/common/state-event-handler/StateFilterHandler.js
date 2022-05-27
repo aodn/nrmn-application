@@ -9,7 +9,7 @@ function stateFilterEventHandler(ref, event) {
 
 // Component must set the id property if it needs to use this function
 function restoreStateFilters(ref) {
-  const filtersJson = getFiltersForId(ref.current.props.id);
+  const filtersJson = stateFilterHandler.getFiltersForId(ref.current.props.id);
 
   if(filtersJson) {
     const filtersObject = JSON.parse(filtersJson);
@@ -17,10 +17,11 @@ function restoreStateFilters(ref) {
   }
 }
 
-export {
+const stateFilterHandler = {
   stateFilterEventHandler,
   restoreStateFilters,
-  getFiltersForId,
+  getFiltersForId
 };
 
+export default stateFilterHandler;
 

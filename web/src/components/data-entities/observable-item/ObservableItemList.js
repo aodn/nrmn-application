@@ -7,7 +7,7 @@ import {getResult} from '../../../api/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Add} from '@mui/icons-material';
-import { stateFilterEventHandler, restoreStateFilters } from '../../../common/state-event-handler/StateFilterHandler';
+import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 
 import 'ag-grid-enterprise';
 
@@ -35,7 +35,7 @@ const ObservableItemList = () => {
 
     fetchObservableItems(event).then(() => {
       if(!(location?.state?.resetFilters)) {
-        restoreStateFilters(gridRef);
+        stateFilterHandler.restoreStateFilters(gridRef);
       }
       autoSizeAll(event, false);
     });
@@ -64,7 +64,7 @@ const ObservableItemList = () => {
         enableCellTextSelection={true}
         onGridReady={(e) => onGridReady(e)}
         onBodyScroll={(e) => autoSizeAll(e, false)}
-        onFilterChanged={(e) => stateFilterEventHandler(gridRef, e)}
+        onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
         context={{useOverlay: 'Loading Observable Items'}}
         components={{loadingOverlay: LoadingOverlay}}
         loadingOverlayComponent="loadingOverlay"
