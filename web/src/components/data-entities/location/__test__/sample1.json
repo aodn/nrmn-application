@@ -1,0 +1,29 @@
+[
+  {
+    "status": "Active",
+    "locationName": "Interest Bay",
+    "countries": "Unknown",
+    "areas": "Racoon City",
+    "ecoRegions": "Unknown",
+    "siteCodes": "PAC111, PAC136, PAC137, PAC138, PAC139, PAC140, PAC141, PAC142, PAC143",
+    "id": 1
+  },
+  {
+    "status": "Active",
+    "locationName": "Antarctica",
+    "countries": "Antarctica",
+    "areas": "Graham City",
+    "ecoRegions": "Antarctic",
+    "siteCodes": "ANT11, ANT21",
+    "id": 2
+  },
+  {
+    "status": "Active",
+    "locationName": "Argentinian Gulfs",
+    "countries": "Argentina",
+    "areas": "Chubut City",
+    "ecoRegions": "North Patagonian",
+    "siteCodes": "ARG16, ARG103, ARG111",
+    "id": 3
+  }
+]
