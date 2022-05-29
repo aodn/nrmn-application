@@ -21,20 +21,20 @@ const useStyles = makeStyles(({ palette, typography }) => ({
       '& .MuiTableHead-root': {
         '& .MuiTableRow-head': {
           '& .MuiTableCell-head': {
-            fontSize: typography.table.fontSize,
-            background: palette.primary.rowHeader
+            fontSize: typography?.table.fontSize,
+            background: palette?.primary.rowHeader
           },
         },
       },
       '& .MuiTableRow-root': {
         '&:nth-child(even)': {
-          backgroundColor: palette.primary.rowHighlight,
+          backgroundColor: palette?.primary.rowHighlight,
         },
       },
       '& .MuiTableCell-root': {
-        fontSize: typography.table.fontSize,
-        padding: typography.table.padding,
-        color: palette.text.textPrimary,
+        fontSize: typography?.table.fontSize,
+        padding: typography?.table.padding,
+        color: palette?.text.textPrimary,
       },
     },
   },
@@ -156,6 +156,7 @@ const SpeciesSearch = ({onRowClick}) => {
           <Grid item xs={5}>
             <TextField
               fullWidth
+              placeholder="WoRMS Search"
               size="small"
               disabled={loading}
               onChange={(e) => setSearchTerm(e.target.value.trim())}
@@ -167,6 +168,7 @@ const SpeciesSearch = ({onRowClick}) => {
           <Grid item xs={1}></Grid>
           <Grid item xs={4}>
             <LoadingButton
+              data-testid="search-button"
               variant="outlined"
               disabled={!(searchTerm?.length > 3)}
               loading={loading}
