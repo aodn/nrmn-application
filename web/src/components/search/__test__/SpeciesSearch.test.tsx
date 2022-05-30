@@ -3,6 +3,7 @@ import '@testing-library/jest-dom';
 import {fireEvent, render, waitFor} from '@testing-library/react';
 import {rest} from 'msw';
 import {setupServer} from 'msw/node';
+import { exact } from 'prop-types';
 import React from 'react';
 import SpeciesSearch from '../SpeciesSearch';
 
@@ -10,7 +11,7 @@ const visibleProps = ['class', 'family', 'genus', 'order', 'phylum', 'species', 
 const props = [...visibleProps, 'supersededBy', 'unacceptReason', 'aphiaId'];
 
 const pages = Array.from({length: 3}, (_, i) => i).map((p) =>
-  Array.from({length: 50}, (_, i) => i).map((i) => {
+  Array.from({length: p == 2 ? 25 : 50}, (_, i) => i).map((i) => {
     return props.reduce((row, prop) => {
       row[prop] = `${prop}.${p}.${i}`;
       return row;
@@ -64,9 +65,10 @@ describe('<SiteList/>', () => {
         expect(queryByText(`${prop}.${page}.0`)).toBeInTheDocument();
         expect(queryByText(`${prop}.${page + 1}.0`)).not.toBeInTheDocument();
         if (page > 0) expect(queryByText(`${prop}.${page - 1}.0`)).not.toBeInTheDocument();
-        expect(queryByText(`${prop}.${page}.49`)).toBeInTheDocument();
-        expect(queryByText(`${prop}.${page}.50`)).not.toBeInTheDocument();
+        expect(queryByText(`${prop}.${page}.${pages[page].length-1}`)).toBeInTheDocument();
+        expect(queryByText(`${prop}.${page}.${pages[page].length}`)).not.toBeInTheDocument();
       }
+      expect(queryByText(`${page*50 + 1}–${page*50 + pages[page].length} of`, {exact: false})).toBeInTheDocument();
     };
 
     await waitFor(() => expectedPage(0));
