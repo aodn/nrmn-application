@@ -122,6 +122,7 @@ const JobList = () => {
           <AgGridColumn
             flex={1}
             field="reference"
+            headerName="Reference"
             cellStyle={{cursor: 'pointer'}}
             onCellClicked={onCellClicked}
           />
@@ -129,6 +130,7 @@ const JobList = () => {
           <AgGridColumn
             width={80}
             field="status"
+            headerName="Status"
             rowGroup={true}
             hide={true}
             comparator={(a, b) => {
@@ -136,9 +138,9 @@ const JobList = () => {
               return status.indexOf(a) - status.indexOf(b);
             }}
           />
-          <AgGridColumn width={100} field="program" />
-          <AgGridColumn width={200} field="creator" />
-          <AgGridColumn width={200} field="created" sort="desc" valueFormatter={TimeStampCell} />
+          <AgGridColumn width={100} field="program" headerName="Program"/>
+          <AgGridColumn width={200} field="creator" headerName="Creator"/>
+          <AgGridColumn width={200} field="created" headerName="Created" sort="desc" valueFormatter={TimeStampCell} />
           <AgGridColumn
             width={60}
             suppressMovable={true}
