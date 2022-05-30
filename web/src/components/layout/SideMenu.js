@@ -31,7 +31,7 @@ const SideMenu = ({open, onClose}) => {
           <ListItem button onClick={onClose} component={NavLink} to="/data/surveys">
             <ListItemText primary="List Surveys" />
           </ListItem>
-          <ListItem button onClick={onClose} component={NavLink} to="/data/jobs">
+          <ListItem button onClick={onClose} component={NavLink} to="/data/jobs" state={{resetFilters: true}}>
             <ListItemText primary="List Jobs" />
           </ListItem>
           <ListItem button onClick={onClose} component={NavLink} to="/data/upload">
