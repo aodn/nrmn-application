@@ -28,7 +28,7 @@ const SideMenu = ({open, onClose}) => {
           <Typography variant="button">Data</Typography>
         </ListSubheader>
         <List component="div" disablePadding>
-          <ListItem button onClick={onClose} component={NavLink} to="/data/surveys">
+          <ListItem button onClick={onClose} component={NavLink} to="/data/surveys" state={{resetFilters: true}}>
             <ListItemText primary="List Surveys" />
           </ListItem>
           <ListItem button onClick={onClose} component={NavLink} to="/data/jobs" state={{resetFilters: true}}>
