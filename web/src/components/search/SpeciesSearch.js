@@ -21,20 +21,20 @@ const useStyles = makeStyles(({ palette, typography }) => ({
       '& .MuiTableHead-root': {
         '& .MuiTableRow-head': {
           '& .MuiTableCell-head': {
-            fontSize: typography.table.fontSize,
-            background: palette.primary.rowHeader
+            fontSize: typography?.table.fontSize,
+            background: palette?.primary.rowHeader
           },
         },
       },
       '& .MuiTableRow-root': {
         '&:nth-child(even)': {
-          backgroundColor: palette.primary.rowHighlight,
+          backgroundColor: palette?.primary.rowHighlight,
         },
       },
       '& .MuiTableCell-root': {
-        fontSize: typography.table.fontSize,
-        padding: typography.table.padding,
-        color: palette.text.textPrimary,
+        fontSize: typography?.table.fontSize,
+        padding: typography?.table.padding,
+        color: palette?.text.textPrimary,
       },
     },
   },
@@ -112,7 +112,7 @@ const SpeciesSearch = ({onRowClick}) => {
             setGridData(gridData ? [...gridData, ...data] : data);
             setPage(searchRequested.page);
             if(data?.length < rowsPerPage)
-              setMaxRows(data.length);
+              setMaxRows(gridData.length + data.length);
           }
         })
         .catch((err) => setSearchError(err.message));
@@ -121,7 +121,7 @@ const SpeciesSearch = ({onRowClick}) => {
   }, [searchRequested, currentSearch, rowsPerPage, gridData]);
 
   const handleChangePage = (_, newPage) => {
-    if(page < newPage && gridData.length / rowsPerPage < newPage + 1)
+    if(maxRows < 0 && page < newPage)
       setSearchRequested({searchType: tabIndex === 0 ? 'WORMS' : 'NRMN', species: searchTerm, includeSuperseded: true, page: newPage});
     else
       setPage(newPage);
@@ -156,6 +156,7 @@ const SpeciesSearch = ({onRowClick}) => {
           <Grid item xs={5}>
             <TextField
               fullWidth
+              placeholder="WoRMS Search"
               size="small"
               disabled={loading}
               onChange={(e) => setSearchTerm(e.target.value.trim())}
@@ -167,6 +168,7 @@ const SpeciesSearch = ({onRowClick}) => {
           <Grid item xs={1}></Grid>
           <Grid item xs={4}>
             <LoadingButton
+              data-testid="search-button"
               variant="outlined"
               disabled={!(searchTerm?.length > 3)}
               loading={loading}
