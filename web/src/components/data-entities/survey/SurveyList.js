@@ -1,22 +1,30 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {Box, Typography} from '@mui/material';
-import {Navigate} from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import {getResult} from '../../../api/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {AuthContext} from '../../../contexts/auth-context';
 import 'ag-grid-enterprise';
+import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 
 const SurveyList = () => {
-  const [rowData, setRowData] = useState();
+  const location = useLocation();
+  const gridRef = useRef(null);
   const [redirect, setRedirect] = useState();
 
-  useEffect(() => {
-    async function fetchSurveys() {
-      await getResult('data/surveys').then((res) => setRowData(res.data));
+  const onGridReady = (event) => {
+
+    async function fetchSurveys(e) {
+      await getResult('data/surveys').then((res) => e.api.setRowData(res.data));
     }
-    fetchSurveys();
-  }, []);
+
+    fetchSurveys(event).then(() => {
+      if(!(location?.state?.resetFilters)) {
+        stateFilterHandler.restoreStateFilters(gridRef);
+      }
+    });
+  };
 
   if (redirect) return <Navigate to={`/data/survey/${redirect}`} />;
 
@@ -30,12 +38,15 @@ const SurveyList = () => {
             </Box>
           </Box>
           <AgGridReact
+            ref={gridRef}
+            id={'survey-list'}
             className="ag-theme-material"
             rowHeight={24}
             animateRows={true}
             enableCellTextSelection={true}
             pagination={true}
-            rowData={rowData}
+            onGridReady={(e) => onGridReady(e)}
+            onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
             context={{useOverlay: 'Loading Surveys'}}
             components={{loadingOverlay: LoadingOverlay}}
             loadingOverlayComponent="loadingOverlay"
@@ -61,7 +72,7 @@ const SurveyList = () => {
                 }
               }}
             />
-            {auth.features.includes('corrections') && (
+            {auth.features?.includes('corrections') && (
               <AgGridColumn
                 width={40}
                 field="surveyId"
