@@ -125,7 +125,6 @@ const SiteList = () => {
           />
           <AgGridColumn
             field="siteCode"
-            headerName="Site Code"
             cellStyle={{cursor: 'pointer'}}
             onCellClicked={(e) => {
               if (e.event.ctrlKey) {
@@ -135,12 +134,12 @@ const SiteList = () => {
               }
             }}
           />
-          <AgGridColumn minWidth={500} field="siteName" headerName="Site Name"/>
-          <AgGridColumn minWidth={200} field="locationName" headerName="Location Name"/>
-          <AgGridColumn field="state" headerName="State"/>
-          <AgGridColumn minWidth={200} field="country" headerName="Country"/>
-          <AgGridColumn field="latitude" headerName="Latitude"/>
-          <AgGridColumn field="longitude" headerName="Longitude"/>
+          <AgGridColumn minWidth={500} field="siteName" />
+          <AgGridColumn minWidth={200} field="locationName" />
+          <AgGridColumn field="state" />
+          <AgGridColumn minWidth={200} field="country" />
+          <AgGridColumn field="latitude" />
+          <AgGridColumn field="longitude" />
           <AgGridColumn suppressMenu={true} field="isActive" headerName="Active" />
           <AgGridColumn
             field="siteId"

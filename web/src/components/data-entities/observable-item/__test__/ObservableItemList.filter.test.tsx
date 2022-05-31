@@ -17,8 +17,8 @@ describe('<ObservableItemList/> filter testing', () => {
   let mockGetResult;
   let mockGetFiltersForId;
   const columns = [
-    'ID', 'Type', 'Name', 'Common Name', 'Superseded By','Superseded Names','Superseded IDs','Phylum',
-    'Class','Order','Family','Genus'];
+    'observableItemId', 'typeName', 'name', 'commonName', 'supersededBy','supersededNames','supersededIDs','phylum',
+    'class','order','family','genus'];
 
   beforeAll(() => {
     mockGetResult = jest.spyOn(axiosInstance, 'getResult');
@@ -53,14 +53,14 @@ describe('<ObservableItemList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: true}}]});
-    const {rerender} = render(<Router location={history.location} navigator={history}><ObservableItemList/></Router>);
+    const {container, rerender} = render(<Router location={history.location} navigator={history}><ObservableItemList/></Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(1), {timeout: 10000})
       .then(() => {
         // verify default columns exist
         columns.forEach(x => {
-          expect(screen.queryAllByText(x).length).toBeGreaterThanOrEqual(1);
+          expect(container.querySelector('[col-id="' + x + '"]')).toBeInTheDocument();
         });
       })
       .finally(() => {
@@ -101,14 +101,14 @@ describe('<ObservableItemList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: false}}]});
-    const {rerender} = render(<Router location={history.location} navigator={history}><ObservableItemList/></Router>);
+    const {container, rerender} = render(<Router location={history.location} navigator={history}><ObservableItemList/></Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(1), {timeout: 10000})
       .then(() => {
         // verify default columns exist
         columns.forEach(x => {
-          expect(screen.queryAllByText(x).length).toBeGreaterThanOrEqual(1);
+          expect(container.querySelector('[col-id="' + x + '"]')).toBeInTheDocument();
         });
       })
       .finally(() => {

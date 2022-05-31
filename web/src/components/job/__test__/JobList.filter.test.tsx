@@ -17,7 +17,7 @@ jest.setTimeout(10000);
 describe('<JobList/> filter testing', () => {
   let mockGetResult;
   let mockGetFiltersForId;
-  const columns = ['Reference', 'Extended', 'Program', 'Creator', 'Created'];
+  const columns = ['reference', 'isExtendedSize', 'program', 'creator', 'created'];
 
   beforeAll(() => {
     mockGetResult = jest.spyOn(axiosInstance, 'getEntity');
@@ -52,14 +52,14 @@ describe('<JobList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: true}}]});
-    const {rerender} = render(<Router location={history.location} navigator={history}><JobList/></Router>);
+    const {container, rerender} = render(<Router location={history.location} navigator={history}><JobList/></Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(1), {timeout: 10000})
       .then(() => {
         // verify default columns exist
         columns.forEach(x => {
-          expect(screen.queryAllByText(x).length).toBeGreaterThanOrEqual(1);
+          expect(container.querySelector('[col-id="' + x + '"]')).toBeInTheDocument();
         });
       })
       .finally(() => {
@@ -114,14 +114,14 @@ describe('<JobList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: false}}]});
-    const {rerender} = render(<Router location={history.location} navigator={history}><JobList/></Router>);
+    const {container, rerender} = render(<Router location={history.location} navigator={history}><JobList/></Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(1), {timeout: 10000})
       .then(() => {
         // verify default columns exist
         columns.forEach(x => {
-          expect(screen.queryAllByText(x).length).toBeGreaterThanOrEqual(1);
+          expect(container.querySelector('[col-id="' + x + '"]')).toBeInTheDocument();
         });
       })
       .finally(() => {

@@ -16,7 +16,7 @@ jest.setTimeout(10000);
 describe('<DiverList/> filter testing', () => {
   let mockGetResult;
   let mockGetFiltersForId;
-  const columns = ['Initials', 'Full Name'];
+  const columns = ['initials', 'fullName'];
 
   beforeAll(() => {
     mockGetResult = jest.spyOn(axiosInstance, 'getResult');
@@ -51,14 +51,15 @@ describe('<DiverList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: true}}]});
-    const {rerender} = render(<Router location={history.location} navigator={history}><DiverList/></Router>);
+    const {container, rerender} = render(<Router location={history.location} navigator={history}><DiverList/></Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(1), {timeout: 10000})
       .then(() => {
         // verify default columns exist
+
         columns.forEach(x => {
-          expect(screen.queryAllByText(x).length).toBeGreaterThanOrEqual(1);
+          expect(container.querySelector('[col-id="' + x + '"]')).toBeInTheDocument();
         });
       })
       .finally(() => {
@@ -99,14 +100,14 @@ describe('<DiverList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: false}}]});
-    const {rerender} = render(<Router location={history.location} navigator={history}><DiverList/></Router>);
+    const {container, rerender} = render(<Router location={history.location} navigator={history}><DiverList/></Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(1), {timeout: 10000})
       .then(() => {
         // verify default columns exist
         columns.forEach(x => {
-          expect(screen.queryAllByText(x).length).toBeGreaterThanOrEqual(1);
+          expect(container.querySelector('[col-id="' + x + '"]')).toBeInTheDocument();
         });
       })
       .finally(() => {

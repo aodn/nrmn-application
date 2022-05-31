@@ -14,7 +14,7 @@ import stateFilterHandler from '../../../../common/state-event-handler/StateFilt
 describe('<LocationList/> filter testing', () => {
   let mockGetEntity;
   let mockGetFiltersForId;
-  const columns = ['Location Name','Status','Eco Regions','Countries','Areas'];
+  const columns = ['locationName','status','ecoRegions','countries','areas'];
 
   beforeAll(() => {
     mockGetEntity = jest.spyOn(axiosInstance, 'getEntity');
@@ -49,14 +49,14 @@ describe('<LocationList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: true}}]});
-    const {rerender} = render(<Router location={history.location} navigator={history}><LocationList/></Router>);
+    const {container, rerender} = render(<Router location={history.location} navigator={history}><LocationList/></Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetEntity).toHaveBeenCalledTimes(1), {timeout: 10000})
       .then(() => {
         // verify default columns exist
         columns.forEach(x => {
-          expect(screen.queryAllByText(x).length).toBeGreaterThanOrEqual(1);
+          expect(container.querySelector('[col-id="' + x + '"]')).toBeInTheDocument();
         });
       })
       .finally(() => {
@@ -97,14 +97,14 @@ describe('<LocationList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: false}}]});
-    const {rerender} = render(<Router location={history.location} navigator={history}><LocationList/></Router>);
+    const {container, rerender} = render(<Router location={history.location} navigator={history}><LocationList/></Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetEntity).toHaveBeenCalledTimes(1), {timeout: 10000})
       .then(() => {
         // verify default columns exist
         columns.forEach(x => {
-          expect(screen.queryAllByText(x).length).toBeGreaterThanOrEqual(1);
+          expect(container.querySelector('[col-id="' + x + '"]')).toBeInTheDocument();
         });
       })
       .finally(() => {
