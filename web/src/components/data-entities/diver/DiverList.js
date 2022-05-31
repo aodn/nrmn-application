@@ -1,14 +1,16 @@
 import React, {useState, useRef} from 'react';
 import {Box, Button, Typography} from '@mui/material';
-import {NavLink} from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import {grey, red} from '@mui/material/colors';
 import {getResult, entityEdit} from '../../../api/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Add, Save} from '@mui/icons-material';
 import 'ag-grid-enterprise';
+import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 
 const DiverList = () => {
+  const location = useLocation();
   const [delta, setDelta] = useState([]);
   const [errors, setErrors] = useState([]);
   const gridRef = useRef(null);
@@ -20,7 +22,11 @@ const DiverList = () => {
       });
     }
 
-    fetchDivers(event).then(() => {});
+    fetchDivers(event).then(() => {
+      if(!(location?.state?.resetFilters)) {
+        stateFilterHandler.restoreStateFilters(gridRef);
+      }
+    });
   };
 
   const onCellValueChanged = (e) => {
@@ -68,6 +74,7 @@ const DiverList = () => {
       </Box>
       <AgGridReact
         ref={gridRef}
+        id={'diver-list'}
         className="ag-theme-material"
         getRowId={(r) => r.data.diverId}
         rowHeight={20}
@@ -79,6 +86,7 @@ const DiverList = () => {
         components={{loadingOverlay: LoadingOverlay}}
         loadingOverlayComponent="loadingOverlay"
         onGridReady={(e) => onGridReady(e)}
+        onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
         defaultColDef={{
           editable: true,
           sortable: true,

@@ -112,7 +112,7 @@ const SpeciesSearch = ({onRowClick}) => {
             setGridData(gridData ? [...gridData, ...data] : data);
             setPage(searchRequested.page);
             if(data?.length < rowsPerPage)
-              setMaxRows(data.length);
+              setMaxRows(gridData.length + data.length);
           }
         })
         .catch((err) => setSearchError(err.message));
@@ -121,7 +121,7 @@ const SpeciesSearch = ({onRowClick}) => {
   }, [searchRequested, currentSearch, rowsPerPage, gridData]);
 
   const handleChangePage = (_, newPage) => {
-    if(page < newPage && gridData.length / rowsPerPage < newPage + 1)
+    if(maxRows < 0 && page < newPage)
       setSearchRequested({searchType: tabIndex === 0 ? 'WORMS' : 'NRMN', species: searchTerm, includeSuperseded: true, page: newPage});
     else
       setPage(newPage);

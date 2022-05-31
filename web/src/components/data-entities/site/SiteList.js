@@ -1,15 +1,17 @@
 import React, {useRef, useState} from 'react';
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
-import {Navigate, NavLink} from 'react-router-dom';
+import { Navigate, NavLink, useLocation } from 'react-router-dom';
 import {getResult} from '../../../api/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Add, CopyAll, Delete, Edit} from '@mui/icons-material';
 import {entityDelete} from '../../../api/api';
+import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 
 import 'ag-grid-enterprise';
 
 const SiteList = () => {
+  const location = useLocation();
   const [redirect, setRedirect] = useState();
   const [dialogState, setDialogState] = useState({open: false});
   const gridRef = useRef(null);
@@ -32,6 +34,9 @@ const SiteList = () => {
     }
 
     fetchSites(event).then(() => {
+      if(!(location?.state?.resetFilters)) {
+        stateFilterHandler.restoreStateFilters(gridRef);
+      }
       autoSizeAll(event, false);
     });
   };
@@ -82,11 +87,13 @@ const SiteList = () => {
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
         <AgGridReact
           ref={gridRef}
+          id={'site-list'}
           rowHeight={24}
           pagination={true}
           enableCellTextSelection={true}
           onGridReady={(e) => onGridReady(e)}
           onBodyScroll={(e) => autoSizeAll(e, false)}
+          onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
           context={{useOverlay: 'Loading Sites'}}
           components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"

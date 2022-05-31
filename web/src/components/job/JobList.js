@@ -2,13 +2,14 @@ import {Box, Button, Typography} from '@mui/material';
 import {CloudUploadOutlined} from '@mui/icons-material';
 import 'ag-grid-enterprise';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import React, {useEffect, useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {Navigate} from 'react-router';
-import {NavLink} from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import {deleteJob, getEntity} from '../../api/api';
 import LoadingOverlay from '../overlays/LoadingOverlay';
 import AlertDialog from '../ui/AlertDialog';
 import {GridOn, Delete, Info} from '@mui/icons-material';
+import stateFilterHandler from '../../common/state-event-handler/StateFilterHandler';
 
 const TimeStampCell = (params) => {
   return params.value
@@ -19,10 +20,14 @@ const TimeStampCell = (params) => {
 };
 
 const JobList = () => {
-  const [rowData, setRowData] = useState([]);
+  const location = useLocation();
+  const gridRef = useRef(null);
   const [redirect, setRedirect] = useState();
   const [deleteJobId, setDeleteJobId] = useState();
   const iconViewBoxDimension = '-2 -2 30 30';
+
+  // callback tells the grid to use the 'id' attribute for IDs, IDs should always be strings
+  const getRowId = params => params.data.id;
 
   const onCellClicked = (e) => {
     if (e.data.status === 'STAGED') {
@@ -31,12 +36,16 @@ const JobList = () => {
     }
   };
 
-  useEffect(() => {
-    async function fetchJobs() {
-      await getEntity('stage/jobs').then((res) => setRowData(res.data));
+  const onGridReady = (event) => {
+    async function fetchJobs(e) {
+      await getEntity('stage/jobs').then((res) => e.api.setRowData(res.data));
     }
-    fetchJobs();
-  }, []);
+    fetchJobs(event).then(() => {
+      if(!(location?.state?.resetFilters)) {
+        stateFilterHandler.restoreStateFilters(gridRef);
+      }
+    });
+  };
 
   if (redirect) return <Navigate to={redirect} />;
 
@@ -50,7 +59,8 @@ const JobList = () => {
         onConfirm={() => {
           deleteJob(deleteJobId).then(() => {
             setDeleteJobId();
-            setRowData([...rowData.filter((d) => d.id !== deleteJobId)]);
+            gridRef.current.api.getRowNode(deleteJobId).setSelected(true);
+            gridRef.current.api.applyTransaction({remove: gridRef.current.api.getSelectedRows()});
           });
         }}
       />
@@ -66,10 +76,14 @@ const JobList = () => {
       </Box>
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
         <AgGridReact
+          ref={gridRef}
+          id={'job-list'}
           rowHeight={24}
           pagination={false}
-          rowData={rowData}
+          getRowId={getRowId}
           enableCellTextSelection={true}
+          onGridReady={(e) => onGridReady(e)}
+          onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
           context={{useOverlay: 'Loading Jobs'}}
           components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
@@ -115,6 +129,7 @@ const JobList = () => {
           <AgGridColumn
             width={80}
             field="status"
+            headerName="Status"
             rowGroup={true}
             hide={true}
             comparator={(a, b) => {
