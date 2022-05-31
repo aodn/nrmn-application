@@ -28,13 +28,14 @@ describe('<SiteList/>', () => {
 
   const visibleColumns = ['siteCode', 'siteName', 'locationName', 'state', 'country', 'latitude', 'longitude'];
 
-  test.skip('Renders ' + visibleColumns.join(','), async () => {
-    const history = createMemoryHistory({initialEntries:[{state: {resetFilters: true}}]});
-    const {getByText} = render(<Router location={history.location} navigator={history}><SiteList /></Router>);
-    for(const row of siteTestData) 
-    for(const field of visibleColumns)
-      await waitFor(() => expect(getByText(`${row[field]}`)));
-  });
+  // TODO: FIXME
+  // test('Renders ' + visibleColumns.join(','), async () => {
+  //   const history = createMemoryHistory();
+  //   const {getByText} = render(<Router location={history.location} navigator={history}><SiteList /></Router>);
+  //   for(const row of siteTestData) 
+  //   for(const field of visibleColumns)
+  //     await waitFor(() => expect(getByText(`${row[field]}`)));
+  // });
 
   test.skip('Clone Icon appears for every site', async () => {
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: true}}]});
