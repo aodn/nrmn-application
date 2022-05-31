@@ -33,7 +33,6 @@
       "request": "launch",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "disableOptimisticBPs": true,
       "cwd": "${workspaceFolder}/web",
       "runtimeExecutable": "yarn",
       "args": ["-s", "test", "--runInBand", "--watchAll=false"]
