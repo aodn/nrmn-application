@@ -33,7 +33,7 @@ describe('<JobList/> filter testing', () => {
   });
 
   test('Render necessary fields and no filter restored', async () => {
-    const canned = require('./sample1.json');
+    const canned = require('./JobList.filter.data.json');
 
     // Override function so that it return the data we set.
     mockGetResult.mockImplementation((url) => {
@@ -90,7 +90,7 @@ describe('<JobList/> filter testing', () => {
   });
 
   test('Render necessary fields with filter restored', async () => {
-    const canned = require('./sample1.json');
+    const canned = require('./JobList.filter.data.json');
 
     // Filter set will cause some items disappeared
     mockGetFiltersForId.mockImplementation((id) => {
