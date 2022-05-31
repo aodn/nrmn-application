@@ -31,11 +31,9 @@ describe('<SiteList/>', () => {
   test('Renders ' + visibleColumns.join(','), async () => {
     const history = createMemoryHistory();
     const {getByText} = render(<Router location={history.location} navigator={history}><SiteList /></Router>);
-    await waitFor(() => {
-      for(const row of siteTestData) 
-      for(const field of visibleColumns)
-        expect(getByText(`${row[field]}`));
-    });
+    for(const row of siteTestData) 
+    for(const field of visibleColumns)
+      await waitFor(() => expect(getByText(`${row[field]}`)));
   });
 
   test('Clone Icon appears for every site', async () => {
