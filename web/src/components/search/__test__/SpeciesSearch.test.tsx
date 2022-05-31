@@ -3,8 +3,6 @@ import '@testing-library/jest-dom';
 import {fireEvent, render, waitFor} from '@testing-library/react';
 import {rest} from 'msw';
 import {setupServer} from 'msw/node';
-import { exact } from 'prop-types';
-import React from 'react';
 import SpeciesSearch from '../SpeciesSearch';
 
 const visibleProps = ['class', 'family', 'genus', 'order', 'phylum', 'species', 'status'];
