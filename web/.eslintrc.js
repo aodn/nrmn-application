@@ -18,7 +18,7 @@ module.exports = exports = {
       jsx: true
     },
     babelOptions: {
-      presets: ["@babel/preset-react"]
+      presets: ['@babel/preset-react']
     },
     ecmaVersion: 2018,
     requireConfigFile: false,

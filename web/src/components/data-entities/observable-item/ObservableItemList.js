@@ -1,16 +1,18 @@
 'use strict';
 
-import React, {useRef, useState} from 'react';
+import React, { useRef, useState } from 'react';
 import {Box, Button, Typography} from '@mui/material';
-import {Navigate, NavLink} from 'react-router-dom';
+import {Navigate, NavLink, useLocation} from 'react-router-dom';
 import {getResult} from '../../../api/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Add} from '@mui/icons-material';
+import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 
 import 'ag-grid-enterprise';
 
 const ObservableItemList = () => {
+  const location = useLocation();
   const [redirect, setRedirect] = useState();
   const gridRef = useRef(null);
 
@@ -32,6 +34,9 @@ const ObservableItemList = () => {
     }
 
     fetchObservableItems(event).then(() => {
+      if(!(location?.state?.resetFilters)) {
+        stateFilterHandler.restoreStateFilters(gridRef);
+      }
       autoSizeAll(event, false);
     });
   };
@@ -53,11 +58,13 @@ const ObservableItemList = () => {
       <AgGridReact
         ref={gridRef}
         className="ag-theme-material"
+        id={'observable-item-list'}
         rowHeight={24}
         pagination={true}
         enableCellTextSelection={true}
         onGridReady={(e) => onGridReady(e)}
         onBodyScroll={(e) => autoSizeAll(e, false)}
+        onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
         context={{useOverlay: 'Loading Observable Items'}}
         components={{loadingOverlay: LoadingOverlay}}
         loadingOverlayComponent="loadingOverlay"
