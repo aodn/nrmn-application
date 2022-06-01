@@ -39,7 +39,7 @@ import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
-import au.org.aodn.nrmn.restapi.model.db.SurveyMethod;
+import au.org.aodn.nrmn.restapi.model.db.SurveyMethodEntity;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
@@ -133,7 +133,7 @@ public class SurveyIngestionServiceTest {
         when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
         StagedRowFormatted row = rowBuilder.build();
         Survey survey = Survey.builder().surveyId(1).build();
-        SurveyMethod surveyMethod = surveyIngestionService.getSurveyMethod(survey, row);
+        SurveyMethodEntity surveyMethod = surveyIngestionService.getSurveyMethod(survey, row);
         assertEquals(1, surveyMethod.getBlockNum());
         assertEquals(2, surveyMethod.getMethod().getMethodId());
         assertEquals(survey, surveyMethod.getSurvey());
@@ -148,7 +148,7 @@ public class SurveyIngestionServiceTest {
         StagedRow inputRow = StagedRow.builder().species("Survey Not Done").build();
         StagedRowFormatted row = rowBuilder.ref(inputRow).build();
         Survey survey = Survey.builder().surveyId(1).build();
-        SurveyMethod surveyMethod = surveyIngestionService.getSurveyMethod(survey, row);
+        SurveyMethodEntity surveyMethod = surveyIngestionService.getSurveyMethod(survey, row);
         assertEquals(true, surveyMethod.getSurveyNotDone());
     }
 
@@ -167,7 +167,7 @@ public class SurveyIngestionServiceTest {
              rowBuilder.isInvertSizing(true).species(Optional.of(obsItem)).method(i).build();
             Survey survey = Survey.builder().surveyId(i).build();
             Method theMethod = Method.builder().methodId(i).methodName("The Method").isActive(true).build();
-            SurveyMethod surveyMethod = SurveyMethod.builder().survey(survey).method(theMethod).blockNum(1).build();
+            SurveyMethodEntity surveyMethod = SurveyMethodEntity.builder().survey(survey).method(theMethod).blockNum(1).build();
 
             // ExtendedSizing = false
             List<Observation> observations = surveyIngestionService.getObservations(surveyMethod, row, false);
@@ -188,7 +188,7 @@ public class SurveyIngestionServiceTest {
     void getObservationsM3() {
         when(measureRepository.findByMeasureTypeIdAndSeqNo(2, 1)).then(m -> Optional.of(Measure.builder()
                 .measureName("2.5cm").measureType(MeasureType.builder().measureTypeId(2).build()).build()));
-        SurveyMethod surveyMethod3 = SurveyMethod.builder().survey(Survey.builder().surveyId(3).build())
+        SurveyMethodEntity surveyMethod3 = SurveyMethodEntity.builder().survey(Survey.builder().surveyId(3).build())
                 .method(Method.builder().methodId(3).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations3 = surveyIngestionService.getObservations(surveyMethod3,
                 rowBuilder.isInvertSizing(true).method(3).species(Optional.of(
@@ -203,7 +203,7 @@ public class SurveyIngestionServiceTest {
     void getObservationsM4() {
         when(measureRepository.findByMeasureTypeIdAndSeqNo(3, 1)).then(m -> Optional.of(Measure.builder()
                 .measureName("2.5cm").measureType(MeasureType.builder().measureTypeId(3).build()).build()));
-        SurveyMethod surveyMethod4 = SurveyMethod.builder().survey(Survey.builder().surveyId(4).build())
+        SurveyMethodEntity surveyMethod4 = SurveyMethodEntity.builder().survey(Survey.builder().surveyId(4).build())
                 .method(Method.builder().methodId(4).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations4 = surveyIngestionService.getObservations(surveyMethod4,
                 rowBuilder.isInvertSizing(true).method(4).species(Optional.of(
@@ -218,7 +218,7 @@ public class SurveyIngestionServiceTest {
     void getObservationsM5() {
         when(measureRepository.findByMeasureTypeIdAndSeqNo(7, 1)).then(m -> Optional.of(Measure.builder()
                 .measureName("2.5cm").measureType(MeasureType.builder().measureTypeId(7).build()).build()));
-        SurveyMethod surveyMethod5 = SurveyMethod.builder().survey(Survey.builder().surveyId(5).build())
+        SurveyMethodEntity surveyMethod5 = SurveyMethodEntity.builder().survey(Survey.builder().surveyId(5).build())
                 .method(Method.builder().methodId(4).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations5 = surveyIngestionService.getObservations(surveyMethod5,
                 rowBuilder.isInvertSizing(true).method(5).species(Optional.of(
@@ -244,7 +244,7 @@ public class SurveyIngestionServiceTest {
         // M2
         Survey survey = Survey.builder().surveyId(1).build();
         Method theMethod = Method.builder().methodId(2).methodName("The Method").isActive(true).build();
-        SurveyMethod surveyMethod = SurveyMethod.builder().survey(survey).method(theMethod).blockNum(1).build();
+        SurveyMethodEntity surveyMethod = SurveyMethodEntity.builder().survey(survey).method(theMethod).blockNum(1).build();
 
         // ExtendedSizing = false
         List<Observation> observations = surveyIngestionService.getObservations(surveyMethod, row, true);
@@ -267,7 +267,7 @@ public class SurveyIngestionServiceTest {
                                  .measureType(MeasureType.builder().measureTypeId(MEASURE_TYPE_FISH_SIZE_CLASS).build())
                                  .build();
         when(measureRepository.findByMeasureTypeIdAndSeqNo(MEASURE_TYPE_FISH_SIZE_CLASS, 0)).then(m -> Optional.of(unsized));
-        SurveyMethod surveyMethod6 = SurveyMethod.builder().survey(Survey.builder().surveyId(6).build())
+        SurveyMethodEntity surveyMethod6 = SurveyMethodEntity.builder().survey(Survey.builder().surveyId(6).build())
                 .method(Method.builder().methodId(1).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations6 = surveyIngestionService.getObservations(surveyMethod6,
                 rowBuilder.inverts(10).measureJson(Collections.emptyMap()).isInvertSizing(false).method(1).species(
@@ -287,7 +287,7 @@ public class SurveyIngestionServiceTest {
                                  .measureType(MeasureType.builder().measureTypeId(MEASURE_TYPE_SINGLE_ITEM).build())
                                  .build();
         when(measureRepository.findByMeasureTypeIdAndSeqNo(MEASURE_TYPE_SINGLE_ITEM, 0)).then(m -> Optional.of(item));
-        SurveyMethod surveyMethod7 = SurveyMethod.builder().survey(Survey.builder().surveyId(7).build())
+        SurveyMethodEntity surveyMethod7 = SurveyMethodEntity.builder().survey(Survey.builder().surveyId(7).build())
                 .method(Method.builder().methodId(12).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations7 = surveyIngestionService.getObservations(surveyMethod7,
                 rowBuilder.inverts(10).measureJson(Collections.emptyMap()).isInvertSizing(false).method(12).species(
@@ -351,9 +351,9 @@ public class SurveyIngestionServiceTest {
         Survey survey = surveyCaptor.getValue();
         assertEquals(3.0, survey.getVisibility());
 
-        ArgumentCaptor<SurveyMethod> surveyMethodCaptor = ArgumentCaptor.forClass(SurveyMethod.class);
+        ArgumentCaptor<SurveyMethodEntity> surveyMethodCaptor = ArgumentCaptor.forClass(SurveyMethodEntity.class);
         Mockito.verify(surveyMethodRepository).save(surveyMethodCaptor.capture());
-        SurveyMethod surveyMethod = surveyMethodCaptor.getValue();
+        SurveyMethodEntity surveyMethod = surveyMethodCaptor.getValue();
         assertEquals(true, surveyMethod.getSurveyNotDone());
 
     }

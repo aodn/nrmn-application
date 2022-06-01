@@ -46,20 +46,14 @@ public class MeasurementValidationService {
     }
 
     public Collection<ValidationError> validate(Map<Integer, UiSpeciesAttributes> speciesAttributes, CorrectionRowPutDto row) {
-
+        
         ValidationResultSet results = new ValidationResultSet();
-
-        if (!speciesAttributes.containsKey(row.getObservableItemId())) {
-            // ObservableItem doesn't have attributes; fatal
-            return null;
+        boolean isMeasureMethod = !Arrays.asList(3, 4, 5).contains(row.getMethodId());
+        if (isMeasureMethod && speciesAttributes.containsKey(row.getObservableItemId()) && row.getMeasurements().size() > 0) {
+            var attrib = speciesAttributes.get(row.getObservableItemId());
+            var errors = validateMeasureRange(row.getId(), row.getUseInvertSizing(), row.getObservableItemName(), row.getMeasurements(), attrib);
+            results.addAll(errors, false);
         }
-
-        if (Arrays.asList(3, 4, 5).contains(row.getMethodId()) || row.getMeasurements().size() < 1)
-            return null;
-
-        var errors = validateMeasureRange(row.getId(), row.getUseInvertSizing(), row.getObservableItemName(), row.getMeasurements(), speciesAttributes.get(row.getObservableItemId()));
-        results.addAll(errors, false);
-
         return results.getAll();
     }
 }

@@ -32,8 +32,11 @@ import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedJobLog;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.model.db.SurveyMethodEntity;
+import au.org.aodn.nrmn.restapi.model.db.enums.MeasureType;
+import au.org.aodn.nrmn.restapi.model.db.enums.ObservableItemType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
+import au.org.aodn.nrmn.restapi.model.db.enums.SurveyMethod;
 import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
 import au.org.aodn.nrmn.restapi.repository.MethodRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
@@ -48,50 +51,38 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import lombok.Value;
 
 @Service
-public class SurveyIngestionService {
-
-    public static final int METHOD_M0 = 0;
-    public static final int METHOD_M1 = 1;
-    public static final int METHOD_M2 = 2;
-    public static final int METHOD_M3 = 3;
-    public static final int METHOD_M4 = 4;
-    public static final int METHOD_M5 = 5;
-    public static final int METHOD_M7 = 7;
-    public static final int METHOD_M10 = 10;
-    public static final int METHOD_M11 = 11;
-    public static final int METHOD_M12 = 12;
-
-    public static final int MEASURE_TYPE_FISH_SIZE_CLASS = 1;
-    public static final int MEASURE_TYPE_IN_SITU_QUADRAT = 2;
-    public static final int MEASURE_TYPE_MACROCYSTIS_BLOCK = 3;
-    public static final int MEASURE_TYPE_INVERT_SIZE_CLASS = 4;
-    public static final int MEASURE_TYPE_SINGLE_ITEM = 5;
-    public static final int MEASURE_TYPE_ABSENCE = 6;
-    public static final int MEASURE_TYPE_LIMPET_QUADRAT = 7;
-
-    public static final int OBS_ITEM_TYPE_DEBRIS = 5;
-    public static final int OBS_ITEM_TYPE_NO_SPECIES_FOUND = 6;
+public class SurveyCorrectionService {
 
     @Autowired
     SurveyRepository surveyRepository;
+    
     @Autowired
     MethodRepository methodRepository;
+    
     @Autowired
     MeasureRepository measureRepository;
+    
     @Autowired
     ObservationRepository observationRepository;
+    
     @Autowired
     SurveyMethodRepository surveyMethodRepository;
+    
     @Autowired
     ObservableItemRepository observableItemRepository;
+    
     @Autowired
     ProgramRepository programRepository;
+    
     @Autowired
     SiteRepository siteRepo;
+    
     @Autowired
     EntityManager entityManager;
+    
     @Autowired
     StagedJobLogRepository stagedJobLogRepository;
+
     @Autowired
     StagedJobRepository jobRepository;
 
@@ -165,27 +156,25 @@ public class SurveyIngestionService {
 
             Integer method = stagedRow.getMethod();
 
-            int measureTypeId = MEASURE_TYPE_FISH_SIZE_CLASS;
+            int measureTypeId = MeasureType.FishSizeClass;
 
-            if (IntStream.of(METHOD_M0, METHOD_M1, METHOD_M2, METHOD_M7, METHOD_M10, METHOD_M11)
+            if (IntStream.of(SurveyMethod.M0, SurveyMethod.M1, SurveyMethod.M2, SurveyMethod.M7, SurveyMethod.M10, SurveyMethod.M11)
                     .anyMatch(x -> x == method)) {
 
-                if (withExtendedSizing) {
-                    measureTypeId = stagedRow.getIsInvertSizing() ? MEASURE_TYPE_INVERT_SIZE_CLASS
-                            : MEASURE_TYPE_FISH_SIZE_CLASS;
-                }
+                if (withExtendedSizing && stagedRow.getIsInvertSizing())
+                    measureTypeId = MeasureType.InvertSizeClass;
 
-                if (stagedRow.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)
-                    measureTypeId = MEASURE_TYPE_ABSENCE;
+                if (stagedRow.getSpecies().get().getObsItemType().getObsItemTypeId() == ObservableItemType.NoSpeciesFound)
+                    measureTypeId = MeasureType.Absence;
 
-            } else if (method == METHOD_M3) {
-                measureTypeId = MEASURE_TYPE_IN_SITU_QUADRAT;
-            } else if (method == METHOD_M4) {
-                measureTypeId = MEASURE_TYPE_MACROCYSTIS_BLOCK;
-            } else if (method == METHOD_M5) {
-                measureTypeId = MEASURE_TYPE_LIMPET_QUADRAT;
-            } else if (method == METHOD_M12) {
-                measureTypeId = MEASURE_TYPE_SINGLE_ITEM;
+            } else if (method == SurveyMethod.M3) {
+                measureTypeId = MeasureType.InSituQuadrat;
+            } else if (method == SurveyMethod.M4) {
+                measureTypeId = MeasureType.MacrocystisBlock;
+            } else if (method == SurveyMethod.M5) {
+                measureTypeId = MeasureType.LimpetQuadrat;
+            } else if (method == SurveyMethod.M12) {
+                measureTypeId = MeasureType.SingleItem;
             }
 
             Measure measure = measureRepository.findByMeasureTypeIdAndSeqNo(measureTypeId, m.getSeqNo()).orElse(null);

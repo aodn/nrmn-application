@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.repository;
 
-import au.org.aodn.nrmn.restapi.model.db.SurveyMethod;
+import au.org.aodn.nrmn.restapi.model.db.SurveyMethodEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,8 +12,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SurveyMethodRepository extends JpaRepository<SurveyMethod, Integer>,
- JpaSpecificationExecutor<SurveyMethod> {
+public interface SurveyMethodRepository extends JpaRepository<SurveyMethodEntity, Integer>,
+ JpaSpecificationExecutor<SurveyMethodEntity> {
 
      @Query(value = "SELECT DISTINCT method_id from {h-schema}survey_method " +
              "WHERE survey_id = :surveyId AND survey_not_done = FALSE " +
@@ -32,7 +32,7 @@ public interface SurveyMethodRepository extends JpaRepository<SurveyMethod, Inte
 
     @Query(value = "select sm from SurveyMethod sm where sm.survey.surveyId = :surveyId and sm.method.methodId = " +
      ":methodId and sm.blockNum = :blockNum")
-    Optional<SurveyMethod> findBySurveyIdMethodIdBlockNum(@Param("surveyId") Integer surveyId,
+    Optional<SurveyMethodEntity> findBySurveyIdMethodIdBlockNum(@Param("surveyId") Integer surveyId,
      @Param("methodId") Integer methodId, @Param("blockNum") Integer blockNum);
 
     @Query("SELECT DISTINCT concat(d.fullName, ' (', d.initials, ')') FROM Observation o JOIN o.diver d WHERE o.surveyMethod.survey.surveyId = :surveyId")

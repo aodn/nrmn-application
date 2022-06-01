@@ -121,7 +121,11 @@ export const getCorrections = (surveyId) =>
     .catch((err) => err);
 
 export const validateSurveyCorrection = (surveyId, rows) => {
-  return axiosInstance.put('correction/validate/' + surveyId, rows);
+  return axiosInstance.post('correction/validate/' + surveyId, rows);
+};
+
+export const submitSurveyCorrection = (surveyId, rows) => {
+  return axiosInstance.post('correction/correct/' + surveyId, rows);
 };
 
 export const validateJob = (jobId, completion) => {

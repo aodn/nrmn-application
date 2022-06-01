@@ -4,12 +4,12 @@ import 'ag-grid-enterprise';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import React, {useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
-import {getCorrections, validateSurveyCorrection} from '../../../api/api';
+import {getCorrections, validateSurveyCorrection, submitSurveyCorrection} from '../../../api/api';
 import {allMeasurements} from '../../../common/constants';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import SummaryPanel from './panel/SummaryPanel';
 import SurveyMeasurementHeader from './SurveyMeasurementHeader';
-import {PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon} from '@mui/icons-material/';
+import {PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon, CloudUpload as CloudUploadIcon} from '@mui/icons-material/';
 
 const SurveyCorrect = () => {
   const surveyId = useParams()?.id;
@@ -91,15 +91,19 @@ const SurveyCorrect = () => {
     });
   };
 
-  const onSaveValidate = () => {
+  const packedData = () => {
     const packedData = [];
     gridApi.forEachNode((rowNode, index) => {
       const data = rowNode.data;
       packedData.push({id: index, ...data, 19: JSON.stringify(data[19])});
     });
-    validateSurveyCorrection(surveyId, packedData);
+    return packedData;
   };
 
+  const onValidate = () => validateSurveyCorrection(surveyId, packedData());
+
+  const onSubmit = () => submitSurveyCorrection(surveyId, packedData());
+  
   const onModelUpdated = () => {};
 
   return (
@@ -108,9 +112,14 @@ const SurveyCorrect = () => {
         <Box flexGrow={1}>
           <Typography variant="h4">Survey Correction</Typography>
         </Box>
-        <Box p={1} minWidth={180}>
-          <Button onClick={onSaveValidate} variant="contained" startIcon={<PlaylistAddCheckOutlinedIcon />}>
+        <Box p={1} minWidth={120}>
+          <Button onClick={onValidate} variant="contained" startIcon={<PlaylistAddCheckOutlinedIcon />}>
             {`Validate`}
+          </Button>
+        </Box>
+        <Box p={1} minWidth={180}>
+          <Button onClick={onSubmit} variant="contained" startIcon={<CloudUploadIcon />}>
+            Submit Correction
           </Button>
         </Box>
       </Box>

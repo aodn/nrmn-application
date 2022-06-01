@@ -54,7 +54,7 @@ public class Observation {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JsonBackReference
-    private SurveyMethod surveyMethod;
+    private SurveyMethodEntity surveyMethod;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diver_id", referencedColumnName = "diver_id")
