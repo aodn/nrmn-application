@@ -30,7 +30,7 @@ public interface SurveyMethodRepository extends JpaRepository<SurveyMethodEntity
             "ORDER BY method_id, block_num", nativeQuery = true)
     List<String> findSurveyNotDoneForSurveyId(@Param("surveyId") Integer surveyId);
 
-    @Query(value = "select sm from SurveyMethod sm where sm.survey.surveyId = :surveyId and sm.method.methodId = " +
+    @Query(value = "select sm from SurveyMethodEntity sm where sm.survey.surveyId = :surveyId and sm.method.methodId = " +
      ":methodId and sm.blockNum = :blockNum")
     Optional<SurveyMethodEntity> findBySurveyIdMethodIdBlockNum(@Param("surveyId") Integer surveyId,
      @Param("methodId") Integer methodId, @Param("blockNum") Integer blockNum);
