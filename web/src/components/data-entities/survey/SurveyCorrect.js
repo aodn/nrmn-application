@@ -103,7 +103,7 @@ const SurveyCorrect = () => {
   const onValidate = () => validateSurveyCorrection(surveyId, packedData());
 
   const onSubmit = () => submitSurveyCorrection(surveyId, packedData());
-  
+
   const onModelUpdated = () => {};
 
   return (
