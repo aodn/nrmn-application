@@ -28,10 +28,10 @@ const SideMenu = ({open, onClose}) => {
           <Typography variant="button">Data</Typography>
         </ListSubheader>
         <List component="div" disablePadding>
-          <ListItem button onClick={onClose} component={NavLink} to="/data/surveys">
+          <ListItem button onClick={onClose} component={NavLink} to="/data/surveys" state={{resetFilters: true}}>
             <ListItemText primary="List Surveys" />
           </ListItem>
-          <ListItem button onClick={onClose} component={NavLink} to="/data/jobs">
+          <ListItem button onClick={onClose} component={NavLink} to="/data/jobs" state={{resetFilters: true}}>
             <ListItemText primary="List Jobs" />
           </ListItem>
           <ListItem button onClick={onClose} component={NavLink} to="/data/upload">
@@ -47,16 +47,16 @@ const SideMenu = ({open, onClose}) => {
         <ListSubheader>
           <Typography variant="button">Reference Data</Typography>
         </ListSubheader>
-        <ListItem button onClick={onClose} component={NavLink} to={'/reference/locations'}>
+        <ListItem button onClick={onClose} component={NavLink} to={'/reference/locations'} state={{resetFilters: true}}>
           <ListItemText primary="Locations" />
         </ListItem>
-        <ListItem button onClick={onClose} component={NavLink} to={'/reference/divers'}>
+        <ListItem button onClick={onClose} component={NavLink} to={'/reference/divers'} state={{resetFilters: true}}>
           <ListItemText primary="Divers" />
         </ListItem>
-        <ListItem button onClick={onClose} component={NavLink} to={'/reference/sites'}>
+        <ListItem button onClick={onClose} component={NavLink} to={'/reference/sites'} state={{resetFilters: true}}>
           <ListItemText primary="Sites" />
         </ListItem>
-        <ListItem button onClick={onClose} component={NavLink} to={'/reference/observableItems'}>
+        <ListItem button onClick={onClose} component={NavLink} to={'/reference/observableItems'} state={{resetFilters: true}}>
           <ListItemText primary="Observable Items" />
         </ListItem>
       </List>

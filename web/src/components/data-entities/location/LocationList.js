@@ -1,15 +1,17 @@
 import React, {useState} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import {Navigate, NavLink} from 'react-router-dom';
+import { Navigate, NavLink, useLocation } from 'react-router-dom';
 import {getEntity} from '../../../api/api';
 import {useRef} from 'react';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {Add} from '@mui/icons-material';
+import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 
 import 'ag-grid-enterprise';
 
 const LocationList = () => {
+  const location = useLocation();
   const [redirect, setRedirect] = useState();
   const gridRef = useRef(null);
 
@@ -31,6 +33,9 @@ const LocationList = () => {
     }
 
     fetchLocations(event).then(() => {
+      if(!(location?.state?.resetFilters)) {
+        stateFilterHandler.restoreStateFilters(gridRef);
+      }
       autoSizeAll(event, false);
     });
   };
@@ -52,11 +57,13 @@ const LocationList = () => {
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
         <AgGridReact
           ref={gridRef}
+          id={'location-list'}
           rowHeight={24}
           pagination={true}
           enableCellTextSelection={true}
           onGridReady={(e) => onGridReady(e)}
           onBodyScroll={(e) => autoSizeAll(e, false)}
+          onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
           context={{useOverlay: 'Loading Locations'}}
           components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"

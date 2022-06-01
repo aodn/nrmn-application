@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "reference": "ingested1.xlsx",
+    "isExtendedSize": false,
+    "status": "INGESTED",
+    "source": "INGEST",
+    "program": "RLS",
+    "created": "2021-09-06T02:23:14.016+00:00",
+    "creator": "apple.orange@utas.edu.au"
+  },
+  {
+    "id": 7,
+    "reference": "ingested2.xlsx",
+    "isExtendedSize": false,
+    "status": "INGESTED",
+    "source": "INGEST",
+    "program": "RLS",
+    "created": "2021-10-28T04:40:20.789+00:00",
+    "creator": "apple.orange@utas.edu.au"
+  },
+  {
+    "id": 10,
+    "reference": "ingested3.xlsx",
+    "isExtendedSize": false,
+    "status": "INGESTED",
+    "source": "INGEST",
+    "program": "RLS",
+    "created": "2021-10-28T06:27:38.763+00:00",
+    "creator": "apple.orange@utas.edu.au"
+  },
+  {
+    "id": 13,
+    "reference": "staged1.xlsx",
+    "isExtendedSize": false,
+    "status": "STAGED",
+    "source": "INGEST",
+    "program": "RLS",
+    "created": "2021-10-28T06:53:28.266+00:00",
+    "creator": "cherry.bananna@utas.edu.au"
+  },
+  {
+    "id": 32,
+    "reference": "failed1.xlsx",
+    "isExtendedSize": false,
+    "status": "FAILED",
+    "source": "INGEST",
+    "program": "RLS",
+    "created": "2022-01-12T01:21:48.625+00:00",
+    "creator": "rock.melon@utas.edu.au"
+  },
+  {
+    "id": 41,
+    "reference": "failed2.xlsx",
+    "isExtendedSize": true,
+    "status": "FAILED",
+    "source": "INGEST",
+    "program": "RLS",
+    "created": "2022-02-02T21:53:36.993+00:00",
+    "creator": "rock.melon@utas.edu.au"
+  }
+]

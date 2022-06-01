@@ -1,3 +1,5 @@
+// @ts-ignore
+import React from 'react';
 import ObservableItemView from '../ObservableItemView';
 import {rest} from 'msw';
 import {setupServer} from 'msw/node';
@@ -49,7 +51,7 @@ afterAll(() => server.close());
 
 describe('<ObservableItemView/>', () => {
   test('Renders fields', async () => {
-    const history = createMemoryHistory({initialEntries: ['/reference/observableItem/1']});
+    const history = createMemoryHistory({initialEntries: [{pathname: '/reference/observableItem/1', state: {resetFilters: true} }]});
     const {getByText} = render(
       <Router location={history.location} navigator={history}>
         <Routes>
@@ -89,11 +91,13 @@ describe('<ObservableItemView/>', () => {
   });
 
   test('Renders when ull', async () => {
-    const history = createMemoryHistory({initialEntries: ['/reference/observableItem/2']});
+    // Avoid loading filter from storage
+    const history = createMemoryHistory({initialEntries: [{ pathname: '/reference/observableItem/2', state: {resetFilters: true} }]});
+
     const {getByText} = render(
-      <Router location={history.location} navigator={history}>
+      <Router location={ history.location } navigator={history}>
         <Routes>
-          <Route path="/reference/observableItem/:id" element={<ObservableItemView />} />
+          <Route path="/reference/observableItem/:id" element={<ObservableItemView />}/>
         </Routes>
       </Router>
     );
