@@ -121,7 +121,10 @@ VALUES (333, 1, 102, 1, 'Species 56', 'S56'),
        (331, 1, 103, 1, 'Species 57', 'S57');
 
 INSERT INTO nrmn.method_ref(method_id, method_name, is_active)
-VALUES (1, 'Standard fish', true), (2, 'Big fish', true);
+VALUES (1, 'Standard fish', true), (2, 'Standard invertebrates & cryptic fish', true), (3, 'Standard quadrat', true);
+
+INSERT INTO nrmn.methods_species 
+VALUES (331, 1), (333, 1), (331, 2), (333, 2), (331, 3), (333, 3);
 
 INSERT INTO nrmn.survey_method(survey_method_id, block_num,
                                survey_method_attribute, survey_not_done,
@@ -244,10 +247,10 @@ VALUES (1,1,'Unsized',0,true),
 INSERT INTO nrmn.observation(observation_id, measure_value,
                              observation_attribute, diver_id, measure_id,
                              observable_item_id, survey_method_id)
-VALUES (551, 1, '{}',51, 3, 333,121),
-       (552, 1, '{}',51, 2, 333,121),
-       (554, 4, '{}',51, 3, 331,  121),
-       (553, 5, '{}',51, 2, 331,  121);
+VALUES (551, 1,   '{}',51, 2, 333, 121),
+       (552, 500, '{}',51, 7, 333, 121),
+       (554, 40,  '{}',51, 2, 331, 121),
+       (553, 500, '{}',51, 7, 331, 121);
 
 INSERT INTO nrmn.staged_row(pqs, block, buddy, code, created, date, depth, direction, diver,
                             inverts, is_invert_sizing, last_updated, latitude, longitude, 
