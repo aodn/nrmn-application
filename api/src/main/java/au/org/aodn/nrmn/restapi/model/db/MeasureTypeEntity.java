@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Table(name = "measure_type_ref")
-public class MeasureType {
+public class MeasureTypeEntity {
     @Id
     @SequenceGenerator(name = "measure_type_ref_measure_id", sequenceName = "measure_type_ref_measure_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="measure_type_ref_measure_id")

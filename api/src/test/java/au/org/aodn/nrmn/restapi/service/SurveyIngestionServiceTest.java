@@ -1,8 +1,6 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import static au.org.aodn.nrmn.restapi.service.SurveyIngestionService.MEASURE_TYPE_FISH_SIZE_CLASS;
-import static au.org.aodn.nrmn.restapi.service.SurveyIngestionService.MEASURE_TYPE_SINGLE_ITEM;
-import static au.org.aodn.nrmn.restapi.service.SurveyIngestionService.OBS_ITEM_TYPE_DEBRIS;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -29,7 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.Measure;
-import au.org.aodn.nrmn.restapi.model.db.MeasureType;
+import au.org.aodn.nrmn.restapi.model.db.MeasureTypeEntity;
 import au.org.aodn.nrmn.restapi.model.db.Method;
 import au.org.aodn.nrmn.restapi.model.db.ObsItemType;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
@@ -41,6 +39,8 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.model.db.SurveyMethodEntity;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
+import au.org.aodn.nrmn.restapi.model.db.enums.ObservableItemType;
+import au.org.aodn.nrmn.restapi.model.db.enums.MeasureType;
 import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
@@ -155,9 +155,9 @@ public class SurveyIngestionServiceTest {
     @Test
     void getObservations() {
         when(measureRepository.findByMeasureTypeIdAndSeqNo(1, 1)).then(m -> Optional.of(Measure.builder()
-                .measureName("2.5cm").measureType(MeasureType.builder().measureTypeId(1).build()).build()));
+                .measureName("2.5cm").measureType(MeasureTypeEntity.builder().measureTypeId(1).build()).build()));
         when(measureRepository.findByMeasureTypeIdAndSeqNo(1, 3)).then(m -> Optional.of(Measure.builder()
-                .measureName("10.5cm").measureType(MeasureType.builder().measureTypeId(1).build()).build()));
+                .measureName("10.5cm").measureType(MeasureTypeEntity.builder().measureTypeId(1).build()).build()));
 
         // M0, M1, M2, M7, M10, M11
         IntStream.of(0, 1, 2, 7, 10, 11).forEach(i -> {
@@ -187,7 +187,7 @@ public class SurveyIngestionServiceTest {
     @Test
     void getObservationsM3() {
         when(measureRepository.findByMeasureTypeIdAndSeqNo(2, 1)).then(m -> Optional.of(Measure.builder()
-                .measureName("2.5cm").measureType(MeasureType.builder().measureTypeId(2).build()).build()));
+                .measureName("2.5cm").measureType(MeasureTypeEntity.builder().measureTypeId(2).build()).build()));
         SurveyMethodEntity surveyMethod3 = SurveyMethodEntity.builder().survey(Survey.builder().surveyId(3).build())
                 .method(Method.builder().methodId(3).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations3 = surveyIngestionService.getObservations(surveyMethod3,
@@ -202,7 +202,7 @@ public class SurveyIngestionServiceTest {
     @Test
     void getObservationsM4() {
         when(measureRepository.findByMeasureTypeIdAndSeqNo(3, 1)).then(m -> Optional.of(Measure.builder()
-                .measureName("2.5cm").measureType(MeasureType.builder().measureTypeId(3).build()).build()));
+                .measureName("2.5cm").measureType(MeasureTypeEntity.builder().measureTypeId(3).build()).build()));
         SurveyMethodEntity surveyMethod4 = SurveyMethodEntity.builder().survey(Survey.builder().surveyId(4).build())
                 .method(Method.builder().methodId(4).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations4 = surveyIngestionService.getObservations(surveyMethod4,
@@ -217,7 +217,7 @@ public class SurveyIngestionServiceTest {
     @Test
     void getObservationsM5() {
         when(measureRepository.findByMeasureTypeIdAndSeqNo(7, 1)).then(m -> Optional.of(Measure.builder()
-                .measureName("2.5cm").measureType(MeasureType.builder().measureTypeId(7).build()).build()));
+                .measureName("2.5cm").measureType(MeasureTypeEntity.builder().measureTypeId(7).build()).build()));
         SurveyMethodEntity surveyMethod5 = SurveyMethodEntity.builder().survey(Survey.builder().surveyId(5).build())
                 .method(Method.builder().methodId(4).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations5 = surveyIngestionService.getObservations(surveyMethod5,
@@ -232,9 +232,9 @@ public class SurveyIngestionServiceTest {
     @Test
     void getObservationsWithExtendedSizing() {
         when(measureRepository.findByMeasureTypeIdAndSeqNo(4, 1)).then(m -> Optional.of(Measure.builder()
-                .measureName("0.5cm").measureType(MeasureType.builder().measureTypeId(4).build()).build()));
+                .measureName("0.5cm").measureType(MeasureTypeEntity.builder().measureTypeId(4).build()).build()));
         when(measureRepository.findByMeasureTypeIdAndSeqNo(4, 3)).then(m -> Optional.of(Measure.builder()
-                .measureName("1.5cm").measureType(MeasureType.builder().measureTypeId(4).build()).build()));
+                .measureName("1.5cm").measureType(MeasureTypeEntity.builder().measureTypeId(4).build()).build()));
 
         Optional<ObservableItem> obsItem =
          Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build())
@@ -264,9 +264,9 @@ public class SurveyIngestionServiceTest {
     void getInvertsObservationM1() {
         Measure unsized = Measure.builder()
                                  .measureName("Unsized")
-                                 .measureType(MeasureType.builder().measureTypeId(MEASURE_TYPE_FISH_SIZE_CLASS).build())
+                                 .measureType(MeasureTypeEntity.builder().measureTypeId(MeasureType.FishSizeClass).build())
                                  .build();
-        when(measureRepository.findByMeasureTypeIdAndSeqNo(MEASURE_TYPE_FISH_SIZE_CLASS, 0)).then(m -> Optional.of(unsized));
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(MeasureType.FishSizeClass, 0)).then(m -> Optional.of(unsized));
         SurveyMethodEntity surveyMethod6 = SurveyMethodEntity.builder().survey(Survey.builder().surveyId(6).build())
                 .method(Method.builder().methodId(1).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations6 = surveyIngestionService.getObservations(surveyMethod6,
@@ -284,14 +284,14 @@ public class SurveyIngestionServiceTest {
     void getInvertsObservationDebris() {
         Measure item = Measure.builder()
                                  .measureName("Item")
-                                 .measureType(MeasureType.builder().measureTypeId(MEASURE_TYPE_SINGLE_ITEM).build())
+                                 .measureType(MeasureTypeEntity.builder().measureTypeId(MeasureType.SingleItem).build())
                                  .build();
-        when(measureRepository.findByMeasureTypeIdAndSeqNo(MEASURE_TYPE_SINGLE_ITEM, 0)).then(m -> Optional.of(item));
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(MeasureType.SingleItem, 0)).then(m -> Optional.of(item));
         SurveyMethodEntity surveyMethod7 = SurveyMethodEntity.builder().survey(Survey.builder().surveyId(7).build())
                 .method(Method.builder().methodId(12).methodName("").isActive(true).build()).blockNum(1).build();
         List<Observation> observations7 = surveyIngestionService.getObservations(surveyMethod7,
                 rowBuilder.inverts(10).measureJson(Collections.emptyMap()).isInvertSizing(false).method(12).species(
-                        Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(OBS_ITEM_TYPE_DEBRIS).build()).build()))
+                        Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(ObservableItemType.Debris).build()).build()))
                           .build(),
                 false);
         // Should return one observation of 10 items

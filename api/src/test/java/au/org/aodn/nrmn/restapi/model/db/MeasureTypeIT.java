@@ -33,9 +33,9 @@ class MeasureTypeIT {
 
     @Test
     public void testMapping() {
-        MeasureType measureType = measureTypeTestData.persistedMeasureType();
+        MeasureTypeEntity measureType = measureTypeTestData.persistedMeasureType();
         entityManager.clear();
-        MeasureType persistedMeasureType = measureTypeRepository.findById(measureType.getMeasureTypeId()).get();
+        MeasureTypeEntity persistedMeasureType = measureTypeRepository.findById(measureType.getMeasureTypeId()).get();
         assertEquals(measureType, persistedMeasureType);
     }
 }

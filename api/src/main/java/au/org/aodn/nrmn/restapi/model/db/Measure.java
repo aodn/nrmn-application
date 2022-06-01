@@ -32,7 +32,7 @@ public class Measure {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "measure_type_id", referencedColumnName = "measure_type_id")
-    private MeasureType measureType;
+    private MeasureTypeEntity measureType;
     
     @Basic
     @Column(name = "measure_name")
