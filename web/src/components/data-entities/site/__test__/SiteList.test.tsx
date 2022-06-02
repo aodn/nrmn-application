@@ -38,7 +38,7 @@ describe('<SiteList/>', () => {
 
   test('Renders ' + visibleColumns.join(','), async () => {
     const history = createMemoryHistory();
-    const {container} = render(<Router location={history.location} navigator={history}><SiteList /></Router>);
+    render(<Router location={history.location} navigator={history}><SiteList /></Router>);
 
     // At least the first data appears before scanning the rest of it
     await waitFor(() => expect(screen.getByText('AAA')).toBeInTheDocument(), {timeout: 10000})
