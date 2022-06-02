@@ -454,6 +454,18 @@ public class ValidationProcess {
         return rowIds.size() > 0 ? new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING, "Missing quadrats in transect " + transect, rowIds, columnNames) : null;
     }
 
+    public Collection<ValidationCell> validateMethod3QuadratsLT50(List<StagedRowFormatted> rows) {
+        Collection<ValidationCell> errors = new ArrayList<ValidationCell>();
+
+        for (int measureIndex : Arrays.asList(1, 2, 3, 4, 5))
+        for (StagedRowFormatted row : rows) {
+            if (row.getMeasureJson().getOrDefault(measureIndex, 0) > 50)
+                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "M3 quadrat more than 50", row.getId(), Integer.toString(measureIndex)));
+        }
+        
+        return errors;
+    }
+
     public ValidationError validateMethod3QuadratsGT50(String transect, List<StagedRowFormatted> rows) {
 
         Set<String> columnNames = new HashSet<String>();
@@ -589,13 +601,16 @@ public class ValidationProcess {
 
     private Collection<ValidationError> checkMethod3Transects(String programName, Boolean isExtended, Map<String, List<StagedRowFormatted>> method3SurveyMap) {
         Set<ValidationError> res = new HashSet<ValidationError>();
+        ValidationResultSet results = new ValidationResultSet();
 
         // Validate M3 transects
         for (String transectName : method3SurveyMap.keySet()) {
             res.add(validateMethod3Quadrats(transectName, method3SurveyMap.get(transectName)));
             res.add(validateMethod3QuadratsGT50(transectName, method3SurveyMap.get(transectName)));
+            results.addAll(validateMethod3QuadratsLT50(method3SurveyMap.get(transectName)), false);
         }
 
+        res.addAll(results.getAll());
         res.remove(null);
 
         return res;
