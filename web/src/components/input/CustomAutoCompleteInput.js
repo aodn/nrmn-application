@@ -6,36 +6,36 @@ import { makeStyles } from '@mui/styles';
 
 export const ERROR_TYPE = {NORMAL: 0, WARNING: 1, ERROR: 2};
 
-const CustomAutoCompleteInput = ({label, field, options, onChange, formData, errors, warnLevelOnNewValue = ERROR_TYPE.NORMAL}) => {
-
-  const useStyles = value =>
-    makeStyles(() => ({
-      root: {
-        // Text in the text box color
-        '& .MuiOutlinedInput-root.Mui-error': {
-          color: acquireValidationColor(value.type),
-          // The border color on alert
-          '& fieldset': {
-            borderColor: acquireValidationColor(value.type),
-          },
-        },
-        // Helper text color
-        '& .MuiFormHelperText-root.Mui-error' :{
-          color: acquireValidationColor(value.type)
+const useStyles = value =>
+  makeStyles(() => ({
+    root: {
+      // Text in the text box color
+      '& .MuiOutlinedInput-root.Mui-error': {
+        color: acquireValidationColor(value.type),
+        // The border color on alert
+        '& fieldset': {
+          borderColor: acquireValidationColor(value.type),
         },
       },
-    }));
+      // Helper text color
+      '& .MuiFormHelperText-root.Mui-error' :{
+        color: acquireValidationColor(value.type)
+      },
+    },
+  }));
 
-  const acquireValidationColor = state => {
-    switch (state) {
-      case ERROR_TYPE.WARNING:
-        return 'DarkOrange';
-      case ERROR_TYPE.ERROR:
-        return 'red';
-      default:
-        return 'black';
-    }
-  };
+const acquireValidationColor = state => {
+  switch (state) {
+    case ERROR_TYPE.WARNING:
+      return 'DarkOrange';
+    case ERROR_TYPE.ERROR:
+      return 'red';
+    default:
+      return 'black';
+  }
+};
+
+const CustomAutoCompleteInput = ({label, field, options, onChange, formData, errors, warnLevelOnNewValue = ERROR_TYPE.NORMAL}) => {
 
   const errorReducer = (state, action) => {
     state.display = action.internalError !== undefined && warnLevelOnNewValue !== ERROR_TYPE.NORMAL ?
