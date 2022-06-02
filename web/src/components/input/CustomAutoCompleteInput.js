@@ -104,7 +104,7 @@ CustomAutoCompleteInput.propTypes = {
   errors: PropTypes.array,
   formData: PropTypes.string,
   options: PropTypes.array,
-  warnLevelOnNewValue: ERROR_TYPE
+  warnLevelOnNewValue: PropTypes.number
 };
 
 export default CustomAutoCompleteInput;
