@@ -110,6 +110,37 @@ public class StagedJobController {
     @Value("${app.s3.bucket}")
     private String bucketName;
 
+    public List<StagedRow> getRowsToSave(ParsedSheet parsedSheet){
+        List<StagedRow> rowsToSave = parsedSheet.getStagedRows();
+
+        // remove rows that are missing diver / site / date / depth
+        rowsToSave.removeIf(r -> r.getDiver().isEmpty() && r.getSiteCode().isEmpty()
+                && r.getDate().isEmpty()
+                && r.getDepth().isEmpty());
+
+        // remove duplicate rows from the end of the sheet
+        StagedRow lastRow = rowsToSave.get(rowsToSave.size() - 1);
+
+        if (lastRow.getTotal().equalsIgnoreCase("0")) {
+            Long lastRowId = lastRow.getId();
+            Optional<ValidationRow> rowsToTruncate = validation.checkDuplicateRows(true, false, rowsToSave)
+                    .stream()
+                    .filter(v -> v.getRowIds().contains(lastRowId)).findAny();
+
+            // only apply if there are three or more duplicate rows (detect 3 duplicate rows
+            // rule)
+            if (rowsToTruncate.isPresent() && rowsToTruncate.get().getRowIds().size() >= 3) {
+                Collection<Long> rowIdsToRemove = rowsToTruncate.get().getRowIds();
+                // keep the last row if the data should finish with a true zero
+                if (Arrays.asList("SURVEY NOT DONE", "DEBRIS - ZERO", "NO SPECIES FOUND")
+                        .contains(lastRow.getSpecies().toUpperCase()))
+                    rowIdsToRemove.remove(lastRowId);
+                rowsToSave.removeIf(r -> rowIdsToRemove.contains(r.getId()));
+            }
+        }
+        return rowsToSave;
+    }
+
     @PostMapping("/upload")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<UploadResponse> uploadFile(@RequestParam("withExtendedSizes") Boolean withExtendedSizes,
@@ -143,43 +174,14 @@ public class StagedJobController {
 
         try {
             ParsedSheet parsedSheet = sheetService.stageXlsxFile(file, withExtendedSizes);
+            int totalRows = parsedSheet.getStagedRows().size();
             job.setStatus(StatusJobType.STAGED);
             jobRepo.save(job);
 
-            List<StagedRow> rowsToSave = parsedSheet.getStagedRows();
-            int totalRowsCount = parsedSheet.getStagedRows().size();
+            List<StagedRow> rowsToSave = getRowsToSave(parsedSheet);
 
-            // remove rows that are missing diver / site / date / depth
-            rowsToSave.removeIf(r -> r.getDiver().isEmpty() && r.getSiteCode().isEmpty()
-                    && r.getDate().isEmpty()
-                    && r.getDepth().isEmpty());
-            int totalValidRowsCount = rowsToSave.size();
-
-            // remove duplicate rows from the end of the sheet
-            StagedRow lastRow = rowsToSave.get(rowsToSave.size() - 1);
-
-            if (lastRow.getTotal().equalsIgnoreCase("0")) {
-                Long lastRowId = lastRow.getId();
-                Optional<ValidationRow> rowsToTruncate = validation.checkDuplicateRows(true, rowsToSave)
-                        .stream()
-                        .filter(v -> v.getRowIds().contains(lastRowId)).findAny();
-
-                // only apply if there are three or more duplicate rows (detect 3 duplicate rows
-                // rule)
-                if (rowsToTruncate.isPresent() && rowsToTruncate.get().getRowIds().size() >= 3) {
-                    Collection<Long> rowIdsToRemove = rowsToTruncate.get().getRowIds();
-                    // keep the last row if the data should finish with a true zero
-                    if (Arrays.asList("SURVEY NOT DONE", "DEBRIS - ZERO", "NO SPECIES FOUND")
-                            .contains(lastRow.getSpecies().toUpperCase()))
-                        rowIdsToRemove.remove(lastRowId);
-                    rowsToSave.removeIf(r -> rowIdsToRemove.contains(r.getId()));
-                }
-            }
-
-            int invalidRows = totalValidRowsCount - rowsToSave.size();
-            String message = "Saved " + (rowsToSave.size()) + " rows. Skipped "
-                    + (totalRowsCount - totalValidRowsCount)
-                    + " empty rows and " + invalidRows + " duplicate rows.";
+            int invalidRows = totalRows - rowsToSave.size();
+            String message = "Saved " + (rowsToSave.size()) + " rows. Removed " + invalidRows + " invalid rows.";
             StagedJobLog stagedLog = StagedJobLog.builder()
                     .eventTime(new Timestamp(System.currentTimeMillis()))
                     .eventType(StagedJobEventType.STAGED).stagedJob(job)
