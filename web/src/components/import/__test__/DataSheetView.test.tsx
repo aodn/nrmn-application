@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, waitFor, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import {describe, beforeAll, afterEach} from '@jest/globals';
+import {describe, beforeAll, afterEach, test} from '@jest/globals';
 import {BrowserRouter} from 'react-router-dom';
 import * as axiosInstance from '../../../api/api';
 import {AxiosResponse} from 'axios';
-import DataSheetView from '../DataSheetView';
+import DataSheetView, {dateComparator} from '../DataSheetView';
 import {extendedMeasurements, measurements} from '../../../common/constants';
 import '@testing-library/jest-dom/extend-expect';
 
@@ -29,6 +29,7 @@ describe('<DataSheetView/>', () => {
   afterEach(() => {
     mockGetDataJob.mockClear();
   });
+
   // The export function follows the column of the grid, if the grid is right, the export fields are correct
   test('Non extend data column correct, hence export column match', async () => {
     const canned = require('./job16.json');
@@ -118,5 +119,15 @@ describe('<DataSheetView/>', () => {
         expect(screen.getByText('Happy Bay')).toBeInTheDocument();
         expect(screen.getByText('Sad Bay')).toBeInTheDocument();
       });
+  });
+
+  test('Date Comparator', async () => {
+    expect(dateComparator('01/01/2006', '01/01/2006')).toEqual(0);
+    expect(dateComparator('01/01/2006', '01/01/06')).toEqual(0);
+    expect(dateComparator('01/01/06', '01/01/2006')).toEqual(0);
+    expect(dateComparator('01/01/00', '01/01/06')).not.toBeGreaterThanOrEqual(0);
+    expect(dateComparator('01/01/06', '01/01/00')).toBeGreaterThanOrEqual(0);
+    expect(dateComparator('01/01/2000', '01/01/06')).not.toBeGreaterThanOrEqual(0);
+    expect(dateComparator('01/01/06', '01/01/2000')).toBeGreaterThanOrEqual(0);
   });
 });

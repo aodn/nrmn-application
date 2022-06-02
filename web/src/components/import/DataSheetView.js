@@ -39,7 +39,7 @@ const dateToNum = (date) => {
   return yearNumber * 10000 + monthNumber * 100 + dayNumber;
 };
 
-const dateComparator = (date1, date2) => {
+export const dateComparator = (date1, date2) => {
   var date1Number = dateToNum(date1);
   var date2Number = dateToNum(date2);
 
