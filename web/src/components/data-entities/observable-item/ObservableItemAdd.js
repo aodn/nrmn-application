@@ -8,7 +8,7 @@ import SpeciesSearch from '../../search/SpeciesSearch';
 
 import EntityContainer from '../../containers/EntityContainer';
 import CustomDropDownInput from '../../input/CustomDropDownInput';
-import CustomAutoCompleteInput from '../../input/CustomAutoCompleteInput';
+import CustomAutoCompleteInput, {ERROR_TYPE} from '../../input/CustomAutoCompleteInput';
 import CustomTextInput from '../../input/CustomTextInput';
 import CustomSearchInput from '../../input/CustomSearchInput';
 
@@ -206,6 +206,7 @@ const ObservableItemAdd = () => {
                 field="reportGroup"
                 errors={errors}
                 onChange={(t) => dispatch({field: 'reportGroup', value: t})}
+                warnLevelOnNewValue={ERROR_TYPE.WARNING}
               />
             </Grid>
             <Grid item xs={6}>
@@ -216,6 +217,7 @@ const ObservableItemAdd = () => {
                 field="habitatGroups"
                 errors={errors}
                 onChange={(t) => dispatch({field: 'habitatGroups', value: t})}
+                warnLevelOnNewValue={ERROR_TYPE.WARNING}
               />
             </Grid>
             <Grid item xs={6}>
