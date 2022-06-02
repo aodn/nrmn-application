@@ -70,7 +70,7 @@ describe('<CustomAutoCompleteInput/> options behavior', () => {
     expect(i === 'item10').toBeTruthy();
   });
 
-  test('Input do not appears in options, no warning created due to default options', async () => {
+  test('Input do not appears in options, no warning created due to warnLevelOnNewValue default value', async () => {
     let i;
     onChangeFunction.mockImplementation((t) => i = t);
 
