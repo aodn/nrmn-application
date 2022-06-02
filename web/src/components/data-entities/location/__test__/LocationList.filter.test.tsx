@@ -14,11 +14,13 @@ import stateFilterHandler from '../../../../common/state-event-handler/StateFilt
 describe('<LocationList/> filter testing', () => {
   let mockGetEntity;
   let mockGetFiltersForId;
+  let mockResetStateFilters;
   const columns = ['locationName','status','ecoRegions','countries','areas'];
 
   beforeAll(() => {
     mockGetEntity = jest.spyOn(axiosInstance, 'getEntity');
     mockGetFiltersForId = jest.spyOn(stateFilterHandler, 'getFiltersForId');
+    mockResetStateFilters = jest.spyOn(stateFilterHandler, 'resetStateFilters');
 
     // silence errors caused by not setting an AG Grid licence
     jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -69,6 +71,7 @@ describe('<LocationList/> filter testing', () => {
 
         // Restore filter not called if you pass the resetFilter false to the component
         expect(mockGetFiltersForId).toBeCalledTimes(0);
+        expect(mockResetStateFilters).toBeCalledTimes(1);
       });
   });
 
@@ -113,6 +116,7 @@ describe('<LocationList/> filter testing', () => {
 
         // Restore filter called
         expect(mockGetFiltersForId).toBeCalledTimes(1);
+        expect(mockResetStateFilters).toBeCalledTimes(0);
 
         expect(screen.getByText('Interest Bay')).toBeInTheDocument();
         screen.findByText('Antarctica').then(i => expect(i).toBe({}));
