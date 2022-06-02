@@ -14,6 +14,7 @@ const CustomAutoCompleteInput = ({label, field, options, onChange, formData, err
         // Text in the text box color
         '& .MuiOutlinedInput-root.Mui-error': {
           color: acquireValidationColor(value.type),
+          // The border color on alert
           '& fieldset': {
             borderColor: acquireValidationColor(value.type),
           },
