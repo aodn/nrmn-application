@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 
 import EntityContainer from '../../containers/EntityContainer';
 
-import CustomAutoCompleteInput, { ERROR_TYPE } from "../../input/CustomAutoCompleteInput";
+import CustomAutoCompleteInput, { ERROR_TYPE } from '../../input/CustomAutoCompleteInput';
 import CustomTextInput from '../../input/CustomTextInput';
 import CustomSearchInput from '../../input/CustomSearchInput';
 
