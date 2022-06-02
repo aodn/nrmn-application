@@ -1,9 +1,9 @@
 import SiteList from '../SiteList';
 import {rest} from 'msw';
 import {setupServer} from 'msw/node';
-import {render, waitFor} from '@testing-library/react';
+import {render, waitFor, screen} from '@testing-library/react';
 import {createMemoryHistory} from 'history'
-import {describe, beforeAll, afterAll, afterEach, test, expect} from '@jest/globals';
+import {describe, beforeAll, afterAll, afterEach, test, expect, jest} from '@jest/globals';
 import '@testing-library/jest-dom';
 import { Router } from 'react-router-dom';
 
@@ -28,15 +28,19 @@ describe('<SiteList/>', () => {
 
   const visibleColumns = ['siteCode', 'siteName', 'locationName', 'state', 'country', 'latitude', 'longitude'];
 
-  test.skip('Renders ' + visibleColumns.join(','), async () => {
-    const history = createMemoryHistory({initialEntries:[{state: {resetFilters: true}}]});
-    const {getByText} = render(<Router location={history.location} navigator={history}><SiteList /></Router>);
-    for(const row of siteTestData) 
-    for(const field of visibleColumns)
-      await waitFor(() => expect(getByText(`${row[field]}`)));
+  test('Renders ' + visibleColumns.join(','), async () => {
+    const history = createMemoryHistory();
+    render(<Router location={history.location} navigator={history}><SiteList /></Router>);
+      await waitFor(() => {
+        for(const field of visibleColumns) {
+          expect(screen.getByText(`${siteTestData[0][field]}`)).toBeInTheDocument();
+          expect(screen.getByText(`${siteTestData[1][field]}`)).toBeInTheDocument();
+          expect(screen.getByText(`${siteTestData[2][field]}`)).toBeInTheDocument();
+        }
+      });
   });
 
-  test.skip('Clone Icon appears for every site', async () => {
+  test('Clone Icon appears for every site', async () => {
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: true}}]});
     const {queryAllByTestId} = render(<Router location={history.location} navigator={history}><SiteList /></Router>);
     await waitFor(() => {
@@ -45,7 +49,7 @@ describe('<SiteList/>', () => {
     });
   });
 
-  test.skip('Delete Icon only appears for inactive sites', async () => {
+  test('Delete Icon only appears for inactive sites', async () => {
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: true}}]});
     const {queryAllByTestId} = render(<Router location={history.location} navigator={history}><SiteList /></Router>);
     await waitFor(() => {
