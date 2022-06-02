@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 
 import EntityContainer from '../../containers/EntityContainer';
 
-import CustomAutoCompleteInput from '../../input/CustomAutoCompleteInput';
+import CustomAutoCompleteInput, { ERROR_TYPE } from '../../input/CustomAutoCompleteInput';
 import CustomTextInput from '../../input/CustomTextInput';
 import CustomSearchInput from '../../input/CustomSearchInput';
 
@@ -169,6 +169,7 @@ const ObservableItemEdit = () => {
                   field="reportGroup"
                   errors={errors}
                   onChange={(t) => dispatch({field: 'reportGroup', value: t})}
+                  warnLevelOnNewValue={ERROR_TYPE.WARNING}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -179,6 +180,7 @@ const ObservableItemEdit = () => {
                   field="habitatGroups"
                   errors={errors}
                   onChange={(t) => dispatch({field: 'habitatGroups', value: t})}
+                  warnLevelOnNewValue={ERROR_TYPE.WARNING}
                 />
               </Grid>
               <Grid item xs={12}>
