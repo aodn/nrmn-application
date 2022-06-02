@@ -5,11 +5,7 @@ import { render, waitFor, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, beforeAll, afterEach } from '@jest/globals';
 import userEvent from '@testing-library/user-event';
-import { Router } from 'react-router-dom';
-import * as axiosInstance from '../../../api/api';
-import { AxiosResponse } from 'axios';
-import CustomAutoCompleteInput from '../CustomAutoCompleteInput';
-import { createMemoryHistory } from 'history';
+import CustomAutoCompleteInput, {ERROR_TYPE} from '../CustomAutoCompleteInput';
 
 jest.setTimeout(10000);
 
@@ -38,6 +34,7 @@ describe('<CustomAutoCompleteInput/> options behavior', () => {
       field={'testField'}
       errors={null}
       onChange={onChangeFunction}
+      warnLevelOnNewValue={ERROR_TYPE.WARNING}
     />);
 
     userEvent.type(screen.getByRole('combobox'), 'item1');
@@ -60,6 +57,7 @@ describe('<CustomAutoCompleteInput/> options behavior', () => {
       field={'testField'}
       errors={null}
       onChange={onChangeFunction}
+      warnLevelOnNewValue={ERROR_TYPE.WARNING}
     />);
 
     userEvent.type(screen.getByRole('combobox'), 'item10');
@@ -72,4 +70,25 @@ describe('<CustomAutoCompleteInput/> options behavior', () => {
     expect(i === 'item10').toBeTruthy();
   });
 
+  test('Input do not appears in options, no warning created due to default options', async () => {
+    let i;
+    onChangeFunction.mockImplementation((t) => i = t);
+
+    const {rerender} = render(<CustomAutoCompleteInput
+      label={'test label'}
+      options={cannedOptions}
+      formData={null}
+      field={'testField'}
+      errors={null}
+      onChange={onChangeFunction}
+    />);
+
+    userEvent.type(screen.getByRole('combobox'), 'item11');
+    expect(screen.queryByText('New "test label" will be created')).toBeNull();
+
+    // Pretended you move away from the text box by clicking the label hence onBlur trigger
+    userEvent.click(screen.getByText('test label'));
+    expect(onChangeFunction).toBeCalledTimes(1);
+    expect(i === 'item11').toBeTruthy();
+  });
 });

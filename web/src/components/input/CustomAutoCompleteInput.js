@@ -4,9 +4,9 @@ import Autocomplete from '@mui/material/Autocomplete';
 import {PropTypes} from 'prop-types';
 import { makeStyles } from '@mui/styles';
 
-const CustomAutoCompleteInput = ({label, field, options, onChange, formData, errors}) => {
+export const ERROR_TYPE = {NORMAL: 0, WARNING: 1, ERROR: 2};
 
-  const ERROR_TYPE = {NORMAL: 0, WARNING: 1, ERROR: 2};
+const CustomAutoCompleteInput = ({label, field, options, onChange, formData, errors, warnLevelOnNewValue = ERROR_TYPE.NORMAL}) => {
 
   const useStyles = value =>
     makeStyles(theme => ({
@@ -38,7 +38,8 @@ const CustomAutoCompleteInput = ({label, field, options, onChange, formData, err
   };
 
   const errorReducer = (state, action) => {
-    state.display = action.internalError !== undefined? action.internalError : state.display;
+    state.display = action.internalError !== undefined && warnLevelOnNewValue !== ERROR_TYPE.NORMAL ?
+      action.internalError : state.display;
 
     if(state.display) {
       state.message = state.internalErrorMessage;
@@ -52,7 +53,7 @@ const CustomAutoCompleteInput = ({label, field, options, onChange, formData, err
   const [validate, setValidate] = useReducer(errorReducer, {
     internalErrorMessage: 'New "' + label + '" will be created',
     display: false,
-    type: ERROR_TYPE.WARNING,
+    type: warnLevelOnNewValue,
     message: ''
   });
 
@@ -102,7 +103,8 @@ CustomAutoCompleteInput.propTypes = {
   onChange: PropTypes.func,
   errors: PropTypes.array,
   formData: PropTypes.string,
-  options: PropTypes.array
+  options: PropTypes.array,
+  warnLevelOnNewValue: ERROR_TYPE
 };
 
 export default CustomAutoCompleteInput;
