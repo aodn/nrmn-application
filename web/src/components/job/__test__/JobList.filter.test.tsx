@@ -17,11 +17,13 @@ jest.setTimeout(10000);
 describe('<JobList/> filter testing', () => {
   let mockGetResult;
   let mockGetFiltersForId;
+  let mockResetStateFilters;
   const columns = ['reference', 'isExtendedSize', 'program', 'creator', 'created'];
 
   beforeAll(() => {
     mockGetResult = jest.spyOn(axiosInstance, 'getEntity');
     mockGetFiltersForId = jest.spyOn(stateFilterHandler, 'getFiltersForId');
+    mockResetStateFilters = jest.spyOn(stateFilterHandler, 'resetStateFilters');
 
     // silence errors caused by not setting an AG Grid licence
     jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -86,6 +88,7 @@ describe('<JobList/> filter testing', () => {
 
         // Restore filter not called if you pass the resetFilter false to the component
         expect(mockGetFiltersForId).toBeCalledTimes(0);
+        expect(mockResetStateFilters).toBeCalledTimes(1);
       });
   });
 
@@ -137,6 +140,7 @@ describe('<JobList/> filter testing', () => {
 
         // Restore filter called
         expect(mockGetFiltersForId).toBeCalledTimes(1);
+        expect(mockResetStateFilters).toBeCalledTimes(0);
 
         // Given filter, these items filtered out even you expended the list
         screen.findByText('failed1.xlsx').then(i => expect(i).toBe({}));

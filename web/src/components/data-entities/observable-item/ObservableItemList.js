@@ -37,6 +37,10 @@ const ObservableItemList = () => {
       if(!(location?.state?.resetFilters)) {
         stateFilterHandler.restoreStateFilters(gridRef);
       }
+      else {
+        stateFilterHandler.resetStateFilters(gridRef);
+      }
+
       autoSizeAll(event, false);
     });
   };
