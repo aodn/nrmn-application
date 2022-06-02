@@ -40,7 +40,7 @@ describe('<SiteList/>', () => {
     const history = createMemoryHistory();
     render(<Router location={history.location} navigator={history}><SiteList /></Router>);
 
-    // At least the first data appears before scanning the rest of it
+    // Wait first piece of info appears before scanning the rest of it
     await waitFor(() => expect(screen.getByText('AAA')).toBeInTheDocument(), {timeout: 10000})
       .then(() => {
         for(const field of visibleColumns) {
