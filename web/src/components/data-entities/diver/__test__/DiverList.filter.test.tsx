@@ -16,11 +16,13 @@ jest.setTimeout(10000);
 describe('<DiverList/> filter testing', () => {
   let mockGetResult;
   let mockGetFiltersForId;
+  let mockResetStateFilters;
   const columns = ['initials', 'fullName'];
 
   beforeAll(() => {
     mockGetResult = jest.spyOn(axiosInstance, 'getResult');
     mockGetFiltersForId = jest.spyOn(stateFilterHandler, 'getFiltersForId');
+    mockResetStateFilters = jest.spyOn(stateFilterHandler, 'resetStateFilters');
 
     // silence errors caused by not setting an AG Grid licence
     jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -72,6 +74,7 @@ describe('<DiverList/> filter testing', () => {
 
         // Restore filter not called if you pass the resetFilter false to the component
         expect(mockGetFiltersForId).toBeCalledTimes(0);
+        expect(mockResetStateFilters).toBeCalledTimes(1);
       });
   });
 
@@ -116,6 +119,7 @@ describe('<DiverList/> filter testing', () => {
 
         // Restore filter called
         expect(mockGetFiltersForId).toBeCalledTimes(1);
+        expect(mockResetStateFilters).toBeCalledTimes(0);
 
         // id = 1 so show this one
         expect(screen.getByText('Apple Orange')).toBeInTheDocument();
