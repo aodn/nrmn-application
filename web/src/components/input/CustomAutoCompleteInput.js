@@ -9,7 +9,7 @@ export const ERROR_TYPE = {NORMAL: 0, WARNING: 1, ERROR: 2};
 const CustomAutoCompleteInput = ({label, field, options, onChange, formData, errors, warnLevelOnNewValue = ERROR_TYPE.NORMAL}) => {
 
   const useStyles = value =>
-    makeStyles(theme => ({
+    makeStyles(() => ({
       root: {
         // Text in the text box color
         '& .MuiOutlinedInput-root.Mui-error': {
@@ -52,12 +52,14 @@ const CustomAutoCompleteInput = ({label, field, options, onChange, formData, err
 
   const [validate, setValidate] = useReducer(errorReducer, {
     internalErrorMessage: 'New "' + label + '" will be created',
+    externalErrorMessage: errors?.message,
+    field: field,
     display: false,
     type: warnLevelOnNewValue,
     message: ''
   });
 
-  const onInputChange = (event, value, reason) => {
+  const onInputChange = (event, value) => {
     if(options.find(p => p.toLowerCase() === value.toLowerCase()) === undefined && value !== '') {
       setValidate({ internalError: true});
     }
@@ -77,7 +79,7 @@ const CustomAutoCompleteInput = ({label, field, options, onChange, formData, err
         freeSolo
         value={formData}
         onBlur={(e) => onChange(e.target.value)}
-        onInputChange={(e, v, r) => onInputChange(e,v,r)}
+        onInputChange={(e, v)=> onInputChange(e,v)}
         renderInput={(params) => (
           <TextField
             {...params}
