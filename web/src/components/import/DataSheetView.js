@@ -30,6 +30,28 @@ const pushUndo = (api, delta) => {
   return ctx.undoStack.length;
 };
 
+const dateToNum = (date) => {
+  if (date === undefined || (date === null && (date.length !== 10 || date.length !== 8))) return null;
+
+  const yearNumber = date.length === 10 ? date.substring(6, 10) : '20' + date.substring(6, 8);
+  const monthNumber = date.substring(3, 5);
+  const dayNumber = date.substring(0, 2);
+  return yearNumber * 10000 + monthNumber * 100 + dayNumber;
+};
+
+export const dateComparator = (date1, date2) => {
+  var date1Number = dateToNum(date1);
+  var date2Number = dateToNum(date2);
+
+  if (date1Number === null && date2Number === null) return 0;
+
+  if (date1Number === null) return -1;
+
+  if (date2Number === null) return 1;
+
+  return date1Number - date2Number;
+};
+
 const popUndo = (api) => {
   const ctx = api.gridOptionsWrapper.gridOptions.context;
   const deltaSet = ctx.undoStack.pop();
@@ -630,17 +652,37 @@ const DataSheetView = ({onIngest, isAdmin}) => {
 
   const onClickExcelExport = (api, name, isExtended) => {
     const columns = [
-      'id','diver','buddy','siteCode','siteName','latitude','longitude','date','vis','direction','time',
-      'P-Qs','depth','method','block','code','species','commonName','total','inverts', ...measurements.map((m) => m.field)];
+      'id',
+      'diver',
+      'buddy',
+      'siteCode',
+      'siteName',
+      'latitude',
+      'longitude',
+      'date',
+      'vis',
+      'direction',
+      'time',
+      'P-Qs',
+      'depth',
+      'method',
+      'block',
+      'code',
+      'species',
+      'commonName',
+      'total',
+      'inverts',
+      ...measurements.map((m) => m.field)
+    ];
 
-    const extendedColumns = [...extendedMeasurements.map((m) => m.field),'isInvertSizing'];
-    const requiredColumns = isExtended ? [...columns, ...extendedColumns]: columns;
+    const extendedColumns = [...extendedMeasurements.map((m) => m.field), 'isInvertSizing'];
+    const requiredColumns = isExtended ? [...columns, ...extendedColumns] : columns;
     const headers = [];
 
     requiredColumns.forEach((x) => {
       // Get the row display name from the fields, this is because we turn on skipColumnHeaders so that
       // we can add empty row, '' is used to force type to string.
-      headers.push({ data: { value: '' + api.getColumnDefs().filter(y => y.field === x)[0].headerName, type: 'String' } });
+      headers.push({data: {value: '' + api.getColumnDefs().filter((y) => y.field === x)[0].headerName, type: 'String'}});
     });
 
     api.exportDataAsExcel({
@@ -648,7 +690,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
       author: 'NRMN',
       columnKeys: requiredColumns,
       skipColumnHeaders: true,
-      prependContent: [headers, []],  // This make row 2 an empty row due to file standard
+      prependContent: [headers, []], // This make row 2 an empty row due to file standard
       fileName: `export_${name}`
     });
   };
@@ -692,7 +734,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             <Box m={1} ml={0}>
               <Button
                 variant="outlined"
-                onClick={ () => onClickExcelExport(gridApi, job.reference, job.isExtendedSize) }
+                onClick={() => onClickExcelExport(gridApi, job.reference, job.isExtendedSize)}
                 startIcon={<CloudDownloadIcon />}
               >
                 Export
@@ -790,7 +832,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             <AgGridColumn field="siteName" headerName="Site Name" minWidth={160} />
             <AgGridColumn field="latitude" headerName="Latitude" />
             <AgGridColumn field="longitude" headerName="Longitude" />
-            <AgGridColumn field="date" headerName="Date" rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="date" headerName="Date" rowGroup={false} enableRowGroup={true} comparator={dateComparator} />
             <AgGridColumn field="vis" headerName="Vis" />
             <AgGridColumn field="direction" headerName="Direction" />
             <AgGridColumn field="time" headerName="Time" />
