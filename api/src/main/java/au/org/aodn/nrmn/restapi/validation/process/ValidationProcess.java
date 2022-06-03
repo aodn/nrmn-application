@@ -84,11 +84,11 @@ public class ValidationProcess {
     private static final double[] INVERT_VALUES = { 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 16, 17, 18, 19, 20, 22, 24, 26, 28, 30 };
 
     // VALIDATION: Rows duplicated
-    public Collection<ValidationRow> checkDuplicateRows(boolean includeTotal, Collection<StagedRow> rows) {
+    public Collection<ValidationRow> checkDuplicateRows(boolean includeTotal, boolean includeSpeciesCode, Collection<StagedRow> rows) {
         Map<String, List<Long>> mappedRows = new HashMap<String, List<Long>>();
         Map<String, String> mappedSpecies = new HashMap<String, String>();
         rows.stream().forEach(r -> {
-            String rowHash = r.getContentsHash(includeTotal);
+            String rowHash = r.getContentsHash(includeTotal, includeSpeciesCode);
             List<Long> rowIds = mappedRows.getOrDefault(rowHash, new ArrayList<Long>());
             rowIds.add(r.getId());
             if(!mappedSpecies.containsKey(rowHash))
@@ -115,7 +115,7 @@ public class ValidationProcess {
 
         ValidationResultSet errors = new ValidationResultSet();
 
-        errors.addGlobal(checkDuplicateRows(false, rows));
+        errors.addGlobal(checkDuplicateRows(false, true, rows));
 
         for (StagedRow row : rows) {
 
