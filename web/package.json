@@ -6,7 +6,7 @@
     "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.8.0",
     "@mui/lab": "^5.0.0-alpha.83",
-    "@mui/material": "^5.7.0",
+    "@mui/material": "^5.8.2",
     "@mui/styles": "^5.8.0",
     "ag-grid-community": "27.2.1",
     "ag-grid-enterprise": "27.3.0",
