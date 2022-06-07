@@ -1,24 +1,43 @@
 import React from 'react';
-import { render, waitFor, screen } from '@testing-library/react';
+import {render, waitFor, screen} from '@testing-library/react';
 import '@testing-library/jest-dom';
-import {describe, beforeAll, afterEach} from '@jest/globals';
+import {describe, beforeAll, afterEach, test} from '@jest/globals';
 import {BrowserRouter} from 'react-router-dom';
 import * as axiosInstance from '../../../api/api';
 import {AxiosResponse} from 'axios';
-import DataSheetView from '../DataSheetView';
+import DataSheetView, {dateComparator} from '../DataSheetView';
 import {extendedMeasurements, measurements} from '../../../common/constants';
 import '@testing-library/jest-dom/extend-expect';
 
 describe('<DataSheetView/>', () => {
-
   let mockGetDataJob;
   const ingest = () => {};
 
   const columns = [
-    'ID','Diver','Buddy','Site No.','Site Name','Latitude','Longitude','Date','Vis','Direction','Time',
-    'P-Qs','Depth','Method','Block','Code','Species','Common Name','Total','Inverts',...measurements.map((m) => m.fishSize)];
+    'ID',
+    'Diver',
+    'Buddy',
+    'Site No.',
+    'Site Name',
+    'Latitude',
+    'Longitude',
+    'Date',
+    'Vis',
+    'Direction',
+    'Time',
+    'P-Qs',
+    'Depth',
+    'Method',
+    'Block',
+    'Code',
+    'Species',
+    'Common Name',
+    'Total',
+    'Inverts',
+    ...measurements.map((m) => m.fishSize)
+  ];
 
-  const extendedColumns = [...extendedMeasurements.map((m) => m.fishSize),'Use InvertSizing'];
+  const extendedColumns = [...extendedMeasurements.map((m) => m.fishSize), 'Use InvertSizing'];
 
   beforeAll(() => {
     mockGetDataJob = jest.spyOn(axiosInstance, 'getDataJob');
@@ -29,6 +48,7 @@ describe('<DataSheetView/>', () => {
   afterEach(() => {
     mockGetDataJob.mockClear();
   });
+
   // The export function follows the column of the grid, if the grid is right, the export fields are correct
   test('Non extend data column correct, hence export column match', async () => {
     const canned = require('./job16.json');
@@ -38,34 +58,42 @@ describe('<DataSheetView/>', () => {
       const raw = {
         config: undefined,
         data: canned,
-        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        headers: {'Content-Type': 'application/json', Accept: 'application/json'},
         status: 200,
         statusText: url
       };
 
-      return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
-      }));
+      return (
+        new Promise<AxiosResponse>((resolve) => {
+          resolve(raw);
+        })
+      );
     });
 
     // Need to wrap with a Router otherwise the useLocation() error shows, the result will auto set to screen object
-    const {rerender} = render(<BrowserRouter><DataSheetView onIngest={ingest} isAdmin={false}/></BrowserRouter>);
+    const {rerender} = render(
+      <BrowserRouter>
+        <DataSheetView onIngest={ingest} isAdmin={false} />
+      </BrowserRouter>
+    );
 
     await waitFor(() => screen.findByText('user_noextend.xlsx'))
       .then(() => {
-
         // verify default columns exist
-        columns.forEach(x => {
+        columns.forEach((x) => {
           expect(screen.queryAllByText(x).length).toBeGreaterThanOrEqual(1);
         });
-
       })
       .finally(() => {
         // Data loaded after initial render, need refresh to trigger HTML update
-        rerender(<BrowserRouter><DataSheetView onIngest={ingest} isAdmin={false}/></BrowserRouter>);
+        rerender(
+          <BrowserRouter>
+            <DataSheetView onIngest={ingest} isAdmin={false} />
+          </BrowserRouter>
+        );
 
         // non extend job and hence you will not have the following column
-        extendedColumns.forEach(x => {
+        extendedColumns.forEach((x) => {
           expect(screen.queryAllByText(x).length).toEqual(0);
         });
 
@@ -83,33 +111,42 @@ describe('<DataSheetView/>', () => {
       const raw = {
         config: undefined,
         data: nonextend,
-        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        headers: {'Content-Type': 'application/json', Accept: 'application/json'},
         status: 200,
         statusText: url
       };
 
-      return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
-      }));
+      return (
+        new Promise<AxiosResponse>((resolve) => {
+          resolve(raw);
+        })
+      );
     });
 
     // Need to wrap with a Router otherwise the useLocation() error shows, the result will auto set to screen object
-    const {rerender} = render(<BrowserRouter><DataSheetView onIngest={ingest} isAdmin={false}/></BrowserRouter>);
+    const {rerender} = render(
+      <BrowserRouter>
+        <DataSheetView onIngest={ingest} isAdmin={false} />
+      </BrowserRouter>
+    );
 
     await waitFor(() => screen.findByText('user_extend.xlsx'))
       .then(() => {
-
         // verify default columns exist
-        columns.forEach(x => {
+        columns.forEach((x) => {
           expect(screen.queryAllByText(x).length).toBeGreaterThanOrEqual(1);
         });
       })
       .finally(() => {
         // Data loaded after initial render, need refresh to trigger HTML update
-        rerender(<BrowserRouter><DataSheetView onIngest={ingest} isAdmin={false}/></BrowserRouter>);
+        rerender(
+          <BrowserRouter>
+            <DataSheetView onIngest={ingest} isAdmin={false} />
+          </BrowserRouter>
+        );
 
         // Extend job and hence you will have the following column
-        extendedColumns.forEach(x => {
+        extendedColumns.forEach((x) => {
           expect(screen.queryAllByText(x).length).toBeGreaterThanOrEqual(1);
         });
 
@@ -118,5 +155,15 @@ describe('<DataSheetView/>', () => {
         expect(screen.getByText('Happy Bay')).toBeInTheDocument();
         expect(screen.getByText('Sad Bay')).toBeInTheDocument();
       });
+  });
+
+  test('Date Comparator', async () => {
+    expect(dateComparator('01/01/2006', '01/01/2006')).toEqual(0);
+    expect(dateComparator('01/01/2006', '01/01/06')).toEqual(0);
+    expect(dateComparator('01/01/06', '01/01/2006')).toEqual(0);
+    expect(dateComparator('01/01/00', '01/01/06')).not.toBeGreaterThanOrEqual(0);
+    expect(dateComparator('01/01/06', '01/01/00')).toBeGreaterThanOrEqual(0);
+    expect(dateComparator('01/01/2000', '01/01/06')).not.toBeGreaterThanOrEqual(0);
+    expect(dateComparator('01/01/06', '01/01/2000')).toBeGreaterThanOrEqual(0);
   });
 });

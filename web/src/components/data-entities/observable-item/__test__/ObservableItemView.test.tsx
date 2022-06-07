@@ -1,5 +1,3 @@
-// @ts-ignore
-import React from 'react';
 import ObservableItemView from '../ObservableItemView';
 import {rest} from 'msw';
 import {setupServer} from 'msw/node';
@@ -37,7 +35,7 @@ const observableItemTestData = {
 };
 
 const observableItemNullData = {...observableItemTestData};
-for(const key in observableItemNullData) observableItemNullData[key] = null;
+for (const key in observableItemNullData) observableItemNullData[key] = null;
 
 const getTestData = (req, res, ctx) => {
   return res(ctx.json(req.params[0] == '1' ? observableItemTestData : observableItemNullData));
@@ -51,7 +49,7 @@ afterAll(() => server.close());
 
 describe('<ObservableItemView/>', () => {
   test('Renders fields', async () => {
-    const history = createMemoryHistory({initialEntries: [{pathname: '/reference/observableItem/1', state: {resetFilters: true} }]});
+    const history = createMemoryHistory({initialEntries: [{pathname: '/reference/observableItem/1', state: {resetFilters: true}}]});
     const {getByText} = render(
       <Router location={history.location} navigator={history}>
         <Routes>
@@ -90,14 +88,14 @@ describe('<ObservableItemView/>', () => {
     });
   });
 
-  test('Renders when ull', async () => {
+  test('Renders when null', async () => {
     // Avoid loading filter from storage
-    const history = createMemoryHistory({initialEntries: [{ pathname: '/reference/observableItem/2', state: {resetFilters: true} }]});
+    const history = createMemoryHistory({initialEntries: [{pathname: '/reference/observableItem/2', state: {resetFilters: true}}]});
 
     const {getByText} = render(
-      <Router location={ history.location } navigator={history}>
+      <Router location={history.location} navigator={history}>
         <Routes>
-          <Route path="/reference/observableItem/:id" element={<ObservableItemView />}/>
+          <Route path="/reference/observableItem/:id" element={<ObservableItemView />} />
         </Routes>
       </Router>
     );

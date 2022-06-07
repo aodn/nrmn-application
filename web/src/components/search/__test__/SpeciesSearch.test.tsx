@@ -63,10 +63,10 @@ describe('<SiteList/>', () => {
         expect(queryByText(`${prop}.${page}.0`)).toBeInTheDocument();
         expect(queryByText(`${prop}.${page + 1}.0`)).not.toBeInTheDocument();
         if (page > 0) expect(queryByText(`${prop}.${page - 1}.0`)).not.toBeInTheDocument();
-        expect(queryByText(`${prop}.${page}.${pages[page].length-1}`)).toBeInTheDocument();
+        expect(queryByText(`${prop}.${page}.${pages[page].length - 1}`)).toBeInTheDocument();
         expect(queryByText(`${prop}.${page}.${pages[page].length}`)).not.toBeInTheDocument();
       }
-      expect(queryByText(`${page*50 + 1}–${page*50 + pages[page].length} of`, {exact: false})).toBeInTheDocument();
+      expect(queryByText(`${page * 50 + 1}–${page * 50 + pages[page].length} of`, {exact: false})).toBeInTheDocument();
     };
 
     await waitFor(() => expectedPage(0));

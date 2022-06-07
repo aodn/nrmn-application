@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.service;
 import java.io.InputStream;
 import java.util.List;
 
+import au.org.aodn.nrmn.restapi.controller.StagedJobController;
 import au.org.aodn.nrmn.restapi.enumeration.SurveyField;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,9 @@ public class SpreadSheetServiceIT {
 
     @Autowired
     SpreadSheetService sheetService;
+
+    @Autowired
+    StagedJobController stagedJobController;
 
     @Test
     public void correctShortHeadersShouldBeValid() throws Exception {
@@ -213,6 +217,15 @@ public class SpreadSheetServiceIT {
 
         assertEquals("-1", stageSurveys.get(6).getLatitude());
         assertEquals("1", stageSurveys.get(6).getLongitude());
+    }
+
+    @Test
+    void duplicateRowsShouldBeRemoved() throws Exception {
+        FileSystemResource file = new FileSystemResource("src/test/resources/sheets/duplicateCheck.xlsx");
+        MockMultipartFile mockFile = new MockMultipartFile("sheets/duplicateCheck.xlsx", file.getInputStream());
+        var parsedSheet = sheetService.stageXlsxFile(mockFile, true);
+        var validRows = stagedJobController.getRowsToSave(parsedSheet);
+        assertEquals(20, validRows.size());
     }
 
 }
