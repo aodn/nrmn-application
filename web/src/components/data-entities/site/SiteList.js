@@ -41,7 +41,7 @@ const SiteList = () => {
         stateFilterHandler.resetStateFilters(gridRef);
       }
 
-      autoSizeAll(event, false);
+      // autoSizeAll(event, false);
     });
   };
 

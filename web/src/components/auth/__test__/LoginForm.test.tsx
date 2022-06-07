@@ -1,5 +1,5 @@
 import LoginForm from '../LoginForm';
-import {DefaultRequestBody, rest} from 'msw';
+import {DefaultBodyType, rest} from 'msw';
 import {setupServer} from 'msw/node';
 import {render, fireEvent, waitFor} from '@testing-library/react';
 import {describe, beforeAll, afterAll, afterEach, test, expect} from "@jest/globals";
@@ -9,7 +9,7 @@ const UNAUTHORIZED = 'Unauthorised';
 const TEST_USERNAME = 'test@example.com';
 const TEST_PASSWORD = 'abc123';
 
-type LoginRequest<T extends DefaultRequestBody> = T & {
+type LoginRequest<T extends DefaultBodyType> = T & {
   body: {
     username: string;
     password: string;
