@@ -6,7 +6,7 @@ import ValidationSummary from '../../../import/panel/ValidationSummary';
 const SummaryPanel = ({api, context}) => {
   const [blocking, setBlocking] = useState([]);
 
-  const handleItemClick = (item, noFilter) => {
+ // const handleItemClick = (item, noFilter) => {
     // const rowId = item.row || item.rowIds[0];
     // context.focusedRows = noFilter ? item.rowIds || [item.row] : [];
     // const row = context.rowData.find((r) => r.id === rowId);
@@ -17,7 +17,9 @@ const SummaryPanel = ({api, context}) => {
     // if (item.columnNames) for (const column of item.columnNames) props.api.ensureColumnVisible(column);
     // props.api.setFilterModel(noFilter ? null : {id: {type: 'set', values: item.rowIds.map((id) => id.toString())}});
     // props.api.redrawRows();
-  };
+  //  };
+
+  const handleItemClick = () => {};
 
   const updateValidations = () => {
     setBlocking(context.validations?.blocking ?? []);
@@ -26,7 +28,7 @@ const SummaryPanel = ({api, context}) => {
   useEffect(() => {
     api.addEventListener('toolPanelVisibleChanged', updateValidations);
     return () => api.removeEventListener('toolPanelVisibleChanged', updateValidations);
-  }, []);
+  });
 
   return (
     <Box m={2} mr={4}>
