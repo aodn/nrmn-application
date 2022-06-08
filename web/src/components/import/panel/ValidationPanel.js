@@ -3,8 +3,7 @@ import {Box, Divider, Table, TableBody, TableCell, TableRow, Tooltip, Typography
 import {PropTypes} from 'prop-types';
 import ValidationSummary from './ValidationSummary';
 
-const ValidationPanel = (props) => {
-  const context = props.api.gridOptionsWrapper.gridOptions.context;
+const ValidationPanel = ({api, context}) => {
   const summary = context.summary;
   const errorList = context.errorList;
 
@@ -13,12 +12,12 @@ const ValidationPanel = (props) => {
     context.focusedRows = noFilter ? item.rowIds || [item.row] : [];
     const row = context.rowData.find((r) => r.id === rowId);
     let visible = false;
-    props.api.forEachNodeAfterFilter((n) => (visible = n.data.id === row.id || visible));
-    if (visible) props.api.ensureNodeVisible(row, 'middle');
-    if (item.columnName) props.api.ensureColumnVisible(item.columnName);
-    if (item.columnNames) for (const column of item.columnNames) props.api.ensureColumnVisible(column);
-    props.api.setFilterModel(noFilter ? null : {id: {type: 'set', values: item.rowIds.map((id) => id.toString())}});
-    props.api.redrawRows();
+    api.forEachNodeAfterFilter((n) => (visible = n.data.id === row.id || visible));
+    if (visible) api.ensureNodeVisible(row, 'middle');
+    if (item.columnName) api.ensureColumnVisible(item.columnName);
+    if (item.columnNames) for (const column of item.columnNames) api.ensureColumnVisible(column);
+    api.setFilterModel(noFilter ? null : {id: {type: 'set', values: item.rowIds.map((id) => id.toString())}});
+    api.redrawRows();
   };
 
   const siteTooltip = summary.foundSites
@@ -134,7 +133,7 @@ const ValidationPanel = (props) => {
 
 ValidationPanel.propTypes = {
   api: PropTypes.object,
-  columnApi: PropTypes.object
+  context: PropTypes.object
 };
 
 export default ValidationPanel;

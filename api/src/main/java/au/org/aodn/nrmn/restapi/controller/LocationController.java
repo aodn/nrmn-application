@@ -55,8 +55,11 @@ public class LocationController {
 
     @GetMapping("/location/{id}")
     public ResponseEntity<?> getLocation(@PathVariable Integer id) {
-        var res = locationRepository.getReferenceById(id);
-        return ResponseEntity.ok(new LocationDto(res));
+        var lOptional = locationRepository.findById(id);
+        if(!lOptional.isPresent())
+            return ResponseEntity.notFound().build();
+        var location = lOptional.get();
+        return ResponseEntity.ok(new LocationDto(location));
     }
 
     @PutMapping("/location/{id}")

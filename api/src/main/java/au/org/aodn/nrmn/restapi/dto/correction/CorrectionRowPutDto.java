@@ -12,7 +12,7 @@ public class CorrectionRowPutDto {
     Long id;
     Collection<Integer> observationIds;
     Long surveyId;
-    Long diverId;
+    Integer diverId;
     String initials;
     String siteCode;
     Integer depth;

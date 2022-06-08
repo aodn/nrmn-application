@@ -2,7 +2,7 @@ import {Box, Button, Typography} from '@mui/material';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import React, {useMemo, useState} from 'react';
+import React, {useRef, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {getCorrections, validateSurveyCorrection, submitSurveyCorrection} from '../../../api/api';
 import {allMeasurements} from '../../../common/constants';
@@ -10,17 +10,18 @@ import LoadingOverlay from '../../overlays/LoadingOverlay';
 import SummaryPanel from './panel/SummaryPanel';
 import SurveyMeasurementHeader from './SurveyMeasurementHeader';
 import {PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon, CloudUpload as CloudUploadIcon} from '@mui/icons-material/';
+import ValidationPanel from '../../import/panel/ValidationPanel';
 
 const SurveyCorrect = () => {
   const surveyId = useParams()?.id;
-
+  const gridRef = useRef();
   const [rowData, setRowData] = useState();
-  const [gridApi, setGridApi] = useState();
 
   const components = useMemo(() => {
     return {
       loadingOverlay: LoadingOverlay,
-      summaryPanel: SummaryPanel
+      summaryPanel: SummaryPanel,
+      validationPanel: ValidationPanel
     };
   }, []);
 
@@ -59,7 +60,7 @@ const SurveyCorrect = () => {
       {field: 'diverId', label: 'Diver ID', hide: true},
       {field: 'initials', label: 'Diver', hide: false},
       {field: 'siteCode', label: 'Site Code', hide: true},
-      {field: 'depth', label: 'Depth', hide: false},
+      {field: 'depth', label: 'Depth', hide: false, editable: true},
       {field: 'surveyDate', label: 'Survey Date', hide: false},
       {field: 'surveyTime', label: 'Survey Time', hide: false},
       {field: 'visibility', label: 'Visibility', hide: false},
@@ -77,7 +78,6 @@ const SurveyCorrect = () => {
   }, []);
 
   const onGridReady = ({api}) => {
-    setGridApi(api);
     getCorrections(surveyId).then((res) => {
       api.hideOverlay();
       if (res.status !== 200) return;
@@ -93,18 +93,59 @@ const SurveyCorrect = () => {
 
   const packedData = () => {
     const packedData = [];
-    gridApi.forEachNode((rowNode, index) => {
+    gridRef.current.api.forEachNode((rowNode, index) => {
       const data = rowNode.data;
       packedData.push({id: index, ...data, 19: JSON.stringify(data[19])});
     });
     return packedData;
   };
 
-  const onValidate = () => validateSurveyCorrection(surveyId, packedData());
+  const gridOptions = {context: {useOverlay: 'Loading Survey Correction...', validations: []}};
+
+  const generateErrorTree = (rowData, rowPos, errors) => {
+    const tree = {blocking: [], warning: [], info: [], duplicate: []};
+    errors
+      .sort((a, b) => (a.message < b.message ? -1 : a.message > b.message ? 1 : 0))
+      .forEach((e) => {
+        const rows = rowData.filter((r) => e.rowIds.includes(r.id));
+        let summary = [];
+        if (e.columnNames && e.categoryId !== 'SPAN') {
+          const col = e.columnNames[0];
+          summary = rows.reduce((acc, r) => {
+            const rowPosition = rowData.find((d) => d.id === r.id)?.id;
+            const rowNumber = rowPos.indexOf(rowPosition) + 1;
+            const existingIdx = acc.findIndex((m) => m.columnName === col && m.value === r[col]);
+            if (existingIdx >= 0 && isNaN(parseInt(acc[existingIdx].columnName)))
+              acc[existingIdx] = {
+                columnName: col,
+                value: r[col],
+                rowIds: [...acc[existingIdx].rowIds, r.id],
+                rowNumbers: [...acc[existingIdx].rowNumbers, rowNumber]
+              };
+            else
+              acc.push({columnName: col, value: r[col], rowIds: [r.id], rowNumbers: [rowNumber], isInvertSize: r.isInvertSizing === 'Yes'});
+            return acc;
+          }, []);
+        } else {
+          const rowPositions = e.rowIds.map((r) => rowData.find((d) => d.id === r)?.id).filter((r) => r);
+          const rowNumbers = rowPositions.map((r) => rowPos.indexOf(r) + 1);
+          summary = [{rowIds: e.rowIds, columnNames: e.columnNames, rowNumbers}];
+        }
+        tree[e.levelId.toLowerCase()].push({key: `err-${e.id}`, message: e.message, count: e.rowIds.length, description: summary});
+      });
+    return tree;
+  };
+
+  const onValidate = async () => {
+    const result = await validateSurveyCorrection(surveyId, packedData());
+    let context = gridRef.current.api.gridOptionsWrapper.gridOptions.context;
+
+    const rowPos = rowData.map((r) => r.id).sort((a, b) => a - b);
+    const errorTree = generateErrorTree(rowData,rowPos, result.data.errors);
+    context.validations = errorTree;
+  };
 
   const onSubmit = () => submitSurveyCorrection(surveyId, packedData());
-
-  const onModelUpdated = () => {};
 
   return (
     <>
@@ -113,7 +154,7 @@ const SurveyCorrect = () => {
           <Typography variant="h4">Survey Correction</Typography>
         </Box>
         <Box p={1} minWidth={120}>
-          <Button onClick={onValidate} variant="contained" startIcon={<PlaylistAddCheckOutlinedIcon />}>
+          <Button onClick={() => onValidate(gridOptions)} variant="contained" startIcon={<PlaylistAddCheckOutlinedIcon />}>
             {`Validate`}
           </Button>
         </Box>
@@ -125,18 +166,18 @@ const SurveyCorrect = () => {
       </Box>
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
         <AgGridReact
+          ref={gridRef}
+          gridOptions={gridOptions}
           animateRows
           cellFadeDelay={100}
           cellFlashDelay={100}
           components={components}
-          context={{useOverlay: 'Loading Survey Correction'}}
           defaultColDef={defaultColDef}
           enableBrowserTooltips
           enableRangeSelection
-          getRowId={(r) => r.data[0]}
+          getRowId={(r) => r.data.id}
           loadingOverlayComponent="loadingOverlay"
           onGridReady={onGridReady}
-          onModelUpdated={onModelUpdated}
           onRowDataUpdated={(e) => e.columnApi.autoSizeAllColumns()}
           pivotMode={false}
           rowData={rowData}
@@ -151,12 +192,13 @@ const SurveyCorrect = () => {
                 field={header.field}
                 headerName={header.label}
                 hide={header.hide}
+
                 cellEditor="agSelectCellEditor"
                 cellEditorParams={{values: [true, false]}}
                 valueFormatter={(e) => (e.value === true ? 'Yes' : 'No')}
               />
             ) : (
-              <AgGridColumn key={idx} field={header.field} headerName={header.label} hide={header.hide} cellEditor="agTextCellEditor" />
+              <AgGridColumn key={idx} field={header.field} headerName={header.label} hide={header.hide} cellEditor="agTextCellEditor" editable={header.editable ?? false} />
             )
           )}
           <AgGridColumn field={'measurements.0'} headerName="Unsized" />

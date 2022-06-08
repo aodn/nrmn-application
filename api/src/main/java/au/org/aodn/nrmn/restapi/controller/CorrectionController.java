@@ -22,8 +22,11 @@ import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.CorrectionRowRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidationService;
 import au.org.aodn.nrmn.restapi.service.validation.NullValidationService;
@@ -52,6 +55,9 @@ public class CorrectionController {
 
     @Autowired
     NullValidationService nullValidationService;
+
+    @Autowired
+    SurveyRepository surveyRepository;
     
     @GetMapping(path = "correct/{survey_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
@@ -63,25 +69,36 @@ public class CorrectionController {
 
     @PostMapping(path = "validate/{survey_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<?> validateSurveyCorrection(@PathVariable("survey_id") Long surveyId, Authentication authentication, @RequestBody List<CorrectionRowPutDto> rowUpdates) {
+    public ResponseEntity<?> validateSurveyCorrection(@PathVariable("survey_id") Integer surveyId, Authentication authentication, @RequestBody Collection<CorrectionRowPutDto> rowUpdates) {
         
         String logMessage =  "correction validation: username: " + authentication.getName() + " survey: " + surveyId;
         userAuditRepo.save(new UserActionAudit("correct/survey", logMessage));
-
-        List<Integer> observableItemIds = rowUpdates.stream().map(r -> r.getObservableItemId()).collect(Collectors.toList());
-        var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
-        observationRepository.getSpeciesAttributesByIds(observableItemIds).stream().forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
-
-        var observationIdsToReplace = new ArrayList<Integer>();
         Collection<ValidationError> errors = new HashSet<ValidationError>();
-        for(var row: rowUpdates) {
-            observationIdsToReplace.addAll(row.getObservationIds());
-            errors.addAll(measurementValidationService.validate(speciesAttributes, row));
-            errors.addAll(nullValidationService.validate(row));
-        }
 
-        logger.info("observations: " + observationIdsToReplace.toString());
-        
+        try
+        {
+            List<Integer> observableItemIds = rowUpdates.stream().map(r -> r.getObservableItemId()).collect(Collectors.toList());
+            var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
+            observationRepository.getSpeciesAttributesByIds(observableItemIds).stream().forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
+
+            var existingSurveyOptional = surveyRepository.findById(surveyId);
+            if(!existingSurveyOptional.isPresent())
+                return ResponseEntity.notFound().build();
+                
+            var existingSurvey = existingSurveyOptional.get();
+            var observationIdsToReplace = new ArrayList<Integer>();
+            errors.addAll(nullValidationService.validate(existingSurvey, rowUpdates));
+            for(var row: rowUpdates) {
+                observationIdsToReplace.addAll(row.getObservationIds());
+                errors.addAll(measurementValidationService.validate(speciesAttributes, row));
+            }
+
+            logger.info("observations: " + observationIdsToReplace.toString());
+        }
+        catch(Exception exception)
+        {
+            errors.add(new ValidationError(ValidationCategory.RUNTIME, ValidationLevel.BLOCKING, exception.getMessage(), null, null));
+        }
         var response = new ValidationResponse();
         response.setErrors(errors);
         return ResponseEntity.ok().body(response);
@@ -103,7 +120,6 @@ public class CorrectionController {
         for(var row: rowUpdates) {
             observationIdsToReplace.addAll(row.getObservationIds());
             errors.addAll(measurementValidationService.validate(speciesAttributes, row));
-            errors.addAll(nullValidationService.validate(row));
         }
 
         logger.info("observations: " + observationIdsToReplace.toString());
