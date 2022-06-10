@@ -553,7 +553,8 @@ public class ValidationProcess {
             List<Integer> missingSurveys = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4));
             missingSurveys.removeAll(surveyGroup.keySet());
             List<String> missingSurveysMessage = missingSurveys.stream().map(s -> s.toString()).collect(Collectors.toList());
-            String message =  "Survey group incomplete: missing " + String.join(", ", missingSurveysMessage);
+            var row = surveyRows.get(0).getRef();
+            String message =  "Survey group " + row.getSurveyGroup() + " missing transect " + String.join(", ", missingSurveysMessage);
             return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, message, surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
         }
         return null;

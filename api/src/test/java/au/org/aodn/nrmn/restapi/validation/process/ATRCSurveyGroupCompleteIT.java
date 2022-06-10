@@ -69,7 +69,7 @@ class ATRCSurveyGroupCompleteIT {
         stagedRowRepo.deleteAll();
         stagedRowRepo.saveAll(Arrays.asList(sn1, sn2, sn3, sn4));
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(!response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey group incomplete")));
+        assertTrue(!response.getErrors().stream().anyMatch(e -> e.getMessage().contains("missing transect")));
     }
 
     @Test
@@ -88,15 +88,18 @@ class ATRCSurveyGroupCompleteIT {
 
         StagedRow sn2 = (StagedRow) SerializationUtils.clone(sn1);
         sn2.setDepth("7.2");
+
+        StagedRow sn4 = (StagedRow) SerializationUtils.clone(sn1);
+        sn4.setDepth("7.4");
         stagedRowRepo.deleteAll();
 
         Location location = Location.builder().locationName("LOC1").isActive(false).build();
         locationRepository.save(location);
         siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
-        stagedRowRepo.saveAll(Arrays.asList(sn1, sn2));
+        stagedRowRepo.saveAll(Arrays.asList(sn1, sn2, sn4));
 
         ValidationResponse response = validationProcess.process(job);
-        Optional<ValidationError> surveyGroupValidation = response.getErrors().stream().filter(e -> e.getMessage().startsWith("Survey group incomplete")).findFirst();
+        Optional<ValidationError> surveyGroupValidation = response.getErrors().stream().filter(e -> e.getMessage().startsWith("Survey group [ERZ1, 2020-09-11, 7] missing transect 3")).findFirst();
         assertTrue(surveyGroupValidation.isPresent());
         assertEquals(ValidationLevel.WARNING, surveyGroupValidation.get().getLevelId());
     }
@@ -139,7 +142,7 @@ class ATRCSurveyGroupCompleteIT {
         stagedRowRepo.saveAll(Arrays.asList(sn1b1, sn1b2, sn2b1, sn2b2, sn3b1, sn3b2, sn4b1, sn4b2));
 
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(!response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey group incomplete")));
+        assertTrue(!response.getErrors().stream().anyMatch(e -> e.getMessage().contains("missing transect")));
     }
 
     @Test
@@ -188,7 +191,7 @@ class ATRCSurveyGroupCompleteIT {
         stagedRowRepo.saveAll(Arrays.asList(sn1b1, sn1b2, sn2b1, sn2b2, sn3b1, sn3b2, sn4b1, sn4b2));
 
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(!response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey group incomplete")));
+        assertTrue(!response.getErrors().stream().anyMatch(e -> e.getMessage().contains("missing transect")));
     }
 
 
