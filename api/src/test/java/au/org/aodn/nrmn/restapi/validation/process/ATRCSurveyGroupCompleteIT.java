@@ -1,8 +1,10 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
@@ -11,11 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.Location;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.LocationRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
@@ -92,7 +96,9 @@ class ATRCSurveyGroupCompleteIT {
         stagedRowRepo.saveAll(Arrays.asList(sn1, sn2));
 
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey group incomplete")));
+        Optional<ValidationError> surveyGroupValidation = response.getErrors().stream().filter(e -> e.getMessage().startsWith("Survey group incomplete")).findFirst();
+        assertTrue(surveyGroupValidation.isPresent());
+        assertEquals(ValidationLevel.WARNING, surveyGroupValidation.get().getLevelId());
     }
 
     @Test
