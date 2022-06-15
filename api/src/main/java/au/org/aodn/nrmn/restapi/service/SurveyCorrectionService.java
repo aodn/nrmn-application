@@ -1,15 +1,9 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import java.sql.Date;
-import java.sql.Time;
-import java.time.LocalTime;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -17,27 +11,18 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.Measure;
 import au.org.aodn.nrmn.restapi.model.db.Method;
 import au.org.aodn.nrmn.restapi.model.db.Observation;
-import au.org.aodn.nrmn.restapi.model.db.Program;
-import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedJobLog;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.model.db.SurveyMethodEntity;
 import au.org.aodn.nrmn.restapi.model.db.enums.MeasureType;
 import au.org.aodn.nrmn.restapi.model.db.enums.ObservableItemType;
-import au.org.aodn.nrmn.restapi.model.db.enums.StagedJobEventType;
-import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.SurveyMethod;
-import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
 import au.org.aodn.nrmn.restapi.repository.MethodRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;

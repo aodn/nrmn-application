@@ -1,13 +1,14 @@
 package au.org.aodn.nrmn.restapi.service.validation;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowPutDto;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.model.db.Observation;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
@@ -24,20 +25,21 @@ public class NullValidationService {
 
     @Autowired DiverRepository diverRepository;
 
-    public Collection<ValidationError> validate(Survey existingSurvey, Collection<CorrectionRowPutDto> rowUpdates) {
+    public Collection<ValidationError> validate(Survey existingSurvey, Collection<StagedRow> rows) {
 
         ValidationResultSet errors = new ValidationResultSet();
 
-        // TODO: Where does the diver come from?
-        var divers = diverRepository.findAllById(rowUpdates.stream().map(r -> r.getDiverId()).collect(Collectors.toList())).stream().map(d -> d.getDiverId()).collect(Collectors.toSet());
+        for(var row : rows) {
 
-        // TODO: Verify that reference data has not changed
-        for(var row : rowUpdates) {
+            Optional<Observation> anObservation = Optional.empty();
+            var observationId = row.getObservationIds().stream().findFirst();
+            if(observationId.isPresent())
+                anObservation = observationRepository.findById(observationId.get());
 
-            if(!divers.contains(row.getDiverId()))
+            if(anObservation.isPresent() && !anObservation.get().getDiver().getInitials().equalsIgnoreCase(row.getDiver()))
                 errors.add(row.getId(), ValidationLevel.BLOCKING, "initials", "Cannot Correct Diver");
 
-            if(existingSurvey.getDepth().intValue() != row.getDepth().intValue())
+            if(!existingSurvey.getDepth().toString().equalsIgnoreCase(row.getDepth()))
                 errors.add(row.getId(), ValidationLevel.BLOCKING, "depth", "Cannot Correct Depth");
 
             // errors.add(row.getId(), ValidationLevel.BLOCKING, "siteCode", "Cannot Correct Site");

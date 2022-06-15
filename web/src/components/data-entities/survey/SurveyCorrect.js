@@ -52,28 +52,29 @@ const SurveyCorrect = () => {
       defaultToolPanel: ''
     };
   }, []);
+  const [sideBar, setSideBar] = useState(defaultSideBar);
 
   const headers = useMemo(() => {
     return [
       {field: 'id', label: '', hide: false},
       {field: 'surveyId', label: 'Survey', hide: true},
       {field: 'diverId', label: 'Diver ID', hide: true},
-      {field: 'initials', label: 'Diver', hide: false},
+      {field: 'diver', label: 'Diver', hide: false, editable: true},
       {field: 'siteCode', label: 'Site Code', hide: true},
       {field: 'depth', label: 'Depth', hide: false, editable: true},
-      {field: 'surveyDate', label: 'Survey Date', hide: false},
-      {field: 'surveyTime', label: 'Survey Time', hide: false},
-      {field: 'visibility', label: 'Visibility', hide: false},
+      {field: 'date', label: 'Survey Date', hide: false},
+      {field: 'time', label: 'Survey Time', hide: false},
+      {field: 'vis', label: 'Visibility', hide: false},
       {field: 'direction', label: 'Direction', hide: false},
       {field: 'latitude', label: 'Latitude', hide: false},
       {field: 'longitude', label: 'Longitude', hide: false},
       {field: 'observableItemId', hide: true},
-      {field: 'observableItemName', label: 'Species Name', hide: false},
+      {field: 'species', label: 'Species Name', hide: false},
       {field: 'letterCode', label: 'Letter Code', hide: false},
-      {field: 'methodId', label: 'Method', hide: false},
+      {field: 'method', label: 'Method', hide: false},
       {field: 'blockNum', label: 'Block', hide: false},
       {field: 'surveyNotDone', label: 'Survey Not Done', hide: false, isBoolean: true},
-      {field: 'useInvertSizing', label: 'Use Invert Sizing', hide: false, isBoolean: true}
+      {field: 'isInvertSizing', label: 'Use Invert Sizing', hide: false, isBoolean: true}
     ];
   }, []);
 
@@ -82,9 +83,9 @@ const SurveyCorrect = () => {
       api.hideOverlay();
       if (res.status !== 200) return;
       const unpackedData = res.data.map((data, idx) => {
-        const measurements = JSON.parse(data.measurementJson);
+        const measurements = JSON.parse(data.measureJson);
         const observationIds = JSON.parse(data.observationIds);
-        delete data.measurementJson;
+        delete data.measureJson;
         return {id: idx + 1, ...data, observationIds, measurements};
       });
       setRowData(unpackedData);
@@ -138,11 +139,14 @@ const SurveyCorrect = () => {
 
   const onValidate = async () => {
     const result = await validateSurveyCorrection(surveyId, packedData());
-    let context = gridRef.current.api.gridOptionsWrapper.gridOptions.context;
-
+    const context = gridRef.current.api.gridOptionsWrapper.gridOptions.context;
     const rowPos = rowData.map((r) => r.id).sort((a, b) => a - b);
     const errorTree = generateErrorTree(rowData,rowPos, result.data.errors);
     context.validations = errorTree;
+    setSideBar((s) => ({
+      ...s,
+      defaultToolPanel: 'summaryPanel'
+    }));
   };
 
   const onSubmit = () => submitSurveyCorrection(surveyId, packedData());
@@ -183,7 +187,7 @@ const SurveyCorrect = () => {
           rowData={rowData}
           rowHeight={20}
           rowSelection="multiple"
-          sideBar={defaultSideBar}
+          sideBar={sideBar}
         >
           {headers.map((header, idx) =>
             header.isBoolean ? (

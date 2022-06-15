@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowPutDto;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
+import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
@@ -69,7 +69,7 @@ public class CorrectionController {
 
     @PostMapping(path = "validate/{survey_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<?> validateSurveyCorrection(@PathVariable("survey_id") Integer surveyId, Authentication authentication, @RequestBody Collection<CorrectionRowPutDto> rowUpdates) {
+    public ResponseEntity<?> validateSurveyCorrection(@PathVariable("survey_id") Integer surveyId, Authentication authentication, @RequestBody Collection<StagedRow> rowUpdates) {
         
         String logMessage =  "correction validation: username: " + authentication.getName() + " survey: " + surveyId;
         userAuditRepo.save(new UserActionAudit("correct/survey", logMessage));
@@ -77,9 +77,9 @@ public class CorrectionController {
 
         try
         {
-            List<Integer> observableItemIds = rowUpdates.stream().map(r -> r.getObservableItemId()).collect(Collectors.toList());
+            List<String> speciesNames = rowUpdates.stream().map(r -> r.getSpecies()).collect(Collectors.toList());
             var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
-            observationRepository.getSpeciesAttributesByIds(observableItemIds).stream().forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
+            observationRepository.getSpeciesAttributesBySpeciesNames(speciesNames).stream().forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
 
             var existingSurveyOptional = surveyRepository.findById(surveyId);
             if(!existingSurveyOptional.isPresent())
@@ -88,10 +88,10 @@ public class CorrectionController {
             var existingSurvey = existingSurveyOptional.get();
             var observationIdsToReplace = new ArrayList<Integer>();
             errors.addAll(nullValidationService.validate(existingSurvey, rowUpdates));
-            for(var row: rowUpdates) {
-                observationIdsToReplace.addAll(row.getObservationIds());
-                errors.addAll(measurementValidationService.validate(speciesAttributes, row));
-            }
+            //for(var row: rowUpdates) {
+                // observationIdsToReplace.addAll(row.getObservationIds());
+             //   errors.addAll(measurementValidationService.validate(speciesAttributes, row));
+            //}
 
             logger.info("observations: " + observationIdsToReplace.toString());
         }
@@ -106,23 +106,23 @@ public class CorrectionController {
 
     @PostMapping(path = "correct/{survey_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<?> submitSurveyCorrection(@PathVariable("survey_id") Long surveyId, Authentication authentication, @RequestBody List<CorrectionRowPutDto> rowUpdates) {
+    public ResponseEntity<?> submitSurveyCorrection(@PathVariable("survey_id") Long surveyId, Authentication authentication, @RequestBody List<StagedRow> rows) {
         
-        String logMessage =  "correction: username: " + authentication.getName() + " survey: " + surveyId;
-        userAuditRepo.save(new UserActionAudit("correct/survey", logMessage));
+        // String logMessage =  "correction: username: " + authentication.getName() + " survey: " + surveyId;
+        // userAuditRepo.save(new UserActionAudit("correct/survey", logMessage));
 
-        List<Integer> observableItemIds = rowUpdates.stream().map(r -> r.getObservableItemId()).collect(Collectors.toList());
-        var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
-        observationRepository.getSpeciesAttributesByIds(observableItemIds).stream().forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
+        // List<Integer> observableItemIds = rows.stream().map(r -> r.getObservableItemId()).collect(Collectors.toList());
+        // var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
+        // observationRepository.getSpeciesAttributesByIds(observableItemIds).stream().forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
 
-        var observationIdsToReplace = new ArrayList<Integer>();
+        // var observationIdsToReplace = new ArrayList<Integer>();
         Collection<ValidationError> errors = new HashSet<ValidationError>();
-        for(var row: rowUpdates) {
-            observationIdsToReplace.addAll(row.getObservationIds());
-            errors.addAll(measurementValidationService.validate(speciesAttributes, row));
-        }
+        // for(var row: rows) {
+        //     observationIdsToReplace.addAll(row.getObservationIds());
+        //     errors.addAll(measurementValidationService.validate(speciesAttributes, row));
+        // }
 
-        logger.info("observations: " + observationIdsToReplace.toString());
+        // logger.info("observations: " + observationIdsToReplace.toString());
         
         var response = new ValidationResponse();
         response.setErrors(errors);

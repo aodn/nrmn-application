@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
-import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowPutDto;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
+import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.process.ValidationResultSet;
 
 @Service
@@ -22,7 +22,7 @@ public class MeasurementValidationService {
     private static final double[] INVERT_VALUES = { 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 16, 17, 18, 19, 20, 22, 24, 26, 28, 30 };
 
     // VALIDATION: Species size within L5 - L95
-    private Collection<ValidationCell> validateMeasureRange(Long rowId, Boolean isInvertSized, String speciesName, Map<Integer, String> measurements, UiSpeciesAttributes speciesAttributes) {
+    private Collection<ValidationCell> validateMeasureRange(Long rowId, Boolean isInvertSized, String speciesName, Map<Integer, Integer> measurements, UiSpeciesAttributes speciesAttributes) {
 
         Collection<ValidationCell> errors = new ArrayList<ValidationCell>();
 
@@ -34,7 +34,7 @@ public class MeasurementValidationService {
         if (l5 != 0 && l95 != 0) {
             List<Integer> outOfRange = measurements.entrySet()
                     .stream()
-                    .filter(entry -> entry.getValue() != "0" && (l5 > 0 && range[entry.getKey() - 1] < l5) || (l95 > 0 && range[entry.getKey() - 1] > l95))
+                    .filter(entry -> entry.getValue() != 0 && (l5 > 0 && range[entry.getKey() - 1] < l5) || (l95 > 0 && range[entry.getKey() - 1] > l95))
                     .map(Map.Entry::getKey).collect(Collectors.toList());
 
             if (!outOfRange.isEmpty()) {
@@ -45,13 +45,14 @@ public class MeasurementValidationService {
         return errors;
     }
 
-    public Collection<ValidationError> validate(Map<Integer, UiSpeciesAttributes> speciesAttributes, CorrectionRowPutDto row) {
+    public Collection<ValidationError> validate(Map<Integer, UiSpeciesAttributes> speciesAttributes, StagedRowFormatted row) {
         
         ValidationResultSet results = new ValidationResultSet();
-        boolean isMeasureMethod = !Arrays.asList(3, 4, 5).contains(row.getMethodId());
-        if (isMeasureMethod && speciesAttributes.containsKey(row.getObservableItemId()) && row.getMeasurements().size() > 0) {
-            var attrib = speciesAttributes.get(row.getObservableItemId());
-            var errors = validateMeasureRange(row.getId(), row.getUseInvertSizing(), row.getObservableItemName(), row.getMeasurements(), attrib);
+        boolean isMeasureMethod = !Arrays.asList(3, 4, 5).contains(row.getMethod());
+        var observableItem = row.getSpecies().get();
+        if (isMeasureMethod && speciesAttributes.containsKey(observableItem.getObservableItemId()) && row.getMeasureJson().size() > 0) {
+            var attrib = speciesAttributes.get(observableItem.getObservableItemId());
+            var errors = validateMeasureRange(row.getId(), row.getIsInvertSizing(), observableItem.getObservableItemName(), row.getMeasureJson(), attrib);
             results.addAll(errors, false);
         }
         return results.getAll();
