@@ -1,3 +1,6 @@
+[![Build and run tests](https://github.com/aodn/nrmn-application/actions/workflows/maven.yml/badge.svg)](https://github.com/aodn/nrmn-application/actions/workflows/maven.yml)
+[![CodeQL](https://github.com/aodn/nrmn-application/actions/workflows/codeql.yml/badge.svg)](https://github.com/aodn/nrmn-application/actions/workflows/codeql.yml)
+
 # National Reef Monitoring Network Data Portal
 
 The National Reef Monitoring Network (NRMN) Data Portal is a web application for collation, validation, and storage of all data obtained during shallow reef surveys conducted by the NRMN. NRMN is a sub-facility of the Integrated Marine Observing System [IMOS](https://imos.org.au/).
