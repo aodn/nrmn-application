@@ -6,28 +6,10 @@ import ValidationSummary from '../../../import/panel/ValidationSummary';
 const SummaryPanel = ({api, context}) => {
   const [blocking, setBlocking] = useState([]);
 
- // const handleItemClick = (item, noFilter) => {
-    // const rowId = item.row || item.rowIds[0];
-    // context.focusedRows = noFilter ? item.rowIds || [item.row] : [];
-    // const row = context.rowData.find((r) => r.id === rowId);
-    // let visible = false;
-    // props.api.forEachNodeAfterFilter((n) => (visible = n.data.id === row.id || visible));
-    // if (visible) props.api.ensureNodeVisible(row, 'middle');
-    // if (item.columnName) props.api.ensureColumnVisible(item.columnName);
-    // if (item.columnNames) for (const column of item.columnNames) props.api.ensureColumnVisible(column);
-    // props.api.setFilterModel(noFilter ? null : {id: {type: 'set', values: item.rowIds.map((id) => id.toString())}});
-    // props.api.redrawRows();
-  //  };
-
   const handleItemClick = () => {};
 
-  const updateValidations = () => {
-    setBlocking(context.validations?.blocking ?? []);
-  };
-
   useEffect(() => {
-    api.addEventListener('toolPanelVisibleChanged', updateValidations);
-    return () => api.removeEventListener('toolPanelVisibleChanged', updateValidations);
+    setBlocking(context.validations?.blocking ?? []);
   });
 
   return (

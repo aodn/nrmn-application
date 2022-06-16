@@ -62,19 +62,19 @@ const SurveyCorrect = () => {
       {field: 'diver', label: 'Diver', hide: false, editable: true},
       {field: 'siteCode', label: 'Site Code', hide: true},
       {field: 'depth', label: 'Depth', hide: false, editable: true},
-      {field: 'date', label: 'Survey Date', hide: false},
-      {field: 'time', label: 'Survey Time', hide: false},
-      {field: 'vis', label: 'Visibility', hide: false},
-      {field: 'direction', label: 'Direction', hide: false},
-      {field: 'latitude', label: 'Latitude', hide: false},
-      {field: 'longitude', label: 'Longitude', hide: false},
+      {field: 'date', label: 'Survey Date', hide: false, editable: true},
+      {field: 'time', label: 'Survey Time', hide: false, editable: true},
+      {field: 'vis', label: 'Visibility', hide: false, editable: true},
+      {field: 'direction', label: 'Direction', hide: false, editable: true},
+      {field: 'latitude', label: 'Latitude', hide: false, editable: true},
+      {field: 'longitude', label: 'Longitude', hide: false, editable: true},
       {field: 'observableItemId', hide: true},
-      {field: 'species', label: 'Species Name', hide: false},
-      {field: 'letterCode', label: 'Letter Code', hide: false},
-      {field: 'method', label: 'Method', hide: false},
-      {field: 'blockNum', label: 'Block', hide: false},
-      {field: 'surveyNotDone', label: 'Survey Not Done', hide: false, isBoolean: true},
-      {field: 'isInvertSizing', label: 'Use Invert Sizing', hide: false, isBoolean: true}
+      {field: 'species', label: 'Species Name', hide: false, editable: true},
+      {field: 'letterCode', label: 'Letter Code', hide: false, editable: true},
+      {field: 'method', label: 'Method', hide: false, editable: true},
+      {field: 'block', label: 'Block', hide: false, editable: true},
+      {field: 'surveyNotDone', label: 'Survey Not Done', hide: false, isBoolean: false, editable: true},
+      {field: 'isInvertSizing', label: 'Use Invert Sizing', hide: false, isBoolean: false, editable: true}
     ];
   }, []);
 
@@ -96,7 +96,7 @@ const SurveyCorrect = () => {
     const packedData = [];
     gridRef.current.api.forEachNode((rowNode, index) => {
       const data = rowNode.data;
-      packedData.push({id: index, ...data, 19: JSON.stringify(data[19])});
+      packedData.push({id: index, ...data, measureJson: data.measurements});
     });
     return packedData;
   };
@@ -138,6 +138,7 @@ const SurveyCorrect = () => {
   };
 
   const onValidate = async () => {
+    setSideBar(defaultSideBar);
     const result = await validateSurveyCorrection(surveyId, packedData());
     const context = gridRef.current.api.gridOptionsWrapper.gridOptions.context;
     const rowPos = rowData.map((r) => r.id).sort((a, b) => a - b);
@@ -159,7 +160,7 @@ const SurveyCorrect = () => {
         </Box>
         <Box p={1} minWidth={120}>
           <Button onClick={() => onValidate(gridOptions)} variant="contained" startIcon={<PlaylistAddCheckOutlinedIcon />}>
-            {`Validate`}
+            Validate
           </Button>
         </Box>
         <Box p={1} minWidth={180}>
@@ -196,7 +197,6 @@ const SurveyCorrect = () => {
                 field={header.field}
                 headerName={header.label}
                 hide={header.hide}
-
                 cellEditor="agSelectCellEditor"
                 cellEditorParams={{values: [true, false]}}
                 valueFormatter={(e) => (e.value === true ? 'Yes' : 'No')}
