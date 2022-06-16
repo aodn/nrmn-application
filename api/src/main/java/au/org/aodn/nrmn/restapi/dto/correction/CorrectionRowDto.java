@@ -17,7 +17,7 @@ public interface CorrectionRowDto {
 
     String getLongitude();
 
-    Boolean getIsInvertSizing();
+    String getIsInvertSizing();
 
     String getObservableItemId();
 
@@ -27,7 +27,7 @@ public interface CorrectionRowDto {
 
     String getMethod();
 
-    String getBlockNum();
+    String getBlock();
 
     Integer getDepth();
 
@@ -35,7 +35,7 @@ public interface CorrectionRowDto {
 
     String getTime();
 
-    Boolean getSurveyNotDone();
+    String getSurveyNotDone();
 
     Integer getVis();
 

@@ -22,7 +22,7 @@ public class MeasurementValidationService {
     private static final double[] INVERT_VALUES = { 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 16, 17, 18, 19, 20, 22, 24, 26, 28, 30 };
 
     // VALIDATION: Species size within L5 - L95
-    private Collection<ValidationCell> validateMeasureRange(Long rowId, Boolean isInvertSized, String speciesName, Map<Integer, Integer> measurements, UiSpeciesAttributes speciesAttributes) {
+    private Collection<ValidationCell> validateMeasureRange(Long rowId, Boolean isInvertSized, Map<Integer, Integer> measurements, UiSpeciesAttributes speciesAttributes) {
 
         Collection<ValidationCell> errors = new ArrayList<ValidationCell>();
 
@@ -38,21 +38,19 @@ public class MeasurementValidationService {
                     .map(Map.Entry::getKey).collect(Collectors.toList());
 
             if (!outOfRange.isEmpty()) {
-                String message = (isInvertSized ? "Invert measurements" : "Measurements") + " outside L5/95 [" + l5 + "," + l95 + "] for [" + speciesName + "]";
-                outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.INFO, message, rowId, col.toString())));
+                String message = (isInvertSized ? "Invert measurements" : "Measurements") + " outside L5/95 [" + l5 + "," + l95 + "]";
+                outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, message, rowId, col.toString())));
             }
         }
         return errors;
     }
 
-    public Collection<ValidationError> validate(Map<Integer, UiSpeciesAttributes> speciesAttributes, StagedRowFormatted row) {
+    public Collection<ValidationError> validate(UiSpeciesAttributes speciesAttributes, StagedRowFormatted row) {
         
         ValidationResultSet results = new ValidationResultSet();
         boolean isMeasureMethod = !Arrays.asList(3, 4, 5).contains(row.getMethod());
-        var observableItem = row.getSpecies().get();
-        if (isMeasureMethod && speciesAttributes.containsKey(observableItem.getObservableItemId()) && row.getMeasureJson().size() > 0) {
-            var attrib = speciesAttributes.get(observableItem.getObservableItemId());
-            var errors = validateMeasureRange(row.getId(), row.getIsInvertSizing(), observableItem.getObservableItemName(), row.getMeasureJson(), attrib);
+        if (isMeasureMethod && row.getMeasureJson().size() > 0) {
+            var errors = validateMeasureRange(row.getId(), row.getIsInvertSizing(), row.getMeasureJson(), speciesAttributes);
             results.addAll(errors, false);
         }
         return results.getAll();

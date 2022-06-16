@@ -22,7 +22,7 @@ public interface CorrectionRowRepository
             "c.direction, " +
             "c.latitude, c.longitude, " +
             "c.observable_item_id as observableItemId, c.observable_item_name as species, c.letter_code as letterCode, " +
-            "c.method_id as method, c.block_num as blockNum, c.survey_not_done as surveyNotDone, " +
+            "c.method_id as method, c.block_num as block, c.survey_not_done as surveyNotDone, " +
             "(CASE WHEN measure_type_id = 4 THEN true ELSE false END) as isInvertSizing, " +
             "cast(jsonb_object_agg(c.seq_no, c.measure_sum) as text) as measureJson " +
             "from ( " +

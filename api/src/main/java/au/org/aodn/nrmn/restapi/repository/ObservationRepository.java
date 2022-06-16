@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.repository;
 
 import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,7 +25,7 @@ public interface ObservationRepository
     @Query(nativeQuery = true, value ="select a.observable_item_id as id, a.species_name as speciesName, a.common_name as commonName, " + 
     "a.is_invert_sized as isInvertSized, a.l5 as l5, a.l95 as l95, a.maxabundance as maxAbundance, a.lmax as lmax " + 
     "from nrmn.ui_species_attributes a join nrmn.observable_item_ref o on a.observable_item_id = o.observable_item_id where o.observable_item_name in :names")
-    List<UiSpeciesAttributes> getSpeciesAttributesBySpeciesNames(@Param("names") List<String> names);
+    List<UiSpeciesAttributes> getSpeciesAttributesBySpeciesNames(@Param("names") Collection<String> names);
 
     @Query(nativeQuery = true, value = "SELECT  observable_item_id as id, species_name as speciesName, common_name " +
             "as commonName, is_invert_sized as isInvertSized, l5, l95, maxabundance as maxAbundance, lmax " +
@@ -34,6 +35,6 @@ public interface ObservationRepository
     @Query(nativeQuery = true, value = "SELECT DISTINCT ON (species_name) observable_item_id as id, species_name as speciesName, common_name " +
             "as commonName, is_invert_sized as isInvertSized, l5, l95, maxabundance as maxAbundance, lmax " +
             "FROM  nrmn.ui_species_attributes   where observable_item_id in :id")
-    List<UiSpeciesAttributes> getSpeciesAttributesByIds(@Param("id") List<Integer> id);
+    List<UiSpeciesAttributes> getSpeciesAttributesByIds(@Param("id") Collection<Integer> id);
 
 }
