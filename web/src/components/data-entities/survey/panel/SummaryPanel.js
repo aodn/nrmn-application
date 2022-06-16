@@ -3,14 +3,14 @@ import {PropTypes} from 'prop-types';
 import {Box, Typography} from '@mui/material';
 import ValidationSummary from '../../../import/panel/ValidationSummary';
 
-const SummaryPanel = ({api, context}) => {
+const SummaryPanel = ({context}) => {
   const [blocking, setBlocking] = useState([]);
 
   const handleItemClick = () => {};
 
   useEffect(() => {
     setBlocking(context.validations?.blocking ?? []);
-  });
+  }, [context.validations.blocking]);
 
   return (
     <Box m={2} mr={4}>
