@@ -1,5 +1,7 @@
 package au.org.aodn.nrmn.restapi.tasks;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.PQSurveyService;
 
 @Component
@@ -18,14 +21,24 @@ public class ScheduledTasks {
     @Autowired
     private Environment environment;
 
+    @Autowired
+    private MaterializedViewService materializedViewService;
+    
     private static Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
 
+    @PostConstruct
+    public void onStartup() {
+        performDailyTasks();
+    }
+
     @Scheduled(cron = "0 0 0 * * ?", zone = "Australia/Sydney")
-    public void updateSurveyPQFields() {
-        if (environment.getActiveProfiles().length < 1)
+    public void performDailyTasks() {
+        if (environment.getActiveProfiles().length < 1) {
             pqSurveyService.updatePQSurveyFlags();
-        else
+            materializedViewService.refreshAllMaterializedViews();
+        } else {
             logger.info("Skipping PQ update as active profile set.");
+        }
 
     }
 }
