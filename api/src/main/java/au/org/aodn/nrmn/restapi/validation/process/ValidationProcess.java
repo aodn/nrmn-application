@@ -626,6 +626,7 @@ public class ValidationProcess {
         /** Row-level Checks */
         for (StagedRowFormatted row : rows) {
 
+            // FUTURE: move these checks to the `MeasurementValidationService`
             if (row.getSpeciesAttributesOpt().isPresent()) {
                 UiSpeciesAttributes speciesAttributes = row.getSpeciesAttributesOpt().get();
 

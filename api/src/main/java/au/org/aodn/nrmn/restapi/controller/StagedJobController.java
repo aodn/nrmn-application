@@ -259,7 +259,11 @@ public class StagedJobController {
     @GetMapping("/stagedJob/{jobId}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<StagedJobDto> getStagedJob(@PathVariable Long jobId) {
-        var j = jobRepo.getReferenceById(jobId);
+        var jOptional = jobRepo.findById(jobId);
+        if(!jOptional.isPresent())
+            return ResponseEntity.notFound().build();
+
+        var j = jOptional.get();
         var dto = StagedJobDto.builder()
                 .id(j.getId())
                 .programName(j.getProgram().getProgramName())
@@ -287,8 +291,11 @@ public class StagedJobController {
     @DeleteMapping("/delete/{jobId}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<Object> deleteJob(@PathVariable Long jobId) {
-        var job = jobRepo.getReferenceById(jobId);
-        if (job != null && job.getStatus() != StatusJobType.INGESTED) {
+        var jOptional = jobRepo.findById(jobId);
+        if(!jOptional.isPresent())
+            return ResponseEntity.notFound().build();
+        var job = jOptional.get();
+        if (job.getStatus() != StatusJobType.INGESTED) {
             jobRepo.deleteById(jobId);
             return ResponseEntity.ok().build();
         } else {

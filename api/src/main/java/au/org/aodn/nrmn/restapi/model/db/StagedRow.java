@@ -3,6 +3,8 @@ package au.org.aodn.nrmn.restapi.model.db;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -15,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -53,6 +56,18 @@ public class StagedRow implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="staged_row_id_seq")
     @SequenceGenerator(name="staged_row_id_seq", sequenceName = "staged_row_id_seq", allocationSize = 100)
     private Long id;
+
+    @Transient
+    @Builder.Default
+    private String surveyId = "";
+    
+    @Transient
+    @Builder.Default
+    private String surveyNotDone = "";
+
+    @Transient
+    @Builder.Default
+    Collection<Integer> observationIds = Collections.emptyList();
 
     @Column(name = "site_no")
     @Builder.Default

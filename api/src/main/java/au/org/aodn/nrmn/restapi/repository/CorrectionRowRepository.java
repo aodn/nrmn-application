@@ -16,15 +16,15 @@ public interface CorrectionRowRepository
         extends JpaRepository<Observation, Long>, JpaSpecificationExecutor<Observation> {
 
     @Query(value = "select cast(jsonb_agg(c.observation_id) as text) as observationIds, c.survey_id as surveyId, " +
-            "c.diver_id as diverId, c.initials, " +
-            "c.site_code as siteCode, c.depth, c.survey_date as surveyDate, c.survey_time as surveyTime, c.visibility, "
+            "c.diver_id as diverId, c.initials as diver, " +
+            "c.site_code as siteCode, c.depth, c.survey_date as date, c.survey_time as time, c.visibility as vis, "
             +
             "c.direction, " +
             "c.latitude, c.longitude, " +
-            "c.observable_item_id as observableItemId, c.observable_item_name as observableItemName, c.letter_code as letterCode, " +
-            "c.method_id as methodId, c.block_num as blockNum, c.survey_not_done as surveyNotDone, " +
-            "(CASE WHEN measure_type_id = 4 THEN true ELSE false END) as useInvertSizing, " +
-            "cast(jsonb_object_agg(c.seq_no, c.measure_sum) as text) as measurementJson " +
+            "c.observable_item_id as observableItemId, c.observable_item_name as species, c.letter_code as letterCode, " +
+            "c.method_id as method, c.block_num as block, c.survey_not_done as surveyNotDone, " +
+            "(CASE WHEN measure_type_id = 4 THEN true ELSE false END) as isInvertSizing, " +
+            "cast(jsonb_object_agg(c.seq_no, c.measure_sum) as text) as measureJson " +
             "from ( " +
             "select " +
             "o.observation_id, s.survey_id, o.diver_id, d.initials, " +

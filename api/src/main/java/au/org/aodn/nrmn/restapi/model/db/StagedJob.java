@@ -65,7 +65,6 @@ public class StagedJob implements Serializable {
     @Column(name = "source")
     private SourceJobType source;
 
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "program_id", referencedColumnName = "program_id", nullable = false)
     private Program program;
@@ -90,7 +89,6 @@ public class StagedJob implements Serializable {
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "stagedJob", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StagedRow> rows;
-
 
     @Basic
     @Column(name = "survey_ids", columnDefinition = "integer[]")

@@ -36,7 +36,7 @@ import lombok.ToString;
 @Builder
 @Table(name = "survey_method")
 @Audited(withModifiedFlag = true)
-public class SurveyMethod {
+public class SurveyMethodEntity {
     @Id
     @SequenceGenerator(name = "survey_method_survey_method_id", sequenceName = "survey_method_survey_method_id",
         allocationSize = 1)

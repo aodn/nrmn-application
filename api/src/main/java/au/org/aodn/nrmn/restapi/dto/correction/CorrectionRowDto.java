@@ -7,7 +7,7 @@ public interface CorrectionRowDto {
 
     Integer getDiverId();
 
-    String getInitials();
+    String getDiver();
 
     String getSiteCode();
 
@@ -17,27 +17,27 @@ public interface CorrectionRowDto {
 
     String getLongitude();
 
-    Boolean getUseInvertSizing();
+    String getIsInvertSizing();
 
     String getObservableItemId();
 
-    String getObservableItemName();
+    String getSpecies();
 
     String getLetterCode();
 
-    String getMethodId();
+    String getMethod();
 
-    String getBlockNum();
+    String getBlock();
 
     Integer getDepth();
 
-    String getSurveyDate();
+    String getDate();
 
-    String getSurveyTime();
+    String getTime();
 
-    Boolean getSurveyNotDone();
+    String getSurveyNotDone();
 
-    Integer getVisibility();
+    Integer getVis();
 
-    String getMeasurementJson();
+    String getMeasureJson();
 }
