@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 public class SpeciesRecord {
     @JsonAlias("AphiaID")
-    private Integer aphiaId;
+    public Integer aphiaId;
 
     private String url;
 

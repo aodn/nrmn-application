@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {Box, Divider, Paper, Grid, Tab, Tabs, TextField, Typography} from '@mui/material';
 import {makeStyles} from '@mui/styles';
 import Table from '@mui/material/Table';
@@ -42,94 +42,101 @@ const useStyles = makeStyles(({ palette, typography }) => ({
 
 const SpeciesSearch = ({onRowClick}) => {
   const classes = useStyles();
+  const rowsPerPage = 50;
 
   const [tabIndex, setTabIndex] = useState(0);
   const [searchTerm, setSearchTerm] = useState();
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(50);
   const [gridData, setGridData] = useState();
-  const [currentSearch, setCurrentSearch] = useState({});
+  const [lastSearch, setLastSearch] = useState({});
   const [info, setInfo] = useState();
   const [maxRows, setMaxRows] = useState(-1);
-
-  const [searchRequested, setSearchRequested] = useState();
   const [searchError, setSearchError] = useState();
+  const [searching, setSearching] = useState(false);
 
-  const loading = searchRequested && !gridData && !searchError;
+  const loading = searching && !gridData && !searchError;
 
-  const handleChange = (_, newValue) => {
+  const handleTabChange = useCallback((_, newValue) => {
     setSearchTerm(null);
     setGridData(null);
     setInfo(null);
-    setSearchRequested(null);
-    setCurrentSearch(null);
+    setLastSearch(null);
     setPage(0);
     setMaxRows(-1);
     setTabIndex(newValue);
-  };
+  }, []);
 
-  useEffect(() => {
-    if (currentSearch?.species === searchRequested?.species && currentSearch?.page === searchRequested?.page) {
+  const uniqueData = useCallback((obj) => {
+    obj.filter((value, index, self) => index === self.findIndex((t) => (t.aphiaId === value.aphiaId)));
+  }, []);
+
+  const doSearch = (request) => {
+    if (lastSearch?.species === request?.species && lastSearch?.page === request?.page) {
+      // If the search is the same as previous, then no need to execute
       return;
     }
-    async function fetchSearchResults() {
+    else {
       setInfo(null);
       setSearchError(null);
-      if (currentSearch?.species !== searchRequested.species) {
+
+      if (lastSearch?.species !== request.species) {
+        // This is a new search, not change page.
         setMaxRows(-1);
         setGridData(null);
       }
-      await search(searchRequested)
+
+      setSearching(prevValue => !prevValue);
+      search({...request, pageSize: rowsPerPage+1})
         .then((res) => {
           if (res.data.error) {
             setSearchError(res.data.error);
             return;
           }
-          setCurrentSearch(searchRequested);
+          setLastSearch(request);
+
           const data = res?.data
-              ? res.data.map((r, id) => {
-                  // if not a generic name then remove the genus from the species to produce the species epithet
-                  let speciesEpithet = '';
-                  if (r.species) {
-                    const isGenericName =
-                      r.species.toUpperCase().includes('SP.') ||
-                      r.species.toUpperCase().includes('SPP.') ||
-                      r.species.includes('(') ||
-                      r.species.includes('[') ||
-                      !r.species.includes(' ');
-                    if (!isGenericName) speciesEpithet = r.species.replace(`${r.genus} `, '');
-                  }
-                  return {id: id, ...r, speciesEpithet};
-                })
-              : null;
+            ? res.data.map((r, id) => {
+              // if not a generic name then remove the genus from the species to produce the species epithet
+              let speciesEpithet = '';
+              if (r.species) {
+                const isGenericName =
+                  r.species.toUpperCase().includes('SP.') ||
+                  r.species.toUpperCase().includes('SPP.') ||
+                  r.species.includes('(') ||
+                  r.species.includes('[') ||
+                  !r.species.includes(' ');
+                if (!isGenericName) speciesEpithet = r.species.replace(`${r.genus} `, '');
+              }
+              return {id: id, ...r, speciesEpithet};
+            })
+            : null;
 
           if(data?.length === 0) {
-            if(!gridData) setGridData([]);
-            setMaxRows(gridData?.length ?? 0);
+            setGridData((prevValue) => prevValue ? null : []);
           }
 
           if(data?.length > 0) {
-            setGridData(gridData ? [...gridData, ...data] : data);
-            setPage(searchRequested.page);
-            if(data?.length < rowsPerPage)
-              setMaxRows(gridData.length + data.length);
+            setGridData((prevValue) => prevValue ? uniqueData([...prevValue, ...data]) : data);
+            setPage(request.page);
           }
+
         })
-        .catch((err) => setSearchError(err.message));
+        .catch((err) =>
+          setSearchError(err.message))
+        .finally(() =>
+          setSearching(prevValue => !prevValue));
     }
-    if (searchRequested) fetchSearchResults();
-  }, [searchRequested, currentSearch, rowsPerPage, gridData]);
+  };
+
+  useEffect(() => {
+    setMaxRows(gridData?.length ?? 0);
+  }, [gridData]);
 
   const handleChangePage = (_, newPage) => {
     if(maxRows < 0 && page < newPage)
-      setSearchRequested({searchType: tabIndex === 0 ? 'WORMS' : 'NRMN', species: searchTerm, includeSuperseded: true, page: newPage});
+      doSearch({searchType: tabIndex === 0 ? 'WORMS' : 'NRMN', species: searchTerm, includeSuperseded: true, page: newPage});
     else
       setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
   };
 
   return (
@@ -138,7 +145,7 @@ const SpeciesSearch = ({onRowClick}) => {
         <Typography variant="h4">Species Lookup</Typography>
       </Box>
       <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
-        <Tabs value={tabIndex} onChange={handleChange}>
+        <Tabs value={tabIndex} onChange={handleTabChange}>
           <Tab label="WoRMS" style={{minWidth: '50%', textTransform: 'none'}} />
           <Tab label="NRMN" style={{minWidth: '50%'}} />
         </Tabs>
@@ -161,7 +168,7 @@ const SpeciesSearch = ({onRowClick}) => {
               disabled={loading}
               onChange={(e) => setSearchTerm(e.target.value.trim())}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') setSearchRequested({searchType: 'WORMS', species: searchTerm, includeSuperseded: true, page: 0});
+                if (e.key === 'Enter') doSearch({searchType: 'WORMS', species: searchTerm, includeSuperseded: true, page: 0});
               }}
             />
           </Grid>
@@ -174,8 +181,7 @@ const SpeciesSearch = ({onRowClick}) => {
               loading={loading}
               startIcon={<Search></Search>}
               onClick={() => {
-                setPage(1);
-                setSearchRequested({searchType: 'WORMS', species: searchTerm, includeSuperseded: true, page: 0});
+                doSearch({searchType: 'WORMS', species: searchTerm, includeSuperseded: true, page: 0});
               }}
               style={{textTransform: 'none'}}
             >
@@ -200,7 +206,7 @@ const SpeciesSearch = ({onRowClick}) => {
               size="small"
               disabled={loading}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') setSearchRequested({searchType: 'NRMN', species: searchTerm, includeSuperseded: true, page: 0});
+                if (e.key === 'Enter') doSearch({searchType: 'NRMN', species: searchTerm, includeSuperseded: true, page: 0});
               }}
               onChange={(e) => setSearchTerm(e.target.value.trim())}
             />
@@ -212,7 +218,7 @@ const SpeciesSearch = ({onRowClick}) => {
               disabled={loading || !(searchTerm?.length > 3)}
               loading={loading}
               startIcon={<Search></Search>}
-              onClick={() => setSearchRequested({searchType: 'NRMN', species: searchTerm, includeSuperseded: true, page: 0})}
+              onClick={() => doSearch({searchType: 'NRMN', species: searchTerm, includeSuperseded: true, page: 0})}
               style={{textTransform: 'none'}}
             >
               Search NRMN
@@ -294,7 +300,6 @@ const SpeciesSearch = ({onRowClick}) => {
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </>
       ) : (

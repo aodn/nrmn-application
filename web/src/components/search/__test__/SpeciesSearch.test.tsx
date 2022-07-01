@@ -1,4 +1,4 @@
-import {afterAll, afterEach, beforeAll, describe} from '@jest/globals';
+import {afterEach, describe} from '@jest/globals';
 import '@testing-library/jest-dom';
 import {fireEvent, render, waitFor} from '@testing-library/react';
 import {rest} from 'msw';
@@ -8,7 +8,8 @@ import SpeciesSearch from '../SpeciesSearch';
 const visibleProps = ['class', 'family', 'genus', 'order', 'phylum', 'species', 'status'];
 const props = [...visibleProps, 'supersededBy', 'unacceptReason', 'aphiaId'];
 
-const pages = Array.from({length: 3}, (_, i) => i).map((p) =>
+// Create array of [3][50] where field name is props and field values are combination of field names and iteration value
+const longPages = Array.from({length: 3}, (_, i) => i).map((p) =>
   Array.from({length: p == 2 ? 25 : 50}, (_, i) => i).map((i) => {
     return props.reduce((row, prop) => {
       row[prop] = `${prop}.${p}.${i}`;
@@ -17,22 +18,26 @@ const pages = Array.from({length: 3}, (_, i) => i).map((p) =>
   })
 );
 
-const server = setupServer(
+const server = (data) => setupServer(
   rest.get('/api/v1/species', (req, res, ctx) => {
     const pageParam = req.url.search
       .match(/page=.?/gm)
       ?.at(0)
       .slice(-1);
-    const pageData = pages[pageParam ? parseInt(pageParam) : 0];
+    const pageData = data[pageParam ? parseInt(pageParam) : 0];
     return res(ctx.json(pageData));
   })
 );
 
-beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
-
 describe('<SiteList/>', () => {
+
+  let myServer = null;
+
+  afterEach(() => {
+    myServer?.close();
+    myServer = null;
+  });
+
   it('has both NRMN and WoRMS search options', async () => {
     const {getByText} = render(<SpeciesSearch />);
     await waitFor(() => {
@@ -45,6 +50,9 @@ describe('<SiteList/>', () => {
     const {getByPlaceholderText, getByTestId} = render(<SpeciesSearch />);
     const searchBox = getByPlaceholderText('WoRMS Search');
 
+    myServer = server(longPages);
+    myServer.listen();
+
     fireEvent.change(searchBox, {target: {value: '1234'}});
     await waitFor(() => expect(getByTestId('search-button')).toBeEnabled());
 
@@ -53,8 +61,13 @@ describe('<SiteList/>', () => {
   });
 
   it('paginates', async () => {
-    const {getByPlaceholderText, getByTestId, getByLabelText, queryByText} = render(<SpeciesSearch />);
+
+    const {getByPlaceholderText, getByTestId, getByLabelText, queryByText, rerender} = render(<SpeciesSearch />);
     const searchBox = getByPlaceholderText('WoRMS Search');
+
+    myServer = server(longPages);
+    myServer.listen();
+
     fireEvent.change(searchBox, {target: {value: '1234'}});
     fireEvent.click(getByTestId('search-button'));
 
@@ -62,16 +75,20 @@ describe('<SiteList/>', () => {
       for (const prop of visibleProps) {
         expect(queryByText(`${prop}.${page}.0`)).toBeInTheDocument();
         expect(queryByText(`${prop}.${page + 1}.0`)).not.toBeInTheDocument();
+
         if (page > 0) expect(queryByText(`${prop}.${page - 1}.0`)).not.toBeInTheDocument();
-        expect(queryByText(`${prop}.${page}.${pages[page].length - 1}`)).toBeInTheDocument();
-        expect(queryByText(`${prop}.${page}.${pages[page].length}`)).not.toBeInTheDocument();
+
+        expect(queryByText(`${prop}.${page}.${longPages[page].length - 1}`)).toBeInTheDocument();
+        expect(queryByText(`${prop}.${page}.${longPages[page].length}`)).not.toBeInTheDocument();
       }
-      expect(queryByText(`${page * 50 + 1}–${page * 50 + pages[page].length} of`, {exact: false})).toBeInTheDocument();
+      expect(queryByText(`${page * 50 + 1}–${page * 50 + longPages[page].length} of`, {exact: false})).toBeInTheDocument();
     };
 
     await waitFor(() => expectedPage(0));
 
     fireEvent.click(getByLabelText('Go to next page'));
+    rerender(<SpeciesSearch />);
+
     await waitFor(() => expectedPage(1));
 
     fireEvent.click(getByLabelText('Go to next page'));

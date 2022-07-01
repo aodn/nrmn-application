@@ -171,7 +171,7 @@ export const submitIngest = (jobId, onResult) => {
 export const search = (params) => {
   const url = `species?searchType=${escape(params.searchType)}&species=${escape(params.species)}&includeSuperseded=${
     params.includeSuperseded
-  }${params.page ? '&page=' + params.page : ''}`;
+  }${params.page ? '&page=' + params.page : ''}${params.pageSize ? '&pageSize=' + params.pageSize : ''}`;
 
   return axiosInstance
     .get(url, {
