@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useState, useCallback} from 'react';
 import {Box, Divider, Paper, Grid, Tab, Tabs, TextField, Typography} from '@mui/material';
 import {makeStyles} from '@mui/styles';
 import Table from '@mui/material/Table';
@@ -65,11 +65,7 @@ const SpeciesSearch = ({onRowClick}) => {
     setMaxRows(-1);
     setTabIndex(newValue);
   }, []);
-
-  const uniqueData = useCallback((obj) => {
-    obj.filter((value, index, self) => index === self.findIndex((t) => (t.aphiaId === value.aphiaId)));
-  }, []);
-
+  
   const doSearch = (request) => {
     if (lastSearch?.species === request?.species && lastSearch?.page === request?.page) {
       // If the search is the same as previous, then no need to execute
@@ -81,12 +77,14 @@ const SpeciesSearch = ({onRowClick}) => {
 
       if (lastSearch?.species !== request.species) {
         // This is a new search, not change page.
-        setMaxRows(-1);
         setGridData(null);
+        setMaxRows(-1);
       }
 
       setSearching(prevValue => !prevValue);
-      search({...request, pageSize: rowsPerPage+1})
+
+      // Add one more to test if we have next page or reach the end
+      search({...request, pageSize: 51})
         .then((res) => {
           if (res.data.error) {
             setSearchError(res.data.error);
@@ -94,7 +92,7 @@ const SpeciesSearch = ({onRowClick}) => {
           }
           setLastSearch(request);
 
-          const data = res?.data
+          let data = res?.data
             ? res.data.map((r, id) => {
               // if not a generic name then remove the genus from the species to produce the species epithet
               let speciesEpithet = '';
@@ -115,8 +113,20 @@ const SpeciesSearch = ({onRowClick}) => {
             setGridData((prevValue) => prevValue ? null : []);
           }
 
+          // Must use temp variable due to slight time lag in update
+          let i = data?.length === 51;
+          if(i) {
+            // We do not need the last item for now
+            data = data.slice(0, -1);
+          }
+
           if(data?.length > 0) {
-            setGridData((prevValue) => prevValue ? uniqueData([...prevValue, ...data]) : data);
+            setGridData((prevValue) => {
+              const k = prevValue ? ([...prevValue, ...data]) : data;
+              setMaxRows(i ? -1 : k?.length);
+
+              return k;
+            });
             setPage(request.page);
           }
 
@@ -128,15 +138,23 @@ const SpeciesSearch = ({onRowClick}) => {
     }
   };
 
-  useEffect(() => {
-    setMaxRows(gridData?.length ?? 0);
-  }, [gridData]);
+  // useEffect(() => {
+  //   setMaxRows(hasNextPage ? -1 : gridData?.length);
+  //
+  // }, [hasNextPage, gridData]);
 
   const handleChangePage = (_, newPage) => {
-    if(maxRows < 0 && page < newPage)
-      doSearch({searchType: tabIndex === 0 ? 'WORMS' : 'NRMN', species: searchTerm, includeSuperseded: true, page: newPage});
-    else
+    if(maxRows < 0 && page < newPage) {
+      doSearch({
+        searchType: tabIndex === 0 ? 'WORMS' : 'NRMN',
+        species: searchTerm,
+        includeSuperseded: true,
+        page: newPage
+      });
+    }
+    else {
       setPage(newPage);
+    }
   };
 
   return (
