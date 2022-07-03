@@ -18,10 +18,13 @@ import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.Measure;
 import au.org.aodn.nrmn.restapi.model.db.Method;
 import au.org.aodn.nrmn.restapi.model.db.Observation;
+import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.model.db.SurveyMethodEntity;
 import au.org.aodn.nrmn.restapi.model.db.enums.MeasureType;
 import au.org.aodn.nrmn.restapi.model.db.enums.ObservableItemType;
+import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
+import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.SurveyMethod;
 import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
 import au.org.aodn.nrmn.restapi.repository.MethodRepository;
@@ -143,11 +146,10 @@ public class SurveyCorrectionService {
     }
 
     @Transactional
-    public void correctionTransaction(Collection<Observation> observations) {
-        // StagedJob job = StagedJob.builder().isExtendedSize(withExtendedSizes).source(SourceJobType.INGEST)
-        // .reference(file.getOriginalFilename()).status(StatusJobType.PENDING)
-        // .program(programOpt.get())
-        // .creator(user.get()).build();
-        // jobRepo.save(job);
+    public void correctionTransaction(Survey survey, Collection<Observation> observations) {
+        var surveyId = survey.getSurveyId();
+        observationRepository.deleteAllForSurvey(surveyId);
+        surveyMethodRepository.deleteForSurveyId(surveyId);
+        surveyRepository.save(survey);
     }
 }

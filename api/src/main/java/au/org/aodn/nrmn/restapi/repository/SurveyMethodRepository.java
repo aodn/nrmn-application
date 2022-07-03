@@ -37,4 +37,7 @@ public interface SurveyMethodRepository extends JpaRepository<SurveyMethodEntity
 
     @Query("SELECT DISTINCT concat(d.fullName, ' (', d.initials, ')') FROM Observation o JOIN o.diver d WHERE o.surveyMethod.survey.surveyId = :surveyId")
     List<String> findDiversForSurvey(@Param("surveyId") Integer surveyId);
+
+    @Query(value = "DELETE FROM {h-schema}survey_method m WHERE m.survey_id = :surveyId", nativeQuery = true)
+    void deleteForSurveyId(@Param("surveyId") Integer surveyId);
 }
