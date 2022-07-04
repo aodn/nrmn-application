@@ -5,8 +5,11 @@ import au.org.aodn.nrmn.restapi.model.db.SurveyMethodEntity;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -38,6 +41,8 @@ public interface SurveyMethodRepository extends JpaRepository<SurveyMethodEntity
     @Query("SELECT DISTINCT concat(d.fullName, ' (', d.initials, ')') FROM Observation o JOIN o.diver d WHERE o.surveyMethod.survey.surveyId = :surveyId")
     List<String> findDiversForSurvey(@Param("surveyId") Integer surveyId);
 
-    @Query(value = "DELETE FROM {h-schema}survey_method m WHERE m.survey_id = :surveyId", nativeQuery = true)
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM SurveyMethodEntity WHERE survey_id = :surveyId")
     void deleteForSurveyId(@Param("surveyId") Integer surveyId);
 }

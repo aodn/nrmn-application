@@ -1,13 +1,14 @@
 import {Box, Button, CircularProgress, Grid, Typography} from '@mui/material';
-import {Save} from '@mui/icons-material';
+import {Delete, Save} from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
 import React, {useEffect, useReducer, useState} from 'react';
 import {Navigate, NavLink, useParams} from 'react-router-dom';
-import {entityEdit, getResult} from '../../../api/api';
+import {entityDelete, entityEdit, getResult} from '../../../api/api';
 import EntityContainer from '../../containers/EntityContainer';
 import CustomCheckboxInput from '../../input/CustomCheckboxInput';
 import CustomDropDownInput from '../../input/CustomDropDownInput';
 import CustomTextInput from '../../input/CustomTextInput';
+import {AuthContext} from '../../../contexts/auth-context';
 
 const SurveyEdit = () => {
   const surveyId = useParams()?.id;
@@ -103,13 +104,24 @@ const SurveyEdit = () => {
 
   return (
     <EntityContainer name="Surveys" goBackTo="/data/surveys">
-      <Grid container alignItems="flex-start" direction="row">
-        <Grid item xs={10}>
-          <Box fontWeight="fontWeightBold">
-            <Typography variant="h4">Edit Survey</Typography>
-          </Box>
-        </Grid>
-      </Grid>
+      <Box m={2} display="flex" flexDirection="row" width="100%">
+        <Box flexGrow={1}>
+          <Typography variant="h4">Edit Survey</Typography>
+        </Box>
+        <Box>
+          <AuthContext.Consumer>
+            {({auth}) =>
+              auth?.features?.includes('corrections') && (
+                <Button variant="outlined" color="error" startIcon={<Delete></Delete>} onClick={() => {
+                  entityDelete('correction/correct', surveyId);
+                }}>
+                  Delete Survey
+                </Button>
+              )
+            }
+          </AuthContext.Consumer>
+        </Box>
+      </Box>
       <Grid container direction="column" justifyContent="flex-start" alignItems="center">
         {surveyId && Object.keys(item).length === 0 ? (
           <CircularProgress size={20} />

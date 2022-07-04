@@ -1,9 +1,11 @@
 package au.org.aodn.nrmn.restapi.service;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -19,11 +21,12 @@ import au.org.aodn.nrmn.restapi.model.db.Measure;
 import au.org.aodn.nrmn.restapi.model.db.Method;
 import au.org.aodn.nrmn.restapi.model.db.Observation;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
+import au.org.aodn.nrmn.restapi.model.db.StagedJobLog;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.model.db.SurveyMethodEntity;
 import au.org.aodn.nrmn.restapi.model.db.enums.MeasureType;
 import au.org.aodn.nrmn.restapi.model.db.enums.ObservableItemType;
-import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
+import au.org.aodn.nrmn.restapi.model.db.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.SurveyMethod;
 import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
@@ -44,46 +47,52 @@ public class SurveyCorrectionService {
 
     @Autowired
     SurveyRepository surveyRepository;
-    
+
     @Autowired
     MethodRepository methodRepository;
-    
+
     @Autowired
     MeasureRepository measureRepository;
-    
-    @Autowired
-    ObservationRepository observationRepository;
-    
+
     @Autowired
     SurveyMethodRepository surveyMethodRepository;
-    
+
     @Autowired
     ObservableItemRepository observableItemRepository;
-    
+
     @Autowired
     ProgramRepository programRepository;
-    
+
     @Autowired
     SiteRepository siteRepo;
-    
+
     @Autowired
     EntityManager entityManager;
-    
+
+    @Autowired
+    ObservationRepository observationRepository;
+
     @Autowired
     StagedJobLogRepository stagedJobLogRepository;
 
     @Autowired
     StagedJobRepository jobRepository;
 
-    public SurveyMethodEntity getSurveyMethod(Survey survey, StagedRowFormatted stagedRow) {
+    public void deleteSurvey(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows,
+            Boolean deleteSurvey) {
+        correctionTransaction(job, survey, validatedRows, deleteSurvey);
+    }
+
+    private SurveyMethodEntity getSurveyMethod(Survey survey, StagedRowFormatted stagedRow) {
         boolean surveyNotDone = stagedRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done");
         Method method = entityManager.getReference(Method.class, stagedRow.getMethod());
-        SurveyMethodEntity surveyMethod = SurveyMethodEntity.builder().survey(survey).method(method).blockNum(stagedRow.getBlock())
+        SurveyMethodEntity surveyMethod = SurveyMethodEntity.builder().survey(survey).method(method)
+                .blockNum(stagedRow.getBlock())
                 .surveyNotDone(surveyNotDone).build();
         return surveyMethodRepository.save(surveyMethod);
     }
 
-    public List<Observation> getObservations(SurveyMethodEntity surveyMethod, StagedRowFormatted stagedRow,
+    private List<Observation> getObservations(SurveyMethodEntity surveyMethod, StagedRowFormatted stagedRow,
             Boolean withExtendedSizing) {
         if (!stagedRow.getSpecies().isPresent())
             return Collections.emptyList();
@@ -100,7 +109,8 @@ public class SurveyCorrectionService {
 
         Stream<MeasureValue> unsized = Stream.empty();
 
-        if (!stagedRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done") && stagedRow.getInverts() != null && stagedRow.getInverts() > 0) {
+        if (!stagedRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done") && stagedRow.getInverts() != null
+                && stagedRow.getInverts() > 0) {
             unsized = Stream.of(new MeasureValue(0, stagedRow.getInverts()));
         }
 
@@ -112,13 +122,16 @@ public class SurveyCorrectionService {
 
             int measureTypeId = MeasureType.FishSizeClass;
 
-            if (IntStream.of(SurveyMethod.M0, SurveyMethod.M1, SurveyMethod.M2, SurveyMethod.M7, SurveyMethod.M10, SurveyMethod.M11)
+            if (IntStream
+                    .of(SurveyMethod.M0, SurveyMethod.M1, SurveyMethod.M2, SurveyMethod.M7, SurveyMethod.M10,
+                            SurveyMethod.M11)
                     .anyMatch(x -> x == method)) {
 
                 if (withExtendedSizing && stagedRow.getIsInvertSizing())
                     measureTypeId = MeasureType.InvertSizeClass;
 
-                if (stagedRow.getSpecies().get().getObsItemType().getObsItemTypeId() == ObservableItemType.NoSpeciesFound)
+                if (stagedRow.getSpecies().get().getObsItemType()
+                        .getObsItemTypeId() == ObservableItemType.NoSpeciesFound)
                     measureTypeId = MeasureType.Absence;
 
             } else if (method == SurveyMethod.M3) {
@@ -132,8 +145,10 @@ public class SurveyCorrectionService {
             }
 
             Measure measure = measureRepository.findByMeasureTypeIdAndSeqNo(measureTypeId, m.getSeqNo()).orElse(null);
-            
-            Observation observation = Observation.builder().diver(diver).surveyMethod(surveyMethod).observableItem(stagedRow.getSpecies().get()).measure(measure).measureValue(m.getMeasureValue()).build();
+
+            Observation observation = Observation.builder().diver(diver).surveyMethod(surveyMethod)
+                    .observableItem(stagedRow.getSpecies().get()).measure(measure).measureValue(m.getMeasureValue())
+                    .build();
 
             return observation;
         }).collect(Collectors.toList());
@@ -141,15 +156,61 @@ public class SurveyCorrectionService {
         return observations;
     }
 
-    public Map<String, List<StagedRowFormatted>> groupRowsByMethodBlock(List<StagedRowFormatted> surveyRows) {
-        return surveyRows.stream().filter(r -> r.getMethodBlock() != null).collect(Collectors.groupingBy(StagedRowFormatted::getMethodBlock));
+    private Map<String, List<StagedRowFormatted>> groupRowsByMethodBlock(List<StagedRowFormatted> surveyRows) {
+        return surveyRows.stream().filter(r -> r.getMethodBlock() != null)
+                .collect(Collectors.groupingBy(StagedRowFormatted::getMethodBlock));
     }
 
     @Transactional
-    public void correctionTransaction(Survey survey, Collection<Observation> observations) {
-        var surveyId = survey.getSurveyId();
-        observationRepository.deleteAllForSurvey(surveyId);
-        surveyMethodRepository.deleteForSurveyId(surveyId);
-        surveyRepository.save(survey);
+    private void correctionTransaction(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows,
+            Boolean deleteSurvey) {
+
+        // Remove existing observations
+        surveyMethodRepository.deleteForSurveyId(survey.getSurveyId());
+
+        String message;
+        List<Integer> surveyIds = Arrays.asList(survey.getSurveyId());
+
+        if (deleteSurvey) {
+            surveyRepository.deleteById(survey.getSurveyId());
+            message = String.format("Survey %d deleted", survey.getSurveyId());
+        } else {
+
+            Map<String, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream()
+                    .collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
+
+            surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
+
+                OptionalDouble visAvg = surveyRows.stream().filter(r -> r.getVis().isPresent())
+                        .mapToDouble(r -> r.getVis().get()).average();
+
+                if (visAvg.isPresent())
+                    visAvg = OptionalDouble.of((double) Math.round(visAvg.getAsDouble()));
+
+                groupRowsByMethodBlock(surveyRows).values().forEach(methodBlockRows -> {
+                    SurveyMethodEntity surveyMethod = getSurveyMethod(survey, methodBlockRows.get(0));
+                    methodBlockRows.forEach(row -> observationRepository
+                            .saveAll(getObservations(surveyMethod, row, job.getIsExtendedSize())));
+                });
+                return survey.getSurveyId();
+            }).collect(Collectors.toList());
+
+            long rowCount = validatedRows.size();
+            long siteCount = validatedRows.stream().map(r -> r.getSite()).distinct().count();
+            long surveyCount = surveyIds.size();
+            long obsItemCount = validatedRows.stream().map(r -> r.getSpecies()).filter(o -> o.isPresent()).distinct()
+                    .count();
+            long diverCount = validatedRows.stream().map(r -> r.getDiver()).distinct().count();
+
+            List<String> messages = Arrays.asList(rowCount + " rows of data", siteCount + " sites",
+                    surveyCount + " surveys", obsItemCount + " distinct observable items", diverCount + " divers");
+            message = messages.stream().collect(Collectors.joining("\n"));
+        }
+
+        stagedJobLogRepository.save(
+                StagedJobLog.builder().stagedJob(job).details(message).eventType(StagedJobEventType.CORRECTED).build());
+        job.setStatus(StatusJobType.CORRECTION);
+        job.setSurveyIds(surveyIds);
+        jobRepository.save(job);
     }
 }

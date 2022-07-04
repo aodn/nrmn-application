@@ -57,5 +57,5 @@ public interface CorrectionRowRepository
             "c.latitude, c.longitude, " +
             "c.observable_item_id, c.observable_item_name, c.letter_code, " +
             "c.method_id, c.block_num, c.survey_not_done, c.measure_type_id", nativeQuery = true)
-    List<CorrectionRowDto> findRowsBySurveyId(@Param("surveyId") Long surveyId);
+    List<CorrectionRowDto> findRowsBySurveyId(@Param("surveyId") Integer surveyId);
 }
