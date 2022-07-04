@@ -17,7 +17,7 @@ const createPageData = (page, pageSize) =>
     }, {});
   });
 
-const server = (maxDataSize) => setupServer(
+const handler = (maxDataSize) =>
   rest.get('/api/v1/species', (req, res, ctx) => {
     const pageParam = req.url.search.match(/page=.[0-9]*/gm)?.pop();
     const pageSizeParam = req.url.search.match(/pageSize=.[0-9]*/gm)?.pop();
@@ -25,12 +25,12 @@ const server = (maxDataSize) => setupServer(
     const page = pageParam === undefined ? 0 : parseInt(pageParam.replace('page=',''));
     const pageSize = pageSizeParam ? parseInt(pageSizeParam.replace('pageSize=','')) : 0;
 
-    const pageData = createPageData(page,
-      (page * pageSize < maxDataSize) ? pageSize : maxDataSize - (page * pageSize));
+    // Remove server default page is 50, if you have total of 100 then you have 2 page
+    // if you have total of 101 then you have 3 page where page 3 contains 1 item
+    const length = ((page * 50) + pageSize < maxDataSize) ? pageSize : maxDataSize - page * 50;
 
-    return res(ctx.json(pageData));
-  })
-);
+    return res(ctx.json(createPageData(page,length)));
+  });
 
 const expectedPage = (page, pageSize) => {
   for (const prop of visibleProps) {
@@ -42,16 +42,24 @@ const expectedPage = (page, pageSize) => {
     expect(screen.queryByText(`${prop}.${page}.${pageSize - 1}`)).toBeInTheDocument();
     expect(screen.queryByText(`${prop}.${page}.${pageSize}`)).not.toBeInTheDocument();
   }
-//      expect(queryByText(`${page * 50 + 1}–${page * 50 + longPages[page].length} of`, {exact: false})).toBeInTheDocument();
 };
 
 describe('<SiteList/>', () => {
 
   let myServer = null;
 
-  afterEach(() => {
+  beforeAll(() => {
+    myServer = setupServer();
+    myServer.listen();
+  });
+
+  afterAll(() => {
     myServer?.close();
     myServer = null;
+  });
+
+  afterEach(() => {
+    myServer?.resetHandlers();
   });
 
   it('has both NRMN and WoRMS search options', async () => {
@@ -63,8 +71,8 @@ describe('<SiteList/>', () => {
   });
 
   it('disables the search button if less than 4 characters', async () => {
-    myServer = server(150);
-    myServer.listen();
+
+    myServer.use(handler(150));
 
     const {getByPlaceholderText, getByTestId} = render(<SpeciesSearch />);
     const searchBox = getByPlaceholderText('WoRMS Search');
@@ -76,12 +84,11 @@ describe('<SiteList/>', () => {
     await waitFor(() => expect(getByTestId('search-button')).toBeDisabled());
   });
 
-  it('paginates', async () => {
+  it('Paginates with 3 pages', async () => {
 
-    myServer = server(150);
-    myServer.listen();
+    myServer.use(handler(150));
 
-    render(<SpeciesSearch />);
+    render(<SpeciesSearch/>);
     const searchBox = screen.getByPlaceholderText('WoRMS Search');
 
     fireEvent.change(searchBox, {target: {value: '1234'}});
@@ -100,6 +107,9 @@ describe('<SiteList/>', () => {
     await waitFor(() => screen.findByText('class.2.0'))
       .then(() => expectedPage(2, 50));
 
+    // Should not have next page, so the class should contains Mui-disabled
+    expect(screen.getByLabelText('Go to next page')).toHaveClass('Mui-disabled');
+
     fireEvent.click(screen.getByLabelText('Go to previous page'));
     await waitFor(() => screen.findByText('class.1.0'))
       .then(() => expectedPage(1, 50));
@@ -108,4 +118,24 @@ describe('<SiteList/>', () => {
     await waitFor(() => screen.findByText('class.0.0'))
       .then(() => expectedPage(0, 50));
   });
+
+  it('Paginates with only 1 page', async () => {
+
+    myServer.use(handler(17));
+
+    render(<SpeciesSearch />);
+    const searchBox = screen.getByPlaceholderText('WoRMS Search');
+
+    fireEvent.change(searchBox, { target: { value: '1234' } });
+    fireEvent.click(screen.getByTestId('search-button'));
+
+    await waitFor(() => screen.findByText('class.0.0'))
+      .then(() => {
+        expectedPage(0, 17);
+      });
+
+    // Should not have next page, so the class should contains Mui-disabled
+    expect(screen.getByLabelText('Go to next page')).toHaveClass('Mui-disabled');
+  });
+
 });
