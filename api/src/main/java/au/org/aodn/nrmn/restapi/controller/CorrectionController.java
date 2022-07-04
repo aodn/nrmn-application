@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -203,6 +205,30 @@ public class CorrectionController {
                 .collect(Collectors.toList());
     }
 
+    
+    Pair<Collection<StagedRowFormatted>, Collection<ValidationError>> mapRows(Collection<ObservableItem> species, Collection<StagedRow> rows) {
+        Collection<StagedRowFormatted> mappedRows = formatRowsWithSpecies(rows, species);
+        
+        var result = new ArrayList<Pair<StagedRowFormatted, Collection<String>>>();
+
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.typeMap(StagedRowFormatted.class, StagedRow.class).addMappings(mapper -> mapper.map(src -> src.getDiver().getInitials(), StagedRow::setDiver));
+        for(var row : mappedRows) {
+            var res = new Pair<StagedRowFormatted, Collection>(row, List.of());
+
+            var unmappedRow = modelMapper.map(row, StagedRow.class);
+            var stagedRow = row.getRef();
+
+            if(!unmappedRow.getDiver().equalsIgnoreCase(stagedRow.getDiver()))
+                res.
+            result.add(res);
+        }
+
+        if(mappedRows.size() != rows.size()) {
+            return ResponseEntity.unprocessableEntity().body("Failed to map rows");
+        }
+    }
+
     @PostMapping(path = "correct/{survey_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> submitSurveyCorrection(@PathVariable("survey_id") Integer surveyId,
@@ -220,19 +246,10 @@ public class CorrectionController {
         userAuditRepo.save(new UserActionAudit("correct/survey", logMessage));
 
         Collection<ObservableItem> species = getSpeciesForRows(rows);
-        Collection<StagedRowFormatted> mappedRows = formatRowsWithSpecies(rows, species);
-        
-        // TODO: Check mapping is complete
-
-        if(mappedRows.size() != rows.size()) {
-            return ResponseEntity.unprocessableEntity().body("Failed to map rows");
-        }
+        var mappedRows = mapRows(species, rows);
 
         var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
-        observationRepository
-                .getSpeciesAttributesByIds(
-                        species.stream().map(o -> o.getObservableItemId()).collect(Collectors.toList()))
-                .stream().forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
+        observationRepository.getSpeciesAttributesByIds(species.stream().map(o -> o.getObservableItemId()).collect(Collectors.toList())).stream().forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
 
         Collection<ValidationError> errors = new HashSet<ValidationError>();
 
