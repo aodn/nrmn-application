@@ -64,7 +64,7 @@ public class SurveyCorrectionService {
     ProgramRepository programRepository;
 
     @Autowired
-    SiteRepository siteRepo;
+    SiteRepository siteRepository;
 
     @Autowired
     EntityManager entityManager;
@@ -78,9 +78,12 @@ public class SurveyCorrectionService {
     @Autowired
     StagedJobRepository jobRepository;
 
-    public void deleteSurvey(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows,
-            Boolean deleteSurvey) {
-        correctionTransaction(job, survey, validatedRows, deleteSurvey);
+    public void correctSurvey(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows) {
+        correctionTransaction(job, survey, validatedRows, false);
+    }
+
+    public void deleteSurvey(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows) {
+        correctionTransaction(job, survey, validatedRows, true);
     }
 
     private SurveyMethodEntity getSurveyMethod(Survey survey, StagedRowFormatted stagedRow) {
@@ -169,7 +172,7 @@ public class SurveyCorrectionService {
         surveyMethodRepository.deleteForSurveyId(survey.getSurveyId());
 
         String message;
-        List<Integer> surveyIds = Arrays.asList(survey.getSurveyId());
+        List<Integer> surveyIds = Arrays.asList();
 
         if (deleteSurvey) {
             surveyRepository.deleteById(survey.getSurveyId());

@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +24,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
+import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.SecUser;
+import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedJobLog;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
@@ -38,9 +43,11 @@ import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.CorrectionRowRepository;
+import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.SecUserRepository;
+import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
@@ -92,6 +99,12 @@ public class CorrectionController {
 
     @Autowired
     SurveyCorrectionService surveyCorrectionService;
+
+    @Autowired
+    DiverRepository diverRepository;
+
+    @Autowired
+    SiteRepository siteRepository;
 
     private void logMessage(StagedJob job, String message) {
         var log = StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.CORRECTING).details(message)
@@ -167,30 +180,75 @@ public class CorrectionController {
         return ResponseEntity.ok().body(response);
     }
 
+    public Collection<ObservableItem> getSpeciesForRows(Collection<StagedRow> rows) {
+        Collection<String> enteredSpeciesNames = rows.stream().map(s -> s.getSpecies()).collect(Collectors.toSet());
+        return observableItemRepository.getAllSpeciesNamesMatching(enteredSpeciesNames);
+    }
+
+    public Collection<StagedRowFormatted> formatRowsWithSpecies(Collection<StagedRow> rows,
+            Collection<ObservableItem> species) {
+        Map<Long, StagedRow> rowMap = rows.stream().collect(Collectors.toMap(StagedRow::getId, r -> r));
+        List<Integer> speciesIds = species.stream().map(s -> s.getObservableItemId()).collect(Collectors.toList());
+        Map<String, UiSpeciesAttributes> speciesAttributesMap = observationRepository
+                .getSpeciesAttributesByIds(speciesIds).stream()
+                .collect(Collectors.toMap(UiSpeciesAttributes::getSpeciesName, a -> a));
+        Map<String, ObservableItem> speciesMap = species.stream()
+                .collect(Collectors.toMap(ObservableItem::getObservableItemName, o -> o));
+        Collection<Diver> divers = diverRepository.getAll().stream().collect(Collectors.toList());
+        Collection<Site> sites = siteRepository.getAll().stream().collect(Collectors.toList());
+
+        StagedRowFormattedMapperConfig mapperConfig = new StagedRowFormattedMapperConfig();
+        ModelMapper mapper = mapperConfig.getModelMapper(speciesMap, rowMap, speciesAttributesMap, divers, sites);
+        return rows.stream().map(stagedRow -> mapper.map(stagedRow, StagedRowFormatted.class))
+                .collect(Collectors.toList());
+    }
+
     @PostMapping(path = "correct/{survey_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<?> submitSurveyCorrection(@PathVariable("survey_id") Long surveyId,
+    public ResponseEntity<?> submitSurveyCorrection(@PathVariable("survey_id") Integer surveyId,
             Authentication authentication, @RequestBody List<StagedRow> rows) {
 
-        // String logMessage = "correction: username: " + authentication.getName() + "
-        // survey: " + surveyId;
-        // userAuditRepo.save(new UserActionAudit("correct/survey", logMessage));
+        Optional<SecUser> user = userRepo.findByEmail(authentication.getName());
 
-        // List<Integer> observableItemIds = rows.stream().map(r ->
-        // r.getObservableItemId()).collect(Collectors.toList());
-        // var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
-        // observationRepository.getSpeciesAttributesByIds(observableItemIds).stream().forEach(m
-        // -> speciesAttributes.put(m.getId().intValue(), m));
+        var surveyOptional = surveyRepository.findById(surveyId);
+        if (!surveyOptional.isPresent())
+            return ResponseEntity.notFound().build();
 
-        // var observationIdsToReplace = new ArrayList<Integer>();
+        var survey = surveyOptional.get();
+
+        String logMessage = "correction: username: " + authentication.getName() + "survey: " + surveyId;
+        userAuditRepo.save(new UserActionAudit("correct/survey", logMessage));
+
+        Collection<ObservableItem> species = getSpeciesForRows(rows);
+        Collection<StagedRowFormatted> mappedRows = formatRowsWithSpecies(rows, species);
+        
+        // TODO: Check mapping is complete
+
+        if(mappedRows.size() != rows.size()) {
+            return ResponseEntity.unprocessableEntity().body("Failed to map rows");
+        }
+
+        var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
+        observationRepository
+                .getSpeciesAttributesByIds(
+                        species.stream().map(o -> o.getObservableItemId()).collect(Collectors.toList()))
+                .stream().forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
+
         Collection<ValidationError> errors = new HashSet<ValidationError>();
-        // for(var row: rows) {
-        // observationIdsToReplace.addAll(row.getObservationIds());
-        // errors.addAll(measurementValidationService.validate(speciesAttributes, row));
-        // }
 
-        // logger.info("observations: " + observationIdsToReplace.toString());
+        for (var row : mappedRows) {
+            errors.addAll(measurementValidationService
+                    .validate(speciesAttributes.get(row.getSpecies().get().getObservableItemId()), row));
+        }
 
+        var job = jobRepository.save(StagedJob.builder().source(SourceJobType.CORRECTION)
+                .reference(surveyId.toString()).status(StatusJobType.CORRECTION)
+                .program(survey.getProgram())
+                .creator(user.get()).build());
+
+        logMessage(job, "Correct Survey " + surveyId);
+
+        surveyCorrectionService.correctSurvey(job, survey, mappedRows);
         var response = new ValidationResponse();
         response.setErrors(errors);
         return ResponseEntity.ok().body(response);
@@ -217,7 +275,7 @@ public class CorrectionController {
         logMessage(job, "Delete Survey " + id);
 
         try {
-            surveyCorrectionService.deleteSurvey(job, survey, Collections.emptyList(), true);
+            surveyCorrectionService.deleteSurvey(job, survey, Collections.emptyList());
         } catch (Exception e) {
 
             logger.error("Correction Failed", e);
