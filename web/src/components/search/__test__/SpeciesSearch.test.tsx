@@ -1,6 +1,6 @@
 import {afterEach, describe} from '@jest/globals';
 import '@testing-library/jest-dom';
-import {fireEvent, render, waitFor} from '@testing-library/react';
+import { fireEvent, screen, render, waitFor, prettyDOM } from '@testing-library/react';
 import {rest} from 'msw';
 import {setupServer} from 'msw/node';
 import SpeciesSearch from '../SpeciesSearch';
@@ -8,26 +8,42 @@ import SpeciesSearch from '../SpeciesSearch';
 const visibleProps = ['class', 'family', 'genus', 'order', 'phylum', 'species', 'status'];
 const props = [...visibleProps, 'supersededBy', 'unacceptReason', 'aphiaId'];
 
-// Create array of [3][50] where field name is props and field values are combination of field names and iteration value
-const longPages = Array.from({length: 3}, (_, i) => i).map((p) =>
-  Array.from({length: p == 2 ? 25 : 50}, (_, i) => i).map((i) => {
+// dynamic create an array where size of page size and data contains identity of page value
+const createPageData = (page, pageSize) =>
+  Array.from({length: pageSize}, (_, i) => i).map((i) => {
     return props.reduce((row, prop) => {
-      row[prop] = `${prop}.${p}.${i}`;
+      row[prop] = `${prop}.${page}.${i}`;
       return row;
     }, {});
-  })
-);
+  });
 
-const server = (data) => setupServer(
+const server = (maxDataSize) => setupServer(
   rest.get('/api/v1/species', (req, res, ctx) => {
-    const pageParam = req.url.search
-      .match(/page=.?/gm)
-      ?.at(0)
-      .slice(-1);
-    const pageData = data[pageParam ? parseInt(pageParam) : 0];
+    const pageParam = req.url.search.match(/page=.[0-9]*/gm)?.pop();
+    const pageSizeParam = req.url.search.match(/pageSize=.[0-9]*/gm)?.pop();
+
+    const page = pageParam === undefined ? 0 : parseInt(pageParam.replace('page=',''));
+    const pageSize = pageSizeParam ? parseInt(pageSizeParam.replace('pageSize=','')) : 0;
+
+    const pageData = createPageData(page,
+      (page * pageSize < maxDataSize) ? pageSize : maxDataSize - (page * pageSize));
+
     return res(ctx.json(pageData));
   })
 );
+
+const expectedPage = (page, pageSize) => {
+  for (const prop of visibleProps) {
+    expect(screen.queryByText(`${prop}.${page}.0`)).toBeInTheDocument();
+    expect(screen.queryByText(`${prop}.${page + 1}.0`)).not.toBeInTheDocument();
+
+    if (page > 0) expect(screen.queryByText(`${prop}.${page - 1}.0`)).not.toBeInTheDocument();
+
+    expect(screen.queryByText(`${prop}.${page}.${pageSize - 1}`)).toBeInTheDocument();
+    expect(screen.queryByText(`${prop}.${page}.${pageSize}`)).not.toBeInTheDocument();
+  }
+//      expect(queryByText(`${page * 50 + 1}–${page * 50 + longPages[page].length} of`, {exact: false})).toBeInTheDocument();
+};
 
 describe('<SiteList/>', () => {
 
@@ -47,11 +63,11 @@ describe('<SiteList/>', () => {
   });
 
   it('disables the search button if less than 4 characters', async () => {
+    myServer = server(150);
+    myServer.listen();
+
     const {getByPlaceholderText, getByTestId} = render(<SpeciesSearch />);
     const searchBox = getByPlaceholderText('WoRMS Search');
-
-    myServer = server(longPages);
-    myServer.listen();
 
     fireEvent.change(searchBox, {target: {value: '1234'}});
     await waitFor(() => expect(getByTestId('search-button')).toBeEnabled());
@@ -62,42 +78,34 @@ describe('<SiteList/>', () => {
 
   it('paginates', async () => {
 
-    const {getByPlaceholderText, getByTestId, getByLabelText, queryByText, rerender} = render(<SpeciesSearch />);
-    const searchBox = getByPlaceholderText('WoRMS Search');
-
-    myServer = server(longPages);
+    myServer = server(150);
     myServer.listen();
 
+    render(<SpeciesSearch />);
+    const searchBox = screen.getByPlaceholderText('WoRMS Search');
+
     fireEvent.change(searchBox, {target: {value: '1234'}});
-    fireEvent.click(getByTestId('search-button'));
+    fireEvent.click(screen.getByTestId('search-button'));
 
-    const expectedPage = (page) => {
-      for (const prop of visibleProps) {
-        expect(queryByText(`${prop}.${page}.0`)).toBeInTheDocument();
-        expect(queryByText(`${prop}.${page + 1}.0`)).not.toBeInTheDocument();
+    await waitFor(() => screen.findByText('class.0.0'))
+      .then(() => {
+        expectedPage(0, 50);
+      });
 
-        if (page > 0) expect(queryByText(`${prop}.${page - 1}.0`)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText('Go to next page'));
+    await waitFor(() => screen.findByText('class.1.0'))
+      .then(() => expectedPage(1, 50));
 
-        expect(queryByText(`${prop}.${page}.${longPages[page].length - 1}`)).toBeInTheDocument();
-        expect(queryByText(`${prop}.${page}.${longPages[page].length}`)).not.toBeInTheDocument();
-      }
-      expect(queryByText(`${page * 50 + 1}–${page * 50 + longPages[page].length} of`, {exact: false})).toBeInTheDocument();
-    };
+    fireEvent.click(screen.getByLabelText('Go to next page'));
+    await waitFor(() => screen.findByText('class.2.0'))
+      .then(() => expectedPage(2, 50));
 
-    await waitFor(() => expectedPage(0));
+    fireEvent.click(screen.getByLabelText('Go to previous page'));
+    await waitFor(() => screen.findByText('class.1.0'))
+      .then(() => expectedPage(1, 50));
 
-    fireEvent.click(getByLabelText('Go to next page'));
-    rerender(<SpeciesSearch />);
-
-    await waitFor(() => expectedPage(1));
-
-    fireEvent.click(getByLabelText('Go to next page'));
-    await waitFor(() => expectedPage(2));
-
-    fireEvent.click(getByLabelText('Go to previous page'));
-    await waitFor(() => expectedPage(1));
-
-    fireEvent.click(getByLabelText('Go to previous page'));
-    await waitFor(() => expectedPage(0));
+    fireEvent.click(screen.getByLabelText('Go to previous page'));
+    await waitFor(() => screen.findByText('class.0.0'))
+      .then(() => expectedPage(0, 50));
   });
 });

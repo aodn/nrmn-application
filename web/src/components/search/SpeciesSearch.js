@@ -65,7 +65,7 @@ const SpeciesSearch = ({onRowClick}) => {
     setMaxRows(-1);
     setTabIndex(newValue);
   }, []);
-  
+
   const doSearch = (request) => {
     if (lastSearch?.species === request?.species && lastSearch?.page === request?.page) {
       // If the search is the same as previous, then no need to execute
@@ -137,11 +137,6 @@ const SpeciesSearch = ({onRowClick}) => {
           setSearching(prevValue => !prevValue));
     }
   };
-
-  // useEffect(() => {
-  //   setMaxRows(hasNextPage ? -1 : gridData?.length);
-  //
-  // }, [hasNextPage, gridData]);
 
   const handleChangePage = (_, newPage) => {
     if(maxRows < 0 && page < newPage) {
