@@ -1,7 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,10 +8,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -182,11 +185,6 @@ public class CorrectionController {
         return ResponseEntity.ok().body(response);
     }
 
-    public Collection<ObservableItem> getSpeciesForRows(Collection<StagedRow> rows) {
-        Collection<String> enteredSpeciesNames = rows.stream().map(s -> s.getSpecies()).collect(Collectors.toSet());
-        return observableItemRepository.getAllSpeciesNamesMatching(enteredSpeciesNames);
-    }
-
     public Collection<StagedRowFormatted> formatRowsWithSpecies(Collection<StagedRow> rows,
             Collection<ObservableItem> species) {
         Map<Long, StagedRow> rowMap = rows.stream().collect(Collectors.toMap(StagedRow::getId, r -> r));
@@ -205,34 +203,105 @@ public class CorrectionController {
                 .collect(Collectors.toList());
     }
 
-    
-    Pair<Collection<StagedRowFormatted>, Collection<ValidationError>> mapRows(Collection<ObservableItem> species, Collection<StagedRow> rows) {
-        Collection<StagedRowFormatted> mappedRows = formatRowsWithSpecies(rows, species);
-        
-        var result = new ArrayList<Pair<StagedRowFormatted, Collection<String>>>();
+    private boolean properiesDiffer(Function<StagedRow, String> getter, StagedRow rowA, StagedRow rowB) {
+        var valueA = getter.apply(rowA);
+        var valueB = getter.apply(rowB);
+        return StringUtils.isNotEmpty(valueA) &&
+                StringUtils.isNotEmpty(valueB) &&
+                !valueA.equalsIgnoreCase(valueB);
+    }
 
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.typeMap(StagedRowFormatted.class, StagedRow.class).addMappings(mapper -> mapper.map(src -> src.getDiver().getInitials(), StagedRow::setDiver));
-        for(var row : mappedRows) {
-            var res = new Pair<StagedRowFormatted, Collection>(row, List.of());
+    private List<Pair<StagedRowFormatted, HashSet<String>>> mapRows(
+            Collection<ObservableItem> species,
+            Collection<StagedRow> rows) {
 
-            var unmappedRow = modelMapper.map(row, StagedRow.class);
+        var mappedRows = formatRowsWithSpecies(rows, species);
+
+        var result = new ArrayList<Pair<StagedRowFormatted, HashSet<String>>>();
+
+        // -- model mapping
+
+        var modelMapper = new ModelMapper();
+
+        var obsItemMapper = (Converter<Optional<ObservableItem>, String>) ctx -> {
+            return ctx.getSource().isPresent() ? ctx.getSource().get().getObservableItemName() : null;
+        };
+
+        modelMapper.typeMap(StagedRowFormatted.class, StagedRow.class)
+                .addMappings(mapper -> mapper.map(src -> src.getDiver().getInitials(), StagedRow::setDiver))
+                .addMappings(mapper -> mapper.using(obsItemMapper)
+                        .map(StagedRowFormatted::getSpecies, StagedRow::setSpecies));
+
+        // ---
+
+        for (var row : mappedRows) {
+
+            var res = Pair.of(row, new HashSet<String>());
+
+            var demappedRow = modelMapper.map(row, StagedRow.class);
+
             var stagedRow = row.getRef();
 
-            if(!unmappedRow.getDiver().equalsIgnoreCase(stagedRow.getDiver()))
-                res.
+            var rowErrors = res.getRight();
+
+            if (properiesDiffer(StagedRow::getDiver, demappedRow, stagedRow))
+                rowErrors.add("diver");
+
+            if (properiesDiffer(StagedRow::getDepth, demappedRow, stagedRow))
+                rowErrors.add("depth");
+
+            if (properiesDiffer(StagedRow::getDate, demappedRow, stagedRow))
+                rowErrors.add("date");
+
+            if (properiesDiffer(StagedRow::getTime, demappedRow, stagedRow))
+                rowErrors.add("time");
+
+            if (properiesDiffer(StagedRow::getVis, demappedRow, stagedRow))
+                rowErrors.add("vis");
+
+            if (properiesDiffer(StagedRow::getDirection, demappedRow, stagedRow))
+                rowErrors.add("direction");
+
+            if (properiesDiffer(StagedRow::getLatitude, demappedRow, stagedRow))
+                rowErrors.add("latitude");
+
+            if (properiesDiffer(StagedRow::getLongitude, demappedRow, stagedRow))
+                rowErrors.add("longitude");
+
+            if (properiesDiffer(StagedRow::getSpecies, demappedRow, stagedRow))
+                rowErrors.add("species");
+
+            if (properiesDiffer(StagedRow::getCode, demappedRow, stagedRow))
+                rowErrors.add("code");
+
+            if (properiesDiffer(StagedRow::getMethod, demappedRow, stagedRow))
+                rowErrors.add("method");
+
+            if (properiesDiffer(StagedRow::getBlock, demappedRow, stagedRow))
+                rowErrors.add("block");
+
+            if (properiesDiffer(StagedRow::getSurveyNotDone, demappedRow, stagedRow))
+                rowErrors.add("snd");
+
+            if (properiesDiffer(StagedRow::getIsInvertSizing, demappedRow, stagedRow))
+                rowErrors.add("useInvertSizing");
+
+            // if
+            // (!demappedRow.getMeasureJson().equalsIgnoreCase(stagedRow.getMeasureJson()))
+            // rowErrors.add("measures");
+
             result.add(res);
         }
 
-        if(mappedRows.size() != rows.size()) {
-            return ResponseEntity.unprocessableEntity().body("Failed to map rows");
-        }
+        return result;
     }
 
     @PostMapping(path = "correct/{survey_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> submitSurveyCorrection(@PathVariable("survey_id") Integer surveyId,
             Authentication authentication, @RequestBody List<StagedRow> rows) {
+
+        // -- preamble
 
         Optional<SecUser> user = userRepo.findByEmail(authentication.getName());
 
@@ -245,27 +314,47 @@ public class CorrectionController {
         String logMessage = "correction: username: " + authentication.getName() + "survey: " + surveyId;
         userAuditRepo.save(new UserActionAudit("correct/survey", logMessage));
 
-        Collection<ObservableItem> species = getSpeciesForRows(rows);
-        var mappedRows = mapRows(species, rows);
+        // create a new job for this correction
 
-        var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
-        observationRepository.getSpeciesAttributesByIds(species.stream().map(o -> o.getObservableItemId()).collect(Collectors.toList())).stream().forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
-
-        Collection<ValidationError> errors = new HashSet<ValidationError>();
-
-        for (var row : mappedRows) {
-            errors.addAll(measurementValidationService
-                    .validate(speciesAttributes.get(row.getSpecies().get().getObservableItemId()), row));
-        }
-
-        var job = jobRepository.save(StagedJob.builder().source(SourceJobType.CORRECTION)
-                .reference(surveyId.toString()).status(StatusJobType.CORRECTION)
+        var job = StagedJob.builder()
+                .source(SourceJobType.CORRECTION)
+                .reference(surveyId.toString())
+                .status(StatusJobType.CORRECTION)
                 .program(survey.getProgram())
-                .creator(user.get()).build());
+                .creator(user.get())
+                .build();
+
+        job = jobRepository.save(job);
 
         logMessage(job, "Correct Survey " + surveyId);
 
-        surveyCorrectionService.correctSurvey(job, survey, mappedRows);
+        // ---
+
+        var speciesNames = rows.stream().map(s -> s.getSpecies()).collect(Collectors.toSet());
+        var observableItems = observableItemRepository.getAllSpeciesNamesMatching(speciesNames);
+
+        var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
+        var obsItemIds = observableItems.stream().map(o -> o.getObservableItemId()).collect(Collectors.toList());
+        observationRepository
+                .getSpeciesAttributesByIds(obsItemIds)
+                .stream()
+                .forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
+
+        var mappingResult = mapRows(observableItems, rows);
+
+        var mappedRows = mappingResult.stream().map(r -> r.getLeft()).collect(Collectors.toList());
+
+        var errors =  new HashSet<ValidationError>();
+        for (var row : mappedRows) {
+            var speciesAttrib = speciesAttributes.get(row.getSpecies().get().getObservableItemId());
+            errors.addAll(measurementValidationService.validate(speciesAttrib, row));
+        }
+
+        if (errors.size() < 1)
+            surveyCorrectionService.correctSurvey(job, survey, mappedRows);
+        else
+            logMessage(job, "Survey correction failed. Errors found.");
+
         var response = new ValidationResponse();
         response.setErrors(errors);
         return ResponseEntity.ok().body(response);
