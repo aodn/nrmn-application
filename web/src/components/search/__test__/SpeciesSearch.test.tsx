@@ -17,7 +17,7 @@ const createPageData = (page, pageSize) =>
     }, {});
   });
 
-const handler = (maxDataSize) =>
+const handler = (properties) =>
   rest.get('/api/v1/species', (req, res, ctx) => {
     const pageParam = req.url.search.match(/page=.[0-9]*/gm)?.pop();
     const pageSizeParam = req.url.search.match(/pageSize=.[0-9]*/gm)?.pop();
@@ -27,7 +27,8 @@ const handler = (maxDataSize) =>
 
     // Remove server default page is 50, if you have total of 100 then you have 2 page
     // if you have total of 101 then you have 3 page where page 3 contains 1 item
-    const length = ((page * 50) + pageSize < maxDataSize) ? pageSize : maxDataSize - page * 50;
+    const length = ((page * 50) + pageSize < properties.maxDataSize) ? pageSize : properties.maxDataSize - page * 50;
+    properties.invokeCount++;
 
     return res(ctx.json(createPageData(page,length)));
   });
@@ -72,7 +73,7 @@ describe('<SiteList/>', () => {
 
   it('disables the search button if less than 4 characters', async () => {
 
-    myServer.use(handler(150));
+    myServer.use(handler({maxDataSize: 150, invokeCount: 0}));
 
     const {getByPlaceholderText, getByTestId} = render(<SpeciesSearch />);
     const searchBox = getByPlaceholderText('WoRMS Search');
@@ -85,8 +86,8 @@ describe('<SiteList/>', () => {
   });
 
   it('Paginates with 3 pages', async () => {
-
-    myServer.use(handler(150));
+    const properties = {maxDataSize: 150, invokeCount: 0};
+    myServer.use(handler(properties));
 
     render(<SpeciesSearch/>);
     const searchBox = screen.getByPlaceholderText('WoRMS Search');
@@ -97,31 +98,53 @@ describe('<SiteList/>', () => {
     await waitFor(() => screen.findByText('class.0.0'))
       .then(() => {
         expectedPage(0, 50);
+        expect(properties.invokeCount).toBe(1);
       });
 
     fireEvent.click(screen.getByLabelText('Go to next page'));
     await waitFor(() => screen.findByText('class.1.0'))
-      .then(() => expectedPage(1, 50));
+      .then(() => {
+        expectedPage(1, 50);
+        expect(properties.invokeCount).toBe(2);
+      });
 
     fireEvent.click(screen.getByLabelText('Go to next page'));
     await waitFor(() => screen.findByText('class.2.0'))
-      .then(() => expectedPage(2, 50));
+      .then(() => {
+        expectedPage(2, 50);
+        expect(properties.invokeCount).toBe(3);
+      });
 
     // Should not have next page, so the class should contains Mui-disabled
     expect(screen.getByLabelText('Go to next page')).toHaveClass('Mui-disabled');
 
     fireEvent.click(screen.getByLabelText('Go to previous page'));
     await waitFor(() => screen.findByText('class.1.0'))
-      .then(() => expectedPage(1, 50));
+      .then(() => {
+        expectedPage(1, 50);
+        // Value cached, so will not count will not increase
+        expect(properties.invokeCount).toBe(3);
+      });
 
     fireEvent.click(screen.getByLabelText('Go to previous page'));
     await waitFor(() => screen.findByText('class.0.0'))
-      .then(() => expectedPage(0, 50));
+      .then(() => {
+        expectedPage(0, 50);
+        // Value cached, so will not count will not increase
+        expect(properties.invokeCount).toBe(3);
+      });
+
+    fireEvent.click(screen.getByLabelText('Go to next page'));
+    await waitFor(() => screen.findByText('class.1.0'))
+      .then(() => {
+        expectedPage(1, 50);
+        expect(properties.invokeCount).toBe(3);
+      });
   });
 
   it('Paginates with only 1 page', async () => {
-
-    myServer.use(handler(17));
+    const properties = {maxDataSize: 17, invokeCount: 0};
+    myServer.use(handler(properties));
 
     render(<SpeciesSearch />);
     const searchBox = screen.getByPlaceholderText('WoRMS Search');
