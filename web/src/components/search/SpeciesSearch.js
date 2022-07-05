@@ -139,7 +139,7 @@ const SpeciesSearch = ({onRowClick}) => {
   };
 
   const handleChangePage = (_, newPage) => {
-    if(maxRows < 0 && page < newPage) {
+    if(maxRows < 0 && page < newPage && gridData.length < (newPage + 1) * rowsPerPage) {
       doSearch({
         searchType: tabIndex === 0 ? 'WORMS' : 'NRMN',
         species: searchTerm,
