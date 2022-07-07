@@ -1,5 +1,7 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
@@ -98,5 +100,69 @@ class StagedRowFormattedMappingIT {
         assertEquals(Optional.of(10.0), formattedRow.getVis());
         assertEquals(4, formattedRow.getSurveyNum());
         assertEquals(7, formattedRow.getDepth());
+    }
+
+    @Test
+    void invalidMappingsShouldBeNull() {
+
+        StagedJob job = new StagedJob();
+        job.setId(1L);
+        job.setIsExtendedSize(false);
+        Program program = new Program();
+        program.setProgramId(1);
+        program.setProgramName("RLS");
+        job.setProgram(program);
+
+        StagedRow row = new StagedRow();
+        row.setStagedJob(job);
+        row.setBlock("1]");
+        row.setCode("]]]]]");
+        row.setDate("The Past");
+        row.setDepth("Very Deep");
+        row.setDirection("Directly under the earth's sun");
+        row.setDiver("");
+        row.setInverts("0]");
+        row.setLatitude("BBB");
+        row.setLongitude("AAA");
+        row.setMethod("]]]]]]");
+        row.setPqs("Nonexistent PQ diver");
+        row.setSiteCode("");
+        row.setSpecies("Nonexistent Species");
+        row.setTime("Eleven:Thirty");
+        row.setTotal("]]]]]]");
+        row.setVis("Very Murky");
+        row.setMeasureJson(new HashMap<Integer, String>() {
+            {
+                put(13, "1]");
+            }
+        });
+
+        Collection<ObservableItem> species = observableItemRepository
+                .getAllSpeciesNamesMatching(Arrays.asList(row.getSpecies()));
+
+        Collection<StagedRowFormatted> validatedRows = validationProcess
+                .formatRowsWithSpecies(Arrays.asList(row), species);
+
+        assertEquals(1, validatedRows.size());
+
+        StagedRowFormatted formattedRow = (StagedRowFormatted) validatedRows.toArray()[0];
+
+        assertNull(formattedRow.getBlock());
+        assertNull(formattedRow.getDate());
+        assertNull(formattedRow.getDepth());
+        assertNull(formattedRow.getDirection());
+        assertNull(formattedRow.getDiver());
+        assertNull(formattedRow.getInverts());
+        assertNull(formattedRow.getLatitude());
+        assertNull(formattedRow.getLongitude());
+        assertNull(formattedRow.getMethod());
+        assertNull(formattedRow.getPqs());
+        assertNull(formattedRow.getSite());
+        assertNull(formattedRow.getTotal());
+        assertNull(formattedRow.getMeasureJson().get(13));
+
+        assertFalse(formattedRow.getSpecies().isPresent());
+        assertFalse(formattedRow.getTime().isPresent());
+        assertFalse(formattedRow.getVis().isPresent());
     }
 }
