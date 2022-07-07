@@ -165,4 +165,37 @@ class StagedRowFormattedMappingIT {
         assertFalse(formattedRow.getTime().isPresent());
         assertFalse(formattedRow.getVis().isPresent());
     }
+
+    @Test
+    void onlyMeasurementsGreaterThanZeroShouldBeMapped() {
+            
+            StagedJob job = new StagedJob();
+            job.setId(1L);
+            job.setIsExtendedSize(false);
+            Program program = new Program();
+            program.setProgramId(1);
+            program.setProgramName("RLS");
+            job.setProgram(program);
+            StagedRow row = new StagedRow();
+            row.setStagedJob(job);
+            row.setMeasureJson(new HashMap<Integer, String>() {
+                {
+                    put(1, "0");
+                    put(2, "222");
+                    put(3, "0");
+                    put(4, "444");
+                    put(5, "0");
+                }
+            });
+    
+            Collection<ObservableItem> species = observableItemRepository
+                    .getAllSpeciesNamesMatching(Arrays.asList(row.getSpecies()));
+            Collection<StagedRowFormatted> validatedRows = validationProcess.formatRowsWithSpecies(Arrays.asList(row),
+                    species);
+
+            StagedRowFormatted formattedRow = (StagedRowFormatted) validatedRows.toArray()[0];
+            assertEquals(2, formattedRow.getMeasureJson().size());
+            assertEquals(222, formattedRow.getMeasureJson().get(2));
+            assertEquals(444, formattedRow.getMeasureJson().get(4));
+    }
 }
