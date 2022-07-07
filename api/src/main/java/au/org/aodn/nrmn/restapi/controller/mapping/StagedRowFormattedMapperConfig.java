@@ -100,7 +100,7 @@ public class StagedRowFormattedMapperConfig {
 
         Converter<String, Double> toDouble = ctx -> {
             Double dbl = NumberUtils.toDouble(ctx.getSource(), Double.NaN);
-            return (dbl != Double.NaN) ? dbl : null;
+            return Double.isNaN(dbl) ? null : dbl;
         };
 
         Converter<String, Integer> toInteger = ctx -> {
