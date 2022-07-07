@@ -44,7 +44,7 @@ public class StagedRowFormattedMapperConfig {
 
         Converter<Long, StagedRow> toRef = ctx -> rowMap.get(ctx.getSource());
 
-        Converter<String, Optional<UiSpeciesAttributes>> toSpeciesAttributesOpt = ctx -> {
+        Converter<String, Optional<UiSpeciesAttributes>> toSpeciesAttribute = ctx -> {
             UiSpeciesAttributes speciesAttributes = speciesAttributesMap.get(ctx.getSource());
             return speciesAttributes != null ? Optional.of(speciesAttributes) : Optional.empty();
         };
@@ -100,7 +100,7 @@ public class StagedRowFormattedMapperConfig {
 
         Converter<String, Double> toDouble = ctx -> {
             Double dbl = NumberUtils.toDouble(ctx.getSource(), Double.NaN);
-            return (dbl != Double.NaN) ? dbl : null;
+            return Double.isNaN(dbl) ? null : dbl;
         };
 
         Converter<String, Integer> toInteger = ctx -> {
@@ -131,23 +131,28 @@ public class StagedRowFormattedMapperConfig {
 
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.typeMap(StagedRow.class, StagedRowFormatted.class).addMappings(mapper -> {
-            mapper.using(toObservableItem).map(StagedRow::getSpecies, StagedRowFormatted::setSpecies);
-            mapper.using(toSpeciesAttributesOpt).map(StagedRow::getSpecies,
-                    StagedRowFormatted::setSpeciesAttributesOpt);
-            mapper.using(toMeasureJson).map(StagedRow::getMeasureJson, StagedRowFormatted::setMeasureJson);
+
             mapper.using(toDiver).map(StagedRow::getDiver, StagedRowFormatted::setDiver);
-            mapper.using(toDirection).map(StagedRow::getDirection, StagedRowFormatted::setDirection);
             mapper.using(toDiver).map(StagedRow::getPqs, StagedRowFormatted::setPqs);
+
             mapper.using(toDouble).map(StagedRow::getLatitude, StagedRowFormatted::setLatitude);
             mapper.using(toDouble).map(StagedRow::getLongitude, StagedRowFormatted::setLongitude);
-            mapper.using(toRef).map(StagedRow::getId, StagedRowFormatted::setRef);
-            mapper.using(toSite).map(StagedRow::getSiteCode, StagedRowFormatted::setSite);
+
+            mapper.using(toInteger).map(StagedRow::getBlock, StagedRowFormatted::setBlock);
+            mapper.using(toInteger).map(StagedRow::getInverts, StagedRowFormatted::setInverts);
+            mapper.using(toInteger).map(StagedRow::getMethod, StagedRowFormatted::setMethod);
+            mapper.using(toInteger).map(StagedRow::getTotal, StagedRowFormatted::setTotal);
+
             mapper.using(toDate).map(StagedRow::getDate, StagedRowFormatted::setDate);
             mapper.using(toDepth).map(StagedRow::getDepth, StagedRowFormatted::setDepth);
-            mapper.using(toInteger).map(StagedRow::getMethod, StagedRowFormatted::setMethod);
-            mapper.using(toInteger).map(StagedRow::getInverts, StagedRowFormatted::setInverts);
-            mapper.using(toSurveyNum).map(StagedRow::getDepth, StagedRowFormatted::setSurveyNum);
+            mapper.using(toDirection).map(StagedRow::getDirection, StagedRowFormatted::setDirection);
             mapper.using(toInvertSizing).map(StagedRow::getIsInvertSizing, StagedRowFormatted::setIsInvertSizing);
+            mapper.using(toMeasureJson).map(StagedRow::getMeasureJson, StagedRowFormatted::setMeasureJson);
+            mapper.using(toObservableItem).map(StagedRow::getSpecies, StagedRowFormatted::setSpecies);
+            mapper.using(toRef).map(StagedRow::getId, StagedRowFormatted::setRef);
+            mapper.using(toSite).map(StagedRow::getSiteCode, StagedRowFormatted::setSite);
+            mapper.using(toSpeciesAttribute).map(StagedRow::getSpecies, StagedRowFormatted::setSpeciesAttributesOpt);
+            mapper.using(toSurveyNum).map(StagedRow::getDepth, StagedRowFormatted::setSurveyNum);
             mapper.using(toTime).map(StagedRow::getTime, StagedRowFormatted::setTime);
             mapper.using(toVis).map(StagedRow::getVis, StagedRowFormatted::setVis);
         });
