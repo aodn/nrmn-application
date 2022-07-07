@@ -1,5 +1,7 @@
 package au.org.aodn.nrmn.restapi.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -8,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -33,10 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
-import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.SecUser;
-import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedJobLog;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
@@ -187,18 +186,26 @@ public class CorrectionController {
 
     public Collection<StagedRowFormatted> formatRowsWithSpecies(Collection<StagedRow> rows,
             Collection<ObservableItem> species) {
-        Map<Long, StagedRow> rowMap = rows.stream().collect(Collectors.toMap(StagedRow::getId, r -> r));
-        List<Integer> speciesIds = species.stream().map(s -> s.getObservableItemId()).collect(Collectors.toList());
-        Map<String, UiSpeciesAttributes> speciesAttributesMap = observationRepository
+
+        var rowMap = rows.stream().collect(Collectors.toMap(StagedRow::getId, r -> r));
+
+        var speciesIds = species.stream()
+                .map(s -> s.getObservableItemId())
+                .collect(Collectors.toList());
+
+        var speciesAttributesMap = observationRepository
                 .getSpeciesAttributesByIds(speciesIds).stream()
                 .collect(Collectors.toMap(UiSpeciesAttributes::getSpeciesName, a -> a));
-        Map<String, ObservableItem> speciesMap = species.stream()
-                .collect(Collectors.toMap(ObservableItem::getObservableItemName, o -> o));
-        Collection<Diver> divers = diverRepository.getAll().stream().collect(Collectors.toList());
-        Collection<Site> sites = siteRepository.getAll().stream().collect(Collectors.toList());
 
-        StagedRowFormattedMapperConfig mapperConfig = new StagedRowFormattedMapperConfig();
-        ModelMapper mapper = mapperConfig.getModelMapper(speciesMap, rowMap, speciesAttributesMap, divers, sites);
+        var speciesMap = species.stream().collect(Collectors.toMap(ObservableItem::getObservableItemName, o -> o));
+
+        var divers = diverRepository.getAll().stream().collect(Collectors.toList());
+
+        var sites = siteRepository.getAll().stream().collect(Collectors.toList());
+
+        var mapperConfig = new StagedRowFormattedMapperConfig();
+        var mapper = mapperConfig.getModelMapper(speciesMap, rowMap, speciesAttributesMap, divers, sites);
+
         return rows.stream().map(stagedRow -> mapper.map(stagedRow, StagedRowFormatted.class))
                 .collect(Collectors.toList());
     }
@@ -206,9 +213,11 @@ public class CorrectionController {
     private boolean properiesDiffer(Function<StagedRow, String> getter, StagedRow rowA, StagedRow rowB) {
         var valueA = getter.apply(rowA);
         var valueB = getter.apply(rowB);
-        return StringUtils.isNotEmpty(valueA) &&
-                StringUtils.isNotEmpty(valueB) &&
-                !valueA.equalsIgnoreCase(valueB);
+        var contentDiffers = (valueA == null && valueB != null) || (valueB == null && valueA != null);
+        var valueDiffers = StringUtils.isNotEmpty(valueA)
+                && StringUtils.isNotEmpty(valueB)
+                && !valueA.equalsIgnoreCase(valueB);
+        return contentDiffers || valueDiffers;
     }
 
     private List<Pair<StagedRowFormatted, HashSet<String>>> mapRows(
@@ -227,12 +236,45 @@ public class CorrectionController {
             return ctx.getSource().isPresent() ? ctx.getSource().get().getObservableItemName() : null;
         };
 
+        var dateMapper = (Converter<LocalDate, String>) ctx -> {
+            return ctx.getSource() != null ? ctx.getSource().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : null;
+        };
+
+        var integerMapper = (Converter<Optional<Double>, String>) ctx -> {
+            return ctx.getSource().isPresent() ? String.valueOf(ctx.getSource().get().intValue()) : null;
+        };
+
         modelMapper.typeMap(StagedRowFormatted.class, StagedRow.class)
+                .addMappings(mapper -> mapper.map(StagedRowFormatted::getMethod, StagedRow::setMethod))
+                .addMappings(mapper -> mapper.map(StagedRowFormatted::getBlock, StagedRow::setBlock))
                 .addMappings(mapper -> mapper.map(src -> src.getDiver().getInitials(), StagedRow::setDiver))
+                .addMappings(mapper -> mapper.using(dateMapper)
+                        .map(StagedRowFormatted::getDate, StagedRow::setDate))
+                .addMappings(mapper -> mapper.using(integerMapper)
+                        .map(StagedRowFormatted::getVis, StagedRow::setVis))
                 .addMappings(mapper -> mapper.using(obsItemMapper)
                         .map(StagedRowFormatted::getSpecies, StagedRow::setSpecies));
 
         // ---
+
+        var propertyChecks = new HashMap<String, Function<StagedRow, String>>() {
+            {
+                put("block", StagedRow::getBlock);
+                put("date", StagedRow::getDate);
+                put("depth", StagedRow::getDepth);
+                put("direction", StagedRow::getDirection);
+                put("diver", StagedRow::getDiver);
+                put("latitude", StagedRow::getLatitude);
+                put("longitude", StagedRow::getLongitude);
+                put("method", StagedRow::getMethod);
+                put("code", StagedRow::getCode);
+                put("species", StagedRow::getSpecies);
+                put("time", StagedRow::getTime);
+                put("vis", StagedRow::getVis);
+                put("snd", StagedRow::getSurveyNotDone);
+                put("useInvertSizing", StagedRow::getIsInvertSizing);
+            }
+        };
 
         for (var row : mappedRows) {
 
@@ -244,47 +286,10 @@ public class CorrectionController {
 
             var rowErrors = res.getRight();
 
-            if (properiesDiffer(StagedRow::getDiver, demappedRow, stagedRow))
-                rowErrors.add("diver");
-
-            if (properiesDiffer(StagedRow::getDepth, demappedRow, stagedRow))
-                rowErrors.add("depth");
-
-            if (properiesDiffer(StagedRow::getDate, demappedRow, stagedRow))
-                rowErrors.add("date");
-
-            if (properiesDiffer(StagedRow::getTime, demappedRow, stagedRow))
-                rowErrors.add("time");
-
-            if (properiesDiffer(StagedRow::getVis, demappedRow, stagedRow))
-                rowErrors.add("vis");
-
-            if (properiesDiffer(StagedRow::getDirection, demappedRow, stagedRow))
-                rowErrors.add("direction");
-
-            if (properiesDiffer(StagedRow::getLatitude, demappedRow, stagedRow))
-                rowErrors.add("latitude");
-
-            if (properiesDiffer(StagedRow::getLongitude, demappedRow, stagedRow))
-                rowErrors.add("longitude");
-
-            if (properiesDiffer(StagedRow::getSpecies, demappedRow, stagedRow))
-                rowErrors.add("species");
-
-            if (properiesDiffer(StagedRow::getCode, demappedRow, stagedRow))
-                rowErrors.add("code");
-
-            if (properiesDiffer(StagedRow::getMethod, demappedRow, stagedRow))
-                rowErrors.add("method");
-
-            if (properiesDiffer(StagedRow::getBlock, demappedRow, stagedRow))
-                rowErrors.add("block");
-
-            if (properiesDiffer(StagedRow::getSurveyNotDone, demappedRow, stagedRow))
-                rowErrors.add("snd");
-
-            if (properiesDiffer(StagedRow::getIsInvertSizing, demappedRow, stagedRow))
-                rowErrors.add("useInvertSizing");
+            for(var entry : propertyChecks.entrySet()) {
+                if (properiesDiffer(entry.getValue(), demappedRow, stagedRow))
+                    rowErrors.add(entry.getKey());
+            }
 
             // if
             // (!demappedRow.getMeasureJson().equalsIgnoreCase(stagedRow.getMeasureJson()))
@@ -344,7 +349,7 @@ public class CorrectionController {
 
         var mappedRows = mappingResult.stream().map(r -> r.getLeft()).collect(Collectors.toList());
 
-        var errors =  new HashSet<ValidationError>();
+        var errors = new HashSet<ValidationError>();
         for (var row : mappedRows) {
             var speciesAttrib = speciesAttributes.get(row.getSpecies().get().getObservableItemId());
             errors.addAll(measurementValidationService.validate(speciesAttrib, row));

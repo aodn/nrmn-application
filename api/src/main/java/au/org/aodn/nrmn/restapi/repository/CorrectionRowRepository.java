@@ -17,7 +17,7 @@ public interface CorrectionRowRepository
 
     @Query(value = "select cast(jsonb_agg(c.observation_id) as text) as observationIds, c.survey_id as surveyId, " +
             "c.diver_id as diverId, c.initials as diver, " +
-            "c.site_code as siteCode, c.depth, c.survey_date as date, c.survey_time as time, c.visibility as vis, "
+            "c.site_code as siteCode, c.depth, TO_CHAR(c.survey_date, 'dd/MM/yyyy') as date, TO_CHAR(c.survey_time, 'HH24:MI') as time, c.visibility as vis, "
             +
             "c.direction, " +
             "c.latitude, c.longitude, " +
