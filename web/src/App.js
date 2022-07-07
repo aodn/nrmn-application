@@ -53,7 +53,7 @@ const App = () => {
         createTheme({
           typography: {
             table: {
-              fontSize: 11,
+              fontSize: 12,
               padding: 6
           }},
           palette: {
@@ -72,7 +72,7 @@ const App = () => {
         createTheme({
           typography: {
             table: {
-              fontSize: 11,
+              fontSize: 12,
           }},
           palette: {
             mode: 'light',
