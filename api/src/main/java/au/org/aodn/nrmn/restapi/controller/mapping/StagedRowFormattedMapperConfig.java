@@ -122,7 +122,7 @@ public class StagedRowFormattedMapperConfig {
             if (ctx.getSource() != null) {
                 for (Map.Entry<Integer, String> entry : ctx.getSource().entrySet()) {
                     int val = NumberUtils.toInt(entry.getValue(), Integer.MIN_VALUE);
-                    if (val != Integer.MIN_VALUE)
+                    if (val != Integer.MIN_VALUE && val > 0)
                         measures.put(entry.getKey(), val);
                 }
             }
