@@ -434,7 +434,7 @@ public class TemplateServiceTest {
 
         Site site1 = Site.builder().siteId(1).build();
         List<Integer> siteIds = Arrays.asList(site1.getSiteId());
-        List<Integer> obsIds = Arrays.asList(123);
+        int[] obsIds = {123};
         when(observableItemRepository.getAllWithMethodForSites(2, siteIds))
                 .thenReturn(Arrays.asList(o1).stream().collect(Collectors.toList()));
         when(observationRepository.getSpeciesAttributesByIds(obsIds)).thenReturn(swaList);

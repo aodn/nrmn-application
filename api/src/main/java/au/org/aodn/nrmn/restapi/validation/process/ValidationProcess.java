@@ -669,7 +669,7 @@ public class ValidationProcess {
 
     public Collection<StagedRowFormatted> formatRowsWithSpecies(Collection<StagedRow> rows, Collection<ObservableItem> species) {
         Map<Long, StagedRow> rowMap = rows.stream().collect(Collectors.toMap(StagedRow::getId, r -> r));
-        List<Integer> speciesIds = species.stream().map(s -> s.getObservableItemId()).collect(Collectors.toList());
+        var speciesIds = species.stream().mapToInt(ObservableItem::getObservableItemId).toArray();
         Map<String, UiSpeciesAttributes> speciesAttributesMap = observationRepository.getSpeciesAttributesByIds(speciesIds).stream().collect(Collectors.toMap(UiSpeciesAttributes::getSpeciesName, a -> a));
         Map<String, ObservableItem> speciesMap = species.stream().collect(Collectors.toMap(ObservableItem::getObservableItemName, o -> o));
         Collection<Diver> divers = diverRepository.getAll().stream().collect(Collectors.toList());

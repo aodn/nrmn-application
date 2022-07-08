@@ -1,23 +1,16 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.modelmapper.Converter;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
+import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowMapperConfig;
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
@@ -59,7 +54,9 @@ import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.service.SurveyCorrectionService;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidationService;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationConstraintService;
+import au.org.aodn.nrmn.restapi.util.ObjectUtils;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.validation.process.ValidationResultSet;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -68,8 +65,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/correction")
 @Tag(name = "correction")
 public class CorrectionController {
-
-    private static Logger logger = LoggerFactory.getLogger(CorrectionController.class);
 
     @Autowired
     private CorrectionRowRepository correctionRowRepository;
@@ -84,12 +79,6 @@ public class CorrectionController {
     ObservableItemRepository observableItemRepository;
 
     @Autowired
-    MeasurementValidationService measurementValidationService;
-
-    @Autowired
-    ValidationConstraintService constraintService;
-
-    @Autowired
     StagedJobRepository jobRepository;
 
     @Autowired
@@ -102,96 +91,38 @@ public class CorrectionController {
     SecUserRepository userRepo;
 
     @Autowired
-    SurveyCorrectionService surveyCorrectionService;
-
-    @Autowired
     DiverRepository diverRepository;
 
     @Autowired
     SiteRepository siteRepository;
 
+    @Autowired
+    SurveyCorrectionService surveyCorrectionService;
+
+    @Autowired
+    MeasurementValidationService measurementValidationService;
+
+    @Autowired
+    ValidationConstraintService constraintService;
+
+    private static Logger logger = LoggerFactory.getLogger(CorrectionController.class);
+
     private void logMessage(StagedJob job, String message) {
-        var log = StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.CORRECTING).details(message)
+        var log = StagedJobLog.builder()
+                .stagedJob(job).eventType(StagedJobEventType.CORRECTING)
+                .details(message)
                 .build();
         stagedJobLogRepository.save(log);
     }
 
-    public StagedRowFormatted formatRow(List<ObservableItem> species, StagedRow row) {
-        StagedRowFormatted formatted = new StagedRowFormatted();
-
-        formatted.setIsInvertSizing(Boolean.parseBoolean(row.getIsInvertSizing()));
-        formatted.setSpecies(
-                species.stream().filter(s -> s.getObservableItemName().equalsIgnoreCase(row.getSpecies())).findFirst());
-        formatted.setRef(row);
-
-        Map<Integer, Integer> measures = new HashMap<Integer, Integer>();
-        if (row.getMeasureJson() != null) {
-            for (Map.Entry<Integer, String> entry : row.getMeasureJson().entrySet()) {
-                int val = NumberUtils.toInt(entry.getValue(), Integer.MIN_VALUE);
-                if (val != Integer.MIN_VALUE)
-                    measures.put(entry.getKey(), val);
-            }
-        }
-        formatted.setMeasureJson(measures);
-        return formatted;
-    }
-
-    @GetMapping(path = "correct/{survey_id}")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<?> getSurveyCorrection(@PathVariable("survey_id") Integer surveyId) {
-        var rows = correctionRowRepository.findRowsBySurveyId(surveyId);
-        var exists = rows != null && rows.size() > 0;
-        return exists ? ResponseEntity.ok(rows) : ResponseEntity.notFound().build();
-    }
-
-    @PostMapping(path = "validate/{survey_id}")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<?> validateSurveyCorrection(@PathVariable("survey_id") Integer surveyId,
-            Authentication authentication, @RequestBody Collection<StagedRow> rowUpdates) {
-
-        var message = "correction validation: username: " + authentication.getName() + " survey: " + surveyId;
-        logger.debug("correction/validation", message);
-        Collection<ValidationError> errors = new HashSet<ValidationError>();
-
-        try {
-            var speciesNames = rowUpdates.stream().map(r -> r.getSpecies()).collect(Collectors.toSet());
-            var species = observableItemRepository.getAllSpeciesNamesMatching(speciesNames);
-
-            var speciesAttributesMap = new HashMap<Integer, UiSpeciesAttributes>();
-            observationRepository.getSpeciesAttributesBySpeciesNames(speciesNames).stream()
-                    .forEach(m -> speciesAttributesMap.put(m.getId().intValue(), m));
-            var existingSurveyOptional = surveyRepository.findById(surveyId);
-            if (!existingSurveyOptional.isPresent())
-                return ResponseEntity.notFound().build();
-
-            var existingSurvey = existingSurveyOptional.get();
-            var observationIdsToReplace = new ArrayList<Integer>();
-            errors.addAll(constraintService.validate(existingSurvey, rowUpdates));
-            for (var row : rowUpdates) {
-                observationIdsToReplace.addAll(row.getObservationIds());
-                var formattedRow = formatRow(species, row);
-                errors.addAll(measurementValidationService.validate(
-                        speciesAttributesMap.get(formattedRow.getSpecies().get().getObservableItemId()), formattedRow));
-            }
-
-            logger.info("observations: " + observationIdsToReplace.toString());
-        } catch (Exception exception) {
-            errors.add(new ValidationError(ValidationCategory.RUNTIME, ValidationLevel.BLOCKING, exception.getMessage(),
-                    null, null));
-        }
-        var response = new ValidationResponse();
-        response.setErrors(errors);
-        return ResponseEntity.ok().body(response);
-    }
-
-    public Collection<StagedRowFormatted> formatRowsWithSpecies(Collection<StagedRow> rows,
+    private List<StagedRowFormatted> formatRowsWithSpecies(Collection<StagedRow> rows,
             Collection<ObservableItem> species) {
 
         var rowMap = rows.stream().collect(Collectors.toMap(StagedRow::getId, r -> r));
 
         var speciesIds = species.stream()
-                .map(s -> s.getObservableItemId())
-                .collect(Collectors.toList());
+                .mapToInt(s -> s.getObservableItemId())
+                .toArray();
 
         var speciesAttributesMap = observationRepository
                 .getSpeciesAttributesByIds(speciesIds).stream()
@@ -210,52 +141,11 @@ public class CorrectionController {
                 .collect(Collectors.toList());
     }
 
-    private boolean properiesDiffer(Function<StagedRow, String> getter, StagedRow rowA, StagedRow rowB) {
-        var valueA = getter.apply(rowA);
-        var valueB = getter.apply(rowB);
-        var contentDiffers = (valueA == null && valueB != null) || (valueB == null && valueA != null);
-        var valueDiffers = StringUtils.isNotEmpty(valueA)
-                && StringUtils.isNotEmpty(valueB)
-                && !valueA.equalsIgnoreCase(valueB);
-        return contentDiffers || valueDiffers;
-    }
+    private List<Pair<StagedRowFormatted, HashSet<String>>> mapRows(Collection<StagedRow> rows) {
 
-    private List<Pair<StagedRowFormatted, HashSet<String>>> mapRows(
-            Collection<ObservableItem> species,
-            Collection<StagedRow> rows) {
-
-        var mappedRows = formatRowsWithSpecies(rows, species);
-
-        var result = new ArrayList<Pair<StagedRowFormatted, HashSet<String>>>();
-
-        // -- model mapping
-
-        var modelMapper = new ModelMapper();
-
-        var obsItemMapper = (Converter<Optional<ObservableItem>, String>) ctx -> {
-            return ctx.getSource().isPresent() ? ctx.getSource().get().getObservableItemName() : null;
-        };
-
-        var dateMapper = (Converter<LocalDate, String>) ctx -> {
-            return ctx.getSource() != null ? ctx.getSource().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : null;
-        };
-
-        var integerMapper = (Converter<Optional<Double>, String>) ctx -> {
-            return ctx.getSource().isPresent() ? String.valueOf(ctx.getSource().get().intValue()) : null;
-        };
-
-        modelMapper.typeMap(StagedRowFormatted.class, StagedRow.class)
-                .addMappings(mapper -> mapper.map(StagedRowFormatted::getMethod, StagedRow::setMethod))
-                .addMappings(mapper -> mapper.map(StagedRowFormatted::getBlock, StagedRow::setBlock))
-                .addMappings(mapper -> mapper.map(src -> src.getDiver().getInitials(), StagedRow::setDiver))
-                .addMappings(mapper -> mapper.using(dateMapper)
-                        .map(StagedRowFormatted::getDate, StagedRow::setDate))
-                .addMappings(mapper -> mapper.using(integerMapper)
-                        .map(StagedRowFormatted::getVis, StagedRow::setVis))
-                .addMappings(mapper -> mapper.using(obsItemMapper)
-                        .map(StagedRowFormatted::getSpecies, StagedRow::setSpecies));
-
-        // ---
+        var speciesNames = rows.stream().map(s -> s.getSpecies()).collect(Collectors.toSet());
+        var observableItems = observableItemRepository.getAllSpeciesNamesMatching(speciesNames);
+        var formattedRows = formatRowsWithSpecies(rows, observableItems);
 
         var propertyChecks = new HashMap<String, Function<StagedRow, String>>() {
             {
@@ -276,24 +166,19 @@ public class CorrectionController {
             }
         };
 
-        for (var row : mappedRows) {
-
-            var res = Pair.of(row, new HashSet<String>());
-
-            var demappedRow = modelMapper.map(row, StagedRow.class);
+        var result = new ArrayList<Pair<StagedRowFormatted, HashSet<String>>>();
+        var modelMapper = StagedRowMapperConfig.GetModelMapper();
+        for (var row : formattedRows) {
 
             var stagedRow = row.getRef();
+            var mappedRow = modelMapper.map(row, StagedRow.class);
 
+            var res = Pair.of(row, new HashSet<String>());
             var rowErrors = res.getRight();
 
-            for(var entry : propertyChecks.entrySet()) {
-                if (properiesDiffer(entry.getValue(), demappedRow, stagedRow))
+            for (var entry : propertyChecks.entrySet())
+                if (ObjectUtils.stringPropertiesDiffer(entry.getValue(), mappedRow, stagedRow))
                     rowErrors.add(entry.getKey());
-            }
-
-            // if
-            // (!demappedRow.getMeasureJson().equalsIgnoreCase(stagedRow.getMeasureJson()))
-            // rowErrors.add("measures");
 
             result.add(res);
         }
@@ -301,12 +186,65 @@ public class CorrectionController {
         return result;
     }
 
+    @GetMapping(path = "correct/{survey_id}")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public ResponseEntity<?> getSurveyCorrection(@PathVariable("survey_id") Integer surveyId) {
+        var rows = correctionRowRepository.findRowsBySurveyId(surveyId);
+        var exists = rows != null && rows.size() > 0;
+        return exists ? ResponseEntity.ok(rows) : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping(path = "validate/{survey_id}")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public ResponseEntity<?> validateSurveyCorrection(@PathVariable("survey_id") Integer surveyId,
+            Authentication authentication, @RequestBody Collection<StagedRow> rows) {
+
+        var message = "correction validation: username: " + authentication.getName() + " survey: " + surveyId;
+        logger.debug("correction/validation", message);
+        var resultSet = new ValidationResultSet();
+
+        var messages = new HashMap<String, String>() {
+            {
+                put("block", "Block is not an integer");
+                put("date", "Date format not valid");
+                put("depth", "Depth is not an interger");
+                put("direction", "Direction is not valid");
+                put("diver", "Diver does not exist");
+                put("latitude", "Latitude is not a number");
+                put("longitude", "Longitude is not a number");
+                put("method", "Method is missing");
+                put("code", "Site does not exist");
+                put("species", "Species does not exist");
+                put("time", "Time is not valid");
+                put("vis", "Vis is not a number");
+                put("snd", "Survey Not Done not valid");
+                put("useInvertSizing", "Use Invert Sizing not valid");
+            }
+        };
+
+        var results = mapRows(rows);
+        for (var result : results) {
+            var row = result.getLeft();
+            var rowErrors = result.getRight().stream()
+                    .map(col -> new ValidationCell(
+                            ValidationCategory.FORMAT,
+                            ValidationLevel.BLOCKING,
+                            messages.get(col),
+                            row.getId(),
+                            col))
+                    .collect(Collectors.toSet());
+            resultSet.addAll(rowErrors, false);
+        }
+
+        var response = new ValidationResponse();
+        response.setErrors(resultSet.getAll());
+        return ResponseEntity.ok().body(response);
+    }
+
     @PostMapping(path = "correct/{survey_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> submitSurveyCorrection(@PathVariable("survey_id") Integer surveyId,
             Authentication authentication, @RequestBody List<StagedRow> rows) {
-
-        // -- preamble
 
         Optional<SecUser> user = userRepo.findByEmail(authentication.getName());
 
@@ -318,8 +256,6 @@ public class CorrectionController {
 
         String logMessage = "correction: username: " + authentication.getName() + "survey: " + surveyId;
         userAuditRepo.save(new UserActionAudit("correct/survey", logMessage));
-
-        // create a new job for this correction
 
         var job = StagedJob.builder()
                 .source(SourceJobType.CORRECTION)
@@ -333,22 +269,22 @@ public class CorrectionController {
 
         logMessage(job, "Correct Survey " + surveyId);
 
-        // ---
+        var mappingResult = mapRows(rows);
 
-        var speciesNames = rows.stream().map(s -> s.getSpecies()).collect(Collectors.toSet());
-        var observableItems = observableItemRepository.getAllSpeciesNamesMatching(speciesNames);
+        var mappedRows = mappingResult.stream().map(r -> r.getLeft()).collect(Collectors.toList());
+
+        int[] obsItemIds = mappedRows.stream()
+                .filter(r -> r.getSpecies().isPresent())
+                .mapToInt(r -> r.getSpecies().get().getObservableItemId())
+                .distinct()
+                .toArray();
 
         var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
-        var obsItemIds = observableItems.stream().map(o -> o.getObservableItemId()).collect(Collectors.toList());
+
         observationRepository
                 .getSpeciesAttributesByIds(obsItemIds)
                 .stream()
                 .forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
-
-        var mappingResult = mapRows(observableItems, rows);
-
-        var mappedRows = mappingResult.stream().map(r -> r.getLeft()).collect(Collectors.toList());
-
         var errors = new HashSet<ValidationError>();
         for (var row : mappedRows) {
             var speciesAttrib = speciesAttributes.get(row.getSpecies().get().getObservableItemId());

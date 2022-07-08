@@ -127,8 +127,8 @@ public class StagedJobController {
                     .stream()
                     .filter(v -> v.getRowIds().contains(lastRowId)).findAny();
 
-            // only apply if there are three or more duplicate rows (detect 3 duplicate rows
-            // rule)
+            // only apply if there are three or more duplicate rows 
+            // (detect 3 duplicate rows rule)
             if (rowsToTruncate.isPresent() && rowsToTruncate.get().getRowIds().size() >= 3) {
                 Collection<Long> rowIdsToRemove = rowsToTruncate.get().getRowIds();
                 // keep the last row if the data should finish with a true zero

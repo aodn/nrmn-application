@@ -179,8 +179,7 @@ public class TemplateService {
 
         List<ObservableItemRow> observableItemRows = observableItemRepository.getAllWithMethodForSites(mode, siteIds);
 
-        List<Integer> observableItemIds = observableItemRows.stream().map(ObservableItemRow::getObservableItemId)
-                .collect(toList());
+        var observableItemIds = observableItemRows.stream().mapToInt(ObservableItemRow::getObservableItemId).toArray();
         List<SpeciesWithAttributesCsvRow> species = observationRepository.getSpeciesAttributesByIds(observableItemIds)
                 .stream()
                 .map(s -> SpeciesWithAttributesCsvRow.builder().letterCode(letterCodeMap.get(s.getId()))
