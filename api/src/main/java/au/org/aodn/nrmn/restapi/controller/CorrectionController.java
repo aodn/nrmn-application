@@ -180,6 +180,20 @@ public class CorrectionController {
                 if (ObjectUtils.stringPropertiesDiffer(entry.getValue(), mappedRow, stagedRow))
                     rowErrors.add(entry.getKey());
 
+            var mmA = stagedRow.getMeasureJson().entrySet().stream()
+                    .filter(e -> !e.getValue().equals(mappedRow.getMeasureJson().get(e.getKey())))
+                    .map(e -> e.getKey())
+                    .collect(Collectors.toSet());
+
+            // probably not necessary?
+            var mmB = mappedRow.getMeasureJson().entrySet().stream()
+                    .filter(e -> !e.getValue().equals(stagedRow.getMeasureJson().get(e.getKey())))
+                    .map(e -> e.getKey())
+                    .collect(Collectors.toSet());
+
+            mmA.addAll(mmB);
+            rowErrors.addAll(mmA.stream().map(e -> e.toString()).collect(Collectors.toSet()));
+
             result.add(res);
         }
 
@@ -201,7 +215,6 @@ public class CorrectionController {
 
         var message = "correction validation: username: " + authentication.getName() + " survey: " + surveyId;
         logger.debug("correction/validation", message);
-        var resultSet = new ValidationResultSet();
 
         var messages = new HashMap<String, String>() {
             {
@@ -219,25 +232,31 @@ public class CorrectionController {
                 put("vis", "Vis is not a number");
                 put("snd", "Survey Not Done not valid");
                 put("useInvertSizing", "Use Invert Sizing not valid");
+                put("measurement", "Measurement is not valid");
             }
         };
 
-        var results = mapRows(rows);
-        for (var result : results) {
-            var row = result.getLeft();
-            var rowErrors = result.getRight().stream()
-                    .map(col -> new ValidationCell(
-                            ValidationCategory.FORMAT,
-                            ValidationLevel.BLOCKING,
-                            messages.get(col),
-                            row.getId(),
-                            col))
-                    .collect(Collectors.toSet());
-            resultSet.addAll(rowErrors, false);
+        var errors = new ValidationResultSet();
+        try {
+            var results = mapRows(rows);
+            for (var result : results) {
+                var row = result.getLeft();
+                var rowErrors = result.getRight().stream()
+                        .map(col -> new ValidationCell(
+                                ValidationCategory.FORMAT,
+                                ValidationLevel.BLOCKING,
+                                messages.keySet().contains(col) ? messages.get(col) : messages.get("measurement"),
+                                row.getId(),
+                                col))
+                        .collect(Collectors.toSet());
+                errors.addAll(rowErrors, false);
+            }
+        } catch (Exception e) {
+            logger.error("Validation Failed", e);
+            return ResponseEntity.badRequest().body("Validation failed. Error: " + e.getMessage());
         }
-
         var response = new ValidationResponse();
-        response.setErrors(resultSet.getAll());
+        response.setErrors(errors.getAll());
         return ResponseEntity.ok().body(response);
     }
 
@@ -268,36 +287,53 @@ public class CorrectionController {
         job = jobRepository.save(job);
 
         logMessage(job, "Correct Survey " + surveyId);
+        var response = new ValidationResponse();
 
-        var mappingResult = mapRows(rows);
+        try {
+            var mappingResult = mapRows(rows);
 
-        var mappedRows = mappingResult.stream().map(r -> r.getLeft()).collect(Collectors.toList());
+            var mappedRows = mappingResult.stream().map(r -> r.getLeft()).collect(Collectors.toList());
 
-        int[] obsItemIds = mappedRows.stream()
-                .filter(r -> r.getSpecies().isPresent())
-                .mapToInt(r -> r.getSpecies().get().getObservableItemId())
-                .distinct()
-                .toArray();
+            int[] obsItemIds = mappedRows.stream()
+                    .filter(r -> r.getSpecies().isPresent())
+                    .mapToInt(r -> r.getSpecies().get().getObservableItemId())
+                    .distinct()
+                    .toArray();
 
-        var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
+            var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
 
-        observationRepository
-                .getSpeciesAttributesByIds(obsItemIds)
-                .stream()
-                .forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
-        var errors = new HashSet<ValidationError>();
-        for (var row : mappedRows) {
-            var speciesAttrib = speciesAttributes.get(row.getSpecies().get().getObservableItemId());
-            errors.addAll(measurementValidationService.validate(speciesAttrib, row));
+            observationRepository
+                    .getSpeciesAttributesByIds(obsItemIds)
+                    .stream()
+                    .forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
+
+            var errors = new HashSet<ValidationError>();
+            for (var row : mappedRows) {
+                var attribute = speciesAttributes.get(row.getSpecies().get().getObservableItemId());
+                errors.addAll(measurementValidationService.validate(attribute, row));
+            }
+
+            if (errors.size() < 1)
+                surveyCorrectionService.correctSurvey(job, survey, mappedRows);
+            else
+                logMessage(job, "Survey correction failed. Errors found.");
+
+            response.setErrors(errors);
+
+        } catch (Exception e) {
+
+            logger.error("Correction Failed", e);
+
+            var log = StagedJobLog.builder()
+                    .stagedJob(job)
+                    .details("Application error deleting survey " + survey.getSurveyId())
+                    .eventType(StagedJobEventType.ERROR).build();
+
+            stagedJobLogRepository.save(log);
+
+            return ResponseEntity.badRequest().body("Survey failed to delete. No data has been changed.");
         }
 
-        if (errors.size() < 1)
-            surveyCorrectionService.correctSurvey(job, survey, mappedRows);
-        else
-            logMessage(job, "Survey correction failed. Errors found.");
-
-        var response = new ValidationResponse();
-        response.setErrors(errors);
         return ResponseEntity.ok().body(response);
     }
 

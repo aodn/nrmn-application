@@ -32,7 +32,7 @@ public class MeasurementValidationService {
         Double l95 = speciesAttributes.getL95() != null ? speciesAttributes.getL95() : 0;
 
         if (l5 != 0 && l95 != 0) {
-            List<Integer> outOfRange = measurements.entrySet()
+            var outOfRange = measurements.entrySet()
                     .stream()
                     .filter(entry -> entry.getValue() != 0 && (l5 > 0 && range[entry.getKey() - 1] < l5) || (l95 > 0 && range[entry.getKey() - 1] > l95))
                     .map(Map.Entry::getKey).collect(Collectors.toList());
