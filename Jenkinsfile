@@ -21,7 +21,7 @@ pipeline {
                     }
                 }
                 stage('set_version_release') {
-                    when { branch "master" }
+                    when { branch "main" }
                     steps {
                         withCredentials([usernamePassword(credentialsId: env.GIT_CREDENTIALS_ID, passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                             sh './bumpversion.sh'
