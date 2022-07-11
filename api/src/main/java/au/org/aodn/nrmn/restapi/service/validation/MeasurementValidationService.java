@@ -21,7 +21,7 @@ public class MeasurementValidationService {
     private static final double[] INVERT_VALUES = { 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 16, 17, 18, 19, 20, 22, 24, 26, 28, 30 };
 
     // VALIDATION: Species size within L5 - L95
-    private Collection<ValidationCell> validateMeasureRange(Long rowId, Boolean isInvertSized, Map<Integer, Integer> measurements, UiSpeciesAttributes speciesAttributes) {
+    private Collection<ValidationCell> validateMeasureRange(Long rowId, String species, Boolean isInvertSized, Map<Integer, Integer> measurements, UiSpeciesAttributes speciesAttributes) {
 
         Collection<ValidationCell> errors = new ArrayList<ValidationCell>();
 
@@ -33,12 +33,12 @@ public class MeasurementValidationService {
         if (l5 != 0 && l95 != 0) {
             var outOfRange = measurements.entrySet()
                     .stream()
-                    .filter(entry -> entry.getValue() != 0 && (l5 > 0 && range[entry.getKey() - 1] < l5) || (l95 > 0 && range[entry.getKey() - 1] > l95))
+                    .filter(entry -> entry.getKey() > 0 && ((l5 > 0 && range[entry.getKey() - 1] < l5) || (l95 > 0 && range[entry.getKey() - 1] > l95)))
                     .map(Map.Entry::getKey).collect(Collectors.toList());
 
             if (!outOfRange.isEmpty()) {
-                String message = (isInvertSized ? "Invert measurements" : "Measurements") + " outside L5/95 [" + l5 + "," + l95 + "]";
-                outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, message, rowId, col.toString())));
+                String message = (isInvertSized ? "Invert measurements" : "Measurements") + " outside L5/95 [" + l5 + "," + l95 + "] for [" + species + "]";
+                outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.INFO, message, rowId, "measurements." + col)));
             }
         }
         return errors;
@@ -48,7 +48,7 @@ public class MeasurementValidationService {
         
         boolean isMeasureMethod = !Arrays.asList(3, 4, 5).contains(row.getMethod());
         if (isMeasureMethod && row.getMeasureJson().size() > 0) {
-            return validateMeasureRange(row.getId(), row.getIsInvertSizing(), row.getMeasureJson(), speciesAttributes);
+            return validateMeasureRange(row.getId(),  row.getRef().getSpecies(), row.getIsInvertSizing(), row.getMeasureJson(), speciesAttributes);
         }
         return new ArrayList<ValidationCell>();
     }

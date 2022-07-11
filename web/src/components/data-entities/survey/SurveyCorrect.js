@@ -1,40 +1,75 @@
 import {Box, Button, Typography} from '@mui/material';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
+import {blue, grey, orange, red} from '@mui/material/colors';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import React, {useRef, useMemo, useState} from 'react';
+import React, {useRef, useMemo, useState, useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import {getCorrections, validateSurveyCorrection, submitSurveyCorrection} from '../../../api/api';
-import {allMeasurements} from '../../../common/constants';
+import {allMeasurements} from '../../../common/correctionsConstants';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import SummaryPanel from './panel/SummaryPanel';
 import SurveyMeasurementHeader from './SurveyMeasurementHeader';
 import {PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon, CloudUpload as CloudUploadIcon} from '@mui/icons-material/';
 import ValidationPanel from '../../import/panel/ValidationPanel';
 
+const chooseCellStyle = (params) => {
+  // Grey-out the first  column containing the row number
+  if (params.colDef.field === 'id') return {color: grey[500]};
+
+  if (!params.context.cellValidations) return;
+  // Highlight and search results
+  //const row = params.context.highlighted[params.rowIndex];
+  //if (row && row[params.colDef.field]) return {backgroundColor: yellow[100]};
+
+  // Highlight cell validations
+
+  const row = params.data.id;
+  const field = params.colDef.field;
+  const level = params.context.cellValidations[row]?.[field]?.levelId;
+  switch (level) {
+    case 'BLOCKING':
+      return {backgroundColor: red[100]};
+    case 'WARNING':
+      return {backgroundColor: orange[100]};
+    case 'DUPLICATE':
+      // if (context.focusedRows?.includes(params.data.id)) {
+      //   return {backgroundColor: blue[100], fontWeight: 'bold'};
+      // } else {
+      return {backgroundColor: blue[100]};
+    // }
+    case 'INFO':
+      return {backgroundColor: grey[100]};
+    default:
+      return null;
+  }
+};
+
+const toolTipValueGetter = ({context, data, colDef}) => {
+  if (!context.cellValidations) return;
+  const row = data.id;
+  const field = colDef.field;
+  const error = context.cellValidations[row]?.[field];
+  if (error?.levelId === 'DUPLICATE') {
+    const rowPositions = error.rowIds.map((r) => context.rowData.find((d) => d.id === r)?.pos).filter((r) => r);
+    const duplicates = rowPositions.map((r) => context.rowPos.indexOf(r) + 1);
+    return duplicates.length > 1 ? 'Rows are duplicated: ' + duplicates.join(', ') : 'Duplicate rows have been removed';
+  }
+  return error?.message;
+};
+
 const SurveyCorrect = () => {
   const surveyId = useParams()?.id;
   const gridRef = useRef();
   const [rowData, setRowData] = useState();
+  const [validationResult, setValidationResult] = useState();
+  const [cellValidations, setCellValidations] = useState([]);
 
   const components = useMemo(() => {
     return {
       loadingOverlay: LoadingOverlay,
       summaryPanel: SummaryPanel,
       validationPanel: ValidationPanel
-    };
-  }, []);
-
-  const defaultColDef = useMemo(() => {
-    return {
-      editable: false,
-      enableCellChangeFlash: false,
-      filter: false,
-      floatingFilter: false,
-      resizable: false,
-      sortable: false,
-      suppressMenu: false,
-      valueParser: ({newValue}) => (newValue ? newValue.trim() : '')
     };
   }, []);
 
@@ -92,6 +127,28 @@ const SurveyCorrect = () => {
     });
   };
 
+  useEffect(() => {
+    if (gridRef.current.api) {
+      gridRef.current.api.gridOptionsWrapper.gridOptions.context.cellValidations = [...cellValidations];
+      gridRef.current.api.redrawRows();
+    }
+  }, [cellValidations]);
+
+  useEffect(() => {
+    // iterate through each validation
+    if (!validationResult) return;
+    const cellFormat = [];
+    for (const res of validationResult) {
+      for (const row of res.rowIds) {
+        for (const col of res.columnNames) {
+          if (!cellFormat[row]) cellFormat[row] = {};
+          cellFormat[row][col] = {levelId: res.levelId, message: res.message};
+        }
+      }
+    }
+    setCellValidations(cellFormat);
+  }, [validationResult]);
+
   const packedData = () => {
     const packedData = [];
     gridRef.current.api.forEachNode((rowNode, index) => {
@@ -103,47 +160,14 @@ const SurveyCorrect = () => {
 
   const gridOptions = {context: {useOverlay: 'Loading Survey Correction...', validations: []}};
 
-  const generateErrorTree = (rowData, rowPos, errors) => {
-    const tree = {blocking: [], warning: [], info: [], duplicate: []};
-    errors
-      .sort((a, b) => (a.message < b.message ? -1 : a.message > b.message ? 1 : 0))
-      .forEach((e) => {
-        const rows = rowData.filter((r) => e.rowIds.includes(r.id));
-        let summary = [];
-        if (e.columnNames && e.categoryId !== 'SPAN') {
-          const col = e.columnNames[0];
-          summary = rows.reduce((acc, r) => {
-            const rowPosition = rowData.find((d) => d.id === r.id)?.id;
-            const rowNumber = rowPos.indexOf(rowPosition) + 1;
-            const existingIdx = acc.findIndex((m) => m.columnName === col && m.value === r[col]);
-            if (existingIdx >= 0 && isNaN(parseInt(acc[existingIdx].columnName)))
-              acc[existingIdx] = {
-                columnName: col,
-                value: r[col],
-                rowIds: [...acc[existingIdx].rowIds, r.id],
-                rowNumbers: [...acc[existingIdx].rowNumbers, rowNumber]
-              };
-            else
-              acc.push({columnName: col, value: r[col], rowIds: [r.id], rowNumbers: [rowNumber], isInvertSize: r.isInvertSizing === 'Yes'});
-            return acc;
-          }, []);
-        } else {
-          const rowPositions = e.rowIds.map((r) => rowData.find((d) => d.id === r)?.id).filter((r) => r);
-          const rowNumbers = rowPositions.map((r) => rowPos.indexOf(r) + 1);
-          summary = [{rowIds: e.rowIds, columnNames: e.columnNames, rowNumbers}];
-        }
-        tree[e.levelId.toLowerCase()].push({key: `err-${e.id}`, message: e.message, count: e.rowIds.length, description: summary});
-      });
-    return tree;
-  };
-
   const onValidate = async () => {
     setSideBar(defaultSideBar);
     const result = await validateSurveyCorrection(surveyId, packedData());
     const context = gridRef.current.api.gridOptionsWrapper.gridOptions.context;
-    const rowPos = rowData.map((r) => r.id).sort((a, b) => a - b);
-    const errorTree = generateErrorTree(rowData,rowPos, result.data.errors);
-    context.validations = errorTree;
+    // const rowPos = rowData.map((r) => r.id).sort((a, b) => a - b);
+    context.rowData = [...rowData];
+    setValidationResult(result.data.errors);
+    context.validations = result.data.errors;
     setSideBar((s) => ({
       ...s,
       defaultToolPanel: 'summaryPanel'
@@ -151,6 +175,21 @@ const SurveyCorrect = () => {
   };
 
   const onSubmit = () => submitSurveyCorrection(surveyId, packedData());
+
+  const defaultColDef = useMemo(() => {
+    return {
+      editable: false,
+      enableCellChangeFlash: false,
+      filter: false,
+      floatingFilter: false,
+      resizable: false,
+      sortable: false,
+      suppressMenu: false,
+      cellStyle: chooseCellStyle,
+      tooltipValueGetter: toolTipValueGetter,
+      valueParser: ({newValue}) => (newValue ? newValue.trim() : '')
+    };
+  }, []);
 
   return (
     <>
@@ -202,7 +241,14 @@ const SurveyCorrect = () => {
                 valueFormatter={(e) => (e.value === true ? 'Yes' : 'No')}
               />
             ) : (
-              <AgGridColumn key={idx} field={header.field} headerName={header.label} hide={header.hide} cellEditor="agTextCellEditor" editable={header.editable ?? false} />
+              <AgGridColumn
+                key={idx}
+                field={header.field}
+                headerName={header.label}
+                hide={header.hide}
+                cellEditor="agTextCellEditor"
+                editable={header.editable ?? false}
+              />
             )
           )}
           <AgGridColumn field={'measurements.0'} headerName="Unsized" />

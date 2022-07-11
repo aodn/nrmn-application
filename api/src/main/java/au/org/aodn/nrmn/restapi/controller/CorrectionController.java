@@ -222,8 +222,8 @@ public class CorrectionController {
                 put("depth", "Depth is not an interger");
                 put("direction", "Direction is not valid");
                 put("diver", "Diver does not exist");
-                put("latitude", "Latitude is not a number");
-                put("longitude", "Longitude is not a number");
+                put("latitude", "Latitude is not a decimal");
+                put("longitude", "Longitude is not a decimal");
                 put("method", "Method is missing");
                 put("code", "Site does not exist");
                 put("species", "Species does not exist");
@@ -267,13 +267,20 @@ public class CorrectionController {
                     .forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
 
             for (var row : mappedRows) {
-                var attribute = speciesAttributes.get(row.getSpecies().get().getObservableItemId());
-                errors.addAll(measurementValidationService.validate(attribute, row), false);
+                var attribute = row.getSpecies().isPresent() ? speciesAttributes.get(row.getSpecies().get().getObservableItemId()) : null;
+                if(attribute != null)
+                    errors.addAll(measurementValidationService.validate(attribute, row), false);
             }
         } catch (Exception e) {
             logger.error("Validation Failed", e);
             return ResponseEntity.badRequest().body("Validation failed. Error: " + e.getMessage());
         }
+
+        long errorId = 0;
+        for(var error: errors.getAll()) {
+            error.setId(errorId++);
+        }
+
         response.setErrors(errors.getAll());
         return ResponseEntity.ok().body(response);
     }
