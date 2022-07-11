@@ -3,17 +3,16 @@ package au.org.aodn.nrmn.restapi.service.validation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
+
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
-import au.org.aodn.nrmn.restapi.validation.process.ValidationResultSet;
 
 @Service
 public class MeasurementValidationService {
@@ -45,14 +44,12 @@ public class MeasurementValidationService {
         return errors;
     }
 
-    public Collection<ValidationError> validate(UiSpeciesAttributes speciesAttributes, StagedRowFormatted row) {
+    public Collection<ValidationCell> validate(UiSpeciesAttributes speciesAttributes, StagedRowFormatted row) {
         
-        ValidationResultSet results = new ValidationResultSet();
         boolean isMeasureMethod = !Arrays.asList(3, 4, 5).contains(row.getMethod());
         if (isMeasureMethod && row.getMeasureJson().size() > 0) {
-            var errors = validateMeasureRange(row.getId(), row.getIsInvertSizing(), row.getMeasureJson(), speciesAttributes);
-            results.addAll(errors, false);
+            return validateMeasureRange(row.getId(), row.getIsInvertSizing(), row.getMeasureJson(), speciesAttributes);
         }
-        return results.getAll();
+        return new ArrayList<ValidationCell>();
     }
 }

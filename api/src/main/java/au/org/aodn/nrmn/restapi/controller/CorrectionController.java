@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowMapperConfig;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.SecUser;
@@ -236,6 +235,7 @@ public class CorrectionController {
             }
         };
 
+        var response = new ValidationResponse();
         var errors = new ValidationResultSet();
         try {
             var results = mapRows(rows);
@@ -251,11 +251,29 @@ public class CorrectionController {
                         .collect(Collectors.toSet());
                 errors.addAll(rowErrors, false);
             }
+
+            var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
+
+            int[] obsItemIds = mappedRows.stream()
+                    .filter(r -> r.getSpecies().isPresent())
+                    .mapToInt(r -> r.getSpecies().get().getObservableItemId())
+                    .distinct()
+                    .toArray();
+
+            var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
+            observationRepository
+                    .getSpeciesAttributesByIds(obsItemIds)
+                    .stream()
+                    .forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
+
+            for (var row : mappedRows) {
+                var attribute = speciesAttributes.get(row.getSpecies().get().getObservableItemId());
+                errors.addAll(measurementValidationService.validate(attribute, row), false);
+            }
         } catch (Exception e) {
             logger.error("Validation Failed", e);
             return ResponseEntity.badRequest().body("Validation failed. Error: " + e.getMessage());
         }
-        var response = new ValidationResponse();
         response.setErrors(errors.getAll());
         return ResponseEntity.ok().body(response);
     }
@@ -290,35 +308,15 @@ public class CorrectionController {
         var response = new ValidationResponse();
 
         try {
-            var mappingResult = mapRows(rows);
+            
+            // var mappingResult = mapRows(rows);
 
-            var mappedRows = mappingResult.stream().map(r -> r.getLeft()).collect(Collectors.toList());
+            // if (errors.size() < 1)
+            //     surveyCorrectionService.correctSurvey(job, survey, mappedRows);
+            // else
+            //     logMessage(job, "Survey correction failed. Errors found.");
 
-            int[] obsItemIds = mappedRows.stream()
-                    .filter(r -> r.getSpecies().isPresent())
-                    .mapToInt(r -> r.getSpecies().get().getObservableItemId())
-                    .distinct()
-                    .toArray();
-
-            var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
-
-            observationRepository
-                    .getSpeciesAttributesByIds(obsItemIds)
-                    .stream()
-                    .forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
-
-            var errors = new HashSet<ValidationError>();
-            for (var row : mappedRows) {
-                var attribute = speciesAttributes.get(row.getSpecies().get().getObservableItemId());
-                errors.addAll(measurementValidationService.validate(attribute, row));
-            }
-
-            if (errors.size() < 1)
-                surveyCorrectionService.correctSurvey(job, survey, mappedRows);
-            else
-                logMessage(job, "Survey correction failed. Errors found.");
-
-            response.setErrors(errors);
+            // response.setErrors(errors);
 
         } catch (Exception e) {
 
