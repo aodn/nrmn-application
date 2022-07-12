@@ -52,6 +52,9 @@ const App = () => {
       responsiveFontSizes(
         createTheme({
           typography: {
+            body2: {
+              fontSize: 12
+            },
             table: {
               fontSize: 12,
               padding: 6

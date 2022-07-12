@@ -199,21 +199,8 @@ public class CorrectionController {
         return result;
     }
 
-    @GetMapping(path = "correct/{survey_id}")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<?> getSurveyCorrection(@PathVariable("survey_id") Integer surveyId) {
-        var rows = correctionRowRepository.findRowsBySurveyId(surveyId);
-        var exists = rows != null && rows.size() > 0;
-        return exists ? ResponseEntity.ok(rows) : ResponseEntity.notFound().build();
-    }
-
-    @PostMapping(path = "validate/{survey_id}")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<?> validateSurveyCorrection(@PathVariable("survey_id") Integer surveyId,
-            Authentication authentication, @RequestBody Collection<StagedRow> rows) {
-
-        var message = "correction validation: username: " + authentication.getName() + " survey: " + surveyId;
-        logger.debug("correction/validation", message);
+    private ValidationResultSet mappingResultToValidation(List<Pair<StagedRowFormatted, HashSet<String>>> results) {
+        var validationResult = new ValidationResultSet();
 
         var messages = new HashMap<String, String>() {
             {
@@ -235,60 +222,91 @@ public class CorrectionController {
             }
         };
 
+        for (var result : results) {
+            var row = result.getLeft();
+            var rowErrors = result.getRight().stream()
+                    .map(col -> new ValidationCell(
+                            ValidationCategory.FORMAT,
+                            ValidationLevel.BLOCKING,
+                            messages.keySet().contains(col) ? messages.get(col) : messages.get("measurement"),
+                            row.getId(),
+                            col))
+                    .collect(Collectors.toSet());
+            validationResult.addAll(rowErrors, false);
+        }
+
+        return validationResult;
+    }
+
+    private ValidationResultSet validate(List<Pair<StagedRowFormatted, HashSet<String>>> results) {
+
+        var validation = mappingResultToValidation(results);
+
+        var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
+
+        int[] obsItemIds = mappedRows.stream()
+                .filter(r -> r.getSpecies().isPresent())
+                .mapToInt(r -> r.getSpecies().get().getObservableItemId())
+                .distinct()
+                .toArray();
+
+        var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
+        observationRepository
+                .getSpeciesAttributesByIds(obsItemIds)
+                .stream()
+                .forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
+
+        for (var row : mappedRows) {
+            // TODO: add constraints here ..
+            var attribute = row.getSpecies().isPresent()
+                    ? speciesAttributes.get(row.getSpecies().get().getObservableItemId())
+                    : null;
+            if (attribute != null)
+                validation.addAll(measurementValidationService.validate(attribute, row), false);
+            // FUTURE: other validations go here ..
+        }
+
+        long errorId = 0;
+        for (var error : validation.getAll())
+            error.setId(errorId++);
+
+        return validation;
+    }
+
+    @GetMapping(path = "correct/{survey_id}")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public ResponseEntity<?> getSurveyCorrection(@PathVariable("survey_id") Integer surveyId) {
+        var rows = correctionRowRepository.findRowsBySurveyId(surveyId);
+        var exists = rows != null && rows.size() > 0;
+        return exists ? ResponseEntity.ok(rows) : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping(path = "validate/{survey_id}")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public ResponseEntity<?> validateSurveyCorrection(
+        @PathVariable("survey_id") Integer surveyId,
+            Authentication authentication, 
+            @RequestBody Collection<StagedRow> rows) {
+
+        var message = "correction validation: username: " + authentication.getName() + " survey: " + surveyId;
+        logger.debug("correction/validation", message);
+
         var response = new ValidationResponse();
-        var errors = new ValidationResultSet();
         try {
-            var results = mapRows(rows);
-            for (var result : results) {
-                var row = result.getLeft();
-                var rowErrors = result.getRight().stream()
-                        .map(col -> new ValidationCell(
-                                ValidationCategory.FORMAT,
-                                ValidationLevel.BLOCKING,
-                                messages.keySet().contains(col) ? messages.get(col) : messages.get("measurement"),
-                                row.getId(),
-                                col))
-                        .collect(Collectors.toSet());
-                errors.addAll(rowErrors, false);
-            }
-
-            var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
-
-            int[] obsItemIds = mappedRows.stream()
-                    .filter(r -> r.getSpecies().isPresent())
-                    .mapToInt(r -> r.getSpecies().get().getObservableItemId())
-                    .distinct()
-                    .toArray();
-
-            var speciesAttributes = new HashMap<Integer, UiSpeciesAttributes>();
-            observationRepository
-                    .getSpeciesAttributesByIds(obsItemIds)
-                    .stream()
-                    .forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
-
-            for (var row : mappedRows) {
-                var attribute = row.getSpecies().isPresent() ? speciesAttributes.get(row.getSpecies().get().getObservableItemId()) : null;
-                if(attribute != null)
-                    errors.addAll(measurementValidationService.validate(attribute, row), false);
-            }
+            response.setErrors(validate(mapRows(rows)).getAll());
         } catch (Exception e) {
             logger.error("Validation Failed", e);
             return ResponseEntity.badRequest().body("Validation failed. Error: " + e.getMessage());
         }
-
-        long errorId = 0;
-        for(var error: errors.getAll()) {
-            error.setId(errorId++);
-        }
-
-        response.setErrors(errors.getAll());
         return ResponseEntity.ok().body(response);
     }
 
     @PostMapping(path = "correct/{survey_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<?> submitSurveyCorrection(@PathVariable("survey_id") Integer surveyId,
-            Authentication authentication, @RequestBody List<StagedRow> rows) {
+    public ResponseEntity<?> submitSurveyCorrection(
+            @PathVariable("survey_id") Integer surveyId,
+            Authentication authentication,
+            @RequestBody List<StagedRow> rows) {
 
         Optional<SecUser> user = userRepo.findByEmail(authentication.getName());
 
@@ -315,15 +333,18 @@ public class CorrectionController {
         var response = new ValidationResponse();
 
         try {
-            
-            // var mappingResult = mapRows(rows);
 
-            // if (errors.size() < 1)
-            //     surveyCorrectionService.correctSurvey(job, survey, mappedRows);
-            // else
-            //     logMessage(job, "Survey correction failed. Errors found.");
+            var results = mapRows(rows);
+            var result = validate(results).getAll();
+            var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
+            var blockingErrors = result.stream().filter(r -> r.getLevelId() == ValidationLevel.BLOCKING).collect(Collectors.toList());
 
-            // response.setErrors(errors);
+            if (blockingErrors.size() > 0) {
+                logMessage(job, "Survey correction failed. Errors found.");
+                return ResponseEntity.ok().body(result);
+            }
+
+            surveyCorrectionService.correctSurvey(job, survey, mappedRows);
 
         } catch (Exception e) {
 
@@ -343,7 +364,10 @@ public class CorrectionController {
     }
 
     @DeleteMapping("correct/{id}")
-    public ResponseEntity<?> submitSurveyDeletion(@PathVariable Integer id, Authentication authentication) {
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public ResponseEntity<?> submitSurveyDeletion(
+        @PathVariable Integer id, 
+        Authentication authentication) {
 
         Optional<SecUser> user = userRepo.findByEmail(authentication.getName());
 
@@ -356,14 +380,16 @@ public class CorrectionController {
         userAuditRepo.save(new UserActionAudit("correction/delete", "survey: " + id));
 
         var job = jobRepository.save(StagedJob.builder().source(SourceJobType.CORRECTION)
-                .reference(String.format("%d", id)).status(StatusJobType.CORRECTION)
+                .reference(id.toString()).status(StatusJobType.CORRECTION)
                 .program(survey.getProgram())
                 .creator(user.get()).build());
 
         logMessage(job, "Delete Survey " + id);
 
         try {
+
             surveyCorrectionService.deleteSurvey(job, survey, Collections.emptyList());
+
         } catch (Exception e) {
 
             logger.error("Correction Failed", e);
@@ -377,6 +403,7 @@ public class CorrectionController {
 
             return ResponseEntity.badRequest().body("Survey failed to delete. No data has been changed.");
         }
+
         return ResponseEntity.ok("Survey " + id + " deleted.");
     }
 }
