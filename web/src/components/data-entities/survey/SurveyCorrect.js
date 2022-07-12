@@ -1,4 +1,4 @@
-import { Box, Button, Typography, Paper, Grid } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 import { blue, grey, orange, red } from '@mui/material/colors';
@@ -179,7 +179,7 @@ const SurveyCorrect = () => {
     context.useOverlay = 'Validating Survey Correction...';
     gridRef.current.api.showLoadingOverlay();
     setSideBar(defaultSideBar);
-    const result = await validateSurveyCorrection(surveyId, packedData());
+    const result = validateSurveyCorrection(surveyId, packedData());
     setValidationResult(result.data.errors);
     setEditMode(false);
   };
@@ -281,7 +281,7 @@ const SurveyCorrect = () => {
             </Box>
             <Box flexDirection="row">
               <Button sx={{ width: '25px', marginLeft: '20%' }} variant='outlined' onClick={() => { setEditMode(true); }}>Cancel</Button>
-              <Button sx={{ width: '50%', marginLeft: '10px' }} variant='contained' onClick={() => { setEditMode(true); }}>Apply Changes</Button>
+              <Button sx={{ width: '50%', marginLeft: '10px' }} variant='contained' onClick={onSubmitConfirm}>Apply Changes</Button>
             </Box>
           </Box>
         </Box>
