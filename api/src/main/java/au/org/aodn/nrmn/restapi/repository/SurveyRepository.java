@@ -4,6 +4,8 @@ import au.org.aodn.nrmn.restapi.dto.survey.SurveyFilterDto;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.repository.projections.SurveyRow;
+import au.org.aodn.nrmn.restapi.repository.projections.SurveyRowCacheable;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -19,35 +21,27 @@ import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 
 @Repository
 public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpecificationExecutor<Survey> {
-
-        @Query(value = "" +
-                "WITH diver_names AS (" +
-                "    SELECT survey_id, array_to_string(array_agg(DISTINCT full_name), ', ') AS names_list" +
-                "    FROM {h-schema}diver_ref dv" +
-                "    INNER JOIN {h-schema}observation o ON o.diver_id = dv.diver_id  " +
-                "    INNER JOIN {h-schema}survey_method sm ON o.survey_method_id = sm.survey_method_id" +
-                "    GROUP BY survey_id" +
-                ")" +
-                "select " +
-                "    survey_date as surveyDate, " +
-                "    survey_time as surveyTime, " +
-                "    concat(depth, '.', survey_num) as depth, " +
-                "    COALESCE(pq_catalogued, false) as hasPQs, " +
-                "    sv.survey_id as surveyId, " +
-                "    st.site_name as siteName, " +
-                "    st.site_code as siteCode, " +
+        @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
+        @Query("SELECT new au.org.aodn.nrmn.restapi.repository.projections.SurveyRowCacheable(" +
+                "    sv.surveyId, " +
+                "    sv.surveyDate, " +
+                "    sv.surveyTime, " +
+                "    sv.depth, " +
+                "    sv.surveyNum, " +
+                "    sv.pqCatalogued, " +
+                "    st.siteName, " +
+                "    st.siteCode, " +
                 "    st.mpa, " +
                 "    st.country, " +
-                "    pg.program_name as programName, " +
-                "    names_list as diverName, " +
-                "    lc.location_name as locationName " +
-                "FROM {h-schema}survey sv " +
-                "LEFT JOIN {h-schema}program_ref pg USING (program_id)" +
-                "LEFT JOIN {h-schema}site_ref st USING (site_id)" +
-                "LEFT JOIN {h-schema}location_ref lc USING (location_id)" +
-                "LEFT JOIN diver_names dn USING (survey_id)" +
-                "ORDER BY surveyId DESC", countQuery = "SELECT count(*) FROM {h-schema}survey", nativeQuery = true)
-        List<SurveyRow> findAllProjectedBy();
+                "    pg.programName, " +
+                "    lc.locationName " +
+                ") " +
+                "FROM Survey as sv " +
+                "LEFT JOIN sv.site as st " +
+                "LEFT JOIN sv.program as pg " +
+                "LEFT JOIN st.location as lc " +
+                "ORDER BY sv.surveyId DESC")
+        List<SurveyRowCacheable> findAllProjectedBy();
 
         @Query("SELECT t FROM #{#entityName} t WHERE t.id IN :ids")
         List<Survey> findByIdsIn(@Param("ids") List<Integer> ids);

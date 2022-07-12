@@ -22,7 +22,7 @@ import au.org.aodn.nrmn.restapi.model.db.Program;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
-import au.org.aodn.nrmn.restapi.repository.projections.SurveyRow;
+import au.org.aodn.nrmn.restapi.repository.projections.SurveyRowCacheable;
 import au.org.aodn.nrmn.restapi.service.SurveyEditService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -44,11 +44,11 @@ public class SurveyController {
     private ModelMapper mapper;
 
     @GetMapping(path = "/surveys")
-    public ResponseEntity<List<SurveyRow>> listMatching(SurveyFilterDto surveyFilter) {
-        if (surveyFilter.isSet())
-            return ResponseEntity
-                    .ok(surveyRepository.findByCriteria(surveyFilter).stream().collect(Collectors.toList()));
-        else
+    public ResponseEntity<List<SurveyRowCacheable>> listMatching(SurveyFilterDto surveyFilter) {
+        // if (surveyFilter.isSet())
+        //     return ResponseEntity
+        //             .ok(surveyRepository.findByCriteria(surveyFilter).stream().collect(Collectors.toList()));
+        // else
             return ResponseEntity.ok(surveyRepository.findAllProjectedBy().stream().collect(Collectors.toList()));
     }
 
