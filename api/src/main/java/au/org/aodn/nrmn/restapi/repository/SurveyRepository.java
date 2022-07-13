@@ -5,6 +5,7 @@ import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.repository.projections.SurveyRow;
 import au.org.aodn.nrmn.restapi.repository.projections.SurveyRowCacheable;
+import au.org.aodn.nrmn.restapi.repository.projections.SurveyRowDivers;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -29,18 +30,13 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
                 "    sv.depth, " +
                 "    sv.surveyNum, " +
                 "    sv.pqCatalogued, " +
-                "    st.siteName, " +
-                "    st.siteCode, " +
-                "    st.mpa, " +
-                "    st.country, " +
-                "    pg.programName, " +
-                "    lc.locationName " +
-                ") " +
-                "FROM Survey as sv " +
-                "LEFT JOIN sv.site as st " +
-                "LEFT JOIN sv.program as pg " +
-                "LEFT JOIN st.location as lc " +
-                "ORDER BY sv.surveyId DESC")
+                "    sv.site.siteName, " +
+                "    sv.site.siteCode, " +
+                "    sv.site.mpa, " +
+                "    sv.site.country, " +
+                "    sv.program.programName, " +
+                "    sv.site.location.locationName " +
+                ") FROM Survey as sv ORDER BY sv.surveyId DESC")
         List<SurveyRowCacheable> findAllProjectedBy();
 
         @Query("SELECT t FROM #{#entityName} t WHERE t.id IN :ids")
@@ -82,4 +78,8 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
 
         @Query("SELECT s FROM Survey s WHERE s.surveyId IN :ids AND (s.pqCatalogued = FALSE OR s.pqCatalogued IS NULL)")
         List<Survey> findSurveysWithoutPQ(@Param("ids") List<Integer> ids);
+
+        @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
+        @Query("SELECT DISTINCT new au.org.aodn.nrmn.restapi.repository.projections.SurveyRowDivers(o.surveyMethod.survey.surveyId, o.diver.fullName) from Observation o where o.surveyMethod.survey.surveyId IN (:surveyIds)")
+        List<SurveyRowDivers> getDiversForSurvey(@Param("surveyIds") List<Integer> surveyIds);
 }

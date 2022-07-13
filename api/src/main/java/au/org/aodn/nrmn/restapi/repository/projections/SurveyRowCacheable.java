@@ -6,11 +6,11 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.cache.annotation.Cacheable;
 
-import lombok.Value;
+import lombok.Getter;
 
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-@Value
+@Getter
 public class SurveyRowCacheable {
     private Integer surveyId;
     private String siteName;
@@ -23,6 +23,11 @@ public class SurveyRowCacheable {
     private String country;
     private String programName;
     private String locationName;
+    private String diverName;
+
+    public void setDiverNames(String diverNames) {
+        this.diverName = diverNames;
+    }
 
     public SurveyRowCacheable(Integer surveyId, Date surveyDate, Date surveyTime, Integer depth, Integer surveyNum, Boolean hasPQs, String siteName, String siteCode, String mpa, String country, String programName, String locationName) {
         this.surveyId = surveyId;
