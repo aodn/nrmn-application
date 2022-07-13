@@ -46,6 +46,7 @@ public interface SiteRepository
     List<String> findAllSiteCodes();
 
     @Query(value = "SELECT * FROM {h-schema}site_ref WHERE site_code IS NOT NULL ORDER BY SUBSTRING(site_code, '^[A-Z]+'), CAST(SUBSTRING(site_code, '[0-9]+$') AS INTEGER)", nativeQuery = true)
+    @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
     List<Site> findAll();
 
     @Query(value = "SELECT DISTINCT state FROM Site WHERE state is not null ORDER BY state")

@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +23,6 @@ import au.org.aodn.nrmn.restapi.model.db.Program;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
-import au.org.aodn.nrmn.restapi.repository.projections.SurveyRowCacheable;
 import au.org.aodn.nrmn.restapi.repository.projections.SurveyRowDivers;
 import au.org.aodn.nrmn.restapi.service.SurveyEditService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,24 +45,25 @@ public class SurveyController {
     private ModelMapper mapper;
 
     @GetMapping(path = "/surveys")
-    public ResponseEntity<List<SurveyRowCacheable>> listMatching(SurveyFilterDto surveyFilter) {
-        // if (surveyFilter.isSet())
-        // return ResponseEntity
-        // .ok(surveyRepository.findByCriteria(surveyFilter).stream().collect(Collectors.toList()));
-        // else
-        // return ResponseEntity.ok();
-        // getDiversFromSurveys
-        var surveyRows = surveyRepository.findAllProjectedBy().stream().collect(Collectors.toList());
-        var surveyIds = surveyRows.stream().map(s -> s.getSurveyId()).collect(Collectors.toList());
-        Map<Integer, String> diverNames = surveyRepository.getDiversForSurvey(surveyIds).stream()
-                .collect(Collectors.groupingBy(SurveyRowDivers::getSurveyId, Collectors.mapping(SurveyRowDivers::getDiverName, Collectors.joining(", "))));
+    public ResponseEntity<?> listMatching(SurveyFilterDto surveyFilter) {
+        if (surveyFilter.isSet()) {
+            return ResponseEntity
+                    .ok(surveyRepository.findByCriteria(surveyFilter).stream().collect(Collectors.toList()));
+        } else {
 
-        var surveyRowsWithDivers = surveyRows.stream().map(s -> {
-            s.setDiverNames(diverNames.get(s.getSurveyId()));
-            return s;
-        }).collect(Collectors.toList());
-        
-        return ResponseEntity.ok(surveyRowsWithDivers);
+            var surveyRows = surveyRepository.findAllProjectedBy().stream().collect(Collectors.toList());
+            var surveyIds = surveyRows.stream().map(s -> s.getSurveyId()).collect(Collectors.toList());
+            Map<Integer, String> diverNames = surveyRepository.getDiversForSurvey(surveyIds).stream()
+                    .collect(Collectors.groupingBy(SurveyRowDivers::getSurveyId,
+                            Collectors.mapping(SurveyRowDivers::getDiverName, Collectors.joining(", "))));
+
+            var surveyRowsWithDivers = surveyRows.stream().map(s -> {
+                s.setDiverNames(diverNames.get(s.getSurveyId()));
+                return s;
+            }).collect(Collectors.toList());
+
+            return ResponseEntity.ok(surveyRowsWithDivers);
+        }
     }
 
     @GetMapping(path = "/programs")
