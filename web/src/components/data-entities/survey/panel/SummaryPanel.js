@@ -52,12 +52,13 @@ const SummaryPanel = ({api, context}) => {
   const summary = (
     <TreeView defaultCollapseIcon={<ArrowDropDownIcon />} defaultExpandIcon={<ArrowRightIcon />}>
       {Object.keys(messages).map((level) => (
-        <>
+        <div key={level}>
           <Typography variant="button">{level}</Typography>
           {messages[level].map((m) => (
             <Box my={0.25} key={m.id}>
               <TreeItem
-                nodeId={m.id}
+                nodeId={`${m.id}`}
+                key={`${m.id}`}
                 label={
                   <Typography variant="body2">
                     {m.message} {m.description.length > 1 ? '(' + m.description.length + ')' : ''}
@@ -67,7 +68,6 @@ const SummaryPanel = ({api, context}) => {
                 {m.description.map((d) => {
                   const mmHeader = mm.find((m) => m.field === d.columnName);
                   const label = mmHeader ? `${d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
-
                   return (
                     <TreeItem
                       nodeId={`${m.id}-${d.columnName}`}
@@ -97,7 +97,7 @@ const SummaryPanel = ({api, context}) => {
               </TreeItem>
             </Box>
           ))}
-        </>
+        </div>
       ))}
     </TreeView>
   );
@@ -106,7 +106,6 @@ const SummaryPanel = ({api, context}) => {
     <Box m={2} mr={4}>
       <Box m={2} mt={1}>
         {summary}
-        {/* <ValidationSummary data={blocking} onItemClick={(item) => handleItemClick(item, true)} /> */}
       </Box>
     </Box>
   );

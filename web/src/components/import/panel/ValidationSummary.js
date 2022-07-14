@@ -15,7 +15,7 @@ const ValidationSummary = (props) => {
       {props.data.map((m) => (
         <TreeItem
           key={m.key}
-          nodeId={m.key}
+          nodeId={`${m.key}`}
           label={
             <Typography variant="body2">
               {m.message} {m.description.length > 1 ? '(' + m.description.length + ')' : ''}

@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from '@mui/material';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
-import { blue, grey, orange, red } from '@mui/material/colors';
+import { grey, orange, red } from '@mui/material/colors';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
@@ -14,16 +14,13 @@ import { PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon, CloudUpload a
 import ValidationPanel from '../../import/panel/ValidationPanel';
 
 const chooseCellStyle = (params) => {
+
   // Grey-out the first  column containing the row number
   if (params.colDef.field === 'id') return { color: grey[500] };
 
   if (!params.context.cellValidations) return;
-  // Highlight and search results
-  //const row = params.context.highlighted[params.rowIndex];
-  //if (row && row[params.colDef.field]) return {backgroundColor: yellow[100]};
 
   // Highlight cell validations
-
   const row = params.data.id;
   const field = params.colDef.field;
   const level = params.context.cellValidations[row]?.[field]?.levelId;
@@ -32,12 +29,6 @@ const chooseCellStyle = (params) => {
       return { backgroundColor: red[100] };
     case 'WARNING':
       return { backgroundColor: orange[100] };
-    case 'DUPLICATE':
-      // if (context.focusedRows?.includes(params.data.id)) {
-      //   return {backgroundColor: blue[100], fontWeight: 'bold'};
-      // } else {
-      return { backgroundColor: blue[100] };
-    // }
     case 'INFO':
       return { backgroundColor: grey[100] };
     default:
@@ -58,10 +49,14 @@ const toolTipValueGetter = ({ context, data, colDef }) => {
   return error?.message;
 };
 
+const removeNullProperties = (obj) => {
+  return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== ''));
+};
+
 const SurveyCorrect = () => {
   const surveyId = useParams()?.id;
   const gridRef = useRef();
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(true);
   const [rowData, setRowData] = useState();
   const [validationResult, setValidationResult] = useState();
   const [cellValidations, setCellValidations] = useState([]);
@@ -154,7 +149,7 @@ const SurveyCorrect = () => {
     const packedData = [];
     gridRef.current.api.forEachNode((rowNode, index) => {
       const data = rowNode.data;
-      packedData.push({ id: index, ...data, measureJson: data.measurements });
+      packedData.push({ id: index, ...data, measureJson: removeNullProperties(data.measurements) });
     });
     return packedData;
   };
@@ -174,18 +169,20 @@ const SurveyCorrect = () => {
     }));
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     const context = gridRef.current.api.gridOptionsWrapper.gridOptions.context;
     context.useOverlay = 'Validating Survey Correction...';
     gridRef.current.api.showLoadingOverlay();
     setSideBar(defaultSideBar);
-    const result = validateSurveyCorrection(surveyId, packedData());
+    const result = await validateSurveyCorrection(surveyId, packedData());
     setValidationResult(result.data.errors);
     setEditMode(false);
   };
 
-  const onSubmitConfirm = () => {
-    submitSurveyCorrection(surveyId, packedData());
+  const onSubmitConfirm = async () => {
+    const result = await submitSurveyCorrection(surveyId, packedData());
+    // `result` should contain the jobId to redirect. (does it?)
+    const jobId = result.data.job?.jobId;
   };
 
   const defaultColDef = useMemo(() => {
@@ -220,8 +217,7 @@ const SurveyCorrect = () => {
           </Button>
         </Box>
       </Box>
-      {editMode ? (
-        <Box flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
+      <Box display={editMode ? 'block' : 'none'} flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
           <AgGridReact
             ref={gridRef}
             gridOptions={{ context: { useOverlay: 'Loading Survey Correction...', validations: [] } }}
@@ -264,14 +260,14 @@ const SurveyCorrect = () => {
                 />
               )
             )}
-            <AgGridColumn field={'measurements.0'} headerName="Unsized" />
+            <AgGridColumn editable field={'measurements.0'} headerName="Unsized" />
             {allMeasurements.map((_, idx) => {
               const field = `measurements.${idx + 1}`;
               return <AgGridColumn editable field={field} headerComponent={SurveyMeasurementHeader} key={idx} width={35} />;
             })}
           </AgGridReact>
-        </Box>) : (
-        <Box display="flex" justifyContent="center">
+        </Box>
+        <Box display={editMode ? 'none' : 'flex'}   justifyContent="center">
           <Box style={{ background: 'white', width: 900 }} boxShadow={1} padding={3} margin={3} display="flex" justifyContent="center" flexDirection='column'>
             <Box>
               <Typography variant="h5">Confirm Survey Correction</Typography>
@@ -281,11 +277,10 @@ const SurveyCorrect = () => {
             </Box>
             <Box flexDirection="row">
               <Button sx={{ width: '25px', marginLeft: '20%' }} variant='outlined' onClick={() => { setEditMode(true); }}>Cancel</Button>
-              <Button sx={{ width: '50%', marginLeft: '10px' }} variant='contained' onClick={onSubmitConfirm}>Apply Changes</Button>
+              <Button sx={{ width: '50%', marginLeft: '10px' }} variant='contained' onClick={onSubmitConfirm}>Apply Correction</Button>
             </Box>
           </Box>
         </Box>
-      )}
     </>
   );
 };

@@ -184,7 +184,8 @@ public class CorrectionController {
                     .map(e -> e.getKey())
                     .collect(Collectors.toSet());
 
-            // probably not necessary?
+            // probably not necessary? 
+            // (how can a measure exist in the mapped row that doesn't in the staged row?)
             var mmB = mappedRow.getMeasureJson().entrySet().stream()
                     .filter(e -> !e.getValue().equals(stagedRow.getMeasureJson().get(e.getKey())))
                     .map(e -> e.getKey())
@@ -257,7 +258,6 @@ public class CorrectionController {
                 .forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
 
         for (var row : mappedRows) {
-            // TODO: add constraints here ..
             var attribute = row.getSpecies().isPresent()
                     ? speciesAttributes.get(row.getSpecies().get().getObservableItemId())
                     : null;
