@@ -36,4 +36,7 @@ public interface ObservationRepository
             "as commonName, is_invert_sized as isInvertSized, l5, l95, maxabundance as maxAbundance, lmax " +
             "FROM  nrmn.ui_species_attributes   where observable_item_id in :id")
     List<UiSpeciesAttributes> getSpeciesAttributesByIds(@Param("id") int[] id);
+
+    @Query("SELECT observationId FROM Observation where surveyMethod.survey.surveyId = :surveyId")
+    List<Integer> findObservationIdsForSurvey(@Param("surveyId") Integer surveyId);
 }

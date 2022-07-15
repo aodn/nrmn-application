@@ -47,9 +47,15 @@ public class MeasurementValidationService {
     public Collection<ValidationCell> validate(UiSpeciesAttributes speciesAttributes, StagedRowFormatted row) {
         
         boolean isMeasureMethod = !Arrays.asList(3, 4, 5).contains(row.getMethod());
-        if (isMeasureMethod && row.getMeasureJson().size() > 0) {
+
+        if(!isMeasureMethod)
+            return Arrays.<ValidationCell>asList();
+
+        if (row.getMeasureJson().size() > 0) {
             return validateMeasureRange(row.getId(),  row.getRef().getSpecies(), row.getIsInvertSizing(), row.getMeasureJson(), speciesAttributes);
+        } else {
+            var noMeasurements = new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Row contains no measurements", row.getId(), "measurements.1");
+            return Arrays.<ValidationCell>asList(noMeasurements);
         }
-        return new ArrayList<ValidationCell>();
     }
 }

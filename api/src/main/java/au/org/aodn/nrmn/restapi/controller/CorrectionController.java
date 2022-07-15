@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -315,13 +316,14 @@ public class CorrectionController {
             return ResponseEntity.notFound().build();
 
         var survey = surveyOptional.get();
+        var surveyName = String.format("[%s, %s, %s.%d]", survey.getSite().getSiteCode(),  survey.getSurveyDate(), survey.getDepth(), survey.getSurveyNum());
 
         String logMessage = "correction: username: " + authentication.getName() + "survey: " + surveyId;
         userAuditRepo.save(new UserActionAudit("correct/survey", logMessage));
 
         var job = StagedJob.builder()
                 .source(SourceJobType.CORRECTION)
-                .reference(surveyId.toString())
+                .reference(surveyName)
                 .status(StatusJobType.CORRECTION)
                 .program(survey.getProgram())
                 .creator(user.get())
@@ -330,7 +332,6 @@ public class CorrectionController {
         job = jobRepository.save(job);
 
         logMessage(job, "Correct Survey " + surveyId);
-        var response = new ValidationResponse();
 
         try {
 
@@ -360,7 +361,7 @@ public class CorrectionController {
             return ResponseEntity.badRequest().body("Survey failed to delete. No data has been changed.");
         }
 
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.ok().body(job.getId());
     }
 
     @DeleteMapping("correct/{id}")

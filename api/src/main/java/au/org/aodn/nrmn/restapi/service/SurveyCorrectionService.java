@@ -1,11 +1,11 @@
 package au.org.aodn.nrmn.restapi.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -43,6 +43,7 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import lombok.Value;
 
 @Service
+@Transactional
 public class SurveyCorrectionService {
 
     @Autowired
@@ -79,17 +80,17 @@ public class SurveyCorrectionService {
     StagedJobRepository jobRepository;
 
     public void correctSurvey(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows) {
-        correctionTransaction(job, survey, validatedRows, false);
+        correctionTransaction(job, survey, validatedRows);
     }
 
     public void deleteSurvey(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows) {
-        correctionTransaction(job, survey, validatedRows, true);
+        deletionTransaction(job, survey, validatedRows);
     }
 
     private SurveyMethodEntity getSurveyMethod(Survey survey, StagedRowFormatted stagedRow) {
-        boolean surveyNotDone = stagedRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done");
-        Method method = entityManager.getReference(Method.class, stagedRow.getMethod());
-        SurveyMethodEntity surveyMethod = SurveyMethodEntity.builder().survey(survey).method(method)
+        var surveyNotDone = stagedRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done");
+        var method = entityManager.getReference(Method.class, stagedRow.getMethod());
+        var surveyMethod = SurveyMethodEntity.builder().survey(survey).method(method)
                 .blockNum(stagedRow.getBlock())
                 .surveyNotDone(surveyNotDone).build();
         return surveyMethodRepository.save(surveyMethod);
@@ -164,54 +165,65 @@ public class SurveyCorrectionService {
                 .collect(Collectors.groupingBy(StagedRowFormatted::getMethodBlock));
     }
 
-    @Transactional
-    private void correctionTransaction(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows,
-            Boolean deleteSurvey) {
+    private String observationsForSurveySummary(Integer surveyId) {
+        return observationRepository.findObservationIdsForSurvey(surveyId).stream().map(String::valueOf)
+                .collect(Collectors.joining(", "));
+    }
+
+    private void deletionTransaction(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows) {
+        var messages = Arrays.<String>asList();
 
         // Remove existing observations
-        surveyMethodRepository.deleteForSurveyId(survey.getSurveyId());
+        var surveyId = survey.getSurveyId();
+        messages.add("Delete Observation IDs: " + observationsForSurveySummary(surveyId));
+        surveyMethodRepository.deleteForSurveyId(surveyId);
 
-        String message;
-        List<Integer> surveyIds = Arrays.asList();
-
-        if (deleteSurvey) {
-            surveyRepository.deleteById(survey.getSurveyId());
-            message = String.format("Survey %d deleted", survey.getSurveyId());
-        } else {
-
-            Map<String, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream()
-                    .collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
-
-            surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
-
-                OptionalDouble visAvg = surveyRows.stream().filter(r -> r.getVis().isPresent())
-                        .mapToDouble(r -> r.getVis().get()).average();
-
-                if (visAvg.isPresent())
-                    visAvg = OptionalDouble.of((double) Math.round(visAvg.getAsDouble()));
-
-                groupRowsByMethodBlock(surveyRows).values().forEach(methodBlockRows -> {
-                    SurveyMethodEntity surveyMethod = getSurveyMethod(survey, methodBlockRows.get(0));
-                    methodBlockRows.forEach(row -> observationRepository
-                            .saveAll(getObservations(surveyMethod, row, job.getIsExtendedSize())));
-                });
-                return survey.getSurveyId();
-            }).collect(Collectors.toList());
-
-            long rowCount = validatedRows.size();
-            long siteCount = validatedRows.stream().map(r -> r.getSite()).distinct().count();
-            long surveyCount = surveyIds.size();
-            long obsItemCount = validatedRows.stream().map(r -> r.getSpecies()).filter(o -> o.isPresent()).distinct()
-                    .count();
-            long diverCount = validatedRows.stream().map(r -> r.getDiver()).distinct().count();
-
-            List<String> messages = Arrays.asList(rowCount + " rows of data", siteCount + " sites",
-                    surveyCount + " surveys", obsItemCount + " distinct observable items", diverCount + " divers");
-            message = messages.stream().collect(Collectors.joining("\n"));
-        }
+        surveyRepository.deleteById(survey.getSurveyId());
+        messages.add("Delete Survey ID: " + surveyId);
 
         stagedJobLogRepository.save(
-                StagedJobLog.builder().stagedJob(job).details(message).eventType(StagedJobEventType.CORRECTED).build());
+                StagedJobLog.builder()
+                        .stagedJob(job)
+                        .details(messages.stream().collect(Collectors.joining("\n")))
+                        .eventType(StagedJobEventType.CORRECTED)
+                        .build());
+        job.setStatus(StatusJobType.CORRECTION);
+        jobRepository.save(job);
+    }
+
+    private void correctionTransaction(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows) {
+
+        var surveyIds = Arrays.<Integer>asList();
+        var messages = new ArrayList<String>();
+
+        var surveyId = survey.getSurveyId();
+        messages.add("Delete Observation IDs: " + observationsForSurveySummary(surveyId));
+        surveyMethodRepository.deleteForSurveyId(surveyId);
+
+        var rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
+
+        surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
+            groupRowsByMethodBlock(surveyRows).values().forEach(methodBlockRows -> {
+                var surveyMethod = getSurveyMethod(survey, methodBlockRows.get(0));
+                methodBlockRows.forEach(row -> {
+                    var newObservations = observationRepository.saveAll(
+                            getObservations(surveyMethod, row, job.getIsExtendedSize()));
+                    messages.add("Insert Observation IDs: " + newObservations.stream()
+                            .map(Observation::getObservationId)
+                            .map(String::valueOf)
+                            .collect(Collectors.joining(", ")));
+                });
+            });
+            messages.add("Delete Survey ID: " + surveyId);
+            return surveyId;
+        }).collect(Collectors.toList());
+
+        stagedJobLogRepository.save(
+                StagedJobLog.builder()
+                        .stagedJob(job)
+                        .details(messages.stream().collect(Collectors.joining("\n")))
+                        .eventType(StagedJobEventType.CORRECTED)
+                        .build());
         job.setStatus(StatusJobType.CORRECTION);
         job.setSurveyIds(surveyIds);
         jobRepository.save(job);
