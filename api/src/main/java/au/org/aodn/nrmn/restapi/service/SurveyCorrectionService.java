@@ -171,7 +171,7 @@ public class SurveyCorrectionService {
     }
 
     private void deletionTransaction(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows) {
-        var messages = Arrays.<String>asList();
+        var messages = new ArrayList<String>();
 
         // Remove existing observations
         var surveyId = survey.getSurveyId();
