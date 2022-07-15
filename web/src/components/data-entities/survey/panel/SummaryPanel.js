@@ -51,52 +51,52 @@ const SummaryPanel = ({api, context}) => {
 
   const summary = (
     <TreeView defaultCollapseIcon={<ArrowDropDownIcon />} defaultExpandIcon={<ArrowRightIcon />}>
-      {Object.keys(messages).map((level) => (
+      {['BLOCKING', 'WARNING', 'DUPLICATE', 'INFO'].map((level) => (
         <div key={level}>
-          <Typography variant="button">{level}</Typography>
-          {messages[level].map((m) => (
-            <Box my={0.25} key={m.id}>
-              <TreeItem
-                nodeId={`${m.id}`}
-                key={`${m.id}`}
-                label={
-                  <Typography variant="body2">
-                    {m.message} {m.description.length > 1 ? '(' + m.description.length + ')' : ''}
-                  </Typography>
-                }
-              >
-                {m.description.map((d) => {
-                  const mmHeader = mm.find((m) => m.field === d.columnName);
-                  const label = mmHeader ? `${d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
-                  return (
-                    <TreeItem
-                      nodeId={`${m.id}-${d.columnName}`}
-                      key={`${m.id}-${d.columnName}`}
-                      onClick={() => handleItemClick(d)}
-                      label={
-                        <Typography variant="body2">
-                          {d.value ? (
-                            <span>
-                              {d.rowNumbers ? `${d.rowNumbers[0]}: ` : ''}
-                              <b>{label}</b> {d.value}
-                            </span>
-                          ) : d.label ? (
-                            <b>{label} is empty</b>
-                          ) : d.columnNames ? (
-                            <b>
-                              Check Column{d.columnNames.length > 1 ? 's' : ''} {d.columnNames.join(', ')}
-                            </b>
-                          ) : (
-                            <b>Rows {d.rowNumbers.join(', ')}</b>
-                          )}
-                        </Typography>
-                      }
-                    />
-                  );
-                })}
-              </TreeItem>
-            </Box>
-          ))}
+          <Typography variant="button">{messages[level] ? level : 'No ' + level + '✔'}</Typography>
+          {messages[level]?.map((m) => (
+              <Box my={0.25} key={m.id}>
+                <TreeItem
+                  nodeId={`${m.id}`}
+                  key={`${m.id}`}
+                  label={
+                    <Typography variant="body2">
+                      {m.message} {m.description.length > 1 ? '(' + m.description.length + ')' : ''}
+                    </Typography>
+                  }
+                >
+                  {m.description.map((d) => {
+                    const mmHeader = mm.find((m) => m.field === d.columnName);
+                    const label = mmHeader ? `${d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
+                    return (
+                      <TreeItem
+                        nodeId={`${m.id}-${d.columnName}`}
+                        key={`${m.id}-${d.columnName}`}
+                        onClick={() => handleItemClick(d)}
+                        label={
+                          <Typography variant="body2">
+                            {d.value ? (
+                              <span>
+                                {d.rowNumbers ? `${d.rowNumbers[0]}: ` : ''}
+                                <b>{label}</b> {d.value}
+                              </span>
+                            ) : d.label ? (
+                              <b>{label} is empty</b>
+                            ) : d.columnNames ? (
+                              <b>
+                                Check Column{d.columnNames.length > 1 ? 's' : ''} {d.columnNames.join(', ')}
+                              </b>
+                            ) : (
+                              <b>Rows {d.rowNumbers.join(', ')}</b>
+                            )}
+                          </Typography>
+                        }
+                      />
+                    );
+                  })}
+                </TreeItem>
+              </Box>
+            ))}
         </div>
       ))}
     </TreeView>
