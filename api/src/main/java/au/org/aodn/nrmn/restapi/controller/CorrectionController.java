@@ -51,6 +51,7 @@ import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
+import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.SurveyCorrectionService;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidationService;
 import au.org.aodn.nrmn.restapi.util.ObjectUtils;
@@ -66,40 +67,43 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class CorrectionController {
 
     @Autowired
-    private CorrectionRowRepository correctionRowRepository;
+    DiverRepository diverRepository;
 
     @Autowired
-    UserActionAuditRepository userAuditRepo;
-
-    @Autowired
-    ObservationRepository observationRepository;
+    MeasurementValidationService measurementValidationService;
 
     @Autowired
     ObservableItemRepository observableItemRepository;
 
     @Autowired
-    StagedJobRepository jobRepository;
+    ObservationRepository observationRepository;
 
     @Autowired
-    StagedJobLogRepository stagedJobLogRepository;
+    private CorrectionRowRepository correctionRowRepository;
 
     @Autowired
-    SurveyRepository surveyRepository;
+    private MaterializedViewService materializedViewService;
 
     @Autowired
-    SecUserRepository userRepo;
-
-    @Autowired
-    DiverRepository diverRepository;
+    SecUserRepository secUserRepository;
 
     @Autowired
     SiteRepository siteRepository;
 
     @Autowired
+    StagedJobLogRepository stagedJobLogRepository;
+
+    @Autowired
+    StagedJobRepository stagedJobRepository;
+
+    @Autowired
     SurveyCorrectionService surveyCorrectionService;
 
     @Autowired
-    MeasurementValidationService measurementValidationService;
+    SurveyRepository surveyRepository;
+
+    @Autowired
+    UserActionAuditRepository userActionAuditRepository;
 
     private static Logger logger = LoggerFactory.getLogger(CorrectionController.class);
 
@@ -181,7 +185,7 @@ public class CorrectionController {
                     .map(e -> e.getKey())
                     .collect(Collectors.toSet());
 
-            // probably not necessary? 
+            // probably not necessary?
             // (how can a measure exist in the mapped row that doesn't in the staged row?)
             var mmB = mappedRow.getMeasureJson().entrySet().stream()
                     .filter(e -> !e.getValue().equals(stagedRow.getMeasureJson().get(e.getKey())))
@@ -281,15 +285,15 @@ public class CorrectionController {
     @PostMapping(path = "validate/{survey_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> validateSurveyCorrection(
-        @PathVariable("survey_id") Integer surveyId,
-            Authentication authentication, 
+            @PathVariable("survey_id") Integer surveyId,
+            Authentication authentication,
             @RequestBody Collection<StagedRow> rows) {
 
         var message = "correction validation: username: " + authentication.getName() + " survey: " + surveyId;
         logger.debug("correction/validation", message);
 
         // does survey exist?
-        if(surveyRepository.getReferenceById(surveyId) == null)
+        if (surveyRepository.getReferenceById(surveyId) == null)
             return ResponseEntity.badRequest().body("Survey does not exist: " + surveyId);
 
         var response = new ValidationResponse();
@@ -312,27 +316,28 @@ public class CorrectionController {
             Authentication authentication,
             @RequestBody List<StagedRow> rows) {
 
-        Optional<SecUser> user = userRepo.findByEmail(authentication.getName());
+        Optional<SecUser> user = secUserRepository.findByEmail(authentication.getName());
 
         var surveyOptional = surveyRepository.findById(surveyId);
         if (!surveyOptional.isPresent())
             return ResponseEntity.notFound().build();
 
         var survey = surveyOptional.get();
-        var surveyName = String.format("[%s, %s, %s.%d]", survey.getSite().getSiteCode(),  survey.getSurveyDate(), survey.getDepth(), survey.getSurveyNum());
+        var surveyName = String.format("[%s, %s, %s.%d]", survey.getSite().getSiteCode(), survey.getSurveyDate(),
+                survey.getDepth(), survey.getSurveyNum());
 
         String logMessage = "correction: username: " + authentication.getName() + "survey: " + surveyId;
-        userAuditRepo.save(new UserActionAudit("correct/survey", logMessage));
+        userActionAuditRepository.save(new UserActionAudit("correct/survey", logMessage));
 
         var job = StagedJob.builder()
                 .source(SourceJobType.CORRECTION)
-                .reference(surveyName)
+                .reference("Correct Survey " + surveyName)
                 .status(StatusJobType.CORRECTION)
                 .program(survey.getProgram())
                 .creator(user.get())
                 .build();
 
-        job = jobRepository.save(job);
+        job = stagedJobRepository.save(job);
 
         logMessage(job, "Correct Survey " + surveyId);
 
@@ -341,7 +346,8 @@ public class CorrectionController {
             var results = mapRows(rows);
             var result = validate(results).getAll();
             var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
-            var blockingErrors = result.stream().filter(r -> r.getLevelId() == ValidationLevel.BLOCKING).collect(Collectors.toList());
+            var blockingErrors = result.stream().filter(r -> r.getLevelId() == ValidationLevel.BLOCKING)
+                    .collect(Collectors.toList());
 
             if (blockingErrors.size() > 0) {
                 logMessage(job, "Survey correction failed. Errors found.");
@@ -349,6 +355,7 @@ public class CorrectionController {
             }
 
             surveyCorrectionService.correctSurvey(job, survey, mappedRows);
+            materializedViewService.refreshAllMaterializedViews();
 
         } catch (Exception e) {
 
@@ -370,10 +377,10 @@ public class CorrectionController {
     @DeleteMapping("correct/{id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> submitSurveyDeletion(
-        @PathVariable Integer id, 
-        Authentication authentication) {
+            @PathVariable Integer id,
+            Authentication authentication) {
 
-        Optional<SecUser> user = userRepo.findByEmail(authentication.getName());
+        var user = secUserRepository.findByEmail(authentication.getName());
 
         var surveyOptional = surveyRepository.findById(id);
         if (!surveyOptional.isPresent())
@@ -381,19 +388,18 @@ public class CorrectionController {
 
         var survey = surveyOptional.get();
 
-        userAuditRepo.save(new UserActionAudit("correction/delete", "survey: " + id));
+        userActionAuditRepository.save(new UserActionAudit("correction/delete", "survey: " + id));
 
-        var job = jobRepository.save(StagedJob.builder().source(SourceJobType.CORRECTION)
-                .reference(id.toString()).status(StatusJobType.CORRECTION)
+        var job = stagedJobRepository.save(StagedJob.builder().source(SourceJobType.CORRECTION)
+                .reference("Delete Survey " + id.toString()).status(StatusJobType.CORRECTION)
                 .program(survey.getProgram())
                 .creator(user.get()).build());
 
         logMessage(job, "Delete Survey " + id);
 
         try {
-
             surveyCorrectionService.deleteSurvey(job, survey, Collections.emptyList());
-
+            materializedViewService.refreshAllMaterializedViews();
         } catch (Exception e) {
 
             logger.error("Correction Failed", e);
@@ -408,6 +414,6 @@ public class CorrectionController {
             return ResponseEntity.badRequest().body("Survey failed to delete. No data has been changed.");
         }
 
-        return ResponseEntity.ok("Survey " + id + " deleted.");
+        return ResponseEntity.ok().body(job.getId());
     }
 }

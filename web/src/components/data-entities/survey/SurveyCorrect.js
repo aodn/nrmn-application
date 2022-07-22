@@ -100,22 +100,22 @@ const SurveyCorrect = () => {
       {field: 'id', label: '', hide: false},
       {field: 'surveyId', label: 'Survey', hide: false},
       {field: 'diverId', label: 'Diver ID', hide: true},
-      {field: 'diver', label: 'Diver', hide: false, editable: true},
+      {field: 'diver', label: 'Diver', hide: false, editable: false},
       {field: 'siteCode', label: 'Site Code', hide: true},
-      {field: 'depth', label: 'Depth', hide: false, editable: true},
-      {field: 'date', label: 'Survey Date', hide: false, editable: true},
-      {field: 'time', label: 'Survey Time', hide: false, editable: true},
-      {field: 'vis', label: 'Visibility', hide: false, editable: true},
-      {field: 'direction', label: 'Direction', hide: false, editable: true},
-      {field: 'latitude', label: 'Latitude', hide: false, editable: true},
-      {field: 'longitude', label: 'Longitude', hide: false, editable: true},
+      {field: 'depth', label: 'Depth', hide: false, editable: false},
+      {field: 'date', label: 'Survey Date', hide: false, editable: false},
+      {field: 'time', label: 'Survey Time', hide: false, editable: false},
+      {field: 'vis', label: 'Visibility', hide: false, editable: false},
+      {field: 'direction', label: 'Direction', hide: false, editable: false},
+      {field: 'latitude', label: 'Latitude', hide: false, editable: false},
+      {field: 'longitude', label: 'Longitude', hide: false, editable: false},
       {field: 'observableItemId', hide: true},
-      {field: 'species', label: 'Species Name', hide: false, editable: true},
-      {field: 'letterCode', label: 'Letter Code', hide: false, editable: true},
-      {field: 'method', label: 'Method', hide: false, editable: true},
-      {field: 'block', label: 'Block', hide: false, editable: true},
-      {field: 'surveyNotDone', label: 'Survey Not Done', hide: false, isBoolean: false, editable: true},
-      {field: 'isInvertSizing', label: 'Use Invert Sizing', hide: false, isBoolean: false, editable: true}
+      {field: 'species', label: 'Species Name', hide: false, editable: false},
+      {field: 'letterCode', label: 'Letter Code', hide: false, editable: false},
+      {field: 'method', label: 'Method', hide: false, editable: false},
+      {field: 'block', label: 'Block', hide: false, editable: false},
+      {field: 'surveyNotDone', label: 'Survey Not Done', hide: false, isBoolean: false, editable: false},
+      {field: 'isInvertSizing', label: 'Use Invert Sizing', hide: false, isBoolean: false, editable: false}
     ];
   }, []);
 
@@ -201,6 +201,12 @@ const SurveyCorrect = () => {
   };
 
   const onSubmitConfirm = async () => {
+    setEditMode(true);
+    setLoading(true);
+    const api = gridRef.current.api;
+    const context = api.gridOptionsWrapper.gridOptions.context;
+    context.useOverlay = 'Correcting Survey...';
+    api.showLoadingOverlay();
     const result = await submitSurveyCorrection(surveyId, packedData(gridRef.current.api));
     setRedirect(`/data/job/${result.data}/view`);
   };

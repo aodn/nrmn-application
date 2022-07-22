@@ -214,7 +214,7 @@ public class SurveyCorrectionService {
                             .collect(Collectors.joining(", ")));
                 });
             });
-            messages.add("Delete Survey ID: " + surveyId);
+            messages.add("Update Survey ID: " + surveyId);
             return surveyId;
         }).collect(Collectors.toList());
 

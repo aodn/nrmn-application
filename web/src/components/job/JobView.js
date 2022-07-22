@@ -47,7 +47,7 @@ const JobView = () => {
               <Box my={2}>
                 <Typography variant="h5">{job.reference}</Typography>
               </Box>
-              {existsOnS3 && (
+              {job.type === 'INGESTED' && existsOnS3 && (
                 <Button variant="outlined" onClick={() => downloadZip(job.id, job.reference)}>
                   Download
                 </Button>
