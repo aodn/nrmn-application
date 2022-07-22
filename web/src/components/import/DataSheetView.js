@@ -191,8 +191,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
   });
 
   useEffect(() => {
-    if (gridApi && state === IngestState.Loading)
-      gridApi.showLoadingOverlay();
+    if (gridApi && state === IngestState.Loading) gridApi.showLoadingOverlay();
   }, [gridApi, state]);
 
   useEffect(() => {

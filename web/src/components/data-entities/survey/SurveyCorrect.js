@@ -1,28 +1,122 @@
+import {CloudUpload as CloudUploadIcon, PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon} from '@mui/icons-material/';
 import {Box, Button, Typography} from '@mui/material';
+import {grey, orange, red} from '@mui/material/colors';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import React, {useRef, useMemo, useState} from 'react';
-import {useParams} from 'react-router-dom';
-import {getCorrections, validateSurveyCorrection, submitSurveyCorrection} from '../../../api/api';
-import {allMeasurements} from '../../../common/constants';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {Navigate, useParams} from 'react-router-dom';
+import {getCorrections, submitSurveyCorrection, validateSurveyCorrection} from '../../../api/api';
+import {allMeasurements} from '../../../common/correctionsConstants';
+import ValidationPanel from '../../import/panel/ValidationPanel';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import SummaryPanel from './panel/SummaryPanel';
 import SurveyMeasurementHeader from './SurveyMeasurementHeader';
-import {PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon, CloudUpload as CloudUploadIcon} from '@mui/icons-material/';
-import ValidationPanel from '../../import/panel/ValidationPanel';
+
+const chooseCellStyle = (params) => {
+  // Grey-out the first  column containing the row number
+  if (params.colDef.field === 'id') return {color: grey[500]};
+
+  if (!params.context.cellValidations) return;
+
+  // Highlight cell validations
+  const row = params.data.id;
+  const field = params.colDef.field;
+  const level = params.context.cellValidations[row]?.[field]?.levelId;
+  switch (level) {
+    case 'BLOCKING':
+      return {backgroundColor: red[100]};
+    case 'WARNING':
+      return {backgroundColor: orange[100]};
+    case 'INFO':
+      return {backgroundColor: grey[100]};
+    default:
+      return null;
+  }
+};
+
+const toolTipValueGetter = ({context, data, colDef}) => {
+  if (!context.cellValidations) return;
+  const row = data.id;
+  const field = colDef.field;
+  const error = context.cellValidations[row]?.[field];
+  if (error?.levelId === 'DUPLICATE') {
+    const rowPositions = error.rowIds.map((r) => context.rowData.find((d) => d.id === r)?.pos).filter((r) => r);
+    const duplicates = rowPositions.map((r) => context.rowPos.indexOf(r) + 1);
+    return duplicates.length > 1 ? 'Rows are duplicated: ' + duplicates.join(', ') : 'Duplicate rows have been removed';
+  }
+  return error?.message;
+};
+
+const removeNullProperties = (obj) => {
+  return Object.fromEntries(Object.entries(obj).filter((v) => v[1] !== ''));
+};
+
+const packedData = (api) => {
+  const packedData = [];
+  api.forEachNode((rowNode, index) => {
+    const data = rowNode.data;
+    packedData.push({id: index, ...data, measureJson: removeNullProperties(data.measurements)});
+  });
+  return packedData;
+};
 
 const SurveyCorrect = () => {
   const surveyId = useParams()?.id;
   const gridRef = useRef();
-  const [rowData, setRowData] = useState();
 
-  const components = useMemo(() => {
-    return {
-      loadingOverlay: LoadingOverlay,
-      summaryPanel: SummaryPanel,
-      validationPanel: ValidationPanel
-    };
+  // FUTURE: useReducer
+  const [editMode, setEditMode] = useState(true);
+  const [rowData, setRowData] = useState();
+  const [loading, setLoading] = useState(false);
+  const [validationResult, setValidationResult] = useState();
+  const [cellValidations, setCellValidations] = useState([]);
+  const [redirect, setRedirect] = useState();
+
+  useEffect(() => {
+    if (gridRef.current?.api) {
+      gridRef.current.api.gridOptionsWrapper.gridOptions.context.cellValidations = [...cellValidations];
+      gridRef.current.api.redrawRows();
+    }
+  }, [cellValidations]);
+
+  useEffect(() => {
+    if (!validationResult) return;
+    const cellFormat = [];
+    for (const res of validationResult) {
+      for (const row of res.rowIds) {
+        for (const col of res.columnNames) {
+          if (!cellFormat[row]) cellFormat[row] = {};
+          cellFormat[row][col] = {levelId: res.levelId, message: res.message};
+        }
+      }
+    }
+    setCellValidations(cellFormat);
+    gridRef.current.api.hideOverlay();
+  }, [validationResult]);
+
+  const headers = useMemo(() => {
+    return [
+      {field: 'id', label: '', hide: false},
+      {field: 'surveyId', label: 'Survey', hide: false},
+      {field: 'diverId', label: 'Diver ID', hide: true},
+      {field: 'diver', label: 'Diver', hide: false, editable: false},
+      {field: 'siteCode', label: 'Site Code', hide: true},
+      {field: 'depth', label: 'Depth', hide: false, editable: false},
+      {field: 'date', label: 'Survey Date', hide: false, editable: false},
+      {field: 'time', label: 'Survey Time', hide: false, editable: false},
+      {field: 'vis', label: 'Visibility', hide: false, editable: false},
+      {field: 'direction', label: 'Direction', hide: false, editable: false},
+      {field: 'latitude', label: 'Latitude', hide: false, editable: false},
+      {field: 'longitude', label: 'Longitude', hide: false, editable: false},
+      {field: 'observableItemId', hide: true},
+      {field: 'species', label: 'Species Name', hide: false, editable: false},
+      {field: 'letterCode', label: 'Letter Code', hide: false, editable: false},
+      {field: 'method', label: 'Method', hide: false, editable: false},
+      {field: 'block', label: 'Block', hide: false, editable: false},
+      {field: 'surveyNotDone', label: 'Survey Not Done', hide: false, isBoolean: false, editable: false},
+      {field: 'isInvertSizing', label: 'Use Invert Sizing', hide: false, isBoolean: false, editable: false}
+    ];
   }, []);
 
   const defaultColDef = useMemo(() => {
@@ -34,7 +128,17 @@ const SurveyCorrect = () => {
       resizable: false,
       sortable: false,
       suppressMenu: false,
+      cellStyle: chooseCellStyle,
+      tooltipValueGetter: toolTipValueGetter,
       valueParser: ({newValue}) => (newValue ? newValue.trim() : '')
+    };
+  }, []);
+
+  const components = useMemo(() => {
+    return {
+      loadingOverlay: LoadingOverlay,
+      summaryPanel: SummaryPanel,
+      validationPanel: ValidationPanel
     };
   }, []);
 
@@ -52,31 +156,8 @@ const SurveyCorrect = () => {
       defaultToolPanel: ''
     };
   }, []);
-  const [sideBar, setSideBar] = useState(defaultSideBar);
 
-  const headers = useMemo(() => {
-    return [
-      {field: 'id', label: '', hide: false},
-      {field: 'surveyId', label: 'Survey', hide: true},
-      {field: 'diverId', label: 'Diver ID', hide: true},
-      {field: 'diver', label: 'Diver', hide: false, editable: true},
-      {field: 'siteCode', label: 'Site Code', hide: true},
-      {field: 'depth', label: 'Depth', hide: false, editable: true},
-      {field: 'date', label: 'Survey Date', hide: false, editable: true},
-      {field: 'time', label: 'Survey Time', hide: false, editable: true},
-      {field: 'vis', label: 'Visibility', hide: false, editable: true},
-      {field: 'direction', label: 'Direction', hide: false, editable: true},
-      {field: 'latitude', label: 'Latitude', hide: false, editable: true},
-      {field: 'longitude', label: 'Longitude', hide: false, editable: true},
-      {field: 'observableItemId', hide: true},
-      {field: 'species', label: 'Species Name', hide: false, editable: true},
-      {field: 'letterCode', label: 'Letter Code', hide: false, editable: true},
-      {field: 'method', label: 'Method', hide: false, editable: true},
-      {field: 'block', label: 'Block', hide: false, editable: true},
-      {field: 'surveyNotDone', label: 'Survey Not Done', hide: false, isBoolean: false, editable: true},
-      {field: 'isInvertSizing', label: 'Use Invert Sizing', hide: false, isBoolean: false, editable: true}
-    ];
-  }, []);
+  const [sideBar, setSideBar] = useState(defaultSideBar);
 
   const onGridReady = ({api}) => {
     getCorrections(surveyId).then((res) => {
@@ -92,87 +173,74 @@ const SurveyCorrect = () => {
     });
   };
 
-  const packedData = () => {
-    const packedData = [];
-    gridRef.current.api.forEachNode((rowNode, index) => {
-      const data = rowNode.data;
-      packedData.push({id: index, ...data, measureJson: data.measurements});
-    });
-    return packedData;
-  };
-
-  const gridOptions = {context: {useOverlay: 'Loading Survey Correction...', validations: []}};
-
-  const generateErrorTree = (rowData, rowPos, errors) => {
-    const tree = {blocking: [], warning: [], info: [], duplicate: []};
-    errors
-      .sort((a, b) => (a.message < b.message ? -1 : a.message > b.message ? 1 : 0))
-      .forEach((e) => {
-        const rows = rowData.filter((r) => e.rowIds.includes(r.id));
-        let summary = [];
-        if (e.columnNames && e.categoryId !== 'SPAN') {
-          const col = e.columnNames[0];
-          summary = rows.reduce((acc, r) => {
-            const rowPosition = rowData.find((d) => d.id === r.id)?.id;
-            const rowNumber = rowPos.indexOf(rowPosition) + 1;
-            const existingIdx = acc.findIndex((m) => m.columnName === col && m.value === r[col]);
-            if (existingIdx >= 0 && isNaN(parseInt(acc[existingIdx].columnName)))
-              acc[existingIdx] = {
-                columnName: col,
-                value: r[col],
-                rowIds: [...acc[existingIdx].rowIds, r.id],
-                rowNumbers: [...acc[existingIdx].rowNumbers, rowNumber]
-              };
-            else
-              acc.push({columnName: col, value: r[col], rowIds: [r.id], rowNumbers: [rowNumber], isInvertSize: r.isInvertSizing === 'Yes'});
-            return acc;
-          }, []);
-        } else {
-          const rowPositions = e.rowIds.map((r) => rowData.find((d) => d.id === r)?.id).filter((r) => r);
-          const rowNumbers = rowPositions.map((r) => rowPos.indexOf(r) + 1);
-          summary = [{rowIds: e.rowIds, columnNames: e.columnNames, rowNumbers}];
-        }
-        tree[e.levelId.toLowerCase()].push({key: `err-${e.id}`, message: e.message, count: e.rowIds.length, description: summary});
-      });
-    return tree;
+  const validate = async () => {
+    setLoading(true);
+    const api = gridRef.current.api;
+    const context = api.gridOptionsWrapper.gridOptions.context;
+    context.rowData = [...rowData];
+    context.useOverlay = 'Validating Survey Correction...';
+    api.showLoadingOverlay();
+    setSideBar(defaultSideBar);
+    const result = await validateSurveyCorrection(surveyId, packedData(api));
+    setValidationResult(result.data.errors);
+    context.validations = result.data.errors;
+    setLoading(false);
   };
 
   const onValidate = async () => {
-    setSideBar(defaultSideBar);
-    const result = await validateSurveyCorrection(surveyId, packedData());
-    const context = gridRef.current.api.gridOptionsWrapper.gridOptions.context;
-    const rowPos = rowData.map((r) => r.id).sort((a, b) => a - b);
-    const errorTree = generateErrorTree(rowData,rowPos, result.data.errors);
-    context.validations = errorTree;
+    await validate();
     setSideBar((s) => ({
       ...s,
       defaultToolPanel: 'summaryPanel'
     }));
   };
 
-  const onSubmit = () => submitSurveyCorrection(surveyId, packedData());
+  const onSubmit = async () => {
+    await validate();
+    setEditMode(false);
+  };
+
+  const onSubmitConfirm = async () => {
+    setEditMode(true);
+    setLoading(true);
+    const api = gridRef.current.api;
+    const context = api.gridOptionsWrapper.gridOptions.context;
+    context.useOverlay = 'Correcting Survey...';
+    api.showLoadingOverlay();
+    const result = await submitSurveyCorrection(surveyId, packedData(gridRef.current.api));
+    setRedirect(`/data/job/${result.data}/view`);
+  };
+
+  const canSubmitCorrection = validationResult && validationResult.filter((res) => res.levelId === 'BLOCKING').length < 1;
+
+  if (redirect) return <Navigate push to={redirect} />;
 
   return (
     <>
       <Box display="flex" flexDirection="row" p={1} pb={1}>
         <Box flexGrow={1}>
-          <Typography variant="h4">Survey Correction</Typography>
+          <Typography variant="h6">Correct Survey {rowData && '[' + rowData[0].siteCode + ', ' + rowData[0].date + ', ' + rowData[0].depth + ']'}</Typography>
         </Box>
         <Box p={1} minWidth={120}>
-          <Button onClick={() => onValidate(gridOptions)} variant="contained" startIcon={<PlaylistAddCheckOutlinedIcon />}>
+          <Button onClick={onValidate} variant="contained" disabled={!editMode || loading} startIcon={<PlaylistAddCheckOutlinedIcon />}>
             Validate
           </Button>
         </Box>
         <Box p={1} minWidth={180}>
-          <Button onClick={onSubmit} variant="contained" startIcon={<CloudUploadIcon />}>
+          <Button
+            onClick={onSubmit}
+            variant="contained"
+            disabled={!canSubmitCorrection || !editMode || loading}
+            startIcon={<CloudUploadIcon />}
+          >
             Submit Correction
           </Button>
         </Box>
       </Box>
-      <Box flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
+      <Box display={editMode ? 'block' : 'none'} flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
         <AgGridReact
           ref={gridRef}
-          gridOptions={gridOptions}
+          gridOptions={{context: {useOverlay: 'Loading Survey Correction...', validations: []}}}
           animateRows
           cellFadeDelay={100}
           cellFlashDelay={100}
@@ -202,15 +270,50 @@ const SurveyCorrect = () => {
                 valueFormatter={(e) => (e.value === true ? 'Yes' : 'No')}
               />
             ) : (
-              <AgGridColumn key={idx} field={header.field} headerName={header.label} hide={header.hide} cellEditor="agTextCellEditor" editable={header.editable ?? false} />
+              <AgGridColumn
+                key={idx}
+                field={header.field}
+                headerName={header.label}
+                hide={header.hide}
+                cellEditor="agTextCellEditor"
+                editable={header.editable ?? false}
+              />
             )
           )}
-          <AgGridColumn field={'measurements.0'} headerName="Unsized" />
+          <AgGridColumn editable field={'measurements.0'} headerName="Unsized" />
           {allMeasurements.map((_, idx) => {
             const field = `measurements.${idx + 1}`;
             return <AgGridColumn editable field={field} headerComponent={SurveyMeasurementHeader} key={idx} width={35} />;
           })}
         </AgGridReact>
+      </Box>
+      <Box display={editMode ? 'none' : 'flex'} justifyContent="center">
+        <Box
+          style={{background: 'white', width: 900}}
+          boxShadow={1}
+          padding={3}
+          margin={3}
+          display="flex"
+          justifyContent="center"
+          flexDirection="column"
+        >
+          <Box>
+            <Typography variant="h5">Confirm Survey Correction?</Typography>
+          </Box>
+          <Box border={0} borderColor="grey" p={2} margin={3}>
+            {validationResult?.map((res, idx) => (
+              <p key={idx}>{res.message}</p>
+            ))}
+          </Box>
+          <Box flexDirection="row">
+            <Button sx={{width: '25px', marginLeft: '20%'}} variant="outlined" onClick={() => setEditMode(true)}>
+              Cancel
+            </Button>
+            <Button sx={{width: '50%', marginLeft: '10px'}} variant="contained" disabled={!canSubmitCorrection} onClick={onSubmitConfirm}>
+              Apply Correction
+            </Button>
+          </Box>
+        </Box>
       </Box>
     </>
   );

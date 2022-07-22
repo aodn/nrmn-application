@@ -3,17 +3,16 @@ package au.org.aodn.nrmn.restapi.service.validation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
+
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
-import au.org.aodn.nrmn.restapi.validation.process.ValidationResultSet;
 
 @Service
 public class MeasurementValidationService {
@@ -22,7 +21,7 @@ public class MeasurementValidationService {
     private static final double[] INVERT_VALUES = { 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 16, 17, 18, 19, 20, 22, 24, 26, 28, 30 };
 
     // VALIDATION: Species size within L5 - L95
-    private Collection<ValidationCell> validateMeasureRange(Long rowId, Boolean isInvertSized, Map<Integer, Integer> measurements, UiSpeciesAttributes speciesAttributes) {
+    private Collection<ValidationCell> validateMeasureRange(Long rowId, String species, Boolean isInvertSized, Map<Integer, Integer> measurements, UiSpeciesAttributes speciesAttributes) {
 
         Collection<ValidationCell> errors = new ArrayList<ValidationCell>();
 
@@ -32,27 +31,31 @@ public class MeasurementValidationService {
         Double l95 = speciesAttributes.getL95() != null ? speciesAttributes.getL95() : 0;
 
         if (l5 != 0 && l95 != 0) {
-            List<Integer> outOfRange = measurements.entrySet()
+            var outOfRange = measurements.entrySet()
                     .stream()
-                    .filter(entry -> entry.getValue() != 0 && (l5 > 0 && range[entry.getKey() - 1] < l5) || (l95 > 0 && range[entry.getKey() - 1] > l95))
+                    .filter(entry -> entry.getKey() > 0 && ((l5 > 0 && range[entry.getKey() - 1] < l5) || (l95 > 0 && range[entry.getKey() - 1] > l95)))
                     .map(Map.Entry::getKey).collect(Collectors.toList());
 
             if (!outOfRange.isEmpty()) {
-                String message = (isInvertSized ? "Invert measurements" : "Measurements") + " outside L5/95 [" + l5 + "," + l95 + "]";
-                outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, message, rowId, col.toString())));
+                String message = (isInvertSized ? "Invert measurements" : "Measurements") + " outside L5/95 [" + l5 + "," + l95 + "] for [" + species + "]";
+                outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.INFO, message, rowId, "measurements." + col)));
             }
         }
         return errors;
     }
 
-    public Collection<ValidationError> validate(UiSpeciesAttributes speciesAttributes, StagedRowFormatted row) {
+    public Collection<ValidationCell> validate(UiSpeciesAttributes speciesAttributes, StagedRowFormatted row) {
         
-        ValidationResultSet results = new ValidationResultSet();
         boolean isMeasureMethod = !Arrays.asList(3, 4, 5).contains(row.getMethod());
-        if (isMeasureMethod && row.getMeasureJson().size() > 0) {
-            var errors = validateMeasureRange(row.getId(), row.getIsInvertSizing(), row.getMeasureJson(), speciesAttributes);
-            results.addAll(errors, false);
+
+        if(!isMeasureMethod)
+            return Arrays.<ValidationCell>asList();
+
+        if (row.getMeasureJson().size() > 0) {
+            return validateMeasureRange(row.getId(),  row.getRef().getSpecies(), row.getIsInvertSizing(), row.getMeasureJson(), speciesAttributes);
+        } else {
+            var noMeasurements = new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING, "Row contains no measurements", row.getId(), "measurements.1");
+            return Arrays.<ValidationCell>asList(noMeasurements);
         }
-        return results.getAll();
     }
 }

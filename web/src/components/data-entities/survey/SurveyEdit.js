@@ -1,18 +1,22 @@
 import {Box, Button, CircularProgress, Grid, Typography} from '@mui/material';
-import {Save} from '@mui/icons-material';
+import {Delete, Save} from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
 import React, {useEffect, useReducer, useState} from 'react';
 import {Navigate, NavLink, useParams} from 'react-router-dom';
-import {entityEdit, getResult} from '../../../api/api';
+import {entityDelete, entityEdit, getResult} from '../../../api/api';
 import EntityContainer from '../../containers/EntityContainer';
 import CustomCheckboxInput from '../../input/CustomCheckboxInput';
 import CustomDropDownInput from '../../input/CustomDropDownInput';
 import CustomTextInput from '../../input/CustomTextInput';
+import {AuthContext} from '../../../contexts/auth-context';
+import AlertDialog from '../../ui/AlertDialog';
 
 const SurveyEdit = () => {
   const surveyId = useParams()?.id;
 
   const [saved, setSaved] = useState(false);
+  const [deleted, setDeleted] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [errors, setErrors] = useState([]);
   const [divers, setDivers] = useState([]);
   const [sites, setSites] = useState([]);
@@ -101,15 +105,39 @@ const SurveyEdit = () => {
     return <Navigate to={`/data/survey/${id}`} state={{message: 'Survey Updated'}} />;
   }
 
+  if (deleted) {
+    return <Navigate to={`/data/job/${deleted}/view`} state={{message: 'Survey Deleted'}} />;
+  }
+
+  const onDelete = () => {
+    entityDelete('correction/correct', surveyId).then((res) => setDeleted(res.data));
+  };
+
   return (
     <EntityContainer name="Surveys" goBackTo="/data/surveys">
-      <Grid container alignItems="flex-start" direction="row">
-        <Grid item xs={10}>
-          <Box fontWeight="fontWeightBold">
-            <Typography variant="h4">Edit Survey</Typography>
-          </Box>
-        </Grid>
-      </Grid>
+      <AlertDialog
+        open={confirmDelete}
+        text="Delete Survey?"
+        action="Submit"
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={onDelete}
+      />
+      <Box m={2} display="flex" flexDirection="row" width="100%">
+        <Box flexGrow={1}>
+          <Typography variant="h4">Edit Survey</Typography>
+        </Box>
+        <Box>
+          <AuthContext.Consumer>
+            {({auth}) =>
+              auth?.features?.includes('corrections') && (
+                <Button variant="outlined" color="error" startIcon={<Delete></Delete>} onClick={() => setConfirmDelete(true)}>
+                  Delete Survey
+                </Button>
+              )
+            }
+          </AuthContext.Consumer>
+        </Box>
+      </Box>
       <Grid container direction="column" justifyContent="flex-start" alignItems="center">
         {surveyId && Object.keys(item).length === 0 ? (
           <CircularProgress size={20} />

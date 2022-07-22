@@ -4,7 +4,7 @@ import 'ag-grid-enterprise';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import React, {useState, useRef} from 'react';
 import {Navigate} from 'react-router';
-import { NavLink, useLocation } from 'react-router-dom';
+import {NavLink, useLocation} from 'react-router-dom';
 import {deleteJob, getEntity} from '../../api/api';
 import LoadingOverlay from '../overlays/LoadingOverlay';
 import AlertDialog from '../ui/AlertDialog';
@@ -27,7 +27,7 @@ const JobList = () => {
   const iconViewBoxDimension = '-2 -2 30 30';
 
   // callback tells the grid to use the 'id' attribute for IDs, IDs should always be strings
-  const getRowId = params => params.data.id;
+  const getRowId = (params) => params.data.id;
 
   const onCellClicked = (e) => {
     if (e.data.status === 'STAGED') {
@@ -41,13 +41,11 @@ const JobList = () => {
       await getEntity('stage/jobs').then((res) => e.api.setRowData(res.data));
     }
     fetchJobs(event).then(() => {
-      if(!(location?.state?.resetFilters)) {
+      if (!location?.state?.resetFilters) {
         stateFilterHandler.restoreStateFilters(gridRef);
-      }
-      else {
+      } else {
         stateFilterHandler.resetStateFilters(gridRef);
       }
-
     });
   };
 
@@ -106,7 +104,7 @@ const JobList = () => {
             filter={false}
             resizable={false}
             sortable={false}
-            cellRenderer={(e) => (e.data?.id ? <Info viewBox={iconViewBoxDimension}/> : <></>)}
+            cellRenderer={(e) => (e.data?.id ? <Info viewBox={iconViewBoxDimension} /> : <></>)}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => {
               if (!e.data.id) return;
@@ -120,15 +118,10 @@ const JobList = () => {
           <AgGridColumn
             width={40}
             cellStyle={{cursor: 'pointer'}}
-            cellRenderer={(e) => (e.data?.status === 'STAGED' ? <GridOn htmlColor={'#808080'} viewBox={iconViewBoxDimension}/> : <></>)}
+            cellRenderer={(e) => (e.data?.status === 'STAGED' ? <GridOn htmlColor={'#808080'} viewBox={iconViewBoxDimension} /> : <></>)}
             onCellClicked={onCellClicked}
           />
-          <AgGridColumn
-            flex={1}
-            field="reference"
-            cellStyle={{cursor: 'pointer'}}
-            onCellClicked={onCellClicked}
-          />
+          <AgGridColumn flex={1} field="reference" cellStyle={{cursor: 'pointer'}} onCellClicked={onCellClicked} />
           <AgGridColumn width={80} field="isExtendedSize" headerName="Extended" />
           <AgGridColumn
             width={80}
@@ -151,7 +144,9 @@ const JobList = () => {
             filter={false}
             resizable={false}
             sortable={false}
-            cellRenderer={(e) => (e.data && e.data.status !== 'INGESTED' ? <Delete viewBox={iconViewBoxDimension}/> : <></>)}
+            cellRenderer={(e) =>
+              e.data && ['STAGED', 'ERROR'].includes(e.data.status) ? <Delete viewBox={iconViewBoxDimension} /> : <></>
+            }
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => setDeleteJobId(e.data.id)}
           />
