@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowMapperConfig;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.SecUser;
@@ -52,7 +53,6 @@ import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.service.SurveyCorrectionService;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidationService;
-import au.org.aodn.nrmn.restapi.service.validation.ValidationConstraintService;
 import au.org.aodn.nrmn.restapi.util.ObjectUtils;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.process.ValidationResultSet;
@@ -100,9 +100,6 @@ public class CorrectionController {
 
     @Autowired
     MeasurementValidationService measurementValidationService;
-
-    @Autowired
-    ValidationConstraintService constraintService;
 
     private static Logger logger = LoggerFactory.getLogger(CorrectionController.class);
 
@@ -291,9 +288,16 @@ public class CorrectionController {
         var message = "correction validation: username: " + authentication.getName() + " survey: " + surveyId;
         logger.debug("correction/validation", message);
 
+        // does survey exist?
+        if(surveyRepository.getReferenceById(surveyId) == null)
+            return ResponseEntity.badRequest().body("Survey does not exist: " + surveyId);
+
         var response = new ValidationResponse();
         try {
-            response.setErrors(validate(mapRows(rows)).getAll());
+            var errors = new ArrayList<ValidationError>();
+            var rowMap = mapRows(rows);
+            errors.addAll(validate(rowMap).getAll());
+            response.setErrors(errors);
         } catch (Exception e) {
             logger.error("Validation Failed", e);
             return ResponseEntity.badRequest().body("Validation failed. Error: " + e.getMessage());
