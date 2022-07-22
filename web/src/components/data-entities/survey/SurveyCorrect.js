@@ -211,7 +211,7 @@ const SurveyCorrect = () => {
     setRedirect(`/data/job/${result.data}/view`);
   };
 
-  const canSubmitCorrection = validationResult && validationResult.map((res) => res.levelId === 'BLOCKING').length < 1;
+  const canSubmitCorrection = validationResult && validationResult.filter((res) => res.levelId === 'BLOCKING').length < 1;
 
   if (redirect) return <Navigate push to={redirect} />;
 
