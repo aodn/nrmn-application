@@ -50,10 +50,6 @@ p {
   width: 350px;
 }
 
-#validation-grid .ag-react-container > .MuiBox-root {
-  margin: 0px;
-}
-
 #validation-grid .ag-tool-panel-wrapper > .ag-react-container {
   width: 100%;
   border-left: 2px solid #ccc;

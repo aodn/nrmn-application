@@ -50,12 +50,13 @@ const SummaryPanel = ({api, context}) => {
   const mm = measurements.concat(extendedMeasurements);
 
   const summary = (
-    <TreeView defaultCollapseIcon={<ArrowDropDownIcon />} defaultExpandIcon={<ArrowRightIcon />}>
-      {['BLOCKING', 'WARNING', 'DUPLICATE', 'INFO'].map((level) => (
-        <div key={level}>
-          <Typography variant="button">{messages[level] ? level : 'No ' + level + '✔'}</Typography>
-          {messages[level]?.map((m) => (
-              <Box my={0.25} key={m.id}>
+    <Box m={2}>
+      <TreeView defaultCollapseIcon={<ArrowDropDownIcon />} defaultExpandIcon={<ArrowRightIcon />}>
+        {['BLOCKING', 'WARNING', 'DUPLICATE', 'INFO'].map((level) => (
+          <div key={level}>
+            <Typography variant="button">{messages[level] ? level : 'No ' + level + '✔'}</Typography>
+            {messages[level]?.map((m) => (
+              <Box key={m.id}>
                 <TreeItem
                   nodeId={`${m.id}`}
                   key={`${m.id}`}
@@ -97,18 +98,13 @@ const SummaryPanel = ({api, context}) => {
                 </TreeItem>
               </Box>
             ))}
-        </div>
-      ))}
-    </TreeView>
-  );
-
-  return (
-    <Box m={2} mr={4}>
-      <Box m={2} mt={1}>
-        {summary}
-      </Box>
+          </div>
+        ))}
+      </TreeView>
     </Box>
   );
+
+  return summary;
 };
 
 SummaryPanel.propTypes = {

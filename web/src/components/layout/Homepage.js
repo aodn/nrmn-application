@@ -26,22 +26,22 @@ const Homepage = () => {
           Underwater visual census data on shallow reefs
         </Typography>
         <Box mt={5}>
-          <Typography color="textPrimary" variant="h6">
-            NRMN is an IMOS sub-facility. Its roles:
-          </Typography>
           <Typography color="textPrimary" variant="body1" component="div">
-            <ul>
-              <li>
-                Collate, clean, store and make rapidly available, all data obtained during shallow reef surveys conducted by the National
-                Reef Monitoring Network
-              </li>
-              <li>Foster formal links with external monitoring programs for integrated use and outcomes</li>
-              <li>Make consistent data available at the national (and international) scale, for shallow reefs</li>
-            </ul>
             <p>
-              <strong>Australia’s Integrated Marine Observing System (IMOS)</strong> is enabled by the National Collaborative Research
+              <strong>Australia{"'"}s Integrated Marine Observing System (IMOS)</strong> is enabled by the National Collaborative Research
               Infrastructure Strategy (NCRIS). It is operated by a consortium of institutions as an unincorporated joint venture, with the{' '}
               <Link href="https://www.utas.edu.au/">University of Tasmania</Link> as Lead Agent.
+            </p>
+            <p>
+            NRMN is an IMOS sub-facility. Its roles:
+              <ul>
+                <li>
+                  Collate, clean, store and make rapidly available, all data obtained during shallow reef surveys conducted by the National
+                  Reef Monitoring Network
+                </li>
+                <li>Foster formal links with external monitoring programs for integrated use and outcomes</li>
+                <li>Make consistent data available at the national (and international) scale, for shallow reefs</li>
+              </ul>
             </p>
             <p>
               <strong>
