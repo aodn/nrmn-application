@@ -227,5 +227,6 @@ public class SurveyCorrectionService {
         job.setStatus(StatusJobType.CORRECTION);
         job.setSurveyIds(surveyIds);
         jobRepository.save(job);
+        surveyRepository.updateSurveyModified();
     }
 }

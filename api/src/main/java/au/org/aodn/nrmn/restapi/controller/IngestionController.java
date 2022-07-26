@@ -1,10 +1,5 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import java.util.Collection;
-import java.util.Optional;
-
-import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedJobLog;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
 import au.org.aodn.nrmn.restapi.model.db.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
@@ -25,8 +17,8 @@ import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
+import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.SurveyIngestionService;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.validation.process.ValidationProcess;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -65,35 +57,38 @@ public class IngestionController {
     public ResponseEntity<String> ingest(@PathVariable("job_id") Long jobId) {
         userActionAuditRepository.save(new UserActionAudit("ingestion/ingest", "ingest job: " + jobId));
 
-        Optional<StagedJob> optionalJob = jobRepository.findById(jobId);
-
-        if (!optionalJob.isPresent()) {
+        var optionalJob = jobRepository.findById(jobId);
+        if (!optionalJob.isPresent())
             return ResponseEntity.badRequest().body("Job with given id does not exist. jobId: " + jobId);
-        }
 
-        StagedJob job = optionalJob.get();
-        if (job.getStatus() != StatusJobType.STAGED) {
+        var job = optionalJob.get();
+        if (job.getStatus() != StatusJobType.STAGED)
             return ResponseEntity.badRequest().body("Job with given id has not been validated: " + jobId);
-        }
 
         try {
-            stagedJobLogRepository
-                    .save(StagedJobLog.builder().stagedJob(job).eventType(StagedJobEventType.INGESTING).build());
 
-            Collection<StagedRow> rows = rowRepository.findRowsByJobId(job.getId());
-            Collection<ObservableItem> species = validation.getSpeciesForRows(rows);
-            Collection<StagedRowFormatted> validatedRows = validation.formatRowsWithSpecies(rows, species);
+            var stagedJobLog = StagedJobLog.builder()
+                    .stagedJob(job)
+                    .eventType(StagedJobEventType.INGESTING)
+                    .build();
+            stagedJobLogRepository.save(stagedJobLog);
+
+            var rows = rowRepository.findRowsByJobId(job.getId());
+            var species = validation.getSpeciesForRows(rows);
+            var validatedRows = validation.formatRowsWithSpecies(rows, species);
+            
             surveyIngestionService.ingestTransaction(job, validatedRows);
+            
             materializedViewService.refreshAllMaterializedViews();
+
         } catch (Exception e) {
 
             logger.error("Ingestion Failed", e);
 
             var log = StagedJobLog.builder()
-                                .stagedJob(job)
-                                .details("Application error ingesting sheet.")
-                                .eventType(StagedJobEventType.ERROR).build();
-
+                    .stagedJob(job)
+                    .details("Application error ingesting sheet.")
+                    .eventType(StagedJobEventType.ERROR).build();
             stagedJobLogRepository.save(log);
 
             return ResponseEntity.badRequest().body("Sheet failed to ingest. No survey data has been inserted.");

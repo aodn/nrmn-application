@@ -2,8 +2,17 @@ import React from 'react';
 import {Box, Grid, TextField, Typography} from '@mui/material';
 import {PropTypes} from 'prop-types';
 
-const CustomTextInput = ({field, type, readOnlyInput, readOnlyModify, formData, errors, onChange, onBlur, label}) => {
-  const value = typeof formData === 'number' || typeof formData === 'boolean' ? formData.toString() : formData ?? '';
+const CustomTextInput = ({field, type, readOnlyInput, readOnlyModify, formData, errors, onChange, onBlur, label, asDate}) => {
+  const parseDate = (d) => {
+    const parsedDate = Date.parse(d);
+    return isNaN(parsedDate) ? '---' : new Date(parsedDate).toLocaleString();
+  };
+
+  const value = asDate
+    ? parseDate(formData)
+    : typeof formData === 'number' || typeof formData === 'boolean'
+    ? formData.toString()
+    : formData ?? '';
   const error = errors?.find((f) => f.property === field);
 
   const splitField = (value) => {
@@ -66,7 +75,8 @@ CustomTextInput.propTypes = {
   label: PropTypes.string,
   onBlur: PropTypes.func,
   readOnlyModify: PropTypes.bool,
-  readOnlyInput: PropTypes.bool
+  readOnlyInput: PropTypes.bool,
+  asDate: PropTypes.bool
 };
 
 export default CustomTextInput;

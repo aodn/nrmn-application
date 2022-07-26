@@ -5,6 +5,7 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.sql.Timestamp;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -18,15 +19,19 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.envers.Audited;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Data
@@ -48,6 +53,17 @@ public class Survey {
     @Column(name = "survey_date")
     @Schema(title = "Survey date")
     private Date surveyDate;
+
+    @Column(name = "created", columnDefinition = "timestamp without time zone", nullable = false)
+    @CreationTimestamp
+    @Setter(AccessLevel.NONE)
+    @Audited(targetAuditMode = NOT_AUDITED)
+    private Timestamp created;
+
+    @Column(name = "modified", columnDefinition = "timestamp without time zone", nullable = false)
+    @UpdateTimestamp
+    @Setter(AccessLevel.NONE)
+    private Timestamp modified;
 
     @Basic
     @Column(name = "survey_time")
