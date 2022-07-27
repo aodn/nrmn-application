@@ -388,6 +388,9 @@ public class CorrectionController {
 
         var survey = surveyOptional.get();
 
+        if (survey.getPqCatalogued())
+            return ResponseEntity.badRequest().body("Deletion Failed. PQs catalogued for this survey.");
+
         userActionAuditRepository.save(new UserActionAudit("correction/delete", "survey: " + id));
 
         var job = stagedJobRepository.save(StagedJob.builder().source(SourceJobType.CORRECTION)
@@ -411,7 +414,7 @@ public class CorrectionController {
 
             stagedJobLogRepository.save(log);
 
-            return ResponseEntity.badRequest().body("Survey failed to delete. No data has been changed.");
+            return ResponseEntity.badRequest().body("Deletion failed. No data has been changed.");
         }
 
         return ResponseEntity.ok().body(job.getId());
