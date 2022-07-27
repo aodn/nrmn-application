@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -22,12 +23,17 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000", "https://*.aodn.org.au","http://*.dev.aodn.org.au")
                 .allowedMethods("HEAD", "OPTIONS", "GET", "POST", "PUT", "DELETE")
+                .exposedHeaders("X-Rate-Limit-Retry-After-Seconds")
                 .maxAge(MAX_AGE_SECS);
     }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        frontendPagesWhitelist.stream()
-                .forEach(frontEndPage -> registry.addViewController(frontEndPage).setViewName("forward:/"));
+        frontendPagesWhitelist.stream().forEach(frontEndPage -> registry.addViewController(frontEndPage).setViewName("forward:/"));
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new RateLimitInterceptor()).addPathPatterns("/api/v1/auth/**");
     }
 }
