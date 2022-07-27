@@ -64,7 +64,14 @@ export const userLogin = (params, onResult) => {
         LicenseManager.setLicenseKey(res.data.gridLicense);
         onResult(state, null);
       } else {
-        onResult({expires: 0}, res.data.error);
+        const retryHeader = res.headers['x-rate-limit-retry-after-seconds'];
+        if (retryHeader) {
+          const seconds = parseInt(retryHeader);
+          const delay = seconds < 60 ? `${seconds} seconds.` : `${Math.ceil(seconds / 60)} minutes.`;
+          onResult({expires: 0}, `Too many authentication requests from your IP. Try again in ${delay}`);
+        } else {
+          onResult({expires: 0}, res.data.error);
+        }
       }
     });
 };
