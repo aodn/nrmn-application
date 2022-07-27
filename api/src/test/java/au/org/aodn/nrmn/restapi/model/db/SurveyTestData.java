@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Component
 public class SurveyTestData {
@@ -36,7 +38,9 @@ public class SurveyTestData {
                      .surveyNum(1)
                      .visibility(null)
                      .direction(null)
-                     .blockAbundanceSimulated(true);
+                     .blockAbundanceSimulated(true)
+                     .created(Timestamp.valueOf(LocalDateTime.now()))
+                     .updated(Timestamp.valueOf(LocalDateTime.now()));
     }
 
 }

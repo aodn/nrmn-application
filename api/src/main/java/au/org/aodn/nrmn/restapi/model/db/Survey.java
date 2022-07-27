@@ -60,10 +60,10 @@ public class Survey {
     @Audited(targetAuditMode = NOT_AUDITED)
     private Timestamp created;
 
-    @Column(name = "modified", columnDefinition = "timestamp without time zone", nullable = false)
+    @Column(name = "updated", columnDefinition = "timestamp without time zone", nullable = false)
     @UpdateTimestamp
     @Setter(AccessLevel.NONE)
-    private Timestamp modified;
+    private Timestamp updated;
 
     @Basic
     @Column(name = "survey_time")

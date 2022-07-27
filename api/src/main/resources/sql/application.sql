@@ -373,3 +373,10 @@ ALTER SEQUENCE nrmn.staged_row_id_seq INCREMENT BY 100;
 
 CREATE UNIQUE INDEX idx_unique_ep_rarity_frequency_taxon ON nrmn.ep_rarity_frequency(taxon);
 CREATE UNIQUE INDEX idx_unique_ep_m1 ON nrmn.ep_m1(survey_id, recorded_species_name, size_class, block, "method", diver);
+
+ALTER TABLE nrmn.survey ADD COLUMN created TIMESTAMP;
+ALTER TABLE nrmn.survey_aud ADD COLUMN created TIMESTAMP;
+ALTER TABLE nrmn.survey_aud ADD COLUMN created_mod BOOLEAN;
+ALTER TABLE nrmn.survey ADD COLUMN updated TIMESTAMP;
+ALTER TABLE nrmn.survey_aud ADD COLUMN updated TIMESTAMP;
+ALTER TABLE nrmn.survey_aud ADD COLUMN updated_mod BOOLEAN;

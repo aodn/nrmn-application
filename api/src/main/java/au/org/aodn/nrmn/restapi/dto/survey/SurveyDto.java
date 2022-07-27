@@ -42,5 +42,5 @@ public class SurveyDto {
     private String divers;
     private String decimalDepth;
     private Date created;
-    private Date modified;
+    private Date updated;
 }

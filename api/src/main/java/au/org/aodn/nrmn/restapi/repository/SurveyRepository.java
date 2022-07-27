@@ -85,6 +85,6 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
         List<SurveyRowDivers> getDiversForSurvey(@Param("surveyIds") List<Integer> surveyIds);
 
         @Modifying
-        @Query("UPDATE Survey s SET s.modified = current_timestamp()")
+        @Query("UPDATE Survey s SET s.updated = current_timestamp()")
         void updateSurveyModified();
 }

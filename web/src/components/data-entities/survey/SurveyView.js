@@ -36,7 +36,7 @@ const SurveyView = () => {
             <CustomTextInput readOnlyInput label="Created" formData={data.created} asDate />
           </Grid>
           <Grid item xs={6}>
-            <CustomTextInput readOnlyInput label="Modified" formData={data.modified} asDate />
+            <CustomTextInput readOnlyInput label="Updated" formData={data.updated} asDate />
           </Grid>
           <Grid item xs={6}>
             <CustomTextInput readOnlyInput label="Survey ID" formData={data.surveyId} />

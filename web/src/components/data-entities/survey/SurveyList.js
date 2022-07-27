@@ -1,6 +1,6 @@
 import React, {useState, useRef} from 'react';
 import {Box, Typography} from '@mui/material';
-import { Navigate, useLocation } from 'react-router-dom';
+import {Navigate, useLocation} from 'react-router-dom';
 import {getResult} from '../../../api/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
@@ -14,19 +14,18 @@ const SurveyList = () => {
   const [redirect, setRedirect] = useState();
 
   const onGridReady = (event) => {
-
     async function fetchSurveys(e) {
-      await getResult('data/surveys').then((res) => e.api.setRowData(res.data));
+      await getResult('data/surveys').then((res) => {
+        e.api.setRowData(res.data);
+      });
     }
 
     fetchSurveys(event).then(() => {
-      if(!(location?.state?.resetFilters)) {
+      if (!location?.state?.resetFilters) {
         stateFilterHandler.restoreStateFilters(gridRef);
-      }
-      else {
+      } else {
         stateFilterHandler.resetStateFilters(gridRef);
       }
-
     });
   };
 
