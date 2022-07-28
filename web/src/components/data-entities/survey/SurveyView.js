@@ -1,4 +1,4 @@
-import {Box, Button, Grid, Typography} from '@mui/material';
+import {Box, Button, Grid, LinearProgress, Typography} from '@mui/material';
 import {Edit} from '@mui/icons-material';
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router';
@@ -25,13 +25,19 @@ const SurveyView = () => {
           <Typography variant="h4">Survey Details</Typography>
         </Box>
         <Box>
-          <Button variant="contained" component={NavLink} to={`/data/survey/${id}/edit`} startIcon={<Edit>edit</Edit>}>
+          <Button variant="contained" disabled={!data.surveyId} component={NavLink} to={`/data/survey/${id}/edit`} startIcon={<Edit>edit</Edit>}>
             Edit
           </Button>
         </Box>
       </Box>
-      <Box p={2}>
+      {data.surveyId ? <Box p={2}>
         <Grid container spacing={2}>
+        <Grid item xs={6}>
+            <CustomTextInput readOnlyInput label="Created" formData={data.created} asDate />
+          </Grid>
+          <Grid item xs={6}>
+            <CustomTextInput readOnlyInput label="Updated" formData={data.updated} asDate />
+          </Grid>
           <Grid item xs={6}>
             <CustomTextInput readOnlyInput label="Survey ID" formData={data.surveyId} />
           </Grid>
@@ -109,7 +115,9 @@ const SurveyView = () => {
             <CustomTextInput readOnlyInput label="Notes" formData={data.notes} />
           </Grid>
         </Grid>
-      </Box>
+      </Box> :    <Box sx={{ width: '100%' }}>
+      <LinearProgress />
+    </Box>}
     </EntityContainer>
   );
 };

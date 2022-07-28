@@ -110,7 +110,13 @@ const SurveyEdit = () => {
   }
 
   const onDelete = () => {
-    entityDelete('correction/correct', surveyId).then((res) => setDeleted(res.data));
+    setConfirmDelete(false);
+    entityDelete('correction/correct', surveyId).then((res) => {
+      if(res.status == 200)
+        setDeleted(res.data);
+      else
+        setErrors([{banner: res.data}]);
+    });
   };
 
   return (

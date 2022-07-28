@@ -3,6 +3,8 @@ package au.org.aodn.nrmn.restapi.dto.survey;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 import javax.persistence.Id;
 
 @Data
@@ -39,4 +41,6 @@ public class SurveyDto {
     private String country;
     private String divers;
     private String decimalDepth;
+    private Date created;
+    private Date updated;
 }

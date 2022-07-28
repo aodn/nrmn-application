@@ -9,6 +9,7 @@ import au.org.aodn.nrmn.restapi.repository.projections.SurveyRowDivers;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
@@ -82,4 +83,8 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
         @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
         @Query("SELECT DISTINCT new au.org.aodn.nrmn.restapi.repository.projections.SurveyRowDivers(o.surveyMethod.survey.surveyId, o.diver.fullName) from Observation o where o.surveyMethod.survey.surveyId IN (:surveyIds)")
         List<SurveyRowDivers> getDiversForSurvey(@Param("surveyIds") List<Integer> surveyIds);
+
+        @Modifying
+        @Query("UPDATE Survey s SET s.updated = current_timestamp()")
+        void updateSurveyModified();
 }
