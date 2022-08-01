@@ -219,7 +219,7 @@ const SurveyCorrect = () => {
     <>
       <Box display="flex" flexDirection="row" p={1} pb={1}>
         <Box flexGrow={1}>
-          <Typography variant="h6">Correct Survey {rowData && '[' + rowData[0].siteCode + ', ' + rowData[0].date + ', ' + rowData[0].depth + ']'}</Typography>
+          <Typography variant="h6">Correct Survey {rowData && '[' + rowData[0].siteCode + ', ' + rowData[0].date + ', ' + rowData[0].depth + '.' + rowData[0].surveyNum + ']'}</Typography>
         </Box>
         <Box p={1} minWidth={120}>
           <Button onClick={onValidate} variant="contained" disabled={!editMode || loading} startIcon={<PlaylistAddCheckOutlinedIcon />}>
