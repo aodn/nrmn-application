@@ -4,6 +4,8 @@ public interface CorrectionRowDto {
     String getObservationIds();
 
     Integer getSurveyId();
+    
+    Integer getSurveyNum();
 
     Integer getDiverId();
 

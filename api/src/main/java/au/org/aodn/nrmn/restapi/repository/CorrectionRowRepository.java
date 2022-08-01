@@ -15,7 +15,7 @@ import au.org.aodn.nrmn.restapi.model.db.Observation;
 public interface CorrectionRowRepository
         extends JpaRepository<Observation, Long>, JpaSpecificationExecutor<Observation> {
 
-    @Query(value = "select cast(jsonb_agg(c.observation_id) as text) as observationIds, c.survey_id as surveyId, " +
+    @Query(value = "select cast(jsonb_agg(c.observation_id) as text) as observationIds, c.survey_id as surveyId, c.survey_num as surveyNum, " +
             "c.diver_id as diverId, c.initials as diver, " +
             "c.site_code as siteCode, c.depth, TO_CHAR(c.survey_date, 'dd/MM/yyyy') as date, TO_CHAR(c.survey_time, 'HH24:MI') as time, c.visibility as vis, "
             +
@@ -27,7 +27,7 @@ public interface CorrectionRowRepository
             "cast(jsonb_object_agg(c.seq_no, c.measure_sum) as text) as measureJson " +
             "from ( " +
             "select " +
-            "o.observation_id, s.survey_id, o.diver_id, d.initials, " +
+            "o.observation_id, s.survey_id, s.survey_num, o.diver_id, d.initials, " +
             "t.site_code, s.depth, s.survey_date, s.survey_time, s.visibility, " +
             "s.direction, " +
             "s.latitude, s.longitude, " +
@@ -44,14 +44,14 @@ public interface CorrectionRowRepository
             "join nrmn.measure_type_ref mt on r.measure_type_id = mt.measure_type_id " +
             "where m.survey_id = :surveyId " +
             "group by " +
-            "o.observation_id, s.survey_id, o.diver_id, d.initials, " +
+            "o.observation_id, s.survey_id, s.survey_num, o.diver_id, d.initials, " +
             "t.site_code, s.depth, s.survey_date, s.survey_time, s.visibility, " +
             "s.direction, " +
             "s.latitude, s.longitude, r.seq_no, " +
             "o.observable_item_id, i.observable_item_name, i.letter_code, " +
             "m.method_id, m.block_num, m.survey_not_done, o.measure_id, mt.measure_type_id" +
             ") c " +
-            "group by c.survey_id, c.diver_id, c.initials, " +
+            "group by c.survey_id, c.survey_num, c.diver_id, c.initials, " +
             "c.site_code, c.depth, c.survey_date, c.survey_time, c.visibility, " +
             "c.direction, " +
             "c.latitude, c.longitude, " +
