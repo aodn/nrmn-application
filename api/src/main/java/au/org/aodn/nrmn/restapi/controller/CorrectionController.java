@@ -11,6 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.hibernate.internal.util.NullnessHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,7 +130,7 @@ public class CorrectionController {
                 .collect(Collectors.toMap(UiSpeciesAttributes::getSpeciesName, a -> a));
 
         var speciesMap = species.stream().collect(Collectors.toMap(ObservableItem::getObservableItemName, o -> o));
-
+        
         var divers = diverRepository.getAll().stream().collect(Collectors.toList());
 
         var sites = siteRepository.getAll().stream().collect(Collectors.toList());
@@ -145,6 +146,15 @@ public class CorrectionController {
 
         var speciesNames = rows.stream().map(s -> s.getSpecies()).collect(Collectors.toSet());
         var observableItems = observableItemRepository.getAllSpeciesNamesMatching(speciesNames);
+
+        // HACK: Survey Not Done
+        if(speciesNames.stream().anyMatch(s -> s.equalsIgnoreCase("Survey Not Done"))) {
+            var snd = new ObservableItem();
+            snd.setObservableItemId(0);
+            snd.setObservableItemName("Survey Not Done");
+            observableItems.add(snd);
+        }
+        
         var formattedRows = formatRowsWithSpecies(rows, observableItems);
 
         var propertyChecks = new HashMap<String, Function<StagedRow, String>>() {
@@ -161,7 +171,6 @@ public class CorrectionController {
                 put("species", StagedRow::getSpecies);
                 put("time", StagedRow::getTime);
                 put("vis", StagedRow::getVis);
-                put("snd", StagedRow::getSurveyNotDone);
                 put("useInvertSizing", StagedRow::getIsInvertSizing);
             }
         };
