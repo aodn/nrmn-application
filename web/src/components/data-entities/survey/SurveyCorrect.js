@@ -114,7 +114,6 @@ const SurveyCorrect = () => {
       {field: 'letterCode', label: 'Letter Code', hide: false, editable: false},
       {field: 'method', label: 'Method', hide: false, editable: false},
       {field: 'block', label: 'Block', hide: false, editable: false},
-      {field: 'surveyNotDone', label: 'Survey Not Done', hide: false, isBoolean: false, editable: false},
       {field: 'isInvertSizing', label: 'Use Invert Sizing', hide: false, isBoolean: false, editable: false}
     ];
   }, []);
@@ -164,8 +163,8 @@ const SurveyCorrect = () => {
       api.hideOverlay();
       if (res.status !== 200) return;
       const unpackedData = res.data.map((data, idx) => {
-        const measurements = JSON.parse(data.measureJson);
-        const observationIds = JSON.parse(data.observationIds);
+        const measurements = data.observationIds === '' ? {} : JSON.parse(data.measureJson);
+        const observationIds = data.observationIds === '' ? [] : JSON.parse(data.observationIds);
         delete data.measureJson;
         return {id: idx + 1, ...data, observationIds, measurements};
       });

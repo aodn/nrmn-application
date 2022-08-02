@@ -63,10 +63,6 @@ public class StagedRow implements Serializable {
     
     @Transient
     @Builder.Default
-    private String surveyNotDone = "";
-
-    @Transient
-    @Builder.Default
     Collection<Integer> observationIds = Collections.emptyList();
 
     @Column(name = "site_no")

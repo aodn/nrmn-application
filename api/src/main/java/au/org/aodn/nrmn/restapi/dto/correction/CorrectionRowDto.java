@@ -37,8 +37,6 @@ public interface CorrectionRowDto {
 
     String getTime();
 
-    String getSurveyNotDone();
-
     Integer getVis();
 
     String getMeasureJson();
