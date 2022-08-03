@@ -395,8 +395,8 @@ public class CorrectionController {
             return ResponseEntity.notFound().build();
 
         var survey = surveyOptional.get();
-
-        if (survey.getPqCatalogued())
+        
+        if (survey.getPqCatalogued() != null && survey.getPqCatalogued())
             return ResponseEntity.badRequest().body("Deletion Failed. PQs catalogued for this survey.");
 
         userActionAuditRepository.save(new UserActionAudit("correction/delete", "survey: " + id));
