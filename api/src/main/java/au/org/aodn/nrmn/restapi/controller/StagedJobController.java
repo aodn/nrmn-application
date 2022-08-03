@@ -266,6 +266,7 @@ public class StagedJobController {
         var j = jOptional.get();
         var dto = StagedJobDto.builder()
                 .id(j.getId())
+                .isExtendedSize(j.getIsExtendedSize())
                 .programName(j.getProgram().getProgramName())
                 .reference(j.getReference())
                 .status(j.getStatus())
