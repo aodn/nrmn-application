@@ -53,6 +53,7 @@ public class SurveyEditService {
 
     private static final int RLS_PROGRAM_ID = 1;
     private static final int ATRC_PROGRAM_ID = 2;
+    private static final int FRDC_PROGRAM_ID = 4;
 
     public Survey updateSurvey(SurveyDto surveyDto) {
 
@@ -120,7 +121,7 @@ public class SurveyEditService {
                             "A survey date cannot be before January 1st, 2006."));
             }
             
-            if(surveyDto.getProgramId() != null && surveyDto.getProgramId() == ATRC_PROGRAM_ID && 
+            if(surveyDto.getProgramId() != null && (surveyDto.getProgramId() == ATRC_PROGRAM_ID || surveyDto.getProgramId() == FRDC_PROGRAM_ID) && 
                 surveyDate.before(Date.from(LocalDate.of(1991, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant()))) {
                     errors.add(new ValidationError("Survey", "surveyDate", surveyDto.getSurveyDate(),
                             "A survey date cannot be before January 1st, 1991."));
