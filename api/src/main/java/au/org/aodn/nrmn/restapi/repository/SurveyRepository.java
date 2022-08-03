@@ -7,6 +7,8 @@ import au.org.aodn.nrmn.restapi.repository.projections.SurveyRow;
 import au.org.aodn.nrmn.restapi.repository.projections.SurveyRowCacheable;
 import au.org.aodn.nrmn.restapi.repository.projections.SurveyRowDivers;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -38,7 +40,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
                 "    sv.program.programName, " +
                 "    sv.site.location.locationName " +
                 ") FROM Survey as sv ORDER BY sv.surveyId DESC")
-        List<SurveyRowCacheable> findAllProjectedBy();
+        Page<SurveyRowCacheable> findAllProjectedBy(Pageable pageable);
 
         @Query("SELECT t FROM #{#entityName} t WHERE t.id IN :ids")
         List<Survey> findByIdsIn(@Param("ids") List<Integer> ids);

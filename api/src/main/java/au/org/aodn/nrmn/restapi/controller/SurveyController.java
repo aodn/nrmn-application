@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -8,13 +9,10 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
@@ -44,15 +42,29 @@ public class SurveyController {
     @Autowired
     private ModelMapper mapper;
 
+    /**
+     *
+     * @param surveyFilter
+     * @param page
+     * @param pageSize - AgGrid use 100 as default page size
+     * @return
+     */
     @GetMapping(path = "/surveys")
-    public ResponseEntity<?> listMatching(SurveyFilterDto surveyFilter) {
+    public ResponseEntity<?> listMatching(SurveyFilterDto surveyFilter,
+                                          @RequestParam(value = "page", defaultValue = "0") int page,
+                                          @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) {
+
         if (surveyFilter.isSet()) {
             return ResponseEntity
                     .ok(surveyRepository.findByCriteria(surveyFilter).stream().collect(Collectors.toList()));
         } else {
 
-            var surveyRows = surveyRepository.findAllProjectedBy().stream().collect(Collectors.toList());
-            var surveyIds = surveyRows.stream().map(s -> s.getSurveyId()).collect(Collectors.toList());
+            var surveyRows = surveyRepository.findAllProjectedBy(PageRequest.of(page, pageSize));
+            var surveyIds = surveyRows.stream()
+                    .map(s -> s.getSurveyId())
+                    .distinct()
+                    .collect(Collectors.toList());
+
             Map<Integer, String> diverNames = surveyRepository.getDiversForSurvey(surveyIds).stream()
                     .collect(Collectors.groupingBy(SurveyRowDivers::getSurveyId,
                             Collectors.mapping(SurveyRowDivers::getDiverName, Collectors.joining(", "))));
@@ -62,7 +74,12 @@ public class SurveyController {
                 return s;
             }).collect(Collectors.toList());
 
-            return ResponseEntity.ok(surveyRowsWithDivers);
+            Map<String, Object> data = new HashMap<>();
+
+            data.put("lastRow", surveyRows.getTotalElements());
+            data.put("items", surveyRowsWithDivers);
+
+            return ResponseEntity.ok(data);
         }
     }
 

@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useCallback} from 'react';
 import {Box, Typography} from '@mui/material';
 import {Navigate, useLocation} from 'react-router-dom';
 import {getResult} from '../../../api/api';
@@ -9,14 +9,23 @@ import 'ag-grid-enterprise';
 import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 
 const SurveyList = () => {
+  const rowsPerPage = 50;
+
   const location = useLocation();
   const gridRef = useRef(null);
   const [redirect, setRedirect] = useState();
 
-  const onGridReady = (event) => {
+  const onGridReady = useCallback((event) => {
     async function fetchSurveys(e) {
-      await getResult('data/surveys').then((res) => {
-        e.api.setRowData(res.data);
+      e.api.setDatasource({
+        rowCount: rowsPerPage,
+        getRows: (params) => {
+          getResult(`data/surveys?page=${params.startRow / 100}`)
+            .then(res => {
+              console.log(params);
+              params.successCallback(res.data.items, res.data.lastRow);
+            });
+        }
       });
     }
 
@@ -27,7 +36,7 @@ const SurveyList = () => {
         stateFilterHandler.resetStateFilters(gridRef);
       }
     });
-  };
+  }, []);
 
   if (redirect) return <Navigate to={`/data/survey/${redirect}`} />;
 
@@ -48,6 +57,8 @@ const SurveyList = () => {
             animateRows={true}
             enableCellTextSelection={true}
             pagination={true}
+            paginationPageSize={rowsPerPage}
+            rowModelType={'infinite'}
             onGridReady={(e) => onGridReady(e)}
             onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
             context={{useOverlay: 'Loading Surveys'}}
