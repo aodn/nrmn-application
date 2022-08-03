@@ -130,7 +130,7 @@ const JobList = () => {
             rowGroup={true}
             hide={true}
             comparator={(a, b) => {
-              const status = ['STAGED', 'FAILED', 'INGESTED'];
+              const status = ['STAGED', 'INGESTED', 'CORRECTED', 'FAILED'];
               return status.indexOf(a) - status.indexOf(b);
             }}
           />

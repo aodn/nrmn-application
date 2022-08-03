@@ -340,7 +340,7 @@ public class CorrectionController {
         var job = StagedJob.builder()
                 .source(SourceJobType.CORRECTION)
                 .reference("Correct Survey " + surveyName)
-                .status(StatusJobType.CORRECTION)
+                .status(StatusJobType.CORRECTED)
                 .program(survey.getProgram())
                 .creator(user.get())
                 .build();
@@ -402,7 +402,7 @@ public class CorrectionController {
         userActionAuditRepository.save(new UserActionAudit("correction/delete", "survey: " + id));
 
         var job = stagedJobRepository.save(StagedJob.builder().source(SourceJobType.CORRECTION)
-                .reference("Delete Survey " + id.toString()).status(StatusJobType.CORRECTION)
+                .reference("Delete Survey " + id.toString()).status(StatusJobType.CORRECTED)
                 .program(survey.getProgram())
                 .creator(user.get()).build());
 

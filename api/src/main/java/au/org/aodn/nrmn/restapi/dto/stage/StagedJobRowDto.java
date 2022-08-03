@@ -25,5 +25,5 @@ public class StagedJobRowDto implements Serializable {
   private Timestamp created;
 
   private String creator;
-
+  
 }
