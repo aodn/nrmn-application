@@ -1,15 +1,12 @@
 package au.org.aodn.nrmn.restapi.repository.dynamicQuery;
 
 import au.org.aodn.nrmn.restapi.controller.filter.Filter;
+import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
-import org.hibernate.Criteria;
-import org.hibernate.mapping.Join;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Predicate;
 
 /**
  * The purpose of this class is to generate select conditions based on incoming filter value, usually it is post
@@ -33,28 +30,52 @@ public class SurveyFilterCondition {
             Arrays.stream(filters).forEach(filter -> {
                 // Income filter name not always match the db field name, hence we need a map
                 switch (filter.getFieldName()) {
+
+                    case "siteCode" : {
+                        if(filter.isCompositeCondition()) {
+
+                        }
+                        else {
+                            specifications.add(
+                                    filter.isCompositeCondition() ?
+                                            null :
+                                            condition.getJoinSiteFieldSpecification("siteCode", filter.getValue(), filter.getOperation()));
+                        }
+
+                        break;
+                    }
                     case "surveysId": {
-                        specifications.add(
-                                filter.isCompositeCondition() ?
-                                        null :
-                                        condition.getSimpleFieldSpecification("surveyId", filter.getValue(), filter.getOperation()));
+                        if(filter.isCompositeCondition()) {
+
+                        }
+                        else {
+                            specifications.add(
+                                    filter.isCompositeCondition() ?
+                                            null :
+                                            condition.getSimpleFieldSpecification("surveyId", filter.getValue(), filter.getOperation()));
+                        }
                         break;
                     }
                     case "depth" : {
                         // Special handle, please refer to SurveyRowCacheable, logic make sense?
-                        String[] i = filter.getValue().split("\\.");
+                        if(filter.isCompositeCondition()) {
 
-                        specifications.add(
-                                filter.isCompositeCondition() ?
-                                        null :
-                                        condition.getSimpleFieldSpecification("depth", i[0], filter.getOperation()));
+                        }
+                        else {
+                            String[] i = filter.getValue().split("\\.");
 
-                        if(i.length > 1) {
-                            // We have something after dot
                             specifications.add(
                                     filter.isCompositeCondition() ?
                                             null :
-                                            condition.getSimpleFieldSpecification("surveyNum", i[1], filter.getOperation()));
+                                            condition.getSimpleFieldSpecification("depth", i[0], filter.getOperation()));
+
+                            if (i.length > 1) {
+                                // We have something after dot
+                                specifications.add(
+                                        filter.isCompositeCondition() ?
+                                                null :
+                                                condition.getSimpleFieldSpecification("surveyNum", i[1], filter.getOperation()));
+                            }
                         }
                         break;
                     }
@@ -94,45 +115,55 @@ public class SurveyFilterCondition {
         }
     }
 
-//    protected Specification<Survey> getJoinFieldSpecification() {
-//    }
-//
-    protected Specification<Survey> getSimpleFieldSpecification(String field, String value, String operation) {
-
+    protected Specification<Survey> getJoinSiteFieldSpecification(String field, String value, String operation) {
         return ((root, query, criteriaBuilder) -> {
-            // Single condition
-            switch(operation) {
-
-                case "startsWith": {
-                    return criteriaBuilder.like(root.get(field).as(String.class), value + "%");
-                }
-                case "endsWith": {
-                    return criteriaBuilder.like(root.get(field).as(String.class), "%" + value);
-                }
-                case "contains": {
-                    return criteriaBuilder.like(root.get(field).as(String.class), "%" + value + "%");
-                }
-                case "notContains" : {
-                    return criteriaBuilder.notLike(root.get(field).as(String.class), "%" + value + "%");
-                }
-                case "equals" : {
-                    return criteriaBuilder.equal(root.get(field).as(String.class), value);
-                }
-                case "notEqual" : {
-                    return criteriaBuilder.notEqual(root.get(field).as(String.class), value);
-                }
-                case "blank" : {
-                    return criteriaBuilder.or(
-                            criteriaBuilder.equal(criteriaBuilder.trim(root.get(field).as(String.class)), ""),
-                            criteriaBuilder.isNull(root.get(field)));
-                }
-                case "notBlank" : {
-                    return criteriaBuilder.notEqual(criteriaBuilder.trim(root.get(field).as(String.class)), "");
-                }
-                default: {
-                    return null;
-                }
-            }
+            Join<Survey, Site> site = root.join("site", JoinType.INNER);
+            return getSimpleFieldSpecification(root, site, criteriaBuilder, field, value, operation);
         });
+    }
+
+    protected Specification<Survey> getSimpleFieldSpecification(String field, String value, String operation) {
+        return ((root, query, criteriaBuilder) ->
+                getSimpleFieldSpecification(root, null, criteriaBuilder, field, value, operation));
+    }
+
+    protected Predicate getSimpleFieldSpecification(
+            From<?, ?> root, From<?,?> table, CriteriaBuilder criteriaBuilder, String field, String value, String operation) {
+
+        From<?,?> r = table == null ? root : table;
+
+        // Single condition
+        switch(operation) {
+
+            case "startsWith": {
+                return criteriaBuilder.like(r.get(field).as(String.class), value + "%");
+            }
+            case "endsWith": {
+                return criteriaBuilder.like(r.get(field).as(String.class), "%" + value);
+            }
+            case "contains": {
+                return criteriaBuilder.like(r.get(field).as(String.class), "%" + value + "%");
+            }
+            case "notContains" : {
+                return criteriaBuilder.notLike(r.get(field).as(String.class), "%" + value + "%");
+            }
+            case "equals" : {
+                return criteriaBuilder.equal(r.get(field).as(String.class), value);
+            }
+            case "notEqual" : {
+                return criteriaBuilder.notEqual(r.get(field).as(String.class), value);
+            }
+            case "blank" : {
+                return criteriaBuilder.or(
+                        criteriaBuilder.equal(criteriaBuilder.trim(r.get(field).as(String.class)), ""),
+                        criteriaBuilder.isNull(r.get(field)));
+            }
+            case "notBlank" : {
+                return criteriaBuilder.notEqual(criteriaBuilder.trim(r.get(field).as(String.class)), "");
+            }
+            default: {
+                return null;
+            }
+        }
     }
 }
