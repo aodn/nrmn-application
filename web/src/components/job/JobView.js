@@ -112,33 +112,41 @@ const JobView = () => {
               )}
             </Grid>
           </Grid>
-          <Grid>
+          <Grid width="100%">
             {job.logs && (
               <TableContainer>
                 <Table aria-label="Event Log Table">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Event Time</TableCell>
-                      <TableCell>Event</TableCell>
+                      <TableCell width="150px">Event Time</TableCell>
+                      <TableCell width="100px">Event</TableCell>
                       <TableCell>Details</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {job.logs.map((log) => (
                       <TableRow key={log.id}>
-                        <TableCell component="th" scope="row">
-                          {new Date(log.eventTime).toLocaleDateString('en-AU') +
-                            ' ' +
-                            new Date(log.eventTime).toLocaleTimeString('en-AU', {hour: 'numeric', minute: '2-digit'})}
+                        <TableCell component="th" scope="row" style={{verticalAlign: 'top'}}>
+                          <Typography fontFamily="Courier New" fontSize={12}>
+                            {new Date(log.eventTime).toLocaleDateString('en-AU') +
+                              ' ' +
+                              new Date(log.eventTime).toLocaleTimeString('en-AU', {hour: 'numeric', minute: '2-digit'})}
+                          </Typography>
                         </TableCell>
-                        <TableCell>{log.eventType}</TableCell>
+                        <TableCell style={{verticalAlign: 'top'}}>
+                          <Typography fontFamily="Courier New" fontSize={12} fontWeight="bold" >
+                            {log.eventType}
+                          </Typography>
+                        </TableCell>
                         <TableCell>
-                          {log.details?.split('\n').map((e) => (
-                            <div key={e}>
-                              {e}
-                              <br />
-                            </div>
-                          ))}
+                          <Typography fontFamily="Courier New" fontSize={12}>
+                            {log.details?.split('\n').map((e) => (
+                              <div key={e}>
+                                {e}
+                                <br />
+                              </div>
+                            ))}
+                          </Typography>
                         </TableCell>
                       </TableRow>
                     ))}
