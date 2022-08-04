@@ -1,5 +1,5 @@
 import {Box, Button, CircularProgress, Grid, Typography} from '@mui/material';
-import {Delete, Save} from '@mui/icons-material';
+import {Delete, Save, Construction} from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
 import React, {useEffect, useReducer, useState} from 'react';
 import {Navigate, NavLink, useParams} from 'react-router-dom';
@@ -14,8 +14,7 @@ import AlertDialog from '../../ui/AlertDialog';
 const SurveyEdit = () => {
   const surveyId = useParams()?.id;
 
-  const [saved, setSaved] = useState(false);
-  const [deleted, setDeleted] = useState(false);
+  const [redirect, setRedirect] = useState();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [errors, setErrors] = useState([]);
   const [divers, setDivers] = useState([]);
@@ -92,30 +91,24 @@ const SurveyEdit = () => {
 
   const handleSubmit = () => {
     entityEdit(`data/survey/${surveyId}`, item).then((res) => {
-      if (res.data.surveyId) {
-        setSaved(res.data);
+      const id = res.data.surveyId;
+      if (id) {
+        setRedirect({to: `/data/survey/${id}`, message: 'Survey Updated'});
       } else {
         setErrors(res.data.errors);
       }
     });
   };
 
-  if (saved) {
-    const id = saved['surveyId'];
-    return <Navigate to={`/data/survey/${id}`} state={{message: 'Survey Updated'}} />;
-  }
-
-  if (deleted) {
-    return <Navigate to={`/data/job/${deleted}/view`} state={{message: 'Survey Deleted'}} />;
+  if (redirect) {
+    return <Navigate to={redirect.to} state={{message: redirect.message}} />;
   }
 
   const onDelete = () => {
     setConfirmDelete(false);
     entityDelete('correction/correct', surveyId).then((res) => {
-      if(res.status == 200)
-        setDeleted(res.data);
-      else
-        setErrors([{banner: res.data}]);
+      if (res.status == 200) setRedirect({to: `/data/job/${res.data}/view`, message: 'Survey Deleted'});
+      else setErrors([{banner: res.data}]);
     });
   };
 
@@ -132,13 +125,26 @@ const SurveyEdit = () => {
         <Box flexGrow={1}>
           <Typography variant="h4">Edit Survey</Typography>
         </Box>
-        <Box>
+        <Box display="flex" flexDirection="row">
           <AuthContext.Consumer>
             {({auth}) =>
               auth?.features?.includes('corrections') && (
-                <Button variant="outlined" color="error" startIcon={<Delete></Delete>} onClick={() => setConfirmDelete(true)}>
-                  Delete Survey
-                </Button>
+                <>
+                  <Box>
+                    <Button
+                      variant="outlined"
+                      startIcon={<Construction />}
+                      onClick={() => setRedirect({to: `/data/survey/${surveyId}/correct`})}
+                    >
+                      Correct Survey
+                    </Button>
+                  </Box>
+                  <Box ml={1}>
+                    <Button variant="outlined" color="error" startIcon={<Delete />} onClick={() => setConfirmDelete(true)}>
+                      Delete Survey
+                    </Button>
+                  </Box>
+                </>
               )
             }
           </AuthContext.Consumer>
@@ -326,7 +332,7 @@ const SurveyEdit = () => {
                 Cancel
               </Button>
               <Box ml={5}>
-                <Button variant="contained" onClick={handleSubmit} startIcon={<Save></Save>}>
+                <Button variant="contained" onClick={handleSubmit} startIcon={<Save />}>
                   Save Survey
                 </Button>
               </Box>
