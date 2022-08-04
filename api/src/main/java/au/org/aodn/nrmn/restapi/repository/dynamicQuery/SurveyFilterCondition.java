@@ -40,6 +40,46 @@ public class SurveyFilterCondition {
                                         condition.getSimpleFieldSpecification("surveyId", filter.getValue(), filter.getOperation()));
                         break;
                     }
+                    case "depth" : {
+                        // Special handle, please refer to SurveyRowCacheable, logic make sense?
+                        String[] i = filter.getValue().split("\\.");
+
+                        specifications.add(
+                                filter.isCompositeCondition() ?
+                                        null :
+                                        condition.getSimpleFieldSpecification("depth", i[0], filter.getOperation()));
+
+                        if(i.length > 1) {
+                            // We have something after dot
+                            specifications.add(
+                                    filter.isCompositeCondition() ?
+                                            null :
+                                            condition.getSimpleFieldSpecification("surveyNum", i[1], filter.getOperation()));
+                        }
+                        break;
+                    }
+                    case "hasPQs": {
+                        // True if not equals null, so we need to rewrite the query
+                        boolean positive = filter.getValue().toLowerCase().matches("^(t|tr|tru|true)");
+                        boolean negative = filter.getValue().toLowerCase().matches("^(f|fa|fal|fals|false)");
+
+                        if(filter.isCompositeCondition()) {
+
+                        }
+                        else {
+                            if(positive) {
+                                specifications.add(condition.getSimpleFieldSpecification("pqCatalogued", null, "notBlank"));
+                            }
+                            else if(negative) {
+                                specifications.add(condition.getSimpleFieldSpecification("pqCatalogued", null, "blank"));
+                            }
+                            else {
+                                // A string that will never match if user type something else
+                                specifications.add(condition.getSimpleFieldSpecification("pqCatalogued", "-", "equals"));
+                            }
+                        }
+                        break;
+                    }
                 }
             });
 
