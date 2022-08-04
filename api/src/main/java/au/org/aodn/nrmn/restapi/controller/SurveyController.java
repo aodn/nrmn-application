@@ -7,16 +7,17 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import au.org.aodn.nrmn.restapi.controller.filter.Filter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
-import au.org.aodn.nrmn.restapi.dto.survey.SurveyFilterDto;
 import au.org.aodn.nrmn.restapi.model.db.Program;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
@@ -42,45 +43,46 @@ public class SurveyController {
     @Autowired
     private ModelMapper mapper;
 
+    @Autowired
+    private ObjectMapper objMapper;
+
     /**
      *
-     * @param surveyFilter
      * @param page
      * @param pageSize - AgGrid use 100 as default page size
      * @return
      */
     @GetMapping(path = "/surveys")
-    public ResponseEntity<?> listMatching(SurveyFilterDto surveyFilter,
+    public ResponseEntity<?> listMatching(@RequestParam(value = "filters", required = false) String filters,
                                           @RequestParam(value = "page", defaultValue = "0") int page,
-                                          @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) {
+                                          @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) throws JsonProcessingException {
 
-        if (surveyFilter.isSet()) {
-            return ResponseEntity
-                    .ok(surveyRepository.findByCriteria(surveyFilter).stream().collect(Collectors.toList()));
-        } else {
+        // RequestParam do not support json object parsing automatically
+        Filter[] f = filters != null ? objMapper.readValue(filters, Filter[].class) : null;
 
-            var surveyRows = surveyRepository.findAllProjectedBy(PageRequest.of(page, pageSize));
-            var surveyIds = surveyRows.stream()
-                    .map(s -> s.getSurveyId())
-                    .distinct()
-                    .collect(Collectors.toList());
+        var surveyRows = surveyRepository
+                .findAllProjectedBy(f, PageRequest.of(page, pageSize));
 
-            Map<Integer, String> diverNames = surveyRepository.getDiversForSurvey(surveyIds).stream()
-                    .collect(Collectors.groupingBy(SurveyRowDivers::getSurveyId,
-                            Collectors.mapping(SurveyRowDivers::getDiverName, Collectors.joining(", "))));
+        var surveyIds = surveyRows.stream()
+                .map(s -> s.getSurveyId())
+                .distinct()
+                .collect(Collectors.toList());
 
-            var surveyRowsWithDivers = surveyRows.stream().map(s -> {
-                s.setDiverNames(diverNames.get(s.getSurveyId()));
-                return s;
-            }).collect(Collectors.toList());
+        Map<Integer, String> diverNames = surveyRepository.getDiversForSurvey(surveyIds).stream()
+                .collect(Collectors.groupingBy(SurveyRowDivers::getSurveyId,
+                        Collectors.mapping(SurveyRowDivers::getDiverName, Collectors.joining(", "))));
 
-            Map<String, Object> data = new HashMap<>();
+        var surveyRowsWithDivers = surveyRows.stream().map(s -> {
+            s.setDiverNames(diverNames.get(s.getSurveyId()));
+            return s;
+        }).collect(Collectors.toList());
 
-            data.put("lastRow", surveyRows.getTotalElements());
-            data.put("items", surveyRowsWithDivers);
+        Map<String, Object> data = new HashMap<>();
 
-            return ResponseEntity.ok(data);
-        }
+        data.put("lastRow", surveyRows.getTotalElements());
+        data.put("items", surveyRowsWithDivers);
+
+        return ResponseEntity.ok(data);
     }
 
     @GetMapping(path = "/programs")

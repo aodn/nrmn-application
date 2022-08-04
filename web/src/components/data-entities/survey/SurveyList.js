@@ -18,9 +18,39 @@ const SurveyList = () => {
   const onGridReady = useCallback((event) => {
     async function fetchSurveys(e) {
       e.api.setDatasource({
+        // This is the functional structure need for datasource
         rowCount: rowsPerPage,
         getRows: (params) => {
-          getResult(`data/surveys?page=${params.startRow / 100}`)
+          let url = `data/surveys?page=${params.startRow / 100}`;
+          let conditions = [];
+
+          for(let name in params.filterModel) {
+            const p = params.filterModel[name];
+
+            if(p.type) {
+              // This is single condition
+              conditions.push({
+                field: name,
+                ops: p.type,
+                val: p.filter
+              });
+            }
+            else {
+              // This is a multiple condition, currently max two conditions
+              conditions.push({
+                field: name,
+                ops: p.operator,
+                conditions: [
+                  { ops: p.condition1.type, val: p.condition1.filter },
+                  { ops: p.condition2.type, val: p.condition2.filter }
+                ]
+              });
+            }
+          };
+
+          url = conditions.length !== 0 ? url + `&filters=${encodeURIComponent(JSON.stringify(conditions))}` : url;
+
+          getResult(url)
             .then(res => {
               console.log(params);
               params.successCallback(res.data.items, res.data.lastRow);
@@ -111,6 +141,7 @@ const SurveyList = () => {
               width={110}
               field="surveyId"
               headerName="Survey ID"
+              colId="surveysId"
               sort="desc"
               cellStyle={{cursor: 'pointer'}}
               onCellClicked={(e) => {
