@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
+import org.apache.commons.lang3.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -165,9 +166,18 @@ public class SurveyCorrectionService {
                 .collect(Collectors.groupingBy(StagedRowFormatted::getMethodBlock));
     }
 
+    private String formatRange(List<Integer> ids) {
+        var min = ids.get(0);
+        var max = ids.get(ids.size() - 1);
+        var range = IntStream.rangeClosed(min, max).boxed().collect(Collectors.toList());
+
+        return (ids.equals(range))
+                ? "[" + min + " to " + max + "]"
+                : ids.stream().map(String::valueOf).collect(Collectors.joining(", "));
+    }
+
     private String observationsForSurveySummary(Integer surveyId) {
-        return observationRepository.findObservationIdsForSurvey(surveyId).stream().map(String::valueOf)
-                .collect(Collectors.joining(", "));
+        return formatRange(observationRepository.findObservationIdsForSurvey(surveyId));
     }
 
     private void deletionTransaction(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows) {
@@ -202,18 +212,17 @@ public class SurveyCorrectionService {
 
         var rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
 
+        var newIds = new ArrayList<Integer>();
         surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
             groupRowsByMethodBlock(surveyRows).values().forEach(methodBlockRows -> {
                 var surveyMethod = getSurveyMethod(survey, methodBlockRows.get(0));
                 methodBlockRows.forEach(row -> {
                     var newObservations = observationRepository.saveAll(
                             getObservations(surveyMethod, row, job.getIsExtendedSize()));
-                    messages.add("Insert Observation IDs: " + newObservations.stream()
-                            .map(Observation::getObservationId)
-                            .map(String::valueOf)
-                            .collect(Collectors.joining(", ")));
+                    newIds.addAll(newObservations.stream().map(o -> o.getObservationId()).collect(Collectors.toList()));
                 });
             });
+            messages.add("Insert Observation IDs: " + formatRange(newIds));
             messages.add("Update Survey ID: " + surveyId);
             return surveyId;
         }).collect(Collectors.toList());
