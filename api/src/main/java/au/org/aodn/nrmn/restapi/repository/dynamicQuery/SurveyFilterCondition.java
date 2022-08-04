@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.repository.dynamicQuery;
 
 import au.org.aodn.nrmn.restapi.controller.filter.Filter;
+import au.org.aodn.nrmn.restapi.model.db.Program;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,32 +29,31 @@ public class SurveyFilterCondition {
             List<Specification<Survey>> specifications = new ArrayList<>();
 
             Arrays.stream(filters).forEach(filter -> {
-                // Income filter name not always match the db field name, hence we need a map
+                // Income filter name not always match the db field name, hence we need a switch
+                // plus some field need special handle
                 switch (filter.getFieldName()) {
 
-                    case "siteCode" : {
-                        if(filter.isCompositeCondition()) {
+                    case "programName" : {
+                        specifications.add(
+                                filter.isCompositeCondition() ?
+                                        null :
+                                        condition.getJoinProgramFieldSpecification(filter.getFieldName(), filter.getValue(), filter.getOperation()));
+                        break;
+                    }
 
-                        }
-                        else {
-                            specifications.add(
-                                    filter.isCompositeCondition() ?
-                                            null :
-                                            condition.getJoinSiteFieldSpecification("siteCode", filter.getValue(), filter.getOperation()));
-                        }
-
+                    case "siteCode" :
+                    case "siteName" : {
+                        specifications.add(
+                                filter.isCompositeCondition() ?
+                                        null :
+                                        condition.getJoinSiteFieldSpecification(filter.getFieldName(), filter.getValue(), filter.getOperation()));
                         break;
                     }
                     case "surveysId": {
-                        if(filter.isCompositeCondition()) {
-
-                        }
-                        else {
-                            specifications.add(
-                                    filter.isCompositeCondition() ?
-                                            null :
-                                            condition.getSimpleFieldSpecification("surveyId", filter.getValue(), filter.getOperation()));
-                        }
+                        specifications.add(
+                                filter.isCompositeCondition() ?
+                                        null :
+                                        condition.getSimpleFieldSpecification("surveyId", filter.getValue(), filter.getOperation()));
                         break;
                     }
                     case "depth" : {
@@ -64,30 +64,25 @@ public class SurveyFilterCondition {
                         else {
                             String[] i = filter.getValue().split("\\.");
 
-                            specifications.add(
-                                    filter.isCompositeCondition() ?
-                                            null :
-                                            condition.getSimpleFieldSpecification("depth", i[0], filter.getOperation()));
+                            specifications.add(condition.getSimpleFieldSpecification("depth", i[0], filter.getOperation()));
 
                             if (i.length > 1) {
                                 // We have something after dot
-                                specifications.add(
-                                        filter.isCompositeCondition() ?
-                                                null :
-                                                condition.getSimpleFieldSpecification("surveyNum", i[1], filter.getOperation()));
+                                specifications.add(condition.getSimpleFieldSpecification("surveyNum", i[1], filter.getOperation()));
                             }
                         }
                         break;
                     }
                     case "hasPQs": {
                         // True if not equals null, so we need to rewrite the query
-                        boolean positive = filter.getValue().toLowerCase().matches("^(t|tr|tru|true)");
-                        boolean negative = filter.getValue().toLowerCase().matches("^(f|fa|fal|fals|false)");
 
                         if(filter.isCompositeCondition()) {
 
                         }
                         else {
+                            boolean positive = filter.getValue().toLowerCase().matches("^(t|tr|tru|true)");
+                            boolean negative = filter.getValue().toLowerCase().matches("^(f|fa|fal|fals|false)");
+
                             if(positive) {
                                 specifications.add(condition.getSimpleFieldSpecification("pqCatalogued", null, "notBlank"));
                             }
@@ -122,6 +117,13 @@ public class SurveyFilterCondition {
         });
     }
 
+    protected Specification<Survey> getJoinProgramFieldSpecification(String field, String value, String operation) {
+        return ((root, query, criteriaBuilder) -> {
+            Join<Survey, Program> site = root.join("program", JoinType.INNER);
+            return getSimpleFieldSpecification(root, site, criteriaBuilder, field, value, operation);
+        });
+    }
+
     protected Specification<Survey> getSimpleFieldSpecification(String field, String value, String operation) {
         return ((root, query, criteriaBuilder) ->
                 getSimpleFieldSpecification(root, null, criteriaBuilder, field, value, operation));
@@ -136,22 +138,22 @@ public class SurveyFilterCondition {
         switch(operation) {
 
             case "startsWith": {
-                return criteriaBuilder.like(r.get(field).as(String.class), value + "%");
+                return criteriaBuilder.like(criteriaBuilder.lower(r.get(field).as(String.class)), value.toLowerCase() + "%");
             }
             case "endsWith": {
-                return criteriaBuilder.like(r.get(field).as(String.class), "%" + value);
+                return criteriaBuilder.like(criteriaBuilder.lower(r.get(field).as(String.class)), "%" + value.toLowerCase());
             }
             case "contains": {
-                return criteriaBuilder.like(r.get(field).as(String.class), "%" + value + "%");
+                return criteriaBuilder.like(criteriaBuilder.lower(r.get(field).as(String.class)), "%" + value.toLowerCase() + "%");
             }
             case "notContains" : {
-                return criteriaBuilder.notLike(r.get(field).as(String.class), "%" + value + "%");
+                return criteriaBuilder.notLike(criteriaBuilder.lower(r.get(field).as(String.class)), "%" + value.toLowerCase() + "%");
             }
             case "equals" : {
-                return criteriaBuilder.equal(r.get(field).as(String.class), value);
+                return criteriaBuilder.equal(criteriaBuilder.lower(r.get(field).as(String.class)), value.toLowerCase());
             }
             case "notEqual" : {
-                return criteriaBuilder.notEqual(r.get(field).as(String.class), value);
+                return criteriaBuilder.notEqual(criteriaBuilder.lower(r.get(field).as(String.class)), value.toLowerCase());
             }
             case "blank" : {
                 return criteriaBuilder.or(
