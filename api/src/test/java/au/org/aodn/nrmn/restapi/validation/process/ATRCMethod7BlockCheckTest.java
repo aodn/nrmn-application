@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
@@ -42,7 +43,7 @@ class ATRCMethod7BlockCheckTest {
         row.setMethod("7");
         row.setBlock("2");
         row.setStagedJob(job);
-        Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<ValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("ATRC Method 7")));
     }
 
@@ -54,7 +55,7 @@ class ATRCMethod7BlockCheckTest {
         row.setMethod("7");
         row.setBlock("3");
         row.setStagedJob(job);
-        Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<ValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertTrue(errors.stream().anyMatch(e -> e.getMessage().contains("ATRC Method 7")));
     }
 
@@ -66,7 +67,7 @@ class ATRCMethod7BlockCheckTest {
         row.setMethod("2");
         row.setBlock("2");
         row.setStagedJob(job);
-        Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<ValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("ATRC Method 7")));
     }
 

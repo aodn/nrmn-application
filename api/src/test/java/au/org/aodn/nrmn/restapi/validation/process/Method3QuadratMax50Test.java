@@ -8,6 +8,7 @@ import java.util.HashMap;
 import org.junit.jupiter.api.Test;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
+import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 class Method3QuadratMax50Test extends FormattedTestProvider {
@@ -15,7 +16,7 @@ class Method3QuadratMax50Test extends FormattedTestProvider {
     public void outOfScopeShouldSuccess() {
         StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMethod(2);
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", formatted);
+        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
         assertTrue(errors.isEmpty());
     }
 
@@ -32,7 +33,7 @@ class Method3QuadratMax50Test extends FormattedTestProvider {
                 put(5, 49);
             }
         });
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", row);
+        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, row);
         assertTrue(errors.isEmpty());
     }
 
@@ -48,7 +49,7 @@ class Method3QuadratMax50Test extends FormattedTestProvider {
                 put(5, 50);
             }
         });
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", row);
+        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, row);
         assertTrue(errors.isEmpty());
     }
 }

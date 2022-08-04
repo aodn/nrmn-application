@@ -24,7 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
@@ -40,6 +39,7 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
+import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
@@ -50,6 +50,7 @@ import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.util.TimeUtils;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import lombok.var;
 
 @Component
 public class ValidationProcess {
@@ -105,7 +106,7 @@ public class ValidationProcess {
         return duplicateRows;
     }
 
-    public Collection<ValidationError> checkFormatting(String programName, Boolean isExtendedSize, Collection<String> siteCodes, Collection<ObservableItem> species, Collection<StagedRow> rows) {
+    public Collection<ValidationError> checkFormatting(ProgramValidation validation, Boolean isExtendedSize, Collection<String> siteCodes, Collection<ObservableItem> species, Collection<StagedRow> rows) {
 
         Collection<String> diverNames = new ArrayList<String>();
         for (Diver d : diverRepository.getAll()) {
@@ -233,7 +234,7 @@ public class ValidationProcess {
                 errors.add(rowId, ValidationLevel.BLOCKING, "depth", "Depth is invalid, expected: depth[.surveyNum]");
 
             // RLS Method
-            if (programName.equalsIgnoreCase("RLS") && !Arrays.asList(0, 1, 2, 10).contains(NumberUtils.toInt(row.getMethod(), INVALID_INT)))
+            if (validation == ProgramValidation.RLS && !Arrays.asList(0, 1, 2, 10).contains(NumberUtils.toInt(row.getMethod(), INVALID_INT)))
                 errors.add(rowId, ValidationLevel.BLOCKING, "method", "RLS Method must be 0, 1, 2 or 10");
 
             // Block 0
@@ -241,7 +242,7 @@ public class ValidationProcess {
                 errors.add(rowId, ValidationLevel.BLOCKING, "block", "Block 0 is invalid for method");
 
             // ATRC Method
-            if (programName.equalsIgnoreCase("ATRC")) {
+            if (validation == ProgramValidation.ATRC) {
                 if (!Arrays.asList(0, 1, 2, 3, 4, 5, 7, 10).contains(NumberUtils.toInt(row.getMethod(), INVALID_INT)))
                     errors.add(rowId, ValidationLevel.BLOCKING, "method", "ATRC Method must be [0-5], 7 or 10");
 
@@ -337,7 +338,7 @@ public class ValidationProcess {
         return observationTotal == 0 || observationTotal == 1;
     }
 
-    public Collection<ValidationCell> validateMeasurements(String programName, StagedRowFormatted row) {
+    public Collection<ValidationCell> validateMeasurements(ProgramValidation validation, StagedRowFormatted row) {
         Collection<ValidationCell> errors = new ArrayList<ValidationCell>();
 
         if (row.getMeasureJson() == null)
@@ -485,7 +486,7 @@ public class ValidationProcess {
         return null;
     }
 
-    private ValidationError validateSurveyComplete(String programName, List<StagedRowFormatted> surveyRows) {
+    private ValidationError validateSurveyComplete(ProgramValidation validation, List<StagedRowFormatted> surveyRows) {
 
         if(surveyRows.stream().anyMatch(r -> r.getMethod() == null || r.getBlock() == null))
             return null;
@@ -506,7 +507,7 @@ public class ValidationProcess {
                         method0Rows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("block"));
 
         // VALIDATE: Both M1, M2 present and if ATRC has M3 and at least one method of 3,4,5,7
-        List<Integer> requiredMethods = programName.equalsIgnoreCase("ATRC") ? Arrays.asList(1,2,3) : Arrays.asList(1,2);
+        List<Integer> requiredMethods = validation == ProgramValidation.ATRC ? Arrays.asList(1,2,3) : Arrays.asList(1,2);
         List<Integer> missingMethods =  new ArrayList<Integer>(requiredMethods);
         missingMethods.removeAll(surveyByMethod.keySet());
         if(missingMethods.size() > 0) {
@@ -517,13 +518,13 @@ public class ValidationProcess {
         }
 
         // VALIDATE: M1, M2 each has B1, B2 and if ATRC M3 has B0
-        List<Integer> methodsRequired = programName.equalsIgnoreCase("RLS") ? Arrays.asList(1,2) : Arrays.asList(1,2,3);
+        List<Integer> methodsRequired = validation == ProgramValidation.RLS ? Arrays.asList(1,2) : Arrays.asList(1,2,3);
         ValidationLevel level = ValidationLevel.WARNING;
         for (Integer method : methodsRequired) {
             List<StagedRowFormatted> methodRows = surveyByMethod.get(method);
             if(methodRows == null) continue;
 
-            List<Integer> blocksRequired = programName.equalsIgnoreCase("RLS") ? new ArrayList<Integer>(Arrays.asList(1,2)) : new ArrayList<Integer>(method == 3 ? Arrays.asList(0) : Arrays.asList(1,2));
+            List<Integer> blocksRequired = validation == ProgramValidation.RLS ? new ArrayList<Integer>(Arrays.asList(1,2)) : new ArrayList<Integer>(method == 3 ? Arrays.asList(0) : Arrays.asList(1,2));
 
             List<Integer> hasBlocks = methodRows.stream().map(r -> r.getBlock()).distinct().collect(Collectors.toList());
             List<Integer> missingBlocks = blocksRequired.stream().filter(b -> !hasBlocks.contains(b)).collect(Collectors.toList());
@@ -560,19 +561,19 @@ public class ValidationProcess {
         return null;
     }
 
-    private Collection<ValidationError> checkSurveys(String programName, Boolean isExtended, Map<String, List<StagedRowFormatted>> surveyMap) {
+    private Collection<ValidationError> checkSurveys(ProgramValidation validation, Boolean isExtended, Map<String, List<StagedRowFormatted>> surveyMap) {
         Set<ValidationError> res = new HashSet<ValidationError>();
  
         for (Map.Entry<String, List<StagedRowFormatted>> survey : surveyMap.entrySet()) {
             List<StagedRowFormatted> surveyRows = survey.getValue();
             
-            if (programName.equalsIgnoreCase("ATRC")){
+            if (validation == ProgramValidation.ATRC){
                 // VALIDATE: Survey group transect number valid
                 res.add(validateSurveyTransectNumber(surveyRows));
             }
 
             // VALIDATE: Survey Complete
-            res.add(validateSurveyComplete(programName, surveyRows));
+            res.add(validateSurveyComplete(validation, surveyRows));
 
             // VALIDATE: Is Existing Survey
             res.add(validateSurveyIsNew(surveyRows.get(0)));
@@ -583,13 +584,13 @@ public class ValidationProcess {
         return res;
     }
 
-    private Collection<ValidationError> checkSurveyGroups(String programName, Boolean isExtended, Map<String, List<StagedRowFormatted>> surveyGroupMap) {
+    private Collection<ValidationError> checkSurveyGroups(ProgramValidation validation, Boolean isExtended, Map<String, List<StagedRowFormatted>> surveyGroupMap) {
         Set<ValidationError> res = new HashSet<ValidationError>();
  
         for (Map.Entry<String, List<StagedRowFormatted>> survey : surveyGroupMap.entrySet()) {
             List<StagedRowFormatted> surveyRows = survey.getValue();
             
-            if (programName.equalsIgnoreCase("ATRC")){
+            if (validation == ProgramValidation.ATRC){
                 // VALIDATE: Survey Group Complete
                 res.add(validateSurveyGroup(surveyRows));
             }
@@ -600,7 +601,7 @@ public class ValidationProcess {
         return res;
     }
 
-    private Collection<ValidationError> checkMethod3Transects(String programName, Boolean isExtended, Map<String, List<StagedRowFormatted>> method3SurveyMap) {
+    private Collection<ValidationError> checkMethod3Transects(Boolean isExtended, Map<String, List<StagedRowFormatted>> method3SurveyMap) {
         Set<ValidationError> res = new HashSet<ValidationError>();
         ValidationResultSet results = new ValidationResultSet();
 
@@ -617,7 +618,7 @@ public class ValidationProcess {
         return res;
     }
 
-    public Collection<ValidationError> checkData(String programName, Boolean isExtended, Collection<StagedRowFormatted> rows) {
+    public Collection<ValidationError> checkData(ProgramValidation validation, Boolean isExtended, Collection<StagedRowFormatted> rows) {
 
         Set<ValidationError> res = new HashSet<ValidationError>();
 
@@ -641,7 +642,7 @@ public class ValidationProcess {
             }
 
             // Total Checksum & Missing Data
-            results.addAll(validateMeasurements(programName, row), false);
+            results.addAll(validateMeasurements(validation, row), false);
 
             // Row Method is valid for species
             results.add(validateSpeciesBelowToMethod(row), false);
@@ -653,7 +654,7 @@ public class ValidationProcess {
             results.add(validateInvertsZeroOnM3M4M5(row), false);
             
             // Date is not in the future or too far in the past
-            results.add(validateDateRange(programName.equalsIgnoreCase("RLS") ? DATE_MIN_RLS : DATE_MIN_ATRC, row), false);
+            results.add(validateDateRange(validation == ProgramValidation.RLS ? DATE_MIN_RLS : DATE_MIN_ATRC, row), false);
         }
 
         res.addAll(results.getAll());
@@ -694,6 +695,7 @@ public class ValidationProcess {
         response.setNewSiteCount(foundSites.values().stream().filter(e -> e == true).count());
 
         // Diver Count
+        
         Collection<Diver> divers = diverRepository.getAll();
         
         Collection<String> distinctSurveyDivers = mappedRows.stream().map(d -> Normalizer.normalize(d.getRef().getDiver(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").toUpperCase()).filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
@@ -730,49 +732,48 @@ public class ValidationProcess {
     }
 
     public ValidationResponse process(StagedJob job) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean hasAdminRole = authentication != null ? authentication.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN")) : false;
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var hasAdminRole = authentication != null ? authentication.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN")) : false;
 
-        Collection<StagedRow> rows = rowRepository.findRowsByJobId(job.getId());
-        Collection<ObservableItem> species = getSpeciesForRows(rows);
+        var rows = rowRepository.findRowsByJobId(job.getId());
+        var species = getSpeciesForRows(rows);
 
-        String programName = job.getProgram().getProgramName();
-        String validationProgramName = programName.equalsIgnoreCase("FRDC") ? "ATRC" : programName;
-        Collection<String> enteredSiteCodes = rows.stream().map(s -> s.getSiteCode().toUpperCase()).collect(Collectors.toSet());
-        Collection<String> siteCodes = siteRepository.getAllSiteCodesMatching(enteredSiteCodes);
-        Collection<ValidationError> sheetErrors = new HashSet<ValidationError>();
+        var programName = job.getProgram().getProgramName();
+        var validation = Arrays.asList("ATRC", "FRDC").contains(programName.toUpperCase()) ? ProgramValidation.ATRC : ProgramValidation.RLS;
+        var enteredSiteCodes = rows.stream().map(s -> s.getSiteCode().toUpperCase()).collect(Collectors.toSet());
+        var siteCodes = siteRepository.getAllSiteCodesMatching(enteredSiteCodes);
+        var sheetErrors = new HashSet<ValidationError>();
 
-        sheetErrors.addAll(checkFormatting(validationProgramName, job.getIsExtendedSize(), siteCodes, species, rows));
+        sheetErrors.addAll(checkFormatting(validation, job.getIsExtendedSize(), siteCodes, species, rows));
 
-        Collection<StagedRowFormatted> mappedRows = formatRowsWithSpecies(rows, species);
+        var mappedRows = formatRowsWithSpecies(rows, species);
 
-        ValidationResponse response = generateSummary(mappedRows);
+        var response = generateSummary(mappedRows);
 
         if(hasAdminRole) {
             response.setErrors(sheetErrors);
             return response;
         }
         
-        sheetErrors.addAll(checkData(validationProgramName, job.getIsExtendedSize(), mappedRows));
+        sheetErrors.addAll(checkData(validation, job.getIsExtendedSize(), mappedRows));
 
-        Map<String, List<StagedRowFormatted>> surveyMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
-        sheetErrors.addAll(checkSurveys(validationProgramName, job.getIsExtendedSize(), surveyMap));
+        var surveyMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
+        sheetErrors.addAll(checkSurveys(validation, job.getIsExtendedSize(), surveyMap));
         response.setIncompleteSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("Survey incomplete")).count());
         response.setExistingSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("Survey exists:")).count());
 
-        Map<String, List<StagedRowFormatted>> surveyGroupMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
-        sheetErrors.addAll(checkSurveyGroups(validationProgramName, job.getIsExtendedSize(), surveyGroupMap));
+        var surveyGroupMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
+        sheetErrors.addAll(checkSurveyGroups(validation, job.getIsExtendedSize(), surveyGroupMap));
 
-        Map<String, List<StagedRowFormatted>> method3SurveyMap = mappedRows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3) && !row.getRef().getSpecies().equalsIgnoreCase("Survey Not Done")).collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
-        sheetErrors.addAll(checkMethod3Transects(validationProgramName, job.getIsExtendedSize(), method3SurveyMap));
+        var method3SurveyMap = mappedRows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3) && !row.getRef().getSpecies().equalsIgnoreCase("Survey Not Done")).collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
+        sheetErrors.addAll(checkMethod3Transects(job.getIsExtendedSize(), method3SurveyMap));
 
-        Long distinctSurveys = mappedRows.stream().filter(r -> Arrays.asList(1,2).contains(r.getMethod())).map(r -> r.getSurvey()).distinct().count();
+        var distinctSurveys = mappedRows.stream().filter(r -> Arrays.asList(1,2).contains(r.getMethod())).map(r -> r.getSurvey()).distinct().count();
         response.setSurveyCount(distinctSurveys);
 
-        long errorId = 0;
-        for(ValidationError validationError: sheetErrors) {
+        var errorId = 0;
+        for(var validationError: sheetErrors)
             validationError.setId(errorId++);
-        }
 
         response.setErrors(sheetErrors);
 
