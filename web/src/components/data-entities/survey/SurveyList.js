@@ -141,7 +141,7 @@ const SurveyList = () => {
               width={110}
               field="surveyId"
               headerName="Survey ID"
-              colId="surveysId"
+              colId="survey.surveyId"
               sort="desc"
               cellStyle={{cursor: 'pointer'}}
               onCellClicked={(e) => {
@@ -152,16 +152,16 @@ const SurveyList = () => {
                 }
               }}
             />
-            <AgGridColumn width={100} field="siteCode" />
-            <AgGridColumn width={100} field="surveyDate" />
-            <AgGridColumn width={100} field="depth" />
-            <AgGridColumn flex={1} field="siteName" />
-            <AgGridColumn width={100} field="programName" headerName="Program" />
-            <AgGridColumn flex={1} field="locationName" />
-            <AgGridColumn width={100} field="hasPQs" />
-            <AgGridColumn flex={1} field="mpa" />
-            <AgGridColumn flex={1} field="country" />
-            <AgGridColumn flex={1} field="diverName" />
+            <AgGridColumn width={100} field="siteCode" colId="survey.siteCode" />
+            <AgGridColumn width={100} field="surveyDate" colId="survey.surveyDate"/>
+            <AgGridColumn width={100} field="depth" colId="survey.depth"/>
+            <AgGridColumn flex={1} field="siteName" colId="survey.siteName"/>
+            <AgGridColumn width={100} field="programName" headerName="Program" colId="survey.programName"/>
+            <AgGridColumn flex={1} field="locationName" colId="survey.locationName"/>
+            <AgGridColumn width={100} field="hasPQs" colId="survey.hasPQs"/>
+            <AgGridColumn flex={1} field="mpa" colId="survey.mpa"/>
+            <AgGridColumn flex={1} field="country" colId="survey.country"/>
+            <AgGridColumn flex={1} field="diverName" colId="observation.diverName"/>
           </AgGridReact>
         </>
       )}
