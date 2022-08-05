@@ -197,7 +197,7 @@ public class SurveyCorrectionService {
                         .details(messages.stream().collect(Collectors.joining("\n")))
                         .eventType(StagedJobEventType.CORRECTED)
                         .build());
-        job.setStatus(StatusJobType.CORRECTION);
+        job.setStatus(StatusJobType.CORRECTED);
         jobRepository.save(job);
     }
 
@@ -233,7 +233,7 @@ public class SurveyCorrectionService {
                         .details(messages.stream().collect(Collectors.joining("\n")))
                         .eventType(StagedJobEventType.CORRECTED)
                         .build());
-        job.setStatus(StatusJobType.CORRECTION);
+        job.setStatus(StatusJobType.CORRECTED);
         job.setSurveyIds(surveyIds);
         jobRepository.save(job);
         surveyRepository.updateSurveyModified();
