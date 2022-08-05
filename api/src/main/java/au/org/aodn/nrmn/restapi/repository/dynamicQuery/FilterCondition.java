@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.repository.dynamicQuery;
 
 import au.org.aodn.nrmn.restapi.controller.filter.Filter;
+import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
@@ -8,15 +9,32 @@ import javax.persistence.criteria.From;
 import javax.persistence.criteria.Predicate;
 import java.sql.Date;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public abstract class FilterCondition {
+
+    public static final String STARTS_WITH = "startsWith";
+    public static final String ENDS_WITH = "endsWith";
+    public static final String CONTAINS = "contains";
+    public static final String NOT_CONTAINS = "notContains";
+    public static final String EQUALS = "equals";
+    public static final String NOT_EQUALS = "notEqual";
+    public static final String BLANK = "blank";
+    public static final String NOT_BLANK = "notBlank";
+    public static final String IN = "in";
 
     interface DBField {
         String getDBFieldName();
     }
 
-    protected static <T extends Enum<T>> boolean containsSupportField(Filter[] fs, Class<T> e) {
-        return Arrays.stream(fs).filter(filter -> isSupportedField(filter.getFieldName(), e)).findFirst().isPresent();
+    public static <T extends Enum<T>> boolean isContainFilter(List<Filter> fs, T v) {
+        return fs != null && fs.stream().filter(filter -> filter.getFieldName().equals(v.toString())).findFirst().isPresent();
+    }
+
+    protected static <T extends Enum<T>> boolean containsSupportField(List<Filter> fs, Class<T> e) {
+        return fs.stream().filter(filter -> isSupportedField(filter.getFieldName(), e)).findFirst().isPresent();
     }
 
     protected static <T extends Enum<T>> boolean isSupportedField(String f, Class<T> e) {
@@ -24,7 +42,8 @@ public abstract class FilterCondition {
     }
 
     protected static <T extends Enum<T>> T getFieldEnum(String f, Class<T> e) {
-        return Arrays.stream(e.getEnumConstants()).filter(v -> v.toString().equals(f)).findFirst().get();
+        Optional<T> k = Arrays.stream(e.getEnumConstants()).filter(v -> v.toString().equals(f)).findFirst();
+        return k.isPresent() ? k.get() : null;
     }
 
     protected Predicate getSimpleFieldSpecification(
@@ -46,30 +65,33 @@ public abstract class FilterCondition {
         // Single condition
         switch(operation) {
 
-            case "startsWith": {
+            case STARTS_WITH: {
                 return criteriaBuilder.like(target, value.toLowerCase() + "%");
             }
-            case "endsWith": {
+            case ENDS_WITH: {
                 return criteriaBuilder.like(target, "%" + value.toLowerCase());
             }
-            case "contains": {
+            case CONTAINS: {
                 return criteriaBuilder.like(target, "%" + value.toLowerCase() + "%");
             }
-            case "notContains" : {
+            case NOT_CONTAINS: {
                 return criteriaBuilder.notLike(target, "%" + value.toLowerCase() + "%");
             }
-            case "equals" : {
+            case EQUALS : {
                 return criteriaBuilder.equal(target, value.toLowerCase());
             }
-            case "notEqual" : {
+            case NOT_EQUALS: {
                 return criteriaBuilder.notEqual(target, value.toLowerCase());
             }
-            case "blank" : {
+            case IN : {
+                return target.in(value.split(","));
+            }
+            case BLANK: {
                 return criteriaBuilder.or(
                         criteriaBuilder.equal(target, ""),
                         criteriaBuilder.isNull(r.get(field)));
             }
-            case "notBlank" : {
+            case NOT_BLANK : {
                 return criteriaBuilder.notEqual(target, "");
             }
             default: {

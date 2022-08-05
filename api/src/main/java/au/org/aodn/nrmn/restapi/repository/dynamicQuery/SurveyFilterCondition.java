@@ -16,7 +16,7 @@ import java.util.*;
 
 public class SurveyFilterCondition extends FilterCondition {
 
-    enum SupportedFilters implements DBField {
+    public enum SupportedFilters implements DBField {
         PROGRAMS {
             @Override
             public String toString() {
@@ -119,95 +119,98 @@ public class SurveyFilterCondition extends FilterCondition {
         };
     }
 
-    public static Specification<Survey> createSpecification(Filter[] filters) {
+    public static Specification<Survey> createSpecification(List<Filter> filters) {
         SurveyFilterCondition condition = new SurveyFilterCondition();
 
-        if(filters == null || filters.length == 0 || !containsSupportField(filters, SupportedFilters.class)) {
+        if(filters == null || filters.size() == 0 || !containsSupportField(filters, SupportedFilters.class)) {
             // Return null means select all
             return null;
         }
         else {
             List<Specification<Survey>> specifications = new ArrayList<>();
 
-            Arrays.stream(filters).forEach(filter -> {
+            filters.forEach(filter -> {
                 // Income filter name not always match the db field name, hence we need a switch
                 // plus some field need special handle
                 SupportedFilters target = getFieldEnum(filter.getFieldName(), SupportedFilters.class);
-                switch (target) {
+                if(target != null) {
 
-                    case PROGRAMS: {
-                        specifications.add(
-                                filter.isCompositeCondition() ?
-                                        null :
-                                        condition.getJoinProgramFieldSpecification(target.getDBFieldName(), filter.getValue(), filter.getOperation()));
-                        break;
-                    }
+                    switch (target) {
 
-                    case LOCATION_NAME : {
-                        specifications.add(
-                                filter.isCompositeCondition() ?
-                                        null :
-                                        condition.getJoinLocationFieldSpecification(target.getDBFieldName(), filter.getValue(), filter.getOperation()));
-                        break;
-                    }
-
-                    case MPA :
-                    case COUNTRY :
-                    case SITE_CODE :
-                    case SITE_NAME : {
-                        specifications.add(
-                                filter.isCompositeCondition() ?
-                                        null :
-                                        condition.getJoinSiteFieldSpecification(target.getDBFieldName(), filter.getValue(), filter.getOperation()));
-                        break;
-                    }
-                    case SURVEY_DATE :
-                    case SURVEY_ID : {
-                        specifications.add(
-                                filter.isCompositeCondition() ?
-                                        null :
-                                        condition.getSimpleFieldSpecification(target.getDBFieldName(), filter.getValue(), filter.getOperation()));
-                        break;
-                    }
-                    case DEPTH : {
-                        // Special handle, please refer to SurveyRowCacheable, logic make sense?
-                        if(filter.isCompositeCondition()) {
-
+                        case PROGRAMS: {
+                            specifications.add(
+                                    filter.isCompositeCondition() ?
+                                            null :
+                                            condition.getJoinProgramFieldSpecification(target.getDBFieldName(), filter.getValue(), filter.getOperation()));
+                            break;
                         }
-                        else {
-                            String[] i = filter.getValue().split("\\.");
 
-                            specifications.add(condition.getSimpleFieldSpecification(target.getDBFieldName(), i[0], filter.getOperation()));
-
-                            if (i.length > 1) {
-                                // We have something after dot
-                                specifications.add(condition.getSimpleFieldSpecification("surveyNum", i[1], filter.getOperation()));
-                            }
+                        case LOCATION_NAME : {
+                            specifications.add(
+                                    filter.isCompositeCondition() ?
+                                            null :
+                                            condition.getJoinLocationFieldSpecification(target.getDBFieldName(), filter.getValue(), filter.getOperation()));
+                            break;
                         }
-                        break;
-                    }
-                    case HAS_PQs : {
-                        // True if not equals null, so we need to rewrite the query
 
-                        if(filter.isCompositeCondition()) {
-
+                        case MPA :
+                        case COUNTRY :
+                        case SITE_CODE :
+                        case SITE_NAME : {
+                            specifications.add(
+                                    filter.isCompositeCondition() ?
+                                            null :
+                                            condition.getJoinSiteFieldSpecification(target.getDBFieldName(), filter.getValue(), filter.getOperation()));
+                            break;
                         }
-                        else {
-                            boolean positive = filter.getValue().toLowerCase().matches("^(t|tr|tru|true)");
-                            boolean negative = filter.getValue().toLowerCase().matches("^(f|fa|fal|fals|false)");
+                        case SURVEY_DATE :
+                        case SURVEY_ID : {
+                            specifications.add(
+                                    filter.isCompositeCondition() ?
+                                            null :
+                                            condition.getSimpleFieldSpecification(target.getDBFieldName(), filter.getValue(), filter.getOperation()));
+                            break;
+                        }
+                        case DEPTH : {
+                            // Special handle, please refer to SurveyRowCacheable, logic make sense?
+                            if(filter.isCompositeCondition()) {
 
-                            if(positive) {
-                                specifications.add(condition.getSimpleFieldSpecification(target.getDBFieldName(), null, "notBlank"));
-                            }
-                            else if(negative) {
-                                specifications.add(condition.getSimpleFieldSpecification(target.getDBFieldName(), null, "blank"));
                             }
                             else {
-                                // A string that will never match if user type something else
-                                specifications.add(condition.getSimpleFieldSpecification(target.getDBFieldName(), "-", "equals"));
+                                String[] i = filter.getValue().split("\\.");
+
+                                specifications.add(condition.getSimpleFieldSpecification(target.getDBFieldName(), i[0], filter.getOperation()));
+
+                                if (i.length > 1) {
+                                    // We have something after dot
+                                    specifications.add(condition.getSimpleFieldSpecification("surveyNum", i[1], filter.getOperation()));
+                                }
                             }
+                            break;
                         }
-                        break;
+                        case HAS_PQs : {
+                            // True if not equals null, so we need to rewrite the query
+
+                            if(filter.isCompositeCondition()) {
+
+                            }
+                            else {
+                                boolean positive = filter.getValue().toLowerCase().matches("^(t|tr|tru|true)");
+                                boolean negative = filter.getValue().toLowerCase().matches("^(f|fa|fal|fals|false)");
+
+                                if(positive) {
+                                    specifications.add(condition.getSimpleFieldSpecification(target.getDBFieldName(), null, "notBlank"));
+                                }
+                                else if(negative) {
+                                    specifications.add(condition.getSimpleFieldSpecification(target.getDBFieldName(), null, "blank"));
+                                }
+                                else {
+                                    // A string that will never match if user type something else
+                                    specifications.add(condition.getSimpleFieldSpecification(target.getDBFieldName(), "-", "equals"));
+                                }
+                            }
+                            break;
+                        }
                     }
                 }
             });

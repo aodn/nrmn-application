@@ -1,18 +1,24 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import au.org.aodn.nrmn.restapi.controller.filter.Filter;
+import au.org.aodn.nrmn.restapi.model.db.Observation;
+import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.repository.dynamicQuery.ObservationFilterCondition;
+import au.org.aodn.nrmn.restapi.repository.dynamicQuery.SurveyFilterCondition;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections4.ListUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +36,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Surveys")
 @RequestMapping(path = "/api/v1/data")
 public class SurveyController {
+
+    @Autowired
+    private ObservationRepository observationRepository;
 
     @Autowired
     private SurveyRepository surveyRepository;
@@ -58,7 +67,47 @@ public class SurveyController {
                                           @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) throws JsonProcessingException {
 
         // RequestParam do not support json object parsing automatically
-        Filter[] f = filters != null ? objMapper.readValue(filters, Filter[].class) : null;
+        List<Filter> f = filters != null ? Arrays.stream((objMapper.readValue(filters, Filter[].class))).collect(Collectors.toList()) : null;
+
+        // Diver name search need another table
+        if(ObservationFilterCondition.isContainFilter(f, ObservationFilterCondition.SupportedFilters.DIVER_NAME)) {
+            Specification<Observation> observationSpecification;
+
+            observationSpecification = ObservationFilterCondition.createSpecification(f);
+
+            if(observationSpecification != null) {
+                // User wants to filter by diver name, we need to get the list of survey id that matches and
+                // add it to the filter for next search
+                List<Observation> o = observationRepository.findAll(observationSpecification);
+                List<Integer> obs_ids = o.stream()
+                        .map(m -> m.getObservationId())
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                if(!obs_ids.isEmpty()) {
+                    // We need a special query to get unique survey id given observation id, the return id can long
+                    // and hence we need to split it in group and query them
+                    List<List<Integer>> partitionIds = ListUtils.partition(obs_ids, 20000);
+
+                    // Set make id distinct
+                    Set<Integer> ids = ConcurrentHashMap.newKeySet();
+
+                    partitionIds.parallelStream().forEach(l -> {
+                        ids.addAll(surveyRepository.getSurveyFromObservation(l));
+                    });
+
+                    if(!ids.isEmpty()) {
+                        // Expend and add filter
+                        f.add(new Filter(
+                                SurveyFilterCondition.SupportedFilters.SURVEY_ID.toString(),
+                                String.join(",", ids.stream().map(i -> i.toString()).collect(Collectors.toList())),
+                                SurveyFilterCondition.IN,
+                                null,
+                                null));
+                    }
+                }
+            }
+        }
 
         var surveyRows = surveyRepository
                 .findAllProjectedBy(f, PageRequest.of(page, pageSize));
