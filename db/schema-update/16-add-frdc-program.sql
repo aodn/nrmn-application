@@ -1,0 +1,3 @@
+BEGIN TRANSACTION;
+INSERT INTO nrmn.program_ref VALUES (4, 'FRDC', FALSE);
+END;
