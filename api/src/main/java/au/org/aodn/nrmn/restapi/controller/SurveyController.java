@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.controller;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -70,10 +71,18 @@ public class SurveyController {
         List<Filter> f = filters != null ? Arrays.stream((objMapper.readValue(filters, Filter[].class))).collect(Collectors.toList()) : null;
 
         // Diver name search need another table
-        if(ObservationFilterCondition.isContainFilter(f, ObservationFilterCondition.SupportedFilters.DIVER_NAME)) {
-            Specification<Observation> observationSpecification;
+        Optional<Filter> diverFilter = ObservationFilterCondition.getFilter(f, ObservationFilterCondition.SupportedFilters.DIVER_NAME);
+        if(diverFilter.isPresent()) {
 
-            observationSpecification = ObservationFilterCondition.createSpecification(f);
+            if(diverFilter.get().isCompositeCondition()) {
+                // Diver name need special handle for composite selection, as observation to diver is 1 to 1 map,
+                // if use need AND operation between two filters for diver name, what it really means in db level is
+                // select observation's survey id, where either comes from diver 1 OR diver 2 therefore count
+                // survey id will > 1
+                diverFilter.get().setOperation(Filter.OR);
+            }
+
+            Specification<Observation> observationSpecification = ObservationFilterCondition.createSpecification(f);
 
             if(observationSpecification != null) {
                 // User wants to filter by diver name, we need to get the list of survey id that matches and
@@ -85,21 +94,40 @@ public class SurveyController {
                         .collect(Collectors.toList());
 
                 if(!obs_ids.isEmpty()) {
-                    // We need a special query to get unique survey id given observation id, the return id list can
+                    // We need a special query to get survey id given observation id, id can
                     // be very long and exceed sql param limit and hence we need to split it in group and query them
                     List<List<Integer>> partitionIds = ListUtils.partition(obs_ids, 15000);
 
-                    // Set make id distinct
-                    Set<Integer> ids = ConcurrentHashMap.newKeySet();
+                    // Store all survey id first
+                    List<SurveyRowDivers> ids = Collections.synchronizedList(new ArrayList<>());
 
                     partitionIds.parallelStream().forEach(l -> {
                         ids.addAll(surveyRepository.getSurveyFromObservation(l));
                     });
 
+                    Set<Integer> uniqueIds;
+
+                    if(diverFilter.get().isCompositeCondition()) {
+                        // Find all id where count > 1, we cannot do it at sql level due to parallelStream()
+                        List<Integer> d = ids.stream()
+                                .collect(Collectors.groupingBy(i -> i.getSurveyId(), Collectors.counting()))
+                                .entrySet()
+                                .stream()
+                                .filter(e -> e.getValue() > 1)
+                                .map(Map.Entry::getKey)
+                                .collect(Collectors.toList());
+
+                        uniqueIds = new HashSet<>(d);
+                    }
+                    else {
+                        // Make is unique by add to set
+                        uniqueIds = new HashSet<>(ids.stream().map(m -> m.getSurveyId()).collect(Collectors.toList()));
+                    }
+
                     // Expend and add filter, you should never see empty ids here
                     f.add(new Filter(
                             SurveyFilterCondition.SupportedFilters.SURVEY_ID.toString(),
-                            String.join(",", ids.stream().map(i -> i.toString()).collect(Collectors.toList())),
+                            String.join(",", uniqueIds.stream().map(i -> i.toString()).collect(Collectors.toList())),
                             SurveyFilterCondition.IN,
                             null,
                             null));

@@ -7,6 +7,9 @@ import java.util.List;
 
 public class Filter {
 
+    public static final String AND = "and";
+    public static final String OR = "or";
+
     private String fieldName;
 
     private String operation;
@@ -34,7 +37,7 @@ public class Filter {
 
     @JsonIgnore
     public boolean isAndOperation() {
-        return this.getOperation() != null && this.getOperation().toLowerCase().equals("and");
+        return this.getOperation() != null && this.getOperation().equalsIgnoreCase(AND);
     }
 
     public String getFieldName() {

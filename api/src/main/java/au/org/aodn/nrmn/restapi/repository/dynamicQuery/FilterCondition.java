@@ -28,8 +28,8 @@ public abstract class FilterCondition {
         String getDBFieldName();
     }
 
-    public static <T extends Enum<T>> boolean isContainFilter(List<Filter> fs, T v) {
-        return fs != null && fs.stream().filter(filter -> filter.getFieldName().equals(v.toString())).findFirst().isPresent();
+    public static <T extends Enum<T>> Optional<Filter> getFilter(List<Filter> fs, T v) {
+        return fs != null ? fs.stream().filter(filter -> filter.getFieldName().equals(v.toString())).findFirst() : Optional.empty();
     }
 
     protected static <T extends Enum<T>> boolean containsSupportField(List<Filter> fs, Class<T> e) {

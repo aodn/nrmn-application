@@ -1,10 +1,8 @@
 package au.org.aodn.nrmn.restapi.repository;
 
 import au.org.aodn.nrmn.restapi.controller.filter.Filter;
-import au.org.aodn.nrmn.restapi.dto.survey.SurveyFilterDto;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
-import au.org.aodn.nrmn.restapi.repository.projections.SurveyRow;
 import au.org.aodn.nrmn.restapi.repository.projections.SurveyRowCacheable;
 import au.org.aodn.nrmn.restapi.repository.projections.SurveyRowDivers;
 
@@ -18,10 +16,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.MultiValueMap;
 
 import javax.persistence.QueryHint;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 
@@ -80,9 +80,9 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
         @Query("SELECT DISTINCT new au.org.aodn.nrmn.restapi.repository.projections.SurveyRowDivers(o.surveyMethod.survey.surveyId, o.diver.fullName) from Observation o where o.surveyMethod.survey.surveyId IN (:surveyIds)")
         List<SurveyRowDivers> getDiversForSurvey(@Param("surveyIds") List<Integer> surveyIds);
 
-        @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
-        @Query("SELECT DISTINCT o.surveyMethod.survey.surveyId from Observation o where o.observationId IN (:observationIds)")
-        List<Integer> getSurveyFromObservation(@Param("observationIds") List<Integer> surveyIds);
+        @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "false") })
+        @Query("SELECT DISTINCT new au.org.aodn.nrmn.restapi.repository.projections.SurveyRowDivers(o.surveyMethod.survey.surveyId, o.diver.diverId) from Observation o where o.observationId IN (:observationIds)")
+        List<SurveyRowDivers> getSurveyFromObservation(@Param("observationIds") List<Integer> surveyIds);
 
         @Modifying
         @Query("UPDATE Survey s SET s.updated = current_timestamp()")

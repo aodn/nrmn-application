@@ -11,10 +11,18 @@ import lombok.Value;
 @Value
 public class SurveyRowDivers {
     private Integer surveyId;
+    private Integer diverId;
     private String diverName;
 
     public SurveyRowDivers(Integer surveyId, String diverName) {
         this.surveyId = surveyId;
+        this.diverId = null;
         this.diverName = diverName;
+    }
+
+    public SurveyRowDivers(Integer surveyId, Integer diverId) {
+        this.surveyId = surveyId;
+        this.diverId = diverId;
+        this.diverName = null;
     }
 }
