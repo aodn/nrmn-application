@@ -32,6 +32,11 @@ public class Filter {
         return conditions != null;
     }
 
+    @JsonIgnore
+    public boolean isAndOperation() {
+        return this.getOperation() != null && this.getOperation().toLowerCase().equals("and");
+    }
+
     public String getFieldName() {
         return fieldName;
     }
@@ -42,6 +47,10 @@ public class Filter {
 
     public String getValue() {
         return value;
+    }
+
+    public List<Filter> getConditions() {
+        return this.conditions;
     }
 
     @JsonSetter("field")

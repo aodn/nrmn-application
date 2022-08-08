@@ -51,17 +51,31 @@ public class ObservationFilterCondition extends FilterCondition {
                 if(target != null) {
                     switch (target) {
                         case DIVER_NAME : {
-                            specifications.add(
-                                    filter.isCompositeCondition() ?
-                                            null :
-                                            condition.getJoinDiverFieldSpecification(target.getDBFieldName(), filter.getValue(), filter.getOperation()));
+                            if(filter.isCompositeCondition()) {
+                                specifications.add(
+                                        condition.getJoinDiverFieldSpecification(
+                                                target,
+                                                filter.isAndOperation(),
+                                                filter.getConditions().get(0),
+                                                filter.getConditions().get(1)));
+                            }
+                            else {
+                                specifications.add(condition.getJoinDiverFieldSpecification(target, filter));
+                            }
                             break;
                         }
                         case SURVEY_ID: {
-                            specifications.add(
-                                    filter.isCompositeCondition() ?
-                                            null :
-                                            condition.getJoinSurveyFieldSpecification(target.getDBFieldName(), filter.getValue(), filter.getOperation()));
+                            if(filter.isCompositeCondition()) {
+                                specifications.add(
+                                        condition.getJoinSurveyFieldSpecification(
+                                                target,
+                                                filter.isAndOperation(),
+                                                filter.getConditions().get(0),
+                                                filter.getConditions().get(1)));
+                            }
+                            else {
+                                specifications.add(condition.getJoinSurveyFieldSpecification(target, filter));
+                            }
                             break;
                         }
                     }}
@@ -78,19 +92,36 @@ public class ObservationFilterCondition extends FilterCondition {
         }
     }
 
-    protected Specification<Observation> getJoinSurveyFieldSpecification(String field, String value, String operation) {
+    protected Specification<Observation> getJoinSurveyFieldSpecification(SupportedFilters target, boolean isAnd, Filter filter1, Filter filter2) {
         return ((root, query, criteriaBuilder) -> {
             Join<Observation, SurveyMethodEntity> surveyMethodEntityJoin = root.join("surveyMethod", JoinType.INNER);
             Join<SurveyMethodEntity, Survey> surveyJoin = surveyMethodEntityJoin.join("survey", JoinType.INNER);
 
-            return getSimpleFieldSpecification(surveyMethodEntityJoin, surveyJoin, criteriaBuilder, field, value, operation);
+            return getSimpleFieldSpecification(surveyJoin, criteriaBuilder, target.getDBFieldName() , isAnd, filter1, filter2);
         });
     }
 
-    protected Specification<Observation> getJoinDiverFieldSpecification(String field, String value, String operation) {
+    protected Specification<Observation> getJoinSurveyFieldSpecification(SupportedFilters target, Filter filter) {
+        return ((root, query, criteriaBuilder) -> {
+            Join<Observation, SurveyMethodEntity> surveyMethodEntityJoin = root.join("surveyMethod", JoinType.INNER);
+            Join<SurveyMethodEntity, Survey> surveyJoin = surveyMethodEntityJoin.join("survey", JoinType.INNER);
+
+            return getSimpleFieldSpecification(surveyJoin, criteriaBuilder, target.getDBFieldName(), filter.getValue(), filter.getOperation());
+        });
+    }
+
+    protected Specification<Observation> getJoinDiverFieldSpecification(SupportedFilters target, boolean isAnd, Filter filter1, Filter filter2) {
         return ((root, query, criteriaBuilder) -> {
             Join<Observation, Diver> diver = root.join("diver", JoinType.INNER);
-            return getSimpleFieldSpecification(root, diver, criteriaBuilder, field, value, operation);
+
+            return getSimpleFieldSpecification(diver, criteriaBuilder, target.getDBFieldName(), isAnd, filter1, filter2);
+        });
+    }
+
+    protected Specification<Observation> getJoinDiverFieldSpecification(SupportedFilters target, Filter filter) {
+        return ((root, query, criteriaBuilder) -> {
+            Join<Observation, Diver> diver = root.join("diver", JoinType.INNER);
+            return getSimpleFieldSpecification(diver, criteriaBuilder, target.getDBFieldName(), filter.getValue(), filter.getOperation());
         });
     }
 }

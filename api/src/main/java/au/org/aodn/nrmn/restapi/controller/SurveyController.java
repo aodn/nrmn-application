@@ -85,9 +85,9 @@ public class SurveyController {
                         .collect(Collectors.toList());
 
                 if(!obs_ids.isEmpty()) {
-                    // We need a special query to get unique survey id given observation id, the return id can long
-                    // and hence we need to split it in group and query them
-                    List<List<Integer>> partitionIds = ListUtils.partition(obs_ids, 20000);
+                    // We need a special query to get unique survey id given observation id, the return id list can
+                    // be very long and exceed sql param limit and hence we need to split it in group and query them
+                    List<List<Integer>> partitionIds = ListUtils.partition(obs_ids, 15000);
 
                     // Set make id distinct
                     Set<Integer> ids = ConcurrentHashMap.newKeySet();
@@ -96,15 +96,23 @@ public class SurveyController {
                         ids.addAll(surveyRepository.getSurveyFromObservation(l));
                     });
 
-                    if(!ids.isEmpty()) {
-                        // Expend and add filter
-                        f.add(new Filter(
-                                SurveyFilterCondition.SupportedFilters.SURVEY_ID.toString(),
-                                String.join(",", ids.stream().map(i -> i.toString()).collect(Collectors.toList())),
-                                SurveyFilterCondition.IN,
-                                null,
-                                null));
-                    }
+                    // Expend and add filter, you should never see empty ids here
+                    f.add(new Filter(
+                            SurveyFilterCondition.SupportedFilters.SURVEY_ID.toString(),
+                            String.join(",", ids.stream().map(i -> i.toString()).collect(Collectors.toList())),
+                            SurveyFilterCondition.IN,
+                            null,
+                            null));
+                }
+                else {
+                    // User search by diver, but non of the observation id matches, we put a condition that cause
+                    // the search return nothing.
+                    f.add(new Filter(
+                            SurveyFilterCondition.SupportedFilters.SURVEY_ID.toString(),
+                            ",",
+                            SurveyFilterCondition.IN,
+                            null,
+                            null));
                 }
             }
         }

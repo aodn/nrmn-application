@@ -138,18 +138,32 @@ public class SurveyFilterCondition extends FilterCondition {
                     switch (target) {
 
                         case PROGRAMS: {
-                            specifications.add(
-                                    filter.isCompositeCondition() ?
-                                            null :
-                                            condition.getJoinProgramFieldSpecification(target.getDBFieldName(), filter.getValue(), filter.getOperation()));
+                            if(filter.isCompositeCondition()) {
+                                specifications.add(
+                                        condition.getJoinProgramFieldSpecification(
+                                                target,
+                                                filter.isAndOperation(),
+                                                filter.getConditions().get(0),
+                                                filter.getConditions().get(1)));
+                            }
+                            else {
+                                specifications.add(condition.getJoinProgramFieldSpecification(target, filter));
+                            }
                             break;
                         }
 
                         case LOCATION_NAME : {
-                            specifications.add(
-                                    filter.isCompositeCondition() ?
-                                            null :
-                                            condition.getJoinLocationFieldSpecification(target.getDBFieldName(), filter.getValue(), filter.getOperation()));
+                            if(filter.isCompositeCondition()) {
+                                specifications.add(
+                                        condition.getJoinLocationFieldSpecification(
+                                                target,
+                                                filter.isAndOperation(),
+                                                filter.getConditions().get(0),
+                                                filter.getConditions().get(1)));
+                            }
+                            else {
+                            }
+                                specifications.add(condition.getJoinLocationFieldSpecification(target, filter));
                             break;
                         }
 
@@ -157,57 +171,59 @@ public class SurveyFilterCondition extends FilterCondition {
                         case COUNTRY :
                         case SITE_CODE :
                         case SITE_NAME : {
-                            specifications.add(
-                                    filter.isCompositeCondition() ?
-                                            null :
-                                            condition.getJoinSiteFieldSpecification(target.getDBFieldName(), filter.getValue(), filter.getOperation()));
+                            if(filter.isCompositeCondition()) {
+                                specifications.add(
+                                        condition.getJoinSiteFieldSpecification(
+                                                target,
+                                                filter.isAndOperation(),
+                                                filter.getConditions().get(0),
+                                                filter.getConditions().get(1)));
+                            }
+                            else {
+                                specifications.add(condition.getJoinSiteFieldSpecification(target, filter));
+                            }
                             break;
                         }
                         case SURVEY_DATE :
                         case SURVEY_ID : {
-                            specifications.add(
-                                    filter.isCompositeCondition() ?
-                                            null :
-                                            condition.getSimpleFieldSpecification(target.getDBFieldName(), filter.getValue(), filter.getOperation()));
+                            if(filter.isCompositeCondition()) {
+                                specifications.add(
+                                        condition.getSurveyFieldSpecification(target,
+                                                filter.isAndOperation(),
+                                                filter.getConditions().get(0),
+                                                filter.getConditions().get(1)));
+                            }
+                            else {
+                                specifications.add(condition.getSurveyFieldSpecification(target, filter));
+                            }
                             break;
                         }
                         case DEPTH : {
                             // Special handle, please refer to SurveyRowCacheable, logic make sense?
                             if(filter.isCompositeCondition()) {
-
+                                specifications.add(
+                                        condition.getDepthSpecification(
+                                                target,
+                                                filter.isAndOperation(),
+                                                filter.getConditions().get(0),
+                                                filter.getConditions().get(1)));
                             }
                             else {
-                                String[] i = filter.getValue().split("\\.");
-
-                                specifications.add(condition.getSimpleFieldSpecification(target.getDBFieldName(), i[0], filter.getOperation()));
-
-                                if (i.length > 1) {
-                                    // We have something after dot
-                                    specifications.add(condition.getSimpleFieldSpecification("surveyNum", i[1], filter.getOperation()));
-                                }
+                                specifications.add(condition.getDepthSpecification(target, filter));
                             }
                             break;
                         }
                         case HAS_PQs : {
-                            // True if not equals null, so we need to rewrite the query
-
                             if(filter.isCompositeCondition()) {
-
+                                specifications.add(
+                                        condition.getHasPQSpecification(
+                                                target,
+                                                filter.isAndOperation(),
+                                                filter.getConditions().get(0),
+                                                filter.getConditions().get(1)));
                             }
                             else {
-                                boolean positive = filter.getValue().toLowerCase().matches("^(t|tr|tru|true)");
-                                boolean negative = filter.getValue().toLowerCase().matches("^(f|fa|fal|fals|false)");
-
-                                if(positive) {
-                                    specifications.add(condition.getSimpleFieldSpecification(target.getDBFieldName(), null, "notBlank"));
-                                }
-                                else if(negative) {
-                                    specifications.add(condition.getSimpleFieldSpecification(target.getDBFieldName(), null, "blank"));
-                                }
-                                else {
-                                    // A string that will never match if user type something else
-                                    specifications.add(condition.getSimpleFieldSpecification(target.getDBFieldName(), "-", "equals"));
-                                }
+                                specifications.add(condition.getHasPQSpecification(target, filter));
                             }
                             break;
                         }
@@ -226,31 +242,149 @@ public class SurveyFilterCondition extends FilterCondition {
         }
     }
 
-    protected Specification<Survey> getJoinLocationFieldSpecification(String field, String value, String operation) {
+    protected Filter getHasPqFilterBy(Filter filter) {
+        // True = not equals blank, so we need to rewrite the query
+        Filter f = new Filter();
+
+        if (filter.getValue().toLowerCase().matches("^(t|tr|tru|true)")) {
+            f.setOperation(SurveyFilterCondition.NOT_BLANK);
+        }
+        else if (filter.getValue().toLowerCase().matches("^(f|fa|fal|fals|false)")) {
+            f.setOperation(SurveyFilterCondition.BLANK);
+        }
+        else {
+            // A string that will never match if user type something else
+            f.setOperation(SurveyFilterCondition.EQUALS);
+            f.setValue("-");
+        }
+        return f;
+    }
+
+    protected Specification<Survey> getHasPQSpecification(final SupportedFilters target, boolean isAnd, Filter filter1, Filter filter2) {
+        return (root, query, criteriaBuilder) -> {
+            Filter f1 = getHasPqFilterBy(filter1);
+            Filter f2 = getHasPqFilterBy(filter2);
+
+            return getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), isAnd, f1, f2);
+        };
+    }
+
+    protected Specification<Survey> getHasPQSpecification(final SupportedFilters target, final Filter filter) {
+        return (root, query, criteriaBuilder) -> {
+            Filter f = getHasPqFilterBy(filter);
+            return getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), f.getValue(), f.getOperation());
+        };
+    }
+
+    protected List<Filter> getDepthFilterBy(Filter filter) {
+        String[] i = filter.getValue().split("\\.");
+        List<Filter> result = new ArrayList<>();
+        Filter f1 = new Filter();
+
+        // if value is .xxxx, we assume user do not care what is in front
+        f1.setOperation("".equals(i[0].trim()) ? SurveyFilterCondition.NOT_BLANK : filter.getOperation());
+        f1.setValue(i[0]);
+        result.add(f1);
+
+        if(i.length > 1) {
+            // We have something after dot
+            Filter f2 = new Filter();
+            f2.setOperation(filter.getOperation());
+            f2.setValue(i[1]);
+            result.add(f2);
+        }
+
+        return result;
+    }
+
+    protected Specification<Survey> getDepthSpecification(final SupportedFilters target, boolean isAnd, Filter filter1, Filter filter2) {
+        return ((root, query, criteriaBuilder) -> {
+
+            Specification<Survey> spec1 = getDepthSpecification(target, filter1);
+            Specification<Survey> spec2 = getDepthSpecification(target, filter2);
+
+            if(isAnd) {
+                return criteriaBuilder.and(
+                        spec1.toPredicate(root, query, criteriaBuilder),
+                        spec2.toPredicate(root, query, criteriaBuilder));
+            }
+            else {
+                return criteriaBuilder.or(
+                        spec1.toPredicate(root, query, criteriaBuilder),
+                        spec2.toPredicate(root, query, criteriaBuilder));
+            }
+        });
+    }
+
+    protected Specification<Survey> getDepthSpecification(final SupportedFilters target, final Filter filter) {
+        return ((root, query, criteriaBuilder) -> {
+            List<Filter> f = getDepthFilterBy(filter);
+            Predicate spec = this.getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), f.get(0).getValue(), f.get(0).getOperation());
+
+            if (f.size() > 1) {
+                // We have something after dot
+                return criteriaBuilder.and(
+                        spec,
+                        getSimpleFieldSpecification(root, criteriaBuilder, "surveyNum", f.get(1).getValue(), f.get(1).getOperation()));
+            }
+            else {
+                return spec;
+            }
+        });
+    }
+
+    protected Specification<Survey> getJoinLocationFieldSpecification(final SupportedFilters target, boolean isAnd, Filter filter1, Filter filter2) {
         return ((root, query, criteriaBuilder) -> {
             Join<Survey, Site> site = root.join("site", JoinType.INNER);
             Join<Site, Location> location = site.join("location", JoinType.INNER);
-            return getSimpleFieldSpecification(site, location, criteriaBuilder, field, value, operation);
+            return getSimpleFieldSpecification(location, criteriaBuilder, target.getDBFieldName(), isAnd, filter1, filter2);
         });
     }
 
-    protected Specification<Survey> getJoinSiteFieldSpecification(String field, String value, String operation) {
+    protected Specification<Survey> getJoinLocationFieldSpecification(final SupportedFilters target, Filter filter) {
         return ((root, query, criteriaBuilder) -> {
             Join<Survey, Site> site = root.join("site", JoinType.INNER);
-            return getSimpleFieldSpecification(root, site, criteriaBuilder, field, value, operation);
+            Join<Site, Location> location = site.join("location", JoinType.INNER);
+            return getSimpleFieldSpecification(location, criteriaBuilder, target.getDBFieldName(), filter.getValue(), filter.getOperation());
         });
     }
 
-    protected Specification<Survey> getJoinProgramFieldSpecification(String field, String value, String operation) {
+    protected Specification<Survey> getJoinSiteFieldSpecification(final SupportedFilters target, boolean isAnd, Filter filter1, Filter filter2) {
+        return ((root, query, criteriaBuilder) -> {
+            Join<Survey, Site> site = root.join("site", JoinType.INNER);
+
+            return getSimpleFieldSpecification(site, criteriaBuilder, target.getDBFieldName(), isAnd, filter1, filter2);
+        });
+    }
+
+    protected Specification<Survey> getJoinSiteFieldSpecification(final SupportedFilters target, Filter filter) {
+        return ((root, query, criteriaBuilder) -> {
+            Join<Survey, Site> site = root.join("site", JoinType.INNER);
+            return getSimpleFieldSpecification(site, criteriaBuilder, target.getDBFieldName(), filter.getValue(), filter.getOperation());
+        });
+    }
+
+    protected Specification<Survey> getJoinProgramFieldSpecification(final SupportedFilters target, boolean isAnd, Filter filter1, Filter filter2) {
         return ((root, query, criteriaBuilder) -> {
             Join<Survey, Program> site = root.join("program", JoinType.INNER);
-            return getSimpleFieldSpecification(root, site, criteriaBuilder, field, value, operation);
+            return getSimpleFieldSpecification(site, criteriaBuilder,  target.getDBFieldName(), isAnd, filter1, filter2);
         });
     }
 
-    protected Specification<Survey> getSimpleFieldSpecification(String field, String value, String operation) {
-        return ((root, query, criteriaBuilder) ->
-                getSimpleFieldSpecification(root, null, criteriaBuilder, field, value, operation));
+    protected Specification<Survey> getJoinProgramFieldSpecification(final SupportedFilters target, Filter filter) {
+        return ((root, query, criteriaBuilder) -> {
+            Join<Survey, Program> site = root.join("program", JoinType.INNER);
+            return getSimpleFieldSpecification(site, criteriaBuilder,  target.getDBFieldName(), filter.getValue(), filter.getOperation());
+        });
     }
 
+    protected Specification<Survey> getSurveyFieldSpecification(final SupportedFilters target, boolean isAnd, Filter filter1, Filter filter2) {
+        return (root, query, criteriaBuilder) ->
+                getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), isAnd, filter1, filter2);
+    }
+
+    protected Specification<Survey> getSurveyFieldSpecification(final SupportedFilters target, Filter filter) {
+        return (root, query, criteriaBuilder) ->
+                getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), filter.getValue(), filter.getOperation());
+    }
 }

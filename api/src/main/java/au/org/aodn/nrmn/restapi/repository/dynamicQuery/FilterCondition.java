@@ -11,7 +11,6 @@ import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public abstract class FilterCondition {
 
@@ -46,20 +45,32 @@ public abstract class FilterCondition {
         return k.isPresent() ? k.get() : null;
     }
 
-    protected Predicate getSimpleFieldSpecification(
-            From<?, ?> root, From<?,?> table, CriteriaBuilder criteriaBuilder, String field, String value, String operation) {
+    protected Predicate getSimpleFieldSpecification(From<?,?> table, CriteriaBuilder criteriaBuilder, String field,  boolean isAnd, Filter filter1, Filter filter2) {
+        if(isAnd) {
+            return criteriaBuilder.and(
+                    getSimpleFieldSpecification(table, criteriaBuilder, field, filter1.getValue(), filter1.getOperation()),
+                    getSimpleFieldSpecification(table, criteriaBuilder, field, filter2.getValue(), filter2.getOperation())
+            );
+        }
+        else {
+            return criteriaBuilder.or(
+                    getSimpleFieldSpecification(table, criteriaBuilder, field, filter1.getValue(), filter1.getOperation()),
+                    getSimpleFieldSpecification(table, criteriaBuilder, field, filter2.getValue(), filter2.getOperation())
+            );
+        }
+    }
 
-        From<?,?> r = table == null ? root : table;
+    protected Predicate getSimpleFieldSpecification(From<?,?> table, CriteriaBuilder criteriaBuilder, String field, String value, String operation) {
 
         // Need to handle date field, as we cannot assume date format always yyyy-MM-dd
         Expression<String> target = null;
 
-        if(r.get(field).getJavaType() == Date.class) {
+        if(table.get(field).getJavaType() == Date.class) {
             // DB specific function call !!!!
-            target = criteriaBuilder.function("to_char", String.class, r.get(field), criteriaBuilder.literal("yyyy-MM-dd"));
+            target = criteriaBuilder.function("to_char", String.class, table.get(field), criteriaBuilder.literal("yyyy-MM-dd"));
         }
         else{
-            target = criteriaBuilder.lower(r.get(field).as(String.class));
+            target = criteriaBuilder.lower(table.get(field).as(String.class));
         }
 
         // Single condition
@@ -89,7 +100,7 @@ public abstract class FilterCondition {
             case BLANK: {
                 return criteriaBuilder.or(
                         criteriaBuilder.equal(target, ""),
-                        criteriaBuilder.isNull(r.get(field)));
+                        criteriaBuilder.isNull(table.get(field)));
             }
             case NOT_BLANK : {
                 return criteriaBuilder.notEqual(target, "");
