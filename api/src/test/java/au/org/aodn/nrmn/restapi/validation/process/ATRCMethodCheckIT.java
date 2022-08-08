@@ -14,6 +14,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 
@@ -49,7 +50,7 @@ class ATRCMethodCheckIT {
         StagedRow m2b1d8 = (StagedRow) SerializationUtils.clone(m1b1d8);
         m1b1d8.setMethod("2");
 
-        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"),
+        Collection<ValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"),
                 Arrays.asList(), Arrays.asList(m1b1, m2b1, m2b2, m1b1d8, m2b1d8));
 
         assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("ATRC Method must be [0-5], 7 or 10")));
@@ -81,7 +82,7 @@ class ATRCMethodCheckIT {
         StagedRow m5b3 = (StagedRow) SerializationUtils.clone(m3b1);
         m5b3.setBlock("5");
 
-        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"),
+        Collection<ValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"),
                 Arrays.asList(), Arrays.asList(m0b1, m0b2, m3b1, m3b3, m5b3));
 
         assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("ATRC Method must be [0-5], 7 or 10")));
@@ -107,7 +108,7 @@ class ATRCMethodCheckIT {
         StagedRow m2b1d8 = (StagedRow) SerializationUtils.clone(m1b1d8);
         m1b1d8.setMethod("2");
 
-        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false, Arrays.asList("ERZ1"),
+        Collection<ValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"),
                 Arrays.asList(), Arrays.asList(m1b1, m1b1d10, m1b1d8, m2b1d8));
 
         assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("ATRC Method must be [0-5], 7 or 10")));

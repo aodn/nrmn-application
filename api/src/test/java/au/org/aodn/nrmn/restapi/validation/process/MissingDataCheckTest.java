@@ -12,6 +12,7 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.model.db.ObsItemType;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
+import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 class MissingDataCheckTest extends FormattedTestProvider {
@@ -27,7 +28,7 @@ class MissingDataCheckTest extends FormattedTestProvider {
                 Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(6).build())
                         .observableItemName("No Species Found").build()));
 
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", formatted);
+        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
         assertTrue(errors.isEmpty());
     }
 
@@ -39,7 +40,7 @@ class MissingDataCheckTest extends FormattedTestProvider {
         formatted.setTotal(0);
         formatted.setCode("snd");
         formatted.setSpecies(Optional.of(ObservableItem.builder().observableItemName("Survey Not Done").build()));
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", formatted);
+        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
         assertTrue(errors.isEmpty());
     }
 
@@ -52,7 +53,7 @@ class MissingDataCheckTest extends FormattedTestProvider {
         formatted.setSpecies(
                 Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build())
                         .observableItemName("Pictilabrus laticlavius").letterCode("pla").build()));
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", formatted);
+        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
         assertTrue(errors.isEmpty());
     }
 
@@ -65,7 +66,7 @@ class MissingDataCheckTest extends FormattedTestProvider {
         formatted.setSpecies(
                 Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build())
                         .observableItemName("Pictilabrus laticlavius").letterCode("pla").build()));
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", formatted);
+        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
         assertFalse(errors.isEmpty());
     }
 }

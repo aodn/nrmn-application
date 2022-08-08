@@ -23,6 +23,7 @@ import au.org.aodn.nrmn.restapi.model.db.SecUser;
 import au.org.aodn.nrmn.restapi.model.db.SecUserTestData;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
@@ -115,7 +116,7 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .depth(depth)
                 .build();
 
-        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false,
+        Collection<ValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false,
                 Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
 
         Assertions.assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));
@@ -130,7 +131,7 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .date(date)
                 .depth(depth)
                 .build();
-        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false,
+        Collection<ValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false,
                 Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
 
         Assertions.assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));
@@ -145,7 +146,7 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .date(date)
                 .depth(depth)
                 .build();
-        Collection<ValidationError> res = validationProcess.checkFormatting("ATRC", false,
+        Collection<ValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false,
                 Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
 
         Assertions.assertTrue(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));

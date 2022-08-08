@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.validation.process;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.Method;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
+import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,7 @@ class SpeciesBelongToMethodCheckTest extends FormattedTestProvider {
         formatted.setSpecies(
                 Optional.of(ObservableItem.builder().observableItemName("THE SPECIES").methods(methods).build()));
 
-        Collection<ValidationError> errors = validationProcess.checkData("ATRC", false, Arrays.asList(formatted));
+        Collection<ValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
         assertFalse(errors.stream().anyMatch(p -> p.getMessage().contains("invalid for species")));
     }
 
@@ -39,7 +40,7 @@ class SpeciesBelongToMethodCheckTest extends FormattedTestProvider {
         formatted.setSpecies(
                 Optional.of(ObservableItem.builder().observableItemName("THE SPECIES").methods(methods).build()));
 
-        Collection<ValidationError> errors = validationProcess.checkData("ATRC", false, Arrays.asList(formatted));
+        Collection<ValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
         assertTrue(errors.stream().anyMatch(p -> p.getMessage().contains("invalid for species")));
     }
 }

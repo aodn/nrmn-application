@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
+import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,7 +26,7 @@ class TotalCheckSumTest extends FormattedTestProvider  {
         StagedRowFormatted row = getDefaultFormatted().build();
         row.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 1).put(4, 2).build());
         row.setTotal(3);
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", row);
+        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, row);
         assertTrue(errors.isEmpty());
     }
 
@@ -35,7 +36,7 @@ class TotalCheckSumTest extends FormattedTestProvider  {
         row.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 0).put(3, 1).put(4, 2).build());
         row.setInverts(2);
         row.setTotal(5);
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", row);
+        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, row);
         assertTrue(errors.isEmpty());
     }
 
@@ -44,7 +45,7 @@ class TotalCheckSumTest extends FormattedTestProvider  {
         StagedRowFormatted row = getDefaultFormatted().build();
         row.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(0, 1).put(3, 1).put(4, 2).build());
         row.setTotal(3);
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", row);
+        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, row);
         assertFalse(errors.isEmpty());
     }
 
@@ -53,7 +54,7 @@ class TotalCheckSumTest extends FormattedTestProvider  {
         StagedRowFormatted row = getDezFormatted().build();
         row.setInverts(0);
         row.setTotal(0);
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", row);
+        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, row);
         assertTrue(errors.isEmpty());
     }
 
@@ -62,7 +63,7 @@ class TotalCheckSumTest extends FormattedTestProvider  {
         StagedRowFormatted row = getDezFormatted().build();
         row.setInverts(1);
         row.setTotal(1);
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", row);
+        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, row);
         assertTrue(errors.isEmpty());
     }
 
@@ -71,7 +72,7 @@ class TotalCheckSumTest extends FormattedTestProvider  {
         StagedRowFormatted row = getDezFormatted().build();
         row.setInverts(0);
         row.setTotal(1);
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements("RLS", row);
+        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, row);
         assertFalse(errors.isEmpty());
     }
 }

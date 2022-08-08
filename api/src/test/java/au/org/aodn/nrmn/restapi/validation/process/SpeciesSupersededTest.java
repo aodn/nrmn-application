@@ -18,6 +18,7 @@ import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
 import au.org.aodn.nrmn.restapi.model.db.Method;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,7 +37,7 @@ class SpeciesSupersededTest {
         StagedRow row = new StagedRow();
         row.setSpecies("THE SPECIES");
         List<ObservableItem> species = Arrays.asList(ObservableItem.builder().observableItemName("THE SPECIES").supersededBy("NEXT SPECIES").methods(methods).build());
-        Collection<ValidationError> errors = validationProcess.checkFormatting("ATRC", false, Arrays.asList(), species, Arrays.asList(row));
+        Collection<ValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), species, Arrays.asList(row));
         assertTrue(errors.stream().anyMatch(p -> p.getMessage().contains("Superseded by")));
     }
 }
