@@ -16,34 +16,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.MultiValueMap;
 
 import javax.persistence.QueryHint;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 
 @Repository
 public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpecificationExecutor<Survey> {
 
-//        @Query("SELECT new au.org.aodn.nrmn.restapi.repository.projections.SurveyRowCacheable(" +
-//                "    sv.surveyId, " +
-//                "    sv.surveyDate, " +
-//                "    sv.surveyTime, " +
-//                "    sv.depth, " +
-//                "    sv.surveyNum, " +
-//                "    sv.pqCatalogued, " +
-//                "    sv.site.siteName, " +
-//                "    sv.site.siteCode, " +
-//                "    sv.site.mpa, " +
-//                "    sv.site.country, " +
-//                "    sv.program.programName, " +
-//                "    sv.site.location.locationName " +
-//                ") FROM Survey as sv " +
-//                "WHERE (:surveyId is null or CAST(sv.surveyId as text) LIKE :surveyId) ORDER BY sv.surveyId DESC")
-//        Page<SurveyRowCacheable> findAllProjectedBy(@Param("surveyId")  String surveyId, Pageable pageable);
         @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
         default Page<SurveyRowCacheable> findAllProjectedBy(List<Filter> filters, Pageable pageable) {
 

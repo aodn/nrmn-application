@@ -1,7 +1,6 @@
 package au.org.aodn.nrmn.restapi.repository.dynamicQuery;
 
 import au.org.aodn.nrmn.restapi.controller.filter.Filter;
-import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
