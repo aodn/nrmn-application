@@ -161,7 +161,7 @@ const SurveyList = () => {
             <AgGridColumn width={100} field="hasPQs" colId="survey.hasPQs"/>
             <AgGridColumn flex={1} field="mpa" colId="survey.mpa"/>
             <AgGridColumn flex={1} field="country" colId="survey.country"/>
-            <AgGridColumn flex={1} field="diverName" colId="observation.diverName"/>
+            <AgGridColumn flex={1} field="diverName" colId="survey.diverName"/>
           </AgGridReact>
         </>
       )}

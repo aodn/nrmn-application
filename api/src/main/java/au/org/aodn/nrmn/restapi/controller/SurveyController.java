@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -72,16 +73,8 @@ public class SurveyController {
         List<Filter> f = filters != null ? Arrays.stream((objMapper.readValue(filters, Filter[].class))).collect(Collectors.toList()) : null;
 
         // Diver name search need another table
-        Optional<Filter> diverFilter = ObservationFilterCondition.getFilter(f, ObservationFilterCondition.SupportedFilters.DIVER_NAME);
+        Optional<Filter> diverFilter = ObservationFilterCondition.getFilter(f, ObservationFilterCondition.SupportedFilters.DIVER_NAME_IN_SURVEY);
         if(diverFilter.isPresent()) {
-
-            if(diverFilter.get().isCompositeCondition()) {
-                // Diver name need special handle for composite selection, as observation to diver is 1 to 1 map,
-                // if use need AND operation between two filters for diver name, what it really means in db level is
-                // select observation's survey id, where either comes from diver 1 OR diver 2 therefore count
-                // survey id will > 1
-                diverFilter.get().setOperation(Filter.OR);
-            }
 
             Specification<Observation> observationSpecification = ObservationFilterCondition.createSpecification(f);
 
@@ -100,32 +93,11 @@ public class SurveyController {
                     List<List<Integer>> partitionIds = ListUtils.partition(obs_ids, 15000);
 
                     // Store all survey id first
-                    List<SurveyRowDivers> ids = Collections.synchronizedList(new ArrayList<>());
+                    Set<Integer> uniqueIds = new ConcurrentSkipListSet<>();
 
                     partitionIds.parallelStream().forEach(l -> {
-                        ids.addAll(surveyRepository.getSurveyFromObservation(l));
+                        uniqueIds.addAll(surveyRepository.getSurveyFromObservation(l));
                     });
-
-                    Set<Integer> uniqueIds;
-
-                    if(diverFilter.get().isCompositeCondition()) {
-                        // Find all id where count > 1, we cannot do it at sql level due to parallelStream() that even
-                        // distinct is applied, we can see dup result, just fewer items return
-                        Map<Integer, Set<Integer>> temp = ids.stream()
-                                .collect(Collectors.groupingBy(i -> i.getSurveyId(), Collectors.mapping(divers -> divers.getDiverId(), Collectors.toSet())));
-
-                        // Since we group by set, the value are unique
-                        uniqueIds = temp
-                                .entrySet()
-                                .stream()
-                                .filter(k -> k.getValue().size() > 1)
-                                .map(j -> j.getKey())
-                                .collect(Collectors.toSet());
-                    }
-                    else {
-                        // Make is unique by add to set
-                        uniqueIds = ids.stream().map(m -> m.getSurveyId()).collect(Collectors.toSet());
-                    }
 
                     // Expend and add filter, you should never see empty ids here
                     f.add(new Filter(

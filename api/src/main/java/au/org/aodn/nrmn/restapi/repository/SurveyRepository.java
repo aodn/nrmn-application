@@ -20,6 +20,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.QueryHint;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 
@@ -63,8 +64,8 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
         List<SurveyRowDivers> getDiversForSurvey(@Param("surveyIds") List<Integer> surveyIds);
 
         @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "false") })
-        @Query("SELECT new au.org.aodn.nrmn.restapi.repository.projections.SurveyRowDivers(o.surveyMethod.survey.surveyId, o.diver.diverId) from Observation o where o.observationId IN (:observationIds)")
-        List<SurveyRowDivers> getSurveyFromObservation(@Param("observationIds") List<Integer> surveyIds);
+        @Query("SELECT DISTINCT o.surveyMethod.survey.surveyId from Observation o where o.observationId IN (:observationIds)")
+        Set<Integer> getSurveyFromObservation(@Param("observationIds") List<Integer> surveyIds);
 
         @Modifying
         @Query("UPDATE Survey s SET s.updated = current_timestamp()")
