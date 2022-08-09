@@ -25,4 +25,16 @@ public class SurveyRowDivers {
         this.diverId = diverId;
         this.diverName = null;
     }
+
+    protected <T> boolean valueEquals(T a, T b) {
+        if(a == null && b == null) {
+            return true;
+        }
+        else if(a != null) {
+            return a.equals(b);
+        }
+        else {
+            return b.equals(a);
+        }
+    }
 }

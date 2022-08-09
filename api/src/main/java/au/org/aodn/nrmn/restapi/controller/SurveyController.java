@@ -17,6 +17,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.ListUtils;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -37,6 +39,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Surveys")
 @RequestMapping(path = "/api/v1/data")
 public class SurveyController {
+
+    protected Logger logger = LoggerFactory.getLogger(SurveyController.class);
 
     @Autowired
     private ObservationRepository observationRepository;
@@ -85,17 +89,17 @@ public class SurveyController {
             Specification<Observation> observationSpecification = ObservationFilterCondition.createSpecification(f);
 
             if(observationSpecification != null) {
-                // User wants to filter by diver name, we need to get the list of survey id that matches and
-                // add it to the filter for next search
+                // User wants to filter by diver name, we need to get the list of survey id from observation id
+                // that matches and add it to the filter for next search
                 List<Observation> o = observationRepository.findAll(observationSpecification);
                 List<Integer> obs_ids = o.stream()
                         .map(m -> m.getObservationId())
-                        .distinct()
                         .collect(Collectors.toList());
 
                 if(!obs_ids.isEmpty()) {
-                    // We need a special query to get survey id given observation id, id can
+                    // We need a special query to get survey id given observation id, observation id can
                     // be very long and exceed sql param limit and hence we need to split it in group and query them
+                    // Call the observation and link it to the survey id from object is too slow.
                     List<List<Integer>> partitionIds = ListUtils.partition(obs_ids, 15000);
 
                     // Store all survey id first
@@ -108,20 +112,22 @@ public class SurveyController {
                     Set<Integer> uniqueIds;
 
                     if(diverFilter.get().isCompositeCondition()) {
-                        // Find all id where count > 1, we cannot do it at sql level due to parallelStream()
-                        List<Integer> d = ids.stream()
-                                .collect(Collectors.groupingBy(i -> i.getSurveyId(), Collectors.counting()))
+                        // Find all id where count > 1, we cannot do it at sql level due to parallelStream() that even
+                        // distinct is applied, we can see dup result, just fewer items return
+                        Map<Integer, Set<Integer>> temp = ids.stream()
+                                .collect(Collectors.groupingBy(i -> i.getSurveyId(), Collectors.mapping(divers -> divers.getDiverId(), Collectors.toSet())));
+
+                        // Since we group by set, the value are unique
+                        uniqueIds = temp
                                 .entrySet()
                                 .stream()
-                                .filter(e -> e.getValue() > 1)
-                                .map(Map.Entry::getKey)
-                                .collect(Collectors.toList());
-
-                        uniqueIds = new HashSet<>(d);
+                                .filter(k -> k.getValue().size() > 1)
+                                .map(j -> j.getKey())
+                                .collect(Collectors.toSet());
                     }
                     else {
                         // Make is unique by add to set
-                        uniqueIds = new HashSet<>(ids.stream().map(m -> m.getSurveyId()).collect(Collectors.toList()));
+                        uniqueIds = ids.stream().map(m -> m.getSurveyId()).collect(Collectors.toSet());
                     }
 
                     // Expend and add filter, you should never see empty ids here
