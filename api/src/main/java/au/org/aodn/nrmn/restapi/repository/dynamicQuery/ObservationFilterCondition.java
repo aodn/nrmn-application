@@ -142,6 +142,26 @@ public class ObservationFilterCondition extends FilterCondition {
     /**
      * The diver name is present in different way in survey and needs different handle. The diver name are contact
      * to a single string and multiple filter are applied to the concat string
+     *
+     * This is the same query as show below using dynamic query
+     *
+     * select survey_method.survey_id from nrmn.observation
+     * inner join nrmn.survey_method
+     * on survey_method.survey_method_id = observation.survey_method_id
+     * WHERE survey_method.survey_id
+     * IN (
+     * select distinct survey_method.survey_id from nrmn.observation
+     * inner join nrmn.survey_method
+     * on survey_method.survey_method_id = observation.survey_method_id
+     * inner join nrmn.diver_ref ON diver_ref.diver_id = observation.diver_id
+     * where diver_ref.full_name like '%Fra%'
+     * AND survey_method.survey_id IN
+     * (select distinct survey_method.survey_id from nrmn.observation
+     * inner join nrmn.survey_method
+     * on survey_method.survey_method_id = observation.survey_method_id
+     * inner join nrmn.diver_ref ON diver_ref.diver_id = observation.diver_id
+     * where diver_ref.full_name like '%ne'));
+     *
      * @param target
      * @param isAnd
      * @param filter1

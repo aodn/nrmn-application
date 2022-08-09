@@ -7,6 +7,8 @@ import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {AuthContext} from '../../../contexts/auth-context';
 import 'ag-grid-enterprise';
 import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const SurveyList = () => {
   const rowsPerPage = 50;
@@ -14,6 +16,7 @@ const SurveyList = () => {
   const location = useLocation();
   const gridRef = useRef(null);
   const [redirect, setRedirect] = useState();
+  const [loading, setLoading] = React.useState(false);
 
   const onGridReady = useCallback((event) => {
     async function fetchSurveys(e) {
@@ -52,8 +55,10 @@ const SurveyList = () => {
 
           getResult(url)
             .then(res => {
-              console.log(params);
               params.successCallback(res.data.items, res.data.lastRow);
+            })
+            .finally(()=> {
+              setLoading(false);
             });
         }
       });
@@ -74,6 +79,11 @@ const SurveyList = () => {
     <AuthContext.Consumer>
       {({auth}) => (
         <>
+          <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={loading}>
+            <CircularProgress color="inherit" />
+          </Backdrop>
           <Box display="flex" flexDirection="row" p={1} pb={1}>
             <Box flexGrow={1}>
               <Typography variant="h4">Surveys</Typography>
@@ -90,7 +100,10 @@ const SurveyList = () => {
             paginationPageSize={rowsPerPage}
             rowModelType={'infinite'}
             onGridReady={(e) => onGridReady(e)}
-            onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
+            onFilterChanged={(e) => {
+              setLoading(true);
+              stateFilterHandler.stateFilterEventHandler(gridRef, e);
+              }}
             context={{useOverlay: 'Loading Surveys'}}
             components={{loadingOverlay: LoadingOverlay}}
             loadingOverlayComponent="loadingOverlay"

@@ -82,27 +82,16 @@ public class SurveyController {
                 // User wants to filter by diver name, we need to get the list of survey id from observation id
                 // that matches and add it to the filter for next search
                 List<Observation> o = observationRepository.findAll(observationSpecification);
-                List<Integer> obs_ids = o.stream()
-                        .map(m -> m.getObservationId())
+                List<String> ids = o.stream()
+                        .map(m -> m.getSurveyMethod().getSurvey().getSurveyId().toString())
+                        .distinct()
                         .collect(Collectors.toList());
 
-                if(!obs_ids.isEmpty()) {
-                    // We need a special query to get survey id given observation id, observation id can
-                    // be very long and exceed sql param limit and hence we need to split it in group and query them
-                    // Call the observation and link it to the survey id from object is too slow.
-                    List<List<Integer>> partitionIds = ListUtils.partition(obs_ids, 15000);
-
-                    // Store all survey id first
-                    Set<Integer> uniqueIds = new ConcurrentSkipListSet<>();
-
-                    partitionIds.parallelStream().forEach(l -> {
-                        uniqueIds.addAll(surveyRepository.getSurveyFromObservation(l));
-                    });
-
+                if(!ids.isEmpty()) {
                     // Expend and add filter, you should never see empty ids here
                     f.add(new Filter(
                             SurveyFilterCondition.SupportedFilters.SURVEY_ID.toString(),
-                            String.join(",", uniqueIds.stream().map(i -> i.toString()).collect(Collectors.toList())),
+                            String.join(",", ids),
                             SurveyFilterCondition.IN,
                             null,
                             null));
