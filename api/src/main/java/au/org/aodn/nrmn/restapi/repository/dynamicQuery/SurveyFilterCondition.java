@@ -390,15 +390,15 @@ public class SurveyFilterCondition extends FilterCondition {
 
     protected Specification<Survey> getJoinProgramFieldSpecification(final SupportedFields target, boolean isAnd, Filter filter1, Filter filter2) {
         return ((root, query, criteriaBuilder) -> {
-            Join<Survey, Program> site = root.join("program", JoinType.INNER);
-            return getSimpleFieldSpecification(site, criteriaBuilder,  target.getDBFieldName(), isAnd, filter1, filter2);
+            Join<Survey, Program> prog = root.join("program", JoinType.INNER);
+            return getSimpleFieldSpecification(prog, criteriaBuilder,  target.getDBFieldName(), isAnd, filter1, filter2);
         });
     }
 
     protected Specification<Survey> getJoinProgramFieldSpecification(final SupportedFields target, Filter filter) {
         return ((root, query, criteriaBuilder) -> {
-            Join<Survey, Program> site = root.join("program", JoinType.INNER);
-            return getSimpleFieldSpecification(site, criteriaBuilder,  target.getDBFieldName(), filter.getValue(), filter.getOperation());
+            Join<Survey, Program> prog = root.join("program", JoinType.INNER);
+            return getSimpleFieldSpecification(prog, criteriaBuilder,  target.getDBFieldName(), filter.getValue(), filter.getOperation());
         });
     }
 
@@ -420,18 +420,29 @@ public class SurveyFilterCondition extends FilterCondition {
                 SupportedFields target = getFieldEnum(sortItem.getFieldName(), SupportedFields.class);
                 if(target != null) {
                     switch (target) {
-                        case SURVEY_DATE :
-                        case SURVEY_ID : {
-                            orders.add(getItemOrdering(root, criteriaBuilder, sortItem));
+                        case PROGRAMS: {
+                            Join<Survey, Program> prog = root.join("program", JoinType.INNER);
+                            orders.add(getItemOrdering(prog, criteriaBuilder, sortItem));
                             break;
                         }
-
+                        case LOCATION_NAME: {
+                            Join<Survey, Site> site = root.join("site", JoinType.INNER);
+                            Join<Site, Location> location = site.join("location", JoinType.INNER);
+                            orders.add(getItemOrdering(location, criteriaBuilder, sortItem));
+                            break;
+                        }
                         case MPA :
                         case COUNTRY :
                         case SITE_CODE :
                         case SITE_NAME : {
                             Join<Survey, Site> site = root.join("site", JoinType.INNER);
                             orders.add(getItemOrdering(site, criteriaBuilder, sortItem));
+                            break;
+                        }
+                        case HAS_PQs:
+                        case SURVEY_DATE :
+                        case SURVEY_ID : {
+                            orders.add(getItemOrdering(root, criteriaBuilder, sortItem));
                             break;
                         }
                         case DEPTH : {
@@ -457,7 +468,7 @@ public class SurveyFilterCondition extends FilterCondition {
     protected Order getItemOrderingContact(From<?,?> from, CriteriaBuilder criteriaBuilder, String f1, String f2, boolean isAsc) {
         // It is field1 . field2, we do this because the field on screen is a concat of two fields in db
         Expression<String> c = criteriaBuilder.concat(
-                criteriaBuilder.concat(from.get(f1), criteriaBuilder.literal(".")),
+                criteriaBuilder.concat(from.get(f1), "."),
                 from.get(f2));
 
         return (isAsc ? criteriaBuilder.asc(c) : criteriaBuilder.desc(c));
