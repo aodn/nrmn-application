@@ -1,19 +1,18 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import au.org.aodn.nrmn.restapi.controller.filter.Filter;
+import au.org.aodn.nrmn.restapi.controller.transform.Filter;
+import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
 import au.org.aodn.nrmn.restapi.model.db.Observation;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.dynamicQuery.ObservationFilterCondition;
 import au.org.aodn.nrmn.restapi.repository.dynamicQuery.SurveyFilterCondition;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.collections4.ListUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,15 +64,17 @@ public class SurveyController {
      * @return
      */
     @GetMapping(path = "/surveys")
-    public ResponseEntity<?> listMatching(@RequestParam(value = "filters", required = false) String filters,
+    public ResponseEntity<?> listMatching(@RequestParam(value = "sort", required = false) String sort,
+                                          @RequestParam(value = "filters", required = false) String filters,
                                           @RequestParam(value = "page", defaultValue = "0") int page,
                                           @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) throws JsonProcessingException {
 
         // RequestParam do not support json object parsing automatically
         List<Filter> f = filters != null ? Arrays.stream((objMapper.readValue(filters, Filter[].class))).collect(Collectors.toList()) : null;
+        List<Sorter> s = sort != null ? Arrays.stream((objMapper.readValue(sort, Sorter[].class))).collect(Collectors.toList()) : null;
 
-        // Diver name search need another table
-        Optional<Filter> diverFilter = ObservationFilterCondition.getFilter(f, ObservationFilterCondition.SupportedFilters.DIVER_NAME_IN_SURVEY);
+        // Diver name search need another table, we do not need to apply sorting here as it is just intermediate result.
+        Optional<Filter> diverFilter = ObservationFilterCondition.getSupportField(f, ObservationFilterCondition.SupportedFilters.DIVER_NAME_IN_SURVEY);
         if(diverFilter.isPresent()) {
 
             Specification<Observation> observationSpecification = ObservationFilterCondition.createSpecification(f);
@@ -90,30 +91,27 @@ public class SurveyController {
                 if(!ids.isEmpty()) {
                     // Expend and add filter, you should never see empty ids here
                     f.add(new Filter(
-                            SurveyFilterCondition.SupportedFilters.SURVEY_ID.toString(),
+                            SurveyFilterCondition.SupportedFields.SURVEY_ID.toString(),
                             String.join(",", ids),
                             SurveyFilterCondition.IN,
-                            null,
                             null));
                 }
                 else {
                     // User search by diver, but non of the observation id matches, we put a condition that cause
                     // the search return nothing.
                     f.add(new Filter(
-                            SurveyFilterCondition.SupportedFilters.SURVEY_ID.toString(),
+                            SurveyFilterCondition.SupportedFields.SURVEY_ID.toString(),
                             ",",
                             SurveyFilterCondition.IN,
-                            null,
                             null));
                 }
             }
         }
 
-        var surveyRows = surveyRepository
-                .findAllProjectedBy(f, PageRequest.of(page, pageSize));
+        var surveyRows = surveyRepository.findAllProjectedBy(f, s, PageRequest.of(page, pageSize));
 
         var surveyIds = surveyRows.stream()
-                .map(s -> s.getSurveyId())
+                .map(sid -> sid.getSurveyId())
                 .distinct()
                 .collect(Collectors.toList());
 
@@ -121,9 +119,9 @@ public class SurveyController {
                 .collect(Collectors.groupingBy(SurveyRowDivers::getSurveyId,
                         Collectors.mapping(SurveyRowDivers::getDiverName, Collectors.joining(", "))));
 
-        var surveyRowsWithDivers = surveyRows.stream().map(s -> {
-            s.setDiverNames(diverNames.get(s.getSurveyId()));
-            return s;
+        var surveyRowsWithDivers = surveyRows.stream().map(z -> {
+            z.setDiverNames(diverNames.get(z.getSurveyId()));
+            return z;
         }).collect(Collectors.toList());
 
         Map<String, Object> data = new HashMap<>();

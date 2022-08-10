@@ -1,11 +1,13 @@
 package au.org.aodn.nrmn.restapi.repository.dynamicQuery;
 
-import au.org.aodn.nrmn.restapi.controller.filter.Filter;
+import au.org.aodn.nrmn.restapi.controller.transform.Filter;
+import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
 import au.org.aodn.nrmn.restapi.model.db.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The purpose of this class is to generate select conditions based on incoming filter value, usually it is post
@@ -16,7 +18,7 @@ import java.util.*;
 
 public class SurveyFilterCondition extends FilterCondition {
 
-    public enum SupportedFilters implements DBField {
+    public enum SupportedFields implements DBField {
         PROGRAMS {
             @Override
             public String toString() {
@@ -119,127 +121,149 @@ public class SurveyFilterCondition extends FilterCondition {
         };
     }
 
-    public static Specification<Survey> createSpecification(List<Filter> filters) {
+    protected Specification<Survey> filtersSpec = null;
+    protected Specification<Survey> sortingSpec = null;
+
+    public static Specification<Survey> createSpecification(List<Filter> filters, List<Sorter> sort) {
         SurveyFilterCondition condition = new SurveyFilterCondition();
 
-        if(filters == null || filters.size() == 0 || !containsSupportField(filters, SupportedFilters.class)) {
-            // Return null means select all
-            return null;
+        if(!(filters == null || filters.size() == 0 || !containsSupportField(filters, SupportedFields.class))) {
+            condition.applyFilters(filters);
+        }
+
+        if(!(sort == null  || sort.size() == 0 || !containsSupportField(sort, SupportedFields.class))) {
+            condition.applySort(sort);
+        }
+
+        return condition.build();
+    }
+
+    protected Specification<Survey> build() {
+        if(filtersSpec == null) {
+            return sortingSpec;
         }
         else {
-            List<Specification<Survey>> specifications = new ArrayList<>();
+            return filtersSpec.and(sortingSpec);
+        }
+    }
 
-            filters.forEach(filter -> {
-                // Income filter name not always match the db field name, hence we need a switch
-                // plus some field need special handle
-                SupportedFilters target = getFieldEnum(filter.getFieldName(), SupportedFilters.class);
-                if(target != null) {
+    protected SurveyFilterCondition applySort(List<Sorter> sort) {
+        sortingSpec = createOrdering(sort);
+        return this;
+    }
 
-                    switch (target) {
+    protected SurveyFilterCondition applyFilters(List<Filter> filters) {
 
-                        case PROGRAMS: {
-                            if(filter.isCompositeCondition()) {
-                                specifications.add(
-                                        condition.getJoinProgramFieldSpecification(
-                                                target,
-                                                filter.isAndOperation(),
-                                                filter.getConditions().get(0),
-                                                filter.getConditions().get(1)));
-                            }
-                            else {
-                                specifications.add(condition.getJoinProgramFieldSpecification(target, filter));
-                            }
-                            break;
-                        }
+        List<Specification<Survey>> specifications = new ArrayList<>();
 
-                        case LOCATION_NAME : {
-                            if(filter.isCompositeCondition()) {
-                                specifications.add(
-                                        condition.getJoinLocationFieldSpecification(
-                                                target,
-                                                filter.isAndOperation(),
-                                                filter.getConditions().get(0),
-                                                filter.getConditions().get(1)));
-                            }
-                            else {
-                            }
-                                specifications.add(condition.getJoinLocationFieldSpecification(target, filter));
-                            break;
-                        }
+        filters.forEach(filter -> {
+            // Income filter name not always match the db field name, hence we need a switch
+            // plus some field need special handle
+            SupportedFields target = getFieldEnum(filter.getFieldName(), SupportedFields.class);
+            if(target != null) {
 
-                        case MPA :
-                        case COUNTRY :
-                        case SITE_CODE :
-                        case SITE_NAME : {
-                            if(filter.isCompositeCondition()) {
-                                specifications.add(
-                                        condition.getJoinSiteFieldSpecification(
-                                                target,
-                                                filter.isAndOperation(),
-                                                filter.getConditions().get(0),
-                                                filter.getConditions().get(1)));
-                            }
-                            else {
-                                specifications.add(condition.getJoinSiteFieldSpecification(target, filter));
-                            }
-                            break;
+                switch (target) {
+
+                    case PROGRAMS: {
+                        if(filter.isCompositeCondition()) {
+                            specifications.add(
+                                    getJoinProgramFieldSpecification(
+                                            target,
+                                            filter.isAndOperation(),
+                                            filter.getConditions().get(0),
+                                            filter.getConditions().get(1)));
                         }
-                        case SURVEY_DATE :
-                        case SURVEY_ID : {
-                            if(filter.isCompositeCondition()) {
-                                specifications.add(
-                                        condition.getSurveyFieldSpecification(target,
-                                                filter.isAndOperation(),
-                                                filter.getConditions().get(0),
-                                                filter.getConditions().get(1)));
-                            }
-                            else {
-                                specifications.add(condition.getSurveyFieldSpecification(target, filter));
-                            }
-                            break;
+                        else {
+                            specifications.add(getJoinProgramFieldSpecification(target, filter));
                         }
-                        case DEPTH : {
-                            // Special handle, please refer to SurveyRowCacheable, logic make sense?
-                            if(filter.isCompositeCondition()) {
-                                specifications.add(
-                                        condition.getDepthSpecification(
-                                                target,
-                                                filter.isAndOperation(),
-                                                filter.getConditions().get(0),
-                                                filter.getConditions().get(1)));
-                            }
-                            else {
-                                specifications.add(condition.getDepthSpecification(target, filter));
-                            }
-                            break;
+                        break;
+                    }
+
+                    case LOCATION_NAME : {
+                        if(filter.isCompositeCondition()) {
+                            specifications.add(
+                                    getJoinLocationFieldSpecification(
+                                            target,
+                                            filter.isAndOperation(),
+                                            filter.getConditions().get(0),
+                                            filter.getConditions().get(1)));
                         }
-                        case HAS_PQs : {
-                            if(filter.isCompositeCondition()) {
-                                specifications.add(
-                                        condition.getHasPQSpecification(
-                                                target,
-                                                filter.isAndOperation(),
-                                                filter.getConditions().get(0),
-                                                filter.getConditions().get(1)));
-                            }
-                            else {
-                                specifications.add(condition.getHasPQSpecification(target, filter));
-                            }
-                            break;
+                        else {
                         }
+                        specifications.add(getJoinLocationFieldSpecification(target, filter));
+                        break;
+                    }
+
+                    case MPA :
+                    case COUNTRY :
+                    case SITE_CODE :
+                    case SITE_NAME : {
+                        if(filter.isCompositeCondition()) {
+                            specifications.add(
+                                    getJoinSiteFieldSpecification(
+                                            target,
+                                            filter.isAndOperation(),
+                                            filter.getConditions().get(0),
+                                            filter.getConditions().get(1)));
+                        }
+                        else {
+                            specifications.add(getJoinSiteFieldSpecification(target, filter));
+                        }
+                        break;
+                    }
+                    case SURVEY_DATE :
+                    case SURVEY_ID : {
+                        if(filter.isCompositeCondition()) {
+                            specifications.add(
+                                    getSurveyFieldSpecification(target,
+                                            filter.isAndOperation(),
+                                            filter.getConditions().get(0),
+                                            filter.getConditions().get(1)));
+                        }
+                        else {
+                            specifications.add(getSurveyFieldSpecification(target, filter));
+                        }
+                        break;
+                    }
+                    case DEPTH : {
+                        // Special handle, please refer to SurveyRowCacheable, logic make sense?
+                        if(filter.isCompositeCondition()) {
+                            specifications.add(
+                                    getDepthSpecification(
+                                            target,
+                                            filter.isAndOperation(),
+                                            filter.getConditions().get(0),
+                                            filter.getConditions().get(1)));
+                        }
+                        else {
+                            specifications.add(getDepthSpecification(target, filter));
+                        }
+                        break;
+                    }
+                    case HAS_PQs : {
+                        if(filter.isCompositeCondition()) {
+                            specifications.add(
+                                    getHasPQSpecification(
+                                            target,
+                                            filter.isAndOperation(),
+                                            filter.getConditions().get(0),
+                                            filter.getConditions().get(1)));
+                        }
+                        else {
+                            specifications.add(getHasPQSpecification(target, filter));
+                        }
+                        break;
                     }
                 }
-            });
-
-            // Join all condition with and
-            Specification<Survey> resultCondition = null;
-
-            for(int i = 0; i < specifications.size(); i++) {
-                resultCondition = resultCondition == null ? specifications.get(i) : resultCondition.and(specifications.get(i));
             }
+        });
 
-            return resultCondition;
+        // Join all condition with and
+        for(int i = 0; i < specifications.size(); i++) {
+            filtersSpec = filtersSpec == null ? specifications.get(i) : filtersSpec.and(specifications.get(i));
         }
+
+        return this;
     }
 
     protected Filter getHasPqFilterBy(Filter filter) {
@@ -260,7 +284,7 @@ public class SurveyFilterCondition extends FilterCondition {
         return f;
     }
 
-    protected Specification<Survey> getHasPQSpecification(final SupportedFilters target, boolean isAnd, Filter filter1, Filter filter2) {
+    protected Specification<Survey> getHasPQSpecification(final SupportedFields target, boolean isAnd, Filter filter1, Filter filter2) {
         return (root, query, criteriaBuilder) -> {
             Filter f1 = getHasPqFilterBy(filter1);
             Filter f2 = getHasPqFilterBy(filter2);
@@ -269,7 +293,7 @@ public class SurveyFilterCondition extends FilterCondition {
         };
     }
 
-    protected Specification<Survey> getHasPQSpecification(final SupportedFilters target, final Filter filter) {
+    protected Specification<Survey> getHasPQSpecification(final SupportedFields target, final Filter filter) {
         return (root, query, criteriaBuilder) -> {
             Filter f = getHasPqFilterBy(filter);
             return getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), f.getValue(), f.getOperation());
@@ -297,7 +321,7 @@ public class SurveyFilterCondition extends FilterCondition {
         return result;
     }
 
-    protected Specification<Survey> getDepthSpecification(final SupportedFilters target, boolean isAnd, Filter filter1, Filter filter2) {
+    protected Specification<Survey> getDepthSpecification(final SupportedFields target, boolean isAnd, Filter filter1, Filter filter2) {
         return ((root, query, criteriaBuilder) -> {
 
             Specification<Survey> spec1 = getDepthSpecification(target, filter1);
@@ -316,7 +340,7 @@ public class SurveyFilterCondition extends FilterCondition {
         });
     }
 
-    protected Specification<Survey> getDepthSpecification(final SupportedFilters target, final Filter filter) {
+    protected Specification<Survey> getDepthSpecification(final SupportedFields target, final Filter filter) {
         return ((root, query, criteriaBuilder) -> {
             List<Filter> f = getDepthFilterBy(filter);
             Predicate spec = this.getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), f.get(0).getValue(), f.get(0).getOperation());
@@ -333,7 +357,7 @@ public class SurveyFilterCondition extends FilterCondition {
         });
     }
 
-    protected Specification<Survey> getJoinLocationFieldSpecification(final SupportedFilters target, boolean isAnd, Filter filter1, Filter filter2) {
+    protected Specification<Survey> getJoinLocationFieldSpecification(final SupportedFields target, boolean isAnd, Filter filter1, Filter filter2) {
         return ((root, query, criteriaBuilder) -> {
             Join<Survey, Site> site = root.join("site", JoinType.INNER);
             Join<Site, Location> location = site.join("location", JoinType.INNER);
@@ -341,7 +365,7 @@ public class SurveyFilterCondition extends FilterCondition {
         });
     }
 
-    protected Specification<Survey> getJoinLocationFieldSpecification(final SupportedFilters target, Filter filter) {
+    protected Specification<Survey> getJoinLocationFieldSpecification(final SupportedFields target, Filter filter) {
         return ((root, query, criteriaBuilder) -> {
             Join<Survey, Site> site = root.join("site", JoinType.INNER);
             Join<Site, Location> location = site.join("location", JoinType.INNER);
@@ -349,7 +373,7 @@ public class SurveyFilterCondition extends FilterCondition {
         });
     }
 
-    protected Specification<Survey> getJoinSiteFieldSpecification(final SupportedFilters target, boolean isAnd, Filter filter1, Filter filter2) {
+    protected Specification<Survey> getJoinSiteFieldSpecification(final SupportedFields target, boolean isAnd, Filter filter1, Filter filter2) {
         return ((root, query, criteriaBuilder) -> {
             Join<Survey, Site> site = root.join("site", JoinType.INNER);
 
@@ -357,34 +381,61 @@ public class SurveyFilterCondition extends FilterCondition {
         });
     }
 
-    protected Specification<Survey> getJoinSiteFieldSpecification(final SupportedFilters target, Filter filter) {
+    protected Specification<Survey> getJoinSiteFieldSpecification(final SupportedFields target, Filter filter) {
         return ((root, query, criteriaBuilder) -> {
             Join<Survey, Site> site = root.join("site", JoinType.INNER);
             return getSimpleFieldSpecification(site, criteriaBuilder, target.getDBFieldName(), filter.getValue(), filter.getOperation());
         });
     }
 
-    protected Specification<Survey> getJoinProgramFieldSpecification(final SupportedFilters target, boolean isAnd, Filter filter1, Filter filter2) {
+    protected Specification<Survey> getJoinProgramFieldSpecification(final SupportedFields target, boolean isAnd, Filter filter1, Filter filter2) {
         return ((root, query, criteriaBuilder) -> {
             Join<Survey, Program> site = root.join("program", JoinType.INNER);
             return getSimpleFieldSpecification(site, criteriaBuilder,  target.getDBFieldName(), isAnd, filter1, filter2);
         });
     }
 
-    protected Specification<Survey> getJoinProgramFieldSpecification(final SupportedFilters target, Filter filter) {
+    protected Specification<Survey> getJoinProgramFieldSpecification(final SupportedFields target, Filter filter) {
         return ((root, query, criteriaBuilder) -> {
             Join<Survey, Program> site = root.join("program", JoinType.INNER);
             return getSimpleFieldSpecification(site, criteriaBuilder,  target.getDBFieldName(), filter.getValue(), filter.getOperation());
         });
     }
 
-    protected Specification<Survey> getSurveyFieldSpecification(final SupportedFilters target, boolean isAnd, Filter filter1, Filter filter2) {
+    protected Specification<Survey> getSurveyFieldSpecification(final SupportedFields target, boolean isAnd, Filter filter1, Filter filter2) {
         return (root, query, criteriaBuilder) ->
                 getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), isAnd, filter1, filter2);
     }
 
-    protected Specification<Survey> getSurveyFieldSpecification(final SupportedFilters target, Filter filter) {
+    protected Specification<Survey> getSurveyFieldSpecification(final SupportedFields target, Filter filter) {
         return (root, query, criteriaBuilder) ->
                 getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), filter.getValue(), filter.getOperation());
+    }
+
+    protected Specification<Survey> createOrdering(List<Sorter> sort) {
+        return (root, query, criteriaBuilder) -> {
+            List<Order> orders = new ArrayList<>();
+
+            sort.forEach(sortItem -> {
+                SupportedFields target = getFieldEnum(sortItem.getFieldName(), SupportedFields.class);
+                if(target != null) {
+                    switch (target) {
+                        case SURVEY_DATE :
+                        case SURVEY_ID : {
+                            orders.add(getItemOrdering(root, criteriaBuilder, sortItem));
+                            break;
+                        }
+                    }
+                }});
+
+
+            query.orderBy(orders);
+            return criteriaBuilder.conjunction();
+        };
+    }
+
+    protected Order getItemOrdering(From<?,?> from, CriteriaBuilder criteriaBuilder, Sorter sort) {
+        Expression<Survey> e = from.get(SurveyFilterCondition.getFieldEnum(sort.getFieldName(), SupportedFields.class).getDBFieldName());
+        return (sort.isAsc()  ? criteriaBuilder.asc(e) : criteriaBuilder.desc(e));
     }
 }

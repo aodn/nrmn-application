@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.repository;
 
-import au.org.aodn.nrmn.restapi.controller.filter.Filter;
+import au.org.aodn.nrmn.restapi.controller.transform.Filter;
+import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.repository.projections.SurveyRowCacheable;
@@ -9,6 +10,7 @@ import au.org.aodn.nrmn.restapi.repository.projections.SurveyRowDivers;
 import au.org.aodn.nrmn.restapi.repository.dynamicQuery.SurveyFilterCondition;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -28,9 +30,11 @@ import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpecificationExecutor<Survey> {
 
         @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
-        default Page<SurveyRowCacheable> findAllProjectedBy(List<Filter> filters, Pageable pageable) {
+        default Page<SurveyRowCacheable> findAllProjectedBy(List<Filter> filters, List<Sorter> sort, Pageable pageable) {
 
-                return this.findAll(SurveyFilterCondition.createSpecification(filters), pageable).map(v ->
+                Specification<Survey> spec = SurveyFilterCondition.createSpecification(filters, sort);
+
+                return this.findAll(spec, pageable).map(v ->
                         new SurveyRowCacheable(
                                 v.getSurveyId(),
                                 v.getSurveyDate(),

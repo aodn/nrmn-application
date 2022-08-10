@@ -26,7 +26,7 @@ const SurveyList = () => {
         getRows: (params) => {
           let url = `data/surveys?page=${params.startRow / 100}`;
           let conditions = [];
-
+          // Filter section
           for(let name in params.filterModel) {
             const p = params.filterModel[name];
 
@@ -51,7 +51,17 @@ const SurveyList = () => {
             }
           };
 
+          // Sorting section, order is important
+          let sort = [];
+          params.sortModel.forEach(i => {
+            sort.push({
+              field: i.colId,
+              order: i.sort
+            });
+          });
+
           url = conditions.length !== 0 ? url + `&filters=${encodeURIComponent(JSON.stringify(conditions))}` : url;
+          url = sort.length !== 0 ? url + `&sort=${encodeURIComponent(JSON.stringify(sort))}` : url;
 
           getResult(url)
             .then(res => {

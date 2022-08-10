@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.repository.dynamicQuery;
 
-import au.org.aodn.nrmn.restapi.controller.filter.Filter;
+import au.org.aodn.nrmn.restapi.controller.transform.Field;
+import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
@@ -27,11 +28,11 @@ public abstract class FilterCondition {
         String getDBFieldName();
     }
 
-    public static <T extends Enum<T>> Optional<Filter> getFilter(List<Filter> fs, T v) {
+    public static <T extends Enum<T>> Optional<Filter> getSupportField(List<Filter> fs, T v) {
         return fs != null ? fs.stream().filter(filter -> filter.getFieldName().equals(v.toString())).findFirst() : Optional.empty();
     }
 
-    protected static <T extends Enum<T>> boolean containsSupportField(List<Filter> fs, Class<T> e) {
+    protected static <T extends Enum<T>> boolean containsSupportField(List<? extends Field> fs, Class<T> e) {
         return fs.stream().filter(filter -> isSupportedField(filter.getFieldName(), e)).findFirst().isPresent();
     }
 

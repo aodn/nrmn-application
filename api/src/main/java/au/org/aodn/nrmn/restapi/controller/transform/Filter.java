@@ -1,11 +1,11 @@
-package au.org.aodn.nrmn.restapi.controller.filter;
+package au.org.aodn.nrmn.restapi.controller.transform;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
 import java.util.List;
 
-public class Filter {
+public class Filter implements Field {
 
     public static final String AND = "and";
     public static final String OR = "or";
@@ -14,19 +14,16 @@ public class Filter {
 
     private String operation;
 
-    private Boolean sortBy;
-
     private String value;
 
     private List<Filter> conditions;
 
     public Filter() {}
 
-    public Filter(String fieldName, String value, String operation, Boolean sortBy, List<Filter> conditions) {
+    public Filter(String fieldName, String value, String operation, List<Filter> conditions) {
         this.fieldName = fieldName;
         this.value = value;
         this.operation = operation;
-        this.sortBy = sortBy;
         this.conditions = conditions;
     }
 
@@ -40,6 +37,7 @@ public class Filter {
         return this.getOperation() != null && this.getOperation().equalsIgnoreCase(AND);
     }
 
+    @Override
     public String getFieldName() {
         return fieldName;
     }
@@ -64,11 +62,6 @@ public class Filter {
     @JsonSetter("ops")
     public void setOperation(String operation) {
         this.operation = operation;
-    }
-
-    @JsonSetter("sortBy")
-    public void setSortBy(Boolean sortBy) {
-        this.sortBy = sortBy;
     }
 
     @JsonSetter("val")

@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.repository.dynamicQuery;
 
-import au.org.aodn.nrmn.restapi.controller.filter.Filter;
+import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
