@@ -425,8 +425,23 @@ public class SurveyFilterCondition extends FilterCondition {
                             orders.add(getItemOrdering(root, criteriaBuilder, sortItem));
                             break;
                         }
+
+                        case MPA :
+                        case COUNTRY :
+                        case SITE_CODE :
+                        case SITE_NAME : {
+                            Join<Survey, Site> site = root.join("site", JoinType.INNER);
+                            orders.add(getItemOrdering(site, criteriaBuilder, sortItem));
+                            break;
+                        }
+                        case DEPTH : {
+                            // Need to concat two fields
+                            orders.add(getItemOrderingContact(root, criteriaBuilder, SupportedFields.DEPTH.getDBFieldName(), "surveyNum", sortItem.isAsc()));
+                            break;
+                        }
                     }
-                }});
+                }
+            });
 
 
             query.orderBy(orders);
@@ -437,5 +452,14 @@ public class SurveyFilterCondition extends FilterCondition {
     protected Order getItemOrdering(From<?,?> from, CriteriaBuilder criteriaBuilder, Sorter sort) {
         Expression<Survey> e = from.get(SurveyFilterCondition.getFieldEnum(sort.getFieldName(), SupportedFields.class).getDBFieldName());
         return (sort.isAsc()  ? criteriaBuilder.asc(e) : criteriaBuilder.desc(e));
+    }
+
+    protected Order getItemOrderingContact(From<?,?> from, CriteriaBuilder criteriaBuilder, String f1, String f2, boolean isAsc) {
+        // It is field1 . field2, we do this because the field on screen is a concat of two fields in db
+        Expression<String> c = criteriaBuilder.concat(
+                criteriaBuilder.concat(from.get(f1), criteriaBuilder.literal(".")),
+                from.get(f2));
+
+        return (isAsc ? criteriaBuilder.asc(c) : criteriaBuilder.desc(c));
     }
 }
