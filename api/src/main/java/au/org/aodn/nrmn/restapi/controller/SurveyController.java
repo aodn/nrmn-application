@@ -76,12 +76,11 @@ public class SurveyController {
         // Diver name search need another table, we do not need to apply sorting here as it is just intermediate result.
         Optional<Filter> diverFilter = ObservationFilterCondition.getSupportField(f, ObservationFilterCondition.SupportedFilters.DIVER_NAME_IN_SURVEY);
         if(diverFilter.isPresent()) {
-
+            // Find a list of observation where diver name matches diver filters
             Specification<Observation> observationSpecification = ObservationFilterCondition.createSpecification(f);
 
             if(observationSpecification != null) {
-                // User wants to filter by diver name, we need to get the list of survey id from observation id
-                // that matches and add it to the filter for next search
+                // Now we can use the observation to link to the survey id that matches diver filters
                 List<Observation> o = observationRepository.findAll(observationSpecification);
                 List<String> ids = o.stream()
                         .map(m -> m.getSurveyMethod().getSurvey().getSurveyId().toString())
@@ -89,7 +88,7 @@ public class SurveyController {
                         .collect(Collectors.toList());
 
                 if(!ids.isEmpty()) {
-                    // Expend and add filter, you should never see empty ids here
+                    // Add filter, so that we only bound the result given these survey ids
                     f.add(new Filter(
                             SurveyFilterCondition.SupportedFields.SURVEY_ID.toString(),
                             String.join(",", ids),

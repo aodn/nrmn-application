@@ -6,18 +6,9 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.List;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -152,4 +143,10 @@ public class Survey {
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     @Schema(title = "Program")
     private Program program;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "survey_id", referencedColumnName = "survey_id", nullable = false, insertable = false, updatable = false)
+    @JsonIgnore
+    @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
+    private List<SurveyMethodEntity> surveyMethods;
 }

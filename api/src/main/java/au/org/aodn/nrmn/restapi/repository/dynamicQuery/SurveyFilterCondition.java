@@ -7,7 +7,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * The purpose of this class is to generate select conditions based on incoming filter value, usually it is post
@@ -118,7 +117,18 @@ public class SurveyFilterCondition extends FilterCondition {
             public String getDBFieldName() {
                 return "pqCatalogued";
             }
-        };
+        },
+        // We do not filter operation here, for reason please read ObservationFilterCondition
+        DIVER_NAME {
+            @Override
+            public String toString() {
+                return "survey.diverName";
+            }
+            @Override
+            public String getDBFieldName() {
+                return "fullName";
+            }
+        }
     }
 
     protected Specification<Survey> filtersSpec = null;
@@ -416,10 +426,17 @@ public class SurveyFilterCondition extends FilterCondition {
         return (root, query, criteriaBuilder) -> {
             List<Order> orders = new ArrayList<>();
 
+            // Depends on user sort, we may or may not need it
+            Predicate diverNameJoin = null;
+
             sort.forEach(sortItem -> {
                 SupportedFields target = getFieldEnum(sortItem.getFieldName(), SupportedFields.class);
                 if(target != null) {
                     switch (target) {
+                        case DIVER_NAME: {
+                            orders.add(getDiverNameJoin(root, query, criteriaBuilder, sortItem.isAsc()));
+                            break;
+                        }
                         case PROGRAMS: {
                             Join<Survey, Program> prog = root.join("program", JoinType.INNER);
                             orders.add(getItemOrdering(prog, criteriaBuilder, sortItem));
@@ -454,9 +471,8 @@ public class SurveyFilterCondition extends FilterCondition {
                 }
             });
 
-
             query.orderBy(orders);
-            return criteriaBuilder.conjunction();
+            return diverNameJoin != null ? diverNameJoin : criteriaBuilder.conjunction();
         };
     }
 
@@ -472,5 +488,21 @@ public class SurveyFilterCondition extends FilterCondition {
                 from.get(f2));
 
         return (isAsc ? criteriaBuilder.asc(c) : criteriaBuilder.desc(c));
+    }
+
+    protected Order getDiverNameJoin(From<?,?> root, CriteriaQuery query, CriteriaBuilder criteriaBuilder, boolean isAsc) {
+
+        Join<Survey, SurveyMethodEntity> surveyMethodEntityRoot = root.join("surveyMethods", JoinType.LEFT);
+        Join<SurveyMethodEntity, Observation> observationRoot = surveyMethodEntityRoot.join("observations", JoinType.LEFT);
+        Join<Observation, Diver> diverJoin = observationRoot.join("diver", JoinType.INNER);
+
+        // DB specific call !!
+        Expression name = diverJoin.get(SupportedFields.DIVER_NAME.getDBFieldName());
+        Expression<String> diverRowConcat = criteriaBuilder
+                .function(PGDialect.STRING_AGG_DISTINCT_ASC, String.class, name, name);
+
+        query.groupBy(root.get(SupportedFields.SURVEY_ID.getDBFieldName()));
+
+        return (isAsc ? criteriaBuilder.asc(diverRowConcat) : criteriaBuilder.desc(diverRowConcat));
     }
 }

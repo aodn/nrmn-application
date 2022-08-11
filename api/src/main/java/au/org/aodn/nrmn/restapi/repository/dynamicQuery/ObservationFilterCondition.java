@@ -140,10 +140,11 @@ public class ObservationFilterCondition extends FilterCondition {
         });
     }
     /**
-     * The diver name is present in different way in survey and needs different handle. The diver name are contact
-     * to a single string and multiple filter are applied to the concat string
+     * The diver name is present in different way in survey and needs different handle. The diver name are concat
+     * to a single string and multiple filter are applied to the diver name individually
      *
-     * This is the same query as show below using dynamic query
+     * This is the same query as show below using dynamic query, the condition diver_ref.full_name varies based on
+     * incoming filter, noted that we need to support combined filters (two at the moment) on single field
      *
      * select survey_method.survey_id from nrmn.observation
      * inner join nrmn.survey_method
