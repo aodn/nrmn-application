@@ -492,17 +492,26 @@ public class SurveyFilterCondition extends FilterCondition {
 
     protected Order getDiverNameJoin(From<?,?> root, CriteriaQuery query, CriteriaBuilder criteriaBuilder, boolean isAsc) {
 
-        Join<Survey, SurveyMethodEntity> surveyMethodEntityRoot = root.join("surveyMethods", JoinType.LEFT);
-        Join<SurveyMethodEntity, Observation> observationRoot = surveyMethodEntityRoot.join("observations", JoinType.LEFT);
-        Join<Observation, Diver> diverJoin = observationRoot.join("diver", JoinType.INNER);
+        if(query.getResultType().equals(Survey.class)) {
+            Join<Survey, SurveyMethodEntity> surveyMethodEntityRoot = root.join("surveyMethods", JoinType.LEFT);
+            Join<SurveyMethodEntity, Observation> observationRoot = surveyMethodEntityRoot.join("observations", JoinType.LEFT);
+            Join<Observation, Diver> diverJoin = observationRoot.join("diver", JoinType.INNER);
 
-        // DB specific call !!
-        Expression name = diverJoin.get(SupportedFields.DIVER_NAME.getDBFieldName());
-        Expression<String> diverRowConcat = criteriaBuilder
-                .function(PGDialect.STRING_AGG_DISTINCT_ASC, String.class, name, name);
+            // DB specific call !!
+            Expression name = diverJoin.get(SupportedFields.DIVER_NAME.getDBFieldName());
+            Expression<String> diverRowConcat = criteriaBuilder
+                    .function(PGDialect.STRING_AGG_DISTINCT_ASC, String.class, name, name);
 
-        query.groupBy(root.get(SupportedFields.SURVEY_ID.getDBFieldName()));
+            query.groupBy(root);
 
-        return (isAsc ? criteriaBuilder.asc(diverRowConcat) : criteriaBuilder.desc(diverRowConcat));
+            return (isAsc ? criteriaBuilder.asc(diverRowConcat) : criteriaBuilder.desc(diverRowConcat));
+        }
+        else {
+            // That means we are not dealing with Survey object but the count() query from jpa, in this case
+            // we should not join the table which cause it report incorrect count on survey table, also it is
+            // much efficient query by return null. The other join will not have impact due to only this
+            // table with 1 to many
+            return null;
+        }
     }
 }

@@ -63,6 +63,7 @@ const SurveyList = () => {
           url = conditions.length !== 0 ? url + `&filters=${encodeURIComponent(JSON.stringify(conditions))}` : url;
           url = sort.length !== 0 ? url + `&sort=${encodeURIComponent(JSON.stringify(sort))}` : url;
 
+          setLoading(true);
           getResult(url)
             .then(res => {
               params.successCallback(res.data.items, res.data.lastRow);
@@ -110,10 +111,7 @@ const SurveyList = () => {
             paginationPageSize={rowsPerPage}
             rowModelType={'infinite'}
             onGridReady={(e) => onGridReady(e)}
-            onFilterChanged={(e) => {
-              setLoading(true);
-              stateFilterHandler.stateFilterEventHandler(gridRef, e);
-              }}
+            onFilterChanged={(e) => { stateFilterHandler.stateFilterEventHandler(gridRef, e); }}
             context={{useOverlay: 'Loading Surveys'}}
             components={{loadingOverlay: LoadingOverlay}}
             loadingOverlayComponent="loadingOverlay"
