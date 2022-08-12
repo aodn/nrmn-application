@@ -37,6 +37,6 @@ public interface ObservationRepository
             "FROM  nrmn.ui_species_attributes   where observable_item_id in :id")
     List<UiSpeciesAttributes> getSpeciesAttributesByIds(@Param("id") int[] id);
 
-    @Query("SELECT observationId FROM Observation where surveyMethod.survey.surveyId = :surveyId")
+    @Query("SELECT observationId FROM Observation where surveyMethod.survey.surveyId = :surveyId ORDER BY observationId")
     List<Integer> findObservationIdsForSurvey(@Param("surveyId") Integer surveyId);
 }

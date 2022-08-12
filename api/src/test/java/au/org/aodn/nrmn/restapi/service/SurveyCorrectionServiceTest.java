@@ -110,7 +110,8 @@ public class SurveyCorrectionServiceTest {
     void correctSurvey() {
 
         when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
-        when(observationRepository.saveAll(any())).then(s -> s.getArgument(0));
+        when(observationRepository.saveAll(any())).thenReturn(Arrays.asList(Observation.builder().observationId(0).build()));
+        when(observationRepository.findObservationIdsForSurvey(any())).thenReturn(Arrays.asList(0));
 
         var correctedRow = rowBuilder.build();
         var correctedMeasures = Map.of(2, 5);

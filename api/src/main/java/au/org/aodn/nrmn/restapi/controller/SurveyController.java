@@ -133,7 +133,7 @@ public class SurveyController {
 
     @GetMapping(path = "/programs")
     public ResponseEntity<List<Program>> getSurveyPrograms() {
-        return ResponseEntity.ok(programRepository.findAll());
+        return ResponseEntity.ok(programRepository.findActive());
     }
 
     @GetMapping("/survey/{id}")
