@@ -1,3 +1,0 @@
-BEGIN TRANSACTION;
-UPDATE nrmn.staged_job SET status = 'CORRECTED' WHERE status = 'CORRECTION';
-END;
