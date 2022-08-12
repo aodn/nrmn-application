@@ -63,7 +63,7 @@ public class SurveyMethodEntity {
 
     @OneToMany
     @JoinColumn(name = "survey_method_id", referencedColumnName = "survey_method_id", nullable = false, updatable = false, insertable = false)
-    @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
+    @Audited(targetAuditMode = NOT_AUDITED)
     @JsonIgnore
     private List<Observation> observations;
 }

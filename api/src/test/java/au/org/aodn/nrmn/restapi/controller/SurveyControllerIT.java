@@ -67,7 +67,8 @@ public class SurveyControllerIT {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("surveyId", hasItems(testSurvey.getSurveyId()));
+                .body("lastRow", equalTo(1),
+                        "items[0].surveyId", equalTo(testSurvey.getSurveyId()));
     }
 
     @Test

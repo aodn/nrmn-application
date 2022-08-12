@@ -147,6 +147,6 @@ public class Survey {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "survey_id", referencedColumnName = "survey_id", nullable = false, insertable = false, updatable = false)
     @JsonIgnore
-    @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
+    @Audited(targetAuditMode = NOT_AUDITED)
     private List<SurveyMethodEntity> surveyMethods;
 }
