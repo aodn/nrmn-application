@@ -82,7 +82,7 @@ const SurveyList = () => {
         stateFilterHandler.resetStateFilters(gridRef);
       }
     });
-  }, []);
+  }, [location]);
 
   if (redirect) return <Navigate to={`/data/survey/${redirect}`} />;
 
