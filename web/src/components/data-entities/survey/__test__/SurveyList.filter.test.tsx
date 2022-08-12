@@ -83,11 +83,13 @@ describe('<SurveyList/> filter testing', () => {
 
     // Filter set will cause some items disappeared
     mockGetFiltersForId.mockImplementation((id) => {
-      return '{"siteName":{"filterType":"text","type":"contains","filter":"South East Apple"}}';
+      return '{"survey.siteName":{"filterType":"text","type":"contains","filter":"South East Apple"}}';
     });
 
+    let requestURL = '';
     // Override function so that it return the data we set.
     mockGetResult.mockImplementation((url) => {
+      requestURL = url;
 
       const raw = {
         config: undefined,
@@ -120,13 +122,14 @@ describe('<SurveyList/> filter testing', () => {
         // Restore filter called
         expect(mockGetFiltersForId).toBeCalledTimes(1);
         expect(mockResetStateFilters).toBeCalledTimes(0);
+      });
 
-        // id = 1 so show this one
-        expect(screen.getByText('Apple')).toBeInTheDocument();
-
-        // id != 1 so no show
-        screen.findByText('Orange').then(i => expect(i).toBe({}));
-        screen.findByText('Melon').then(i => expect(i).toBe({}));
+    // Once filter applied, ag grid will trigger another load.
+    await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(2), {timeout: 10000})
+      .then(() => {
+        // With the filter operation moved to backend, there is no need to validate filter values
+        // just need to make sure it do send filter in the url
+        expect(requestURL).toEqual(expect.stringContaining('&filters='));
       });
   });
 });
