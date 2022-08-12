@@ -15,8 +15,19 @@ public class ProgramTestData {
 
     public Program persistedProgram() {
         Program program = defaultBuilder().build();
+        return persistedProgram(program);
+    }
+
+    public Program persistedProgram(Program program) {
         programRepository.saveAndFlush(program);
         return program;
+    }
+
+    public Program buildWith(int itemNumber) {
+        return Program.builder()
+                .programName("P" + itemNumber)
+                .isActive(true)
+                .build();
     }
 
     public ProgramBuilder defaultBuilder() {

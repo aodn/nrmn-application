@@ -23,8 +23,31 @@ public class SiteTestData {
 
     public Site persistedSite() {
         Site site = defaultBuilder().build();
+        return persistedSite(site);
+    }
+
+    public Site persistedSite(Site site) {
+        locationTestData.persistedLocation(site.getLocation());
         siteRepository.saveAndFlush(site);
         return site;
+    }
+
+    public Site buildWith(int itemNumber) {
+        final Map<String, String> siteAttribute = new HashMap<String, String>();
+        siteAttribute.put("ProxCountry", "ProxCountry" + itemNumber);
+        siteAttribute.put("ProtectionStatus", "Fishing" + itemNumber);
+        return Site.builder()
+                .siteCode("Site " + itemNumber)
+                .siteName("Site name" + itemNumber)
+                .longitude(Double.valueOf(itemNumber))
+                .latitude(-Double.valueOf(itemNumber))
+                .location(locationTestData.buildWith(itemNumber))
+                .oldSiteCodes(Arrays.asList(new String[] {"SIT01", "SIT02"}))
+                .state("Graham Land Antarctica" + itemNumber)
+                .country("Antarctica" + itemNumber)
+                .siteAttribute(siteAttribute)
+                .isActive(true)
+                .build();
     }
 
     public SiteBuilder defaultBuilder() {
