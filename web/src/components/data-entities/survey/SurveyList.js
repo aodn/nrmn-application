@@ -2,7 +2,6 @@ import React, {useState, useRef, useCallback} from 'react';
 import {Box, Typography} from '@mui/material';
 import {Navigate, useLocation} from 'react-router-dom';
 import {getResult} from '../../../api/api';
-import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {AuthContext} from '../../../contexts/auth-context';
 import 'ag-grid-enterprise';
@@ -112,9 +111,6 @@ const SurveyList = () => {
             rowModelType={'infinite'}
             onGridReady={(e) => onGridReady(e)}
             onFilterChanged={(e) => { stateFilterHandler.stateFilterEventHandler(gridRef, e); }}
-            context={{useOverlay: 'Loading Surveys'}}
-            components={{loadingOverlay: LoadingOverlay}}
-            loadingOverlayComponent="loadingOverlay"
             suppressCellFocus={true}
             defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
           >
