@@ -19,6 +19,18 @@ public class DiverTestData {
         return diver;
     }
 
+    public Diver persistedDiver(Diver diver) {
+        diverRepository.saveAndFlush(diver);
+        return diver;
+    }
+
+    public Diver buildWith(int itemNumber, String name) {
+        return Diver.builder()
+                .initials(String.valueOf(itemNumber))
+                .fullName(name)
+                .build();
+    }
+
     public DiverBuilder defaultBuilder() {
         return Diver.builder()
             .initials("I" + ++diverNo)

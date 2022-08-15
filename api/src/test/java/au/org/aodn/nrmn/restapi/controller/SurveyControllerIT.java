@@ -1,7 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.restapi.model.db.Survey;
-import au.org.aodn.nrmn.restapi.model.db.SurveyTestData;
+import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
@@ -43,6 +42,15 @@ public class SurveyControllerIT {
     @Autowired
     private SurveyTestData surveyTestData;
     private String NON_EXISTENT_SURVEY_ID = "123123123";
+
+    @Autowired
+    private SurveyMethodTestData surveyMethodTestData;
+
+    @Autowired
+    private ObservationTestData observationTestData;
+
+    @Autowired
+    private DiverTestData diverTestData;
 
     @Autowired
     private JwtToken jwtToken;
@@ -445,7 +453,6 @@ public class SurveyControllerIT {
             assertTrue(date.getDayOfMonth() == 12 || date.getDayOfMonth() == 13);
         });
     }
-
     /**
      * Site require table join and date field need correct format
      */
@@ -576,6 +583,149 @@ public class SurveyControllerIT {
             // We should never see something that is like .20 etc
             assertFalse(item.get("depth").toString(), !item.get("depth").toString().contains(".1"));
         });
+
+    }
+    /**
+     * More table join and sql operation is required for diver name
+     */
+    @Test
+    @WithUserDetails("test@example.com")
+    public void testFilterByDiverName() {
+        // Generate a sample data of 150, the default page size on server is 100 hence we have two page of data.
+        List<Survey> surveyList = new ArrayList<>();
+        int totalRecord = 150;
+        for (int i = 0; i < totalRecord; i++) {
+            surveyList.add(surveyTestData.buildWith(i));
+        }
+        surveyTestData.persistedSurvey(surveyList);
+
+        // Extra sample needed
+        Diver d1 = diverTestData.persistedDiver(diverTestData.buildWith(1, "Apple orange"));
+        Diver d2 = diverTestData.persistedDiver(diverTestData.buildWith(2, "car crossing"));
+        Diver d3 = diverTestData.persistedDiver(diverTestData.buildWith(3, "n sugar"));
+        Diver d4 = diverTestData.persistedDiver(diverTestData.buildWith(4, "b coconut"));
+        Diver d5 = diverTestData.persistedDiver(diverTestData.buildWith(5, "leave"));
+
+        for(int i = 99; i < 103; i++) {
+            SurveyMethodEntity e = surveyMethodTestData.buildWith(surveyList.get(i), i);
+            surveyMethodTestData.persistedSurveyMethod(e);
+
+            if(i == 99) {
+                Observation o = observationTestData.buildWith(e, d1, i);
+                observationTestData.persistedObservation(o);
+            }
+            else if(i == 100) {
+                Observation o = observationTestData.buildWith(e, d1, i);
+                observationTestData.persistedObservation(o);
+
+                o = observationTestData.buildWith(e, d2, i);
+                observationTestData.persistedObservation(o);
+            }
+            else if(i == 101) {
+                Observation o = observationTestData.buildWith(e, d2, i);
+                observationTestData.persistedObservation(o);
+
+                o = observationTestData.buildWith(e, d3, i);
+                observationTestData.persistedObservation(o);
+
+                o = observationTestData.buildWith(e, d4, i);
+                observationTestData.persistedObservation(o);
+            }
+            else if(i == 102) {
+                Observation o = observationTestData.buildWith(e, d1, i);
+                observationTestData.persistedObservation(o);
+
+                o = observationTestData.buildWith(e, d2, i);
+                observationTestData.persistedObservation(o);
+
+                o = observationTestData.buildWith(e, d3, i);
+                observationTestData.persistedObservation(o);
+
+                o = observationTestData.buildWith(e, d5, i);
+                observationTestData.persistedObservation(o);
+            }
+        }
+
+        // filter by diver, expect "car crossing", "n sugar" hit
+        Map<String, ArrayList<Map<String, Object>>> obj = given().spec(getDataSpec)
+                .queryParam("filters", "[{\"field\":\"survey.diverName\",\"ops\":\"contains\",\"val\":\"ar\"}]")
+                .queryParam("page", 0)
+                .auth()
+                .oauth2(jwtToken.get())
+                .get("surveys")
+                .then()
+                .assertThat()
+                .statusCode(200).extract().jsonPath().get("");
+
+        assertEquals(3, obj.get("lastRow"));
+
+        List<Map<String, Object>>  items = obj.get("items");
+        assertEquals(3, items.size());
+
+        items.forEach(item -> {
+            // We should never see a name without ar
+            assertFalse(item.get("diverName").toString(), !item.get("diverName").toString().contains("ar"));
+        });
+
+        // filter by diver, expect "n sugar" hit
+        obj = given().spec(getDataSpec)
+                .queryParam("filters", "[{\"field\":\"survey.diverName\",\"ops\":\"endsWith\",\"val\":\"ar\"}]")
+                .queryParam("sort", "[{\"field\":\"survey.diverName\",\"order\":\"asc\"}]")
+                .queryParam("page", 0)
+                .auth()
+                .oauth2(jwtToken.get())
+                .get("surveys")
+                .then()
+                .assertThat()
+                .statusCode(200).extract().jsonPath().get("");
+
+        assertEquals(2, obj.get("lastRow"));
+
+        items = obj.get("items");
+        assertEquals(2, items.size());
+
+        // Since sorted by diver name we should expect this in order
+        assertEquals(
+                "Apple orange, car crossing, leave, n sugar",
+                items.get(0).get("diverName").toString());
+
+        assertEquals(
+                "b coconut, car crossing, n sugar",
+                items.get(1).get("diverName").toString());
+
+        // Noted desc ordering in test, diver name equals "Apple orange" or ends with "ar"
+        obj = given().spec(getDataSpec)
+                .queryParam("filters", "[{\"field\":\"survey.diverName\",\"ops\":\"OR\",\"conditions\":[{\"ops\":\"equals\",\"val\":\"Apple orange\"},{\"ops\":\"contains\",\"val\":\"ar\"}]}]")
+                .queryParam("sort", "[{\"field\":\"survey.diverName\",\"order\":\"desc\"}]")
+                .queryParam("page", 0)
+                .auth()
+                .oauth2(jwtToken.get())
+                .get("surveys")
+                .then()
+                .assertThat()
+                .statusCode(200).extract().jsonPath().get("");
+
+        assertEquals(4, obj.get("lastRow"));
+
+        items = obj.get("items");
+        assertEquals(4, items.size());
+
+        // Since sorted by diver name we should expect this in order
+        assertEquals(
+                "b coconut, car crossing, n sugar",
+                items.get(0).get("diverName").toString());
+
+        assertEquals(
+                "Apple orange, car crossing, leave, n sugar",
+                items.get(1).get("diverName").toString());
+
+        assertEquals(
+                "Apple orange, car crossing",
+                items.get(2).get("diverName").toString());
+
+        assertEquals(
+                "Apple orange",
+                items.get(3).get("diverName").toString());
 
     }
 }
