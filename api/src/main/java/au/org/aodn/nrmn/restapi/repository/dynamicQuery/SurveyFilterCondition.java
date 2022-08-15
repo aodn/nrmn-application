@@ -311,16 +311,16 @@ public class SurveyFilterCondition extends FilterCondition {
     }
 
     protected List<Filter> getDepthFilterBy(Filter filter) {
-        String[] i = filter.getValue().split("\\.");
+        String[] i = filter.getValue() == null ? new String[] {""} : filter.getValue().split("\\.");
         List<Filter> result = new ArrayList<>();
         Filter f1 = new Filter();
 
         // if value is .xxxx, we assume user do not care what is in front
-        f1.setOperation("".equals(i[0].trim()) ? SurveyFilterCondition.NOT_BLANK : filter.getOperation());
-        f1.setValue(i[0]);
+        f1.setOperation(i.length == 0 ||(i.length > 1 && "" .equals(i[0].trim()))? SurveyFilterCondition.NOT_BLANK : filter.getOperation());
+        f1.setValue(i.length == 0 ? "" : i[0]);
         result.add(f1);
 
-        if(i.length > 1) {
+        if (i.length > 1) {
             // We have something after dot
             Filter f2 = new Filter();
             f2.setOperation(filter.getOperation());
@@ -353,7 +353,25 @@ public class SurveyFilterCondition extends FilterCondition {
     protected Specification<Survey> getDepthSpecification(final SupportedFields target, final Filter filter) {
         return ((root, query, criteriaBuilder) -> {
             List<Filter> f = getDepthFilterBy(filter);
-            Predicate spec = this.getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), f.get(0).getValue(), f.get(0).getOperation());
+
+            Predicate spec = null;
+
+            if(filter.getValue() != null && filter.getValue().contains(".") && !"".equalsIgnoreCase(f.get(0).getValue())) {
+                if (filter.getOperation().equalsIgnoreCase(SurveyFilterCondition.CONTAINS)) {
+                    // Special case, user input is contains x. so user means value ends with x
+                    spec = this.getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), f.get(0).getValue(), SurveyFilterCondition.ENDS_WITH);
+                } else if (filter.getOperation().equalsIgnoreCase(SurveyFilterCondition.NOT_CONTAINS)) {
+                    // Special case, user input is not contains x. so user do want to see x(non x).
+                    spec = this.getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), f.get(0).getValue(), SurveyFilterCondition.NOT_ENDS_WITH);
+                } else if (filter.getOperation().equalsIgnoreCase(SurveyFilterCondition.STARTS_WITH)) {
+                    // Special case, user input is startWith x. so it really means is x in front of dot only
+                    spec = this.getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), f.get(0).getValue(), SurveyFilterCondition.EQUALS);
+                }
+            }
+
+            if(spec == null) {
+                spec = this.getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), f.get(0).getValue(), f.get(0).getOperation());
+            }
 
             if (f.size() > 1) {
                 // We have something after dot

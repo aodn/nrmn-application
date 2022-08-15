@@ -16,6 +16,7 @@ public abstract class FilterCondition {
 
     public static final String STARTS_WITH = "startsWith";
     public static final String ENDS_WITH = "endsWith";
+    public static final String NOT_ENDS_WITH = "notEndsWith";
     public static final String CONTAINS = "contains";
     public static final String NOT_CONTAINS = "notContains";
     public static final String EQUALS = "equals";
@@ -81,6 +82,9 @@ public abstract class FilterCondition {
             }
             case ENDS_WITH: {
                 return criteriaBuilder.like(target, "%" + value.toLowerCase());
+            }
+            case NOT_ENDS_WITH: {
+                return criteriaBuilder.not(criteriaBuilder.like(target, "%" + value.toLowerCase()));
             }
             case CONTAINS: {
                 return criteriaBuilder.like(target, "%" + value.toLowerCase() + "%");

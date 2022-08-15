@@ -48,7 +48,7 @@ public class SurveyTestData {
                 .surveyDate(Date.valueOf(date.plusDays(itemNumber)))
                 .surveyTime(Time.valueOf("23:37:00"))
                 .depth(itemNumber)
-                .surveyNum(itemNumber)
+                .surveyNum(itemNumber + 100)
                 .visibility(null)
                 .direction(null)
                 .blockAbundanceSimulated(true)
