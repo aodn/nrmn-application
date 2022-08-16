@@ -15,8 +15,19 @@ public class LocationTestData {
 
     public Location persistedLocation() {
         Location location = defaultBuilder().build();
+        return persistedLocation(location);
+    }
+
+    public Location persistedLocation(Location location ) {
         locationRepository.saveAndFlush(location);
         return location;
+    }
+
+    public Location buildWith(int itemNumber) {
+        return Location.builder()
+                .locationName("Location " + itemNumber)
+                .isActive(true)
+                .build();
     }
 
     public LocationBuilder defaultBuilder() {

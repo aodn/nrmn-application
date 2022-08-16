@@ -1,24 +1,29 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import au.org.aodn.nrmn.restapi.controller.transform.Filter;
+import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
+import au.org.aodn.nrmn.restapi.model.db.Observation;
+import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.repository.dynamicQuery.ObservationFilterCondition;
+import au.org.aodn.nrmn.restapi.repository.dynamicQuery.SurveyFilterCondition;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
-import au.org.aodn.nrmn.restapi.dto.survey.SurveyFilterDto;
 import au.org.aodn.nrmn.restapi.model.db.Program;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
@@ -32,6 +37,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/data")
 public class SurveyController {
 
+    protected Logger logger = LoggerFactory.getLogger(SurveyController.class);
+
+    @Autowired
+    private ObservationRepository observationRepository;
+
     @Autowired
     private SurveyRepository surveyRepository;
 
@@ -44,26 +54,81 @@ public class SurveyController {
     @Autowired
     private ModelMapper mapper;
 
+    @Autowired
+    private ObjectMapper objMapper;
+
+    /**
+     *
+     * @param page
+     * @param pageSize - AgGrid use 100 as default page size
+     * @return
+     */
     @GetMapping(path = "/surveys")
-    public ResponseEntity<?> listMatching(SurveyFilterDto surveyFilter) {
-        if (surveyFilter.isSet()) {
-            return ResponseEntity
-                    .ok(surveyRepository.findByCriteria(surveyFilter).stream().collect(Collectors.toList()));
-        } else {
+    public ResponseEntity<?> listMatching(@RequestParam(value = "sort", required = false) String sort,
+                                          @RequestParam(value = "filters", required = false) String filters,
+                                          @RequestParam(value = "page", defaultValue = "0") int page,
+                                          @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) throws JsonProcessingException {
 
-            var surveyRows = surveyRepository.findAllProjectedBy().stream().collect(Collectors.toList());
-            var surveyIds = surveyRows.stream().map(s -> s.getSurveyId()).collect(Collectors.toList());
-            Map<Integer, String> diverNames = surveyRepository.getDiversForSurvey(surveyIds).stream()
-                    .collect(Collectors.groupingBy(SurveyRowDivers::getSurveyId,
-                            Collectors.mapping(SurveyRowDivers::getDiverName, Collectors.joining(", "))));
+        // RequestParam do not support json object parsing automatically
+        List<Filter> f = filters != null ? Arrays.stream((objMapper.readValue(filters, Filter[].class))).collect(Collectors.toList()) : null;
+        List<Sorter> s = sort != null ? Arrays.stream((objMapper.readValue(sort, Sorter[].class))).collect(Collectors.toList()) : null;
 
-            var surveyRowsWithDivers = surveyRows.stream().map(s -> {
-                s.setDiverNames(diverNames.get(s.getSurveyId()));
-                return s;
-            }).collect(Collectors.toList());
+        // Diver name search need another table, we do not need to apply sorting here as it is just intermediate result.
+        Optional<Filter> diverFilter = ObservationFilterCondition.getSupportField(f, ObservationFilterCondition.SupportedFilters.DIVER_NAME_IN_SURVEY);
+        if(diverFilter.isPresent()) {
+            // Find a list of observation where diver name matches diver filters
+            Specification<Observation> observationSpecification = ObservationFilterCondition.createSpecification(f);
 
-            return ResponseEntity.ok(surveyRowsWithDivers);
+            if(observationSpecification != null) {
+                // Now we can use the observation to link to the survey id that matches diver filters
+                List<Observation> o = observationRepository.findAll(observationSpecification);
+                List<String> ids = o.stream()
+                        .map(m -> m.getSurveyMethod().getSurvey().getSurveyId().toString())
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                if(!ids.isEmpty()) {
+                    // Add filter, so that we only bound the result given these survey ids
+                    f.add(new Filter(
+                            SurveyFilterCondition.SupportedFields.SURVEY_ID.toString(),
+                            String.join(",", ids),
+                            SurveyFilterCondition.IN,
+                            null));
+                }
+                else {
+                    // User search by diver, but non of the observation id matches, we put a condition that cause
+                    // the search return nothing.
+                    f.add(new Filter(
+                            SurveyFilterCondition.SupportedFields.SURVEY_ID.toString(),
+                            ",",
+                            SurveyFilterCondition.IN,
+                            null));
+                }
+            }
         }
+
+        var surveyRows = surveyRepository.findAllProjectedBy(f, s, PageRequest.of(page, pageSize));
+
+        var surveyIds = surveyRows.stream()
+                .map(sid -> sid.getSurveyId())
+                .distinct()
+                .collect(Collectors.toList());
+
+        Map<Integer, String> diverNames = surveyRepository.getDiversForSurvey(surveyIds).stream()
+                .collect(Collectors.groupingBy(SurveyRowDivers::getSurveyId,
+                        Collectors.mapping(SurveyRowDivers::getDiverName, Collectors.joining(", "))));
+
+        var surveyRowsWithDivers = surveyRows.stream().map(z -> {
+            z.setDiverNames(diverNames.get(z.getSurveyId()));
+            return z;
+        }).collect(Collectors.toList());
+
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("lastRow", surveyRows.getTotalElements());
+        data.put("items", surveyRowsWithDivers);
+
+        return ResponseEntity.ok(data);
     }
 
     @GetMapping(path = "/programs")
