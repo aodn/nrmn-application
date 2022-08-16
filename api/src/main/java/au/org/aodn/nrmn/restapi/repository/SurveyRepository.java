@@ -63,6 +63,10 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
         @Query("SELECT DISTINCT new au.org.aodn.nrmn.restapi.repository.projections.SurveyRowDivers(o.surveyMethod.survey.surveyId, o.diver.fullName) from Observation o where o.surveyMethod.survey.surveyId IN (:surveyIds)")
         List<SurveyRowDivers> getDiversForSurvey(@Param("surveyIds") List<Integer> surveyIds);
 
+        @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
+        @Query("SELECT DISTINCT o.surveyMethod.survey.surveyId from Observation o where o.observationId IN (:observationIds)")
+        List<Integer> getSurveyIdForObservation(@Param("observationIds") List<Integer> observationIds);
+
         @Modifying
         @Query("UPDATE Survey s SET s.updated = current_timestamp()")
         void updateSurveyModified();

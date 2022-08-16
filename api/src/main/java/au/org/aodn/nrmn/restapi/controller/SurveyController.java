@@ -11,8 +11,10 @@ import au.org.aodn.nrmn.restapi.model.db.Observation;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.dynamicQuery.ObservationFilterCondition;
 import au.org.aodn.nrmn.restapi.repository.dynamicQuery.SurveyFilterCondition;
+import au.org.aodn.nrmn.restapi.util.ObjectUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections4.ListUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,10 +84,23 @@ public class SurveyController {
             if(observationSpecification != null) {
                 // Now we can use the observation to link to the survey id that matches diver filters
                 List<Observation> o = observationRepository.findAll(observationSpecification);
-                List<String> ids = o.stream()
-                        .map(m -> m.getSurveyMethod().getSurvey().getSurveyId().toString())
-                        .distinct()
+
+                // To avoid table join in object level, extract ids and use it in another query.
+                List<Integer> observationIds = o.stream()
+                        .map(observation -> observation.getObservationId())
                         .collect(Collectors.toList());
+
+                // We need to partition it because of the length limitation of a parameter in query
+                List<List<Integer>> partitionObvIds = ListUtils.partition(observationIds, 5000);
+
+                // With set ids will be unique
+                Set<Integer> temp = new HashSet<>();
+
+                partitionObvIds
+                        .stream()
+                        .forEach(p -> temp.addAll(surveyRepository.getSurveyIdForObservation(p)));
+
+                List<String> ids = temp.stream().map(String::valueOf).collect(Collectors.toList());
 
                 if(!ids.isEmpty()) {
                     // Add filter, so that we only bound the result given these survey ids
