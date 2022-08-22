@@ -30,7 +30,7 @@ const JobList = () => {
   const getRowId = (params) => params.data.id;
 
   const onCellClicked = (e) => {
-    if (e.data.status === 'STAGED') {
+    if (['STAGED', 'INGESTED'].includes(e.data.status)) {
       const target = `/data/job/${e.data.id}/edit`;
       e.event.ctrlKey ? window.open(target, '_blank').focus() : setRedirect(target);
     }
@@ -118,7 +118,9 @@ const JobList = () => {
           <AgGridColumn
             width={40}
             cellStyle={{cursor: 'pointer'}}
-            cellRenderer={(e) => (e.data?.status === 'STAGED' ? <GridOn htmlColor={'#808080'} viewBox={iconViewBoxDimension} /> : <></>)}
+            cellRenderer={(e) =>
+              ['STAGED', 'INGESTED'].includes(e.data?.status) ? <GridOn htmlColor={'#808080'} viewBox={iconViewBoxDimension} /> : <></>
+            }
             onCellClicked={onCellClicked}
           />
           <AgGridColumn flex={1} field="reference" cellStyle={{cursor: 'pointer'}} onCellClicked={onCellClicked} />
