@@ -22,8 +22,6 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.QueryHint;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
-
 import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 
 @Repository

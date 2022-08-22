@@ -11,7 +11,6 @@ import au.org.aodn.nrmn.restapi.model.db.Observation;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.dynamicQuery.ObservationFilterCondition;
 import au.org.aodn.nrmn.restapi.repository.dynamicQuery.SurveyFilterCondition;
-import au.org.aodn.nrmn.restapi.util.ObjectUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.ListUtils;

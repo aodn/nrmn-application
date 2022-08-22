@@ -47,10 +47,15 @@ const JobView = () => {
               <Box my={2}>
                 <Typography variant="h5">{job.reference}</Typography>
               </Box>
-              {job.type === 'INGESTED' && existsOnS3 && (
-                <Button variant="outlined" onClick={() => downloadZip(job.id, job.reference)}>
-                  Download
-                </Button>
+              {['STAGED', 'INGESTED'].includes(job.status) && (
+                <>
+                  <Button disabled={!existsOnS3} variant="outlined" onClick={() => downloadZip(job.id, job.reference)}>
+                    {existsOnS3 ? 'Download' : 'File not found'}
+                  </Button>{' '}
+                  <Button variant="outlined" component="a" href={`/data/job/${id}/edit`} clickable>
+                    {['INGESTED'].includes(job.status) ? 'View' : 'Edit'} Sheet
+                  </Button>
+                </>
               )}
             </Box>
             <Divider style={{margin: 15, marginTop: 0}} />
@@ -127,19 +132,19 @@ const JobView = () => {
                     {job.logs.map((log) => (
                       <TableRow key={log.id}>
                         <TableCell component="th" scope="row" style={{verticalAlign: 'top'}}>
-                          <Typography fontFamily="Courier New" fontSize={12}>
+                          <Typography variant="caption">
                             {new Date(log.eventTime).toLocaleDateString('en-AU') +
                               ' ' +
                               new Date(log.eventTime).toLocaleTimeString('en-AU', {hour: 'numeric', minute: '2-digit'})}
                           </Typography>
                         </TableCell>
                         <TableCell style={{verticalAlign: 'top'}}>
-                          <Typography fontFamily="Courier New" fontSize={12} fontWeight="bold" >
+                          <Typography variant="caption" fontWeight="bold">
                             {log.eventType}
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography fontFamily="Courier New" fontSize={12}>
+                          <Typography variant="caption">
                             {log.details?.split('\n').map((e) => (
                               <div key={e}>
                                 {e}

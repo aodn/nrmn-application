@@ -99,7 +99,7 @@ public abstract class FilterCondition {
                 return criteriaBuilder.notEqual(target, value.toLowerCase());
             }
             case IN : {
-                return target.in(value.split(","));
+                return target.in((Object[])value.split(","));
             }
             case BLANK: {
                 return criteriaBuilder.or(
