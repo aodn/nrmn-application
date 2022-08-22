@@ -264,6 +264,8 @@ public class SurveyFilterCondition extends FilterCondition {
                         }
                         break;
                     }
+                    case DIVER_NAME:
+                        break;
                 }
             }
         });
@@ -508,7 +510,7 @@ public class SurveyFilterCondition extends FilterCondition {
         return (isAsc ? criteriaBuilder.asc(c) : criteriaBuilder.desc(c));
     }
 
-    protected Order getDiverNameJoin(From<?,?> root, CriteriaQuery query, CriteriaBuilder criteriaBuilder, boolean isAsc) {
+    protected Order getDiverNameJoin(From<?,?> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder, boolean isAsc) {
 
         if(query.getResultType().equals(Survey.class)) {
             Join<Survey, SurveyMethodEntity> surveyMethodEntityRoot = root.join("surveyMethods", JoinType.LEFT);
@@ -516,7 +518,7 @@ public class SurveyFilterCondition extends FilterCondition {
             Join<Observation, Diver> diverJoin = observationRoot.join("diver", JoinType.INNER);
 
             // DB specific call !!
-            Expression name = diverJoin.get(SupportedFields.DIVER_NAME.getDBFieldName());
+            var name = diverJoin.get(SupportedFields.DIVER_NAME.getDBFieldName());
             Expression<String> diverRowConcat = criteriaBuilder
                     .function(PGDialect.STRING_AGG_DISTINCT_ASC, String.class, name, name);
 

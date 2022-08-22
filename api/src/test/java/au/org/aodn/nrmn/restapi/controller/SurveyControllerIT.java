@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -54,8 +53,6 @@ public class SurveyControllerIT {
 
     @Autowired
     private JwtToken jwtToken;
-
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     RequestSpecification getDataSpec;
 
