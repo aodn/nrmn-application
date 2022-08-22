@@ -497,7 +497,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
 
   const chooseCellStyle = (params) => {
     // Grey-out the first  column containing the row number
-    if (params.colDef.field === 'row') return {color: grey[500]};
+    if (!params.colDef.editable) return {color: grey[800], backgroundColor: grey[50]};
 
     // Highlight and search results
     const row = params.context.highlighted[params.rowIndex];
@@ -521,8 +521,6 @@ const DataSheetView = ({onIngest, isAdmin}) => {
         }
       case 'INFO':
         return {backgroundColor: grey[100]};
-      default:
-        return null;
     }
   };
 
@@ -690,6 +688,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
     });
   };
 
+  const editable = ['STAGED'].includes(job.status);
   const measurementColumns = job.isExtendedSize ? measurements.concat(extendedMeasurements) : measurements;
   return (
     <>
@@ -706,13 +705,13 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             <Typography>{'<< Back to Jobs'}</Typography>
           </NavLink>
         </Box>
-        {job && job.status === 'STAGED' && (
+        {job?.status && (
           <Box display="flex" flexDirection="row">
             <Box p={1} flexGrow={1}>
               <Typography noWrap variant="subtitle2">
                 {job.reference}
               </Typography>
-              <Typography variant="body2">{`${job.status} ${job.source} ${job.program} ${
+              <Typography variant="body2">{`${job.source} (${job.status}) - ${job.program} ${
                 job.isExtendedSize ? 'Extended Size' : ''
               } `}</Typography>
             </Box>
@@ -735,26 +734,30 @@ const DataSheetView = ({onIngest, isAdmin}) => {
                 Export
               </Button>
             </Box>
-            <Box p={1} minWidth={180}>
-              <Button
-                variant="contained"
-                disabled={state === IngestState.Loading}
-                onClick={handleSaveAndValidate}
-                startIcon={<PlaylistAddCheckOutlinedIcon />}
-              >
-                {`Save & Validate`}
-              </Button>
-            </Box>
-            <Box p={1} mr={2}>
-              <Button
-                variant="contained"
-                disabled={state !== IngestState.Valid && !isAdmin}
-                onClick={() => setState(IngestState.ConfirmSubmit)}
-                startIcon={<CloudUploadIcon />}
-              >
-                Submit
-              </Button>
-            </Box>
+            {editable && (
+              <>
+                <Box p={1} minWidth={180}>
+                  <Button
+                    variant="contained"
+                    disabled={state === IngestState.Loading}
+                    onClick={handleSaveAndValidate}
+                    startIcon={<PlaylistAddCheckOutlinedIcon />}
+                  >
+                    {`Save & Validate`}
+                  </Button>
+                </Box>
+                <Box p={1} mr={2}>
+                  <Button
+                    variant="contained"
+                    disabled={state !== IngestState.Valid && !isAdmin}
+                    onClick={() => setState(IngestState.ConfirmSubmit)}
+                    startIcon={<CloudUploadIcon />}
+                  >
+                    Submit
+                  </Button>
+                </Box>
+              </>
+            )}
           </Box>
         )}
       </Box>
@@ -766,7 +769,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             cellFlashDelay={100}
             cellFadeDelay={100}
             defaultColDef={{
-              editable: true,
+              editable,
               sortable: true,
               resizable: true,
               minWidth: 70,
@@ -845,7 +848,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
                 field={m.field}
                 headerName={m.fishSize}
                 key={m.field}
-                editable={true}
+                editable={editable}
                 width={35}
                 headerComponentParams={{
                   template: `<div style="width: 48px; float: left; text-align:center"><div style="color: #c4d79b; border-bottom: 1px solid rgba(0, 0, 0, 0.12)">${m.fishSize}</div><div style="color: #da9694">${m.invertSize}</div></div>`

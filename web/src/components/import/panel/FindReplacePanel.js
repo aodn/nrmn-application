@@ -101,6 +101,7 @@ const FindReplacePanel = (props) => {
 
   const onReplace = () => {
     const focusedCell = props.api.getFocusedCell();
+    if (!focusedCell.column.colDef.editable) return;
     const agRow = props.api.getDisplayedRowAtIndex(focusedCell.rowIndex);
     let [oldRow, newRow] = clone(agRow.data);
     const colId = focusedCell.column.colId;
@@ -146,6 +147,8 @@ const FindReplacePanel = (props) => {
       props.agGridReact.props.defaultColDef.suppressKeyboardEvent({event: e, api: props.api});
   };
 
+  const readonly = props.agGridReact?.props.defaultColDef.editable === false;
+
   return (
     <Box m={2} mr={4}>
       <Button variant="outlined" onClick={reset}>
@@ -165,6 +168,7 @@ const FindReplacePanel = (props) => {
       </Button>
       <TextField
         size="small"
+        disabled={readonly}
         placeholder="Replace With.."
         sx={{marginTop: 2, width: '100%'}}
         value={replaceString}
@@ -178,7 +182,7 @@ const FindReplacePanel = (props) => {
         startIcon={<FindReplaceIcon />}
         onKeyDown={onKeyDown}
         onClick={replaceAll ? onReplaceAll : onReplace}
-        disabled={currentFindString.length < 1}
+        disabled={readonly || currentFindString.length < 1}
       >
         Replace
       </Button>
@@ -200,7 +204,7 @@ const FindReplacePanel = (props) => {
       <FormControlLabel
         label="Replace All"
         sx={{width: '100%'}}
-        control={<Checkbox checked={replaceAll} onChange={(e) => setReplaceAll(e.target.checked)} />}
+        control={<Checkbox disabled={readonly} checked={replaceAll} onChange={(e) => setReplaceAll(e.target.checked)} />}
       />
       <Box sx={{marginTop: 2, width: '100%'}}>{status}</Box>
     </Box>
