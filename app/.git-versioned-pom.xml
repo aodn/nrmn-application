@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>nrmn</artifactId>
+        <groupId>au.org.aodn.nrmn</groupId>
+        <version>main-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <artifactId>nrmn-app</artifactId>
+    <packaging>war</packaging>
+
+    <properties>
+        <java.version>11</java.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>au.org.aodn.nrmn</groupId>
+            <artifactId>nrmn-api</artifactId>
+            <version>main-SNAPSHOT</version>
+            <type>war</type>
+         </dependency>
+        <dependency>
+            <groupId>au.org.aodn.nrmn</groupId>
+            <artifactId>nrmn-web</artifactId>
+            <version>main-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+              <artifactId>maven-war-plugin</artifactId>
+              <version>3.3.2</version>
+              <configuration>
+                <failOnMissingWebXml>false</failOnMissingWebXml>
+              </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
