@@ -20,14 +20,6 @@ pipeline {
                         sh 'git clean --force --force -xd --exclude=web/node_modules'
                     }
                 }
-                stage('set_version_release') {
-                    when { branch "main" }
-                    steps {
-                        withCredentials([usernamePassword(credentialsId: env.GIT_CREDENTIALS_ID, passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                            sh './bumpversion.sh'
-                        }
-                    }
-                }
                 stage('build') {
                     steps {
                         sh 'yarn --cwd web --frozen-lockfile'
