@@ -30,8 +30,8 @@ jobs:
         run: mvn --batch-mode clean verify
         env:
           CI: true
-      - uses: actions/upload-artifact@v3
-        with:
-          name: war-file ${{ matrix.node-version }}
-          path: /home/runner/work/nrmn-application/nrmn-application/app/target/nrmn-app-*war
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: war-file ${{ matrix.node-version }}
+      #     path: /home/runner/work/nrmn-application/nrmn-application/app/target/nrmn-app-*war
     timeout-minutes: 45
