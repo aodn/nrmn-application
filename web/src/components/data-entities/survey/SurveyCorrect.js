@@ -122,7 +122,7 @@ const SurveyCorrect = () => {
       enableCellChangeFlash: true,
       filter: true,
       floatingFilter: true,
-      minWidth: 70,
+      minWidth: 40,
       resizable: true,
       sortable: true,
       suppressKeyboardEvent: eh.overrideKeyboardEvents,
