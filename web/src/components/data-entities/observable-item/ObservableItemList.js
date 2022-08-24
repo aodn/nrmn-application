@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useRef, useState } from 'react';
+import React, {useRef, useState} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {Navigate, NavLink, useLocation} from 'react-router-dom';
 import {getResult} from '../../../api/api';
@@ -34,10 +34,9 @@ const ObservableItemList = () => {
     }
 
     fetchObservableItems(event).then(() => {
-      if(!(location?.state?.resetFilters)) {
+      if (!location?.state?.resetFilters) {
         stateFilterHandler.restoreStateFilters(gridRef);
-      }
-      else {
+      } else {
         stateFilterHandler.resetStateFilters(gridRef);
       }
 

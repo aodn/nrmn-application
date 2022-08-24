@@ -1,6 +1,6 @@
 import React, {useState, useRef} from 'react';
 import {Box, Button, Typography} from '@mui/material';
-import { NavLink, useLocation } from 'react-router-dom';
+import {NavLink, useLocation} from 'react-router-dom';
 import {grey, red} from '@mui/material/colors';
 import {getResult, entityEdit} from '../../../api/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
@@ -23,10 +23,9 @@ const DiverList = () => {
     }
 
     fetchDivers(event).then(() => {
-      if(!(location?.state?.resetFilters)) {
+      if (!location?.state?.resetFilters) {
         stateFilterHandler.restoreStateFilters(gridRef);
-      }
-      else {
+      } else {
         stateFilterHandler.resetStateFilters(gridRef);
       }
     });

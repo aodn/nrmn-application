@@ -1,14 +1,14 @@
-import { CloudUpload as CloudUploadIcon, PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon } from '@mui/icons-material/';
-import { Box, Button, Typography } from '@mui/material';
+import {CloudUpload as CloudUploadIcon, PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon} from '@mui/icons-material/';
+import {Box, Button, Typography} from '@mui/material';
 import UndoIcon from '@mui/icons-material/Undo';
 import ResetIcon from '@mui/icons-material/LayersClear';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
-import { AgGridColumn, AgGridReact } from 'ag-grid-react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Navigate, useParams } from 'react-router-dom';
-import { getCorrections, submitSurveyCorrection, validateSurveyCorrection } from '../../../api/api';
-import { allMeasurements } from '../../../common/correctionsConstants';
+import {AgGridColumn, AgGridReact} from 'ag-grid-react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {Navigate, useParams} from 'react-router-dom';
+import {getCorrections, submitSurveyCorrection, validateSurveyCorrection} from '../../../api/api';
+import {allMeasurements} from '../../../common/correctionsConstants';
 import ValidationPanel from '../../import/panel/ValidationPanel';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import SummaryPanel from './panel/SummaryPanel';
@@ -16,7 +16,7 @@ import FindReplacePanel from '../../import/panel/FindReplacePanel';
 import SurveyMeasurementHeader from './SurveyMeasurementHeader';
 import eh from '../../../components/import/DataSheetEventHandlers';
 
-const toolTipValueGetter = ({ context, data, colDef }) => {
+const toolTipValueGetter = ({context, data, colDef}) => {
   if (!context.cellValidations) return;
   const row = data.id;
   const field = colDef.field;
@@ -37,7 +37,7 @@ const packedData = (api) => {
   const packedData = [];
   api.forEachNode((rowNode, index) => {
     const data = rowNode.data;
-    packedData.push({ id: index, ...data, measureJson: removeNullProperties(data.measurements) });
+    packedData.push({id: index, ...data, measureJson: removeNullProperties(data.measurements)});
   });
   return packedData;
 };
@@ -61,7 +61,7 @@ const SurveyCorrect = () => {
       if (event.ctrlKey && event.key === 'z') {
         event.preventDefault();
         event.stopPropagation();
-        eh.handleUndo({ api: gridApi });
+        eh.handleUndo({api: gridApi});
       }
     };
     document.body.addEventListener('keydown', undoKeyboardHandler);
@@ -84,7 +84,7 @@ const SurveyCorrect = () => {
       for (const row of res.rowIds) {
         for (const col of res.columnNames) {
           if (!cellFormat[row]) cellFormat[row] = {};
-          cellFormat[row][col] = { levelId: res.levelId, message: res.message };
+          cellFormat[row][col] = {levelId: res.levelId, message: res.message};
         }
       }
     }
@@ -94,24 +94,24 @@ const SurveyCorrect = () => {
 
   const headers = useMemo(() => {
     return [
-      { field: 'id', label: '', editable: false },
-      { field: 'surveyId', label: 'Survey', editable: false },
-      { field: 'diverId', label: 'Diver ID', hide: true },
-      { field: 'diver', label: 'Diver' },
-      { field: 'siteCode', label: 'Site Code', hide: true },
-      { field: 'depth', label: 'Depth' },
-      { field: 'date', label: 'Survey Date' },
-      { field: 'time', label: 'Survey Time' },
-      { field: 'vis', label: 'Visibility' },
-      { field: 'direction', label: 'Direction' },
-      { field: 'latitude', label: 'Latitude' },
-      { field: 'longitude', label: 'Longitude' },
-      { field: 'observableItemId', hide: true },
-      { field: 'species', label: 'Species Name' },
-      { field: 'letterCode', label: 'Letter Code' },
-      { field: 'method', label: 'Method' },
-      { field: 'block', label: 'Block' },
-      { field: 'isInvertSizing', label: 'Use Invert Sizing', isBoolean: false }
+      {field: 'id', label: '', editable: false},
+      {field: 'surveyId', label: 'Survey', editable: false},
+      {field: 'diverId', label: 'Diver ID', hide: true},
+      {field: 'diver', label: 'Diver'},
+      {field: 'siteCode', label: 'Site Code', hide: true},
+      {field: 'depth', label: 'Depth'},
+      {field: 'date', label: 'Survey Date'},
+      {field: 'time', label: 'Survey Time'},
+      {field: 'vis', label: 'Visibility'},
+      {field: 'direction', label: 'Direction'},
+      {field: 'latitude', label: 'Latitude'},
+      {field: 'longitude', label: 'Longitude'},
+      {field: 'observableItemId', hide: true},
+      {field: 'species', label: 'Species Name'},
+      {field: 'letterCode', label: 'Letter Code'},
+      {field: 'method', label: 'Method'},
+      {field: 'block', label: 'Block'},
+      {field: 'isInvertSizing', label: 'Use Invert Sizing', isBoolean: false}
     ];
   }, []);
 
@@ -141,41 +141,46 @@ const SurveyCorrect = () => {
     };
   }, []);
 
-  const defaultSideBar = useMemo(() => ({
-    toolPanels: [
-      {
-        id: 'findReplace',
-        labelDefault: 'Find Replace',
-        labelKey: 'findReplace',
-        iconKey: 'columns',
-        toolPanel: 'findReplacePanel'
-      },
-      {
-        id: 'summaryPanel',
-        labelDefault: 'Summary',
-        labelKey: 'summary',
-        iconKey: 'columns',
-        toolPanel: 'summaryPanel'
-      }
-    ],
-    defaultToolPanel: ''
-  }
-  ), []);
+  const defaultSideBar = useMemo(
+    () => ({
+      toolPanels: [
+        {
+          id: 'findReplace',
+          labelDefault: 'Find Replace',
+          labelKey: 'findReplace',
+          iconKey: 'columns',
+          toolPanel: 'findReplacePanel'
+        },
+        {
+          id: 'summaryPanel',
+          labelDefault: 'Summary',
+          labelKey: 'summary',
+          iconKey: 'columns',
+          toolPanel: 'summaryPanel'
+        }
+      ],
+      defaultToolPanel: ''
+    }),
+    []
+  );
 
-  const context = useMemo(() => ({
-    errors: [],
-    highlighted: [],
-    popUndo: eh.popUndo,
-    pushUndo: eh.pushUndo,
-    putRowIds: [],
-    undoStack: [],
-    useOverlay: 'Loading Survey Correction...',
-    validations: []
-  }), []);
+  const context = useMemo(
+    () => ({
+      errors: [],
+      highlighted: [],
+      popUndo: eh.popUndo,
+      pushUndo: eh.pushUndo,
+      putRowIds: [],
+      undoStack: [],
+      useOverlay: 'Loading Survey Correction...',
+      validations: []
+    }),
+    []
+  );
 
   const [sideBar, setSideBar] = useState(defaultSideBar);
 
-  const onGridReady = ({ api }) => {
+  const onGridReady = ({api}) => {
     getCorrections(surveyId).then((res) => {
       api.hideOverlay();
       if (res.status !== 200) return;
@@ -183,7 +188,7 @@ const SurveyCorrect = () => {
         const measurements = data.observationIds === '' ? {} : JSON.parse(data.measureJson);
         const observationIds = data.observationIds === '' ? [] : JSON.parse(data.observationIds);
         delete data.measureJson;
-        return { id: idx + 1, ...data, observationIds, measurements };
+        return {id: idx + 1, ...data, observationIds, measurements};
       });
       const context = api.gridOptionsWrapper.gridOptions.context;
       context.rowData = [...unpackedData];
@@ -248,10 +253,13 @@ const SurveyCorrect = () => {
     <>
       <Box display="flex" flexDirection="row" p={1} pb={1}>
         <Box flexGrow={1}>
-          <Typography variant="h6">Correct Survey {rowData && '[' + rowData[0].siteCode + ', ' + rowData[0].date + ', ' + rowData[0].depth + '.' + rowData[0].surveyNum + ']'}</Typography>
+          <Typography variant="h6">
+            Correct Survey{' '}
+            {rowData && '[' + rowData[0].siteCode + ', ' + rowData[0].date + ', ' + rowData[0].depth + '.' + rowData[0].surveyNum + ']'}
+          </Typography>
         </Box>
         <Box m={1} ml={0}>
-          <Button variant="outlined" startIcon={<UndoIcon />} onClick={() => eh.handleUndo({ api: gridApi })}>
+          <Button variant="outlined" startIcon={<UndoIcon />} onClick={() => eh.handleUndo({api: gridApi})}>
             Undo
           </Button>
         </Box>
@@ -279,7 +287,7 @@ const SurveyCorrect = () => {
       <Box display={editMode ? 'block' : 'none'} flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
         <AgGridReact
           ref={gridRef}
-          gridOptions={{ context }}
+          gridOptions={{context}}
           animateRows
           cellFadeDelay={10}
           cellFlashDelay={10}
@@ -308,7 +316,7 @@ const SurveyCorrect = () => {
                 headerName={header.label}
                 hide={header.hide}
                 cellEditor="agSelectCellEditor"
-                cellEditorParams={{ values: [true, false] }}
+                cellEditorParams={{values: [true, false]}}
                 valueFormatter={(e) => (e.value === true ? 'Yes' : 'No')}
               />
             ) : (
@@ -331,7 +339,7 @@ const SurveyCorrect = () => {
       </Box>
       <Box display={editMode ? 'none' : 'flex'} justifyContent="center">
         <Box
-          style={{ background: 'white', width: 900 }}
+          style={{background: 'white', width: 900}}
           boxShadow={1}
           padding={3}
           margin={3}
@@ -348,10 +356,10 @@ const SurveyCorrect = () => {
             ))}
           </Box>
           <Box flexDirection="row">
-            <Button sx={{ width: '25px', marginLeft: '20%' }} variant="outlined" onClick={() => setEditMode(true)}>
+            <Button sx={{width: '25px', marginLeft: '20%'}} variant="outlined" onClick={() => setEditMode(true)}>
               Cancel
             </Button>
-            <Button sx={{ width: '50%', marginLeft: '10px' }} variant="contained" disabled={!canSubmitCorrection} onClick={onSubmitConfirm}>
+            <Button sx={{width: '50%', marginLeft: '10px'}} variant="contained" disabled={!canSubmitCorrection} onClick={onSubmitConfirm}>
               Apply Correction
             </Button>
           </Box>

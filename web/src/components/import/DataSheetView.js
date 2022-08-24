@@ -106,7 +106,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
     return () => {
       document.body.removeEventListener('keydown', undoKeyboardHandler);
     };
-  },[gridApi]);
+  }, [gridApi]);
 
   useEffect(() => {
     if (gridApi && state === IngestState.Loading) gridApi.showLoadingOverlay();
@@ -218,10 +218,15 @@ const DataSheetView = ({onIngest, isAdmin}) => {
 
   const onGridReady = (p) => {
     setGridApi(p.api);
-    reload(p.api, id, (job) => {
-      setState(IngestState.Edited);
-      setJob(job);
-    }, isAdmin);
+    reload(
+      p.api,
+      id,
+      (job) => {
+        setState(IngestState.Edited);
+        setJob(job);
+      },
+      isAdmin
+    );
   };
 
   const onFilterChanged = (e) => {
@@ -348,7 +353,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             onFilterChanged={onFilterChanged}
             onRowDataUpdated={onRowDataUpdated}
             fillHandleDirection="y"
-            getContextMenuItems={(e) => eh.getContextMenuItems(e,eh)}
+            getContextMenuItems={(e) => eh.getContextMenuItems(e, eh)}
             undoRedoCellEditing={false}
             onCellEditingStopped={onCellEditingStopped}
             components={{

@@ -1,14 +1,13 @@
-import { blue, grey, orange, red, yellow } from '@mui/material/colors';
-import { extendedMeasurements, measurements } from '../../common/constants';
+import {blue, grey, orange, red, yellow} from '@mui/material/colors';
+import {extendedMeasurements, measurements} from '../../common/constants';
 
 const DataSheetEventHandlers = {
-
   pushUndo(api, delta) {
     const context = api.gridOptionsWrapper.gridOptions.context;
     context.undoStack.push(
       delta.map((d) => {
         context.putRowIds.push(d.id);
-        return { ...d };
+        return {...d};
       })
     );
     return context.undoStack.length;
@@ -53,14 +52,14 @@ const DataSheetEventHandlers = {
     for (let i = startIdx; i < endIdx + 1; i++) {
       const row = e.api.getDisplayedRowAtIndex(i);
       const dataIdx = rowData.findIndex((d) => d.id == row.data.id);
-      const data = { ...rowData[dataIdx] };
+      const data = {...rowData[dataIdx]};
       delta.push(data);
       let newData = {};
       Object.keys(data).forEach(function (key) {
         newData[key] = data[key];
       });
       fields
-        .filter(key => columnDefs.find((d) => d.field === key)?.editable == true)
+        .filter((key) => columnDefs.find((d) => d.field === key)?.editable == true)
         .forEach((key) => {
           newData[key] = fill;
         });
@@ -94,11 +93,11 @@ const DataSheetEventHandlers = {
   },
   chooseCellStyle(params) {
     // Read-only columns
-    if (!params.colDef.editable) return { color: grey[800], backgroundColor: grey[50] };
+    if (!params.colDef.editable) return {color: grey[800], backgroundColor: grey[50]};
 
     // Search results
     const row = params.context.highlighted[params.rowIndex];
-    if (row && row[params.colDef.field]) return { backgroundColor: yellow[100] };
+    if (row && row[params.colDef.field]) return {backgroundColor: yellow[100]};
 
     // Cell validations
     const error = params.context.errors.find(
@@ -107,17 +106,17 @@ const DataSheetEventHandlers = {
 
     switch (error?.levelId) {
       case 'BLOCKING':
-        return { backgroundColor: red[100] };
+        return {backgroundColor: red[100]};
       case 'WARNING':
-        return { backgroundColor: orange[100] };
+        return {backgroundColor: orange[100]};
       case 'DUPLICATE':
         if (params.context.focusedRows?.includes(params.data.id)) {
-          return { backgroundColor: blue[100], fontWeight: 'bold' };
+          return {backgroundColor: blue[100], fontWeight: 'bold'};
         } else {
-          return { backgroundColor: blue[100] };
+          return {backgroundColor: blue[100]};
         }
       case 'INFO':
-        return { backgroundColor: grey[100] };
+        return {backgroundColor: grey[100]};
     }
   },
   onSortChanged(e) {
@@ -140,7 +139,7 @@ const DataSheetEventHandlers = {
     return params.context.rowPos ? params.context.rowPos.indexOf(params.data.pos) + 1 : 0;
   },
   generateErrorTree(rowData, rowPos, errors) {
-    const tree = { blocking: [], warning: [], info: [], duplicate: [] };
+    const tree = {blocking: [], warning: [], info: [], duplicate: []};
     errors
       .sort((a, b) => (a.message < b.message ? -1 : a.message > b.message ? 1 : 0))
       .forEach((e) => {
@@ -160,15 +159,15 @@ const DataSheetEventHandlers = {
                 rowNumbers: [...acc[existingIdx].rowNumbers, rowNumber]
               };
             else
-              acc.push({ columnName: col, value: r[col], rowIds: [r.id], rowNumbers: [rowNumber], isInvertSize: r.isInvertSizing === 'Yes' });
+              acc.push({columnName: col, value: r[col], rowIds: [r.id], rowNumbers: [rowNumber], isInvertSize: r.isInvertSizing === 'Yes'});
             return acc;
           }, []);
         } else {
           const rowPositions = e.rowIds.map((r) => rowData.find((d) => d.id === r)?.pos).filter((r) => r);
           const rowNumbers = rowPositions.map((r) => rowPos.indexOf(r) + 1);
-          summary = [{ rowIds: e.rowIds, columnNames: e.columnNames, rowNumbers }];
+          summary = [{rowIds: e.rowIds, columnNames: e.columnNames, rowNumbers}];
         }
-        tree[e.levelId.toLowerCase()].push({ key: `err-${e.id}`, message: e.message, count: e.rowIds.length, description: summary });
+        tree[e.levelId.toLowerCase()].push({key: `err-${e.id}`, message: e.message, count: e.rowIds.length, description: summary});
       });
     return tree;
   },
@@ -211,7 +210,7 @@ const DataSheetEventHandlers = {
     requiredColumns.forEach((x) => {
       // Get the row display name from the fields, this is because we turn on skipColumnHeaders so that
       // we can add empty row, '' is used to force type to string.
-      headers.push({ data: { value: '' + api.getColumnDefs().filter((y) => y.field === x)[0].headerName, type: 'String' } });
+      headers.push({data: {value: '' + api.getColumnDefs().filter((y) => y.field === x)[0].headerName, type: 'String'}});
     });
 
     api.exportDataAsExcel({
@@ -303,7 +302,7 @@ const DataSheetEventHandlers = {
       delete newData.errors;
       newData.pos = posMap[currentPosIdx + 1] ? posMap[currentPosIdx + 1] - 1 : posMap[currentPosIdx] + 1000;
       newData.id = newId;
-      eh.pushUndo(e.api, [{ id: newId }]);
+      eh.pushUndo(e.api, [{id: newId}]);
       rowData.push(newData);
       e.api.setRowData(rowData);
       e.context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
@@ -350,20 +349,20 @@ const DataSheetEventHandlers = {
     if (startIdx === endIdx && startIdx === e.node.rowIndex) {
       e.api.getSelectedRows().forEach(() => {
         const data = e.node.data;
-        delta.push({ ...data });
+        delta.push({...data});
         rowData.splice(rowData.indexOf(data), 1);
       });
     } else if (startIdx === endIdx) {
       e.api.getSelectedRows().forEach((row) => {
         const data = rowData.find((d) => d.id === row.id);
-        delta.push({ ...data });
+        delta.push({...data});
         rowData.splice(rowData.indexOf(data), 1);
       });
     } else {
       for (let i = startIdx; i < endIdx + 1; i++) {
         const row = e.api.getDisplayedRowAtIndex(i);
         const data = rowData.find((d) => d.id === row.data.id);
-        delta.push({ ...data });
+        delta.push({...data});
         rowData.splice(rowData.indexOf(data), 1);
       }
     }
@@ -419,8 +418,7 @@ const DataSheetEventHandlers = {
     return context.pushUndo(e.api, [...oldRows]);
   },
   handleCellValueChanged(e) {
-    if (e.context.pasteMode)
-      e.context.pendingPasteUndo.push({ id: e.data.id, field: e.colDef.field, value: e.oldValue });
+    if (e.context.pasteMode) e.context.pendingPasteUndo.push({id: e.data.id, field: e.colDef.field, value: e.oldValue});
     return e.context.undoStack.length;
   },
   handleUndo(e) {
@@ -431,7 +429,7 @@ const DataSheetEventHandlers = {
   },
   handleCellEditingStopped(e) {
     if (e.oldValue === e.newValue) return;
-    const row = { ...e.data };
+    const row = {...e.data};
     row[e.column.colId] = e.oldValue;
     return this.pushUndo(e.api, [row]);
   }

@@ -1,6 +1,6 @@
 import React, {useRef, useState} from 'react';
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
-import { Navigate, NavLink, useLocation } from 'react-router-dom';
+import {Navigate, NavLink, useLocation} from 'react-router-dom';
 import {getResult} from '../../../api/api';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
@@ -34,10 +34,9 @@ const SiteList = () => {
     }
 
     fetchSites(event).then(() => {
-      if(!(location?.state?.resetFilters)) {
+      if (!location?.state?.resetFilters) {
         stateFilterHandler.restoreStateFilters(gridRef);
-      }
-      else {
+      } else {
         stateFilterHandler.resetStateFilters(gridRef);
       }
 

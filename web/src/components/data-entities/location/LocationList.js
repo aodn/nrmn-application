@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import { Navigate, NavLink, useLocation } from 'react-router-dom';
+import {Navigate, NavLink, useLocation} from 'react-router-dom';
 import {getEntity} from '../../../api/api';
 import {useRef} from 'react';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
@@ -33,10 +33,9 @@ const LocationList = () => {
     }
 
     fetchLocations(event).then(() => {
-      if(!(location?.state?.resetFilters)) {
+      if (!location?.state?.resetFilters) {
         stateFilterHandler.restoreStateFilters(gridRef);
-      }
-      else {
+      } else {
         stateFilterHandler.resetStateFilters(gridRef);
       }
 
