@@ -1,16 +1,19 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import { Navigate, NavLink, useLocation } from 'react-router-dom';
-import {getEntity} from '../../../api/api';
+import { getResult } from '../../../api/api';
 import {useRef} from 'react';
-import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {Add} from '@mui/icons-material';
 import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
-
 import 'ag-grid-enterprise';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const LocationList = () => {
+  const rowsPerPage = 50;
+  const [loading, setLoading] = React.useState(false);
+
   const location = useLocation();
   const [redirect, setRedirect] = useState();
   const gridRef = useRef(null);
@@ -22,13 +25,60 @@ const LocationList = () => {
     }
   };
 
-  const onGridReady = (event) => {
-    async function fetchLocations(event) {
-      await getEntity('locations').then((res) => {
-        // Use setRowData in api will not trigger onGridReady but onDataChange event.
-        // if you use useState and connect row to setRowData then you will
-        // keep fire onGridReady as row change
-        event.api.setRowData(res.data);
+  const onGridReady = useCallback((event) => {
+    async function fetchLocations(e) {
+      e.api.setDatasource({
+        // This is the functional structure need for datasource
+        rowCount: rowsPerPage,
+        getRows: (params) => {
+          let url = `locations?page=${params.startRow / 100}`;
+          let conditions = [];
+          // Filter section
+          for(let name in params.filterModel) {
+            const p = params.filterModel[name];
+
+            if(p.type) {
+              // This is single condition
+              conditions.push({
+                field: name,
+                ops: p.type,
+                val: p.filter
+              });
+            }
+            else {
+              // This is a multiple condition, currently max two conditions
+              conditions.push({
+                field: name,
+                ops: p.operator,
+                conditions: [
+                  { ops: p.condition1.type, val: p.condition1.filter },
+                  { ops: p.condition2.type, val: p.condition2.filter }
+                ]
+              });
+            }
+          };
+
+          // Sorting section, order is important
+          let sort = [];
+          params.sortModel.forEach(i => {
+            sort.push({
+              field: i.colId,
+              order: i.sort
+            });
+          });
+
+          url = conditions.length !== 0 ? url + `&filters=${encodeURIComponent(JSON.stringify(conditions))}` : url;
+          url = sort.length !== 0 ? url + `&sort=${encodeURIComponent(JSON.stringify(sort))}` : url;
+
+          setLoading(true);
+          getResult(url)
+            .then(res => {
+              params.successCallback(res.data.items, res.data.lastRow);
+            })
+            .finally(()=> {
+              setLoading(false);
+            });
+        }
       });
     }
 
@@ -42,12 +92,17 @@ const LocationList = () => {
 
       autoSizeAll(event, false);
     });
-  };
+  }, [location]);
 
   if (redirect) return <Navigate push to={`/reference/location/${redirect}`} />;
 
   return (
     <>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Box display="flex" flexDirection="row" p={1} pb={1}>
         <Box flexGrow={1}>
           <Typography variant="h4">Locations</Typography>
@@ -64,13 +119,12 @@ const LocationList = () => {
           id={'location-list'}
           rowHeight={24}
           pagination={true}
+          paginationPageSize={rowsPerPage}
+          rowModelType={'infinite'}
           enableCellTextSelection={true}
           onGridReady={(e) => onGridReady(e)}
           onBodyScroll={(e) => autoSizeAll(e, false)}
           onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
-          context={{useOverlay: 'Loading Locations'}}
-          components={{loadingOverlay: LoadingOverlay}}
-          loadingOverlayComponent="loadingOverlay"
           suppressCellFocus={true}
           defaultColDef={{
             sortable: true,

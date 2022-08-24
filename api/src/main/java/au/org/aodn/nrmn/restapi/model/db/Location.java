@@ -9,14 +9,10 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cache;
 import org.hibernate.envers.Audited;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+
+import java.util.List;
 
 import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
 
@@ -43,4 +39,14 @@ public class Location {
     @Column(name = "is_active")
     @NotNull
     private Boolean isActive;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @NotNull
+    @JoinColumn(name = "location_id", referencedColumnName = "location_id", nullable = false)
+    private List<Site> site;
+    /**
+     * This field association is create with dynamicQuery not hardcode here to make it flexible
+     */
+    @Transient
+    private List<MeowEcoregions> meowRegions;
 }

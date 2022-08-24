@@ -2,6 +2,9 @@ package au.org.aodn.nrmn.restapi.repository.dynamicQuery;
 
 import au.org.aodn.nrmn.restapi.controller.transform.Field;
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
@@ -11,6 +14,7 @@ import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public abstract class FilterCondition {
 
@@ -27,6 +31,10 @@ public abstract class FilterCondition {
 
     interface DBField {
         String getDBFieldName();
+    }
+
+    public static <T> List<T> parse(ObjectMapper objectMapper, String values, Class<T[]> clazz) throws JsonProcessingException {
+        return values != null ? Arrays.stream((objectMapper.readValue(values, clazz))).collect(Collectors.toList()) : null;
     }
 
     public static <T extends Enum<T>> Optional<Filter> getSupportField(List<Filter> fs, T v) {
