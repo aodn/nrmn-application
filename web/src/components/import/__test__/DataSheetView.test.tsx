@@ -5,9 +5,10 @@ import {describe, beforeAll, afterEach, test} from '@jest/globals';
 import {BrowserRouter} from 'react-router-dom';
 import * as axiosInstance from '../../../api/api';
 import {AxiosResponse} from 'axios';
-import DataSheetView, {dateComparator} from '../DataSheetView';
+import DataSheetView from '../DataSheetView';
 import {extendedMeasurements, measurements} from '../../../common/constants';
 import '@testing-library/jest-dom/extend-expect';
+import eh from '../DataSheetEventHandlers';
 
 describe('<DataSheetView/>', () => {
   let mockGetDataJob;
@@ -77,7 +78,7 @@ describe('<DataSheetView/>', () => {
       </BrowserRouter>
     );
 
-    await waitFor(() => screen.findByText('user_noextend.xlsx'))
+    waitFor(() => screen.findByText('user_noextend.xlsx'))
       .then(() => {
         // verify default columns exist
         columns.forEach((x) => {
@@ -130,7 +131,7 @@ describe('<DataSheetView/>', () => {
       </BrowserRouter>
     );
 
-    await waitFor(() => screen.findByText('user_extend.xlsx'))
+    waitFor(() => screen.findByText('id.xlsx'))
       .then(() => {
         // verify default columns exist
         columns.forEach((x) => {
@@ -158,12 +159,12 @@ describe('<DataSheetView/>', () => {
   });
 
   test('Date Comparator', async () => {
-    expect(dateComparator('01/01/2006', '01/01/2006')).toEqual(0);
-    expect(dateComparator('01/01/2006', '01/01/06')).toEqual(0);
-    expect(dateComparator('01/01/06', '01/01/2006')).toEqual(0);
-    expect(dateComparator('01/01/00', '01/01/06')).not.toBeGreaterThanOrEqual(0);
-    expect(dateComparator('01/01/06', '01/01/00')).toBeGreaterThanOrEqual(0);
-    expect(dateComparator('01/01/2000', '01/01/06')).not.toBeGreaterThanOrEqual(0);
-    expect(dateComparator('01/01/06', '01/01/2000')).toBeGreaterThanOrEqual(0);
+    expect(eh.dateComparator('01/01/2006', '01/01/2006')).toEqual(0);
+    expect(eh.dateComparator('01/01/2006', '01/01/06')).toEqual(0);
+    expect(eh.dateComparator('01/01/06', '01/01/2006')).toEqual(0);
+    expect(eh.dateComparator('01/01/00', '01/01/06')).not.toBeGreaterThanOrEqual(0);
+    expect(eh.dateComparator('01/01/06', '01/01/00')).toBeGreaterThanOrEqual(0);
+    expect(eh.dateComparator('01/01/2000', '01/01/06')).not.toBeGreaterThanOrEqual(0);
+    expect(eh.dateComparator('01/01/06', '01/01/2000')).toBeGreaterThanOrEqual(0);
   });
 });
