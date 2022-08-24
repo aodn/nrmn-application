@@ -83,13 +83,13 @@ const JobList = () => {
           rowHeight={24}
           pagination={false}
           getRowId={getRowId}
-          enableCellTextSelection={true}
+          enableCellTextSelection
           onGridReady={(e) => onGridReady(e)}
           onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
           context={{useOverlay: 'Loading Jobs'}}
           components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
-          suppressCellFocus={true}
+          suppressCellFocus
           isGroupOpenByDefault={(params) => params.key === 'STAGED'}
           autoGroupColumnDef={{sortable: true, sort: 'asc', width: 150}}
           groupDisplayType="singleColumn"
@@ -99,8 +99,8 @@ const JobList = () => {
             width={40}
             field="id"
             headerName=""
-            suppressMovable={true}
-            suppressMenu={true}
+            suppressMovable
+            suppressMenu
             filter={false}
             resizable={false}
             sortable={false}
@@ -129,8 +129,8 @@ const JobList = () => {
             width={80}
             field="status"
             headerName="Status"
-            rowGroup={true}
-            hide={true}
+            rowGroup
+            hide
             comparator={(a, b) => {
               const status = ['STAGED', 'INGESTED', 'CORRECTED', 'FAILED'];
               return status.indexOf(a) - status.indexOf(b);
@@ -141,8 +141,8 @@ const JobList = () => {
           <AgGridColumn width={200} field="created" sort="desc" valueFormatter={TimeStampCell} />
           <AgGridColumn
             width={60}
-            suppressMovable={true}
-            suppressMenu={true}
+            suppressMovable
+            suppressMenu
             filter={false}
             resizable={false}
             sortable={false}

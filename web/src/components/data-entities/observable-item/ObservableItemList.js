@@ -64,21 +64,21 @@ const ObservableItemList = () => {
         className="ag-theme-material"
         id={'observable-item-list'}
         rowHeight={24}
-        pagination={true}
-        enableCellTextSelection={true}
+        pagination
+        enableCellTextSelection
         onGridReady={(e) => onGridReady(e)}
         onBodyScroll={(e) => autoSizeAll(e, false)}
         onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
         context={{useOverlay: 'Loading Observable Items'}}
         components={{loadingOverlay: LoadingOverlay}}
         loadingOverlayComponent="loadingOverlay"
-        suppressCellFocus={true}
+        suppressCellFocus
         defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
       >
         <AgGridColumn
           field="observableItemId"
           headerName=""
-          suppressMovable={true}
+          suppressMovable
           filter={false}
           resizable={false}
           sortable={false}

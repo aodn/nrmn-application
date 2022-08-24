@@ -276,7 +276,7 @@ const SurveyEdit = () => {
               <Grid item xs={6}>
                 <CustomDropDownInput
                   label="PQ Diver"
-                  optional={true}
+                  optional
                   formData={item.pqDiverInitials}
                   options={divers}
                   field="pqDiverInitials"

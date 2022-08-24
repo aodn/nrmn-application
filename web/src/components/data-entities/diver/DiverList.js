@@ -82,7 +82,7 @@ const DiverList = () => {
         getRowId={(r) => r.data.diverId}
         rowHeight={20}
         fillHandleDirection="y"
-        pagination={true}
+        pagination
         enableBrowserTooltips
         onCellValueChanged={onCellValueChanged}
         context={{useOverlay: 'Loading Divers', delta, errors}}

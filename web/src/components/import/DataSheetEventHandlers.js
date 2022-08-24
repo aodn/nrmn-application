@@ -15,17 +15,17 @@ const DataSheetEventHandlers = {
   },
   resetContext() {
     this.context = this.context || {};
-    this.context.useOverlay = 'Loading';
-    this.context.rowData = [];
-    this.context.rowPos = [];
-    this.context.highlighted = [];
-    this.context.putRowIds = [];
-    this.context.summary = [];
     this.context.errorList = {};
     this.context.errors = [];
-    this.context.pendingPasteUndo = [];
     this.context.focusedRows = [];
+    this.context.highlighted = [];
     this.context.pasteMode = false;
+    this.context.pendingPasteUndo = [];
+    this.context.putRowIds = [];
+    this.context.rowData = [];
+    this.context.rowPos = [];
+    this.context.summary = [];
+    this.context.useOverlay = 'Loading';
   },
   dateComparator(date1, date2) {
     const dateToNum = (date) => {
@@ -46,6 +46,7 @@ const DataSheetEventHandlers = {
     const rowData = e.context.rowData;
     const [cells] = e.api.getCellRanges();
     const fields = cells.columns.map((col) => col.colId);
+    const columnDefs = e.api.columnModel.columnDefs;
     const delta = [];
     const startIdx = Math.min(cells.startRow.rowIndex, cells.endRow.rowIndex);
     const endIdx = Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
@@ -58,11 +59,11 @@ const DataSheetEventHandlers = {
       Object.keys(data).forEach(function (key) {
         newData[key] = data[key];
       });
-      fields.forEach((key) => {
-        if (key != 'pos') {
+      fields
+        .filter(key => columnDefs.find((d) => d.field === key)?.editable == true)
+        .forEach((key) => {
           newData[key] = fill;
-        }
-      });
+        });
       rowData[dataIdx] = newData;
     }
     this.pushUndo(e.api, delta);
@@ -92,14 +93,14 @@ const DataSheetEventHandlers = {
     return context.undoStack.length;
   },
   chooseCellStyle(params) {
-    // Grey-out the first  column containing the row number
+    // Read-only columns
     if (!params.colDef.editable) return { color: grey[800], backgroundColor: grey[50] };
 
-    // Highlight and search results
+    // Search results
     const row = params.context.highlighted[params.rowIndex];
     if (row && row[params.colDef.field]) return { backgroundColor: yellow[100] };
 
-    // Highlight cell validations
+    // Cell validations
     const error = params.context.errors.find(
       (e) => e.rowIds.includes(params.data.id) && (!e.columnNames || e.columnNames.includes(params.colDef.field))
     );

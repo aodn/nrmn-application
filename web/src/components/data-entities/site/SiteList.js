@@ -93,15 +93,15 @@ const SiteList = () => {
           ref={gridRef}
           id={'site-list'}
           rowHeight={24}
-          pagination={true}
-          enableCellTextSelection={true}
+          pagination
+          enableCellTextSelection
           onGridReady={(e) => onGridReady(e)}
           onBodyScroll={(e) => autoSizeAll(e, false)}
           onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
           context={{useOverlay: 'Loading Sites'}}
           components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
-          suppressCellFocus={true}
+          suppressCellFocus
           defaultColDef={{
             sortable: true,
             resizable: true,
@@ -112,8 +112,8 @@ const SiteList = () => {
           <AgGridColumn
             field="siteId"
             headerName=""
-            suppressMovable={true}
-            suppressMenu={true}
+            suppressMovable
+            suppressMenu
             filter={false}
             resizable={false}
             sortable={false}
@@ -144,12 +144,12 @@ const SiteList = () => {
           <AgGridColumn minWidth={200} field="country" />
           <AgGridColumn field="latitude" />
           <AgGridColumn field="longitude" />
-          <AgGridColumn suppressMenu={true} field="isActive" headerName="Active" />
+          <AgGridColumn suppressMenu field="isActive" headerName="Active" />
           <AgGridColumn
             field="siteId"
             headerName=""
-            suppressMovable={true}
-            suppressMenu={true}
+            suppressMovable
+            suppressMenu
             filter={false}
             resizable={false}
             sortable={false}
@@ -166,8 +166,8 @@ const SiteList = () => {
           <AgGridColumn
             field="observableItemId"
             headerName=""
-            suppressMovable={true}
-            suppressMenu={true}
+            suppressMovable
+            suppressMenu
             filter={false}
             resizable={false}
             sortable={false}

@@ -104,21 +104,21 @@ const SurveyList = () => {
             id={'survey-list'}
             className="ag-theme-material"
             rowHeight={24}
-            animateRows={true}
-            enableCellTextSelection={true}
-            pagination={true}
+            animateRows
+            enableCellTextSelection
+            pagination
             paginationPageSize={rowsPerPage}
             rowModelType={'infinite'}
             onGridReady={(e) => onGridReady(e)}
             onFilterChanged={(e) => { stateFilterHandler.stateFilterEventHandler(gridRef, e); }}
-            suppressCellFocus={true}
+            suppressCellFocus
             defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
           >
             <AgGridColumn
               width={40}
               field="surveyId"
               headerName=""
-              suppressMovable={true}
+              suppressMovable
               filter={false}
               resizable={false}
               sortable={false}
@@ -138,7 +138,7 @@ const SurveyList = () => {
                 width={40}
                 field="surveyId"
                 headerName=""
-                suppressMovable={true}
+                suppressMovable
                 filter={false}
                 tooltipValueGetter={() => 'Correct Survey'}
                 resizable={false}

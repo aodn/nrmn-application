@@ -114,7 +114,7 @@ const JobUpload = () => {
                 <Grid item xs={12}>
                   <Box p={3}>
                     <LinearProgressWithLabel
-                      determinate={true}
+                      determinate
                       value={uploadProgress}
                       done={false}
                       label={`Uploading ${formData.file.name}...`}

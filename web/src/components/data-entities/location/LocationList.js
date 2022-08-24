@@ -63,15 +63,15 @@ const LocationList = () => {
           ref={gridRef}
           id={'location-list'}
           rowHeight={24}
-          pagination={true}
-          enableCellTextSelection={true}
+          pagination
+          enableCellTextSelection
           onGridReady={(e) => onGridReady(e)}
           onBodyScroll={(e) => autoSizeAll(e, false)}
           onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
           context={{useOverlay: 'Loading Locations'}}
           components={{loadingOverlay: LoadingOverlay}}
           loadingOverlayComponent="loadingOverlay"
-          suppressCellFocus={true}
+          suppressCellFocus
           defaultColDef={{
             sortable: true,
             resizable: true,
@@ -83,7 +83,7 @@ const LocationList = () => {
             width={40}
             field="id"
             headerName=""
-            suppressMovable={true}
+            suppressMovable
             filter={false}
             resizable={false}
             sortable={false}

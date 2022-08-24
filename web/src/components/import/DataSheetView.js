@@ -49,13 +49,6 @@ const defaultSideBar = {
       labelKey: 'findReplace',
       iconKey: 'columns',
       toolPanel: 'findReplacePanel'
-    },
-    {
-      id: 'columns',
-      labelDefault: 'Pivot',
-      labelKey: 'columns',
-      iconKey: 'columns',
-      toolPanel: 'agColumnsToolPanel'
     }
   ],
   defaultToolPanel: ''
@@ -327,25 +320,25 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             cellFlashDelay={100}
             cellFadeDelay={100}
             defaultColDef={{
+              cellStyle: eh.chooseCellStyle,
               editable,
-              sortable: true,
-              resizable: true,
-              minWidth: 70,
+              enableCellChangeFlash: true,
               filter: true,
               floatingFilter: true,
-              suppressMenu: true,
+              minWidth: 70,
+              resizable: true,
+              sortable: true,
               suppressKeyboardEvent: eh.overrideKeyboardEvents,
-              cellStyle: eh.chooseCellStyle,
-              enableCellChangeFlash: true,
+              suppressMenu: true,
               tooltipValueGetter: eh.toolTipValueGetter,
               valueParser: ({newValue}) => (newValue ? newValue.trim() : '')
             }}
             rowHeight={20}
             enableBrowserTooltips
             rowSelection="multiple"
-            enableRangeSelection={true}
-            animateRows={true}
-            enableRangeHandle={true}
+            enableRangeSelection
+            animateRows
+            enableRangeHandle
             onCellKeyDown={eh.onCellKeyDown}
             onPasteStart={eh.onPasteStart}
             onPasteEnd={onPasteEnd}
@@ -364,17 +357,15 @@ const DataSheetView = ({onIngest, isAdmin}) => {
               loadingOverlay: LoadingOverlay
             }}
             loadingOverlayComponent="loadingOverlay"
-            pivotMode={false}
-            pivotColumnGroupTotals="before"
             sideBar={sideBar}
             onGridReady={onGridReady}
           >
-            <AgGridColumn field="id" headerName="ID" editable={false} hide={true} />
-            <AgGridColumn field="pos" editable={false} hide={true} sort="asc" />
+            <AgGridColumn field="id" headerName="ID" editable={false} hide />
+            <AgGridColumn field="pos" editable={false} hide sort="asc" />
             <AgGridColumn
               field="row"
               headerName=""
-              suppressMovable={true}
+              suppressMovable
               editable={false}
               valueGetter={eh.rowValueGetter}
               minWidth={40}
@@ -382,22 +373,22 @@ const DataSheetView = ({onIngest, isAdmin}) => {
               filter={false}
               sortable={false}
             />
-            <AgGridColumn field="diver" headerName="Diver" pivot={true} enablePivot={false} />
+            <AgGridColumn field="diver" headerName="Diver" />
             <AgGridColumn field="buddy" headerName="Buddy" />
-            <AgGridColumn field="siteCode" headerName="Site No." rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="siteCode" headerName="Site No." rowGroup={false} enableRowGroup />
             <AgGridColumn field="siteName" headerName="Site Name" minWidth={160} />
             <AgGridColumn field="latitude" headerName="Latitude" />
             <AgGridColumn field="longitude" headerName="Longitude" />
-            <AgGridColumn field="date" headerName="Date" rowGroup={false} enableRowGroup={true} comparator={eh.dateComparator} />
+            <AgGridColumn field="date" headerName="Date" rowGroup={false} enableRowGroup comparator={eh.dateComparator} />
             <AgGridColumn field="vis" headerName="Vis" />
             <AgGridColumn field="direction" headerName="Direction" />
             <AgGridColumn field="time" headerName="Time" />
             <AgGridColumn field="P-Qs" headerName="P-Qs" />
-            <AgGridColumn field="depth" headerName="Depth" rowGroup={false} enableRowGroup={true} />
-            <AgGridColumn field="method" headerName="Method" rowGroup={false} enableRowGroup={true} />
-            <AgGridColumn field="block" headerName="Block" rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="depth" headerName="Depth" rowGroup={false} enableRowGroup />
+            <AgGridColumn field="method" headerName="Method" rowGroup={false} enableRowGroup />
+            <AgGridColumn field="block" headerName="Block" rowGroup={false} enableRowGroup />
             <AgGridColumn field="code" headerName="Code" />
-            <AgGridColumn field="species" headerName="Species" pivot={true} enablePivot={false} />
+            <AgGridColumn field="species" headerName="Species" />
             <AgGridColumn field="commonName" headerName="Common Name" />
             <AgGridColumn field="total" headerName="Total" aggFunc="count" />
             <AgGridColumn field="inverts" headerName="Inverts" />
