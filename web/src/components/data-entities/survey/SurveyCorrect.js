@@ -12,6 +12,7 @@ import ValidationPanel from '../../import/panel/ValidationPanel';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import SummaryPanel from './panel/SummaryPanel';
 import SurveyMeasurementHeader from './SurveyMeasurementHeader';
+import eh from '../../../components/import/DataSheetEventHandlers';
 
 const chooseCellStyle = (params) => {
   // Grey-out the first  column containing the row number
@@ -97,30 +98,30 @@ const SurveyCorrect = () => {
 
   const headers = useMemo(() => {
     return [
-      {field: 'id', label: '', hide: false},
-      {field: 'surveyId', label: 'Survey', hide: false},
+      {field: 'id', label: '', hide: false, editable: false},
+      {field: 'surveyId', label: 'Survey', hide: false, editable: false},
       {field: 'diverId', label: 'Diver ID', hide: true},
-      {field: 'diver', label: 'Diver', hide: false, editable: false},
+      {field: 'diver', label: 'Diver', hide: false},
       {field: 'siteCode', label: 'Site Code', hide: true},
-      {field: 'depth', label: 'Depth', hide: false, editable: false},
-      {field: 'date', label: 'Survey Date', hide: false, editable: false},
-      {field: 'time', label: 'Survey Time', hide: false, editable: false},
-      {field: 'vis', label: 'Visibility', hide: false, editable: false},
-      {field: 'direction', label: 'Direction', hide: false, editable: false},
-      {field: 'latitude', label: 'Latitude', hide: false, editable: false},
-      {field: 'longitude', label: 'Longitude', hide: false, editable: false},
+      {field: 'depth', label: 'Depth', hide: false},
+      {field: 'date', label: 'Survey Date', hide: false},
+      {field: 'time', label: 'Survey Time', hide: false},
+      {field: 'vis', label: 'Visibility', hide: false},
+      {field: 'direction', label: 'Direction', hide: false},
+      {field: 'latitude', label: 'Latitude', hide: false},
+      {field: 'longitude', label: 'Longitude', hide: false},
       {field: 'observableItemId', hide: true},
-      {field: 'species', label: 'Species Name', hide: false, editable: false},
-      {field: 'letterCode', label: 'Letter Code', hide: false, editable: false},
-      {field: 'method', label: 'Method', hide: false, editable: false},
-      {field: 'block', label: 'Block', hide: false, editable: false},
-      {field: 'isInvertSizing', label: 'Use Invert Sizing', hide: false, isBoolean: false, editable: false}
+      {field: 'species', label: 'Species Name', hide: false},
+      {field: 'letterCode', label: 'Letter Code', hide: false},
+      {field: 'method', label: 'Method', hide: false},
+      {field: 'block', label: 'Block', hide: false},
+      {field: 'isInvertSizing', label: 'Use Invert Sizing', hide: false, isBoolean: false}
     ];
   }, []);
 
   const defaultColDef = useMemo(() => {
     return {
-      editable: false,
+      editable: true,
       enableCellChangeFlash: false,
       filter: false,
       floatingFilter: false,
@@ -168,7 +169,9 @@ const SurveyCorrect = () => {
         delete data.measureJson;
         return {id: idx + 1, ...data, observationIds, measurements};
       });
-      setRowData(unpackedData);
+      const context = api.gridOptionsWrapper.gridOptions.context;
+      context.rowData = [...unpackedData];
+      setRowData(context.rowData);
     });
   };
 
@@ -239,7 +242,7 @@ const SurveyCorrect = () => {
       <Box display={editMode ? 'block' : 'none'} flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
         <AgGridReact
           ref={gridRef}
-          gridOptions={{context: {useOverlay: 'Loading Survey Correction...', validations: []}}}
+          gridOptions={{context: {useOverlay: 'Loading Survey Correction...',   undoStack: [], putRowIds: [], validations: []}}}
           animateRows
           cellFadeDelay={100}
           cellFlashDelay={100}
@@ -256,6 +259,7 @@ const SurveyCorrect = () => {
           rowHeight={20}
           rowSelection="multiple"
           sideBar={sideBar}
+          getContextMenuItems={(e) => eh.getContextMenuItems(e,eh)}
         >
           {headers.map((header, idx) =>
             header.isBoolean ? (
@@ -275,7 +279,7 @@ const SurveyCorrect = () => {
                 headerName={header.label}
                 hide={header.hide}
                 cellEditor="agTextCellEditor"
-                editable={header.editable ?? false}
+                editable={header.editable ?? true}
               />
             )
           )}
