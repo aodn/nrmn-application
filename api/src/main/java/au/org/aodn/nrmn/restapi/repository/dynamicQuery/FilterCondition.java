@@ -28,6 +28,7 @@ public abstract class FilterCondition {
     public static final String BLANK = "blank";
     public static final String NOT_BLANK = "notBlank";
     public static final String IN = "in";
+    public static final String NOT_IN = "notIn";
 
     interface DBField {
         String getDBFieldName();
@@ -108,6 +109,9 @@ public abstract class FilterCondition {
             }
             case IN : {
                 return target.in((Object[])value.split(","));
+            }
+            case NOT_IN : {
+                return criteriaBuilder.not(target.in((Object[])value.split(",")));
             }
             case BLANK: {
                 return criteriaBuilder.or(
