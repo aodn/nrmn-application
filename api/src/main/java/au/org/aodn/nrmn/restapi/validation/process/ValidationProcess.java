@@ -846,7 +846,9 @@ public class ValidationProcess {
 
         var programName = job.getProgram().getProgramName();
         var validation = Arrays.asList("ATRC", "FRDC").contains(programName.toUpperCase()) ? ProgramValidation.ATRC
-                : ProgramValidation.RLS;
+                       : Arrays.asList("RLS", "Parks Vic").contains(programName.toUpperCase()) ? ProgramValidation.RLS 
+                       : ProgramValidation.NONE;
+
         var enteredSiteCodes = rows.stream().map(s -> s.getSiteCode().toUpperCase()).collect(Collectors.toSet());
         var siteCodes = siteRepository.getAllSiteCodesMatching(enteredSiteCodes);
         var sheetErrors = new HashSet<ValidationError>();
