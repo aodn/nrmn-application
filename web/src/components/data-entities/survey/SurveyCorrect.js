@@ -196,6 +196,7 @@ const SurveyCorrect = () => {
       context.rowData = rowData;
       context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
       api.setRowData(context.rowData.length > 0 ? context.rowData : null);
+      setRowData(rowData);
       setGridApi(api);
     });
   };
