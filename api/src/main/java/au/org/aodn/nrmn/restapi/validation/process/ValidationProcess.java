@@ -846,7 +846,7 @@ public class ValidationProcess {
 
         var programName = job.getProgram().getProgramName();
         var validation = Arrays.asList("ATRC", "FRDC").contains(programName.toUpperCase()) ? ProgramValidation.ATRC
-                       : Arrays.asList("RLS", "Parks Vic").contains(programName.toUpperCase()) ? ProgramValidation.RLS 
+                       : Arrays.asList("RLS", "PARKS VIC").contains(programName.toUpperCase()) ? ProgramValidation.RLS 
                        : ProgramValidation.NONE;
 
         var enteredSiteCodes = rows.stream().map(s -> s.getSiteCode().toUpperCase()).collect(Collectors.toSet());
