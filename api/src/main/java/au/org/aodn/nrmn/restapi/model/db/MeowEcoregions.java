@@ -49,7 +49,6 @@ public class MeowEcoregions {
     @NotNull
     private String latitudeZone;
 
-    @Column(columnDefinition = "Geometry")
-    @Type(type = "org.hibernate.spatial.GeometryType")
+    @Column(name="geom", columnDefinition = "Geometry")
     private Polygon polygon;
 }

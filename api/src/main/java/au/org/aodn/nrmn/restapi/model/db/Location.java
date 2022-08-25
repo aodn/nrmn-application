@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
+import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 @Entity
 @Cache(region = "entities", usage = READ_WRITE)
@@ -41,8 +43,9 @@ public class Location {
     private Boolean isActive;
 
     @OneToMany(fetch = FetchType.LAZY)
-    @NotNull
-    @JoinColumn(name = "location_id", referencedColumnName = "location_id", nullable = false)
+    @Audited(targetAuditMode = NOT_AUDITED)
+    @Schema(title = "Site")
+    @JoinColumn(name = "location_id", referencedColumnName = "location_id", nullable = false, insertable = false, updatable = false)
     private List<Site> site;
     /**
      * This field association is create with dynamicQuery not hardcode here to make it flexible

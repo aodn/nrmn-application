@@ -17,11 +17,32 @@ public class LocationExtendedMapping {
     public LocationExtendedMapping(Location location) {
         this.id = location.getLocationId();
         this.locationName = location.getLocationName();
-        this.countries = location.getSite().stream().map(n -> n.getCountry()).sorted().collect(Collectors.joining(","));
-        this.areas = location.getSite().stream().map(n -> n.getState()).sorted().collect(Collectors.joining(","));
-        this.ecoRegions = location.getMeowRegions().stream().map(n -> n.getEcoRegion()).sorted().collect(Collectors.joining(","));
+        this.countries = location.getSite()
+                .stream()
+                .map(n -> n.getCountry())
+                .filter(n -> n != null)
+                .distinct()
+                .sorted()
+                .collect(Collectors.joining(", "));
+
+        this.areas = location.getSite()
+                .stream()
+                .map(n -> n.getState())
+                .filter(n -> n != null)
+                .distinct()
+                .sorted()
+                .collect(Collectors.joining(", "));
+
+        this.siteCodes = location.getSite()
+                .stream()
+                .map(n -> n.getSiteCode())
+                .filter(n -> n != null)
+                .distinct()
+                .sorted()
+                .collect(Collectors.joining(", "));;
+
         this.status = location.getIsActive() ? "Active" : "Inactive";
-        this.siteCodes = location.getSite().stream().map(n -> n.getSiteCode()).sorted().collect(Collectors.joining(","));;
+//        this.ecoRegions = location.getMeowRegions().stream().map(n -> n.getEcoRegion()).distinct().sorted().collect(Collectors.joining(","));
     }
 
     public int getId() {

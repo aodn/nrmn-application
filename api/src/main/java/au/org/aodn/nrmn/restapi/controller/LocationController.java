@@ -1,7 +1,9 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -43,7 +45,7 @@ public class LocationController {
     private ObjectMapper objMapper;
 
     @GetMapping("/locations")
-    public List<LocationExtendedMapping> getLocationsWithRegions(@RequestParam(value = "sort", required = false) String sort,
+    public ResponseEntity<?>  getLocationsWithRegions(@RequestParam(value = "sort", required = false) String sort,
                                                                  @RequestParam(value = "filters", required = false) String filters,
                                                                  @RequestParam(value = "page", defaultValue = "0") int page,
                                                                  @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) throws JsonProcessingException {
@@ -54,7 +56,12 @@ public class LocationController {
 
 
         Page<LocationExtendedMapping> v = locationRepository.findAllLocationBy(f, s, PageRequest.of(page, pageSize));
+        Map<String, Object> data = new HashMap<>();
 
+        data.put("lastRow", v.getTotalElements());
+        data.put("items", v.getContent());
+
+        return ResponseEntity.ok(data);
     }
 
     @PostMapping("/location")
