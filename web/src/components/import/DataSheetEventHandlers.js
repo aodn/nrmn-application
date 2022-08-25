@@ -1,7 +1,16 @@
 import {blue, grey, orange, red, yellow} from '@mui/material/colors';
 import {extendedMeasurements, measurements} from '../../common/constants';
 
-const DataSheetEventHandlers = {
+class DataSheetEventHandlers {
+  constructor() {
+    this.fillRegion = this.fillRegion.bind(this);
+    this.handleUndo = this.handleUndo.bind(this);
+    this.onClearRegion = this.onClearRegion.bind(this);
+    this.onCopyRegion = this.onCopyRegion.bind(this);
+    this.onCutRegion = this.onCutRegion.bind(this);
+    this.overrideKeyboardEvents = this.overrideKeyboardEvents.bind(this);
+  }
+
   pushUndo(api, delta) {
     const context = api.gridOptionsWrapper.gridOptions.context;
     context.undoStack.push(
@@ -11,7 +20,8 @@ const DataSheetEventHandlers = {
       })
     );
     return context.undoStack.length;
-  },
+  }
+
   resetContext() {
     this.context = this.context || {};
     this.context.errorList = {};
@@ -25,7 +35,8 @@ const DataSheetEventHandlers = {
     this.context.rowPos = [];
     this.context.summary = [];
     this.context.useOverlay = 'Loading';
-  },
+  }
+
   dateComparator(date1, date2) {
     const dateToNum = (date) => {
       if (date === undefined || (date === null && (date.length !== 10 || date.length !== 8))) return null;
@@ -40,7 +51,8 @@ const DataSheetEventHandlers = {
     if (date1Number === null) return -1;
     if (date2Number === null) return 1;
     return date1Number - date2Number;
-  },
+  }
+
   fillRegion(e, fill) {
     const rowData = e.context.rowData;
     const [cells] = e.api.getCellRanges();
@@ -59,7 +71,7 @@ const DataSheetEventHandlers = {
         newData[key] = data[key];
       });
       fields
-        .filter((key) => columnDefs.find((d) => d.field === key)?.editable == true)
+        .filter((key) => !(columnDefs.find((d) => d.field === key)?.editable == false))
         .forEach((key) => {
           newData[key] = fill;
         });
@@ -67,7 +79,8 @@ const DataSheetEventHandlers = {
     }
     this.pushUndo(e.api, delta);
     e.api.setRowData(rowData);
-  },
+  }
+
   popUndo(api) {
     const context = api.gridOptionsWrapper.gridOptions.context;
     const deltaSet = context.undoStack.pop();
@@ -90,7 +103,8 @@ const DataSheetEventHandlers = {
     api.setRowData(rowData);
     context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
     return context.undoStack.length;
-  },
+  }
+
   chooseCellStyle(params) {
     // Read-only columns
     if (!params.colDef.editable) return {color: grey[800], backgroundColor: grey[50]};
@@ -118,10 +132,12 @@ const DataSheetEventHandlers = {
       case 'INFO':
         return {backgroundColor: grey[100]};
     }
-  },
+  }
+
   onSortChanged(e) {
     e.api.refreshCells();
-  },
+  }
+
   toolTipValueGetter(params) {
     const error = params.context.errors.find(
       (e) => e.rowIds.includes(params.data.id) && (!e.columnNames || e.columnNames.includes(params.colDef.field))
@@ -134,10 +150,12 @@ const DataSheetEventHandlers = {
     }
 
     return error?.message;
-  },
-  rowValueGetter(params) {
-    return params.context.rowPos ? params.context.rowPos.indexOf(params.data.pos) + 1 : 0;
-  },
+  }
+
+  rowValueGetter(e) {
+    return e.context.rowPos ? e.context.rowPos.indexOf(e.data.pos) + 1 : 0;
+  }
+
   generateErrorTree(rowData, rowPos, errors) {
     const tree = {blocking: [], warning: [], info: [], duplicate: []};
     errors
@@ -170,14 +188,17 @@ const DataSheetEventHandlers = {
         tree[e.levelId.toLowerCase()].push({key: `err-${e.id}`, message: e.message, count: e.rowIds.length, description: summary});
       });
     return tree;
-  },
+  }
+
   onPasteStart(e) {
     const context = e.api.gridOptionsWrapper.gridOptions.context;
     context.pasteMode = true;
-  },
+  }
+
   onCopyRegion(e) {
     e.api.copySelectedRangeToClipboard();
-  },
+  }
+
   onClickExcelExport(api, name, isExtended) {
     const columns = [
       'id',
@@ -221,7 +242,8 @@ const DataSheetEventHandlers = {
       prependContent: [headers, []],
       fileName: `export_${name}`
     });
-  },
+  }
+
   onCellKeyDown(e) {
     const editingCells = e.api.getEditingCells();
     if (editingCells.length === 1) {
@@ -239,7 +261,8 @@ const DataSheetEventHandlers = {
       }
       context.navigationKey = '';
     }
-  },
+  }
+
   onTabToNextCell(e) {
     let context = e.api.gridOptionsWrapper.gridOptions.context;
     let result;
@@ -269,7 +292,8 @@ const DataSheetEventHandlers = {
     }
 
     return result;
-  },
+  }
+
   getContextMenuItems(e, eh) {
     const [cells] = e.api.getCellRanges();
     if (!cells) return;
@@ -338,7 +362,8 @@ const DataSheetEventHandlers = {
       });
     }
     return items;
-  },
+  }
+
   deleteRow(e) {
     const rowData = e.context.rowData;
     const [cells] = e.api.getCellRanges();
@@ -370,7 +395,8 @@ const DataSheetEventHandlers = {
     e.api.setRowData(rowData);
     e.context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
     e.api.refreshCells();
-  },
+  }
+
   overrideKeyboardEvents(e) {
     if (e.event.key === 'Delete') {
       if (e.event.type === 'keydown') this.onClearRegion(e);
@@ -387,14 +413,17 @@ const DataSheetEventHandlers = {
       }
       return false;
     }
-  },
+  }
+
   onClearRegion(e) {
     this.fillRegion(e, '');
-  },
+  }
+
   onCutRegion(e) {
     this.onCopyRegion(e);
     this.onClearRegion(e);
-  },
+  }
+
   handlePasteEnd(e) {
     const context = e.api.gridOptionsWrapper.gridOptions.context;
     context.pasteMode = false;
@@ -416,23 +445,26 @@ const DataSheetEventHandlers = {
     });
     context.pendingPasteUndo = [];
     return context.pushUndo(e.api, [...oldRows]);
-  },
+  }
+
   handleCellValueChanged(e) {
     if (e.context.pasteMode) e.context.pendingPasteUndo.push({id: e.data.id, field: e.colDef.field, value: e.oldValue});
     return e.context.undoStack.length;
-  },
+  }
+
   handleUndo(e) {
     const context = e.api.gridOptionsWrapper.gridOptions.context;
     if (context.undoStack.length < 1) return;
     this.popUndo(e.api);
     e.api.refreshCells();
-  },
+  }
+
   handleCellEditingStopped(e) {
     if (e.oldValue === e.newValue) return;
     const row = {...e.data};
     row[e.column.colId] = e.oldValue;
     return this.pushUndo(e.api, [row]);
   }
-};
+}
 
-export default DataSheetEventHandlers;
+export default new DataSheetEventHandlers();

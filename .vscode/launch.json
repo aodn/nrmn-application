@@ -24,6 +24,7 @@
       "request": "launch",
       "type": "firefox",
       "reAttach": true,
+      "keepProfileChanges": true,
       "profile": "dev",
       "url": "http://localhost:3000/",
       "webRoot": "${workspaceFolder}",

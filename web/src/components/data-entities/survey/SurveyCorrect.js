@@ -94,7 +94,8 @@ const SurveyCorrect = () => {
 
   const headers = useMemo(() => {
     return [
-      {field: 'id', label: '', editable: false},
+      {field: 'pos', label: '', editable: false, hide: true, sort: 'asc'},
+      {field: 'id', label: '', editable: false, hide: true},
       {field: 'surveyId', label: 'Survey', editable: false},
       {field: 'diverId', label: 'Diver ID', hide: true},
       {field: 'diver', label: 'Diver'},
@@ -111,7 +112,7 @@ const SurveyCorrect = () => {
       {field: 'letterCode', label: 'Letter Code'},
       {field: 'method', label: 'Method'},
       {field: 'block', label: 'Block'},
-      {field: 'isInvertSizing', label: 'Use Invert Sizing', isBoolean: false}
+      {field: 'isInvertSizing', label: 'Use Invert Sizing'}
     ];
   }, []);
 
@@ -188,11 +189,13 @@ const SurveyCorrect = () => {
         const measurements = data.observationIds === '' ? {} : JSON.parse(data.measureJson);
         const observationIds = data.observationIds === '' ? [] : JSON.parse(data.observationIds);
         delete data.measureJson;
-        return {id: idx + 1, ...data, observationIds, measurements};
+        return {id: (idx + 1) * 100, pos: idx + 1, ...data, observationIds, measurements};
       });
       const context = api.gridOptionsWrapper.gridOptions.context;
-      context.rowData = [...unpackedData];
-      setRowData(context.rowData);
+      const rowData = [...unpackedData];
+      context.rowData = rowData;
+      context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
+      api.setRowData(context.rowData.length > 0 ? context.rowData : null);
       setGridApi(api);
     });
   };
@@ -300,7 +303,6 @@ const SurveyCorrect = () => {
           loadingOverlayComponent="loadingOverlay"
           onGridReady={onGridReady}
           onRowDataUpdated={(e) => e.columnApi.autoSizeAllColumns()}
-          rowData={rowData}
           rowHeight={20}
           onSortChanged={eh.onSortChanged}
           onFilterChanged={onFilterChanged}
@@ -308,27 +310,27 @@ const SurveyCorrect = () => {
           sideBar={sideBar}
           getContextMenuItems={(e) => eh.getContextMenuItems(e, eh)}
         >
+                      <AgGridColumn
+              field="row"
+              headerName=""
+              suppressMovable
+              editable={false}
+              valueGetter={eh.rowValueGetter}
+              minWidth={40}
+              enableCellChangeFlash={false}
+              filter={false}
+              sortable={false}
+            />
           {headers.map((header, idx) =>
-            header.isBoolean ? (
               <AgGridColumn
                 key={idx}
                 field={header.field}
                 headerName={header.label}
                 hide={header.hide}
-                cellEditor="agSelectCellEditor"
-                cellEditorParams={{values: [true, false]}}
-                valueFormatter={(e) => (e.value === true ? 'Yes' : 'No')}
-              />
-            ) : (
-              <AgGridColumn
-                key={idx}
-                field={header.field}
-                headerName={header.label}
-                hide={header.hide}
+                sort={header.sort}
                 cellEditor="agTextCellEditor"
                 editable={header.editable ?? true}
               />
-            )
           )}
           <AgGridColumn editable field={'measurements.0'} headerName="Unsized" />
           {allMeasurements.map((_, idx) => {
