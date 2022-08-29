@@ -40,7 +40,7 @@ public class LocationFilterCondition extends FilterCondition {
 
             @Override
             public String getDBFieldName() {
-                return "country";
+                return "countries";
             }
         },
         SITE_CODE {
@@ -51,18 +51,18 @@ public class LocationFilterCondition extends FilterCondition {
 
             @Override
             public String getDBFieldName() {
-                return "state";
+                return "areas";
             }
         },
         ECO_REGIONS {
             @Override
             public String toString() {
-                return "location.ecoregions";
+                return "location.ecoRegions";
             }
 
             @Override
             public String getDBFieldName() {
-                return "ecoregions";
+                return "ecoRegions";
             }
         }
     }
@@ -104,8 +104,8 @@ public class LocationFilterCondition extends FilterCondition {
             switch (target) {
                 case SITE_CODE:
                 case COUNTRIES:
+                case ECO_REGIONS: filter.setOperation(SPLIT_STRING_CONTAINS);
                 case STATUS:
-                case ECO_REGIONS:
                 case LOCATION_NAME: {
                     if(filter.isCompositeCondition()) {
                         specifications.add(

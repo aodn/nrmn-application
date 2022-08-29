@@ -22,7 +22,7 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
         "string_agg(DISTINCT sit.country, ', ' ORDER BY sit.country) AS countries, "+
         "string_agg(DISTINCT sit.state, ', ' ORDER BY sit.state) AS areas, "+
         "string_agg(DISTINCT sit.site_code, ', ' ORDER BY sit.site_code) AS siteCodes, " +
-        "string_agg(DISTINCT meo.ecoregion, ', ' ORDER BY meo.ecoregion) AS ecoRegions "+
+        "string_agg(DISTINCT meo.ecoregion, ', ' ORDER BY meo.ecoregion) AS eco_regions "+
         "FROM nrmn.location_ref loc " +
         "LEFT JOIN nrmn.site_ref sit ON loc.location_id = sit.location_id " +
         "LEFT JOIN nrmn.meow_ecoregions meo ON st_contains(meo.geom, sit.geom) " +
@@ -54,7 +54,7 @@ public class LocationListView {
     @Audited(targetAuditMode = NOT_AUDITED)
     private String siteCodes;
 
-    @Column(name="ecoregions")
+    @Column(name="eco_regions")
     @Audited(targetAuditMode = NOT_AUDITED)
     private String ecoRegions;
 

@@ -11,12 +11,17 @@ import org.hibernate.type.StandardBasicTypes;
 public class PGDialect extends PostgisPG94Dialect {
 
     public static final String STRING_AGG_DISTINCT_ASC = "string_agg_distinct_asc";
+    public static final String STRING_SPLIT_CONTAINS = "string_split_contains";
 
     public PGDialect() {
         super();
         registerFunction(STRING_AGG_DISTINCT_ASC, new SQLFunctionTemplate(
                 StandardBasicTypes.STRING,
                 "string_agg(distinct ?1, ',' ORDER BY ?2 ASC)"
+        ));
+        registerFunction(STRING_SPLIT_CONTAINS, new SQLFunctionTemplate(
+                StandardBasicTypes.INTEGER,
+                "(select count(i) from unnest(string_to_array(?1, ?2)) as i where trim(i) like '%' || ?3 || '%')"
         ));
     }
 }

@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static au.org.aodn.nrmn.restapi.repository.dynamicQuery.PGDialect.STRING_SPLIT_CONTAINS;
+
 public abstract class FilterCondition {
 
     public static final String STARTS_WITH = "startsWith";
@@ -28,6 +30,7 @@ public abstract class FilterCondition {
     public static final String NOT_BLANK = "notBlank";
     public static final String IN = "in";
     public static final String NOT_IN = "notIn";
+    public static final String SPLIT_STRING_CONTAINS = "splitStringContains";
 
     interface DBField {
 
@@ -122,6 +125,15 @@ public abstract class FilterCondition {
             }
             case NOT_BLANK : {
                 return criteriaBuilder.notEqual(target, "");
+            }
+            case SPLIT_STRING_CONTAINS: {
+                return criteriaBuilder.greaterThan(
+                    criteriaBuilder.function(
+                                STRING_SPLIT_CONTAINS,
+                                Integer.class,
+                                target,
+                                criteriaBuilder.literal(","),
+                                criteriaBuilder.literal(value.toLowerCase())), 0);
             }
             default: {
                 return null;
