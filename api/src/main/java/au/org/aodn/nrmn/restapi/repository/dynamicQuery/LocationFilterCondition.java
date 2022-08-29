@@ -39,6 +39,9 @@ public class LocationFilterCondition extends FilterCondition {
             }
 
             @Override
+            public Boolean isRequireSplitString() { return Boolean.TRUE; }
+
+            @Override
             public String getDBFieldName() {
                 return "countries";
             }
@@ -50,6 +53,9 @@ public class LocationFilterCondition extends FilterCondition {
             }
 
             @Override
+            public Boolean isRequireSplitString() { return Boolean.TRUE; }
+
+            @Override
             public String getDBFieldName() {
                 return "areas";
             }
@@ -59,6 +65,9 @@ public class LocationFilterCondition extends FilterCondition {
             public String toString() {
                 return "location.ecoRegions";
             }
+
+            @Override
+            public Boolean isRequireSplitString() { return Boolean.TRUE; }
 
             @Override
             public String getDBFieldName() {
@@ -104,7 +113,7 @@ public class LocationFilterCondition extends FilterCondition {
             switch (target) {
                 case SITE_CODE:
                 case COUNTRIES:
-                case ECO_REGIONS: filter.setOperation(SPLIT_STRING_CONTAINS);
+                case ECO_REGIONS:
                 case STATUS:
                 case LOCATION_NAME: {
                     if(filter.isCompositeCondition()) {
