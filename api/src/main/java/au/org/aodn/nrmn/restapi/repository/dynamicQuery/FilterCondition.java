@@ -4,7 +4,6 @@ import au.org.aodn.nrmn.restapi.controller.transform.Field;
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
@@ -31,7 +30,19 @@ public abstract class FilterCondition {
     public static final String NOT_IN = "notIn";
 
     interface DBField {
+
         String getDBFieldName();
+
+        default Expression<String> getDBField(From<?,?> table, CriteriaBuilder criteriaBuilder) {
+            // Need to handle date field, as we cannot assume date format always yyyy-MM-dd
+            if(table.get(getDBFieldName()).getJavaType() == Date.class) {
+                // DB specific function call !!!!
+                return criteriaBuilder.function("to_char", String.class, table.get(getDBFieldName()), criteriaBuilder.literal("yyyy-MM-dd"));
+            }
+            else{
+                return criteriaBuilder.lower(table.get(getDBFieldName()).as(String.class));
+            }
+        }
     }
 
     public static <T> List<T> parse(ObjectMapper objectMapper, String values, Class<T[]> clazz) throws JsonProcessingException {
@@ -55,7 +66,7 @@ public abstract class FilterCondition {
         return k.isPresent() ? k.get() : null;
     }
 
-    protected Predicate getSimpleFieldSpecification(From<?,?> table, CriteriaBuilder criteriaBuilder, String field,  boolean isAnd, Filter filter1, Filter filter2) {
+    protected Predicate getSimpleFieldSpecification(From<?,?> table, CriteriaBuilder criteriaBuilder, DBField field,  boolean isAnd, Filter filter1, Filter filter2) {
         if(isAnd) {
             return criteriaBuilder.and(
                     getSimpleFieldSpecification(table, criteriaBuilder, field, filter1.getValue(), filter1.getOperation()),
@@ -70,18 +81,9 @@ public abstract class FilterCondition {
         }
     }
 
-    protected Predicate getSimpleFieldSpecification(From<?,?> table, CriteriaBuilder criteriaBuilder, String field, String value, String operation) {
+    protected Predicate getSimpleFieldSpecification(From<?,?> table, CriteriaBuilder criteriaBuilder, DBField field, String value, String operation) {
 
-        // Need to handle date field, as we cannot assume date format always yyyy-MM-dd
-        Expression<String> target = null;
-
-        if(table.get(field).getJavaType() == Date.class) {
-            // DB specific function call !!!!
-            target = criteriaBuilder.function("to_char", String.class, table.get(field), criteriaBuilder.literal("yyyy-MM-dd"));
-        }
-        else{
-            target = criteriaBuilder.lower(table.get(field).as(String.class));
-        }
+        Expression<String> target = field.getDBField(table, criteriaBuilder);
 
         // Single condition
         switch(operation) {
@@ -116,7 +118,7 @@ public abstract class FilterCondition {
             case BLANK: {
                 return criteriaBuilder.or(
                         criteriaBuilder.equal(target, ""),
-                        criteriaBuilder.isNull(table.get(field)));
+                        criteriaBuilder.isNull(table.get(field.getDBFieldName())));
             }
             case NOT_BLANK : {
                 return criteriaBuilder.notEqual(target, "");

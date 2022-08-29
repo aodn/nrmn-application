@@ -1,38 +1,18 @@
 package au.org.aodn.nrmn.restapi.repository;
 
-import java.util.List;
 import java.util.Optional;
 
-import au.org.aodn.nrmn.restapi.controller.transform.Filter;
-import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
-import au.org.aodn.nrmn.restapi.repository.dynamicQuery.LocationFilterCondition;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
 import au.org.aodn.nrmn.restapi.model.db.Location;
-import au.org.aodn.nrmn.restapi.repository.projections.LocationExtendedMapping;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import javax.persistence.QueryHint;
-
-import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 
 @RepositoryRestResource
 @Tag(name = "locations")
 public interface LocationRepository extends JpaRepository<Location, Integer>, JpaSpecificationExecutor<Location> {
-
-    @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
-    default Page<LocationExtendedMapping> findAllLocationBy(List<Filter> filters, List<Sorter> sort, Pageable pageable) {
-        Specification<Location> spec = LocationFilterCondition.createSpecification(filters, sort);
-        return this.findAll(spec, pageable).map(t -> new LocationExtendedMapping(t));
-    }
 
     @Override
     @RestResource

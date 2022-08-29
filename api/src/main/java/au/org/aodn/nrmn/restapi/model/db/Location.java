@@ -13,10 +13,7 @@ import org.hibernate.envers.Audited;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-import java.util.List;
-
 import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
-import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 @Entity
 @Cache(region = "entities", usage = READ_WRITE)
@@ -41,15 +38,4 @@ public class Location {
     @Column(name = "is_active")
     @NotNull
     private Boolean isActive;
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @Audited(targetAuditMode = NOT_AUDITED)
-    @Schema(title = "Site")
-    @JoinColumn(name = "location_id", referencedColumnName = "location_id", nullable = false, insertable = false, updatable = false)
-    private List<Site> site;
-    /**
-     * This field association is create with dynamicQuery not hardcode here to make it flexible
-     */
-    @Transient
-    private List<MeowEcoregions> meowRegions;
 }

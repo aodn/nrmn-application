@@ -1,24 +1,22 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
+import au.org.aodn.nrmn.restapi.model.db.LocationListView;
 import au.org.aodn.nrmn.restapi.repository.dynamicQuery.FilterCondition;
-import au.org.aodn.nrmn.restapi.repository.dynamicQuery.LocationFilterCondition;
+import au.org.aodn.nrmn.restapi.repository.projections.LocationListRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +26,6 @@ import au.org.aodn.nrmn.restapi.controller.validation.RowError;
 import au.org.aodn.nrmn.restapi.dto.location.LocationDto;
 import au.org.aodn.nrmn.restapi.model.db.Location;
 import au.org.aodn.nrmn.restapi.repository.LocationRepository;
-import au.org.aodn.nrmn.restapi.repository.projections.LocationExtendedMapping;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,6 +37,9 @@ public class LocationController {
 
     @Autowired
     private LocationRepository locationRepository;
+
+    @Autowired
+    private LocationListRepository locationListRepository;
 
     @Autowired
     private ObjectMapper objMapper;
@@ -54,8 +54,7 @@ public class LocationController {
         List<Filter> f = FilterCondition.parse(objMapper, filters, Filter[].class);
         List<Sorter> s = FilterCondition.parse(objMapper, sort, Sorter[].class);
 
-
-        Page<LocationExtendedMapping> v = locationRepository.findAllLocationBy(f, s, PageRequest.of(page, pageSize));
+        Page<LocationListView> v = locationListRepository.findAllLocationBy(f, s, PageRequest.of(page, pageSize));
         Map<String, Object> data = new HashMap<>();
 
         data.put("lastRow", v.getTotalElements());
