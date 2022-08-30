@@ -1,9 +1,8 @@
 package au.org.aodn.nrmn.restapi.repository.dynamicQuery;
 
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
+import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
 import au.org.aodn.nrmn.restapi.model.db.*;
-import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -12,10 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class ObservationFilterCondition extends FilterCondition {
-
-    @Autowired
-    protected ObservationRepository observationRepository;
+public class ObservationFilterCondition extends FilterCondition<Observation> {
 
     public enum SupportedFilters implements DBField {
         DIVER_NAME_IN_SURVEY {
@@ -120,6 +116,16 @@ public class ObservationFilterCondition extends FilterCondition {
 
             return resultCondition;
         }
+    }
+
+    @Override
+    protected FilterCondition applySort(List<Sorter> sort) {
+        return null;
+    }
+
+    @Override
+    protected FilterCondition applyFilters(List<Filter> filters) {
+        return null;
     }
 
     protected Specification<Observation> getJoinSurveyFieldSpecification(SupportedFilters target, boolean isAnd, Filter filter1, Filter filter2) {
