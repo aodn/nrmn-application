@@ -469,13 +469,13 @@ public class SurveyFilterCondition extends FilterCondition {
                         }
                         case PROGRAMS: {
                             Join<Survey, Program> prog = root.join("program", JoinType.INNER);
-                            orders.add(getItemOrdering(prog, criteriaBuilder, sortItem));
+                            orders.add(getItemOrdering(prog, criteriaBuilder, sortItem, SupportedFields.class));
                             break;
                         }
                         case LOCATION_NAME: {
                             Join<Survey, Site> site = root.join("site", JoinType.INNER);
                             Join<Site, Location> location = site.join("location", JoinType.INNER);
-                            orders.add(getItemOrdering(location, criteriaBuilder, sortItem));
+                            orders.add(getItemOrdering(location, criteriaBuilder, sortItem, SupportedFields.class));
                             break;
                         }
                         case MPA :
@@ -483,13 +483,13 @@ public class SurveyFilterCondition extends FilterCondition {
                         case SITE_CODE :
                         case SITE_NAME : {
                             Join<Survey, Site> site = root.join("site", JoinType.INNER);
-                            orders.add(getItemOrdering(site, criteriaBuilder, sortItem));
+                            orders.add(getItemOrdering(site, criteriaBuilder, sortItem, SupportedFields.class));
                             break;
                         }
                         case HAS_PQs:
                         case SURVEY_DATE :
                         case SURVEY_ID : {
-                            orders.add(getItemOrdering(root, criteriaBuilder, sortItem));
+                            orders.add(getItemOrdering(root, criteriaBuilder, sortItem, SupportedFields.class));
                             break;
                         }
                         case DEPTH : {
@@ -504,11 +504,6 @@ public class SurveyFilterCondition extends FilterCondition {
             query.orderBy(orders);
             return diverNameJoin != null ? diverNameJoin : criteriaBuilder.conjunction();
         };
-    }
-
-    protected Order getItemOrdering(From<?,?> from, CriteriaBuilder criteriaBuilder, Sorter sort) {
-        Expression<Survey> e = from.get(SurveyFilterCondition.getFieldEnum(sort.getFieldName(), SupportedFields.class).getDBFieldName());
-        return (sort.isAsc()  ? criteriaBuilder.asc(e) : criteriaBuilder.desc(e));
     }
 
     protected Order getItemOrderingContact(From<?,?> from, CriteriaBuilder criteriaBuilder, String f1, String f2, boolean isAsc) {

@@ -2,13 +2,12 @@ package au.org.aodn.nrmn.restapi.repository.dynamicQuery;
 
 import au.org.aodn.nrmn.restapi.controller.transform.Field;
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
+import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
+import au.org.aodn.nrmn.restapi.model.db.Survey;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.From;
-import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.*;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
@@ -48,6 +47,11 @@ public abstract class FilterCondition {
                 return criteriaBuilder.lower(table.get(getDBFieldName()).as(String.class));
             }
         }
+    }
+
+    protected <T extends Enum<T> & FilterCondition.DBField> Order getItemOrdering(From<?,?> from, CriteriaBuilder criteriaBuilder, Sorter sort, Class<T> clazz) {
+        Expression<Survey> e = from.get(FilterCondition.getFieldEnum(sort.getFieldName(), clazz).getDBFieldName());
+        return (sort.isAsc()  ? criteriaBuilder.asc(e) : criteriaBuilder.desc(e));
     }
 
     public static <T> List<T> parse(ObjectMapper objectMapper, String values, Class<T[]> clazz) throws JsonProcessingException {

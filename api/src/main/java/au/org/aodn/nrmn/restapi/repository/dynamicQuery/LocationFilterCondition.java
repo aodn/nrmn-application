@@ -5,6 +5,7 @@ import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
 import au.org.aodn.nrmn.restapi.model.db.LocationListView;
 import org.springframework.data.jpa.domain.Specification;
 
+import javax.persistence.criteria.Order;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,7 +88,7 @@ public class LocationFilterCondition extends FilterCondition {
         }
 
         if(!(sort == null  || sort.size() == 0 || !containsSupportField(sort, LocationFilterCondition.SupportedFields.class))) {
-            //condition.applySort(sort);
+            condition.applySort(sort);
         }
 
         return condition.build();
@@ -102,6 +103,11 @@ public class LocationFilterCondition extends FilterCondition {
         else {
             return filtersSpec.and(sortingSpec);
         }
+    }
+
+    protected LocationFilterCondition applySort(List<Sorter> sort) {
+        sortingSpec = createOrdering(sort);
+        return this;
     }
 
     protected LocationFilterCondition applyFilters(List<Filter> filters) {
@@ -139,6 +145,30 @@ public class LocationFilterCondition extends FilterCondition {
         }
 
         return this;
+    }
+
+    protected Specification<LocationListView> createOrdering(List<Sorter> sort) {
+        return (root, query, criteriaBuilder) -> {
+            List<Order> orders = new ArrayList<>();
+
+            sort.forEach(sortItem -> {
+                LocationFilterCondition.SupportedFields target = getFieldEnum(sortItem.getFieldName(), LocationFilterCondition.SupportedFields.class);
+                if (target != null) {
+
+                    switch(target) {
+                        case SITE_CODE:
+                        case COUNTRIES:
+                        case ECO_REGIONS:
+                        case STATUS:
+                        case LOCATION_NAME: {
+                            orders.add(getItemOrdering(root, criteriaBuilder, sortItem, SupportedFields.class));
+                        }
+                    }
+                }
+            });
+
+            return query.orderBy(orders).getRestriction();
+        };
     }
 
     protected Specification<LocationListView> getLocationFieldSpecification(final LocationFilterCondition.SupportedFields target, Filter filter) {
