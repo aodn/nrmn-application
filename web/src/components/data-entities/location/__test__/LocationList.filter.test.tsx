@@ -78,7 +78,7 @@ describe('<LocationList/> filter testing', () => {
 
     // Filter set will cause some items disappeared
     mockGetFiltersForId.mockImplementation((id) => {
-      return '{"locationName":{"filterType":"text","type":"contains","filter":"Interest Bay"}}';
+      return '{"location.locationName":{"filterType":"text","type":"contains","filter":"Interest Bay"}}';
     });
 
     // Override function so that it return the data we set.
@@ -112,13 +112,10 @@ describe('<LocationList/> filter testing', () => {
         // Refresh the dom tree
         rerender(<Router location={history.location} navigator={history}><LocationList/></Router>);
 
-        // Restore filter called
+        // Given the filter is now implemented on server side, all we care now is filter restored
         expect(mockGetFiltersForId).toBeCalledTimes(1);
         expect(mockResetStateFilters).toBeCalledTimes(0);
 
-        expect(screen.getByText('Interest Bay')).toBeInTheDocument();
-        screen.findByText('Antarctica').then(i => expect(i).toBe({}));
-        screen.findByText('Argentinian Gulfs').then(i => expect(i).toBe({}));
       });
   });
 });
