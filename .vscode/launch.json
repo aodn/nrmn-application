@@ -26,16 +26,6 @@
       "url": "http://localhost:3000/",
       "webRoot": "${workspaceFolder}",
       "userDataDir": "${env:HOME}/.config/chromium-debug"
-    },
-    {
-      "type": "node",
-      "name": "vscode-jest-tests",
-      "request": "launch",
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "cwd": "${workspaceFolder}/web",
-      "runtimeExecutable": "yarn",
-      "args": ["-s", "test", "--runInBand", "--watchAll=false"]
     }
   ]
 }
