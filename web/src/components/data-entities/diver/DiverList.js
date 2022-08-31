@@ -96,8 +96,8 @@ const DiverList = () => {
 
   const chooseCellStyle = (params) => {
     if(params.context !== undefined) {
-      if (params.context.errors.some((e) => e.id === params.data.diverId)) return { backgroundColor: red[100] };
-      if (params.context.delta[params.data.diverId]) return { backgroundColor: grey[100] };
+      if (params.context.errors.some((e) => e.id === params.data?.diverId)) return { backgroundColor: red[100] };
+      if (params.context.delta[params.data?.diverId]) return { backgroundColor: grey[100] };
     }
     return null;
   };
@@ -150,6 +150,7 @@ const DiverList = () => {
         rowModelType={'infinite'}
         enableBrowserTooltips
         onCellValueChanged={onCellValueChanged}
+        context={{delta, errors}}
         onGridReady={(e) => onGridReady(e)}
         onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
         defaultColDef={{
