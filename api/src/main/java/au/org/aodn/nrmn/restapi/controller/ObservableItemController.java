@@ -3,10 +3,19 @@ package au.org.aodn.nrmn.restapi.controller;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
+import au.org.aodn.nrmn.restapi.controller.transform.Filter;
+import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
+import au.org.aodn.nrmn.restapi.model.db.ObservationItemListView;
+import au.org.aodn.nrmn.restapi.repository.ObservableItemListRepository;
+import au.org.aodn.nrmn.restapi.repository.dynamicQuery.FilterCondition;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -14,17 +23,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.exception.ValidationException;
@@ -34,7 +37,6 @@ import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemGetDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemPutDto;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -48,11 +50,32 @@ public class ObservableItemController {
     private ObservableItemRepository observableItemRepository;
 
     @Autowired
+    private ObservableItemListRepository observableItemListRepository;
+
+    @Autowired
     private ModelMapper mapper;
 
+    @Autowired
+    private ObjectMapper objMapper;
+
     @GetMapping(path = "/observableItems")
-    public ResponseEntity<List<ObservableItemRow>> list() {
-        return ResponseEntity.ok(observableItemRepository.findAllProjectedBy());
+    public  ResponseEntity<?> getObservationItemsWithFitlers(@RequestParam(value = "sort", required = false) String sort,
+                                                             @RequestParam(value = "filters", required = false) String filters,
+                                                             @RequestParam(value = "page", defaultValue = "0") int page,
+                                                             @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) throws JsonProcessingException {
+
+        // RequestParam do not support json object parsing automatically
+        List<Filter> f = FilterCondition.parse(objMapper, filters, Filter[].class);
+        List<Sorter> s = FilterCondition.parse(objMapper, sort, Sorter[].class);
+
+        Page<ObservationItemListView> v = observableItemListRepository.findAllObservationItemBy(f, s, PageRequest.of(page, pageSize));
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("lastRow", v.getTotalElements());
+        data.put("items", v.getContent());
+
+        return ResponseEntity.ok(data);
+
     }
 
     @PostMapping("/observableItem")
