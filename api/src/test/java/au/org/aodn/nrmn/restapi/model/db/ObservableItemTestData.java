@@ -18,8 +18,7 @@ public class ObservableItemTestData {
 
     public ObservableItem persistedObservableItem() {
         ObservableItem observableItem = defaultBuilder().build();
-        observableItemRepository.saveAndFlush(observableItem);
-        return observableItem;
+        return observableItemRepository.saveAndFlush(observableItem);
     }
 
     public ObservableItemBuilder defaultBuilder() {
