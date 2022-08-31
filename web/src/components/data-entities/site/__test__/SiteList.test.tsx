@@ -9,41 +9,44 @@ import {Router} from 'react-router-dom';
 import {waitForDataToHaveLoaded} from '../../../../common/AgGridTestHelper';
 
 describe('<SiteList/>', () => {
-  const siteTestData = [
-    {
-      siteId: 1,
-      siteCode: 'AAA',
-      siteName: 'Site A',
-      locationName: 'Location A',
-      state: 'State A',
-      country: 'Country A',
-      latitude: 11.0,
-      longitude: -11.0,
-      isActive: true
-    },
-    {
-      siteId: 2,
-      siteCode: 'BBB',
-      siteName: 'Site B',
-      locationName: 'Location B',
-      state: 'State B',
-      country: 'Country B',
-      latitude: 22.0,
-      longitude: -22.0,
-      isActive: false
-    },
-    {
-      siteId: 3,
-      siteCode: 'CCC',
-      siteName: 'Site C',
-      locationName: 'Location C',
-      state: 'State C',
-      country: 'Country C',
-      latitude: 33.0,
-      longitude: -33.0,
-      isActive: false
-    }
-  ];
+  const siteTestData = {
+      "lastRow": 3,
+      "items": [
+        {
+          siteId: 1,
+          siteCode: 'AAA',
+          siteName: 'Site A',
+          locationName: 'Location A',
+          state: 'State A',
+          country: 'Country A',
+          latitude: 11.0,
+          longitude: -11.0,
+          isActive: true
+        },
+        {
+          siteId: 2,
+          siteCode: 'BBB',
+          siteName: 'Site B',
+          locationName: 'Location B',
+          state: 'State B',
+          country: 'Country B',
+          latitude: 22.0,
+          longitude: -22.0,
+          isActive: false
+        },
+        {
+          siteId: 3,
+          siteCode: 'CCC',
+          siteName: 'Site C',
+          locationName: 'Location C',
+          state: 'State C',
+          country: 'Country C',
+          latitude: 33.0,
+          longitude: -33.0,
+          isActive: false
+      }
+    ]
+  };
 
   const server = setupServer(
     rest.get('/api/v1/sites', (_, res, ctx) => {
@@ -74,9 +77,9 @@ describe('<SiteList/>', () => {
     );
     await waitForDataToHaveLoaded();
     for (const field of visibleColumns) {
-      expect(getByText(`${siteTestData[0][field]}`)).toBeInTheDocument();
-      expect(getByText(`${siteTestData[1][field]}`)).toBeInTheDocument();
-      expect(getByText(`${siteTestData[2][field]}`)).toBeInTheDocument();
+      expect(getByText(`${siteTestData.items[0][field]}`)).toBeInTheDocument();
+      expect(getByText(`${siteTestData.items[1][field]}`)).toBeInTheDocument();
+      expect(getByText(`${siteTestData.items[2][field]}`)).toBeInTheDocument();
     }
   });
 
@@ -89,7 +92,7 @@ describe('<SiteList/>', () => {
     );
     await waitForDataToHaveLoaded();
     const copyAllIcons: Element[] = queryAllByTestId('CopyAllIcon');
-    expect(copyAllIcons.length === siteTestData.length);
+    expect(copyAllIcons.length === siteTestData.lastRow);
   });
 
   it('shows a delete icon for inactive sites', async () => {
@@ -101,7 +104,7 @@ describe('<SiteList/>', () => {
     );
     await waitForDataToHaveLoaded();
     const visibleDeleteIcons: Element[] = queryAllByTestId('DeleteIcon');
-    const activeSites: Object[] = siteTestData.filter((s) => s.isActive == false);
+    const activeSites: Object[] = siteTestData.items.filter((s) => s.isActive == false);
     expect(visibleDeleteIcons.length === activeSites.length);
   });
 });

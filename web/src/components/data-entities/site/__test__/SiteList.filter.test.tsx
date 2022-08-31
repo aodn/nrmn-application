@@ -15,7 +15,7 @@ describe('<SiteList/> filter testing', () => {
   let mockGetEntity;
   let mockGetFiltersForId;
   let mockResetStateFilters;
-  const columns = ['siteCode','siteName','locationName','state','country','latitude','longitude','isActive'];
+  const columns = ['site.siteCode','site.siteName','site.locationName','site.state','site.country','site.latitude','site.longitude','site.isActive'];
 
   beforeAll(() => {
     mockGetEntity = jest.spyOn(axiosInstance, 'getResult');
@@ -80,7 +80,7 @@ describe('<SiteList/> filter testing', () => {
 
     // Filter set will cause some items disappeared
     mockGetFiltersForId.mockImplementation((id) => {
-      return '{"siteName":{"filterType":"text","type":"contains","filter":"Channel"}}';
+      return '{"site.siteName":{"filterType":"text","type":"contains","filter":"Channel"}}';
     });
 
     // Override function so that it return the data we set.
@@ -114,13 +114,9 @@ describe('<SiteList/> filter testing', () => {
         // Refresh the dom tree
         rerender(<Router location={history.location} navigator={history}><SiteList/></Router>);
 
-        // Restore filter called
+        // Filter is done on server site, we just need filter restore correctly
         expect(mockGetFiltersForId).toBeCalledTimes(1);
         expect(mockResetStateFilters).toBeCalledTimes(0);
-
-        expect(screen.getByText('Channel')).toBeInTheDocument();
-        screen.findByText('Lhohaesf').then(i => expect(i).toBe({}));
-        screen.findByText('Janeng 2').then(i => expect(i).toBe({}));
       });
   });
 });

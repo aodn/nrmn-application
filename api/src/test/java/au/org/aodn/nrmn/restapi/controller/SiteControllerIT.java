@@ -60,7 +60,7 @@ public class SiteControllerIT {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("siteId", hasItems(testSite.getSiteId()));
+                .body("items.siteId", hasItems(testSite.getSiteId()));
     }
 
 }

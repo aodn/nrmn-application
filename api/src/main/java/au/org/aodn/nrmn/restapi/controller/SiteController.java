@@ -1,16 +1,23 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import au.org.aodn.nrmn.restapi.controller.transform.Filter;
+import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
+import au.org.aodn.nrmn.restapi.model.db.SiteListView;
+import au.org.aodn.nrmn.restapi.repository.*;
+import au.org.aodn.nrmn.restapi.repository.dynamicQuery.FilterCondition;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,10 +39,6 @@ import au.org.aodn.nrmn.restapi.dto.site.SiteGetDto;
 import au.org.aodn.nrmn.restapi.dto.site.SiteListItem;
 import au.org.aodn.nrmn.restapi.dto.site.SiteOptionsDto;
 import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.repository.LocationRepository;
-import au.org.aodn.nrmn.restapi.repository.MarineProtectedAreaRepository;
-import au.org.aodn.nrmn.restapi.repository.ProtectionStatusRepository;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -56,12 +59,31 @@ public class SiteController {
     private ProtectionStatusRepository protectionStatusRepository;
 
     @Autowired
+    private SiteListRepository siteListRepository;
+
+    @Autowired
+    private ObjectMapper objMapper;
+
+    @Autowired
     private ModelMapper mapper;
 
     @GetMapping("/sites")
-    public ResponseEntity<List<SiteListItem>> list() {
-        return ResponseEntity.ok(siteRepository.findAll().stream().map(site -> mapper.map(site, SiteListItem.class))
-                .collect(Collectors.toList()));
+    public ResponseEntity<?> getSitesWithFilters(@RequestParam(value = "sort", required = false) String sort,
+                                                 @RequestParam(value = "filters", required = false) String filters,
+                                                 @RequestParam(value = "page", defaultValue = "0") int page,
+                                                 @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) throws JsonProcessingException {
+
+        // RequestParam do not support json object parsing automatically
+        List<Filter> f = FilterCondition.parse(objMapper, filters, Filter[].class);
+        List<Sorter> s = FilterCondition.parse(objMapper, sort, Sorter[].class);
+
+        Page<SiteListView> v = siteListRepository.findSiteBy(f, s, PageRequest.of(page, pageSize));
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("lastRow", v.getTotalElements());
+        data.put("items", v.getContent());
+
+        return ResponseEntity.ok(data);
     }
 
     @GetMapping("/siteOptions")
