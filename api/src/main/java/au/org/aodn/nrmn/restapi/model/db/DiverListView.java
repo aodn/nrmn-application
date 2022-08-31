@@ -21,7 +21,7 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 @Audited(withModifiedFlag = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Subselect(
-        "SELECT d.diver_id, d.initials, d.full_name FROM nrmn.diver_ref d"
+        "SELECT d.diver_id, d.initials, d.full_name FROM nrmn.diver_ref d ORDER BY (CASE WHEN initials SIMILAR TO '%[a-zA-Z]' THEN 0 ELSE 1 END), LOWER(d.initials)"
 )
 public class DiverListView {
     @Id
