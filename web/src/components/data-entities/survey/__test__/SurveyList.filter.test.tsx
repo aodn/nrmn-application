@@ -105,14 +105,14 @@ describe('<SurveyList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: false}}]});
-    const {rerender} = render(<Router location={history.location} navigator={history}><SurveyList/></Router>);
+    const {rerender, container} = render(<Router location={history.location} navigator={history}><SurveyList/></Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(1), {timeout: 10000})
       .then(() => {
         // verify default columns exist
         columns.forEach(x => {
-          expect(screen.queryAllByText(x).length).toBeGreaterThanOrEqual(1);
+          expect(container.querySelector('[col-id="' + x + '"]')).toBeInTheDocument();
         });
       })
       .finally(() => {
