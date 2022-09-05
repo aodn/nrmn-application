@@ -127,7 +127,7 @@ public class ObservationFilterCondition extends FilterCondition {
             Join<Observation, SurveyMethodEntity> surveyMethodEntityJoin = root.join("surveyMethod", JoinType.INNER);
             Join<SurveyMethodEntity, Survey> surveyJoin = surveyMethodEntityJoin.join("survey", JoinType.INNER);
 
-            return getSimpleFieldSpecification(surveyJoin, criteriaBuilder, target.getDBFieldName() , isAnd, filter1, filter2);
+            return getSimpleFieldSpecification(surveyJoin, criteriaBuilder, target , isAnd, filter1, filter2);
         });
     }
 
@@ -136,7 +136,7 @@ public class ObservationFilterCondition extends FilterCondition {
             Join<Observation, SurveyMethodEntity> surveyMethodEntityJoin = root.join("surveyMethod", JoinType.INNER);
             Join<SurveyMethodEntity, Survey> surveyJoin = surveyMethodEntityJoin.join("survey", JoinType.INNER);
 
-            return getSimpleFieldSpecification(surveyJoin, criteriaBuilder, target.getDBFieldName(), filter.getValue(), filter.getOperation());
+            return getSimpleFieldSpecification(surveyJoin, criteriaBuilder, target, filter.getValue(), filter.getOperation());
         });
     }
     /**
@@ -189,13 +189,13 @@ public class ObservationFilterCondition extends FilterCondition {
 
                 subquery1.select(c1Join.get("surveyId"));
                 subquery1.distinct(true);
-                subquery1.where(getSimpleFieldSpecification(d1Join, criteriaBuilder, target.getDBFieldName(), filter1.getValue(), filter1.getOperation()));
+                subquery1.where(getSimpleFieldSpecification(d1Join, criteriaBuilder, target, filter1.getValue(), filter1.getOperation()));
 
                 subquery2.select(c2Join.get("surveyId"));
                 subquery2.distinct(true);
                 subquery2.where(
                         criteriaBuilder.and(
-                                getSimpleFieldSpecification(d2Join, criteriaBuilder, target.getDBFieldName(), filter2.getValue(), filter2.getOperation()),
+                                getSimpleFieldSpecification(d2Join, criteriaBuilder, target, filter2.getValue(), filter2.getOperation()),
                                 c2Join.get("surveyId").in(subquery1)));
 
                 Join<Observation, SurveyMethodEntity> rootSurveyMethodJoin = root.join("surveyMethod", JoinType.INNER);
@@ -206,7 +206,7 @@ public class ObservationFilterCondition extends FilterCondition {
             }
             else {
                 Join<Observation, Diver> diver = root.join("diver", JoinType.INNER);
-                return getSimpleFieldSpecification(diver, criteriaBuilder, target.getDBFieldName(), isAnd, filter1, filter2);
+                return getSimpleFieldSpecification(diver, criteriaBuilder, target, isAnd, filter1, filter2);
             }
         });
     }
@@ -215,14 +215,14 @@ public class ObservationFilterCondition extends FilterCondition {
         return ((root, query, criteriaBuilder) -> {
             Join<Observation, Diver> diver = root.join("diver", JoinType.INNER);
 
-            return getSimpleFieldSpecification(diver, criteriaBuilder, target.getDBFieldName(), isAnd, filter1, filter2);
+            return getSimpleFieldSpecification(diver, criteriaBuilder, target, isAnd, filter1, filter2);
         });
     }
 
     protected Specification<Observation> getJoinDiverFieldSpecification(SupportedFilters target, Filter filter) {
         return ((root, query, criteriaBuilder) -> {
             Join<Observation, Diver> diver = root.join("diver", JoinType.INNER);
-            return getSimpleFieldSpecification(diver, criteriaBuilder, target.getDBFieldName(), filter.getValue(), filter.getOperation());
+            return getSimpleFieldSpecification(diver, criteriaBuilder, target, filter.getValue(), filter.getOperation());
         });
     }
 }

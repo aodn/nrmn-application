@@ -128,6 +128,16 @@ public class SurveyFilterCondition extends FilterCondition {
             public String getDBFieldName() {
                 return "fullName";
             }
+        },
+        SURVEY_NUM {
+            @Override
+            public String toString() {
+                return "survey.surveyNum";
+            }
+            @Override
+            public String getDBFieldName() {
+                return "surveyNum";
+            }
         }
     }
 
@@ -301,14 +311,14 @@ public class SurveyFilterCondition extends FilterCondition {
             Filter f1 = getHasPqFilterBy(filter1);
             Filter f2 = getHasPqFilterBy(filter2);
 
-            return getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), isAnd, f1, f2);
+            return getSimpleFieldSpecification(root, criteriaBuilder, target, isAnd, f1, f2);
         };
     }
 
     protected Specification<Survey> getHasPQSpecification(final SupportedFields target, final Filter filter) {
         return (root, query, criteriaBuilder) -> {
             Filter f = getHasPqFilterBy(filter);
-            return getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), f.getValue(), f.getOperation());
+            return getSimpleFieldSpecification(root, criteriaBuilder, target, f.getValue(), f.getOperation());
         };
     }
 
@@ -361,25 +371,25 @@ public class SurveyFilterCondition extends FilterCondition {
             if(filter.getValue() != null && filter.getValue().contains(".") && !"".equalsIgnoreCase(f.get(0).getValue())) {
                 if (filter.getOperation().equalsIgnoreCase(SurveyFilterCondition.CONTAINS)) {
                     // Special case, user input is contains x. so user means value ends with x
-                    spec = this.getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), f.get(0).getValue(), SurveyFilterCondition.ENDS_WITH);
+                    spec = this.getSimpleFieldSpecification(root, criteriaBuilder, target, f.get(0).getValue(), SurveyFilterCondition.ENDS_WITH);
                 } else if (filter.getOperation().equalsIgnoreCase(SurveyFilterCondition.NOT_CONTAINS)) {
                     // Special case, user input is not contains x. so user do want to see x(non x).
-                    spec = this.getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), f.get(0).getValue(), SurveyFilterCondition.NOT_ENDS_WITH);
+                    spec = this.getSimpleFieldSpecification(root, criteriaBuilder, target, f.get(0).getValue(), SurveyFilterCondition.NOT_ENDS_WITH);
                 } else if (filter.getOperation().equalsIgnoreCase(SurveyFilterCondition.STARTS_WITH)) {
                     // Special case, user input is startWith x. so it really means is x in front of dot only
-                    spec = this.getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), f.get(0).getValue(), SurveyFilterCondition.EQUALS);
+                    spec = this.getSimpleFieldSpecification(root, criteriaBuilder, target, f.get(0).getValue(), SurveyFilterCondition.EQUALS);
                 }
             }
 
             if(spec == null) {
-                spec = this.getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), f.get(0).getValue(), f.get(0).getOperation());
+                spec = this.getSimpleFieldSpecification(root, criteriaBuilder, target, f.get(0).getValue(), f.get(0).getOperation());
             }
 
             if (f.size() > 1) {
                 // We have something after dot
                 return criteriaBuilder.and(
                         spec,
-                        getSimpleFieldSpecification(root, criteriaBuilder, "surveyNum", f.get(1).getValue(), f.get(1).getOperation()));
+                        getSimpleFieldSpecification(root, criteriaBuilder, SupportedFields.SURVEY_NUM, f.get(1).getValue(), f.get(1).getOperation()));
             }
             else {
                 return spec;
@@ -391,7 +401,7 @@ public class SurveyFilterCondition extends FilterCondition {
         return ((root, query, criteriaBuilder) -> {
             Join<Survey, Site> site = root.join("site", JoinType.INNER);
             Join<Site, Location> location = site.join("location", JoinType.INNER);
-            return getSimpleFieldSpecification(location, criteriaBuilder, target.getDBFieldName(), isAnd, filter1, filter2);
+            return getSimpleFieldSpecification(location, criteriaBuilder, target, isAnd, filter1, filter2);
         });
     }
 
@@ -399,7 +409,7 @@ public class SurveyFilterCondition extends FilterCondition {
         return ((root, query, criteriaBuilder) -> {
             Join<Survey, Site> site = root.join("site", JoinType.INNER);
             Join<Site, Location> location = site.join("location", JoinType.INNER);
-            return getSimpleFieldSpecification(location, criteriaBuilder, target.getDBFieldName(), filter.getValue(), filter.getOperation());
+            return getSimpleFieldSpecification(location, criteriaBuilder, target, filter.getValue(), filter.getOperation());
         });
     }
 
@@ -407,39 +417,39 @@ public class SurveyFilterCondition extends FilterCondition {
         return ((root, query, criteriaBuilder) -> {
             Join<Survey, Site> site = root.join("site", JoinType.INNER);
 
-            return getSimpleFieldSpecification(site, criteriaBuilder, target.getDBFieldName(), isAnd, filter1, filter2);
+            return getSimpleFieldSpecification(site, criteriaBuilder, target, isAnd, filter1, filter2);
         });
     }
 
     protected Specification<Survey> getJoinSiteFieldSpecification(final SupportedFields target, Filter filter) {
         return ((root, query, criteriaBuilder) -> {
             Join<Survey, Site> site = root.join("site", JoinType.INNER);
-            return getSimpleFieldSpecification(site, criteriaBuilder, target.getDBFieldName(), filter.getValue(), filter.getOperation());
+            return getSimpleFieldSpecification(site, criteriaBuilder, target, filter.getValue(), filter.getOperation());
         });
     }
 
     protected Specification<Survey> getJoinProgramFieldSpecification(final SupportedFields target, boolean isAnd, Filter filter1, Filter filter2) {
         return ((root, query, criteriaBuilder) -> {
             Join<Survey, Program> prog = root.join("program", JoinType.INNER);
-            return getSimpleFieldSpecification(prog, criteriaBuilder,  target.getDBFieldName(), isAnd, filter1, filter2);
+            return getSimpleFieldSpecification(prog, criteriaBuilder,  target, isAnd, filter1, filter2);
         });
     }
 
     protected Specification<Survey> getJoinProgramFieldSpecification(final SupportedFields target, Filter filter) {
         return ((root, query, criteriaBuilder) -> {
             Join<Survey, Program> prog = root.join("program", JoinType.INNER);
-            return getSimpleFieldSpecification(prog, criteriaBuilder,  target.getDBFieldName(), filter.getValue(), filter.getOperation());
+            return getSimpleFieldSpecification(prog, criteriaBuilder,  target, filter.getValue(), filter.getOperation());
         });
     }
 
     protected Specification<Survey> getSurveyFieldSpecification(final SupportedFields target, boolean isAnd, Filter filter1, Filter filter2) {
         return (root, query, criteriaBuilder) ->
-                getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), isAnd, filter1, filter2);
+                getSimpleFieldSpecification(root, criteriaBuilder, target, isAnd, filter1, filter2);
     }
 
     protected Specification<Survey> getSurveyFieldSpecification(final SupportedFields target, Filter filter) {
         return (root, query, criteriaBuilder) ->
-                getSimpleFieldSpecification(root, criteriaBuilder, target.getDBFieldName(), filter.getValue(), filter.getOperation());
+                getSimpleFieldSpecification(root, criteriaBuilder, target, filter.getValue(), filter.getOperation());
     }
 
     protected Specification<Survey> createOrdering(List<Sorter> sort) {
@@ -459,13 +469,13 @@ public class SurveyFilterCondition extends FilterCondition {
                         }
                         case PROGRAMS: {
                             Join<Survey, Program> prog = root.join("program", JoinType.INNER);
-                            orders.add(getItemOrdering(prog, criteriaBuilder, sortItem));
+                            orders.add(getItemOrdering(prog, criteriaBuilder, sortItem, SupportedFields.class));
                             break;
                         }
                         case LOCATION_NAME: {
                             Join<Survey, Site> site = root.join("site", JoinType.INNER);
                             Join<Site, Location> location = site.join("location", JoinType.INNER);
-                            orders.add(getItemOrdering(location, criteriaBuilder, sortItem));
+                            orders.add(getItemOrdering(location, criteriaBuilder, sortItem, SupportedFields.class));
                             break;
                         }
                         case MPA :
@@ -473,13 +483,13 @@ public class SurveyFilterCondition extends FilterCondition {
                         case SITE_CODE :
                         case SITE_NAME : {
                             Join<Survey, Site> site = root.join("site", JoinType.INNER);
-                            orders.add(getItemOrdering(site, criteriaBuilder, sortItem));
+                            orders.add(getItemOrdering(site, criteriaBuilder, sortItem, SupportedFields.class));
                             break;
                         }
                         case HAS_PQs:
                         case SURVEY_DATE :
                         case SURVEY_ID : {
-                            orders.add(getItemOrdering(root, criteriaBuilder, sortItem));
+                            orders.add(getItemOrdering(root, criteriaBuilder, sortItem, SupportedFields.class));
                             break;
                         }
                         case DEPTH : {
@@ -494,11 +504,6 @@ public class SurveyFilterCondition extends FilterCondition {
             query.orderBy(orders);
             return diverNameJoin != null ? diverNameJoin : criteriaBuilder.conjunction();
         };
-    }
-
-    protected Order getItemOrdering(From<?,?> from, CriteriaBuilder criteriaBuilder, Sorter sort) {
-        Expression<Survey> e = from.get(SurveyFilterCondition.getFieldEnum(sort.getFieldName(), SupportedFields.class).getDBFieldName());
-        return (sort.isAsc()  ? criteriaBuilder.asc(e) : criteriaBuilder.desc(e));
     }
 
     protected Order getItemOrderingContact(From<?,?> from, CriteriaBuilder criteriaBuilder, String f1, String f2, boolean isAsc) {

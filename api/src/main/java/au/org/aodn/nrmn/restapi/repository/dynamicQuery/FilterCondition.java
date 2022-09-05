@@ -2,15 +2,20 @@ package au.org.aodn.nrmn.restapi.repository.dynamicQuery;
 
 import au.org.aodn.nrmn.restapi.controller.transform.Field;
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
+import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
+import au.org.aodn.nrmn.restapi.model.db.Survey;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.From;
-import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.*;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static au.org.aodn.nrmn.restapi.repository.dynamicQuery.PGDialect.STRING_SPLIT_EQUALS;
+import static au.org.aodn.nrmn.restapi.repository.dynamicQuery.PGDialect.STRING_SPLIT_LIKE;
 
 public abstract class FilterCondition {
 
@@ -24,9 +29,33 @@ public abstract class FilterCondition {
     public static final String BLANK = "blank";
     public static final String NOT_BLANK = "notBlank";
     public static final String IN = "in";
+    public static final String NOT_IN = "notIn";
 
     interface DBField {
+
         String getDBFieldName();
+
+        default Boolean isRequireSplitString() { return Boolean.FALSE; }
+
+        default Expression<String> getDBField(From<?,?> table, CriteriaBuilder criteriaBuilder) {
+            // Need to handle date field, as we cannot assume date format always yyyy-MM-dd
+            if(table.get(getDBFieldName()).getJavaType() == Date.class) {
+                // DB specific function call !!!!
+                return criteriaBuilder.function("to_char", String.class, table.get(getDBFieldName()), criteriaBuilder.literal("yyyy-MM-dd"));
+            }
+            else{
+                return criteriaBuilder.lower(table.get(getDBFieldName()).as(String.class));
+            }
+        }
+    }
+
+    protected <T extends Enum<T> & FilterCondition.DBField> Order getItemOrdering(From<?,?> from, CriteriaBuilder criteriaBuilder, Sorter sort, Class<T> clazz) {
+        Expression<Survey> e = from.get(FilterCondition.getFieldEnum(sort.getFieldName(), clazz).getDBFieldName());
+        return (sort.isAsc()  ? criteriaBuilder.asc(e) : criteriaBuilder.desc(e));
+    }
+
+    public static <T> List<T> parse(ObjectMapper objectMapper, String values, Class<T[]> clazz) throws JsonProcessingException {
+        return values != null ? Arrays.stream((objectMapper.readValue(values, clazz))).collect(Collectors.toList()) : null;
     }
 
     public static <T extends Enum<T>> Optional<Filter> getSupportField(List<Filter> fs, T v) {
@@ -46,7 +75,7 @@ public abstract class FilterCondition {
         return k.isPresent() ? k.get() : null;
     }
 
-    protected Predicate getSimpleFieldSpecification(From<?,?> table, CriteriaBuilder criteriaBuilder, String field,  boolean isAnd, Filter filter1, Filter filter2) {
+    protected Predicate getSimpleFieldSpecification(From<?,?> table, CriteriaBuilder criteriaBuilder, DBField field,  boolean isAnd, Filter filter1, Filter filter2) {
         if(isAnd) {
             return criteriaBuilder.and(
                     getSimpleFieldSpecification(table, criteriaBuilder, field, filter1.getValue(), filter1.getOperation()),
@@ -61,50 +90,139 @@ public abstract class FilterCondition {
         }
     }
 
-    protected Predicate getSimpleFieldSpecification(From<?,?> table, CriteriaBuilder criteriaBuilder, String field, String value, String operation) {
+    protected Predicate getSimpleFieldSpecification(From<?,?> table, CriteriaBuilder criteriaBuilder, DBField field, String value, String operation) {
 
-        // Need to handle date field, as we cannot assume date format always yyyy-MM-dd
-        Expression<String> target = null;
-
-        if(table.get(field).getJavaType() == Date.class) {
-            // DB specific function call !!!!
-            target = criteriaBuilder.function("to_char", String.class, table.get(field), criteriaBuilder.literal("yyyy-MM-dd"));
-        }
-        else{
-            target = criteriaBuilder.lower(table.get(field).as(String.class));
-        }
+        Expression<String> target = field.getDBField(table, criteriaBuilder);
 
         // Single condition
         switch(operation) {
 
             case STARTS_WITH: {
-                return criteriaBuilder.like(target, value.toLowerCase() + "%");
+                if(field.isRequireSplitString()) {
+                    return criteriaBuilder.greaterThan(
+                            criteriaBuilder.function(
+                                    STRING_SPLIT_LIKE,
+                                    Integer.class,
+                                    target,
+                                    criteriaBuilder.literal(","),
+                                    criteriaBuilder.literal(""),
+                                    criteriaBuilder.literal(value.toLowerCase()),
+                                    criteriaBuilder.literal("%")),
+                            0);
+                }
+                else {
+                    return criteriaBuilder.like(target, value.toLowerCase() + "%");
+                }
             }
             case ENDS_WITH: {
-                return criteriaBuilder.like(target, "%" + value.toLowerCase());
+                if(field.isRequireSplitString()) {
+                    return criteriaBuilder.greaterThan(
+                            criteriaBuilder.function(
+                                    STRING_SPLIT_LIKE,
+                                    Integer.class,
+                                    target,
+                                    criteriaBuilder.literal(","),
+                                    criteriaBuilder.literal("%"),
+                                    criteriaBuilder.literal(value.toLowerCase()),
+                                    criteriaBuilder.literal("")),
+                            0);
+
+                }
+                else {
+                    return criteriaBuilder.like(target, "%" + value.toLowerCase());
+                }
             }
             case NOT_ENDS_WITH: {
-                return criteriaBuilder.not(criteriaBuilder.like(target, "%" + value.toLowerCase()));
+                if(field.isRequireSplitString()) {
+                    return criteriaBuilder.equal(
+                            criteriaBuilder.function(
+                                    STRING_SPLIT_LIKE,
+                                    Integer.class,
+                                    target,
+                                    criteriaBuilder.literal(","),
+                                    criteriaBuilder.literal("%"),
+                                    criteriaBuilder.literal(value.toLowerCase()),
+                                    criteriaBuilder.literal("")),
+                            0);
+                }
+                else {
+                    return criteriaBuilder.not(criteriaBuilder.like(target, "%" + value.toLowerCase()));
+                }
             }
             case CONTAINS: {
-                return criteriaBuilder.like(target, "%" + value.toLowerCase() + "%");
+                if(field.isRequireSplitString()) {
+                    return criteriaBuilder.greaterThan(
+                            criteriaBuilder.function(
+                                    STRING_SPLIT_LIKE,
+                                    Integer.class,
+                                    target,
+                                    criteriaBuilder.literal(","),
+                                    criteriaBuilder.literal("%"),
+                                    criteriaBuilder.literal(value.toLowerCase()),
+                                    criteriaBuilder.literal("%")),
+                            0);
+                }
+                else {
+                    return criteriaBuilder.like(target, "%" + value.toLowerCase() + "%");
+                }
             }
             case NOT_CONTAINS: {
-                return criteriaBuilder.notLike(target, "%" + value.toLowerCase() + "%");
+                if(field.isRequireSplitString()) {
+                    return criteriaBuilder.equal(
+                            criteriaBuilder.function(
+                                    STRING_SPLIT_LIKE,
+                                    Integer.class,
+                                    target,
+                                    criteriaBuilder.literal(","),
+                                    criteriaBuilder.literal("%"),
+                                    criteriaBuilder.literal(value.toLowerCase()),
+                                    criteriaBuilder.literal("%")),
+                            0);
+                }
+                else {
+                    return criteriaBuilder.notLike(target, "%" + value.toLowerCase() + "%");
+                }
             }
             case EQUALS : {
-                return criteriaBuilder.equal(target, value.toLowerCase());
+                if(field.isRequireSplitString()) {
+                    return criteriaBuilder.greaterThan(
+                            criteriaBuilder.function(
+                                    STRING_SPLIT_EQUALS,
+                                    Integer.class,
+                                    target,
+                                    criteriaBuilder.literal(","),
+                                    criteriaBuilder.literal(value.toLowerCase())),
+                            0);
+                }
+                else {
+                    return criteriaBuilder.equal(target, value.toLowerCase());
+                }
             }
             case NOT_EQUALS: {
-                return criteriaBuilder.notEqual(target, value.toLowerCase());
+                if(field.isRequireSplitString()) {
+                    return criteriaBuilder.equal(
+                            criteriaBuilder.function(
+                                    STRING_SPLIT_EQUALS,
+                                    Integer.class,
+                                    target,
+                                    criteriaBuilder.literal(","),
+                                    criteriaBuilder.literal(value.toLowerCase())),
+                            0);
+                }
+                else {
+                    return criteriaBuilder.notEqual(target, value.toLowerCase());
+                }
             }
             case IN : {
                 return target.in((Object[])value.split(","));
             }
+            case NOT_IN : {
+                return criteriaBuilder.not(target.in((Object[])value.split(",")));
+            }
             case BLANK: {
                 return criteriaBuilder.or(
                         criteriaBuilder.equal(target, ""),
-                        criteriaBuilder.isNull(table.get(field)));
+                        criteriaBuilder.isNull(table.get(field.getDBFieldName())));
             }
             case NOT_BLANK : {
                 return criteriaBuilder.notEqual(target, "");
