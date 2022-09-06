@@ -17,7 +17,8 @@ function restoreStateFilters(ref) {
 
   if(filtersJson) {
     const filtersObject = JSON.parse(filtersJson);
-    ref.current.api.setFilterModel(filtersObject);
+    ref.current.api
+      .setFilterModel(filtersObject);
   }
 }
 

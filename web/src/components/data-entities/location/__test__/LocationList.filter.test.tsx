@@ -10,13 +10,13 @@ import { createMemoryHistory } from 'history';
 import stateFilterHandler from '../../../../common/state-event-handler/StateFilterHandler';
 
 describe('<LocationList/> filter testing', () => {
-  let mockGetEntity;
+  let mockGetResult;
   let mockGetFiltersForId;
   let mockResetStateFilters;
-  const columns = ['locationName','status','ecoRegions','countries','areas'];
+  const columns = ['location.locationName','location.status','location.ecoRegions','location.countries','location.areas'];
 
   beforeAll(() => {
-    mockGetEntity = jest.spyOn(axiosInstance, 'getEntity');
+    mockGetResult = jest.spyOn(axiosInstance, 'getResult');
     mockGetFiltersForId = jest.spyOn(stateFilterHandler, 'getFiltersForId');
     mockResetStateFilters = jest.spyOn(stateFilterHandler, 'resetStateFilters');
 
@@ -25,7 +25,7 @@ describe('<LocationList/> filter testing', () => {
   });
 
   afterEach(() => {
-    mockGetEntity.mockReset();
+    mockGetResult.mockReset();
     mockGetFiltersForId.mockReset();
   });
 
@@ -33,7 +33,7 @@ describe('<LocationList/> filter testing', () => {
     const canned = require('./LocationList.filter.data.json');
 
     // Override function so that it return the data we set.
-    mockGetEntity.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url) => {
 
       const raw = {
         config: undefined,
@@ -52,7 +52,7 @@ describe('<LocationList/> filter testing', () => {
     const {container, rerender} = render(<Router location={history.location} navigator={history}><LocationList/></Router>);
 
     // Data loaded due to mock object being called once
-    await waitFor(() => expect(mockGetEntity).toHaveBeenCalledTimes(1), {timeout: 10000})
+    await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(1), {timeout: 10000})
       .then(() => {
         // verify default columns exist
         columns.forEach(x => {
@@ -78,11 +78,11 @@ describe('<LocationList/> filter testing', () => {
 
     // Filter set will cause some items disappeared
     mockGetFiltersForId.mockImplementation((id) => {
-      return '{"locationName":{"filterType":"text","type":"contains","filter":"Interest Bay"}}';
+      return '{"location.locationName":{"filterType":"text","type":"contains","filter":"Interest Bay"}}';
     });
 
     // Override function so that it return the data we set.
-    mockGetEntity.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url) => {
 
       const raw = {
         config: undefined,
@@ -101,7 +101,7 @@ describe('<LocationList/> filter testing', () => {
     const {container, rerender} = render(<Router location={history.location} navigator={history}><LocationList/></Router>);
 
     // Data loaded due to mock object being called once
-    await waitFor(() => expect(mockGetEntity).toHaveBeenCalledTimes(1), {timeout: 10000})
+    await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(1), {timeout: 10000})
       .then(() => {
         // verify default columns exist
         columns.forEach(x => {
@@ -112,13 +112,10 @@ describe('<LocationList/> filter testing', () => {
         // Refresh the dom tree
         rerender(<Router location={history.location} navigator={history}><LocationList/></Router>);
 
-        // Restore filter called
+        // Given the filter is now implemented on server side, all we care now is filter restored
         expect(mockGetFiltersForId).toBeCalledTimes(1);
         expect(mockResetStateFilters).toBeCalledTimes(0);
 
-        expect(screen.getByText('Interest Bay')).toBeInTheDocument();
-        screen.findByText('Antarctica').then(i => expect(i).toBe({}));
-        screen.findByText('Argentinian Gulfs').then(i => expect(i).toBe({}));
       });
   });
 });

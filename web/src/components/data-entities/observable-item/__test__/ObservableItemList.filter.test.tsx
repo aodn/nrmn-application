@@ -18,8 +18,9 @@ describe('<ObservableItemList/> filter testing', () => {
   let mockGetFiltersForId;
   let mockResetStateFilters;
   const columns = [
-    'observableItemId', 'typeName', 'name', 'commonName', 'supersededBy','supersededNames','supersededIDs','phylum',
-    'class','order','family','genus'];
+    'observation.observableItemId', 'observation.typeName', 'observation.name', 'observation.commonName',
+    'observation.supersededBy', 'observation.supersededNames','observation.supersededIds','observation.phylum',
+    'observation.class','observation.order','observation.family','observation.genus'];
 
   beforeAll(() => {
     mockGetResult = jest.spyOn(axiosInstance, 'getResult');
@@ -84,7 +85,7 @@ describe('<ObservableItemList/> filter testing', () => {
 
     // Filter set will cause some items disappeared
     mockGetFiltersForId.mockImplementation((id) => {
-      return '{"commonName":{"filterType":"text","type":"contains","filter":"Nap"}}';
+      return '{"observation.commonName":{"filterType":"text","type":"contains","filter":"Nap"}}';
     });
 
     // Override function so that it return the data we set.
@@ -118,16 +119,9 @@ describe('<ObservableItemList/> filter testing', () => {
         // Refresh the dom tree
         rerender(<Router location={history.location} navigator={history}><ObservableItemList/></Router>);
 
-        // Restore filter called
+        // All filter operation on server side, we just need to check if filter restored
         expect(mockGetFiltersForId).toBeCalledTimes(1);
         expect(mockResetStateFilters).toBeCalledTimes(0);
-
-        // id = 1 so show this one
-        expect(screen.getByText('Nap')).toBeInTheDocument();
-
-        // id != 1 so no show
-        screen.findByText('California').then(i => expect(i).toBe({}));
-        screen.findByText('Silve').then(i => expect(i).toBe({}));
       });
   });
 });

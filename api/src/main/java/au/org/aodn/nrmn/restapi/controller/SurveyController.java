@@ -9,6 +9,7 @@ import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
 import au.org.aodn.nrmn.restapi.model.db.Observation;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.repository.dynamicQuery.FilterCondition;
 import au.org.aodn.nrmn.restapi.repository.dynamicQuery.ObservationFilterCondition;
 import au.org.aodn.nrmn.restapi.repository.dynamicQuery.SurveyFilterCondition;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -71,8 +72,8 @@ public class SurveyController {
                                           @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) throws JsonProcessingException {
 
         // RequestParam do not support json object parsing automatically
-        List<Filter> f = filters != null ? Arrays.stream((objMapper.readValue(filters, Filter[].class))).collect(Collectors.toList()) : null;
-        List<Sorter> s = sort != null ? Arrays.stream((objMapper.readValue(sort, Sorter[].class))).collect(Collectors.toList()) : null;
+        List<Filter> f = FilterCondition.parse(objMapper, filters, Filter[].class);
+        List<Sorter> s = FilterCondition.parse(objMapper, sort, Sorter[].class);
 
         // Diver name search need another table, we do not need to apply sorting here as it is just intermediate result.
         Optional<Filter> diverFilter = ObservationFilterCondition.getSupportField(f, ObservationFilterCondition.SupportedFilters.DIVER_NAME_IN_SURVEY);

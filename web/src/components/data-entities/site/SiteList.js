@@ -1,16 +1,20 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useCallback} from 'react';
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
 import {Navigate, NavLink, useLocation} from 'react-router-dom';
 import {getResult} from '../../../api/api';
-import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Add, CopyAll, Delete, Edit} from '@mui/icons-material';
 import {entityDelete} from '../../../api/api';
 import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import 'ag-grid-enterprise';
 
 const SiteList = () => {
+  const rowsPerPage = 50;
+  const [loading, setLoading] = React.useState(false);
+
   const location = useLocation();
   const [redirect, setRedirect] = useState();
   const [dialogState, setDialogState] = useState({open: false});
@@ -23,13 +27,60 @@ const SiteList = () => {
     }
   };
 
-  const onGridReady = (event) => {
-    async function fetchSites(event) {
-      await getResult('sites').then((res) => {
-        // Use setRowData in api will not trigger onGridReady but onDataChange event.
-        // if you use useState and connect row to setRowData then you will
-        // keep fire onGridReady as row change
-        event.api.setRowData(res.data);
+  const onGridReady = useCallback((event) => {
+    async function fetchSites(e) {
+      e.api.setDatasource({
+        // This is the functional structure need for datasource
+        rowCount: rowsPerPage,
+        getRows: (params) => {
+          let url = `sites?page=${params.startRow / 100}`;
+          let conditions = [];
+          // Filter section
+          for(let name in params.filterModel) {
+            const p = params.filterModel[name];
+
+            if(p.type) {
+              // This is single condition
+              conditions.push({
+                field: name,
+                ops: p.type,
+                val: p.filter
+              });
+            }
+            else {
+              // This is a multiple condition, currently max two conditions
+              conditions.push({
+                field: name,
+                ops: p.operator,
+                conditions: [
+                  { ops: p.condition1.type, val: p.condition1.filter },
+                  { ops: p.condition2.type, val: p.condition2.filter }
+                ]
+              });
+            }
+          };
+
+          // Sorting section, order is important
+          let sort = [];
+          params.sortModel.forEach(i => {
+            sort.push({
+              field: i.colId,
+              order: i.sort
+            });
+          });
+
+          url = conditions.length !== 0 ? url + `&filters=${encodeURIComponent(JSON.stringify(conditions))}` : url;
+          url = sort.length !== 0 ? url + `&sort=${encodeURIComponent(JSON.stringify(sort))}` : url;
+
+          setLoading(true);
+          getResult(url)
+            .then(res => {
+              params.successCallback(res.data.items, res.data.lastRow);
+            })
+            .finally(()=> {
+              setLoading(false);
+            });
+        }
       });
     }
 
@@ -42,7 +93,7 @@ const SiteList = () => {
 
       // autoSizeAll(event, false);
     });
-  };
+  }, [location]);
 
   if (redirect) return <Navigate to={`/reference/site/${redirect}`} />;
 
@@ -76,6 +127,11 @@ const SiteList = () => {
 
   return (
     <>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       {dialogState.open && dialog}
       <Box display="flex" flexDirection="row" pt={1}>
         <Box p={1} pl={2} flexGrow={1}>
@@ -92,15 +148,14 @@ const SiteList = () => {
           ref={gridRef}
           id={'site-list'}
           rowHeight={24}
-          pagination
-          enableCellTextSelection
+          pagination={true}
+          paginationPageSize={rowsPerPage}
+          rowModelType={'infinite'}
+          enableCellTextSelection={true}
           onGridReady={(e) => onGridReady(e)}
           onBodyScroll={(e) => autoSizeAll(e, false)}
           onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
-          context={{useOverlay: 'Loading Sites'}}
-          components={{loadingOverlay: LoadingOverlay}}
-          loadingOverlayComponent="loadingOverlay"
-          suppressCellFocus
+          suppressCellFocus={true}
           defaultColDef={{
             sortable: true,
             resizable: true,
@@ -128,6 +183,7 @@ const SiteList = () => {
           />
           <AgGridColumn
             field="siteCode"
+            colId="site.siteCode"
             cellStyle={{cursor: 'pointer'}}
             onCellClicked={(e) => {
               if (e.event.ctrlKey) {
@@ -137,13 +193,13 @@ const SiteList = () => {
               }
             }}
           />
-          <AgGridColumn minWidth={500} field="siteName" />
-          <AgGridColumn minWidth={200} field="locationName" />
-          <AgGridColumn field="state" />
-          <AgGridColumn minWidth={200} field="country" />
-          <AgGridColumn field="latitude" />
-          <AgGridColumn field="longitude" />
-          <AgGridColumn suppressMenu field="isActive" headerName="Active" />
+          <AgGridColumn minWidth={500} field="siteName" colId="site.siteName"/>
+          <AgGridColumn minWidth={200} field="locationName" colId="site.locationName"/>
+          <AgGridColumn field="state" colId="site.state"/>
+          <AgGridColumn minWidth={200} field="country" colId="site.country"/>
+          <AgGridColumn field="latitude" colId="site.latitude"/>
+          <AgGridColumn field="longitude" colId="site.longitude"/>
+          <AgGridColumn suppressMenu={true} field="isActive" headerName="Active" colId="site.isActive"/>
           <AgGridColumn
             field="siteId"
             headerName=""
@@ -170,7 +226,7 @@ const SiteList = () => {
             filter={false}
             resizable={false}
             sortable={false}
-            cellRenderer={(e) => (e.data.isActive ? <></> : <Delete />)}
+            cellRenderer={(e) => (e.data?.isActive ? <></> : <Delete />)}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => {
               !e.data.isActive &&

@@ -1,24 +1,78 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useCallback} from 'react';
 import {Box, Button, Typography} from '@mui/material';
 import {NavLink, useLocation} from 'react-router-dom';
 import {grey, red} from '@mui/material/colors';
 import {getResult, entityEdit} from '../../../api/api';
-import LoadingOverlay from '../../overlays/LoadingOverlay';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {Add, Save} from '@mui/icons-material';
 import 'ag-grid-enterprise';
 import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const DiverList = () => {
+  const rowsPerPage = 50;
+  const [loading, setLoading] = React.useState(false);
+
   const location = useLocation();
   const [delta, setDelta] = useState([]);
   const [errors, setErrors] = useState([]);
   const gridRef = useRef(null);
 
-  const onGridReady = (event) => {
-    async function fetchDivers(event) {
-      await getResult('divers').then((res) => {
-        event.api.setRowData(res.data);
+  const onGridReady = useCallback((event) => {
+    async function fetchDivers(e) {
+      e.api.setDatasource({
+        // This is the functional structure need for datasource
+        rowCount: rowsPerPage,
+        getRows: (params) => {
+          let url = `divers?page=${params.startRow / 100}`;
+          let conditions = [];
+          // Filter section
+          for(let name in params.filterModel) {
+            const p = params.filterModel[name];
+
+            if(p.type) {
+              // This is single condition
+              conditions.push({
+                field: name,
+                ops: p.type,
+                val: p.filter
+              });
+            }
+            else {
+              // This is a multiple condition, currently max two conditions
+              conditions.push({
+                field: name,
+                ops: p.operator,
+                conditions: [
+                  { ops: p.condition1.type, val: p.condition1.filter },
+                  { ops: p.condition2.type, val: p.condition2.filter }
+                ]
+              });
+            }
+          };
+
+          // Sorting section, order is important
+          let sort = [];
+          params.sortModel.forEach(i => {
+            sort.push({
+              field: i.colId,
+              order: i.sort
+            });
+          });
+
+          url = conditions.length !== 0 ? url + `&filters=${encodeURIComponent(JSON.stringify(conditions))}` : url;
+          url = sort.length !== 0 ? url + `&sort=${encodeURIComponent(JSON.stringify(sort))}` : url;
+
+          setLoading(true);
+          getResult(url)
+            .then(res => {
+              params.successCallback(res.data.items, res.data.lastRow);
+            })
+            .finally(()=> {
+              setLoading(false);
+            });
+        }
       });
     }
 
@@ -29,7 +83,7 @@ const DiverList = () => {
         stateFilterHandler.resetStateFilters(gridRef);
       }
     });
-  };
+  }, [location]);
 
   const onCellValueChanged = (e) => {
     setDelta((data) => {
@@ -40,14 +94,18 @@ const DiverList = () => {
   };
 
   const chooseCellStyle = (params) => {
-    if (params.context.errors.some((e) => e.id === params.data.diverId)) return {backgroundColor: red[100]};
-    if (params.context.delta[params.data.diverId]) return {backgroundColor: grey[100]};
+    if(params.context !== undefined) {
+      if (params.context.errors.some((e) => e.id === params.data?.diverId)) return { backgroundColor: red[100] };
+      if (params.context.delta[params.data?.diverId]) return { backgroundColor: grey[100] };
+    }
     return null;
   };
 
   const tooltipValueGetter = (params) => {
-    const error = params.context.errors.find((e) => e.id === params.data.diverId);
-    if (error) return error.message;
+    if(params.context !== undefined) {
+      const error = params.context.errors.find((e) => e.id === params.data.diverId);
+      if (error) return error.message;
+    }
   };
 
   const saveGrid = () => {
@@ -59,6 +117,11 @@ const DiverList = () => {
 
   return (
     <>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Box display="flex" flexDirection="row" p={1} pb={1}>
         <Box flexGrow={1}>
           <Typography variant="h4">Divers</Typography>
@@ -81,12 +144,12 @@ const DiverList = () => {
         getRowId={(r) => r.data.diverId}
         rowHeight={20}
         fillHandleDirection="y"
-        pagination
+        pagination={true}
+        paginationPageSize={rowsPerPage}
+        rowModelType={'infinite'}
         enableBrowserTooltips
         onCellValueChanged={onCellValueChanged}
-        context={{useOverlay: 'Loading Divers', delta, errors}}
-        components={{loadingOverlay: LoadingOverlay}}
-        loadingOverlayComponent="loadingOverlay"
+        context={{delta, errors}}
         onGridReady={(e) => onGridReady(e)}
         onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
         defaultColDef={{
@@ -100,8 +163,8 @@ const DiverList = () => {
           tooltipValueGetter: tooltipValueGetter
         }}
       >
-        <AgGridColumn field="initials" />
-        <AgGridColumn flex={1} field="fullName" />
+        <AgGridColumn field="initials" colId="diver.initials"/>
+        <AgGridColumn flex={1} field="fullName" colId="diver.fullName"/>
       </AgGridReact>
     </>
   );

@@ -1,4 +1,6 @@
-[
+{
+  "lastRow": 3,
+  "items": [
   {
     "status": "Active",
     "locationName": "Interest Bay",
@@ -26,4 +28,5 @@
     "siteCodes": "ARG16, ARG103, ARG111",
     "id": 3
   }
-]
+  ]
+}

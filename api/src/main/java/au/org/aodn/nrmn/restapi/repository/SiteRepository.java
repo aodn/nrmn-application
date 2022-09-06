@@ -25,35 +25,22 @@ public interface SiteRepository
 
     @Override
     @Query("SELECT s FROM Site s WHERE lower(s.siteCode) = lower(:code)")
-    @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
+    @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
     List<Site> findByCriteria(@Param("code") String siteCode);
 
     @Query(value = "SELECT LOWER(siteCode) FROM Site WHERE siteCode IN :siteCodes")
     List<String> getAllSiteCodesMatching(Collection<String> siteCodes);
 
     @Query("SELECT s FROM Site s")
-    @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
+    @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
     Collection<Site> getAll();
 
     @Query("SELECT s FROM Site s WHERE lower(s.siteCode) = lower(:code)")
-    @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
+    @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
     Site findBySiteCode(@Param("code") String siteCode);
-
-    @Query(nativeQuery = true, value = "SELECT site_code FROM {h-schema}ep_site_list WHERE province = ?1")
-    List<String> findSiteCodesByProvince(String province);
-
-    @Query(value = "SELECT site_code FROM {h-schema}site_ref WHERE site_code IS NOT NULL ORDER BY SUBSTRING(site_code, '^[A-Z]+'), CAST(SUBSTRING(site_code, '[0-9]+$') AS INTEGER)", nativeQuery = true)
-    List<String> findAllSiteCodes();
-
-    @Query(value = "SELECT * FROM {h-schema}site_ref WHERE site_code IS NOT NULL ORDER BY SUBSTRING(site_code, '^[A-Z]+'), CAST(SUBSTRING(site_code, '[0-9]+$') AS INTEGER)", nativeQuery = true)
-    @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
-    List<Site> findAll();
 
     @Query(value = "SELECT DISTINCT state FROM Site WHERE state is not null ORDER BY state")
     List<String> findAllSiteStates();
-
-    @Query(nativeQuery = true, value = "SELECT DISTINCT province FROM {h-schema}ep_site_list where province is not null ORDER BY province")
-    List<String> findAllSiteProvinces();
 
     @Query(value = "SELECT DISTINCT country FROM Site WHERE country is not null ORDER BY country")
     List<String> findAllCountries();
@@ -64,6 +51,4 @@ public interface SiteRepository
             "WHERE ST_DWithin(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography), 200) " +
             "AND (sr.site_id <> :siteId)")
     List<String> sitesWithin200m(Integer siteId, double longitude, double latitude);
-
-    <T> Optional<T> findBySiteId(Integer id, Class<T> type);
 }

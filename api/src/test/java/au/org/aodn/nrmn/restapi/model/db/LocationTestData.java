@@ -19,8 +19,7 @@ public class LocationTestData {
     }
 
     public Location persistedLocation(Location location ) {
-        locationRepository.saveAndFlush(location);
-        return location;
+        return locationRepository.saveAndFlush(location);
     }
 
     public Location buildWith(int itemNumber) {

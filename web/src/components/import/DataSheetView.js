@@ -233,6 +233,12 @@ const DataSheetView = ({onIngest, isAdmin}) => {
     e.api.refreshCells();
     const filterModel = e.api.getFilterModel();
     setIsFiltered(Object.getOwnPropertyNames(filterModel).length > 0);
+    e.api.setFilterModel({
+      id: {
+        type: 'set',
+        values: e.api.getRenderedNodes().map((field) => field.id.toString())
+      }
+    });
   };
 
   const onRowDataUpdated = (e) => {
