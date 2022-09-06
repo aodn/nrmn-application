@@ -9,7 +9,7 @@ import javax.persistence.criteria.Order;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocationFilterCondition extends FilterCondition {
+public class LocationFilterCondition extends FilterCondition<LocationListView> {
     public enum SupportedFields implements DBField {
         LOCATION_NAME {
             @Override
@@ -77,9 +77,6 @@ public class LocationFilterCondition extends FilterCondition {
         }
     }
 
-    protected Specification<LocationListView> filtersSpec = null;
-    protected Specification<LocationListView> sortingSpec = null;
-
     public static Specification<LocationListView> createSpecification(List<Filter> filters, List<Sorter> sort) {
         LocationFilterCondition condition = new LocationFilterCondition();
 
@@ -92,17 +89,6 @@ public class LocationFilterCondition extends FilterCondition {
         }
 
         return condition.build();
-    }
-
-    protected Specification<LocationListView> build() {
-        if(filtersSpec == null) {
-            // We need to do join to get the relationship even we do not have any search criteria, if we have
-            // search criteria, table already join so no need to do it here again
-            return sortingSpec;
-        }
-        else {
-            return filtersSpec.and(sortingSpec);
-        }
     }
 
     protected LocationFilterCondition applySort(List<Sorter> sort) {
@@ -135,7 +121,7 @@ public class LocationFilterCondition extends FilterCondition {
                     break;
                 }
 
-                default: {}
+                default: { break; }
             }
         });
 
@@ -162,7 +148,9 @@ public class LocationFilterCondition extends FilterCondition {
                         case STATUS:
                         case LOCATION_NAME: {
                             orders.add(getItemOrdering(root, criteriaBuilder, sortItem, SupportedFields.class));
+                            break;
                         }
+                        default: { break; }
                     }
                 }
             });

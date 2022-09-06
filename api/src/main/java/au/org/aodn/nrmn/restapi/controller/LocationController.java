@@ -10,7 +10,7 @@ import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
 import au.org.aodn.nrmn.restapi.model.db.LocationListView;
 import au.org.aodn.nrmn.restapi.repository.dynamicQuery.FilterCondition;
-import au.org.aodn.nrmn.restapi.repository.projections.LocationListRepository;
+import au.org.aodn.nrmn.restapi.repository.LocationListRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ public class LocationController {
     private ObjectMapper objMapper;
 
     @GetMapping("/locations")
-    public ResponseEntity<?>  getLocationsWithRegions(@RequestParam(value = "sort", required = false) String sort,
+    public ResponseEntity<?>  getLocationsWithFilters(@RequestParam(value = "sort", required = false) String sort,
                                                                  @RequestParam(value = "filters", required = false) String filters,
                                                                  @RequestParam(value = "page", defaultValue = "0") int page,
                                                                  @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) throws JsonProcessingException {

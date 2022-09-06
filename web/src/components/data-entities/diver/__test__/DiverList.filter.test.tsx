@@ -15,7 +15,7 @@ describe('<DiverList/> filter testing', () => {
   let mockGetResult;
   let mockGetFiltersForId;
   let mockResetStateFilters;
-  const columns = ['initials', 'fullName'];
+  const columns = ['diver.initials', 'diver.fullName'];
 
   beforeAll(() => {
     mockGetResult = jest.spyOn(axiosInstance, 'getResult');
@@ -81,7 +81,7 @@ describe('<DiverList/> filter testing', () => {
 
     // Filter set will cause some items disappeared
     mockGetFiltersForId.mockImplementation((id) => {
-      return '{"fullName":{"filterType":"text","type":"contains","filter":"Orange"}}';
+      return '{"diver.fullName":{"filterType":"text","type":"contains","filter":"Orange"}}';
     });
 
     // Override function so that it return the data we set.
@@ -115,16 +115,9 @@ describe('<DiverList/> filter testing', () => {
         // Refresh the dom tree
         rerender(<Router location={history.location} navigator={history}><DiverList/></Router>);
 
-        // Restore filter called
+        // All filter operation in server side, we just need to check if filter get restored
         expect(mockGetFiltersForId).toBeCalledTimes(1);
         expect(mockResetStateFilters).toBeCalledTimes(0);
-
-        // id = 1 so show this one
-        expect(screen.getByText('Apple Orange')).toBeInTheDocument();
-
-        // id != 1 so no show
-        screen.findByText('Cherry Melon').then(i => expect(i).toBe({}));
-        screen.findByText('Rock Melon').then(i => expect(i).toBe({}));
       });
   });
 });

@@ -12,6 +12,9 @@ import javax.persistence.Id;
 
 import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
+/**
+ * This view is use by the GUI location list screen
+ */
 @Entity
 @Immutable
 @Audited(withModifiedFlag = false)

@@ -3,9 +3,11 @@ package au.org.aodn.nrmn.restapi.repository.dynamicQuery;
 import au.org.aodn.nrmn.restapi.controller.transform.Field;
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
+import au.org.aodn.nrmn.restapi.model.db.LocationListView;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
 import java.sql.Date;
@@ -17,7 +19,7 @@ import java.util.stream.Collectors;
 import static au.org.aodn.nrmn.restapi.repository.dynamicQuery.PGDialect.STRING_SPLIT_EQUALS;
 import static au.org.aodn.nrmn.restapi.repository.dynamicQuery.PGDialect.STRING_SPLIT_LIKE;
 
-public abstract class FilterCondition {
+public abstract class FilterCondition<T> {
 
     public static final String STARTS_WITH = "startsWith";
     public static final String ENDS_WITH = "endsWith";
@@ -30,6 +32,9 @@ public abstract class FilterCondition {
     public static final String NOT_BLANK = "notBlank";
     public static final String IN = "in";
     public static final String NOT_IN = "notIn";
+
+    protected Specification<T> filtersSpec = null;
+    protected Specification<T> sortingSpec = null;
 
     interface DBField {
 
@@ -48,6 +53,21 @@ public abstract class FilterCondition {
             }
         }
     }
+
+    protected Specification<T> build() {
+        if(filtersSpec == null) {
+            // We need to do join to get the relationship even we do not have any search criteria, if we have
+            // search criteria, table already join so no need to do it here again
+            return sortingSpec;
+        }
+        else {
+            return filtersSpec.and(sortingSpec);
+        }
+    }
+
+    protected abstract FilterCondition applySort(List<Sorter> sort);
+
+    protected abstract FilterCondition applyFilters(List<Filter> filters);
 
     protected <T extends Enum<T> & FilterCondition.DBField> Order getItemOrdering(From<?,?> from, CriteriaBuilder criteriaBuilder, Sorter sort, Class<T> clazz) {
         Expression<Survey> e = from.get(FilterCondition.getFieldEnum(sort.getFieldName(), clazz).getDBFieldName());

@@ -15,7 +15,7 @@ import java.util.*;
  * Due to tight couple with the database structure, this class cannot be generalized
  */
 
-public class SurveyFilterCondition extends FilterCondition {
+public class SurveyFilterCondition extends FilterCondition<Survey> {
 
     public enum SupportedFields implements DBField {
         PROGRAMS {
@@ -141,9 +141,6 @@ public class SurveyFilterCondition extends FilterCondition {
         }
     }
 
-    protected Specification<Survey> filtersSpec = null;
-    protected Specification<Survey> sortingSpec = null;
-
     public static Specification<Survey> createSpecification(List<Filter> filters, List<Sorter> sort) {
         SurveyFilterCondition condition = new SurveyFilterCondition();
 
@@ -156,15 +153,6 @@ public class SurveyFilterCondition extends FilterCondition {
         }
 
         return condition.build();
-    }
-
-    protected Specification<Survey> build() {
-        if(filtersSpec == null) {
-            return sortingSpec;
-        }
-        else {
-            return filtersSpec.and(sortingSpec);
-        }
     }
 
     protected SurveyFilterCondition applySort(List<Sorter> sort) {

@@ -20,8 +20,7 @@ public class DiverTestData {
     }
 
     public Diver persistedDiver(Diver diver) {
-        diverRepository.saveAndFlush(diver);
-        return diver;
+        return diverRepository.saveAndFlush(diver);
     }
 
     public Diver buildWith(int itemNumber, String name) {
