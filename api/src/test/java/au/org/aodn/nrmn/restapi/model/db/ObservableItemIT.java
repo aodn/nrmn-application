@@ -35,7 +35,8 @@ class ObservableItemIT {
         ObservableItem observableItem = observableItemTestData.persistedObservableItem();
         entityManager.clear();
         ObservableItem persistedObservableItem = observableItemRepository.findById(observableItem.getObservableItemId()).get();
-        assertEquals(observableItem, persistedObservableItem);
+        assertEquals(observableItem.getObservableItemName(), persistedObservableItem.getObservableItemName());
+        assertEquals(observableItem.getObservableItemId(), persistedObservableItem.getObservableItemId());
     }
 
 }
