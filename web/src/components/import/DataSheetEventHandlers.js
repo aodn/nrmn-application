@@ -67,9 +67,7 @@ class DataSheetEventHandlers {
       const data = {...rowData[dataIdx]};
       delta.push(data);
       let newData = {};
-      Object.keys(data).forEach(function (key) {
-        newData[key] = data[key];
-      });
+      Object.keys(data).forEach((key) => (newData[key] = data[key]));
       fields
         .filter((key) => !(columnDefs.find((d) => d.field === key)?.editable == false))
         .forEach((key) => {
@@ -114,23 +112,38 @@ class DataSheetEventHandlers {
     if (row && row[params.colDef.field]) return {backgroundColor: yellow[100]};
 
     // Cell validations
-    const error = params.context.errors.find(
-      (e) => e.rowIds.includes(params.data.id) && (!e.columnNames || e.columnNames.includes(params.colDef.field))
-    );
-
-    switch (error?.levelId) {
-      case 'BLOCKING':
-        return {backgroundColor: red[100]};
-      case 'WARNING':
-        return {backgroundColor: orange[100]};
-      case 'DUPLICATE':
-        if (params.context.focusedRows?.includes(params.data.id)) {
-          return {backgroundColor: blue[100], fontWeight: 'bold'};
-        } else {
-          return {backgroundColor: blue[100]};
-        }
-      case 'INFO':
-        return {backgroundColor: grey[100]};
+    if (params.context.cellValidations) {
+      const row = params.data.id;
+      const field = params.colDef.field;
+      const level = params.context.cellValidations[row]?.[field]?.levelId;
+      switch (level) {
+        case 'BLOCKING':
+          return {backgroundColor: red[100]};
+        case 'WARNING':
+          return {backgroundColor: orange[100]};
+        case 'INFO':
+          return {backgroundColor: grey[100]};
+        default:
+          return null;
+      }
+    } else {
+      const error = params.context.errors.find(
+        (e) => e.rowIds.includes(params.data.id) && (!e.columnNames || e.columnNames.includes(params.colDef.field))
+      );
+      switch (error?.levelId) {
+        case 'BLOCKING':
+          return {backgroundColor: red[100]};
+        case 'WARNING':
+          return {backgroundColor: orange[100]};
+        case 'DUPLICATE':
+          if (params.context.focusedRows?.includes(params.data.id)) {
+            return {backgroundColor: blue[100], fontWeight: 'bold'};
+          } else {
+            return {backgroundColor: blue[100]};
+          }
+        case 'INFO':
+          return {backgroundColor: grey[100]};
+      }
     }
   }
 
@@ -302,7 +315,6 @@ class DataSheetEventHandlers {
     const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
     const label = row.data[colId];
 
-    let rowData = e.context.rowData;
     const items = [];
 
     if (label) {
@@ -315,21 +327,19 @@ class DataSheetEventHandlers {
     const cloneRow = (clearData) => {
       const [cells] = e.api.getCellRanges();
       const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
-      const data = rowData.find((d) => d.id == row.data.id);
+      const data = e.context.rowData.find((d) => d.id == row.data.id);
       const newId = +new Date().valueOf();
-      const posMap = rowData.map((r) => r.pos).sort((a, b) => a - b);
+      const posMap = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
       const currentPosIdx = posMap.findIndex((p) => p == data.pos);
       let newData = {};
-      Object.keys(data).forEach(function (key) {
-        newData[key] = clearData ? '' : data[key];
-      });
+      Object.keys(data).forEach((key) => (newData[key] = clearData ? '' : data[key]));
       delete newData.errors;
       newData.pos = posMap[currentPosIdx + 1] ? posMap[currentPosIdx + 1] - 1 : posMap[currentPosIdx] + 1000;
       newData.id = newId;
       eh.pushUndo(e.api, [{id: newId}]);
-      rowData.push(newData);
-      e.api.setRowData(rowData);
-      e.context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
+      e.context.rowData.push(newData);
+      e.api.setRowData(e.context.rowData);
+      e.context.rowPos = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
       const values = e.api.getRenderedNodes().reduce((acc, field) => acc.concat(field.id.toString()), [newId.toString()]);
       e.api.setFilterModel({
         id: {

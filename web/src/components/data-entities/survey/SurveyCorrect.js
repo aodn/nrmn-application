@@ -193,7 +193,7 @@ const SurveyCorrect = () => {
         const measurements = data.observationIds === '' ? {} : JSON.parse(data.measureJson);
         const observationIds = data.observationIds === '' ? [] : JSON.parse(data.observationIds);
         delete data.measureJson;
-        return {id: (idx + 1) * 100, pos: idx + 1, ...data, observationIds, measurements};
+        return {id: (idx + 1) * 100, pos: (idx + 1) * 100, ...data, observationIds, measurements};
       });
       const context = api.gridOptionsWrapper.gridOptions.context;
       const rowData = [...unpackedData];

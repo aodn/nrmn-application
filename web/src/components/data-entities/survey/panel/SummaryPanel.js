@@ -34,11 +34,13 @@ const SummaryPanel = ({api, context}) => {
     for (const validation of context.validations) {
       if (validation.rowIds.length == 1 || validation.columnNames.length == 1) {
         const rowId = validation.rowIds[0];
-        const rowData = context.rowData.find((r) => r.id === rowId);
+        const rowPos = context.rowPos.indexOf(rowId);
+        const rowData = api.getRowNode(rowId).data;
         const columnPath = validation.columnNames[0];
         const columnParts = columnPath.split('.');
-        const datum = columnParts.length > 1 ? rowData[columnParts[0]][columnParts[1]] : rowData[columnParts[0]];
-        validation.description = [{columnNames: validation.columnNames, rowIds: [rowId], value: datum}];
+        const value = columnParts.length > 1 ? rowData[columnParts[0]][columnParts[1]] : rowData[columnParts[0]];
+        const col =  validation.columnNames.length > 1 ? {columnNames: validation.columnNames} : {columnName: columnPath};
+        validation.description = [{...col, rowIds: validation.rowIds, rowNumbers: [rowPos], value}];
       }
       validation.rowNumbers = validation.rowIds; // FIXME
 
@@ -67,7 +69,7 @@ const SummaryPanel = ({api, context}) => {
                   }
                 >
                   {m.description.map((d) => {
-                    const mmHeader = mm.find((m) => m.field === d.columnName);
+                    const mmHeader = mm.find((m) => m.field === d.columnName.replace('measurements.', ''));
                     const label = mmHeader ? `${d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
                     return (
                       <TreeItem
