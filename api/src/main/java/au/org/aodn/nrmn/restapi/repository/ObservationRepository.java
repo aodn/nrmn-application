@@ -1,8 +1,6 @@
 package au.org.aodn.nrmn.restapi.repository;
 
 import java.util.List;
-import java.util.Collection;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

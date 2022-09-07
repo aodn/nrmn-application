@@ -14,7 +14,6 @@ import javax.persistence.QueryHint;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 
