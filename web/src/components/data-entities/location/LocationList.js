@@ -123,7 +123,7 @@ const LocationList = () => {
           rowModelType={'infinite'}
           enableCellTextSelection={true}
           onGridReady={(e) => onGridReady(e)}
-          onBodyScroll={(e) => autoSizeAll(e, false)}
+          onBodyScrollEnd={(e) => autoSizeAll(e, false)}
           onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
           suppressCellFocus={true}
           defaultColDef={{

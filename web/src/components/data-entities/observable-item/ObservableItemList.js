@@ -125,7 +125,7 @@ const ObservableItemList = () => {
         rowModelType={'infinite'}
         enableCellTextSelection={true}
         onGridReady={(e) => onGridReady(e)}
-        onBodyScroll={(e) => autoSizeAll(e, false)}
+        onBodyScrollEnd={(e) => autoSizeAll(e, false)}
         onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
         suppressCellFocus={true}
         defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
