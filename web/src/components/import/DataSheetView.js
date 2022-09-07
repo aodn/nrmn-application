@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Button, Typography} from '@mui/material';
-import {blue, grey, orange, red, yellow} from '@mui/material/colors';
-import {
-  CloudDownload as CloudDownloadIcon,
-  CloudUpload as CloudUploadIcon,
-  PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon
-} from '@mui/icons-material/';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
 import ResetIcon from '@mui/icons-material/LayersClear';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
@@ -17,64 +16,7 @@ import LoadingOverlay from '../overlays/LoadingOverlay';
 import AlertDialog from '../ui/AlertDialog';
 import FindReplacePanel from './panel/FindReplacePanel';
 import ValidationPanel from './panel/ValidationPanel';
-
-// |delta| is an array of rowData
-const pushUndo = (api, delta) => {
-  const ctx = api.gridOptionsWrapper.gridOptions.context;
-  ctx.undoStack.push(
-    delta.map((d) => {
-      ctx.putRowIds.push(d.id);
-      return {...d};
-    })
-  );
-  return ctx.undoStack.length;
-};
-
-const dateToNum = (date) => {
-  if (date === undefined || (date === null && (date.length !== 10 || date.length !== 8))) return null;
-
-  const yearNumber = date.length === 10 ? date.substring(6, 10) : '20' + date.substring(6, 8);
-  const monthNumber = date.substring(3, 5);
-  const dayNumber = date.substring(0, 2);
-  return yearNumber * 10000 + monthNumber * 100 + dayNumber;
-};
-
-export const dateComparator = (date1, date2) => {
-  var date1Number = dateToNum(date1);
-  var date2Number = dateToNum(date2);
-
-  if (date1Number === null && date2Number === null) return 0;
-
-  if (date1Number === null) return -1;
-
-  if (date2Number === null) return 1;
-
-  return date1Number - date2Number;
-};
-
-const popUndo = (api) => {
-  const ctx = api.gridOptionsWrapper.gridOptions.context;
-  const deltaSet = ctx.undoStack.pop();
-  let rowData = ctx.rowData;
-  for (const deltaIdx in deltaSet) {
-    const deltaId = deltaSet[deltaIdx].id;
-    ctx.putRowIds.push(deltaId);
-    const rowIdx = rowData.findIndex((d) => d.id === deltaId);
-    if (Object.keys(deltaSet[deltaIdx]).length < 2) {
-      rowData.splice(rowIdx, 1);
-    } else {
-      if (rowIdx < 0) {
-        rowData.push(deltaSet[deltaIdx]);
-      } else {
-        rowData[rowIdx] = deltaSet[deltaIdx];
-      }
-    }
-  }
-  context.fullRefresh = true;
-  api.setRowData(rowData);
-  ctx.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
-  return ctx.undoStack.length;
-};
+import eh from './DataSheetEventHandlers';
 
 // |context| is where all custom properties and helper functions
 // associated with the ag-grid are stored
@@ -88,27 +30,15 @@ const context = {
   summary: [],
   errors: [],
   fullRefresh: false,
-  pushUndo: pushUndo,
-  popUndo: popUndo,
+
+  // needed by the panels
+  pushUndo: eh.pushUndo,
+  popUndo: eh.popUndo,
 
   // paste operations must be done row-by-row. build up |pendingPasteUndo|
   // while in paste mode, then when onPasteEnd is called then call pushUndo
   pendingPasteUndo: [],
   pasteMode: false
-};
-
-const resetContext = () => {
-  context.useOverlay = 'Loading';
-  context.rowData = [];
-  context.rowPos = [];
-  context.highlighted = [];
-  context.putRowIds = [];
-  context.summary = [];
-  context.errorList = {};
-  context.errors = [];
-  context.pendingPasteUndo = [];
-  context.focusedRows = [];
-  context.pasteMode = false;
 };
 
 const defaultSideBar = {
@@ -119,50 +49,38 @@ const defaultSideBar = {
       labelKey: 'findReplace',
       iconKey: 'columns',
       toolPanel: 'findReplacePanel'
-    },
-    {
-      id: 'columns',
-      labelDefault: 'Pivot',
-      labelKey: 'columns',
-      iconKey: 'columns',
-      toolPanel: 'agColumnsToolPanel'
     }
   ],
   defaultToolPanel: ''
 };
 
-const generateErrorTree = (rowData, rowPos, errors) => {
-  const tree = {blocking: [], warning: [], info: [], duplicate: []};
-  errors
-    .sort((a, b) => (a.message < b.message ? -1 : a.message > b.message ? 1 : 0))
-    .forEach((e) => {
-      const rows = rowData.filter((r) => e.rowIds.includes(r.id));
-      let summary = [];
-      if (e.columnNames && e.categoryId !== 'SPAN') {
-        const col = e.columnNames[0];
-        summary = rows.reduce((acc, r) => {
-          const rowPosition = rowData.find((d) => d.id === r.id)?.pos;
-          const rowNumber = rowPos.indexOf(rowPosition) + 1;
-          const existingIdx = acc.findIndex((m) => m.columnName === col && m.value === r[col]);
-          if (existingIdx >= 0 && isNaN(parseInt(acc[existingIdx].columnName)))
-            acc[existingIdx] = {
-              columnName: col,
-              value: r[col],
-              rowIds: [...acc[existingIdx].rowIds, r.id],
-              rowNumbers: [...acc[existingIdx].rowNumbers, rowNumber]
-            };
-          else
-            acc.push({columnName: col, value: r[col], rowIds: [r.id], rowNumbers: [rowNumber], isInvertSize: r.isInvertSizing === 'Yes'});
-          return acc;
-        }, []);
-      } else {
-        const rowPositions = e.rowIds.map((r) => rowData.find((d) => d.id === r)?.pos).filter((r) => r);
-        const rowNumbers = rowPositions.map((r) => rowPos.indexOf(r) + 1);
-        summary = [{rowIds: e.rowIds, columnNames: e.columnNames, rowNumbers}];
-      }
-      tree[e.levelId.toLowerCase()].push({key: `err-${e.id}`, message: e.message, count: e.rowIds.length, description: summary});
-    });
-  return tree;
+const reload = (api, id, completion, isAdmin) => {
+  const context = api.gridOptionsWrapper.gridOptions.context;
+  eh.resetContext();
+  context.isAdmin = isAdmin;
+  getDataJob(id).then((res) => {
+    const job = {
+      program: res.data.job.program.programName,
+      reference: res.data.job.reference,
+      isExtendedSize: res.data.job.isExtendedSize,
+      source: res.data.job.source,
+      status: res.data.job.status
+    };
+    if (res.data.rows) {
+      const rowData = res.data.rows.map((row) => {
+        const {measureJson} = {...row};
+        Object.getOwnPropertyNames(measureJson || {}).forEach((numKey) => {
+          row[numKey] = measureJson[numKey];
+        });
+        delete row.measureJson;
+        return row;
+      });
+      context.rowData = rowData;
+      context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
+      api.setRowData(rowData.length > 0 ? rowData : null);
+    }
+    if (completion) completion(job);
+  });
 };
 
 const IngestState = Object.freeze({Loading: 0, Edited: 1, Valid: 2, ConfirmSubmit: 3});
@@ -181,14 +99,14 @@ const DataSheetView = ({onIngest, isAdmin}) => {
       if (event.ctrlKey && event.key === 'z') {
         event.preventDefault();
         event.stopPropagation();
-        onUndo({api: gridApi});
+        eh.handleUndo({api: gridApi});
       }
     };
     document.body.addEventListener('keydown', undoKeyboardHandler);
     return () => {
       document.body.removeEventListener('keydown', undoKeyboardHandler);
     };
-  });
+  }, [gridApi]);
 
   useEffect(() => {
     if (gridApi && state === IngestState.Loading) gridApi.showLoadingOverlay();
@@ -215,7 +133,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
       delete result.data.errors;
       delete result.data.job;
       context.summary = result.data;
-      context.errorList = generateErrorTree(context.rowData, context.rowPos, context.errors);
+      context.errorList = eh.generateErrorTree(context.rowData, context.rowPos, context.errors);
 
       setState(context.errors.some((e) => e.levelId === 'BLOCKING') ? IngestState.Edited : IngestState.Valid);
 
@@ -276,7 +194,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
     });
     updateRows(id, rowUpdateDtos, () => {
       if (context.fullRefresh) {
-        reload(gridApi, id, handleValidate);
+        reload(gridApi, id, handleValidate, isAdmin);
         context.fullRefresh = false;
       } else {
         handleValidate();
@@ -284,248 +202,30 @@ const DataSheetView = ({onIngest, isAdmin}) => {
     });
   };
 
-  const onPasteStart = (e) => {
-    e.api.gridOptionsWrapper.gridOptions.context.pasteMode = true;
-  };
-
   const onCellValueChanged = (e) => {
-    if (e.context.pasteMode) {
-      e.context.pendingPasteUndo.push({id: e.data.id, field: e.colDef.field, value: e.oldValue});
-    }
-    setUndoSize(e.context.undoStack.length);
+    setUndoSize(eh.handleCellValueChanged(e));
   };
 
   const onPasteEnd = (e) => {
-    const ctx = e.api.gridOptionsWrapper.gridOptions.context;
-    ctx.pasteMode = false;
-    let oldRows = [];
-    Array.from(new Set(ctx.pendingPasteUndo.map((u) => u.id))).forEach((id) => {
-      let oldRow = {};
-      let rowData = ctx.rowData;
-      const newRow = rowData.find((r) => r.id === id);
-      Object.keys(newRow).forEach(function (key) {
-        oldRow[key] = newRow[key];
-      });
-      ctx.pendingPasteUndo
-        .filter((u) => u.id === id)
-        .forEach((p) => {
-          const field = p.field;
-          oldRow[field] = p.value;
-        });
-      oldRows.push(oldRow);
-    });
-    setUndoSize(ctx.pushUndo(e.api, [...oldRows]));
-    ctx.pendingPasteUndo = [];
-  };
-
-  const onCopyRegion = (e) => {
-    e.api.copySelectedRangeToClipboard();
-  };
-
-  const getContextMenuItems = (e) => {
-    const [cells] = e.api.getCellRanges();
-    if (!cells) return;
-
-    const colId = cells.startColumn.colId;
-    const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
-    const label = row.data[colId];
-
-    let rowData = e.context.rowData;
-    const items = [];
-
-    if (label) {
-      items.push({
-        name: `Fill with '${label}'`,
-        action: () => fillRegion(e, label)
-      });
-    }
-
-    const cloneRow = (clearData) => {
-      const [cells] = e.api.getCellRanges();
-      const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
-      const data = rowData.find((d) => d.id == row.data.id);
-      const newId = +new Date().valueOf();
-      const posMap = rowData.map((r) => r.pos).sort((a, b) => a - b);
-      const currentPosIdx = posMap.findIndex((p) => p == data.pos);
-      let newData = {};
-      Object.keys(data).forEach(function (key) {
-        newData[key] = clearData ? '' : data[key];
-      });
-      delete newData.errors;
-      newData.pos = posMap[currentPosIdx + 1] ? posMap[currentPosIdx + 1] - 1 : posMap[currentPosIdx] + 1000;
-      newData.id = newId;
-      pushUndo(e.api, [{id: newId}]);
-      rowData.push(newData);
-      e.api.setRowData(rowData);
-      e.context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
-      const values = e.api.getRenderedNodes().reduce((acc, field) => acc.concat(field.id.toString()), [newId.toString()]);
-      e.api.setFilterModel({
-        id: {
-          type: 'set',
-          values: values
-        }
-      });
-    };
-
-    const multiRowsSelected = e.api.getSelectedRows().length > 1 || cells.startRow.rowIndex !== cells.endRow.rowIndex;
-    if (!multiRowsSelected) {
-      if (items.length > 0) items.push('separator');
-      items.push({
-        name: 'Delete Row',
-        action: () => deleteRow(e)
-      });
-      items.push({
-        name: 'Clone Row',
-        action: () => cloneRow(false)
-      });
-      items.push({
-        name: 'Insert Row',
-        action: () => cloneRow(true)
-      });
-    } else {
-      if (items.length > 0) items.push('separator');
-      items.push({
-        name: 'Delete Selected Rows',
-        action: () => deleteRow(e)
-      });
-    }
-    return items;
-  };
-
-  const fillRegion = (e, fill) => {
-    const rowData = e.context.rowData;
-    const [cells] = e.api.getCellRanges();
-    const fields = cells.columns.map((col) => col.colId);
-    const delta = [];
-    const startIdx = Math.min(cells.startRow.rowIndex, cells.endRow.rowIndex);
-    const endIdx = Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
-    for (let i = startIdx; i < endIdx + 1; i++) {
-      const row = e.api.getDisplayedRowAtIndex(i);
-      const dataIdx = rowData.findIndex((d) => d.id == row.data.id);
-      const data = {...rowData[dataIdx]};
-      delta.push(data);
-      let newData = {};
-      Object.keys(data).forEach(function (key) {
-        newData[key] = data[key];
-      });
-      fields.forEach((key) => {
-        if (key != 'pos') {
-          newData[key] = fill;
-        }
-      });
-      rowData[dataIdx] = newData;
-    }
-    pushUndo(e.api, delta);
-    e.api.setRowData(rowData);
-  };
-
-  const onClearRegion = (e) => fillRegion(e, '');
-
-  const onCutRegion = (e) => {
-    onCopyRegion(e);
-    onClearRegion(e);
-  };
-
-  const onUndo = (e) => {
-    if (undoSize < 1) return;
-    popUndo(e.api);
-    e.api.refreshCells();
+    setUndoSize(eh.handlePasteEnd(e));
   };
 
   const onCellEditingStopped = (e) => {
-    if (e.oldValue === e.newValue) return;
-    const row = {...e.data};
-    row[e.column.colId] = e.oldValue;
-    setUndoSize(pushUndo(e.api, [row]));
+    setUndoSize(eh.handleCellEditingStopped(e));
     setState(IngestState.Edited);
-  };
-
-  const overrideKeyboardEvents = (e) => {
-    if (e.event.key === 'Delete') {
-      if (e.event.type === 'keydown') onClearRegion(e);
-      return true;
-    }
-
-    if (e.event.ctrlKey || e.event.metaKey) {
-      if (e.event.key === 'c' && e.event.type === 'keydown') {
-        onCopyRegion(e);
-        return true;
-      }
-      if (e.event.key === 'x' && e.event.type === 'keydown') {
-        onCutRegion(e);
-        return true;
-      }
-      return false;
-    }
-  };
-
-  const reload = (api, id, completion) => {
-    resetContext();
-    context.isAdmin = isAdmin;
-    getDataJob(id).then((res) => {
-      const job = {
-        program: res.data.job.program.programName,
-        reference: res.data.job.reference,
-        isExtendedSize: res.data.job.isExtendedSize,
-        source: res.data.job.source,
-        status: res.data.job.status
-      };
-      if (res.data.rows) {
-        const rowData = res.data.rows.map((row) => {
-          const {measureJson} = {...row};
-          Object.getOwnPropertyNames(measureJson || {}).forEach((numKey) => {
-            row[numKey] = measureJson[numKey];
-          });
-          delete row.measureJson;
-          return row;
-        });
-        api.gridOptionsWrapper.gridOptions.context.rowData = rowData;
-        api.gridOptionsWrapper.gridOptions.context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
-        api.setRowData(rowData.length > 0 ? rowData : null);
-      }
-      if (completion) completion(job);
-    });
   };
 
   const onGridReady = (p) => {
     setGridApi(p.api);
-    reload(p.api, id, (job) => {
-      setState(IngestState.Edited);
-      setJob(job);
-    });
-  };
-
-  const chooseCellStyle = (params) => {
-    // Grey-out the first  column containing the row number
-    if (!params.colDef.editable) return {color: grey[800], backgroundColor: grey[50]};
-
-    // Highlight and search results
-    const row = params.context.highlighted[params.rowIndex];
-    if (row && row[params.colDef.field]) return {backgroundColor: yellow[100]};
-
-    // Highlight cell validations
-    const error = params.context.errors.find(
-      (e) => e.rowIds.includes(params.data.id) && (!e.columnNames || e.columnNames.includes(params.colDef.field))
+    reload(
+      p.api,
+      id,
+      (job) => {
+        setState(IngestState.Edited);
+        setJob(job);
+      },
+      isAdmin
     );
-
-    switch (error?.levelId) {
-      case 'BLOCKING':
-        return {backgroundColor: red[100]};
-      case 'WARNING':
-        return {backgroundColor: orange[100]};
-      case 'DUPLICATE':
-        if (context.focusedRows?.includes(params.data.id)) {
-          return {backgroundColor: blue[100], fontWeight: 'bold'};
-        } else {
-          return {backgroundColor: blue[100]};
-        }
-      case 'INFO':
-        return {backgroundColor: grey[100]};
-    }
-  };
-
-  const onSortChanged = (e) => {
-    e.api.refreshCells();
   };
 
   const onFilterChanged = (e) => {
@@ -547,151 +247,6 @@ const DataSheetView = ({onIngest, isAdmin}) => {
     }
     e.columnApi.autoSizeAllColumns();
     setUndoSize(ctx.undoStack.length);
-  };
-
-  const toolTipValueGetter = (params) => {
-    const error = params.context.errors.find(
-      (e) => e.rowIds.includes(params.data.id) && (!e.columnNames || e.columnNames.includes(params.colDef.field))
-    );
-
-    if (error?.levelId === 'DUPLICATE') {
-      const rowPositions = error.rowIds.map((r) => params.context.rowData.find((d) => d.id === r)?.pos).filter((r) => r);
-      const duplicates = rowPositions.map((r) => params.context.rowPos.indexOf(r) + 1);
-      return duplicates.length > 1 ? 'Rows are duplicated: ' + duplicates.join(', ') : 'Duplicate rows have been removed';
-    }
-
-    return error?.message;
-  };
-
-  const rowValueGetter = (params) => {
-    return params.context.rowPos ? params.context.rowPos.indexOf(params.data.pos) + 1 : 0;
-  };
-
-  const deleteRow = (e) => {
-    const rowData = e.context.rowData;
-    const [cells] = e.api.getCellRanges();
-    const startIdx = Math.min(cells.startRow.rowIndex, cells.endRow.rowIndex);
-    const endIdx = Math.max(cells.startRow.rowIndex, cells.endRow.rowIndex);
-    const delta = [];
-
-    if (startIdx === endIdx && startIdx === e.node.rowIndex) {
-      e.api.getSelectedRows().forEach(() => {
-        const data = e.node.data;
-        delta.push({...data});
-        rowData.splice(rowData.indexOf(data), 1);
-      });
-    } else if (startIdx === endIdx) {
-      e.api.getSelectedRows().forEach((row) => {
-        const data = rowData.find((d) => d.id === row.id);
-        delta.push({...data});
-        rowData.splice(rowData.indexOf(data), 1);
-      });
-    } else {
-      for (let i = startIdx; i < endIdx + 1; i++) {
-        const row = e.api.getDisplayedRowAtIndex(i);
-        const data = rowData.find((d) => d.id === row.data.id);
-        delta.push({...data});
-        rowData.splice(rowData.indexOf(data), 1);
-      }
-    }
-    pushUndo(e.api, delta);
-    e.api.setRowData(rowData);
-    e.context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
-    e.api.refreshCells();
-  };
-
-  const onCellKeyDown = (e) => {
-    const editingCells = e.api.getEditingCells();
-    if (editingCells.length === 1) {
-      e.api.gridOptionsWrapper.gridOptions.context.navigationKey = e.event.key;
-      if (['ArrowLeft', 'ArrowUp'].includes(e.event.key)) {
-        e.event.preventDefault();
-        e.api.stopEditing();
-        e.api.tabToPreviousCell();
-      }
-      if (['ArrowRight', 'ArrowDown'].includes(e.event.key)) {
-        e.event.preventDefault();
-        e.api.stopEditing();
-        e.api.tabToNextCell();
-      }
-      e.api.gridOptionsWrapper.gridOptions.context.navigationKey = '';
-    }
-  };
-
-  const onTabToNextCell = (params) => {
-    let context = gridApi.gridOptionsWrapper.gridOptions.context;
-    let result;
-
-    if (['ArrowUp', 'ArrowDown'].includes(context.navigationKey) && params.previousCellPosition) {
-      let previousCell = params.previousCellPosition,
-        lastRowIndex = previousCell.rowIndex,
-        nextRowIndex = params.backwards ? lastRowIndex - 1 : lastRowIndex + 1,
-        renderedRowCount = gridApi.getModel().getRowCount();
-
-      if (nextRowIndex < 0) nextRowIndex = -1;
-      if (nextRowIndex >= renderedRowCount) nextRowIndex = renderedRowCount - 1;
-
-      result = {
-        rowIndex: nextRowIndex,
-        column: previousCell.column,
-        floating: previousCell.floating
-      };
-    }
-
-    if (['ArrowLeft', 'ArrowRight'].includes(context.navigationKey) && params.nextCellPosition) {
-      result = {
-        rowIndex: params.nextCellPosition.rowIndex,
-        column: params.nextCellPosition.column,
-        floating: params.nextCellPosition.floating
-      };
-    }
-
-    return result;
-  };
-
-  const onClickExcelExport = (api, name, isExtended) => {
-    const columns = [
-      'id',
-      'diver',
-      'buddy',
-      'siteCode',
-      'siteName',
-      'latitude',
-      'longitude',
-      'date',
-      'vis',
-      'direction',
-      'time',
-      'P-Qs',
-      'depth',
-      'method',
-      'block',
-      'code',
-      'species',
-      'commonName',
-      'total',
-      'inverts',
-      ...measurements.map((m) => m.field)
-    ];
-
-    const extendedColumns = [...extendedMeasurements.map((m) => m.field), 'isInvertSizing'];
-    const requiredColumns = isExtended ? [...columns, ...extendedColumns] : columns;
-    const headers = [];
-
-    requiredColumns.forEach((x) => {
-      // Get the row display name from the fields, this is because we turn on skipColumnHeaders so that
-      // we can add empty row, '' is used to force type to string.
-      headers.push({data: {value: '' + api.getColumnDefs().filter((y) => y.field === x)[0].headerName, type: 'String'}});
-    });
-
-    api.exportDataAsExcel({
-      sheetName: 'DATA',
-      author: 'NRMN',
-      columnKeys: requiredColumns,
-      skipColumnHeaders: true,
-      prependContent: [headers, []],
-      fileName: `export_${name}`
-    });
   };
 
   const editable = ['STAGED'].includes(job.status);
@@ -722,7 +277,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
               } `}</Typography>
             </Box>
             <Box m={1} ml={0}>
-              <Button variant="outlined" disabled={undoSize < 1} startIcon={<UndoIcon />} onClick={() => onUndo({api: gridApi})}>
+              <Button variant="outlined" disabled={undoSize < 1} startIcon={<UndoIcon />} onClick={() => eh.handleUndo({api: gridApi})}>
                 Undo
               </Button>
             </Box>
@@ -734,7 +289,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             <Box m={1} ml={0}>
               <Button
                 variant="outlined"
-                onClick={() => onClickExcelExport(gridApi, job.reference, job.isExtendedSize)}
+                onClick={() => eh.onClickExcelExport(gridApi, job.reference, job.isExtendedSize)}
                 startIcon={<CloudDownloadIcon />}
               >
                 Export
@@ -775,35 +330,35 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             cellFlashDelay={100}
             cellFadeDelay={100}
             defaultColDef={{
+              cellStyle: eh.chooseCellStyle,
               editable,
-              sortable: true,
-              resizable: true,
-              minWidth: 70,
+              enableCellChangeFlash: true,
               filter: true,
               floatingFilter: true,
+              minWidth: 70,
+              resizable: true,
+              sortable: true,
+              suppressKeyboardEvent: eh.overrideKeyboardEvents,
               suppressMenu: true,
-              suppressKeyboardEvent: overrideKeyboardEvents,
-              cellStyle: chooseCellStyle,
-              enableCellChangeFlash: true,
-              tooltipValueGetter: toolTipValueGetter,
+              tooltipValueGetter: eh.toolTipValueGetter,
               valueParser: ({newValue}) => (newValue ? newValue.trim() : '')
             }}
             rowHeight={20}
             enableBrowserTooltips
             rowSelection="multiple"
-            enableRangeSelection={true}
-            animateRows={true}
-            enableRangeHandle={true}
-            onCellKeyDown={onCellKeyDown}
-            onPasteStart={onPasteStart}
+            enableRangeSelection
+            animateRows
+            enableRangeHandle
+            onCellKeyDown={eh.onCellKeyDown}
+            onPasteStart={eh.onPasteStart}
             onPasteEnd={onPasteEnd}
-            tabToNextCell={onTabToNextCell}
+            tabToNextCell={eh.onTabToNextCell}
             onCellValueChanged={onCellValueChanged}
-            onSortChanged={onSortChanged}
+            onSortChanged={eh.onSortChanged}
             onFilterChanged={onFilterChanged}
             onRowDataUpdated={onRowDataUpdated}
             fillHandleDirection="y"
-            getContextMenuItems={getContextMenuItems}
+            getContextMenuItems={(e) => eh.getContextMenuItems(e, eh)}
             undoRedoCellEditing={false}
             onCellEditingStopped={onCellEditingStopped}
             components={{
@@ -812,40 +367,38 @@ const DataSheetView = ({onIngest, isAdmin}) => {
               loadingOverlay: LoadingOverlay
             }}
             loadingOverlayComponent="loadingOverlay"
-            pivotMode={false}
-            pivotColumnGroupTotals="before"
             sideBar={sideBar}
             onGridReady={onGridReady}
           >
-            <AgGridColumn field="id" headerName="ID" editable={false} hide={true} />
-            <AgGridColumn field="pos" editable={false} hide={true} sort="asc" />
+            <AgGridColumn field="id" headerName="ID" editable={false} hide />
+            <AgGridColumn field="pos" editable={false} hide sort="asc" />
             <AgGridColumn
               field="row"
               headerName=""
-              suppressMovable={true}
+              suppressMovable
               editable={false}
-              valueGetter={rowValueGetter}
+              valueGetter={eh.rowValueGetter}
               minWidth={40}
               enableCellChangeFlash={false}
               filter={false}
               sortable={false}
             />
-            <AgGridColumn field="diver" headerName="Diver" pivot={true} enablePivot={false} />
+            <AgGridColumn field="diver" headerName="Diver" />
             <AgGridColumn field="buddy" headerName="Buddy" />
-            <AgGridColumn field="siteCode" headerName="Site No." rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="siteCode" headerName="Site No." rowGroup={false} enableRowGroup />
             <AgGridColumn field="siteName" headerName="Site Name" minWidth={160} />
             <AgGridColumn field="latitude" headerName="Latitude" />
             <AgGridColumn field="longitude" headerName="Longitude" />
-            <AgGridColumn field="date" headerName="Date" rowGroup={false} enableRowGroup={true} comparator={dateComparator} />
+            <AgGridColumn field="date" headerName="Date" rowGroup={false} enableRowGroup comparator={eh.dateComparator} />
             <AgGridColumn field="vis" headerName="Vis" />
             <AgGridColumn field="direction" headerName="Direction" />
             <AgGridColumn field="time" headerName="Time" />
             <AgGridColumn field="P-Qs" headerName="P-Qs" />
-            <AgGridColumn field="depth" headerName="Depth" rowGroup={false} enableRowGroup={true} />
-            <AgGridColumn field="method" headerName="Method" rowGroup={false} enableRowGroup={true} />
-            <AgGridColumn field="block" headerName="Block" rowGroup={false} enableRowGroup={true} />
+            <AgGridColumn field="depth" headerName="Depth" rowGroup={false} enableRowGroup />
+            <AgGridColumn field="method" headerName="Method" rowGroup={false} enableRowGroup />
+            <AgGridColumn field="block" headerName="Block" rowGroup={false} enableRowGroup />
             <AgGridColumn field="code" headerName="Code" />
-            <AgGridColumn field="species" headerName="Species" pivot={true} enablePivot={false} />
+            <AgGridColumn field="species" headerName="Species" />
             <AgGridColumn field="commonName" headerName="Common Name" />
             <AgGridColumn field="total" headerName="Total" aggFunc="count" />
             <AgGridColumn field="inverts" headerName="Inverts" />
