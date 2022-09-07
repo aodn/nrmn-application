@@ -47,7 +47,7 @@ const SummaryPanel = ({api, context}) => {
       formatted.push(validation);
     }
     setMessages(groupArrayByKey(formatted, 'levelId'));
-  }, [context]);
+  }, [context, api]);
 
   const mm = measurements.concat(extendedMeasurements);
 
