@@ -262,7 +262,7 @@ public class SurveyFilterCondition extends FilterCondition<Survey> {
                         }
                         break;
                     }
-                    case DIVER_NAME:
+                    default:
                         break;
                 }
             }
@@ -485,6 +485,8 @@ public class SurveyFilterCondition extends FilterCondition<Survey> {
                             orders.add(getItemOrderingContact(root, criteriaBuilder, SupportedFields.DEPTH.getDBFieldName(), "surveyNum", sortItem.isAsc()));
                             break;
                         }
+                        default:
+                            break;
                     }
                 }
             });

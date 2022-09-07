@@ -116,7 +116,7 @@ public class Site {
 
     @Basic
     @Column(name = "is_active", columnDefinition = "boolean default false")
-    private Boolean isActive = false;
+    private Boolean isActive;
 
     @Basic
     @Column(name = "geom")

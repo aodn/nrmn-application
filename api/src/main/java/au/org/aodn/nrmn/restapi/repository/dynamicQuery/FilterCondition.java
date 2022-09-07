@@ -3,7 +3,6 @@ package au.org.aodn.nrmn.restapi.repository.dynamicQuery;
 import au.org.aodn.nrmn.restapi.controller.transform.Field;
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
-import au.org.aodn.nrmn.restapi.model.db.LocationListView;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,11 +64,11 @@ public abstract class FilterCondition<T> {
         }
     }
 
-    protected abstract FilterCondition applySort(List<Sorter> sort);
+    protected abstract FilterCondition<T> applySort(List<Sorter> sort);
 
-    protected abstract FilterCondition applyFilters(List<Filter> filters);
+    protected abstract FilterCondition<T> applyFilters(List<Filter> filters);
 
-    protected <T extends Enum<T> & FilterCondition.DBField> Order getItemOrdering(From<?,?> from, CriteriaBuilder criteriaBuilder, Sorter sort, Class<T> clazz) {
+    protected <E extends Enum<E> & FilterCondition.DBField> Order getItemOrdering(From<?,?> from, CriteriaBuilder criteriaBuilder, Sorter sort, Class<E> clazz) {
         Expression<Survey> e = from.get(FilterCondition.getFieldEnum(sort.getFieldName(), clazz).getDBFieldName());
         return (sort.isAsc()  ? criteriaBuilder.asc(e) : criteriaBuilder.desc(e));
     }
