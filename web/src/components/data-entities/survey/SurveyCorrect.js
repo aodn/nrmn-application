@@ -1,6 +1,7 @@
 import {CloudUpload as CloudUploadIcon, PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon} from '@mui/icons-material/';
 import {Box, Button, Typography} from '@mui/material';
-import {grey, orange, red} from '@mui/material/colors';
+import UndoIcon from '@mui/icons-material/Undo';
+import ResetIcon from '@mui/icons-material/LayersClear';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
@@ -11,29 +12,9 @@ import {allMeasurements} from '../../../common/correctionsConstants';
 import ValidationPanel from '../../import/panel/ValidationPanel';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import SummaryPanel from './panel/SummaryPanel';
+import FindReplacePanel from '../../import/panel/FindReplacePanel';
 import SurveyMeasurementHeader from './SurveyMeasurementHeader';
-
-const chooseCellStyle = (params) => {
-  // Grey-out the first  column containing the row number
-  if (params.colDef.field === 'id') return {color: grey[500]};
-
-  if (!params.context.cellValidations) return;
-
-  // Highlight cell validations
-  const row = params.data.id;
-  const field = params.colDef.field;
-  const level = params.context.cellValidations[row]?.[field]?.levelId;
-  switch (level) {
-    case 'BLOCKING':
-      return {backgroundColor: red[100]};
-    case 'WARNING':
-      return {backgroundColor: orange[100]};
-    case 'INFO':
-      return {backgroundColor: grey[100]};
-    default:
-      return null;
-  }
-};
+import eh from '../../../components/import/DataSheetEventHandlers';
 
 const toolTipValueGetter = ({context, data, colDef}) => {
   if (!context.cellValidations) return;
@@ -68,10 +49,27 @@ const SurveyCorrect = () => {
   // FUTURE: useReducer
   const [editMode, setEditMode] = useState(true);
   const [rowData, setRowData] = useState();
+  const [gridApi, setGridApi] = useState();
+  const [isFiltered, setIsFiltered] = useState(false);
   const [loading, setLoading] = useState(false);
   const [validationResult, setValidationResult] = useState();
   const [cellValidations, setCellValidations] = useState([]);
   const [redirect, setRedirect] = useState();
+  const [undoSize, setUndoSize] = useState(0);
+
+  useEffect(() => {
+    const undoKeyboardHandler = (event) => {
+      if (event.ctrlKey && event.key === 'z') {
+        event.preventDefault();
+        event.stopPropagation();
+        eh.handleUndo({api: gridApi});
+      }
+    };
+    document.body.addEventListener('keydown', undoKeyboardHandler);
+    return () => {
+      document.body.removeEventListener('keydown', undoKeyboardHandler);
+    };
+  }, [gridApi]);
 
   useEffect(() => {
     if (gridRef.current?.api) {
@@ -97,37 +95,40 @@ const SurveyCorrect = () => {
 
   const headers = useMemo(() => {
     return [
-      {field: 'id', label: '', hide: false},
-      {field: 'surveyId', label: 'Survey', hide: false},
+      {field: 'pos', label: '', editable: false, hide: true, sort: 'asc'},
+      {field: 'id', label: '', editable: false, hide: true},
+      {field: 'surveyId', label: 'Survey', editable: false},
       {field: 'diverId', label: 'Diver ID', hide: true},
-      {field: 'diver', label: 'Diver', hide: false, editable: false},
+      {field: 'diver', label: 'Diver'},
       {field: 'siteCode', label: 'Site Code', hide: true},
-      {field: 'depth', label: 'Depth', hide: false, editable: false},
-      {field: 'date', label: 'Survey Date', hide: false, editable: false},
-      {field: 'time', label: 'Survey Time', hide: false, editable: false},
-      {field: 'vis', label: 'Visibility', hide: false, editable: false},
-      {field: 'direction', label: 'Direction', hide: false, editable: false},
-      {field: 'latitude', label: 'Latitude', hide: false, editable: false},
-      {field: 'longitude', label: 'Longitude', hide: false, editable: false},
+      {field: 'depth', label: 'Depth'},
+      {field: 'date', label: 'Survey Date'},
+      {field: 'time', label: 'Survey Time'},
+      {field: 'vis', label: 'Visibility'},
+      {field: 'direction', label: 'Direction'},
+      {field: 'latitude', label: 'Latitude'},
+      {field: 'longitude', label: 'Longitude'},
       {field: 'observableItemId', hide: true},
-      {field: 'species', label: 'Species Name', hide: false, editable: false},
-      {field: 'letterCode', label: 'Letter Code', hide: false, editable: false},
-      {field: 'method', label: 'Method', hide: false, editable: false},
-      {field: 'block', label: 'Block', hide: false, editable: false},
-      {field: 'isInvertSizing', label: 'Use Invert Sizing', hide: false, isBoolean: false, editable: false}
+      {field: 'species', label: 'Species Name'},
+      {field: 'letterCode', label: 'Letter Code'},
+      {field: 'method', label: 'Method'},
+      {field: 'block', label: 'Block'},
+      {field: 'isInvertSizing', label: 'Use Invert Sizing'}
     ];
   }, []);
 
   const defaultColDef = useMemo(() => {
     return {
-      editable: false,
-      enableCellChangeFlash: false,
-      filter: false,
-      floatingFilter: false,
-      resizable: false,
-      sortable: false,
-      suppressMenu: false,
-      cellStyle: chooseCellStyle,
+      cellStyle: eh.chooseCellStyle,
+      editable: true,
+      enableCellChangeFlash: true,
+      filter: true,
+      floatingFilter: true,
+      minWidth: 40,
+      resizable: true,
+      sortable: true,
+      suppressKeyboardEvent: eh.overrideKeyboardEvents,
+      suppressMenu: true,
       tooltipValueGetter: toolTipValueGetter,
       valueParser: ({newValue}) => (newValue ? newValue.trim() : '')
     };
@@ -135,15 +136,23 @@ const SurveyCorrect = () => {
 
   const components = useMemo(() => {
     return {
+      findReplacePanel: FindReplacePanel,
       loadingOverlay: LoadingOverlay,
       summaryPanel: SummaryPanel,
       validationPanel: ValidationPanel
     };
   }, []);
 
-  const defaultSideBar = useMemo(() => {
-    return {
+  const defaultSideBar = useMemo(
+    () => ({
       toolPanels: [
+        {
+          id: 'findReplace',
+          labelDefault: 'Find Replace',
+          labelKey: 'findReplace',
+          iconKey: 'columns',
+          toolPanel: 'findReplacePanel'
+        },
         {
           id: 'summaryPanel',
           labelDefault: 'Summary',
@@ -153,8 +162,26 @@ const SurveyCorrect = () => {
         }
       ],
       defaultToolPanel: ''
-    };
-  }, []);
+    }),
+    []
+  );
+
+  const context = useMemo(
+    () => ({
+      errors: [],
+      highlighted: [],
+      popUndo: eh.popUndo,
+      pushUndo: eh.pushUndo,
+      putRowIds: [],
+      undoStack: [],
+      fullRefresh: false,
+      useOverlay: 'Loading Survey Correction...',
+      validations: [],
+      pendingPasteUndo: [],
+      pasteMode: false
+    }),
+    []
+  );
 
   const [sideBar, setSideBar] = useState(defaultSideBar);
 
@@ -166,10 +193,40 @@ const SurveyCorrect = () => {
         const measurements = data.observationIds === '' ? {} : JSON.parse(data.measureJson);
         const observationIds = data.observationIds === '' ? [] : JSON.parse(data.observationIds);
         delete data.measureJson;
-        return {id: idx + 1, ...data, observationIds, measurements};
+        return {id: (idx + 1) * 100, pos: (idx + 1) * 100, ...data, observationIds, measurements};
       });
-      setRowData(unpackedData);
+      const context = api.gridOptionsWrapper.gridOptions.context;
+      const rowData = [...unpackedData];
+      context.rowData = rowData;
+      context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
+      api.setRowData(context.rowData.length > 0 ? context.rowData : null);
+      setRowData(rowData);
+      setGridApi(api);
     });
+  };
+
+  const onCellValueChanged = (e) => {
+    setUndoSize(eh.handleCellValueChanged(e));
+  };
+
+  const onPasteEnd = (e) => {
+    setUndoSize(eh.handlePasteEnd(e));
+  };
+
+  const onCellEditingStopped = (e) => {
+    setUndoSize(eh.handleCellEditingStopped(e));
+  };
+
+  const onRowDataUpdated = (e) => {
+    const ctx = e.api.gridOptionsWrapper.gridOptions.context;
+    e.columnApi.autoSizeAllColumns();
+    setUndoSize(ctx.undoStack.length);
+  };
+
+  const onFilterChanged = (e) => {
+    e.api.refreshCells();
+    const filterModel = e.api.getFilterModel();
+    setIsFiltered(Object.getOwnPropertyNames(filterModel).length > 0);
   };
 
   const validate = async () => {
@@ -185,6 +242,10 @@ const SurveyCorrect = () => {
     context.validations = result.data.errors;
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (gridApi && !isFiltered) gridApi.setFilterModel(null);
+  }, [gridApi, isFiltered]);
 
   const onValidate = async () => {
     await validate();
@@ -218,7 +279,20 @@ const SurveyCorrect = () => {
     <>
       <Box display="flex" flexDirection="row" p={1} pb={1}>
         <Box flexGrow={1}>
-          <Typography variant="h6">Correct Survey {rowData && '[' + rowData[0].siteCode + ', ' + rowData[0].date + ', ' + rowData[0].depth + '.' + rowData[0].surveyNum + ']'}</Typography>
+          <Typography variant="h6">
+            Correct Survey{' '}
+            {rowData && '[' + rowData[0].siteCode + ', ' + rowData[0].date + ', ' + rowData[0].depth + '.' + rowData[0].surveyNum + ']'}
+          </Typography>
+        </Box>
+        <Box m={1} ml={0}>
+          <Button variant="outlined" disabled={undoSize < 1} startIcon={<UndoIcon />} onClick={() => eh.handleUndo({api: gridApi})}>
+            Undo
+          </Button>
+        </Box>
+        <Box m={1} ml={0} minWidth={150}>
+          <Button variant="outlined" startIcon={<ResetIcon />} disabled={!isFiltered} onClick={() => setIsFiltered()}>
+            Reset Filter
+          </Button>
         </Box>
         <Box p={1} minWidth={120}>
           <Button onClick={onValidate} variant="contained" disabled={!editMode || loading} startIcon={<PlaylistAddCheckOutlinedIcon />}>
@@ -239,45 +313,51 @@ const SurveyCorrect = () => {
       <Box display={editMode ? 'block' : 'none'} flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
         <AgGridReact
           ref={gridRef}
-          gridOptions={{context: {useOverlay: 'Loading Survey Correction...', validations: []}}}
+          gridOptions={{context}}
           animateRows
-          cellFadeDelay={100}
-          cellFlashDelay={100}
+          cellFadeDelay={10}
+          cellFlashDelay={10}
+          onCellEditingStopped={onCellEditingStopped}
+          onPasteStart={eh.onPasteStart}
+          onPasteEnd={onPasteEnd}
           components={components}
           defaultColDef={defaultColDef}
           enableBrowserTooltips
           enableRangeSelection
+          undoRedoCellEditing={false}
           getRowId={(r) => r.data.id}
           loadingOverlayComponent="loadingOverlay"
+          onCellValueChanged={onCellValueChanged}
           onGridReady={onGridReady}
-          onRowDataUpdated={(e) => e.columnApi.autoSizeAllColumns()}
-          pivotMode={false}
-          rowData={rowData}
+          onRowDataUpdated={onRowDataUpdated}
           rowHeight={20}
+          onSortChanged={eh.onSortChanged}
+          onFilterChanged={onFilterChanged}
           rowSelection="multiple"
           sideBar={sideBar}
+          getContextMenuItems={(e) => eh.getContextMenuItems(e, eh)}
         >
+          <AgGridColumn
+              field="row"
+              headerName=""
+              suppressMovable
+              editable={false}
+              valueGetter={eh.rowValueGetter}
+              minWidth={40}
+              enableCellChangeFlash={false}
+              filter={false}
+              sortable={false}
+            />
           {headers.map((header, idx) =>
-            header.isBoolean ? (
               <AgGridColumn
                 key={idx}
                 field={header.field}
                 headerName={header.label}
                 hide={header.hide}
-                cellEditor="agSelectCellEditor"
-                cellEditorParams={{values: [true, false]}}
-                valueFormatter={(e) => (e.value === true ? 'Yes' : 'No')}
-              />
-            ) : (
-              <AgGridColumn
-                key={idx}
-                field={header.field}
-                headerName={header.label}
-                hide={header.hide}
+                sort={header.sort}
                 cellEditor="agTextCellEditor"
-                editable={header.editable ?? false}
+                editable={header.editable ?? true}
               />
-            )
           )}
           <AgGridColumn editable field={'measurements.0'} headerName="Unsized" />
           {allMeasurements.map((_, idx) => {
