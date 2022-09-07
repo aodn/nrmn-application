@@ -2,7 +2,6 @@ package au.org.aodn.nrmn.restapi.repository.dynamicQuery;
 
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
-import au.org.aodn.nrmn.restapi.model.db.DiverListView;
 import au.org.aodn.nrmn.restapi.model.db.SiteListView;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -142,7 +141,8 @@ public class SiteFilterCondition extends FilterCondition<SiteListView> {
                             orders.add(getItemOrdering(root, criteriaBuilder, sortItem, SiteFilterCondition.SupportedFields.class));
                             break;
                         }
-                        default: { break; }
+                        default:
+                            break;
                     }
                 }
             });

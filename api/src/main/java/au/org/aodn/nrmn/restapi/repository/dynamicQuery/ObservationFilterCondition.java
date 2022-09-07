@@ -119,12 +119,12 @@ public class ObservationFilterCondition extends FilterCondition<Observation> {
     }
 
     @Override
-    protected FilterCondition applySort(List<Sorter> sort) {
+    protected FilterCondition<Observation> applySort(List<Sorter> sort) {
         return null;
     }
 
     @Override
-    protected FilterCondition applyFilters(List<Filter> filters) {
+    protected FilterCondition<Observation> applyFilters(List<Filter> filters) {
         return null;
     }
 

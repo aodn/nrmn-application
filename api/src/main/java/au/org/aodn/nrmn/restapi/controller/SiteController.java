@@ -36,7 +36,6 @@ import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
 import au.org.aodn.nrmn.restapi.dto.site.SiteDto;
 import au.org.aodn.nrmn.restapi.dto.site.SiteGetDto;
-import au.org.aodn.nrmn.restapi.dto.site.SiteListItem;
 import au.org.aodn.nrmn.restapi.dto.site.SiteOptionsDto;
 import au.org.aodn.nrmn.restapi.model.db.Site;
 import io.swagger.v3.oas.annotations.tags.Tag;
