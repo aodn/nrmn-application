@@ -331,22 +331,31 @@ class DataSheetEventHandlers {
       const newId = +new Date().valueOf();
       const posMap = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
       const currentPosIdx = posMap.findIndex((p) => p == data.pos);
+
       let newData = {};
       Object.keys(data).forEach((key) => (newData[key] = clearData ? '' : data[key]));
-      delete newData.errors;
+      newData.measurements = {...data.measurements};
       newData.pos = posMap[currentPosIdx + 1] ? posMap[currentPosIdx + 1] - 1 : posMap[currentPosIdx] + 1000;
       newData.id = newId;
+      delete newData.errors;
+
       eh.pushUndo(e.api, [{id: newId}]);
       e.context.rowData.push(newData);
       e.api.setRowData(e.context.rowData);
       e.context.rowPos = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
-      const values = e.api.getRenderedNodes().reduce((acc, field) => acc.concat(field.id.toString()), [newId.toString()]);
-      e.api.setFilterModel({
-        id: {
-          type: 'set',
-          values: values
-        }
-      });
+
+      const filterModel = e.api.getFilterModel();
+      const isFiltered = Object.getOwnPropertyNames(filterModel).length > 0;
+      if (isFiltered) {
+        const values = e.api.getRenderedNodes().reduce((acc, field) => acc.concat(field.id.toString()), [newId.toString()]);
+        e.api.setFilterModel({
+          id: {
+            type: 'set',
+            values: values
+          }
+        });
+      }
+      e.api.refreshCells();
     };
 
     const multiRowsSelected = e.api.getSelectedRows().length > 1 || cells.startRow.rowIndex !== cells.endRow.rowIndex;

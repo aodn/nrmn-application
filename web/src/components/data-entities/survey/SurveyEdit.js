@@ -71,16 +71,16 @@ const SurveyEdit = () => {
     fetchPrograms();
 
     async function fetchSites() {
-      await getResult('sites').then((res) => {
-        setSites(res.data);
+      await getResult('sites?pageSize=65536').then((res) => {
+        setSites(res.data?.items);
       });
     }
     fetchSites();
 
     async function fetchDivers() {
-      await getResult('divers').then((res) => {
+      await getResult('divers?pageSize=65536').then((res) => {
         setDivers(
-          res.data?.map((d) => {
+          res.data?.items.map((d) => {
             return {id: d.initials, label: d.fullName};
           })
         );
