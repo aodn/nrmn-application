@@ -26,6 +26,7 @@
         <checkstyle.version>3.1.2</checkstyle.version>
         <checkstyle.puppycrawl.version>9.3</checkstyle.puppycrawl.version>
         <main.basedir>${project.basedir}</main.basedir>
+        <versioning.updatePom>true</versioning.updatePom>
     </properties>
 
     <build>
