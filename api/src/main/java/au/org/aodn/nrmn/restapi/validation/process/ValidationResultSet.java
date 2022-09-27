@@ -8,18 +8,18 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 
 public class ValidationResultSet {
 
-    Map<String, ValidationError> errorMap = new HashMap<String, ValidationError>();
+    Map<String, SurveyValidationError> errorMap = new HashMap<String, SurveyValidationError>();
 
     public void addGlobal(Collection<ValidationRow> validationRows) {
         for (ValidationRow validationRow : validationRows) {
-            ValidationError value = errorMap.getOrDefault(validationRow.getMessage(), new ValidationError(ValidationCategory.DATA, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
+            SurveyValidationError value = errorMap.getOrDefault(validationRow.getMessage(), new SurveyValidationError(ValidationCategory.DATA, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
             if (value != null) {
                 value.getRowIds().addAll(validationRow.getRowIds());
                 value.setRowIds(value.getRowIds().stream().distinct().collect(Collectors.toList()));
@@ -38,8 +38,8 @@ public class ValidationResultSet {
 
     private void add(Long id, ValidationCategory validationCategory, ValidationLevel validationLevel, String column, String message, Boolean groupInRow, Integer count) {
         String key = (groupInRow) ? message + Long.toString(id) : message + column;
-        ValidationError defaultValue = new ValidationError(validationCategory, validationLevel, message, new HashSet<>(Arrays.asList(id)), new HashSet<>(Arrays.asList(column)));
-        ValidationError value = errorMap.getOrDefault(key, defaultValue);
+        SurveyValidationError defaultValue = new SurveyValidationError(validationCategory, validationLevel, message, new HashSet<>(Arrays.asList(id)), new HashSet<>(Arrays.asList(column)));
+        SurveyValidationError value = errorMap.getOrDefault(key, defaultValue);
         if (value != null) {
             value.getRowIds().add(id);
             value.getColumnNames().add(column);
@@ -58,7 +58,7 @@ public class ValidationResultSet {
         }
     }
 
-    public Collection<ValidationError> getAll() {
+    public Collection<SurveyValidationError> getAll() {
         return errorMap.values();
     }
 }

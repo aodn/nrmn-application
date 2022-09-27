@@ -9,9 +9,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ValidationError {
+public class SurveyValidationError {
 
-    public ValidationError(ValidationCategory categoryId, ValidationLevel levelId,String message,Collection<Long> rowIds,Collection<String> columnNames){
+    public SurveyValidationError(ValidationCategory categoryId, ValidationLevel levelId, String message,Collection<Long> rowIds,Collection<String> columnNames){
         setCategoryId(categoryId);
         setLevelId(levelId);
         setMessage(message);

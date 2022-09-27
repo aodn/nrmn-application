@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.model.db.ObsItemType;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
@@ -44,7 +44,7 @@ class NoSpeciesFoundMeasurementsTest {
         row.setMeasureJson(ImmutableMap.<Integer, String>builder().put(1, "2").build());
         row.setSpecies("Pictilabrus laticlavius");
         ObservableItem item = ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).observableItemName("Pictilabrus laticlavius").letterCode("pla").build();
-        Collection<ValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(item), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(item), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("species")));
     }
 

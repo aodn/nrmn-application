@@ -31,5 +31,5 @@ public class ValidationResponse {
 
     Map<String, Boolean> foundSites;
 
-    Collection<ValidationError> errors;
+    Collection<SurveyValidationError> errors;
 }

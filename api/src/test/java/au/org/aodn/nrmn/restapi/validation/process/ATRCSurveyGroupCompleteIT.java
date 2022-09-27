@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.Location;
 import au.org.aodn.nrmn.restapi.model.db.Site;
@@ -99,7 +99,7 @@ class ATRCSurveyGroupCompleteIT {
         stagedRowRepo.saveAll(Arrays.asList(sn1, sn2, sn4));
 
         ValidationResponse response = validationProcess.process(job);
-        Optional<ValidationError> surveyGroupValidation = response.getErrors().stream().filter(e -> e.getMessage().startsWith("Survey group [ERZ1, 2020-09-11, 7] missing transect 3")).findFirst();
+        Optional<SurveyValidationError> surveyGroupValidation = response.getErrors().stream().filter(e -> e.getMessage().startsWith("Survey group [ERZ1, 2020-09-11, 7] missing transect 3")).findFirst();
         assertTrue(surveyGroupValidation.isPresent());
         assertEquals(ValidationLevel.WARNING, surveyGroupValidation.get().getLevelId());
     }

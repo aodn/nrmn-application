@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 
@@ -92,7 +92,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        ValidationError error = validationProcess.validateMethod3QuadratsGT50("", Arrays.asList(r1, r2, r3, r4, a1, a2, a3, a4));
+        SurveyValidationError error = validationProcess.validateMethod3QuadratsGT50("", Arrays.asList(r1, r2, r3, r4, a1, a2, a3, a4));
         assertTrue(error != null && error.getMessage().startsWith("Quadrats do not sum to at least 50 in transect"));
     }
 
@@ -264,7 +264,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        ValidationError error = validationProcess.validateMethod3QuadratsGT50("", Arrays.asList(r1, r2, r3, r4, a1, a2, a3, a4));
+        SurveyValidationError error = validationProcess.validateMethod3QuadratsGT50("", Arrays.asList(r1, r2, r3, r4, a1, a2, a3, a4));
         assertFalse(error != null && error.getMessage().startsWith("Quadrats do not sum to at least 50 in transect"));
     }
 }

@@ -13,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
@@ -44,7 +44,7 @@ class DuplicateRowCheckTest {
             put(2, "4");
         }}).build();
 
-        Collection<ValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
+        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
         assertTrue(res.stream().anyMatch(e -> e.getLevelId() == ValidationLevel.DUPLICATE));
     }
 
@@ -65,7 +65,7 @@ class DuplicateRowCheckTest {
             put(5, "47");
         }}).build();
 
-        Collection<ValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
+        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
         assertTrue(res.stream().anyMatch(e -> e.getLevelId() == ValidationLevel.DUPLICATE));
     }
 
@@ -84,7 +84,7 @@ class DuplicateRowCheckTest {
             put(2, "4");
         }}).build();
 
-        Collection<ValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
+        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
         assertFalse(res.stream().anyMatch(e -> e.getLevelId() == ValidationLevel.DUPLICATE));
     }
 }

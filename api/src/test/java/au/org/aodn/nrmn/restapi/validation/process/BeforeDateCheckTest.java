@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
@@ -37,7 +37,7 @@ class BeforeDateCheckTest {
         StagedRowFormatted rowFormatted = new StagedRowFormatted();
         rowFormatted.setDate(LocalDate.parse("1990-01-01"));
         rowFormatted.setRef(row);
-        Collection<ValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(rowFormatted));
+        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(rowFormatted));
         assertTrue(errors.stream().anyMatch(e -> e.getMessage().startsWith("Date must be after")));
     }
 
@@ -53,7 +53,7 @@ class BeforeDateCheckTest {
         StagedRowFormatted rowFormatted = new StagedRowFormatted();
         rowFormatted.setDate(LocalDate.parse("2100-01-01"));
         rowFormatted.setRef(row);
-        Collection<ValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(rowFormatted));
+        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(rowFormatted));
         assertTrue(errors.stream().anyMatch(e -> e.getMessage().startsWith("Date is in the future")));
     }
 
@@ -70,7 +70,7 @@ class BeforeDateCheckTest {
         rowFormatted.setDate(LocalDate.parse("1991-01-01"));
         rowFormatted.setRef(row);
 
-        Collection<ValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(rowFormatted));
+        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(rowFormatted));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().startsWith("Date is in the future")));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().startsWith("Date must be after")));
     }

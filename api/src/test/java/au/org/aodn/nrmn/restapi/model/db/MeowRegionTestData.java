@@ -5,7 +5,6 @@ import org.locationtech.jts.geom.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.security.Policy;
 import java.util.ArrayList;
 import java.util.List;
 

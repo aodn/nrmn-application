@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.Program;
 import au.org.aodn.nrmn.restapi.model.db.ProgramTestData;
@@ -116,7 +116,7 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .depth(depth)
                 .build();
 
-        Collection<ValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false,
+        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false,
                 Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
 
         Assertions.assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));
@@ -131,7 +131,7 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .date(date)
                 .depth(depth)
                 .build();
-        Collection<ValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false,
+        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false,
                 Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
 
         Assertions.assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));
@@ -146,7 +146,7 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .date(date)
                 .depth(depth)
                 .build();
-        Collection<ValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false,
+        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false,
                 Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
 
         Assertions.assertTrue(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));

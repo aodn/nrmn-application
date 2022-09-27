@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 class Method3QuadratsMissingTest extends FormattedTestProvider {
@@ -38,7 +38,7 @@ class Method3QuadratsMissingTest extends FormattedTestProvider {
             }
         });
 
-        ValidationError error = validationProcess.validateMethod3Quadrats("0", Arrays.asList(r1, r2, r3));
+        SurveyValidationError error = validationProcess.validateMethod3Quadrats("0", Arrays.asList(r1, r2, r3));
         assertTrue(error == null);
     }
 
@@ -61,7 +61,7 @@ class Method3QuadratsMissingTest extends FormattedTestProvider {
             }
         });
         
-        ValidationError error = validationProcess.validateMethod3Quadrats("0", Arrays.asList(r1, r2));
+        SurveyValidationError error = validationProcess.validateMethod3Quadrats("0", Arrays.asList(r1, r2));
         assertTrue(error != null);
     }
 }

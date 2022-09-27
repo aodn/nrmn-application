@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
@@ -39,7 +39,7 @@ class DiverExistsIT {
         StagedRow row = new StagedRow();
         row.setDiver("NOP");
         row.setStagedJob(job);
-        Collection<ValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
         assertTrue(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Diver does not exist")));
     }
 
@@ -50,7 +50,7 @@ class DiverExistsIT {
         StagedRow row = new StagedRow();
         row.setStagedJob(job);
         row.setDiver("JEP");
-        Collection<ValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
         assertFalse(res.stream().anyMatch(e -> e.getColumnNames().contains("diver") && e.getMessage().equalsIgnoreCase("Diver does not exist")));
     }
 
@@ -61,7 +61,7 @@ class DiverExistsIT {
         StagedRow row = new StagedRow();
         row.setStagedJob(job);
         row.setDiver("Juán Español Página");
-        Collection<ValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
         assertFalse(res.stream().anyMatch(e -> e.getColumnNames().contains("diver") && e.getMessage().equalsIgnoreCase("Diver does not exist")));
     }
 }

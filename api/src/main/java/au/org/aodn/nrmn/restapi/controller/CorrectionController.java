@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowMapperConfig;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.SecUser;
@@ -129,7 +129,7 @@ public class CorrectionController {
                 .collect(Collectors.toMap(UiSpeciesAttributes::getSpeciesName, a -> a));
 
         var speciesMap = species.stream().collect(Collectors.toMap(ObservableItem::getObservableItemName, o -> o));
-        
+
         var divers = diverRepository.getAll().stream().collect(Collectors.toList());
 
         var sites = siteRepository.getAll().stream().collect(Collectors.toList());
@@ -147,13 +147,13 @@ public class CorrectionController {
         var observableItems = observableItemRepository.getAllSpeciesNamesMatching(speciesNames);
 
         // HACK: Survey Not Done
-        if(speciesNames.stream().anyMatch(s -> s.equalsIgnoreCase("Survey Not Done"))) {
+        if (speciesNames.stream().anyMatch(s -> s.equalsIgnoreCase("Survey Not Done"))) {
             var snd = new ObservableItem();
             snd.setObservableItemId(0);
             snd.setObservableItemName("Survey Not Done");
             observableItems.add(snd);
         }
-        
+
         var formattedRows = formatRowsWithSpecies(rows, observableItems);
 
         var propertyChecks = new HashMap<String, Function<StagedRow, String>>() {
@@ -248,7 +248,7 @@ public class CorrectionController {
         return validationResult;
     }
 
-    private ValidationResultSet validate(List<Pair<StagedRowFormatted, HashSet<String>>> results) {
+    private ValidationResultSet validate(List<Pair<StagedRowFormatted, HashSet<String>>> results, Boolean isExtended) {
 
         var validation = mappingResultToValidation(results);
 
@@ -267,11 +267,11 @@ public class CorrectionController {
                 .forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
 
         for (var row : mappedRows) {
-            var attribute = row.getSpecies().isPresent()
-                    ? speciesAttributes.get(row.getSpecies().get().getObservableItemId())
-                    : null;
-            if (attribute != null)
-                validation.addAll(measurementValidationService.validate(attribute, row), false);
+
+            var speciesAttrib = row.getSpeciesAttributesOpt();
+            if (speciesAttrib.isPresent())
+                validation.addAll(measurementValidationService.validate(speciesAttrib.get(), row, isExtended), false);
+
             // FUTURE: other validations go here ..
         }
 
@@ -300,15 +300,18 @@ public class CorrectionController {
         var message = "correction validation: username: " + authentication.getName() + " survey: " + surveyId;
         logger.debug("correction/validation", message);
 
+        // FIXME: fixme!
+        var isExtended = false;
+
         // does survey exist?
         if (surveyRepository.getReferenceById(surveyId) == null)
             return ResponseEntity.badRequest().body("Survey does not exist: " + surveyId);
 
         var response = new ValidationResponse();
         try {
-            var errors = new ArrayList<ValidationError>();
+            var errors = new ArrayList<SurveyValidationError>();
             var rowMap = mapRows(rows);
-            errors.addAll(validate(rowMap).getAll());
+            errors.addAll(validate(rowMap, isExtended).getAll());
             response.setErrors(errors);
         } catch (Exception e) {
             logger.error("Validation Failed", e);
@@ -326,6 +329,8 @@ public class CorrectionController {
 
         Optional<SecUser> user = secUserRepository.findByEmail(authentication.getName());
 
+        // FIXME: fixme!
+        var isExtended = false;
         var surveyOptional = surveyRepository.findById(surveyId);
         if (!surveyOptional.isPresent())
             return ResponseEntity.notFound().build();
@@ -352,7 +357,7 @@ public class CorrectionController {
         try {
 
             var results = mapRows(rows);
-            var result = validate(results).getAll();
+            var result = validate(results, isExtended).getAll();
             var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
             var blockingErrors = result.stream().filter(r -> r.getLevelId() == ValidationLevel.BLOCKING)
                     .collect(Collectors.toList());
@@ -395,7 +400,7 @@ public class CorrectionController {
             return ResponseEntity.notFound().build();
 
         var survey = surveyOptional.get();
-        
+
         if (survey.getPqCatalogued() != null && survey.getPqCatalogued())
             return ResponseEntity.badRequest().body("Deletion Failed. PQs catalogued for this survey.");
 

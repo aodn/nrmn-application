@@ -3,7 +3,6 @@ package au.org.aodn.nrmn.restapi.validation.process;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Collection;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidationService;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
@@ -83,6 +81,7 @@ class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
         var errors = measurementValidation.validateAbundance(formatted, specAttribute);
         assertFalse(errors.isEmpty());
     }
+
     @Test
     public void outOfScopeShouldSuccess() {
         StagedRowFormatted formatted = getDefaultFormatted().build();
@@ -91,7 +90,4 @@ class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
         var errors = measurementValidation.validateAbundance(formatted, specAttribute);
         assertTrue(errors.isEmpty());
     }
-
-
-
 }

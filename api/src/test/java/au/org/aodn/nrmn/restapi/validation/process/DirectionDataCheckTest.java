@@ -12,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
@@ -41,7 +41,7 @@ class DirectionDataCheckTest {
         StagedRow row = new StagedRow();
         row.setStagedJob(job);
         row.setDirection("ED");
-        Collection<ValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Direction is not valid")));
     }
 
@@ -52,7 +52,7 @@ class DirectionDataCheckTest {
         StagedRow row = new StagedRow();
         row.setStagedJob(job);
         row.setDirection("NE");
-        Collection<ValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().equals("Direction is not valid")));
     }
 }

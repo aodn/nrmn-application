@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
@@ -40,7 +40,7 @@ class RLSDepthValidationTest {
         StagedRow row = new StagedRow();
         row.setDepth("3.14");
         row.setStagedJob(job);
-        Collection<ValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertTrue(errors.stream().anyMatch(e -> e.getMessage().contains("Depth is invalid, expected: depth[.surveyNum]")));
     }
 
@@ -51,7 +51,7 @@ class RLSDepthValidationTest {
         StagedRow row = new StagedRow();
         row.setDepth(null);
         row.setStagedJob(job);
-        Collection<ValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertTrue(errors.stream().anyMatch(e -> e.getMessage().contains("Depth is invalid, expected: depth[.surveyNum]")));
     }
 }

@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationRow;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
@@ -46,6 +46,7 @@ import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidationService;
 import au.org.aodn.nrmn.restapi.util.TimeUtils;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
@@ -53,22 +54,25 @@ import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 public class ValidationProcess {
 
     @Autowired
-    StagedRowRepository rowRepository;
-
-    @Autowired
-    SiteRepository siteRepository;
-
-    @Autowired
     DiverRepository diverRepository;
 
     @Autowired
-    SurveyRepository surveyRepository;
+    ObservableItemRepository observableItemRepository;
 
     @Autowired
     ObservationRepository observationRepository;
 
     @Autowired
-    ObservableItemRepository observableItemRepository;
+    SiteRepository siteRepository;
+
+    @Autowired
+    StagedRowRepository rowRepository;
+
+    @Autowired
+    SurveyRepository surveyRepository;
+
+    @Autowired
+    MeasurementValidationService measurementValidationService;
 
     private static final int INVALID_INT = Integer.MIN_VALUE;
     private static final double INVALID_DOUBLE = Double.NEGATIVE_INFINITY;
@@ -77,12 +81,6 @@ public class ValidationProcess {
     private static final Pattern VALID_DEPTH_SURVEY_NUM = Pattern.compile("^[0-9]+(\\.[0-9])?$");
     private static final LocalDate DATE_MIN_RLS = LocalDate.parse("2006-01-01");
     private static final LocalDate DATE_MIN_ATRC = LocalDate.parse("1991-01-01");
-
-    private static final double[] FISH_VALUES = { 2.5, 5, 7.5, 10, 12.5, 15, 20, 25, 30, 35, 40, 50, 62.5, 75, 87.5,
-            100, 112.5, 125, 137.5, 150, 162.5, 175, 187.5, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750,
-            800, 850, 900, 950, 1000 };
-    private static final double[] INVERT_VALUES = { 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5,
-            9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 16, 17, 18, 19, 20, 22, 24, 26, 28, 30 };
 
     // VALIDATION: Rows duplicated
     public Collection<ValidationRow> checkDuplicateRows(boolean includeTotal, boolean includeSpeciesCode,
@@ -107,7 +105,7 @@ public class ValidationProcess {
         return duplicateRows;
     }
 
-    public Collection<ValidationError> checkFormatting(ProgramValidation validation, Boolean isExtendedSize,
+    public Collection<SurveyValidationError> checkFormatting(ProgramValidation validation, Boolean isExtendedSize,
             Collection<String> siteCodes, Collection<ObservableItem> species, Collection<StagedRow> rows) {
 
         var diverNames = new ArrayList<String>();
@@ -285,82 +283,6 @@ public class ValidationProcess {
         return errors.getAll();
     }
 
-    private boolean validateMeasure(Boolean isExtended, StagedRowFormatted row) {
-        if (Arrays.asList(3, 4, 5).contains(row.getMethod()) || !row.getSpeciesAttributesOpt().isPresent())
-            return false;
-
-        return !row.getMeasureJson().isEmpty();
-    }
-
-    // VALIDATION: Species size within L5 - L95
-    private Collection<ValidationCell> validateMeasureRange(Boolean isExtended, StagedRowFormatted row,
-            UiSpeciesAttributes speciesAttributes) {
-
-        var errors = new ArrayList<ValidationCell>();
-
-        var isInvertSized = isExtended && row.getIsInvertSizing();
-        var range = isInvertSized ? INVERT_VALUES : FISH_VALUES;
-
-        var l5 = speciesAttributes.getL5() != null ? speciesAttributes.getL5() : 0;
-        var l95 = speciesAttributes.getL95() != null ? speciesAttributes.getL95() : 0;
-
-        if (l5 != 0 && l95 != 0) {
-            var outOfRange = row.getMeasureJson().entrySet()
-                    .stream()
-                    .filter(entry -> entry.getValue() != 0 && (l5 > 0 && range[entry.getKey() - 1] < l5)
-                            || (l95 > 0 && range[entry.getKey() - 1] > l95))
-                    .map(Map.Entry::getKey).collect(Collectors.toList());
-
-            if (!outOfRange.isEmpty()) {
-                var message = (isInvertSized ? "Invert measurements" : "Measurements") + " outside L5/95 [" + l5
-                        + "," + l95 + "] for [" + row.getRef().getSpecies() + "]";
-                outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA,
-                        ValidationLevel.INFO, message, row.getId(), col.toString())));
-            }
-        }
-        return errors;
-    }
-
-    // VALIDATION: Species size below LMax
-    private Collection<ValidationCell> validateMeasureUnderMax(Boolean isExtended, StagedRowFormatted row,
-            UiSpeciesAttributes speciesAttributes) {
-
-        var errors = new ArrayList<ValidationCell>();
-
-        var isInvertSized = isExtended && row.getIsInvertSizing();
-        var range = isInvertSized ? INVERT_VALUES : FISH_VALUES;
-
-        var lMax = speciesAttributes.getLmax() != null ? speciesAttributes.getLmax() : 0;
-        if (lMax != 0) {
-
-            List<Integer> outOfRange = row.getMeasureJson().entrySet().stream()
-                    .filter(entry -> range[entry.getKey() - 1] > lMax)
-                    .map(Map.Entry::getKey)
-                    .collect(Collectors.toList());
-
-            if (!outOfRange.isEmpty()) {
-                var message = (isInvertSized ? "Invert measurement " : "Measurement ") + " is above Lmax [" + lMax
-                        + "] for Species [" + row.getRef().getSpecies() + "]";
-                outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA,
-                        ValidationLevel.INFO, message, row.getId(), col.toString())));
-            }
-        }
-        return errors;
-    }
-
-    // VALIDATION: Species Abundance Check
-    public Collection<ValidationError> validateAbundance(StagedRowFormatted row,
-            UiSpeciesAttributes speciesAttributes) {
-        var errors = new ValidationResultSet();
-        if (Arrays.asList(1, 2).contains(row.getMethod()) && speciesAttributes != null) {
-            var maxAbundance = speciesAttributes.getMaxAbundance();
-            if (maxAbundance != null && row.getTotal() != null && maxAbundance < row.getTotal())
-                errors.add(row.getId(), ValidationLevel.INFO, "total",
-                        "Exceeds max abundance " + maxAbundance + " for species " + row.getRef().getSpecies() + "");
-        }
-        return errors.getAll();
-    }
-
     private Boolean validateRowZeroOrOneInvertsTotal(StagedRowFormatted row, Integer observationTotal) {
         if (row.getInverts() == null || row.getTotal() == null)
             return false;
@@ -441,7 +363,7 @@ public class ValidationProcess {
                         : null;
     }
 
-    private ValidationError validateSurveyIsNew(StagedRowFormatted row) {
+    private SurveyValidationError validateSurveyIsNew(StagedRowFormatted row) {
         if (row.getDate() != null && Arrays.asList(METHODS_TO_CHECK).contains(row.getMethod())) {
 
             var surveyDate = Date.from(row.getDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
@@ -452,7 +374,7 @@ public class ValidationProcess {
                 var existingSurvey = existingSurveys.stream().findFirst().get();
                 var message = "Survey exists: " + existingSurvey.getSurveyId() + " includes "
                         + row.getDecimalSurvey();
-                return new ValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, message,
+                return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, message,
                         Arrays.asList(row.getId()), Arrays.asList("siteCode"));
             }
 
@@ -501,7 +423,7 @@ public class ValidationProcess {
         return null;
     }
 
-    public ValidationError validateMethod3Quadrats(String transect, List<StagedRowFormatted> rows) {
+    public SurveyValidationError validateMethod3Quadrats(String transect, List<StagedRowFormatted> rows) {
 
         var columnNames = new HashSet<String>();
         var rowIds = new HashSet<Long>();
@@ -512,7 +434,7 @@ public class ValidationProcess {
                 columnNames.add(Integer.toString(measureIndex));
             }
 
-        return rowIds.size() > 0 ? new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING,
+        return rowIds.size() > 0 ? new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING,
                 "Missing quadrats in transect " + transect, rowIds, columnNames) : null;
     }
 
@@ -529,7 +451,7 @@ public class ValidationProcess {
         return errors;
     }
 
-    public ValidationError validateMethod3QuadratsGT50(String transect, List<StagedRowFormatted> rows) {
+    public SurveyValidationError validateMethod3QuadratsGT50(String transect, List<StagedRowFormatted> rows) {
 
         var columnNames = new HashSet<String>();
 
@@ -539,22 +461,22 @@ public class ValidationProcess {
         }
 
         var rowIds = rows.stream().map(r -> r.getId()).collect(Collectors.toList());
-        return columnNames.size() > 0 ? new ValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING,
+        return columnNames.size() > 0 ? new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING,
                 "Quadrats do not sum to at least 50 in transect " + transect, rowIds, columnNames) : null;
     }
 
-    public ValidationError validateSurveyTransectNumber(List<StagedRowFormatted> surveyRows) {
+    public SurveyValidationError validateSurveyTransectNumber(List<StagedRowFormatted> surveyRows) {
         var invalidTransectRows = surveyRows.stream()
                 .filter(r -> !Arrays.asList(1, 2, 3, 4).contains(r.getSurveyNum())).collect(Collectors.toList());
         if (invalidTransectRows.size() > 0)
-            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING,
+            return new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING,
                     "Survey group transect invalid",
                     invalidTransectRows.stream().map(r -> r.getId()).collect(Collectors.toList()),
                     Arrays.asList("depth"));
         return null;
     }
 
-    private ValidationError validateSurveyComplete(ProgramValidation validation, List<StagedRowFormatted> surveyRows) {
+    private SurveyValidationError validateSurveyComplete(ProgramValidation validation, List<StagedRowFormatted> surveyRows) {
 
         if (surveyRows.stream().anyMatch(r -> r.getMethod() == null || r.getBlock() == null))
             return null;
@@ -571,7 +493,7 @@ public class ValidationProcess {
         // VALIDATE: If method = 0 then Block should be 0, 1 or 2
         var method0Rows = surveyByMethod.get(0);
         if (method0Rows != null && method0Rows.stream().anyMatch(r -> !Arrays.asList(0, 1, 2).contains(r.getBlock())))
-            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING,
+            return new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING,
                     "Method 0 must have block 0, 1 or 2",
                     method0Rows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("block"));
 
@@ -616,14 +538,14 @@ public class ValidationProcess {
         }
 
         if (messages.size() > 0) {
-            return new ValidationError(ValidationCategory.SPAN, level,
+            return new SurveyValidationError(ValidationCategory.SPAN, level,
                     messagePrefix + " " + String.join(". ", messages), rowIds, flagColumns);
         }
 
         return null;
     }
 
-    public ValidationError validateSurveyGroup(List<StagedRowFormatted> surveyRows) {
+    public SurveyValidationError validateSurveyGroup(List<StagedRowFormatted> surveyRows) {
         var surveyGroup = surveyRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyNum));
         if (!surveyGroup.keySet().containsAll(Arrays.asList(1, 2, 3, 4))) {
             var missingSurveys = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4));
@@ -632,15 +554,15 @@ public class ValidationProcess {
             var row = surveyRows.get(0).getRef();
             var message = "Survey group " + row.getSurveyGroup() + " missing transect "
                     + String.join(", ", missingSurveysMessage);
-            return new ValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, message,
+            return new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, message,
                     surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
         }
         return null;
     }
 
-    private Collection<ValidationError> checkSurveys(ProgramValidation validation, Boolean isExtended,
+    private Collection<SurveyValidationError> checkSurveys(ProgramValidation validation, Boolean isExtended,
             Map<String, List<StagedRowFormatted>> surveyMap) {
-        var res = new HashSet<ValidationError>();
+        var res = new HashSet<SurveyValidationError>();
 
         for (var survey : surveyMap.entrySet()) {
             var surveyRows = survey.getValue();
@@ -662,9 +584,9 @@ public class ValidationProcess {
         return res;
     }
 
-    private Collection<ValidationError> checkSurveyGroups(ProgramValidation validation, Boolean isExtended,
+    private Collection<SurveyValidationError> checkSurveyGroups(ProgramValidation validation, Boolean isExtended,
             Map<String, List<StagedRowFormatted>> surveyGroupMap) {
-        var res = new HashSet<ValidationError>();
+        var res = new HashSet<SurveyValidationError>();
 
         for (var survey : surveyGroupMap.entrySet()) {
             var surveyRows = survey.getValue();
@@ -680,9 +602,9 @@ public class ValidationProcess {
         return res;
     }
 
-    private Collection<ValidationError> checkMethod3Transects(Boolean isExtended,
+    private Collection<SurveyValidationError> checkMethod3Transects(Boolean isExtended,
             Map<String, List<StagedRowFormatted>> method3SurveyMap) {
-        var res = new HashSet<ValidationError>();
+        var res = new HashSet<SurveyValidationError>();
         var results = new ValidationResultSet();
 
         // Validate M3 transects
@@ -698,29 +620,20 @@ public class ValidationProcess {
         return res;
     }
 
-    public Collection<ValidationError> checkData(ProgramValidation validation, Boolean isExtended,
+    public Collection<SurveyValidationError> checkData(ProgramValidation validation, Boolean isExtended,
             Collection<StagedRowFormatted> rows) {
 
-        var res = new HashSet<ValidationError>();
-
         var results = new ValidationResultSet();
+
+        var dateValidation = validation == ProgramValidation.RLS ? DATE_MIN_RLS : DATE_MIN_ATRC;
 
         /** Row-level Checks */
         for (var row : rows) {
 
             // FUTURE: move these checks to the `MeasurementValidationService`
-            if (row.getSpeciesAttributesOpt().isPresent()) {
-                var speciesAttributes = row.getSpeciesAttributesOpt().get();
-
-                // Measure l5, l95 and lMax
-                if (validateMeasure(isExtended, row)) {
-                    results.addAll(validateMeasureRange(isExtended, row, speciesAttributes), false);
-                    results.addAll(validateMeasureUnderMax(isExtended, row, speciesAttributes), false);
-                }
-
-                // Abundance check
-                res.addAll(validateAbundance(row, speciesAttributes));
-            }
+            var speciesAttrib = row.getSpeciesAttributesOpt();
+            if (speciesAttrib.isPresent())
+                results.addAll(measurementValidationService.validate(speciesAttrib.get(), row, isExtended), false);
 
             // Total Checksum & Missing Data
             results.addAll(validateMeasurements(validation, row), false);
@@ -735,13 +648,12 @@ public class ValidationProcess {
             results.add(validateInvertsZeroOnM3M4M5(row), false);
 
             // Date is not in the future or too far in the past
-            results.add(validateDateRange(validation == ProgramValidation.RLS ? DATE_MIN_RLS : DATE_MIN_ATRC, row),
-                    false);
+            results.add(validateDateRange(dateValidation, row), false);
         }
 
+        var res = new HashSet<SurveyValidationError>();
         res.addAll(results.getAll());
         res.remove(null);
-
         return res;
     }
 
@@ -846,12 +758,12 @@ public class ValidationProcess {
 
         var programName = job.getProgram().getProgramName();
         var validation = Arrays.asList("ATRC", "FRDC").contains(programName.toUpperCase()) ? ProgramValidation.ATRC
-                       : Arrays.asList("RLS", "PARKS VIC").contains(programName.toUpperCase()) ? ProgramValidation.RLS 
-                       : ProgramValidation.NONE;
+                : Arrays.asList("RLS", "PARKS VIC").contains(programName.toUpperCase()) ? ProgramValidation.RLS
+                        : ProgramValidation.NONE;
 
         var enteredSiteCodes = rows.stream().map(s -> s.getSiteCode().toUpperCase()).collect(Collectors.toSet());
         var siteCodes = siteRepository.getAllSiteCodesMatching(enteredSiteCodes);
-        var sheetErrors = new HashSet<ValidationError>();
+        var sheetErrors = new HashSet<SurveyValidationError>();
 
         sheetErrors.addAll(checkFormatting(validation, job.getIsExtendedSize(), siteCodes, species, rows));
 

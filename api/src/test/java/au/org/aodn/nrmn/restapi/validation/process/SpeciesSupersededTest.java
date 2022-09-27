@@ -14,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.model.db.Method;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
@@ -37,7 +37,7 @@ class SpeciesSupersededTest {
         StagedRow row = new StagedRow();
         row.setSpecies("THE SPECIES");
         List<ObservableItem> species = Arrays.asList(ObservableItem.builder().observableItemName("THE SPECIES").supersededBy("NEXT SPECIES").methods(methods).build());
-        Collection<ValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), species, Arrays.asList(row));
+        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), species, Arrays.asList(row));
         assertTrue(errors.stream().anyMatch(p -> p.getMessage().contains("Superseded by")));
     }
 }

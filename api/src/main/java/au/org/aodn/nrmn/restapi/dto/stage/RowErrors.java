@@ -9,5 +9,5 @@ import java.util.List;
 @AllArgsConstructor
 public class RowErrors {
     private Long id;
-    private List<ValidationError> errors;
+    private List<SurveyValidationError> errors;
 }

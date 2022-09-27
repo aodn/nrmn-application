@@ -12,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
@@ -43,7 +43,7 @@ class Block0DataCheckTest {
         row.setBlock("0");
         row.setMethod("2");
         row.setStagedJob(job);
-        Collection<ValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Block 0 is invalid for method")));
     }
 
@@ -55,7 +55,7 @@ class Block0DataCheckTest {
         row.setBlock("0");
         row.setMethod("5");
         row.setStagedJob(job);
-        Collection<ValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().equals("Block 0 is invalid for method")));
     }
 }
