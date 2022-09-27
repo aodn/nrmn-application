@@ -36,7 +36,6 @@ import au.org.aodn.nrmn.restapi.dto.stage.StagedJobDto;
 import au.org.aodn.nrmn.restapi.dto.stage.StagedJobRowDto;
 import au.org.aodn.nrmn.restapi.dto.stage.UploadResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationRow;
 import au.org.aodn.nrmn.restapi.model.db.Program;
 import au.org.aodn.nrmn.restapi.model.db.SecUser;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
@@ -123,7 +122,7 @@ public class StagedJobController {
 
         if (lastRow.getTotal().equalsIgnoreCase("0")) {
             Long lastRowId = lastRow.getId();
-            Optional<ValidationRow> rowsToTruncate = validation.checkDuplicateRows(true, false, rowsToSave)
+            var rowsToTruncate = validation.checkDuplicateRows(true, false, rowsToSave)
                     .stream()
                     .filter(v -> v.getRowIds().contains(lastRowId)).findAny();
 

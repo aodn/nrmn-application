@@ -31,7 +31,6 @@ import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfi
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationRow;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
@@ -83,7 +82,7 @@ public class ValidationProcess {
     private static final LocalDate DATE_MIN_ATRC = LocalDate.parse("1991-01-01");
 
     // VALIDATION: Rows duplicated
-    public Collection<ValidationRow> checkDuplicateRows(boolean includeTotal, boolean includeSpeciesCode,
+    public Collection<SurveyValidationError> checkDuplicateRows(boolean includeTotal, boolean includeSpeciesCode,
             Collection<StagedRow> rows) {
         var mappedRows = new HashMap<String, List<Long>>();
         var mappedSpecies = new HashMap<String, String>();
@@ -95,11 +94,12 @@ public class ValidationProcess {
                 mappedSpecies.put(rowHash, r.getSpecies());
             mappedRows.put(rowHash, rowIds);
         });
-        var duplicateRows = new ArrayList<ValidationRow>();
+        var duplicateRows = new ArrayList<SurveyValidationError>();
         mappedRows.forEach((r, v) -> {
             if (v.size() > 1) {
                 List<Long> rowIds = v.stream().collect(Collectors.toList());
-                duplicateRows.add(new ValidationRow(r, rowIds, ValidationLevel.DUPLICATE, mappedSpecies.get(r)));
+                duplicateRows.add(new SurveyValidationError(null, ValidationLevel.DUPLICATE, mappedSpecies.get(r), rowIds, null));
+
             }
         });
         return duplicateRows;

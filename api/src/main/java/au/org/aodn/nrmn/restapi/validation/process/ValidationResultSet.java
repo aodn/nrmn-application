@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 
@@ -17,14 +16,14 @@ public class ValidationResultSet {
 
     Map<String, SurveyValidationError> errorMap = new HashMap<String, SurveyValidationError>();
 
-    public void addGlobal(Collection<ValidationRow> validationRows) {
-        for (ValidationRow validationRow : validationRows) {
+    public void addGlobal(Collection<SurveyValidationError> validationRows) {
+        for (SurveyValidationError validationRow : validationRows) {
             SurveyValidationError value = errorMap.getOrDefault(validationRow.getMessage(), new SurveyValidationError(ValidationCategory.DATA, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
             if (value != null) {
                 value.getRowIds().addAll(validationRow.getRowIds());
                 value.setRowIds(value.getRowIds().stream().distinct().collect(Collectors.toList()));
             }
-            errorMap.put(validationRow.getKey(), value);
+            errorMap.put(Long.toString(validationRow.getId()), value);
         }
     }
 
