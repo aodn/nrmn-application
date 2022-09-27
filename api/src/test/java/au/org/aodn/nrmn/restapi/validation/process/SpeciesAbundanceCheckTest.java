@@ -11,15 +11,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidationService;
 import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 @ExtendWith(MockitoExtension.class)
 class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
 
     @InjectMocks
-    ValidationProcess validationProcess;
+    MeasurementValidationService measurementValidation;
 
     UiSpeciesAttributes specAttribute = new UiSpeciesAttributes(){
         @Override
@@ -69,7 +70,7 @@ class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
         formatted.setSpeciesAttributesOpt(Optional.of(specAttribute));
         formatted.setTotal(20);
         formatted.setMethod(1);
-        Collection<ValidationError> errors = validationProcess.validateAbundance(formatted, specAttribute);
+        var errors = measurementValidation.validateAbundance(formatted, specAttribute);
         assertTrue(errors.isEmpty());
     }
 
@@ -79,7 +80,7 @@ class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
         formatted.setSpeciesAttributesOpt(Optional.of(specAttribute));
         formatted.setTotal(31);
         formatted.setMethod(1);
-        Collection<ValidationError> errors = validationProcess.validateAbundance(formatted, specAttribute);
+        var errors = measurementValidation.validateAbundance(formatted, specAttribute);
         assertFalse(errors.isEmpty());
     }
     @Test
@@ -87,7 +88,7 @@ class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
         StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMethod(4);
         formatted.setSpeciesAttributesOpt(Optional.empty());
-        Collection<ValidationError> errors = validationProcess.validateAbundance(formatted, specAttribute);
+        var errors = measurementValidation.validateAbundance(formatted, specAttribute);
         assertTrue(errors.isEmpty());
     }
 
