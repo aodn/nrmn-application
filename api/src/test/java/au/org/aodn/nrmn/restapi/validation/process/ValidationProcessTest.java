@@ -10,7 +10,7 @@ import java.util.HashMap;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,6 +25,8 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 
 @ExtendWith(MockitoExtension.class)
 class ValidationProcessTest {

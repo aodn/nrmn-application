@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 class ZeroInvertsTest extends FormattedTestProvider {
 

@@ -12,7 +12,6 @@ import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 @Service
 public class MeasurementValidationService {

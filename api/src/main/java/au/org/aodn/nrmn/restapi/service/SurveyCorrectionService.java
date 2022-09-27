@@ -39,7 +39,7 @@ import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyMethodRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import lombok.Value;
 
 @Service

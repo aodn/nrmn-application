@@ -23,10 +23,11 @@ import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
 import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 import au.org.aodn.nrmn.restapi.util.TimeUtils;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 @Testcontainers
 @SpringBootTest

@@ -13,7 +13,7 @@ import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.model.db.ObsItemType;
 import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
 import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 class MissingDataCheckTest extends FormattedTestProvider {
     @Test

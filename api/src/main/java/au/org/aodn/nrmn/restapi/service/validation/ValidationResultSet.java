@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation.process;
+package au.org.aodn.nrmn.restapi.service.validation;
 
 import java.util.Arrays;
 import java.util.Collection;

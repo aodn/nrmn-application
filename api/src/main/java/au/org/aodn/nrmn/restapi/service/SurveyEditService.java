@@ -9,6 +9,7 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
-import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
 import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.Site;
@@ -97,7 +97,7 @@ public class SurveyEditService {
         return survey;
     }
 
-    public ValidationErrors validateSurvey(SurveyDto surveyDto) {
+    public Collection<ValidationError> validateSurvey(SurveyDto surveyDto) {
         List<ValidationError> errors = new ArrayList<>();
         Site surveyDtoSite = siteRepository.findBySiteCode(surveyDto.getSiteCode());
         Date surveyDate = null;
@@ -205,6 +205,6 @@ public class SurveyEditService {
                             surveyDto.getSiteCode(), surveyDto.getSurveyDate(), surveyDto.getDepth(), surveyDto.getSurveyNum())));
         }
 
-        return new ValidationErrors(errors);
+        return errors;
     }
 }

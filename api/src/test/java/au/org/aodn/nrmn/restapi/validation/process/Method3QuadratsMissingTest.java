@@ -8,7 +8,7 @@ import java.util.HashMap;
 import org.junit.jupiter.api.Test;
 
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 class Method3QuadratsMissingTest extends FormattedTestProvider {
 

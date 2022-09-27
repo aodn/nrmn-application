@@ -1,6 +1,5 @@
 package au.org.aodn.nrmn.restapi.config;
 
-import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
 import au.org.aodn.nrmn.restapi.controller.exception.ValidationException;
 import org.springframework.core.Ordered;
@@ -49,7 +48,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                             .build();
                     errors.add(error);
                 });
-        return new ResponseEntity<>(new ValidationErrors(errors), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
     /* Handle spring data rest JSR-303 validation errors */
@@ -71,7 +70,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                     .build();
             errors.add(error);
         });
-        return new ResponseEntity<>(new ValidationErrors(errors), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
     /* Handle custom controller validation errors */

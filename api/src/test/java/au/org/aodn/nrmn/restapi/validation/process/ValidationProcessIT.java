@@ -26,6 +26,7 @@ import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
+import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 

@@ -19,7 +19,7 @@ import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.SurveyIngestionService;
-import au.org.aodn.nrmn.restapi.validation.process.ValidationProcess;
+import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;

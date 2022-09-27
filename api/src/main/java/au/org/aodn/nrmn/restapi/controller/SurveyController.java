@@ -24,7 +24,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
 import au.org.aodn.nrmn.restapi.model.db.Program;
 import au.org.aodn.nrmn.restapi.model.db.Survey;
@@ -160,8 +159,8 @@ public class SurveyController {
     @PutMapping("/survey/{id}")
     public ResponseEntity<?> findOne(@Valid @RequestBody SurveyDto surveyDto) {
 
-        ValidationErrors errors = surveyEditService.validateSurvey(surveyDto);
-        if (!errors.getErrors().isEmpty()) {
+        var errors = surveyEditService.validateSurvey(surveyDto);
+        if (!errors.isEmpty()) {
             return ResponseEntity.badRequest().body(errors);
         }
 

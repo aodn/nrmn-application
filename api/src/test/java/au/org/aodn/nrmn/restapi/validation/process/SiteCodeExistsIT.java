@@ -20,6 +20,7 @@ import au.org.aodn.nrmn.restapi.repository.LocationRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
+import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 

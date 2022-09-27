@@ -19,8 +19,8 @@ import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.util.TimeUtils;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 public class StagedRowFormattedMapperConfig {
 

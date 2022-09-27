@@ -55,7 +55,7 @@ import au.org.aodn.nrmn.restapi.service.S3IO;
 import au.org.aodn.nrmn.restapi.service.SpreadSheetService;
 import au.org.aodn.nrmn.restapi.service.StagedRowService;
 import au.org.aodn.nrmn.restapi.service.SurveyContentsHandler.ParsedSheet;
-import au.org.aodn.nrmn.restapi.validation.process.ValidationProcess;
+import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;

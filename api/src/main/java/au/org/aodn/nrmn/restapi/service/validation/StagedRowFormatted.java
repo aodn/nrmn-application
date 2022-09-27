@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation;
+package au.org.aodn.nrmn.restapi.service.validation;
 
 import au.org.aodn.nrmn.restapi.model.db.Diver;
 import au.org.aodn.nrmn.restapi.model.db.Site;

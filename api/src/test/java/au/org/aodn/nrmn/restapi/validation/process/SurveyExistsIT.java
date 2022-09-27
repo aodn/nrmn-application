@@ -23,6 +23,7 @@ import au.org.aodn.nrmn.restapi.model.db.SurveyTestData;
 import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 

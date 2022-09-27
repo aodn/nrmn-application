@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation.process;
+package au.org.aodn.nrmn.restapi.service.validation;
 
 import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistanceLatLongMeters;
 
@@ -45,9 +45,7 @@ import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
-import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidationService;
 import au.org.aodn.nrmn.restapi.util.TimeUtils;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 @Component
 public class ValidationProcess {

@@ -18,6 +18,7 @@ import au.org.aodn.nrmn.restapi.model.db.StagedJob;
 import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 
 @ExtendWith(MockitoExtension.class)
 class MeasureJsonValidationTest {

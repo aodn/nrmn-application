@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 class Method3QuadratMax50Test extends FormattedTestProvider {
     @Test

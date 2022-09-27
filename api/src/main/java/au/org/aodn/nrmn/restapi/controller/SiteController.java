@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
-import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
 import au.org.aodn.nrmn.restapi.dto.site.SiteDto;
 import au.org.aodn.nrmn.restapi.dto.site.SiteGetDto;
 import au.org.aodn.nrmn.restapi.dto.site.SiteOptionsDto;
@@ -115,8 +114,8 @@ public class SiteController {
     @PostMapping("/site")
     public ResponseEntity<?> newSite(@Valid @RequestBody SiteDto sitePostDto) {
         Site newSite = mapper.map(sitePostDto, Site.class);
-        ValidationErrors errors = validateConstraints(newSite);
-        if (!errors.getErrors().isEmpty()) {
+        var errors = validateConstraints(newSite);
+        if (!errors.isEmpty()) {
             return ResponseEntity.badRequest().body(errors);
         }
         Site persistedSite = siteRepository.save(newSite);
@@ -128,8 +127,8 @@ public class SiteController {
     public ResponseEntity<?> updateSite(@PathVariable Integer id, @Valid @RequestBody SiteDto sitePutDto) {
         Site site = siteRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         mapper.map(sitePutDto, site);
-        ValidationErrors errors = validateConstraints(site);
-        if (!errors.getErrors().isEmpty()) {
+        var errors = validateConstraints(site);
+        if (!errors.isEmpty()) {
             return ResponseEntity.badRequest().body(errors);
         }
         Site persistedSite = siteRepository.save(site);
@@ -143,7 +142,7 @@ public class SiteController {
         siteRepository.deleteById(id);
     }
 
-    private ValidationErrors validateConstraints(Site site) {
+    private List<ValidationError> validateConstraints(Site site) {
         List<ValidationError> errors = new ArrayList<>();
 
         if (StringUtils.isBlank(site.getSiteName()))
@@ -156,7 +155,7 @@ public class SiteController {
             errors.add(new ValidationError("Site", "locationId", "", "Please select a location."));
 
         if (errors.size() > 0)
-            return new ValidationErrors(errors);
+            return errors;
 
         Example<Site> siteWithCodeExample = Example.of(
                 Site.builder()
@@ -184,6 +183,6 @@ public class SiteController {
                     "A site with this name already exists in this location."));
         }
 
-        return new ValidationErrors(errors);
+        return errors;
     }
 }
