@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.config;
 
-import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
+import au.org.aodn.nrmn.restapi.controller.validation.FormValidationError;
 import au.org.aodn.nrmn.restapi.controller.exception.ValidationException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -34,13 +34,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        List<ValidationError> errors = new ArrayList<>();
+        List<FormValidationError> errors = new ArrayList<>();
         String objectName = ex.getBindingResult().getObjectName();
         ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .forEach(fieldError -> {
-                    ValidationError error = ValidationError.builder()
+                    FormValidationError error = FormValidationError.builder()
                             .entity(objectName)
                             .property(fieldError.getField())
                             .invalidValue(String.valueOf(fieldError.getRejectedValue()))
@@ -60,10 +60,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             throw cause;
         if (!(cause.getCause() instanceof ConstraintViolationException))
             throw cause.getCause();
-        List<ValidationError> errors = new ArrayList<>();
+        List<FormValidationError> errors = new ArrayList<>();
         ConstraintViolationException validationException = (ConstraintViolationException) cause.getCause();
         validationException.getConstraintViolations().stream().forEach(fieldError -> {
-            ValidationError error = ValidationError.builder()
+            FormValidationError error = FormValidationError.builder()
                     .entity(fieldError.getRootBeanClass().getSimpleName())
                     .property(String.valueOf(fieldError.getPropertyPath()))
                     .message(fieldError.getMessage())

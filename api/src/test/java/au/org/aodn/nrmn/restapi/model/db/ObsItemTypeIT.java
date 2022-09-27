@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.db.model.ObsItemType;
-import au.org.aodn.nrmn.db.repository.ObsItemTypeRepository;
+import au.org.aodn.nrmn.restapi.data.model.ObsItemType;
+import au.org.aodn.nrmn.restapi.data.repository.ObsItemTypeRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 import org.junit.jupiter.api.Test;

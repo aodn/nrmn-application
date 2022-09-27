@@ -3,7 +3,7 @@ package au.org.aodn.nrmn.restapi.dto.stage;
 import java.util.Collection;
 import java.util.Map;
 
-import au.org.aodn.nrmn.db.model.StagedJob;
+import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

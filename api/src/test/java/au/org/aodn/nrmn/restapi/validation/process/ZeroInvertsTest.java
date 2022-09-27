@@ -8,8 +8,8 @@ import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
 
-import au.org.aodn.nrmn.db.model.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
+import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 class ZeroInvertsTest extends FormattedTestProvider {

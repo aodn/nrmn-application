@@ -9,13 +9,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import au.org.aodn.nrmn.db.model.Diver;
-import au.org.aodn.nrmn.db.model.ObservableItem;
-import au.org.aodn.nrmn.db.model.Program;
-import au.org.aodn.nrmn.db.model.Site;
-import au.org.aodn.nrmn.db.model.StagedJob;
-import au.org.aodn.nrmn.db.model.StagedRow;
-import au.org.aodn.nrmn.db.model.enums.Directions;
+import au.org.aodn.nrmn.restapi.data.model.Diver;
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
+import au.org.aodn.nrmn.restapi.data.model.Program;
+import au.org.aodn.nrmn.restapi.data.model.Site;
+import au.org.aodn.nrmn.restapi.data.model.StagedJob;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
+import au.org.aodn.nrmn.restapi.enums.Directions;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 

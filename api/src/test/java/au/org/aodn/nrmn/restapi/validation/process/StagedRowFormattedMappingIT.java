@@ -17,12 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import au.org.aodn.nrmn.db.model.ObservableItem;
-import au.org.aodn.nrmn.db.model.Program;
-import au.org.aodn.nrmn.db.model.StagedJob;
-import au.org.aodn.nrmn.db.model.StagedRow;
-import au.org.aodn.nrmn.db.model.enums.Directions;
-import au.org.aodn.nrmn.db.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
+import au.org.aodn.nrmn.restapi.data.model.Program;
+import au.org.aodn.nrmn.restapi.data.model.StagedJob;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
+import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.enums.Directions;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;

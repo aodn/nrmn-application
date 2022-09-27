@@ -1,11 +1,11 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.db.model.Program;
-import au.org.aodn.nrmn.db.model.Program.ProgramBuilder;
-import au.org.aodn.nrmn.db.repository.ProgramRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import au.org.aodn.nrmn.restapi.data.model.Program;
+import au.org.aodn.nrmn.restapi.data.model.Program.ProgramBuilder;
+import au.org.aodn.nrmn.restapi.data.repository.ProgramRepository;
 
 @Component
 public class ProgramTestData {

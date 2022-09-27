@@ -21,17 +21,17 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import au.org.aodn.nrmn.db.model.Diver;
-import au.org.aodn.nrmn.db.model.Site;
-import au.org.aodn.nrmn.db.model.Survey;
-import au.org.aodn.nrmn.db.model.enums.Directions;
-import au.org.aodn.nrmn.db.repository.DiverRepository;
-import au.org.aodn.nrmn.db.repository.ProgramRepository;
-import au.org.aodn.nrmn.db.repository.SiteRepository;
-import au.org.aodn.nrmn.db.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.data.model.Diver;
+import au.org.aodn.nrmn.restapi.data.model.Site;
+import au.org.aodn.nrmn.restapi.data.model.Survey;
+import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.data.repository.ProgramRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
-import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
+import au.org.aodn.nrmn.restapi.controller.validation.FormValidationError;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
+import au.org.aodn.nrmn.restapi.enums.Directions;
 
 @Service
 public class SurveyEditService {
@@ -97,8 +97,8 @@ public class SurveyEditService {
         return survey;
     }
 
-    public Collection<ValidationError> validateSurvey(SurveyDto surveyDto) {
-        List<ValidationError> errors = new ArrayList<>();
+    public Collection<FormValidationError> validateSurvey(SurveyDto surveyDto) {
+        List<FormValidationError> errors = new ArrayList<>();
         Site surveyDtoSite = siteRepository.findBySiteCode(surveyDto.getSiteCode());
         Date surveyDate = null;
 
@@ -106,25 +106,25 @@ public class SurveyEditService {
         try {
             surveyDate = parseDate(surveyDto.getSurveyDate());
         } catch (DateTimeException e) {
-            errors.add(new ValidationError("Survey", "surveyDate", surveyDto.getSurveyDate(),
+            errors.add(new FormValidationError("Survey", "surveyDate", surveyDto.getSurveyDate(),
                     e.getMessage()));
         }
 
         if(surveyDate != null) {
             if (surveyDate.after(new Date())) {
-                errors.add(new ValidationError("Survey", "surveyDate", surveyDto.getSurveyDate(),
+                errors.add(new FormValidationError("Survey", "surveyDate", surveyDto.getSurveyDate(),
                         "A survey date cannot be in the future."));
             }
 
             if(surveyDto.getProgramId() != null && (surveyDto.getProgramId() == RLS_PROGRAM_ID || surveyDto.getProgramId() == PARKS_VIC_PROGRAM_ID) && 
                 surveyDate.before(Date.from(LocalDate.of(2006, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant()))) {
-                    errors.add(new ValidationError("Survey", "surveyDate", surveyDto.getSurveyDate(),
+                    errors.add(new FormValidationError("Survey", "surveyDate", surveyDto.getSurveyDate(),
                             "A survey date cannot be before January 1st, 2006."));
             }
             
             if(surveyDto.getProgramId() != null && (surveyDto.getProgramId() == ATRC_PROGRAM_ID || surveyDto.getProgramId() == FRDC_PROGRAM_ID) && 
                 surveyDate.before(Date.from(LocalDate.of(1991, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant()))) {
-                    errors.add(new ValidationError("Survey", "surveyDate", surveyDto.getSurveyDate(),
+                    errors.add(new FormValidationError("Survey", "surveyDate", surveyDto.getSurveyDate(),
                             "A survey date cannot be before January 1st, 1991."));
             }
 
@@ -135,7 +135,7 @@ public class SurveyEditService {
           if (StringUtils.isEmpty(surveyDto.getSurveyTime()))
             surveyDto.getSurveyTime();
         } catch (DateTimeException e) {
-            errors.add(new ValidationError("Survey", "surveyTime", surveyDto.getSurveyTime(),
+            errors.add(new FormValidationError("Survey", "surveyTime", surveyDto.getSurveyTime(),
                     "The survey time must be in the format hh:mm[:ss]"));
         }
 
@@ -143,10 +143,10 @@ public class SurveyEditService {
         if (!StringUtils.isBlank(surveyDto.getVisibility())) {
             Double vis = NumberUtils.toDouble(surveyDto.getVisibility(), Double.NEGATIVE_INFINITY);
             if (vis < 0) {
-                errors.add(new ValidationError("Survey", "visibility", surveyDto.getVisibility(), (vis == Double.NEGATIVE_INFINITY) ? "Vis is not a decimal" : "Vis is not positive"));
+                errors.add(new FormValidationError("Survey", "visibility", surveyDto.getVisibility(), (vis == Double.NEGATIVE_INFINITY) ? "Vis is not a decimal" : "Vis is not positive"));
             } else {
                 if(vis.toString().split("\\.")[1].length() > 1)
-                    errors.add(new ValidationError("Survey", "visibility", surveyDto.getVisibility(), "Vis is more than one decimal place"));
+                    errors.add(new FormValidationError("Survey", "visibility", surveyDto.getVisibility(), "Vis is more than one decimal place"));
             }
         }
 
@@ -156,39 +156,39 @@ public class SurveyEditService {
         try {
             lat = StringUtils.isEmpty(surveyDto.getLatitude()) ? null : Double.parseDouble(surveyDto.getLatitude());
         } catch (NumberFormatException e) {
-            errors.add(new ValidationError("Survey", "latitude", surveyDto.getLatitude(),
+            errors.add(new FormValidationError("Survey", "latitude", surveyDto.getLatitude(),
                     "Latitude must contain a valid number"));
         }
 
         try {
             lon = StringUtils.isEmpty(surveyDto.getLongitude()) ? null : Double.parseDouble(surveyDto.getLongitude());
         } catch (NumberFormatException e) {
-            errors.add(new ValidationError("Survey", "longitude", surveyDto.getLongitude(),
+            errors.add(new FormValidationError("Survey", "longitude", surveyDto.getLongitude(),
                     "Longitude must contain a valid number"));
         }
 
         boolean hasValidCoords = lat != null && lon != null && !lat.isNaN() && !lon.isNaN();
         double distMeters = hasValidCoords ? getDistanceLatLongMeters(lat, lon, surveyDtoSite.getLatitude(), surveyDtoSite.getLongitude()) : 0;
         if(distMeters > 200){
-            errors.add(new ValidationError("Survey", "latitude", surveyDto.getLatitude(),
+            errors.add(new FormValidationError("Survey", "latitude", surveyDto.getLatitude(),
                     String.format("Coordinates are further than 200m from the Site (%.2fm)", distMeters)));
-            errors.add(new ValidationError("Survey", "longitude", surveyDto.getLongitude(),
+            errors.add(new FormValidationError("Survey", "longitude", surveyDto.getLongitude(),
                     String.format("Coordinates are further than 200m from the Site (%.2fm)", distMeters)));
         }
 
         if(lat != null && !lat.isNaN() && (lat < -90 || lat > 90) ) {
-            errors.add(new ValidationError("Survey", "latitude", surveyDto.getLatitude(),
+            errors.add(new FormValidationError("Survey", "latitude", surveyDto.getLatitude(),
                     "The latitude must be a valid number between -90 and 90"));
         }
 
         if(lon != null && !lon.isNaN() && (lon < -180 || lon > 180) ) {
-            errors.add(new ValidationError("Survey", "longitude", surveyDto.getLongitude(),
+            errors.add(new FormValidationError("Survey", "longitude", surveyDto.getLongitude(),
                     "The longitude must be a valid number between -180 and 180"));
         }
 
         // Direction Validation
         if (surveyDto.getDirection() !=null && surveyDto.getDirection().length() > 0 && !EnumUtils.isValidEnum(Directions.class, surveyDto.getDirection())) {
-            errors.add(new ValidationError("Survey", "direction", surveyDto.getDirection(),
+            errors.add(new FormValidationError("Survey", "direction", surveyDto.getDirection(),
                     surveyDto.getDirection() + " is invalid, expected: N,NE,E,SE,S,SW,W,NW, O or blank"));
         }
 
@@ -200,7 +200,7 @@ public class SurveyEditService {
                 .collect(Collectors.toList());
 
         if (duplicateSurveys.size() > 0) {
-            errors.add(new ValidationError("Survey", "surveyNum", surveyDto.getSurveyNum().toString(),
+            errors.add(new FormValidationError("Survey", "surveyNum", surveyDto.getSurveyNum().toString(),
                     String.format("A survey with the site, date and depth of \"%s/%s/%s.%s\" already exists.",
                             surveyDto.getSiteCode(), surveyDto.getSurveyDate(), surveyDto.getDepth(), surveyDto.getSurveyNum())));
         }

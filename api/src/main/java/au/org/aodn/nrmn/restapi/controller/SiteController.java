@@ -29,12 +29,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import au.org.aodn.nrmn.db.model.Site;
-import au.org.aodn.nrmn.db.model.SiteListView;
-import au.org.aodn.nrmn.db.repository.*;
-import au.org.aodn.nrmn.db.repository.dynamicQuery.FilterCondition;
+import au.org.aodn.nrmn.restapi.data.model.Site;
+import au.org.aodn.nrmn.restapi.data.model.SiteListView;
+import au.org.aodn.nrmn.restapi.data.repository.*;
+import au.org.aodn.nrmn.restapi.data.repository.dynamicQuery.FilterCondition;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
-import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
+import au.org.aodn.nrmn.restapi.controller.validation.FormValidationError;
 import au.org.aodn.nrmn.restapi.dto.site.SiteDto;
 import au.org.aodn.nrmn.restapi.dto.site.SiteGetDto;
 import au.org.aodn.nrmn.restapi.dto.site.SiteOptionsDto;
@@ -143,17 +143,17 @@ public class SiteController {
         siteRepository.deleteById(id);
     }
 
-    private List<ValidationError> validateConstraints(Site site) {
-        List<ValidationError> errors = new ArrayList<>();
+    private List<FormValidationError> validateConstraints(Site site) {
+        List<FormValidationError> errors = new ArrayList<>();
 
         if (StringUtils.isBlank(site.getSiteName()))
-            errors.add(new ValidationError("Site", "siteName", "", "Site Name must not be empty."));
+            errors.add(new FormValidationError("Site", "siteName", "", "Site Name must not be empty."));
 
         if (StringUtils.isBlank(site.getSiteCode()))
-            errors.add(new ValidationError("Site", "siteCode", "", "Site Code must not be empty."));
+            errors.add(new FormValidationError("Site", "siteCode", "", "Site Code must not be empty."));
 
         if (site.getLocation() == null)
-            errors.add(new ValidationError("Site", "locationId", "", "Please select a location."));
+            errors.add(new FormValidationError("Site", "locationId", "", "Please select a location."));
 
         if (errors.size() > 0)
             return errors;
@@ -166,7 +166,7 @@ public class SiteController {
         Optional<Site> existingSite = siteRepository.findOne(siteWithCodeExample);
 
         if (existingSite.isPresent() && !existingSite.get().getSiteId().equals(site.getSiteId())) {
-            errors.add(new ValidationError("Site", "siteCode", site.getSiteCode(),
+            errors.add(new FormValidationError("Site", "siteCode", site.getSiteCode(),
                     "A site with this code already exists."));
         }
 
@@ -180,7 +180,7 @@ public class SiteController {
 
         if (existingSiteWithName.isPresent() && (site.getSiteCode() == null
                 || !existingSiteWithName.get().getSiteCode().equalsIgnoreCase(site.getSiteCode()))) {
-            errors.add(new ValidationError("Site", "siteName", site.getSiteName(),
+            errors.add(new FormValidationError("Site", "siteName", site.getSiteName(),
                     "A site with this name already exists in this location."));
         }
 

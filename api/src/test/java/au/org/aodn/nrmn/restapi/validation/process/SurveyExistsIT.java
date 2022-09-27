@@ -13,12 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import au.org.aodn.nrmn.db.model.StagedJob;
-import au.org.aodn.nrmn.db.model.StagedRow;
-import au.org.aodn.nrmn.db.model.Survey;
-import au.org.aodn.nrmn.db.repository.StagedJobRepository;
-import au.org.aodn.nrmn.db.repository.StagedRowRepository;
-import au.org.aodn.nrmn.db.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.data.model.StagedJob;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
+import au.org.aodn.nrmn.restapi.data.model.Survey;
+import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
+import au.org.aodn.nrmn.restapi.data.repository.StagedRowRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.model.db.SiteTestData;
 import au.org.aodn.nrmn.restapi.model.db.StagedJobTestData;

@@ -1,15 +1,15 @@
 package au.org.aodn.nrmn.restapi.security;
 
-import au.org.aodn.nrmn.db.model.SecUser;
-import au.org.aodn.nrmn.db.model.enums.SecUserStatus;
-import au.org.aodn.nrmn.db.repository.SecUserRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import au.org.aodn.nrmn.restapi.data.model.SecUser;
+import au.org.aodn.nrmn.restapi.data.repository.SecUserRepository;
+import au.org.aodn.nrmn.restapi.enums.SecUserStatus;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {

@@ -1,11 +1,11 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.db.model.ObsItemType;
-import au.org.aodn.nrmn.db.model.ObsItemType.ObsItemTypeBuilder;
-import au.org.aodn.nrmn.db.repository.ObsItemTypeRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import au.org.aodn.nrmn.restapi.data.model.ObsItemType;
+import au.org.aodn.nrmn.restapi.data.model.ObsItemType.ObsItemTypeBuilder;
+import au.org.aodn.nrmn.restapi.data.repository.ObsItemTypeRepository;
 
 @Component
 public class ObsItemTypeTestData {

@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;
 
-import au.org.aodn.nrmn.db.model.Location;
+import au.org.aodn.nrmn.restapi.data.model.Location;
 
 @Data
 @NoArgsConstructor

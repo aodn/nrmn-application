@@ -10,7 +10,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import au.org.aodn.nrmn.db.repository.SecUserRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SecUserRepository;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

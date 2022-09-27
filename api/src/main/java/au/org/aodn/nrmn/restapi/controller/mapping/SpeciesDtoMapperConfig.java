@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller.mapping;
 
-import au.org.aodn.nrmn.db.model.ObservableItem;
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.dto.species.SpeciesDto;
 import au.org.aodn.nrmn.restapi.dto.species.SpeciesRecordDto;
 

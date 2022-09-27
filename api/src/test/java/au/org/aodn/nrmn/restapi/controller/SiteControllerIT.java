@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.db.model.Location;
-import au.org.aodn.nrmn.db.model.Site;
+import au.org.aodn.nrmn.restapi.data.model.Location;
+import au.org.aodn.nrmn.restapi.data.model.Site;
 import au.org.aodn.nrmn.restapi.model.db.LocationTestData;
 import au.org.aodn.nrmn.restapi.model.db.SiteTestData;
 import au.org.aodn.nrmn.restapi.test.JwtToken;

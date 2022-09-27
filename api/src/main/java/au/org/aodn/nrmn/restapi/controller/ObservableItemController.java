@@ -27,14 +27,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import au.org.aodn.nrmn.db.model.ObservableItem;
-import au.org.aodn.nrmn.db.model.ObservationItemListView;
-import au.org.aodn.nrmn.db.repository.ObservableItemListRepository;
-import au.org.aodn.nrmn.db.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.db.repository.dynamicQuery.FilterCondition;
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
+import au.org.aodn.nrmn.restapi.data.model.ObservationItemListView;
+import au.org.aodn.nrmn.restapi.data.repository.ObservableItemListRepository;
+import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.data.repository.dynamicQuery.FilterCondition;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.exception.ValidationException;
-import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
+import au.org.aodn.nrmn.restapi.controller.validation.FormValidationError;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemGetDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemPutDto;
@@ -112,8 +112,8 @@ public class ObservableItemController {
         if (!observableItem.getObservableItemName().equals(observableItemPutDto.getObservableItemName()) &&
                 (observableItem.getCreated() == null
                         || ChronoUnit.HOURS.between(observableItem.getCreated(), LocalDateTime.now()) >= 72)) {
-            List<ValidationError> errors = new ArrayList<ValidationError>();
-            errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName", "",
+            List<FormValidationError> errors = new ArrayList<FormValidationError>();
+            errors.add(new FormValidationError(ObservableItemDto.class.getName(), "observableItemName", "",
                     "Species Name editing not allowed more than 72 hours after creation."));
             throw new ValidationException(errors);
         }
@@ -126,10 +126,10 @@ public class ObservableItemController {
 
     private void validate(ObservableItem item) {
 
-        List<ValidationError> errors = new ArrayList<ValidationError>();
+        List<FormValidationError> errors = new ArrayList<FormValidationError>();
 
         if (StringUtils.isEmpty(item.getObservableItemName()))
-            errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName",
+            errors.add(new FormValidationError(ObservableItemDto.class.getName(), "observableItemName",
                     item.getObservableItemName(), "Species Name Required."));
 
         ObservableItem probe = ObservableItem.builder().commonName(item.getCommonName())
@@ -144,11 +144,11 @@ public class ObservableItemController {
 
             if (StringUtils.isNotEmpty(match.getObservableItemName())
                     && match.getObservableItemName().equals(item.getObservableItemName()))
-                errors.add(new ValidationError(ObservableItemDto.class.getName(), "observableItemName",
+                errors.add(new FormValidationError(ObservableItemDto.class.getName(), "observableItemName",
                         item.getObservableItemName(), "An item with this name already exists."));
 
             if (StringUtils.isNotEmpty(match.getLetterCode()) && match.getLetterCode().equals(item.getLetterCode()))
-                errors.add(new ValidationError(ObservableItemDto.class.getName(), "letterCode", item.getLetterCode(),
+                errors.add(new FormValidationError(ObservableItemDto.class.getName(), "letterCode", item.getLetterCode(),
                         "An item with this letter code already exists."));
         }
 

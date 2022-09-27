@@ -6,12 +6,12 @@ import java.util.HashSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import au.org.aodn.nrmn.db.model.SecRole;
-import au.org.aodn.nrmn.db.model.SecUser;
-import au.org.aodn.nrmn.db.model.SecUser.SecUserBuilder;
-import au.org.aodn.nrmn.db.model.enums.SecUserStatus;
-import au.org.aodn.nrmn.db.repository.SecRoleRepository;
-import au.org.aodn.nrmn.db.repository.SecUserRepository;
+import au.org.aodn.nrmn.restapi.data.model.SecRole;
+import au.org.aodn.nrmn.restapi.data.model.SecUser;
+import au.org.aodn.nrmn.restapi.data.model.SecUser.SecUserBuilder;
+import au.org.aodn.nrmn.restapi.data.repository.SecRoleRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SecUserRepository;
+import au.org.aodn.nrmn.restapi.enums.SecUserStatus;
 
 @Component
 public class SecUserTestData {

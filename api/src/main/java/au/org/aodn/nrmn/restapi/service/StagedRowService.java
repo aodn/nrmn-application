@@ -8,10 +8,10 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import au.org.aodn.nrmn.db.model.StagedJob;
-import au.org.aodn.nrmn.db.model.StagedRow;
-import au.org.aodn.nrmn.db.repository.StagedJobRepository;
-import au.org.aodn.nrmn.db.repository.StagedRowRepository;
+import au.org.aodn.nrmn.restapi.data.model.StagedJob;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
+import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
+import au.org.aodn.nrmn.restapi.data.repository.StagedRowRepository;
 
 @Service
 public class StagedRowService {

@@ -1,11 +1,11 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.db.model.Survey;
-import au.org.aodn.nrmn.db.model.Survey.SurveyBuilder;
-import au.org.aodn.nrmn.db.repository.SurveyRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import au.org.aodn.nrmn.restapi.data.model.Survey;
+import au.org.aodn.nrmn.restapi.data.model.Survey.SurveyBuilder;
+import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 
 import java.sql.Date;
 import java.sql.Time;

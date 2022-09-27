@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import au.org.aodn.nrmn.db.model.ObservableItem;
-import au.org.aodn.nrmn.db.repository.HabitatGroupRepository;
-import au.org.aodn.nrmn.db.repository.ObsItemTypeRepository;
-import au.org.aodn.nrmn.db.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.db.repository.ReportGroupRepository;
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
+import au.org.aodn.nrmn.restapi.data.repository.HabitatGroupRepository;
+import au.org.aodn.nrmn.restapi.data.repository.ObsItemTypeRepository;
+import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.data.repository.ReportGroupRepository;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemOptionsDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemTaxonomyDto;
 import au.org.aodn.nrmn.restapi.dto.species.SpeciesDto;

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,22 +27,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import au.org.aodn.nrmn.db.model.Program;
-import au.org.aodn.nrmn.db.model.SecUser;
-import au.org.aodn.nrmn.db.model.StagedJob;
-import au.org.aodn.nrmn.db.model.StagedJobLog;
-import au.org.aodn.nrmn.db.model.StagedRow;
-import au.org.aodn.nrmn.db.model.audit.UserActionAudit;
-import au.org.aodn.nrmn.db.model.enums.SourceJobType;
-import au.org.aodn.nrmn.db.model.enums.StagedJobEventType;
-import au.org.aodn.nrmn.db.model.enums.StatusJobType;
-import au.org.aodn.nrmn.db.repository.ProgramRepository;
-import au.org.aodn.nrmn.db.repository.SecUserRepository;
-import au.org.aodn.nrmn.db.repository.StagedJobLogRepository;
-import au.org.aodn.nrmn.db.repository.StagedJobRepository;
-import au.org.aodn.nrmn.db.repository.StagedRowRepository;
-import au.org.aodn.nrmn.db.repository.UserActionAuditRepository;
-import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
+import au.org.aodn.nrmn.restapi.data.model.Program;
+import au.org.aodn.nrmn.restapi.data.model.SecUser;
+import au.org.aodn.nrmn.restapi.data.model.StagedJob;
+import au.org.aodn.nrmn.restapi.data.model.StagedJobLog;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
+import au.org.aodn.nrmn.restapi.data.model.audit.UserActionAudit;
+import au.org.aodn.nrmn.restapi.data.repository.ProgramRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SecUserRepository;
+import au.org.aodn.nrmn.restapi.data.repository.StagedJobLogRepository;
+import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
+import au.org.aodn.nrmn.restapi.data.repository.StagedRowRepository;
+import au.org.aodn.nrmn.restapi.data.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.dto.site.RowUpdateDto;
 import au.org.aodn.nrmn.restapi.dto.stage.FileUpload;
 import au.org.aodn.nrmn.restapi.dto.stage.JobResponse;
@@ -51,6 +46,9 @@ import au.org.aodn.nrmn.restapi.dto.stage.StagedJobDto;
 import au.org.aodn.nrmn.restapi.dto.stage.StagedJobRowDto;
 import au.org.aodn.nrmn.restapi.dto.stage.UploadResponse;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
+import au.org.aodn.nrmn.restapi.enums.SourceJobType;
+import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
+import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.service.S3IO;
 import au.org.aodn.nrmn.restapi.service.SpreadSheetService;
 import au.org.aodn.nrmn.restapi.service.StagedRowService;
@@ -281,11 +279,8 @@ public class StagedJobController {
     public ResponseEntity<JobResponse> getJob(@PathVariable Long jobId) {
         var rows = stagedRowRepo.findRowsByJobId(jobId);
         return jobRepo.findById(jobId)
-                .map(job -> ResponseEntity.ok(new JobResponse(job, rows, Collections.emptyList())))
-                .orElseGet(() -> ResponseEntity.badRequest().body(new JobResponse(null,
-                        Collections.emptyList(),
-                        Collections.singletonList(
-                                new ErrorInput("StagedJob Not found", "StagedJob")))));
+                .map(job -> ResponseEntity.ok(new JobResponse(job, rows)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @DeleteMapping("/delete/{jobId}")

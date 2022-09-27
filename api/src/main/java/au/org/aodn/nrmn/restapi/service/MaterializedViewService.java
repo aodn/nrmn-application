@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
-import au.org.aodn.nrmn.db.repository.MaterializedViewsRepository;
+import au.org.aodn.nrmn.restapi.data.repository.MaterializedViewsRepository;
 
 @Component
 @EnableAsync

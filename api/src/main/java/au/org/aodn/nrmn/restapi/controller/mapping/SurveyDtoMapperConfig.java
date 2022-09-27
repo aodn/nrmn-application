@@ -1,9 +1,9 @@
 package au.org.aodn.nrmn.restapi.controller.mapping;
 
-import au.org.aodn.nrmn.db.model.Diver;
-import au.org.aodn.nrmn.db.model.Survey;
-import au.org.aodn.nrmn.db.repository.DiverRepository;
-import au.org.aodn.nrmn.db.repository.SurveyMethodRepository;
+import au.org.aodn.nrmn.restapi.data.model.Diver;
+import au.org.aodn.nrmn.restapi.data.model.Survey;
+import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SurveyMethodRepository;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
 
 import org.modelmapper.Converter;

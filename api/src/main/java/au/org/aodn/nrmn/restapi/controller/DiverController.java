@@ -21,11 +21,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import au.org.aodn.nrmn.db.model.Diver;
-import au.org.aodn.nrmn.db.model.DiverListView;
-import au.org.aodn.nrmn.db.repository.DiverListRepository;
-import au.org.aodn.nrmn.db.repository.DiverRepository;
-import au.org.aodn.nrmn.db.repository.dynamicQuery.FilterCondition;
+import au.org.aodn.nrmn.restapi.data.model.Diver;
+import au.org.aodn.nrmn.restapi.data.model.DiverListView;
+import au.org.aodn.nrmn.restapi.data.repository.DiverListRepository;
+import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.data.repository.dynamicQuery.FilterCondition;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.validation.RowError;
 import au.org.aodn.nrmn.restapi.dto.diver.DiverDto;

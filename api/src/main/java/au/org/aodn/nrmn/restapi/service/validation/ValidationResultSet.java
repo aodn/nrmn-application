@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
-import au.org.aodn.nrmn.db.model.enums.ValidationCategory;
-import au.org.aodn.nrmn.db.model.enums.ValidationLevel;
+import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
+import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 
 public class ValidationResultSet {

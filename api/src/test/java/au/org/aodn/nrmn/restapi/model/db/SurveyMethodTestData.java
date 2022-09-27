@@ -3,13 +3,13 @@ package au.org.aodn.nrmn.restapi.model.db;
 import java.util.HashMap;
 import java.util.Map;
 
-import au.org.aodn.nrmn.db.model.Survey;
-import au.org.aodn.nrmn.db.model.SurveyMethodEntity;
-import au.org.aodn.nrmn.db.model.SurveyMethodEntity.SurveyMethodEntityBuilder;
-import au.org.aodn.nrmn.db.repository.SurveyMethodRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import au.org.aodn.nrmn.restapi.data.model.Survey;
+import au.org.aodn.nrmn.restapi.data.model.SurveyMethodEntity;
+import au.org.aodn.nrmn.restapi.data.model.SurveyMethodEntity.SurveyMethodEntityBuilder;
+import au.org.aodn.nrmn.restapi.data.repository.SurveyMethodRepository;
 
 @Component
 public class SurveyMethodTestData {

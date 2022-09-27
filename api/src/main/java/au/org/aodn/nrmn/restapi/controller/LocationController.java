@@ -19,11 +19,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import au.org.aodn.nrmn.db.model.Location;
-import au.org.aodn.nrmn.db.model.LocationListView;
-import au.org.aodn.nrmn.db.repository.LocationListRepository;
-import au.org.aodn.nrmn.db.repository.LocationRepository;
-import au.org.aodn.nrmn.db.repository.dynamicQuery.FilterCondition;
+import au.org.aodn.nrmn.restapi.data.model.Location;
+import au.org.aodn.nrmn.restapi.data.model.LocationListView;
+import au.org.aodn.nrmn.restapi.data.repository.LocationListRepository;
+import au.org.aodn.nrmn.restapi.data.repository.LocationRepository;
+import au.org.aodn.nrmn.restapi.data.repository.dynamicQuery.FilterCondition;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.validation.RowError;
 import au.org.aodn.nrmn.restapi.dto.location.LocationDto;

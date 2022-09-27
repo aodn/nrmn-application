@@ -1,11 +1,11 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.db.model.Diver;
-import au.org.aodn.nrmn.db.model.Diver.DiverBuilder;
-import au.org.aodn.nrmn.db.repository.DiverRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import au.org.aodn.nrmn.restapi.data.model.Diver;
+import au.org.aodn.nrmn.restapi.data.model.Diver.DiverBuilder;
+import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
 
 @Component
 public class DiverTestData {

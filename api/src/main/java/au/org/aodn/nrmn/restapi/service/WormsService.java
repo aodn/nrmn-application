@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import au.org.aodn.nrmn.db.model.ObservableItem;
-import au.org.aodn.nrmn.db.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
+import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.dto.species.SpeciesRecordDto;
 
 import org.apache.commons.lang3.StringUtils;

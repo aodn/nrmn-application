@@ -1,11 +1,11 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.db.model.Location;
-import au.org.aodn.nrmn.db.model.Location.LocationBuilder;
-import au.org.aodn.nrmn.db.repository.LocationRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import au.org.aodn.nrmn.restapi.data.model.Location;
+import au.org.aodn.nrmn.restapi.data.model.Location.LocationBuilder;
+import au.org.aodn.nrmn.restapi.data.repository.LocationRepository;
 
 @Component
 public class LocationTestData {

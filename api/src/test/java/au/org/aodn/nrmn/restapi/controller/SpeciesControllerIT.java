@@ -1,8 +1,8 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.db.model.ObsItemType;
-import au.org.aodn.nrmn.db.model.ObservableItem;
-import au.org.aodn.nrmn.db.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.data.model.ObsItemType;
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
+import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.model.db.ObsItemTypeTestData;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;

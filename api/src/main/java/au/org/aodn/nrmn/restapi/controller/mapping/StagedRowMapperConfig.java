@@ -7,8 +7,8 @@ import java.util.Optional;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 
-import au.org.aodn.nrmn.db.model.ObservableItem;
-import au.org.aodn.nrmn.db.model.StagedRow;
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 public class StagedRowMapperConfig {

@@ -7,8 +7,8 @@ import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
 
-import au.org.aodn.nrmn.db.model.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
+import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 class Method3QuadratMax50Test extends FormattedTestProvider {

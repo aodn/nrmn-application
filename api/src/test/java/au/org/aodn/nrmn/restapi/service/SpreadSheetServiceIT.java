@@ -3,9 +3,10 @@ package au.org.aodn.nrmn.restapi.service;
 import java.io.InputStream;
 import java.util.List;
 
-import au.org.aodn.nrmn.db.model.StagedRow;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
+import au.org.aodn.nrmn.restapi.enums.SurveyField;
 import au.org.aodn.nrmn.restapi.controller.StagedJobController;
-import au.org.aodn.nrmn.restapi.enumeration.SurveyField;
+
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

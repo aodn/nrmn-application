@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.db.model.*;
+import au.org.aodn.nrmn.restapi.data.model.*;
 import au.org.aodn.nrmn.restapi.model.db.DiverTestData;
 import au.org.aodn.nrmn.restapi.model.db.ObservationTestData;
 import au.org.aodn.nrmn.restapi.model.db.SurveyMethodTestData;

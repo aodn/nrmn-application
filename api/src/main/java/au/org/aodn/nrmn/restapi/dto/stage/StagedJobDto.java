@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 
-import au.org.aodn.nrmn.db.model.StagedJobLog;
-import au.org.aodn.nrmn.db.model.enums.SourceJobType;
-import au.org.aodn.nrmn.db.model.enums.StatusJobType;
+import au.org.aodn.nrmn.restapi.data.model.StagedJobLog;
+import au.org.aodn.nrmn.restapi.enums.SourceJobType;
+import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 import lombok.Builder;
 import lombok.Data;
 

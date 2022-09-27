@@ -9,10 +9,10 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
-import au.org.aodn.nrmn.db.model.ObsItemType;
-import au.org.aodn.nrmn.db.model.ObservableItem;
-import au.org.aodn.nrmn.db.model.enums.ProgramValidation;
+import au.org.aodn.nrmn.restapi.data.model.ObsItemType;
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
+import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 class MissingDataCheckTest extends FormattedTestProvider {

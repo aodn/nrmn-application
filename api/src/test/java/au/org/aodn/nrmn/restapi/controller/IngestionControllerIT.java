@@ -1,10 +1,10 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.db.model.SecUser;
-import au.org.aodn.nrmn.db.model.StagedJob;
-import au.org.aodn.nrmn.db.model.enums.StatusJobType;
-import au.org.aodn.nrmn.db.repository.ObservationRepository;
-import au.org.aodn.nrmn.db.repository.StagedJobRepository;
+import au.org.aodn.nrmn.restapi.data.model.SecUser;
+import au.org.aodn.nrmn.restapi.data.model.StagedJob;
+import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
+import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.RestApiApplication;
 import au.org.aodn.nrmn.restapi.controller.utils.RequestWrapper;
 import au.org.aodn.nrmn.restapi.security.JwtTokenProvider;

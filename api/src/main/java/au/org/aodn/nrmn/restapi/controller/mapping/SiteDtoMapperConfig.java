@@ -1,8 +1,8 @@
 package au.org.aodn.nrmn.restapi.controller.mapping;
 
-import au.org.aodn.nrmn.db.model.Location;
-import au.org.aodn.nrmn.db.model.Site;
-import au.org.aodn.nrmn.db.repository.LocationRepository;
+import au.org.aodn.nrmn.restapi.data.model.Location;
+import au.org.aodn.nrmn.restapi.data.model.Site;
+import au.org.aodn.nrmn.restapi.data.repository.LocationRepository;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.dto.site.SiteDto;
 

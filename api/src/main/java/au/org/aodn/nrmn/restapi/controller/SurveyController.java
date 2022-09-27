@@ -5,16 +5,16 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import au.org.aodn.nrmn.db.model.Observation;
-import au.org.aodn.nrmn.db.model.Program;
-import au.org.aodn.nrmn.db.model.Survey;
-import au.org.aodn.nrmn.db.repository.ObservationRepository;
-import au.org.aodn.nrmn.db.repository.ProgramRepository;
-import au.org.aodn.nrmn.db.repository.SurveyRepository;
-import au.org.aodn.nrmn.db.repository.dynamicQuery.FilterCondition;
-import au.org.aodn.nrmn.db.repository.dynamicQuery.ObservationFilterCondition;
-import au.org.aodn.nrmn.db.repository.dynamicQuery.SurveyFilterCondition;
-import au.org.aodn.nrmn.db.repository.projections.SurveyRowDivers;
+import au.org.aodn.nrmn.restapi.data.model.Observation;
+import au.org.aodn.nrmn.restapi.data.model.Program;
+import au.org.aodn.nrmn.restapi.data.model.Survey;
+import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.data.repository.ProgramRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.data.repository.dynamicQuery.FilterCondition;
+import au.org.aodn.nrmn.restapi.data.repository.dynamicQuery.ObservationFilterCondition;
+import au.org.aodn.nrmn.restapi.data.repository.dynamicQuery.SurveyFilterCondition;
+import au.org.aodn.nrmn.restapi.data.repository.projections.SurveyRowDivers;
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
 

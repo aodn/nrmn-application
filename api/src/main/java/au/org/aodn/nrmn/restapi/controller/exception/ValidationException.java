@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller.exception;
 
-import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
+import au.org.aodn.nrmn.restapi.controller.validation.FormValidationError;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,10 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 public class ValidationException extends RuntimeException {
 
-    private final List<ValidationError> errors;
+    private final List<FormValidationError> errors;
 
     public ValidationException(String object, String property, String message) {
-        ValidationError error = new ValidationError(object, property, null, message);
+        FormValidationError error = new FormValidationError(object, property, null, message);
         this.errors = Collections.singletonList(error);
     }
 
