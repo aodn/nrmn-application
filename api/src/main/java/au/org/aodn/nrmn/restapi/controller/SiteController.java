@@ -7,9 +7,7 @@ import javax.validation.Valid;
 
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
-import au.org.aodn.nrmn.restapi.model.db.SiteListView;
-import au.org.aodn.nrmn.restapi.repository.*;
-import au.org.aodn.nrmn.restapi.repository.dynamicQuery.FilterCondition;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -31,12 +29,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import au.org.aodn.nrmn.db.model.Site;
+import au.org.aodn.nrmn.db.model.SiteListView;
+import au.org.aodn.nrmn.db.repository.*;
+import au.org.aodn.nrmn.db.repository.dynamicQuery.FilterCondition;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
 import au.org.aodn.nrmn.restapi.dto.site.SiteDto;
 import au.org.aodn.nrmn.restapi.dto.site.SiteGetDto;
 import au.org.aodn.nrmn.restapi.dto.site.SiteOptionsDto;
-import au.org.aodn.nrmn.restapi.model.db.Site;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController

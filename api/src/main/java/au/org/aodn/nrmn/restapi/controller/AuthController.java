@@ -1,11 +1,11 @@
 package au.org.aodn.nrmn.restapi.controller;
 
+import au.org.aodn.nrmn.db.model.audit.UserActionAudit;
+import au.org.aodn.nrmn.db.repository.SecRoleRepository;
+import au.org.aodn.nrmn.db.repository.SecUserRepository;
+import au.org.aodn.nrmn.db.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.dto.auth.LoginRequest;
 import au.org.aodn.nrmn.restapi.dto.payload.JwtAuthenticationResponse;
-import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
-import au.org.aodn.nrmn.restapi.repository.SecRoleRepository;
-import au.org.aodn.nrmn.restapi.repository.SecUserRepository;
-import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.security.JwtTokenProvider;
 import au.org.aodn.nrmn.restapi.util.LogInfo;
 import io.swagger.v3.oas.annotations.Operation;

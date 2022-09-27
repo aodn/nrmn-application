@@ -1,7 +1,9 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem.ObservableItemBuilder;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.db.model.ObservableItem;
+import au.org.aodn.nrmn.db.model.ObservableItem.ObservableItemBuilder;
+import au.org.aodn.nrmn.db.repository.ObservableItemRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

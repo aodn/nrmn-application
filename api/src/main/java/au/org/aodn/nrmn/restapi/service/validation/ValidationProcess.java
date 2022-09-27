@@ -27,24 +27,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import au.org.aodn.nrmn.db.model.ObservableItem;
+import au.org.aodn.nrmn.db.model.StagedJob;
+import au.org.aodn.nrmn.db.model.StagedRow;
+import au.org.aodn.nrmn.db.model.UiSpeciesAttributes;
+import au.org.aodn.nrmn.db.model.enums.Directions;
+import au.org.aodn.nrmn.db.model.enums.ProgramValidation;
+import au.org.aodn.nrmn.db.model.enums.ValidationCategory;
+import au.org.aodn.nrmn.db.model.enums.ValidationLevel;
+import au.org.aodn.nrmn.db.repository.DiverRepository;
+import au.org.aodn.nrmn.db.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.db.repository.ObservationRepository;
+import au.org.aodn.nrmn.db.repository.SiteRepository;
+import au.org.aodn.nrmn.db.repository.StagedRowRepository;
+import au.org.aodn.nrmn.db.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
-import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
-import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
-import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
-import au.org.aodn.nrmn.restapi.repository.DiverRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedRowRepository;
-import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.util.TimeUtils;
 
 @Component

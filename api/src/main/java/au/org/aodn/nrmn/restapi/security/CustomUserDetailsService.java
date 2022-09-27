@@ -1,8 +1,9 @@
 package au.org.aodn.nrmn.restapi.security;
 
-import au.org.aodn.nrmn.restapi.model.db.SecUser;
-import au.org.aodn.nrmn.restapi.model.db.enums.SecUserStatus;
-import au.org.aodn.nrmn.restapi.repository.SecUserRepository;
+import au.org.aodn.nrmn.db.model.SecUser;
+import au.org.aodn.nrmn.db.model.enums.SecUserStatus;
+import au.org.aodn.nrmn.db.repository.SecUserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -1,7 +1,9 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.model.db.Method.MethodBuilder;
-import au.org.aodn.nrmn.restapi.repository.MethodRepository;
+import au.org.aodn.nrmn.db.model.Method;
+import au.org.aodn.nrmn.db.model.Method.MethodBuilder;
+import au.org.aodn.nrmn.db.repository.MethodRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

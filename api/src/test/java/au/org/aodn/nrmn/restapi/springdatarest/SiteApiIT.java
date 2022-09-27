@@ -18,11 +18,11 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.test.context.support.WithUserDetails;
 
-import au.org.aodn.nrmn.restapi.model.db.Location;
+import au.org.aodn.nrmn.db.model.Location;
+import au.org.aodn.nrmn.db.model.Site;
+import au.org.aodn.nrmn.db.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.model.db.LocationTestData;
-import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.SiteTestData;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;

@@ -11,13 +11,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import au.org.aodn.nrmn.db.model.StagedJob;
+import au.org.aodn.nrmn.db.model.StagedRow;
+import au.org.aodn.nrmn.db.model.enums.ProgramValidation;
+import au.org.aodn.nrmn.db.repository.DiverRepository;
+import au.org.aodn.nrmn.db.repository.ObservationRepository;
+import au.org.aodn.nrmn.db.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.repository.DiverRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 

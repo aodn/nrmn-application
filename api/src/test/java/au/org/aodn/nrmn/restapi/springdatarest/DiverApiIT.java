@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.springdatarest;
 
-import au.org.aodn.nrmn.restapi.model.db.Diver;
+import au.org.aodn.nrmn.db.model.Diver;
 import au.org.aodn.nrmn.restapi.model.db.DiverTestData;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;

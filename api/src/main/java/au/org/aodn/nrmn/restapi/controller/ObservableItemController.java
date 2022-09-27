@@ -11,9 +11,7 @@ import javax.validation.Valid;
 
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
-import au.org.aodn.nrmn.restapi.model.db.ObservationItemListView;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemListRepository;
-import au.org.aodn.nrmn.restapi.repository.dynamicQuery.FilterCondition;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -29,14 +27,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import au.org.aodn.nrmn.db.model.ObservableItem;
+import au.org.aodn.nrmn.db.model.ObservationItemListView;
+import au.org.aodn.nrmn.db.repository.ObservableItemListRepository;
+import au.org.aodn.nrmn.db.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.db.repository.dynamicQuery.FilterCondition;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.exception.ValidationException;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemGetDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemPutDto;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController

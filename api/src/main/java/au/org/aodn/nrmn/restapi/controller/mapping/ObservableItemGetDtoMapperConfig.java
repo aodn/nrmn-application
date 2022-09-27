@@ -1,9 +1,9 @@
 package au.org.aodn.nrmn.restapi.controller.mapping;
 
+import au.org.aodn.nrmn.db.model.ObservableItem;
+import au.org.aodn.nrmn.db.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.db.repository.projections.ObservableItemSuperseded;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemGetDto;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemSuperseded;
 
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;

@@ -5,10 +5,14 @@ import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedJob.StagedJobBuilder;
-import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
-import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
-import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
+import au.org.aodn.nrmn.db.model.Program;
+import au.org.aodn.nrmn.db.model.SecUser;
+import au.org.aodn.nrmn.db.model.StagedJob;
+import au.org.aodn.nrmn.db.model.StagedRow;
+import au.org.aodn.nrmn.db.model.StagedJob.StagedJobBuilder;
+import au.org.aodn.nrmn.db.model.enums.SourceJobType;
+import au.org.aodn.nrmn.db.model.enums.StatusJobType;
+import au.org.aodn.nrmn.db.repository.StagedJobRepository;
 
 @Component
 public class StagedJobTestData {

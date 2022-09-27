@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -22,16 +21,17 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import au.org.aodn.nrmn.db.model.Diver;
+import au.org.aodn.nrmn.db.model.Site;
+import au.org.aodn.nrmn.db.model.Survey;
+import au.org.aodn.nrmn.db.model.enums.Directions;
+import au.org.aodn.nrmn.db.repository.DiverRepository;
+import au.org.aodn.nrmn.db.repository.ProgramRepository;
+import au.org.aodn.nrmn.db.repository.SiteRepository;
+import au.org.aodn.nrmn.db.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
-import au.org.aodn.nrmn.restapi.model.db.Diver;
-import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.model.db.Survey;
-import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
-import au.org.aodn.nrmn.restapi.repository.DiverRepository;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
 
 @Service
 public class SurveyEditService {

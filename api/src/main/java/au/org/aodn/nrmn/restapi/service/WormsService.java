@@ -1,8 +1,8 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.service.model.SpeciesRecord;
+import au.org.aodn.nrmn.db.model.ObservableItem;
+import au.org.aodn.nrmn.db.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.dto.species.SpeciesRecordDto;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,28 +38,28 @@ public class WormsService {
         this.wormsClient = wormsClient;
     }
 
-    public List<SpeciesRecord> partialSearch(final int page, final int pageSize, final String searchTerm) {
+    public List<SpeciesRecordDto> partialSearch(final int page, final int pageSize, final String searchTerm) {
 
         try {
-            List<SpeciesRecord> records = new ArrayList<>();
+            List<SpeciesRecordDto> records = new ArrayList<>();
             Boolean done = Boolean.FALSE;
             int itemRemain = pageSize;
             final AtomicInteger p = new AtomicInteger(page);
             final AtomicInteger pz = new AtomicInteger(pageSize);
 
             while(!done) {
-                Mono<SpeciesRecord[]> response = wormsClient
+                Mono<SpeciesRecordDto[]> response = wormsClient
                         .get().uri(uriBuilder -> uriBuilder.path("/AphiaRecordsByName/" + removeTrailingJunk(searchTerm))
                                 .queryParam("like", true)
                                 .queryParam("marine_only", true)
                                 .queryParam("offset", p.get() * pz.get() + 1)
                                 .build())
                         .retrieve()
-                        .bodyToMono(SpeciesRecord[].class);
+                        .bodyToMono(SpeciesRecordDto[].class);
 
-                SpeciesRecord[] matchingSpecies = Optional.ofNullable(response.block()).orElse(new SpeciesRecord[0]);
+                SpeciesRecordDto[] matchingSpecies = Optional.ofNullable(response.block()).orElse(new SpeciesRecordDto[0]);
 
-                List<SpeciesRecord> i = Arrays.stream(matchingSpecies)
+                List<SpeciesRecordDto> i = Arrays.stream(matchingSpecies)
                         .map(m -> {
                             m.setIsPresent(StringUtils.isNotEmpty(m.getScientificName())
                                     ? observableItemRepository.count(Example.of(

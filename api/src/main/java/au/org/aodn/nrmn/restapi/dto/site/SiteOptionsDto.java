@@ -2,7 +2,7 @@ package au.org.aodn.nrmn.restapi.dto.site;
 
 import java.util.List;
 
-import au.org.aodn.nrmn.restapi.model.db.Location;
+import au.org.aodn.nrmn.db.model.Location;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

@@ -1,12 +1,5 @@
 package au.org.aodn.nrmn.restapi.service.validation;
 
-import au.org.aodn.nrmn.restapi.model.db.Diver;
-import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
-import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
-
 import lombok.Data;
 import lombok.Getter;
 import lombok.Builder;
@@ -18,6 +11,13 @@ import java.time.LocalTime;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import au.org.aodn.nrmn.db.model.Diver;
+import au.org.aodn.nrmn.db.model.ObservableItem;
+import au.org.aodn.nrmn.db.model.Site;
+import au.org.aodn.nrmn.db.model.StagedRow;
+import au.org.aodn.nrmn.db.model.UiSpeciesAttributes;
+import au.org.aodn.nrmn.db.model.enums.Directions;
 
 @Data
 @Getter

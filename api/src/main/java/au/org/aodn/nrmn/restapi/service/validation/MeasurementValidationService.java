@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import au.org.aodn.nrmn.db.model.UiSpeciesAttributes;
+import au.org.aodn.nrmn.db.model.enums.ValidationCategory;
+import au.org.aodn.nrmn.db.model.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
-import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
-import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
-import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 
 @Service
 public class MeasurementValidationService {

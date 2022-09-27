@@ -1,11 +1,11 @@
 
 package au.org.aodn.nrmn.restapi.controller.mapping;
 
+import au.org.aodn.nrmn.db.model.ObsItemType;
+import au.org.aodn.nrmn.db.model.ObservableItem;
+import au.org.aodn.nrmn.db.repository.ObsItemTypeRepository;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemPutDto;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.ObsItemType;
-import au.org.aodn.nrmn.restapi.repository.ObsItemTypeRepository;
 
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;

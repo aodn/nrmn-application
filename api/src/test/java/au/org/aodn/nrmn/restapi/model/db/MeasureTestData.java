@@ -1,7 +1,9 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.model.db.Measure.MeasureBuilder;
-import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
+import au.org.aodn.nrmn.db.model.Measure;
+import au.org.aodn.nrmn.db.model.Measure.MeasureBuilder;
+import au.org.aodn.nrmn.db.repository.MeasureRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

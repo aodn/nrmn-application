@@ -9,10 +9,10 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
+import au.org.aodn.nrmn.db.model.ObservableItem;
+import au.org.aodn.nrmn.db.model.enums.ProgramValidation;
+import au.org.aodn.nrmn.db.model.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 class DebrisZeroObsTest extends FormattedTestProvider {

@@ -16,8 +16,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import au.org.aodn.nrmn.restapi.model.db.Survey;
-import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
+import au.org.aodn.nrmn.db.model.Survey;
+import au.org.aodn.nrmn.db.repository.SurveyRepository;
 
 @Service
 public class PQSurveyService {

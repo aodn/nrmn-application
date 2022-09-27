@@ -11,9 +11,7 @@ import javax.validation.Valid;
 
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
-import au.org.aodn.nrmn.restapi.model.db.DiverListView;
-import au.org.aodn.nrmn.restapi.repository.DiverListRepository;
-import au.org.aodn.nrmn.restapi.repository.dynamicQuery.FilterCondition;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +21,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import au.org.aodn.nrmn.db.model.Diver;
+import au.org.aodn.nrmn.db.model.DiverListView;
+import au.org.aodn.nrmn.db.repository.DiverListRepository;
+import au.org.aodn.nrmn.db.repository.DiverRepository;
+import au.org.aodn.nrmn.db.repository.dynamicQuery.FilterCondition;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.validation.RowError;
 import au.org.aodn.nrmn.restapi.dto.diver.DiverDto;
-import au.org.aodn.nrmn.restapi.model.db.Diver;
-import au.org.aodn.nrmn.restapi.repository.DiverRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;

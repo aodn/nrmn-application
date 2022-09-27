@@ -6,12 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import au.org.aodn.nrmn.db.model.StagedRow;
 import au.org.aodn.nrmn.restapi.enumeration.SurveyField;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
 import lombok.Value;
 
 public class SurveyContentsHandler implements SheetContentsHandler {

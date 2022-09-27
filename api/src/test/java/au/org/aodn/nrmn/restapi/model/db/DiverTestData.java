@@ -1,7 +1,9 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.model.db.Diver.DiverBuilder;
-import au.org.aodn.nrmn.restapi.repository.DiverRepository;
+import au.org.aodn.nrmn.db.model.Diver;
+import au.org.aodn.nrmn.db.model.Diver.DiverBuilder;
+import au.org.aodn.nrmn.db.repository.DiverRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

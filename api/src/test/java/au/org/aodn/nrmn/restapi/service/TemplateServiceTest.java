@@ -20,18 +20,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Example;
 
-import au.org.aodn.nrmn.restapi.model.db.Diver;
-import au.org.aodn.nrmn.restapi.model.db.Location;
-import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
-import au.org.aodn.nrmn.restapi.repository.DiverRepository;
-import au.org.aodn.nrmn.restapi.repository.LetterCodeRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import au.org.aodn.nrmn.restapi.repository.projections.LetterCodeMapping;
-import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
-import au.org.aodn.nrmn.restapi.repository.projections.SpeciesWithAttributesCsvRow;
+import au.org.aodn.nrmn.db.model.Diver;
+import au.org.aodn.nrmn.db.model.Location;
+import au.org.aodn.nrmn.db.model.Site;
+import au.org.aodn.nrmn.db.model.UiSpeciesAttributes;
+import au.org.aodn.nrmn.db.repository.DiverRepository;
+import au.org.aodn.nrmn.db.repository.LetterCodeRepository;
+import au.org.aodn.nrmn.db.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.db.repository.ObservationRepository;
+import au.org.aodn.nrmn.db.repository.SiteRepository;
+import au.org.aodn.nrmn.db.repository.projections.LetterCodeMapping;
+import au.org.aodn.nrmn.db.repository.projections.ObservableItemRow;
+import au.org.aodn.nrmn.db.repository.projections.SpeciesWithAttributesCsvRow;
 
 @ExtendWith(MockitoExtension.class)
 public class TemplateServiceTest {

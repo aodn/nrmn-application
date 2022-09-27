@@ -17,15 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import au.org.aodn.nrmn.db.model.ObservableItem;
+import au.org.aodn.nrmn.db.repository.HabitatGroupRepository;
+import au.org.aodn.nrmn.db.repository.ObsItemTypeRepository;
+import au.org.aodn.nrmn.db.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.db.repository.ReportGroupRepository;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemOptionsDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemTaxonomyDto;
 import au.org.aodn.nrmn.restapi.dto.species.SpeciesDto;
 import au.org.aodn.nrmn.restapi.dto.species.SpeciesSearchType;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.repository.HabitatGroupRepository;
-import au.org.aodn.nrmn.restapi.repository.ObsItemTypeRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.repository.ReportGroupRepository;
 import au.org.aodn.nrmn.restapi.service.WormsService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 

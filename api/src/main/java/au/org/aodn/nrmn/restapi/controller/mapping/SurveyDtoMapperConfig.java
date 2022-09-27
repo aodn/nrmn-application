@@ -1,10 +1,11 @@
 package au.org.aodn.nrmn.restapi.controller.mapping;
 
+import au.org.aodn.nrmn.db.model.Diver;
+import au.org.aodn.nrmn.db.model.Survey;
+import au.org.aodn.nrmn.db.repository.DiverRepository;
+import au.org.aodn.nrmn.db.repository.SurveyMethodRepository;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
-import au.org.aodn.nrmn.restapi.model.db.Diver;
-import au.org.aodn.nrmn.restapi.model.db.Survey;
-import au.org.aodn.nrmn.restapi.repository.DiverRepository;
-import au.org.aodn.nrmn.restapi.repository.SurveyMethodRepository;
+
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

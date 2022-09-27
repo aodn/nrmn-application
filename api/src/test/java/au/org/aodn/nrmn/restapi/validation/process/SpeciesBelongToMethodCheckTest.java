@@ -1,9 +1,9 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
+import au.org.aodn.nrmn.db.model.Method;
+import au.org.aodn.nrmn.db.model.ObservableItem;
+import au.org.aodn.nrmn.db.model.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
-import au.org.aodn.nrmn.restapi.model.db.Method;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 import org.junit.jupiter.api.Test;

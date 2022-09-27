@@ -1,6 +1,10 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.restapi.model.db.*;
+import au.org.aodn.nrmn.db.model.*;
+import au.org.aodn.nrmn.restapi.model.db.DiverTestData;
+import au.org.aodn.nrmn.restapi.model.db.ObservationTestData;
+import au.org.aodn.nrmn.restapi.model.db.SurveyMethodTestData;
+import au.org.aodn.nrmn.restapi.model.db.SurveyTestData;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;

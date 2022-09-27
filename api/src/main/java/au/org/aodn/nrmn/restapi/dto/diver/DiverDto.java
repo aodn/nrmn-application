@@ -1,11 +1,12 @@
 package au.org.aodn.nrmn.restapi.dto.diver;
 
-import au.org.aodn.nrmn.restapi.model.db.Diver;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;
+
+import au.org.aodn.nrmn.db.model.Diver;
 
 @Data
 @NoArgsConstructor
