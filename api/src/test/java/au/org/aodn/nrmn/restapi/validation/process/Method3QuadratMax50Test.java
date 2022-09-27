@@ -6,12 +6,18 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 class Method3QuadratMax50Test extends FormattedTestProvider {
+
+    @InjectMocks
+    MeasurementValidation measurementValidation;
+    
     @Test
     public void outOfScopeShouldSuccess() {
         StagedRowFormatted formatted = getDefaultFormatted().build();

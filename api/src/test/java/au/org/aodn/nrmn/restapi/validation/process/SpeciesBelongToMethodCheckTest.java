@@ -4,9 +4,11 @@ import au.org.aodn.nrmn.restapi.data.model.Method;
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -18,6 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SpeciesBelongToMethodCheckTest extends FormattedTestProvider {
+    
+    @Mock
+    MeasurementValidation measurementValidation;
 
     @Test
     public void matchingMethodShouldSuccess() {

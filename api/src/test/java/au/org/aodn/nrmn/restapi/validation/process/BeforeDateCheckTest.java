@@ -10,12 +10,14 @@ import java.util.Collection;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 
@@ -24,6 +26,9 @@ class BeforeDateCheckTest {
 
     @InjectMocks
     ValidationProcess validationProcess;
+
+    @Mock
+    MeasurementValidation measurementValidation;
     
     @Test
     void beforeDateShouldSucceed() throws Exception {

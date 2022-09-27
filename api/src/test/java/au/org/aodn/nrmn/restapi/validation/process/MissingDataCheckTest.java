@@ -7,15 +7,21 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import au.org.aodn.nrmn.restapi.data.model.ObsItemType;
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 class MissingDataCheckTest extends FormattedTestProvider {
+    
+    @InjectMocks
+    MeasurementValidation measurementValidation;
+    
     @Test
     public void noSpeciesFoundWithNoObservationsShouldSucceed() {
         StagedRowFormatted formatted = getDefaultFormatted().build();
@@ -59,14 +65,14 @@ class MissingDataCheckTest extends FormattedTestProvider {
 
     @Test
     public void speciesWithNoObservationsShouldFail() {
-        StagedRowFormatted formatted = getDefaultFormatted().build();
+        var formatted = getDefaultFormatted().build();
         formatted.setMeasureJson(ImmutableMap.<Integer, Integer>builder().build());
         formatted.setTotal(0);
         formatted.setCode("pla");
         formatted.setSpecies(
                 Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build())
                         .observableItemName("Pictilabrus laticlavius").letterCode("pla").build()));
-        Collection<ValidationCell> errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, formatted);
+        var errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, formatted);
         assertFalse(errors.isEmpty());
     }
 }

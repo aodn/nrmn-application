@@ -8,14 +8,19 @@ import java.util.HashMap;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 class DebrisZeroObsTest extends FormattedTestProvider {
+
+    @InjectMocks
+    MeasurementValidation measurementValidation;
 
     @Test
     public void debrisWithNoValueShouldBeOK() {

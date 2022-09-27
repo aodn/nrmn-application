@@ -7,13 +7,18 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 class ZeroInvertsTest extends FormattedTestProvider {
 
+    @Mock
+    MeasurementValidation measurementValidation;
+    
     @Test
     void method3WithInvertsShouldSucceed() {
         StagedRowFormatted formatted = getDefaultFormatted().build();
