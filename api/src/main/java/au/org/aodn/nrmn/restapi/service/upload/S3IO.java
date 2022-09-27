@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.service;
+package au.org.aodn.nrmn.restapi.service.upload;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;

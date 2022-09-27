@@ -69,11 +69,10 @@ public class ValidationProcess {
     SurveyRepository surveyRepository;
 
     @Autowired
-    MeasurementValidationService measurementValidationService;
+    MeasurementValidation speciesMeasurement;
 
     private static final int INVALID_INT = Integer.MIN_VALUE;
     private static final double INVALID_DOUBLE = Double.NEGATIVE_INFINITY;
-    private static final int OBS_ITEM_TYPE_NO_SPECIES_FOUND = 6;
     private static final Integer[] METHODS_TO_CHECK = { 0, 1, 2, 7, 10 };
     private static final Pattern VALID_DEPTH_SURVEY_NUM = Pattern.compile("^[0-9]+(\\.[0-9])?$");
     private static final LocalDate DATE_MIN_RLS = LocalDate.parse("2006-01-01");
@@ -279,62 +278,6 @@ public class ValidationProcess {
         }
 
         return errors.getAll();
-    }
-
-    private Boolean validateRowZeroOrOneInvertsTotal(StagedRowFormatted row, Integer observationTotal) {
-        if (row.getInverts() == null || row.getTotal() == null)
-            return false;
-        if (!(row.getInverts() == row.getTotal() && row.getTotal() == observationTotal))
-            return false;
-        return observationTotal == 0 || observationTotal == 1;
-    }
-
-    public Collection<ValidationCell> validateMeasurements(ProgramValidation validation, StagedRowFormatted row) {
-        var errors = new ArrayList<ValidationCell>();
-
-        if (row.getMeasureJson() == null)
-            return errors;
-
-        var observationTotal = row.getMeasureJson().entrySet().stream().map(Map.Entry::getValue).reduce(0,
-                Integer::sum) + (row.getInverts() != null ? row.getInverts() : 0);
-
-        // VALIDATION: Debris Zero observations
-        if (row.isDebrisZero() && !validateRowZeroOrOneInvertsTotal(row, observationTotal)) {
-            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING,
-                    "Debris has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
-        }
-
-        // VALIDATION: Record has no data and but not flagged as 'Survey Not Done' or
-        // 'No Species Found'
-        if (observationTotal < 1 && !row.isDebrisZero() && !row.isSurveyNotDone() && !(row.getSpecies().isPresent()
-                && row.getSpecies().get().getObsItemType() != null
-                && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND)) {
-
-            // VALIDATION: At least one value recorded in any of the size class columns or
-            // in the column Inverts
-            if (row.getInverts() != null) {
-                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING,
-                        "Record has no data and but not flagged as 'Survey Not Done' or 'No Species Found'",
-                        row.getId(), "total"));
-            } else {
-                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING,
-                        "Record has no data and no value recorded for inverts", row.getId(), "inverts"));
-            }
-        } else if (row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType() != null
-                && row.getSpecies().get().getObsItemType().getObsItemTypeId() == OBS_ITEM_TYPE_NO_SPECIES_FOUND
-                && !validateRowZeroOrOneInvertsTotal(row, observationTotal)) {
-            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING,
-                    "'No Species Found' has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
-        } else if (row.isSurveyNotDone() && !validateRowZeroOrOneInvertsTotal(row, observationTotal)) {
-            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING,
-                    "'Survey Not Done' has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
-        }
-        // VALIDATION: Abundance CheckSums
-        if (errors.size() < 1 && row.getTotal() != null && !row.getTotal().equals(observationTotal))
-            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING,
-                    "Calculated total is " + observationTotal, row.getId(), "total"));
-
-        return errors;
     }
 
     private ValidationCell validateSpeciesBelowToMethod(StagedRowFormatted row) {
@@ -628,13 +571,13 @@ public class ValidationProcess {
         /** Row-level Checks */
         for (var row : rows) {
 
-            // FUTURE: move these checks to the `MeasurementValidationService`
+            // Validate measurements if species attributes are present
             var speciesAttrib = row.getSpeciesAttributesOpt();
             if (speciesAttrib.isPresent())
-                results.addAll(measurementValidationService.validate(speciesAttrib.get(), row, isExtended), false);
+                results.addAll(speciesMeasurement.validate(speciesAttrib.get(), row, isExtended), false);
 
             // Total Checksum & Missing Data
-            results.addAll(validateMeasurements(validation, row), false);
+            results.addAll(speciesMeasurement.validateMeasurements(validation, row), false);
 
             // Row Method is valid for species
             results.add(validateSpeciesBelowToMethod(row), false);

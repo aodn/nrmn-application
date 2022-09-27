@@ -10,11 +10,13 @@ import org.springframework.stereotype.Service;
 
 import au.org.aodn.nrmn.restapi.data.model.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
+import au.org.aodn.nrmn.restapi.enums.ObservableItemType;
+import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 
 @Service
-public class MeasurementValidationService {
+public class MeasurementValidation {
 
     private static final double[] FISH_VALUES = { 2.5, 5, 7.5, 10, 12.5, 15, 20, 25, 30, 35, 40, 50, 62.5, 75, 87.5,
             100, 112.5, 125, 137.5, 150, 162.5, 175, 187.5, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750,
@@ -22,6 +24,62 @@ public class MeasurementValidationService {
 
     private static final double[] INVERT_VALUES = { 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5,
             9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 16, 17, 18, 19, 20, 22, 24, 26, 28, 30 };
+
+    private Boolean validateRowZeroOrOneInvertsTotal(StagedRowFormatted row, Integer observationTotal) {
+        if (row.getInverts() == null || row.getTotal() == null)
+            return false;
+        if (!(row.getInverts() == row.getTotal() && row.getTotal() == observationTotal))
+            return false;
+        return observationTotal == 0 || observationTotal == 1;
+    }
+
+    public Collection<ValidationCell> validateMeasurements(ProgramValidation validation, StagedRowFormatted row) {
+        var errors = new ArrayList<ValidationCell>();
+
+        if (row.getMeasureJson() == null)
+            return errors;
+
+        var observationTotal = row.getMeasureJson().entrySet().stream().map(Map.Entry::getValue).reduce(0,
+                Integer::sum) + (row.getInverts() != null ? row.getInverts() : 0);
+
+        // VALIDATION: Debris Zero observations
+        if (row.isDebrisZero() && !validateRowZeroOrOneInvertsTotal(row, observationTotal)) {
+            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING,
+                    "Debris has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
+        }
+
+        // VALIDATION: Record has no data and but not flagged as 'Survey Not Done' or
+        // 'No Species Found'
+        if (observationTotal < 1 && !row.isDebrisZero() && !row.isSurveyNotDone() && !(row.getSpecies().isPresent()
+                && row.getSpecies().get().getObsItemType() != null
+                && row.getSpecies().get().getObsItemType().getObsItemTypeId() == ObservableItemType.NoSpeciesFound)) {
+
+            // VALIDATION: At least one value recorded in any of the size class columns or
+            // in the column Inverts
+            if (row.getInverts() != null) {
+                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING,
+                        "Record has no data and but not flagged as 'Survey Not Done' or 'No Species Found'",
+                        row.getId(), "total"));
+            } else {
+                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING,
+                        "Record has no data and no value recorded for inverts", row.getId(), "inverts"));
+            }
+        } else if (row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType() != null
+                && row.getSpecies().get().getObsItemType().getObsItemTypeId() == ObservableItemType.NoSpeciesFound
+                && !validateRowZeroOrOneInvertsTotal(row, observationTotal)) {
+            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING,
+                    "'No Species Found' has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
+        } else if (row.isSurveyNotDone() && !validateRowZeroOrOneInvertsTotal(row, observationTotal)) {
+            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING,
+                    "'Survey Not Done' has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
+        }
+        // VALIDATION: Abundance CheckSums
+        if (errors.size() < 1 && row.getTotal() != null && !row.getTotal().equals(observationTotal))
+            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING,
+                    "Calculated total is " + observationTotal, row.getId(), "total"));
+
+        return errors;
+    }
 
     // VALIDATION: Species size within L5 - L95
     private Collection<ValidationCell> validateMeasureRange(Long rowId, String species, Boolean isInvertSized,

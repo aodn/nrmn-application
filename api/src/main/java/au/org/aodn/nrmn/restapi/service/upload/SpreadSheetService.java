@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.service;
+package au.org.aodn.nrmn.restapi.service.upload;
 
 import java.io.InputStream;
 import java.util.Iterator;
@@ -24,7 +24,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
-import au.org.aodn.nrmn.restapi.service.SurveyContentsHandler.ParsedSheet;
+import au.org.aodn.nrmn.restapi.service.upload.SurveyContentsHandler.ParsedSheet;
 
 @Service
 public class SpreadSheetService {

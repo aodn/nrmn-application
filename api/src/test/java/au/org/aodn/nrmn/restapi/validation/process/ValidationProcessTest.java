@@ -25,6 +25,7 @@ import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 
@@ -42,6 +43,9 @@ class ValidationProcessTest {
 
     @InjectMocks
     ValidationProcess validationProcess;
+
+    @InjectMocks
+    MeasurementValidation measurementValidation;
 
     @Test
     void incorrectTimeFormatShouldFail() {
@@ -286,7 +290,7 @@ class ValidationProcessTest {
         stagedRowFormatted.getMeasureJson().put(1, 10);
         stagedRowFormatted.getMeasureJson().put(2, 11);
 
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.NONE, stagedRowFormatted);
+        Collection<ValidationCell> errors = measurementValidation.validateMeasurements(ProgramValidation.NONE, stagedRowFormatted);
         assertTrue(errors.stream().filter(f -> f.getLevelId() == ValidationLevel.BLOCKING && f.getMessage().contains("Calculated total is 21")).findAny().isPresent(),
                 "BLOCKING error for total mismatch");
     }

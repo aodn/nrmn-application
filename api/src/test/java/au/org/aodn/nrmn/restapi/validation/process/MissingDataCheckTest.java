@@ -28,7 +28,7 @@ class MissingDataCheckTest extends FormattedTestProvider {
                 Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(6).build())
                         .observableItemName("No Species Found").build()));
 
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
+        Collection<ValidationCell> errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, formatted);
         assertTrue(errors.isEmpty());
     }
 
@@ -40,7 +40,7 @@ class MissingDataCheckTest extends FormattedTestProvider {
         formatted.setTotal(0);
         formatted.setCode("snd");
         formatted.setSpecies(Optional.of(ObservableItem.builder().observableItemName("Survey Not Done").build()));
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
+        Collection<ValidationCell> errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, formatted);
         assertTrue(errors.isEmpty());
     }
 
@@ -53,7 +53,7 @@ class MissingDataCheckTest extends FormattedTestProvider {
         formatted.setSpecies(
                 Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build())
                         .observableItemName("Pictilabrus laticlavius").letterCode("pla").build()));
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
+        Collection<ValidationCell> errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, formatted);
         assertTrue(errors.isEmpty());
     }
 
@@ -66,7 +66,7 @@ class MissingDataCheckTest extends FormattedTestProvider {
         formatted.setSpecies(
                 Optional.of(ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build())
                         .observableItemName("Pictilabrus laticlavius").letterCode("pla").build()));
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
+        Collection<ValidationCell> errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, formatted);
         assertFalse(errors.isEmpty());
     }
 }

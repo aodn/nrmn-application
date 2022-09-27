@@ -24,6 +24,7 @@ import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 
@@ -35,6 +36,9 @@ class NoSpeciesFoundMeasurementsTest {
     
     @InjectMocks
     ValidationProcess validationProcess;
+
+    @InjectMocks
+    MeasurementValidation measurementValidation;
         
     @Test
     void outOfScopeShouldSuccess( ) {
@@ -62,7 +66,7 @@ class NoSpeciesFoundMeasurementsTest {
                 put(3, 0);
             }
         });
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
+        Collection<ValidationCell> errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, formatted);
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("'Survey Not Done' has Value/Total/Inverts not 0 or 1")));
     }
 
@@ -79,7 +83,7 @@ class NoSpeciesFoundMeasurementsTest {
                 put(3, 4);
             }
         });
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
+        Collection<ValidationCell> errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, formatted);
         assertTrue(errors.stream().anyMatch(e -> e.getMessage().contains("has Value/Total/Inverts not 0 or 1")));
     }
 
@@ -91,7 +95,7 @@ class NoSpeciesFoundMeasurementsTest {
         formatted.setTotal(0);
         formatted.setInverts(0);
         formatted.setMeasureJson(Collections.emptyMap());
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
+        Collection<ValidationCell> errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, formatted);
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("'Survey Not Done' has Value/Total/Inverts not 0 or 1")));
     }
 }

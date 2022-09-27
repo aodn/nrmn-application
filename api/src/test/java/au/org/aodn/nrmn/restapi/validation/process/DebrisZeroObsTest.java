@@ -26,7 +26,7 @@ class DebrisZeroObsTest extends FormattedTestProvider {
         formatted.setTotal(0);
         formatted.setInverts(0);
         formatted.setMeasureJson(Collections.emptyMap());
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
+        Collection<ValidationCell> errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, formatted);
         assertTrue(errors.isEmpty());
     }
 
@@ -43,7 +43,7 @@ class DebrisZeroObsTest extends FormattedTestProvider {
                 put(3, 0);
             }
         });
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
+        Collection<ValidationCell> errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, formatted);
         assertTrue(errors.isEmpty());
     }
 
@@ -55,7 +55,7 @@ class DebrisZeroObsTest extends FormattedTestProvider {
         formatted.setTotal(1);
         formatted.setInverts(1);
         formatted.setMeasureJson(Collections.emptyMap());
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
+        Collection<ValidationCell> errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, formatted);
         assertTrue(errors.isEmpty());
     }
 
@@ -69,12 +69,12 @@ class DebrisZeroObsTest extends FormattedTestProvider {
 
         formatted.setTotal(0);
         formatted.setInverts(1);
-        errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
+        errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, formatted);
         assertTrue(errors.stream().anyMatch(e -> e.getLevelId() == ValidationLevel.BLOCKING));
 
         formatted.setTotal(1);
         formatted.setInverts(0);
-        errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
+        errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, formatted);
         assertTrue(errors.stream().anyMatch(e -> e.getLevelId() == ValidationLevel.BLOCKING));
     }
 }

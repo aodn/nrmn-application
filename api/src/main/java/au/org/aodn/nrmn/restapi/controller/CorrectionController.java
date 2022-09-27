@@ -53,7 +53,7 @@ import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.SurveyCorrectionService;
-import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidationService;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationResultSet;
 import au.org.aodn.nrmn.restapi.util.ObjectUtils;
@@ -70,7 +70,7 @@ public class CorrectionController {
     DiverRepository diverRepository;
 
     @Autowired
-    MeasurementValidationService measurementValidationService;
+    MeasurementValidation measurementValidationService;
 
     @Autowired
     ObservableItemRepository observableItemRepository;

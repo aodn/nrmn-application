@@ -16,6 +16,7 @@ import au.org.aodn.nrmn.restapi.data.model.Site;
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.enums.Directions;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 
@@ -24,6 +25,9 @@ public class FormattedTestProvider {
 
         @InjectMocks
         ValidationProcess validationProcess;
+
+        @InjectMocks
+        MeasurementValidation measurementValidation;
 
         protected StagedRowFormatted.StagedRowFormattedBuilder getDefaultFormatted() {
                 StagedRow ref = StagedRow.builder()

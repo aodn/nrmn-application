@@ -11,14 +11,14 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import au.org.aodn.nrmn.restapi.data.model.UiSpeciesAttributes;
-import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidationService;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 @ExtendWith(MockitoExtension.class)
 class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
 
     @InjectMocks
-    MeasurementValidationService measurementValidation;
+    MeasurementValidation measurementValidation;
 
     UiSpeciesAttributes specAttribute = new UiSpeciesAttributes(){
         @Override

@@ -16,7 +16,7 @@ class Method3QuadratMax50Test extends FormattedTestProvider {
     public void outOfScopeShouldSuccess() {
         StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMethod(2);
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, formatted);
+        Collection<ValidationCell> errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, formatted);
         assertTrue(errors.isEmpty());
     }
 
@@ -33,7 +33,7 @@ class Method3QuadratMax50Test extends FormattedTestProvider {
                 put(5, 49);
             }
         });
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, row);
+        Collection<ValidationCell> errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, row);
         assertTrue(errors.isEmpty());
     }
 
@@ -49,7 +49,7 @@ class Method3QuadratMax50Test extends FormattedTestProvider {
                 put(5, 50);
             }
         });
-        Collection<ValidationCell> errors = validationProcess.validateMeasurements(ProgramValidation.RLS, row);
+        Collection<ValidationCell> errors = measurementValidation.validateMeasurements(ProgramValidation.RLS, row);
         assertTrue(errors.isEmpty());
     }
 }
