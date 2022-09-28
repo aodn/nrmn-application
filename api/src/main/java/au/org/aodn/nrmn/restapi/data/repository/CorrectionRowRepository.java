@@ -29,7 +29,7 @@ public interface CorrectionRowRepository
     "   s.visibility, s.direction, s.latitude, s.longitude, o.observable_item_id," +
     "   COALESCE(i.observable_item_name, 'Survey Not Done') AS observable_item_name," +
     "   CASE WHEN o.observation_id IS NULL THEN 'SND' ELSE i.letter_code END," +
-    "   m.method_id, m.block_num, o.measure_id, COALESCE(r.seq_no, 0) AS seq_no, COALESCE(SUM(o.measure_value), 0)" +
+    "   m.method_id, COALESCE(m.block_num, 0) as block_num, o.measure_id, COALESCE(r.seq_no, 0) AS seq_no, COALESCE(SUM(o.measure_value), 0)" +
     "   AS measure_sum, mt.measure_type_id FROM nrmn.survey_method m" +
     "   LEFT JOIN nrmn.observation o ON o.survey_method_id = m.survey_method_id" +
     "   LEFT JOIN nrmn.observable_item_ref i ON o.observable_item_id = i.observable_item_id" +
