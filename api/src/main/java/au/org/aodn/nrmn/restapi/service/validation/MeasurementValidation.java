@@ -123,7 +123,7 @@ public class MeasurementValidation {
 
             var outOfRange = row.getMeasureJson().entrySet()
                     .stream()
-                    .filter(entry -> range[entry.getKey() - 1] > lMax)
+                    .filter(entry -> entry.getKey() > 0 && range[entry.getKey() - 1] > lMax)
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toList());
 

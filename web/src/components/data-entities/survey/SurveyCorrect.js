@@ -56,6 +56,7 @@ const SurveyCorrect = () => {
   const [cellValidations, setCellValidations] = useState([]);
   const [redirect, setRedirect] = useState();
   const [undoSize, setUndoSize] = useState(0);
+  const [validationMode, setValidationMode] = useState({programValidation: 'NONE', isExtended: false});
 
   useEffect(() => {
     const undoKeyboardHandler = (event) => {
@@ -189,17 +190,20 @@ const SurveyCorrect = () => {
     getCorrections(surveyId).then((res) => {
       api.hideOverlay();
       if (res.status !== 200) return;
-      const unpackedData = res.data.map((data, idx) => {
+      const {rows, programValidation} = res.data;
+      const unpackedData = rows.map((data, idx) => {
         const measurements = data.observationIds === '' ? {} : JSON.parse(data.measureJson);
         const observationIds = data.observationIds === '' ? [] : JSON.parse(data.observationIds);
         delete data.measureJson;
         return {id: (idx + 1) * 100, pos: (idx + 1) * 100, ...data, observationIds, measurements};
       });
+      const isExtended = unpackedData.includes(r => Object.keys(r.measurements).includes(k => k > 28));
       const context = api.gridOptionsWrapper.gridOptions.context;
       const rowData = [...unpackedData];
       context.rowData = rowData;
       context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
       api.setRowData(context.rowData.length > 0 ? context.rowData : null);
+      setValidationMode({programValidation, isExtended});
       setRowData(rowData);
       setGridApi(api);
     });
@@ -237,7 +241,8 @@ const SurveyCorrect = () => {
     context.useOverlay = 'Validating Survey Correction...';
     api.showLoadingOverlay();
     setSideBar(defaultSideBar);
-    const result = await validateSurveyCorrection(surveyId, packedData(api));
+    const bodyDto = {...validationMode, rows: packedData(api)};
+    const result = await validateSurveyCorrection(surveyId, bodyDto);
     setValidationResult(result.data.errors);
     context.validations = result.data.errors;
     setLoading(false);
@@ -281,7 +286,7 @@ const SurveyCorrect = () => {
         <Box flexGrow={1}>
           <Typography variant="h6">
             Correct Survey{' '}
-            {rowData && '[' + rowData[0].siteCode + ', ' + rowData[0].date + ', ' + rowData[0].depth + '.' + rowData[0].surveyNum + ']'}
+            {rowData && '[' + rowData[0].siteCode + ', ' + rowData[0].date + ', ' + rowData[0].depth + '.' + rowData[0].surveyNum + '] ' + validationMode.programValidation + ' ' + (validationMode.isExtended ? 'Extended' : '')}
           </Typography>
         </Box>
         <Box m={1} ml={0}>
