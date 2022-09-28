@@ -272,7 +272,7 @@ const SurveyCorrect = () => {
     const context = api.gridOptionsWrapper.gridOptions.context;
     context.useOverlay = 'Correcting Survey...';
     api.showLoadingOverlay();
-    const result = await submitSurveyCorrection(surveyId, packedData(gridRef.current.api));
+    const result = await submitSurveyCorrection(surveyId, {...validationMode, rows: packedData(gridRef.current.api)});
     setRedirect(`/data/job/${result.data}/view`);
   };
 

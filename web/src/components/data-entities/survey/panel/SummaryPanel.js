@@ -34,16 +34,14 @@ const SummaryPanel = ({api, context}) => {
     for (const validation of context.validations) {
       if (validation.rowIds.length == 1 || validation.columnNames.length == 1) {
         const rowId = validation.rowIds[0];
-        const rowPos = context.rowPos.indexOf(rowId);
         const rowData = api.getRowNode(rowId).data;
         const columnPath = validation.columnNames[0];
         const columnParts = columnPath.split('.');
         const value = columnParts.length > 1 ? rowData[columnParts[0]][columnParts[1]] : rowData[columnParts[0]];
         const col =  validation.columnNames.length > 1 ? {columnNames: validation.columnNames} : {columnName: columnPath};
-        validation.description = [{...col, rowIds: validation.rowIds, rowNumbers: [rowPos], value}];
+        const rowNumbers = validation.rowIds.map(r => (context.rowPos.indexOf(r) + 1));
+        validation.description = [{...col, rowIds: validation.rowIds, rowNumbers, value}];
       }
-      validation.rowNumbers = validation.rowIds; // FIXME
-
       formatted.push(validation);
     }
     setMessages(groupArrayByKey(formatted, 'levelId'));
