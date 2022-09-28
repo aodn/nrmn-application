@@ -21,7 +21,7 @@ public interface CorrectionRowRepository
     " TO_CHAR(c.survey_time, 'HH24:MI') AS time, c.visibility AS vis, c.direction, c.latitude, c.longitude," +
     " c.observable_item_id AS observableItemId, c.observable_item_name AS species, c.letter_code AS letterCode," +
     " c.method_id AS method, c.block_num as block," +
-    " (CASE WHEN measure_type_id = 4 THEN true ELSE false END) AS isInvertSizing," +
+    " (CASE WHEN measure_type_id = 4 THEN 'Yes' ELSE 'No' END) AS isInvertSizing," +
     " (CASE WHEN c.letter_code = 'SND' THEN '' ELSE CAST(jsonb_agg(c.observation_id) AS text) END) AS observationIds," +
     " CAST(jsonb_object_agg(c.seq_no, c.measure_sum) AS TEXT) AS measureJson" +
     " FROM" +

@@ -96,7 +96,7 @@ public class StagedRowFormattedMapperConfig {
         };
 
         Converter<String, Boolean> toInvertSizing = ctx -> StringUtils.isNotEmpty(ctx.getSource())
-                ? ctx.getSource().equalsIgnoreCase("YES")
+                ? ctx.getSource().equalsIgnoreCase("Yes")
                 : false;
 
         Converter<String, Double> toDouble = ctx -> {

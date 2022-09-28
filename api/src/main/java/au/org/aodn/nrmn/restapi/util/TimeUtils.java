@@ -1,13 +1,11 @@
 package au.org.aodn.nrmn.restapi.util;
 
 import java.sql.Date;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 /**
@@ -24,7 +22,7 @@ public class TimeUtils {
     public static Optional<LocalTime> parseTime(String value) {
         try {
             return Optional.of(LocalTime.parse(value, SUPPORTED_TIME_FORMATTER));
-        } catch (DateTimeParseException e) {
+        } catch (Exception e) {
             return Optional.empty();
         }
     }
@@ -46,7 +44,7 @@ public class TimeUtils {
         sdf.setLenient(false);
         try {
             date = new Date(sdf.parse(value).getTime());
-        } catch (ParseException ignored) {
+        } catch (Exception ignored) {
             throw new DateTimeException("Invalid date. The date must be in the format yyyy-mm-dd");
         }
 
