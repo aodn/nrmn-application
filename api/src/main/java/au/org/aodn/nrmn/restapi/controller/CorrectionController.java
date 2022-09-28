@@ -44,8 +44,11 @@ import au.org.aodn.nrmn.restapi.data.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowMapperConfig;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
+import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRequestBodyDto;
+import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowsDto;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
+import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.enums.StatusJobType;
@@ -248,7 +251,8 @@ public class CorrectionController {
         return validationResult;
     }
 
-    private ValidationResultSet validate(List<Pair<StagedRowFormatted, HashSet<String>>> results, Boolean isExtended) {
+    private ValidationResultSet validate(ProgramValidation programValidation, Boolean isExtended,
+            List<Pair<StagedRowFormatted, HashSet<String>>> results) {
 
         var validation = mappingResultToValidation(results);
 
@@ -272,6 +276,9 @@ public class CorrectionController {
             if (speciesAttrib.isPresent())
                 validation.addAll(measurementValidationService.validate(speciesAttrib.get(), row, isExtended), false);
 
+            // Total Checksum & Missing Data
+            validation.addAll(measurementValidationService.validateMeasurements(programValidation, row), false);
+
             // FUTURE: other validations go here ..
         }
 
@@ -287,7 +294,11 @@ public class CorrectionController {
     public ResponseEntity<?> getSurveyCorrection(@PathVariable("survey_id") Integer surveyId) {
         var rows = correctionRowRepository.findRowsBySurveyId(surveyId);
         var exists = rows != null && rows.size() > 0;
-        return exists ? ResponseEntity.ok(rows) : ResponseEntity.notFound().build();
+        var bodyDto = new CorrectionRowsDto();
+        bodyDto.setRows(rows);
+        var survey = surveyRepository.getReferenceById(surveyId);
+        bodyDto.setProgramValidation(ProgramValidation.fromProgram(survey.getProgram()));
+        return exists ? ResponseEntity.ok(bodyDto) : ResponseEntity.notFound().build();
     }
 
     @PostMapping(path = "validate/{survey_id}")
@@ -295,13 +306,10 @@ public class CorrectionController {
     public ResponseEntity<?> validateSurveyCorrection(
             @PathVariable("survey_id") Integer surveyId,
             Authentication authentication,
-            @RequestBody Collection<StagedRow> rows) {
+            @RequestBody CorrectionRequestBodyDto bodyDto) {
 
         var message = "correction validation: username: " + authentication.getName() + " survey: " + surveyId;
         logger.debug("correction/validation", message);
-
-        // FIXME: fixme!
-        var isExtended = false;
 
         // does survey exist?
         if (surveyRepository.getReferenceById(surveyId) == null)
@@ -310,8 +318,10 @@ public class CorrectionController {
         var response = new ValidationResponse();
         try {
             var errors = new ArrayList<SurveyValidationError>();
-            var rowMap = mapRows(rows);
-            errors.addAll(validate(rowMap, isExtended).getAll());
+            errors.addAll(validate(bodyDto.getProgramValidation(),
+                    bodyDto.getIsExtended(),
+                    mapRows(bodyDto.getRows()))
+                    .getAll());
             response.setErrors(errors);
         } catch (Exception e) {
             logger.error("Validation Failed", e);
@@ -325,12 +335,10 @@ public class CorrectionController {
     public ResponseEntity<?> submitSurveyCorrection(
             @PathVariable("survey_id") Integer surveyId,
             Authentication authentication,
-            @RequestBody List<StagedRow> rows) {
+            @RequestBody CorrectionRequestBodyDto bodyDto) {
 
         Optional<SecUser> user = secUserRepository.findByEmail(authentication.getName());
 
-        // FIXME: fixme!
-        var isExtended = false;
         var surveyOptional = surveyRepository.findById(surveyId);
         if (!surveyOptional.isPresent())
             return ResponseEntity.notFound().build();
@@ -355,9 +363,8 @@ public class CorrectionController {
         logMessage(job, "Correct Survey " + surveyId);
 
         try {
-
-            var results = mapRows(rows);
-            var result = validate(results, isExtended).getAll();
+            var results = mapRows(bodyDto.getRows());
+            var result = validate(bodyDto.getProgramValidation(), bodyDto.getIsExtended(), results).getAll();
             var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
             var blockingErrors = result.stream().filter(r -> r.getLevelId() == ValidationLevel.BLOCKING)
                     .collect(Collectors.toList());
