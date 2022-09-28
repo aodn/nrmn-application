@@ -10,10 +10,11 @@ public class ObjectUtils {
         var valueA = getter.apply(rowA);
         var valueB = getter.apply(rowB);
         var contentDiffers = (valueA == null && valueB != null) || (valueB == null && valueA != null);
+        var contentEmpty = !contentDiffers && StringUtils.isEmpty(valueA);
         var valueDiffers = StringUtils.isNotEmpty(valueA)
                 && StringUtils.isNotEmpty(valueB)
                 && !valueA.equalsIgnoreCase(valueB);
-        return contentDiffers || valueDiffers;
+        return contentDiffers || valueDiffers || contentEmpty;
     }
 
 }
