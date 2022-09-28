@@ -89,11 +89,11 @@ public class StagedRowFormatted {
 
     
     public Boolean isDebrisZero() {
-        return (code.equalsIgnoreCase("DEZ") || (ref != null && ref.getSpecies().equalsIgnoreCase("Debris - Zero")));
+        return ((code != null && code.equalsIgnoreCase("DEZ")) || (ref != null && ref.getSpecies().equalsIgnoreCase("Debris - Zero")));
     }
 
     public Boolean isSurveyNotDone() {
-        return (code.equalsIgnoreCase("SND") || (ref != null && ref.getSpecies().equalsIgnoreCase("Survey Not Done")));
+        return ((code != null && code.equalsIgnoreCase("SND")) || (ref != null && ref.getSpecies().equalsIgnoreCase("Survey Not Done")));
     }
 
     public String getMethodBlock() {

@@ -169,6 +169,7 @@ public class CorrectionController {
                 put("latitude", StagedRow::getLatitude);
                 put("longitude", StagedRow::getLongitude);
                 put("method", StagedRow::getMethod);
+                put("siteCode", StagedRow::getSiteCode);
                 put("code", StagedRow::getCode);
                 put("species", StagedRow::getSpecies);
                 put("time", StagedRow::getTime);
@@ -225,7 +226,8 @@ public class CorrectionController {
                 put("latitude", "Latitude is not a decimal");
                 put("longitude", "Longitude is not a decimal");
                 put("method", "Method is missing");
-                put("code", "Site does not exist");
+                put("siteCode", "Site does not exist");
+                put("code", "Letter Code does not exist");
                 put("species", "Species does not exist");
                 put("time", "Time is not valid");
                 put("vis", "Vis is not a number");

@@ -19,7 +19,7 @@ public interface CorrectionRowRepository
     " c.survey_id AS surveyId, c.survey_num AS surveyNum, c.diver_id AS diverId," +
     " c.initials AS diver, c.site_code AS siteCode, c.depth, TO_CHAR(c.survey_date, 'dd/MM/yyyy') AS DATE," +
     " TO_CHAR(c.survey_time, 'HH24:MI') AS time, c.visibility AS vis, c.direction, c.latitude, c.longitude," +
-    " c.observable_item_id AS observableItemId, c.observable_item_name AS species, c.letter_code AS letterCode," +
+    " c.observable_item_id AS observableItemId, c.observable_item_name AS species, c.letter_code AS code," +
     " c.method_id AS method, c.block_num as block," +
     " (CASE WHEN measure_type_id = 4 THEN 'Yes' ELSE 'No' END) AS isInvertSizing," +
     " (CASE WHEN c.letter_code = 'SND' THEN '' ELSE CAST(jsonb_agg(c.observation_id) AS text) END) AS observationIds," +
