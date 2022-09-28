@@ -697,10 +697,7 @@ public class ValidationProcess {
         var rows = rowRepository.findRowsByJobId(job.getId());
         var species = getSpeciesForRows(rows);
 
-        var programName = job.getProgram().getProgramName();
-        var validation = Arrays.asList("ATRC", "FRDC").contains(programName.toUpperCase()) ? ProgramValidation.ATRC
-                : Arrays.asList("RLS", "PARKS VIC").contains(programName.toUpperCase()) ? ProgramValidation.RLS
-                        : ProgramValidation.NONE;
+        var validation = ProgramValidation.fromProgram(job.getProgram());
 
         var enteredSiteCodes = rows.stream().map(s -> s.getSiteCode().toUpperCase()).collect(Collectors.toSet());
         var siteCodes = siteRepository.getAllSiteCodesMatching(enteredSiteCodes);
