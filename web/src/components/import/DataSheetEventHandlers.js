@@ -71,7 +71,12 @@ class DataSheetEventHandlers {
       fields
         .filter((key) => !(columnDefs.find((d) => d.field === key)?.editable == false))
         .forEach((key) => {
-          newData[key] = fill;
+          if(key.includes('.') > 0) {
+            const splitKey = key.split('.');
+            newData[splitKey[0]][splitKey[1]] = fill;
+          } else {
+            newData[key] = fill;
+          }
         });
       rowData[dataIdx] = newData;
     }
