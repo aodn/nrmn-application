@@ -48,7 +48,7 @@ public class MeasurementValidation {
                     "Debris has Value/Total/Inverts not 0 or 1", row.getId(), "total"));
         }
 
-        // VALIDATION: Record has no data and but not flagged as 'Survey Not Done' or
+        // VALIDATION: Row has no data and but not flagged as 'Survey Not Done' or
         // 'No Species Found'
         if (observationTotal < 1 && !row.isDebrisZero() && !row.isSurveyNotDone() && !(row.getSpecies().isPresent()
                 && row.getSpecies().get().getObsItemType() != null
@@ -58,11 +58,11 @@ public class MeasurementValidation {
             // in the column Inverts
             if (row.getInverts() != null) {
                 errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING,
-                        "Record has no data and but not flagged as 'Survey Not Done' or 'No Species Found'",
+                        "Row has no data and but not flagged as 'Survey Not Done' or 'No Species Found'",
                         row.getId(), "total"));
             } else {
                 errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING,
-                        "Record has no data and no value recorded for inverts", row.getId(), "inverts"));
+                        "Row has no data and no value recorded for inverts", row.getId(), "inverts"));
             }
         } else if (row.getSpecies().isPresent() && row.getSpecies().get().getObsItemType() != null
                 && row.getSpecies().get().getObsItemType().getObsItemTypeId() == ObservableItemType.NoSpeciesFound
