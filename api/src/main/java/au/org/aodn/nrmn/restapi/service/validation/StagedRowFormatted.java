@@ -111,4 +111,8 @@ public class StagedRowFormatted {
     public String getDecimalSurvey() {
         return String.format("[%s, %s, %s.%d]", getRef().getSiteCode(),  getDate(), getDepth(), getSurveyNum());
     }
+
+    public Integer observationTotal() { 
+        return getMeasureJson().entrySet().stream().map(Map.Entry::getValue).reduce(0, Integer::sum) + (getInverts() != null ? getInverts() : 0);
+    }
 }

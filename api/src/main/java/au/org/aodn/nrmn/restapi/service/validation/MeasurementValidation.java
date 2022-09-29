@@ -39,8 +39,7 @@ public class MeasurementValidation {
         if (row.getMeasureJson() == null)
             return errors;
 
-        var observationTotal = row.getMeasureJson().entrySet().stream().map(Map.Entry::getValue).reduce(0,
-                Integer::sum) + (row.getInverts() != null ? row.getInverts() : 0);
+        var observationTotal = row.observationTotal();
 
         // VALIDATION: Debris Zero observations
         if (row.isDebrisZero() && !validateRowZeroOrOneInvertsTotal(row, observationTotal)) {
@@ -143,8 +142,9 @@ public class MeasurementValidation {
         var errors = new ArrayList<ValidationCell>();
         if (Arrays.asList(1, 2).contains(row.getMethod()) && speciesAttributes != null) {
             var maxAbundance = speciesAttributes.getMaxAbundance();
-            if (maxAbundance != null && row.getTotal() != null && maxAbundance < row.getTotal()) {
-                var message = "Exceeds max abundance " + maxAbundance + " for species " + row.getRef().getSpecies() + "";
+            var observationTotal = row.observationTotal();
+            if (maxAbundance != null && maxAbundance < observationTotal) {
+                var message = "Abundance exceeds " + maxAbundance + " for species " + row.getRef().getSpecies();
                 errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.INFO, message, row.getId(), "total"));
             }
         }
