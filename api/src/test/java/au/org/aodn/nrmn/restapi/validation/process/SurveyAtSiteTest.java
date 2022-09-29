@@ -7,13 +7,18 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
-import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.data.model.Site;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
+import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 class SurveyAtSiteTest extends FormattedTestProvider {
+
+    @Mock
+    MeasurementValidation measurementValidation;
 
     @Test
     void sameCoordsShouldSucceed() {
@@ -23,7 +28,7 @@ class SurveyAtSiteTest extends FormattedTestProvider {
         formatted.setLongitude(147.33520415427964);
 
         formatted.setSite(Site.builder().siteCode("A SITE").latitude( -42.886410468013004).longitude(147.33520415427964).build());
-        Collection<ValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
+        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
         assertFalse(errors.stream().anyMatch(p -> p.getMessage().startsWith("Survey coordinates") && p.getColumnNames().contains("latitude")));
         assertFalse(errors.stream().anyMatch(p -> p.getMessage().startsWith("Survey coordinates") && p.getColumnNames().contains("longitude")));
     }
@@ -42,7 +47,7 @@ class SurveyAtSiteTest extends FormattedTestProvider {
                 .latitude( -42.88397415318471)
                 .longitude(147.3293531695972).build());
 
-        Collection<ValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
+        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
         assertTrue(errors.stream().anyMatch(p -> p.getMessage().startsWith("Survey coordinates") && p.getColumnNames().contains("latitude")));
         assertTrue(errors.stream().anyMatch(p -> p.getMessage().startsWith("Survey coordinates") && p.getColumnNames().contains("longitude")));
     }

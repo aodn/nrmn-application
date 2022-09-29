@@ -19,8 +19,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
-import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
-import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
+import au.org.aodn.nrmn.restapi.data.model.StagedJob;
+import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
+import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 

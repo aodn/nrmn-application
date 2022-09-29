@@ -1,6 +1,5 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import au.org.aodn.nrmn.restapi.service.model.SpeciesRecord;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -11,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+
+import au.org.aodn.nrmn.restapi.dto.species.SpeciesRecordDto;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,10 +26,10 @@ public class WormsServiceIT {
     protected ObjectMapper mapper = new ObjectMapper();
 
     protected void createBasisWebClientWithDefaultResult(int size) {
-        List<SpeciesRecord> records = new ArrayList<>();
+        List<SpeciesRecordDto> records = new ArrayList<>();
 
         for(int i = 0; i < size; i++) {
-            SpeciesRecord speciesRecord= new SpeciesRecord();
+            SpeciesRecordDto speciesRecord= new SpeciesRecordDto();
             speciesRecord.aphiaId = i;
 
             records.add(speciesRecord);
@@ -37,7 +38,7 @@ public class WormsServiceIT {
         createBasisWebClientWithResult(records);
     }
 
-    protected void createBasisWebClientWithResult(final List<SpeciesRecord> target) {
+    protected void createBasisWebClientWithResult(final List<SpeciesRecordDto> target) {
 
         Dispatcher dispatcher = new Dispatcher() {
 
@@ -49,7 +50,7 @@ public class WormsServiceIT {
                         try {
                             // We need to extract the offset
                             int offset = Integer.parseInt(request.getRequestUrl().queryParameter("offset")) - 1;
-                            List<SpeciesRecord> item = target.subList(offset, target.size());
+                            List<SpeciesRecordDto> item = target.subList(offset, target.size());
                             item = item.subList(0, (item.size() >= 50 ? 50 : item.size()));
 
                             return new MockResponse()
@@ -94,7 +95,7 @@ public class WormsServiceIT {
         WebClient mock = WebClient.create(mockWebServer.url("/api/v1/species").toString());
         WormsService wormsService = new WormsService(mock);
 
-        List<SpeciesRecord> results = wormsService.partialSearch(0, 50, "anyworks");
+        List<SpeciesRecordDto> results = wormsService.partialSearch(0, 50, "anyworks");
         assertEquals("Record size match", 14, results.size());
 
         results = wormsService.partialSearch(0, 10, "anyworks");
@@ -112,7 +113,7 @@ public class WormsServiceIT {
         WebClient mock = WebClient.create(mockWebServer.url("/api/v1/species").toString());
         WormsService wormsService = new WormsService(mock);
 
-        List<SpeciesRecord> results = wormsService.partialSearch(0, 50, "anyworks");
+        List<SpeciesRecordDto> results = wormsService.partialSearch(0, 50, "anyworks");
         assertEquals("Record size match", 50, results.size());
 
         results = wormsService.partialSearch(0, 10, "anyworks");
@@ -130,7 +131,7 @@ public class WormsServiceIT {
         WebClient mock = WebClient.create(mockWebServer.url("/api/v1/species").toString());
         WormsService wormsService = new WormsService(mock);
 
-        List<SpeciesRecord> results = wormsService.partialSearch(0, 50, "anyworks");
+        List<SpeciesRecordDto> results = wormsService.partialSearch(0, 50, "anyworks");
         assertEquals("Record size match", 50, results.size());
 
         results = wormsService.partialSearch(1, 50, "anyworks");

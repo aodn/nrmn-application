@@ -11,14 +11,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.repository.DiverRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.data.model.StagedJob;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
+import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
+import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 
 @ExtendWith(MockitoExtension.class)
 class ATRCDepthValidationTest {
@@ -44,7 +45,7 @@ class ATRCDepthValidationTest {
     row.setDepth("");
     row.setBlock("");
     row.setStagedJob(job);
-    Collection<ValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(),
+    Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(),
         Arrays.asList(), Arrays.asList(row));
     assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Depth is invalid, expected: depth[.surveyNum]")));
   }
@@ -55,7 +56,7 @@ class ATRCDepthValidationTest {
     job.setId(1L);
     StagedRowFormatted stage = new StagedRowFormatted();
     stage.setSurveyNum(9);
-    ValidationError error = validationProcess.validateSurveyTransectNumber(Arrays.asList(stage));
+    SurveyValidationError error = validationProcess.validateSurveyTransectNumber(Arrays.asList(stage));
     assertTrue(error.getMessage().equals("Survey group transect invalid"));
   }
 
@@ -67,7 +68,7 @@ class ATRCDepthValidationTest {
     row.setDepth(7);
     row.setSurveyNum(3);
     row.setMethod(1);
-    ValidationError error = validationProcess.validateSurveyTransectNumber(Arrays.asList(row));
+    SurveyValidationError error = validationProcess.validateSurveyTransectNumber(Arrays.asList(row));
     assertTrue(error == null);
   }
 }

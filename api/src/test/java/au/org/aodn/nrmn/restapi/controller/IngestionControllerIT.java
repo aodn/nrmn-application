@@ -1,12 +1,12 @@
 package au.org.aodn.nrmn.restapi.controller;
 
+import au.org.aodn.nrmn.restapi.data.model.SecUser;
+import au.org.aodn.nrmn.restapi.data.model.StagedJob;
+import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
+import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.RestApiApplication;
 import au.org.aodn.nrmn.restapi.controller.utils.RequestWrapper;
-import au.org.aodn.nrmn.restapi.model.db.SecUser;
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
-import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.security.JwtTokenProvider;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;

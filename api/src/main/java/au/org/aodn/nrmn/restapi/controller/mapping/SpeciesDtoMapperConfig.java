@@ -1,8 +1,9 @@
 package au.org.aodn.nrmn.restapi.controller.mapping;
 
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.dto.species.SpeciesDto;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.service.model.SpeciesRecord;
+import au.org.aodn.nrmn.restapi.dto.species.SpeciesRecordDto;
+
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +17,13 @@ public class SpeciesDtoMapperConfig {
         modelMapper.typeMap(ObservableItem.class, SpeciesDto.class)
                 .addMapping(ObservableItem::getObservableItemName, SpeciesDto::setScientificName);
 
-        modelMapper.typeMap(SpeciesRecord.class, SpeciesDto.class)
+        modelMapper.typeMap(SpeciesRecordDto.class, SpeciesDto.class)
                 .setPostConverter(customMappings());
     }
 
-    private Converter<SpeciesRecord, SpeciesDto> customMappings() {
+    private Converter<SpeciesRecordDto, SpeciesDto> customMappings() {
         return context -> {
-            SpeciesRecord speciesRecord = context.getSource();
+            SpeciesRecordDto speciesRecord = context.getSource();
             SpeciesDto speciesDto = context.getDestination();
 
             if (speciesRecord.getStatus().equalsIgnoreCase("unaccepted")) {

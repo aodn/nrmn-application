@@ -1,11 +1,12 @@
 package au.org.aodn.nrmn.restapi.dto.location;
 
-import au.org.aodn.nrmn.restapi.model.db.Location;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;
+
+import au.org.aodn.nrmn.restapi.data.model.Location;
 
 @Data
 @NoArgsConstructor

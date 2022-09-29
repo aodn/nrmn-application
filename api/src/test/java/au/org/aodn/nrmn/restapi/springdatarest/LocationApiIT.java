@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.test.context.support.WithUserDetails;
 
-import au.org.aodn.nrmn.restapi.model.db.Location;
+import au.org.aodn.nrmn.restapi.data.model.Location;
 import au.org.aodn.nrmn.restapi.model.db.LocationTestData;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;

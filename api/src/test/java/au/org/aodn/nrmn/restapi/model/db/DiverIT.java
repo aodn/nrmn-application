@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.data.model.Diver;
+import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 import org.junit.jupiter.api.Test;

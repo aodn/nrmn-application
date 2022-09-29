@@ -14,12 +14,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
-import au.org.aodn.nrmn.restapi.model.db.Method;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.data.model.Method;
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
+import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
+import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
+import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 
 @ExtendWith(MockitoExtension.class)
 class SpeciesSupersededTest {
@@ -37,7 +38,7 @@ class SpeciesSupersededTest {
         StagedRow row = new StagedRow();
         row.setSpecies("THE SPECIES");
         List<ObservableItem> species = Arrays.asList(ObservableItem.builder().observableItemName("THE SPECIES").supersededBy("NEXT SPECIES").methods(methods).build());
-        Collection<ValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), species, Arrays.asList(row));
+        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), species, Arrays.asList(row));
         assertTrue(errors.stream().anyMatch(p -> p.getMessage().contains("Superseded by")));
     }
 }

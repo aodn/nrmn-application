@@ -2,9 +2,8 @@ package au.org.aodn.nrmn.restapi.dto.stage;
 
 import java.util.List;
 
-import au.org.aodn.nrmn.restapi.dto.payload.ErrorInput;
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.data.model.StagedJob;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,5 +12,4 @@ import lombok.Getter;
 public class JobResponse {
     private StagedJob job;
     private  List<StagedRow> rows;
-    private  List<ErrorInput> errorInputs;
 }

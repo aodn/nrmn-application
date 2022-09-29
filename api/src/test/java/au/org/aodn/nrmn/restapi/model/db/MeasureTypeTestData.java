@@ -1,9 +1,11 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.model.db.MeasureTypeEntity.MeasureTypeEntityBuilder;
-import au.org.aodn.nrmn.restapi.repository.MeasureTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import au.org.aodn.nrmn.restapi.data.model.MeasureTypeEntity;
+import au.org.aodn.nrmn.restapi.data.model.MeasureTypeEntity.MeasureTypeEntityBuilder;
+import au.org.aodn.nrmn.restapi.data.repository.MeasureTypeRepository;
 
 @Component
 public class MeasureTypeTestData {

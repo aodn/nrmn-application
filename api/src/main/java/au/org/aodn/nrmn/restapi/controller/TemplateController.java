@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
+import au.org.aodn.nrmn.restapi.data.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.service.TemplateService;
 import au.org.aodn.nrmn.restapi.util.LogInfo;
 import io.swagger.v3.oas.annotations.tags.Tag;

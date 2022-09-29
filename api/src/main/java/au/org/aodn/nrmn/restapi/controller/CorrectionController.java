@@ -24,39 +24,42 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
+import au.org.aodn.nrmn.restapi.data.model.SecUser;
+import au.org.aodn.nrmn.restapi.data.model.StagedJob;
+import au.org.aodn.nrmn.restapi.data.model.StagedJobLog;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
+import au.org.aodn.nrmn.restapi.data.model.UiSpeciesAttributes;
+import au.org.aodn.nrmn.restapi.data.model.audit.UserActionAudit;
+import au.org.aodn.nrmn.restapi.data.repository.CorrectionRowRepository;
+import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SecUserRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.data.repository.StagedJobLogRepository;
+import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.data.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowMapperConfig;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
+import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRequestBodyDto;
+import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowsDto;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.SecUser;
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedJobLog;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
-import au.org.aodn.nrmn.restapi.model.db.audit.UserActionAudit;
-import au.org.aodn.nrmn.restapi.model.db.enums.SourceJobType;
-import au.org.aodn.nrmn.restapi.model.db.enums.StagedJobEventType;
-import au.org.aodn.nrmn.restapi.model.db.enums.StatusJobType;
-import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
-import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
-import au.org.aodn.nrmn.restapi.repository.CorrectionRowRepository;
-import au.org.aodn.nrmn.restapi.repository.DiverRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
-import au.org.aodn.nrmn.restapi.repository.SecUserRepository;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
-import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
-import au.org.aodn.nrmn.restapi.repository.UserActionAuditRepository;
+import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
+import au.org.aodn.nrmn.restapi.enums.SourceJobType;
+import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
+import au.org.aodn.nrmn.restapi.enums.StatusJobType;
+import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
+import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.SurveyCorrectionService;
-import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidationService;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.service.validation.ValidationResultSet;
 import au.org.aodn.nrmn.restapi.util.ObjectUtils;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
-import au.org.aodn.nrmn.restapi.validation.process.ValidationResultSet;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -70,7 +73,7 @@ public class CorrectionController {
     DiverRepository diverRepository;
 
     @Autowired
-    MeasurementValidationService measurementValidationService;
+    MeasurementValidation measurementValidationService;
 
     @Autowired
     ObservableItemRepository observableItemRepository;
@@ -129,7 +132,7 @@ public class CorrectionController {
                 .collect(Collectors.toMap(UiSpeciesAttributes::getSpeciesName, a -> a));
 
         var speciesMap = species.stream().collect(Collectors.toMap(ObservableItem::getObservableItemName, o -> o));
-        
+
         var divers = diverRepository.getAll().stream().collect(Collectors.toList());
 
         var sites = siteRepository.getAll().stream().collect(Collectors.toList());
@@ -147,13 +150,13 @@ public class CorrectionController {
         var observableItems = observableItemRepository.getAllSpeciesNamesMatching(speciesNames);
 
         // HACK: Survey Not Done
-        if(speciesNames.stream().anyMatch(s -> s.equalsIgnoreCase("Survey Not Done"))) {
+        if (speciesNames.stream().anyMatch(s -> s.equalsIgnoreCase("Survey Not Done"))) {
             var snd = new ObservableItem();
             snd.setObservableItemId(0);
             snd.setObservableItemName("Survey Not Done");
             observableItems.add(snd);
         }
-        
+
         var formattedRows = formatRowsWithSpecies(rows, observableItems);
 
         var propertyChecks = new HashMap<String, Function<StagedRow, String>>() {
@@ -166,6 +169,7 @@ public class CorrectionController {
                 put("latitude", StagedRow::getLatitude);
                 put("longitude", StagedRow::getLongitude);
                 put("method", StagedRow::getMethod);
+                put("siteCode", StagedRow::getSiteCode);
                 put("code", StagedRow::getCode);
                 put("species", StagedRow::getSpecies);
                 put("time", StagedRow::getTime);
@@ -222,7 +226,8 @@ public class CorrectionController {
                 put("latitude", "Latitude is not a decimal");
                 put("longitude", "Longitude is not a decimal");
                 put("method", "Method is missing");
-                put("code", "Site does not exist");
+                put("siteCode", "Site does not exist");
+                put("code", "Letter Code missing");
                 put("species", "Species does not exist");
                 put("time", "Time is not valid");
                 put("vis", "Vis is not a number");
@@ -248,7 +253,8 @@ public class CorrectionController {
         return validationResult;
     }
 
-    private ValidationResultSet validate(List<Pair<StagedRowFormatted, HashSet<String>>> results) {
+    private ValidationResultSet validate(ProgramValidation programValidation, Boolean isExtended,
+            List<Pair<StagedRowFormatted, HashSet<String>>> results) {
 
         var validation = mappingResultToValidation(results);
 
@@ -267,11 +273,14 @@ public class CorrectionController {
                 .forEach(m -> speciesAttributes.put(m.getId().intValue(), m));
 
         for (var row : mappedRows) {
-            var attribute = row.getSpecies().isPresent()
-                    ? speciesAttributes.get(row.getSpecies().get().getObservableItemId())
-                    : null;
-            if (attribute != null)
-                validation.addAll(measurementValidationService.validate(attribute, row), false);
+
+            var speciesAttrib = row.getSpeciesAttributesOpt();
+            if (speciesAttrib.isPresent())
+                validation.addAll(measurementValidationService.validate(speciesAttrib.get(), row, isExtended), false);
+
+            // Total Checksum & Missing Data
+            validation.addAll(measurementValidationService.validateMeasurements(programValidation, row), false);
+
             // FUTURE: other validations go here ..
         }
 
@@ -287,7 +296,11 @@ public class CorrectionController {
     public ResponseEntity<?> getSurveyCorrection(@PathVariable("survey_id") Integer surveyId) {
         var rows = correctionRowRepository.findRowsBySurveyId(surveyId);
         var exists = rows != null && rows.size() > 0;
-        return exists ? ResponseEntity.ok(rows) : ResponseEntity.notFound().build();
+        var bodyDto = new CorrectionRowsDto();
+        bodyDto.setRows(rows);
+        var survey = surveyRepository.getReferenceById(surveyId);
+        bodyDto.setProgramValidation(ProgramValidation.fromProgram(survey.getProgram()));
+        return exists ? ResponseEntity.ok(bodyDto) : ResponseEntity.notFound().build();
     }
 
     @PostMapping(path = "validate/{survey_id}")
@@ -295,7 +308,7 @@ public class CorrectionController {
     public ResponseEntity<?> validateSurveyCorrection(
             @PathVariable("survey_id") Integer surveyId,
             Authentication authentication,
-            @RequestBody Collection<StagedRow> rows) {
+            @RequestBody CorrectionRequestBodyDto bodyDto) {
 
         var message = "correction validation: username: " + authentication.getName() + " survey: " + surveyId;
         logger.debug("correction/validation", message);
@@ -306,9 +319,11 @@ public class CorrectionController {
 
         var response = new ValidationResponse();
         try {
-            var errors = new ArrayList<ValidationError>();
-            var rowMap = mapRows(rows);
-            errors.addAll(validate(rowMap).getAll());
+            var errors = new ArrayList<SurveyValidationError>();
+            errors.addAll(validate(bodyDto.getProgramValidation(),
+                    bodyDto.getIsExtended(),
+                    mapRows(bodyDto.getRows()))
+                    .getAll());
             response.setErrors(errors);
         } catch (Exception e) {
             logger.error("Validation Failed", e);
@@ -322,7 +337,7 @@ public class CorrectionController {
     public ResponseEntity<?> submitSurveyCorrection(
             @PathVariable("survey_id") Integer surveyId,
             Authentication authentication,
-            @RequestBody List<StagedRow> rows) {
+            @RequestBody CorrectionRequestBodyDto bodyDto) {
 
         Optional<SecUser> user = secUserRepository.findByEmail(authentication.getName());
 
@@ -350,9 +365,8 @@ public class CorrectionController {
         logMessage(job, "Correct Survey " + surveyId);
 
         try {
-
-            var results = mapRows(rows);
-            var result = validate(results).getAll();
+            var results = mapRows(bodyDto.getRows());
+            var result = validate(bodyDto.getProgramValidation(), bodyDto.getIsExtended(), results).getAll();
             var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
             var blockingErrors = result.stream().filter(r -> r.getLevelId() == ValidationLevel.BLOCKING)
                     .collect(Collectors.toList());
@@ -395,7 +409,7 @@ public class CorrectionController {
             return ResponseEntity.notFound().build();
 
         var survey = surveyOptional.get();
-        
+
         if (survey.getPqCatalogued() != null && survey.getPqCatalogued())
             return ResponseEntity.badRequest().body("Deletion Failed. PQs catalogued for this survey.");
 

@@ -25,24 +25,24 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import au.org.aodn.nrmn.restapi.model.db.Diver;
-import au.org.aodn.nrmn.restapi.model.db.ObsItemType;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.Observation;
-import au.org.aodn.nrmn.restapi.model.db.Program;
-import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.model.db.Survey;
-import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
-import au.org.aodn.nrmn.restapi.repository.MeasureRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
-import au.org.aodn.nrmn.restapi.repository.StagedJobRepository;
-import au.org.aodn.nrmn.restapi.repository.SurveyMethodRepository;
-import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.data.model.Diver;
+import au.org.aodn.nrmn.restapi.data.model.ObsItemType;
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
+import au.org.aodn.nrmn.restapi.data.model.Observation;
+import au.org.aodn.nrmn.restapi.data.model.Program;
+import au.org.aodn.nrmn.restapi.data.model.Site;
+import au.org.aodn.nrmn.restapi.data.model.StagedJob;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
+import au.org.aodn.nrmn.restapi.data.model.Survey;
+import au.org.aodn.nrmn.restapi.data.repository.MeasureRepository;
+import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.data.repository.StagedJobLogRepository;
+import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SurveyMethodRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.enums.Directions;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 @ExtendWith(MockitoExtension.class)
 public class SurveyCorrectionServiceTest {

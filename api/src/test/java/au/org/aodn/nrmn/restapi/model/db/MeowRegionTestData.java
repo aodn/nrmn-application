@@ -1,11 +1,12 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.repository.MeowRegionsRepository;
 import org.locationtech.jts.geom.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.security.Policy;
+import au.org.aodn.nrmn.restapi.data.model.MeowEcoRegions;
+import au.org.aodn.nrmn.restapi.data.repository.MeowRegionsRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 

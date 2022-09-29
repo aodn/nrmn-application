@@ -7,19 +7,24 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
-import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
+import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 class ZeroInvertsTest extends FormattedTestProvider {
 
+    @Mock
+    MeasurementValidation measurementValidation;
+    
     @Test
     void method3WithInvertsShouldSucceed() {
         StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMethod(3);
         formatted.setInverts(0);
-        Collection<ValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
+        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
         assertFalse(errors.stream().anyMatch(p -> p.getMessage().contains("Method 3")));
     }
 
@@ -28,7 +33,7 @@ class ZeroInvertsTest extends FormattedTestProvider {
         StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMethod(3);
         formatted.setInverts(5);
-        Collection<ValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
+        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
         assertTrue(errors.stream().anyMatch(p -> p.getMessage().contains("Method 3")));
     }
 
@@ -37,7 +42,7 @@ class ZeroInvertsTest extends FormattedTestProvider {
         StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMethod(4);
         formatted.setInverts(5);
-        Collection<ValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
+        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
         assertTrue(errors.stream().anyMatch(p -> p.getMessage().contains("Method 4")));
     }
 
@@ -46,7 +51,7 @@ class ZeroInvertsTest extends FormattedTestProvider {
         StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMethod(5);
         formatted.setInverts(5);
-        Collection<ValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
+        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
         assertTrue(errors.stream().anyMatch(p -> p.getMessage().contains("Method 5")));
     }
 }

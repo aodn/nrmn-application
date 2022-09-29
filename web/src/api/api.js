@@ -127,12 +127,12 @@ export const getCorrections = (surveyId) =>
     .then((res) => res)
     .catch((err) => err);
 
-export const validateSurveyCorrection = (surveyId, rows) => {
-  return axiosInstance.post('correction/validate/' + surveyId, rows);
+export const validateSurveyCorrection = (surveyId, bodyDto) => {
+  return axiosInstance.post('correction/validate/' + surveyId, bodyDto);
 };
 
-export const submitSurveyCorrection = (surveyId, rows) => {
-  return axiosInstance.post('correction/correct/' + surveyId, rows);
+export const submitSurveyCorrection = (surveyId, bodyDto) => {
+  return axiosInstance.post('correction/correct/' + surveyId, bodyDto);
 };
 
 export const validateJob = (jobId, completion) => {

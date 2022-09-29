@@ -13,14 +13,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
-import au.org.aodn.nrmn.restapi.model.db.Diver;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.model.db.UiSpeciesAttributes;
-import au.org.aodn.nrmn.restapi.model.db.enums.Directions;
+
+import au.org.aodn.nrmn.restapi.data.model.Diver;
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
+import au.org.aodn.nrmn.restapi.data.model.Site;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
+import au.org.aodn.nrmn.restapi.data.model.UiSpeciesAttributes;
+import au.org.aodn.nrmn.restapi.enums.Directions;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.util.TimeUtils;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
 
 public class StagedRowFormattedMapperConfig {
 
@@ -95,7 +96,7 @@ public class StagedRowFormattedMapperConfig {
         };
 
         Converter<String, Boolean> toInvertSizing = ctx -> StringUtils.isNotEmpty(ctx.getSource())
-                ? ctx.getSource().equalsIgnoreCase("YES")
+                ? ctx.getSource().equalsIgnoreCase("Yes")
                 : false;
 
         Converter<String, Double> toDouble = ctx -> {

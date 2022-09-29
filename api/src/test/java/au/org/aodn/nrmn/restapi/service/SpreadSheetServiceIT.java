@@ -3,8 +3,12 @@ package au.org.aodn.nrmn.restapi.service;
 import java.io.InputStream;
 import java.util.List;
 
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
+import au.org.aodn.nrmn.restapi.enums.SurveyField;
+import au.org.aodn.nrmn.restapi.service.upload.SpreadSheetService;
+import au.org.aodn.nrmn.restapi.service.upload.SurveyContentsHandler.ParsedSheet;
 import au.org.aodn.nrmn.restapi.controller.StagedJobController;
-import au.org.aodn.nrmn.restapi.enumeration.SurveyField;
+
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,8 +18,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.service.SurveyContentsHandler.ParsedSheet;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 

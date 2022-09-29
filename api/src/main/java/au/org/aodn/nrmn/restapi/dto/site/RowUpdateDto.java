@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.dto.site;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

@@ -1,6 +1,9 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.restapi.model.db.*;
+import au.org.aodn.nrmn.restapi.data.model.*;
+import au.org.aodn.nrmn.restapi.model.db.LocationTestData;
+import au.org.aodn.nrmn.restapi.model.db.MeowRegionTestData;
+import au.org.aodn.nrmn.restapi.model.db.SiteTestData;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;

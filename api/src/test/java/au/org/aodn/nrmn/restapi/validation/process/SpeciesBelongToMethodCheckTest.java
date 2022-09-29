@@ -1,11 +1,14 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationError;
-import au.org.aodn.nrmn.restapi.model.db.Method;
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.data.model.Method;
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
+import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,6 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SpeciesBelongToMethodCheckTest extends FormattedTestProvider {
+    
+    @Mock
+    MeasurementValidation measurementValidation;
 
     @Test
     public void matchingMethodShouldSuccess() {
@@ -27,7 +33,7 @@ class SpeciesBelongToMethodCheckTest extends FormattedTestProvider {
         formatted.setSpecies(
                 Optional.of(ObservableItem.builder().observableItemName("THE SPECIES").methods(methods).build()));
 
-        Collection<ValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
+        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
         assertFalse(errors.stream().anyMatch(p -> p.getMessage().contains("invalid for species")));
     }
 
@@ -40,7 +46,7 @@ class SpeciesBelongToMethodCheckTest extends FormattedTestProvider {
         formatted.setSpecies(
                 Optional.of(ObservableItem.builder().observableItemName("THE SPECIES").methods(methods).build()));
 
-        Collection<ValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
+        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
         assertTrue(errors.stream().anyMatch(p -> p.getMessage().contains("invalid for species")));
     }
 }

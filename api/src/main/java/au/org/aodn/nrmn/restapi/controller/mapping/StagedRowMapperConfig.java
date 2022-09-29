@@ -7,9 +7,9 @@ import java.util.Optional;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 
-import au.org.aodn.nrmn.restapi.model.db.ObservableItem;
-import au.org.aodn.nrmn.restapi.model.db.StagedRow;
-import au.org.aodn.nrmn.restapi.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
+import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 public class StagedRowMapperConfig {
     
@@ -28,6 +28,10 @@ public class StagedRowMapperConfig {
             return ctx.getSource().isPresent() ? String.valueOf(ctx.getSource().get().intValue()) : null;
         };
 
+        var booleanMapper = (Converter<Boolean, String>) ctx -> {
+            return ctx.getSource() != null && ctx.getSource() == true ? "Yes" : "No";
+        };
+
         modelMapper.typeMap(StagedRowFormatted.class, StagedRow.class)
                 .addMappings(mapper -> mapper.map(StagedRowFormatted::getMethod, StagedRow::setMethod))
                 .addMappings(mapper -> mapper.map(StagedRowFormatted::getBlock, StagedRow::setBlock))
@@ -36,6 +40,8 @@ public class StagedRowMapperConfig {
                         .map(StagedRowFormatted::getDate, StagedRow::setDate))
                 .addMappings(mapper -> mapper.using(integerMapper)
                         .map(StagedRowFormatted::getVis, StagedRow::setVis))
+                .addMappings(mapper -> mapper.using(booleanMapper)
+                        .map(StagedRowFormatted::getIsInvertSizing, StagedRow::setIsInvertSizing))
                 .addMappings(mapper -> mapper.using(obsItemMapper)
                         .map(StagedRowFormatted::getSpecies, StagedRow::setSpecies));
 

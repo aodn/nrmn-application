@@ -25,7 +25,7 @@ public interface CorrectionRowDto {
 
     String getSpecies();
 
-    String getLetterCode();
+    String getCode();
 
     String getMethod();
 

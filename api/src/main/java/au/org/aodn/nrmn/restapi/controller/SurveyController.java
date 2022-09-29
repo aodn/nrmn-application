@@ -5,13 +5,19 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import au.org.aodn.nrmn.restapi.data.model.Observation;
+import au.org.aodn.nrmn.restapi.data.model.Program;
+import au.org.aodn.nrmn.restapi.data.model.Survey;
+import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.data.repository.ProgramRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.data.repository.dynamicQuery.FilterCondition;
+import au.org.aodn.nrmn.restapi.data.repository.dynamicQuery.ObservationFilterCondition;
+import au.org.aodn.nrmn.restapi.data.repository.dynamicQuery.SurveyFilterCondition;
+import au.org.aodn.nrmn.restapi.data.repository.projections.SurveyRowDivers;
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
-import au.org.aodn.nrmn.restapi.model.db.Observation;
-import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
-import au.org.aodn.nrmn.restapi.repository.dynamicQuery.FilterCondition;
-import au.org.aodn.nrmn.restapi.repository.dynamicQuery.ObservationFilterCondition;
-import au.org.aodn.nrmn.restapi.repository.dynamicQuery.SurveyFilterCondition;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.ListUtils;
@@ -24,13 +30,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
-import au.org.aodn.nrmn.restapi.model.db.Program;
-import au.org.aodn.nrmn.restapi.model.db.Survey;
-import au.org.aodn.nrmn.restapi.repository.ProgramRepository;
-import au.org.aodn.nrmn.restapi.repository.SurveyRepository;
-import au.org.aodn.nrmn.restapi.repository.projections.SurveyRowDivers;
 import au.org.aodn.nrmn.restapi.service.SurveyEditService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -160,8 +160,8 @@ public class SurveyController {
     @PutMapping("/survey/{id}")
     public ResponseEntity<?> findOne(@Valid @RequestBody SurveyDto surveyDto) {
 
-        ValidationErrors errors = surveyEditService.validateSurvey(surveyDto);
-        if (!errors.getErrors().isEmpty()) {
+        var errors = surveyEditService.validateSurvey(surveyDto);
+        if (!errors.isEmpty()) {
             return ResponseEntity.badRequest().body(errors);
         }
 

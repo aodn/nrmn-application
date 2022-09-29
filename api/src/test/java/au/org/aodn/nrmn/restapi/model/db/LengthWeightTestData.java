@@ -1,7 +1,9 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.model.db.LengthWeight.LengthWeightBuilder;
 import org.springframework.stereotype.Component;
+
+import au.org.aodn.nrmn.restapi.data.model.LengthWeight;
+import au.org.aodn.nrmn.restapi.data.model.LengthWeight.LengthWeightBuilder;
 
 @Component
 public class LengthWeightTestData {

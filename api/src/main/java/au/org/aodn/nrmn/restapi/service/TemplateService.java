@@ -25,17 +25,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
-import au.org.aodn.nrmn.restapi.model.db.Diver;
-import au.org.aodn.nrmn.restapi.model.db.Location;
-import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.repository.DiverRepository;
-import au.org.aodn.nrmn.restapi.repository.LetterCodeRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
-import au.org.aodn.nrmn.restapi.repository.projections.LetterCodeMapping;
-import au.org.aodn.nrmn.restapi.repository.projections.ObservableItemRow;
-import au.org.aodn.nrmn.restapi.repository.projections.SpeciesWithAttributesCsvRow;
+import au.org.aodn.nrmn.restapi.data.model.Diver;
+import au.org.aodn.nrmn.restapi.data.model.Location;
+import au.org.aodn.nrmn.restapi.data.model.Site;
+import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
+import au.org.aodn.nrmn.restapi.data.repository.LetterCodeRepository;
+import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
+import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.data.repository.projections.LetterCodeMapping;
+import au.org.aodn.nrmn.restapi.data.repository.projections.ObservableItemRow;
+import au.org.aodn.nrmn.restapi.data.repository.projections.SpeciesWithAttributesCsvRow;
 
 @Service
 public class TemplateService {

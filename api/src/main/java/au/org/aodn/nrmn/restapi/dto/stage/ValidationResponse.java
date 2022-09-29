@@ -3,7 +3,7 @@ package au.org.aodn.nrmn.restapi.dto.stage;
 import java.util.Collection;
 import java.util.Map;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedJob;
+import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,5 +31,5 @@ public class ValidationResponse {
 
     Map<String, Boolean> foundSites;
 
-    Collection<ValidationError> errors;
+    Collection<SurveyValidationError> errors;
 }

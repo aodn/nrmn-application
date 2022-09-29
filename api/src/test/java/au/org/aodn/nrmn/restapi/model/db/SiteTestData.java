@@ -7,8 +7,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import au.org.aodn.nrmn.restapi.model.db.Site.SiteBuilder;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
+import au.org.aodn.nrmn.restapi.data.model.Site;
+import au.org.aodn.nrmn.restapi.data.model.Site.SiteBuilder;
+import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 
 @Component
 public class SiteTestData {

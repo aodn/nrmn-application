@@ -1,10 +1,11 @@
 package au.org.aodn.nrmn.restapi.controller.mapping;
 
+import au.org.aodn.nrmn.restapi.data.model.Location;
+import au.org.aodn.nrmn.restapi.data.model.Site;
+import au.org.aodn.nrmn.restapi.data.repository.LocationRepository;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.dto.site.SiteDto;
-import au.org.aodn.nrmn.restapi.model.db.Location;
-import au.org.aodn.nrmn.restapi.model.db.Site;
-import au.org.aodn.nrmn.restapi.repository.LocationRepository;
+
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

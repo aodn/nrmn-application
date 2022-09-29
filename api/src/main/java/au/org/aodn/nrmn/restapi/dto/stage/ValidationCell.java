@@ -1,7 +1,7 @@
 package au.org.aodn.nrmn.restapi.dto.stage;
 
-import au.org.aodn.nrmn.restapi.model.db.enums.ValidationCategory;
-import au.org.aodn.nrmn.restapi.model.db.enums.ValidationLevel;
+import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
+import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

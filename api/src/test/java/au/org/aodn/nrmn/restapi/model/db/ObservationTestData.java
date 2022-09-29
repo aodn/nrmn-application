@@ -1,13 +1,16 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.model.db.Observation.ObservationBuilder;
-
 import java.util.HashMap;
 import java.util.Map;
 
-import au.org.aodn.nrmn.restapi.repository.ObservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import au.org.aodn.nrmn.restapi.data.model.Diver;
+import au.org.aodn.nrmn.restapi.data.model.Observation;
+import au.org.aodn.nrmn.restapi.data.model.SurveyMethodEntity;
+import au.org.aodn.nrmn.restapi.data.model.Observation.ObservationBuilder;
+import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
 
 @Component
 public class ObservationTestData {

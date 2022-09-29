@@ -7,9 +7,7 @@ import javax.validation.Valid;
 
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
-import au.org.aodn.nrmn.restapi.model.db.SiteListView;
-import au.org.aodn.nrmn.restapi.repository.*;
-import au.org.aodn.nrmn.restapi.repository.dynamicQuery.FilterCondition;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -31,13 +29,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import au.org.aodn.nrmn.restapi.data.model.Site;
+import au.org.aodn.nrmn.restapi.data.model.SiteListView;
+import au.org.aodn.nrmn.restapi.data.repository.*;
+import au.org.aodn.nrmn.restapi.data.repository.dynamicQuery.FilterCondition;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
-import au.org.aodn.nrmn.restapi.controller.validation.ValidationError;
-import au.org.aodn.nrmn.restapi.controller.validation.ValidationErrors;
+import au.org.aodn.nrmn.restapi.controller.validation.FormValidationError;
 import au.org.aodn.nrmn.restapi.dto.site.SiteDto;
 import au.org.aodn.nrmn.restapi.dto.site.SiteGetDto;
 import au.org.aodn.nrmn.restapi.dto.site.SiteOptionsDto;
-import au.org.aodn.nrmn.restapi.model.db.Site;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -115,8 +115,8 @@ public class SiteController {
     @PostMapping("/site")
     public ResponseEntity<?> newSite(@Valid @RequestBody SiteDto sitePostDto) {
         Site newSite = mapper.map(sitePostDto, Site.class);
-        ValidationErrors errors = validateConstraints(newSite);
-        if (!errors.getErrors().isEmpty()) {
+        var errors = validateConstraints(newSite);
+        if (!errors.isEmpty()) {
             return ResponseEntity.badRequest().body(errors);
         }
         Site persistedSite = siteRepository.save(newSite);
@@ -128,8 +128,8 @@ public class SiteController {
     public ResponseEntity<?> updateSite(@PathVariable Integer id, @Valid @RequestBody SiteDto sitePutDto) {
         Site site = siteRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         mapper.map(sitePutDto, site);
-        ValidationErrors errors = validateConstraints(site);
-        if (!errors.getErrors().isEmpty()) {
+        var errors = validateConstraints(site);
+        if (!errors.isEmpty()) {
             return ResponseEntity.badRequest().body(errors);
         }
         Site persistedSite = siteRepository.save(site);
@@ -143,20 +143,20 @@ public class SiteController {
         siteRepository.deleteById(id);
     }
 
-    private ValidationErrors validateConstraints(Site site) {
-        List<ValidationError> errors = new ArrayList<>();
+    private List<FormValidationError> validateConstraints(Site site) {
+        List<FormValidationError> errors = new ArrayList<>();
 
         if (StringUtils.isBlank(site.getSiteName()))
-            errors.add(new ValidationError("Site", "siteName", "", "Site Name must not be empty."));
+            errors.add(new FormValidationError("Site", "siteName", "", "Site Name must not be empty."));
 
         if (StringUtils.isBlank(site.getSiteCode()))
-            errors.add(new ValidationError("Site", "siteCode", "", "Site Code must not be empty."));
+            errors.add(new FormValidationError("Site", "siteCode", "", "Site Code must not be empty."));
 
         if (site.getLocation() == null)
-            errors.add(new ValidationError("Site", "locationId", "", "Please select a location."));
+            errors.add(new FormValidationError("Site", "locationId", "", "Please select a location."));
 
         if (errors.size() > 0)
-            return new ValidationErrors(errors);
+            return errors;
 
         Example<Site> siteWithCodeExample = Example.of(
                 Site.builder()
@@ -166,7 +166,7 @@ public class SiteController {
         Optional<Site> existingSite = siteRepository.findOne(siteWithCodeExample);
 
         if (existingSite.isPresent() && !existingSite.get().getSiteId().equals(site.getSiteId())) {
-            errors.add(new ValidationError("Site", "siteCode", site.getSiteCode(),
+            errors.add(new FormValidationError("Site", "siteCode", site.getSiteCode(),
                     "A site with this code already exists."));
         }
 
@@ -180,10 +180,10 @@ public class SiteController {
 
         if (existingSiteWithName.isPresent() && (site.getSiteCode() == null
                 || !existingSiteWithName.get().getSiteCode().equalsIgnoreCase(site.getSiteCode()))) {
-            errors.add(new ValidationError("Site", "siteName", site.getSiteName(),
+            errors.add(new FormValidationError("Site", "siteName", site.getSiteName(),
                     "A site with this name already exists in this location."));
         }
 
-        return new ValidationErrors(errors);
+        return errors;
     }
 }

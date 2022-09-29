@@ -86,7 +86,7 @@ const SiteEdit = ({clone}) => {
         if (res.data.siteId) {
           setSaved(res.data);
         } else {
-          setErrors(res.data.errors);
+          setErrors(res.data);
         }
       });
     } else {
@@ -94,7 +94,7 @@ const SiteEdit = ({clone}) => {
         if (res.data.siteId) {
           setSaved(res.data);
         } else {
-          setErrors(res.data.errors);
+          setErrors(res.data);
         }
       });
     }

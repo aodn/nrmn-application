@@ -1,10 +1,12 @@
 package au.org.aodn.nrmn.restapi.model.db;
 
-import au.org.aodn.nrmn.restapi.model.db.StagedJobLog.StagedJobLogBuilder;
-import au.org.aodn.nrmn.restapi.model.db.enums.StagedJobEventType;
-import au.org.aodn.nrmn.restapi.repository.StagedJobLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import au.org.aodn.nrmn.restapi.data.model.StagedJobLog;
+import au.org.aodn.nrmn.restapi.data.model.StagedJobLog.StagedJobLogBuilder;
+import au.org.aodn.nrmn.restapi.data.repository.StagedJobLogRepository;
+import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
 
 @Component
 public class StagedJobLogTestData {

@@ -18,11 +18,11 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.test.context.support.WithUserDetails;
 
-import au.org.aodn.nrmn.restapi.model.db.Location;
+import au.org.aodn.nrmn.restapi.data.model.Location;
+import au.org.aodn.nrmn.restapi.data.model.Site;
+import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.model.db.LocationTestData;
-import au.org.aodn.nrmn.restapi.model.db.Site;
 import au.org.aodn.nrmn.restapi.model.db.SiteTestData;
-import au.org.aodn.nrmn.restapi.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
@@ -152,7 +152,7 @@ public class SiteApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("A site with this code already exists.")));
+                .body("[0].message", is(equalTo("A site with this code already exists.")));
     }
 
     @Test
@@ -176,7 +176,7 @@ public class SiteApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("A site with this name already exists in this location.")));
+                .body("[0].message", is(equalTo("A site with this name already exists in this location.")));
     }
 
     @Test
@@ -201,7 +201,7 @@ public class SiteApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("A site with this code already exists.")));
+                .body("[0].message", is(equalTo("A site with this code already exists.")));
     }
 
     @Test
@@ -226,7 +226,7 @@ public class SiteApiIT {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body("errors[0].message", is(equalTo("A site with this name already exists in this location.")));
+                .body("[0].message", is(equalTo("A site with this name already exists in this location.")));
     }
 
     @Test
