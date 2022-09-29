@@ -1,6 +1,5 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
@@ -13,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import au.org.aodn.nrmn.restapi.data.model.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 @ExtendWith(MockitoExtension.class)
 class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
@@ -62,6 +62,7 @@ class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
         }
     };
 
+
     @Test
     public void TotalUnderMaxAbundanceShouldSuccess() {
         StagedRowFormatted formatted = getDefaultFormatted().build();
@@ -76,10 +77,11 @@ class SpeciesAbundanceCheckTest extends  FormattedTestProvider {
     public void TotalAboveMaxAbundanceShouldFailed() {
         StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setSpeciesAttributesOpt(Optional.of(specAttribute));
-        formatted.setTotal(31);
+        formatted.setMeasureJson(ImmutableMap.<Integer, Integer>builder().put(1, 1).put(3, 15).put(4, 15).build());
         formatted.setMethod(1);
         var errors = measurementValidation.validateAbundance(formatted, specAttribute);
-        assertFalse(errors.isEmpty());
+        final String expectedError = "Abundance exceeds 30";
+        assertTrue(errors.stream().anyMatch(e -> e.getMessage().startsWith(expectedError)));
     }
 
     @Test

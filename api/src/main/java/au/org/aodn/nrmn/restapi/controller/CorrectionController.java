@@ -227,7 +227,7 @@ public class CorrectionController {
                 put("longitude", "Longitude is not a decimal");
                 put("method", "Method is missing");
                 put("siteCode", "Site does not exist");
-                put("code", "Letter Code does not exist");
+                put("code", "Letter Code missing");
                 put("species", "Species does not exist");
                 put("time", "Time is not valid");
                 put("vis", "Vis is not a number");
