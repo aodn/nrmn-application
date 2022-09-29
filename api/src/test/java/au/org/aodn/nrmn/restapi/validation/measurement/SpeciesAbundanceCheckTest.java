@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation.process;
+package au.org.aodn.nrmn.restapi.validation.measurement;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -12,6 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import au.org.aodn.nrmn.restapi.data.model.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.validation.process.FormattedTestProvider;
+
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 @ExtendWith(MockitoExtension.class)

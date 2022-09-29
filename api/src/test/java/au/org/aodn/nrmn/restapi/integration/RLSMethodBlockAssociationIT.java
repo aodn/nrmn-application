@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation.process;
+package au.org.aodn.nrmn.restapi.integration;
 
 import au.org.aodn.nrmn.restapi.data.model.Location;
 import au.org.aodn.nrmn.restapi.data.model.Site;

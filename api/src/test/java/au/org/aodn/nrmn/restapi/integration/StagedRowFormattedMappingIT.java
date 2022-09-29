@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation.process;
+package au.org.aodn.nrmn.restapi.integration;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;

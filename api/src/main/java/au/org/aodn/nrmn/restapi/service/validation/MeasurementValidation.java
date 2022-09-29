@@ -127,8 +127,8 @@ public class MeasurementValidation {
                     .collect(Collectors.toList());
 
             if (!outOfRange.isEmpty()) {
-                var message = (isInvertSized ? "Invert measurement " : "Measurement ") + " is above Lmax [" + lMax
-                        + "] for Species [" + row.getRef().getSpecies() + "]";
+                var message = (isInvertSized ? "Invert measurement" : "Measurement") + " above Lmax [" + lMax
+                        + "] for [" + row.getRef().getSpecies() + "]";
                 outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA,
                         ValidationLevel.INFO, message, row.getId(), col.toString())));
             }

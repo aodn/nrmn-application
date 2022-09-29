@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation.process;
+package au.org.aodn.nrmn.restapi.integration;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
@@ -29,6 +29,7 @@ import au.org.aodn.nrmn.restapi.model.db.SecUserTestData;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
+import au.org.aodn.nrmn.restapi.validation.process.FormattedTestProvider;
 
 @Testcontainers
 @SpringBootTest

@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation.process;
+package au.org.aodn.nrmn.restapi.validation.measurement;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -11,6 +11,7 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
+import au.org.aodn.nrmn.restapi.validation.process.FormattedTestProvider;
 
 @ExtendWith(MockitoExtension.class)
 class TotalCheckSumTest extends FormattedTestProvider  {

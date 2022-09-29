@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation.process;
+package au.org.aodn.nrmn.restapi.validation.measurement;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -16,6 +16,7 @@ import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.validation.process.FormattedTestProvider;
 
 class DebrisZeroObsTest extends FormattedTestProvider {
 
