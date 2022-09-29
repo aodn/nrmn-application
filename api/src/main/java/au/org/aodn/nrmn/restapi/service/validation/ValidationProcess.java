@@ -22,11 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
-import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
-import au.org.aodn.nrmn.restapi.data.model.StagedRow;
-import au.org.aodn.nrmn.restapi.data.model.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
@@ -39,6 +35,7 @@ import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
+import au.org.aodn.nrmn.restapi.service.formatting.SpeciesFormattingService;
 
 @Component
 public class ValidationProcess {
@@ -66,6 +63,9 @@ public class ValidationProcess {
 
     @Autowired
     MeasurementValidation speciesMeasurement;
+
+    @Autowired
+    SpeciesFormattingService speciesFormatting;
 
     private static final Integer[] METHODS_TO_CHECK = { 0, 1, 2, 7, 10 };
     private static final LocalDate DATE_MIN_RLS = LocalDate.parse("2006-01-01");
@@ -389,27 +389,6 @@ public class ValidationProcess {
         return res;
     }
 
-    public Collection<ObservableItem> getSpeciesForRows(Collection<StagedRow> rows) {
-        var enteredSpeciesNames = rows.stream().map(s -> s.getSpecies()).collect(Collectors.toSet());
-        return observableItemRepository.getAllSpeciesNamesMatching(enteredSpeciesNames);
-    }
-
-    public Collection<StagedRowFormatted> formatRowsWithSpecies(Collection<StagedRow> rows,
-            Collection<ObservableItem> species) {
-        var rowMap = rows.stream().collect(Collectors.toMap(StagedRow::getId, r -> r));
-        var speciesIds = species.stream().mapToInt(ObservableItem::getObservableItemId).toArray();
-        var speciesAttributesMap = observationRepository.getSpeciesAttributesByIds(speciesIds).stream()
-                .collect(Collectors.toMap(UiSpeciesAttributes::getSpeciesName, a -> a));
-        var speciesMap = species.stream().collect(Collectors.toMap(ObservableItem::getObservableItemName, o -> o));
-        var divers = diverRepository.getAll().stream().collect(Collectors.toList());
-        var sites = siteRepository.getAll().stream().collect(Collectors.toList());
-
-        var mapperConfig = new StagedRowFormattedMapperConfig();
-        var mapper = mapperConfig.getModelMapper(speciesMap, rowMap, speciesAttributesMap, divers, sites);
-        return rows.stream().map(stagedRow -> mapper.map(stagedRow, StagedRowFormatted.class))
-                .collect(Collectors.toList());
-    }
-
     public ValidationResponse generateSummary(Collection<StagedRowFormatted> mappedRows) {
         var response = new ValidationResponse();
         response.setRowCount(mappedRows.size());
@@ -486,7 +465,6 @@ public class ValidationProcess {
                 : false;
 
         var rows = rowRepository.findRowsByJobId(job.getId());
-        var species = getSpeciesForRows(rows);
 
         var validation = ProgramValidation.fromProgram(job.getProgram());
 
@@ -494,9 +472,9 @@ public class ValidationProcess {
         var siteCodes = siteRepository.getAllSiteCodesMatching(enteredSiteCodes);
         var sheetErrors = new HashSet<SurveyValidationError>();
 
+        var species = speciesFormatting.getSpeciesForRows(rows);
         sheetErrors.addAll(dataValidation.checkFormatting(validation, job.getIsExtendedSize(), siteCodes, species, rows));
-
-        var mappedRows = formatRowsWithSpecies(rows, species);
+        var mappedRows = speciesFormatting.formatRowsWithSpecies(rows, species);
 
         var response = generateSummary(mappedRows);
 

@@ -23,8 +23,8 @@ import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.enums.Directions;
+import au.org.aodn.nrmn.restapi.service.formatting.SpeciesFormattingService;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
-import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 import au.org.aodn.nrmn.restapi.util.TimeUtils;
@@ -36,7 +36,7 @@ import au.org.aodn.nrmn.restapi.util.TimeUtils;
 class StagedRowFormattedMappingIT {
 
     @Autowired
-    ValidationProcess validationProcess;
+    SpeciesFormattingService speciesFormatting;
 
     @Autowired
     ObservableItemRepository observableItemRepository;
@@ -81,7 +81,7 @@ class StagedRowFormattedMappingIT {
 
         Collection<ObservableItem> species = observableItemRepository
                 .getAllSpeciesNamesMatching(Arrays.asList(row.getSpecies()));
-        Collection<StagedRowFormatted> validatedRows = validationProcess.formatRowsWithSpecies(Arrays.asList(row),
+        Collection<StagedRowFormatted> validatedRows = speciesFormatting.formatRowsWithSpecies(Arrays.asList(row),
                 species);
 
         assertEquals(1, validatedRows.size());
@@ -141,7 +141,7 @@ class StagedRowFormattedMappingIT {
         Collection<ObservableItem> species = observableItemRepository
                 .getAllSpeciesNamesMatching(Arrays.asList(row.getSpecies()));
 
-        Collection<StagedRowFormatted> validatedRows = validationProcess
+        Collection<StagedRowFormatted> validatedRows = speciesFormatting
                 .formatRowsWithSpecies(Arrays.asList(row), species);
 
         assertEquals(1, validatedRows.size());
@@ -191,7 +191,7 @@ class StagedRowFormattedMappingIT {
     
             Collection<ObservableItem> species = observableItemRepository
                     .getAllSpeciesNamesMatching(Arrays.asList(row.getSpecies()));
-            Collection<StagedRowFormatted> validatedRows = validationProcess.formatRowsWithSpecies(Arrays.asList(row),
+            Collection<StagedRowFormatted> validatedRows = speciesFormatting.formatRowsWithSpecies(Arrays.asList(row),
                     species);
 
             StagedRowFormatted formattedRow = (StagedRowFormatted) validatedRows.toArray()[0];

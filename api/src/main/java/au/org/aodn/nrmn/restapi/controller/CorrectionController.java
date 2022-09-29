@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowMapperConfig;
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.data.model.SecUser;
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
@@ -41,12 +42,10 @@ import au.org.aodn.nrmn.restapi.data.repository.StagedJobLogRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.data.repository.UserActionAuditRepository;
-import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
-import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowMapperConfig;
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRequestBodyDto;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowsDto;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.enums.SourceJobType;
@@ -56,8 +55,9 @@ import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.SurveyCorrectionService;
-import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
+import au.org.aodn.nrmn.restapi.service.formatting.SpeciesFormattingService;
 import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
+import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationResultSet;
 import au.org.aodn.nrmn.restapi.util.ObjectUtils;
@@ -112,6 +112,9 @@ public class CorrectionController {
     @Autowired
     UserActionAuditRepository userActionAuditRepository;
 
+    @Autowired
+    SpeciesFormattingService speciesFormatting;
+
     private static Logger logger = LoggerFactory.getLogger(CorrectionController.class);
 
     private void logMessage(StagedJob job, String message) {
@@ -120,32 +123,6 @@ public class CorrectionController {
                 .details(message)
                 .build();
         stagedJobLogRepository.save(log);
-    }
-
-    private List<StagedRowFormatted> formatRowsWithSpecies(Collection<StagedRow> rows,
-            Collection<ObservableItem> species) {
-
-        var rowMap = rows.stream().collect(Collectors.toMap(StagedRow::getId, r -> r));
-
-        var speciesIds = species.stream()
-                .mapToInt(s -> s.getObservableItemId())
-                .toArray();
-
-        var speciesAttributesMap = observationRepository
-                .getSpeciesAttributesByIds(speciesIds).stream()
-                .collect(Collectors.toMap(UiSpeciesAttributes::getSpeciesName, a -> a));
-
-        var speciesMap = species.stream().collect(Collectors.toMap(ObservableItem::getObservableItemName, o -> o));
-
-        var divers = diverRepository.getAll().stream().collect(Collectors.toList());
-
-        var sites = siteRepository.getAll().stream().collect(Collectors.toList());
-
-        var mapperConfig = new StagedRowFormattedMapperConfig();
-        var mapper = mapperConfig.getModelMapper(speciesMap, rowMap, speciesAttributesMap, divers, sites);
-
-        return rows.stream().map(stagedRow -> mapper.map(stagedRow, StagedRowFormatted.class))
-                .collect(Collectors.toList());
     }
 
     private List<Pair<StagedRowFormatted, HashSet<String>>> mapRows(Collection<StagedRow> rows) {
@@ -161,7 +138,7 @@ public class CorrectionController {
             observableItems.add(snd);
         }
 
-        var formattedRows = formatRowsWithSpecies(rows, observableItems);
+        var formattedRows = speciesFormatting.formatRowsWithSpecies(rows, observableItems);
 
         var propertyChecks = new HashMap<String, Function<StagedRow, String>>() {
             {
