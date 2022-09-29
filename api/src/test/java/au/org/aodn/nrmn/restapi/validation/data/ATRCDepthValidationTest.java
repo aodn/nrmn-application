@@ -20,7 +20,7 @@ import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
-import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
+import au.org.aodn.nrmn.restapi.service.validation.SurveyValidation;
 
 @ExtendWith(MockitoExtension.class)
 class ATRCDepthValidationTest {
@@ -38,7 +38,7 @@ class ATRCDepthValidationTest {
   DataValidation dataValidation;
 
   @InjectMocks
-  ValidationProcess validationProcess;
+  SurveyValidation surveyValidation;
 
   @Test
   void nullDepthShouldFail() {
@@ -60,7 +60,7 @@ class ATRCDepthValidationTest {
     job.setId(1L);
     StagedRowFormatted stage = new StagedRowFormatted();
     stage.setSurveyNum(9);
-    SurveyValidationError error = validationProcess.validateSurveyTransectNumber(Arrays.asList(stage));
+    SurveyValidationError error = surveyValidation.validateSurveyTransectNumber(Arrays.asList(stage));
     assertTrue(error.getMessage().equals("Survey group transect invalid"));
   }
 
@@ -72,7 +72,7 @@ class ATRCDepthValidationTest {
     row.setDepth(7);
     row.setSurveyNum(3);
     row.setMethod(1);
-    SurveyValidationError error = validationProcess.validateSurveyTransectNumber(Arrays.asList(row));
+    SurveyValidationError error = surveyValidation.validateSurveyTransectNumber(Arrays.asList(row));
     assertTrue(error == null);
   }
 }

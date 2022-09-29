@@ -9,12 +9,18 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.service.validation.SurveyValidation;
 
 class Method3QuadratsSumTest extends FormattedTestProvider {
+
+    @InjectMocks
+    SurveyValidation surveyValidation;
+
     @Test
     void quadratsSumUnder50ShouldFail() {
         StagedRowFormatted r1 = getDefaultFormatted().build();
@@ -92,7 +98,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        SurveyValidationError error = validationProcess.validateMethod3QuadratsGT50("", Arrays.asList(r1, r2, r3, r4, a1, a2, a3, a4));
+        SurveyValidationError error = surveyValidation.validateMethod3QuadratsGT50("", Arrays.asList(r1, r2, r3, r4, a1, a2, a3, a4));
         assertTrue(error != null && error.getMessage().startsWith("Quadrats do not sum to at least 50 in transect"));
     }
 
@@ -178,7 +184,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        Collection<ValidationCell> errors = validationProcess.validateMethod3QuadratsLT50(Arrays.asList(r1, r2, r3, r4, a1, a2, a3, a4));
+        Collection<ValidationCell> errors = surveyValidation.validateMethod3QuadratsLT50(Arrays.asList(r1, r2, r3, r4, a1, a2, a3, a4));
         assertTrue(errors != null && errors.iterator().next().getMessage().startsWith("M3 quadrat more than 50"));
     }
 
@@ -264,7 +270,7 @@ class Method3QuadratsSumTest extends FormattedTestProvider {
             }
         });
 
-        SurveyValidationError error = validationProcess.validateMethod3QuadratsGT50("", Arrays.asList(r1, r2, r3, r4, a1, a2, a3, a4));
+        SurveyValidationError error = surveyValidation.validateMethod3QuadratsGT50("", Arrays.asList(r1, r2, r3, r4, a1, a2, a3, a4));
         assertFalse(error != null && error.getMessage().startsWith("Quadrats do not sum to at least 50 in transect"));
     }
 }
