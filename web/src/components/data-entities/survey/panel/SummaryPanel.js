@@ -32,7 +32,7 @@ const SummaryPanel = ({api, context}) => {
   useEffect(() => {
     var formatted = [];
     for (const validation of context.validations) {
-      if (validation.rowIds.length == 1 || validation.columnNames.length == 1) {
+      if (validation.rowIds?.length == 1 || validation.columnNames?.length == 1) {
         const rowId = validation.rowIds[0];
         const rowData = api.getRowNode(rowId).data;
         const columnPath = validation.columnNames[0];
@@ -42,6 +42,12 @@ const SummaryPanel = ({api, context}) => {
         const rowNumbers = validation.rowIds.map(r => (context.rowPos.indexOf(r) + 1));
         validation.description = [{...col, rowIds: validation.rowIds, rowNumbers, value}];
       }
+      else if(validation.levelId === 'DUPLICATE') {
+        const rowNumbers = validation.rowIds.map(r => (context.rowPos.indexOf(r) + 2));
+        validation.id = 'duplicate' + rowNumbers.join('.');
+        validation.description = [{columnName: 'id', rowIds: validation.rowIds, rowNumbers, value:''}];
+      }
+
       formatted.push(validation);
     }
     setMessages(groupArrayByKey(formatted, 'levelId'));
@@ -88,7 +94,7 @@ const SummaryPanel = ({api, context}) => {
                                 Check Column{d.columnNames.length > 1 ? 's' : ''} {d.columnNames.join(', ')}
                               </b>
                             ) : (
-                              <b>Rows {d.rowNumbers.join(', ')}</b>
+                              <b>Rows {d.rowNumbers.sort().join(', ')}</b>
                             )}
                           </Typography>
                         }

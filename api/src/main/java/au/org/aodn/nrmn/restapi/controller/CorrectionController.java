@@ -324,10 +324,11 @@ public class CorrectionController {
         var response = new ValidationResponse();
         try {
             var errors = new ArrayList<SurveyValidationError>();
-            
+            var rows = bodyDto.getRows();
+            errors.addAll(dataValidation.checkDuplicateRows(false, true, rows));
             errors.addAll(validate(bodyDto.getProgramValidation(),
                     bodyDto.getIsExtended(),
-                    mapRows(bodyDto.getRows()))
+                    mapRows(rows))
                     .getAll());
             response.setErrors(errors);
         } catch (Exception e) {

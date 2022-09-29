@@ -20,11 +20,11 @@ const toolTipValueGetter = ({context, data, colDef}) => {
   if (!context.cellValidations) return;
   const row = data.id;
   const field = colDef.field;
-  const error = context.cellValidations[row]?.[field];
+  const error = context.cellValidations[row]?.[field] || context.cellValidations[row];
   if (error?.levelId === 'DUPLICATE') {
     const rowPositions = error.rowIds.map((r) => context.rowData.find((d) => d.id === r)?.pos).filter((r) => r);
     const duplicates = rowPositions.map((r) => context.rowPos.indexOf(r) + 1);
-    return duplicates.length > 1 ? 'Rows are duplicated: ' + duplicates.join(', ') : 'Duplicate rows have been removed';
+    return 'Rows are duplicated: ' + duplicates.join(', ');
   }
   return error?.message;
 };
@@ -84,9 +84,13 @@ const SurveyCorrect = () => {
     const cellFormat = [];
     for (const res of validationResult) {
       for (const row of res.rowIds) {
-        for (const col of res.columnNames) {
-          if (!cellFormat[row]) cellFormat[row] = {};
-          cellFormat[row][col] = {levelId: res.levelId, message: res.message};
+        if (!cellFormat[row]) cellFormat[row] = {};
+        if(res.columnNames) {
+          for (const col of res.columnNames) {
+            cellFormat[row][col] = {levelId: res.levelId, message: res.message};
+          }
+        } else {
+          cellFormat[row]['id'] = {levelId: res.levelId, message: res.message, rowIds: res.rowIds};
         }
       }
     }
