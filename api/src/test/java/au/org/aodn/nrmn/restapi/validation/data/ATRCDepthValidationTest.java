@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation.process;
+package au.org.aodn.nrmn.restapi.validation.data;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -18,6 +18,7 @@ import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
+import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 
@@ -34,6 +35,9 @@ class ATRCDepthValidationTest {
   SiteRepository siteRepository;
 
   @InjectMocks
+  DataValidation dataValidation;
+
+  @InjectMocks
   ValidationProcess validationProcess;
 
   @Test
@@ -45,7 +49,7 @@ class ATRCDepthValidationTest {
     row.setDepth("");
     row.setBlock("");
     row.setStagedJob(job);
-    Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(),
+    Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(),
         Arrays.asList(), Arrays.asList(row));
     assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Depth is invalid, expected: depth[.surveyNum]")));
   }

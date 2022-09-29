@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.data.model.ObsItemType;
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
@@ -24,9 +23,9 @@ import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
+import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
-import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 
 @ExtendWith(MockitoExtension.class)
 class NoSpeciesFoundMeasurementsTest {
@@ -35,7 +34,7 @@ class NoSpeciesFoundMeasurementsTest {
     DiverRepository diverRepository;
     
     @InjectMocks
-    ValidationProcess validationProcess;
+    DataValidation dataValidation;
 
     @InjectMocks
     MeasurementValidation measurementValidation;
@@ -49,7 +48,7 @@ class NoSpeciesFoundMeasurementsTest {
         row.setMeasureJson(ImmutableMap.<Integer, String>builder().put(1, "2").build());
         row.setSpecies("Pictilabrus laticlavius");
         ObservableItem item = ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).observableItemName("Pictilabrus laticlavius").letterCode("pla").build();
-        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(item), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(item), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("species")));
     }
 

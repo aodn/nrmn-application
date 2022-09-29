@@ -15,7 +15,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
+import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 
@@ -26,7 +26,7 @@ import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 class ATRCMethodCheckIT {
 
     @Autowired
-    ValidationProcess validationProcess;
+    DataValidation dataValidation;
 
     @Test
     void only12methodShouldSucceed() {
@@ -51,7 +51,7 @@ class ATRCMethodCheckIT {
         StagedRow m2b1d8 = (StagedRow) SerializationUtils.clone(m1b1d8);
         m1b1d8.setMethod("2");
 
-        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"),
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"),
                 Arrays.asList(), Arrays.asList(m1b1, m2b1, m2b2, m1b1d8, m2b1d8));
 
         assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("ATRC Method must be [0-5], 7 or 10")));
@@ -83,7 +83,7 @@ class ATRCMethodCheckIT {
         StagedRow m5b3 = (StagedRow) SerializationUtils.clone(m3b1);
         m5b3.setBlock("5");
 
-        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"),
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"),
                 Arrays.asList(), Arrays.asList(m0b1, m0b2, m3b1, m3b3, m5b3));
 
         assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("ATRC Method must be [0-5], 7 or 10")));
@@ -109,7 +109,7 @@ class ATRCMethodCheckIT {
         StagedRow m2b1d8 = (StagedRow) SerializationUtils.clone(m1b1d8);
         m1b1d8.setMethod("2");
 
-        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"),
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"),
                 Arrays.asList(), Arrays.asList(m1b1, m1b1d10, m1b1d8, m2b1d8));
 
         assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("ATRC Method must be [0-5], 7 or 10")));

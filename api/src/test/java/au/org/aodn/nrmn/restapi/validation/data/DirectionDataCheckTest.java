@@ -1,7 +1,7 @@
-package au.org.aodn.nrmn.restapi.validation.process;
+package au.org.aodn.nrmn.restapi.validation.data;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,11 +19,10 @@ import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
+import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 
 @ExtendWith(MockitoExtension.class)
-class Block0DataCheckTest {
-
+class DirectionDataCheckTest {
     @Mock
     ObservationRepository observationRepository;
 
@@ -34,29 +33,27 @@ class Block0DataCheckTest {
     SiteRepository siteRepository;
 
     @InjectMocks
-    ValidationProcess validationProcess;
+    DataValidation dataValidation;
 
     @Test
-    void block0MethodOutOfRangeShouldFail() {
+    void invalidDirectionShouldFail() {
         StagedJob job = new StagedJob();
         job.setId(1L);
         StagedRow row = new StagedRow();
-        row.setBlock("0");
-        row.setMethod("2");
         row.setStagedJob(job);
-        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
-        assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Block 0 is invalid for method")));
+        row.setDirection("ED");
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Direction is not valid")));
     }
 
     @Test
-    void block0MethodInRangeShouldSucceed() {
+    void validDirectionShouldSucceed() {
         StagedJob job = new StagedJob();
         job.setId(1L);
         StagedRow row = new StagedRow();
-        row.setBlock("0");
-        row.setMethod("5");
         row.setStagedJob(job);
-        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
-        assertFalse(errors.stream().anyMatch(e -> e.getMessage().equals("Block 0 is invalid for method")));
+        row.setDirection("NE");
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        assertFalse(errors.stream().anyMatch(e -> e.getMessage().equals("Direction is not valid")));
     }
 }

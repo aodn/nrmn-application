@@ -57,6 +57,7 @@ import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.SurveyCorrectionService;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
+import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationResultSet;
 import au.org.aodn.nrmn.restapi.util.ObjectUtils;
@@ -73,7 +74,10 @@ public class CorrectionController {
     DiverRepository diverRepository;
 
     @Autowired
-    MeasurementValidation measurementValidationService;
+    MeasurementValidation measurementValidation;
+    
+    @Autowired
+    DataValidation dataValidation;
 
     @Autowired
     ObservableItemRepository observableItemRepository;
@@ -145,7 +149,7 @@ public class CorrectionController {
     }
 
     private List<Pair<StagedRowFormatted, HashSet<String>>> mapRows(Collection<StagedRow> rows) {
-
+            
         var speciesNames = rows.stream().map(s -> s.getSpecies()).collect(Collectors.toSet());
         var observableItems = observableItemRepository.getAllSpeciesNamesMatching(speciesNames);
 
@@ -276,10 +280,10 @@ public class CorrectionController {
 
             var speciesAttrib = row.getSpeciesAttributesOpt();
             if (speciesAttrib.isPresent())
-                validation.addAll(measurementValidationService.validate(speciesAttrib.get(), row, isExtended), false);
+                validation.addAll(measurementValidation.validate(speciesAttrib.get(), row, isExtended), false);
 
             // Total Checksum & Missing Data
-            validation.addAll(measurementValidationService.validateMeasurements(programValidation, row), false);
+            validation.addAll(measurementValidation.validateMeasurements(programValidation, row), false);
 
             // FUTURE: other validations go here ..
         }
@@ -320,6 +324,7 @@ public class CorrectionController {
         var response = new ValidationResponse();
         try {
             var errors = new ArrayList<SurveyValidationError>();
+            
             errors.addAll(validate(bodyDto.getProgramValidation(),
                     bodyDto.getIsExtended(),
                     mapRows(bodyDto.getRows()))

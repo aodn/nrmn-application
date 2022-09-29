@@ -53,6 +53,7 @@ import au.org.aodn.nrmn.restapi.service.StagedRowService;
 import au.org.aodn.nrmn.restapi.service.upload.S3IO;
 import au.org.aodn.nrmn.restapi.service.upload.SpreadSheetService;
 import au.org.aodn.nrmn.restapi.service.upload.SurveyContentsHandler.ParsedSheet;
+import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -96,6 +97,9 @@ public class StagedJobController {
     private ValidationProcess validation;
 
     @Autowired
+    private DataValidation dataValidation;
+
+    @Autowired
     private SecUserRepository userRepo;
 
     @Autowired
@@ -120,7 +124,7 @@ public class StagedJobController {
 
         if (lastRow.getTotal().equalsIgnoreCase("0")) {
             Long lastRowId = lastRow.getId();
-            var rowsToTruncate = validation.checkDuplicateRows(true, false, rowsToSave)
+            var rowsToTruncate = dataValidation.checkDuplicateRows(true, false, rowsToSave)
                     .stream()
                     .filter(v -> v.getRowIds().contains(lastRowId)).findAny();
 

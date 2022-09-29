@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation.process;
+package au.org.aodn.nrmn.restapi.validation.data;
 
 import static org.junit.Assert.assertTrue;
 
@@ -18,7 +18,7 @@ import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
+import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 
 @ExtendWith(MockitoExtension.class)
 class RLSDepthValidationTest {
@@ -32,7 +32,7 @@ class RLSDepthValidationTest {
     SiteRepository siteRepository;
 
     @InjectMocks
-    ValidationProcess validationProcess;
+    DataValidation dataValidation;
 
     @Test
     void depthWithMulipleDecimalsShouldFail() {
@@ -41,7 +41,7 @@ class RLSDepthValidationTest {
         StagedRow row = new StagedRow();
         row.setDepth("3.14");
         row.setStagedJob(job);
-        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertTrue(errors.stream().anyMatch(e -> e.getMessage().contains("Depth is invalid, expected: depth[.surveyNum]")));
     }
 
@@ -52,7 +52,7 @@ class RLSDepthValidationTest {
         StagedRow row = new StagedRow();
         row.setDepth(null);
         row.setStagedJob(job);
-        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertTrue(errors.stream().anyMatch(e -> e.getMessage().contains("Depth is invalid, expected: depth[.surveyNum]")));
     }
 }

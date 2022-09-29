@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation.process;
+package au.org.aodn.nrmn.restapi.validation.data;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -20,13 +20,13 @@ import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
+import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 
 @ExtendWith(MockitoExtension.class)
 class SpeciesSupersededTest {
 
     @InjectMocks
-    ValidationProcess validationProcess;
+    DataValidation dataValidation;
 
     @Mock
     DiverRepository diverRepository;
@@ -38,7 +38,7 @@ class SpeciesSupersededTest {
         StagedRow row = new StagedRow();
         row.setSpecies("THE SPECIES");
         List<ObservableItem> species = Arrays.asList(ObservableItem.builder().observableItemName("THE SPECIES").supersededBy("NEXT SPECIES").methods(methods).build());
-        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), species, Arrays.asList(row));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), species, Arrays.asList(row));
         assertTrue(errors.stream().anyMatch(p -> p.getMessage().contains("Superseded by")));
     }
 }
