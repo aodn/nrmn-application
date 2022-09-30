@@ -19,12 +19,14 @@ public class ValidationResultSet {
 
     public void addGlobal(Collection<SurveyValidationError> validationRows) {
         for (SurveyValidationError validationRow : validationRows) {
-            SurveyValidationError value = errorMap.getOrDefault(validationRow.getMessage(), new SurveyValidationError(ValidationCategory.DATA, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
+            var validationRowKey = validationRow.getMessage();
+            SurveyValidationError value = errorMap.getOrDefault(validationRowKey, new SurveyValidationError(ValidationCategory.DATA, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
             if (value != null) {
                 var rowIds = Stream.concat(value.getRowIds().stream(), validationRow.getRowIds().stream());
                 value.setRowIds(rowIds.distinct().collect(Collectors.toList()));
+                value.setRowIds(value.getRowIds().stream().distinct().collect(Collectors.toList()));
             }
-            errorMap.put(value.getRowIds().stream().map(id -> id.toString()).collect(Collectors.joining(".")) + value.getMessage(), value);
+            errorMap.put(validationRowKey, value);
         }
     }
 
