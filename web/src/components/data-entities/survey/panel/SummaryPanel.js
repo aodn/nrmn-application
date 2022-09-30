@@ -44,7 +44,7 @@ const SummaryPanel = ({api, context}) => {
       }
       else
       {
-        const rowNumbers = validation.rowIds.map(r => (context.rowPos.indexOf(r) + 2));
+        const rowNumbers = validation.rowIds.map(r => (context.rowPos.indexOf(r) + 1));
         validation.id = validation.message + rowNumbers.join('.');
         validation.description = [{columnName: 'id', rowIds: validation.rowIds, rowNumbers, value:''}];
       }

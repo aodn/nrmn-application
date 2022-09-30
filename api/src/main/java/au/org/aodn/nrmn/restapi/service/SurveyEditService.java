@@ -194,9 +194,9 @@ public class SurveyEditService {
 
         // Ensure site/date/depth.surveyNum is unique
         Integer depth = surveyDto.getDepth() != null && surveyDto.getDepth().length() > 0 ? Integer.valueOf(surveyDto.getDepth()) : null;
-        List<Survey> duplicateSurveys = surveyRepository.findBySiteDepthSurveyNumDate(
+        var duplicateSurveys = surveyRepository.findBySiteDepthSurveyNumDate(
                 surveyDtoSite, depth, surveyDto.getSurveyNum(), surveyDate).stream()
-                .filter(s -> !s.getSurveyId().equals(surveyDto.getSurveyId()))
+                .filter(surveyId -> !surveyId.equals(Integer.toUnsignedLong(surveyDto.getSurveyId())))
                 .collect(Collectors.toList());
 
         if (duplicateSurveys.size() > 0) {

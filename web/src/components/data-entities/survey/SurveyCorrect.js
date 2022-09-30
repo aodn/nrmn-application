@@ -102,7 +102,7 @@ const SurveyCorrect = () => {
     return [
       {field: 'pos', label: '', editable: false, hide: true, sort: 'asc'},
       {field: 'id', label: '', editable: false, hide: true},
-      {field: 'surveyId', label: 'Survey', editable: false},
+      {field: 'surveyId', label: 'Survey'},
       {field: 'diverId', label: 'Diver ID', hide: true},
       {field: 'diver', label: 'Diver'},
       {field: 'siteCode', label: 'Site Code', hide: true},

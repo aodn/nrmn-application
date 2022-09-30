@@ -25,7 +25,9 @@ import au.org.aodn.nrmn.restapi.enums.Directions;
 @Builder
 @AllArgsConstructor
 public class StagedRowFormatted {
-    private long id;
+    private Long id;
+
+    private Long surveyId;
 
     private Site site;
 

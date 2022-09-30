@@ -170,13 +170,12 @@ public class SurveyValidation {
         if (row.getDate() != null && Arrays.asList(METHODS_TO_CHECK).contains(row.getMethod())) {
 
             var surveyDate = Date.from(row.getDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-            var existingSurveys = surveyRepository.findBySiteDepthSurveyNumDate(row.getSite(), row.getDepth(),
+            var existingSurveyIds = surveyRepository.findBySiteDepthSurveyNumDate(row.getSite(), row.getDepth(),
                     row.getSurveyNum(), surveyDate);
 
-            if (!existingSurveys.isEmpty()) {
-                var existingSurvey = existingSurveys.stream().findFirst().get();
-                var message = "Survey exists: " + existingSurvey.getSurveyId() + " includes "
-                        + row.getDecimalSurvey();
+            if (existingSurveyIds.size() > 0 && !existingSurveyIds.contains(row.getSurveyId())) {
+                var existingSurveyId = existingSurveyIds.get(0);
+                var message = "Survey exists: " + existingSurveyId + " includes " + row.getDecimalSurvey();
                 return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, message,
                         Arrays.asList(row.getId()), Arrays.asList("siteCode"));
             }
@@ -251,14 +250,20 @@ public class SurveyValidation {
         var surveyMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
         sheetErrors.addAll(checkSurveys(validation, isExtended, surveyMap));
 
-        var surveyGroupMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
-        sheetErrors.addAll(checkSurveyGroups(validation, isExtended, surveyGroupMap));
-
         var method3SurveyMap = mappedRows.stream()
                 .filter(row -> row.getMethod() != null && row.getMethod().equals(3)
                         && !row.getRef().getSpecies().equalsIgnoreCase("Survey Not Done"))
                 .collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
         sheetErrors.addAll(checkMethod3Transects(isExtended, method3SurveyMap));
+
+        return sheetErrors;
+    }
+
+    public Collection<SurveyValidationError> validateSurveyGroups(ProgramValidation validation, Boolean isExtended, Collection<StagedRowFormatted> mappedRows) {
+        var sheetErrors = new HashSet<SurveyValidationError>();
+
+        var surveyGroupMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
+        sheetErrors.addAll(checkSurveyGroups(validation, isExtended, surveyGroupMap));
 
         return sheetErrors;
     }
