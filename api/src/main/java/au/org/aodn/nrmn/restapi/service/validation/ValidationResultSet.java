@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
@@ -20,10 +21,10 @@ public class ValidationResultSet {
         for (SurveyValidationError validationRow : validationRows) {
             SurveyValidationError value = errorMap.getOrDefault(validationRow.getMessage(), new SurveyValidationError(ValidationCategory.DATA, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
             if (value != null) {
-                value.getRowIds().addAll(validationRow.getRowIds());
-                value.setRowIds(value.getRowIds().stream().distinct().collect(Collectors.toList()));
+                var rowIds = Stream.concat(value.getRowIds().stream(), validationRow.getRowIds().stream());
+                value.setRowIds(rowIds.distinct().collect(Collectors.toList()));
             }
-            errorMap.put(Long.toString(validationRow.getId()), value);
+            errorMap.put(value.getRowIds().stream().map(id -> id.toString()).collect(Collectors.joining(".")) + value.getMessage(), value);
         }
     }
 

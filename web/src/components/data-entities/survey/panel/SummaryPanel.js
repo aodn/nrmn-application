@@ -32,7 +32,7 @@ const SummaryPanel = ({api, context}) => {
   useEffect(() => {
     var formatted = [];
     for (const validation of context.validations) {
-      if (validation.rowIds?.length == 1 || validation.columnNames?.length == 1) {
+      if (validation.rowIds?.length == 1 && validation.columnNames) {
         const rowId = validation.rowIds[0];
         const rowData = api.getRowNode(rowId).data;
         const columnPath = validation.columnNames[0];
@@ -42,9 +42,10 @@ const SummaryPanel = ({api, context}) => {
         const rowNumbers = validation.rowIds.map(r => (context.rowPos.indexOf(r) + 1));
         validation.description = [{...col, rowIds: validation.rowIds, rowNumbers, value}];
       }
-      else if(validation.levelId === 'DUPLICATE') {
+      else
+      {
         const rowNumbers = validation.rowIds.map(r => (context.rowPos.indexOf(r) + 2));
-        validation.id = 'duplicate' + rowNumbers.join('.');
+        validation.id = validation.message + rowNumbers.join('.');
         validation.description = [{columnName: 'id', rowIds: validation.rowIds, rowNumbers, value:''}];
       }
 
@@ -68,11 +69,11 @@ const SummaryPanel = ({api, context}) => {
                   key={`${m.id}`}
                   label={
                     <Typography variant="body2">
-                      {m.message} {m.description.length > 1 ? '(' + m.description.length + ')' : ''}
+                      {m.message} {m.description?.length > 1 ? '(' + m.description.length + ')' : ''}
                     </Typography>
                   }
                 >
-                  {m.description.map((d) => {
+                  {m.description?.map((d) => {
                     const mmHeader = mm.find((m) => m.field === d.columnName.replace('measurements.', ''));
                     const label = mmHeader ? `${d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
                     return (

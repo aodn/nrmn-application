@@ -151,7 +151,7 @@ public class SurveyValidation {
         return null;
     }
 
-    public SurveyValidationError validateSurveyGroup(List<StagedRowFormatted> surveyRows) {
+    private SurveyValidationError validateSurveyGroup(List<StagedRowFormatted> surveyRows) {
         var surveyGroup = surveyRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyNum));
         if (!surveyGroup.keySet().containsAll(Arrays.asList(1, 2, 3, 4))) {
             var missingSurveys = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4));
@@ -162,6 +162,25 @@ public class SurveyValidation {
                     + String.join(", ", missingSurveysMessage);
             return new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, message,
                     surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
+        }
+        return null;
+    }
+    
+    private SurveyValidationError validateSurveyIsNew(StagedRowFormatted row) {
+        if (row.getDate() != null && Arrays.asList(METHODS_TO_CHECK).contains(row.getMethod())) {
+
+            var surveyDate = Date.from(row.getDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            var existingSurveys = surveyRepository.findBySiteDepthSurveyNumDate(row.getSite(), row.getDepth(),
+                    row.getSurveyNum(), surveyDate);
+
+            if (!existingSurveys.isEmpty()) {
+                var existingSurvey = existingSurveys.stream().findFirst().get();
+                var message = "Survey exists: " + existingSurvey.getSurveyId() + " includes "
+                        + row.getDecimalSurvey();
+                return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, message,
+                        Arrays.asList(row.getId()), Arrays.asList("siteCode"));
+            }
+
         }
         return null;
     }
@@ -224,25 +243,6 @@ public class SurveyValidation {
         res.remove(null);
 
         return res;
-    }
-
-    private SurveyValidationError validateSurveyIsNew(StagedRowFormatted row) {
-        if (row.getDate() != null && Arrays.asList(METHODS_TO_CHECK).contains(row.getMethod())) {
-
-            var surveyDate = Date.from(row.getDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-            var existingSurveys = surveyRepository.findBySiteDepthSurveyNumDate(row.getSite(), row.getDepth(),
-                    row.getSurveyNum(), surveyDate);
-
-            if (!existingSurveys.isEmpty()) {
-                var existingSurvey = existingSurveys.stream().findFirst().get();
-                var message = "Survey exists: " + existingSurvey.getSurveyId() + " includes "
-                        + row.getDecimalSurvey();
-                return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, message,
-                        Arrays.asList(row.getId()), Arrays.asList("siteCode"));
-            }
-
-        }
-        return null;
     }
 
     public Collection<SurveyValidationError> validateSurveys(ProgramValidation validation, Boolean isExtended, Collection<StagedRowFormatted> mappedRows) {

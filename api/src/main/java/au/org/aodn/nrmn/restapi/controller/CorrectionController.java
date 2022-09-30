@@ -59,6 +59,7 @@ import au.org.aodn.nrmn.restapi.service.formatting.SpeciesFormattingService;
 import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.service.validation.SurveyValidation;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationResultSet;
 import au.org.aodn.nrmn.restapi.util.ObjectUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -108,6 +109,9 @@ public class CorrectionController {
 
     @Autowired
     SurveyRepository surveyRepository;
+
+    @Autowired
+    SurveyValidation surveyValidation;
 
     @Autowired
     UserActionAuditRepository userActionAuditRepository;
@@ -264,6 +268,8 @@ public class CorrectionController {
 
             // FUTURE: other validations go here ..
         }
+
+        validation.addGlobal(surveyValidation.validateSurveys(programValidation, isExtended, mappedRows));
 
         long errorId = 0;
         for (var error : validation.getAll())
