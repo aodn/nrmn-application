@@ -256,7 +256,7 @@ public class ValidationProcess {
 
         var species = speciesFormatting.getSpeciesForRows(rows);
         sheetErrors
-                .addAll(dataValidation.checkFormatting(validation, job.getIsExtendedSize(), siteCodes, species, rows));
+                .addAll(dataValidation.checkFormatting(validation, job.getIsExtendedSize(), true, siteCodes, species, rows));
         var mappedRows = speciesFormatting.formatRowsWithSpecies(rows, species);
 
         var response = generateSummary(mappedRows);

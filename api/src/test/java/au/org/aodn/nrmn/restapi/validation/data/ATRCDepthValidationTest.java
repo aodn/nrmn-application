@@ -49,7 +49,7 @@ class ATRCDepthValidationTest {
     row.setDepth("");
     row.setBlock("");
     row.setStagedJob(job);
-    Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(),
+    Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList(),
         Arrays.asList(), Arrays.asList(row));
     assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Depth is invalid, expected: depth[.surveyNum]")));
   }

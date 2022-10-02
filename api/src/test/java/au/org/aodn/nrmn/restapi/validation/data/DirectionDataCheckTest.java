@@ -42,7 +42,7 @@ class DirectionDataCheckTest {
         StagedRow row = new StagedRow();
         row.setStagedJob(job);
         row.setDirection("ED");
-        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Direction is not valid")));
     }
 
@@ -53,7 +53,7 @@ class DirectionDataCheckTest {
         StagedRow row = new StagedRow();
         row.setStagedJob(job);
         row.setDirection("NE");
-        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().equals("Direction is not valid")));
     }
 }

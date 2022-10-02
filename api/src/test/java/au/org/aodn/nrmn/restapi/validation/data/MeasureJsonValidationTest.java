@@ -45,7 +45,7 @@ class MeasureJsonValidationTest {
                 }
         );
         row.setStagedJob(job);
-        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
         assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Measurement is not valid")));
     }
 
@@ -64,7 +64,7 @@ class MeasureJsonValidationTest {
                 }
         );
         row.setStagedJob(job);
-        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
         assertTrue(res.stream().filter(e -> e.getMessage().equalsIgnoreCase("Measurement is not valid")).count() == 2);
     }
 }

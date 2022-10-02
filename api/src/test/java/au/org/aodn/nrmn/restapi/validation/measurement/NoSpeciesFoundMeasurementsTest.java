@@ -48,7 +48,7 @@ class NoSpeciesFoundMeasurementsTest {
         row.setMeasureJson(ImmutableMap.<Integer, String>builder().put(1, "2").build());
         row.setSpecies("Pictilabrus laticlavius");
         ObservableItem item = ObservableItem.builder().obsItemType(ObsItemType.builder().obsItemTypeId(1).build()).observableItemName("Pictilabrus laticlavius").letterCode("pla").build();
-        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(item), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList(), Arrays.asList(item), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("species")));
     }
 

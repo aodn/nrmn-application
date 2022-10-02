@@ -38,7 +38,7 @@ class SpeciesSupersededTest {
         StagedRow row = new StagedRow();
         row.setSpecies("THE SPECIES");
         List<ObservableItem> species = Arrays.asList(ObservableItem.builder().observableItemName("THE SPECIES").supersededBy("NEXT SPECIES").methods(methods).build());
-        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), species, Arrays.asList(row));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList(), species, Arrays.asList(row));
         assertTrue(errors.stream().anyMatch(p -> p.getMessage().contains("Superseded by")));
     }
 }

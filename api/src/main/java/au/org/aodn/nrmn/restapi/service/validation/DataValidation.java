@@ -85,8 +85,12 @@ public class DataValidation {
         return duplicateRows;
     }
 
-    public Collection<SurveyValidationError> checkFormatting(ProgramValidation validation, Boolean isExtendedSize,
-            Collection<String> siteCodes, Collection<ObservableItem> species, Collection<StagedRow> rows) {
+    public Collection<SurveyValidationError> checkFormatting(ProgramValidation validation,
+            Boolean isExtendedSize,
+            Boolean checkBuddy,
+            Collection<String> siteCodes,
+            Collection<ObservableItem> species,
+            Collection<StagedRow> rows) {
 
         var diverNames = new ArrayList<String>();
         for (var d : diverRepository.getAll()) {
@@ -124,14 +128,16 @@ public class DataValidation {
                 }
             }
 
-            if (StringUtils.isEmpty(row.getBuddy())) {
-                errors.add(rowId, ValidationLevel.WARNING, "buddy", "Diver does not exist", 0);
-            } else if (unknownBuddies.size() == 1) {
-                errors.add(rowId, ValidationLevel.WARNING, "buddy",
-                        "Diver " + unknownBuddies.get(0) + " does not exist", 1);
-            } else if (unknownBuddies.size() > 1) {
-                errors.add(rowId, ValidationLevel.WARNING, "buddy",
-                        "Divers " + String.join(", ", unknownBuddies) + " do not exist", unknownBuddies.size());
+            if (checkBuddy) {
+                if (StringUtils.isEmpty(row.getBuddy())) {
+                    errors.add(rowId, ValidationLevel.WARNING, "buddy", "Diver does not exist", 0);
+                } else if (unknownBuddies.size() == 1) {
+                    errors.add(rowId, ValidationLevel.WARNING, "buddy",
+                            "Diver " + unknownBuddies.get(0) + " does not exist", 1);
+                } else if (unknownBuddies.size() > 1) {
+                    errors.add(rowId, ValidationLevel.WARNING, "buddy",
+                            "Divers " + String.join(", ", unknownBuddies) + " do not exist", unknownBuddies.size());
+                }
             }
 
             if (StringUtils.isBlank(row.getPqs())) {

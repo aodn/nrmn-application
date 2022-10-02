@@ -122,7 +122,7 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .depth(depth)
                 .build();
 
-        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false,
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true,
                 Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
 
         Assertions.assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));
@@ -137,7 +137,7 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .date(date)
                 .depth(depth)
                 .build();
-        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false,
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true,
                 Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
 
         Assertions.assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));
@@ -152,7 +152,7 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .date(date)
                 .depth(depth)
                 .build();
-        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false,
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true,
                 Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
 
         Assertions.assertTrue(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));

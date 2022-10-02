@@ -311,14 +311,14 @@ public class CorrectionController {
             var mappedRows = mapRows(rows);
             var siteCodes = mappedRows.stream()
                             .filter(r -> r.getKey().getSite() != null)
-                            .map(r -> r.getKey().getSite().getSiteCode())
-                            .collect(Collectors.toList());
+                            .map(r -> r.getKey().getSite().getSiteCode().toLowerCase())
+                            .distinct().collect(Collectors.toList());
             var observableItems = mappedRows.stream()
                             .filter(r -> r.getKey().getSpecies().isPresent())
                             .map(r -> r.getKey().getSpecies().get())
                             .collect(Collectors.toList());
             errors.addAll(dataValidation.checkDuplicateRows(false, true, rows));
-            errors.addAll(dataValidation.checkFormatting(bodyDto.getProgramValidation(), bodyDto.getIsExtended(), siteCodes, observableItems, rows));
+            errors.addAll(dataValidation.checkFormatting(bodyDto.getProgramValidation(), bodyDto.getIsExtended(), false, siteCodes, observableItems, rows));
             errors.addAll(validate(bodyDto.getProgramValidation(), bodyDto.getIsExtended(), mappedRows).getAll());
             response.setErrors(errors);
         } catch (Exception e) {

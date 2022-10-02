@@ -44,7 +44,7 @@ class ATRCMethod7BlockCheckTest {
         row.setMethod("7");
         row.setBlock("2");
         row.setStagedJob(job);
-        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("ATRC Method 7")));
     }
 
@@ -56,7 +56,7 @@ class ATRCMethod7BlockCheckTest {
         row.setMethod("7");
         row.setBlock("3");
         row.setStagedJob(job);
-        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertTrue(errors.stream().anyMatch(e -> e.getMessage().contains("ATRC Method 7")));
     }
 
@@ -68,7 +68,7 @@ class ATRCMethod7BlockCheckTest {
         row.setMethod("2");
         row.setBlock("2");
         row.setStagedJob(job);
-        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("ATRC Method 7")));
     }
 

@@ -44,7 +44,7 @@ class DuplicateRowCheckTest {
             put(2, "4");
         }}).build();
 
-        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
         assertTrue(res.stream().anyMatch(e -> e.getLevelId() == ValidationLevel.DUPLICATE));
     }
 
@@ -65,7 +65,7 @@ class DuplicateRowCheckTest {
             put(5, "47");
         }}).build();
 
-        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
         assertTrue(res.stream().anyMatch(e -> e.getLevelId() == ValidationLevel.DUPLICATE));
     }
 
@@ -84,7 +84,7 @@ class DuplicateRowCheckTest {
             put(2, "4");
         }}).build();
 
-        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
         assertFalse(res.stream().anyMatch(e -> e.getLevelId() == ValidationLevel.DUPLICATE));
     }
 }

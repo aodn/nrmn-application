@@ -40,7 +40,7 @@ class DiverExistsIT {
         StagedRow row = new StagedRow();
         row.setDiver("NOP");
         row.setStagedJob(job);
-        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
         assertTrue(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Diver does not exist")));
     }
 
@@ -51,7 +51,7 @@ class DiverExistsIT {
         StagedRow row = new StagedRow();
         row.setStagedJob(job);
         row.setDiver("JEP");
-        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
         assertFalse(res.stream().anyMatch(e -> e.getColumnNames().contains("diver") && e.getMessage().equalsIgnoreCase("Diver does not exist")));
     }
 
@@ -62,7 +62,7 @@ class DiverExistsIT {
         StagedRow row = new StagedRow();
         row.setStagedJob(job);
         row.setDiver("Juán Español Página");
-        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
         assertFalse(res.stream().anyMatch(e -> e.getColumnNames().contains("diver") && e.getMessage().equalsIgnoreCase("Diver does not exist")));
     }
 }
