@@ -103,8 +103,7 @@ public class SurveyValidation {
                     "Method 0 must have block 0, 1 or 2",
                     method0Rows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("block"));
 
-        // VALIDATION: Both M1, M2 present and if ATRC has M3 and at least one method of
-        // 3,4,5,7
+        // VALIDATION: M1, M2 (and M3 if ATRC) are present
         var requiredMethods = validation == ProgramValidation.ATRC ? Arrays.asList(1, 2, 3) : Arrays.asList(1, 2);
         var missingMethods = new ArrayList<Integer>(requiredMethods);
         missingMethods.removeAll(surveyByMethod.keySet());
@@ -115,7 +114,7 @@ public class SurveyValidation {
             flagColumns.add("method");
         }
 
-        // VALIDATION: M1, M2 each has B1, B2 and if ATRC M3 has B0
+        // VALIDATION: M1, M2 each have B1, B2 (and M3 has B0 if ATRC)
         var methodsRequired = validation == ProgramValidation.RLS ? Arrays.asList(1, 2) : Arrays.asList(1, 2, 3);
         var level = ValidationLevel.WARNING;
         for (var method : methodsRequired) {
@@ -165,7 +164,7 @@ public class SurveyValidation {
         }
         return null;
     }
-    
+
     private SurveyValidationError validateSurveyIsNew(StagedRowFormatted row) {
         if (row.getDate() != null && Arrays.asList(METHODS_TO_CHECK).contains(row.getMethod())) {
 
@@ -244,7 +243,8 @@ public class SurveyValidation {
         return res;
     }
 
-    public Collection<SurveyValidationError> validateSurveys(ProgramValidation validation, Boolean isExtended, Collection<StagedRowFormatted> mappedRows) {
+    public Collection<SurveyValidationError> validateSurveys(ProgramValidation validation, Boolean isExtended,
+            Collection<StagedRowFormatted> mappedRows) {
         var sheetErrors = new HashSet<SurveyValidationError>();
 
         var surveyMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
@@ -259,7 +259,8 @@ public class SurveyValidation {
         return sheetErrors;
     }
 
-    public Collection<SurveyValidationError> validateSurveyGroups(ProgramValidation validation, Boolean isExtended, Collection<StagedRowFormatted> mappedRows) {
+    public Collection<SurveyValidationError> validateSurveyGroups(ProgramValidation validation, Boolean isExtended,
+            Collection<StagedRowFormatted> mappedRows) {
         var sheetErrors = new HashSet<SurveyValidationError>();
 
         var surveyGroupMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));

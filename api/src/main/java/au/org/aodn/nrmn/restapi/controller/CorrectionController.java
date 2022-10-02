@@ -308,11 +308,18 @@ public class CorrectionController {
         try {
             var errors = new ArrayList<SurveyValidationError>();
             var rows = bodyDto.getRows();
+            var mappedRows = mapRows(rows);
+            var siteCodes = mappedRows.stream()
+                            .filter(r -> r.getKey().getSite() != null)
+                            .map(r -> r.getKey().getSite().getSiteCode())
+                            .collect(Collectors.toList());
+            var observableItems = mappedRows.stream()
+                            .filter(r -> r.getKey().getSpecies().isPresent())
+                            .map(r -> r.getKey().getSpecies().get())
+                            .collect(Collectors.toList());
             errors.addAll(dataValidation.checkDuplicateRows(false, true, rows));
-            errors.addAll(validate(bodyDto.getProgramValidation(),
-                    bodyDto.getIsExtended(),
-                    mapRows(rows))
-                    .getAll());
+            errors.addAll(dataValidation.checkFormatting(bodyDto.getProgramValidation(), bodyDto.getIsExtended(), siteCodes, observableItems, rows));
+            errors.addAll(validate(bodyDto.getProgramValidation(), bodyDto.getIsExtended(), mappedRows).getAll());
             response.setErrors(errors);
         } catch (Exception e) {
             logger.error("Validation Failed", e);
