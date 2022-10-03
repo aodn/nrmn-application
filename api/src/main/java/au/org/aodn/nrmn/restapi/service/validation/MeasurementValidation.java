@@ -165,7 +165,8 @@ public class MeasurementValidation {
                 errors.addAll(validateMeasureUnderMax(isExtended, row, speciesAttributes));
                 errors.addAll(validateAbundance(row, speciesAttributes));
             } else {
-                errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING,
+                if(row.getInverts() < 1)
+                    errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING,
                         "Row contains no measurements", row.getId(), "measurements.1"));
             }
         }

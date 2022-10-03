@@ -118,7 +118,8 @@ const SurveyCorrect = () => {
       {field: 'code', label: 'Letter Code'},
       {field: 'method', label: 'Method'},
       {field: 'block', label: 'Block'},
-      {field: 'isInvertSizing', label: 'Use Invert Sizing'}
+      {field: 'isInvertSizing', label: 'Use Invert Sizing'},
+      {field: 'inverts', label: 'Inverts'}
     ];
   }, []);
 
@@ -197,9 +198,11 @@ const SurveyCorrect = () => {
       const {rows, programValidation} = res.data;
       const unpackedData = rows.map((data, idx) => {
         const measurements = data.observationIds === '' ? {} : JSON.parse(data.measureJson);
+        const inverts = measurements[0] || '0';
+        delete measurements[0];
         const observationIds = data.observationIds === '' ? [] : JSON.parse(data.observationIds);
         delete data.measureJson;
-        return {id: (idx + 1) * 100, pos: (idx + 1) * 100, ...data, observationIds, measurements};
+        return {id: (idx + 1) * 100, pos: (idx + 1) * 100, ...data, inverts, observationIds, measurements};
       });
       const isExtended = unpackedData.includes(r => Object.keys(r.measurements).includes(k => k > 28));
       const context = api.gridOptionsWrapper.gridOptions.context;
@@ -368,7 +371,6 @@ const SurveyCorrect = () => {
                 editable={header.editable ?? true}
               />
           )}
-          <AgGridColumn editable field={'measurements.0'} headerName="Unsized" />
           {allMeasurements.map((_, idx) => {
             const field = `measurements.${idx + 1}`;
             return <AgGridColumn editable field={field} headerComponent={SurveyMeasurementHeader} key={idx} width={35} />;

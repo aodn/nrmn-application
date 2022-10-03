@@ -162,7 +162,7 @@ public class DataValidation {
             }
 
             // Direction
-            if (StringUtils.isNotEmpty(row.getDirection())
+            if (row.getDirection() != null && StringUtils.isNotEmpty(row.getDirection())
                     && !EnumUtils.isValidEnumIgnoreCase(Directions.class, row.getDirection())
                     && !Arrays.asList("0", "").contains(row.getDirection()))
                 errors.add(rowId, ValidationLevel.BLOCKING, "direction", "Direction is not valid");
@@ -187,7 +187,7 @@ public class DataValidation {
             }
 
             // Time
-            if (row.getTime().length() > 0 && !TimeUtils.parseTime(row.getTime()).isPresent())
+            if (row.getTime() != null && row.getTime().length() > 0 && !TimeUtils.parseTime(row.getTime()).isPresent())
                 errors.add(rowId, ValidationLevel.WARNING, "time", "Time format is not valid");
 
             // Block
