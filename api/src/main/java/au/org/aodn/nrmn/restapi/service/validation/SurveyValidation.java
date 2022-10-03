@@ -1,6 +1,8 @@
 package au.org.aodn.nrmn.restapi.service.validation;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,6 +29,53 @@ public class SurveyValidation {
     SurveyRepository surveyRepository;
 
     private static final Integer[] METHODS_TO_CHECK = { 0, 1, 2, 7, 10 };
+
+    private static final LocalDate DATE_MIN_RLS = LocalDate.parse("2006-01-01");
+    private static final LocalDate DATE_MIN_ATRC = LocalDate.parse("1991-01-01");
+
+    public ValidationCell validateSpeciesBelowToMethod(StagedRowFormatted row) {
+
+        if (row.getSpecies().isPresent() && row.getSpecies().get().getMethods() != null) {
+            var methodIds = row.getSpecies().get().getMethods().stream().map(m -> m.getMethodId())
+                    .collect(Collectors.toSet());
+
+            if (!methodIds.contains(row.getMethod()))
+                return new ValidationCell(
+                        ValidationCategory.DATA, ValidationLevel.WARNING, "Method " + row.getMethod()
+                                + " invalid for species " + row.getSpecies().get().getObservableItemName(),
+                        row.getId(), "method");
+
+        }
+        return null;
+    }
+
+    public ValidationCell validateInvertsZeroOnM3M4M5(StagedRowFormatted row) {
+        return (row.getMethod() != null && row.getInverts() != null && Arrays.asList(3, 4, 5).contains(row.getMethod())
+                && row.getInverts() > 0)
+                        ? new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING,
+                                "Method " + row.getMethod() + " has value for inverts", row.getId(), "inverts")
+                        : null;
+    }
+
+    public ValidationCell validateDateRange(ProgramValidation validation, StagedRowFormatted row) {
+
+        var earliest = validation == ProgramValidation.RLS ? DATE_MIN_RLS : DATE_MIN_ATRC;
+
+        if (row.getDate() == null)
+            return null;
+
+        // Validation: Surveys Too Old
+        if (row.getDate().isAfter(LocalDate.from(ZonedDateTime.now())))
+            return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Date is in the future",
+                    row.getId(), "date");
+
+        // Validation: Future Survey Rule
+        if (row.getDate().isBefore(earliest))
+            return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING,
+                    "Date must be after " + earliest.toString(), row.getId(), "date");
+
+        return null;
+    }
 
     public SurveyValidationError validateMethod3Quadrats(String transect, List<StagedRowFormatted> rows) {
 

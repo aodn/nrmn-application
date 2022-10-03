@@ -270,11 +270,17 @@ public class CorrectionController {
             // Total Checksum & Missing Data
             validation.addAll(measurementValidation.validateMeasurements(programValidation, row), false);
 
+            // Row Method is valid for species
+            validation.add(surveyValidation.validateSpeciesBelowToMethod(row), false);
+
+            // Validate M3, M4 and M5 rows have zero inverts
+            validation.add(surveyValidation.validateInvertsZeroOnM3M4M5(row), false);
+
+            // Date is not in the future or too far in the past
+            validation.add(surveyValidation.validateDateRange(programValidation, row), false);
 
             // Site distance validation
             validation.add(siteValidation.validateSurveyAtSite(row));
-
-            // FUTURE: other validations go here ..
         }
 
         validation.addAll(surveyValidation.validateSurveys(programValidation, isExtended, mappedRows));
@@ -313,21 +319,30 @@ public class CorrectionController {
             return ResponseEntity.badRequest().body("Survey does not exist: " + surveyId);
 
         var response = new ValidationResponse();
-        try {
+
+        try 
+        {
             var errors = new ArrayList<SurveyValidationError>();
             var rows = bodyDto.getRows();
+
             var mappedRows = mapRows(rows);
+            
             var siteCodes = mappedRows.stream()
                             .filter(r -> r.getKey().getSite() != null)
                             .map(r -> r.getKey().getSite().getSiteCode().toLowerCase())
                             .distinct().collect(Collectors.toList());
+            
             var observableItems = mappedRows.stream()
                             .filter(r -> r.getKey().getSpecies().isPresent())
                             .map(r -> r.getKey().getSpecies().get())
                             .collect(Collectors.toList());
+
             errors.addAll(dataValidation.checkDuplicateRows(false, true, rows));
+            
             errors.addAll(dataValidation.checkFormatting(bodyDto.getProgramValidation(), bodyDto.getIsExtended(), false, siteCodes, observableItems, rows));
+            
             errors.addAll(validate(bodyDto.getProgramValidation(), bodyDto.getIsExtended(), mappedRows).getAll());
+
             response.setErrors(errors);
         } catch (Exception e) {
             logger.error("Validation Failed", e);

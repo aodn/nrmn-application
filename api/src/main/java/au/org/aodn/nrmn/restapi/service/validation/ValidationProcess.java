@@ -2,8 +2,6 @@ package au.org.aodn.nrmn.restapi.service.validation;
 
 
 import java.text.Normalizer;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,11 +22,8 @@ import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
-import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.service.formatting.SpeciesFormattingService;
 
 @Component
@@ -67,39 +62,12 @@ public class ValidationProcess {
     @Autowired
     SiteValidation siteValidation;
 
-    private static final LocalDate DATE_MIN_RLS = LocalDate.parse("2006-01-01");
-    private static final LocalDate DATE_MIN_ATRC = LocalDate.parse("1991-01-01");
-
-    private ValidationCell validateSpeciesBelowToMethod(StagedRowFormatted row) {
-
-        if (row.getSpecies().isPresent() && row.getSpecies().get().getMethods() != null) {
-            var methodIds = row.getSpecies().get().getMethods().stream().map(m -> m.getMethodId())
-                    .collect(Collectors.toSet());
-
-            if (!methodIds.contains(row.getMethod()))
-                return new ValidationCell(
-                        ValidationCategory.DATA, ValidationLevel.WARNING, "Method " + row.getMethod()
-                                + " invalid for species " + row.getSpecies().get().getObservableItemName(),
-                        row.getId(), "method");
-
-        }
-        return null;
-    }
-
-    private ValidationCell validateInvertsZeroOnM3M4M5(StagedRowFormatted row) {
-        return (row.getMethod() != null && row.getInverts() != null && Arrays.asList(3, 4, 5).contains(row.getMethod())
-                && row.getInverts() > 0)
-                        ? new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING,
-                                "Method " + row.getMethod() + " has value for inverts", row.getId(), "inverts")
-                        : null;
-    }
 
     public Collection<SurveyValidationError> checkData(ProgramValidation validation, Boolean isExtended,
             Collection<StagedRowFormatted> rows) {
 
         var results = new ValidationResultSet();
 
-        var dateValidation = validation == ProgramValidation.RLS ? DATE_MIN_RLS : DATE_MIN_ATRC;
 
         /** Row-level Checks */
         for (var row : rows) {
@@ -113,40 +81,22 @@ public class ValidationProcess {
             results.addAll(speciesMeasurement.validateMeasurements(validation, row), false);
 
             // Row Method is valid for species
-            results.add(validateSpeciesBelowToMethod(row), false);
+            results.add(surveyValidation.validateSpeciesBelowToMethod(row), false);
+
+            // Validate M3, M4 and M5 rows have zero inverts
+            results.add(surveyValidation.validateInvertsZeroOnM3M4M5(row), false);
+
+            // Date is not in the future or too far in the past
+            results.add(surveyValidation.validateDateRange(validation, row), false);
 
             // Validate survey is at site location
             results.add(siteValidation.validateSurveyAtSite(row));
-
-            // Validate M3, M4 and M5 rows have zero inverts
-            results.add(validateInvertsZeroOnM3M4M5(row), false);
-
-            // Date is not in the future or too far in the past
-            results.add(validateDateRange(dateValidation, row), false);
         }
 
         var res = new HashSet<SurveyValidationError>();
         res.addAll(results.getAll());
         res.remove(null);
         return res;
-    }
-
-    private ValidationCell validateDateRange(LocalDate earliest, StagedRowFormatted row) {
-
-        if (row.getDate() == null)
-            return null;
-
-        // Validation: Surveys Too Old
-        if (row.getDate().isAfter(LocalDate.from(ZonedDateTime.now())))
-            return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, "Date is in the future",
-                    row.getId(), "date");
-
-        // Validation: Future Survey Rule
-        if (row.getDate().isBefore(earliest))
-            return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING,
-                    "Date must be after " + earliest.toString(), row.getId(), "date");
-
-        return null;
     }
 
     public ValidationResponse generateSummary(Collection<StagedRowFormatted> mappedRows) {
