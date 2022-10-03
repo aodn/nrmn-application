@@ -115,7 +115,6 @@ const SurveyCorrect = () => {
       {field: 'longitude', label: 'Longitude'},
       {field: 'observableItemId', hide: true},
       {field: 'species', label: 'Species Name'},
-      {field: 'code', label: 'Letter Code'},
       {field: 'method', label: 'Method'},
       {field: 'block', label: 'Block'},
       {field: 'isInvertSizing', label: 'Use Invert Sizing'},

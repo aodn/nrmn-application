@@ -87,7 +87,7 @@ public class DataValidation {
 
     public Collection<SurveyValidationError> checkFormatting(ProgramValidation validation,
             Boolean isExtendedSize,
-            Boolean checkBuddy,
+            Boolean isIngest,
             Collection<String> siteCodes,
             Collection<ObservableItem> species,
             Collection<StagedRow> rows) {
@@ -128,7 +128,8 @@ public class DataValidation {
                 }
             }
 
-            if (checkBuddy) {
+            if (isIngest) {
+                
                 if (StringUtils.isEmpty(row.getBuddy())) {
                     errors.add(rowId, ValidationLevel.WARNING, "buddy", "Diver does not exist");
                 } else if (unknownBuddies.size() == 1) {
@@ -138,6 +139,10 @@ public class DataValidation {
                     errors.add(rowId, ValidationLevel.WARNING, "buddy",
                             "Divers " + String.join(", ", unknownBuddies) + " do not exist");
                 }
+
+                // Total
+                if (NumberUtils.toInt(row.getTotal(), INVALID_INT) == INVALID_INT)
+                    errors.add(rowId, ValidationLevel.BLOCKING, "total", "Total is not an integer");
             }
 
             if (StringUtils.isBlank(row.getPqs())) {
@@ -211,10 +216,6 @@ public class DataValidation {
             var inverts = NumberUtils.toInt(row.getInverts(), INVALID_INT);
             if (inverts == INVALID_INT)
                 errors.add(rowId, ValidationLevel.BLOCKING, "inverts", "Inverts is not an integer");
-
-            // Total
-            if (NumberUtils.toInt(row.getTotal(), INVALID_INT) == INVALID_INT)
-                errors.add(rowId, ValidationLevel.BLOCKING, "total", "Total is not an integer");
 
             // Method
             if (NumberUtils.toInt(row.getMethod(), INVALID_INT) == INVALID_INT)

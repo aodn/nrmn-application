@@ -159,7 +159,6 @@ public class CorrectionController {
                 put("longitude", StagedRow::getLongitude);
                 put("method", StagedRow::getMethod);
                 put("siteCode", StagedRow::getSiteCode);
-                put("code", StagedRow::getCode);
                 put("species", StagedRow::getSpecies);
                 put("time", StagedRow::getTime);
                 put("vis", StagedRow::getVis);
