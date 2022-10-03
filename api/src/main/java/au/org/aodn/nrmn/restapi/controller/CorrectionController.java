@@ -336,8 +336,6 @@ public class CorrectionController {
                             .filter(r -> r.getKey().getSpecies().isPresent())
                             .map(r -> r.getKey().getSpecies().get())
                             .collect(Collectors.toList());
-
-            errors.addAll(dataValidation.checkDuplicateRows(false, true, rows));
             
             errors.addAll(dataValidation.checkFormatting(bodyDto.getProgramValidation(), bodyDto.getIsExtended(), false, siteCodes, observableItems, rows));
             

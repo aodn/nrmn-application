@@ -20,7 +20,7 @@ public class ValidationResultSet {
     public void add(SurveyValidationError validationRow) {
         if(validationRow == null) return;
         var validationRowKey = validationRow.getMessage();
-        SurveyValidationError value = errorMap.getOrDefault(validationRowKey, new SurveyValidationError(ValidationCategory.DATA, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), null));
+        var value = errorMap.getOrDefault(validationRowKey, new SurveyValidationError(ValidationCategory.DATA, validationRow.getLevelId(), validationRow.getMessage(), validationRow.getRowIds(), validationRow.getColumnNames()));
         if (value != null) {
             var rowIds = Stream.concat(value.getRowIds().stream(), validationRow.getRowIds().stream());
             value.setRowIds(rowIds.distinct().collect(Collectors.toList()));
@@ -40,9 +40,9 @@ public class ValidationResultSet {
     }
 
     private void add(Long id, ValidationCategory validationCategory, ValidationLevel validationLevel, String column, String message, Boolean groupInRow) {
-        String key = (groupInRow) ? message + Long.toString(id) : message + column;
-        SurveyValidationError defaultValue = new SurveyValidationError(validationCategory, validationLevel, message, new HashSet<>(Arrays.asList(id)), new HashSet<>(Arrays.asList(column)));
-        SurveyValidationError value = errorMap.getOrDefault(key, defaultValue);
+        var key = (groupInRow) ? message + Long.toString(id) : message + column;
+        var defaultValue = new SurveyValidationError(validationCategory, validationLevel, message, new HashSet<>(Arrays.asList(id)), new HashSet<>(Arrays.asList(column)));
+        var value = errorMap.getOrDefault(key, defaultValue);
         if (value != null) {
             value.getRowIds().add(id);
             value.getColumnNames().add(column);
