@@ -102,7 +102,7 @@ public class DataValidation {
 
         var errors = new ValidationResultSet();
 
-        errors.addGlobal(checkDuplicateRows(false, true, rows));
+        errors.addAll(checkDuplicateRows(false, true, rows));
 
         for (var row : rows) {
 
@@ -130,13 +130,13 @@ public class DataValidation {
 
             if (checkBuddy) {
                 if (StringUtils.isEmpty(row.getBuddy())) {
-                    errors.add(rowId, ValidationLevel.WARNING, "buddy", "Diver does not exist", 0);
+                    errors.add(rowId, ValidationLevel.WARNING, "buddy", "Diver does not exist");
                 } else if (unknownBuddies.size() == 1) {
                     errors.add(rowId, ValidationLevel.WARNING, "buddy",
-                            "Diver " + unknownBuddies.get(0) + " does not exist", 1);
+                            "Diver " + unknownBuddies.get(0) + " does not exist");
                 } else if (unknownBuddies.size() > 1) {
                     errors.add(rowId, ValidationLevel.WARNING, "buddy",
-                            "Divers " + String.join(", ", unknownBuddies) + " do not exist", unknownBuddies.size());
+                            "Divers " + String.join(", ", unknownBuddies) + " do not exist");
                 }
             }
 

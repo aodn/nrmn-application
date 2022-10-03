@@ -1,11 +1,9 @@
 package au.org.aodn.nrmn.restapi.service.validation;
 
-import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistanceLatLongMeters;
 
 import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -66,6 +64,9 @@ public class ValidationProcess {
     @Autowired
     SurveyValidation surveyValidation;
 
+    @Autowired
+    SiteValidation siteValidation;
+
     private static final LocalDate DATE_MIN_RLS = LocalDate.parse("2006-01-01");
     private static final LocalDate DATE_MIN_ATRC = LocalDate.parse("1991-01-01");
 
@@ -83,29 +84,6 @@ public class ValidationProcess {
 
         }
         return null;
-    }
-
-    // VALIDATION: Survey coordinates match site coordinates
-    private Collection<ValidationCell> validateSurveyAtSite(StagedRowFormatted row) {
-        var errors = new ArrayList<ValidationCell>();
-
-        if (row.getSite() == null || row.getSite().getLatitude() == null || row.getSite().getLongitude() == null
-                || row.getLatitude() == null || row.getLongitude() == null)
-            return errors;
-
-        var distMeters = getDistanceLatLongMeters(row.getSite().getLatitude(), row.getSite().getLongitude(),
-                row.getLatitude(), row.getLongitude());
-
-        // Warn if survey is more than 10 meters away from site
-        if (distMeters > 10) {
-            String message = "Survey coordinates more than 10m from site (" + String.format("%.1f", distMeters) + "m)";
-            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, message, row.getId(),
-                    "latitude"));
-            errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING, message, row.getId(),
-                    "longitude"));
-        }
-
-        return errors;
     }
 
     private ValidationCell validateInvertsZeroOnM3M4M5(StagedRowFormatted row) {
@@ -138,7 +116,7 @@ public class ValidationProcess {
             results.add(validateSpeciesBelowToMethod(row), false);
 
             // Validate survey is at site location
-            results.addAll(validateSurveyAtSite(row), false);
+            results.add(siteValidation.validateSurveyAtSite(row));
 
             // Validate M3, M4 and M5 rows have zero inverts
             results.add(validateInvertsZeroOnM3M4M5(row), false);

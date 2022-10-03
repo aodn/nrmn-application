@@ -167,13 +167,15 @@ public class SurveyEditService {
                     "Longitude must contain a valid number"));
         }
 
-        boolean hasValidCoords = lat != null && lon != null && !lat.isNaN() && !lon.isNaN();
-        double distMeters = hasValidCoords ? getDistanceLatLongMeters(lat, lon, surveyDtoSite.getLatitude(), surveyDtoSite.getLongitude()) : 0;
-        if(distMeters > 200){
-            errors.add(new FormValidationError("Survey", "latitude", surveyDto.getLatitude(),
-                    String.format("Coordinates are further than 200m from the Site (%.2fm)", distMeters)));
-            errors.add(new FormValidationError("Survey", "longitude", surveyDto.getLongitude(),
-                    String.format("Coordinates are further than 200m from the Site (%.2fm)", distMeters)));
+        var hasValidCoords = lat != null && lon != null && !lat.isNaN() && !lon.isNaN();
+        if(hasValidCoords) {
+            var distMeters = hasValidCoords ? getDistanceLatLongMeters(lat, lon, surveyDtoSite.getLatitude(), surveyDtoSite.getLongitude()) : 0;
+            if(distMeters > 200){
+                errors.add(new FormValidationError("Survey", "latitude", surveyDto.getLatitude(),
+                        String.format("Coordinates are further than 200m from the Site (%.2fm)", distMeters)));
+                errors.add(new FormValidationError("Survey", "longitude", surveyDto.getLongitude(),
+                        String.format("Coordinates are further than 200m from the Site (%.2fm)", distMeters)));
+            }
         }
 
         if(lat != null && !lat.isNaN() && (lat < -90 || lat > 90) ) {

@@ -58,6 +58,7 @@ import au.org.aodn.nrmn.restapi.service.SurveyCorrectionService;
 import au.org.aodn.nrmn.restapi.service.formatting.SpeciesFormattingService;
 import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
+import au.org.aodn.nrmn.restapi.service.validation.SiteValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.service.validation.SurveyValidation;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationResultSet;
@@ -97,6 +98,9 @@ public class CorrectionController {
 
     @Autowired
     SiteRepository siteRepository;
+
+    @Autowired
+    SiteValidation siteValidation;
 
     @Autowired
     StagedJobLogRepository stagedJobLogRepository;
@@ -266,10 +270,14 @@ public class CorrectionController {
             // Total Checksum & Missing Data
             validation.addAll(measurementValidation.validateMeasurements(programValidation, row), false);
 
+
+            // Site distance validation
+            validation.add(siteValidation.validateSurveyAtSite(row));
+
             // FUTURE: other validations go here ..
         }
 
-        validation.addGlobal(surveyValidation.validateSurveys(programValidation, isExtended, mappedRows));
+        validation.addAll(surveyValidation.validateSurveys(programValidation, isExtended, mappedRows));
 
         long errorId = 0;
         for (var error : validation.getAll())
