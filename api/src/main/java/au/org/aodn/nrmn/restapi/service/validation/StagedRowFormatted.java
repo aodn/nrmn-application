@@ -89,7 +89,6 @@ public class StagedRowFormatted {
                 && Objects.equals(species, that.species);
     }
 
-    
     public Boolean isDebrisZero() {
         return ((code != null && code.equalsIgnoreCase("DEZ")) || (ref != null && ref.getSpecies().equalsIgnoreCase("Debris - Zero")));
     }
@@ -115,6 +114,6 @@ public class StagedRowFormatted {
     }
 
     public Integer observationTotal() { 
-        return getMeasureJson().entrySet().stream().map(Map.Entry::getValue).reduce(0, Integer::sum) + (getInverts() != null ? getInverts() : 0);
+        return getMeasureJson().entrySet().stream().mapToInt(Map.Entry::getValue).sum() + (getInverts() != null ? getInverts() : 0);
     }
 }

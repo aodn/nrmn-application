@@ -18,6 +18,7 @@ import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
+import au.org.aodn.nrmn.restapi.service.validation.SiteValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 
@@ -30,6 +31,9 @@ class BeforeDateCheckTest {
     @Mock
     MeasurementValidation measurementValidation;
     
+    @Mock
+    SiteValidation siteValidation;
+
     @Test
     void beforeDateShouldSucceed() throws Exception {
 

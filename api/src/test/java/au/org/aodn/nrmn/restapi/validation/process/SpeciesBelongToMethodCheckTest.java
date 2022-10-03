@@ -5,6 +5,7 @@ import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
+import au.org.aodn.nrmn.restapi.service.validation.SiteValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,9 @@ class SpeciesBelongToMethodCheckTest extends FormattedTestProvider {
     
     @Mock
     MeasurementValidation measurementValidation;
+
+    @Mock
+    SiteValidation siteValidation;
 
     @Test
     public void matchingMethodShouldSuccess() {
