@@ -118,4 +118,40 @@ class RLSMethodBlockAssociationIT {
         assertTrue(response.getErrors().stream()
                 .anyMatch(e -> e.getMessage().startsWith("Survey incomplete: [ERZ1, 2020-09-11, 7.1] M2 missing B2")));
     }
+
+    @Test
+    void missingM0BlockShouldFail() {
+        stagedRowRepo.deleteAll();
+
+        Location location = Location.builder().locationName("LOC1").isActive(false).build();
+        locationRepository.save(location);
+
+        siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
+
+        StagedJob job = jobRepo.findByReference("jobid-rls").get();
+        String date = "11/09/2020";
+        String depth = "7.1";
+        String siteNo = "ERZ1";
+
+        StagedRow m1b1 = new StagedRow();
+        m1b1.setMethod("0");
+        m1b1.setBlock("3");
+        m1b1.setDate(date);
+        m1b1.setDepth(depth);
+        m1b1.setSiteCode(siteNo);
+        m1b1.setStagedJob(job);
+
+        StagedRow m1b2 = (StagedRow) SerializationUtils.clone(m1b1);
+        m1b2.setBlock("4");
+
+        StagedRow m2b1 = (StagedRow) SerializationUtils.clone(m1b1);
+        m2b1.setMethod("5");
+        // M0 missing B0 or B1 or 2
+
+        stagedRowRepo.saveAll(Arrays.asList(m1b1, m1b2, m2b1));
+
+        ValidationResponse response = validationProcess.process(job);
+        assertTrue(response.getErrors().stream()
+                .anyMatch(e -> e.getMessage().startsWith("Method 0 must have block 0, 1 or 2")));
+    }
 }
