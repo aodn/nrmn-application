@@ -109,19 +109,18 @@ const DataSheetView = ({onIngest, isAdmin}) => {
   }, [gridApi]);
 
   useEffect(() => {
-    if (gridApi && state === IngestState.Loading) gridApi.showLoadingOverlay();
+    if(!gridApi) return;
+    if (state === IngestState.Loading) {
+      gridApi.showLoadingOverlay();
+    } else {
+      gridApi.hideOverlay();
+      gridApi.redrawRows();
+    }
   }, [gridApi, state]);
 
   useEffect(() => {
     if (gridApi && !isFiltered) gridApi.setFilterModel(null);
   }, [gridApi, isFiltered]);
-
-  useEffect(() => {
-    if (gridApi) {
-      gridApi.hideOverlay();
-      gridApi.redrawRows();
-    }
-  }, [gridApi, sideBar]);
 
   const handleValidate = () => {
     context.useOverlay = 'Validating';
