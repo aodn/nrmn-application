@@ -70,8 +70,11 @@ public class StagedRowFormattedMapperConfig {
 
         Converter<String, Optional<LocalTime>> toTime = ctx -> TimeUtils.parseTime(ctx.getSource());
 
-        Converter<String, Directions> toDirection = ctx -> EnumUtils.getEnumIgnoreCase(Directions.class,
-                ctx.getSource());
+        Converter<String, Directions> toDirection = ctx -> {
+            if(StringUtils.isEmpty(ctx.getSource()))
+                return Directions.O;
+            return EnumUtils.getEnumIgnoreCase(Directions.class,ctx.getSource());
+        };
 
         Converter<String, Integer> toDepth = ctx -> {
             try {

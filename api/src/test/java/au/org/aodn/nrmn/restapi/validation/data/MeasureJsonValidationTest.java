@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation.process;
+package au.org.aodn.nrmn.restapi.validation.data;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,14 +18,13 @@ import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
+import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 
 @ExtendWith(MockitoExtension.class)
 class MeasureJsonValidationTest {
 
     @InjectMocks
-    ValidationProcess validationProcess;
-
+    DataValidation dataValidation;
     
     @Mock
     DiverRepository diverRepository;
@@ -46,7 +45,7 @@ class MeasureJsonValidationTest {
                 }
         );
         row.setStagedJob(job);
-        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
         assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Measurement is not valid")));
     }
 
@@ -65,7 +64,7 @@ class MeasureJsonValidationTest {
                 }
         );
         row.setStagedJob(job);
-        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(row));
         assertTrue(res.stream().filter(e -> e.getMessage().equalsIgnoreCase("Measurement is not valid")).count() == 2);
     }
 }

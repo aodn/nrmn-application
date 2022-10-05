@@ -13,7 +13,7 @@ public class ObjectUtils {
         var contentEmpty = !contentDiffers && StringUtils.isEmpty(valueA);
         var valueDiffers = StringUtils.isNotEmpty(valueA)
                 && StringUtils.isNotEmpty(valueB)
-                && !valueA.equalsIgnoreCase(valueB);
+                && (valueA != null && !valueA.equalsIgnoreCase(valueB));
         return contentDiffers || valueDiffers || contentEmpty;
     }
 

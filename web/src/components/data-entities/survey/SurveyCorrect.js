@@ -20,11 +20,11 @@ const toolTipValueGetter = ({context, data, colDef}) => {
   if (!context.cellValidations) return;
   const row = data.id;
   const field = colDef.field;
-  const error = context.cellValidations[row]?.[field];
+  const error = context.cellValidations[row]?.[field] || context.cellValidations[row];
   if (error?.levelId === 'DUPLICATE') {
     const rowPositions = error.rowIds.map((r) => context.rowData.find((d) => d.id === r)?.pos).filter((r) => r);
     const duplicates = rowPositions.map((r) => context.rowPos.indexOf(r) + 1);
-    return duplicates.length > 1 ? 'Rows are duplicated: ' + duplicates.join(', ') : 'Duplicate rows have been removed';
+    return 'Rows are duplicated: ' + duplicates.join(', ');
   }
   return error?.message;
 };
@@ -84,9 +84,13 @@ const SurveyCorrect = () => {
     const cellFormat = [];
     for (const res of validationResult) {
       for (const row of res.rowIds) {
-        for (const col of res.columnNames) {
-          if (!cellFormat[row]) cellFormat[row] = {};
-          cellFormat[row][col] = {levelId: res.levelId, message: res.message};
+        if (!cellFormat[row]) cellFormat[row] = {};
+        if(res.columnNames) {
+          for (const col of res.columnNames) {
+            cellFormat[row][col] = {levelId: res.levelId, message: res.message};
+          }
+        } else {
+          cellFormat[row]['id'] = {levelId: res.levelId, message: res.message, rowIds: res.rowIds};
         }
       }
     }
@@ -98,10 +102,10 @@ const SurveyCorrect = () => {
     return [
       {field: 'pos', label: '', editable: false, hide: true, sort: 'asc'},
       {field: 'id', label: '', editable: false, hide: true},
-      {field: 'surveyId', label: 'Survey', editable: false},
+      {field: 'surveyId', label: 'Survey'},
       {field: 'diverId', label: 'Diver ID', hide: true},
       {field: 'diver', label: 'Diver'},
-      {field: 'siteCode', label: 'Site Code', hide: true},
+      {field: 'siteCode', label: 'Site Code'},
       {field: 'depth', label: 'Depth'},
       {field: 'date', label: 'Survey Date'},
       {field: 'time', label: 'Survey Time'},
@@ -111,10 +115,10 @@ const SurveyCorrect = () => {
       {field: 'longitude', label: 'Longitude'},
       {field: 'observableItemId', hide: true},
       {field: 'species', label: 'Species Name'},
-      {field: 'code', label: 'Letter Code'},
       {field: 'method', label: 'Method'},
       {field: 'block', label: 'Block'},
-      {field: 'isInvertSizing', label: 'Use Invert Sizing'}
+      {field: 'isInvertSizing', label: 'Use Invert Sizing'},
+      {field: 'inverts', label: 'Inverts'}
     ];
   }, []);
 
@@ -193,9 +197,11 @@ const SurveyCorrect = () => {
       const {rows, programValidation} = res.data;
       const unpackedData = rows.map((data, idx) => {
         const measurements = data.observationIds === '' ? {} : JSON.parse(data.measureJson);
+        const inverts = measurements[0] || '0';
+        delete measurements[0];
         const observationIds = data.observationIds === '' ? [] : JSON.parse(data.observationIds);
         delete data.measureJson;
-        return {id: (idx + 1) * 100, pos: (idx + 1) * 100, ...data, observationIds, measurements};
+        return {id: (idx + 1) * 100, pos: (idx + 1) * 100, ...data, inverts, observationIds, measurements};
       });
       const isExtended = unpackedData.includes(r => Object.keys(r.measurements).includes(k => k > 28));
       const context = api.gridOptionsWrapper.gridOptions.context;
@@ -364,7 +370,6 @@ const SurveyCorrect = () => {
                 editable={header.editable ?? true}
               />
           )}
-          <AgGridColumn editable field={'measurements.0'} headerName="Unsized" />
           {allMeasurements.map((_, idx) => {
             const field = `measurements.${idx + 1}`;
             return <AgGridColumn editable field={field} headerComponent={SurveyMeasurementHeader} key={idx} width={35} />;

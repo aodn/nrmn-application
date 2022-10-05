@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowMapperConfig;
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.data.model.SecUser;
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
@@ -41,12 +42,10 @@ import au.org.aodn.nrmn.restapi.data.repository.StagedJobLogRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.data.repository.UserActionAuditRepository;
-import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
-import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowMapperConfig;
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRequestBodyDto;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowsDto;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.enums.SourceJobType;
@@ -56,8 +55,12 @@ import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.SurveyCorrectionService;
+import au.org.aodn.nrmn.restapi.service.formatting.SpeciesFormattingService;
+import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
+import au.org.aodn.nrmn.restapi.service.validation.SiteValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.service.validation.SurveyValidation;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationResultSet;
 import au.org.aodn.nrmn.restapi.util.ObjectUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -73,7 +76,10 @@ public class CorrectionController {
     DiverRepository diverRepository;
 
     @Autowired
-    MeasurementValidation measurementValidationService;
+    MeasurementValidation measurementValidation;
+    
+    @Autowired
+    DataValidation dataValidation;
 
     @Autowired
     ObservableItemRepository observableItemRepository;
@@ -94,6 +100,9 @@ public class CorrectionController {
     SiteRepository siteRepository;
 
     @Autowired
+    SiteValidation siteValidation;
+
+    @Autowired
     StagedJobLogRepository stagedJobLogRepository;
 
     @Autowired
@@ -106,7 +115,13 @@ public class CorrectionController {
     SurveyRepository surveyRepository;
 
     @Autowired
+    SurveyValidation surveyValidation;
+
+    @Autowired
     UserActionAuditRepository userActionAuditRepository;
+
+    @Autowired
+    SpeciesFormattingService speciesFormatting;
 
     private static Logger logger = LoggerFactory.getLogger(CorrectionController.class);
 
@@ -118,34 +133,8 @@ public class CorrectionController {
         stagedJobLogRepository.save(log);
     }
 
-    private List<StagedRowFormatted> formatRowsWithSpecies(Collection<StagedRow> rows,
-            Collection<ObservableItem> species) {
-
-        var rowMap = rows.stream().collect(Collectors.toMap(StagedRow::getId, r -> r));
-
-        var speciesIds = species.stream()
-                .mapToInt(s -> s.getObservableItemId())
-                .toArray();
-
-        var speciesAttributesMap = observationRepository
-                .getSpeciesAttributesByIds(speciesIds).stream()
-                .collect(Collectors.toMap(UiSpeciesAttributes::getSpeciesName, a -> a));
-
-        var speciesMap = species.stream().collect(Collectors.toMap(ObservableItem::getObservableItemName, o -> o));
-
-        var divers = diverRepository.getAll().stream().collect(Collectors.toList());
-
-        var sites = siteRepository.getAll().stream().collect(Collectors.toList());
-
-        var mapperConfig = new StagedRowFormattedMapperConfig();
-        var mapper = mapperConfig.getModelMapper(speciesMap, rowMap, speciesAttributesMap, divers, sites);
-
-        return rows.stream().map(stagedRow -> mapper.map(stagedRow, StagedRowFormatted.class))
-                .collect(Collectors.toList());
-    }
-
     private List<Pair<StagedRowFormatted, HashSet<String>>> mapRows(Collection<StagedRow> rows) {
-
+            
         var speciesNames = rows.stream().map(s -> s.getSpecies()).collect(Collectors.toSet());
         var observableItems = observableItemRepository.getAllSpeciesNamesMatching(speciesNames);
 
@@ -157,7 +146,7 @@ public class CorrectionController {
             observableItems.add(snd);
         }
 
-        var formattedRows = formatRowsWithSpecies(rows, observableItems);
+        var formattedRows = speciesFormatting.formatRowsWithSpecies(rows, observableItems);
 
         var propertyChecks = new HashMap<String, Function<StagedRow, String>>() {
             {
@@ -170,7 +159,6 @@ public class CorrectionController {
                 put("longitude", StagedRow::getLongitude);
                 put("method", StagedRow::getMethod);
                 put("siteCode", StagedRow::getSiteCode);
-                put("code", StagedRow::getCode);
                 put("species", StagedRow::getSpecies);
                 put("time", StagedRow::getTime);
                 put("vis", StagedRow::getVis);
@@ -220,7 +208,7 @@ public class CorrectionController {
             {
                 put("block", "Block is not an integer");
                 put("date", "Date format not valid");
-                put("depth", "Depth is not an interger");
+                put("depth", "Depth is not an integer");
                 put("direction", "Direction is not valid");
                 put("diver", "Diver does not exist");
                 put("latitude", "Latitude is not a decimal");
@@ -276,13 +264,25 @@ public class CorrectionController {
 
             var speciesAttrib = row.getSpeciesAttributesOpt();
             if (speciesAttrib.isPresent())
-                validation.addAll(measurementValidationService.validate(speciesAttrib.get(), row, isExtended), false);
+                validation.addAll(measurementValidation.validate(speciesAttrib.get(), row, isExtended), false);
 
             // Total Checksum & Missing Data
-            validation.addAll(measurementValidationService.validateMeasurements(programValidation, row), false);
+            validation.addAll(measurementValidation.validateMeasurements(programValidation, row), false);
 
-            // FUTURE: other validations go here ..
+            // Row Method is valid for species
+            validation.add(surveyValidation.validateSpeciesBelowToMethod(row), false);
+
+            // Validate M3, M4 and M5 rows have zero inverts
+            validation.add(surveyValidation.validateInvertsZeroOnM3M4M5(row), false);
+
+            // Date is not in the future or too far in the past
+            validation.add(surveyValidation.validateDateRange(programValidation, row), false);
+
+            // Site distance validation
+            validation.add(siteValidation.validateSurveyAtSite(row));
         }
+
+        validation.addAll(surveyValidation.validateSurveys(programValidation, isExtended, mappedRows));
 
         long errorId = 0;
         for (var error : validation.getAll())
@@ -318,12 +318,28 @@ public class CorrectionController {
             return ResponseEntity.badRequest().body("Survey does not exist: " + surveyId);
 
         var response = new ValidationResponse();
-        try {
+
+        try 
+        {
             var errors = new ArrayList<SurveyValidationError>();
-            errors.addAll(validate(bodyDto.getProgramValidation(),
-                    bodyDto.getIsExtended(),
-                    mapRows(bodyDto.getRows()))
-                    .getAll());
+            var rows = bodyDto.getRows();
+
+            var mappedRows = mapRows(rows);
+            
+            var siteCodes = mappedRows.stream()
+                            .filter(r -> r.getKey().getSite() != null)
+                            .map(r -> r.getKey().getSite().getSiteCode().toLowerCase())
+                            .distinct().collect(Collectors.toList());
+            
+            var observableItems = mappedRows.stream()
+                            .filter(r -> r.getKey().getSpecies().isPresent())
+                            .map(r -> r.getKey().getSpecies().get())
+                            .collect(Collectors.toList());
+            
+            errors.addAll(dataValidation.checkFormatting(bodyDto.getProgramValidation(), bodyDto.getIsExtended(), false, siteCodes, observableItems, rows));
+            
+            errors.addAll(validate(bodyDto.getProgramValidation(), bodyDto.getIsExtended(), mappedRows).getAll());
+
             response.setErrors(errors);
         } catch (Exception e) {
             logger.error("Validation Failed", e);

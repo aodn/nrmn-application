@@ -1,11 +1,9 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,10 +13,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.model.StagedRow;
-import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
+import au.org.aodn.nrmn.restapi.service.validation.SiteValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.service.validation.SurveyValidation;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +29,12 @@ class BeforeDateCheckTest {
     @Mock
     MeasurementValidation measurementValidation;
     
+    @Mock
+    SiteValidation siteValidation;
+
+    @InjectMocks
+    SurveyValidation surveyValidation;
+
     @Test
     void beforeDateShouldSucceed() throws Exception {
 
@@ -43,8 +48,8 @@ class BeforeDateCheckTest {
         StagedRowFormatted rowFormatted = new StagedRowFormatted();
         rowFormatted.setDate(LocalDate.parse("1990-01-01"));
         rowFormatted.setRef(row);
-        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(rowFormatted));
-        assertTrue(errors.stream().anyMatch(e -> e.getMessage().startsWith("Date must be after")));
+        var error = surveyValidation.validateDateRange(ProgramValidation.ATRC, rowFormatted);
+        assertTrue(error.getMessage().contains("Date must be after"));
     }
 
     @Test
@@ -59,8 +64,8 @@ class BeforeDateCheckTest {
         StagedRowFormatted rowFormatted = new StagedRowFormatted();
         rowFormatted.setDate(LocalDate.parse("2100-01-01"));
         rowFormatted.setRef(row);
-        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(rowFormatted));
-        assertTrue(errors.stream().anyMatch(e -> e.getMessage().startsWith("Date is in the future")));
+        var error = surveyValidation.validateDateRange(ProgramValidation.ATRC, rowFormatted);
+        assertTrue(error.getMessage().contains("Date is in the future"));
     }
 
     @Test
@@ -75,9 +80,7 @@ class BeforeDateCheckTest {
         StagedRowFormatted rowFormatted = new StagedRowFormatted();
         rowFormatted.setDate(LocalDate.parse("1991-01-01"));
         rowFormatted.setRef(row);
-
-        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(rowFormatted));
-        assertFalse(errors.stream().anyMatch(e -> e.getMessage().startsWith("Date is in the future")));
-        assertFalse(errors.stream().anyMatch(e -> e.getMessage().startsWith("Date must be after")));
+        var error = surveyValidation.validateDateRange(ProgramValidation.ATRC, rowFormatted);
+        assertNull(error);
     }
 }

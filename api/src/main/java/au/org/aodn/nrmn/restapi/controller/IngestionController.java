@@ -19,7 +19,7 @@ import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.SurveyIngestionService;
-import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
+import au.org.aodn.nrmn.restapi.service.formatting.SpeciesFormattingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,9 +43,9 @@ public class IngestionController {
 
     @Autowired
     UserActionAuditRepository userActionAuditRepository;
-
+    
     @Autowired
-    private ValidationProcess validation;
+    private SpeciesFormattingService speciesFormatting;
 
     @Autowired
     private MaterializedViewService materializedViewService;
@@ -74,8 +74,8 @@ public class IngestionController {
             stagedJobLogRepository.save(stagedJobLog);
 
             var rows = rowRepository.findRowsByJobId(job.getId());
-            var species = validation.getSpeciesForRows(rows);
-            var validatedRows = validation.formatRowsWithSpecies(rows, species);
+            var species = speciesFormatting.getSpeciesForRows(rows);
+            var validatedRows = speciesFormatting.formatRowsWithSpecies(rows, species);
             
             surveyIngestionService.ingestTransaction(job, validatedRows);
             

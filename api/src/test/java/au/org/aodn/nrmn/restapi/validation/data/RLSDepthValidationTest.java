@@ -1,6 +1,5 @@
-package au.org.aodn.nrmn.restapi.validation.process;
+package au.org.aodn.nrmn.restapi.validation.data;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -19,10 +18,10 @@ import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
+import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 
 @ExtendWith(MockitoExtension.class)
-class DirectionDataCheckTest {
+class RLSDepthValidationTest {
     @Mock
     ObservationRepository observationRepository;
 
@@ -33,27 +32,27 @@ class DirectionDataCheckTest {
     SiteRepository siteRepository;
 
     @InjectMocks
-    ValidationProcess validationProcess;
+    DataValidation dataValidation;
 
     @Test
-    void invalidDirectionShouldFail() {
+    void depthWithMulipleDecimalsShouldFail() {
         StagedJob job = new StagedJob();
         job.setId(1L);
         StagedRow row = new StagedRow();
+        row.setDepth("3.14");
         row.setStagedJob(job);
-        row.setDirection("ED");
-        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
-        assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Direction is not valid")));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        assertTrue(errors.stream().anyMatch(e -> e.getMessage().contains("Depth is invalid, expected: depth[.surveyNum]")));
     }
 
     @Test
-    void validDirectionShouldSucceed() {
+    void nullDepthShouldFail() {
         StagedJob job = new StagedJob();
         job.setId(1L);
         StagedRow row = new StagedRow();
+        row.setDepth(null);
         row.setStagedJob(job);
-        row.setDirection("NE");
-        Collection<SurveyValidationError> errors = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
-        assertFalse(errors.stream().anyMatch(e -> e.getMessage().equals("Direction is not valid")));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
+        assertTrue(errors.stream().anyMatch(e -> e.getMessage().contains("Depth is invalid, expected: depth[.surveyNum]")));
     }
 }

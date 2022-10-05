@@ -48,10 +48,10 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
                                 v.getSite().getLocation().getLocationName()));
         }
 
-        @Query("SELECT s FROM #{#entityName} s " + "WHERE s.site = :site " + "  AND s.depth = :depth "
+        @Query("SELECT s.surveyId FROM #{#entityName} s " + "WHERE s.site = :site " + "  AND s.depth = :depth "
                         + "  AND s.surveyNum = :surveyNum " + "  AND s.surveyDate = :date")
         @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
-        List<Survey> findBySiteDepthSurveyNumDate(@Param("site") Site site, @Param("depth") Integer depth,
+        List<Long> findBySiteDepthSurveyNumDate(@Param("site") Site site, @Param("depth") Integer depth,
                         @Param("surveyNum") Integer surveyNum, @Param("date") Date date);
 
         @Query("SELECT s FROM Survey s WHERE s.surveyId IN :ids AND (s.pqCatalogued = FALSE OR s.pqCatalogued IS NULL)")

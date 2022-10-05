@@ -1,4 +1,4 @@
-package au.org.aodn.nrmn.restapi.validation.process;
+package au.org.aodn.nrmn.restapi.validation.data;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,14 +18,13 @@ import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
-import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
+import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 
 @ExtendWith(MockitoExtension.class)
 class DuplicateRowCheckTest {
 
     @InjectMocks
-    ValidationProcess validationProcess;
-
+    DataValidation dataValidation;
     
     @Mock
     DiverRepository diverRepository;
@@ -45,7 +44,7 @@ class DuplicateRowCheckTest {
             put(2, "4");
         }}).build();
 
-        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
         assertTrue(res.stream().anyMatch(e -> e.getLevelId() == ValidationLevel.DUPLICATE));
     }
 
@@ -66,7 +65,7 @@ class DuplicateRowCheckTest {
             put(5, "47");
         }}).build();
 
-        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
         assertTrue(res.stream().anyMatch(e -> e.getLevelId() == ValidationLevel.DUPLICATE));
     }
 
@@ -85,7 +84,7 @@ class DuplicateRowCheckTest {
             put(2, "4");
         }}).build();
 
-        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList("ERZ1"), Arrays.asList(), Arrays.asList(r1, r2, r3));
         assertFalse(res.stream().anyMatch(e -> e.getLevelId() == ValidationLevel.DUPLICATE));
     }
 }

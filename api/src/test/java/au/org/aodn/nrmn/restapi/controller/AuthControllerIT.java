@@ -24,6 +24,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Testcontainers
 @SpringBootTest(classes = RestApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -43,12 +44,12 @@ public class AuthControllerIT {
         ResponseEntity<JwtAuthenticationResponse> response = loginResponse("auth@example.com", "Hnh3?gx5zE*f7TVF5tKq");
 
         assertEquals(response.getStatusCode(), HttpStatus.OK);
-        assertEquals(response.getBody().getAccessToken().length() > 10, true);
-        assertEquals(response.getBody().getTokenType(), "Bearer");
+        var body = response.getBody();
+        assertNotNull(body);
+        assertEquals(body.getAccessToken().length() > 10, true);
+        assertEquals(body.getTokenType(), "Bearer");
 
-        String token = response.getBody().getAccessToken();
-
-        ResponseEntity<Void> resp = logoutResponse(token);
+        ResponseEntity<Void> resp = logoutResponse(body.getAccessToken());
         assertEquals(resp.getStatusCode(), HttpStatus.OK);
     }
 
@@ -116,8 +117,9 @@ public class AuthControllerIT {
     }
 
     private String login(String username, String password) throws Exception {
-        ResponseEntity<JwtAuthenticationResponse> response = loginResponse(username, password);
-        return response.getBody().getAccessToken();
+        var response = loginResponse(username, password);
+        var body = response.getBody();
+        return body != null ? body.getAccessToken() : "";
     }
 
 }

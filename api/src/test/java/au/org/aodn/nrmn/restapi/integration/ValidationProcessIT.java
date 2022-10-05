@@ -26,6 +26,7 @@ import au.org.aodn.nrmn.restapi.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.model.db.ProgramTestData;
 import au.org.aodn.nrmn.restapi.model.db.SecUserTestData;
+import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
@@ -36,6 +37,9 @@ import au.org.aodn.nrmn.restapi.validation.process.FormattedTestProvider;
 @ExtendWith(PostgresqlContainerExtension.class)
 @WithNoData
 public class ValidationProcessIT extends FormattedTestProvider {
+
+    @Autowired
+    private DataValidation dataValidation;
 
     @Autowired
     private ValidationProcess validationProcess;
@@ -118,7 +122,7 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .depth(depth)
                 .build();
 
-        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false,
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true,
                 Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
 
         Assertions.assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));
@@ -133,7 +137,7 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .date(date)
                 .depth(depth)
                 .build();
-        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false,
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true,
                 Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
 
         Assertions.assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));
@@ -148,7 +152,7 @@ public class ValidationProcessIT extends FormattedTestProvider {
                 .date(date)
                 .depth(depth)
                 .build();
-        Collection<SurveyValidationError> res = validationProcess.checkFormatting(ProgramValidation.ATRC, false,
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true,
                 Collections.singletonList("erz1"), Collections.emptyList(), Collections.singletonList(row));
 
         Assertions.assertTrue(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Site Code does not exist")));

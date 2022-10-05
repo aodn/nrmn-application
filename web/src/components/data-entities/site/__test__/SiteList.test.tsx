@@ -8,6 +8,8 @@ import SiteList from '../SiteList';
 import {Router} from 'react-router-dom';
 import {waitForDataToHaveLoaded} from '../../../../common/AgGridTestHelper';
 
+jest.setTimeout(10000);
+
 describe('<SiteList/>', () => {
   const siteTestData = {
       "lastRow": 3,

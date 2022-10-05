@@ -6,11 +6,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.service.validation.SurveyValidation;
 
 class Method3QuadratsMissingTest extends FormattedTestProvider {
+
+    @InjectMocks
+    SurveyValidation surveyValidation;
 
     @Test
     void transectWithAllQuadratsFilledShouldSuccess() {
@@ -38,7 +43,7 @@ class Method3QuadratsMissingTest extends FormattedTestProvider {
             }
         });
 
-        SurveyValidationError error = validationProcess.validateMethod3Quadrats("0", Arrays.asList(r1, r2, r3));
+        SurveyValidationError error = surveyValidation.validateMethod3Quadrats("0", Arrays.asList(r1, r2, r3));
         assertTrue(error == null);
     }
 
@@ -61,7 +66,7 @@ class Method3QuadratsMissingTest extends FormattedTestProvider {
             }
         });
         
-        SurveyValidationError error = validationProcess.validateMethod3Quadrats("0", Arrays.asList(r1, r2));
+        SurveyValidationError error = surveyValidation.validateMethod3Quadrats("0", Arrays.asList(r1, r2));
         assertTrue(error != null);
     }
 }

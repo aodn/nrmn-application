@@ -1,41 +1,35 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.mockito.InjectMocks;
 
 import au.org.aodn.nrmn.restapi.data.model.Site;
-import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
-import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
-import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
-import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.service.validation.SiteValidation;
 
 class SurveyAtSiteTest extends FormattedTestProvider {
 
-    @Mock
-    MeasurementValidation measurementValidation;
-
+    @InjectMocks
+    SiteValidation siteValidation;
+    
     @Test
     void sameCoordsShouldSucceed() {
-        StagedRowFormatted formatted = getDefaultFormatted().build();
+        var formatted = getDefaultFormatted().build();
 
         formatted.setLatitude(-42.886410468013004);
         formatted.setLongitude(147.33520415427964);
 
         formatted.setSite(Site.builder().siteCode("A SITE").latitude( -42.886410468013004).longitude(147.33520415427964).build());
-        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
-        assertFalse(errors.stream().anyMatch(p -> p.getMessage().startsWith("Survey coordinates") && p.getColumnNames().contains("latitude")));
-        assertFalse(errors.stream().anyMatch(p -> p.getMessage().startsWith("Survey coordinates") && p.getColumnNames().contains("longitude")));
+        var error = siteValidation.validateSurveyAtSite(formatted);
+        assertNull(error);
     }
 
     @Test
     void differentCoordsShouldFail() {
-        StagedRowFormatted formatted = getDefaultFormatted().build();
+        var formatted = getDefaultFormatted().build();
         formatted.setMethod(1);
 
         //hobart IMAS -42.886410468013004, 147.33520415427964
@@ -47,9 +41,11 @@ class SurveyAtSiteTest extends FormattedTestProvider {
                 .latitude( -42.88397415318471)
                 .longitude(147.3293531695972).build());
 
-        Collection<SurveyValidationError> errors = validationProcess.checkData(ProgramValidation.ATRC, false, Arrays.asList(formatted));
-        assertTrue(errors.stream().anyMatch(p -> p.getMessage().startsWith("Survey coordinates") && p.getColumnNames().contains("latitude")));
-        assertTrue(errors.stream().anyMatch(p -> p.getMessage().startsWith("Survey coordinates") && p.getColumnNames().contains("longitude")));
+        var error = siteValidation.validateSurveyAtSite(formatted);
+        assertNotNull(error);
+        assertTrue(error.getMessage().startsWith("Survey coordinates"));
+        assertTrue(error.getColumnNames().contains("latitude"));
+        assertTrue(error.getColumnNames().contains("longitude"));
     }
 
 }
