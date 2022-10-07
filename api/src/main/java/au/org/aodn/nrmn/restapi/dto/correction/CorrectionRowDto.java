@@ -1,15 +1,18 @@
 package au.org.aodn.nrmn.restapi.dto.correction;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public interface CorrectionRowDto {
     String getObservationIds();
 
     Integer getSurveyId();
     
-    Integer getSurveyNum();
-
     Integer getDiverId();
 
     String getDiver();
+
+    @JsonProperty(value = "P-Qs")
+    String getPqDiver();
 
     String getSiteCode();
 
@@ -31,7 +34,7 @@ public interface CorrectionRowDto {
 
     String getBlock();
 
-    Integer getDepth();
+    String getDepth();
 
     String getDate();
 
