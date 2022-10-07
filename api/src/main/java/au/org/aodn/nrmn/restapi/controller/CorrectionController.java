@@ -208,7 +208,7 @@ public class CorrectionController {
             {
                 put("block", "Block is not an integer");
                 put("date", "Date format not valid");
-                put("depth", "Depth is not an integer");
+                put("depth", "Depth is not a decimal");
                 put("direction", "Direction is not valid");
                 put("diver", "Diver does not exist");
                 put("latitude", "Latitude is not a decimal");

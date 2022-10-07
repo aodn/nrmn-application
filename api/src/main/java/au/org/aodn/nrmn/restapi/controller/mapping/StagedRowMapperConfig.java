@@ -35,6 +35,7 @@ public class StagedRowMapperConfig {
         modelMapper.typeMap(StagedRowFormatted.class, StagedRow.class)
                 .addMappings(mapper -> mapper.map(StagedRowFormatted::getMethod, StagedRow::setMethod))
                 .addMappings(mapper -> mapper.map(StagedRowFormatted::getBlock, StagedRow::setBlock))
+                .addMappings(mapper -> mapper.map(StagedRowFormatted::getDecimalDepth, StagedRow::setDepth))
                 .addMappings(mapper -> mapper.map(src -> src.getDiver().getInitials(), StagedRow::setDiver))
                 .addMappings(mapper -> mapper.using(dateMapper)
                         .map(StagedRowFormatted::getDate, StagedRow::setDate))

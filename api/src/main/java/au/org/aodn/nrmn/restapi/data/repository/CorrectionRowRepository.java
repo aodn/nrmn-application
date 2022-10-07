@@ -17,7 +17,7 @@ public interface CorrectionRowRepository
 
     @Query(value = "SELECT" +
     " c.survey_id AS surveyId, c.survey_num AS surveyNum, c.diver_id AS diverId," +
-    " c.initials AS diver, c.pq_initials AS pqDiver, c.site_code AS siteCode, c.depth, TO_CHAR(c.survey_date, 'dd/MM/yyyy') AS DATE," +
+    " c.initials AS diver, c.pq_initials AS pqDiver, c.site_code AS siteCode, CAST(c.depth AS text) || '.' || CAST(c.survey_num AS text) AS depth, TO_CHAR(c.survey_date, 'dd/MM/yyyy') AS DATE," +
     " TO_CHAR(c.survey_time, 'HH24:MI') AS time, c.visibility AS vis, c.direction, c.latitude, c.longitude," +
     " c.observable_item_id AS observableItemId, c.observable_item_name AS species, c.letter_code AS code," +
     " c.method_id AS method, c.block_num as block," +

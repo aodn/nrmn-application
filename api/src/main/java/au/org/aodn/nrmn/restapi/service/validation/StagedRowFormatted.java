@@ -109,8 +109,13 @@ public class StagedRowFormatted {
         return ref.getSurveyGroup();
     }
 
+    public String getDecimalDepth() {
+        return String.format("%s.%d", getDepth(), getSurveyNum());
+    }
+
+
     public String getDecimalSurvey() {
-        return String.format("[%s, %s, %s.%d]", getRef().getSiteCode(),  getDate(), getDepth(), getSurveyNum());
+        return String.format("[%s, %s, %s]", getRef().getSiteCode(),  getDate(), getDecimalDepth());
     }
 
     public Integer observationTotal() { 

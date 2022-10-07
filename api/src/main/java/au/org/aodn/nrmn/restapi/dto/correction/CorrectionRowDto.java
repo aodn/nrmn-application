@@ -7,8 +7,6 @@ public interface CorrectionRowDto {
 
     Integer getSurveyId();
     
-    Integer getSurveyNum();
-
     Integer getDiverId();
 
     String getDiver();
@@ -36,7 +34,7 @@ public interface CorrectionRowDto {
 
     String getBlock();
 
-    Integer getDepth();
+    String getDepth();
 
     String getDate();
 
