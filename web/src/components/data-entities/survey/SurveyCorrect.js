@@ -102,13 +102,13 @@ const SurveyCorrect = () => {
     return [
       {field: 'pos', label: '', editable: false, hide: true, sort: 'asc'},
       {field: 'id', label: '', editable: false, hide: true},
-      {field: 'surveyId', label: 'Survey'},
+      {field: 'surveyId', label: 'Survey', editable: false},
       {field: 'diverId', label: 'Diver ID', hide: true},
       {field: 'diver', label: 'Diver'},
       {field: 'P-Qs', label: 'PQ Diver'},
-      {field: 'siteCode', label: 'Site Code'},
-      {field: 'depth', label: 'Depth'},
-      {field: 'date', label: 'Survey Date'},
+      {field: 'siteCode', label: 'Site Code', editable: false},
+      {field: 'depth', label: 'Depth', editable: false},
+      {field: 'date', label: 'Survey Date', editable: false},
       {field: 'time', label: 'Survey Time'},
       {field: 'vis', label: 'Visibility'},
       {field: 'direction', label: 'Direction'},
@@ -293,7 +293,7 @@ const SurveyCorrect = () => {
         <Box flexGrow={1}>
           <Typography variant="h6">
             Correct Survey{' '}
-            {rowData && '[' + rowData[0].siteCode + ', ' + rowData[0].date + ', ' + rowData[0].depth + '.' + rowData[0].surveyNum + '] ' + validationMode.programValidation + ' ' + (validationMode.isExtended ? 'Extended' : '')}
+            {rowData && '[' + rowData[0].siteCode + ', ' + rowData[0].date + ', ' + rowData[0].depth + '] ' + validationMode.programValidation + ' ' + (validationMode.isExtended ? 'Extended' : '')}
           </Typography>
         </Box>
         <Box m={1} ml={0}>
