@@ -336,15 +336,17 @@ class DataSheetEventHandlers {
 
     const cloneRow = (clearData) => {
       const [cells] = e.api.getCellRanges();
+      const columnDefs = e.api.columnModel.columnDefs;
       const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
       const data = e.context.rowData.find((d) => d.id == row.data.id);
       const newId = +((new Date().valueOf() + '').slice(-8));
       const posMap = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
       const currentPosIdx = posMap.findIndex((p) => p == data.pos);
-
       let newData = {};
-      Object.keys(data).forEach((key) => (newData[key] = clearData ? '' : data[key]));
-      newData.measurements = {...data.measurements};
+      Object.keys(data).forEach((key) => {
+        newData[key] = clearData && columnDefs.some(d => d.field === key && d.editable !== false) ? (Array.isArray(data[key]) ? [] : typeof data[key] === 'string' ? '' : 0) : data[key];
+      });
+      newData.measurements = clearData ? {} : {...data.measurements};
       newData.pos = posMap[currentPosIdx + 1] ? posMap[currentPosIdx + 1] - 1 : posMap[currentPosIdx] + 1000;
       newData.id = newId;
       delete newData.errors;
