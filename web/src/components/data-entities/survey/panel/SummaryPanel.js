@@ -74,7 +74,7 @@ const SummaryPanel = ({api, context}) => {
                   }
                 >
                   {m.description?.map((d) => {
-                    const mmHeader = mm.find((m) => m.field === d.columnName.replace('measurements.', ''));
+                    const mmHeader = mm.find((m) => d.columnName && m.field === d.columnName.replace('measurements.', ''));
                     const label = mmHeader ? `${d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
                     return (
                       <TreeItem
