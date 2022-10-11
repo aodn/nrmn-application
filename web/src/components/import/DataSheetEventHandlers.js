@@ -149,7 +149,7 @@ class DataSheetEventHandlers {
           if (params.context.focusedRows?.includes(params.data.id)) {
             return {backgroundColor: blue[100], fontWeight: 'bold'};
           } else {
-            return {backgroundColor: blue[100]};
+            return {backgroundColor: blue[100], fontWeight: 'normal'};
           }
         case 'INFO':
           return {backgroundColor: grey[100]};
@@ -356,7 +356,7 @@ class DataSheetEventHandlers {
       e.api.setRowData(e.context.rowData);
       const positions = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
       e.context.rowPos = positions.map((p) => e.context.rowData.find(r => r.pos === p).id);
-
+      
       const filterModel = e.api.getFilterModel();
       const isFiltered = Object.getOwnPropertyNames(filterModel).length > 0;
       if (isFiltered) {
@@ -386,6 +386,18 @@ class DataSheetEventHandlers {
         name: 'Insert Row',
         action: () => cloneRow(true)
       });
+      if(e.column.colId === 'species') {
+        if (items.length > 0) items.push('separator');
+        items.push({
+          name: 'View on reeflifesurvey.com',
+          action: () => {
+            const species = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex).data.species;
+            const speciesUrl = species.replace(/\s+/g, '-');
+            const url = `https://reeflifesurvey.com/species/${encodeURIComponent(speciesUrl)}`;
+            window.open(url, '_blank');
+          }
+        });
+      }
     } else {
       if (items.length > 0) items.push('separator');
       items.push({
