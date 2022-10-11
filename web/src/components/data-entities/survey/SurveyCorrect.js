@@ -74,7 +74,7 @@ const SurveyCorrect = () => {
 
   useEffect(() => {
     if (gridRef.current?.api) {
-      gridRef.current.api.gridOptionsWrapper.gridOptions.context.cellValidations = [...cellValidations];
+      gridRef.current.api.gridOptionsWrapper.gridOptions.context.cellValidations = cellValidations;
       gridRef.current.api.redrawRows();
     }
   }, [cellValidations]);
