@@ -202,7 +202,7 @@ const SurveyCorrect = () => {
         delete measurements[0];
         const observationIds = data.observationIds === '' ? [] : JSON.parse(data.observationIds);
         delete data.measureJson;
-        return {id: (idx + 1) * 100, pos: (idx + 1) * 100, ...data, inverts, observationIds, measurements};
+        return {id: (idx + 1) * 100, pos: (idx + 1) * 1000, ...data, inverts, observationIds, measurements};
       });
       const isExtended = unpackedData.includes(r => Object.keys(r.measurements).includes(k => k > 28));
       const context = api.gridOptionsWrapper.gridOptions.context;

@@ -344,10 +344,11 @@ class DataSheetEventHandlers {
       const currentPosIdx = posMap.findIndex((p) => p == data.pos);
       let newData = {};
       Object.keys(data).forEach((key) => {
-        newData[key] = clearData && columnDefs.some(d => d.field === key && d.editable !== false) ? (Array.isArray(data[key]) ? [] : typeof data[key] === 'string' ? '' : 0) : data[key];
+        newData[key] = clearData && columnDefs.some(d => d.field === key && d.editable !== false) ? 
+        (Array.isArray(data[key]) ? [] : typeof data[key] === 'string' ? '' : 0) : data[key];
       });
       newData.measurements = clearData ? {} : {...data.measurements};
-      newData.pos = posMap[currentPosIdx + 1] ? posMap[currentPosIdx + 1] - 1 : posMap[currentPosIdx] + 1000;
+      newData.pos = posMap[currentPosIdx + 1] ? posMap[currentPosIdx] + ((posMap[currentPosIdx + 1] - posMap[currentPosIdx]) / 2) : posMap[currentPosIdx] + 1000;
       newData.id = newId;
       delete newData.errors;
 
@@ -355,7 +356,7 @@ class DataSheetEventHandlers {
       e.context.rowData.push(newData);
       e.api.setRowData(e.context.rowData);
       const positions = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
-      e.context.rowPos = positions.map((p) => e.context.rowData.find(r => r.pos === p).id);
+      e.context.rowPos = positions.map((p) => e.context.rowData.find(r => r.pos === p).pos);
       
       const filterModel = e.api.getFilterModel();
       const isFiltered = Object.getOwnPropertyNames(filterModel).length > 0;
