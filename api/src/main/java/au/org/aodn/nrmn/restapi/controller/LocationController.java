@@ -89,7 +89,9 @@ public class LocationController {
     @PutMapping("/location/{id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> updateLocation(@PathVariable Integer id, @Valid @RequestBody Location locationDto) {
-        Location location = locationRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Location location = locationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("UserId " + id + " not found"));
+
         if (!location.getLocationName().contentEquals(locationDto.getLocationName())) {
             Example<Location> example = Example
                     .of(Location.builder().locationName(locationDto.getLocationName()).build());

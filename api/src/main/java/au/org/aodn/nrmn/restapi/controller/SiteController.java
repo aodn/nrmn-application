@@ -107,8 +107,10 @@ public class SiteController {
 
     @GetMapping("/site/{id}")
     public SiteGetDto findOne(@PathVariable Integer id) {
-        Site site = siteRepository.findById(id)
-                .orElseThrow(ResourceNotFoundException::new);
+        Site site = siteRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Site id " + id + " not found in findOne()"));
+
         return mapper.map(site, SiteGetDto.class);
     }
 
@@ -126,7 +128,10 @@ public class SiteController {
 
     @PutMapping("/site/{id}")
     public ResponseEntity<?> updateSite(@PathVariable Integer id, @Valid @RequestBody SiteDto sitePutDto) {
-        Site site = siteRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Site site = siteRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Site id " + id + " not found in updateSite()"));
+
         mapper.map(sitePutDto, site);
         var errors = validateConstraints(site);
         if (!errors.isEmpty()) {
