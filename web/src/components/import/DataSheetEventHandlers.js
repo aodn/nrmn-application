@@ -71,7 +71,7 @@ class DataSheetEventHandlers {
       fields
         .filter((key) => !(columnDefs.find((d) => d.field === key)?.editable == false))
         .forEach((key) => {
-          if(key.includes('.') > 0) {
+          if (key.includes('.') > 0) {
             const splitKey = key.split('.');
             newData[splitKey[0]][splitKey[1]] = fill;
           } else {
@@ -116,13 +116,11 @@ class DataSheetEventHandlers {
     const row = params.context.highlighted[params.rowIndex];
     if (row && row[params.colDef.field]) return {backgroundColor: yellow[100]};
 
-
     // Cell validations
     if (params.context.cellValidations) {
       const row = params.data.id;
 
-      if(params.context.cellValidations[row]?.id?.levelId === 'DUPLICATE')
-        return {backgroundColor: blue[100]};
+      if (params.context.cellValidations[row]?.id?.levelId === 'DUPLICATE') return {backgroundColor: blue[100]};
 
       const field = params.colDef.field;
       const level = params.context.cellValidations[row]?.[field]?.levelId;
@@ -339,16 +337,25 @@ class DataSheetEventHandlers {
       const columnDefs = e.api.columnModel.columnDefs;
       const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
       const data = e.context.rowData.find((d) => d.id == row.data.id);
-      const newId = +((new Date().valueOf() + '').slice(-8));
+      const newId = +(new Date().valueOf() + '').slice(-8);
       const posMap = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
       const currentPosIdx = posMap.findIndex((p) => p == data.pos);
       let newData = {};
       Object.keys(data).forEach((key) => {
-        newData[key] = clearData && columnDefs.some(d => d.field === key && d.editable !== false) ? 
-        (Array.isArray(data[key]) ? [] : typeof data[key] === 'string' ? '' : 0) : data[key];
+        newData[key] =
+          clearData && columnDefs.some((d) => d.field === key && d.editable !== false)
+            ? Array.isArray(data[key])
+              ? []
+              : typeof data[key] === 'string'
+              ? ''
+              : 0
+            : data[key];
       });
       newData.measurements = clearData ? {} : {...data.measurements};
-      newData.pos = posMap[currentPosIdx + 1] ? posMap[currentPosIdx] + ((posMap[currentPosIdx + 1] - posMap[currentPosIdx]) / 2) : posMap[currentPosIdx] + 1000;
+      newData.pos = posMap[currentPosIdx + 1]
+        ? posMap[currentPosIdx] + (posMap[currentPosIdx + 1] - posMap[currentPosIdx]) / 2
+        : posMap[currentPosIdx] + 1000;
+      if (newData.pos % 1 !== 0) return;
       newData.id = newId;
       delete newData.errors;
 
@@ -356,8 +363,8 @@ class DataSheetEventHandlers {
       e.context.rowData.push(newData);
       e.api.setRowData(e.context.rowData);
       const positions = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
-      e.context.rowPos = positions.map((p) => e.context.rowData.find(r => r.pos === p).pos);
-      
+      e.context.rowPos = positions.map((p) => e.context.rowData.find((r) => r.pos === p).pos);
+
       const filterModel = e.api.getFilterModel();
       const isFiltered = Object.getOwnPropertyNames(filterModel).length > 0;
       if (isFiltered) {
@@ -387,7 +394,7 @@ class DataSheetEventHandlers {
         name: 'Insert Row',
         action: () => cloneRow(true)
       });
-      if(e.column.colId === 'species') {
+      if (e.column.colId === 'species') {
         if (items.length > 0) items.push('separator');
         items.push({
           name: 'View on reeflifesurvey.com',

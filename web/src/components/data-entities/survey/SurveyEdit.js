@@ -95,7 +95,7 @@ const SurveyEdit = () => {
       if (id) {
         setRedirect({to: `/data/survey/${id}`, message: 'Survey Updated'});
       } else {
-        setErrors(res.data.errors);
+        setErrors(res.data);
       }
     });
   };
