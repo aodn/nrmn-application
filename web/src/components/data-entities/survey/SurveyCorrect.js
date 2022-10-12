@@ -21,8 +21,8 @@ const toolTipValueGetter = ({context, data, colDef}) => {
   const row = data.id;
   const field = colDef.field;
   const error = context.cellValidations[row]?.[field];
-  
-  if(error) return error?.message;
+
+  if (error) return error?.message;
 
   if (context.cellValidations[row]?.id?.levelId === 'DUPLICATE') {
     return 'Duplicate rows';
@@ -86,7 +86,7 @@ const SurveyCorrect = () => {
     for (const res of validationResult) {
       for (const row of res.rowIds) {
         if (!cellFormat[row]) cellFormat[row] = {};
-        if(res.columnNames) {
+        if (res.columnNames) {
           for (const col of res.columnNames) {
             cellFormat[row][col] = {levelId: res.levelId, message: res.message};
           }
@@ -221,7 +221,7 @@ const SurveyCorrect = () => {
         delete data.measureJson;
         return {id: (idx + 1) * 100, pos: (idx + 1) * 1000, ...data, inverts, observationIds, measurements};
       });
-      const isExtended = unpackedData.includes(r => Object.keys(r.measurements).includes(k => k > 28));
+      const isExtended = unpackedData.includes((r) => Object.keys(r.measurements).includes((k) => k > 28));
       const context = api.gridOptionsWrapper.gridOptions.context;
       const rowData = [...unpackedData];
       context.rowData = rowData;
@@ -307,7 +307,17 @@ const SurveyCorrect = () => {
         <Box flexGrow={1}>
           <Typography variant="h6">
             Correct Survey{' '}
-            {rowData && '[' + rowData[0].siteCode + ', ' + rowData[0].date + ', ' + rowData[0].depth + '] ' + validationMode.programValidation + ' ' + (validationMode.isExtended ? 'Extended' : '')}
+            {rowData &&
+              '[' +
+                rowData[0].siteCode +
+                ', ' +
+                rowData[0].date +
+                ', ' +
+                rowData[0].depth +
+                '] ' +
+                validationMode.programValidation +
+                ' ' +
+                (validationMode.isExtended ? 'Extended' : '')}
           </Typography>
         </Box>
         <Box m={1} ml={0}>
@@ -364,27 +374,27 @@ const SurveyCorrect = () => {
           getContextMenuItems={(e) => eh.getContextMenuItems(e, eh)}
         >
           <AgGridColumn
-              field="row"
-              headerName=""
-              suppressMovable
-              editable={false}
-              valueGetter={eh.rowValueGetter}
-              minWidth={40}
-              enableCellChangeFlash={false}
-              filter={false}
-              sortable={false}
+            field="row"
+            headerName=""
+            suppressMovable
+            editable={false}
+            valueGetter={eh.rowValueGetter}
+            minWidth={40}
+            enableCellChangeFlash={false}
+            filter={false}
+            sortable={false}
+          />
+          {headers.map((header, idx) => (
+            <AgGridColumn
+              key={idx}
+              field={header.field}
+              headerName={header.label}
+              hide={header.hide}
+              sort={header.sort}
+              cellEditor="agTextCellEditor"
+              editable={header.editable ?? true}
             />
-          {headers.map((header, idx) =>
-              <AgGridColumn
-                key={idx}
-                field={header.field}
-                headerName={header.label}
-                hide={header.hide}
-                sort={header.sort}
-                cellEditor="agTextCellEditor"
-                editable={header.editable ?? true}
-              />
-          )}
+          ))}
           {allMeasurements.map((_, idx) => {
             const field = `measurements.${idx + 1}`;
             return <AgGridColumn editable field={field} headerComponent={SurveyMeasurementHeader} key={idx} width={35} />;
