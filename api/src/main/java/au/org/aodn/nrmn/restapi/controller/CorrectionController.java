@@ -355,7 +355,7 @@ public class CorrectionController {
             Authentication authentication,
             @RequestBody CorrectionRequestBodyDto bodyDto) {
 
-        Optional<SecUser> user = secUserRepository.findByEmail(authentication.getName());
+        var user = secUserRepository.findByEmail(authentication.getName());
 
         var surveyOptional = surveyRepository.findById(surveyId);
         if (!surveyOptional.isPresent())
@@ -365,7 +365,7 @@ public class CorrectionController {
         var surveyName = String.format("[%s, %s, %s.%d]", survey.getSite().getSiteCode(), survey.getSurveyDate(),
                 survey.getDepth(), survey.getSurveyNum());
 
-        String logMessage = "correction: username: " + authentication.getName() + "survey: " + surveyId;
+        var logMessage = "correction: username: " + authentication.getName() + "survey: " + surveyId;
         userActionAuditRepository.save(new UserActionAudit("correct/survey", logMessage));
 
         var job = StagedJob.builder()

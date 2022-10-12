@@ -120,8 +120,6 @@ class DataSheetEventHandlers {
     if (params.context.cellValidations) {
       const row = params.data.id;
 
-      if (params.context.cellValidations[row]?.id?.levelId === 'DUPLICATE') return {backgroundColor: blue[100]};
-
       const field = params.colDef.field;
       const level = params.context.cellValidations[row]?.[field]?.levelId;
       switch (level) {
@@ -131,9 +129,10 @@ class DataSheetEventHandlers {
           return {backgroundColor: orange[100]};
         case 'INFO':
           return {backgroundColor: grey[100]};
-        default:
-          return null;
       }
+
+      if (params.context.cellValidations[row]?.id?.levelId === 'DUPLICATE') return {backgroundColor: blue[100]};
+
     } else {
       const error = params.context.errors.find(
         (e) => e.rowIds.includes(params.data.id) && (!e.columnNames || e.columnNames.includes(params.colDef.field))
@@ -143,14 +142,14 @@ class DataSheetEventHandlers {
           return {backgroundColor: red[100]};
         case 'WARNING':
           return {backgroundColor: orange[100]};
+        case 'INFO':
+          return {backgroundColor: grey[100]};
         case 'DUPLICATE':
           if (params.context.focusedRows?.includes(params.data.id)) {
             return {backgroundColor: blue[100], fontWeight: 'bold'};
           } else {
             return {backgroundColor: blue[100], fontWeight: 'normal'};
           }
-        case 'INFO':
-          return {backgroundColor: grey[100]};
       }
     }
   }
@@ -337,7 +336,7 @@ class DataSheetEventHandlers {
       const columnDefs = e.api.columnModel.columnDefs;
       const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
       const data = e.context.rowData.find((d) => d.id == row.data.id);
-      const newId = +(new Date().valueOf() + '').slice(-8);
+      const newId = +(new Date().valueOf() + '').slice(-10);
       const posMap = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
       const currentPosIdx = posMap.findIndex((p) => p == data.pos);
       let newData = {};

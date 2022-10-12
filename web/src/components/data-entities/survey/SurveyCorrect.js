@@ -11,7 +11,7 @@ import {getCorrections, submitSurveyCorrection, validateSurveyCorrection} from '
 import {allMeasurements} from '../../../common/correctionsConstants';
 import ValidationPanel from '../../import/panel/ValidationPanel';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
-import SummaryPanel from './panel/SummaryPanel';
+import SurveyCorrectPanel from './panel/SurveyCorrectPanel';
 import FindReplacePanel from '../../import/panel/FindReplacePanel';
 import SurveyMeasurementHeader from './SurveyMeasurementHeader';
 import eh from '../../../components/import/DataSheetEventHandlers';
@@ -20,11 +20,12 @@ const toolTipValueGetter = ({context, data, colDef}) => {
   if (!context.cellValidations) return;
   const row = data.id;
   const field = colDef.field;
-  const error = context.cellValidations[row]?.[field] || context.cellValidations[row];
-  if (error?.levelId === 'DUPLICATE') {
-    const rowPositions = error.rowIds.map((r) => context.rowData.find((d) => d.id === r)?.pos).filter((r) => r);
-    const duplicates = rowPositions.map((r) => context.rowPos.indexOf(r) + 1);
-    return 'Rows are duplicated: ' + duplicates.join(', ');
+  const error = context.cellValidations[row]?.[field];
+  
+  if(error) return error?.message;
+
+  if (context.cellValidations[row]?.id?.levelId === 'DUPLICATE') {
+    return 'Duplicate rows';
   }
   return error?.message;
 };
@@ -144,12 +145,28 @@ const SurveyCorrect = () => {
     return {
       findReplacePanel: FindReplacePanel,
       loadingOverlay: LoadingOverlay,
-      summaryPanel: SummaryPanel,
+      summaryPanel: SurveyCorrectPanel,
       validationPanel: ValidationPanel
     };
   }, []);
 
   const defaultSideBar = useMemo(
+    () => ({
+      toolPanels: [
+        {
+          id: 'findReplace',
+          labelDefault: 'Find Replace',
+          labelKey: 'findReplace',
+          iconKey: 'columns',
+          toolPanel: 'findReplacePanel'
+        }
+      ],
+      defaultToolPanel: ''
+    }),
+    []
+  );
+
+  const summarySideBar = useMemo(
     () => ({
       toolPanels: [
         {
@@ -167,7 +184,7 @@ const SurveyCorrect = () => {
           toolPanel: 'summaryPanel'
         }
       ],
-      defaultToolPanel: ''
+      defaultToolPanel: 'summaryPanel'
     }),
     []
   );
@@ -244,7 +261,7 @@ const SurveyCorrect = () => {
     setLoading(true);
     const api = gridRef.current.api;
     const context = api.gridOptionsWrapper.gridOptions.context;
-    context.rowData = [...rowData];
+    // context.rowData = [...rowData];
     context.useOverlay = 'Validating Survey Correction...';
     api.showLoadingOverlay();
     setSideBar(defaultSideBar);
@@ -261,10 +278,7 @@ const SurveyCorrect = () => {
 
   const onValidate = async () => {
     await validate();
-    setSideBar((s) => ({
-      ...s,
-      defaultToolPanel: 'summaryPanel'
-    }));
+    setSideBar(summarySideBar);
   };
 
   const onSubmit = async () => {

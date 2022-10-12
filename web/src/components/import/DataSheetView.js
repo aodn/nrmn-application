@@ -185,11 +185,11 @@ const DataSheetView = ({onIngest, isAdmin}) => {
       // Null row data means that the row is to be deleted
       rowUpdateDtos.push({rowId: rowId, row: row});
 
-      // HACK: use the fact that new rows are assigned a very high string
+      // HACK: use the fact that new rows are assigned a long identifier
       // to determine if we need a full reload to get the server-assigned
       // row id. A better way would be to do a full reload based on a server
       // response.
-      context.fullRefresh = context.fullRefresh || rowId.toString().length > 10 || row === null;
+      context.fullRefresh = context.fullRefresh || rowId.toString().length === 10 || row === null;
     });
     updateRows(id, rowUpdateDtos, () => {
       if (context.fullRefresh) {
