@@ -16,8 +16,11 @@ public class ObservableItemDtoMapperConfig {
 
     @Autowired
     ObservableItemDtoMapperConfig(ObsItemTypeRepository obsItemTypeRepository, ModelMapper modelMapper) {
-        Converter<Integer, ObsItemType> toObsItemType = ctx -> ctx.getSource() == null ? null
-                : obsItemTypeRepository.findById(ctx.getSource()).orElseThrow(ResourceNotFoundException::new);
+        Converter<Integer, ObsItemType> toObsItemType = ctx -> ctx.getSource() == null ? null :
+                obsItemTypeRepository
+                        .findById(ctx.getSource())
+                        .orElseThrow(() -> new ResourceNotFoundException("Observation id " + ctx.getSource() + "not found in model mapper"));
+
         modelMapper.typeMap(ObservableItemDto.class, ObservableItem.class).addMappings(mapper -> {
             mapper.using(toObsItemType).map(ObservableItemDto::getObsItemTypeId, ObservableItem::setObsItemType);
             mapper.skip(ObservableItem::setObservableItemId);

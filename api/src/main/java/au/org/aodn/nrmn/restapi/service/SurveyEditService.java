@@ -58,7 +58,9 @@ public class SurveyEditService {
 
     public Survey updateSurvey(SurveyDto surveyDto) {
 
-        Survey survey = surveyRepository.findById(surveyDto.getSurveyId()).orElseThrow(ResourceNotFoundException::new);
+        Survey survey = surveyRepository
+                .findById(surveyDto.getSurveyId()).
+                orElseThrow(() -> new ResourceNotFoundException("Update failed because survey id " + surveyDto.getSurveyId() + " not found"));
 
         survey.setVisibility(StringUtils.isNotEmpty(surveyDto.getVisibility()) ? Double.valueOf(surveyDto.getVisibility()) : null);
         survey.setDirection(surveyDto.getDirection());
@@ -72,7 +74,10 @@ public class SurveyEditService {
         }
         survey.setSite(site);
 
-        survey.setProgram(programRepository.findById(surveyDto.getProgramId()).orElseThrow(ResourceNotFoundException::new));
+        survey.setProgram(programRepository
+                .findById(surveyDto.getProgramId())
+                .orElseThrow(() -> new ResourceNotFoundException("Program Id " + surveyDto.getProgramId() + " not found during survey update")));
+
         survey.setBlockAbundanceSimulated(surveyDto.getBlockAbundanceSimulated());
         survey.setSurveyDate(parseDate(surveyDto.getSurveyDate()));
         survey.setSurveyTime(Time.valueOf(parseTime(surveyDto.getSurveyTime()).get()));
