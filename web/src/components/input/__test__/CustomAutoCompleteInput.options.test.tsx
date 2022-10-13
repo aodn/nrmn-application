@@ -5,7 +5,7 @@ import {describe, beforeAll, afterEach} from '@jest/globals';
 import userEvent from '@testing-library/user-event';
 import CustomAutoCompleteInput, {ERROR_TYPE} from '../CustomAutoCompleteInput';
 
-jest.setTimeout(10000);
+jest.setTimeout(30000);
 
 describe('<CustomAutoCompleteInput/> options behavior', () => {
   let onChangeFunction;
