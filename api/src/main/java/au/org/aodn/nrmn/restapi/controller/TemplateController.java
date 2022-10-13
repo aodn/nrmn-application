@@ -1,6 +1,5 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.restapi.data.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.service.TemplateService;
 import au.org.aodn.nrmn.restapi.util.LogInfo;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,27 +20,25 @@ import java.util.List;
 @RequestMapping(path = "/api/v1/template")
 @Tag(name = "Template Export")
 public class TemplateController {
-    private static Logger logger = LoggerFactory.getLogger(AuthController.class);
-    @Autowired
-    UserActionAuditRepository userActionAuditRepository;
+    private static Logger logger = LoggerFactory.getLogger(TemplateController.class);
+
     @Autowired
     private TemplateService templateService;
 
     @GetMapping(path = "/template.zip", produces = "application/zip")
     public void getTemplateZip(final HttpServletResponse response,
-            @RequestParam(defaultValue = "") List<Integer> locations) throws IOException {
+                               @RequestParam(defaultValue = "") List<Integer> locations) {
+
         logger.info(LogInfo.withContext(String.format("downloading template zip")));
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        templateService.writeZip(outputStream, locations);
+        try(ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            templateService.writeZip(outputStream, locations);
 
-        try {
             response.getOutputStream().write(outputStream.toByteArray());
             response.flushBuffer();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            outputStream.close();
+        }
+        catch (IOException e) {
+            logger.error("Fail to get template zip file", e);
         }
     }
 }

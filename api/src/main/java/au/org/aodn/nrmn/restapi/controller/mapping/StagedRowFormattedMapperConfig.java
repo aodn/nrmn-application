@@ -22,8 +22,12 @@ import au.org.aodn.nrmn.restapi.data.model.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.enums.Directions;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.util.TimeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StagedRowFormattedMapperConfig {
+
+    Logger logger = LoggerFactory.getLogger(StagedRowFormattedMapperConfig.class);
 
     public ModelMapper getModelMapper(Map<String, ObservableItem> speciesMap, Map<Long, StagedRow> rowMap,
             Map<String, UiSpeciesAttributes> speciesAttributesMap, Collection<Diver> divers, Collection<Site> sites) {
@@ -63,7 +67,10 @@ public class StagedRowFormattedMapperConfig {
         Converter<String, LocalDate> toDate = ctx -> {
             try {
                 return LocalDate.parse(ctx.getSource(), TimeUtils.getRowDateFormatter());
-            } catch (DateTimeParseException e) {
+            }
+            catch (DateTimeParseException e) {
+                logger.error("Fail to convert date time {} given format {} in toDate",
+                        ctx.getSource(), TimeUtils.getRowDateFormatter().toString(), e);
                 return null;
             }
         };
@@ -79,7 +86,9 @@ public class StagedRowFormattedMapperConfig {
         Converter<String, Integer> toDepth = ctx -> {
             try {
                 return Integer.parseInt(ctx.getSource().split("\\.")[0]);
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
+                logger.error("Fail to parse [{}] to Integer in toDepth", ctx.getSource().split("\\.")[0], e);
                 return null;
             }
         };
@@ -93,7 +102,9 @@ public class StagedRowFormattedMapperConfig {
             String[] splitDepth = ctx.getSource().split("\\.");
             try {
                 return splitDepth.length > 1 ? Integer.parseInt(splitDepth[1]) : 0;
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
+                logger.error("Fail to parse [{}] to Integer in toSurveyNum", splitDepth[1], e);
                 return null;
             }
         };
@@ -111,7 +122,9 @@ public class StagedRowFormattedMapperConfig {
             try {
                 Integer i = NumberUtils.toInt(ctx.getSource(), Integer.MIN_VALUE);
                 return (i != Integer.MIN_VALUE) ? i : null;
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
+                logger.error("Fail to parse [{}] to Integer in toInteger", ctx.getSource(), e);
                 return null;
             }
         };

@@ -104,18 +104,18 @@ public class ObservableItemController {
     @PutMapping("/observableItem/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ObservableItemGetDto updateObservableItem(@PathVariable Integer id,
-            @Valid @RequestBody ObservableItemPutDto observableItemPutDto) {
-        var observableItem = observableItemRepository.findById(id)
-                .orElseThrow(ResourceNotFoundException::new);
+                                                     @Valid @RequestBody ObservableItemPutDto observableItemPutDto) {
+
+        var observableItem = observableItemRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Observable Id " + id + " not found in updateObservableItem()"));
 
         // Only allow the species name to be changed within 72 hours of creation
         if (!observableItem.getObservableItemName().equals(observableItemPutDto.getObservableItemName()) &&
                 (observableItem.getCreated() == null
                         || ChronoUnit.HOURS.between(observableItem.getCreated(), LocalDateTime.now()) >= 72)) {
-            List<FormValidationError> errors = new ArrayList<FormValidationError>();
-            errors.add(new FormValidationError(ObservableItemDto.class.getName(), "observableItemName", "",
-                    "Species Name editing not allowed more than 72 hours after creation."));
-            throw new ValidationException(errors);
+
+            throw new ValidationException(ObservableItemDto.class.getName(),"observableItemName","Species Name editing not allowed more than 72 hours after creation.");
         }
 
         mapper.map(observableItemPutDto, observableItem);

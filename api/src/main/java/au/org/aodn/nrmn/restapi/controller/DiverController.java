@@ -69,7 +69,7 @@ public class DiverController {
     @GetMapping("/diver/{id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public DiverDto findOne(@PathVariable Integer id) {
-        Diver diver = diverRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Diver diver = diverRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Diver Id " + id + " not found"));
         return new DiverDto(diver);
     }
 
@@ -94,7 +94,10 @@ public class DiverController {
         var updatedDivers = new ArrayList<Diver>();
         var errors = new ArrayList<RowError>();
         for (DiverDto diverDto : diverDtos) {
-            Diver diver = diverRepository.findById(diverDto.getDiverId()).orElseThrow(ResourceNotFoundException::new);
+            Diver diver = diverRepository
+                    .findById(diverDto.getDiverId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Diver Id " + diverDto.getDiverId() + " not found"));
+
             diver.setInitials(diverDto.getInitials());
             diver.setFullName(diverDto.getFullName());
             errors.addAll(validateConstraints(diver));

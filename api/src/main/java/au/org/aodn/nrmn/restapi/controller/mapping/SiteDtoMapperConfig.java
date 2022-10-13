@@ -16,8 +16,11 @@ public class SiteDtoMapperConfig {
 
     @Autowired
     SiteDtoMapperConfig(LocationRepository locationRepository, ModelMapper modelMapper) {
-        Converter<Integer, Location> toLocation = ctx -> ctx.getSource() == null ? null
-                : locationRepository.findById(ctx.getSource()).orElseThrow(ResourceNotFoundException::new);
+        Converter<Integer, Location> toLocation = ctx -> ctx.getSource() == null ? null :
+                locationRepository
+                        .findById(ctx.getSource())
+                        .orElseThrow(() -> new ResourceNotFoundException("Site Dto " + ctx.getSource() + " not found"));
+
         modelMapper.typeMap(SiteDto.class, Site.class).addMappings(mapper -> {
             mapper.using(toLocation).map(SiteDto::getLocationId, Site::setLocation);
             mapper.skip(Site::setSiteId);
