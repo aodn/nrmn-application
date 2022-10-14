@@ -324,13 +324,34 @@ const DataSheetView = ({onIngest, isAdmin}) => {
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
         {job && (
           <AgGridReact
-            getRowId={(r) => r.data.id}
-            context={context}
-            cellFlashDelay={100}
+            animateRows
             cellFadeDelay={100}
+            cellFlashDelay={100}
+            context={context}
+            enableBrowserTooltips
+            enableRangeHandle
+            enableRangeSelection
+            fillHandleDirection="y"
+            getContextMenuItems={(e) => eh.getContextMenuItems(e, eh)}
+            getRowId={(r) => r.data.id}
+            loadingOverlayComponent="loadingOverlay"
+            onCellEditingStopped={onCellEditingStopped}
+            onCellKeyDown={eh.onCellKeyDown}
+            onCellValueChanged={onCellValueChanged}
+            onFilterChanged={onFilterChanged}
+            onGridReady={onGridReady}
+            onPasteEnd={onPasteEnd}
+            onPasteStart={eh.onPasteStart}
+            onRowDataUpdated={onRowDataUpdated}
+            onSortChanged={eh.onSortChanged}
+            rowHeight={20}
+            rowSelection="multiple"
+            sideBar={sideBar}
+            tabToNextCell={eh.onTabToNextCell}
+            undoRedoCellEditing={false}
             defaultColDef={{
               cellStyle: eh.chooseCellStyle,
-              editable,
+              editable: true,
               enableCellChangeFlash: true,
               filter: true,
               floatingFilter: true,
@@ -342,32 +363,11 @@ const DataSheetView = ({onIngest, isAdmin}) => {
               tooltipValueGetter: eh.toolTipValueGetter,
               valueParser: ({newValue}) => (newValue ? newValue.trim() : '')
             }}
-            rowHeight={20}
-            enableBrowserTooltips
-            rowSelection="multiple"
-            enableRangeSelection
-            animateRows
-            enableRangeHandle
-            onCellKeyDown={eh.onCellKeyDown}
-            onPasteStart={eh.onPasteStart}
-            onPasteEnd={onPasteEnd}
-            tabToNextCell={eh.onTabToNextCell}
-            onCellValueChanged={onCellValueChanged}
-            onSortChanged={eh.onSortChanged}
-            onFilterChanged={onFilterChanged}
-            onRowDataUpdated={onRowDataUpdated}
-            fillHandleDirection="y"
-            getContextMenuItems={(e) => eh.getContextMenuItems(e, eh)}
-            undoRedoCellEditing={false}
-            onCellEditingStopped={onCellEditingStopped}
             components={{
               validationPanel: ValidationPanel,
               findReplacePanel: FindReplacePanel,
               loadingOverlay: LoadingOverlay
             }}
-            loadingOverlayComponent="loadingOverlay"
-            sideBar={sideBar}
-            onGridReady={onGridReady}
           >
             <AgGridColumn field="id" headerName="ID" editable={false} hide />
             <AgGridColumn field="pos" editable={false} hide sort="asc" />

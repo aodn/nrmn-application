@@ -348,30 +348,33 @@ const SurveyCorrect = () => {
       </Box>
       <Box display={editMode ? 'block' : 'none'} flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
         <AgGridReact
-          ref={gridRef}
-          gridOptions={{context}}
           animateRows
           cellFadeDelay={10}
           cellFlashDelay={10}
-          onCellEditingStopped={onCellEditingStopped}
-          onPasteStart={eh.onPasteStart}
-          onPasteEnd={onPasteEnd}
           components={components}
           defaultColDef={defaultColDef}
           enableBrowserTooltips
+          enableRangeHandle
           enableRangeSelection
-          undoRedoCellEditing={false}
+          fillHandleDirection="y"
+          getContextMenuItems={(e) => eh.getContextMenuItems(e, eh)}
           getRowId={(r) => r.data.id}
+          gridOptions={{context}}
           loadingOverlayComponent="loadingOverlay"
+          onCellEditingStopped={onCellEditingStopped}
           onCellValueChanged={onCellValueChanged}
-          onGridReady={onGridReady}
-          onRowDataUpdated={onRowDataUpdated}
-          rowHeight={20}
-          onSortChanged={eh.onSortChanged}
           onFilterChanged={onFilterChanged}
+          onGridReady={onGridReady}
+          onPasteEnd={onPasteEnd}
+          onPasteStart={eh.onPasteStart}
+          onRowDataUpdated={onRowDataUpdated}
+          onSortChanged={eh.onSortChanged}
+          ref={gridRef}
+          rowHeight={20}
           rowSelection="multiple"
           sideBar={sideBar}
-          getContextMenuItems={(e) => eh.getContextMenuItems(e, eh)}
+          tabToNextCell={eh.onTabToNextCell}
+          undoRedoCellEditing={false}
         >
           <AgGridColumn
             field="row"
