@@ -11,7 +11,7 @@ import ObservableItemList from '../ObservableItemList';
 import { createMemoryHistory } from 'history';
 import stateFilterHandler from '../../../../common/state-event-handler/StateFilterHandler';
 
-jest.setTimeout(10000);
+jest.setTimeout(30000);
 
 describe('<ObservableItemList/> filter testing', () => {
   let mockGetResult;

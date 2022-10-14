@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowMapperConfig;
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
-import au.org.aodn.nrmn.restapi.data.model.SecUser;
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.model.StagedJobLog;
 import au.org.aodn.nrmn.restapi.data.model.StagedRow;
@@ -45,13 +43,11 @@ import au.org.aodn.nrmn.restapi.data.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRequestBodyDto;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowsDto;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
-import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.enums.StatusJobType;
-import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.SurveyCorrectionService;
@@ -201,50 +197,10 @@ public class CorrectionController {
         return result;
     }
 
-    private ValidationResultSet mappingResultToValidation(List<Pair<StagedRowFormatted, HashSet<String>>> results) {
-        var validationResult = new ValidationResultSet();
-
-        var messages = new HashMap<String, String>() {
-            {
-                put("block", "Block is not an integer");
-                put("date", "Date format not valid");
-                put("depth", "Depth is not a decimal");
-                put("direction", "Direction is not valid");
-                put("diver", "Diver does not exist");
-                put("latitude", "Latitude is not a decimal");
-                put("longitude", "Longitude is not a decimal");
-                put("method", "Method is missing");
-                put("siteCode", "Site does not exist");
-                put("code", "Letter Code missing");
-                put("species", "Species does not exist");
-                put("time", "Time is not valid");
-                put("vis", "Vis is not a number");
-                put("snd", "Survey Not Done not valid");
-                put("useInvertSizing", "Use Invert Sizing not valid");
-                put("measurement", "Measurement is not valid");
-            }
-        };
-
-        for (var result : results) {
-            var row = result.getLeft();
-            var rowErrors = result.getRight().stream()
-                    .map(col -> new ValidationCell(
-                            ValidationCategory.FORMAT,
-                            ValidationLevel.BLOCKING,
-                            messages.keySet().contains(col) ? messages.get(col) : messages.get("measurement"),
-                            row.getId(),
-                            col))
-                    .collect(Collectors.toSet());
-            validationResult.addAll(rowErrors, false);
-        }
-
-        return validationResult;
-    }
-
     private ValidationResultSet validate(ProgramValidation programValidation, Boolean isExtended,
             List<Pair<StagedRowFormatted, HashSet<String>>> results) {
 
-        var validation = mappingResultToValidation(results);
+        var validation = new ValidationResultSet();
 
         var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
 
@@ -355,7 +311,7 @@ public class CorrectionController {
             Authentication authentication,
             @RequestBody CorrectionRequestBodyDto bodyDto) {
 
-        Optional<SecUser> user = secUserRepository.findByEmail(authentication.getName());
+        var user = secUserRepository.findByEmail(authentication.getName());
 
         var surveyOptional = surveyRepository.findById(surveyId);
         if (!surveyOptional.isPresent())
@@ -365,7 +321,7 @@ public class CorrectionController {
         var surveyName = String.format("[%s, %s, %s.%d]", survey.getSite().getSiteCode(), survey.getSurveyDate(),
                 survey.getDepth(), survey.getSurveyNum());
 
-        String logMessage = "correction: username: " + authentication.getName() + "survey: " + surveyId;
+        var logMessage = "correction: username: " + authentication.getName() + "survey: " + surveyId;
         userActionAuditRepository.save(new UserActionAudit("correct/survey", logMessage));
 
         var job = StagedJob.builder()

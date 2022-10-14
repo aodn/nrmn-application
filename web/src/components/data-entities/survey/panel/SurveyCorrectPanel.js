@@ -13,7 +13,7 @@ const groupArrayByKey = (xs, key) =>
     return rv;
   }, {});
 
-const SummaryPanel = ({api, context}) => {
+const SurveyCorrectPanel = ({api, context}) => {
   const [messages, setMessages] = useState({});
 
   const handleItemClick = (item, noFilter) => {
@@ -38,15 +38,17 @@ const SummaryPanel = ({api, context}) => {
         const columnPath = validation.columnNames[0];
         const columnParts = columnPath.split('.');
         const value = columnParts.length > 1 ? rowData[columnParts[0]][columnParts[1]] : rowData[columnParts[0]];
-        const col =  validation.columnNames.length > 1 ? {columnNames: validation.columnNames} : {columnName: columnPath};
-        const rowNumbers = validation.rowIds.map(r => (context.rowPos.indexOf(r) + 1));
-        validation.description = [{...col, rowIds: validation.rowIds, rowNumbers, value}];
-      }
-      else
-      {
-        const rowNumbers = validation.rowIds.map(r => (context.rowPos.indexOf(r) + 1));
-        validation.id = validation.message + rowNumbers.join('.');
-        validation.description = [{columnName: 'id', rowIds: validation.rowIds, rowNumbers, value:''}];
+        const col = validation.columnNames.length > 1 ? {columnNames: validation.columnNames} : {columnName: columnPath};
+        const rowPos = validation.rowIds.map((r) => context.rowData.find((d) => d.id === r)?.pos);
+        const rowNum = rowPos.map((r) => context.rowPos.indexOf(r) + 1);
+        rowNum.sort((a, b) => a - b);
+        validation.description = [{...col, rowIds: validation.rowIds, rowNumbers: rowNum, value}];
+      } else {
+        const rowPos = validation.rowIds.map((r) => context.rowData.find((d) => d.id === r)?.pos);
+        const rowNum = rowPos.map((r) => context.rowPos.indexOf(r) + 1);
+        rowNum.sort((a, b) => a - b);
+        validation.id = validation.message + rowNum.join('.');
+        validation.description = [{columnName: 'id', rowIds: validation.rowIds, rowNumbers: rowNum, value: ''}];
       }
 
       formatted.push(validation);
@@ -55,6 +57,12 @@ const SummaryPanel = ({api, context}) => {
   }, [context, api]);
 
   const mm = measurements.concat(extendedMeasurements);
+
+  const isContiguous = (sorted) => {
+    const first = sorted[0];
+    const last = sorted[sorted.length - 1];
+    return last - first + 1 === sorted.length;
+  };
 
   const summary = (
     <Box m={2}>
@@ -95,7 +103,7 @@ const SummaryPanel = ({api, context}) => {
                                 Check Column{d.columnNames.length > 1 ? 's' : ''} {d.columnNames.join(', ')}
                               </b>
                             ) : (
-                              <b>Rows {d.rowNumbers.sort().join(', ')}</b>
+                              <b>Rows {isContiguous(d.rowNumbers) ? `[${d.rowNumbers[0]}-${d.rowNumbers[d.rowNumbers.length-1]}]` : d.rowNumbers.join(', ')}</b>
                             )}
                           </Typography>
                         }
@@ -114,9 +122,9 @@ const SummaryPanel = ({api, context}) => {
   return summary;
 };
 
-SummaryPanel.propTypes = {
+SurveyCorrectPanel.propTypes = {
   api: PropTypes.any,
   context: PropTypes.any
 };
 
-export default SummaryPanel;
+export default SurveyCorrectPanel;

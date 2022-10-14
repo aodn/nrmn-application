@@ -11,7 +11,7 @@ import {getCorrections, submitSurveyCorrection, validateSurveyCorrection} from '
 import {allMeasurements} from '../../../common/correctionsConstants';
 import ValidationPanel from '../../import/panel/ValidationPanel';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
-import SummaryPanel from './panel/SummaryPanel';
+import SurveyCorrectPanel from './panel/SurveyCorrectPanel';
 import FindReplacePanel from '../../import/panel/FindReplacePanel';
 import SurveyMeasurementHeader from './SurveyMeasurementHeader';
 import eh from '../../../components/import/DataSheetEventHandlers';
@@ -20,11 +20,12 @@ const toolTipValueGetter = ({context, data, colDef}) => {
   if (!context.cellValidations) return;
   const row = data.id;
   const field = colDef.field;
-  const error = context.cellValidations[row]?.[field] || context.cellValidations[row];
-  if (error?.levelId === 'DUPLICATE') {
-    const rowPositions = error.rowIds.map((r) => context.rowData.find((d) => d.id === r)?.pos).filter((r) => r);
-    const duplicates = rowPositions.map((r) => context.rowPos.indexOf(r) + 1);
-    return 'Rows are duplicated: ' + duplicates.join(', ');
+  const error = context.cellValidations[row]?.[field];
+
+  if (error) return error?.message;
+
+  if (context.cellValidations[row]?.id?.levelId === 'DUPLICATE') {
+    return 'Duplicate rows';
   }
   return error?.message;
 };
@@ -74,7 +75,7 @@ const SurveyCorrect = () => {
 
   useEffect(() => {
     if (gridRef.current?.api) {
-      gridRef.current.api.gridOptionsWrapper.gridOptions.context.cellValidations = [...cellValidations];
+      gridRef.current.api.gridOptionsWrapper.gridOptions.context.cellValidations = cellValidations;
       gridRef.current.api.redrawRows();
     }
   }, [cellValidations]);
@@ -85,7 +86,7 @@ const SurveyCorrect = () => {
     for (const res of validationResult) {
       for (const row of res.rowIds) {
         if (!cellFormat[row]) cellFormat[row] = {};
-        if(res.columnNames) {
+        if (res.columnNames) {
           for (const col of res.columnNames) {
             cellFormat[row][col] = {levelId: res.levelId, message: res.message};
           }
@@ -144,12 +145,28 @@ const SurveyCorrect = () => {
     return {
       findReplacePanel: FindReplacePanel,
       loadingOverlay: LoadingOverlay,
-      summaryPanel: SummaryPanel,
+      summaryPanel: SurveyCorrectPanel,
       validationPanel: ValidationPanel
     };
   }, []);
 
   const defaultSideBar = useMemo(
+    () => ({
+      toolPanels: [
+        {
+          id: 'findReplace',
+          labelDefault: 'Find Replace',
+          labelKey: 'findReplace',
+          iconKey: 'columns',
+          toolPanel: 'findReplacePanel'
+        }
+      ],
+      defaultToolPanel: ''
+    }),
+    []
+  );
+
+  const summarySideBar = useMemo(
     () => ({
       toolPanels: [
         {
@@ -167,7 +184,7 @@ const SurveyCorrect = () => {
           toolPanel: 'summaryPanel'
         }
       ],
-      defaultToolPanel: ''
+      defaultToolPanel: 'summaryPanel'
     }),
     []
   );
@@ -202,9 +219,9 @@ const SurveyCorrect = () => {
         delete measurements[0];
         const observationIds = data.observationIds === '' ? [] : JSON.parse(data.observationIds);
         delete data.measureJson;
-        return {id: (idx + 1) * 100, pos: (idx + 1) * 100, ...data, inverts, observationIds, measurements};
+        return {id: (idx + 1) * 100, pos: (idx + 1) * 1000, ...data, inverts, observationIds, measurements};
       });
-      const isExtended = unpackedData.includes(r => Object.keys(r.measurements).includes(k => k > 28));
+      const isExtended = unpackedData.includes((r) => Object.keys(r.measurements).includes((k) => k > 28));
       const context = api.gridOptionsWrapper.gridOptions.context;
       const rowData = [...unpackedData];
       context.rowData = rowData;
@@ -244,7 +261,7 @@ const SurveyCorrect = () => {
     setLoading(true);
     const api = gridRef.current.api;
     const context = api.gridOptionsWrapper.gridOptions.context;
-    context.rowData = [...rowData];
+    // context.rowData = [...rowData];
     context.useOverlay = 'Validating Survey Correction...';
     api.showLoadingOverlay();
     setSideBar(defaultSideBar);
@@ -261,10 +278,7 @@ const SurveyCorrect = () => {
 
   const onValidate = async () => {
     await validate();
-    setSideBar((s) => ({
-      ...s,
-      defaultToolPanel: 'summaryPanel'
-    }));
+    setSideBar(summarySideBar);
   };
 
   const onSubmit = async () => {
@@ -293,7 +307,17 @@ const SurveyCorrect = () => {
         <Box flexGrow={1}>
           <Typography variant="h6">
             Correct Survey{' '}
-            {rowData && '[' + rowData[0].siteCode + ', ' + rowData[0].date + ', ' + rowData[0].depth + '] ' + validationMode.programValidation + ' ' + (validationMode.isExtended ? 'Extended' : '')}
+            {rowData &&
+              '[' +
+                rowData[0].siteCode +
+                ', ' +
+                rowData[0].date +
+                ', ' +
+                rowData[0].depth +
+                '] ' +
+                validationMode.programValidation +
+                ' ' +
+                (validationMode.isExtended ? 'Extended' : '')}
           </Typography>
         </Box>
         <Box m={1} ml={0}>
@@ -324,53 +348,56 @@ const SurveyCorrect = () => {
       </Box>
       <Box display={editMode ? 'block' : 'none'} flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
         <AgGridReact
-          ref={gridRef}
-          gridOptions={{context}}
           animateRows
           cellFadeDelay={10}
           cellFlashDelay={10}
-          onCellEditingStopped={onCellEditingStopped}
-          onPasteStart={eh.onPasteStart}
-          onPasteEnd={onPasteEnd}
           components={components}
           defaultColDef={defaultColDef}
           enableBrowserTooltips
+          enableRangeHandle
           enableRangeSelection
-          undoRedoCellEditing={false}
+          fillHandleDirection="y"
+          getContextMenuItems={(e) => eh.getContextMenuItems(e, eh)}
           getRowId={(r) => r.data.id}
+          gridOptions={{context}}
           loadingOverlayComponent="loadingOverlay"
+          onCellEditingStopped={onCellEditingStopped}
           onCellValueChanged={onCellValueChanged}
-          onGridReady={onGridReady}
-          onRowDataUpdated={onRowDataUpdated}
-          rowHeight={20}
-          onSortChanged={eh.onSortChanged}
           onFilterChanged={onFilterChanged}
+          onGridReady={onGridReady}
+          onPasteEnd={onPasteEnd}
+          onPasteStart={eh.onPasteStart}
+          onRowDataUpdated={onRowDataUpdated}
+          onSortChanged={eh.onSortChanged}
+          ref={gridRef}
+          rowHeight={20}
           rowSelection="multiple"
           sideBar={sideBar}
-          getContextMenuItems={(e) => eh.getContextMenuItems(e, eh)}
+          tabToNextCell={eh.onTabToNextCell}
+          undoRedoCellEditing={false}
         >
           <AgGridColumn
-              field="row"
-              headerName=""
-              suppressMovable
-              editable={false}
-              valueGetter={eh.rowValueGetter}
-              minWidth={40}
-              enableCellChangeFlash={false}
-              filter={false}
-              sortable={false}
+            field="row"
+            headerName=""
+            suppressMovable
+            editable={false}
+            valueGetter={eh.rowValueGetter}
+            minWidth={40}
+            enableCellChangeFlash={false}
+            filter={false}
+            sortable={false}
+          />
+          {headers.map((header, idx) => (
+            <AgGridColumn
+              key={idx}
+              field={header.field}
+              headerName={header.label}
+              hide={header.hide}
+              sort={header.sort}
+              cellEditor="agTextCellEditor"
+              editable={header.editable ?? true}
             />
-          {headers.map((header, idx) =>
-              <AgGridColumn
-                key={idx}
-                field={header.field}
-                headerName={header.label}
-                hide={header.hide}
-                sort={header.sort}
-                cellEditor="agTextCellEditor"
-                editable={header.editable ?? true}
-              />
-          )}
+          ))}
           {allMeasurements.map((_, idx) => {
             const field = `measurements.${idx + 1}`;
             return <AgGridColumn editable field={field} headerComponent={SurveyMeasurementHeader} key={idx} width={35} />;

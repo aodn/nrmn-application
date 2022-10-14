@@ -8,7 +8,7 @@ import SiteList from '../SiteList';
 import {Router} from 'react-router-dom';
 import {waitForDataToHaveLoaded} from '../../../../common/AgGridTestHelper';
 
-jest.setTimeout(10000);
+jest.setTimeout(30000);
 
 describe('<SiteList/>', () => {
   const siteTestData = {

@@ -121,7 +121,7 @@ public class SurveyValidation {
 
     public SurveyValidationError validateSurveyTransectNumber(List<StagedRowFormatted> surveyRows) {
         var invalidTransectRows = surveyRows.stream()
-                .filter(r -> !Arrays.asList(1, 2, 3, 4).contains(r.getSurveyNum())).collect(Collectors.toList());
+                .filter(r -> !Arrays.asList(0, 1, 2, 3, 4).contains(r.getSurveyNum())).collect(Collectors.toList());
         if (invalidTransectRows.size() > 0)
             return new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING,
                     "Survey group transect invalid",

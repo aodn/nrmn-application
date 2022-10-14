@@ -9,7 +9,7 @@ import JobList from '../JobList';
 import {createMemoryHistory} from 'history';
 import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 
-jest.setTimeout(10000);
+jest.setTimeout(30000);
 
 describe('<JobList/> filter testing', () => {
   let mockGetResult;

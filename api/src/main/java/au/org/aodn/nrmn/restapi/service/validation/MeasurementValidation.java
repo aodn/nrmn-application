@@ -26,9 +26,10 @@ public class MeasurementValidation {
             9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 16, 17, 18, 19, 20, 22, 24, 26, 28, 30 };
 
     private Boolean validateRowZeroOrOneInvertsTotal(StagedRowFormatted row, Integer observationTotal) {
-        if (row.getInverts() == null || row.getTotal() == null)
-            return false;
-        if (!(row.getInverts() == row.getTotal() && row.getTotal() == observationTotal))
+        if (row.getTotal() == null)
+            return observationTotal == 0 || observationTotal == 1;
+
+        if (row.getInverts() == null || !(row.getInverts() == row.getTotal() && row.getTotal() == observationTotal))
             return false;
         return observationTotal == 0 || observationTotal == 1;
     }

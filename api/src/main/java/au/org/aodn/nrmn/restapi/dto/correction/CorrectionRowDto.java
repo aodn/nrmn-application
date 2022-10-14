@@ -6,8 +6,6 @@ public interface CorrectionRowDto {
     String getObservationIds();
 
     Integer getSurveyId();
-    
-    Integer getDiverId();
 
     String getDiver();
 
@@ -40,7 +38,7 @@ public interface CorrectionRowDto {
 
     String getTime();
 
-    Integer getVis();
+    String getVis();
 
     String getMeasureJson();
 }
