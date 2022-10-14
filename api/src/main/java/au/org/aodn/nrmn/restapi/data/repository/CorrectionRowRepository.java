@@ -38,14 +38,13 @@ public interface CorrectionRowRepository
     "   LEFT JOIN nrmn.diver_ref e ON s.pq_diver_id = e.diver_id" +
     "   LEFT JOIN nrmn.measure_ref r ON r.measure_id = o.measure_id" +
     "   LEFT JOIN nrmn.measure_type_ref mt ON r.measure_type_id = mt.measure_type_id" +
-    "   WHERE m.survey_id = :surveyId" +
+    "   WHERE m.survey_id IN :surveyIds" +
     "   GROUP BY o.observation_id, s.survey_id, s.survey_num, o.diver_id, d.initials, e.initials, t.site_code, s.depth, s.survey_date, s.survey_time," +
     "   s.visibility, s.direction, s.latitude, s.longitude, r.seq_no, o.observable_item_id, i.observable_item_name, i.letter_code," +
     "   m.method_id, m.block_num, o.measure_id, mt.measure_type_id) c" +
     " GROUP BY c.survey_id, c.survey_num, c.diver_id, c.initials, c.pq_initials, c.site_code, c.depth, c.survey_date, c.survey_time, c.visibility," +
     " c.direction, c.latitude, c.longitude, c.observable_item_id, c.observable_item_name, c.letter_code, c.method_id, c.block_num, c.measure_type_id" +
     " ORDER BY c.method_id, c.block_num;", nativeQuery = true)
-
-            
-    List<CorrectionRowDto> findRowsBySurveyId(@Param("surveyId") Integer surveyId);
+    
+    List<CorrectionRowDto> findRowsBySurveyIds(@Param("surveyIds") List<Integer> surveyIds);
 }

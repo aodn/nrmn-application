@@ -121,7 +121,7 @@ export const getDataJob = (jobId) =>
 
 export const getCorrections = (surveyId) =>
   axiosInstance
-    .get('correction/correct/' + surveyId, {
+    .get('correction/correct?surveyIds=' + surveyId, {
       validateStatus: () => true
     })
     .then((res) => res)

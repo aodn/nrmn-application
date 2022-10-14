@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowMapperConfig;
@@ -247,15 +248,17 @@ public class CorrectionController {
         return validation;
     }
 
-    @GetMapping(path = "correct/{survey_id}")
+    @GetMapping(path = "correct")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<?> getSurveyCorrection(@PathVariable("survey_id") Integer surveyId) {
-        var rows = correctionRowRepository.findRowsBySurveyId(surveyId);
+    public ResponseEntity<?> getSurveyCorrections(@RequestParam("surveyIds") List<Integer> surveyIds) {
+        var rows = correctionRowRepository.findRowsBySurveyIds(surveyIds);
         var exists = rows != null && rows.size() > 0;
         var bodyDto = new CorrectionRowsDto();
         bodyDto.setRows(rows);
-        var survey = surveyRepository.getReferenceById(surveyId);
-        bodyDto.setProgramValidation(ProgramValidation.fromProgram(survey.getProgram()));
+        // HACK: just to get it working
+        bodyDto.setProgramValidation(ProgramValidation.NONE);
+        // var survey = surveyRepository.getReferenceById(surveyId);
+        // bodyDto.setProgramValidation(ProgramValidation.fromProgram(survey.getProgram()));
         return exists ? ResponseEntity.ok(bodyDto) : ResponseEntity.notFound().build();
     }
 
