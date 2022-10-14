@@ -201,50 +201,10 @@ public class CorrectionController {
         return result;
     }
 
-    private ValidationResultSet mappingResultToValidation(List<Pair<StagedRowFormatted, HashSet<String>>> results) {
-        var validationResult = new ValidationResultSet();
-
-        var messages = new HashMap<String, String>() {
-            {
-                put("block", "Block is not an integer");
-                put("date", "Date format not valid");
-                put("depth", "Depth is not a decimal");
-                put("direction", "Direction is not valid");
-                put("diver", "Diver does not exist");
-                put("latitude", "Latitude is not a decimal");
-                put("longitude", "Longitude is not a decimal");
-                put("method", "Method is missing");
-                put("siteCode", "Site does not exist");
-                put("code", "Letter Code missing");
-                put("species", "Species does not exist");
-                put("time", "Time is not valid");
-                put("vis", "Vis is not a number");
-                put("snd", "Survey Not Done not valid");
-                put("useInvertSizing", "Use Invert Sizing not valid");
-                put("measurement", "Measurement is not valid");
-            }
-        };
-
-        for (var result : results) {
-            var row = result.getLeft();
-            var rowErrors = result.getRight().stream()
-                    .map(col -> new ValidationCell(
-                            ValidationCategory.FORMAT,
-                            ValidationLevel.BLOCKING,
-                            messages.keySet().contains(col) ? messages.get(col) : messages.get("measurement"),
-                            row.getId(),
-                            col))
-                    .collect(Collectors.toSet());
-            validationResult.addAll(rowErrors, false);
-        }
-
-        return validationResult;
-    }
-
     private ValidationResultSet validate(ProgramValidation programValidation, Boolean isExtended,
             List<Pair<StagedRowFormatted, HashSet<String>>> results) {
 
-        var validation = mappingResultToValidation(results);
+        var validation = new ValidationResultSet();
 
         var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
 
