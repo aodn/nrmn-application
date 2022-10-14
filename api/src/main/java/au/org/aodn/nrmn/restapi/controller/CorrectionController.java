@@ -35,6 +35,7 @@ import au.org.aodn.nrmn.restapi.data.repository.CorrectionRowRepository;
 import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
+import au.org.aodn.nrmn.restapi.data.repository.ProgramRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SecUserRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedJobLogRepository;
@@ -74,7 +75,7 @@ public class CorrectionController {
 
     @Autowired
     MeasurementValidation measurementValidation;
-    
+
     @Autowired
     DataValidation dataValidation;
 
@@ -115,6 +116,9 @@ public class CorrectionController {
     SurveyValidation surveyValidation;
 
     @Autowired
+    ProgramRepository programRepository;
+
+    @Autowired
     UserActionAuditRepository userActionAuditRepository;
 
     @Autowired
@@ -131,7 +135,7 @@ public class CorrectionController {
     }
 
     private List<Pair<StagedRowFormatted, HashSet<String>>> mapRows(Collection<StagedRow> rows) {
-            
+
         var speciesNames = rows.stream().map(s -> s.getSpecies()).collect(Collectors.toSet());
         var observableItems = observableItemRepository.getAllSpeciesNamesMatching(speciesNames);
 
@@ -241,6 +245,8 @@ public class CorrectionController {
 
         validation.addAll(surveyValidation.validateSurveys(programValidation, isExtended, mappedRows));
 
+        validation.addAll(surveyValidation.validateSurveyGroups(programValidation, true, mappedRows));
+
         long errorId = 0;
         for (var error : validation.getAll())
             error.setId(errorId++);
@@ -251,53 +257,56 @@ public class CorrectionController {
     @GetMapping(path = "correct")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> getSurveyCorrections(@RequestParam("surveyIds") List<Integer> surveyIds) {
+
+        var programValidations = correctionRowRepository.findProgramsBySurveyIds(surveyIds)
+                .stream()
+                .map(ProgramValidation::fromProgram)
+                .collect(Collectors.toList());
+
+        if (programValidations.size() != 1)
+            return ResponseEntity.badRequest().body("Surveys must share the same program validation");
+
         var rows = correctionRowRepository.findRowsBySurveyIds(surveyIds);
         var exists = rows != null && rows.size() > 0;
         var bodyDto = new CorrectionRowsDto();
         bodyDto.setRows(rows);
-        // HACK: just to get it working
-        bodyDto.setProgramValidation(ProgramValidation.NONE);
-        // var survey = surveyRepository.getReferenceById(surveyId);
-        // bodyDto.setProgramValidation(ProgramValidation.fromProgram(survey.getProgram()));
+        bodyDto.setProgramValidation(programValidations.get(0));
         return exists ? ResponseEntity.ok(bodyDto) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping(path = "validate/{survey_id}")
+    @PostMapping(path = "validate")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> validateSurveyCorrection(
-            @PathVariable("survey_id") Integer surveyId,
             Authentication authentication,
             @RequestBody CorrectionRequestBodyDto bodyDto) {
 
-        var message = "correction validation: username: " + authentication.getName() + " survey: " + surveyId;
+        var message = "correction validation: username: " + authentication.getName();
         logger.debug("correction/validation", message);
-
-        // does survey exist?
-        if (surveyRepository.getReferenceById(surveyId) == null)
-            return ResponseEntity.badRequest().body("Survey does not exist: " + surveyId);
 
         var response = new ValidationResponse();
 
-        try 
-        {
+        try {
             var errors = new ArrayList<SurveyValidationError>();
             var rows = bodyDto.getRows();
 
             var mappedRows = mapRows(rows);
-            
+
             var siteCodes = mappedRows.stream()
-                            .filter(r -> r.getKey().getSite() != null)
-                            .map(r -> r.getKey().getSite().getSiteCode().toLowerCase())
-                            .distinct().collect(Collectors.toList());
-            
+                    .filter(r -> r.getKey().getSite() != null)
+                    .map(r -> r.getKey().getSite().getSiteCode().toLowerCase())
+                    .distinct().collect(Collectors.toList());
+
             var observableItems = mappedRows.stream()
-                            .filter(r -> r.getKey().getSpecies().isPresent())
-                            .map(r -> r.getKey().getSpecies().get())
-                            .collect(Collectors.toList());
-            
-            errors.addAll(dataValidation.checkFormatting(bodyDto.getProgramValidation(), bodyDto.getIsExtended(), false, siteCodes, observableItems, rows));
-            
-            errors.addAll(validate(bodyDto.getProgramValidation(), bodyDto.getIsExtended(), mappedRows).getAll());
+                    .filter(r -> r.getKey().getSpecies().isPresent())
+                    .map(r -> r.getKey().getSpecies().get())
+                    .collect(Collectors.toList());
+
+            var programValidation = ProgramValidation.fromProgram(programRepository.findById(bodyDto.getProgramId()).get());
+
+            errors.addAll(dataValidation.checkFormatting(programValidation, bodyDto.getIsExtended(), false,
+                    siteCodes, observableItems, rows));
+
+            errors.addAll(validate(programValidation, bodyDto.getIsExtended(), mappedRows).getAll());
 
             response.setErrors(errors);
         } catch (Exception e) {
@@ -307,41 +316,39 @@ public class CorrectionController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PostMapping(path = "correct/{survey_id}")
+    @PostMapping(path = "correct")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> submitSurveyCorrection(
-            @PathVariable("survey_id") Integer surveyId,
+            @RequestParam("surveyIds") List<Integer> surveyIds,
             Authentication authentication,
             @RequestBody CorrectionRequestBodyDto bodyDto) {
 
+
         var user = secUserRepository.findByEmail(authentication.getName());
+        var survey = surveyIds.stream().map(Object::toString).collect(Collectors.joining(", "));
+        var program = programRepository.findById(bodyDto.getProgramId()).get();
+        var programValidation = ProgramValidation.fromProgram(program);
 
-        var surveyOptional = surveyRepository.findById(surveyId);
-        if (!surveyOptional.isPresent())
-            return ResponseEntity.notFound().build();
+        var message = "correction: username: " + authentication.getName();
+        userActionAuditRepository.save(new UserActionAudit("correct/survey", message));
 
-        var survey = surveyOptional.get();
-        var surveyName = String.format("[%s, %s, %s.%d]", survey.getSite().getSiteCode(), survey.getSurveyDate(),
-                survey.getDepth(), survey.getSurveyNum());
-
-        var logMessage = "correction: username: " + authentication.getName() + "survey: " + surveyId;
-        userActionAuditRepository.save(new UserActionAudit("correct/survey", logMessage));
 
         var job = StagedJob.builder()
                 .source(SourceJobType.CORRECTION)
-                .reference("Correct Survey " + surveyName)
+                .reference("Correct Survey " + survey)
                 .status(StatusJobType.CORRECTED)
-                .program(survey.getProgram())
+                .program(program)
                 .creator(user.get())
                 .build();
 
         job = stagedJobRepository.save(job);
 
-        logMessage(job, "Correct Survey " + surveyId);
-
         try {
+
+        logMessage(job, "Correct Survey " + surveyIds);
+
             var results = mapRows(bodyDto.getRows());
-            var result = validate(bodyDto.getProgramValidation(), bodyDto.getIsExtended(), results).getAll();
+            var result = validate(programValidation, bodyDto.getIsExtended(), results).getAll();
             var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
             var blockingErrors = result.stream().filter(r -> r.getLevelId() == ValidationLevel.BLOCKING)
                     .collect(Collectors.toList());
@@ -351,7 +358,7 @@ public class CorrectionController {
                 return ResponseEntity.ok().body(result);
             }
 
-            surveyCorrectionService.correctSurvey(job, survey, mappedRows);
+            // surveyCorrectionService.correctSurvey(job, survey, mappedRows);
             materializedViewService.refreshAllMaterializedViews();
 
         } catch (Exception e) {
@@ -360,7 +367,7 @@ public class CorrectionController {
 
             var log = StagedJobLog.builder()
                     .stagedJob(job)
-                    .details("Application error deleting survey " + survey.getSurveyId())
+                    .details("Application error attempting correction")
                     .eventType(StagedJobEventType.ERROR).build();
 
             stagedJobLogRepository.save(log);

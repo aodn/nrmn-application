@@ -1,5 +1,5 @@
 import {CloudUpload as CloudUploadIcon, PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon} from '@mui/icons-material/';
-import {Box, Button, Typography} from '@mui/material';
+import {Alert, Box, Button, Typography} from '@mui/material';
 import UndoIcon from '@mui/icons-material/Undo';
 import ResetIcon from '@mui/icons-material/LayersClear';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
@@ -48,6 +48,7 @@ const SurveyCorrect = () => {
   const gridRef = useRef();
 
   // FUTURE: useReducer
+  const [error, setError] = useState();
   const [editMode, setEditMode] = useState(true);
   const [rowData, setRowData] = useState();
   const [gridApi, setGridApi] = useState();
@@ -211,7 +212,10 @@ const SurveyCorrect = () => {
   const onGridReady = ({api}) => {
     getCorrections(surveyId).then((res) => {
       api.hideOverlay();
-      if (res.status !== 200) return;
+      if (res.status !== 200) {
+        setError(res.data);
+        return;
+      }
       const {rows, programValidation} = res.data;
       const unpackedData = rows.map((data, idx) => {
         const measurements = data.observationIds === '' ? {} : JSON.parse(data.measureJson);
@@ -261,7 +265,6 @@ const SurveyCorrect = () => {
     setLoading(true);
     const api = gridRef.current.api;
     const context = api.gridOptionsWrapper.gridOptions.context;
-    // context.rowData = [...rowData];
     context.useOverlay = 'Validating Survey Correction...';
     api.showLoadingOverlay();
     setSideBar(defaultSideBar);
@@ -300,6 +303,15 @@ const SurveyCorrect = () => {
   const canSubmitCorrection = validationResult && validationResult.filter((res) => res.levelId === 'BLOCKING').length < 1;
 
   if (redirect) return <Navigate push to={redirect} />;
+
+  if (error)
+    return (
+      <Box m={2}>
+        <Alert severity="error" variant="filled">
+          {error}
+        </Alert>
+      </Box>
+    );
 
   return (
     <>

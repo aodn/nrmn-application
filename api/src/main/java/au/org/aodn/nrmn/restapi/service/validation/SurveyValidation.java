@@ -256,7 +256,7 @@ public class SurveyValidation {
         return res;
     }
 
-    private Collection<SurveyValidationError> checkSurveyGroups(ProgramValidation validation, Boolean isExtended,
+    private Collection<SurveyValidationError> checkSurveyGroups(ProgramValidation validation,
             Map<String, List<StagedRowFormatted>> surveyGroupMap) {
         var res = new HashSet<SurveyValidationError>();
 
@@ -308,12 +308,15 @@ public class SurveyValidation {
         return sheetErrors;
     }
 
-    public Collection<SurveyValidationError> validateSurveyGroups(ProgramValidation validation, Boolean isExtended,
+    public Collection<SurveyValidationError> validateSurveyGroups(ProgramValidation validation, Boolean isCorrection,
             Collection<StagedRowFormatted> mappedRows) {
         var sheetErrors = new HashSet<SurveyValidationError>();
 
         var surveyGroupMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
-        sheetErrors.addAll(checkSurveyGroups(validation, isExtended, surveyGroupMap));
+
+        // Skip survey group validation if correcting a single survey
+        if(!isCorrection || surveyGroupMap.keySet().size() > 1)
+            sheetErrors.addAll(checkSurveyGroups(validation, surveyGroupMap));
 
         return sheetErrors;
     }

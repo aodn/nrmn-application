@@ -9,11 +9,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import au.org.aodn.nrmn.restapi.data.model.Observation;
+import au.org.aodn.nrmn.restapi.data.model.Program;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowDto;
 
 @Repository
 public interface CorrectionRowRepository
         extends JpaRepository<Observation, Long>, JpaSpecificationExecutor<Observation> {
+
+    @Query("SELECT DISTINCT s.program FROM Survey s where s.id IN :surveyIds")
+    List<Program> findProgramsBySurveyIds(@Param("surveyIds") List<Integer> surveyIds);
 
     @Query(value = "SELECT" +
     " c.survey_id AS surveyId, c.survey_num AS surveyNum, c.diver_id AS diverId," +
@@ -44,7 +48,7 @@ public interface CorrectionRowRepository
     "   m.method_id, m.block_num, o.measure_id, mt.measure_type_id) c" +
     " GROUP BY c.survey_id, c.survey_num, c.diver_id, c.initials, c.pq_initials, c.site_code, c.depth, c.survey_date, c.survey_time, c.visibility," +
     " c.direction, c.latitude, c.longitude, c.observable_item_id, c.observable_item_name, c.letter_code, c.method_id, c.block_num, c.measure_type_id" +
-    " ORDER BY c.method_id, c.block_num;", nativeQuery = true)
+    " ORDER BY c.survey_id, c.method_id, c.block_num;", nativeQuery = true)
     
     List<CorrectionRowDto> findRowsBySurveyIds(@Param("surveyIds") List<Integer> surveyIds);
 }

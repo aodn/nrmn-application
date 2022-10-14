@@ -13,12 +13,14 @@ import TableRow from '@mui/material/TableRow';
 import FileDownload from 'js-file-download';
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router';
+import {Navigate} from 'react-router-dom';
 import {getEntity, originalJobFile} from '../../api/api';
 import EntityContainer from '../containers/EntityContainer';
 
 const JobView = () => {
   const {id} = useParams();
   const [job, setJob] = useState();
+  const [redirect, setRedirect] = useState(false);
   const [existsOnS3, setExistsOnS3] = useState(true);
 
   const downloadZip = (jobId, fileName) => {
@@ -37,6 +39,11 @@ const JobView = () => {
     }
     if (id) fetchJob();
   }, [id]);
+
+  if (redirect) {
+    const url = `/data/survey/${job.surveyIds.join(',')}/correct`;
+    return <Navigate to={url} />;
+  }
 
   return (
     <EntityContainer name="Jobs" goBackTo="/data/jobs">
@@ -110,6 +117,11 @@ const JobView = () => {
                     {job.surveyIds.map((id) => (
                       <Chip key={id} style={{margin: 5}} label={id} component="a" href={`/data/survey/${id}`} clickable />
                     ))}
+                  </Grid>
+                  <Grid container xs={12}>
+                    <Button variant="outlined" component="a" onClick={() => setRedirect(true)} clickable>
+                      Correct
+                    </Button>
                   </Grid>
                 </Grid>
               ) : (
