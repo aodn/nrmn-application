@@ -1,5 +1,9 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
 import {responsiveFontSizes, ThemeProvider, createTheme} from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
 import {LicenseManager} from 'ag-grid-enterprise';
@@ -37,15 +41,17 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css';
 
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [auth, setAuth] = useState(JSON.parse(localStorage.getItem('auth')) || {expires: 0, username: null, features:[]});
+  const [auth, setAuth] = useState(JSON.parse(localStorage.getItem('auth')) || {expires: 0, username: null, features: []});
 
   const [applicationError, setApplicationError] = useState();
+  const [errorToggled, setErrorToggled] = useState(false);
+
   window.setApplicationError = setApplicationError;
 
   const loggedIn = Date.now() < auth.expires;
 
   const licenceKey = JSON.parse(localStorage.getItem('gridLicense'));
-  if(licenceKey) LicenseManager.setLicenseKey(licenceKey);
+  if (licenceKey) LicenseManager.setLicenseKey(licenceKey);
 
   const productionTheme = useMemo(
     () =>
@@ -58,11 +64,12 @@ const App = () => {
             table: {
               fontSize: 12,
               padding: 6
-          }},
+            }
+          },
           palette: {
             mode: 'light',
             primary: {main: '#546E7B', light: '#AADFFA', dark: '#546E7B', rowHeader: '#E4EAED', rowHighlight: '#F2F6F7'},
-            secondary: {main: '#563FF2', light: '#7D69FF', dark: '#5844DB',  rowHeader: '#E4EAED', rowHighlight: '#F2F6F7'}
+            secondary: {main: '#563FF2', light: '#7D69FF', dark: '#5844DB', rowHeader: '#E4EAED', rowHighlight: '#F2F6F7'}
           }
         })
       ),
@@ -75,8 +82,9 @@ const App = () => {
         createTheme({
           typography: {
             table: {
-              fontSize: 12,
-          }},
+              fontSize: 12
+            }
+          },
           palette: {
             mode: 'light',
             primary: {main: '#7B6154', light: '#AADFFA', dark: '#546E7B', rowHeader: '#E4EAED', rowHighlight: '#F2F6F7'},
@@ -92,23 +100,33 @@ const App = () => {
       <ThemeProvider theme={auth?.features?.includes('verification') ? verificationTheme : productionTheme}>
         <Router>
           <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)}></SideMenu>
-          <TopBar onMenuClick={() => setMenuOpen(true)}>{auth?.features?.includes('verification') ? 'NRMN Verification' : 'National Reef Monitoring Network'}</TopBar>
+          <TopBar onMenuClick={() => setMenuOpen(true)}>
+            {auth?.features?.includes('verification') ? 'NRMN Verification' : 'National Reef Monitoring Network'}
+          </TopBar>
           <AppContent>
             {applicationError ? (
-              <Box m={10}>
-                <Box py={3}>
-                  <Alert severity="error" variant="filled">
-                    {applicationError}
-                    <br />
-                    The server may be experiencing problems. Please wait a moment and try again.
-                    <br />
-                    If this problem persists, please contact info@aodn.org.au.
-                  </Alert>
+              <>
+                <Box m={10}>
+                  <Box py={3}>
+                    <Alert severity="error" variant="filled">
+                      The server may be experiencing problems. Please wait a moment and try again.
+                      <br />
+                      If this problem persists, please contact info@aodn.org.au.
+                    </Alert>
+                    <Accordion disableGutters elevation={0} square expanded={errorToggled} onChange={() => setErrorToggled(!errorToggled)}>
+                      <AccordionSummary expandIcon={<ArrowForwardIosSharpIcon sx={{fontSize: '0.9rem'}} />}>
+                        <p>{applicationError?.message}</p>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <code>{applicationError?.response?.data}</code>
+                      </AccordionDetails>
+                    </Accordion>
+                  </Box>
+                  <Button variant="outlined" onClick={() => window.location.reload()}>
+                    Refresh Page
+                  </Button>
                 </Box>
-                <Button variant="outlined" onClick={() => window.location.reload()}>
-                  Refresh Page
-                </Button>
-              </Box>
+              </>
             ) : (
               <Routes>
                 <Route path="/home" element={<Homepage />} />

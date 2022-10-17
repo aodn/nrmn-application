@@ -258,19 +258,25 @@ public class CorrectionController {
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> getSurveyCorrections(@RequestParam("surveyIds") List<Integer> surveyIds) {
 
-        var programValidations = correctionRowRepository.findProgramsBySurveyIds(surveyIds)
+        var programs = correctionRowRepository.findProgramsBySurveyIds(surveyIds)
                 .stream()
-                .map(ProgramValidation::fromProgram)
+                .collect(Collectors.toList());
+
+        var programValidations = programs.stream().map(ProgramValidation::fromProgram)
                 .collect(Collectors.toList());
 
         if (programValidations.size() != 1)
             return ResponseEntity.badRequest().body("Surveys must share the same program validation");
+        var program = programs.get(0);
 
         var rows = correctionRowRepository.findRowsBySurveyIds(surveyIds);
         var exists = rows != null && rows.size() > 0;
         var bodyDto = new CorrectionRowsDto();
         bodyDto.setRows(rows);
-        bodyDto.setProgramValidation(programValidations.get(0));
+        bodyDto.setProgramName(program.getProgramName());
+        bodyDto.setProgramId(program.getProgramId());
+        bodyDto.setSurveyIds(surveyIds);
+
         return exists ? ResponseEntity.ok(bodyDto) : ResponseEntity.notFound().build();
     }
 
@@ -278,6 +284,7 @@ public class CorrectionController {
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> validateSurveyCorrection(
             Authentication authentication,
+            @RequestParam("surveyIds") List<Integer> surveyIds,
             @RequestBody CorrectionRequestBodyDto bodyDto) {
 
         var message = "correction validation: username: " + authentication.getName();
@@ -301,7 +308,8 @@ public class CorrectionController {
                     .map(r -> r.getKey().getSpecies().get())
                     .collect(Collectors.toList());
 
-            var programValidation = ProgramValidation.fromProgram(programRepository.findById(bodyDto.getProgramId()).get());
+            var programValidation = ProgramValidation
+                    .fromProgram(programRepository.findById(bodyDto.getProgramId()).get());
 
             errors.addAll(dataValidation.checkFormatting(programValidation, bodyDto.getIsExtended(), false,
                     siteCodes, observableItems, rows));
@@ -323,7 +331,6 @@ public class CorrectionController {
             Authentication authentication,
             @RequestBody CorrectionRequestBodyDto bodyDto) {
 
-
         var user = secUserRepository.findByEmail(authentication.getName());
         var survey = surveyIds.stream().map(Object::toString).collect(Collectors.joining(", "));
         var program = programRepository.findById(bodyDto.getProgramId()).get();
@@ -331,7 +338,6 @@ public class CorrectionController {
 
         var message = "correction: username: " + authentication.getName();
         userActionAuditRepository.save(new UserActionAudit("correct/survey", message));
-
 
         var job = StagedJob.builder()
                 .source(SourceJobType.CORRECTION)
@@ -345,7 +351,7 @@ public class CorrectionController {
 
         try {
 
-        logMessage(job, "Correct Survey " + surveyIds);
+            logMessage(job, "Correct Survey " + surveyIds);
 
             var results = mapRows(bodyDto.getRows());
             var result = validate(programValidation, bodyDto.getIsExtended(), results).getAll();

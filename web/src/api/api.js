@@ -27,7 +27,7 @@ axiosInstance.interceptors.response.use(
       localStorage.removeItem('auth');
       window.location.reload();
     } else {
-      window.setApplicationError(error?.message || JSON.stringify(error), error);
+      window.setApplicationError(error);
       console.error({error});
     }
   }
@@ -119,16 +119,16 @@ export const getDataJob = (jobId) =>
     .then((res) => res)
     .catch((err) => err);
 
-export const getCorrections = (surveyId) =>
+export const getCorrections = (surveyIds) =>
   axiosInstance
-    .get('correction/correct?surveyIds=' + surveyId, {
+    .get('correction/correct?surveyIds=' + surveyIds, {
       validateStatus: () => true
     })
     .then((res) => res)
     .catch((err) => err);
 
-export const validateSurveyCorrection = (surveyId, bodyDto) => {
-  return axiosInstance.post('correction/validate/' + surveyId, bodyDto);
+export const validateSurveyCorrection = (surveyIds, bodyDto) => {
+  return axiosInstance.post('correction/validate?surveyIds=' + surveyIds, bodyDto);
 };
 
 export const submitSurveyCorrection = (surveyId, bodyDto) => {

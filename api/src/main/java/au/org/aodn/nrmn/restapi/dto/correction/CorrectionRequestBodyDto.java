@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class CorrectionRequestBodyDto {
-    private Boolean isExtended;
     private Integer programId;
+    private Boolean isExtended;
+    private Boolean isMultiple;
     private Collection<StagedRow> rows;
 }

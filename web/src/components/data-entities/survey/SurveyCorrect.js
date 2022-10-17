@@ -58,7 +58,7 @@ const SurveyCorrect = () => {
   const [cellValidations, setCellValidations] = useState([]);
   const [redirect, setRedirect] = useState();
   const [undoSize, setUndoSize] = useState(0);
-  const [validationMode, setValidationMode] = useState({programValidation: 'NONE', isExtended: false});
+  const [metadata, setMetadata] = useState({programName: 'NONE', surveyIds: [], isExtended: false});
 
   useEffect(() => {
     const undoKeyboardHandler = (event) => {
@@ -216,7 +216,7 @@ const SurveyCorrect = () => {
         setError(res.data);
         return;
       }
-      const {rows, programValidation} = res.data;
+      const {rows, programName, programId, surveyIds} = res.data;
       const unpackedData = rows.map((data, idx) => {
         const measurements = data.observationIds === '' ? {} : JSON.parse(data.measureJson);
         const inverts = measurements[0] || '0';
@@ -231,7 +231,7 @@ const SurveyCorrect = () => {
       context.rowData = rowData;
       context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
       api.setRowData(context.rowData.length > 0 ? context.rowData : null);
-      setValidationMode({programValidation, isExtended});
+      setMetadata({programName, programId, isExtended, surveyIds: [...surveyIds]});
       setRowData(rowData);
       setGridApi(api);
     });
@@ -268,7 +268,7 @@ const SurveyCorrect = () => {
     context.useOverlay = 'Validating Survey Correction...';
     api.showLoadingOverlay();
     setSideBar(defaultSideBar);
-    const bodyDto = {...validationMode, rows: packedData(api)};
+    const bodyDto = {...metadata, rows: packedData(api)};
     const result = await validateSurveyCorrection(surveyId, bodyDto);
     setValidationResult(result.data.errors);
     context.validations = result.data.errors;
@@ -296,7 +296,7 @@ const SurveyCorrect = () => {
     const context = api.gridOptionsWrapper.gridOptions.context;
     context.useOverlay = 'Correcting Survey...';
     api.showLoadingOverlay();
-    const result = await submitSurveyCorrection(surveyId, {...validationMode, rows: packedData(gridRef.current.api)});
+    const result = await submitSurveyCorrection(surveyId, {...metadata, rows: packedData(gridRef.current.api)});
     setRedirect(`/data/job/${result.data}/view`);
   };
 
@@ -313,24 +313,22 @@ const SurveyCorrect = () => {
       </Box>
     );
 
+  const row = rowData ? rowData[0] : null;
+
   return (
     <>
       <Box display="flex" flexDirection="row" p={1} pb={1}>
         <Box flexGrow={1}>
-          <Typography variant="h6">
-            Correct Survey{' '}
-            {rowData &&
-              '[' +
-                rowData[0].siteCode +
-                ', ' +
-                rowData[0].date +
-                ', ' +
-                rowData[0].depth +
-                '] ' +
-                validationMode.programValidation +
-                ' ' +
-                (validationMode.isExtended ? 'Extended' : '')}
-          </Typography>
+          {row && (
+            <Typography variant="h6">
+              {metadata.surveyIds.length > 1
+                ? `Correct ${metadata.surveyIds.length} Surveys`
+                : 'Correct Survey' +
+                  ` [${row.siteCode}, ${row.date}, ${row.depth}] ` +
+                  metadata.programName +
+                  (metadata.isExtended ? ' Extended' : '')}
+            </Typography>
+          )}
         </Box>
         <Box m={1} ml={0}>
           <Button variant="outlined" disabled={undoSize < 1} startIcon={<UndoIcon />} onClick={() => eh.handleUndo({api: gridApi})}>
