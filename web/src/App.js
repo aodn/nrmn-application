@@ -1,11 +1,4 @@
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
 import {responsiveFontSizes, ThemeProvider, createTheme} from '@mui/material/styles';
-import Alert from '@mui/material/Alert';
 import {LicenseManager} from 'ag-grid-enterprise';
 import React, {useState, useMemo} from 'react';
 import {BrowserRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
@@ -38,13 +31,13 @@ import SideMenu from './components/layout/SideMenu';
 import TopBar from './components/layout/TopBar';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
+import ApplicationError from './components/ui/ApplicationError';
 
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [auth, setAuth] = useState(JSON.parse(localStorage.getItem('auth')) || {expires: 0, username: null, features: []});
 
   const [applicationError, setApplicationError] = useState();
-  const [errorToggled, setErrorToggled] = useState(false);
 
   window.setApplicationError = setApplicationError;
 
@@ -105,28 +98,7 @@ const App = () => {
           </TopBar>
           <AppContent>
             {applicationError ? (
-              <>
-                <Box m={10}>
-                  <Box py={3}>
-                    <Alert severity="error" variant="filled">
-                      The server may be experiencing problems. Please wait a moment and try again.
-                      <br />
-                      If this problem persists, please contact info@aodn.org.au.
-                    </Alert>
-                    <Accordion disableGutters elevation={0} square expanded={errorToggled} onChange={() => setErrorToggled(!errorToggled)}>
-                      <AccordionSummary expandIcon={<ArrowForwardIosSharpIcon sx={{fontSize: '0.9rem'}} />}>
-                        <p>{applicationError?.message}</p>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <code>{applicationError?.response?.data}</code>
-                      </AccordionDetails>
-                    </Accordion>
-                  </Box>
-                  <Button variant="outlined" onClick={() => window.location.reload()}>
-                    Refresh Page
-                  </Button>
-                </Box>
-              </>
+              <ApplicationError error={applicationError} />
             ) : (
               <Routes>
                 <Route path="/home" element={<Homepage />} />
