@@ -349,7 +349,7 @@ const SurveyCorrect = () => {
           <Button
             onClick={onSubmit}
             variant="contained"
-            disabled={!canSubmitCorrection || !editMode || loading}
+            disabled={!editMode || loading}
             startIcon={<CloudUploadIcon />}
           >
             Submit Correction

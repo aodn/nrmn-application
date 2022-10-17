@@ -341,7 +341,7 @@ public class CorrectionController {
 
         var job = StagedJob.builder()
                 .source(SourceJobType.CORRECTION)
-                .reference("Correct Survey " + survey)
+                .reference("Correct " + survey)
                 .status(StatusJobType.CORRECTED)
                 .program(program)
                 .creator(user.get())
@@ -364,7 +364,7 @@ public class CorrectionController {
                 return ResponseEntity.ok().body(result);
             }
 
-            // surveyCorrectionService.correctSurvey(job, survey, mappedRows);
+            surveyCorrectionService.correctSurvey(job, surveyIds, mappedRows);
             materializedViewService.refreshAllMaterializedViews();
 
         } catch (Exception e) {

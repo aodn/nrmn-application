@@ -118,7 +118,7 @@ public class SurveyCorrectionServiceTest {
         correctedRow.setMeasureJson(correctedMeasures);
 
         try {
-            surveyCorrectionService.correctSurvey(ingestedJob, ingestedSurvey, Arrays.asList(correctedRow));
+            surveyCorrectionService.correctSurvey(ingestedJob, Arrays.asList(0,1,2), Arrays.asList(correctedRow));
         } catch (Exception e) {
             fail(e.getMessage());
         }

@@ -131,8 +131,8 @@ export const validateSurveyCorrection = (surveyIds, bodyDto) => {
   return axiosInstance.post('correction/validate?surveyIds=' + surveyIds, bodyDto);
 };
 
-export const submitSurveyCorrection = (surveyId, bodyDto) => {
-  return axiosInstance.post('correction/correct/' + surveyId, bodyDto);
+export const submitSurveyCorrection = (surveyIds, bodyDto) => {
+  return axiosInstance.post('correction/correct?surveyIds=' + surveyIds, bodyDto);
 };
 
 export const validateJob = (jobId, completion) => {
