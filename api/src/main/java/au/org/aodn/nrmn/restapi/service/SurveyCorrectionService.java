@@ -63,9 +63,6 @@ public class SurveyCorrectionService {
     SiteRepository siteRepository;
 
     @Autowired
-    EntityManager entityManager;
-
-    @Autowired
     ObservationRepository observationRepository;
 
     @Autowired
@@ -160,7 +157,7 @@ public class SurveyCorrectionService {
 
                 var firstRow = methodBlockRows.get(0);
                 var surveyNotDone = firstRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done");
-                var method = entityManager.getReference(Method.class, firstRow.getMethod());
+                var method = methodRepository.getReferenceById(firstRow.getMethod());
                 var surveyMethod = SurveyMethodEntity.builder().survey(survey).method(method)
                         .blockNum(firstRow.getBlock())
                         .surveyNotDone(surveyNotDone).build();
