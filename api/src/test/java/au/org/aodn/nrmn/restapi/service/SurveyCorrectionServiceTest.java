@@ -114,10 +114,10 @@ public class SurveyCorrectionServiceTest {
     @Test
     void correctSingleSurvey() {
 
-        when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
         when(observationRepository.saveAll(any())).thenReturn(Arrays.asList(Observation.builder().observationId(0).build()));
-        when(observationRepository.findObservationIdsForSurvey(any())).thenReturn(Arrays.asList(0));
-        when(methodRepository.getReferenceById(2)).thenReturn(new Method(2, "ASD", true));
+        when(surveyRepository.findAllById(any())).thenReturn(Arrays.asList(ingestedSurvey));
+        when(methodRepository.findAll()).thenReturn(Arrays.asList(Method.builder().methodId(2).build()));
+
         var correctedRow = rowBuilder.build();
         var correctedMeasures = Map.of(2, 5);
         correctedRow.setMeasureJson(correctedMeasures);
@@ -133,12 +133,7 @@ public class SurveyCorrectionServiceTest {
         assertEquals(1, savedObservations.size());
         assertEquals(correctedMeasures.get(2), savedObservations.get(0).getMeasureValue());
 
-        Mockito.verify(surveyMethodRepository).deleteForSurveyId(ingestedSurvey.getSurveyId());
-    }
-
-    @Test
-    void correctMultipleSurvey() {
-        
+        Mockito.verify(surveyMethodRepository).deleteForSurveyIds(any());
     }
 
     @Test
