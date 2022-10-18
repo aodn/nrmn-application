@@ -57,11 +57,16 @@ const JobView = () => {
               {['STAGED', 'INGESTED'].includes(job.status) && (
                 <>
                   <Button disabled={!existsOnS3} variant="outlined" onClick={() => downloadZip(job.id, job.reference)}>
-                    {existsOnS3 ? 'Download' : 'File not found'}
+                    {existsOnS3 ? 'View uploaded XLSX' : 'File not found'}
                   </Button>{' '}
                   <Button variant="outlined" component="a" href={`/data/job/${id}/edit`} clickable>
-                    {['INGESTED'].includes(job.status) ? 'View' : 'Edit'} Sheet
-                  </Button>
+                    {['INGESTED'].includes(job.status) ? 'View ingested ' : 'Edit'} Sheet
+                  </Button>{' '}
+                  {job.surveyIds?.length > 0 && (
+                    <Button variant="outlined" component="a" onClick={() => setRedirect(true)} clickable>
+                      Correct Job Surveys
+                    </Button>
+                  )}
                 </>
               )}
             </Box>
@@ -117,11 +122,6 @@ const JobView = () => {
                     {job.surveyIds.map((id) => (
                       <Chip key={id} style={{margin: 5}} label={id} component="a" href={`/data/survey/${id}`} clickable />
                     ))}
-                  </Grid>
-                  <Grid container xs={12}>
-                    <Button variant="outlined" component="a" onClick={() => setRedirect(true)} clickable>
-                      Correct
-                    </Button>
                   </Grid>
                 </Grid>
               ) : (
