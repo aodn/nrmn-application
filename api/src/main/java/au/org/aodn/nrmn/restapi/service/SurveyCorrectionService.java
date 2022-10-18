@@ -8,13 +8,11 @@ import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import au.org.aodn.nrmn.restapi.data.model.Method;
 import au.org.aodn.nrmn.restapi.data.model.Observation;
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.model.StagedJobLog;
@@ -139,6 +137,7 @@ public class SurveyCorrectionService {
         }
 
         for (var surveyId : surveyIds) {
+            messages.add("Correcting Survey ID: " + surveyId);
             messages.add("Delete Observation IDs: " + observationsForSurveySummary(surveyId));
 
             var survey = surveyRepository.findById(surveyId).orElse(null);
@@ -226,12 +225,12 @@ public class SurveyCorrectionService {
                     newIds.addAll(newObservations.stream().map(o -> o.getObservationId()).collect(Collectors.toList()));
                 }
 
-                messages.add("Insert Observation IDs: " + formatRange(newIds));
-                messages.add("Update Survey ID: " + surveyId);
+                messages.add("Insert Observation IDs for " + firstRow.getBlock() + " : " + method.getMethodId() + " " + formatRange(newIds));
             }
         }
 
         //TODO: set survey last updated and save new vis avg
+
         var details = messages.stream().collect(Collectors.joining("\n"));
         var log = StagedJobLog.builder().stagedJob(job).details(details).eventType(StagedJobEventType.CORRECTED);
         stagedJobLogRepository.save(log.build());
