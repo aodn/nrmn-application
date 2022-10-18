@@ -7,6 +7,7 @@ import 'ag-grid-enterprise';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Navigate, useParams} from 'react-router-dom';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import {getCorrections, submitSurveyCorrection, validateSurveyCorrection} from '../../../api/api';
 import {allMeasurements} from '../../../common/correctionsConstants';
 import ValidationPanel from '../../import/panel/ValidationPanel';
@@ -105,22 +106,22 @@ const SurveyCorrect = () => {
       {field: 'pos', label: '', editable: false, hide: true, sort: 'asc'},
       {field: 'id', label: '', editable: false, hide: true},
       {field: 'surveyId', label: 'Survey', editable: false},
-      {field: 'diverId', label: 'Diver ID', hide: true},
       {field: 'diver', label: 'Diver'},
-      {field: 'P-Qs', label: 'PQ Diver'},
-      {field: 'siteCode', label: 'Site Code', editable: false},
-      {field: 'depth', label: 'Depth', editable: false},
-      {field: 'date', label: 'Survey Date', editable: false},
-      {field: 'time', label: 'Survey Time'},
-      {field: 'vis', label: 'Visibility'},
-      {field: 'direction', label: 'Direction'},
+      {field: 'siteCode', label: 'Site No.', editable: false},
+      {field: 'siteName', label: 'Site Name', editable: false},
       {field: 'latitude', label: 'Latitude'},
       {field: 'longitude', label: 'Longitude'},
-      {field: 'observableItemId', hide: true},
-      {field: 'species', label: 'Species Name'},
+      {field: 'date', label: 'Date', editable: false},
+      {field: 'vis', label: 'Vis'},
+      {field: 'direction', label: 'Direction'},
+      {field: 'time', label: 'Time'},
+      {field: 'P-Qs', label: 'P-Qs'},
+      {field: 'depth', label: 'Depth', editable: false},
       {field: 'method', label: 'Method'},
       {field: 'block', label: 'Block'},
-      {field: 'isInvertSizing', label: 'Use Invert Sizing'},
+      {field: 'code', label: 'Code'},
+      {field: 'species', label: 'Species'},
+      {field: 'commonName', label: 'Common Name'},
       {field: 'inverts', label: 'Inverts'}
     ];
   }, []);
@@ -340,18 +341,18 @@ const SurveyCorrect = () => {
             Reset Filter
           </Button>
         </Box>
+        <Box m={1} ml={0}>
+          <Button variant="outlined" onClick={() => eh.onClickExcelExport(gridApi, 'Export', true)} startIcon={<CloudDownloadIcon />}>
+            Export
+          </Button>
+        </Box>
         <Box p={1} minWidth={120}>
           <Button onClick={onValidate} variant="contained" disabled={!editMode || loading} startIcon={<PlaylistAddCheckOutlinedIcon />}>
             Validate
           </Button>
         </Box>
         <Box p={1} minWidth={180}>
-          <Button
-            onClick={onSubmit}
-            variant="contained"
-            disabled={!editMode || loading}
-            startIcon={<CloudUploadIcon />}
-          >
+          <Button onClick={onSubmit} variant="contained" disabled={!editMode || loading} startIcon={<CloudUploadIcon />}>
             Submit Correction
           </Button>
         </Box>
@@ -412,6 +413,7 @@ const SurveyCorrect = () => {
             const field = `measurements.${idx + 1}`;
             return <AgGridColumn editable field={field} headerComponent={SurveyMeasurementHeader} key={idx} width={35} />;
           })}
+          <AgGridColumn field="isInvertSizing" headerName="Use Invert Sizing" cellEditor="agTextCellEditor" />
         </AgGridReact>
       </Box>
       <Box display={editMode ? 'none' : 'flex'} justifyContent="center">

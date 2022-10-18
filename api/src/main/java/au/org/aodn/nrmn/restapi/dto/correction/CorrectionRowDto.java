@@ -14,6 +14,8 @@ public interface CorrectionRowDto {
 
     String getSiteCode();
 
+    String getSiteName();
+
     String getDirection();
 
     String getLatitude();
@@ -22,9 +24,9 @@ public interface CorrectionRowDto {
 
     String getIsInvertSizing();
 
-    String getObservableItemId();
-
     String getSpecies();
+
+    String getCommonName();
 
     String getCode();
 

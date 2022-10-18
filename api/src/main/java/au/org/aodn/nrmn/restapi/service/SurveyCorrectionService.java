@@ -132,37 +132,40 @@ public class SurveyCorrectionService {
         var groupedSurveyIds = rowsGroupedBySurvey.keySet().stream().map(l -> l.intValue())
                 .collect(Collectors.toList());
 
-        if (!surveyIds.containsAll(groupedSurveyIds) || !groupedSurveyIds.containsAll(surveyIds)) {
+        if (!surveyIds.containsAll(groupedSurveyIds) || !groupedSurveyIds.containsAll(surveyIds))
             throw new RuntimeException("Survey IDs in grouped rows do not match the list of survey IDs passed in");
-        }
 
-        for (var surveyId : surveyIds) {
-            messages.add("Correcting Survey ID: " + surveyId);
-            messages.add("Delete Observation IDs: " + observationsForSurveySummary(surveyId));
+        var surveyMethods = new ArrayList<SurveyMethodEntity>();
+        var observations = new ArrayList<Observation>();
+        var methodEntities = methodRepository.findAll();
+        var measureEntities = measureRepository.findAll();
 
-            var survey = surveyRepository.findById(surveyId).orElse(null);
-            surveyMethodRepository.deleteForSurveyId(surveyId);
-            var surveyRows = rowsGroupedBySurvey.get(surveyId.longValue());
+        surveyMethodRepository.deleteForSurveyIds(surveyIds);
+        var surveys = surveyRepository.findAllById(surveyIds);
 
-            var visAvg = surveyRows.stream().filter(r -> r.getVis().isPresent()).mapToDouble(r -> r.getVis().get()).average();
-            if(visAvg.isPresent())
-                visAvg = OptionalDouble.of((double)Math.round(visAvg.getAsDouble()));
+        for (var survey : surveys) {
+            messages.add("Correcting Survey ID: " + survey.getSurveyId());
 
-            var newIds = new ArrayList<Integer>();
+            var surveyRows = rowsGroupedBySurvey.get(survey.getSurveyId().longValue());
+
+            var visAvg = surveyRows.stream().filter(r -> r.getVis().isPresent()).mapToDouble(r -> r.getVis().get())
+                    .average();
+            if (visAvg.isPresent())
+                visAvg = OptionalDouble.of((double) Math.round(visAvg.getAsDouble()));
+
             var surveyMethodBlocks = surveyRows.stream().filter(r -> r.getMethodBlock() != null)
                     .collect(Collectors.groupingBy(StagedRowFormatted::getMethodBlock));
 
-            for(var methodBlockRows : surveyMethodBlocks.values()) {
+            for (var methodBlockRows : surveyMethodBlocks.values()) {
 
                 var firstRow = methodBlockRows.get(0);
                 var surveyNotDone = firstRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done");
-                var method = methodRepository.getReferenceById(firstRow.getMethod());
+                var method = methodEntities.stream().filter(m -> m.getMethodId() == firstRow.getMethod()).findFirst().orElse(null);
                 var surveyMethod = SurveyMethodEntity.builder().survey(survey).method(method)
                         .blockNum(firstRow.getBlock())
                         .surveyNotDone(surveyNotDone).build();
 
-                // TODO: move out of the loop if we can
-                surveyMethod = surveyMethodRepository.save(surveyMethod);
+                surveyMethods.add(surveyMethod);
 
                 for (var row : methodBlockRows) {
 
@@ -173,28 +176,9 @@ public class SurveyCorrectionService {
                     if (!surveyNotDone && row.getInverts() != null && row.getInverts() > 0)
                         measures.put(0, row.getInverts());
 
-                    var observations = new ArrayList<Observation>();
-
                     for (var m : measures.entrySet()) {
 
-                        var measureTypeId = MeasureType.FishSizeClass;
-
-                        switch (method.getMethodId()) {
-                            case SurveyMethod.M3:
-                                measureTypeId = MeasureType.InSituQuadrat;
-                                break;
-                            case SurveyMethod.M4:
-                                measureTypeId = MeasureType.MacrocystisBlock;
-                                break;
-                            case SurveyMethod.M5:
-                                measureTypeId = MeasureType.LimpetQuadrat;
-                                break;
-                            case SurveyMethod.M12:
-                                measureTypeId = MeasureType.SingleItem;
-                                break;
-                            default:
-                                measureTypeId = MeasureType.FishSizeClass;
-                        }
+                        var measureTypeId = MeasureType.fromMethodId(method.getMethodId());
 
                         if (speciesMethods.contains(method.getMethodId())) {
 
@@ -207,8 +191,10 @@ public class SurveyCorrectionService {
 
                         }
 
-                        var measure = measureRepository.findByMeasureTypeIdAndSeqNo(measureTypeId, m.getKey())
-                                .orElse(null);
+                        final var measureTypeId_ = measureTypeId;
+                        var measure = measureEntities.stream()
+                                .filter(me -> me.getMeasureType().getMeasureTypeId() == measureTypeId_ && me.getSeqNo() == m.getKey())
+                                .findFirst().orElse(null);
 
                         var observation = Observation.builder()
                                 .diver(diver)
@@ -220,16 +206,19 @@ public class SurveyCorrectionService {
 
                         observations.add(observation);
                     }
-
-                    var newObservations = observationRepository.saveAll(observations);
-                    newIds.addAll(newObservations.stream().map(o -> o.getObservationId()).collect(Collectors.toList()));
                 }
 
-                messages.add("Insert Observation IDs for " + firstRow.getBlock() + " : " + method.getMethodId() + " " + formatRange(newIds));
+                messages.add("Correcting " + firstRow.getBlock() + " : " + method.getMethodId());
             }
         }
 
-        //TODO: set survey last updated and save new vis avg
+        surveyMethodRepository.saveAll(surveyMethods);
+        var newObservations = observationRepository.saveAll(observations);
+
+        messages.add("Inserting Observations "
+                + formatRange(newObservations.stream().map(o -> o.getObservationId()).collect(Collectors.toList())));
+
+        // TODO: set survey last updated and save new vis avg
 
         var details = messages.stream().collect(Collectors.joining("\n"));
         var log = StagedJobLog.builder().stagedJob(job).details(details).eventType(StagedJobEventType.CORRECTED);

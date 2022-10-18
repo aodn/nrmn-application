@@ -112,7 +112,7 @@ public class SurveyCorrectionServiceTest {
     }
 
     @Test
-    void correctSurvey() {
+    void correctSingleSurvey() {
 
         when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
         when(observationRepository.saveAll(any())).thenReturn(Arrays.asList(Observation.builder().observationId(0).build()));
@@ -134,6 +134,11 @@ public class SurveyCorrectionServiceTest {
         assertEquals(correctedMeasures.get(2), savedObservations.get(0).getMeasureValue());
 
         Mockito.verify(surveyMethodRepository).deleteForSurveyId(ingestedSurvey.getSurveyId());
+    }
+
+    @Test
+    void correctMultipleSurvey() {
+        
     }
 
     @Test

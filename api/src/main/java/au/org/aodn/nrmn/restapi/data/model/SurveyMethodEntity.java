@@ -30,7 +30,7 @@ import lombok.ToString;
 public class SurveyMethodEntity {
     @Id
     @SequenceGenerator(name = "survey_method_survey_method_id", sequenceName = "survey_method_survey_method_id",
-        allocationSize = 1)
+        allocationSize = 100)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="survey_method_survey_method_id")
     @Column(name = "survey_method_id", unique = true, updatable = false, nullable = false)
     private Integer surveyMethodId;
