@@ -1,5 +1,7 @@
 package au.org.aodn.nrmn.restapi.service;
 
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -148,10 +150,26 @@ public class SurveyCorrectionService {
 
             var surveyRows = rowsGroupedBySurvey.get(survey.getSurveyId().longValue());
 
-            var visAvg = surveyRows.stream().filter(r -> r.getVis().isPresent()).mapToDouble(r -> r.getVis().get())
-                    .average();
-            if (visAvg.isPresent())
-                visAvg = OptionalDouble.of((double) Math.round(visAvg.getAsDouble()));
+            {
+                var row = surveyRows.get(0);
+                // survey.setSite(row.getSite());
+                // survey.setDepth(row.getDepth());
+                // survey.setSurveyDate(row.getDate());
+                survey.setSurveyNum(row.getSurveyNum());
+                survey.setDirection(row.getDirection() != null ? row.getDirection().toString() : null);
+                survey.setSurveyTime(Time.valueOf(row.getTime().orElse(LocalTime.NOON)));
+                survey.setLongitude(row.getLongitude());
+                survey.setLatitude(row.getLatitude());
+                survey.setPqDiverId(row.getPqs() != null ? row.getPqs().getDiverId() : null);
+                
+                var visAvg = surveyRows.stream()
+                        .filter(r -> r.getVis().isPresent())
+                        .mapToDouble(r -> r.getVis().get())
+                        .average();
+                if (visAvg.isPresent())
+                    visAvg = OptionalDouble.of((double) Math.round(visAvg.getAsDouble()));
+                survey.setVisibility(visAvg.orElse(0.0));
+            }
 
             var surveyMethodBlocks = surveyRows.stream().filter(r -> r.getMethodBlock() != null)
                     .collect(Collectors.groupingBy(StagedRowFormatted::getMethodBlock));
@@ -160,7 +178,8 @@ public class SurveyCorrectionService {
 
                 var firstRow = methodBlockRows.get(0);
                 var surveyNotDone = firstRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done");
-                var method = methodEntities.stream().filter(m -> m.getMethodId() == firstRow.getMethod()).findFirst().orElse(null);
+                var method = methodEntities.stream().filter(m -> m.getMethodId() == firstRow.getMethod()).findFirst()
+                        .orElse(null);
                 var surveyMethod = SurveyMethodEntity.builder().survey(survey).method(method)
                         .blockNum(firstRow.getBlock())
                         .surveyNotDone(surveyNotDone).build();
@@ -193,7 +212,8 @@ public class SurveyCorrectionService {
 
                         final var measureTypeId_ = measureTypeId;
                         var measure = measureEntities.stream()
-                                .filter(me -> me.getMeasureType().getMeasureTypeId() == measureTypeId_ && me.getSeqNo() == m.getKey())
+                                .filter(me -> me.getMeasureType().getMeasureTypeId() == measureTypeId_
+                                        && me.getSeqNo() == m.getKey())
                                 .findFirst().orElse(null);
 
                         var observation = Observation.builder()
@@ -212,13 +232,12 @@ public class SurveyCorrectionService {
             }
         }
 
+        surveyRepository.saveAll(surveys);
         surveyMethodRepository.saveAll(surveyMethods);
         var newObservations = observationRepository.saveAll(observations);
 
         messages.add("Inserting Observations "
                 + formatRange(newObservations.stream().map(o -> o.getObservationId()).collect(Collectors.toList())));
-
-        // TODO: set survey last updated and save new vis avg
 
         var details = messages.stream().collect(Collectors.joining("\n"));
         var log = StagedJobLog.builder().stagedJob(job).details(details).eventType(StagedJobEventType.CORRECTED);
