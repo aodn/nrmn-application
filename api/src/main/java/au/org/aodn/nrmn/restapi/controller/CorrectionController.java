@@ -365,7 +365,7 @@ public class CorrectionController {
             }
 
             surveyCorrectionService.correctSurvey(job, surveyIds, mappedRows);
-            // materializedViewService.refreshAllMaterializedViews();
+            materializedViewService.refreshAllMaterializedViews();
 
         } catch (Exception e) {
 
