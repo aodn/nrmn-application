@@ -1,16 +1,16 @@
 package au.org.aodn.nrmn.restapi.dto.correction;
 
+import java.util.Collection;
+
 import au.org.aodn.nrmn.restapi.data.model.StagedRow;
-import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Collection;
 
 @Data
 @NoArgsConstructor
 public class CorrectionRequestBodyDto {
+    private Integer programId;
     private Boolean isExtended;
-    private ProgramValidation programValidation;
+    private Boolean isMultiple;
     private Collection<StagedRow> rows;
 }

@@ -198,7 +198,7 @@ public class ValidationProcess {
 
         sheetErrors.addAll(surveyValidation.validateSurveys(validation, job.getIsExtendedSize(), mappedRows));
         
-        sheetErrors.addAll(surveyValidation.validateSurveyGroups(validation, job.getIsExtendedSize(), mappedRows));
+        sheetErrors.addAll(surveyValidation.validateSurveyGroups(validation, false, mappedRows));
 
         response.setIncompleteSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("Survey incomplete")).count());
         response.setExistingSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("Survey exists:")).count());

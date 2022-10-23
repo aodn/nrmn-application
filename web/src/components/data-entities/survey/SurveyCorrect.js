@@ -1,5 +1,5 @@
 import {CloudUpload as CloudUploadIcon, PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon} from '@mui/icons-material/';
-import {Box, Button, Typography} from '@mui/material';
+import {Alert, Box, Button, Typography} from '@mui/material';
 import UndoIcon from '@mui/icons-material/Undo';
 import ResetIcon from '@mui/icons-material/LayersClear';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
@@ -7,6 +7,7 @@ import 'ag-grid-enterprise';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Navigate, useParams} from 'react-router-dom';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import {getCorrections, submitSurveyCorrection, validateSurveyCorrection} from '../../../api/api';
 import {allMeasurements} from '../../../common/correctionsConstants';
 import ValidationPanel from '../../import/panel/ValidationPanel';
@@ -48,6 +49,7 @@ const SurveyCorrect = () => {
   const gridRef = useRef();
 
   // FUTURE: useReducer
+  const [error, setError] = useState();
   const [editMode, setEditMode] = useState(true);
   const [rowData, setRowData] = useState();
   const [gridApi, setGridApi] = useState();
@@ -57,7 +59,7 @@ const SurveyCorrect = () => {
   const [cellValidations, setCellValidations] = useState([]);
   const [redirect, setRedirect] = useState();
   const [undoSize, setUndoSize] = useState(0);
-  const [validationMode, setValidationMode] = useState({programValidation: 'NONE', isExtended: false});
+  const [metadata, setMetadata] = useState({programName: 'NONE', surveyIds: [], isExtended: false});
 
   useEffect(() => {
     const undoKeyboardHandler = (event) => {
@@ -104,22 +106,22 @@ const SurveyCorrect = () => {
       {field: 'pos', label: '', editable: false, hide: true, sort: 'asc'},
       {field: 'id', label: '', editable: false, hide: true},
       {field: 'surveyId', label: 'Survey', editable: false},
-      {field: 'diverId', label: 'Diver ID', hide: true},
       {field: 'diver', label: 'Diver'},
-      {field: 'P-Qs', label: 'PQ Diver'},
-      {field: 'siteCode', label: 'Site Code', editable: false},
-      {field: 'depth', label: 'Depth', editable: false},
-      {field: 'date', label: 'Survey Date', editable: false},
-      {field: 'time', label: 'Survey Time'},
-      {field: 'vis', label: 'Visibility'},
-      {field: 'direction', label: 'Direction'},
+      {field: 'siteCode', label: 'Site No.', editable: false},
+      {field: 'siteName', label: 'Site Name', editable: false},
       {field: 'latitude', label: 'Latitude'},
       {field: 'longitude', label: 'Longitude'},
-      {field: 'observableItemId', hide: true},
-      {field: 'species', label: 'Species Name'},
+      {field: 'date', label: 'Date', editable: false},
+      {field: 'vis', label: 'Vis'},
+      {field: 'direction', label: 'Direction'},
+      {field: 'time', label: 'Time'},
+      {field: 'P-Qs', label: 'P-Qs'},
+      {field: 'depth', label: 'Depth', editable: false},
       {field: 'method', label: 'Method'},
       {field: 'block', label: 'Block'},
-      {field: 'isInvertSizing', label: 'Use Invert Sizing'},
+      {field: 'code', label: 'Code'},
+      {field: 'species', label: 'Species'},
+      {field: 'commonName', label: 'Common Name'},
       {field: 'inverts', label: 'Inverts'}
     ];
   }, []);
@@ -211,8 +213,11 @@ const SurveyCorrect = () => {
   const onGridReady = ({api}) => {
     getCorrections(surveyId).then((res) => {
       api.hideOverlay();
-      if (res.status !== 200) return;
-      const {rows, programValidation} = res.data;
+      if (res.status !== 200) {
+        setError(res.data);
+        return;
+      }
+      const {rows, programName, programId, surveyIds} = res.data;
       const unpackedData = rows.map((data, idx) => {
         const measurements = data.observationIds === '' ? {} : JSON.parse(data.measureJson);
         const inverts = measurements[0] || '0';
@@ -227,7 +232,7 @@ const SurveyCorrect = () => {
       context.rowData = rowData;
       context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
       api.setRowData(context.rowData.length > 0 ? context.rowData : null);
-      setValidationMode({programValidation, isExtended});
+      setMetadata({programName, programId, isExtended, surveyIds: [...surveyIds]});
       setRowData(rowData);
       setGridApi(api);
     });
@@ -261,11 +266,10 @@ const SurveyCorrect = () => {
     setLoading(true);
     const api = gridRef.current.api;
     const context = api.gridOptionsWrapper.gridOptions.context;
-    // context.rowData = [...rowData];
     context.useOverlay = 'Validating Survey Correction...';
     api.showLoadingOverlay();
     setSideBar(defaultSideBar);
-    const bodyDto = {...validationMode, rows: packedData(api)};
+    const bodyDto = {...metadata, rows: packedData(api)};
     const result = await validateSurveyCorrection(surveyId, bodyDto);
     setValidationResult(result.data.errors);
     context.validations = result.data.errors;
@@ -293,7 +297,7 @@ const SurveyCorrect = () => {
     const context = api.gridOptionsWrapper.gridOptions.context;
     context.useOverlay = 'Correcting Survey...';
     api.showLoadingOverlay();
-    const result = await submitSurveyCorrection(surveyId, {...validationMode, rows: packedData(gridRef.current.api)});
+    const result = await submitSurveyCorrection(surveyId, {...metadata, rows: packedData(gridRef.current.api)});
     setRedirect(`/data/job/${result.data}/view`);
   };
 
@@ -301,24 +305,31 @@ const SurveyCorrect = () => {
 
   if (redirect) return <Navigate push to={redirect} />;
 
+  if (error)
+    return (
+      <Box m={2}>
+        <Alert severity="error" variant="filled">
+          {error}
+        </Alert>
+      </Box>
+    );
+
+  const row = rowData ? rowData[0] : null;
+
   return (
     <>
       <Box display="flex" flexDirection="row" p={1} pb={1}>
         <Box flexGrow={1}>
-          <Typography variant="h6">
-            Correct Survey{' '}
-            {rowData &&
-              '[' +
-                rowData[0].siteCode +
-                ', ' +
-                rowData[0].date +
-                ', ' +
-                rowData[0].depth +
-                '] ' +
-                validationMode.programValidation +
-                ' ' +
-                (validationMode.isExtended ? 'Extended' : '')}
-          </Typography>
+          {row && (
+            <Typography variant="h6">
+              {metadata.surveyIds.length > 1
+                ? `Correct ${metadata.surveyIds.length} Surveys`
+                : 'Correct Survey' +
+                  ` [${row.siteCode}, ${row.date}, ${row.depth}] ` +
+                  metadata.programName +
+                  (metadata.isExtended ? ' Extended' : '')}
+            </Typography>
+          )}
         </Box>
         <Box m={1} ml={0}>
           <Button variant="outlined" disabled={undoSize < 1} startIcon={<UndoIcon />} onClick={() => eh.handleUndo({api: gridApi})}>
@@ -330,18 +341,18 @@ const SurveyCorrect = () => {
             Reset Filter
           </Button>
         </Box>
+        <Box m={1} ml={0}>
+          <Button variant="outlined" onClick={() => eh.onClickExcelExport(gridApi, 'Export', true)} startIcon={<CloudDownloadIcon />}>
+            Export
+          </Button>
+        </Box>
         <Box p={1} minWidth={120}>
           <Button onClick={onValidate} variant="contained" disabled={!editMode || loading} startIcon={<PlaylistAddCheckOutlinedIcon />}>
             Validate
           </Button>
         </Box>
         <Box p={1} minWidth={180}>
-          <Button
-            onClick={onSubmit}
-            variant="contained"
-            disabled={!canSubmitCorrection || !editMode || loading}
-            startIcon={<CloudUploadIcon />}
-          >
+          <Button onClick={onSubmit} variant="contained" disabled={!editMode || loading} startIcon={<CloudUploadIcon />}>
             Submit Correction
           </Button>
         </Box>
@@ -402,6 +413,7 @@ const SurveyCorrect = () => {
             const field = `measurements.${idx + 1}`;
             return <AgGridColumn editable field={field} headerComponent={SurveyMeasurementHeader} key={idx} width={35} />;
           })}
+          <AgGridColumn field="isInvertSizing" headerName="Use Invert Sizing" cellEditor="agTextCellEditor" />
         </AgGridReact>
       </Box>
       <Box display={editMode ? 'none' : 'flex'} justifyContent="center">

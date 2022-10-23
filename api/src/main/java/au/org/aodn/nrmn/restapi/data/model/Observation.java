@@ -36,7 +36,7 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 public class Observation {
     @Id
     @SequenceGenerator(name = "observation_observation_id", sequenceName = "observation_observation_id",
-     allocationSize = 1)
+     allocationSize = 100)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="observation_observation_id")
     @Column(name = "observation_id", unique = true, updatable = false, nullable = false)
     private Integer observationId;

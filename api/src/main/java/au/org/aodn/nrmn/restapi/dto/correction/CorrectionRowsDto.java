@@ -5,11 +5,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.Collection;
 
-import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
-
 @Data
 @NoArgsConstructor
 public class CorrectionRowsDto {
-    ProgramValidation programValidation;
+    Integer programId;
+    String programName;
+    Collection<Integer> surveyIds;
     Collection<CorrectionRowDto> rows;
 }

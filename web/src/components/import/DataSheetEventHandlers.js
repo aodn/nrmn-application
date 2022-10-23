@@ -251,7 +251,8 @@ class DataSheetEventHandlers {
     requiredColumns.forEach((x) => {
       // Get the row display name from the fields, this is because we turn on skipColumnHeaders so that
       // we can add empty row, '' is used to force type to string.
-      headers.push({data: {value: '' + api.getColumnDefs().filter((y) => y.field === x)[0].headerName, type: 'String'}});
+      const column = api.getColumnDefs().filter((y) => y.field === x)[0]?.headerName;
+      if(column) headers.push({data: {value: '' + column, type: 'String'}});
     });
 
     api.exportDataAsExcel({

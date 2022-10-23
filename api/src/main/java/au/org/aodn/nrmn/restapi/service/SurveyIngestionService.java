@@ -108,14 +108,6 @@ public class SurveyIngestionService {
                         .build()));
     }
 
-    public SurveyMethodEntity getSurveyMethod(Survey survey, StagedRowFormatted stagedRow) {
-        boolean surveyNotDone = stagedRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done");
-        Method method = entityManager.getReference(Method.class, stagedRow.getMethod());
-        SurveyMethodEntity surveyMethod = SurveyMethodEntity.builder().survey(survey).method(method).blockNum(stagedRow.getBlock())
-                .surveyNotDone(surveyNotDone).build();
-        return surveyMethodRepository.save(surveyMethod);
-    }
-
     public List<Observation> getObservations(SurveyMethodEntity surveyMethod, StagedRowFormatted stagedRow,
             Boolean withExtendedSizing) {
         if (!stagedRow.getSpecies().isPresent())
@@ -178,6 +170,14 @@ public class SurveyIngestionService {
         return surveyRows.stream().filter(r -> r.getMethodBlock() != null).collect(Collectors.groupingBy(StagedRowFormatted::getMethodBlock));
     }
 
+    public SurveyMethodEntity getSurveyMethod(Survey survey, StagedRowFormatted stagedRow) {
+        boolean surveyNotDone = stagedRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done");
+        Method method = entityManager.getReference(Method.class, stagedRow.getMethod());
+        SurveyMethodEntity surveyMethod = SurveyMethodEntity.builder().survey(survey).method(method).blockNum(stagedRow.getBlock())
+                .surveyNotDone(surveyNotDone).build();
+        return surveyMethodRepository.save(surveyMethod);
+    }
+    
     @Transactional
     public void ingestTransaction(StagedJob job, Collection<StagedRowFormatted> validatedRows) {
 

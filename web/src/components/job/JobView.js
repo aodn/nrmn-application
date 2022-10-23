@@ -13,12 +13,14 @@ import TableRow from '@mui/material/TableRow';
 import FileDownload from 'js-file-download';
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router';
+import {Navigate} from 'react-router-dom';
 import {getEntity, originalJobFile} from '../../api/api';
 import EntityContainer from '../containers/EntityContainer';
 
 const JobView = () => {
   const {id} = useParams();
   const [job, setJob] = useState();
+  const [redirect, setRedirect] = useState(false);
   const [existsOnS3, setExistsOnS3] = useState(true);
 
   const downloadZip = (jobId, fileName) => {
@@ -38,6 +40,11 @@ const JobView = () => {
     if (id) fetchJob();
   }, [id]);
 
+  if (redirect) {
+    const url = `/data/survey/${job.surveyIds.join(',')}/correct`;
+    return <Navigate to={url} />;
+  }
+
   return (
     <EntityContainer name="Jobs" goBackTo="/data/jobs">
       {job ? (
@@ -50,11 +57,16 @@ const JobView = () => {
               {['STAGED', 'INGESTED'].includes(job.status) && (
                 <>
                   <Button disabled={!existsOnS3} variant="outlined" onClick={() => downloadZip(job.id, job.reference)}>
-                    {existsOnS3 ? 'Download' : 'File not found'}
+                    {existsOnS3 ? 'View uploaded XLSX' : 'File not found'}
                   </Button>{' '}
                   <Button variant="outlined" component="a" href={`/data/job/${id}/edit`} clickable>
-                    {['INGESTED'].includes(job.status) ? 'View' : 'Edit'} Sheet
-                  </Button>
+                    {['INGESTED'].includes(job.status) ? 'View ingested ' : 'Edit'} Sheet
+                  </Button>{' '}
+                  {job.surveyIds?.length > 0 && (
+                    <Button variant="outlined" component="a" onClick={() => setRedirect(true)} clickable>
+                      Correct Job Surveys
+                    </Button>
+                  )}
                 </>
               )}
             </Box>

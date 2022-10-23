@@ -26,6 +26,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import au.org.aodn.nrmn.restapi.data.model.Diver;
+import au.org.aodn.nrmn.restapi.data.model.Method;
 import au.org.aodn.nrmn.restapi.data.model.ObsItemType;
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.data.model.Observation;
@@ -35,6 +36,7 @@ import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.data.model.Survey;
 import au.org.aodn.nrmn.restapi.data.repository.MeasureRepository;
+import au.org.aodn.nrmn.restapi.data.repository.MethodRepository;
 import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedJobLogRepository;
@@ -71,6 +73,9 @@ public class SurveyCorrectionServiceTest {
     @Mock
     private StagedJobLogRepository stagedJobLogRepository;
 
+    @Mock
+    private MethodRepository methodRepository;
+    
     @InjectMocks
     SurveyCorrectionService surveyCorrectionService;
 
@@ -101,24 +106,24 @@ public class SurveyCorrectionServiceTest {
                 .site(Site.builder().siteCode("A SITE").isActive(false).build()).depth(1).surveyNum(2)
                 .direction(Directions.N).vis(Optional.of(15.5)).date(LocalDate.of(2003, 03, 03))
                 .time(Optional.of(LocalTime.of(12, 34, 56))).pqs(diver).isInvertSizing(true).code("AAA")
-                .inverts(0)
+                .inverts(0).surveyId(1L)
                 .measureJson(startingMeasures)
                 .ref(ref);
     }
 
     @Test
-    void correctSurvey() {
+    void correctSingleSurvey() {
 
-        when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
         when(observationRepository.saveAll(any())).thenReturn(Arrays.asList(Observation.builder().observationId(0).build()));
-        when(observationRepository.findObservationIdsForSurvey(any())).thenReturn(Arrays.asList(0));
+        when(surveyRepository.findAllById(any())).thenReturn(Arrays.asList(ingestedSurvey));
+        when(methodRepository.findAll()).thenReturn(Arrays.asList(Method.builder().methodId(2).build()));
 
         var correctedRow = rowBuilder.build();
         var correctedMeasures = Map.of(2, 5);
         correctedRow.setMeasureJson(correctedMeasures);
 
         try {
-            surveyCorrectionService.correctSurvey(ingestedJob, ingestedSurvey, Arrays.asList(correctedRow));
+            surveyCorrectionService.correctSurvey(ingestedJob, Arrays.asList(1), Arrays.asList(correctedRow));
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -128,7 +133,7 @@ public class SurveyCorrectionServiceTest {
         assertEquals(1, savedObservations.size());
         assertEquals(correctedMeasures.get(2), savedObservations.get(0).getMeasureValue());
 
-        Mockito.verify(surveyMethodRepository).deleteForSurveyId(ingestedSurvey.getSurveyId());
+        Mockito.verify(surveyMethodRepository).deleteForSurveyIds(any());
     }
 
     @Test

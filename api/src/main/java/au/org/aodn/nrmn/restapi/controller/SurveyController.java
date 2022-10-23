@@ -31,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
+import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.SurveyEditService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -52,6 +53,9 @@ public class SurveyController {
 
     @Autowired
     private SurveyEditService surveyEditService;
+
+    @Autowired
+    private MaterializedViewService materializedViewService;
 
     @Autowired
     private ModelMapper mapper;
@@ -168,6 +172,7 @@ public class SurveyController {
         Survey survey = surveyEditService.updateSurvey(surveyDto);
 
         Survey persistedSurvey = surveyRepository.save(survey);
+        materializedViewService.refreshAllMaterializedViews();
         SurveyDto updatedSurveyDto = mapper.map(persistedSurvey, SurveyDto.class);
         return ResponseEntity.ok(updatedSurveyDto);
 
