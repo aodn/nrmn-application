@@ -45,10 +45,6 @@ const SpeciesCorrect = () => {
     updateFilter({field: 'locationId', value: value});
   };
 
-  const onSearch = () => {
-    console.log(filter);
-  };
-
   return (
     <>
       <Box p={1}>
@@ -93,7 +89,7 @@ const SpeciesCorrect = () => {
             />
           </Box>
           <Box my={4} width={200}>
-            <LoadingButton disabled={!canSearch} fullWidth onClick={onSearch} variant="contained">
+            <LoadingButton disabled={!canSearch} fullWidth variant="contained">
               Search
             </LoadingButton>
           </Box>
