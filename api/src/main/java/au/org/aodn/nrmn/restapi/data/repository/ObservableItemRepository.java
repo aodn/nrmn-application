@@ -59,7 +59,8 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "INNER JOIN {h-schema}methods_species m ON m.observable_item_id = obsitem.observable_item_id "
             + "where m.method_id = :methodId AND site_raw.site_id IN :siteIds AND obsitem.superseded_by IS NULL "
             + "AND (:methodId != 2 OR (obsitem.class NOT IN ('Ophiuroidea', 'Polyplacophora') AND obsitem.family != 'Pyuridae'))", nativeQuery = true)
-    List<ObservableItemRow> getAllWithMethodForSites(@Param("methodId") Integer methodId, @Param("siteIds") Collection<Integer> siteIds);
+    List<ObservableItemRow> getAllWithMethodForSites(@Param("methodId") Integer methodId,
+            @Param("siteIds") Collection<Integer> siteIds);
 
     @Query(value = "SELECT * FROM {h-schema}observable_item_ref oi"
             + " LEFT JOIN {h-schema}lengthweight_ref lw ON (lw.observable_item_id = oi.observable_item_id)"
@@ -82,4 +83,12 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "superseded_ids " + "from {h-schema}observable_item_ref oi_1 "
             + "where oi_1.superseded_by = oi.observable_item_name) as superseded on true WHERE observable_item_id = :id", nativeQuery = true)
     ObservableItemSuperseded findSupersededForId(Integer id);
+
+    @Query(value = "select distinct observable_item_id, observable_item_name, common_name from "
+            + "(select i.observable_item_id, i.common_name, i.observable_item_name from nrmn.survey s "
+            + "join nrmn.survey_method m on m.survey_id = s.survey_id "
+            + "join nrmn.observation o on m.survey_method_id = o.survey_method_id "
+            + "join nrmn.observable_item_ref i on o.observable_item_id = i.observable_item_id "
+            + "where s.survey_id in :surveyIds) as ob;", nativeQuery = true)
+    List<ObservableItem> getAllDistinctForSurveys(@Param("surveyIds") Collection<Integer> surveyIds);
 }
