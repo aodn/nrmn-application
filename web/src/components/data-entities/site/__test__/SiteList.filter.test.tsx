@@ -11,6 +11,8 @@ import SiteList from '../SiteList';
 import { createMemoryHistory } from 'history';
 import stateFilterHandler from '../../../../common/state-event-handler/StateFilterHandler';
 
+jest.setTimeout(30000);
+
 describe('<SiteList/> filter testing', () => {
   let mockGetEntity;
   let mockGetFiltersForId;
