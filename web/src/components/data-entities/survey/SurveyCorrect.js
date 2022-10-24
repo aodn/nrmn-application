@@ -32,7 +32,7 @@ const toolTipValueGetter = ({context, data, colDef}) => {
 };
 
 const removeNullProperties = (obj) => {
-  return Object.fromEntries(Object.entries(obj).filter((v) => v[1] !== ''));
+  return obj ? Object.fromEntries(Object.entries(obj).filter((v) => v[1] !== '')) : null;
 };
 
 const packedData = (api) => {
@@ -300,8 +300,9 @@ const SurveyCorrect = () => {
         return acc;
       }
       for (var key of Object.keys(r)) {
+        if(key === 'observationIds') continue;
         if (typeof r[key] === 'object') {
-          if (JSON.stringify(r[key]) !== JSON.stringify(original[key])) acc.push(`${rowPos}: ${key} changed`);
+          if (JSON.stringify(removeNullProperties(r[key])) !== JSON.stringify(original[key])) acc.push(`Row ${rowPos} ${key} changed`);
         } else if (r[key] !== original[key]) {
           acc.push(`Row ${rowPos}: ${key} change from ${original[key]} to ${r[key]}`);
         }
