@@ -119,6 +119,14 @@ export const getDataJob = (jobId) =>
     .then((res) => res)
     .catch((err) => err);
 
+export const getSurveySpecies = ({locationId, startDate, endDate}) =>
+  axiosInstance
+    .get(`correction/correctSpecies?locationId=${locationId}&startDate=${startDate}&endDate=${endDate}`, {
+      validateStatus: () => true
+    })
+    .then((res) => res)
+    .catch((err) => err);
+
 export const getCorrections = (surveyIds) =>
   axiosInstance
     .get('correction/correct?surveyIds=' + surveyIds, {

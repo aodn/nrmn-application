@@ -429,4 +429,12 @@ public class CorrectionController {
 
         return ResponseEntity.ok().body(job.getId());
     }
+
+    @GetMapping("correctSpecies")
+    public ResponseEntity<?> getSpeciesForSurveysDateAndLocation(@RequestParam(value = "locationId") Integer locationId,
+            @RequestParam(value = "startDate") String startDate, @RequestParam(value = "endDate") String endDate) {
+        var species = observableItemRepository.getAllDistinctForSurveys(locationId, startDate, endDate);
+        return ResponseEntity.ok().body(species);
+    }
+
 }

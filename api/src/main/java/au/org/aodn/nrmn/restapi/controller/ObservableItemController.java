@@ -60,7 +60,7 @@ public class ObservableItemController {
     private ObjectMapper objMapper;
 
     @GetMapping(path = "/observableItems")
-    public  ResponseEntity<?> getObservationItemsWithFitlers(@RequestParam(value = "sort", required = false) String sort,
+    public  ResponseEntity<?> getObservationItemsWithFilters(@RequestParam(value = "sort", required = false) String sort,
                                                              @RequestParam(value = "filters", required = false) String filters,
                                                              @RequestParam(value = "page", defaultValue = "0") int page,
                                                              @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) throws JsonProcessingException {
