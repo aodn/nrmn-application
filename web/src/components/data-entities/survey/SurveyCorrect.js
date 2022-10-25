@@ -32,7 +32,7 @@ const toolTipValueGetter = ({context, data, colDef}) => {
 };
 
 const removeNullProperties = (obj) => {
-  return Object.fromEntries(Object.entries(obj).filter((v) => v[1] !== ''));
+  return obj ? Object.fromEntries(Object.entries(obj).filter((v) => v[1] !== '')) : null;
 };
 
 const packedData = (api) => {
@@ -56,6 +56,7 @@ const SurveyCorrect = () => {
   const [isFiltered, setIsFiltered] = useState(false);
   const [loading, setLoading] = useState(false);
   const [validationResult, setValidationResult] = useState();
+  const [surveyDiff, setSurveyDiff] = useState([]);
   const [cellValidations, setCellValidations] = useState([]);
   const [redirect, setRedirect] = useState();
   const [undoSize, setUndoSize] = useState(0);
@@ -229,6 +230,7 @@ const SurveyCorrect = () => {
       const isExtended = unpackedData.includes((r) => Object.keys(r.measurements).includes((k) => k > 28));
       const context = api.gridOptionsWrapper.gridOptions.context;
       const rowData = [...unpackedData];
+      context.originalData = JSON.parse(JSON.stringify(rowData));
       context.rowData = rowData;
       context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
       api.setRowData(context.rowData.length > 0 ? context.rowData : null);
@@ -269,6 +271,7 @@ const SurveyCorrect = () => {
     context.useOverlay = 'Validating Survey Correction...';
     api.showLoadingOverlay();
     setSideBar(defaultSideBar);
+
     const bodyDto = {...metadata, rows: packedData(api)};
     const result = await validateSurveyCorrection(surveyId, bodyDto);
     setValidationResult(result.data.errors);
@@ -285,8 +288,44 @@ const SurveyCorrect = () => {
     setSideBar(summarySideBar);
   };
 
+  const diffSheet = () => {
+    const api = gridRef.current.api;
+    const context = api.gridOptionsWrapper.gridOptions.context;
+
+    const edited = context.rowData.reduce((acc, r) => {
+      const rowPos = context.rowPos.indexOf(r.pos) + 1;
+      const original = context.originalData.find((o) => o.id === r.id);
+      if (!original) {
+        acc.push(`Row ${rowPos} added`);
+        return acc;
+      }
+      for (var key of Object.keys(r)) {
+        if(key === 'observationIds') continue;
+        if (typeof r[key] === 'object') {
+          if (JSON.stringify(removeNullProperties(r[key])) !== JSON.stringify(original[key])) acc.push(`Row ${rowPos} ${key} changed`);
+        } else if (r[key] !== original[key]) {
+          acc.push(`Row ${rowPos}: ${key} change from ${original[key]} to ${r[key]}`);
+        }
+      }
+      return acc;
+    }, []);
+
+    const deleted = context.originalData.reduce((acc, r) => {
+      const rowPos = context.rowPos.indexOf(r.pos) + 1;
+      if (!context.rowData.find((o) => o.id === r.id)) {
+        acc.push(`Row ${rowPos} deleted`);
+      }
+      return acc;
+    }, []);
+
+    setSurveyDiff([...edited, ...deleted]);
+  };
+
   const onSubmit = async () => {
     await validate();
+
+    diffSheet();
+
     setEditMode(false);
   };
 
@@ -426,14 +465,27 @@ const SurveyCorrect = () => {
           justifyContent="center"
           flexDirection="column"
         >
-          <Box>
-            <Typography variant="h5">Confirm Survey Correction?</Typography>
-          </Box>
-          <Box border={0} borderColor="grey" p={2} margin={3}>
-            {validationResult?.map((res, idx) => (
-              <p key={idx}>{res.message}</p>
-            ))}
-          </Box>
+          {canSubmitCorrection ? (
+            <>
+              <Box>
+                <Typography variant="h5">Confirm Survey Correction?</Typography>
+              </Box>
+              <Box border={0} borderColor="grey" p={2} margin={3}>
+                {surveyDiff?.map((res, idx) => (
+                  <p key={idx}>{res}</p>
+                ))}
+              </Box>
+            </>
+          ) : (
+            <Box border={0} borderColor="grey" p={2} margin={3}>
+              <Typography variant="h6">Survey Correction cannot be submitted until all validation errors are resolved.</Typography>
+              {validationResult
+                ?.filter((r) => r.levelId === 'BLOCKING')
+                .map((res, idx) => (
+                  <p key={idx}>{res.message}</p>
+                ))}
+            </Box>
+          )}
           <Box flexDirection="row">
             <Button sx={{width: '25px', marginLeft: '20%'}} variant="outlined" onClick={() => setEditMode(true)}>
               Cancel
