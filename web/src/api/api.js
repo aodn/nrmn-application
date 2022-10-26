@@ -119,13 +119,14 @@ export const getDataJob = (jobId) =>
     .then((res) => res)
     .catch((err) => err);
 
-export const getSurveySpecies = ({locationId, startDate, endDate}) =>
-  axiosInstance
-    .get(`correction/correctSpecies?locationId=${locationId}&startDate=${startDate}&endDate=${endDate}`, {
+export const getSurveySpecies = (filter) => {
+  const params = Object.keys(filter).map((key) => `${key}=${filter[key]}`).join('&');
+  return axiosInstance.get(`correction/correctSpecies?${params}`, {
       validateStatus: () => true
     })
     .then((res) => res)
     .catch((err) => err);
+  };
 
 export const getCorrections = (surveyIds) =>
   axiosInstance

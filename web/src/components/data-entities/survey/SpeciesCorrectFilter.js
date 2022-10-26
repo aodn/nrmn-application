@@ -15,11 +15,11 @@ const SpeciesCorrectFilter = ({onSearch}) => {
     async function fetchLocations() {
       await getEntity('locations').then((res) => {
         const locations = [];
-        res.data.items.forEach((d) => {
+        const locationIds = [];
+        res.data.items.sort((a, b) => a.locationName.localeCompare(b.locationName)).forEach((d) => {
           locations[d.id] = d.locationName;
+          locationIds.push(d.id);
         });
-        locations.sort((a, b) => a.localeCompare(b));
-        const locationIds = Object.keys(locations).sort();
         setData({locations, locationIds});
       });
       setLoading(false);
@@ -30,10 +30,14 @@ const SpeciesCorrectFilter = ({onSearch}) => {
   const [filter, updateFilter] = useReducer(
     (filter, action) => {
       const updated = {...filter};
-      updated[action.field] = action.value;
+      if(action.value === null) {
+        delete updated[action.field];
+      } else {
+        updated[action.field] = action.value;
+      }
       return updated;
     },
-    {startDate: '2021-01-01', endDate: '2022-01-01', locationId: null}
+    {startDate: '2021-01-01', endDate: '2022-01-01'}
   );
 
   const updateStartDate = (e) => {
@@ -48,7 +52,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
     updateFilter({field: 'locationId', value: value});
   };
 
-  const canSearch = filter.startDate && filter.endDate && filter.locationId;
+  const canSearch = filter.startDate && filter.endDate;
 
   return (
     <>

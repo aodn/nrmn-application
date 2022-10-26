@@ -86,17 +86,26 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
     ObservableItemSuperseded findSupersededForId(Integer id);
 
     @Query(value = ""
-            + "select distinct observable_item_id as observableItemId, survey_id as surveyId, survey_date as surveyDate, "
-            + "observable_item_name as observableItemName, common_name as commonName, location_name as locationName from "
+            + "select distinct observable_item_id as observableItemId,"
+            + "observable_item_name as observableItemName, common_name as commonName, CAST(jsonb_agg(survey_id) AS TEXT) as surveyIds from "
             + "(select i.observable_item_id, i.common_name, i.observable_item_name, l.location_name, s.survey_id, s.survey_date from nrmn.survey s  "
             + "join nrmn.survey_method m on m.survey_id = s.survey_id  "
             + "join nrmn.observation o on m.survey_method_id = o.survey_method_id "
             + "join nrmn.observable_item_ref i on o.observable_item_id = i.observable_item_id "
             + "join nrmn.site_ref t on s.site_id = t.site_id "
             + "join nrmn.location_ref l on l.location_id = t.location_id "
-            + "where t.location_id = :locationId and s.survey_date < cast(:endDate as date) and s.survey_date > cast(:startDate as date)) as ob "
+            + "WHERE s.survey_date < cast(:endDate as date) AND s.survey_date > cast(:startDate as date) "
+            + "AND (:locationId IS NULL OR t.location_id = :locationId) "
+            + "AND (:observableItemId IS NULL OR o.observable_item_id = :observableItemId) "
+            + "AND (:state IS NULL OR t.state = :state) "
+            + "AND (:country IS NULL OR t.country = :country) "
+            + ") as ob "
+            + "group by observable_item_id, observable_item_name, common_name "
             + "order by observableItemName"
             + "", nativeQuery = true)
-    List<SpeciesCorrectDto> getAllDistinctForSurveys(@Param("locationId") Integer locationId,
-            @Param("startDate") String startDate, @Param("endDate") String endDate);
+    List<SpeciesCorrectDto> getAllDistinctForSurveys(
+        @Param("startDate") String startDate, @Param("endDate") String endDate,
+        @Param("locationId") Integer locationId,
+        @Param("observableItemId") Integer observableItemId,
+        @Param("state") String state, @Param("country") String country);
 }
