@@ -22,7 +22,7 @@ public interface CorrectionRowRepository
     @Query(value = "" +
     "SELECT c.survey_id AS surveyId, c.survey_num AS surveyNum, c.diver_id AS diverId, c.initials AS diver, c.pq_initials AS pqDiver," +
     "c.site_code AS siteCode, c.site_name AS siteName, CAST(c.depth AS text) || '.' || CAST(c.survey_num AS text) AS depth, TO_CHAR(c.survey_date, 'dd/MM/yyyy') AS DATE," +
-    "TO_CHAR(c.survey_time, 'HH24:MI') AS time, c.visibility AS vis, c.direction, c.latitude, c.longitude," +
+    "TO_CHAR(c.survey_time, 'HH24:MI') AS time, c.visibility AS vis, c.direction, c.latitudeA as latitude, c.longitudeA as longitude," +
     "c.observable_item_name AS species, c.common_name as commonName, LOWER(c.letter_code) AS code," +
     "c.method_id AS method, c.block_num as block," +
     "(CASE WHEN measure_type_id = 4 THEN 'Yes' ELSE 'No' END) AS isInvertSizing," +
@@ -34,10 +34,12 @@ public interface CorrectionRowRepository
     "COALESCE(m.block_num, 0) as block_num, " +
 	"COALESCE(r.seq_no, 0) AS seq_no, " +
 	"COALESCE(SUM(o.measure_value), 0) as measure_sum," +
+    "ROUND(CAST(COALESCE(s.latitude, t.latitude) as numeric), 5) as latitudeA," +
+    "ROUND(CAST(COALESCE(s.longitude, t.longitude) as numeric),5) as longitudeA," +
 	"CASE WHEN o.observable_item_id IS NULL THEN 'SND' ELSE i.letter_code END AS letter_code," +
 	"m.method_id, o.measure_id," +
 	"s.survey_id, o.diver_id, d.initials, s.survey_num, e.initials as pq_initials, t.site_code, t.site_name, s.depth, s.survey_date, s.survey_time," +
-    "s.visibility, s.direction, s.latitude, s.longitude, i.common_name," +
+    "s.visibility, s.direction, i.common_name," +
 	"mt.measure_type_id FROM nrmn.survey_method m " +
     "LEFT JOIN nrmn.observation o ON o.survey_method_id = m.survey_method_id " +
     "LEFT JOIN nrmn.observable_item_ref i ON o.observable_item_id = i.observable_item_id " +
@@ -49,9 +51,9 @@ public interface CorrectionRowRepository
     "WHERE m.survey_id IN :surveyIds " +
 	"GROUP BY m.method_id, m.block_num, o.measure_id, seq_no, mt.measure_type_id," +
 	"s.survey_id, o.diver_id, d.initials, pq_initials, s.survey_num, e.initials, t.site_code, t.site_name, s.depth, s.survey_date, s.survey_time," +
-	"s.visibility, s.direction, s.latitude, s.longitude, o.observable_item_id, observable_item_name, i.common_name, letter_code) c " +
+	"s.visibility, s.direction, latitudeA, longitudeA, o.observable_item_id, observable_item_name, i.common_name, letter_code) c " +
     "GROUP BY c.survey_id, c.survey_num, c.diver_id, c.initials, c.pq_initials, c.site_code, c.site_name, c.depth, c.survey_date, c.survey_time, c.visibility," +
-    "c.direction, c.latitude, c.longitude, c.observable_item_name, c.common_name, c.letter_code, c.observation_ids, c.method_id, c.block_num, c.measure_type_id " +
+    "c.direction, c.latitudeA, c.longitudeA, c.observable_item_name, c.common_name, c.letter_code, c.observation_ids, c.method_id, c.block_num, c.measure_type_id " +
     "ORDER BY c.survey_id, c.method_id, c.block_num" + 
      "", nativeQuery = true)
     
