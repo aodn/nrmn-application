@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 public class SpeciesDto {
     private String phylum;
 
+    public Integer observableItemId;
+    
     @JsonProperty("class")
     private String className;
 

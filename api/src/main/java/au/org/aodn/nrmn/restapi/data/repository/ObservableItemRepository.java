@@ -87,8 +87,8 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
 
     @Query(value = ""
             + "select distinct observable_item_id as observableItemId,"
-            + "observable_item_name as observableItemName, common_name as commonName, CAST(jsonb_agg(survey_id) AS TEXT) as surveyIds from "
-            + "(select i.observable_item_id, i.common_name, i.observable_item_name, l.location_name, s.survey_id, s.survey_date from nrmn.survey s  "
+            + "observable_item_name as observableItemName, superseded_by as supersededBy, common_name as commonName, CAST(jsonb_agg(survey_id) AS TEXT) as surveyIds from "
+            + "(select i.observable_item_id, i.common_name, i.observable_item_name, i.superseded_by, l.location_name, s.survey_id, s.survey_date from nrmn.survey s  "
             + "join nrmn.survey_method m on m.survey_id = s.survey_id  "
             + "join nrmn.observation o on m.survey_method_id = o.survey_method_id "
             + "join nrmn.observable_item_ref i on o.observable_item_id = i.observable_item_id "
@@ -100,8 +100,8 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "AND (:state IS NULL OR t.state = :state) "
             + "AND (:country IS NULL OR t.country = :country) "
             + ") as ob "
-            + "group by observable_item_id, observable_item_name, common_name "
-            + "order by observableItemName"
+            + "group by observable_item_id, observable_item_name, common_name, superseded_by "
+            + "order by observableItemName, supersededBy"
             + "", nativeQuery = true)
     List<SpeciesCorrectDto> getAllDistinctForSurveys(
         @Param("startDate") String startDate, @Param("endDate") String endDate,

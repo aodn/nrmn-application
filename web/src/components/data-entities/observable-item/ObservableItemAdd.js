@@ -229,7 +229,7 @@ const ObservableItemAdd = () => {
                 exclude={item.observableItemName}
                 field="supersededBy"
                 errors={errors}
-                onChange={(t) => dispatch({field: 'supersededBy', value: t})}
+                onChange={(t) => dispatch({field: 'supersededBy', value: t.species})}
               />
             </Grid>
           </Grid>

@@ -5,18 +5,21 @@ import {PropTypes} from 'prop-types';
 import {search} from '../../api/api';
 import axios from 'axios';
 
-const CustomSearchInput = ({label, exclude, formData, onChange}) => {
+const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
   const minMatchCharacters = 2;
   const [results, setResults] = useState([]);
+  const [options, setOptions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     if (searchTerm.length > minMatchCharacters) {
       const cancelTokenSource = axios.CancelToken.source();
       const query = {searchType: 'NRMN', species: searchTerm, includeSuperseded: false};
-      search(query, cancelTokenSource.token).then((resp) =>
-        setResults(resp.data ? resp.data.map((i) => i.species).filter((f) => f !== exclude) : [])
-      );
+      search(query, cancelTokenSource.token).then((resp) => {
+        const resultSet = resp.data ? resp.data.map((i) => ({id: i.observableItemId, species: i.species})).filter((f) => f !== exclude) : [];
+        setResults(resultSet);
+        setOptions(resultSet.map(i => i.species));
+      });
       return () => cancelTokenSource.cancel();
     }
   }, [searchTerm, minMatchCharacters, exclude]);
@@ -25,11 +28,12 @@ const CustomSearchInput = ({label, exclude, formData, onChange}) => {
     <>
       <Typography variant="subtitle2">{label}</Typography>
       <Autocomplete
-        options={results}
+        options={options}
         clearOnBlur
         freeSolo
+        fullWidth={fullWidth}
         value={formData}
-        onSelect={(e) => onChange(e.target.value)}
+        onSelect={(e) => onChange(results.filter(r => r.species === e.target.value)[0])}
         onKeyUp={(e) => setSearchTerm(e.target.value)}
         renderInput={(params) => <TextField {...params} size="small" color="primary" variant="outlined" />}
       />
@@ -41,7 +45,8 @@ CustomSearchInput.propTypes = {
   onChange: PropTypes.func.isRequired,
   formData: PropTypes.string,
   label: PropTypes.string.isRequired,
-  exclude: PropTypes.string
+  exclude: PropTypes.string,
+  fullWidth: PropTypes.bool
 };
 
 export default CustomSearchInput;

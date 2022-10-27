@@ -1,4 +1,4 @@
-import {Box, Button, Chip, LinearProgress, TextField, Typography, Paper} from '@mui/material';
+import {Box, Button, Chip, IconButton, LinearProgress, TextField, Typography, Paper} from '@mui/material';
 import React, {useEffect, useState, useReducer} from 'react';
 import {getSurveySpecies} from '../../../api/api';
 import {makeStyles} from '@mui/styles';
@@ -11,6 +11,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import LaunchIcon from '@mui/icons-material/Launch';
 
 const useStyles = makeStyles(({palette, typography}) => ({
   root: {
@@ -45,27 +46,33 @@ const SpeciesCorrectResults = ({results, onClick}) => {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell width="40%">Observable Item Name</TableCell>
-            <TableCell width="40%">Common name</TableCell>
-            <TableCell width="20%">Survey Count</TableCell>
+            <TableCell width="30%">Observable Item Name</TableCell>
+            <TableCell width="30%">Common name</TableCell>
+            <TableCell width="30%">Superseded By</TableCell>
+            <TableCell width="10%">Surveys</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {results.map((r) => (
-            <TableRow
-              key={r.observableItemId}
-              selected={selected === r.observableItemId}
-              onClick={() => {
-                setSelected(r.observableItemId);
-                onClick(r.observableItemId);
-              }}
-              style={{cursor: 'pointer'}}
-            >
-              <TableCell>{r.observableItemName}</TableCell>
-              <TableCell>{r.commonName}</TableCell>
-              <TableCell>{r.surveyIds.length}</TableCell>
-            </TableRow>
-          ))}
+          {results.length > 0 ? (
+            results.map((r) => (
+              <TableRow
+                key={r.observableItemId}
+                selected={selected === r.observableItemId}
+                onClick={() => {
+                  setSelected(r.observableItemId);
+                  onClick(r.observableItemId);
+                }}
+                style={{cursor: 'pointer'}}
+              >
+                <TableCell>{r.observableItemName}</TableCell>
+                <TableCell>{r.commonName}</TableCell>
+                <TableCell>{r.supersededBy}</TableCell>
+                <TableCell>{r.surveyIds.length}</TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableCell colSpan={4}>No Results</TableCell>
+          )}
         </TableBody>
       </Table>
     </TableContainer>
@@ -112,7 +119,7 @@ const SpeciesCorrect = () => {
       {request.loading && <LinearProgress />}
       {request.results && (
         <Box display="flex" flex={2} overflow="hidden" flexDirection="row">
-          <Box width="50%" overflow="scroll">
+          <Box width="50%" style={{overflowX: 'hidden', overflowY: 'auto'}}>
             <SpeciesCorrectResults
               results={request.results}
               onClick={(r) => {
@@ -121,22 +128,42 @@ const SpeciesCorrect = () => {
             />
           </Box>
           {detail && (
-            <Box width="50%">
+            <Box width="50%" style={{overflowX: 'hidden', overflowY: 'auto'}}>
               <Box m={1}>
                 <Typography variant="subtitle2">Current species name</Typography>
-                <TextField fullWidth color="primary" size="small" value={detail.observableItemName} spellCheck={false} readOnly />
+                <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
+                  <TextField fullWidth color="primary" size="small" value={detail.observableItemName} spellCheck={false} readOnly />
+                  <IconButton
+                    style={{marginLeft: 5, marginRight: 15}}
+                    onClick={() => window.open(`/reference/observableItem/${detail.observableItemId}`, '_blank').focus()}
+                  >
+                    <LaunchIcon />
+                  </IconButton>
+                </Box>
               </Box>
               <Box m={1}>
-                <CustomSearchInput
-                  clearOnBlur
-                  label="Correct to"
-                  formData={correction?.newObservableItemName}
-                  exclude={detail.observableItemName}
-                  field="supersededBy"
-                  onChange={(t) => {
-                    setCorrection({...request.request, newObservableItemName: t});
-                  }}
-                />
+              <Typography variant="subtitle2">Correct to</Typography>
+                <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
+                  <CustomSearchInput
+                    fullWidth
+                    formData={correction?.newObservableItemName}
+                    exclude={detail.observableItemName}
+                    onChange={(t) => {
+                      if(t) {
+                      setCorrection({...request.request, newObservableItemId: t.id, newObservableItemName: t.species});
+                      } else {
+                        setCorrection({...request.request});
+                      }
+                    }}
+                  />
+                  <IconButton
+                    style={{marginLeft: 5, marginRight: 15}}
+                    disabled={!correction?.newObservableItemId}
+                    onClick={() => window.open(`/reference/observableItem/${correction.newObservableItemId}`, '_blank').focus()}
+                  >
+                    <LaunchIcon />
+                  </IconButton>
+                </Box>
               </Box>
               <Box m={1}>
                 <Button variant="contained" disabled={!correction?.newObservableItemName} onClick={() => setSelected(null)}>
