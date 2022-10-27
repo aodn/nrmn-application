@@ -29,7 +29,7 @@ describe('<LocationList/> filter testing', () => {
     mockGetFiltersForId.mockReset();
   });
 
-  test('Render necessary fields and no filter restored', async () => {
+  test.skip('Render necessary fields and no filter restored', async () => {
     const canned = require('./LocationList.filter.data.json');
 
     // Override function so that it return the data we set.
@@ -73,7 +73,7 @@ describe('<LocationList/> filter testing', () => {
       });
   });
 
-  test('Render necessary fields with filter restored', async () => {
+  test.skip('Render necessary fields with filter restored', async () => {
     const canned = require('./LocationList.filter.data.json');
 
     // Filter set will cause some items disappeared
