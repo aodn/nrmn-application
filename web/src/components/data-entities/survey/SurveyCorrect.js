@@ -243,6 +243,14 @@ const SurveyCorrect = () => {
 
   const onCellValueChanged = (e) => {
     setUndoSize(eh.handleCellValueChanged(e));
+    if (isFiltered) {
+      const filterModel = e.api.getFilterModel();
+      const field = e.colDef.field;
+      if (filterModel[field]) {
+        filterModel[field].values.push(e.newValue);
+        e.api.setFilterModel(filterModel);
+      }
+    }
   };
 
   const onPasteEnd = (e) => {

@@ -109,7 +109,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
   }, [gridApi]);
 
   useEffect(() => {
-    if(!gridApi) return;
+    if (!gridApi) return;
     if (state === IngestState.Loading) {
       gridApi.showLoadingOverlay();
     } else {
@@ -203,6 +203,14 @@ const DataSheetView = ({onIngest, isAdmin}) => {
 
   const onCellValueChanged = (e) => {
     setUndoSize(eh.handleCellValueChanged(e));
+    if (isFiltered) {
+      const filterModel = e.api.getFilterModel();
+      const field = e.colDef.field;
+      if (filterModel[field]) {
+        filterModel[field].values.push(e.newValue);
+        e.api.setFilterModel(filterModel);
+      }
+    }
   };
 
   const onPasteEnd = (e) => {
@@ -231,12 +239,6 @@ const DataSheetView = ({onIngest, isAdmin}) => {
     e.api.refreshCells();
     const filterModel = e.api.getFilterModel();
     setIsFiltered(Object.getOwnPropertyNames(filterModel).length > 0);
-    e.api.setFilterModel({
-      id: {
-        type: 'set',
-        values: e.api.getRenderedNodes().map((field) => field.id.toString())
-      }
-    });
   };
 
   const onRowDataUpdated = (e) => {
