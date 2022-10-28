@@ -123,6 +123,7 @@ const SurveyCorrect = () => {
       {field: 'code', label: 'Code'},
       {field: 'species', label: 'Species'},
       {field: 'commonName', label: 'Common Name'},
+      {field: 'total', label: 'Total'},
       {field: 'inverts', label: 'Inverts'}
     ];
   }, []);
@@ -242,6 +243,14 @@ const SurveyCorrect = () => {
 
   const onCellValueChanged = (e) => {
     setUndoSize(eh.handleCellValueChanged(e));
+    if (isFiltered) {
+      const filterModel = e.api.getFilterModel();
+      const field = e.colDef.field;
+      if (filterModel[field]) {
+        filterModel[field].values.push(e.newValue);
+        e.api.setFilterModel(filterModel);
+      }
+    }
   };
 
   const onPasteEnd = (e) => {
