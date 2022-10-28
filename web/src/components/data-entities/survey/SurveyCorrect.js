@@ -123,8 +123,8 @@ const SurveyCorrect = () => {
       {field: 'code', label: 'Code'},
       {field: 'species', label: 'Species'},
       {field: 'commonName', label: 'Common Name'},
-      {field: 'inverts', label: 'Inverts'},
-      {field: 'total', label: 'Total'}
+      {field: 'total', label: 'Total'},
+      {field: 'inverts', label: 'Inverts'}
     ];
   }, []);
 
