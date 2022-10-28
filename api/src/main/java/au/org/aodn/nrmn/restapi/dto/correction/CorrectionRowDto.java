@@ -42,5 +42,7 @@ public interface CorrectionRowDto {
 
     String getVis();
 
+    String getTotal();
+
     String getMeasureJson();
 }
