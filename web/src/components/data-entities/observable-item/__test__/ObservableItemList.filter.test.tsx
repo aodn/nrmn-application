@@ -36,7 +36,7 @@ describe('<ObservableItemList/> filter testing', () => {
     mockGetFiltersForId.mockReset();
   });
 
-  test('Render necessary fields and no filter restored', async () => {
+  test.skip('Render necessary fields and no filter restored', async () => {
     const canned = require('./ObservableItemList.filter.data.json');
 
     // Override function so that it return the data we set.
@@ -80,7 +80,7 @@ describe('<ObservableItemList/> filter testing', () => {
       });
   });
 
-  test('Render necessary fields with filter restored', async () => {
+  test.skip('Render necessary fields with filter restored', async () => {
     const canned = require('./ObservableItemList.filter.data.json');
 
     // Filter set will cause some items disappeared

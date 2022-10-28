@@ -31,7 +31,7 @@ describe('<DiverList/> filter testing', () => {
     mockGetFiltersForId.mockReset();
   });
 
-  test('Render necessary fields and no filter restored', async () => {
+  test.skip('Render necessary fields and no filter restored', async () => {
     const canned = require('./DiverList.filter.data.json');
 
     // Override function so that it return the data we set.
@@ -76,7 +76,7 @@ describe('<DiverList/> filter testing', () => {
       });
   });
 
-  test('Render necessary fields with filter restored', async () => {
+  test.skip('Render necessary fields with filter restored', async () => {
     const canned = require('./DiverList.filter.data.json');
 
     // Filter set will cause some items disappeared
