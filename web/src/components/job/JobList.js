@@ -93,7 +93,7 @@ const JobList = () => {
           isGroupOpenByDefault={(params) => params.key === 'STAGED'}
           autoGroupColumnDef={{sortable: true, sort: 'asc', width: 150}}
           groupDisplayType="singleColumn"
-          defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true, suppressMenu: true}}
+          defaultColDef={{lockVisible: true, sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true, suppressMenu: true}}
         >
           <AgGridColumn
             width={40}

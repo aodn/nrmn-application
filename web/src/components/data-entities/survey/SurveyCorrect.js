@@ -135,6 +135,7 @@ const SurveyCorrect = () => {
       enableCellChangeFlash: true,
       filter: true,
       floatingFilter: true,
+      lockVisible: true,
       minWidth: 40,
       resizable: true,
       sortable: true,

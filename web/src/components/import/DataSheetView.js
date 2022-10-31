@@ -352,6 +352,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             tabToNextCell={eh.onTabToNextCell}
             undoRedoCellEditing={false}
             defaultColDef={{
+              lockVisible: true,
               cellStyle: eh.chooseCellStyle,
               editable: true,
               enableCellChangeFlash: true,
