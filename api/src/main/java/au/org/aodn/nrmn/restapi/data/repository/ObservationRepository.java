@@ -28,6 +28,6 @@ public interface ObservationRepository
 
 	@Modifying
     @Transactional
-	@Query("UPDATE Observation o SET o.observableItemId = :newId WHERE o.surveyMethod.survey.surveyId IN :surveyIds AND o.observableItemId = :oldId")
+	@Query("UPDATE Observation o SET o.observableItem.observableItemId = :newId WHERE o.surveyMethod.survey.surveyId IN :surveyIds AND o.observableItem.observableItemId = :oldId")
 	void updateObservableItemsForSurveys(@Param("surveyIds") List<Integer> surveyIds, @Param("oldId") Integer oldId, @Param("newId") Integer newId);
 }
