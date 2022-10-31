@@ -135,6 +135,7 @@ const SurveyCorrect = () => {
       enableCellChangeFlash: true,
       filter: true,
       floatingFilter: true,
+      lockVisible: true,
       minWidth: 40,
       resizable: true,
       sortable: true,
@@ -221,12 +222,11 @@ const SurveyCorrect = () => {
       }
       const {rows, programName, programId, surveyIds} = res.data;
       const unpackedData = rows.map((data, idx) => {
-        const measurements = data.observationIds === '' ? {} : JSON.parse(data.measureJson);
+        const measurements = JSON.parse(data.measureJson);
         const inverts = measurements[0] || '0';
         delete measurements[0];
-        const observationIds = data.observationIds === '' ? [] : JSON.parse(data.observationIds);
         delete data.measureJson;
-        return {id: (idx + 1) * 100, pos: (idx + 1) * 1000, ...data, inverts, observationIds, measurements};
+        return {id: (idx + 1) * 100, pos: (idx + 1) * 1000, ...data, inverts, measurements};
       });
       const isExtended = unpackedData.includes((r) => Object.keys(r.measurements).includes((k) => k > 28));
       const context = api.gridOptionsWrapper.gridOptions.context;
