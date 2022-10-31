@@ -448,4 +448,21 @@ public class CorrectionController {
         return ResponseEntity.ok().body(species);
     }
 
+    @PostMapping
+    public ResponseEntity<?> updateSpeciesInSurveys(
+            @RequestParam(value = "surveyIds") List<Integer> surveyIds,
+            @RequestParam(value = "prevObservableItemId") Integer prevObservableItemId,
+            @RequestParam(value = "newObservableItemId") Integer newObservableItemId) {
+
+        // Create a correction job
+        var job = stagedJobRepository.save(StagedJob.builder()
+                .source(SourceJobType.CORRECTION)
+                .reference("Update Species")
+                .status(StatusJobType.CORRECTED)
+                .build());
+
+        observationRepository.updateObservableItemsForSurveys(surveyIds, prevObservableItemId, newObservableItemId);
+
+        return ResponseEntity.ok().body(job.getId());
+    }
 }
