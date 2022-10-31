@@ -128,7 +128,7 @@ const ObservableItemList = () => {
         onBodyScrollEnd={(e) => autoSizeAll(e, false)}
         onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
         suppressCellFocus={true}
-        defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
+        defaultColDef={{lockVisible: true, sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
       >
         <AgGridColumn
           field="observableItemId"

@@ -112,7 +112,7 @@ const SurveyList = () => {
             onGridReady={(e) => onGridReady(e)}
             onFilterChanged={(e) => { stateFilterHandler.stateFilterEventHandler(gridRef, e); }}
             suppressCellFocus={true}
-            defaultColDef={{sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
+            defaultColDef={{lockVisible: true, sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
           >
             <AgGridColumn
               width={40}

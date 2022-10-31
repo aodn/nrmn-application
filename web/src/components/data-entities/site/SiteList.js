@@ -158,6 +158,7 @@ const SiteList = () => {
           onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
           suppressCellFocus={true}
           defaultColDef={{
+            lockVisible: true,
             sortable: true,
             resizable: true,
             filter: 'agTextColumnFilter',

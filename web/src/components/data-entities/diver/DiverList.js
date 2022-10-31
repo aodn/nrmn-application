@@ -154,6 +154,7 @@ const DiverList = () => {
         onGridReady={(e) => onGridReady(e)}
         onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
         defaultColDef={{
+          lockVisible: true,
           editable: true,
           sortable: true,
           resizable: true,
