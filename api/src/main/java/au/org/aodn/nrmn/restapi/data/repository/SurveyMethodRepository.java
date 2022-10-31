@@ -48,6 +48,6 @@ public interface SurveyMethodRepository extends JpaRepository<SurveyMethodEntity
 
     @Modifying
     @Transactional
-    @Query("DELETE FROM SurveyMethodEntity WHERE survey_id IN :surveyId")
+    @Query("DELETE FROM SurveyMethodEntity WHERE survey_id IN :surveyId AND method_id NOT IN (6, 13)")
     void deleteForSurveyIds(@Param("surveyId") List<Integer> surveyIds);
 }
