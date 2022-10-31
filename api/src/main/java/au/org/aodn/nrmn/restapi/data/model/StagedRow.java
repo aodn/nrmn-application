@@ -60,10 +60,7 @@ public class StagedRow implements Serializable {
     @Transient
     @Builder.Default
     private String surveyId = "";
-    
-    @Transient
-    @Builder.Default
-    Collection<Integer> observationIds = Collections.emptyList();
+
 
     @Column(name = "site_no")
     @Builder.Default

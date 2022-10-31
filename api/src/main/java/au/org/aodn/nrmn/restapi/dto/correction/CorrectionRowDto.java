@@ -3,7 +3,6 @@ package au.org.aodn.nrmn.restapi.dto.correction;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public interface CorrectionRowDto {
-    String getObservationIds();
 
     Integer getSurveyId();
 
