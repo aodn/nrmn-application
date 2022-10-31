@@ -1,6 +1,6 @@
 import {Box, Button, Chip, IconButton, LinearProgress, TextField, Typography, Paper} from '@mui/material';
 import React, {useEffect, useState, useReducer} from 'react';
-import {getSurveySpecies} from '../../../api/api';
+import {getSurveySpecies, postSpeciesCorrection} from '../../../api/api';
 import {makeStyles} from '@mui/styles';
 import SpeciesCorrectFilter from './SpeciesCorrectFilter';
 import {PropTypes} from 'prop-types';
@@ -91,10 +91,15 @@ const SpeciesCorrect = () => {
   const [request, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'getRequest':
-        return {loading: true, results: null, request: action.payload};
+        return {loading: true, results: null, request: {type: 'get', payload: action.payload}};
       case 'showResults': {
         const results = action.payload.map((p) => ({...p, surveyIds: JSON.parse(p.surveyIds)}));
         return {loading: false, request: null, results};
+      }
+      case 'postCorrection': {
+        const surveyIds = state.results.find((r) => r.observableItemId === selected).surveyIds;
+        const payload = {prevObservableItemId: selected, newObservableItemId: correction.newObservableItemId, surveyIds};
+        return {loading: true, results: null, request: {type: 'post', payload}};
       }
       default:
         return state;
@@ -103,9 +108,18 @@ const SpeciesCorrect = () => {
 
   useEffect(() => {
     if (request.request)
-      getSurveySpecies(request.request).then((res) => {
-        dispatch({type: 'showResults', payload: res.data});
-      });
+      switch (request.request.type) {
+        case 'get':
+          getSurveySpecies(request.request.payload).then((res) => {
+            dispatch({type: 'showResults', payload: res.data});
+          });
+          break;
+        case 'post':
+          postSpeciesCorrection(request.request.payload).then((res) => {
+            dispatch({type: 'showResults', payload: res.data});
+          });
+          break;
+      }
   }, [request.request]);
 
   const detail = request.results?.find((r) => r.observableItemId === selected);
@@ -142,15 +156,15 @@ const SpeciesCorrect = () => {
                 </Box>
               </Box>
               <Box m={1}>
-              <Typography variant="subtitle2">Correct to</Typography>
+                <Typography variant="subtitle2">Correct to</Typography>
                 <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
                   <CustomSearchInput
                     fullWidth
                     formData={correction?.newObservableItemName}
                     exclude={detail.observableItemName}
                     onChange={(t) => {
-                      if(t) {
-                      setCorrection({...request.request, newObservableItemId: t.id, newObservableItemName: t.species});
+                      if (t) {
+                        setCorrection({...request.request, newObservableItemId: t.id, newObservableItemName: t.species});
                       } else {
                         setCorrection({...request.request});
                       }
@@ -166,7 +180,11 @@ const SpeciesCorrect = () => {
                 </Box>
               </Box>
               <Box m={1}>
-                <Button variant="contained" disabled={!correction?.newObservableItemName} onClick={() => setSelected(null)}>
+                <Button
+                  variant="contained"
+                  disabled={!correction?.newObservableItemName}
+                  onClick={() => dispatch({type: 'postCorrection'})}
+                >
                   Submit Correction
                 </Button>
               </Box>

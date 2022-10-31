@@ -44,6 +44,7 @@ import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.data.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRequestBodyDto;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowsDto;
+import au.org.aodn.nrmn.restapi.dto.correction.SpeciesCorrectBodyDto;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
@@ -448,20 +449,27 @@ public class CorrectionController {
         return ResponseEntity.ok().body(species);
     }
 
-    @PostMapping
+    @PostMapping("correctSpecies")
     public ResponseEntity<?> updateSpeciesInSurveys(
-            @RequestParam(value = "surveyIds") List<Integer> surveyIds,
-            @RequestParam(value = "prevObservableItemId") Integer prevObservableItemId,
-            @RequestParam(value = "newObservableItemId") Integer newObservableItemId) {
+        Authentication authentication,
+        @RequestBody SpeciesCorrectBodyDto bodyDto) {
 
-        // Create a correction job
-        var job = stagedJobRepository.save(StagedJob.builder()
-                .source(SourceJobType.CORRECTION)
-                .reference("Update Species")
-                .status(StatusJobType.CORRECTED)
-                .build());
+            var user = secUserRepository.findByEmail(authentication.getName());
+            var message = "correction: species: " + authentication.getName();
+            var program = surveyRepository.getReferenceById(bodyDto.getSurveyIds().get(0)).getProgram();
+            userActionAuditRepository.save(new UserActionAudit("correct/survey", message));
+    
+            var job = StagedJob.builder()
+                    .source(SourceJobType.CORRECTION)
+                    .reference("Correct Species ")
+                    .status(StatusJobType.CORRECTED)
+                    .creator(user.get())
+                    .program(program)
+                    .build();
+    
+            job = stagedJobRepository.save(job);
 
-        observationRepository.updateObservableItemsForSurveys(surveyIds, prevObservableItemId, newObservableItemId);
+        observationRepository.updateObservableItemsForSurveys(bodyDto.getSurveyIds(), bodyDto.getPrevObservableItemId(), bodyDto.getNewObservableItemId());
 
         return ResponseEntity.ok().body(job.getId());
     }

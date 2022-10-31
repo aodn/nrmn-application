@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.data.repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -28,6 +29,11 @@ public interface ObservationRepository
 
 	@Modifying
     @Transactional
-	@Query("UPDATE Observation o SET o.observableItem.observableItemId = :newId WHERE o.surveyMethod.survey.surveyId IN :surveyIds AND o.observableItem.observableItemId = :oldId")
-	void updateObservableItemsForSurveys(@Param("surveyIds") List<Integer> surveyIds, @Param("oldId") Integer oldId, @Param("newId") Integer newId);
+    @Query(nativeQuery = true, value = "" +
+    "update nrmn.observation " +
+    "set observable_item_id = :newId " +
+    "from nrmn.survey_method " +
+    "where observation.survey_method_id = survey_method.survey_method_id " +
+    "and observable_item_id = :oldId and survey_id in :surveyIds")
+	void updateObservableItemsForSurveys(@Param("surveyIds") Collection<Integer> surveyIds, @Param("oldId") Integer oldId, @Param("newId") Integer newId);
 }

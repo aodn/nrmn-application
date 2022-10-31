@@ -128,6 +128,14 @@ export const getSurveySpecies = (filter) => {
     .catch((err) => err);
   };
 
+  export const postSpeciesCorrection = (payload) => {
+    return axiosInstance.post(`correction/correctSpecies`, payload, {
+        validateStatus: () => true
+      })
+      .then((res) => res)
+      .catch((err) => err);
+    };
+
 export const getCorrections = (surveyIds) =>
   axiosInstance
     .get('correction/correct?surveyIds=' + surveyIds, {
