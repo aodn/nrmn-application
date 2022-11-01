@@ -4,10 +4,12 @@ import React, {useEffect, useReducer, useState} from 'react';
 import {getEntity} from '../../../api/api';
 import LoadingButton from '@mui/lab/LoadingButton';
 import {PropTypes} from 'prop-types';
+import CustomSearchInput from '../../input/CustomSearchInput';
 
 const SpeciesCorrectFilter = ({onSearch}) => {
-
   const [data, setData] = useState();
+  const [countries, setCountries] = useState();
+  const [states, setState] = useState();
 
   const [loading, setLoading] = useState(true);
 
@@ -16,11 +18,29 @@ const SpeciesCorrectFilter = ({onSearch}) => {
       await getEntity('locations').then((res) => {
         const locations = [];
         const locationIds = [];
-        res.data.items.sort((a, b) => a.locationName.localeCompare(b.locationName)).forEach((d) => {
-          locations[d.id] = d.locationName;
-          locationIds.push(d.id);
-        });
+        res.data.items
+          .sort((a, b) => a.locationName.localeCompare(b.locationName))
+          .forEach((d) => {
+            locations[d.id] = d.locationName;
+            locationIds.push(d.id);
+          });
         setData({locations, locationIds});
+        const labels = res.data.items.reduce(
+          (acc, cur) => {
+            if (cur.countries && !acc.countries.includes(cur.countries)) {
+              acc.countries.push(cur.countries);
+            }
+            if (cur.areas && !acc.areas.includes(cur.areas)) {
+              acc.areas.push(cur.areas);
+            }
+            return acc;
+          },
+          {countries: [], areas: []}
+        );
+        labels.countries.sort();
+        labels.areas.sort();
+        setCountries(labels.countries);
+        setState(labels.areas);
       });
       setLoading(false);
     }
@@ -30,7 +50,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
   const [filter, updateFilter] = useReducer(
     (filter, action) => {
       const updated = {...filter};
-      if(action.value === null) {
+      if (!action.value) {
         delete updated[action.field];
       } else {
         updated[action.field] = action.value;
@@ -50,6 +70,18 @@ const SpeciesCorrectFilter = ({onSearch}) => {
 
   const updateLocation = (e, value) => {
     updateFilter({field: 'locationId', value: value});
+  };
+
+  const updateCountry = (e, value) => {
+    updateFilter({field: 'country', value: value});
+  };
+
+  const updateState = (e, value) => {
+    updateFilter({field: 'state', value: value});
+  };
+
+  const updateObservableItem = (e, value) => {
+    updateFilter({field: 'observableItemId', value: e ? e.id : null});
   };
 
   const canSearch = filter.startDate && filter.endDate;
@@ -94,13 +126,45 @@ const SpeciesCorrectFilter = ({onSearch}) => {
                 size="small"
               />
             </Box>
-            <Box my={4} width={200}>
-              <LoadingButton
-                disabled={!canSearch}
-                onClick={() => onSearch(filter)}
-                fullWidth
-                variant="contained"
-              >
+            <Box m={1} width={300}>
+              <Typography variant="subtitle2">Species</Typography>
+              <CustomSearchInput fullWidth onChange={updateObservableItem} />
+            </Box>
+            <Box m={1} my={4} width={200}></Box>
+          </Box>
+          <Box ml={1} display="flex" flexDirection="row">
+            <Box m={1} width={150}>
+              <Typography variant="subtitle2">BBox Min</Typography>
+              <input disabled={true} style={{height: '35px', width: '150px'}} />
+            </Box>
+            <Box m={1} width={150}>
+              <Typography variant="subtitle2">BBox Max</Typography>
+              <input disabled={true} style={{height: '35px', width: '150px'}} />
+            </Box>
+            <Box m={1} width={300}>
+              <Typography variant="subtitle2">Country</Typography>
+              <Autocomplete
+                disabled={loading}
+                filterSelectedOptions
+                onChange={updateCountry}
+                options={countries}
+                renderInput={(params) => <TextField {...params} />}
+                size="small"
+              />
+            </Box>
+            <Box m={1} width={300}>
+              <Typography variant="subtitle2">Area/State</Typography>
+              <Autocomplete
+                disabled={loading}
+                filterSelectedOptions
+                onChange={updateState}
+                options={states}
+                renderInput={(params) => <TextField {...params} />}
+                size="small"
+              />
+            </Box>
+            <Box m={1} my={4} width={200}>
+              <LoadingButton disabled={!canSearch} onClick={() => onSearch(filter)} fullWidth variant="contained">
                 Search
               </LoadingButton>
             </Box>
@@ -114,7 +178,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
 };
 
 SpeciesCorrectFilter.propTypes = {
-    onSearch: PropTypes.func.isRequired,
+  onSearch: PropTypes.func.isRequired
 };
 
 export default SpeciesCorrectFilter;

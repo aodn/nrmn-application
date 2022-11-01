@@ -152,7 +152,7 @@ const SpeciesCorrect = () => {
             </Box>
           )}
           {detail && (
-            <Box width="50%" style={{overflowX: 'hidden', overflowY: 'auto'}}>
+            <Box width="50%" m={2} style={{overflowX: 'hidden', overflowY: 'auto'}}>
               <Box m={1}>
                 <Typography variant="subtitle2">Current species name</Typography>
                 <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
