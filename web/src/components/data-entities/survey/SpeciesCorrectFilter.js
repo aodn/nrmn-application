@@ -80,7 +80,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
     updateFilter({field: 'state', value: value});
   };
 
-  const updateObservableItem = (e, value) => {
+  const updateObservableItem = (e) => {
     updateFilter({field: 'observableItemId', value: e ? e.id : null});
   };
 
