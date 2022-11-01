@@ -1,4 +1,4 @@
-import {Box, Button, Chip, IconButton, LinearProgress, TextField, Typography, Paper} from '@mui/material';
+import {Box, Button, Chip, IconButton, LinearProgress, TextField, Typography, Paper, Alert} from '@mui/material';
 import React, {useEffect, useState, useReducer} from 'react';
 import {getSurveySpecies, postSpeciesCorrection} from '../../../api/api';
 import {makeStyles} from '@mui/styles';
@@ -138,15 +138,17 @@ const SpeciesCorrect = () => {
             <SpeciesCorrectResults results={request.results} onClick={(result) => setSelected({result})} />
           </Box>
           {selected?.jobId && (
-            <Box>
-              <Typography>Correction Submitted</Typography>
-              <TextField fullWidth color="primary" size="small" value="View Job.." spellCheck={false} readOnly />
-                  <IconButton
-                    style={{marginLeft: 5, marginRight: 15}}
-                    onClick={() => window.open(`/data/job/${selected.jobId}/view`, '_blank').focus()}
-                  >
-                    <LaunchIcon />
-                  </IconButton>
+            <Box m={1} width="30%">
+              <Alert>Species Corrected</Alert>
+              <Box m={1}>
+                <Button
+                  variant="outlined"
+                  endIcon={<LaunchIcon />}
+                  onClick={() => window.open(`/data/job/${selected.jobId}/view`, '_blank').focus()}
+                >
+                  Open Job
+                </Button>
+              </Box>
             </Box>
           )}
           {detail && (
