@@ -1,13 +1,13 @@
-import React, {useState, useMemo, useRef, useCallback} from 'react';
 import {Box, Button, Typography} from '@mui/material';
-import {Navigate, NavLink, useLocation} from 'react-router-dom';
-import {getResult} from '../../../api/api';
-import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import {AuthContext} from '../../../contexts/auth-context';
-import 'ag-grid-enterprise';
-import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import 'ag-grid-enterprise';
+import {AgGridColumn, AgGridReact} from 'ag-grid-react';
+import React, {useCallback, useRef, useState} from 'react';
+import {Navigate, useLocation} from 'react-router-dom';
+import {getResult} from '../../../api/api';
+import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
+import {AuthContext} from '../../../contexts/auth-context';
 
 const SurveyList = () => {
   const rowsPerPage = 50;
@@ -100,10 +100,11 @@ const SurveyList = () => {
               <Typography variant="h4">Surveys</Typography>
             </Box>
             <Box>
-              <Button 
-              variant="outlined" 
-              onClick={() => setRedirect(`${selected.join(',')}/correct`)}
-              disabled={!selected || selected.length < 1 || selected.length > 25}>
+              <Button
+                variant="outlined"
+                onClick={() => setRedirect(`${selected.join(',')}/correct`)}
+                disabled={!selected || selected.length < 1 || selected.length > 25}
+              >
                 Correct Selected Surveys
               </Button>
             </Box>
