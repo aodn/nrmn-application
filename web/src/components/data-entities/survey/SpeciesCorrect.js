@@ -91,15 +91,15 @@ const SpeciesCorrect = () => {
   const [request, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'getRequest':
-        return {loading: true, results: null, request: {type: 'get', payload: action.payload}};
+        return {loading: true, results: null, request: {type: 'search', payload: action.payload}};
       case 'showResults': {
         const results = action.payload.map((p) => ({...p, surveyIds: JSON.parse(p.surveyIds)}));
-        return {loading: false, request: null, results};
+        return {loading: false, search: state.request, request: null, results};
       }
       case 'postCorrection': {
-        const surveyIds = state.results.find((r) => r.observableItemId === selected).surveyIds;
-        const payload = {prevObservableItemId: selected, newObservableItemId: correction.newObservableItemId, surveyIds};
-        return {loading: true, results: null, request: {type: 'post', payload}};
+        const surveyIds = state.results.find((r) => r.observableItemId === selected.result).surveyIds;
+        const payload = {prevObservableItemId: selected.result, newObservableItemId: correction.newObservableItemId, surveyIds};
+        return {loading: true, results: null, request: {search: state.search, type: 'post', payload}};
       }
       default:
         return state;
@@ -109,20 +109,21 @@ const SpeciesCorrect = () => {
   useEffect(() => {
     if (request.request)
       switch (request.request.type) {
-        case 'get':
+        case 'search':
           getSurveySpecies(request.request.payload).then((res) => {
             dispatch({type: 'showResults', payload: res.data});
           });
           break;
         case 'post':
           postSpeciesCorrection(request.request.payload).then((res) => {
-            dispatch({type: 'showResults', payload: res.data});
+            setSelected({jobId: res.data});
+            dispatch({type: 'getRequest', payload: request.request.search.payload});
           });
           break;
       }
   }, [request.request]);
 
-  const detail = request.results?.find((r) => r.observableItemId === selected);
+  const detail = request.results?.find((r) => r.observableItemId === selected?.result);
 
   return (
     <>
@@ -134,13 +135,20 @@ const SpeciesCorrect = () => {
       {request.results && (
         <Box display="flex" flex={2} overflow="hidden" flexDirection="row">
           <Box width="50%" style={{overflowX: 'hidden', overflowY: 'auto'}}>
-            <SpeciesCorrectResults
-              results={request.results}
-              onClick={(r) => {
-                setSelected(r);
-              }}
-            />
+            <SpeciesCorrectResults results={request.results} onClick={(result) => setSelected({result})} />
           </Box>
+          {selected?.jobId && (
+            <Box>
+              <Typography>Correction Submitted</Typography>
+              <TextField fullWidth color="primary" size="small" value="View Job.." spellCheck={false} readOnly />
+                  <IconButton
+                    style={{marginLeft: 5, marginRight: 15}}
+                    onClick={() => window.open(`/data/job/${selected.jobId}/view`, '_blank').focus()}
+                  >
+                    <LaunchIcon />
+                  </IconButton>
+            </Box>
+          )}
           {detail && (
             <Box width="50%" style={{overflowX: 'hidden', overflowY: 'auto'}}>
               <Box m={1}>
