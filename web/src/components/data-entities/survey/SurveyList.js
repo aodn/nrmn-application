@@ -1,13 +1,13 @@
-import React, {useState, useRef, useCallback} from 'react';
-import {Box, Typography} from '@mui/material';
-import {Navigate, useLocation} from 'react-router-dom';
-import {getResult} from '../../../api/api';
-import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import {AuthContext} from '../../../contexts/auth-context';
-import 'ag-grid-enterprise';
-import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
+import {Box, Button, Typography} from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import 'ag-grid-enterprise';
+import {AgGridColumn, AgGridReact} from 'ag-grid-react';
+import React, {useCallback, useRef, useState} from 'react';
+import {Navigate, useLocation} from 'react-router-dom';
+import {getResult} from '../../../api/api';
+import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
+import {AuthContext} from '../../../contexts/auth-context';
 
 const SurveyList = () => {
   const rowsPerPage = 50;
@@ -16,72 +16,75 @@ const SurveyList = () => {
   const gridRef = useRef(null);
   const [redirect, setRedirect] = useState();
   const [loading, setLoading] = React.useState(false);
+  const [selected, setSelected] = useState();
 
-  const onGridReady = useCallback((event) => {
-    async function fetchSurveys(e) {
-      e.api.setDatasource({
-        // This is the functional structure need for datasource
-        rowCount: rowsPerPage,
-        getRows: (params) => {
-          let url = `data/surveys?page=${params.startRow / 100}`;
-          let conditions = [];
-          // Filter section
-          for(let name in params.filterModel) {
-            const p = params.filterModel[name];
+  const onGridReady = useCallback(
+    (event) => {
+      async function fetchSurveys(e) {
+        e.api.setDatasource({
+          // This is the functional structure need for datasource
+          rowCount: rowsPerPage,
+          getRows: (params) => {
+            let url = `data/surveys?page=${params.startRow / 100}`;
+            let conditions = [];
+            // Filter section
+            for (let name in params.filterModel) {
+              const p = params.filterModel[name];
 
-            if(p.type) {
-              // This is single condition
-              conditions.push({
-                field: name,
-                ops: p.type,
-                val: p.filter
-              });
+              if (p.type) {
+                // This is single condition
+                conditions.push({
+                  field: name,
+                  ops: p.type,
+                  val: p.filter
+                });
+              } else {
+                // This is a multiple condition, currently max two conditions
+                conditions.push({
+                  field: name,
+                  ops: p.operator,
+                  conditions: [
+                    {ops: p.condition1.type, val: p.condition1.filter},
+                    {ops: p.condition2.type, val: p.condition2.filter}
+                  ]
+                });
+              }
             }
-            else {
-              // This is a multiple condition, currently max two conditions
-              conditions.push({
-                field: name,
-                ops: p.operator,
-                conditions: [
-                  { ops: p.condition1.type, val: p.condition1.filter },
-                  { ops: p.condition2.type, val: p.condition2.filter }
-                ]
+
+            // Sorting section, order is important
+            let sort = [];
+            params.sortModel.forEach((i) => {
+              sort.push({
+                field: i.colId,
+                order: i.sort
               });
-            }
-          };
-
-          // Sorting section, order is important
-          let sort = [];
-          params.sortModel.forEach(i => {
-            sort.push({
-              field: i.colId,
-              order: i.sort
             });
-          });
 
-          url = conditions.length !== 0 ? url + `&filters=${encodeURIComponent(JSON.stringify(conditions))}` : url;
-          url = sort.length !== 0 ? url + `&sort=${encodeURIComponent(JSON.stringify(sort))}` : url;
+            url = conditions.length !== 0 ? url + `&filters=${encodeURIComponent(JSON.stringify(conditions))}` : url;
+            url = sort.length !== 0 ? url + `&sort=${encodeURIComponent(JSON.stringify(sort))}` : url;
 
-          setLoading(true);
-          getResult(url)
-            .then(res => {
-              params.successCallback(res.data.items, res.data.lastRow);
-            })
-            .finally(()=> {
-              setLoading(false);
-            });
+            setLoading(true);
+            getResult(url)
+              .then((res) => {
+                params.successCallback(res.data.items, res.data.lastRow);
+              })
+              .finally(() => {
+                setLoading(false);
+              });
+          }
+        });
+      }
+
+      fetchSurveys(event).then(() => {
+        if (!location?.state?.resetFilters) {
+          stateFilterHandler.restoreStateFilters(gridRef);
+        } else {
+          stateFilterHandler.resetStateFilters(gridRef);
         }
       });
-    }
-
-    fetchSurveys(event).then(() => {
-      if (!location?.state?.resetFilters) {
-        stateFilterHandler.restoreStateFilters(gridRef);
-      } else {
-        stateFilterHandler.resetStateFilters(gridRef);
-      }
-    });
-  }, [location]);
+    },
+    [location]
+  );
 
   if (redirect) return <Navigate to={`/data/survey/${redirect}`} />;
 
@@ -89,14 +92,21 @@ const SurveyList = () => {
     <AuthContext.Consumer>
       {({auth}) => (
         <>
-          <Backdrop
-            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-            open={loading}>
+          <Backdrop sx={{color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1}} open={loading}>
             <CircularProgress color="inherit" />
           </Backdrop>
           <Box display="flex" flexDirection="row" p={1} pb={1}>
             <Box flexGrow={1}>
               <Typography variant="h4">Surveys</Typography>
+            </Box>
+            <Box>
+              <Button
+                variant="outlined"
+                onClick={() => setRedirect(`${selected.join(',')}/correct`)}
+                disabled={!selected || selected.length < 1 || selected.length > 25}
+              >
+                Correct Selected Surveys
+              </Button>
             </Box>
           </Box>
           <AgGridReact
@@ -104,16 +114,44 @@ const SurveyList = () => {
             id={'survey-list'}
             className="ag-theme-material"
             rowHeight={24}
+            rowSelection={'multiple'}
             animateRows={true}
             enableCellTextSelection={true}
             pagination={true}
             paginationPageSize={rowsPerPage}
             rowModelType={'infinite'}
+            row
             onGridReady={(e) => onGridReady(e)}
-            onFilterChanged={(e) => { stateFilterHandler.stateFilterEventHandler(gridRef, e); }}
+            onSelectionChanged={(e) => {
+              setSelected(e.api.getSelectedRows().map((i) => i.surveyId));
+            }}
+            onFilterChanged={(e) => {
+              stateFilterHandler.stateFilterEventHandler(gridRef, e);
+            }}
             suppressCellFocus={true}
             defaultColDef={{lockVisible: true, sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
           >
+            {auth.features?.includes('corrections') && (
+              <AgGridColumn
+                width={40}
+                field="surveyId"
+                headerName=""
+                suppressMovable={true}
+                filter={false}
+                tooltipValueGetter={() => 'Correct Survey'}
+                resizable={false}
+                sortable={false}
+                checkboxSelection={true}
+                cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
+                onCellClicked={(e) => {
+                  if (e.event.ctrlKey) {
+                    window.open(`/data/survey/${e.data.surveyId}/correct`, '_blank').focus();
+                  } else {
+                    setRedirect(`${e.data.surveyId}/correct`);
+                  }
+                }}
+              />
+            )}
             <AgGridColumn
               width={40}
               field="surveyId"
@@ -133,27 +171,6 @@ const SurveyList = () => {
                 }
               }}
             />
-            {auth.features?.includes('corrections') && (
-              <AgGridColumn
-                width={40}
-                field="surveyId"
-                headerName=""
-                suppressMovable={true}
-                filter={false}
-                tooltipValueGetter={() => 'Correct Survey'}
-                resizable={false}
-                sortable={false}
-                valueFormatter={() => '🛠'}
-                cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
-                onCellClicked={(e) => {
-                  if (e.event.ctrlKey) {
-                    window.open(`/data/survey/${e.data.surveyId}/correct`, '_blank').focus();
-                  } else {
-                    setRedirect(`${e.data.surveyId}/correct`);
-                  }
-                }}
-              />
-            )}
             <AgGridColumn
               width={110}
               field="surveyId"
@@ -170,15 +187,15 @@ const SurveyList = () => {
               }}
             />
             <AgGridColumn width={100} field="siteCode" colId="survey.siteCode" />
-            <AgGridColumn width={100} field="surveyDate" colId="survey.surveyDate"/>
-            <AgGridColumn width={100} field="depth" colId="survey.depth"/>
-            <AgGridColumn flex={1} field="siteName" colId="survey.siteName"/>
-            <AgGridColumn width={100} field="programName" headerName="Program" colId="survey.programName"/>
-            <AgGridColumn flex={1} field="locationName" colId="survey.locationName"/>
-            <AgGridColumn width={100} field="hasPQs" colId="survey.hasPQs"/>
-            <AgGridColumn flex={1} field="mpa" colId="survey.mpa"/>
-            <AgGridColumn flex={1} field="country" colId="survey.country"/>
-            <AgGridColumn flex={1} field="diverName" colId="survey.diverName"/>
+            <AgGridColumn width={100} field="surveyDate" colId="survey.surveyDate" />
+            <AgGridColumn width={100} field="depth" colId="survey.depth" />
+            <AgGridColumn flex={1} field="siteName" colId="survey.siteName" />
+            <AgGridColumn width={100} field="programName" headerName="Program" colId="survey.programName" />
+            <AgGridColumn flex={1} field="locationName" colId="survey.locationName" />
+            <AgGridColumn width={100} field="hasPQs" colId="survey.hasPQs" />
+            <AgGridColumn flex={1} field="mpa" colId="survey.mpa" />
+            <AgGridColumn flex={1} field="country" colId="survey.country" />
+            <AgGridColumn flex={1} field="diverName" colId="survey.diverName" />
           </AgGridReact>
         </>
       )}
