@@ -1,9 +1,13 @@
 package au.org.aodn.nrmn.restapi.data.repository;
 
+import java.util.Collection;
 import java.util.List;
+
+import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -22,4 +26,14 @@ public interface ObservationRepository
 
     @Query("SELECT observationId FROM Observation where surveyMethod.survey.surveyId = :surveyId AND surveyMethod.method.methodId NOT IN (6, 13) ORDER BY observationId")
     List<Integer> findObservationIdsForSurvey(@Param("surveyId") Integer surveyId);
+
+	@Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "" +
+    "update nrmn.observation " +
+    "set observable_item_id = :newId " +
+    "from nrmn.survey_method " +
+    "where observation.survey_method_id = survey_method.survey_method_id " +
+    "and observable_item_id = :oldId and survey_id in :surveyIds")
+	void updateObservableItemsForSurveys(@Param("surveyIds") Collection<Integer> surveyIds, @Param("oldId") Integer oldId, @Param("newId") Integer newId);
 }

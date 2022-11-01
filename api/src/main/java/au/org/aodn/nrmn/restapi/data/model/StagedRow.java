@@ -3,8 +3,6 @@ package au.org.aodn.nrmn.restapi.data.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 import javax.persistence.Column;

@@ -12,6 +12,8 @@ public class SpeciesRecordDto {
     @JsonAlias("AphiaID")
     public Integer aphiaId;
 
+
+
     private String url;
 
     @JsonAlias("scientificname")

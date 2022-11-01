@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
@@ -16,10 +17,18 @@ public class MaterializedViewService {
     private static final Logger logger = LoggerFactory.getLogger(MaterializedViewService.class);
 
     @Autowired
+    private Environment environment;
+
+    @Autowired
     MaterializedViewsRepository materializedViewsRepository;
 
     @Async
     public void refreshAllMaterializedViews() {
+
+        if (environment.getActiveProfiles().length > 0) {
+            logger.info("Skipping refreshAllMaterializedViews as active profile set.");
+            return;
+        }
 
         logger.info("Starting materialization of endpoint views");
 

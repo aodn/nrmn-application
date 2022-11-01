@@ -21,6 +21,7 @@ import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.data.repository.model.EntityCriteria;
 import au.org.aodn.nrmn.restapi.data.repository.projections.ObservableItemRow;
 import au.org.aodn.nrmn.restapi.data.repository.projections.ObservableItemSuperseded;
+import au.org.aodn.nrmn.restapi.dto.species.SpeciesCorrectDto;
 
 public interface ObservableItemRepository extends JpaRepository<ObservableItem, Integer>,
         JpaSpecificationExecutor<ObservableItem>, EntityCriteria<ObservableItem> {
@@ -59,7 +60,8 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "INNER JOIN {h-schema}methods_species m ON m.observable_item_id = obsitem.observable_item_id "
             + "where m.method_id = :methodId AND site_raw.site_id IN :siteIds AND obsitem.superseded_by IS NULL "
             + "AND (:methodId != 2 OR (obsitem.class NOT IN ('Ophiuroidea', 'Polyplacophora') AND obsitem.family != 'Pyuridae'))", nativeQuery = true)
-    List<ObservableItemRow> getAllWithMethodForSites(@Param("methodId") Integer methodId, @Param("siteIds") Collection<Integer> siteIds);
+    List<ObservableItemRow> getAllWithMethodForSites(@Param("methodId") Integer methodId,
+            @Param("siteIds") Collection<Integer> siteIds);
 
     @Query(value = "SELECT * FROM {h-schema}observable_item_ref oi"
             + " LEFT JOIN {h-schema}lengthweight_ref lw ON (lw.observable_item_id = oi.observable_item_id)"
@@ -82,4 +84,28 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "superseded_ids " + "from {h-schema}observable_item_ref oi_1 "
             + "where oi_1.superseded_by = oi.observable_item_name) as superseded on true WHERE observable_item_id = :id", nativeQuery = true)
     ObservableItemSuperseded findSupersededForId(Integer id);
+
+    @Query(value = ""
+            + "select distinct observable_item_id as observableItemId,"
+            + "observable_item_name as observableItemName, superseded_by as supersededBy, common_name as commonName, CAST(jsonb_agg(survey_id) AS TEXT) as surveyIds from "
+            + "(select i.observable_item_id, i.common_name, i.observable_item_name, i.superseded_by, l.location_name, s.survey_id, s.survey_date from nrmn.survey s  "
+            + "join nrmn.survey_method m on m.survey_id = s.survey_id  "
+            + "join nrmn.observation o on m.survey_method_id = o.survey_method_id "
+            + "join nrmn.observable_item_ref i on o.observable_item_id = i.observable_item_id "
+            + "join nrmn.site_ref t on s.site_id = t.site_id "
+            + "join nrmn.location_ref l on l.location_id = t.location_id "
+            + "WHERE s.survey_date < cast(:endDate as date) AND s.survey_date > cast(:startDate as date) "
+            + "AND (:locationId IS NULL OR t.location_id = :locationId) "
+            + "AND (:observableItemId IS NULL OR o.observable_item_id = :observableItemId) "
+            + "AND (:state IS NULL OR t.state = :state) "
+            + "AND (:country IS NULL OR t.country = :country) "
+            + ") as ob "
+            + "group by observable_item_id, observable_item_name, common_name, superseded_by "
+            + "order by observableItemName, supersededBy"
+            + "", nativeQuery = true)
+    List<SpeciesCorrectDto> getAllDistinctForSurveys(
+        @Param("startDate") String startDate, @Param("endDate") String endDate,
+        @Param("locationId") Integer locationId,
+        @Param("observableItemId") Integer observableItemId,
+        @Param("state") String state, @Param("country") String country);
 }

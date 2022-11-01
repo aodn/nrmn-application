@@ -119,6 +119,23 @@ export const getDataJob = (jobId) =>
     .then((res) => res)
     .catch((err) => err);
 
+export const getSurveySpecies = (filter) => {
+  const params = Object.keys(filter).map((key) => `${key}=${filter[key]}`).join('&');
+  return axiosInstance.get(`correction/correctSpecies?${params}`, {
+      validateStatus: () => true
+    })
+    .then((res) => res)
+    .catch((err) => err);
+  };
+
+  export const postSpeciesCorrection = (payload) => {
+    return axiosInstance.post(`correction/correctSpecies`, payload, {
+        validateStatus: () => true
+      })
+      .then((res) => res)
+      .catch((err) => err);
+    };
+
 export const getCorrections = (surveyIds) =>
   axiosInstance
     .get('correction/correct?surveyIds=' + surveyIds, {

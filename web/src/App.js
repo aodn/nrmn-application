@@ -32,6 +32,7 @@ import TopBar from './components/layout/TopBar';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import ApplicationError from './components/ui/ApplicationError';
+import SpeciesCorrect from './components/data-entities/survey/SpeciesCorrect';
 
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -114,6 +115,7 @@ const App = () => {
                     <Route path="/data/survey/:id" element={<SurveyView />} />
                     <Route path="/data/survey/:id/edit" element={<SurveyEdit />} />
                     {auth?.features?.includes('corrections') && <Route path="/data/survey/:id/correct" element={<SurveyCorrect />} />}
+                    {auth?.features?.includes('corrections') && <Route path="/data/species" element={<SpeciesCorrect />} />}
 
                     <Route path="/data/jobs" element={<JobList />} />
                     <Route path="/data/job/:id/view" element={<JobView />} />

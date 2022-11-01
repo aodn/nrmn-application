@@ -44,6 +44,7 @@ import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.data.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRequestBodyDto;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowsDto;
+import au.org.aodn.nrmn.restapi.dto.correction.SpeciesCorrectBodyDto;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
@@ -425,6 +426,71 @@ public class CorrectionController {
             stagedJobLogRepository.save(log);
 
             return ResponseEntity.badRequest().body("Deletion failed. No data has been changed.");
+        }
+
+        return ResponseEntity.ok().body(job.getId());
+    }
+
+    @GetMapping("correctSpecies")
+    public ResponseEntity<?> getSpeciesForSurveysDateAndLocation(
+            @RequestParam(value = "startDate") String startDate,
+            @RequestParam(value = "endDate") String endDate,
+            @RequestParam(value = "locationId", required = false) Integer locationId,
+            @RequestParam(value = "observableItemId", required = false) Integer observableItemId,
+            @RequestParam(value = "state", required = false) String state,
+            @RequestParam(value = "country", required = false) String country) {
+        var species = observableItemRepository.getAllDistinctForSurveys(
+                startDate,
+                endDate,
+                locationId,
+                observableItemId,
+                state,
+                country);
+        return ResponseEntity.ok().body(species);
+    }
+
+    @PostMapping("correctSpecies")
+    public ResponseEntity<?> updateSpeciesInSurveys(
+            Authentication authentication,
+            @RequestBody SpeciesCorrectBodyDto bodyDto) {
+
+        var curr = observableItemRepository.findById(bodyDto.getPrevObservableItemId()).get();
+        var next = observableItemRepository.findById(bodyDto.getNewObservableItemId()).get();
+
+        var auditMessage = "species correction: " + authentication.getName();
+        userActionAuditRepository.save(new UserActionAudit("correctSpecies", auditMessage));
+
+        var referenceMessage = "Correct Species from " + curr.getObservableItemName() + " to "
+                + next.getObservableItemName();
+
+        var user = secUserRepository.findByEmail(authentication.getName());
+        var job = StagedJob.builder()
+                .source(SourceJobType.CORRECTION)
+                .reference(referenceMessage)
+                .status(StatusJobType.CORRECTED)
+                .creator(user.get())
+                .program(programRepository.getNoneProgram())
+                .build();
+
+        job = stagedJobRepository.save(job);
+
+        try {
+
+            surveyCorrectionService.correctSpecies(job, bodyDto.getSurveyIds(), curr, next);
+
+            materializedViewService.refreshAllMaterializedViews();
+
+        } catch (Exception e) {
+            logger.error("Correction Failed", e);
+
+            var log = StagedJobLog.builder()
+                    .stagedJob(job)
+                    .details("Application error attempting species correction")
+                    .eventType(StagedJobEventType.ERROR).build();
+
+            stagedJobLogRepository.save(log);
+
+            return ResponseEntity.badRequest().body("Species failed to update. No data has been changed.");
         }
 
         return ResponseEntity.ok().body(job.getId());
