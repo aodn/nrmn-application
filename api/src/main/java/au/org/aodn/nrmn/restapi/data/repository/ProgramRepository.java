@@ -22,4 +22,7 @@ public interface ProgramRepository extends JpaRepository<Program, Integer>, JpaS
 
     @Query(value = "SELECT p from Program p where p.isActive = TRUE")
     List<Program> findActive();
+
+    @Query(value = "SELECT p from Program p where p.id = 0")
+    Program getNoneProgram();
 }

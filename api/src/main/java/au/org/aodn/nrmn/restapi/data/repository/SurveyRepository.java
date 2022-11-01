@@ -66,6 +66,6 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpe
         List<Integer> getSurveyIdForObservation(@Param("observationIds") List<Integer> observationIds);
 
         @Modifying
-        @Query("UPDATE Survey s SET s.updated = current_timestamp()")
-        void updateSurveyModified();
+        @Query("UPDATE Survey s SET s.updated = current_timestamp() WHERE s.surveyId IN :ids")
+        void updateSurveyModified(@Param("ids") List<Integer> ids);
 }

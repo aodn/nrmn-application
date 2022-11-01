@@ -15,6 +15,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.data.model.Observation;
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.model.StagedJobLog;
@@ -80,11 +81,15 @@ public class SurveyCorrectionService {
             SurveyMethod.M11);
 
     public void correctSurvey(StagedJob job, List<Integer> surveyIds, Collection<StagedRowFormatted> validatedRows) {
-        correctionTransaction(job, surveyIds, validatedRows);
+        surveyCorrectionTransaction(job, surveyIds, validatedRows);
+    }
+
+    public void correctSpecies(StagedJob job, List<Integer> surveyIds, ObservableItem curr, ObservableItem next) {
+        speciesCorrectionTransaction(job, surveyIds, curr, next);
     }
 
     public void deleteSurvey(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows) {
-        deletionTransaction(job, survey, validatedRows);
+        surveyDeletionTransaction(job, survey, validatedRows);
     }
 
     private String formatRange(List<Integer> ids) {
@@ -101,7 +106,7 @@ public class SurveyCorrectionService {
         return formatRange(observationRepository.findObservationIdsForSurvey(surveyId));
     }
 
-    private void deletionTransaction(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows) {
+    private void surveyDeletionTransaction(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows) {
         var messages = new ArrayList<String>();
 
         // Remove existing observations
@@ -122,7 +127,26 @@ public class SurveyCorrectionService {
         jobRepository.save(job);
     }
 
-    private void correctionTransaction(StagedJob job, List<Integer> surveyIds,
+    private void speciesCorrectionTransaction(StagedJob job, List<Integer> surveyIds, ObservableItem curr,
+            ObservableItem next) {
+
+        var messages = new ArrayList<String>();
+
+        observationRepository.updateObservableItemsForSurveys(surveyIds, curr.getObservableItemId(),
+                next.getObservableItemId());
+
+        messages.add("Updating species on surveys " + formatRange(surveyIds) + " from " + curr.getObservableItemName()
+                + " to " + next.getObservableItemName());
+
+        var details = messages.stream().collect(Collectors.joining("\n"));
+        var log = StagedJobLog.builder().stagedJob(job).details(details).eventType(StagedJobEventType.CORRECTED);
+        stagedJobLogRepository.save(log.build());
+        job.setStatus(StatusJobType.CORRECTED);
+        job.setSurveyIds(surveyIds);
+        jobRepository.save(job);
+    }
+
+    private void surveyCorrectionTransaction(StagedJob job, List<Integer> surveyIds,
             Collection<StagedRowFormatted> validatedRows) {
 
         var messages = new ArrayList<String>();
@@ -150,38 +174,37 @@ public class SurveyCorrectionService {
 
             var surveyRows = rowsGroupedBySurvey.get(survey.getSurveyId().longValue());
 
-            {
-                var row = surveyRows.get(0);
-                // survey.setSite(row.getSite());
-                // survey.setDepth(row.getDepth());
-                // survey.setSurveyDate(row.getDate());
-                survey.setSurveyNum(row.getSurveyNum());
-                survey.setDirection(row.getDirection() != null ? row.getDirection().toString() : null);
-                survey.setSurveyTime(Time.valueOf(row.getTime().orElse(LocalTime.NOON)));
-                survey.setLongitude(row.getLongitude());
-                survey.setLatitude(row.getLatitude());
-                survey.setPqDiverId(row.getPqs() != null ? row.getPqs().getDiverId() : null);
-                
-                var visAvg = surveyRows.stream()
-                        .filter(r -> r.getVis().isPresent())
-                        .mapToDouble(r -> r.getVis().get())
-                        .average();
-                if (visAvg.isPresent())
-                    visAvg = OptionalDouble.of((double) Math.round(visAvg.getAsDouble()));
-                survey.setVisibility(visAvg.orElse(0.0));
-            }
+            var firstSurveyRow = surveyRows.get(0);
+            survey.setSurveyNum(firstSurveyRow.getSurveyNum());
+            var direction = firstSurveyRow.getDirection() != null ? firstSurveyRow.getDirection().toString() : null;
+            survey.setDirection(direction);
+            survey.setSurveyTime(Time.valueOf(firstSurveyRow.getTime().orElse(LocalTime.NOON)));
+            survey.setLongitude(firstSurveyRow.getLongitude());
+            survey.setLatitude(firstSurveyRow.getLatitude());
+            survey.setPqDiverId(firstSurveyRow.getPqs() != null ? firstSurveyRow.getPqs().getDiverId() : null);
+
+            var visAvg = surveyRows.stream()
+                    .filter(r -> r.getVis().isPresent())
+                    .mapToDouble(r -> r.getVis().get())
+                    .average();
+
+            if (visAvg.isPresent())
+                visAvg = OptionalDouble.of((double) Math.round(visAvg.getAsDouble()));
+
+            survey.setVisibility(visAvg.orElse(0.0));
 
             var surveyMethodBlocks = surveyRows.stream().filter(r -> r.getMethodBlock() != null)
                     .collect(Collectors.groupingBy(StagedRowFormatted::getMethodBlock));
 
             for (var methodBlockRows : surveyMethodBlocks.values()) {
 
-                var firstRow = methodBlockRows.get(0);
-                var surveyNotDone = firstRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done");
-                var method = methodEntities.stream().filter(m -> m.getMethodId() == firstRow.getMethod()).findFirst()
+                var firstMethodBlockRow = methodBlockRows.get(0);
+                var surveyNotDone = firstMethodBlockRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done");
+                var method = methodEntities.stream().filter(m -> m.getMethodId() == firstMethodBlockRow.getMethod())
+                        .findFirst()
                         .orElse(null);
                 var surveyMethod = SurveyMethodEntity.builder().survey(survey).method(method)
-                        .blockNum(firstRow.getBlock())
+                        .blockNum(firstMethodBlockRow.getBlock())
                         .surveyNotDone(surveyNotDone).build();
 
                 surveyMethods.add(surveyMethod);
@@ -228,7 +251,7 @@ public class SurveyCorrectionService {
                     }
                 }
 
-                messages.add("Correcting " + firstRow.getBlock() + " : " + method.getMethodId());
+                messages.add("Correcting " + firstMethodBlockRow.getBlock() + " : " + method.getMethodId());
             }
         }
 
@@ -245,6 +268,6 @@ public class SurveyCorrectionService {
         job.setStatus(StatusJobType.CORRECTED);
         job.setSurveyIds(surveyIds);
         jobRepository.save(job);
-        surveyRepository.updateSurveyModified();
+        surveyRepository.updateSurveyModified(surveyIds);
     }
 }

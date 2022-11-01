@@ -451,25 +451,47 @@ public class CorrectionController {
 
     @PostMapping("correctSpecies")
     public ResponseEntity<?> updateSpeciesInSurveys(
-        Authentication authentication,
-        @RequestBody SpeciesCorrectBodyDto bodyDto) {
+            Authentication authentication,
+            @RequestBody SpeciesCorrectBodyDto bodyDto) {
 
-            var user = secUserRepository.findByEmail(authentication.getName());
-            var message = "correction: species: " + authentication.getName();
-            var program = surveyRepository.getReferenceById(bodyDto.getSurveyIds().get(0)).getProgram();
-            userActionAuditRepository.save(new UserActionAudit("correct/survey", message));
-    
-            var job = StagedJob.builder()
-                    .source(SourceJobType.CORRECTION)
-                    .reference("Correct Species ")
-                    .status(StatusJobType.CORRECTED)
-                    .creator(user.get())
-                    .program(program)
-                    .build();
-    
-            job = stagedJobRepository.save(job);
+        var curr = observableItemRepository.findById(bodyDto.getPrevObservableItemId()).get();
+        var next = observableItemRepository.findById(bodyDto.getNewObservableItemId()).get();
 
-        observationRepository.updateObservableItemsForSurveys(bodyDto.getSurveyIds(), bodyDto.getPrevObservableItemId(), bodyDto.getNewObservableItemId());
+        var auditMessage = "species correction: " + authentication.getName();
+        userActionAuditRepository.save(new UserActionAudit("correctSpecies", auditMessage));
+
+        var referenceMessage = "Correct Species from " + curr.getObservableItemName() + " to "
+                + next.getObservableItemName();
+
+        var user = secUserRepository.findByEmail(authentication.getName());
+        var job = StagedJob.builder()
+                .source(SourceJobType.CORRECTION)
+                .reference(referenceMessage)
+                .status(StatusJobType.CORRECTED)
+                .creator(user.get())
+                .program(programRepository.getNoneProgram())
+                .build();
+
+        job = stagedJobRepository.save(job);
+
+        try {
+
+            surveyCorrectionService.correctSpecies(job, bodyDto.getSurveyIds(), curr, next);
+
+            materializedViewService.refreshAllMaterializedViews();
+
+        } catch (Exception e) {
+            logger.error("Correction Failed", e);
+
+            var log = StagedJobLog.builder()
+                    .stagedJob(job)
+                    .details("Application error attempting species correction")
+                    .eventType(StagedJobEventType.ERROR).build();
+
+            stagedJobLogRepository.save(log);
+
+            return ResponseEntity.badRequest().body("Species failed to update. No data has been changed.");
+        }
 
         return ResponseEntity.ok().body(job.getId());
     }
