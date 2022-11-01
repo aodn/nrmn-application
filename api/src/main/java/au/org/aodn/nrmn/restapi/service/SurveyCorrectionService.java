@@ -135,8 +135,7 @@ public class SurveyCorrectionService {
         observationRepository.updateObservableItemsForSurveys(surveyIds, curr.getObservableItemId(),
                 next.getObservableItemId());
 
-        messages.add("Updating species on surveys " + formatRange(surveyIds) + " from " + curr.getObservableItemName()
-                + " to " + next.getObservableItemName());
+        messages.add("Correcting species from " + curr.getObservableItemName() + " to " + next.getObservableItemName());
 
         var details = messages.stream().collect(Collectors.joining("\n"));
         var log = StagedJobLog.builder().stagedJob(job).details(details).eventType(StagedJobEventType.CORRECTED);
