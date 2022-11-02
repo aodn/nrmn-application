@@ -226,6 +226,8 @@ const SurveyCorrect = () => {
         const inverts = measurements[0] || '0';
         delete measurements[0];
         delete data.measureJson;
+        if (data.code?.toUpperCase() === 'SND')
+          data.diver = rows.find((row) => row.surveyId === data.surveyId && row.diver)?.diver;
         return {id: (idx + 1) * 100, pos: (idx + 1) * 1000, ...data, inverts, measurements};
       });
       const isExtended = unpackedData.includes((r) => Object.keys(r.measurements).includes((k) => k > 28));
