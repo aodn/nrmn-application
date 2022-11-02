@@ -80,7 +80,9 @@ public class SurveyEditService {
 
         survey.setBlockAbundanceSimulated(surveyDto.getBlockAbundanceSimulated());
         survey.setSurveyDate(parseDate(surveyDto.getSurveyDate()));
-        survey.setSurveyTime(Time.valueOf(parseTime(surveyDto.getSurveyTime()).get()));
+        var surveyTime = parseTime(surveyDto.getSurveyTime());
+        if(surveyTime.isPresent())
+            survey.setSurveyTime(Time.valueOf(surveyTime.get()));
         survey.setDepth(Integer.valueOf(surveyDto.getDepth()));
         survey.setSurveyNum(surveyDto.getSurveyNum());
 
