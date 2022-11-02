@@ -99,6 +99,9 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "AND (:observableItemId IS NULL OR o.observable_item_id = :observableItemId) "
             + "AND (:state IS NULL OR t.state = :state) "
             + "AND (:country IS NULL OR t.country = :country) "
+            + "AND (:xmin is null OR (s.latitude is not null and s.longitude is not null "
+            + "AND st_within(st_makepoint(s.latitude, s.longitude), "
+            + "st_makeenvelope(:xmin, :ymin, :xmax, :ymax))) OR st_within(t.geom, st_makeenvelope(:xmin, :ymin, :xmax, :ymax))) "
             + ") as ob "
             + "group by observable_item_id, observable_item_name, common_name, superseded_by "
             + "order by observableItemName, supersededBy"
@@ -107,5 +110,10 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
         @Param("startDate") String startDate, @Param("endDate") String endDate,
         @Param("locationId") Integer locationId,
         @Param("observableItemId") Integer observableItemId,
-        @Param("state") String state, @Param("country") String country);
+        @Param("state") String state,
+        @Param("country") String country,
+        @Param("xmin") Double xmin,
+        @Param("ymin") Double ymin,
+        @Param("xmax") Double xmax,
+        @Param("ymax") Double ymax);
 }

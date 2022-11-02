@@ -96,6 +96,9 @@ const SpeciesCorrect = () => {
         const results = action.payload.map((p) => ({...p, surveyIds: JSON.parse(p.surveyIds)}));
         return {loading: false, search: state.request, request: null, results};
       }
+      case 'showError': {
+        return {loading: false, search: null, request: null, error: action.payload};
+      }
       case 'postCorrection': {
         const surveyIds = state.results.find((r) => r.observableItemId === selected.result).surveyIds;
         const payload = {prevObservableItemId: selected.result, newObservableItemId: correction.newObservableItemId, surveyIds};
@@ -111,7 +114,7 @@ const SpeciesCorrect = () => {
       switch (request.request.type) {
         case 'search':
           getSurveySpecies(request.request.payload).then((res) => {
-            dispatch({type: 'showResults', payload: res.data});
+              dispatch({type: res.status === 200 ? 'showResults' : 'showError', payload: res.data});
           });
           break;
         case 'post':
@@ -132,6 +135,7 @@ const SpeciesCorrect = () => {
       </Box>
       <SpeciesCorrectFilter onSearch={(filter) => dispatch({type: 'getRequest', payload: filter})} />
       {request.loading && <LinearProgress />}
+      {request.error && <Alert severity="error">{request.error}</Alert>}
       {request.results && (
         <Box display="flex" flex={2} overflow="hidden" flexDirection="row">
           <Box width="50%" style={{overflowX: 'hidden', overflowY: 'auto'}}>
