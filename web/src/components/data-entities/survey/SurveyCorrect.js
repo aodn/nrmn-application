@@ -1,5 +1,6 @@
 import {CloudUpload as CloudUploadIcon, PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon} from '@mui/icons-material/';
-import {Alert, Box, Button, Typography} from '@mui/material';
+import {Alert, Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography} from '@mui/material';
+import {makeStyles} from '@mui/styles';
 import UndoIcon from '@mui/icons-material/Undo';
 import ResetIcon from '@mui/icons-material/LayersClear';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
@@ -16,6 +17,31 @@ import SurveyCorrectPanel from './panel/SurveyCorrectPanel';
 import FindReplacePanel from '../../import/panel/FindReplacePanel';
 import SurveyMeasurementHeader from './SurveyMeasurementHeader';
 import eh from '../../../components/import/DataSheetEventHandlers';
+
+const useStyles = makeStyles(({palette, typography}) => ({
+  root: {
+    '& .MuiTable-root': {
+      '& .MuiTableHead-root': {
+        '& .MuiTableRow-head': {
+          '& .MuiTableCell-head': {
+            fontSize: typography?.table.fontSize,
+            background: palette?.primary.rowHeader
+          }
+        }
+      },
+      '& .MuiTableRow-root': {
+        '&:nth-child(even)': {
+          backgroundColor: palette?.primary.rowHighlight
+        }
+      },
+      '& .MuiTableCell-root': {
+        fontSize: typography?.table.fontSize,
+        padding: typography?.table.padding,
+        color: palette?.text.textPrimary
+      }
+    }
+  }
+}));
 
 const toolTipValueGetter = ({context, data, colDef}) => {
   if (!context.cellValidations) return;
@@ -47,6 +73,7 @@ const packedData = (api) => {
 const SurveyCorrect = () => {
   const surveyId = useParams()?.id;
   const gridRef = useRef();
+  const classes = useStyles();
 
   // FUTURE: useReducer
   const [error, setError] = useState();
@@ -226,6 +253,8 @@ const SurveyCorrect = () => {
         const inverts = measurements[0] || '0';
         delete measurements[0];
         delete data.measureJson;
+        if (data.code?.toUpperCase() === 'SND')
+          data.diver = rows.find((row) => row.surveyId === data.surveyId && row.diver)?.diver;
         return {id: (idx + 1) * 100, pos: (idx + 1) * 1000, ...data, inverts, measurements};
       });
       const isExtended = unpackedData.includes((r) => Object.keys(r.measurements).includes((k) => k > 28));
@@ -234,6 +263,7 @@ const SurveyCorrect = () => {
       context.originalData = JSON.parse(JSON.stringify(rowData));
       context.rowData = rowData;
       context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
+      context.originalRowPos = JSON.parse(JSON.stringify(context.rowPos));
       api.setRowData(context.rowData.length > 0 ? context.rowData : null);
       setMetadata({programName, programId, isExtended, surveyIds: [...surveyIds]});
       setRowData(rowData);
@@ -305,24 +335,47 @@ const SurveyCorrect = () => {
       const rowPos = context.rowPos.indexOf(r.pos) + 1;
       const original = context.originalData.find((o) => o.id === r.id);
       if (!original) {
-        acc.push(`Row ${rowPos} added`);
+        acc.push({row: rowPos, message: 'Row inserted'});
         return acc;
       }
+      var messages = [];
       for (var key of Object.keys(r)) {
-        if(key === 'observationIds') continue;
         if (typeof r[key] === 'object') {
-          if (JSON.stringify(removeNullProperties(r[key])) !== JSON.stringify(original[key])) acc.push(`Row ${rowPos} ${key} changed`);
+          const mmOriginal = removeNullProperties(original[key]);
+          const mmUpdated = removeNullProperties(r[key]);
+          if (JSON.stringify(mmOriginal) !== JSON.stringify(mmUpdated)) {
+
+            const changed = {};
+
+            for(var j of Object.keys(mmOriginal)){
+              if(mmOriginal[j] !== mmUpdated[j])
+                changed[j] = mmUpdated[j];
+            }
+
+            for(var k of Object.keys(mmUpdated)){
+              if(mmOriginal[k] !== mmUpdated[k])
+                changed[k] = mmUpdated[k];
+            }
+
+            var mmMessages = Object.keys(changed).map(c => {
+              return `[S${c} ${mmOriginal[c] ? mmOriginal[c] : 0} to ${mmUpdated[c] ? mmUpdated[c] : 0}]`;
+            });
+
+            messages.push(`Observations: ${mmMessages.join(' ')}`);
+          }
         } else if (r[key] !== original[key]) {
-          acc.push(`Row ${rowPos}: ${key} change from ${original[key]} to ${r[key]}`);
+          const columnName = api.gridOptionsWrapper.gridOptions.columnDefs.find((c) => c.field === key).headerName;
+          messages.push(`${columnName}: ${original[key]} to ${r[key]}`);
         }
       }
+      if (messages.length > 0) acc.push({row: rowPos, message: messages.join(', ')});
       return acc;
     }, []);
 
     const deleted = context.originalData.reduce((acc, r) => {
-      const rowPos = context.rowPos.indexOf(r.pos) + 1;
+      const rowPos = context.originalRowPos.indexOf(r.pos) + 1;
       if (!context.rowData.find((o) => o.id === r.id)) {
-        acc.push(`Row ${rowPos} deleted`);
+        acc.push({row: rowPos, message: 'Row deleted'});
       }
       return acc;
     }, []);
@@ -480,9 +533,18 @@ const SurveyCorrect = () => {
                 <Typography variant="h5">Confirm Survey Correction?</Typography>
               </Box>
               <Box border={0} borderColor="grey" p={2} margin={3}>
-                {surveyDiff?.map((res, idx) => (
-                  <p key={idx}>{res}</p>
-                ))}
+                <TableContainer classes={classes} component={Paper} disabled>
+                  <Table>
+                    <TableBody>
+                      {surveyDiff?.map((res, idx) => (
+                        <TableRow key={idx}>
+                          <TableCell>{res.row}</TableCell>
+                          <TableCell>{res.message}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </Box>
             </>
           ) : (

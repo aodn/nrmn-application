@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,7 @@ import au.org.aodn.nrmn.restapi.data.repository.StagedJobLogRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.data.repository.UserActionAuditRepository;
+import au.org.aodn.nrmn.restapi.dto.BoundingBoxDto;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRequestBodyDto;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowsDto;
 import au.org.aodn.nrmn.restapi.dto.correction.SpeciesCorrectBodyDto;
@@ -203,7 +205,9 @@ public class CorrectionController {
         return result;
     }
 
-    private ValidationResultSet validate(ProgramValidation programValidation, Boolean isExtended,
+    private ValidationResultSet validate(
+            ProgramValidation programValidation,
+            Boolean isExtended,
             List<Pair<StagedRowFormatted, HashSet<String>>> results) {
 
         var validation = new ValidationResultSet();
@@ -438,15 +442,40 @@ public class CorrectionController {
             @RequestParam(value = "locationId", required = false) Integer locationId,
             @RequestParam(value = "observableItemId", required = false) Integer observableItemId,
             @RequestParam(value = "state", required = false) String state,
-            @RequestParam(value = "country", required = false) String country) {
-        var species = observableItemRepository.getAllDistinctForSurveys(
-                startDate,
-                endDate,
-                locationId,
-                observableItemId,
-                state,
-                country);
-        return ResponseEntity.ok().body(species);
+            @RequestParam(value = "country", required = false) String country,
+            @RequestParam(value = "coord1", required = false) String coord1,
+            @RequestParam(value = "coord2", required = false) String coord2) {
+
+        try {
+            var bbox = new BoundingBoxDto(coord1, coord2);
+
+            if ((!StringUtils.isEmpty(coord1) || !StringUtils.isEmpty(coord2)) && !bbox.valid())
+                return ResponseEntity.badRequest().body("Invalid bounding box");
+
+            var species = bbox.valid() ? observableItemRepository.getAllDistinctForSurveys(
+                    startDate,
+                    endDate,
+                    locationId,
+                    observableItemId,
+                    state,
+                    country,
+                    bbox.getXmin(),
+                    bbox.getYmin(),
+                    bbox.getXmax(),
+                    bbox.getYmax())
+                    : observableItemRepository.getAllDistinctForSurveys(
+                            startDate,
+                            endDate,
+                            locationId,
+                            observableItemId,
+                            state,
+                            country,
+                            null, null, null, null);
+
+            return ResponseEntity.ok().body(species);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Query failed");
+        }
     }
 
     @PostMapping("correctSpecies")
