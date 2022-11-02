@@ -27,7 +27,7 @@ const ExtractTemplateData = () => {
       await getEntity('locations').then((res) => {
         const locations = [];
         const groups = {ecoRegions: [], countries: [], areas: [], siteCodes: []};
-        res.data.forEach((d) => {
+        res.data.items.forEach((d) => {
           locations[d.id] = d.locationName;
           ['locations', 'ecoRegions', 'countries', 'areas', 'siteCodes'].forEach((prop) => {
             d[prop]
