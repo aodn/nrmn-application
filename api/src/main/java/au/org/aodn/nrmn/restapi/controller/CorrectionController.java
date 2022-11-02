@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -448,17 +449,29 @@ public class CorrectionController {
         try {
             var bbox = new BoundingBoxDto(coord1, coord2);
 
-            if (bbox != null && !bbox.valid())
+            if ((!StringUtils.isEmpty(coord1) || !StringUtils.isEmpty(coord2)) && !bbox.valid())
                 return ResponseEntity.badRequest().body("Invalid bounding box");
 
-            var species = observableItemRepository.getAllDistinctForSurveys(
+            var species = bbox.valid() ? observableItemRepository.getAllDistinctForSurveys(
                     startDate,
                     endDate,
                     locationId,
                     observableItemId,
                     state,
                     country,
-                    bbox.valid() ? bbox.getGeometry() : null);
+                    bbox.getXmin(),
+                    bbox.getYmin(),
+                    bbox.getXmax(),
+                    bbox.getYmax())
+                    : observableItemRepository.getAllDistinctForSurveys(
+                            startDate,
+                            endDate,
+                            locationId,
+                            observableItemId,
+                            state,
+                            country,
+                            null, null, null, null);
+
             return ResponseEntity.ok().body(species);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Query failed");

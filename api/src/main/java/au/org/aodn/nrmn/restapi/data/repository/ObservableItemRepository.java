@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import javax.persistence.QueryHint;
 
-import org.locationtech.jts.geom.Geometry;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -96,11 +95,13 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "join nrmn.site_ref t on s.site_id = t.site_id "
             + "join nrmn.location_ref l on l.location_id = t.location_id "
             + "WHERE s.survey_date < cast(:endDate as date) AND s.survey_date > cast(:startDate as date) "
-            + "AND (CAST(:bbox as org.locationtech.jts.geom.Geometry) is null or (within(t.geom, CAST(:bbox as org.locationtech.jts.geom.Geometry)))) "
             + "AND (:locationId IS NULL OR t.location_id = :locationId) "
             + "AND (:observableItemId IS NULL OR o.observable_item_id = :observableItemId) "
             + "AND (:state IS NULL OR t.state = :state) "
             + "AND (:country IS NULL OR t.country = :country) "
+            + "AND (:xmin is null OR (s.latitude is not null and s.longitude is not null "
+            + "AND st_within(st_makepoint(s.latitude, s.longitude), "
+            + "st_makeenvelope(:xmin, :ymin, :xmax, :ymax))) OR st_within(t.geom, st_makeenvelope(:xmin, :ymin, :xmax, :ymax))) "
             + ") as ob "
             + "group by observable_item_id, observable_item_name, common_name, superseded_by "
             + "order by observableItemName, supersededBy"
@@ -111,5 +112,8 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
         @Param("observableItemId") Integer observableItemId,
         @Param("state") String state,
         @Param("country") String country,
-        @Param("bbox") Geometry bbox);
+        @Param("xmin") Double xmin,
+        @Param("ymin") Double ymin,
+        @Param("xmax") Double xmax,
+        @Param("ymax") Double ymax);
 }

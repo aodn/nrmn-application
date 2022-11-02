@@ -1,4 +1,4 @@
-import {Box, LinearProgress, TextField, Typography} from '@mui/material';
+import {Box, Button, LinearProgress, TextField, Typography} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import React, {useEffect, useReducer, useState} from 'react';
 import {getEntity} from '../../../api/api';
@@ -12,6 +12,18 @@ const SpeciesCorrectFilter = ({onSearch}) => {
   const [states, setState] = useState();
 
   const [loading, setLoading] = useState(true);
+
+  const initialFilter = {
+    startDate: '2021-01-01',
+    endDate: '2022-01-01',
+    country: null,
+    state: null,
+    locationId: null,
+    observableItemId: null,
+    coord1: '',
+    coord2: '',
+    species: null
+  };
 
   useEffect(() => {
     async function fetchLocations() {
@@ -49,6 +61,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
 
   const [filter, updateFilter] = useReducer(
     (filter, action) => {
+      if (!action) return {...initialFilter};
       const updated = {...filter};
       if (!action.value) {
         delete updated[action.field];
@@ -57,7 +70,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
       }
       return updated;
     },
-    {startDate: '2021-01-01', endDate: '2022-01-01'}
+    {...initialFilter}
   );
 
   const updateStartDate = (e) => {
@@ -82,6 +95,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
 
   const updateObservableItem = (e) => {
     updateFilter({field: 'observableItemId', value: e ? e.id : null});
+    updateFilter({field: 'species', value: e ? e.species : null});
   };
 
   const updateCoord1 = (e) => {
@@ -92,11 +106,14 @@ const SpeciesCorrectFilter = ({onSearch}) => {
     updateFilter({field: 'coord2', value: e.target.value});
   };
 
-  const canSearch = filter.startDate && filter.endDate;
+  const canSearch =
+    filter.startDate &&
+    filter.endDate &&
+    (filter.locationId || filter.country || filter.state || filter.observableItemId || (filter.coord1 && filter.coord2));
 
   return (
     <>
-      {data ? (
+      {data?.locationIds && states && countries ? (
         <>
           <Box ml={1} display="flex" flexDirection="row">
             <Box m={1} width={150}>
@@ -135,15 +152,18 @@ const SpeciesCorrectFilter = ({onSearch}) => {
               />
             </Box>
             <Box m={1} width={300}>
-              <Typography variant="subtitle2">Species</Typography>
-              <CustomSearchInput fullWidth onChange={updateObservableItem} />
+              <CustomSearchInput fullWidth label="Species" formData={filter.species} onChange={updateObservableItem} />
             </Box>
-            <Box m={1} my={4} width={200}></Box>
+            <Box mx={1} mt={4} width={200}>
+              <Button onClick={() => updateFilter()} fullWidth variant="contained">
+                Reset Filter
+              </Button>
+            </Box>
           </Box>
           <Box ml={1} display="flex" flexDirection="row">
             <Box m={1} width={150}>
               <Typography variant="subtitle2">BBox Min</Typography>
-              <input onInput={updateCoord1} value={filter.coord1} style={{height: '35px', width: '150px'}} />
+              <input onChange={updateCoord1} value={filter.coord1} style={{height: '35px', width: '150px'}} />
             </Box>
             <Box m={1} width={150}>
               <Typography variant="subtitle2">BBox Max</Typography>
@@ -156,6 +176,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
                 filterSelectedOptions
                 onChange={updateCountry}
                 options={countries}
+                value={filter.country}
                 renderInput={(params) => <TextField {...params} />}
                 size="small"
               />
@@ -167,6 +188,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
                 filterSelectedOptions
                 onChange={updateState}
                 options={states}
+                value={filter.state}
                 renderInput={(params) => <TextField {...params} />}
                 size="small"
               />

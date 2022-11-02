@@ -9,6 +9,22 @@ public class BoundingBoxDto {
 
     Double xmin, ymin, xmax, ymax;
 
+    public Double getXmin() {
+        return xmin;
+    }
+
+    public Double getXmax() {
+        return xmax;
+    }
+
+    public Double getYmin() {
+        return ymin;
+    }
+
+    public Double getYmax() {
+        return ymax;
+    }
+
     public BoundingBoxDto(String coord1, String coord2) {
 
         if(StringUtils.isEmpty(coord1) || StringUtils.isEmpty(coord2))
