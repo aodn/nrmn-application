@@ -339,10 +339,27 @@ const SurveyCorrect = () => {
       var messages = [];
       for (var key of Object.keys(r)) {
         if (typeof r[key] === 'object') {
-          const mmOriginal = JSON.stringify(removeNullProperties(original[key]));
-          const mmUpdated = JSON.stringify(removeNullProperties(r[key]));
-          if (mmOriginal !== mmUpdated) {
-            messages.push(`Observations: ${mmOriginal} to ${mmUpdated}`);
+          const mmOriginal = removeNullProperties(original[key]);
+          const mmUpdated = removeNullProperties(r[key]);
+          if (JSON.stringify(mmOriginal) !== JSON.stringify(mmUpdated)) {
+
+            const changed = {};
+
+            for(var j of Object.keys(mmOriginal)){
+              if(mmOriginal[j] !== mmUpdated[j])
+                changed[j] = mmUpdated[j];
+            }
+
+            for(var k of Object.keys(mmUpdated)){
+              if(mmOriginal[k] !== mmUpdated[k])
+                changed[k] = mmUpdated[k];
+            }
+
+            var mmMessages = Object.keys(changed).map(c => {
+              return `[S${c} ${mmOriginal[c] ? mmOriginal[c] : 0} to ${mmUpdated[c] ? mmUpdated[c] : 0}]`;
+            });
+
+            messages.push(`Observations: ${mmMessages.join(' ')}`);
           }
         } else if (r[key] !== original[key]) {
           const columnName = api.gridOptionsWrapper.gridOptions.columnDefs.find((c) => c.field === key).headerName;
