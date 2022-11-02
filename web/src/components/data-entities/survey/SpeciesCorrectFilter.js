@@ -84,6 +84,14 @@ const SpeciesCorrectFilter = ({onSearch}) => {
     updateFilter({field: 'observableItemId', value: e ? e.id : null});
   };
 
+  const updateCoord1 = (e) => {
+    updateFilter({field: 'coord1', value: e.target.value});
+  };
+
+  const updateCoord2 = (e) => {
+    updateFilter({field: 'coord2', value: e.target.value});
+  };
+
   const canSearch = filter.startDate && filter.endDate;
 
   return (
@@ -135,11 +143,11 @@ const SpeciesCorrectFilter = ({onSearch}) => {
           <Box ml={1} display="flex" flexDirection="row">
             <Box m={1} width={150}>
               <Typography variant="subtitle2">BBox Min</Typography>
-              <input disabled={true} style={{height: '35px', width: '150px'}} />
+              <input onInput={updateCoord1} value={filter.coord1} style={{height: '35px', width: '150px'}} />
             </Box>
             <Box m={1} width={150}>
               <Typography variant="subtitle2">BBox Max</Typography>
-              <input disabled={true} style={{height: '35px', width: '150px'}} />
+              <input onChange={updateCoord2} value={filter.coord2} style={{height: '35px', width: '150px'}} />
             </Box>
             <Box m={1} width={300}>
               <Typography variant="subtitle2">Country</Typography>
