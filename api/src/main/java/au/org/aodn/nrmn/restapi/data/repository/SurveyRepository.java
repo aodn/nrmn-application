@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.data.repository;
 
 import au.org.aodn.nrmn.restapi.data.model.Site;
 import au.org.aodn.nrmn.restapi.data.model.Survey;
+import au.org.aodn.nrmn.restapi.data.model.SurveyListView;
 import au.org.aodn.nrmn.restapi.data.repository.dynamicQuery.SurveyFilterCondition;
 import au.org.aodn.nrmn.restapi.data.repository.projections.SurveyRowCacheable;
 import au.org.aodn.nrmn.restapi.data.repository.projections.SurveyRowDivers;
@@ -26,27 +27,6 @@ import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 
 @Repository
 public interface SurveyRepository extends JpaRepository<Survey, Integer>, JpaSpecificationExecutor<Survey> {
-
-        @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
-        default Page<SurveyRowCacheable> findAllProjectedBy(List<Filter> filters, List<Sorter> sort, Pageable pageable) {
-
-                Specification<Survey> spec = SurveyFilterCondition.createSpecification(filters, sort);
-
-                return this.findAll(spec, pageable).map(v ->
-                        new SurveyRowCacheable(
-                                v.getSurveyId(),
-                                v.getSurveyDate(),
-                                v.getSurveyTime(),
-                                v.getDepth(),
-                                v.getSurveyNum(),
-                                v.getPqCatalogued(),
-                                v.getSite().getSiteName(),
-                                v.getSite().getSiteCode(),
-                                v.getSite().getMpa(),
-                                v.getSite().getCountry(),
-                                v.getProgram().getProgramName(),
-                                v.getSite().getLocation().getLocationName()));
-        }
 
         @Query("SELECT s.surveyId FROM #{#entityName} s " + "WHERE s.site = :site " + "  AND s.depth = :depth "
                         + "  AND s.surveyNum = :surveyNum " + "  AND s.surveyDate = :date")
