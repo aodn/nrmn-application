@@ -575,15 +575,10 @@ public class SurveyControllerIT {
                 .assertThat()
                 .statusCode(200).extract().jsonPath().get("");
 
-        assertEquals(100, obj.get("lastRow"));
+        assertEquals(0, obj.get("lastRow"));
 
         items = obj.get("items");
-        assertEquals(100, items.size());
-
-        items.forEach(item -> {
-            // We should never see something that is like .20 etc
-            assertFalse(item.get("depth").toString(), !item.get("depth").toString().contains(".1"));
-        });
+        assertEquals(0, items.size());
 
     }
     /**

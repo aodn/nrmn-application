@@ -28,7 +28,7 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
                 "INNER JOIN nrmn.site_ref sr ON s.site_id = sr.site_id " +
                 "INNER JOIN nrmn.program_ref pr ON s.program_id = pr.program_id " +
                 "INNER JOIN nrmn.location_ref lr ON sr.location_id = lr.location_id " +
-                "INNER JOIN ( " +
+                "LEFT OUTER JOIN ( " +  // Allow missing diver with outer join
                 "    SELECT sm.survey_id, string_agg(DISTINCT dr.full_name, ', ' ORDER BY dr.full_name ASC) as diver " +
                 "    FROM nrmn.observation o " +
                 "        INNER JOIN nrmn.survey_method sm on o.survey_method_id = sm.survey_method_id " +

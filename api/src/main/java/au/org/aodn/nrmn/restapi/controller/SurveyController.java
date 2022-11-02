@@ -37,9 +37,6 @@ public class SurveyController {
     protected Logger logger = LoggerFactory.getLogger(SurveyController.class);
 
     @Autowired
-    private ObservationRepository observationRepository;
-
-    @Autowired
     private SurveyRepository surveyRepository;
 
     @Autowired
