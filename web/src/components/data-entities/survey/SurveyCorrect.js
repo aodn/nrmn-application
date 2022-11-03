@@ -443,7 +443,7 @@ const SurveyCorrect = () => {
           </Button>
         </Box>
         <Box m={1} ml={0}>
-          <Button variant="outlined" onClick={() => eh.onClickExcelExport(gridApi, 'Export', true)} startIcon={<CloudDownloadIcon />}>
+          <Button variant="outlined" disabled onClick={() => eh.onClickExcelExport(gridApi, 'Export', true)} startIcon={<CloudDownloadIcon />}>
             Export
           </Button>
         </Box>

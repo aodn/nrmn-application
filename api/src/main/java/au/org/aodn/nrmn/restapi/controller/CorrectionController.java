@@ -333,16 +333,27 @@ public class CorrectionController {
             @RequestBody CorrectionRequestBodyDto bodyDto) {
 
         var user = secUserRepository.findByEmail(authentication.getName());
-        var survey = surveyIds.stream().map(Object::toString).collect(Collectors.joining(", "));
         var program = programRepository.findById(bodyDto.getProgramId()).get();
         var programValidation = ProgramValidation.fromProgram(program);
+        var survey = surveyIds.stream().map(Object::toString).collect(Collectors.joining(", "));
 
         var message = "correction: username: " + authentication.getName();
         userActionAuditRepository.save(new UserActionAudit("correct/survey", message));
 
+        var surveyCount = surveyIds.size();
+        var reference = "";
+
+        if (surveyCount == 1)
+            reference = "Correct Survey " + surveyIds.get(0);
+        else if (surveyCount < 5)
+            reference = "Correct Surveys (" + surveyCount + ") " + survey;
+        else
+            reference = "Correct Surveys (" + surveyCount + ") " + survey.substring(0, 50) + "...";
+
         var job = StagedJob.builder()
                 .source(SourceJobType.CORRECTION)
-                .reference("Correct " + survey)
+                .reference(reference)
+                .surveyIds(surveyIds)
                 .status(StatusJobType.CORRECTED)
                 .program(program)
                 .creator(user.get())
