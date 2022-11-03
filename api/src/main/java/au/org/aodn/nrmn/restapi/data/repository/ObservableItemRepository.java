@@ -95,10 +95,11 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "join nrmn.site_ref t on s.site_id = t.site_id "
             + "join nrmn.location_ref l on l.location_id = t.location_id "
             + "WHERE s.survey_date < cast(:endDate as date) AND s.survey_date > cast(:startDate as date) "
-            + "AND (:locationId IS NULL OR t.location_id = :locationId) "
+            + "AND (:locationIds IS NULL OR t.location_id IN :locationIds) "
             + "AND (:observableItemId IS NULL OR o.observable_item_id = :observableItemId) "
-            + "AND (:state IS NULL OR t.state = :state) "
-            + "AND (:country IS NULL OR t.country = :country) "
+        //     + "AND (:state IS NULL OR t.state = :state) "
+        //     + "AND (:country IS NULL OR t.country = :country) "
+        //     + "AND (:ecoRegion IS NULL OR t.ecoRegion = :ecoRegion) "
             + "AND (:xmin is null "
             + "                  OR (s.latitude is not null and s.longitude is not null AND st_within(st_makepoint(s.latitude, s.longitude), st_makeenvelope(:xmin, :ymin, :xmax, :ymax))) "
             + "                  OR st_within(t.geom, st_makeenvelope(:xmin, :ymin, :xmax, :ymax))) "
@@ -108,10 +109,11 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "", nativeQuery = true)
     List<SpeciesCorrectDto> getAllDistinctForSurveys(
         @Param("startDate") String startDate, @Param("endDate") String endDate,
-        @Param("locationId") Integer locationId,
+        @Param("locationIds") List<Integer> locationId,
         @Param("observableItemId") Integer observableItemId,
-        @Param("state") String state,
-        @Param("country") String country,
+        // @Param("state") String state,
+        // @Param("country") String country,
+        // @Param("ecoRegion") String ecoRegion,
         @Param("xmin") Double xmin,
         @Param("ymin") Double ymin,
         @Param("xmax") Double xmax,

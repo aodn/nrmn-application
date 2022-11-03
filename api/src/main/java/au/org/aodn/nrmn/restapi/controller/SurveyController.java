@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import au.org.aodn.nrmn.restapi.data.model.Program;
 import au.org.aodn.nrmn.restapi.data.model.Survey;
-import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.data.repository.ProgramRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SurveyListRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;

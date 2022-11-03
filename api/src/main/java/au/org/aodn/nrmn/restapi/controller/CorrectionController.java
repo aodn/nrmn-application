@@ -450,10 +450,8 @@ public class CorrectionController {
     public ResponseEntity<?> getSpeciesForSurveysDateAndLocation(
             @RequestParam(value = "startDate") String startDate,
             @RequestParam(value = "endDate") String endDate,
-            @RequestParam(value = "locationId", required = false) Integer locationId,
+            @RequestParam(value = "locationIds", required = false) List<Integer> locationIds,
             @RequestParam(value = "observableItemId", required = false) Integer observableItemId,
-            @RequestParam(value = "state", required = false) String state,
-            @RequestParam(value = "country", required = false) String country,
             @RequestParam(value = "coord1", required = false) String coord1,
             @RequestParam(value = "coord2", required = false) String coord2) {
 
@@ -466,10 +464,8 @@ public class CorrectionController {
             var species = bbox.valid() ? observableItemRepository.getAllDistinctForSurveys(
                     startDate,
                     endDate,
-                    locationId,
+                    locationIds,
                     observableItemId,
-                    state,
-                    country,
                     bbox.getXmin(),
                     bbox.getYmin(),
                     bbox.getXmax(),
@@ -477,10 +473,8 @@ public class CorrectionController {
                     : observableItemRepository.getAllDistinctForSurveys(
                             startDate,
                             endDate,
-                            locationId,
+                            locationIds,
                             observableItemId,
-                            state,
-                            country,
                             null, null, null, null);
 
             return ResponseEntity.ok().body(species);
