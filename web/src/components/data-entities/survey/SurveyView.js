@@ -79,6 +79,12 @@ const SurveyView = () => {
             <CustomTextInput readOnlyInput label="Survey Longitude" formData={data.longitude} />
           </Grid>
           <Grid item xs={6}>
+            <CustomTextInput readOnlyInput label="Site Latitude" formData={data.siteLatitude} />
+          </Grid>
+          <Grid item xs={6}>
+            <CustomTextInput readOnlyInput label="Site Longitude" formData={data.siteLongitude} />
+          </Grid>
+          <Grid item xs={6}>
             <CustomTextInput readOnlyInput label="Location Name" formData={data.locationName} />
           </Grid>
           <Grid item xs={6}>
