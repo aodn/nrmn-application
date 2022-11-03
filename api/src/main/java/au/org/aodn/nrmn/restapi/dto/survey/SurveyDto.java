@@ -26,6 +26,8 @@ public class SurveyDto {
     private String block;
     private String longitude;
     private String latitude;
+    private String siteLongitude;
+    private String siteLatitude;
     private String protectionStatus;
     private String insideMarinePark;
     private String notes;
