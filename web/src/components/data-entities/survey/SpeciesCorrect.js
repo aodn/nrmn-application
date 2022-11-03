@@ -38,6 +38,10 @@ const useStyles = makeStyles(({palette, typography}) => ({
   }
 }));
 
+const removeNullProperties = (obj) => {
+  return obj ? Object.fromEntries(Object.entries(obj).filter((v) => v[1] && v[1] !== '')) : null;
+};
+
 const SpeciesCorrectResults = ({results, onClick}) => {
   const classes = useStyles();
   const [selected, setSelected] = useState(null);
@@ -112,11 +116,13 @@ const SpeciesCorrect = () => {
   useEffect(() => {
     if (request.request)
       switch (request.request.type) {
-        case 'search':
-          getSurveySpecies(request.request.payload).then((res) => {
-              dispatch({type: res.status === 200 ? 'showResults' : 'showError', payload: res.data});
+        case 'search': {
+          var payload = removeNullProperties(request.request.payload);
+          getSurveySpecies(payload).then((res) => {
+            dispatch({type: res.status === 200 ? 'showResults' : 'showError', payload: res.data});
           });
           break;
+        }
         case 'post':
           postSpeciesCorrection(request.request.payload).then((res) => {
             setSelected({jobId: res.data});
