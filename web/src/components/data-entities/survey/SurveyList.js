@@ -119,6 +119,8 @@ const SurveyList = () => {
             enableCellTextSelection={true}
             pagination={true}
             paginationPageSize={rowsPerPage}
+            tooltipShowDelay={0}
+            tooltipHideDelay={10000}
             rowModelType={'infinite'}
             row
             onGridReady={(e) => onGridReady(e)}
@@ -186,16 +188,21 @@ const SurveyList = () => {
                 }
               }}
             />
-            <AgGridColumn width={100} field="siteCode" colId="survey.siteCode" />
             <AgGridColumn width={100} field="surveyDate" colId="survey.surveyDate" />
-            <AgGridColumn width={100} field="depth" colId="survey.depth" />
+            <AgGridColumn width={100} field="latitude" colId="survey.latitude" />
+            <AgGridColumn width={100} field="longitude" colId="survey.longitude" />
+            <AgGridColumn width={100} field="siteCode" colId="survey.siteCode" />
             <AgGridColumn flex={1} field="siteName" colId="survey.siteName" />
-            <AgGridColumn width={100} field="programName" headerName="Program" colId="survey.programName" />
-            <AgGridColumn flex={1} field="locationName" colId="survey.locationName" />
-            <AgGridColumn width={100} field="hasPQs" colId="survey.hasPQs" />
-            <AgGridColumn flex={1} field="mpa" colId="survey.mpa" />
-            <AgGridColumn flex={1} field="country" colId="survey.country" />
+            <AgGridColumn width={100} field="depth" colId="survey.depth" />
             <AgGridColumn flex={1} field="diverName" colId="survey.diverName" />
+            <AgGridColumn flex={1} field="method" colId="survey.method" />
+            <AgGridColumn width={100} field="programName" headerName="Program" colId="survey.programName" />
+            <AgGridColumn flex={1} field="country" colId="survey.country" />
+            <AgGridColumn flex={1} field="state" colId="survey.state" />
+            <AgGridColumn flex={1} field="ecoregion" colId="survey.ecoregion" />
+            <AgGridColumn flex={1} field="locationName" colId="survey.locationName" />
+            <AgGridColumn flex={1} field="species" colId="survey.species"
+                          tooltipValueGetter={(param) => param.value} />
           </AgGridReact>
         </>
       )}
