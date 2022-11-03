@@ -18,8 +18,10 @@ describe('<SurveyList/> filter testing', () => {
   let mockGetFiltersForId;
   let mockResetStateFilters;
 
-  const columnIds = ['survey.surveyId', 'survey.siteCode', 'survey.surveyDate', 'survey.depth', 'survey.siteName',
-    'survey.programName', 'survey.locationName', 'survey.hasPQs', 'survey.mpa', 'survey.country', 'survey.diverName'];
+  const columnIds = ['survey.surveyId', 'survey.surveyDate', 'survey.siteCode', 'survey.latitude',
+    'survey.longitude', 'survey.siteName', 'survey.depth', 'survey.diverName', 'survey.method',
+    'survey.programName', 'survey.locationName', 'survey.country', 'survey.state', 'survey.ecoregion',
+    'survey.species'];
 
   beforeAll(() => {
     mockGetResult = jest.spyOn(axiosInstance, 'getResult');

@@ -86,10 +86,6 @@ public class SurveyListView {
     @Audited(targetAuditMode = NOT_AUDITED)
     private String state;
 
-    @Column(name = "mpa")
-    @Audited(targetAuditMode = NOT_AUDITED)
-    private String mpa;
-
     @Column(name = "full_name")
     @Audited(targetAuditMode = NOT_AUDITED)
     private String fullName;
@@ -150,11 +146,6 @@ public class SurveyListView {
     }
 
     @JsonGetter
-    public String getHasPQs() {
-        return pqCatalogued;
-    }
-
-    @JsonGetter
     public String getCountry() {
         return country;
     }
@@ -172,11 +163,6 @@ public class SurveyListView {
     @JsonGetter
     public String getSpecies() {
         return species;
-    }
-
-    @JsonGetter
-    public String getMpa() {
-        return mpa;
     }
 
     @JsonGetter

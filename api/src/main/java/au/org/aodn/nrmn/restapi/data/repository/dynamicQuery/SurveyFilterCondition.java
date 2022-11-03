@@ -139,8 +139,6 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
             public String getDBFieldName() {
                 return "fullName";
             }
-            @Override
-            public Boolean isRequireSplitString() { return Boolean.TRUE; }
         },
         SPECIES {
             @Override
@@ -151,8 +149,6 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
             public String getDBFieldName() {
                 return "species";
             }
-            @Override
-            public Boolean isRequireSplitString() { return Boolean.TRUE; }
         },
         METHOD {
             @Override
@@ -163,8 +159,6 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
             public String getDBFieldName() {
                 return "method";
             }
-            @Override
-            public Boolean isRequireSplitString() { return Boolean.TRUE; }
         },
         ECOREGION {
             @Override
@@ -235,22 +229,21 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
                 SupportedFields target = getFieldEnum(sortItem.getFieldName(), SupportedFields.class);
                 if(target != null) {
                     switch (target) {
-                        case STATE:
+                        case SURVEY_ID :
+                        case SURVEY_DATE :
                         case LATITUDE:
-                        case METHOD:
-                        case ECOREGION:
                         case LONGITUDE:
-                        case DIVER_NAME:
-                        case PROGRAMS:
-                        case LOCATION_NAME:
-                        case MPA :
-                        case COUNTRY :
                         case SITE_CODE :
                         case SITE_NAME :
-                        case HAS_PQs:
-                        case SURVEY_DATE :
                         case DEPTH :
-                        case SURVEY_ID : {
+                        case DIVER_NAME:
+                        case METHOD:
+                        case PROGRAMS:
+                        case COUNTRY :
+                        case STATE:
+                        case ECOREGION:
+                        case LOCATION_NAME :
+                        case SPECIES: {
                             orders.add(getItemOrdering(root, criteriaBuilder, sortItem, SupportedFields.class));
                             break;
                         }
@@ -275,22 +268,21 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
             if(target != null) {
 
                 switch (target) {
-                    case STATE:
-                    case ECOREGION:
-                    case METHOD:
+                    case SURVEY_ID :
+                    case SURVEY_DATE :
                     case LATITUDE:
                     case LONGITUDE:
-                    case DIVER_NAME:
-                    case PROGRAMS:
-                    case LOCATION_NAME :
-                    case MPA :
-                    case COUNTRY :
                     case SITE_CODE :
                     case SITE_NAME :
-                    case SURVEY_DATE :
-                    case SURVEY_ID :
                     case DEPTH :
-                    case HAS_PQs : {
+                    case DIVER_NAME:
+                    case METHOD:
+                    case PROGRAMS:
+                    case COUNTRY :
+                    case STATE:
+                    case ECOREGION:
+                    case LOCATION_NAME :
+                    case SPECIES: {
                         if(filter.isCompositeCondition()) {
                             specifications.add(
                                     getSurveyFieldSpecification(target,
