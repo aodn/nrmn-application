@@ -139,6 +139,8 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
             public String getDBFieldName() {
                 return "fullName";
             }
+            @Override
+            public Boolean isRequireSplitString() { return Boolean.TRUE; }
         },
         SPECIES {
             @Override
@@ -149,6 +151,8 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
             public String getDBFieldName() {
                 return "species";
             }
+            @Override
+            public Boolean isRequireSplitString() { return Boolean.TRUE; }
         },
         METHOD {
             @Override
@@ -159,6 +163,8 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
             public String getDBFieldName() {
                 return "method";
             }
+            @Override
+            public Boolean isRequireSplitString() { return Boolean.TRUE; }
         },
         ECOREGION {
             @Override

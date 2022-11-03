@@ -119,6 +119,8 @@ const SurveyList = () => {
             enableCellTextSelection={true}
             pagination={true}
             paginationPageSize={rowsPerPage}
+            tooltipShowDelay={0}
+            tooltipHideDelay={10000}
             rowModelType={'infinite'}
             row
             onGridReady={(e) => onGridReady(e)}
@@ -199,7 +201,8 @@ const SurveyList = () => {
             <AgGridColumn flex={1} field="state" colId="survey.state" />
             <AgGridColumn flex={1} field="ecoregion" colId="survey.ecoregion" />
             <AgGridColumn flex={1} field="locationName" colId="survey.locationName" />
-            <AgGridColumn flex={1} field="species" colId="survey.species" />
+            <AgGridColumn flex={1} field="species" colId="survey.species"
+                          tooltipValueGetter={(param) => param.value} />
           </AgGridReact>
         </>
       )}
