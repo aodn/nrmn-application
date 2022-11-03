@@ -59,6 +59,16 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
                 return "country";
             }
         },
+        STATE {
+            @Override
+            public String toString() {
+                return "survey.state";
+            }
+            @Override
+            public String getDBFieldName() {
+                return "state";
+            }
+        },
         SITE_CODE {
             @Override
             public String toString() {
@@ -128,6 +138,16 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
             @Override
             public String getDBFieldName() {
                 return "fullName";
+            }
+        },
+        SPECIES {
+            @Override
+            public String toString() {
+                return "survey.species";
+            }
+            @Override
+            public String getDBFieldName() {
+                return "species";
             }
         },
         METHOD {
@@ -209,6 +229,7 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
                 SupportedFields target = getFieldEnum(sortItem.getFieldName(), SupportedFields.class);
                 if(target != null) {
                     switch (target) {
+                        case STATE:
                         case LATITUDE:
                         case METHOD:
                         case ECOREGION:
@@ -248,6 +269,7 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
             if(target != null) {
 
                 switch (target) {
+                    case STATE:
                     case ECOREGION:
                     case METHOD:
                     case LATITUDE:

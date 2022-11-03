@@ -196,9 +196,10 @@ const SurveyList = () => {
             <AgGridColumn flex={1} field="method" colId="survey.method" />
             <AgGridColumn width={100} field="programName" headerName="Program" colId="survey.programName" />
             <AgGridColumn flex={1} field="country" colId="survey.country" />
-            <AgGridColumn flex={1} field="mpa" colId="survey.mpa" />
+            <AgGridColumn flex={1} field="state" colId="survey.state" />
             <AgGridColumn flex={1} field="ecoregion" colId="survey.ecoregion" />
             <AgGridColumn flex={1} field="locationName" colId="survey.locationName" />
+            <AgGridColumn flex={1} field="species" colId="survey.species" />
           </AgGridReact>
         </>
       )}
