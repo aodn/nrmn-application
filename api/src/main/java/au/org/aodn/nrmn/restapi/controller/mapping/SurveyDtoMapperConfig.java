@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.controller.mapping;
 
 import au.org.aodn.nrmn.restapi.data.model.Diver;
+import au.org.aodn.nrmn.restapi.data.model.Site;
 import au.org.aodn.nrmn.restapi.data.model.Survey;
 import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SurveyMethodRepository;
@@ -48,7 +49,12 @@ public class SurveyDtoMapperConfig {
                 surveyMethodRepository.findDiversForSurvey(ctx.getSource()));
         Converter<String, String> passThrough = ctx -> Optional.ofNullable(ctx.getSource()).orElse("");
 
+        Converter<Site, String> toSiteLatitude = ctx -> Double.parseDouble(String.format("%.5f", ctx.getSource().getLatitude())) + "";
+        Converter<Site, String> toSiteLongitude = ctx -> Double.parseDouble(String.format("%.5f", ctx.getSource().getLongitude())) + "";
+
         modelMapper.typeMap(Survey.class, SurveyDto.class).addMappings(mapper -> {
+            mapper.using(toSiteLatitude).map(Survey::getSite, SurveyDto::setSiteLatitude);
+            mapper.using(toSiteLongitude).map(Survey::getSite, SurveyDto::setSiteLongitude);
             mapper.using(toDiverName).map(Survey::getPqDiverId, SurveyDto::setPqDiver);
             mapper.using(toDiverInitial).map(Survey::getPqDiverId, SurveyDto::setPqDiverInitials);
             mapper.using(toBlockString).map(Survey::getSurveyId, SurveyDto::setBlock);
