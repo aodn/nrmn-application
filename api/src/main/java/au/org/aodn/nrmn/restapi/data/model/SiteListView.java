@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.data.model;
 
+import au.org.aodn.nrmn.restapi.enums.Iirc;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.annotations.Immutable;
@@ -24,7 +25,8 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
         // Round latitude and longitude with 5 decimal for display only
         "SELECT " +
                 "s.site_id, s.site_code, s.site_name, " +
-                "ROUND(s.longitude::numeric, 5) as longitude, ROUND(s.latitude::numeric, 5) as latitude, s.state, " +
+                "ROUND(s.longitude::numeric, " + Iirc.ROUNDING_DIGIT + ") as longitude, " +
+                "ROUND(s.latitude::numeric, " + Iirc.ROUNDING_DIGIT + ") as latitude, s.state, " +
                 "s.country, loc.location_name, " +
                 "(CASE WHEN s.is_active = true THEN 'true' ELSE 'false' END) AS status " +
                 "FROM nrmn.site_ref s " +

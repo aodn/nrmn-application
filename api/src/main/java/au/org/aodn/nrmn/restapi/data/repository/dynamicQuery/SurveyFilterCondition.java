@@ -139,6 +139,26 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
             public String getDBFieldName() {
                 return "surveyNum";
             }
+        },
+        LATITUDE {
+            @Override
+            public String toString() {
+                return "survey.latitude";
+            }
+            @Override
+            public String getDBFieldName() {
+                return "latitude";
+            }
+        },
+        LONGITUDE {
+            @Override
+            public String toString() {
+                return "survey.longitude";
+            }
+            @Override
+            public String getDBFieldName() {
+                return "longitude";
+            }
         }
     }
 
@@ -169,6 +189,8 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
                 SupportedFields target = getFieldEnum(sortItem.getFieldName(), SupportedFields.class);
                 if(target != null) {
                     switch (target) {
+                        case LATITUDE:
+                        case LONGITUDE:
                         case DIVER_NAME:
                         case PROGRAMS:
                         case LOCATION_NAME:
@@ -204,6 +226,8 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
             if(target != null) {
 
                 switch (target) {
+                    case LATITUDE:
+                    case LONGITUDE:
                     case DIVER_NAME:
                     case PROGRAMS:
                     case LOCATION_NAME :

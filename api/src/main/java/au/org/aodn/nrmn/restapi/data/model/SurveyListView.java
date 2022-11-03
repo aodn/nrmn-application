@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.data.model;
 
+import au.org.aodn.nrmn.restapi.enums.Iirc;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.annotations.Immutable;
@@ -23,7 +24,10 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 @Subselect(
         "SELECT s.survey_id, sr.site_code, to_char(s.survey_date, 'yyyy-MM-dd') as survey_date, " +
                 "       (s.depth || '.' || s.survey_num) as depth, sr.site_name, pr.program_name, " +
-                "       lr.location_name, CAST((s.pq_catalogued IS NOT NULL) as varchar) as pq_catalogued, COALESCE(sr.mpa, '') as mpa, sr.country, d.diver as full_name " +
+                "       lr.location_name, CAST((s.pq_catalogued IS NOT NULL) as varchar) as pq_catalogued, COALESCE(sr.mpa, '') as mpa, sr.country, " +
+                "       d.diver as full_name, " +
+                "       ROUND(sr.latitude::numeric, " + Iirc.ROUNDING_DIGIT + ") as latitude, " +
+                "       ROUND(sr.longitude::numeric, " + Iirc.ROUNDING_DIGIT + ") as longitude " +
                 "FROM nrmn.survey s " +
                 "INNER JOIN nrmn.site_ref sr ON s.site_id = sr.site_id " +
                 "INNER JOIN nrmn.program_ref pr ON s.program_id = pr.program_id " +
@@ -81,6 +85,14 @@ public class SurveyListView {
     @Audited(targetAuditMode = NOT_AUDITED)
     private String fullName;
 
+    @Column(name = "latitude")
+    @Audited(targetAuditMode = NOT_AUDITED)
+    private Double latitude;
+
+    @Column(name = "longitude")
+    @Audited(targetAuditMode = NOT_AUDITED)
+    private Double longitude;
+
     @JsonGetter
     public Integer getSurveyId() {
         return surveyId;
@@ -135,4 +147,15 @@ public class SurveyListView {
     public String getMpa() {
         return mpa;
     }
+
+    @JsonGetter
+    public String getLatitude() {
+        return String.format(Iirc.FORMAT_DIGIT, latitude);
+    }
+
+    @JsonGetter
+    public String getLongitude() {
+        return String.format(Iirc.FORMAT_DIGIT, longitude);
+    }
+
 }
