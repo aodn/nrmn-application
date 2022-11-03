@@ -130,6 +130,26 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
                 return "fullName";
             }
         },
+        METHOD {
+            @Override
+            public String toString() {
+                return "survey.method";
+            }
+            @Override
+            public String getDBFieldName() {
+                return "method";
+            }
+        },
+        ECOREGION {
+            @Override
+            public String toString() {
+                return "survey.ecoregion";
+            }
+            @Override
+            public String getDBFieldName() {
+                return "ecoregion";
+            }
+        },
         SURVEY_NUM {
             @Override
             public String toString() {
@@ -190,6 +210,8 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
                 if(target != null) {
                     switch (target) {
                         case LATITUDE:
+                        case METHOD:
+                        case ECOREGION:
                         case LONGITUDE:
                         case DIVER_NAME:
                         case PROGRAMS:
@@ -226,6 +248,8 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
             if(target != null) {
 
                 switch (target) {
+                    case ECOREGION:
+                    case METHOD:
                     case LATITUDE:
                     case LONGITUDE:
                     case DIVER_NAME:

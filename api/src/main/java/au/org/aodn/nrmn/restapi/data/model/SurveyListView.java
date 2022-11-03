@@ -25,15 +25,18 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
         "SELECT s.survey_id, sr.site_code, to_char(s.survey_date, 'yyyy-MM-dd') as survey_date, " +
                 "       (s.depth || '.' || s.survey_num) as depth, sr.site_name, pr.program_name, " +
                 "       lr.location_name, CAST((s.pq_catalogued IS NOT NULL) as varchar) as pq_catalogued, COALESCE(sr.mpa, '') as mpa, sr.country, " +
-                "       d.diver as full_name, " +
+                "       d.diver as full_name, d.method, meo.ecoregion, " +
                 "       ROUND(sr.latitude::numeric, " + Iirc.ROUNDING_DIGIT + ") as latitude, " +
                 "       ROUND(sr.longitude::numeric, " + Iirc.ROUNDING_DIGIT + ") as longitude " +
                 "FROM nrmn.survey s " +
                 "INNER JOIN nrmn.site_ref sr ON s.site_id = sr.site_id " +
                 "INNER JOIN nrmn.program_ref pr ON s.program_id = pr.program_id " +
                 "INNER JOIN nrmn.location_ref lr ON sr.location_id = lr.location_id " +
+                "LEFT JOIN nrmn.meow_ecoregions meo ON st_contains(meo.geom, sr.geom) " +
                 "LEFT OUTER JOIN ( " +  // Allow missing diver with outer join
-                "    SELECT sm.survey_id, string_agg(DISTINCT dr.full_name, ', ' ORDER BY dr.full_name ASC) as diver " +
+                "    SELECT sm.survey_id, " +
+                "           string_agg(DISTINCT sm.method_id::text,', ' ORDER BY sm.method_id::text ASC) as method, " +
+                "           string_agg(DISTINCT dr.full_name, ', ' ORDER BY dr.full_name ASC) as diver " +
                 "    FROM nrmn.observation o " +
                 "        INNER JOIN nrmn.survey_method sm on o.survey_method_id = sm.survey_method_id " +
                 "        INNER JOIN nrmn.diver_ref dr on dr.diver_id = o.diver_id " +
@@ -85,6 +88,10 @@ public class SurveyListView {
     @Audited(targetAuditMode = NOT_AUDITED)
     private String fullName;
 
+    @Column(name = "method")
+    @Audited(targetAuditMode = NOT_AUDITED)
+    private String method;
+
     @Column(name = "latitude")
     @Audited(targetAuditMode = NOT_AUDITED)
     private Double latitude;
@@ -92,6 +99,10 @@ public class SurveyListView {
     @Column(name = "longitude")
     @Audited(targetAuditMode = NOT_AUDITED)
     private Double longitude;
+
+    @Column(name = "ecoregion")
+    @Audited(targetAuditMode = NOT_AUDITED)
+    private String ecoregion;
 
     @JsonGetter
     public Integer getSurveyId() {
@@ -146,6 +157,16 @@ public class SurveyListView {
     @JsonGetter
     public String getMpa() {
         return mpa;
+    }
+
+    @JsonGetter
+    public String getMethod() {
+        return method;
+    }
+
+    @JsonGetter
+    public String getEcoregion() {
+        return ecoregion;
     }
 
     @JsonGetter
