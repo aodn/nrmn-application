@@ -16,13 +16,13 @@ const SpeciesCorrectFilter = ({onSearch}) => {
   const initialFilter = {
     startDate: '2021-01-01',
     endDate: '2022-01-01',
-    country: null,
-    state: null,
+    country: '',
+    state: '',
     locationId: null,
     observableItemId: null,
     coord1: '',
     coord2: '',
-    species: null
+    species: ''
   };
 
   useEffect(() => {
@@ -155,7 +155,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
               <CustomSearchInput fullWidth label="Species" formData={filter.species} onChange={updateObservableItem} />
             </Box>
             <Box mx={1} mt={4} width={200}>
-              <Button onClick={() => updateFilter()} fullWidth variant="contained">
+              <Button onClick={() => updateFilter()} fullWidth variant="outlined">
                 Reset Filter
               </Button>
             </Box>
