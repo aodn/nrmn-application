@@ -12,6 +12,8 @@ const SpeciesCorrectFilter = ({onSearch}) => {
   const [states, setState] = useState();
   const [ecoRegions, setEcoRegions] = useState();
 
+  const [dataResponse, setDataResponse] = useState();
+
   const [loading, setLoading] = useState(true);
 
   const initialFilter = {
@@ -23,12 +25,15 @@ const SpeciesCorrectFilter = ({onSearch}) => {
     observableItemId: null,
     coord1: '',
     coord2: '',
-    species: ''
+    species: '',
+    locationIds: []
   };
 
   useEffect(() => {
     async function fetchLocations() {
       await getEntity('locations').then((res) => {
+        const activeLocations = res.data.items.filter(i => i.status === 'Active');
+        setDataResponse(activeLocations);
         const locations = [];
         const locationIds = [];
         res.data.items
@@ -38,25 +43,40 @@ const SpeciesCorrectFilter = ({onSearch}) => {
             locationIds.push(d.id);
           });
         setData({locations, locationIds});
+
+        const groups = {ecoRegions: [], countries: [], areas: [], siteCodes: []};
+        res.data.items.forEach((d) => {
+          locations[d.id] = d.locationName;
+          ['locations', 'ecoRegions', 'countries', 'areas', 'siteCodes'].forEach((prop) => {
+            d[prop]
+              ?.split(',')
+              .map((a) => a.trim())
+              .forEach((a) => {
+                groups[prop][a] = groups[prop][a] ? [...groups[prop][a], d.id] : [d.id];
+              });
+          });
+        });
+        setEcoRegions(groups.ecoRegions);
+        setCountries(groups.countries);
+        setState(groups.areas);
+
         const labels = res.data.items.reduce(
           (acc, cur) => {
-            if (cur.countries && !acc.countries.includes(cur.countries)) 
-              acc.countries.push(cur.countries);
-            
-            if (cur.areas && !acc.areas.includes(cur.areas)) 
-              acc.areas.push(cur.areas);
-            
-            if (cur.ecoRegions && !acc.ecoRegions.includes(cur.ecoRegions))
-              acc.ecoRegions.push(cur.ecoRegions);
+            if (cur.countries && !acc.countries.includes(cur.countries)) acc.countries.push(cur.countries);
+
+            if (cur.areas && !acc.areas.includes(cur.areas)) acc.areas.push(cur.areas);
+
+            if (cur.ecoRegions && !acc.ecoRegions.includes(cur.ecoRegions)) acc.ecoRegions.push(cur.ecoRegions);
 
             return acc;
           },
           {countries: [], areas: [], ecoRegions: []}
         );
         labels.countries.sort();
-        labels.areas.sort();
         setCountries(labels.countries);
+        labels.areas.sort();
         setState(labels.areas);
+        labels.ecoRegions.sort();
         setEcoRegions(labels.ecoRegions);
       });
       setLoading(false);
@@ -73,6 +93,15 @@ const SpeciesCorrectFilter = ({onSearch}) => {
       } else {
         updated[action.field] = action.value;
       }
+
+      var locationIds = [];
+      locationIds.push(updated['locationId']);
+      locationIds.push(dataResponse.find((d) => d.areas === updated['state'])?.id);
+      locationIds.push(dataResponse.find((d) => d.countries === updated['country'])?.id);
+      locationIds.push(dataResponse.find((d) => d.ecoRegions === updated['ecoRegion'])?.id);
+      locationIds = [...new Set(locationIds.filter((d) => d))];
+
+      updated['locationIds'] = locationIds.join(',');
       return updated;
     },
     {...initialFilter}
@@ -118,7 +147,12 @@ const SpeciesCorrectFilter = ({onSearch}) => {
   const canSearch =
     filter.startDate &&
     filter.endDate &&
-    (filter.locationId || filter.country || filter.ecoRegion || filter.state || filter.observableItemId || (filter.coord1 && filter.coord2));
+    (filter.locationId ||
+      filter.country ||
+      filter.ecoRegion ||
+      filter.state ||
+      filter.observableItemId ||
+      (filter.coord1 && filter.coord2));
 
   return (
     <>

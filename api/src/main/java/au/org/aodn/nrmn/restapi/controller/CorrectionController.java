@@ -461,7 +461,7 @@ public class CorrectionController {
             if ((!StringUtils.isEmpty(coord1) || !StringUtils.isEmpty(coord2)) && !bbox.valid())
                 return ResponseEntity.badRequest().body("Invalid bounding box");
 
-            var species = bbox.valid() ? observableItemRepository.getAllDistinctForSurveys(
+            var species = (locationIds != null) ? observableItemRepository.getAllDistinctForSurveysAndLocations(
                     startDate,
                     endDate,
                     locationIds,
@@ -473,9 +473,11 @@ public class CorrectionController {
                     : observableItemRepository.getAllDistinctForSurveys(
                             startDate,
                             endDate,
-                            locationIds,
                             observableItemId,
-                            null, null, null, null);
+                            bbox.getXmin(),
+                            bbox.getYmin(),
+                            bbox.getXmax(),
+                            bbox.getYmax());
 
             return ResponseEntity.ok().body(species);
         } catch (Exception e) {

@@ -95,12 +95,8 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "join nrmn.site_ref t on s.site_id = t.site_id "
             + "join nrmn.location_ref l on l.location_id = t.location_id "
             + "WHERE s.survey_date < cast(:endDate as date) AND s.survey_date > cast(:startDate as date) "
-            + "AND (:locationIds IS NULL OR t.location_id IN :locationIds) "
             + "AND (:observableItemId IS NULL OR o.observable_item_id = :observableItemId) "
-        //     + "AND (:state IS NULL OR t.state = :state) "
-        //     + "AND (:country IS NULL OR t.country = :country) "
-        //     + "AND (:ecoRegion IS NULL OR t.ecoRegion = :ecoRegion) "
-            + "AND (:xmin is null "
+            + "AND (:xmin IS NULL "
             + "                  OR (s.latitude is not null and s.longitude is not null AND st_within(st_makepoint(s.latitude, s.longitude), st_makeenvelope(:xmin, :ymin, :xmax, :ymax))) "
             + "                  OR st_within(t.geom, st_makeenvelope(:xmin, :ymin, :xmax, :ymax))) "
             + ") as ob "
@@ -108,14 +104,38 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "order by observableItemName, supersededBy"
             + "", nativeQuery = true)
     List<SpeciesCorrectDto> getAllDistinctForSurveys(
-        @Param("startDate") String startDate, @Param("endDate") String endDate,
-        @Param("locationIds") List<Integer> locationId,
-        @Param("observableItemId") Integer observableItemId,
-        // @Param("state") String state,
-        // @Param("country") String country,
-        // @Param("ecoRegion") String ecoRegion,
-        @Param("xmin") Double xmin,
-        @Param("ymin") Double ymin,
-        @Param("xmax") Double xmax,
-        @Param("ymax") Double ymax);
+            @Param("startDate") String startDate, @Param("endDate") String endDate,
+            @Param("observableItemId") Integer observableItemId,
+            @Param("xmin") Double xmin,
+            @Param("ymin") Double ymin,
+            @Param("xmax") Double xmax,
+            @Param("ymax") Double ymax);
+
+    @Query(value = ""
+            + "select distinct observable_item_id as observableItemId,"
+            + "observable_item_name as observableItemName, superseded_by as supersededBy, common_name as commonName, CAST(jsonb_agg(survey_id) AS TEXT) as surveyIds from "
+            + "(select i.observable_item_id, i.common_name, i.observable_item_name, i.superseded_by, l.location_name, s.survey_id, s.survey_date from nrmn.survey s  "
+            + "join nrmn.survey_method m on m.survey_id = s.survey_id  "
+            + "join nrmn.observation o on m.survey_method_id = o.survey_method_id "
+            + "join nrmn.observable_item_ref i on o.observable_item_id = i.observable_item_id "
+            + "join nrmn.site_ref t on s.site_id = t.site_id "
+            + "join nrmn.location_ref l on l.location_id = t.location_id "
+            + "WHERE s.survey_date < cast(:endDate as date) AND s.survey_date > cast(:startDate as date) "
+            + "AND (l.location_id IN :locationIds) "
+            + "AND (:observableItemId IS NULL OR o.observable_item_id = :observableItemId) "
+            + "AND (:xmin IS NULL "
+            + "                  OR (s.latitude is not null and s.longitude is not null AND st_within(st_makepoint(s.latitude, s.longitude), st_makeenvelope(:xmin, :ymin, :xmax, :ymax))) "
+            + "                  OR st_within(t.geom, st_makeenvelope(:xmin, :ymin, :xmax, :ymax))) "
+            + ") as ob "
+            + "group by observable_item_id, observable_item_name, common_name, superseded_by "
+            + "order by observableItemName, supersededBy"
+            + "", nativeQuery = true)
+    List<SpeciesCorrectDto> getAllDistinctForSurveysAndLocations(
+            @Param("startDate") String startDate, @Param("endDate") String endDate,
+            @Param("locationIds") List<Integer> locationIds,
+            @Param("observableItemId") Integer observableItemId,
+            @Param("xmin") Double xmin,
+            @Param("ymin") Double ymin,
+            @Param("xmax") Double xmax,
+            @Param("ymax") Double ymax);
 }
