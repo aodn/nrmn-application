@@ -21,6 +21,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
     endDate: '2022-01-01',
     country: '',
     state: '',
+    ecoRegion: '',
     locationId: null,
     observableItemId: null,
     coord1: '',
@@ -243,12 +244,12 @@ const SpeciesCorrectFilter = ({onSearch}) => {
                 size="small"
               />
             </Box>
-            {/* <Box mx={1} mt={4} width={50}>
+            <Box mx={1} mt={4} width={50}>
               <Button onClick={() => updateFilter()} fullWidth variant="outlined">
                 Reset
               </Button>
-            </Box> */}
-            <Box m={1} my={4} width={300}>
+            </Box>
+            <Box m={1} my={4} width={220}>
               <LoadingButton disabled={!canSearch} onClick={() => onSearch(filter)} fullWidth variant="contained">
                 Search
               </LoadingButton>
