@@ -91,6 +91,7 @@ SpeciesCorrectResults.propTypes = {
 const SpeciesCorrect = () => {
   const [selected, setSelected] = useState(null);
   const [correction, setCorrection] = useState(null);
+  const [locationChips, setLocationChips] = useState([]);
 
   const [request, dispatch] = useReducer((state, action) => {
     switch (action.type) {
@@ -139,7 +140,12 @@ const SpeciesCorrect = () => {
       <Box p={1}>
         <Typography variant="h4">Correct Species</Typography>
       </Box>
-      <SpeciesCorrectFilter onSearch={(filter) => dispatch({type: 'getRequest', payload: filter})} />
+      <SpeciesCorrectFilter
+        onSearch={(filter, chips) => {
+          dispatch({type: 'getRequest', payload: filter});
+          setLocationChips(chips);
+        }}
+      />
       {request.loading && <LinearProgress />}
       {request.error && <Alert severity="error">{request.error}</Alert>}
       {request.results && (
@@ -163,6 +169,11 @@ const SpeciesCorrect = () => {
           )}
           {detail && (
             <Box width="50%" m={2} style={{overflowX: 'hidden', overflowY: 'auto'}}>
+              <Box m={1}>
+                {locationChips?.map((c) => (
+                  <Chip key={c.id} label={c.locationName} style={{margin: 5}} />
+                ))}
+              </Box>
               <Box m={1}>
                 <Typography variant="subtitle2">Current species name</Typography>
                 <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>

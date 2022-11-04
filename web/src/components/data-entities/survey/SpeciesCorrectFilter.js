@@ -12,6 +12,11 @@ const SpeciesCorrectFilter = ({onSearch}) => {
   const [states, setState] = useState();
   const [ecoRegions, setEcoRegions] = useState();
 
+  const [locationChips, setLocationChips] = useState([]);
+  const [countryLabels, setCountryLabels] = useState([]);
+  const [stateLabels, setStateLabels] = useState([]);
+  const [ecoRegionLabels, setEcoRegionLabels] = useState([]);
+
   const [dataResponse, setDataResponse] = useState();
 
   const [loading, setLoading] = useState(true);
@@ -33,7 +38,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
   useEffect(() => {
     async function fetchLocations() {
       await getEntity('locations').then((res) => {
-        const activeLocations = res.data.items.filter(i => i.status === 'Active');
+        const activeLocations = res.data.items.filter((i) => i.status === 'Active');
         setDataResponse(activeLocations);
         const locations = [];
         const locationIds = [];
@@ -74,11 +79,11 @@ const SpeciesCorrectFilter = ({onSearch}) => {
           {countries: [], areas: [], ecoRegions: []}
         );
         labels.countries.sort();
-        setCountries(labels.countries);
+        setCountryLabels(labels.countries);
         labels.areas.sort();
-        setState(labels.areas);
+        setStateLabels(labels.areas);
         labels.ecoRegions.sort();
-        setEcoRegions(labels.ecoRegions);
+        setEcoRegionLabels(labels.ecoRegions);
       });
       setLoading(false);
     }
@@ -96,13 +101,16 @@ const SpeciesCorrectFilter = ({onSearch}) => {
       }
 
       var locationIds = [];
-      locationIds.push(updated['locationId']);
-      locationIds.push(dataResponse.find((d) => d.areas === updated['state'])?.id);
-      locationIds.push(dataResponse.find((d) => d.countries === updated['country'])?.id);
-      locationIds.push(dataResponse.find((d) => d.ecoRegions === updated['ecoRegion'])?.id);
+      locationIds = [updated['locationId']];
+      if (states[updated['state']]) locationIds = [...locationIds, ...states[updated['state']]];
+      if (countries[updated['country']]) locationIds = [...locationIds, ...countries[updated['country']]];
+      if (ecoRegions[updated['ecoRegion']]) locationIds = [...locationIds, ...ecoRegions[updated['ecoRegion']]];
+
       locationIds = [...new Set(locationIds.filter((d) => d))];
 
       updated['locationIds'] = locationIds.join(',');
+      const chips = dataResponse.filter((d) => locationIds.includes(d.id)).map((d) => ({id: d.id, locationName: d.locationName}));
+      setLocationChips(chips);
       return updated;
     },
     {...initialFilter}
@@ -201,7 +209,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
                 disabled={loading}
                 filterSelectedOptions
                 onChange={updateEcoRegion}
-                options={ecoRegions}
+                options={ecoRegionLabels}
                 value={filter.ecoRegion}
                 renderInput={(params) => <TextField {...params} />}
                 size="small"
@@ -226,7 +234,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
                 disabled={loading}
                 filterSelectedOptions
                 onChange={updateCountry}
-                options={countries}
+                options={countryLabels}
                 value={filter.country}
                 renderInput={(params) => <TextField {...params} />}
                 size="small"
@@ -238,7 +246,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
                 disabled={loading}
                 filterSelectedOptions
                 onChange={updateState}
-                options={states}
+                options={stateLabels}
                 value={filter.state}
                 renderInput={(params) => <TextField {...params} />}
                 size="small"
@@ -250,7 +258,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
               </Button>
             </Box>
             <Box m={1} my={4} width={220}>
-              <LoadingButton disabled={!canSearch} onClick={() => onSearch(filter)} fullWidth variant="contained">
+              <LoadingButton disabled={!canSearch} onClick={() => onSearch(filter, locationChips)} fullWidth variant="contained">
                 Search
               </LoadingButton>
             </Box>
