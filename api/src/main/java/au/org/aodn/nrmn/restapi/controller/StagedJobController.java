@@ -111,7 +111,7 @@ public class StagedJobController {
     @Value("${app.s3.bucket}")
     private String bucketName;
 
-    public List<StagedRow> getRowsToSave(ParsedSheet parsedSheet){
+    public List<StagedRow> getRowsToSave(ParsedSheet parsedSheet) {
         List<StagedRow> rowsToSave = parsedSheet.getStagedRows();
 
         // remove rows that are missing diver / site / date / depth
@@ -128,7 +128,7 @@ public class StagedJobController {
                     .stream()
                     .filter(v -> v.getRowIds().contains(lastRowId)).findAny();
 
-            // only apply if there are three or more duplicate rows 
+            // only apply if there are three or more duplicate rows
             // (detect 3 duplicate rows rule)
             if (rowsToTruncate.isPresent() && rowsToTruncate.get().getRowIds().size() >= 3) {
                 Collection<Long> rowIdsToRemove = rowsToTruncate.get().getRowIds();
@@ -261,7 +261,7 @@ public class StagedJobController {
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<StagedJobDto> getStagedJob(@PathVariable Long jobId) {
         var jOptional = jobRepo.findById(jobId);
-        if(!jOptional.isPresent())
+        if (!jOptional.isPresent())
             return ResponseEntity.notFound().build();
 
         var j = jOptional.get();
@@ -291,7 +291,7 @@ public class StagedJobController {
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<Object> deleteJob(@PathVariable Long jobId) {
         var jOptional = jobRepo.findById(jobId);
-        if(!jOptional.isPresent())
+        if (!jOptional.isPresent())
             return ResponseEntity.notFound().build();
         var job = jOptional.get();
         if (job.getStatus() != StatusJobType.INGESTED) {
