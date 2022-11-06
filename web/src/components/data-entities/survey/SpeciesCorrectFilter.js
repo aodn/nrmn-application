@@ -10,24 +10,36 @@ const SpeciesCorrectFilter = ({onSearch}) => {
   const [data, setData] = useState();
   const [countries, setCountries] = useState();
   const [states, setState] = useState();
+  const [ecoRegions, setEcoRegions] = useState();
+
+  const [locationChips, setLocationChips] = useState([]);
+  const [countryLabels, setCountryLabels] = useState([]);
+  const [stateLabels, setStateLabels] = useState([]);
+  const [ecoRegionLabels, setEcoRegionLabels] = useState([]);
+
+  const [dataResponse, setDataResponse] = useState();
 
   const [loading, setLoading] = useState(true);
 
   const initialFilter = {
     startDate: '2021-01-01',
     endDate: '2022-01-01',
-    country: '',
-    state: '',
+    country: null,
+    state: null,
+    ecoRegion: null,
     locationId: null,
     observableItemId: null,
     coord1: '',
     coord2: '',
-    species: ''
+    species: null,
+    locationIds: []
   };
 
   useEffect(() => {
     async function fetchLocations() {
-      await getEntity('locations').then((res) => {
+      await getEntity('locations?pageSize=1000').then((res) => {
+        const activeLocations = res.data.items.filter((i) => i.status === 'Active');
+        setDataResponse(activeLocations);
         const locations = [];
         const locationIds = [];
         res.data.items
@@ -37,22 +49,47 @@ const SpeciesCorrectFilter = ({onSearch}) => {
             locationIds.push(d.id);
           });
         setData({locations, locationIds});
+
+        const groups = {ecoRegions: [], countries: [], areas: []};
+        res.data.items.forEach((d) => {
+          locations[d.id] = d.locationName;
+          ['ecoRegions', 'countries', 'areas'].forEach((prop) => {
+            d[prop]
+              ?.split(',')
+              .map((a) => a.trim())
+              .forEach((a) => {
+                groups[prop][a] = groups[prop][a] ? [...groups[prop][a], d.id] : [d.id];
+              });
+          });
+        });
+        setEcoRegions(groups.ecoRegions);
+        setCountries(groups.countries);
+        setState(groups.areas);
+
         const labels = res.data.items.reduce(
           (acc, cur) => {
-            if (cur.countries && !acc.countries.includes(cur.countries)) {
-              acc.countries.push(cur.countries);
-            }
-            if (cur.areas && !acc.areas.includes(cur.areas)) {
-              acc.areas.push(cur.areas);
-            }
+            cur.countries?.split(',').forEach((country) => {
+              if (country && !acc.countries.includes(country)) acc.countries.push(country);
+            });
+
+            cur.areas?.split(',').forEach((area) => {
+              if (area && !acc.areas.includes(area)) acc.areas.push(area);
+            });
+
+            cur.ecoRegions?.split(',').forEach((ecoRegion) => {
+              if (ecoRegion && !acc.ecoRegions.includes(ecoRegion)) acc.ecoRegions.push(ecoRegion);
+            });
+
             return acc;
           },
-          {countries: [], areas: []}
+          {countries: [], areas: [], ecoRegions: []}
         );
         labels.countries.sort();
+        setCountryLabels(labels.countries);
         labels.areas.sort();
-        setCountries(labels.countries);
-        setState(labels.areas);
+        setStateLabels(labels.areas);
+        labels.ecoRegions.sort();
+        setEcoRegionLabels(labels.ecoRegions);
       });
       setLoading(false);
     }
@@ -68,6 +105,18 @@ const SpeciesCorrectFilter = ({onSearch}) => {
       } else {
         updated[action.field] = action.value;
       }
+
+      var locationIds = [];
+      locationIds = [updated['locationId']];
+      if (states[updated['state']]) locationIds = [...locationIds, ...states[updated['state']]];
+      if (countries[updated['country']]) locationIds = [...locationIds, ...countries[updated['country']]];
+      if (ecoRegions[updated['ecoRegion']]) locationIds = [...locationIds, ...ecoRegions[updated['ecoRegion']]];
+
+      locationIds = [...new Set(locationIds.filter((d) => d))];
+
+      updated['locationIds'] = locationIds.join(',');
+      const chips = dataResponse.filter((d) => locationIds.includes(d.id)).map((d) => ({id: d.id, locationName: d.locationName}));
+      setLocationChips(chips);
       return updated;
     },
     {...initialFilter}
@@ -93,6 +142,10 @@ const SpeciesCorrectFilter = ({onSearch}) => {
     updateFilter({field: 'state', value: value});
   };
 
+  const updateEcoRegion = (e, value) => {
+    updateFilter({field: 'ecoRegion', value: value});
+  };
+
   const updateObservableItem = (e) => {
     updateFilter({field: 'observableItemId', value: e ? e.id : null});
     updateFilter({field: 'species', value: e ? e.species : null});
@@ -109,7 +162,12 @@ const SpeciesCorrectFilter = ({onSearch}) => {
   const canSearch =
     filter.startDate &&
     filter.endDate &&
-    (filter.locationId || filter.country || filter.state || filter.observableItemId || (filter.coord1 && filter.coord2));
+    (filter.locationId ||
+      filter.country ||
+      filter.ecoRegion ||
+      filter.state ||
+      filter.observableItemId ||
+      (filter.coord1 && filter.coord2));
 
   return (
     <>
@@ -152,12 +210,19 @@ const SpeciesCorrectFilter = ({onSearch}) => {
               />
             </Box>
             <Box m={1} width={300}>
-              <CustomSearchInput fullWidth label="Species" formData={filter.species} onChange={updateObservableItem} />
+              <Typography variant="subtitle2">EcoRegion</Typography>
+              <Autocomplete
+                disabled={loading}
+                filterSelectedOptions
+                onChange={updateEcoRegion}
+                options={ecoRegionLabels}
+                value={filter.ecoRegion}
+                renderInput={(params) => <TextField {...params} />}
+                size="small"
+              />
             </Box>
-            <Box mx={1} mt={4} width={200}>
-              <Button onClick={() => updateFilter()} fullWidth variant="outlined">
-                Reset Filter
-              </Button>
+            <Box m={1} width={300}>
+              <CustomSearchInput fullWidth label="Species" formData={filter.species} onChange={updateObservableItem} />
             </Box>
           </Box>
           <Box ml={1} display="flex" flexDirection="row">
@@ -175,7 +240,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
                 disabled={loading}
                 filterSelectedOptions
                 onChange={updateCountry}
-                options={countries}
+                options={countryLabels}
                 value={filter.country}
                 renderInput={(params) => <TextField {...params} />}
                 size="small"
@@ -187,14 +252,19 @@ const SpeciesCorrectFilter = ({onSearch}) => {
                 disabled={loading}
                 filterSelectedOptions
                 onChange={updateState}
-                options={states}
+                options={stateLabels}
                 value={filter.state}
                 renderInput={(params) => <TextField {...params} />}
                 size="small"
               />
             </Box>
-            <Box m={1} my={4} width={200}>
-              <LoadingButton disabled={!canSearch} onClick={() => onSearch(filter)} fullWidth variant="contained">
+            <Box mx={1} mt={4} width={50}>
+              <Button onClick={() => updateFilter()} fullWidth variant="outlined">
+                Reset
+              </Button>
+            </Box>
+            <Box m={1} my={4} width={220}>
+              <LoadingButton disabled={!canSearch} onClick={() => onSearch(filter, locationChips)} fullWidth variant="contained">
                 Search
               </LoadingButton>
             </Box>
