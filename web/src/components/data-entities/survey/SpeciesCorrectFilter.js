@@ -24,20 +24,20 @@ const SpeciesCorrectFilter = ({onSearch}) => {
   const initialFilter = {
     startDate: '2021-01-01',
     endDate: '2022-01-01',
-    country: '',
-    state: '',
-    ecoRegion: '',
+    country: null,
+    state: null,
+    ecoRegion: null,
     locationId: null,
     observableItemId: null,
     coord1: '',
     coord2: '',
-    species: '',
+    species: null,
     locationIds: []
   };
 
   useEffect(() => {
     async function fetchLocations() {
-      await getEntity('locations').then((res) => {
+      await getEntity('locations?pageSize=1000').then((res) => {
         const activeLocations = res.data.items.filter((i) => i.status === 'Active');
         setDataResponse(activeLocations);
         const locations = [];
@@ -50,10 +50,10 @@ const SpeciesCorrectFilter = ({onSearch}) => {
           });
         setData({locations, locationIds});
 
-        const groups = {ecoRegions: [], countries: [], areas: [], siteCodes: []};
+        const groups = {ecoRegions: [], countries: [], areas: []};
         res.data.items.forEach((d) => {
           locations[d.id] = d.locationName;
-          ['locations', 'ecoRegions', 'countries', 'areas', 'siteCodes'].forEach((prop) => {
+          ['ecoRegions', 'countries', 'areas'].forEach((prop) => {
             d[prop]
               ?.split(',')
               .map((a) => a.trim())
@@ -68,11 +68,17 @@ const SpeciesCorrectFilter = ({onSearch}) => {
 
         const labels = res.data.items.reduce(
           (acc, cur) => {
-            if (cur.countries && !acc.countries.includes(cur.countries)) acc.countries.push(cur.countries);
+            cur.countries?.split(',').forEach((country) => {
+              if (country && !acc.countries.includes(country)) acc.countries.push(country);
+            });
 
-            if (cur.areas && !acc.areas.includes(cur.areas)) acc.areas.push(cur.areas);
+            cur.areas?.split(',').forEach((area) => {
+              if (area && !acc.areas.includes(area)) acc.areas.push(area);
+            });
 
-            if (cur.ecoRegions && !acc.ecoRegions.includes(cur.ecoRegions)) acc.ecoRegions.push(cur.ecoRegions);
+            cur.ecoRegions?.split(',').forEach((ecoRegion) => {
+              if (ecoRegion && !acc.ecoRegions.includes(ecoRegion)) acc.ecoRegions.push(ecoRegion);
+            });
 
             return acc;
           },

@@ -26,7 +26,7 @@ const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
 
   return (
     <>
-      <Typography variant="subtitle2">{label}</Typography>
+      {label && <Typography variant="subtitle2">{label}</Typography>}
       <Autocomplete
         options={options}
         clearOnBlur
@@ -44,7 +44,7 @@ const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
 CustomSearchInput.propTypes = {
   onChange: PropTypes.func.isRequired,
   formData: PropTypes.string,
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   exclude: PropTypes.string,
   fullWidth: PropTypes.bool
 };
