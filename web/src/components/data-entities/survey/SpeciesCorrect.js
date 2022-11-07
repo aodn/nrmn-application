@@ -177,11 +177,6 @@ const SpeciesCorrect = () => {
           {detail && (
             <Box width="50%" m={2} style={{overflowX: 'hidden', overflowY: 'auto'}}>
               <Box m={1}>
-                {locationChips?.map((c) => (
-                  <Chip key={`location-${c.id}`} label={c.locationName} style={{margin: 5}} />
-                ))}
-              </Box>
-              <Box m={1}>
                 <Typography variant="subtitle2">Current species name</Typography>
                 <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
                   <TextField fullWidth color="primary" size="small" value={detail.observableItemName} spellCheck={false} readOnly />
@@ -225,6 +220,11 @@ const SpeciesCorrect = () => {
                 >
                   Submit Correction
                 </Button>
+              </Box>
+              <Box m={1}>
+                {locationChips?.map((c) => (
+                  <Chip key={`location-${c.id}`} label={c.locationName} style={{margin: 5}} />
+                ))}
               </Box>
               <Box m={1} key={detail.observableItemId}>
                 <Typography variant="subtitle2">Surveys to correct</Typography>
