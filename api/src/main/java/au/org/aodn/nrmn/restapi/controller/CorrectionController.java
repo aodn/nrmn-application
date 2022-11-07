@@ -505,6 +505,7 @@ public class CorrectionController {
                 .reference(referenceMessage)
                 .status(StatusJobType.CORRECTED)
                 .creator(user.get())
+                .surveyIds(bodyDto.getSurveyIds())
                 .program(programRepository.getNoneProgram())
                 .build();
 

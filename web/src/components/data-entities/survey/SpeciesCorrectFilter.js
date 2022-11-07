@@ -69,14 +69,17 @@ const SpeciesCorrectFilter = ({onSearch}) => {
         const labels = res.data.items.reduce(
           (acc, cur) => {
             cur.countries?.split(',').forEach((country) => {
+              country = country.trim();
               if (country && !acc.countries.includes(country)) acc.countries.push(country);
             });
 
             cur.areas?.split(',').forEach((area) => {
+              area = area.trim();
               if (area && !acc.areas.includes(area)) acc.areas.push(area);
             });
 
             cur.ecoRegions?.split(',').forEach((ecoRegion) => {
+              ecoRegion = ecoRegion.trim();
               if (ecoRegion && !acc.ecoRegions.includes(ecoRegion)) acc.ecoRegions.push(ecoRegion);
             });
 
