@@ -75,7 +75,9 @@ const SpeciesCorrectResults = ({results, onClick}) => {
               </TableRow>
             ))
           ) : (
-            <TableCell colSpan={4}>No Results</TableCell>
+            <TableRow>
+              <TableCell colSpan={4}>No Results</TableCell>
+            </TableRow>
           )}
         </TableBody>
       </Table>
@@ -92,18 +94,18 @@ const SpeciesCorrect = () => {
   const [selected, setSelected] = useState(null);
   const [correction, setCorrection] = useState({newObservableItemName: null});
   const [locationChips, setLocationChips] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState(null);
 
   useEffect(() => {
     setCorrection({newObservableItemName: null});
-  },[selected]);
+  }, [selected]);
 
   const [request, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'getRequest':
         return {loading: true, results: null, request: {type: 'search', payload: action.payload}};
       case 'showResults': {
-        return {loading: false, search: state.request, request: null};//, results};
+        return {loading: false, search: state.request, request: null}; //, results};
       }
       case 'showError': {
         return {loading: false, search: null, request: null, error: action.payload};
@@ -155,7 +157,7 @@ const SpeciesCorrect = () => {
       />
       {request.loading && <LinearProgress />}
       {request.error && <Alert severity="error">{request.error}</Alert>}
-      {(!request.loading && searchResults) && (
+      {!request.loading && searchResults && (
         <Box display="flex" flex={2} overflow="hidden" flexDirection="row">
           <Box width="50%" style={{overflowX: 'hidden', overflowY: 'auto'}}>
             <SpeciesCorrectResults results={searchResults} onClick={(result) => setSelected({result})} />
@@ -221,12 +223,12 @@ const SpeciesCorrect = () => {
                   Submit Correction
                 </Button>
               </Box>
-              <Box m={1}>
-                {locationChips?.map((c) => (
-                  <Chip key={`location-${c.id}`} label={c.locationName} style={{margin: 5}} />
-                ))}
-              </Box>
               <Box m={1} key={detail.observableItemId}>
+                <Box m={1}>
+                  {locationChips?.map((c) => (
+                    <Chip key={`location-${c.id}`} label={c.locationName} style={{margin: 5}} />
+                  ))}
+                </Box>
                 <Typography variant="subtitle2">Surveys to correct</Typography>
                 <Box m={1}>
                   {detail?.surveyIds.map((id) => (
