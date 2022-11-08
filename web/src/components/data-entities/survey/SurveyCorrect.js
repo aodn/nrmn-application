@@ -240,7 +240,7 @@ const SurveyCorrect = () => {
 
   const [sideBar, setSideBar] = useState(defaultSideBar);
 
-  const onGridReady = ({api}) => {
+  const onGridReady = ({api, columnApi}) => {
     getCorrections(surveyId).then((res) => {
       api.hideOverlay();
       if (res.status !== 200) {
@@ -253,8 +253,7 @@ const SurveyCorrect = () => {
         const inverts = measurements[0] || '0';
         delete measurements[0];
         delete data.measureJson;
-        if (data.code?.toUpperCase() === 'SND')
-          data.diver = rows.find((row) => row.surveyId === data.surveyId && row.diver)?.diver;
+        if (data.code?.toUpperCase() === 'SND') data.diver = rows.find((row) => row.surveyId === data.surveyId && row.diver)?.diver;
         return {id: (idx + 1) * 100, pos: (idx + 1) * 1000, ...data, inverts, measurements};
       });
       const isExtended = unpackedData.includes((r) => Object.keys(r.measurements).includes((k) => k > 28));
@@ -268,6 +267,7 @@ const SurveyCorrect = () => {
       setMetadata({programName, programId, isExtended, surveyIds: [...surveyIds]});
       setRowData(rowData);
       setGridApi(api);
+      columnApi.autoSizeAllColumns();
     });
   };
 
@@ -293,7 +293,6 @@ const SurveyCorrect = () => {
 
   const onRowDataUpdated = (e) => {
     const ctx = e.api.gridOptionsWrapper.gridOptions.context;
-    e.columnApi.autoSizeAllColumns();
     setUndoSize(ctx.undoStack.length);
   };
 
@@ -344,20 +343,17 @@ const SurveyCorrect = () => {
           const mmOriginal = removeNullProperties(original[key]);
           const mmUpdated = removeNullProperties(r[key]);
           if (JSON.stringify(mmOriginal) !== JSON.stringify(mmUpdated)) {
-
             const changed = {};
 
-            for(var j of Object.keys(mmOriginal)){
-              if(mmOriginal[j] !== mmUpdated[j])
-                changed[j] = mmUpdated[j];
+            for (var j of Object.keys(mmOriginal)) {
+              if (mmOriginal[j] !== mmUpdated[j]) changed[j] = mmUpdated[j];
             }
 
-            for(var k of Object.keys(mmUpdated)){
-              if(mmOriginal[k] !== mmUpdated[k])
-                changed[k] = mmUpdated[k];
+            for (var k of Object.keys(mmUpdated)) {
+              if (mmOriginal[k] !== mmUpdated[k]) changed[k] = mmUpdated[k];
             }
 
-            var mmMessages = Object.keys(changed).map(c => {
+            var mmMessages = Object.keys(changed).map((c) => {
               return `[S${c} ${mmOriginal[c] ? mmOriginal[c] : 0} to ${mmUpdated[c] ? mmUpdated[c] : 0}]`;
             });
 
@@ -443,7 +439,12 @@ const SurveyCorrect = () => {
           </Button>
         </Box>
         <Box m={1} ml={0}>
-          <Button variant="outlined" disabled onClick={() => eh.onClickExcelExport(gridApi, 'Export', true)} startIcon={<CloudDownloadIcon />}>
+          <Button
+            variant="outlined"
+            disabled
+            onClick={() => eh.onClickExcelExport(gridApi, 'Export', true)}
+            startIcon={<CloudDownloadIcon />}
+          >
             Export
           </Button>
         </Box>
