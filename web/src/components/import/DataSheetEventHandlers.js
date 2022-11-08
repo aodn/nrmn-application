@@ -132,7 +132,6 @@ class DataSheetEventHandlers {
       }
 
       if (params.context.cellValidations[row]?.id?.levelId === 'DUPLICATE') return {backgroundColor: blue[100]};
-
     } else {
       const error = params.context.errors.find(
         (e) => e.rowIds.includes(params.data.id) && (!e.columnNames || e.columnNames.includes(params.colDef.field))
@@ -252,7 +251,7 @@ class DataSheetEventHandlers {
       // Get the row display name from the fields, this is because we turn on skipColumnHeaders so that
       // we can add empty row, '' is used to force type to string.
       const column = api.getColumnDefs().filter((y) => y.field === x)[0]?.headerName;
-      if(column) headers.push({data: {value: '' + column, type: 'String'}});
+      if (column) headers.push({data: {value: '' + column, type: 'String'}});
     });
 
     api.exportDataAsExcel({
@@ -491,7 +490,13 @@ class DataSheetEventHandlers {
         .filter((u) => u.id === id)
         .forEach((p) => {
           const field = p.field;
-          oldRow[field] = p.value;
+          if (field.includes('measurements') && typeof oldRow['measurements'] === 'object') {
+            const key = p.field.split('.')[1];
+            if (!p.value) delete oldRow.measurements[key];
+            else oldRow.measurements[key] = p.value;
+          } else {
+            oldRow[field] = p.value;
+          }
         });
       oldRows.push(oldRow);
     });
@@ -513,8 +518,14 @@ class DataSheetEventHandlers {
 
   handleCellEditingStopped(e) {
     if (e.oldValue === e.newValue) return;
-    const row = {...e.data};
-    row[e.column.colId] = e.oldValue;
+    const row = JSON.parse(JSON.stringify(e.data));
+    if (e.column.colId.includes('measurements') && typeof row.measurements === 'object') {
+      const key = e.column.colId.split('.')[1];
+      if (!e.oldValue) delete row.measurements[key];
+      else row.measurements[key] = e.oldValue;
+    } else {
+      row[e.column.colId] = e.oldValue;
+    }
     return this.pushUndo(e.api, [row]);
   }
 }
