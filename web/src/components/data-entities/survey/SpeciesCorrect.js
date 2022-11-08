@@ -1,91 +1,14 @@
-import {Box, Button, Chip, IconButton, LinearProgress, TextField, Typography, Paper, Alert} from '@mui/material';
-import React, {useEffect, useState, useReducer} from 'react';
-import {getSurveySpecies, postSpeciesCorrection} from '../../../api/api';
-import {makeStyles} from '@mui/styles';
-import SpeciesCorrectFilter from './SpeciesCorrectFilter';
-import {PropTypes} from 'prop-types';
+import { Alert, Box, Button, Chip, IconButton, LinearProgress, TextField, Typography } from '@mui/material';
+import React, { useEffect, useReducer, useState } from 'react';
+import { getSurveySpecies, postSpeciesCorrection } from '../../../api/api';
 import CustomSearchInput from '../../input/CustomSearchInput';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import LaunchIcon from '@mui/icons-material/Launch';
+import SpeciesCorrectFilter from './SpeciesCorrectFilter';
+import SpeciesCorrectResults from './SpeciesCorrectResults';
 
-const useStyles = makeStyles(({palette, typography}) => ({
-  root: {
-    '& .MuiTable-root': {
-      '& .MuiTableHead-root': {
-        '& .MuiTableRow-head': {
-          '& .MuiTableCell-head': {
-            fontSize: typography?.table.fontSize,
-            background: palette?.primary.rowHeader
-          }
-        }
-      },
-      '& .MuiTableRow-root': {
-        '&:nth-child(even)': {
-          backgroundColor: palette?.primary.rowHighlight
-        }
-      },
-      '& .MuiTableCell-root': {
-        fontSize: typography?.table.fontSize,
-        padding: typography?.table.padding,
-        color: palette?.text.textPrimary
-      }
-    }
-  }
-}));
+import LaunchIcon from '@mui/icons-material/Launch';
 
 const removeNullProperties = (obj) => {
   return obj ? Object.fromEntries(Object.entries(obj).filter((v) => v[1] && v[1] !== '')) : null;
-};
-
-const SpeciesCorrectResults = ({results, onClick}) => {
-  const classes = useStyles();
-  const [selected, setSelected] = useState(null);
-  return (
-    <TableContainer classes={classes} component={Paper} disabled>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell width="30%">Observable Item Name</TableCell>
-            <TableCell width="30%">Common name</TableCell>
-            <TableCell width="30%">Superseded By</TableCell>
-            <TableCell width="10%">Surveys</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {results.length > 0 ? (
-            results.map((r) => (
-              <TableRow
-                key={r.observableItemId}
-                selected={selected === r.observableItemId}
-                onClick={() => {
-                  setSelected(r.observableItemId);
-                  onClick(r.observableItemId);
-                }}
-                style={{cursor: 'pointer'}}
-              >
-                <TableCell>{r.observableItemName}</TableCell>
-                <TableCell>{r.commonName}</TableCell>
-                <TableCell>{r.supersededBy}</TableCell>
-                <TableCell>{r.surveyIds.length}</TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableCell colSpan={4}>No Results</TableCell>
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
-};
-
-SpeciesCorrectResults.propTypes = {
-  results: PropTypes.array,
-  onClick: PropTypes.func
 };
 
 const SpeciesCorrect = () => {
@@ -103,7 +26,7 @@ const SpeciesCorrect = () => {
       case 'getRequest':
         return {loading: true, results: null, request: {type: 'search', payload: action.payload}};
       case 'showResults': {
-        return {loading: false, search: state.request, request: null};//, results};
+        return {loading: false, search: state.request, request: null};
       }
       case 'showError': {
         return {loading: false, search: null, request: null, error: action.payload};
