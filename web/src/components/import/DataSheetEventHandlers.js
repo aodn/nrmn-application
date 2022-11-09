@@ -65,7 +65,7 @@ class DataSheetEventHandlers {
       const row = e.api.getDisplayedRowAtIndex(i);
       const dataIdx = rowData.findIndex((d) => d.id == row.data.id);
       const data = {...rowData[dataIdx]};
-      delta.push(data);
+      delta.push(JSON.parse(JSON.stringify(data)));
       let newData = {};
       Object.keys(data).forEach((key) => (newData[key] = data[key]));
       fields
@@ -482,10 +482,12 @@ class DataSheetEventHandlers {
     Array.from(new Set(context.pendingPasteUndo.map((u) => u.id))).forEach((id) => {
       let oldRow = {};
       let rowData = context.rowData;
+
       const newRow = rowData.find((r) => r.id === id);
       Object.keys(newRow).forEach(function (key) {
         oldRow[key] = newRow[key];
       });
+
       context.pendingPasteUndo
         .filter((u) => u.id === id)
         .forEach((p) => {
@@ -498,6 +500,15 @@ class DataSheetEventHandlers {
             oldRow[field] = p.value;
           }
         });
+
+      if (typeof newRow['measurements'] === 'object') {
+        var newMeasurements = {};
+        Object.keys(newRow.measurements).forEach((m) => {
+          const i = parseInt(newRow.measurements[m], 10);
+          if (i >= 0) newMeasurements[m] = i;
+        });
+        newRow.measurements = newMeasurements;
+      }
       oldRows.push(oldRow);
     });
     context.pendingPasteUndo = [];
