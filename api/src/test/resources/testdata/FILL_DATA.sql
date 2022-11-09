@@ -2,6 +2,9 @@ INSERT INTO nrmn.location_ref(location_id, location_name, is_active)
 VALUES (29, 'SA - Western', True);
 
 INSERT INTO nrmn.program_ref(program_id, program_name, is_active)
+VALUES (0, 'NONE', True);
+
+INSERT INTO nrmn.program_ref(program_id, program_name, is_active)
 VALUES (55, 'RLS', True);
 
 INSERT INTO nrmn.program_ref(program_id, program_name, is_active)
@@ -248,9 +251,9 @@ INSERT INTO nrmn.observation(observation_id, measure_value,
                              observation_attribute, diver_id, measure_id,
                              observable_item_id, survey_method_id)
 VALUES (551, 1,   '{}',51, 2, 333, 121),
-       (552, 500, '{}',51, 7, 333, 121),
-       (554, 40,  '{}',51, 2, 331, 121),
-       (553, 500, '{}',51, 7, 331, 121);
+       (552, 500, '{}',51, 7, 333, 221),
+       (554, 40,  '{}',51, 2, 331, 321),
+       (553, 600, '{}',51, 7, 331, 421);
 
 INSERT INTO nrmn.staged_row(pqs, block, buddy, code, created, date, depth, direction, diver,
                             inverts, is_invert_sizing, last_updated, latitude, longitude, 
