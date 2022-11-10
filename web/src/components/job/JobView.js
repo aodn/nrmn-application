@@ -75,7 +75,7 @@ const JobView = () => {
               <Grid item xs={4} lg={6} style={{paddingBottom: 0}}>
                 <List dense style={{paddingBottom: 0}}>
                   <ListItem>
-                    <ListItemText primary="Program" secondary={job.programName} />
+                    {job.programName && <ListItemText primary="Program" secondary={job.programName} />}
                   </ListItem>
                   <ListItem>
                     <ListItemText primary="Source" secondary={job.source} />
@@ -99,7 +99,7 @@ const JobView = () => {
                   </ListItem>
                   <Hidden only="lg">
                     <ListItem display={{lg: 'none'}}>
-                      <ListItemText primary="Extended Size" secondary={job.isExtendedSize ? 'Yes' : 'No'} />
+                    {job.programName && <ListItemText primary="Extended Size" secondary={job.isExtendedSize ? 'Yes' : 'No'} />}
                     </ListItem>
                   </Hidden>
                 </List>
@@ -108,7 +108,7 @@ const JobView = () => {
                 <Grid item lg={6} style={{paddingTop: 0}}>
                   <List dense style={{paddingTop: 0}}>
                     <ListItem>
-                      <ListItemText primary="Extended Size" secondary={job.isExtendedSize ? 'Yes' : 'No'} />
+                      {job.programName && <ListItemText primary="Extended Size" secondary={job.isExtendedSize ? 'Yes' : 'No'} />}
                     </ListItem>
                   </List>
                 </Grid>
