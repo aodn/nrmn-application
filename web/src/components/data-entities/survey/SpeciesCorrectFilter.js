@@ -1,6 +1,6 @@
 import {Box, Button, LinearProgress, TextField, Typography} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import React, {useEffect, useReducer, useState} from 'react';
+import React, {useEffect, useMemo, useReducer, useState} from 'react';
 import {getEntity} from '../../../api/api';
 import LoadingButton from '@mui/lab/LoadingButton';
 import {PropTypes} from 'prop-types';
@@ -21,19 +21,23 @@ const SpeciesCorrectFilter = ({onSearch}) => {
 
   const [loading, setLoading] = useState(true);
 
-  const initialFilter = {
-    startDate: '2021-01-01',
-    endDate: '2022-01-01',
-    country: null,
-    state: null,
-    ecoRegion: null,
-    locationId: null,
-    observableItemId: null,
-    coord1: '',
-    coord2: '',
-    species: null,
-    locationIds: []
-  };
+  const initialFilter = useMemo(() => {
+    const d = new Date();
+    const localTime = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+    return {
+      startDate: '1996-01-01',
+      endDate: localTime.toISOString().slice(0, 10),
+      country: null,
+      state: null,
+      ecoRegion: null,
+      locationId: null,
+      observableItemId: null,
+      coord1: '',
+      coord2: '',
+      species: null,
+      locationIds: []
+    };
+  });
 
   useEffect(() => {
     async function fetchLocations() {
