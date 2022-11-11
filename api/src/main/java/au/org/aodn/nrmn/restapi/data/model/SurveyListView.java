@@ -24,7 +24,7 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 @Subselect(
         "SELECT s.survey_id, sr.site_code, to_char(s.survey_date, 'yyyy-MM-dd') as survey_date, " +
                 "       (s.depth || '.' || s.survey_num) as depth, sr.site_name, pr.program_name, " +
-                "       lr.location_name, CAST((s.pq_catalogued IS NOT NULL) as varchar) as pq_catalogued, COALESCE(sr.mpa, '') as mpa, " +
+                "       lr.location_name, CAST((s.pq_catalogued IS TRUE) as varchar) as pq_catalogued, COALESCE(sr.mpa, '') as mpa, " +
                 "       d.diver as full_name, d.method, meo.ecoregion, sr.country, sr.state, d.species, " +
                 "       ROUND(sr.latitude::numeric, " + Iirc.ROUNDING_DIGIT + ") as latitude, " +
                 "       ROUND(sr.longitude::numeric, " + Iirc.ROUNDING_DIGIT + ") as longitude " +
@@ -143,6 +143,11 @@ public class SurveyListView {
     @JsonGetter
     public String getLocationName() {
         return locationName;
+    }
+
+    @JsonGetter
+    public String getPqCatalogued() {
+        return pqCatalogued;
     }
 
     @JsonGetter
