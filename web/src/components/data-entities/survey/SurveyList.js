@@ -191,6 +191,7 @@ const SurveyList = () => {
             <AgGridColumn width={100} field="surveyDate" colId="survey.surveyDate" />
             <AgGridColumn width={100} field="latitude" colId="survey.latitude" />
             <AgGridColumn width={100} field="longitude" colId="survey.longitude" />
+            <AgGridColumn width={100} headerName="Has PQs" field="pqCatalogued" colId="survey.pqCatalogued" />
             <AgGridColumn width={100} field="siteCode" colId="survey.siteCode" />
             <AgGridColumn flex={1} field="siteName" colId="survey.siteName" />
             <AgGridColumn width={100} field="depth" colId="survey.depth" />
