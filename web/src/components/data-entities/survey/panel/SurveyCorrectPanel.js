@@ -36,8 +36,7 @@ const SurveyCorrectPanel = ({api, context}) => {
         const rowId = validation.rowIds[0];
         const rowData = api.getRowNode(rowId).data;
         const columnPath = validation.columnNames[0];
-        const columnParts = columnPath.split('.');
-        const value = columnParts.length > 1 ? rowData[columnParts[0]][columnParts[1]] : rowData[columnParts[0]];
+        const value = rowData[columnPath[0]];
         const col = validation.columnNames.length > 1 ? {columnNames: validation.columnNames} : {columnName: columnPath};
         const rowPos = validation.rowIds.map((r) => context.rowData.find((d) => d.id === r)?.pos);
         const rowNum = rowPos.map((r) => context.rowPos.indexOf(r) + 1);
