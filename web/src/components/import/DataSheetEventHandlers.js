@@ -213,7 +213,7 @@ class DataSheetEventHandlers {
     e.api.copySelectedRangeToClipboard();
   }
 
-  onClickExcelExport(api, name, isExtended) {
+  onClickExcelExport(api, name, isExtended, onlySelected) {
     const columns = [
       'id',
       'diver',
@@ -250,6 +250,7 @@ class DataSheetEventHandlers {
     });
 
     api.exportDataAsExcel({
+      onlySelected,
       sheetName: 'DATA',
       author: 'NRMN',
       columnKeys: requiredColumns,
@@ -373,7 +374,7 @@ class DataSheetEventHandlers {
       e.api.refreshCells();
     };
 
-    const multiRowsSelected = e.api.getSelectedRows().length > 1 || cells.startRow.rowIndex !== cells.endRow.rowIndex;
+    const multiRowsSelected = e.api.getSelectedRows().length > 1;
     if (!multiRowsSelected) {
       if (items.length > 0) items.push('separator');
       items.push({
@@ -405,6 +406,14 @@ class DataSheetEventHandlers {
       items.push({
         name: 'Delete Selected Rows',
         action: () => this.deleteRow(e)
+      });
+      if (items.length > 0) items.push('separator');
+      items.push({
+        name: 'Export & Delete Selected Rows',
+        action: () => {
+          this.onClickExcelExport(e.api, 'selected', true, true);
+          this.deleteRow(e);
+        }
       });
     }
     return items;
