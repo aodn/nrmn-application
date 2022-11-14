@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.integration;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,6 +57,57 @@ class ATRCMethodCheckIT {
 
         assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("ATRC Method must be [0-5], 7 or 10")));
     }
+
+    @Test
+    void method11OnIngestShouldFail() {
+        var date = "11/09/2020";
+        var depth = "7";
+        var siteNo = "ERZ1";
+
+        var m1b1 = new StagedRow();
+        m1b1.setMethod("11");
+        m1b1.setBlock("0");
+        m1b1.setDate(date);
+        m1b1.setDepth(depth);
+        m1b1.setSiteCode(siteNo);
+        m1b1.setSpecies("Haliotis rubra");
+
+        var m2b1 = (StagedRow) SerializationUtils.clone(m1b1);
+        var m2b2 = (StagedRow) SerializationUtils.clone(m2b1);
+        var m1b1d8 = (StagedRow) SerializationUtils.clone(m1b1);
+        var m2b1d8 = (StagedRow) SerializationUtils.clone(m1b1d8);
+
+        m2b1.setMethod("2");
+        m2b1.setBlock("2");
+        m1b1d8.setDepth("8");
+        m1b1d8.setMethod("2");
+
+        Collection<SurveyValidationError> res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList("ERZ1"),
+                Arrays.asList(), Arrays.asList(m1b1, m2b1, m2b2, m1b1d8, m2b1d8));
+
+        assertTrue(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("ATRC Method must be [0-5], 7 or 10")));
+    }
+
+    @Test
+    void method11OnCorrectionsShouldSucceed() {
+        var date = "11/09/2020";
+        var depth = "7";
+        var siteNo = "ERZ1";
+
+        var row = new StagedRow();
+        row.setMethod("11");
+        row.setBlock("0");
+        row.setDate(date);
+        row.setDepth(depth);
+        row.setSiteCode(siteNo);
+        row.setSpecies("Haliotis rubra");
+
+        var res = dataValidation.checkFormatting(ProgramValidation.ATRC, false, false, Arrays.asList("ERZ1"),
+                Arrays.asList(), Arrays.asList(row));
+
+        assertFalse(res.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("ATRC Method must be [0-5], 7 or 10")));
+    }
+
 
     @Test
     void onlyMethod0345ShouldSucceed() {

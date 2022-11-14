@@ -81,7 +81,7 @@ public class ValidationProcess {
             results.addAll(speciesMeasurement.validateMeasurements(validation, row), false);
 
             // Row Method is valid for species
-            results.add(surveyValidation.validateSpeciesBelowToMethod(row), false);
+            results.add(surveyValidation.validateSpeciesBelowToMethod(false, row), false);
 
             // Validate M3, M4 and M5 rows have zero inverts
             results.add(surveyValidation.validateInvertsZeroOnM3M4M5(row), false);
