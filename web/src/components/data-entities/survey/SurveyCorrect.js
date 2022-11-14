@@ -430,8 +430,8 @@ const SurveyCorrect = () => {
           {row && (
             <Typography variant="h6">
               {metadata.surveyIds.length > 1
-                ? `Correct ${metadata.surveyIds.length} Surveys`
-                : 'Correct Survey' +
+                ? `Correct ${metadata.surveyIds.length} Survey Data`
+                : 'Correct Survey Data' +
                   ` [${row.siteCode}, ${row.date}, ${row.depth}] ` +
                   metadata.programName +
                   (metadata.isExtended ? ' Extended' : '')}

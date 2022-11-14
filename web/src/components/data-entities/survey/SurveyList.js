@@ -105,7 +105,7 @@ const SurveyList = () => {
                 onClick={() => setRedirect(`${selected.join(',')}/correct`)}
                 disabled={!selected || selected.length < 1 || selected.length > 25}
               >
-                Correct Selected Surveys
+                Correct Survey Data
               </Button>
             </Box>
           </Box>
@@ -162,7 +162,7 @@ const SurveyList = () => {
               filter={false}
               resizable={false}
               sortable={false}
-              tooltipValueGetter={() => 'Edit Survey'}
+              tooltipValueGetter={() => 'Edit Survey Metadata'}
               valueFormatter={() => '✎'}
               cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
               onCellClicked={(e) => {
