@@ -7,6 +7,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 import au.org.aodn.nrmn.restapi.data.repository.MaterializedViewsRepository;
 
@@ -30,97 +31,44 @@ public class MaterializedViewService {
             return;
         }
 
-        logger.info("Starting materialization of endpoint views");
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
 
-        if(materializedViewsRepository.checkUiSpeciesAttributesRunning()) {
-            logger.info("ui_species_attributes is already being refreshed");
-        } else {
-            logger.info("refreshing ui_species_attributes");
+        if (!materializedViewsRepository.checkUiSpeciesAttributesRunning())
             materializedViewsRepository.refreshUiSpeciesAttributes();
-            logger.info("ui_species_attributes refresh complete");
-        }
 
-        if(materializedViewsRepository.checkEpM2CrypticFishRunning()) {
-            logger.info("ep_m2_cryptic_fish is already being refreshed");
-        } else {
-            logger.info("refreshing ep_m2_cryptic_fish");
+        if (!materializedViewsRepository.checkEpM2CrypticFishRunning())
             materializedViewsRepository.refreshEpM2CrypticFish();
-            logger.info("ep_m2_cryptic_fish refresh complete");
-        }
 
-        if(materializedViewsRepository.checkEpM2InvertsRunning()) {
-            logger.info("ep_m2_inverts is already being refreshed");
-        } else {
-            logger.info("refreshing ep_m2_inverts");
+        if (!materializedViewsRepository.checkEpM2InvertsRunning())
             materializedViewsRepository.refreshEpM2Inverts();
-            logger.info("ep_m2_inverts refresh complete");
-        }
 
-        if(materializedViewsRepository.checkEpObservableItemsRunning()) {
-            logger.info("ep_observable_items is already being refreshed");
-        } else {
-            logger.info("refreshing ep_observable_items");
+        if (!materializedViewsRepository.checkEpObservableItemsRunning())
             materializedViewsRepository.refreshEpObservableItems();
-            logger.info("ep_observable_items refresh complete");
-        }
 
-        if(materializedViewsRepository.checkEpRarityAbundanceRunning()) {
-            logger.info("ep_rarity_abundance is already being refreshed");
-        } else {
-            logger.info("refreshing ep_rarity_abundance");
+        if (!materializedViewsRepository.checkEpRarityAbundanceRunning())
             materializedViewsRepository.refreshEpRarityAbundance();
-            logger.info("ep_rarity_abundance refresh complete");
-        }
 
-        if(materializedViewsRepository.checkEpRarityExtentsRunning()) {
-            logger.info("ep_rarity_extents is already being refreshed");
-        } else {
-            logger.info("refreshing ep_rarity_extents");
+        if (!materializedViewsRepository.checkEpRarityExtentsRunning())
             materializedViewsRepository.refreshEpRarityExtents();
-            logger.info("ep_rarity_extents refresh complete");
-        }
 
-        if(materializedViewsRepository.checkEpRarityRangeRunning()) {
-            logger.info("ep_rarity_range is already being refreshed");
-        } else {
-            logger.info("refreshing ep_rarity_range");
+        if (!materializedViewsRepository.checkEpRarityRangeRunning())
             materializedViewsRepository.refreshEpRarityRange();
-            logger.info("ep_rarity_range refresh complete");
-        }
 
-        if(materializedViewsRepository.checkEpSiteListRunning()) {
-            logger.info("ep_site_list is already being refreshed");
-        } else {
-            logger.info("refreshing ep_site_list");
+        if (!materializedViewsRepository.checkEpSiteListRunning())
             materializedViewsRepository.refreshEpSiteList();
-            logger.info("ep_site_list refresh complete");
-        }
 
-        if(materializedViewsRepository.checkEpSurveyListRunning()) {
-            logger.info("ep_survey_list is already being refreshed");
-        } else {
-            logger.info("refreshing ep_survey_list");
+        if (!materializedViewsRepository.checkEpSurveyListRunning())
             materializedViewsRepository.refreshEpSurveyList();
-            logger.info("ep_survey_list refresh complete");
-        }
 
-        if(materializedViewsRepository.checkEpM1Running()) {
-            logger.info("ep_m1 is already being refreshed");
-        } else {
-            logger.info("refreshing ep_m1");
+        if (!materializedViewsRepository.checkEpM1Running())
             materializedViewsRepository.refreshEpM1();
-            logger.info("ep_m1 refresh complete");
-        }
 
-        if(materializedViewsRepository.checkEpRarityFrequencyRunning()) {
-            logger.info("ep_rarity_frequency is already being refreshed");
-        } else {
-            logger.info("refreshing ep_rarity_frequency");
+        if (!materializedViewsRepository.checkEpRarityFrequencyRunning())
             materializedViewsRepository.refreshEpRarityFrequency();
-            logger.info("ep_rarity_frequency refresh complete");
-        }
-
-        logger.info("Re-materialization complete");
+        
+        stopWatch.stop();
+        logger.info("Endpoints refreshed in {}s", stopWatch.getTotalTimeSeconds());
 
     }
 }
