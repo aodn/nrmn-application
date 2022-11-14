@@ -39,7 +39,9 @@ public class SurveyValidation {
             var methodIds = row.getSpecies().get().getMethods().stream().map(m -> m.getMethodId())
                     .collect(Collectors.toSet());
 
-            if (!methodIds.contains(row.getMethod()))
+            // Handle all M10 as M1
+            var useRowMethod = row.getMethod() == 10 ? 1 : row.getMethod();
+            if (!methodIds.contains(useRowMethod))
                 return new ValidationCell(
                         ValidationCategory.DATA, ValidationLevel.WARNING, "Method " + row.getMethod()
                                 + " invalid for species " + row.getSpecies().get().getObservableItemName(),
