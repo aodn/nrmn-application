@@ -154,4 +154,72 @@ class RLSMethodBlockAssociationIT {
         assertTrue(response.getErrors().stream()
                 .anyMatch(e -> e.getMessage().startsWith("Method 0 must have block 0, 1 or 2")));
     }
+
+    @Test
+    void missingM10BlockShouldFail() {
+        stagedRowRepo.deleteAll();
+
+        var location = Location.builder().locationName("LOC1").isActive(false).build();
+        locationRepository.save(location);
+
+        siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
+
+        var job = jobRepo.findByReference("jobid-rls").get();
+        var date = "11/09/2020";
+        var depth = "7.1";
+        var siteNo = "ERZ1";
+
+        var m1b1 = new StagedRow();
+        m1b1.setMethod("10");
+        m1b1.setBlock("1");
+        m1b1.setDate(date);
+        m1b1.setDepth(depth);
+        m1b1.setSiteCode(siteNo);
+        m1b1.setStagedJob(job);
+
+        var m1b2 = (StagedRow) SerializationUtils.clone(m1b1);
+        m1b2.setBlock("1");
+
+        stagedRowRepo.saveAll(Arrays.asList(m1b1, m1b2));
+
+        var response = validationProcess.process(job);
+        assertTrue(response.getErrors().stream()
+                .anyMatch(e -> e.getMessage().startsWith("M10 requires B1 and B2")));
+    }
+
+    @Test
+    void completeM10BlockShouldSucceed() {
+        stagedRowRepo.deleteAll();
+
+        var location = Location.builder().locationName("LOC1").isActive(false).build();
+        locationRepository.save(location);
+
+        siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
+
+        var job = jobRepo.findByReference("jobid-rls").get();
+        var date = "11/09/2020";
+        var depth = "7.1";
+        var siteNo = "ERZ1";
+
+        var row1 = new StagedRow();
+        row1.setMethod("10");
+        row1.setBlock("1");
+        row1.setDate(date);
+        row1.setDepth(depth);
+        row1.setSiteCode(siteNo);
+        row1.setStagedJob(job);
+        var row2 = (StagedRow) SerializationUtils.clone(row1);
+        var row3 = (StagedRow) SerializationUtils.clone(row1);
+        var row4 = (StagedRow) SerializationUtils.clone(row1);
+
+        row2.setBlock("1");
+        row3.setBlock("2");
+        row4.setBlock("2");
+
+        stagedRowRepo.saveAll(Arrays.asList(row1, row2, row3, row4));
+
+        var response = validationProcess.process(job);
+        assertFalse(response.getErrors().stream()
+                .anyMatch(e -> e.getMessage().startsWith("M10 requires B1 and B2")));
+    }
 }

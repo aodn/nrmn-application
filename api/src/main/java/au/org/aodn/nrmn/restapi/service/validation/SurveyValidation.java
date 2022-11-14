@@ -152,6 +152,13 @@ public class SurveyValidation {
                     "Method 0 must have block 0, 1 or 2",
                     method0Rows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("block"));
 
+        // VALIDATION: M10 requires B1 and B2
+        var method10 = surveyByMethod.get(10);
+        if (method10 != null && !method10.stream().map(r -> r.getBlock()).distinct().collect(Collectors.toList()).containsAll(Arrays.asList(1, 2)))
+            return new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING,
+                    "M10 requires B1 and B2",
+                    method10.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("block"));
+
         // VALIDATION: M1, M2 (and M3 if ATRC) are present
         var requiredMethods = validation == ProgramValidation.ATRC ? Arrays.asList(1, 2, 3) : Arrays.asList(1, 2);
         var missingMethods = new ArrayList<Integer>(requiredMethods);
