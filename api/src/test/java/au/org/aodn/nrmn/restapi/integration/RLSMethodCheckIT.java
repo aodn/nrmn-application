@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.integration;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import au.org.aodn.nrmn.restapi.data.model.Location;
@@ -120,7 +122,76 @@ class RLSMethodCheckIT {
 
         ValidationResponse response = validationProcess.process(job);
         assertTrue(response.getErrors().stream()
-                .anyMatch(e -> e.getMessage().startsWith("RLS Method must be 0, 1, 2 or 10")));
+                .anyMatch(e -> e.getMessage().startsWith("RLS Method must be [0-2], 10 or 12")));
+    }
+
+    @Test
+    @Transactional
+    void onlyDebrisShouldBeMethod12Block2() {
+
+        var location = Location.builder().locationName("LOC1").isActive(false).build();
+        locationRepository.save(location);
+        siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
+
+        var job = jobRepo.findByReference("jobid-rls").get();
+        var date = "11/09/2020";
+        var depth = "7";
+        var siteNo = "ERZ1";
+
+        //RLS Method 12 must be recorded on block 2
+        var row1 = new StagedRow();
+        row1.setMethod("12");
+        row1.setBlock("1");
+        row1.setDate(date);
+        row1.setDepth(depth);
+        row1.setSiteCode(siteNo);
+        row1.setStagedJob(job);
+        row1.setSpecies("Debris");
+
+        // Method 12 invalid for species
+        var row2 = SerializationUtils.clone(row1);
+        row1.setMethod("12");
+        row2.setBlock("2");
+        row2.setSpecies("Species 56");
+
+        stagedRowRepo.deleteAll();
+        stagedRowRepo.saveAll(Arrays.asList(row1, row2));
+
+        var response = validationProcess.process(job);
+
+        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("RLS Method 12 must be recorded on block 2")));
+        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Method 12 invalid for species")));
+    }
+
+    @Test
+    @Transactional
+    void debrisMethod12Block2ShouldSucceed() {
+
+        var location = Location.builder().locationName("LOC1").isActive(false).build();
+        locationRepository.save(location);
+        siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
+
+        var job = jobRepo.findByReference("jobid-rls").get();
+        var date = "11/09/2020";
+        var depth = "7";
+        var siteNo = "ERZ1";
+
+        //RLS Method 12 must be recorded on block 2
+        var row1 = new StagedRow();
+        row1.setMethod("12");
+        row1.setBlock("2");
+        row1.setDate(date);
+        row1.setDepth(depth);
+        row1.setSiteCode(siteNo);
+        row1.setStagedJob(job);
+        row1.setSpecies("Debris");
+
+        stagedRowRepo.deleteAll();
+        stagedRowRepo.saveAll(Arrays.asList(row1));
+
+        var response = validationProcess.process(job);
+        
+        assertFalse(response.getErrors().stream().anyMatch(e -> e.getMessage().contains("Method 12")));
     }
 
     @Test

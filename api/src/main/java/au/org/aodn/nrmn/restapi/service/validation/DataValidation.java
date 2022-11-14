@@ -129,7 +129,7 @@ public class DataValidation {
             }
 
             if (isIngest) {
-                
+
                 if (StringUtils.isEmpty(row.getBuddy())) {
                     errors.add(rowId, ValidationLevel.WARNING, "buddy", "Diver does not exist");
                 } else if (unknownBuddies.size() == 1) {
@@ -235,9 +235,13 @@ public class DataValidation {
                 errors.add(rowId, ValidationLevel.BLOCKING, "depth", "Depth is invalid, expected: depth[.surveyNum]");
 
             // RLS Method
-            if (validation == ProgramValidation.RLS
-                    && !Arrays.asList(0, 1, 2, 10).contains(NumberUtils.toInt(row.getMethod(), INVALID_INT)))
-                errors.add(rowId, ValidationLevel.BLOCKING, "method", "RLS Method must be 0, 1, 2 or 10");
+            if (validation == ProgramValidation.RLS) {
+                if (!Arrays.asList(0, 1, 2, 10, 12).contains(NumberUtils.toInt(row.getMethod(), INVALID_INT)))
+                    errors.add(rowId, ValidationLevel.BLOCKING, "method", "RLS Method must be [0-2], 10 or 12");
+
+                if (NumberUtils.toInt(row.getMethod()) == 12 && NumberUtils.toInt(row.getBlock()) != 2)
+                    errors.add(rowId, ValidationLevel.BLOCKING, "block", "RLS Method 12 must be recorded on block 2");
+            }
 
             // Block 0
             if (row.getBlock().equalsIgnoreCase("0")
@@ -250,7 +254,7 @@ public class DataValidation {
                     errors.add(rowId, ValidationLevel.BLOCKING, "method", "ATRC Method must be [0-5], 7 or 10");
 
                 if (NumberUtils.toInt(row.getMethod()) == 7 && NumberUtils.toInt(row.getBlock()) != 2)
-                    errors.add(rowId, ValidationLevel.BLOCKING, "method", "ATRC Method 7 must be recorded on block 2");
+                    errors.add(rowId, ValidationLevel.BLOCKING, "block", "ATRC Method 7 must be recorded on block 2");
             }
 
             // Validation: Use Invert Sizing is blank

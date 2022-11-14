@@ -71,12 +71,7 @@ class DataSheetEventHandlers {
       fields
         .filter((key) => !(columnDefs.find((d) => d.field === key)?.editable == false))
         .forEach((key) => {
-          if (key.includes('.') > 0) {
-            const splitKey = key.split('.');
-            newData[splitKey[0]][splitKey[1]] = fill;
-          } else {
-            newData[key] = fill;
-          }
+          newData[key] = fill;
         });
       rowData[dataIdx] = newData;
     }
@@ -218,7 +213,7 @@ class DataSheetEventHandlers {
     e.api.copySelectedRangeToClipboard();
   }
 
-  onClickExcelExport(api, name, isExtended) {
+  onClickExcelExport(api, name, isExtended, onlySelected) {
     const columns = [
       'id',
       'diver',
@@ -255,6 +250,7 @@ class DataSheetEventHandlers {
     });
 
     api.exportDataAsExcel({
+      onlySelected,
       sheetName: 'DATA',
       author: 'NRMN',
       columnKeys: requiredColumns,
@@ -378,7 +374,7 @@ class DataSheetEventHandlers {
       e.api.refreshCells();
     };
 
-    const multiRowsSelected = e.api.getSelectedRows().length > 1 || cells.startRow.rowIndex !== cells.endRow.rowIndex;
+    const multiRowsSelected = e.api.getSelectedRows().length > 1;
     if (!multiRowsSelected) {
       if (items.length > 0) items.push('separator');
       items.push({
@@ -410,6 +406,14 @@ class DataSheetEventHandlers {
       items.push({
         name: 'Delete Selected Rows',
         action: () => this.deleteRow(e)
+      });
+      if (items.length > 0) items.push('separator');
+      items.push({
+        name: 'Export & Delete Selected Rows',
+        action: () => {
+          this.onClickExcelExport(e.api, 'selected', true, true);
+          this.deleteRow(e);
+        }
       });
     }
     return items;
@@ -492,23 +496,8 @@ class DataSheetEventHandlers {
         .filter((u) => u.id === id)
         .forEach((p) => {
           const field = p.field;
-          if (field.includes('measurements') && typeof oldRow['measurements'] === 'object') {
-            const key = p.field.split('.')[1];
-            if (!p.value) delete oldRow.measurements[key];
-            else oldRow.measurements[key] = p.value;
-          } else {
-            oldRow[field] = p.value;
-          }
+          oldRow[field] = p.value;
         });
-
-      if (typeof newRow['measurements'] === 'object') {
-        var newMeasurements = {};
-        Object.keys(newRow.measurements).forEach((m) => {
-          const i = parseInt(newRow.measurements[m], 10);
-          if (i >= 0) newMeasurements[m] = i;
-        });
-        newRow.measurements = newMeasurements;
-      }
       oldRows.push(oldRow);
     });
     context.pendingPasteUndo = [];
@@ -530,13 +519,7 @@ class DataSheetEventHandlers {
   handleCellEditingStopped(e) {
     if (e.oldValue === e.newValue) return;
     const row = JSON.parse(JSON.stringify(e.data));
-    if (e.column.colId.includes('measurements') && typeof row.measurements === 'object') {
-      const key = e.column.colId.split('.')[1];
-      if (!e.oldValue) delete row.measurements[key];
-      else row.measurements[key] = e.oldValue;
-    } else {
-      row[e.column.colId] = e.oldValue;
-    }
+    row[e.column.colId] = e.oldValue;
     return this.pushUndo(e.api, [row]);
   }
 }

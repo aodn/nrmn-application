@@ -3,8 +3,7 @@ import {PropTypes} from 'prop-types';
 import {allMeasurements} from '../../../common/constants';
 
 const SurveyMeasurementHeader = ({column}) => {
-  const id = parseInt(column.colId.split('.')[1]) - 1;
-  const header = allMeasurements[id];
+  const header = allMeasurements[column.colId - 1];
 
   return (
     <div style={{width: 35, textAlign: 'center'}}>
