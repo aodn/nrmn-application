@@ -38,7 +38,7 @@ class SpeciesBelongToMethodCheckTest extends FormattedTestProvider {
         StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMethod(1);
         formatted.setSpecies(Optional.of(species));
-        var error = surveyValidation.validateSpeciesBelowToMethod(formatted);
+        var error = surveyValidation.validateSpeciesBelowToMethod(false, formatted);
         assertNull(error);
     }
 
@@ -50,7 +50,7 @@ class SpeciesBelongToMethodCheckTest extends FormattedTestProvider {
         StagedRowFormatted formatted = getDefaultFormatted().build();
         formatted.setMethod(2);
         formatted.setSpecies(Optional.of(species));
-        var error = surveyValidation.validateSpeciesBelowToMethod(formatted);
+        var error = surveyValidation.validateSpeciesBelowToMethod(false, formatted);
         assertNotNull(error);
         assertTrue(error.getMessage().contains("invalid for species"));
     }

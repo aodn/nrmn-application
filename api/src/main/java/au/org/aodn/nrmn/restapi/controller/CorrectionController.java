@@ -236,7 +236,7 @@ public class CorrectionController {
             validation.addAll(measurementValidation.validateMeasurements(programValidation, row), false);
 
             // Row Method is valid for species
-            validation.add(surveyValidation.validateSpeciesBelowToMethod(row), false);
+            validation.add(surveyValidation.validateSpeciesBelowToMethod(true, row), false);
 
             // Validate M3, M4 and M5 rows have zero inverts
             validation.add(surveyValidation.validateInvertsZeroOnM3M4M5(row), false);
