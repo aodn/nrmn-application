@@ -33,21 +33,16 @@ public class SurveyValidation {
     private static final LocalDate DATE_MIN_RLS = LocalDate.parse("2006-01-01");
     private static final LocalDate DATE_MIN_ATRC = LocalDate.parse("1991-01-01");
 
-    public ValidationCell validateSpeciesBelowToMethod(Boolean ignoreM11, StagedRowFormatted row) {
-
-        if(ignoreM11 && row.getMethod() == 11)
-            return null;
+    public ValidationCell validateSpeciesBelowToMethod(Boolean allowM11, StagedRowFormatted row) {
 
         if (row.getSpecies().isPresent() && row.getSpecies().get().getMethods() != null) {
-            var methodIds = row.getSpecies().get().getMethods().stream().map(m -> m.getMethodId())
-                    .collect(Collectors.toSet());
-
-            if (!methodIds.contains(row.getMethod()))
-                return new ValidationCell(
-                        ValidationCategory.DATA, ValidationLevel.WARNING, "Method " + row.getMethod()
-                                + " invalid for species " + row.getSpecies().get().getObservableItemName(),
-                        row.getId(), "method");
-
+            var methodIds = row.getSpecies().get().getMethods().stream().map(m -> m.getMethodId()).collect(Collectors.toSet());
+            var method = row.getMethod();
+            if (!methodIds.contains(method) && (allowM11 || method != 11)) {
+                var level = method == 11 ? ValidationLevel.BLOCKING : ValidationLevel.WARNING;
+                var message = "Method " + method + " invalid for species " + row.getSpecies().get().getObservableItemName();
+                return new ValidationCell(ValidationCategory.DATA, level, message, row.getId(), "method");
+            }
         }
         return null;
     }

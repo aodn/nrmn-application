@@ -1,0 +1,5 @@
+BEGIN TRANSACTION;
+
+INSERT INTO nrmn.methods_species VALUES (243, 11), (271, 11), (278, 11), (5100, 11);
+
+END TRANSACTION;

@@ -246,7 +246,7 @@ public class DataValidation {
 
             // Block 0
             if (row.getBlock().equalsIgnoreCase("0") && 
-                    (isIngest && method == 11)
+                    (isIngest || method != 11)
                     && !Arrays.asList(0, 3, 4, 5).contains(method))
                 errors.add(rowId, ValidationLevel.BLOCKING, "block", "Block 0 is invalid for method");
 
