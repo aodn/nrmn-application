@@ -122,13 +122,14 @@ INSERT INTO nrmn.observable_item_ref (observable_item_id, obs_item_type_id, aphi
                                       observable_item_name, letter_code)
 VALUES (333, 1, 102, 1, 'Species 56', 'S56'),
        (331, 1, 103, 1, 'Species 57', 'S57'),
-       (332, 5, null, null, 'Debris', 'deb');
+       (332, 5, null, null, 'Debris', 'deb'),
+       (334, 1, null, null, 'Haliotis rubra', 'hal');
 
 INSERT INTO nrmn.method_ref(method_id, method_name, is_active)
-VALUES (1, 'Standard fish', true), (2, 'Standard invertebrates & cryptic fish', true), (3, 'Standard quadrat', true), (12, 'Debris', true);
+VALUES (1, 'Standard fish', true), (2, 'Standard invertebrates & cryptic fish', true), (3, 'Standard quadrat', true), (11, 'Off transect', true), (12, 'Debris', true);
 
 INSERT INTO nrmn.methods_species 
-VALUES (331, 1), (333, 1), (331, 2), (333, 2), (331, 3), (333, 3), (332, 12);
+VALUES (331, 1), (333, 1), (331, 2), (333, 2), (331, 3), (333, 3), (332, 12), (334, 11);
 
 INSERT INTO nrmn.survey_method(survey_method_id, block_num,
                                survey_method_attribute, survey_not_done,
