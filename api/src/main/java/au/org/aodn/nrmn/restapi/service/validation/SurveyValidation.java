@@ -36,10 +36,15 @@ public class SurveyValidation {
     public ValidationCell validateSpeciesBelowToMethod(Boolean allowM11, StagedRowFormatted row) {
 
         if (row.getSpecies().isPresent() && row.getSpecies().get().getMethods() != null) {
-            var methodIds = row.getSpecies().get().getMethods().stream().map(m -> m.getMethodId()).collect(Collectors.toSet());
+
+            var methodIds = row.getSpecies().get().getMethods().stream().map(m -> m.getMethodId())
+                    .collect(Collectors.toSet());
+
+            // Handle all M10 as M1
             var method = row.getMethod();
-            if (!methodIds.contains(method) && (allowM11 || method != 11)) {
-                var level = method == 11 ? ValidationLevel.BLOCKING : ValidationLevel.WARNING;
+            var useRowMethod = row.getMethod() == 10 ? 1 : row.getMethod();
+            if (!methodIds.contains(useRowMethod) && (allowM11 || useRowMethod != 11)) {
+                var level = useRowMethod == 11 ? ValidationLevel.BLOCKING : ValidationLevel.WARNING;
                 var message = "Method " + method + " invalid for species " + row.getSpecies().get().getObservableItemName();
                 return new ValidationCell(ValidationCategory.DATA, level, message, row.getId(), "method");
             }
