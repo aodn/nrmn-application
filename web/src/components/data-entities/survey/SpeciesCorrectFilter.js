@@ -37,7 +37,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
       species: null,
       locationIds: []
     };
-  });
+  },[]);
 
   useEffect(() => {
     async function fetchLocations() {
