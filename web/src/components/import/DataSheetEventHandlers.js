@@ -374,8 +374,8 @@ class DataSheetEventHandlers {
       e.api.refreshCells();
     };
 
-    const multiRowsSelected = e.api.getSelectedRows().length > 1;
-    if (!multiRowsSelected) {
+    const selectedRows = e.api.getSelectedRows();
+    if (selectedRows.length < 2) {
       if (items.length > 0) items.push('separator');
       items.push({
         name: 'Delete Row',
@@ -405,18 +405,32 @@ class DataSheetEventHandlers {
       if (items.length > 0) items.push('separator');
       items.push({
         name: 'Delete Selected Rows',
-        action: () => this.deleteRow(e)
+        action: () => this.deleteRows(e, selectedRows)
       });
       if (items.length > 0) items.push('separator');
       items.push({
         name: 'Export & Delete Selected Rows',
         action: () => {
           this.onClickExcelExport(e.api, 'selected', true, true);
-          this.deleteRow(e);
+          this.deleteRows(e, selectedRows);
         }
       });
     }
     return items;
+  }
+
+  deleteRows(e, rows) {
+    const rowData = e.context.rowData;
+    const delta = [];
+    rows.forEach((row) => {
+      const data = rowData.find((d) => d.id === row.id);
+      delta.push({...data});
+      rowData.splice(rowData.indexOf(data), 1);
+    });
+    this.pushUndo(e.api, delta);
+    e.api.setRowData(rowData);
+    e.context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
+    e.api.refreshCells();
   }
 
   deleteRow(e) {
