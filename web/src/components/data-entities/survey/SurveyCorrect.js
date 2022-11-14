@@ -65,7 +65,13 @@ const packedData = (api) => {
   const packedData = [];
   api.forEachNode((rowNode, index) => {
     const data = rowNode.data;
-    packedData.push({id: index, ...data, measureJson: removeNullProperties(data.measurements)});
+    let measure = {};
+    Object.getOwnPropertyNames(data || {})
+      .filter((key) => !isNaN(parseFloat(key)))
+      .forEach((numKey) => {
+        measure[numKey] = data[numKey];
+      });
+    packedData.push({id: index, ...data, measureJson: removeNullProperties(measure)});
   });
   return packedData;
 };
@@ -132,9 +138,10 @@ const SurveyCorrect = () => {
   const headers = useMemo(() => {
     return [
       {field: 'pos', label: '', editable: false, hide: true, sort: 'asc'},
-      {field: 'id', label: '', editable: false, hide: true},
+      {field: 'id', label: 'ID', editable: false, hide: true},
       {field: 'surveyId', label: 'Survey', editable: false},
       {field: 'diver', label: 'Diver'},
+      {field: 'buddy', label: 'Buddy', hide: true},
       {field: 'siteCode', label: 'Site No.', editable: false},
       {field: 'siteName', label: 'Site Name', editable: false},
       {field: 'latitude', label: 'Latitude'},
@@ -249,12 +256,15 @@ const SurveyCorrect = () => {
       }
       const {rows, programName, programId, surveyIds} = res.data;
       const unpackedData = rows.map((data, idx) => {
-        const measurements = JSON.parse(data.measureJson);
-        const inverts = measurements[0] || '0';
-        delete measurements[0];
+        const {measureJson} = {...data};
+        const measure = JSON.parse(measureJson || {});
+        Object.getOwnPropertyNames(measure).forEach((numKey) => {
+          data[numKey == 0 ? 'inverts' : numKey] = measure[numKey];
+        });
+        data['inverts'] = data['inverts'] || 0;
         delete data.measureJson;
         if (data.code?.toUpperCase() === 'SND') data.diver = rows.find((row) => row.surveyId === data.surveyId && row.diver)?.diver;
-        return {id: (idx + 1) * 100, pos: (idx + 1) * 1000, ...data, inverts, measurements};
+        return {id: (idx + 1) * 100, pos: (idx + 1) * 1000, ...data};
       });
       const isExtended = unpackedData.includes((r) => Object.keys(r.measurements).includes((k) => k > 28));
       const context = api.gridOptionsWrapper.gridOptions.context;
@@ -439,12 +449,7 @@ const SurveyCorrect = () => {
           </Button>
         </Box>
         <Box m={1} ml={0}>
-          <Button
-            variant="outlined"
-            disabled
-            onClick={() => eh.onClickExcelExport(gridApi, 'Export', true)}
-            startIcon={<CloudDownloadIcon />}
-          >
+          <Button variant="outlined" onClick={() => eh.onClickExcelExport(gridApi, 'Export', true)} startIcon={<CloudDownloadIcon />}>
             Export
           </Button>
         </Box>
@@ -511,11 +516,19 @@ const SurveyCorrect = () => {
               editable={header.editable ?? true}
             />
           ))}
-          {allMeasurements.map((_, idx) => {
-            const field = `measurements.${idx + 1}`;
-            return <AgGridColumn editable field={field} headerComponent={SurveyMeasurementHeader} key={idx} width={35} />;
+          {allMeasurements.map((m, idx) => {
+            return (
+              <AgGridColumn
+                editable
+                field={`${idx + 1}`}
+                headerComponent={SurveyMeasurementHeader}
+                headerName={m.fishSize}
+                key={idx}
+                width={35}
+              />
+            );
           })}
-          <AgGridColumn field="isInvertSizing" headerName="Use Invert Sizing" cellEditor="agTextCellEditor" />
+          <AgGridColumn field="isInvertSizing" headerName="Use InvertSizing" cellEditor="agTextCellEditor" />
         </AgGridReact>
       </Box>
       <Box display={editMode ? 'none' : 'flex'} justifyContent="center">
