@@ -1,5 +1,5 @@
 BEGIN TRANSACTION;
 
-INSERT INTO nrmn.program_ref VALUES (0, 'NONE', FALSE);
+INSERT INTO nrmn.program_ref VALUES (0, '', FALSE);
 
 END TRANSACTION;

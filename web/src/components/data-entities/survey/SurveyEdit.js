@@ -123,31 +123,29 @@ const SurveyEdit = () => {
       />
       <Box m={2} display="flex" flexDirection="row" width="100%">
         <Box flexGrow={1}>
-          <Typography variant="h4">Edit Survey</Typography>
+          <Typography variant="h4">Edit Survey Metadata</Typography>
         </Box>
         <Box display="flex" flexDirection="row">
           <AuthContext.Consumer>
-            {({auth}) =>
-              auth?.features?.includes('corrections') && (
-                <>
+              {({auth}) =>
+                auth?.features?.includes('corrections') && (
                   <Box>
                     <Button
                       variant="outlined"
                       startIcon={<Construction />}
                       onClick={() => setRedirect({to: `/data/survey/${surveyId}/correct`})}
                     >
-                      Correct Survey
+                      Correct Survey Data
                     </Button>
                   </Box>
-                  <Box ml={1}>
-                    <Button variant="outlined" color="error" startIcon={<Delete />} onClick={() => setConfirmDelete(true)}>
-                      Delete Survey
-                    </Button>
-                  </Box>
-                </>
-              )
-            }
+                )
+              }
           </AuthContext.Consumer>
+          <Box ml={1}>
+            <Button variant="outlined" color="error" startIcon={<Delete />} onClick={() => setConfirmDelete(true)}>
+              Delete Survey
+            </Button>
+          </Box>
         </Box>
       </Box>
       <Grid container direction="column" justifyContent="flex-start" alignItems="center">
@@ -333,7 +331,7 @@ const SurveyEdit = () => {
               </Button>
               <Box ml={5}>
                 <Button variant="contained" onClick={handleSubmit} startIcon={<Save />}>
-                  Save Survey
+                  Save Survey Metadata
                 </Button>
               </Box>
             </Box>
