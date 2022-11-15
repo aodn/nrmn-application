@@ -40,12 +40,18 @@ const SideMenu = ({open, onClose}) => {
           <ListItem button onClick={onClose} component={NavLink} to="/data/extract">
             <ListItemText primary="Template Data" />
           </ListItem>
-          <ListItem button onClick={onClose} component={NavLink} to="/data/species">
-            <ListItemText primary="Correct Species" />
-          </ListItem>
+          <AuthContext.Consumer>
+            {({auth}) =>
+              auth?.features?.includes('corrections') && (
+                <ListItem button onClick={onClose} component={NavLink} to="/data/species">
+                  <ListItemText primary="Correct Species" />
+                </ListItem>
+              )
+            }
+          </AuthContext.Consumer>
         </List>
       </List>
-      <Divider/>
+      <Divider />
       <List>
         <ListSubheader>
           <Typography variant="button">Reference Data</Typography>
@@ -63,13 +69,13 @@ const SideMenu = ({open, onClose}) => {
           <ListItemText primary="Observable Items" />
         </ListItem>
       </List>
-      <Divider/>
+      <Divider />
       <AuthContext.Consumer>
         {({auth}) => (
           <Stack direction="column" spacing={1} m={2}>
-            <Chip color="primary" size="small" label={`Version ${version[0]}.${version[1]} (${version[2]})`}/>
+            <Chip color="primary" size="small" label={`Version ${version[0]}.${version[1]} (${version[2]})`} />
             {auth?.features?.map((label, i) => (
-              <Chip key={i} color="primary" variant="outlined" size="small" label={label}/>
+              <Chip key={i} color="primary" variant="outlined" size="small" label={label} />
             ))}
           </Stack>
         )}
