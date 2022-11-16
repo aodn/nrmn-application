@@ -341,16 +341,14 @@ const SurveyCorrect = () => {
     const context = api.gridOptionsWrapper.gridOptions.context;
 
     const edited = context.rowData.reduce((acc, r) => {
-      
       const rowPos = context.rowPos.indexOf(r.pos) + 1;
       const original = context.originalData.find((o) => o.id === r.id);
 
       if (!original) {
         acc.push({row: rowPos, message: 'Row inserted'});
         return acc;
-
       }
-      
+
       var messages = [];
 
       for (var key of Object.keys(r)) {
@@ -400,7 +398,6 @@ const SurveyCorrect = () => {
 
     const diff = [];
     Object.keys(grouped).forEach((k) => {
-      
       const v = grouped[k];
       const isContinuous = v.reduce((acc, r, idx) => {
         if (idx === 0) return true;
