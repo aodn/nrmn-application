@@ -24,7 +24,7 @@ const ExtractTemplateData = () => {
 
   useEffect(() => {
     async function fetchLocations() {
-      await getEntity('locations').then((res) => {
+      await getEntity('locations?pageSize=99999').then((res) => {
         const locations = [];
         const groups = {ecoRegions: [], countries: [], areas: [], siteCodes: []};
         res.data.items.forEach((d) => {
