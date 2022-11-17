@@ -343,11 +343,14 @@ const SurveyCorrect = () => {
     const edited = context.rowData.reduce((acc, r) => {
       const rowPos = context.rowPos.indexOf(r.pos) + 1;
       const original = context.originalData.find((o) => o.id === r.id);
+
       if (!original) {
         acc.push({row: rowPos, message: 'Row inserted'});
         return acc;
       }
+
       var messages = [];
+
       for (var key of Object.keys(r)) {
         if (typeof r[key] === 'object') {
           const mmOriginal = removeNullProperties(original[key]);
@@ -386,7 +389,26 @@ const SurveyCorrect = () => {
       return acc;
     }, []);
 
-    setSurveyDiff([...edited, ...deleted]);
+    const grouped = [...edited, ...deleted].reduce((acc, r) => {
+      const message = r.message;
+      if (!acc[message]) acc[message] = [];
+      acc[message].push(r.row);
+      return acc;
+    }, {});
+
+    const diff = [];
+    Object.keys(grouped).forEach((k) => {
+      const v = grouped[k];
+      const isContinuous = v.reduce((acc, r, idx) => {
+        if (idx === 0) return true;
+        if (r - v[idx - 1] === 1) return acc;
+        return false;
+      }, true);
+      const asRange = v.length > 1 && isContinuous;
+      diff.push({message: k, row: asRange ? `${v[0]}-${v[v.length - 1]}` : v.join(',')});
+    });
+
+    setSurveyDiff(diff);
   };
 
   const onSubmit = async () => {
@@ -544,7 +566,7 @@ const SurveyCorrect = () => {
           {canSubmitCorrection ? (
             <>
               <Box>
-                <Typography variant="h5">Confirm Survey Correction?</Typography>
+                <Typography variant="h5">Confirm Survey Data Correction?</Typography>
               </Box>
               <Box border={0} borderColor="grey" p={2} margin={3}>
                 <TableContainer classes={classes} component={Paper} disabled>
