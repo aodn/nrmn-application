@@ -5,6 +5,7 @@ import {getEntity} from '../../../api/api';
 import LoadingButton from '@mui/lab/LoadingButton';
 import {PropTypes} from 'prop-types';
 import CustomSearchInput from '../../input/CustomSearchInput';
+import SpeciesCorrectGeometryFilter from './SpeciesCorrectGeometryFilter';
 
 const SpeciesCorrectFilter = ({onSearch}) => {
   const [data, setData] = useState();
@@ -32,8 +33,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
       ecoRegion: null,
       locationId: null,
       observableItemId: null,
-      coord1: '',
-      coord2: '',
+      geometry: '',
       species: null,
       locationIds: []
     };
@@ -119,9 +119,8 @@ const SpeciesCorrectFilter = ({onSearch}) => {
       if (countries[updated['country']]) locationIds = [...locationIds, ...countries[updated['country']]];
       if (ecoRegions[updated['ecoRegion']]) locationIds = [...locationIds, ...ecoRegions[updated['ecoRegion']]];
 
-      locationIds = [...new Set(locationIds.filter((d) => d))];
+      updated['locationIds'] = [...new Set(locationIds.filter((d) => d))];
 
-      updated['locationIds'] = locationIds.join(',');
       const chips = dataResponse.filter((d) => locationIds.includes(d.id)).map((d) => ({id: d.id, locationName: d.locationName}));
       setLocationChips(chips);
       return updated;
@@ -149,6 +148,10 @@ const SpeciesCorrectFilter = ({onSearch}) => {
     updateFilter({field: 'state', value: value});
   };
 
+  const updateGeometry = (value) => {
+    updateFilter({field: 'geometry', value: value});
+  };
+
   const updateEcoRegion = (e, value) => {
     updateFilter({field: 'ecoRegion', value: value});
   };
@@ -156,14 +159,6 @@ const SpeciesCorrectFilter = ({onSearch}) => {
   const updateObservableItem = (e) => {
     updateFilter({field: 'observableItemId', value: e ? e.id : null});
     updateFilter({field: 'species', value: e ? e.species : null});
-  };
-
-  const updateCoord1 = (e) => {
-    updateFilter({field: 'coord1', value: e.target.value});
-  };
-
-  const updateCoord2 = (e) => {
-    updateFilter({field: 'coord2', value: e.target.value});
   };
 
   const canSearch =
@@ -174,7 +169,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
       filter.ecoRegion ||
       filter.state ||
       filter.observableItemId ||
-      (filter.coord1 && filter.coord2));
+      filter.geometry);
 
   return (
     <>
@@ -233,13 +228,9 @@ const SpeciesCorrectFilter = ({onSearch}) => {
             </Box>
           </Box>
           <Box ml={1} display="flex" flexDirection="row">
-            <Box m={1} width={150}>
-              <Typography variant="subtitle2">BBox Min</Typography>
-              <input onChange={updateCoord1} value={filter.coord1} style={{height: '35px', width: '150px'}} />
-            </Box>
-            <Box m={1} width={150}>
-              <Typography variant="subtitle2">BBox Max</Typography>
-              <input onChange={updateCoord2} value={filter.coord2} style={{height: '35px', width: '150px'}} />
+            <Box m={1} width={300}>
+              <Typography variant="subtitle2">Geometry</Typography>
+              <SpeciesCorrectGeometryFilter onChange={updateGeometry} />
             </Box>
             <Box m={1} width={300}>
               <Typography variant="subtitle2">Country</Typography>

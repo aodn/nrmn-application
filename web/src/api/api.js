@@ -119,9 +119,8 @@ export const getDataJob = (jobId) =>
     .then((res) => res)
     .catch((err) => err);
 
-export const getSurveySpecies = (filter) => {
-  const params = Object.keys(filter).map((key) => `${key}=${filter[key]}`).join('&');
-  return axiosInstance.get(`correction/correctSpecies?${params}`, {
+export const getSurveySpecies = (payload) => {
+  return axiosInstance.post(`correction/searchSpecies`, payload, {
       validateStatus: () => true
     })
     .then((res) => res)
