@@ -228,9 +228,9 @@ const SpeciesCorrectFilter = ({onSearch}) => {
             </Box>
           </Box>
           <Box ml={1} display="flex" flexDirection="row">
-            <Box m={1} width={300}>
+            <Box m={1} mr={2} width={300}>
               <Typography variant="subtitle2">Geometry</Typography>
-              <SpeciesCorrectGeometryFilter onChange={updateGeometry} />
+              <SpeciesCorrectGeometryFilter onChange={updateGeometry} filter={filter}/>
             </Box>
             <Box m={1} width={300}>
               <Typography variant="subtitle2">Country</Typography>
