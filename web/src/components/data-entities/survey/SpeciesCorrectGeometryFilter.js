@@ -28,7 +28,7 @@ const SpeciesCorrectGeometryFilter = ({onChange, filter}) => {
       reader.readAsText(file);
       setLabel('Upload KML file ..');
     }
-  }, [file]);
+  }, [file, onChange]);
 
   useEffect(() => {
     if (!filter.geometry) {
