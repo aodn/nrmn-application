@@ -23,12 +23,11 @@ const SpeciesCorrectGeometryFilter = ({onChange, filter}) => {
           items[placeName] = kml;
         }
         setPlaces(items);
-        onChange(Object.keys(items)[0]);
       };
       reader.readAsText(file);
       setLabel('Upload KML file ..');
     }
-  }, [file, onChange]);
+  }, [file]);
 
   useEffect(() => {
     if (!filter.geometry) {
@@ -38,7 +37,7 @@ const SpeciesCorrectGeometryFilter = ({onChange, filter}) => {
   }, [filter.geometry]);
 
   return (
-    <>
+    <Box style={{height: '35px', width: '300px'}}>
       {places ? (
         <Autocomplete
           options={Object.keys(places)}
@@ -51,7 +50,7 @@ const SpeciesCorrectGeometryFilter = ({onChange, filter}) => {
       ) : (
         <Box p={1} border={1} borderColor="grey.400" borderRadius={1}>
           <input
-          id='kmlFileInput'
+            id="kmlFileInput"
             accept=".kml"
             type="file"
             style={{display: 'none'}}
@@ -59,10 +58,12 @@ const SpeciesCorrectGeometryFilter = ({onChange, filter}) => {
               setFile(p.target.files[0]);
             }}
           />
-          <label style={{cursor: 'pointer'}}  htmlFor="kmlFileInput"><Typography variant='subtitle2'>{label}</Typography></label>
+          <label style={{cursor: 'pointer'}} htmlFor="kmlFileInput">
+            <Typography variant="subtitle2">{label}</Typography>
+          </label>
         </Box>
       )}
-    </>
+    </Box>
   );
 };
 

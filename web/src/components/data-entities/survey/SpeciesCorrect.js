@@ -1,6 +1,6 @@
-import { Alert, Box, Button, Chip, IconButton, LinearProgress, TextField, Typography } from '@mui/material';
-import React, { useEffect, useReducer, useState } from 'react';
-import { getSurveySpecies, postSpeciesCorrection } from '../../../api/api';
+import {Alert, Box, Button, Chip, IconButton, LinearProgress, TextField, Typography} from '@mui/material';
+import React, {useEffect, useReducer, useState} from 'react';
+import {getSurveySpecies, postSpeciesCorrection} from '../../../api/api';
 import CustomSearchInput from '../../input/CustomSearchInput';
 import SpeciesCorrectFilter from './SpeciesCorrectFilter';
 import SpeciesCorrectResults from './SpeciesCorrectResults';
