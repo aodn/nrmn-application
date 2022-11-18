@@ -241,11 +241,11 @@ const SpeciesCorrectFilter = ({onSearch}) => {
             </Box>
           </Box>
           <Box ml={1} display="flex" flexDirection="row">
-            <Box m={1} width={300} mr={3}>
+            <Box ml={1} width={300} mr={3}>
               <Typography variant="subtitle2">Geometry</Typography>
               <SpeciesCorrectGeometryFilter onChange={updateGeometry} filter={filter} />
             </Box>
-            <Box m={1} width={300}>
+            <Box mx={1} width={300}>
               <Typography variant="subtitle2">Area/State</Typography>
               <Autocomplete
                 disabled={loading || !enabledFilters.state}
@@ -257,7 +257,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
                 size="small"
               />
             </Box>
-            <Box m={1} width={300}>
+            <Box mx={1} width={300}>
               <Typography variant="subtitle2">Location</Typography>
               <Autocomplete
                 disabled={loading}
@@ -270,12 +270,12 @@ const SpeciesCorrectFilter = ({onSearch}) => {
                 size="small"
               />
             </Box>
-            <Box mx={1} mt={4} width={50}>
+            <Box ml={1} mt={3} width={50}>
               <Button onClick={() => updateFilter()} fullWidth variant="outlined">
                 Reset
               </Button>
             </Box>
-            <Box m={1} my={4} width={220}>
+            <Box ml={3} mr={1} my={3} width={220}>
               <LoadingButton disabled={!canSearch} onClick={() => onSearch(filter, locationChips)} fullWidth variant="contained">
                 Search
               </LoadingButton>
