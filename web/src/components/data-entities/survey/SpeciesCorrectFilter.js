@@ -19,7 +19,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
   const [ecoRegionLabels, setEcoRegionLabels] = useState([]);
 
   const [enabledFilters, setEnabledFilters] = useState({ecoRegion: true, country: true, state: true});
-  
+
   const [dataResponse, setDataResponse] = useState();
 
   const [loading, setLoading] = useState(true);
@@ -39,7 +39,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
       species: null,
       locationIds: []
     };
-  },[]);
+  }, []);
 
   useEffect(() => {
     async function fetchLocations() {
@@ -132,9 +132,10 @@ const SpeciesCorrectFilter = ({onSearch}) => {
 
   useEffect(() => {
     setEnabledFilters({
-      ecoRegion: !filter.country && !filter.state && !filter.location, 
-      country: !filter.state && !filter.location, 
-      state: !filter.location});
+      ecoRegion: !filter.country && !filter.state && !filter.location,
+      country: !filter.state && !filter.location,
+      state: !filter.location
+    });
   }, [filter]);
 
   const updateStartDate = (e) => {
@@ -173,17 +174,17 @@ const SpeciesCorrectFilter = ({onSearch}) => {
   const canSearch =
     filter.startDate &&
     filter.endDate &&
-    (filter.locationId ||
-      filter.country ||
-      filter.ecoRegion ||
-      filter.state ||
-      filter.observableItemId ||
-      filter.geometry);
+    (filter.locationId || filter.country || filter.ecoRegion || filter.state || filter.observableItemId || filter.geometry);
 
-  const filteredEcoRegionLabels = filter.locationIds.length > 0 ? ecoRegionLabels.filter((d) => ecoRegions[d].some((id) => filter.locationIds.includes(id))) : ecoRegionLabels;
-  const filteredCountryLabels = filter.locationIds.length > 0 ? countryLabels.filter((d) => countries[d].some((id) => filter.locationIds.includes(id))) : countryLabels;
-  const filteredStateLabels = filter.locationIds.length > 0 ? stateLabels.filter((d) => states[d].some((id) => filter.locationIds.includes(id))) : stateLabels;
-  
+  const filteredEcoRegionLabels =
+    filter.locationIds.length > 0
+      ? ecoRegionLabels.filter((d) => ecoRegions[d].some((id) => filter.locationIds.includes(id)))
+      : ecoRegionLabels;
+  const filteredCountryLabels =
+    filter.locationIds.length > 0 ? countryLabels.filter((d) => countries[d].some((id) => filter.locationIds.includes(id))) : countryLabels;
+  const filteredStateLabels =
+    filter.locationIds.length > 0 ? stateLabels.filter((d) => states[d].some((id) => filter.locationIds.includes(id))) : stateLabels;
+
   return (
     <>
       {data?.locationIds && states && countries ? (
@@ -242,7 +243,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
           <Box ml={1} display="flex" flexDirection="row">
             <Box m={1} width={300} mr={3}>
               <Typography variant="subtitle2">Geometry</Typography>
-              <SpeciesCorrectGeometryFilter onChange={updateGeometry} filter={filter}/>
+              <SpeciesCorrectGeometryFilter onChange={updateGeometry} filter={filter} />
             </Box>
             <Box m={1} width={300}>
               <Typography variant="subtitle2">Area/State</Typography>
