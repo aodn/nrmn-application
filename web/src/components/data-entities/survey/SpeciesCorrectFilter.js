@@ -18,6 +18,8 @@ const SpeciesCorrectFilter = ({onSearch}) => {
   const [stateLabels, setStateLabels] = useState([]);
   const [ecoRegionLabels, setEcoRegionLabels] = useState([]);
 
+  const [enabledFilters, setEnabledFilters] = useState({ecoRegion: true, country: true, state: true});
+  
   const [dataResponse, setDataResponse] = useState();
 
   const [loading, setLoading] = useState(true);
@@ -128,6 +130,13 @@ const SpeciesCorrectFilter = ({onSearch}) => {
     {...initialFilter}
   );
 
+  useEffect(() => {
+    setEnabledFilters({
+      ecoRegion: !filter.country && !filter.state && !filter.location, 
+      country: !filter.state && !filter.location, 
+      state: !filter.location});
+  }, [filter]);
+
   const updateStartDate = (e) => {
     updateFilter({field: 'startDate', value: e.target.value});
   };
@@ -171,6 +180,10 @@ const SpeciesCorrectFilter = ({onSearch}) => {
       filter.observableItemId ||
       filter.geometry);
 
+  const filteredEcoRegionLabels = filter.locationIds.length > 0 ? ecoRegionLabels.filter((d) => ecoRegions[d].some((id) => filter.locationIds.includes(id))) : ecoRegionLabels;
+  const filteredCountryLabels = filter.locationIds.length > 0 ? countryLabels.filter((d) => countries[d].some((id) => filter.locationIds.includes(id))) : countryLabels;
+  const filteredStateLabels = filter.locationIds.length > 0 ? stateLabels.filter((d) => states[d].some((id) => filter.locationIds.includes(id))) : stateLabels;
+  
   return (
     <>
       {data?.locationIds && states && countries ? (
@@ -199,26 +212,25 @@ const SpeciesCorrectFilter = ({onSearch}) => {
               />
             </Box>
             <Box m={1} width={300}>
-              <Typography variant="subtitle2">Location</Typography>
+              <Typography variant="subtitle2">EcoRegion</Typography>
               <Autocomplete
-                disabled={loading}
+                disabled={loading || !enabledFilters.ecoRegion}
                 filterSelectedOptions
-                getOptionLabel={(id) => data.locations[id]}
-                value={filter.locationId}
-                onChange={updateLocation}
-                options={data.locationIds}
+                onChange={updateEcoRegion}
+                options={filteredEcoRegionLabels}
+                value={filter.ecoRegion}
                 renderInput={(params) => <TextField {...params} />}
                 size="small"
               />
             </Box>
             <Box m={1} width={300}>
-              <Typography variant="subtitle2">EcoRegion</Typography>
+              <Typography variant="subtitle2">Country</Typography>
               <Autocomplete
-                disabled={loading}
+                disabled={loading || !enabledFilters.country}
                 filterSelectedOptions
-                onChange={updateEcoRegion}
-                options={ecoRegionLabels}
-                value={filter.ecoRegion}
+                onChange={updateCountry}
+                options={filteredCountryLabels}
+                value={filter.country}
                 renderInput={(params) => <TextField {...params} />}
                 size="small"
               />
@@ -233,25 +245,26 @@ const SpeciesCorrectFilter = ({onSearch}) => {
               <SpeciesCorrectGeometryFilter onChange={updateGeometry} filter={filter}/>
             </Box>
             <Box m={1} width={300}>
-              <Typography variant="subtitle2">Country</Typography>
+              <Typography variant="subtitle2">Area/State</Typography>
               <Autocomplete
-                disabled={loading}
+                disabled={loading || !enabledFilters.state}
                 filterSelectedOptions
-                onChange={updateCountry}
-                options={countryLabels}
-                value={filter.country}
+                onChange={updateState}
+                options={filteredStateLabels}
+                value={filter.state}
                 renderInput={(params) => <TextField {...params} />}
                 size="small"
               />
             </Box>
             <Box m={1} width={300}>
-              <Typography variant="subtitle2">Area/State</Typography>
+              <Typography variant="subtitle2">Location</Typography>
               <Autocomplete
                 disabled={loading}
                 filterSelectedOptions
-                onChange={updateState}
-                options={stateLabels}
-                value={filter.state}
+                getOptionLabel={(id) => data.locations[id]}
+                value={filter.locationId}
+                onChange={updateLocation}
+                options={data.locationIds}
                 renderInput={(params) => <TextField {...params} />}
                 size="small"
               />
