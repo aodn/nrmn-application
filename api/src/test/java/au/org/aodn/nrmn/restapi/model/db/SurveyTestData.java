@@ -44,6 +44,7 @@ public class SurveyTestData {
 
     public Survey buildWith(int itemNumber) {
         return Survey.builder()
+                .locked(false)
                 .program(programTestData.buildWith(itemNumber))
                 .site(siteTestData.buildWith(itemNumber))
                 .surveyDate(Date.valueOf(date.plusDays(itemNumber)))
@@ -60,6 +61,7 @@ public class SurveyTestData {
 
     public SurveyBuilder defaultBuilder() {
         return Survey.builder()
+                     .locked(false)
                      .program(programTestData.persistedProgram())
                      .site(siteTestData.persistedSite())
                      .surveyDate(Date.valueOf("2004-11-21"))

@@ -109,7 +109,7 @@ public class SurveyCorrectionService {
     private void surveyDeletionTransaction(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows) {
         var messages = new ArrayList<String>();
 
-        if (survey.getLocked())
+        if (survey.getLocked() != null && survey.getLocked())
             throw new RuntimeException("Cannot delete a survey with locked data");
 
         // Remove existing observations
@@ -171,7 +171,7 @@ public class SurveyCorrectionService {
         surveyMethodRepository.deleteForSurveyIds(surveyIds);
         var surveys = surveyRepository.findAllById(surveyIds);
 
-        if (surveys.stream().anyMatch(s -> s.getLocked()))
+        if (surveys.stream().anyMatch(s -> s.getLocked() != null && s.getLocked()))
             throw new RuntimeException("Cannot correct locked survey data");
 
         for (var survey : surveys) {

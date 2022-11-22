@@ -96,8 +96,8 @@ public class SurveyCorrectionServiceTest {
         var diver = Diver.builder().initials("SAM").build();
         var obsItemType = ObsItemType.builder().obsItemTypeId(1).build();
         var observableItem = ObservableItem.builder().obsItemType(obsItemType).observableItemName("THE SPECIES").build();
-        ingestedSurvey = Survey.builder().surveyId(1).build();
-        lockedSurvey = Survey.builder().surveyId(2).locked(true).build();
+        ingestedSurvey = Survey.builder().locked(false).surveyId(1).build();
+        lockedSurvey = Survey.builder().locked(true).surveyId(2).build();
         ingestedJob = StagedJob.builder().id(1L).program(program).build();
 
         startingMeasures = Map.of(1, 4, 3, 7);

@@ -264,7 +264,6 @@ public class CorrectionController {
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> getSurveyCorrections(@RequestParam("surveyIds") List<Integer> surveyIds) {
 
-        // are any surveys locked?
         var lockedSurveys = surveyRepository.findAllById(surveyIds).stream()
                 .filter(s -> s.getLocked() != null && s.getLocked())
                 .collect(Collectors.toList());
@@ -425,7 +424,7 @@ public class CorrectionController {
 
         var survey = surveyOptional.get();
 
-        if (survey.getLocked())
+        if (survey.getLocked() != null && survey.getLocked())
             return ResponseEntity.badRequest().body("Deletion Failed. Survey is locked.");
 
         if (survey.getPqCatalogued() != null && survey.getPqCatalogued())
