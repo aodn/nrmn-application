@@ -121,16 +121,18 @@ const SurveyEdit = () => {
         onClose={() => setConfirmDelete(false)}
         onConfirm={onDelete}
       />
-      <Box m={2} display="flex" flexDirection="row" width="100%">
-        <Box flexGrow={1}>
-          <Typography variant="h4">Edit Survey Metadata</Typography>
-        </Box>
-        <Box display="flex" flexDirection="row">
-          <AuthContext.Consumer>
+      <Box m={2} display="flex" flexDirection="column" width="100%">
+        <Box display="flex" flexDirection="row" width="100%">
+          <Box flexGrow={1}>
+            <Typography variant="h4">Edit Survey Metadata</Typography>
+          </Box>
+          <Box display="flex" flexDirection="row">
+            <AuthContext.Consumer>
               {({auth}) =>
                 auth?.features?.includes('corrections') && (
                   <Box>
                     <Button
+                      disabled={item.locked === true}
                       variant="outlined"
                       startIcon={<Construction />}
                       onClick={() => setRedirect({to: `/data/survey/${surveyId}/correct`})}
@@ -140,14 +142,25 @@ const SurveyEdit = () => {
                   </Box>
                 )
               }
-          </AuthContext.Consumer>
-          <Box ml={1}>
-            <Button variant="outlined" color="error" startIcon={<Delete />} onClick={() => setConfirmDelete(true)}>
-              Delete Survey
-            </Button>
+            </AuthContext.Consumer>
+            <Box ml={1}>
+              <Button
+                variant="outlined"
+                disabled={item.locked === true}
+                color="error"
+                startIcon={<Delete />}
+                onClick={() => setConfirmDelete(true)}
+              >
+                Delete Survey
+              </Button>
+            </Box>
           </Box>
         </Box>
+        <Box display="flex" flexDirection="row-reverse" width="100%">
+            <Typography variant="button">🔒 Survey data are locked</Typography>
+        </Box>
       </Box>
+
       <Grid container direction="column" justifyContent="flex-start" alignItems="center">
         {surveyId && Object.keys(item).length === 0 ? (
           <CircularProgress size={20} />

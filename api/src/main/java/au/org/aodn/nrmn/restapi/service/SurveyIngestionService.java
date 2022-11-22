@@ -93,6 +93,7 @@ public class SurveyIngestionService {
 
         return existingSurvey.orElseGet(() -> surveyRepository.save(
                 Survey.builder()
+                        .locked(false)
                         .depth(stagedRow.getDepth())
                         .surveyNum(stagedRow.getSurveyNum())
                         .direction(stagedRow.getDirection() != null ? stagedRow.getDirection().toString() : null)

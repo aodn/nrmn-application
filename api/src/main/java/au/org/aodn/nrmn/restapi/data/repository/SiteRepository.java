@@ -50,5 +50,5 @@ public interface SiteRepository
             "FROM nrmn.site_ref sr " +
             "WHERE ST_DWithin(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography), 200) " +
             "AND (sr.site_id <> :siteId)")
-    List<String> sitesWithin200m(Integer siteId, double longitude, double latitude);
+    List<String> sitesWithin200m(@Param("siteId") Integer siteId, @Param("longitude") double longitude, @Param("latitude") double latitude);
 }
