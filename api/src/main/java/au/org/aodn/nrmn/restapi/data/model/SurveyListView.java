@@ -22,7 +22,7 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 @Audited(withModifiedFlag = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Subselect(
-        "SELECT s.survey_id, sr.site_code, to_char(s.survey_date, 'yyyy-MM-dd') as survey_date, " +
+        "SELECT s.survey_id, s.locked, sr.site_code, to_char(s.survey_date, 'yyyy-MM-dd') as survey_date, " +
                 "       (s.depth || '.' || s.survey_num) as depth, sr.site_name, pr.program_name, " +
                 "       lr.location_name, CAST((s.pq_catalogued IS TRUE) as varchar) as pq_catalogued, COALESCE(sr.mpa, '') as mpa, " +
                 "       d.diver as full_name, d.method, meo.ecoregion, sr.country, sr.state, d.species, " +
@@ -49,6 +49,10 @@ public class SurveyListView {
     @Column(name = "survey_id")
     @Audited(targetAuditMode = NOT_AUDITED)
     private Integer surveyId;
+
+    @Column(name = "locked")
+    @Audited(targetAuditMode = NOT_AUDITED)
+    private Boolean locked;
 
     @Column(name = "site_code")
     @Audited(targetAuditMode = NOT_AUDITED)
@@ -114,6 +118,12 @@ public class SurveyListView {
     public Integer getSurveyId() {
         return surveyId;
     }
+
+    @JsonGetter
+    public Boolean getLocked() {
+        return locked;
+    }
+
 
     @JsonGetter
     public String getSiteCode() {

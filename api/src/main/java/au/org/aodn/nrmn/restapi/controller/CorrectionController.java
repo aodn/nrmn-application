@@ -264,6 +264,16 @@ public class CorrectionController {
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> getSurveyCorrections(@RequestParam("surveyIds") List<Integer> surveyIds) {
 
+        // are any surveys locked?
+        var lockedSurveys = surveyRepository.findAllById(surveyIds).stream()
+                .filter(s -> s.getLocked() != null && s.getLocked())
+                .collect(Collectors.toList());
+
+        if (lockedSurveys.size() > 0) {
+            var locked = lockedSurveys.stream().map(s -> s.getSurveyId().toString()).collect(Collectors.joining(", "));
+            return ResponseEntity.badRequest().body("Surveys are locked and cannot be corrected: " + locked);
+        }
+
         var programs = correctionRowRepository.findProgramsBySurveyIds(surveyIds)
                 .stream()
                 .collect(Collectors.toList());
@@ -414,6 +424,9 @@ public class CorrectionController {
             return ResponseEntity.notFound().build();
 
         var survey = surveyOptional.get();
+
+        if (survey.getLocked())
+            return ResponseEntity.badRequest().body("Deletion Failed. Survey is locked.");
 
         if (survey.getPqCatalogued() != null && survey.getPqCatalogued())
             return ResponseEntity.badRequest().body("Deletion Failed. PQs catalogued for this survey.");

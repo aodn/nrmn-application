@@ -143,7 +143,7 @@ const SurveyList = () => {
                 tooltipValueGetter={() => 'Correct Survey'}
                 resizable={false}
                 sortable={false}
-                checkboxSelection={true}
+                checkboxSelection={(e) => e.data?.locked !== true}
                 cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
                 onCellClicked={(e) => {
                   if (e.event.ctrlKey) {
@@ -202,8 +202,7 @@ const SurveyList = () => {
             <AgGridColumn flex={1} field="state" colId="survey.state" />
             <AgGridColumn flex={1} field="ecoregion" colId="survey.ecoregion" />
             <AgGridColumn flex={1} field="locationName" colId="survey.locationName" />
-            <AgGridColumn flex={1} field="species" colId="survey.species"
-                          tooltipValueGetter={(param) => param.value} />
+            <AgGridColumn flex={1} field="species" colId="survey.species" tooltipValueGetter={(param) => param.value} />
           </AgGridReact>
         </>
       )}

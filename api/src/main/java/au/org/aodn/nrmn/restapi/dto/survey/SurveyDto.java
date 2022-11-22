@@ -36,6 +36,7 @@ public class SurveyDto {
     private String pqDiver;
     private String pqDiverInitials;
     private Boolean blockAbundanceSimulated;
+    private Boolean locked;
     private String projectTitle;
     private String surveyNotDone;
     private String locationName;
