@@ -84,7 +84,7 @@ public class SurveyCorrectionServiceTest {
 
     StagedRowFormatted.StagedRowFormattedBuilder rowBuilder;
     Map<Integer, Integer> startingMeasures;
-    Survey ingestedSurvey;
+    Survey ingestedSurvey, lockedSurvey;
     StagedJob ingestedJob;
 
     @BeforeEach
@@ -96,7 +96,8 @@ public class SurveyCorrectionServiceTest {
         var diver = Diver.builder().initials("SAM").build();
         var obsItemType = ObsItemType.builder().obsItemTypeId(1).build();
         var observableItem = ObservableItem.builder().obsItemType(obsItemType).observableItemName("THE SPECIES").build();
-        ingestedSurvey = Survey.builder().surveyId(1).build();
+        ingestedSurvey = Survey.builder().locked(false).surveyId(1).build();
+        lockedSurvey = Survey.builder().locked(true).surveyId(2).build();
         ingestedJob = StagedJob.builder().id(1L).program(program).build();
 
         startingMeasures = Map.of(1, 4, 3, 7);
@@ -145,5 +146,37 @@ public class SurveyCorrectionServiceTest {
             fail(e.getMessage());
         }
         Mockito.verify(surveyRepository, times(1)).deleteById(1);
+    }
+
+
+    @Test
+    void correctLockedSurveyFailed() {
+
+        when(surveyRepository.findAllById(any())).thenReturn(Arrays.asList(lockedSurvey));
+
+        var correctedRow = rowBuilder.build();
+        var correctedMeasures = Map.of(2, 5);
+        correctedRow.setMeasureJson(correctedMeasures);
+
+        try {
+            surveyCorrectionService.correctSurvey(ingestedJob, Arrays.asList(1), Arrays.asList(correctedRow));
+        } catch (Exception e) {
+            assertEquals(e.getMessage(), "Cannot correct locked survey data");
+            return;
+        }
+
+        fail("Should have thrown an exception");
+    }
+
+    @Test
+    void deleteLockedsurveyFails() {
+        try {
+            surveyCorrectionService.deleteSurvey(ingestedJob, lockedSurvey, Arrays.asList());
+        } catch (Exception e) {
+            assertEquals(e.getMessage(), "Cannot delete a survey with locked data");
+            return;
+        }
+
+        fail("Should have thrown an exception");
     }
 }

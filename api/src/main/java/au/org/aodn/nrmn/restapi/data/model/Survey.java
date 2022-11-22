@@ -112,6 +112,11 @@ public class Survey {
     private Boolean pqCatalogued;
 
     @Basic
+    @Column(name = "locked")
+    @Schema(title = "Locked")
+    private Boolean locked;
+
+    @Basic
     @Column(name = "pq_zip_url")
     @Schema(title = "PQ zip url")
     private String pqZipUrl;
