@@ -1,4 +1,5 @@
-import {Alert, Box, Button, IconButton, LinearProgress, TextField, Typography} from '@mui/material';
+import {Alert, Box, Button, IconButton, LinearProgress, Link, TextField, Typography} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Close';
 import React, {useEffect, useReducer, useState} from 'react';
 import {getSurveySpecies, postSpeciesCorrection} from '../../../api/api';
 import CustomSearchInput from '../../input/CustomSearchInput';
@@ -36,8 +37,7 @@ const SpeciesCorrect = () => {
         return {loading: false, search: null, request: null, error: action.payload};
       }
       case 'postCorrection': {
-        // TODO: flatten `correctionLocations` into surveyIds
-        const surveyIds = correctionLocations.reduce((p,v) => ([...p, ...v.surveyIds]), []);
+        const surveyIds = correctionLocations.reduce((p, v) => [...p, ...v.surveyIds], []);
         const payload = {prevObservableItemId: selected.result, newObservableItemId: correction.newObservableItemId, surveyIds};
         return {loading: true, results: null, request: {search: state.search, type: 'post', payload}};
       }
@@ -116,7 +116,7 @@ const SpeciesCorrect = () => {
             </Box>
           )}
           {detail && (
-            <Box width="50%" borderLeft={1} borderColor="divider" mr={2} style={{overflowX: 'hidden', overflowY: 'auto'}}>
+            <Box width="50%" borderLeft={1} borderColor="divider" style={{overflowX: 'hidden', overflowY: 'auto'}}>
               <Box mx={1}>
                 <Typography variant="subtitle2">Current species name</Typography>
                 <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
@@ -165,11 +165,29 @@ const SpeciesCorrect = () => {
               <Box m={1} key={detail.observableItemId}>
                 {correctionLocations?.map((l) => {
                   return (
-                    <p key={l.locationId} onClick={() => {
-                      setCorrectionLocations([...correctionLocations.filter(c => c.locationName !== l.locationName)]);
-                    }}>
-                      {l.locationName} {l.surveyIds.join(',')}
-                    </p>
+                    <Box key={l.locationId} borderBottom={1} borderColor="divider">
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          setCorrectionLocations([...correctionLocations.filter((c) => c.locationName !== l.locationName)]);
+                        }}
+                      >
+                        <DeleteIcon fontSize="inherit" />
+                      </IconButton>
+                      <Typography variant="caption" sx={{fontWeight: 'medium'}}>
+                        {l.locationName}{' '}
+                      </Typography>
+                      <Typography variant="caption">
+                        {l.surveyIds.map((l) => (
+                          <>
+                            <Link key={l} onClick={() => window.open(`/data/survey/${l}`, '_blank').focus()} href='#'>
+                              {l}
+                            </Link>
+                            {', '}
+                          </>
+                        ))}
+                      </Typography>
+                    </Box>
                   );
                 })}
               </Box>
