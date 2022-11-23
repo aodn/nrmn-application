@@ -7,7 +7,7 @@ import {PropTypes} from 'prop-types';
 import CustomSearchInput from '../../input/CustomSearchInput';
 import SpeciesCorrectGeometryFilter from './SpeciesCorrectGeometryFilter';
 
-const SpeciesCorrectFilter = ({onSearch}) => {
+const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
   const [data, setData] = useState();
   const [countries, setCountries] = useState();
   const [states, setState] = useState();
@@ -55,7 +55,7 @@ const SpeciesCorrectFilter = ({onSearch}) => {
             locationIds.push(d.id);
           });
         setData({locations, locationIds});
-
+        onLoadLocations(locations);
         const groups = {ecoRegions: [], countries: [], areas: []};
         res.data.items.forEach((d) => {
           locations[d.id] = d.locationName;
@@ -290,7 +290,8 @@ const SpeciesCorrectFilter = ({onSearch}) => {
 };
 
 SpeciesCorrectFilter.propTypes = {
-  onSearch: PropTypes.func.isRequired
+  onSearch: PropTypes.func.isRequired,
+  onLoadLocations: PropTypes.func
 };
 
 export default SpeciesCorrectFilter;

@@ -12,10 +12,11 @@ const removeNullProperties = (obj) => {
 };
 
 const SpeciesCorrect = () => {
-  const [selected, setSelected] = useState(null);
   const [correction, setCorrection] = useState({newObservableItemName: null});
   const [locationChips, setLocationChips] = useState([]);
+  const [locationData, setLocationData] = useState([]);
   const [searchResults, setSearchResults] = useState(null);
+  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
     setCorrection({newObservableItemName: null});
@@ -32,7 +33,7 @@ const SpeciesCorrect = () => {
         return {loading: false, search: null, request: null, error: action.payload};
       }
       case 'postCorrection': {
-        const surveyIds = searchResults.find((r) => r.observableItemId === selected.result).surveyIds;
+        const surveyIds = Object.keys(searchResults.find((r) => r.observableItemId === selected.result).surveyJson);
         const payload = {prevObservableItemId: selected.result, newObservableItemId: correction.newObservableItemId, surveyIds};
         return {loading: true, results: null, request: {search: state.search, type: 'post', payload}};
       }
@@ -47,7 +48,8 @@ const SpeciesCorrect = () => {
         case 'search': {
           var payload = removeNullProperties(request.request.payload);
           getSurveySpecies(payload).then((res) => {
-            setSearchResults(res.data.map((p) => ({...p, surveyIds: JSON.parse(p.surveyIds)})));
+            const out = res.data.map((p) => ({...p, surveyJson: JSON.parse(p.surveyJson)}));
+            setSearchResults(out);
             dispatch({type: 'showResults'});
           });
           break;
@@ -69,6 +71,7 @@ const SpeciesCorrect = () => {
         <Typography variant="h4">Correct Species</Typography>
       </Box>
       <SpeciesCorrectFilter
+        onLoadLocations={(locations) => setLocationData(locations)}
         onSearch={(filter, chips) => {
           setSearchResults([]);
           setSelected(null);
@@ -98,7 +101,7 @@ const SpeciesCorrect = () => {
             </Box>
           )}
           {detail && (
-            <Box width="50%" borderLeft={1} borderColor='divider' mr={2} style={{overflowX: 'hidden', overflowY: 'auto'}}>
+            <Box width="50%" borderLeft={1} borderColor="divider" mr={2} style={{overflowX: 'hidden', overflowY: 'auto'}}>
               <Box mx={1}>
                 <Typography variant="subtitle2">Current species name</Typography>
                 <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
@@ -145,14 +148,18 @@ const SpeciesCorrect = () => {
                 </Button>
               </Box>
               <Box m={1} key={detail.observableItemId}>
-                <Box m={1}>
-                  {locationChips?.map((c) => (
+                {Array.from(new Set(Object.values(detail.surveyJson))).map((l) => {
+                  const surveys = Object.entries(detail.surveyJson).filter((s) => s[1] === l);
+                  return <p key={l}>{locationData[l]} {surveys.join(',')}</p>;
+                })}
+                {/* <Box m={1}>
+                  {Object.values?.map((c) => (
                     <Chip key={`location-${c.id}`} label={c.locationName} style={{margin: 5}} />
                   ))}
                 </Box>
                 <Typography variant="subtitle2">Surveys to correct</Typography>
                 <Box m={1}>
-                  {detail?.surveyIds.map((id) => (
+                  {detail?.surveyJson && Object.keys(detail.surveyJson).map((id) => (
                     <Chip
                       key={`survey-${detail.observableItemId}-${id}`}
                       label={id}
@@ -161,7 +168,7 @@ const SpeciesCorrect = () => {
                       clickable
                     />
                   ))}
-                </Box>
+                </Box> */}
               </Box>
             </Box>
           )}
