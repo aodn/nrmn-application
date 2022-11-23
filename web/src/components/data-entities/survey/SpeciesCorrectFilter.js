@@ -34,7 +34,7 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
       observableItemId: null,
       geometry: '',
       species: null,
-      locationIds: []
+      locationIds: null
     };
   }, []);
 
@@ -175,13 +175,13 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
     (filter.locationId || filter.country || filter.ecoRegion || filter.state || filter.observableItemId || filter.geometry);
 
   const filteredEcoRegionLabels =
-    filter.locationIds.length > 0
+    filter.locationIds?.length > 0
       ? ecoRegionLabels.filter((d) => ecoRegions[d].some((id) => filter.locationIds.includes(id)))
       : ecoRegionLabels;
   const filteredCountryLabels =
-    filter.locationIds.length > 0 ? countryLabels.filter((d) => countries[d].some((id) => filter.locationIds.includes(id))) : countryLabels;
+    filter.locationIds?.length > 0 ? countryLabels.filter((d) => countries[d].some((id) => filter.locationIds.includes(id))) : countryLabels;
   const filteredStateLabels =
-    filter.locationIds.length > 0 ? stateLabels.filter((d) => states[d].some((id) => filter.locationIds.includes(id))) : stateLabels;
+    filter.locationIds?.length > 0 ? stateLabels.filter((d) => states[d].some((id) => filter.locationIds.includes(id))) : stateLabels;
 
   return (
     <>
@@ -263,7 +263,7 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
                 getOptionLabel={(id) => data.locations[id]}
                 value={filter.locationId || null}
                 onChange={updateLocation}
-                options={data.locationIds}
+                options={filter.locationIds || data.locationIds}
                 renderInput={(params) => <TextField {...params} />}
                 size="small"
               />

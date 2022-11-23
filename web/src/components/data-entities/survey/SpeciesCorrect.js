@@ -91,7 +91,9 @@ const SpeciesCorrect = () => {
         onSearch={(filter) => {
           setSearchResults([]);
           setSelected(null);
-          dispatch({type: 'getRequest', payload: filter});
+          const payload = {...filter, locationIds: filter.locationId ? [filter.locationId] : filter.locationIds};
+          delete payload.locationId;
+          dispatch({type: 'getRequest', payload});
         }}
       />
       {request.loading && <LinearProgress />}
@@ -183,7 +185,7 @@ const SpeciesCorrect = () => {
                             <Link key={l} onClick={() => window.open(`/data/survey/${l}`, '_blank').focus()} href='#'>
                               {l}
                             </Link>
-                            {', '}
+                            {' '}
                           </>
                         ))}
                       </Typography>
