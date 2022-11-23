@@ -17,7 +17,7 @@ FROM (SELECT DISTINCT sm.survey_id
          OR o.observation_attribute -> 'SpeciesSex' IS NOT NULL
          OR o.observation_attribute -> 'SimulatedAbsence' IS NOT NULL
          OR o.observation_attribute -> 'SizeClassEstimated' IS NOT NULL
-         OR o.observation_attribute -> 'NonStandardData' IS NOT NULL
+         OR sm.survey_method_attribute -> 'NonStandardData' IS NOT NULL
          OR sm.survey_method_attribute -> 'LegacyMethod' IS NOT NULL) su
 where su.survey_id = s.survey_id;
 
