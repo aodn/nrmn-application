@@ -1,4 +1,4 @@
-import {Alert, Box, Button, Chip, IconButton, LinearProgress, TextField, Typography} from '@mui/material';
+import {Alert, Box, Button, IconButton, LinearProgress, TextField, Typography} from '@mui/material';
 import React, {useEffect, useReducer, useState} from 'react';
 import {getSurveySpecies, postSpeciesCorrection} from '../../../api/api';
 import CustomSearchInput from '../../input/CustomSearchInput';
@@ -13,14 +13,17 @@ const removeNullProperties = (obj) => {
 
 const SpeciesCorrect = () => {
   const [correction, setCorrection] = useState({newObservableItemName: null});
-  const [locationChips, setLocationChips] = useState([]);
   const [locationData, setLocationData] = useState([]);
   const [searchResults, setSearchResults] = useState(null);
   const [selected, setSelected] = useState(null);
+  const [correctionLocations, setCorrectionLocations] = useState([]);
 
   useEffect(() => {
+    if (!selected || selected.jobId) return;
+    const resultLocations = searchResults.find((r) => r.observableItemId === selected.result).locations;
     setCorrection({newObservableItemName: null});
-  }, [selected]);
+    setCorrectionLocations([...resultLocations]);
+  }, [selected, setCorrectionLocations, searchResults]);
 
   const [request, dispatch] = useReducer((state, action) => {
     switch (action.type) {
@@ -33,7 +36,8 @@ const SpeciesCorrect = () => {
         return {loading: false, search: null, request: null, error: action.payload};
       }
       case 'postCorrection': {
-        const surveyIds = Object.keys(searchResults.find((r) => r.observableItemId === selected.result).surveyJson);
+        // TODO: flatten `correctionLocations` into surveyIds
+        const surveyIds = correctionLocations.reduce((p,v) => ([...p, ...v.surveyIds]), []);
         const payload = {prevObservableItemId: selected.result, newObservableItemId: correction.newObservableItemId, surveyIds};
         return {loading: true, results: null, request: {search: state.search, type: 'post', payload}};
       }
@@ -48,8 +52,20 @@ const SpeciesCorrect = () => {
         case 'search': {
           var payload = removeNullProperties(request.request.payload);
           getSurveySpecies(payload).then((res) => {
-            const out = res.data.map((p) => ({...p, surveyJson: JSON.parse(p.surveyJson)}));
-            setSearchResults(out);
+            const rowData = res.data.map((p) => {
+              const surveyJson = JSON.parse(p.surveyJson);
+
+              const locations = Array.from(new Set(Object.values(surveyJson))).map((l) => {
+                const surveyIds = Object.entries(surveyJson)
+                  .filter((s) => s[1] === l)
+                  .map((e) => e[0]);
+                return {locationId: l, locationName: locationData[l], surveyIds};
+              });
+
+              return {...p, locations};
+            });
+
+            setSearchResults(rowData);
             dispatch({type: 'showResults'});
           });
           break;
@@ -61,7 +77,7 @@ const SpeciesCorrect = () => {
           });
           break;
       }
-  }, [request.request]);
+  }, [request.request, locationData]);
 
   const detail = searchResults?.find((r) => r.observableItemId === selected?.result);
   const req = request.request;
@@ -72,11 +88,10 @@ const SpeciesCorrect = () => {
       </Box>
       <SpeciesCorrectFilter
         onLoadLocations={(locations) => setLocationData(locations)}
-        onSearch={(filter, chips) => {
+        onSearch={(filter) => {
           setSearchResults([]);
           setSelected(null);
           dispatch({type: 'getRequest', payload: filter});
-          setLocationChips(chips);
         }}
       />
       {request.loading && <LinearProgress />}
@@ -148,27 +163,15 @@ const SpeciesCorrect = () => {
                 </Button>
               </Box>
               <Box m={1} key={detail.observableItemId}>
-                {Array.from(new Set(Object.values(detail.surveyJson))).map((l) => {
-                  const surveys = Object.entries(detail.surveyJson).filter((s) => s[1] === l);
-                  return <p key={l}>{locationData[l]} {surveys.join(',')}</p>;
+                {correctionLocations?.map((l) => {
+                  return (
+                    <p key={l.locationId} onClick={() => {
+                      setCorrectionLocations([...correctionLocations.filter(c => c.locationName !== l.locationName)]);
+                    }}>
+                      {l.locationName} {l.surveyIds.join(',')}
+                    </p>
+                  );
                 })}
-                {/* <Box m={1}>
-                  {Object.values?.map((c) => (
-                    <Chip key={`location-${c.id}`} label={c.locationName} style={{margin: 5}} />
-                  ))}
-                </Box>
-                <Typography variant="subtitle2">Surveys to correct</Typography>
-                <Box m={1}>
-                  {detail?.surveyJson && Object.keys(detail.surveyJson).map((id) => (
-                    <Chip
-                      key={`survey-${detail.observableItemId}-${id}`}
-                      label={id}
-                      style={{margin: 5}}
-                      onClick={() => window.open(`/data/survey/${id}`, '_blank').focus()}
-                      clickable
-                    />
-                  ))}
-                </Box> */}
               </Box>
             </Box>
           )}

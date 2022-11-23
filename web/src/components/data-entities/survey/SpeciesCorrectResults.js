@@ -69,7 +69,9 @@ const SpeciesCorrectResults = ({results, onClick}) => {
               </TableRow>
             ))
           ) : (
-            <TableCell colSpan={4}>No Results</TableCell>
+            <TableRow>
+              <TableCell colSpan={4}>No Results</TableCell>
+            </TableRow>
           )}
         </TableBody>
       </Table>
