@@ -156,9 +156,9 @@ const SurveyEdit = () => {
             </Box>
           </Box>
         </Box>
-        <Box display="flex" flexDirection="row-reverse" width="100%">
+        {item.locked === true && <Box display="flex" flexDirection="row-reverse" width="100%">
             <Typography variant="button">🔒 Survey data are locked</Typography>
-        </Box>
+        </Box>}
       </Box>
 
       <Grid container direction="column" justifyContent="flex-start" alignItems="center">
