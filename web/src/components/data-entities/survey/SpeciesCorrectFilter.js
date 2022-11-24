@@ -5,19 +5,19 @@ import {getEntity} from '../../../api/api';
 import LoadingButton from '@mui/lab/LoadingButton';
 import {PropTypes} from 'prop-types';
 import CustomSearchInput from '../../input/CustomSearchInput';
+import SpeciesCorrectGeometryFilter from './SpeciesCorrectGeometryFilter';
 
-const SpeciesCorrectFilter = ({onSearch}) => {
+const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
   const [data, setData] = useState();
   const [countries, setCountries] = useState();
   const [states, setState] = useState();
   const [ecoRegions, setEcoRegions] = useState();
 
-  const [locationChips, setLocationChips] = useState([]);
   const [countryLabels, setCountryLabels] = useState([]);
   const [stateLabels, setStateLabels] = useState([]);
   const [ecoRegionLabels, setEcoRegionLabels] = useState([]);
 
-  const [dataResponse, setDataResponse] = useState();
+  const [enabledFilters, setEnabledFilters] = useState({ecoRegion: true, country: true, state: true});
 
   const [loading, setLoading] = useState(true);
 
@@ -32,28 +32,25 @@ const SpeciesCorrectFilter = ({onSearch}) => {
       ecoRegion: null,
       locationId: null,
       observableItemId: null,
-      coord1: '',
-      coord2: '',
+      geometry: '',
       species: null,
-      locationIds: []
+      locationIds: null
     };
-  },[]);
+  }, []);
 
   useEffect(() => {
     async function fetchLocations() {
       await getEntity('locations?pageSize=1000').then((res) => {
-        const activeLocations = res.data.items.filter((i) => i.status === 'Active');
-        setDataResponse(activeLocations);
         const locations = [];
         const locationIds = [];
         res.data.items
+          .filter((i) => i.status === 'Active')
           .sort((a, b) => a.locationName.localeCompare(b.locationName))
           .forEach((d) => {
             locations[d.id] = d.locationName;
             locationIds.push(d.id);
           });
         setData({locations, locationIds});
-
         const groups = {ecoRegions: [], countries: [], areas: []};
         res.data.items.forEach((d) => {
           locations[d.id] = d.locationName;
@@ -103,6 +100,12 @@ const SpeciesCorrectFilter = ({onSearch}) => {
     fetchLocations();
   }, []);
 
+  useEffect(() => {
+    if (data?.locations && onLoadLocations) {
+      onLoadLocations(data.locations);
+    }
+  }, [data, onLoadLocations]);
+
   const [filter, updateFilter] = useReducer(
     (filter, action) => {
       if (!action) return {...initialFilter};
@@ -119,15 +122,19 @@ const SpeciesCorrectFilter = ({onSearch}) => {
       if (countries[updated['country']]) locationIds = [...locationIds, ...countries[updated['country']]];
       if (ecoRegions[updated['ecoRegion']]) locationIds = [...locationIds, ...ecoRegions[updated['ecoRegion']]];
 
-      locationIds = [...new Set(locationIds.filter((d) => d))];
-
-      updated['locationIds'] = locationIds.join(',');
-      const chips = dataResponse.filter((d) => locationIds.includes(d.id)).map((d) => ({id: d.id, locationName: d.locationName}));
-      setLocationChips(chips);
+      updated['locationIds'] = [...new Set(locationIds.filter((d) => d))];
       return updated;
     },
     {...initialFilter}
   );
+
+  useEffect(() => {
+    setEnabledFilters({
+      ecoRegion: !filter.country && !filter.state && !filter.locationId,
+      country: !filter.state && !filter.locationId,
+      state: !filter.locationId
+    });
+  }, [filter]);
 
   const updateStartDate = (e) => {
     updateFilter({field: 'startDate', value: e.target.value});
@@ -149,6 +156,10 @@ const SpeciesCorrectFilter = ({onSearch}) => {
     updateFilter({field: 'state', value: value});
   };
 
+  const updateGeometry = (value) => {
+    updateFilter({field: 'geometry', value: value});
+  };
+
   const updateEcoRegion = (e, value) => {
     updateFilter({field: 'ecoRegion', value: value});
   };
@@ -158,23 +169,19 @@ const SpeciesCorrectFilter = ({onSearch}) => {
     updateFilter({field: 'species', value: e ? e.species : null});
   };
 
-  const updateCoord1 = (e) => {
-    updateFilter({field: 'coord1', value: e.target.value});
-  };
-
-  const updateCoord2 = (e) => {
-    updateFilter({field: 'coord2', value: e.target.value});
-  };
-
   const canSearch =
     filter.startDate &&
     filter.endDate &&
-    (filter.locationId ||
-      filter.country ||
-      filter.ecoRegion ||
-      filter.state ||
-      filter.observableItemId ||
-      (filter.coord1 && filter.coord2));
+    (filter.locationId || filter.country || filter.ecoRegion || filter.state || filter.observableItemId || filter.geometry);
+
+  const filteredEcoRegionLabels =
+    filter.locationIds?.length > 0
+      ? ecoRegionLabels.filter((d) => ecoRegions[d].some((id) => filter.locationIds.includes(id)))
+      : ecoRegionLabels;
+  const filteredCountryLabels =
+    filter.locationIds?.length > 0 ? countryLabels.filter((d) => countries[d].some((id) => filter.locationIds.includes(id))) : countryLabels;
+  const filteredStateLabels =
+    filter.locationIds?.length > 0 ? stateLabels.filter((d) => states[d].some((id) => filter.locationIds.includes(id))) : stateLabels;
 
   return (
     <>
@@ -204,74 +211,70 @@ const SpeciesCorrectFilter = ({onSearch}) => {
               />
             </Box>
             <Box m={1} width={300}>
+              <Typography variant="subtitle2">EcoRegion</Typography>
+              <Autocomplete
+                disabled={loading || !enabledFilters.ecoRegion}
+                filterSelectedOptions
+                onChange={updateEcoRegion}
+                options={filteredEcoRegionLabels}
+                value={filter.ecoRegion || null}
+                renderInput={(params) => <TextField {...params} />}
+                size="small"
+              />
+            </Box>
+            <Box m={1} width={300}>
+              <Typography variant="subtitle2">Country</Typography>
+              <Autocomplete
+                disabled={loading || !enabledFilters.country}
+                filterSelectedOptions
+                onChange={updateCountry}
+                options={filteredCountryLabels}
+                value={filter.country || null}
+                renderInput={(params) => <TextField {...params} />}
+                size="small"
+              />
+            </Box>
+            <Box m={1} width={300}>
+              <CustomSearchInput fullWidth label="Species" formData={filter.species || null} onChange={updateObservableItem} />
+            </Box>
+          </Box>
+          <Box ml={1} display="flex" flexDirection="row">
+            <Box ml={1} width={300} mr={3}>
+              <Typography variant="subtitle2">Geometry</Typography>
+              <SpeciesCorrectGeometryFilter onChange={updateGeometry} filter={filter} />
+            </Box>
+            <Box mx={1} width={300}>
+              <Typography variant="subtitle2">Area/State</Typography>
+              <Autocomplete
+                disabled={loading || !enabledFilters.state}
+                filterSelectedOptions
+                onChange={updateState}
+                options={filteredStateLabels}
+                value={filter.state || null}
+                renderInput={(params) => <TextField {...params} />}
+                size="small"
+              />
+            </Box>
+            <Box mx={1} width={300}>
               <Typography variant="subtitle2">Location</Typography>
               <Autocomplete
                 disabled={loading}
                 filterSelectedOptions
                 getOptionLabel={(id) => data.locations[id]}
-                value={filter.locationId}
+                value={filter.locationId || null}
                 onChange={updateLocation}
-                options={data.locationIds}
+                options={filter.locationIds || data.locationIds}
                 renderInput={(params) => <TextField {...params} />}
                 size="small"
               />
             </Box>
-            <Box m={1} width={300}>
-              <Typography variant="subtitle2">EcoRegion</Typography>
-              <Autocomplete
-                disabled={loading}
-                filterSelectedOptions
-                onChange={updateEcoRegion}
-                options={ecoRegionLabels}
-                value={filter.ecoRegion}
-                renderInput={(params) => <TextField {...params} />}
-                size="small"
-              />
-            </Box>
-            <Box m={1} width={300}>
-              <CustomSearchInput fullWidth label="Species" formData={filter.species} onChange={updateObservableItem} />
-            </Box>
-          </Box>
-          <Box ml={1} display="flex" flexDirection="row">
-            <Box m={1} width={150}>
-              <Typography variant="subtitle2">BBox Min</Typography>
-              <input onChange={updateCoord1} value={filter.coord1} style={{height: '35px', width: '150px'}} />
-            </Box>
-            <Box m={1} width={150}>
-              <Typography variant="subtitle2">BBox Max</Typography>
-              <input onChange={updateCoord2} value={filter.coord2} style={{height: '35px', width: '150px'}} />
-            </Box>
-            <Box m={1} width={300}>
-              <Typography variant="subtitle2">Country</Typography>
-              <Autocomplete
-                disabled={loading}
-                filterSelectedOptions
-                onChange={updateCountry}
-                options={countryLabels}
-                value={filter.country}
-                renderInput={(params) => <TextField {...params} />}
-                size="small"
-              />
-            </Box>
-            <Box m={1} width={300}>
-              <Typography variant="subtitle2">Area/State</Typography>
-              <Autocomplete
-                disabled={loading}
-                filterSelectedOptions
-                onChange={updateState}
-                options={stateLabels}
-                value={filter.state}
-                renderInput={(params) => <TextField {...params} />}
-                size="small"
-              />
-            </Box>
-            <Box mx={1} mt={4} width={50}>
+            <Box ml={1} mt={3} width={50}>
               <Button onClick={() => updateFilter()} fullWidth variant="outlined">
                 Reset
               </Button>
             </Box>
-            <Box m={1} my={4} width={220}>
-              <LoadingButton disabled={!canSearch} onClick={() => onSearch(filter, locationChips)} fullWidth variant="contained">
+            <Box ml={3} mr={1} my={3} width={220}>
+              <LoadingButton disabled={!canSearch} onClick={() => onSearch(filter)} fullWidth variant="contained">
                 Search
               </LoadingButton>
             </Box>
@@ -285,7 +288,8 @@ const SpeciesCorrectFilter = ({onSearch}) => {
 };
 
 SpeciesCorrectFilter.propTypes = {
-  onSearch: PropTypes.func.isRequired
+  onSearch: PropTypes.func.isRequired,
+  onLoadLocations: PropTypes.func
 };
 
 export default SpeciesCorrectFilter;

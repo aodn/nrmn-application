@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,10 +42,10 @@ import au.org.aodn.nrmn.restapi.data.repository.StagedJobLogRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.data.repository.UserActionAuditRepository;
-import au.org.aodn.nrmn.restapi.dto.BoundingBoxDto;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRequestBodyDto;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowsDto;
 import au.org.aodn.nrmn.restapi.dto.correction.SpeciesCorrectBodyDto;
+import au.org.aodn.nrmn.restapi.dto.correction.SpeciesSearchBodyDto;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
@@ -459,39 +458,15 @@ public class CorrectionController {
         return ResponseEntity.ok().body(job.getId());
     }
 
-    @GetMapping("correctSpecies")
+    @PostMapping("searchSpecies")
     public ResponseEntity<?> getSpeciesForSurveysDateAndLocation(
-            @RequestParam(value = "startDate") String startDate,
-            @RequestParam(value = "endDate") String endDate,
-            @RequestParam(value = "locationIds", required = false) List<Integer> locationIds,
-            @RequestParam(value = "observableItemId", required = false) Integer observableItemId,
-            @RequestParam(value = "coord1", required = false) String coord1,
-            @RequestParam(value = "coord2", required = false) String coord2) {
+            Authentication authentication,
+            @RequestBody SpeciesSearchBodyDto bodyDto) {
 
         try {
-            var bbox = new BoundingBoxDto(coord1, coord2);
-
-            if ((!StringUtils.isEmpty(coord1) || !StringUtils.isEmpty(coord2)) && !bbox.valid())
-                return ResponseEntity.badRequest().body("Invalid bounding box");
-
-            var species = (locationIds != null) ? observableItemRepository.getAllDistinctForSurveysAndLocations(
-                    startDate,
-                    endDate,
-                    locationIds,
-                    observableItemId,
-                    bbox.getXmin(),
-                    bbox.getYmin(),
-                    bbox.getXmax(),
-                    bbox.getYmax())
-                    : observableItemRepository.getAllDistinctForSurveys(
-                            startDate,
-                            endDate,
-                            observableItemId,
-                            bbox.getXmin(),
-                            bbox.getYmin(),
-                            bbox.getXmax(),
-                            bbox.getYmax());
-
+            var withLocation = bodyDto.getLocationIds().size() > 0;;
+            var species = observableItemRepository.getAllDistinctForSurveysAndLocationsKML(bodyDto.getStartDate(),
+                    bodyDto.getEndDate(), withLocation, bodyDto.getLocationIds(), bodyDto.getObservableItemId(), bodyDto.getGeometry());
             return ResponseEntity.ok().body(species);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Query failed");

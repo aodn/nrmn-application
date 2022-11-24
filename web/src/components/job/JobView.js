@@ -118,7 +118,7 @@ const JobView = () => {
                   <Typography variant="h6" color="primary" style={{paddingLeft: 15, fontSize: 15, fontWeight: 400}}>
                     Surveys: ({job.surveyIds.length})
                   </Typography>
-                  <Grid container xs={12}>
+                  <Grid container>
                     {job.surveyIds.map((id) => (
                       <Chip key={id} style={{margin: 5}} label={id} component="a" href={`/data/survey/${id}`} clickable />
                     ))}

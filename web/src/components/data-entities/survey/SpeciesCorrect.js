@@ -1,6 +1,7 @@
-import { Alert, Box, Button, Chip, IconButton, LinearProgress, TextField, Typography } from '@mui/material';
-import React, { useEffect, useReducer, useState } from 'react';
-import { getSurveySpecies, postSpeciesCorrection } from '../../../api/api';
+import {Alert, Box, Button, IconButton, LinearProgress, Link, TextField, Typography} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Close';
+import React, {useEffect, useReducer, useState} from 'react';
+import {getSurveySpecies, postSpeciesCorrection} from '../../../api/api';
 import CustomSearchInput from '../../input/CustomSearchInput';
 import SpeciesCorrectFilter from './SpeciesCorrectFilter';
 import SpeciesCorrectResults from './SpeciesCorrectResults';
@@ -12,14 +13,18 @@ const removeNullProperties = (obj) => {
 };
 
 const SpeciesCorrect = () => {
-  const [selected, setSelected] = useState(null);
   const [correction, setCorrection] = useState({newObservableItemName: null});
-  const [locationChips, setLocationChips] = useState([]);
+  const [locationData, setLocationData] = useState([]);
   const [searchResults, setSearchResults] = useState(null);
+  const [selected, setSelected] = useState(null);
+  const [correctionLocations, setCorrectionLocations] = useState([]);
 
   useEffect(() => {
+    if (!selected || selected.jobId) return;
+    const resultLocations = searchResults.find((r) => r.observableItemId === selected.result).locations;
     setCorrection({newObservableItemName: null});
-  }, [selected]);
+    setCorrectionLocations([...resultLocations]);
+  }, [selected, setCorrectionLocations, searchResults]);
 
   const [request, dispatch] = useReducer((state, action) => {
     switch (action.type) {
@@ -32,7 +37,7 @@ const SpeciesCorrect = () => {
         return {loading: false, search: null, request: null, error: action.payload};
       }
       case 'postCorrection': {
-        const surveyIds = searchResults.find((r) => r.observableItemId === selected.result).surveyIds;
+        const surveyIds = correctionLocations.reduce((p, v) => [...p, ...v.surveyIds], []);
         const payload = {prevObservableItemId: selected.result, newObservableItemId: correction.newObservableItemId, surveyIds};
         return {loading: true, results: null, request: {search: state.search, type: 'post', payload}};
       }
@@ -47,7 +52,20 @@ const SpeciesCorrect = () => {
         case 'search': {
           var payload = removeNullProperties(request.request.payload);
           getSurveySpecies(payload).then((res) => {
-            setSearchResults(res.data.map((p) => ({...p, surveyIds: JSON.parse(p.surveyIds)})));
+            const rowData = res.data.map((p) => {
+              const surveyJson = JSON.parse(p.surveyJson);
+
+              const locations = Array.from(new Set(Object.values(surveyJson))).map((l) => {
+                const surveyIds = Object.entries(surveyJson)
+                  .filter((s) => s[1] === l)
+                  .map((e) => e[0]);
+                return {locationId: l, locationName: locationData[l], surveyIds};
+              });
+
+              return {...p, locations};
+            });
+
+            setSearchResults(rowData);
             dispatch({type: 'showResults'});
           });
           break;
@@ -59,7 +77,7 @@ const SpeciesCorrect = () => {
           });
           break;
       }
-  }, [request.request]);
+  }, [request.request, locationData]);
 
   const detail = searchResults?.find((r) => r.observableItemId === selected?.result);
   const req = request.request;
@@ -69,11 +87,13 @@ const SpeciesCorrect = () => {
         <Typography variant="h4">Correct Species</Typography>
       </Box>
       <SpeciesCorrectFilter
-        onSearch={(filter, chips) => {
+        onLoadLocations={(locations) => setLocationData(locations)}
+        onSearch={(filter) => {
           setSearchResults([]);
           setSelected(null);
-          dispatch({type: 'getRequest', payload: filter});
-          setLocationChips(chips);
+          const payload = {...filter, locationIds: filter.locationId ? [filter.locationId] : filter.locationIds};
+          delete payload.locationId;
+          dispatch({type: 'getRequest', payload});
         }}
       />
       {request.loading && <LinearProgress />}
@@ -98,8 +118,8 @@ const SpeciesCorrect = () => {
             </Box>
           )}
           {detail && (
-            <Box width="50%" m={2} style={{overflowX: 'hidden', overflowY: 'auto'}}>
-              <Box m={1}>
+            <Box width="50%" borderLeft={1} borderColor="divider" style={{overflowX: 'hidden', overflowY: 'auto'}}>
+              <Box mx={1}>
                 <Typography variant="subtitle2">Current species name</Typography>
                 <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
                   <TextField fullWidth color="primary" size="small" value={detail.observableItemName} spellCheck={false} readOnly />
@@ -145,23 +165,33 @@ const SpeciesCorrect = () => {
                 </Button>
               </Box>
               <Box m={1} key={detail.observableItemId}>
-                <Box m={1}>
-                  {locationChips?.map((c) => (
-                    <Chip key={`location-${c.id}`} label={c.locationName} style={{margin: 5}} />
-                  ))}
-                </Box>
-                <Typography variant="subtitle2">Surveys to correct</Typography>
-                <Box m={1}>
-                  {detail?.surveyIds.map((id) => (
-                    <Chip
-                      key={`survey-${detail.observableItemId}-${id}`}
-                      label={id}
-                      style={{margin: 5}}
-                      onClick={() => window.open(`/data/survey/${id}`, '_blank').focus()}
-                      clickable
-                    />
-                  ))}
-                </Box>
+                {correctionLocations?.map((l) => {
+                  return (
+                    <Box key={l.locationId} borderBottom={1} borderColor="divider">
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          setCorrectionLocations([...correctionLocations.filter((c) => c.locationName !== l.locationName)]);
+                        }}
+                      >
+                        <DeleteIcon fontSize="inherit" />
+                      </IconButton>
+                      <Typography variant="caption" sx={{fontWeight: 'medium'}}>
+                        {l.locationName}{' '}
+                      </Typography>
+                      <Typography variant="caption">
+                        {l.surveyIds.map((l) => (
+                          <>
+                            <Link key={l} onClick={() => window.open(`/data/survey/${l}`, '_blank').focus()} href='#'>
+                              {l}
+                            </Link>
+                            {' '}
+                          </>
+                        ))}
+                      </Typography>
+                    </Box>
+                  );
+                })}
               </Box>
             </Box>
           )}

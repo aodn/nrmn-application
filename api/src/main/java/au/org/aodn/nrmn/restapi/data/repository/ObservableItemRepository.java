@@ -86,58 +86,27 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
     ObservableItemSuperseded findSupersededForId(@Param("id") Integer id);
 
     @Query(value = ""
-            + "select distinct observable_item_id as observableItemId,"
-            + "observable_item_name as observableItemName, superseded_by as supersededBy, common_name as commonName, CAST(jsonb_agg(survey_id) AS TEXT) as surveyIds from "
-            + "(select i.observable_item_id, i.common_name, i.observable_item_name, i.superseded_by, l.location_name, s.survey_id, s.survey_date from nrmn.survey s  "
-            + "join nrmn.survey_method m on m.survey_id = s.survey_id  "
-            + "join nrmn.observation o on m.survey_method_id = o.survey_method_id "
-            + "join nrmn.observable_item_ref i on o.observable_item_id = i.observable_item_id "
-            + "join nrmn.site_ref t on s.site_id = t.site_id "
-            + "join nrmn.location_ref l on l.location_id = t.location_id "
+            + "select distinct observable_item_id as observableItemId, "
+            + "observable_item_name as observableItemName, superseded_by as supersededBy, common_name as commonName, CAST(jsonb_object_agg(survey_id, location_id) AS TEXT) as surveyJson from "
+            + "(select i.observable_item_id, i.common_name, i.observable_item_name, i.superseded_by, l.location_id, s.survey_id from nrmn.survey s "
+            + "join nrmn.survey_method m on m.survey_id = s.survey_id   "
+            + "join nrmn.observation o on m.survey_method_id = o.survey_method_id  "
+            + "join nrmn.observable_item_ref i on o.observable_item_id = i.observable_item_id  "
+            + "join nrmn.site_ref t on s.site_id = t.site_id  "
+            + "join nrmn.location_ref l on l.location_id = t.location_id  "
             + "WHERE s.survey_date < cast(:endDate as date) AND s.survey_date > cast(:startDate as date) "
+            + "AND (:withLocation IS FALSE OR l.location_id IN :locationIds) "
             + "AND (:observableItemId IS NULL OR o.observable_item_id = :observableItemId) "
-            + "AND (:xmin IS NULL "
-            + "                  OR (s.latitude is not null and s.longitude is not null AND st_within(st_makepoint(s.latitude, s.longitude), st_makeenvelope(:xmin, :ymin, :xmax, :ymax))) "
-            + "                  OR st_within(t.geom, st_makeenvelope(:xmin, :ymin, :xmax, :ymax))) "
+            + "AND (:kml IS NULL OR st_within(t.geom, ST_GeomFromKML(:kml))) "
             + ") as ob "
-            + "group by observable_item_id, observable_item_name, common_name, superseded_by "
-            + "order by observableItemName, supersededBy"
+            + "group by observable_item_id, observable_item_name, common_name, superseded_by  "
+            + "order by observableItemName, supersededBy "
             + "", nativeQuery = true)
-    List<SpeciesCorrectDto> getAllDistinctForSurveys(
+    List<SpeciesCorrectDto> getAllDistinctForSurveysAndLocationsKML(
             @Param("startDate") String startDate,
             @Param("endDate") String endDate,
-            @Param("observableItemId") Integer observableItemId,
-            @Param("xmin") Double xmin,
-            @Param("ymin") Double ymin,
-            @Param("xmax") Double xmax,
-            @Param("ymax") Double ymax);
-
-    @Query(value = ""
-            + "select distinct observable_item_id as observableItemId,"
-            + "observable_item_name as observableItemName, superseded_by as supersededBy, common_name as commonName, CAST(jsonb_agg(survey_id) AS TEXT) as surveyIds from "
-            + "(select i.observable_item_id, i.common_name, i.observable_item_name, i.superseded_by, l.location_name, s.survey_id, s.survey_date from nrmn.survey s  "
-            + "join nrmn.survey_method m on m.survey_id = s.survey_id  "
-            + "join nrmn.observation o on m.survey_method_id = o.survey_method_id "
-            + "join nrmn.observable_item_ref i on o.observable_item_id = i.observable_item_id "
-            + "join nrmn.site_ref t on s.site_id = t.site_id "
-            + "join nrmn.location_ref l on l.location_id = t.location_id "
-            + "WHERE s.survey_date < cast(:endDate as date) AND s.survey_date > cast(:startDate as date) "
-            + "AND (l.location_id IN :locationIds) "
-            + "AND (:observableItemId IS NULL OR o.observable_item_id = :observableItemId) "
-            + "AND (:xmin IS NULL "
-            + "                  OR (s.latitude is not null and s.longitude is not null AND st_within(st_makepoint(s.latitude, s.longitude), st_makeenvelope(:xmin, :ymin, :xmax, :ymax))) "
-            + "                  OR st_within(t.geom, st_makeenvelope(:xmin, :ymin, :xmax, :ymax))) "
-            + ") as ob "
-            + "group by observable_item_id, observable_item_name, common_name, superseded_by "
-            + "order by observableItemName, supersededBy"
-            + "", nativeQuery = true)
-    List<SpeciesCorrectDto> getAllDistinctForSurveysAndLocations(
-            @Param("startDate") String startDate,
-            @Param("endDate") String endDate,
+            @Param("withLocation") Boolean withLocation,
             @Param("locationIds") List<Integer> locationIds,
             @Param("observableItemId") Integer observableItemId,
-            @Param("xmin") Double xmin,
-            @Param("ymin") Double ymin,
-            @Param("xmax") Double xmax,
-            @Param("ymax") Double ymax);
+            @Param("kml") String kml);
 }
