@@ -28,7 +28,7 @@ public class SurveyValidation {
     @Autowired
     SurveyRepository surveyRepository;
 
-    private static final Integer[] METHODS_TO_CHECK = { 0, 1, 2, 7, 10 };
+    private static final Integer[] METHODS_TO_CHECK = { 0, 1, 2, 3, 7, 10 };
 
     private static final LocalDate DATE_MIN_RLS = LocalDate.parse("2006-01-01");
     private static final LocalDate DATE_MIN_ATRC = LocalDate.parse("1991-01-01");
@@ -234,7 +234,8 @@ public class SurveyValidation {
             if (existingSurveyIds.size() > 0 && !existingSurveyIds.contains(row.getSurveyId())) {
                 var existingSurveyId = existingSurveyIds.get(0);
                 var message = "Survey exists: " + existingSurveyId + " includes " + row.getDecimalSurvey();
-                return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.BLOCKING, message,
+                var level = (row.getMethod() == 3) ? ValidationLevel.WARNING : ValidationLevel.BLOCKING;
+                return new SurveyValidationError(ValidationCategory.DATA, level, message,
                         Arrays.asList(row.getId()), Arrays.asList("siteCode"));
             }
 
@@ -248,17 +249,23 @@ public class SurveyValidation {
 
         for (var survey : surveyMap.entrySet()) {
             var surveyRows = survey.getValue();
+            var row = surveyRows.get(0);
 
             if (validation == ProgramValidation.ATRC) {
                 // VALIDATION: Survey group transect number valid
                 res.add(validateSurveyTransectNumber(surveyRows));
             }
 
-            // VALIDATION: Survey Complete
-            res.add(validateSurveyComplete(validation, surveyRows));
-
             // VALIDATION: Is Existing Survey
-            res.add(validateSurveyIsNew(surveyRows.get(0)));
+            res.add(validateSurveyIsNew(row));
+
+            // Skip SurveyComplete if M3 and survey exists
+            var surveyExistsM3 = row.getMethod() == 3 && res.stream().anyMatch(e -> e != null && e.getMessage().contains("Survey exists:"));
+
+            // VALIDATION: Survey Complete
+            if(!surveyExistsM3) {
+                res.add(validateSurveyComplete(validation, surveyRows));
+            }
         }
 
         res.remove(null);
