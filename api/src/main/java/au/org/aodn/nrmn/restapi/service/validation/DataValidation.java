@@ -101,6 +101,10 @@ public class DataValidation {
         }
 
         var errors = new ValidationResultSet();
+        if(rows == null || rows.size() == 0) {
+            errors.add(null, ValidationLevel.BLOCKING, "ID", "Survey data is missing");
+            return errors.getAll();
+        }
 
         errors.addAll(checkDuplicateRows(false, true, rows));
 
