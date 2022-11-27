@@ -20,6 +20,7 @@ import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
+import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.model.db.SiteTestData;
 import au.org.aodn.nrmn.restapi.model.db.StagedJobTestData;
 import au.org.aodn.nrmn.restapi.model.db.SurveyTestData;
@@ -84,12 +85,12 @@ class SurveyExistsIT {
         stagedRowRepo.deleteAll();
         stagedRowRepo.saveAll(Arrays.asList(sn1));
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey exists:")));
+        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey exists:") && e.getLevelId() == ValidationLevel.BLOCKING));
         assertEquals(1, response.getExistingSurveyCount());
     }
 
     @Test
-    void existingSurveyShouldSucceedMethod3() {
+    void existingSurveyShouldWarnMethod3() {
         StagedJob job = stagedJobTestData.persistedJobWithReference("ref");
         Survey survey = surveyTestData.persistedSurvey();
         StagedRow sn1 = new StagedRow();
@@ -101,7 +102,7 @@ class SurveyExistsIT {
         stagedRowRepo.deleteAll();
         stagedRowRepo.saveAll(Arrays.asList(sn1));
         ValidationResponse response = validationProcess.process(job);
-        assertFalse(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey exists:")));
-        assertEquals(0, response.getExistingSurveyCount());
+        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey exists:") && e.getLevelId() == ValidationLevel.WARNING));
+        assertEquals(1, response.getExistingSurveyCount());
     }
 }
