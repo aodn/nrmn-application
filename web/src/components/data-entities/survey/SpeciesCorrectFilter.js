@@ -41,7 +41,8 @@ const SpeciesCorrectFilter = ({display, onSearch, onLoadLocations}) => {
       await getEntity('locations?all=true').then((res) => {
         const locations = [];
         const locationIds = [];
-        res.data.filter((i) => i.status === 'Active')
+        res.data
+          .filter((i) => i.status === 'Active')
           .sort((a, b) => a.locationName.localeCompare(b.locationName))
           .forEach((d) => {
             locations[d.id] = d.locationName;
@@ -65,7 +66,7 @@ const SpeciesCorrectFilter = ({display, onSearch, onLoadLocations}) => {
         setCountries(groups.countries);
         setState(groups.areas);
 
-        const labels = res.data.items.reduce(
+        const labels = res.data.reduce(
           (acc, cur) => {
             cur.countries?.split(',').forEach((country) => {
               country = country.trim();
@@ -122,25 +123,24 @@ const SpeciesCorrectFilter = ({display, onSearch, onLoadLocations}) => {
           default:
             break;
         }
-        return updated;
       } else if (!action.value) {
         delete updated[action.field];
-      } else {
-        updated[action.field] = action.value;
-
-        const set_1 = new Set(states[updated['state']]);
-        const set_2 = new Set(countries[updated['country']]);
-        const set_3 = new Set(ecoRegions[updated['ecoRegion']]);
-
-        var intersect = new Set([...set_1, ...set_2, ...set_3]);
-        if (set_1.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_1.has(i)));
-        if (set_2.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_2.has(i)));
-        if (set_3.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_3.has(i)));
-
-        var intersect_arr = Array.from(intersect);
-        intersect_arr.filter((l) => !filter.locationIds.includes(l));
-        updated['stagedLocationIds'] = [...new Set(intersect_arr.filter((d) => d))];
       }
+      updated[action.field] = action.value;
+
+      const set_1 = new Set(states[updated['state']]);
+      const set_2 = new Set(countries[updated['country']]);
+      const set_3 = new Set(ecoRegions[updated['ecoRegion']]);
+
+      var intersect = new Set([...set_1, ...set_2, ...set_3]);
+      if (set_1.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_1.has(i)));
+      if (set_2.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_2.has(i)));
+      if (set_3.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_3.has(i)));
+
+      var intersect_arr = Array.from(intersect);
+      intersect_arr.filter((l) => !filter.locationIds.includes(l));
+      updated['stagedLocationIds'] = [...new Set(intersect_arr.filter((d) => d))];
+
       return updated;
     },
     {...initialFilter}
