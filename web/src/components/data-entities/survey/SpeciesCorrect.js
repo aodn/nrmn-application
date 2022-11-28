@@ -82,7 +82,7 @@ const SpeciesCorrect = () => {
           });
           break;
       }
-  }, [request.request, locationData]);
+  }, [request.request, request.loading, locationData]);
 
   const detail = searchResults?.find((r) => r.observableItemId === selected?.result);
   const req = request.request;
