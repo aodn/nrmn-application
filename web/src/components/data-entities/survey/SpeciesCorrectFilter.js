@@ -7,7 +7,7 @@ import {PropTypes} from 'prop-types';
 import CustomSearchInput from '../../input/CustomSearchInput';
 import SpeciesCorrectGeometryFilter from './SpeciesCorrectGeometryFilter';
 
-const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
+const SpeciesCorrectFilter = ({display, onSearch, onLoadLocations}) => {
   const [data, setData] = useState();
   const [countries, setCountries] = useState();
   const [states, setState] = useState();
@@ -38,11 +38,10 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
 
   useEffect(() => {
     async function fetchLocations() {
-      await getEntity('locations?pageSize=1000').then((res) => {
+      await getEntity('locations?all=true').then((res) => {
         const locations = [];
         const locationIds = [];
-        res.data.items
-          .filter((i) => i.status === 'Active')
+        res.data.filter((i) => i.status === 'Active')
           .sort((a, b) => a.locationName.localeCompare(b.locationName))
           .forEach((d) => {
             locations[d.id] = d.locationName;
@@ -50,7 +49,7 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
           });
         setData({locations, locationIds});
         const groups = {ecoRegions: [], countries: [], areas: []};
-        res.data.items.forEach((d) => {
+        res.data.forEach((d) => {
           locations[d.id] = d.locationName;
           ['ecoRegions', 'countries', 'areas'].forEach((prop) => {
             d[prop]
@@ -128,20 +127,20 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
         delete updated[action.field];
       } else {
         updated[action.field] = action.value;
+
+        const set_1 = new Set(states[updated['state']]);
+        const set_2 = new Set(countries[updated['country']]);
+        const set_3 = new Set(ecoRegions[updated['ecoRegion']]);
+
+        var intersect = new Set([...set_1, ...set_2, ...set_3]);
+        if (set_1.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_1.has(i)));
+        if (set_2.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_2.has(i)));
+        if (set_3.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_3.has(i)));
+
+        var intersect_arr = Array.from(intersect);
+        intersect_arr.filter((l) => !filter.locationIds.includes(l));
+        updated['stagedLocationIds'] = [...new Set(intersect_arr.filter((d) => d))];
       }
-
-      const set_1 = new Set(states[updated['state']]);
-      const set_2 = new Set(countries[updated['country']]);
-      const set_3 = new Set(ecoRegions[updated['ecoRegion']]);
-
-      var intersect = new Set([...set_1, ...set_2, ...set_3]);
-      if (set_1.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_1.has(i)));
-      if (set_2.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_2.has(i)));
-      if (set_3.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_3.has(i)));
-
-      var intersect_arr = Array.from(intersect);
-      intersect_arr.filter((l) => !filter.locationIds.includes(l));
-      updated['stagedLocationIds'] = [...new Set(intersect_arr.filter((d) => d))];
       return updated;
     },
     {...initialFilter}
@@ -193,121 +192,131 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
       ? stateLabels.filter((d) => states[d].some((id) => filter.stagedLocationIds.includes(id)))
       : stateLabels;
 
+  const visibleLocations = filter.stagedLocationIds?.length > 0 || filter.locationIds?.length > 0;
   const visibleStagedLocations = filter.stagedLocationIds?.filter((l) => !filter.locationIds.includes(l)) || [];
 
   return (
     <>
       {data?.locationIds && states && countries ? (
-        <>
-          <Box ml={1} display="flex" flexDirection="row">
-            <Box m={1} minWidth={300} display="flex">
-              <Box>
-                <Typography variant="subtitle2">Start Date</Typography>
-                <input
+        display && (
+          <>
+            <Box ml={1} display="flex" flexDirection="row">
+              <Box m={1} minWidth={300} display="flex">
+                <Box>
+                  <Typography variant="subtitle2">Start Date</Typography>
+                  <input
+                    disabled={loading}
+                    max={filter.endDate}
+                    onChange={updateStartDate}
+                    style={{height: '35px', width: '130px'}}
+                    type="date"
+                    value={filter.startDate}
+                  />
+                </Box>
+                <Box ml={1}>
+                  <Typography variant="subtitle2">End Date</Typography>
+                  <input
+                    disabled={loading}
+                    min={filter.startDate}
+                    onChange={updateEndDate}
+                    style={{height: '35px', width: '130px'}}
+                    type="date"
+                    value={filter.endDate}
+                  />
+                </Box>
+              </Box>
+              <Box m={1} minWidth={300}>
+                <Typography variant="subtitle2">Geometry</Typography>
+                <SpeciesCorrectGeometryFilter onChange={updateGeometry} filter={filter} />
+              </Box>
+              <Box m={1} minWidth={300}>
+                <CustomSearchInput fullWidth label="Species" formData={filter.species || null} onChange={updateObservableItem} />
+              </Box>
+            </Box>
+            <Box ml={1} display="flex" flexDirection="row">
+              <Box m={1} minWidth={300}>
+                <Typography variant="subtitle2">EcoRegion</Typography>
+                <Autocomplete
                   disabled={loading}
-                  max={filter.endDate}
-                  onChange={updateStartDate}
-                  style={{height: '35px', width: '130px'}}
-                  type="date"
-                  value={filter.startDate}
+                  filterSelectedOptions
+                  onChange={updateEcoRegion}
+                  options={filteredEcoRegionLabels}
+                  value={filter.ecoRegion || null}
+                  renderInput={(params) => <TextField {...params} />}
+                  size="small"
                 />
               </Box>
-              <Box ml={1}>
-                <Typography variant="subtitle2">End Date</Typography>
-                <input
+              <Box m={1} minWidth={300}>
+                <Typography variant="subtitle2">Country</Typography>
+                <Autocomplete
                   disabled={loading}
-                  min={filter.startDate}
-                  onChange={updateEndDate}
-                  style={{height: '35px', width: '130px'}}
-                  type="date"
-                  value={filter.endDate}
+                  filterSelectedOptions
+                  onChange={updateCountry}
+                  options={filteredCountryLabels}
+                  value={filter.country || null}
+                  renderInput={(params) => <TextField {...params} />}
+                  size="small"
+                />
+              </Box>
+              <Box m={1} minWidth={300}>
+                <Typography variant="subtitle2">Area/State</Typography>
+                <Autocomplete
+                  disabled={loading}
+                  filterSelectedOptions
+                  onChange={updateState}
+                  options={filteredStateLabels}
+                  value={filter.state || null}
+                  renderInput={(params) => <TextField {...params} />}
+                  size="small"
                 />
               </Box>
             </Box>
-            <Box m={1} minWidth={300}>
-              <Typography variant="subtitle2">Geometry</Typography>
-              <SpeciesCorrectGeometryFilter onChange={updateGeometry} filter={filter} />
+            {visibleLocations && (
+              <Box m={2} display="flex" flexDirection="column">
+                <Box minWidth={600}>
+                  {visibleStagedLocations.map((l) => (
+                    <Chip key={l} style={{margin: 5}} label={locations[l]} onClick={() => updateFilter({action: 'addLocation', id: l})} />
+                  ))}
+                </Box>
+                <Box width={300} m={1}>
+                  <Button
+                    variant="outlined"
+                    disabled={visibleStagedLocations.length < 1}
+                    onClick={() => updateFilter({action: 'addAllLocations'})}
+                  >
+                    Add All Locations
+                  </Button>
+                </Box>
+                <Box>
+                  <hr></hr>
+                </Box>
+                <Box>
+                  {filter.locationIds &&
+                    filter.locationIds.map((l) => (
+                      <Chip
+                        key={l}
+                        style={{margin: 5}}
+                        label={locations[l]}
+                        onDelete={() => updateFilter({action: 'removeLocation', id: l})}
+                      />
+                    ))}
+                </Box>
+              </Box>
+            )}
+            <Box ml={1} display="flex" flexDirection="row">
+              <Box ml={1} mt={3} width={50}>
+                <Button onClick={() => updateFilter()} fullWidth variant="outlined">
+                  Reset
+                </Button>
+              </Box>
+              <Box ml={3} mr={1} my={3} width={220}>
+                <LoadingButton disabled={!canSearch} onClick={() => onSearch(filter)} fullWidth variant="contained">
+                  Search
+                </LoadingButton>
+              </Box>
             </Box>
-            <Box m={1} minWidth={300}>
-              <CustomSearchInput fullWidth label="Species" formData={filter.species || null} onChange={updateObservableItem} />
-            </Box>
-          </Box>
-          <Box ml={1} display="flex" flexDirection="row">
-            <Box m={1} minWidth={300}>
-              <Typography variant="subtitle2">EcoRegion</Typography>
-              <Autocomplete
-                disabled={loading}
-                filterSelectedOptions
-                onChange={updateEcoRegion}
-                options={filteredEcoRegionLabels}
-                value={filter.ecoRegion || null}
-                renderInput={(params) => <TextField {...params} />}
-                size="small"
-              />
-            </Box>
-            <Box m={1} minWidth={300}>
-              <Typography variant="subtitle2">Country</Typography>
-              <Autocomplete
-                disabled={loading}
-                filterSelectedOptions
-                onChange={updateCountry}
-                options={filteredCountryLabels}
-                value={filter.country || null}
-                renderInput={(params) => <TextField {...params} />}
-                size="small"
-              />
-            </Box>
-            <Box m={1} minWidth={300}>
-              <Typography variant="subtitle2">Area/State</Typography>
-              <Autocomplete
-                disabled={loading}
-                filterSelectedOptions
-                onChange={updateState}
-                options={filteredStateLabels}
-                value={filter.state || null}
-                renderInput={(params) => <TextField {...params} />}
-                size="small"
-              />
-            </Box>
-          </Box>{' '}
-          <Box m={2} display="flex" flexDirection="column">
-            <Box minWidth={600}>
-              {visibleStagedLocations.map((l) => (
-                <Chip key={l} style={{margin: 5}} label={locations[l]} onClick={() => updateFilter({action: 'addLocation', id: l})} />
-              ))}
-            </Box>
-            <Box width={300}>
-            <Button
-              variant="outlined"
-              disabled={visibleStagedLocations.length < 1}
-              onClick={() => updateFilter({action: 'addAllLocations'})}
-            >
-              Add All Locations
-            </Button>
-            </Box>
-            <Box>
-            <hr></hr>
-            </Box>
-            <Box>
-              {filter.locationIds &&
-                filter.locationIds.map((l) => (
-                  <Chip key={l} style={{margin: 5}} label={locations[l]} onDelete={() => updateFilter({action: 'removeLocation', id: l})} />
-                ))}
-            </Box>
-          </Box>
-          <Box ml={1} display="flex" flexDirection="row">
-            <Box ml={1} mt={3} width={50}>
-              <Button onClick={() => updateFilter()} fullWidth variant="outlined">
-                Reset
-              </Button>
-            </Box>
-            <Box ml={3} mr={1} my={3} width={220}>
-              <LoadingButton disabled={!canSearch} onClick={() => onSearch(filter)} fullWidth variant="contained">
-                Search
-              </LoadingButton>
-            </Box>
-          </Box>
-        </>
+          </>
+        )
       ) : (
         <LinearProgress />
       )}
@@ -316,6 +325,7 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
 };
 
 SpeciesCorrectFilter.propTypes = {
+  display: PropTypes.bool,
   onSearch: PropTypes.func.isRequired,
   onLoadLocations: PropTypes.func
 };
