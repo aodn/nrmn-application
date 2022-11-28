@@ -46,10 +46,15 @@ public class LocationController {
     private ObjectMapper objMapper;
 
     @GetMapping("/locations")
-    public ResponseEntity<?>  getLocationsWithFilters(@RequestParam(value = "sort", required = false) String sort,
-                                                                 @RequestParam(value = "filters", required = false) String filters,
-                                                                 @RequestParam(value = "page", defaultValue = "0") int page,
-                                                                 @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) throws JsonProcessingException {
+    public ResponseEntity<?> getLocationsWithFilters(@RequestParam(value = "sort", required = false) String sort,
+            @RequestParam(value = "filters", required = false) String filters,
+            @RequestParam(value = "all", defaultValue = "false") Boolean all,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) throws JsonProcessingException {
+
+        if (all) {
+            return ResponseEntity.ok(locationListRepository.findAll());
+        }
 
         // RequestParam do not support json object parsing automatically
         List<Filter> f = FilterCondition.parse(objMapper, filters, Filter[].class);
@@ -80,7 +85,7 @@ public class LocationController {
     @GetMapping("/location/{id}")
     public ResponseEntity<?> getLocation(@PathVariable Integer id) {
         var lOptional = locationRepository.findById(id);
-        if(!lOptional.isPresent())
+        if (!lOptional.isPresent())
             return ResponseEntity.notFound().build();
         var location = lOptional.get();
         return ResponseEntity.ok(new LocationDto(location));
