@@ -24,10 +24,10 @@ const ExtractTemplateData = () => {
 
   useEffect(() => {
     async function fetchLocations() {
-      await getEntity('locations?pageSize=99999').then((res) => {
+      await getEntity('locations?all=true').then((res) => {
         const locations = [];
         const groups = {ecoRegions: [], countries: [], areas: [], siteCodes: []};
-        res.data.items.forEach((d) => {
+        res.data.forEach((d) => {
           locations[d.id] = d.locationName;
           ['locations', 'ecoRegions', 'countries', 'areas', 'siteCodes'].forEach((prop) => {
             d[prop]

@@ -5,6 +5,8 @@ import {getSurveySpecies, postSpeciesCorrection} from '../../../api/api';
 import CustomSearchInput from '../../input/CustomSearchInput';
 import SpeciesCorrectFilter from './SpeciesCorrectFilter';
 import SpeciesCorrectResults from './SpeciesCorrectResults';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import LaunchIcon from '@mui/icons-material/Launch';
 
@@ -16,6 +18,7 @@ const SpeciesCorrect = () => {
   const [correction, setCorrection] = useState({newObservableItemName: null});
   const [locationData, setLocationData] = useState([]);
   const [searchResults, setSearchResults] = useState(null);
+  const [hideFilter, setHideFilter] = useState(false);
   const [selected, setSelected] = useState(null);
   const [correctionLocations, setCorrectionLocations] = useState([]);
 
@@ -47,6 +50,8 @@ const SpeciesCorrect = () => {
   }, {});
 
   useEffect(() => {
+    if (request.loading && request.request.type === 'search') setHideFilter(true);
+
     if (request.request)
       switch (request.request.type) {
         case 'search': {
@@ -77,7 +82,7 @@ const SpeciesCorrect = () => {
           });
           break;
       }
-  }, [request.request, locationData]);
+  }, [request.request, request.loading, locationData]);
 
   const detail = searchResults?.find((r) => r.observableItemId === selected?.result);
   const req = request.request;
@@ -86,16 +91,24 @@ const SpeciesCorrect = () => {
       <Box p={1}>
         <Typography variant="h4">Correct Species</Typography>
       </Box>
-      <SpeciesCorrectFilter
-        onLoadLocations={(locations) => setLocationData(locations)}
-        onSearch={(filter) => {
-          setSearchResults([]);
-          setSelected(null);
-          const payload = {...filter, locationIds: filter.locationId ? [filter.locationId] : filter.locationIds};
-          delete payload.locationId;
-          dispatch({type: 'getRequest', payload});
-        }}
-      />
+      <Box border={1} borderRadius={1} m={1} borderColor="divider" display="flex"  flexDirection="row">
+        <Box flex={1}>
+          <SpeciesCorrectFilter
+            display={!hideFilter}
+            onLoadLocations={(locations) => setLocationData(locations)}
+            onSearch={(filter) => {
+              setSearchResults([]);
+              setSelected(null);
+              const payload = {...filter, locationIds: filter.locationId ? [filter.locationId] : filter.locationIds};
+              delete payload.locationId;
+              dispatch({type: 'getRequest', payload});
+            }}
+          />
+        </Box>
+        <Box>
+          <IconButton onClick={() => setHideFilter(!hideFilter)}>{hideFilter ? <ExpandMoreIcon /> : <ExpandLessIcon />}</IconButton>
+        </Box>
+      </Box>
       {request.loading && <LinearProgress />}
       {request.error && <Alert severity="error">{request.error}</Alert>}
       {!request.loading && searchResults && (
@@ -182,10 +195,9 @@ const SpeciesCorrect = () => {
                       <Typography variant="caption">
                         {l.surveyIds.map((l) => (
                           <>
-                            <Link key={l} onClick={() => window.open(`/data/survey/${l}`, '_blank').focus()} href='#'>
+                            <Link key={l} onClick={() => window.open(`/data/survey/${l}`, '_blank').focus()} href="#">
                               {l}
-                            </Link>
-                            {' '}
+                            </Link>{' '}
                           </>
                         ))}
                       </Typography>

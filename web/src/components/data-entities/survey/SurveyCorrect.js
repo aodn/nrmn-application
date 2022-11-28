@@ -568,7 +568,7 @@ const SurveyCorrect = () => {
               <Box>
                 <Typography variant="h5">Confirm Survey Data Correction?</Typography>
               </Box>
-              <Box border={0} borderColor="grey" p={2} margin={3}>
+              <Box border={0} borderColor="divider" p={2} margin={3}>
                 <TableContainer classes={classes} component={Paper} disabled>
                   <Table>
                     <TableBody>
