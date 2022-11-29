@@ -202,7 +202,6 @@ const SurveyList = () => {
             <AgGridColumn flex={1} field="state" colId="survey.state" />
             <AgGridColumn flex={1} field="ecoregion" colId="survey.ecoregion" />
             <AgGridColumn flex={1} field="locationName" colId="survey.locationName" />
-            <AgGridColumn flex={1} field="species" colId="survey.species" tooltipValueGetter={(param) => param.value} />
           </AgGridReact>
         </>
       )}
