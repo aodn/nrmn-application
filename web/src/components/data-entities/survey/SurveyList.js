@@ -1,22 +1,128 @@
-import {Box, Button, Typography} from '@mui/material';
+import {Box, Button, Typography, Autocomplete, CircularProgress, TextField, Collapse, IconButton}
+  from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
-import CircularProgress from '@mui/material/CircularProgress';
 import 'ag-grid-enterprise';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useRef, useState, useEffect} from 'react';
 import {Navigate, useLocation} from 'react-router-dom';
 import {getResult} from '../../../api/api';
 import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 import {AuthContext} from '../../../contexts/auth-context';
+import clsx from 'clsx';
+import { makeStyles } from '@mui/styles';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { createFilterOptions } from '@mui/material/Autocomplete';
+
+
+// We want to keep the value between pages, so we only need to load it once.
+const cachedOptions = [];
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    maxWidth: 345,
+  },
+  media: {
+    height: 0,
+    paddingTop: '56.25%', // 16:9
+  },
+  expand: {
+    transform: 'rotate(0deg)',
+    marginLeft: 'auto',
+    transition: theme.transitions.create('transform', {
+      duration: theme.transitions.duration.shortest,
+    }),
+  },
+  expandOpen: {
+    transform: 'rotate(180deg)',
+  },
+}));
 
 const SurveyList = () => {
   const rowsPerPage = 50;
-
+  const classes = useStyles();
   const location = useLocation();
   const gridRef = useRef(null);
   const [redirect, setRedirect] = useState();
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState();
+  const [open, setOpen] = useState(false);
+  const [options, setOptions] = useState([]);
+  const [expanded, setExpanded] = React.useState(false);
+  const optionLoading = open && options.length === 0;
+
+  useEffect(() => {
+    // Empty array
+    cachedOptions.splice(0, cachedOptions.length);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    if (!optionLoading) {
+      return undefined;
+    }
+
+    if(cachedOptions.length !== 0) {
+      setOptions(cachedOptions);
+      return undefined;
+    }
+
+    (async () => {
+      const url = `reference/observableItems?pageSize=-1&sort=${encodeURIComponent('[{"field":"observation.name","order":"asc"}]')}`;
+
+      getResult(url)
+        .then((res) => {
+          res.data.items.forEach(i => cachedOptions.push(i));
+        })
+        .finally(() => {
+          if (active) {
+            setOptions(cachedOptions);
+          }
+        });
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [optionLoading]);
+
+  useEffect(() => {
+    if (!open) {
+      setOptions([]);
+    }
+  }, [open]);
+
+  // Create filter for species and push it to the ag grid to trigger page reload
+  const handleSpeciesFilterChange = useCallback((evt, newValue) => {
+    const f = gridRef.current.api.getFilterInstance('survey.observableItemId');
+
+    if(newValue.length === 0) {
+      f.setModel(null);
+    }
+    else if(newValue.length === 1) {
+      f.setModel({
+        filter: newValue[0].observableItemId,
+        filterType: 'text',
+        type: 'equals'
+      }).then(() => gridRef.current.api.onFilterChanged());
+    }
+    else {
+      const model = {
+        filterType: 'text',
+        operator: 'OR'
+      };
+
+      for(let i = 0; i < newValue.length; i++) {
+        model['condition' + (i + 1)] = {
+          filter: newValue[i].observableItemId,
+          filterType: 'text',
+          type: 'equals'
+        };
+      };
+
+      f.setModel(model).then(() => gridRef.current.api.onFilterChanged());
+    }
+  },[]);
 
   const onGridReady = useCallback(
     (event) => {
@@ -100,6 +206,16 @@ const SurveyList = () => {
               <Typography variant="h4">Surveys</Typography>
             </Box>
             <Box>
+              <IconButton
+                className={clsx(classes.expand, {
+                  [classes.expandOpen]: expanded,
+                })}
+                onClick={() => setExpanded((v) => !v)}
+                aria-expanded={expanded}
+                aria-label="Show more"
+              >
+                <ExpandMoreIcon />
+              </IconButton>
               <Button
                 variant="outlined"
                 onClick={() => setRedirect(`${selected.join(',')}/correct`)}
@@ -107,6 +223,45 @@ const SurveyList = () => {
               >
                 Correct Survey Data
               </Button>
+            </Box>
+          </Box>
+          <Box display="flex" flexDirection="row" p={1} pb={1}>
+            <Box flexGrow={1}>
+              <Collapse in={expanded} timeout="auto" unmountOnExit>
+                <Autocomplete
+                  id="species-filter"
+                  multiple
+                  style={{ width: '100%' }}
+                  open={open}
+                  onOpen={() => setOpen(true)}
+                  onClose={() => setOpen(false)}
+                  getOptionLabel={(option) => option.name}
+                  options={options}
+                  loading={optionLoading}
+                  filterSelectedOptions
+                  onChange={handleSpeciesFilterChange}
+                  filterOptions={createFilterOptions({
+                    matchFrom: 'start',
+                    stringify: (option) => option.name,
+                  })}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Species filter"
+                      variant="outlined"
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <React.Fragment>
+                            {optionLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                            {params.InputProps.endAdornment}
+                          </React.Fragment>
+                        ),
+                      }}
+                    />
+                  )}
+                />
+              </Collapse>
             </Box>
           </Box>
           <AgGridReact
@@ -194,15 +349,20 @@ const SurveyList = () => {
             <AgGridColumn width={100} headerName="Has PQs" field="pqCatalogued" colId="survey.pqCatalogued" />
             <AgGridColumn width={100} field="siteCode" colId="survey.siteCode" />
             <AgGridColumn flex={1} field="siteName" colId="survey.siteName" />
-            <AgGridColumn width={100} field="depth" colId="survey.depth" />
-            <AgGridColumn flex={1} field="diverName" colId="survey.diverName" />
-            <AgGridColumn flex={1} field="method" colId="survey.method" />
+            <AgGridColumn width={50} field="depth" colId="survey.depth" />
+            <AgGridColumn width={250} field="diverName" colId="survey.diverName" />
+            <AgGridColumn width={50} field="method" colId="survey.method" />
             <AgGridColumn width={100} field="programName" headerName="Program" colId="survey.programName" />
             <AgGridColumn flex={1} field="country" colId="survey.country" />
             <AgGridColumn flex={1} field="state" colId="survey.state" />
             <AgGridColumn flex={1} field="ecoregion" colId="survey.ecoregion" />
             <AgGridColumn flex={1} field="locationName" colId="survey.locationName" />
-            <AgGridColumn flex={1} field="species" colId="survey.species" tooltipValueGetter={(param) => param.value} />
+            {
+              /**
+               * Hidden field for apply filter to species.
+               */
+            }
+            <AgGridColumn hide={true} flex={1} colId="survey.observableItemId" />
           </AgGridReact>
         </>
       )}
