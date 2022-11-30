@@ -33,7 +33,7 @@ class ObservableItemIT {
 
     @Test
     public void testMapping() {
-        ObservableItem observableItem = observableItemTestData.persistedObservableItem();
+        ObservableItem observableItem = observableItemTestData.persistedObservableItem(observableItemTestData.defaultBuilder().build());
         entityManager.clear();
         ObservableItem persistedObservableItem = observableItemRepository.findById(observableItem.getObservableItemId()).get();
         assertEquals(observableItem.getObservableItemName(), persistedObservableItem.getObservableItemName());

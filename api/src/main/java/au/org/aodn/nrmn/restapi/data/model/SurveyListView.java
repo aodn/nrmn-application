@@ -25,7 +25,7 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
         "SELECT s.survey_id, s.locked, sr.site_code, to_char(s.survey_date, 'yyyy-MM-dd') as survey_date, " +
                 "       (s.depth || '.' || s.survey_num) as depth, sr.site_name, pr.program_name, " +
                 "       lr.location_name, CAST((s.pq_catalogued IS TRUE) as varchar) as pq_catalogued, COALESCE(sr.mpa, '') as mpa, " +
-                "       d.diver as full_name, d.method, meo.ecoregion, sr.country, sr.state, d.species, " +
+                "       d.diver as full_name, d.method, meo.ecoregion, sr.country, sr.state, " +
                 "       ROUND(sr.latitude::numeric, " + Iirc.ROUNDING_DIGIT + ") as latitude, " +
                 "       ROUND(sr.longitude::numeric, " + Iirc.ROUNDING_DIGIT + ") as longitude " +
                 "FROM nrmn.survey s " +
@@ -36,11 +36,9 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
                 "LEFT OUTER JOIN ( " +  // Allow missing diver with outer join
                 "    SELECT sm.survey_id, " +
                 "           string_agg(DISTINCT sm.method_id::text,', ' ORDER BY sm.method_id::text ASC) as method, " +
-                "           string_agg(DISTINCT oi.observable_item_name, ', ' ORDER BY oi.observable_item_name ASC) as species, " +
                 "           string_agg(DISTINCT dr.full_name, ', ' ORDER BY dr.full_name ASC) as diver " +
                 "    FROM nrmn.observation o " +
                 "        INNER JOIN nrmn.survey_method sm on o.survey_method_id = sm.survey_method_id " +
-                "        INNER JOIN nrmn.observable_item_ref oi on oi.observable_item_id = o.observable_item_id " +
                 "        INNER JOIN nrmn.diver_ref dr on dr.diver_id = o.diver_id " +
                 "    GROUP BY sm.survey_id) d on d.survey_id = s.survey_id"
 )
@@ -110,10 +108,6 @@ public class SurveyListView {
     @Audited(targetAuditMode = NOT_AUDITED)
     private String ecoregion;
 
-    @Column(name = "species")
-    @Audited(targetAuditMode = NOT_AUDITED)
-    private String species;
-
     @JsonGetter
     public Integer getSurveyId() {
         return surveyId;
@@ -173,11 +167,6 @@ public class SurveyListView {
     @JsonGetter
     public String getDiverName() {
         return fullName;
-    }
-
-    @JsonGetter
-    public String getSpecies() {
-        return species;
     }
 
     @JsonGetter

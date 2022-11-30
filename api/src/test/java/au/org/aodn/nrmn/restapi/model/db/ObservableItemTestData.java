@@ -18,9 +18,16 @@ public class ObservableItemTestData {
 
     private int observableItemNo = 0;
 
-    public ObservableItem persistedObservableItem() {
-        ObservableItem observableItem = defaultBuilder().build();
+    public ObservableItem persistedObservableItem(ObservableItem observableItem) {
         return observableItemRepository.saveAndFlush(observableItem);
+    }
+
+    public ObservableItem buildWith(int itemNumber, String itemName) {
+        return ObservableItem.builder()
+                .observableItemName("Obs" + itemNumber)
+                .obsItemType(obsItemTypeTestData.persistedObsItemType())
+                .speciesEpithet(itemName)
+                .build();
     }
 
     public ObservableItemBuilder defaultBuilder() {
