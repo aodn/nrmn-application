@@ -39,7 +39,7 @@ public class ObservationTestData {
     }
 
     public Observation buildWith(SurveyMethodEntity enitity, Diver diver, ObservableItem oi, int itemNumber) {
-        final Map<String, String> observationAttribute = new HashMap<String, String>();
+        final Map<String, String> observationAttribute = new HashMap<>();
         observationAttribute.put("Item Number", String.valueOf(itemNumber));
         return Observation.builder()
                 .surveyMethod(enitity)
@@ -53,7 +53,7 @@ public class ObservationTestData {
     }
 
     public ObservationBuilder defaultBuilder() {
-        final Map<String, String> observationAttribute = new HashMap<String, String>();
+        final Map<String, String> observationAttribute = new HashMap<>();
         observationAttribute.put("Biomass", "0.7630353218");
         return Observation.builder()
             .diver(diverTestData.persistedDiver())
