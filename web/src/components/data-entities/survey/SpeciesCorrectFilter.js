@@ -112,7 +112,7 @@ const SpeciesCorrectFilter = ({display, onSearch, onLoadLocations}) => {
       if (action.action) {
         switch (action.action) {
           case 'addAllLocations':
-            updated['locationIds'] = [...new Set(filter.stagedLocationIds.filter((d) => d))];
+            updated['locationIds'] = [...filter.locationIds, ...new Set(filter.stagedLocationIds.filter((d) => d))];
             break;
           case 'addLocation':
             updated['locationIds'] = [...filter.locationIds, action.id];
