@@ -50,7 +50,7 @@ public class ObservableItemControllerIT {
     @Test
     @WithUserDetails("test@example.com")
     public void testGetObservableItemListItems() {
-        ObservableItem testObservableItem = observableItemTestData.persistedObservableItem();
+        ObservableItem testObservableItem = observableItemTestData.persistedObservableItem(observableItemTestData.defaultBuilder().build());
 
         given()
                 .spec(spec)

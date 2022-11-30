@@ -1,10 +1,7 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import au.org.aodn.nrmn.restapi.data.model.*;
-import au.org.aodn.nrmn.restapi.model.db.DiverTestData;
-import au.org.aodn.nrmn.restapi.model.db.ObservationTestData;
-import au.org.aodn.nrmn.restapi.model.db.SurveyMethodTestData;
-import au.org.aodn.nrmn.restapi.model.db.SurveyTestData;
+import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
@@ -54,6 +51,9 @@ public class SurveyControllerIT {
 
     @Autowired
     private DiverTestData diverTestData;
+
+    @Autowired
+    private ObservableItemTestData observableItemTestData;
 
     @Autowired
     private JwtToken jwtToken;
@@ -723,5 +723,118 @@ public class SurveyControllerIT {
                 "Apple orange",
                 items.get(3).get("diverName").toString());
 
+    }
+
+    @Test
+    @WithUserDetails("test@example.com")
+    public void testFilterBySpecies() {
+        // Generate a sample data of 150, the default page size on server is 100 hence we have two page of data.
+        List<Survey> surveyList = new ArrayList<>();
+        int totalRecord = 150;
+        for (int i = 0; i < totalRecord; i++) {
+            surveyList.add(surveyTestData.buildWith(i));
+        }
+        surveyTestData.persistedSurvey(surveyList);
+
+        ObservableItem oi1 = observableItemTestData.persistedObservableItem(observableItemTestData.buildWith(1, "Species 1"));
+        ObservableItem oi2 = observableItemTestData.persistedObservableItem(observableItemTestData.buildWith(2, "Species 2"));
+        ObservableItem oi3 = observableItemTestData.persistedObservableItem(observableItemTestData.buildWith(3, "Species 3"));
+        ObservableItem oi4 = observableItemTestData.persistedObservableItem(observableItemTestData.buildWith(4, "Species 4"));
+        ObservableItem oi5 = observableItemTestData.persistedObservableItem(observableItemTestData.buildWith(5, "Species 5"));
+        ObservableItem oi6 = observableItemTestData.persistedObservableItem(observableItemTestData.buildWith(6, "Species 6"));
+        ObservableItem oi7 = observableItemTestData.persistedObservableItem(observableItemTestData.buildWith(7, "Species 7"));
+
+        for(int i = 100; i < 107; i++) {
+            SurveyMethodEntity e = surveyMethodTestData.buildWith(surveyList.get(i), i);
+            surveyMethodTestData.persistedSurveyMethod(e);
+
+            if(i == 100) {
+                Observation o = observationTestData.buildWith(e, null, oi1, i);
+                observationTestData.persistedObservation(o);
+            }
+            else if(i == 101) {
+                Observation o = observationTestData.buildWith(e, null, oi2, i);
+                observationTestData.persistedObservation(o);
+
+                o = observationTestData.buildWith(e, null, oi3, i);
+                observationTestData.persistedObservation(o);
+            }
+            else if(i == 102) {
+                Observation o = observationTestData.buildWith(e, null, oi3, i);
+                observationTestData.persistedObservation(o);
+
+                o = observationTestData.buildWith(e, null, oi4, i);
+                observationTestData.persistedObservation(o);
+
+                o = observationTestData.buildWith(e, null, oi5, i);
+                observationTestData.persistedObservation(o);
+            }
+            else if(i == 103) {
+                Observation o = observationTestData.buildWith(e, null, oi1, i);
+                observationTestData.persistedObservation(o);
+
+                o = observationTestData.buildWith(e, null, oi4, i);
+                observationTestData.persistedObservation(o);
+
+                o = observationTestData.buildWith(e, null, oi5, i);
+                observationTestData.persistedObservation(o);
+
+                o = observationTestData.buildWith(e, null, oi7, i);
+                observationTestData.persistedObservation(o);
+            }
+            else if(i == 104) {
+                Observation o = observationTestData.buildWith(e, null, oi6, i);
+                observationTestData.persistedObservation(o);
+            }
+            else if(i == 105) {
+                Observation o = observationTestData.buildWith(e, null, oi6, i);
+                observationTestData.persistedObservation(o);
+
+                o = observationTestData.buildWith(e, null, oi7, i);
+                observationTestData.persistedObservation(o);
+            }
+        }
+
+        // filter by species, expect "Species1" hit given the item id of oi1
+        Map<String, ArrayList<Map<String, Object>>> obj = given().spec(getDataSpec)
+                .queryParam("filters", "[{\"field\":\"survey.observableItemId\",\"ops\":\"equals\",\"val\":\"" +  oi1.getObservableItemId() + "\"}]")
+                .queryParam("page", 0)
+                .auth()
+                .oauth2(jwtToken.get())
+                .get("surveys")
+                .then()
+                .assertThat()
+                .statusCode(200).extract().jsonPath().get("");
+
+        assertEquals(2, obj.get("lastRow"));
+
+        List<Map<String, Object>>  items = obj.get("items");
+        assertEquals(2, items.size());
+
+        assertEquals(101, items.get(0).get("surveyId"));
+        assertEquals(104, items.get(1).get("surveyId"));
+
+        // Noted desc ordering in test, composite filter with OR
+        obj = given().spec(getDataSpec)
+                .queryParam("filters", "[{\"field\":\"survey.observableItemId\",\"ops\":\"OR\",\"conditions\":[{\"ops\":\"equals\",\"val\":\"" + oi3.getObservableItemId() + "\"},{\"ops\":\"contains\",\"val\":\"" + oi6.getObservableItemId() + "\"}]}]")
+                .queryParam("sort", "[{\"field\":\"survey.surveyId\",\"order\":\"desc\"}]")
+                .queryParam("page", 0)
+                .auth()
+                .oauth2(jwtToken.get())
+                .get("surveys")
+                .then()
+                .assertThat()
+                .statusCode(200).extract().jsonPath().get("");
+
+
+        assertEquals(4, obj.get("lastRow"));
+
+        items = obj.get("items");
+        assertEquals(4, items.size());
+
+        assertEquals(106, items.get(0).get("surveyId"));
+        assertEquals(105, items.get(1).get("surveyId"));
+        assertEquals(103, items.get(2).get("surveyId"));
+        assertEquals(102, items.get(3).get("surveyId"));
     }
 }

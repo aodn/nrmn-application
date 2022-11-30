@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.model.db;
 import java.util.HashMap;
 import java.util.Map;
 
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,13 +33,18 @@ public class ObservationTestData {
         return observation;
     }
 
+
     public Observation buildWith(SurveyMethodEntity enitity, Diver diver, int itemNumber) {
+        return buildWith(enitity, diver, null, itemNumber);
+    }
+
+    public Observation buildWith(SurveyMethodEntity enitity, Diver diver, ObservableItem oi, int itemNumber) {
         final Map<String, String> observationAttribute = new HashMap<String, String>();
         observationAttribute.put("Item Number", String.valueOf(itemNumber));
         return Observation.builder()
                 .surveyMethod(enitity)
                 .diver(diver)
-                .observableItem(observableItemTestData.persistedObservableItem())
+                .observableItem(observableItemTestData.persistedObservableItem(oi == null ? observableItemTestData.defaultBuilder().build() : oi))
                 .measure(measureTestData.persistedMeasure())
                 .measureValue(itemNumber)
                 .observationAttribute(observationAttribute)
@@ -51,7 +57,7 @@ public class ObservationTestData {
         observationAttribute.put("Biomass", "0.7630353218");
         return Observation.builder()
             .diver(diverTestData.persistedDiver())
-            .observableItem(observableItemTestData.persistedObservableItem())
+            .observableItem(observableItemTestData.persistedObservableItem(observableItemTestData.defaultBuilder().build()))
             .measure(measureTestData.persistedMeasure())
             .measureValue(4)
             .observationAttribute(observationAttribute);
