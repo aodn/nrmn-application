@@ -814,7 +814,7 @@ public class SurveyControllerIT {
         assertEquals(101, items.get(0).get("surveyId"));
         assertEquals(104, items.get(1).get("surveyId"));
 
-        // Noted desc ordering in test, composite filter with OR
+        // Noted desc ordering in test, composite filter and is always OR condition as in GUI
         obj = given().spec(getDataSpec)
                 .queryParam("filters", "[{\"field\":\"survey.observableItemId\",\"ops\":\"OR\",\"conditions\":[{\"ops\":\"equals\",\"val\":\"" + oi3.getObservableItemId() + "\"},{\"ops\":\"contains\",\"val\":\"" + oi6.getObservableItemId() + "\"}]}]")
                 .queryParam("sort", "[{\"field\":\"survey.surveyId\",\"order\":\"desc\"}]")
