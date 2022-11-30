@@ -49,6 +49,9 @@ public abstract class FilterCondition<T> {
                 // DB specific function call !!!!
                 return criteriaBuilder.function("to_char", String.class, table.get(getDBFieldName()), criteriaBuilder.literal("yyyy-MM-dd"));
             }
+            else if(table.get(getDBFieldName()).getJavaType() == Number.class) {
+                return table.get(getDBFieldName()).as(String.class);
+            }
             else{
                 return criteriaBuilder.lower(table.get(getDBFieldName()).as(String.class));
             }
