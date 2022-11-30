@@ -140,14 +140,14 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
                 return "fullName";
             }
         },
-        SPECIES {
+        OBSERVABLE_ITEM_ID {
             @Override
             public String toString() {
-                return "survey.species";
+                return "survey.observableItemId";
             }
             @Override
             public String getDBFieldName() {
-                return "species";
+                return "observableItemId";
             }
         },
         METHOD {
@@ -242,11 +242,12 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
                         case COUNTRY :
                         case STATE:
                         case ECOREGION:
-                        case LOCATION_NAME :
-                        case SPECIES: {
+                        case LOCATION_NAME : {
                             orders.add(getItemOrdering(root, criteriaBuilder, sortItem, SupportedFields.class));
                             break;
                         }
+                        // The column is hide in UI, it is use as filter only and no ordering needed
+                        case OBSERVABLE_ITEM_ID:
                         default:
                             break;
                     }
@@ -281,8 +282,7 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
                     case COUNTRY :
                     case STATE:
                     case ECOREGION:
-                    case LOCATION_NAME :
-                    case SPECIES: {
+                    case LOCATION_NAME : {
                         if(filter.isCompositeCondition()) {
                             specifications.add(
                                     getSurveyFieldSpecification(target,
@@ -292,6 +292,19 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
                         }
                         else {
                             specifications.add(getSurveyFieldSpecification(target, filter));
+                        }
+                        break;
+                    }
+                    case OBSERVABLE_ITEM_ID: {
+                        if(filter.isCompositeCondition()) {
+                            specifications.add(
+                                    getSurveyObservationItemIdSpecification(target,
+                                            filter.isAndOperation(),
+                                            filter.getConditions().get(0),
+                                            filter.getConditions().get(1)));
+                        }
+                        else {
+                            specifications.add(getSurveyObservationItemIdSpecification(target, filter));
                         }
                         break;
                     }
@@ -307,6 +320,38 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
         }
 
         return this;
+    }
+
+    protected Specification<SurveyListView> getSurveyObservationItemIdSpecification(final SupportedFields target, boolean isAnd, Filter filter1, Filter filter2) {
+        return (root, query, criteriaBuilder) -> {
+            Subquery<Integer> surveyIdsSubquery = query.subquery(Integer.class);
+            Root<Observation> observationRoot = surveyIdsSubquery.from(Observation.class);
+            Join<SurveyMethodEntity, Observation> surveyMethodRoot = observationRoot.join("surveyMethod", JoinType.INNER);
+            Join<Observation, ObservableItem> observationObservableItemJoin = observationRoot.join("observableItem", JoinType.INNER);
+            Join<Survey, SurveyMethodEntity> surveySurveyMethodEntityJoin = surveyMethodRoot.join("survey", JoinType.INNER);
+
+            surveyIdsSubquery.select(surveySurveyMethodEntityJoin.get("surveyId"));
+            surveyIdsSubquery.distinct(true);
+            surveyIdsSubquery.where(getSimpleFieldSpecification(observationObservableItemJoin, criteriaBuilder, target, isAnd, filter1, filter2));
+
+            return root.get("surveyId").in(surveyIdsSubquery);
+        };
+    }
+
+    protected Specification<SurveyListView> getSurveyObservationItemIdSpecification(final SupportedFields target, Filter filter) {
+        return (root, query, criteriaBuilder) -> {
+            Subquery<Integer> surveyIdsSubquery = query.subquery(Integer.class);
+            Root<Observation> observationRoot = surveyIdsSubquery.from(Observation.class);
+            Join<SurveyMethodEntity, Observation> surveyMethodRoot = observationRoot.join("surveyMethod", JoinType.INNER);
+            Join<Observation, ObservableItem> observationObservableItemJoin = observationRoot.join("observableItem", JoinType.INNER);
+            Join<Survey, SurveyMethodEntity> surveySurveyMethodEntityJoin = surveyMethodRoot.join("survey", JoinType.INNER);
+
+            surveyIdsSubquery.select(surveySurveyMethodEntityJoin.get("surveyId"));
+            surveyIdsSubquery.distinct(true);
+            surveyIdsSubquery.where(getSimpleFieldSpecification(observationObservableItemJoin, criteriaBuilder, target, filter.getValue(), filter.getOperation()));
+
+            return root.get("surveyId").in(surveyIdsSubquery);
+        };
     }
 
     protected Specification<SurveyListView> getSurveyFieldSpecification(final SupportedFields target, boolean isAnd, Filter filter1, Filter filter2) {

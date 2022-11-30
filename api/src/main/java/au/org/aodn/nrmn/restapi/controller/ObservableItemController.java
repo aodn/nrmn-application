@@ -19,10 +19,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -69,7 +66,9 @@ public class ObservableItemController {
         List<Filter> f = FilterCondition.parse(objMapper, filters, Filter[].class);
         List<Sorter> s = FilterCondition.parse(objMapper, sort, Sorter[].class);
 
-        Page<ObservationItemListView> v = observableItemListRepository.findAllObservationItemBy(f, s, PageRequest.of(page, pageSize));
+        // Negative page size means you do not want page.
+        Pageable pages = pageSize < 0 ? Pageable.unpaged() : PageRequest.of(page, pageSize);
+        Page<ObservationItemListView> v = observableItemListRepository.findAllObservationItemBy(f, s, pages);
         Map<String, Object> data = new HashMap<>();
 
         data.put("lastRow", v.getTotalElements());
