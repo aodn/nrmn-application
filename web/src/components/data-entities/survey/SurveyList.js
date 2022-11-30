@@ -345,6 +345,7 @@ const SurveyList = () => {
               headerName="Survey ID"
               colId="survey.surveyId"
               sort="desc"
+              sortable="false"
               cellStyle={{cursor: 'pointer'}}
               onCellClicked={(e) => {
                 if (e.event.ctrlKey) {
