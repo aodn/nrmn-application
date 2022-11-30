@@ -16,6 +16,7 @@ import { createFilterOptions } from '@mui/material/Autocomplete';
 
 // We want to keep the value between pages, so we only need to load it once.
 const cachedOptions = [];
+const OBSERVABLE_ITEM_ID_FIELD = 'survey.observableItemId';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -63,7 +64,17 @@ const SurveyList = () => {
     }
 
     if(cachedOptions.length !== 0) {
-      setOptions(cachedOptions);
+      // If user select more than two species, we will not show the dropdown with value such that user cannot enter
+      // more than two species
+      const f = gridRef.current.api.getFilterInstance(OBSERVABLE_ITEM_ID_FIELD);
+      if(!f.getModel() || !f.getModel().operator) {
+        // operator attribute valid if filter on two species
+        setOptions(cachedOptions);
+      }
+      else {
+        // Close the dropdown
+        setOpen(false);
+      }
       return undefined;
     }
 
@@ -94,10 +105,10 @@ const SurveyList = () => {
 
   // Create filter for species and push it to the ag grid to trigger page reload
   const handleSpeciesFilterChange = useCallback((evt, newValue) => {
-    const f = gridRef.current.api.getFilterInstance('survey.observableItemId');
+    const f = gridRef.current.api.getFilterInstance(OBSERVABLE_ITEM_ID_FIELD);
 
     if(newValue.length === 0) {
-      f.setModel(null);
+      f.setModel(null).then(() => gridRef.current.api.onFilterChanged());
     }
     else if(newValue.length === 1) {
       f.setModel({
@@ -247,7 +258,7 @@ const SurveyList = () => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Species filter"
+                      label="Species filter (max two species)"
                       variant="outlined"
                       InputProps={{
                         ...params.InputProps,
@@ -362,7 +373,7 @@ const SurveyList = () => {
                * Hidden field for apply filter to species.
                */
             }
-            <AgGridColumn hide={true} flex={1} colId="survey.observableItemId" />
+            <AgGridColumn hide={true} flex={1} colId={OBSERVABLE_ITEM_ID_FIELD} />
           </AgGridReact>
         </>
       )}
