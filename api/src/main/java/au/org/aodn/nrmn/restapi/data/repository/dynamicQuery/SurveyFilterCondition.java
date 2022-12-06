@@ -236,14 +236,18 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
                         case SITE_CODE :
                         case SITE_NAME :
                         case DEPTH :
-                        case DIVER_NAME:
-                        case METHOD:
                         case PROGRAMS:
                         case COUNTRY :
                         case STATE:
                         case ECOREGION:
                         case LOCATION_NAME : {
                             orders.add(getItemOrdering(root, criteriaBuilder, sortItem, SupportedFields.class));
+                            break;
+                        }
+                        case DIVER_NAME:
+                        case METHOD: {
+                            Join<DiverMethodAggregateView, SurveyListView> join = root.join("aggregateView", JoinType.INNER);
+                            orders.add(getItemOrdering(join, criteriaBuilder, sortItem, SupportedFields.class));
                             break;
                         }
                         // The column is hide in UI, it is use as filter only and no ordering needed
@@ -276,8 +280,6 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
                     case SITE_CODE :
                     case SITE_NAME :
                     case DEPTH :
-                    case DIVER_NAME:
-                    case METHOD:
                     case PROGRAMS:
                     case COUNTRY :
                     case STATE:
@@ -308,6 +310,20 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
                         }
                         break;
                     }
+                    case DIVER_NAME:
+                    case METHOD: {
+                        if(filter.isCompositeCondition()) {
+                            specifications.add(
+                                    getDiverMethodSpecification(target,
+                                            filter.isAndOperation(),
+                                            filter.getConditions().get(0),
+                                            filter.getConditions().get(1)));
+                        }
+                        else {
+                            specifications.add(getDiverMethodSpecification(target, filter));
+                        }
+                        break;
+                    }
                     default:
                         break;
                 }
@@ -320,6 +336,41 @@ public class SurveyFilterCondition extends FilterCondition<SurveyListView> {
         }
 
         return this;
+    }
+
+    /**
+     * Force innter join table before doing filter, fail to do so result in sql error because the field do not exist
+     * @param target
+     * @param isAnd
+     * @param filter1
+     * @param filter2
+     * @return
+     */
+    protected Specification<SurveyListView> getDiverMethodSpecification(final SupportedFields target, boolean isAnd, Filter filter1, Filter filter2) {
+        return (root, query, criteria) -> {
+            Subquery<Integer> subquery = query.subquery(Integer.class);
+            Root<DiverMethodAggregateView> sub = subquery.from(DiverMethodAggregateView.class);
+
+            subquery.select(sub.get("surveyId"));
+            subquery.where(getSimpleFieldSpecification(sub, criteria, target, isAnd, filter1, filter2));
+            return root.get("surveyId").in(subquery);
+        };
+    }
+    /**
+     * Force innter join table before doing filter, fail to do so result in sql error because the field do not exist
+     * @param target
+     * @param filter
+     * @return
+     */
+    protected Specification<SurveyListView> getDiverMethodSpecification(final SupportedFields target, Filter filter) {
+        return (root, query, criteria) -> {
+            Subquery<Integer> subquery = query.subquery(Integer.class);
+            Root<DiverMethodAggregateView> sub = subquery.from(DiverMethodAggregateView.class);
+
+            subquery.select(sub.get("surveyId"));
+            subquery.where(getSimpleFieldSpecification(sub, criteria, target, filter.getValue(), filter.getOperation()));
+            return root.get("surveyId").in(subquery);
+        };
     }
 
     protected Specification<SurveyListView> getSurveyObservationItemIdSpecification(final SupportedFields target, boolean isAnd, Filter filter1, Filter filter2) {

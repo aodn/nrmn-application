@@ -175,7 +175,7 @@ public class SurveyListView {
      */
     @JsonGetter
     public String getDiverName() {
-        return aggregateView.getDiverName();
+        return aggregateView == null ? "" : aggregateView.getDiverName();
     }
     /**
      * Flatten the json to avoid nested structure
@@ -183,6 +183,6 @@ public class SurveyListView {
      */
     @JsonGetter
     public String getMethod() {
-        return aggregateView.getMethod();
+        return aggregateView == null ? "" : aggregateView.getMethod();
     }
 }
