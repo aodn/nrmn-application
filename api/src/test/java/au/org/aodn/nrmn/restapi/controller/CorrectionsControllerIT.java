@@ -4,6 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRequestBodyDto;
+import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
+import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
+import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
+import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -33,10 +38,7 @@ import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -227,5 +229,43 @@ class CorrectionsControllerIT {
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    @WithUserDetails("test@example.com")
+    public void validateSurveyCorrectionEmptyDto() throws Exception {
+        var auth = getContext().getAuthentication();
+        var token = jwtTokenProvider.generateToken(auth);
+
+        // Survey with ATRC and RLS which belongs to different program
+        var param = new HashMap<String, String>() {{
+            put("surveyIds", "812300132,812331346");
+        }};
+
+        CorrectionRequestBodyDto d = new CorrectionRequestBodyDto();
+        d.setProgramId(55);
+        d.setRows(new ArrayList<>());
+
+        var uri = String.format("http://localhost:%d/api/v1/correction/validate?surveyIds={surveyIds}", localServerPort);
+        var reqBuilder = new RequestWrapper<CorrectionRequestBodyDto, ValidationResponse>();
+        var response = reqBuilder
+                .withUri(uri)
+                .withToken(token)
+                .withEntity(d)
+                .withMethod(HttpMethod.POST)
+                .withContentType(MediaType.APPLICATION_JSON)
+                .withParams(param)
+                .withResponseType(ValidationResponse.class)
+                .build(testRestTemplate);
+
+        // Empty body should result in BLOCKING error mentioned in Body
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("1 error returned", response.getBody().getErrors().size(), 1);
+
+        List<SurveyValidationError> e = (List<SurveyValidationError>)response.getBody().getErrors();
+
+        assertEquals("Expect blocking level error", e.get(0).getLevelId(), ValidationLevel.BLOCKING);
+        assertEquals("Data level error", e.get(0).getCategoryId(), ValidationCategory.DATA);
+        assertTrue("Message in error", e.get(0).getMessage().equals("Survey data is missing"));
     }
 }
