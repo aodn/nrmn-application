@@ -84,6 +84,7 @@ class CorrectionsControllerIT {
                 .withMethod(HttpMethod.POST)
                 .withToken(token)
                 .withEntity(speciesCorrection)
+                .withResponseType(Long.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -180,6 +181,49 @@ class CorrectionsControllerIT {
                 .withContentType(MediaType.APPLICATION_JSON)
                 .withParams(param)
                 .withResponseType(Void.class)
+                .build(testRestTemplate);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+    /**
+     * You must request correction survey share the same program validation, otherwise
+     * you will receive error
+     * @throws Exception
+     */
+    @Test
+    @WithUserDetails("test@example.com")
+    public void requestSurveyWithDiffProgramValidationFailedAll() throws Exception {
+        var auth = getContext().getAuthentication();
+        var token = jwtTokenProvider.generateToken(auth);
+
+        // Survey with ATRC and RLS which belongs to different program
+        var param = new HashMap<String, String>() {{
+            put("surveyIds", "812300132,812331346");
+        }};
+
+        var uri = String.format("http://localhost:%d/api/v1/correction/correct?surveyIds={surveyIds}", localServerPort);
+        // We will make a request where the return code is a bad request, so using Void return type is fine.
+        var reqBuilder = new RequestWrapper<Void, Map>();
+        var response = reqBuilder
+                .withUri(uri)
+                .withToken(token)
+                .withMethod(HttpMethod.GET)
+                .withContentType(MediaType.APPLICATION_JSON)
+                .withParams(param)
+                .withResponseType(Map.class)
+                .build(testRestTemplate);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
+        // Same program id will have no issue
+        param.put("surveyIds","812300131,812300133");
+        response = reqBuilder
+                .withUri(uri)
+                .withToken(token)
+                .withMethod(HttpMethod.GET)
+                .withContentType(MediaType.APPLICATION_JSON)
+                .withParams(param)
+                .withResponseType(Map.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());

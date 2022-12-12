@@ -281,7 +281,7 @@ public class CorrectionController {
                 .collect(Collectors.toList());
 
         if (programValidations.size() != 1)
-            return ResponseEntity.badRequest().body("Surveys must share the same program validation");
+            return ResponseEntity.badRequest().body("{ \"message\": \"Surveys must share the same program validation\" }");
         var program = programs.get(0);
 
         var rows = correctionRowRepository.findRowsBySurveyIds(surveyIds);
