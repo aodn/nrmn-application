@@ -1,20 +1,23 @@
 package au.org.aodn.nrmn.restapi.controller.utils;
 
 import java.net.URI;
+import java.util.Map;
 
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-public class      RequestWrapper<E, R> {
+public class RequestWrapper<E, R> {
 
     HttpHeaders headers = new HttpHeaders();
     E entity;
     HttpMethod method;
-    URI url;
+    String url;
+    Map<String, ?> param;
     Class<R> responseClass;
 
     public RequestWrapper<E, R> withAppJson() {
@@ -46,16 +49,35 @@ public class      RequestWrapper<E, R> {
     }
 
     public RequestWrapper<E, R> withUri(String path) throws Exception {
-        url = new URI(path);
+        this.url = path;
+        return this;
+    }
+
+    public RequestWrapper<E, R> withParams(Map<String, ?> param) {
+        this.param = param;
         return this;
     }
 
     public ResponseEntity<R> build(TestRestTemplate testRestTemplate) throws Exception{
-       return testRestTemplate.exchange(
-                url,
-               method,
-                new HttpEntity<E>(entity, headers),
-               responseClass);
+        // It is important that this value cannot be null, else the call success
+        // but jackson fail to convert to the correct type
+        assert responseClass != null;
+
+        if(param == null) {
+            return testRestTemplate.exchange(
+                    new URI(url),
+                    method,
+                    new HttpEntity<E>(entity, headers),
+                    responseClass);
+        }
+        else {
+            return testRestTemplate.exchange(
+                    url,
+                    method,
+                    new HttpEntity<E>(entity, headers),
+                    responseClass,
+                    param);
+        }
     }
 
 }

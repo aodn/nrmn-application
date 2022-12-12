@@ -269,7 +269,8 @@ public class CorrectionController {
 
         if (lockedSurveys.size() > 0) {
             var locked = lockedSurveys.stream().map(s -> s.getSurveyId().toString()).collect(Collectors.joining(", "));
-            return ResponseEntity.badRequest().body("Surveys are locked and cannot be corrected: " + locked);
+            // The return type is application/json
+            return ResponseEntity.badRequest().body(String.format("{ \"message\": \"Surveys are locked and cannot be corrected: %s\" }", locked));
         }
 
         var programs = correctionRowRepository.findProgramsBySurveyIds(surveyIds)
