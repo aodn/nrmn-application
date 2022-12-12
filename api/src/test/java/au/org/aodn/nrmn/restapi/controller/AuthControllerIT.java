@@ -112,6 +112,7 @@ public class AuthControllerIT {
                 .withAppJson()
                 .withMethod(HttpMethod.POST)
                 .withToken(token)
+                .withResponseType(Void.class)
                 .withUri(_createUrl("/api/v1/auth/signout"))
                 .build(testRestTemplate);
     }
