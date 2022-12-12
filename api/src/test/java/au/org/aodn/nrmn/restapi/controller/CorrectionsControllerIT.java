@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRequestBodyDto;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
@@ -99,6 +100,7 @@ class CorrectionsControllerIT {
         assertEquals(0, prevObservableItemCount);
         assertEquals(nextCount, nextObservableItemCount);
     }
+
     /**
      * If you make a request to get these survey ids and one of it is a locked survey. Then the whole request will fail.
      * The UI may not be able to create such request but direct call to API can.
@@ -127,18 +129,18 @@ class CorrectionsControllerIT {
         assertEquals(HttpStatus.OK, surveys.getStatusCode());
 
         // We want a survey locked and one unlock
-        assertTrue("Return object greater than 1", (Integer)surveys.getBody().get("lastRow") > 0);
+        assertTrue("Return object greater than 1", (Integer) surveys.getBody().get("lastRow") > 0);
 
         // Now find the survey id where the item is locked and not locked
-        var locked = ((List<Map<String, Object>>)surveys.getBody().get("items"))
+        var locked = ((List<Map<String, Object>>) surveys.getBody().get("items"))
                 .stream()
-                .filter(i -> (Boolean)i.get("locked") == Boolean.TRUE)
+                .filter(i -> (Boolean) i.get("locked") == Boolean.TRUE)
                 .map(i -> i.get("surveyId").toString())
                 .collect(Collectors.toList());
 
-        var unlocked = ((List<Map<String, Object>>)surveys.getBody().get("items"))
+        var unlocked = ((List<Map<String, Object>>) surveys.getBody().get("items"))
                 .stream()
-                .filter(i -> (Boolean)i.get("locked") == Boolean.FALSE)
+                .filter(i -> (Boolean) i.get("locked") == Boolean.FALSE)
                 .map(i -> i.get("surveyId").toString())
                 .collect(Collectors.toList());
 
@@ -187,9 +189,11 @@ class CorrectionsControllerIT {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
+
     /**
      * You must request correction survey share the same program validation, otherwise
      * you will receive error
+     *
      * @throws Exception
      */
     @Test
@@ -218,7 +222,7 @@ class CorrectionsControllerIT {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 
         // Same program id will have no issue
-        param.put("surveyIds","812300131,812300133");
+        param.put("surveyIds", "812300131,812300133");
         response = reqBuilder
                 .withUri(uri)
                 .withToken(token)
@@ -262,10 +266,66 @@ class CorrectionsControllerIT {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("1 error returned", response.getBody().getErrors().size(), 1);
 
-        List<SurveyValidationError> e = (List<SurveyValidationError>)response.getBody().getErrors();
+        List<SurveyValidationError> e = (List<SurveyValidationError>) response.getBody().getErrors();
 
         assertEquals("Expect blocking level error", e.get(0).getLevelId(), ValidationLevel.BLOCKING);
         assertEquals("Data level error", e.get(0).getCategoryId(), ValidationCategory.DATA);
         assertTrue("Message in error", e.get(0).getMessage().equals("Survey data is missing"));
+    }
+    /**
+     * Verify return error on incorrect site code in body
+     * @throws Exception
+     */
+    @Test
+    @WithUserDetails("test@example.com")
+    public void validateSurveyCorrectionFieldError() throws Exception {
+        var auth = getContext().getAuthentication();
+        var token = jwtTokenProvider.generateToken(auth);
+
+        // Survey with ATRC and RLS which belongs to different program
+        var param = new HashMap<String, String>() {{
+            put("surveyIds", "812300132,812331346");
+        }};
+
+        // SiteCode "-1" should cause problem and cause site code not exist erroer
+        StagedRow stagedRow = new StagedRow();
+        stagedRow.setSiteCode("-1");
+        stagedRow.setSurveyId("812300132");
+        stagedRow.setDate("01/01/2021");
+        stagedRow.setTime("00:00:00");
+        stagedRow.setDepth("1");
+        stagedRow.setMeasureJson(new HashMap<>());
+        stagedRow.setIsInvertSizing("");
+        stagedRow.setMethod("2");
+
+        CorrectionRequestBodyDto d = new CorrectionRequestBodyDto();
+        d.setProgramId(55);
+        d.setIsExtended(Boolean.FALSE);
+        d.setRows(new ArrayList<>());
+        d.getRows().add(stagedRow);
+
+        var uri = String.format("http://localhost:%d/api/v1/correction/validate?surveyIds={surveyIds}", localServerPort);
+        var reqBuilder = new RequestWrapper<CorrectionRequestBodyDto, ValidationResponse>();
+        var response = reqBuilder
+                .withUri(uri)
+                .withToken(token)
+                .withEntity(d)
+                .withMethod(HttpMethod.POST)
+                .withContentType(MediaType.APPLICATION_JSON)
+                .withParams(param)
+                .withResponseType(ValidationResponse.class)
+                .build(testRestTemplate);
+
+        // Empty body should result in BLOCKING error mentioned in Body
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("8 error returned", response.getBody().getErrors().size(), 8);
+
+        List<SurveyValidationError> e = (List<SurveyValidationError>) response.getBody().getErrors();
+
+        assertTrue("Block must be 0, 1 or 2", e.get(0).getMessage().equals("Block must be 0, 1 or 2"));
+        assertTrue("Site Code does not exist", e.get(1).getMessage().equals("Site Code does not exist"));
+        assertTrue("Latitude is not number", e.get(2).getMessage().equals("Latitude is not number"));
+        assertTrue("Longitude is not number", e.get(3).getMessage().equals("Longitude is not number"));
+        assertTrue("Inverts is not an integer", e.get(4).getMessage().equals("Inverts is not an integer"));
     }
 }
