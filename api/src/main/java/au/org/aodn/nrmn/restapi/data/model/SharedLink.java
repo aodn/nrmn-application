@@ -45,7 +45,7 @@ public class SharedLink {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sec_user_id", referencedColumnName = "id", nullable = false)
-    private SecUser userId;
+    private SecUser user;
 
     @Column(name = "description", nullable = true)
     private String description;

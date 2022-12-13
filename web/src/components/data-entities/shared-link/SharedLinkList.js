@@ -15,27 +15,31 @@ const SharedLinkList = () => {
 
   const header = (
     <Box m={1} ml={2}>
-      <Typography variant="h6">Share Endpoints</Typography>
+      <Typography variant="h6">Endpoint Links</Typography>
     </Box>
   );
 
-  if (!data)
+  if (!data) {
     return (
       <>
         {header}
         <LinearProgress />
       </>
     );
+  }
 
-  if (data.length === 0)
-    return (
-      <>
-        {header}
-        <p>no links in the database. please create a link</p>
-      </>
-    );
+  const columns = {
+    description: 'Description',
+    content: 'Content',
+    targetUrl: 'Target URL',
+    copyButton: '',
+    createdBy: 'Created By',
+    created: 'Created',
+    expires: 'Expires'
+  };
 
-  const columns = Object.keys(data[0]);
+  const keys = Object.keys(columns);
+
   return (
     <>
       {header}
@@ -44,16 +48,32 @@ const SharedLinkList = () => {
           <Table>
             <TableHead>
               <TableRow>
-                {columns.map((v, i) => (
-                  <TableCell key={i}>{v}</TableCell>
+                {keys.map((key) => (
+                  <TableCell key={key}>{columns[key]}</TableCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
+              {data.length < 1 && (
+                <TableRow>
+                  <TableCell colSpan={columns.length}>
+                    <i>No Links</i>
+                  </TableCell>
+                </TableRow>
+              )}
               {data.map((row, i) => (
-                <TableRow key={i}>
-                  {columns.map((column) => (
-                    <TableCell key={i}>{row[column]}</TableCell>
+                <TableRow key={row['publicId']}>
+                  {keys.map((key) => (
+                    <TableCell key={i}>
+                      {key == 'targetUrl' ? (
+                        <>
+                          <a href={row[key]}>{row[key].substring(0, 20)}...</a>
+                          <button onClick={() => navigator.clipboard.writeText(row[key])}>Copy</button>
+                        </>
+                      ) : (
+                        row[key]
+                      )}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))}

@@ -26,6 +26,16 @@ public class S3IO {
         return client;
     }
 
+    public void uploadMaterializedView(String path, String data) {
+        try {
+            var fullPath = "materialized_views/" + path + ".csv";
+            var res = RequestBody.fromString(data);
+            getClient().putObject(PutObjectRequest.builder().bucket(bucket).key(fullPath).build(), res);
+        } catch (AwsServiceException e) {
+            throw new RuntimeException("Failed to write to S3: " + e.getMessage());
+        }
+    }
+    
     public String write(String path, MultipartFile file) throws Exception {
         try (InputStream in = file.getInputStream()) {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();

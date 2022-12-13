@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
 import au.org.aodn.nrmn.restapi.data.repository.MaterializedViewsRepository;
+import au.org.aodn.nrmn.restapi.service.upload.S3IO;
 
 @Component
 @EnableAsync
@@ -21,7 +22,31 @@ public class MaterializedViewService {
     private Environment environment;
 
     @Autowired
+    private S3IO s3IO;
+
+    @Autowired
     MaterializedViewsRepository materializedViewsRepository;
+
+    public void uploadAllMaterializedViews() {
+
+        if (materializedViewsRepository.checkAnyRunning()) {
+            logger.error("Failed to upload materialized views as one or more are still refreshing.");
+            return;
+        }
+       
+        StopWatch stopWatch = new StopWatch();
+
+        stopWatch.start();
+        
+        var viewResult = materializedViewsRepository.getUiSpeciesAttributes();
+
+
+
+        // s3IO.uploadMaterializedView("ui_species_attributes", );
+        
+        stopWatch.stop();
+        logger.info("ui_species_attributes upload took: " + stopWatch.getLastTaskTimeMillis() + "ms");
+    }
 
     @Async
     public void refreshAllMaterializedViews() {
@@ -66,7 +91,7 @@ public class MaterializedViewService {
 
         if (!materializedViewsRepository.checkEpRarityFrequencyRunning())
             materializedViewsRepository.refreshEpRarityFrequency();
-        
+
         stopWatch.stop();
         logger.info("Endpoints refreshed in {}s", stopWatch.getTotalTimeSeconds());
 

@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 
+import java.util.Collection;
+
 import javax.transaction.Transactional;
 
 @Transactional
@@ -96,9 +98,14 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW nrmn.ui_species_attributes'", nativeQuery = true)
     Boolean checkUiSpeciesAttributesRunning();
 
+    @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query LIKE 'REFRESH MATERIALIZED VIEW %'", nativeQuery = true)
+    Boolean checkAnyRunning();
+
     @Modifying
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ui_species_attributes;", nativeQuery = true)
     void refreshUiSpeciesAttributes();
 
+    @Query(value = "SELECT * from nrmn.ui_species_attributes;", nativeQuery = true)
+    Collection<String> getUiSpeciesAttributes();
 
 }

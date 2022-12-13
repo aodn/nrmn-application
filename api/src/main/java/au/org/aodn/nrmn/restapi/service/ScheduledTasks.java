@@ -36,6 +36,9 @@ public class ScheduledTasks {
         } else {
             logger.info("Skipping PQ update as active profile set.");
         }
+        // write all the regenerated materialized views to a file in S3 in csv format
+        // materializedViewService.writeAllMaterializedViewsToS3();
+        materializedViewService.uploadAllMaterializedViews();
 
     }
 }
