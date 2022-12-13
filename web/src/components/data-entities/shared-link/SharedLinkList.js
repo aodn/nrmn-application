@@ -1,34 +1,60 @@
-import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from '@mui/material';
+import {LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from '@mui/material';
 import {Box} from '@mui/system';
 import React, {useEffect, useState} from 'react';
 import {getSharedLinks} from '../../../api/api';
 
 const SharedLinkList = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState();
 
   useEffect(() => {
-    getSharedLinks().then((data) => setData(data));
-  });
+    if (data) return;
+    getSharedLinks().then((res) => {
+      setData(res.data);
+    });
+  }, [data, setData]);
 
+  const header = (
+    <Box m={1} ml={2}>
+      <Typography variant="h6">Share Endpoints</Typography>
+    </Box>
+  );
+
+  if (!data)
+    return (
+      <>
+        {header}
+        <LinearProgress />
+      </>
+    );
+
+  if (data.length === 0)
+    return (
+      <>
+        {header}
+        <p>no links in the database. please create a link</p>
+      </>
+    );
+
+  const columns = Object.keys(data[0]);
   return (
     <>
-      <Box m={1} ml={2}>
-        <Typography variant="h6">Share Endpoints</Typography>
-      </Box>
+      {header}
       <Box m={1} border={1} borderColor="divider">
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
-                {Object.keys(data).map((v, i) => (
+                {columns.map((v, i) => (
                   <TableCell key={i}>{v}</TableCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {Object.keys(data).map((v, i) => (
+              {data.map((row, i) => (
                 <TableRow key={i}>
-                  <TableCell>{v}</TableCell>
+                  {columns.map((column) => (
+                    <TableCell key={i}>{row[column]}</TableCell>
+                  ))}
                 </TableRow>
               ))}
             </TableBody>
