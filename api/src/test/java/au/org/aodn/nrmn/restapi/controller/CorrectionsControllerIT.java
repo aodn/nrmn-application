@@ -39,6 +39,7 @@ import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -327,5 +328,35 @@ class CorrectionsControllerIT {
         assertTrue("Latitude is not number", e.get(2).getMessage().equals("Latitude is not number"));
         assertTrue("Longitude is not number", e.get(3).getMessage().equals("Longitude is not number"));
         assertTrue("Inverts is not an integer", e.get(4).getMessage().equals("Inverts is not an integer"));
+        assertTrue("P-Qs Diver is blank", e.get(5).getMessage().equals("P-Qs Diver is blank"));
+        assertTrue("Diver does not exist", e.get(6).getMessage().equals("Diver does not exist"));
+        assertTrue("Row has no data and no value recorded for inverts", e.get(7).getMessage().equals("Row has no data and no value recorded for inverts"));
+    }
+    @Test
+    @WithUserDetails("test@example.com")
+    public void submitSurveyCorrectionUnknownSurveyId() throws Exception {
+        var auth = getContext().getAuthentication();
+        var token = jwtTokenProvider.generateToken(auth);
+
+        // Not exist survey Id
+        var param = new HashMap<String, String>() {{
+            put("surveyIds", "1");
+        }};
+
+        CorrectionRequestBodyDto d = new CorrectionRequestBodyDto();
+        var uri = String.format("http://localhost:%d/api/v1/correction/correct?surveyIds={surveyIds}", localServerPort);
+        var reqBuilder = new RequestWrapper<CorrectionRequestBodyDto, String>();
+        var response = reqBuilder
+                .withUri(uri)
+                .withToken(token)
+                .withEntity(d)
+                .withMethod(HttpMethod.POST)
+                .withContentType(MediaType.APPLICATION_JSON)
+                .withParams(param)
+                .withResponseType(String.class)
+                .build(testRestTemplate);
+
+        // No proper response at the moment, become 500 and screen will blank
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 }
