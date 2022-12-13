@@ -425,10 +425,10 @@ public class CorrectionController {
         var survey = surveyOptional.get();
 
         if (survey.getLocked() != null && survey.getLocked())
-            return ResponseEntity.badRequest().body("Deletion Failed. Survey is locked.");
+            return ResponseEntity.badRequest().body("{\"message\" : \"Deletion Failed. Survey is locked.\"}");
 
         if (survey.getPqCatalogued() != null && survey.getPqCatalogued())
-            return ResponseEntity.badRequest().body("Deletion Failed. PQs catalogued for this survey.");
+            return ResponseEntity.badRequest().body("{\"message\" : \"Deletion Failed. PQs catalogued for this survey.\"}");
 
         userActionAuditRepository.save(new UserActionAudit("correction/delete", "survey: " + id));
 

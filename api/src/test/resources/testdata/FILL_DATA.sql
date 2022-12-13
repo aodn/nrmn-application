@@ -63,6 +63,14 @@ INSERT INTO nrmn.survey (program_id, site_id, survey_id, survey_date, survey_tim
                          direction, notes, project_title, inside_marine_park, block_abundance_simulated, locked)
 VALUES (56, 551, 812331346, '2017-11-28', '00:00:00', 25, 1, 10, 'N',
         'Survey locked for edit', 'Not able to correct this', 'Unsure', true, true);
+/*
+ This survey have pq_catalogued true
+ */
+INSERT INTO nrmn.survey (program_id, site_id, survey_id, survey_date, survey_time, depth, survey_num, visibility,
+                         direction, notes, project_title, inside_marine_park, block_abundance_simulated, pq_catalogued)
+VALUES (55, 551, 812331347, '2017-11-29', '00:00:00', 25, 1, 10, 'N',
+        'Survey locked for edit', 'Not able to correct this', 'Unsure', true, true);
+
 
 INSERT INTO nrmn.diver_ref(diver_id, initials, full_name)
 VALUES (51, 'JEP', 'Juan Espanol Pagina');

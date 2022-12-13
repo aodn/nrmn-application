@@ -135,13 +135,14 @@ class CorrectionsControllerIT {
         // Now find the survey id where the item is locked and not locked
         var locked = ((List<Map<String, Object>>) surveys.getBody().get("items"))
                 .stream()
-                .filter(i -> (Boolean) i.get("locked") == Boolean.TRUE)
+                .filter(i -> i.get("locked") == Boolean.TRUE)
                 .map(i -> i.get("surveyId").toString())
                 .collect(Collectors.toList());
 
+        // pq_catalogued and locked both affect the request operation, so filter out pq_catalogued too
         var unlocked = ((List<Map<String, Object>>) surveys.getBody().get("items"))
                 .stream()
-                .filter(i -> (Boolean) i.get("locked") == Boolean.FALSE)
+                .filter(i -> i.get("locked") == Boolean.FALSE)
                 .map(i -> i.get("surveyId").toString())
                 .collect(Collectors.toList());
 
@@ -152,14 +153,14 @@ class CorrectionsControllerIT {
         }};
 
         var uri = String.format("http://localhost:%d/api/v1/correction/correct?surveyIds={surveyIds}", localServerPort);
-        var reqBuilder1 = new RequestWrapper<Void, Void>();
+        var reqBuilder1 = new RequestWrapper<Void, String>();
         var response = reqBuilder1
                 .withUri(uri)
                 .withToken(token)
                 .withMethod(HttpMethod.GET)
                 .withContentType(MediaType.APPLICATION_JSON)
                 .withParams(param)
-                .withResponseType(Void.class)
+                .withResponseType(String.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -172,7 +173,7 @@ class CorrectionsControllerIT {
                 .withMethod(HttpMethod.GET)
                 .withContentType(MediaType.APPLICATION_JSON)
                 .withParams(param)
-                .withResponseType(Void.class)
+                .withResponseType(String.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -185,7 +186,7 @@ class CorrectionsControllerIT {
                 .withMethod(HttpMethod.GET)
                 .withContentType(MediaType.APPLICATION_JSON)
                 .withParams(param)
-                .withResponseType(Void.class)
+                .withResponseType(String.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -358,5 +359,97 @@ class CorrectionsControllerIT {
 
         // No proper response at the moment, become 500 and screen will blank
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
+    @WithUserDetails("test@example.com")
+    public void deleteSurveyUnknownSurveyId() throws Exception {
+        var auth = getContext().getAuthentication();
+        var token = jwtTokenProvider.generateToken(auth);
+
+        // Not exist survey Id
+        var param = new HashMap<String, String>() {{
+            put("surveyId", "1");
+        }};
+
+        CorrectionRequestBodyDto d = new CorrectionRequestBodyDto();
+        var uri = String.format("http://localhost:%d/api/v1/correction/correct/{surveyId}", localServerPort);
+        var reqBuilder = new RequestWrapper<CorrectionRequestBodyDto, String>();
+        var response = reqBuilder
+                .withUri(uri)
+                .withToken(token)
+                .withEntity(d)
+                .withMethod(HttpMethod.DELETE)
+                .withContentType(MediaType.APPLICATION_JSON)
+                .withParams(param)
+                .withResponseType(String.class)
+                .build(testRestTemplate);
+
+        // No proper response at the moment, become 500 and screen will blank
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+    /**
+     * You cannot delete locked survey
+     * @throws Exception
+     */
+    @Test
+    @WithUserDetails("test@example.com")
+    public void deleteLockedSurveyIdFail() throws Exception {
+        var auth = getContext().getAuthentication();
+        var token = jwtTokenProvider.generateToken(auth);
+
+        // Not exist survey Id
+        var param = new HashMap<String, String>() {{
+            put("surveyId", "812331346");
+        }};
+
+        CorrectionRequestBodyDto d = new CorrectionRequestBodyDto();
+        var uri = String.format("http://localhost:%d/api/v1/correction/correct/{surveyId}", localServerPort);
+        var reqBuilder = new RequestWrapper<CorrectionRequestBodyDto, Map>();
+        var response = reqBuilder
+                .withUri(uri)
+                .withToken(token)
+                .withEntity(d)
+                .withMethod(HttpMethod.DELETE)
+                .withContentType(MediaType.APPLICATION_JSON)
+                .withParams(param)
+                .withResponseType(Map.class)
+                .build(testRestTemplate);
+
+        // No proper response at the moment, become 500 and screen will blank
+        assertEquals("Correct status code", HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue("Correct alert message", response.getBody().get("message").equals("Deletion Failed. Survey is locked."));
+    }
+    /**
+     * You cannot delete survey with PqCatalogued
+     * @throws Exception
+     */
+    @Test
+    @WithUserDetails("test@example.com")
+    public void deletePqCataloguedSurveyIdFail() throws Exception {
+        var auth = getContext().getAuthentication();
+        var token = jwtTokenProvider.generateToken(auth);
+
+        // Not exist survey Id
+        var param = new HashMap<String, String>() {{
+            put("surveyId", "812331347");
+        }};
+
+        CorrectionRequestBodyDto d = new CorrectionRequestBodyDto();
+        var uri = String.format("http://localhost:%d/api/v1/correction/correct/{surveyId}", localServerPort);
+        var reqBuilder = new RequestWrapper<CorrectionRequestBodyDto, Map>();
+        var response = reqBuilder
+                .withUri(uri)
+                .withToken(token)
+                .withEntity(d)
+                .withMethod(HttpMethod.DELETE)
+                .withContentType(MediaType.APPLICATION_JSON)
+                .withParams(param)
+                .withResponseType(Map.class)
+                .build(testRestTemplate);
+
+        // No proper response at the moment, become 500 and screen will blank
+        assertEquals("Correct status code", HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue("Correct alert message", response.getBody().get("message").equals("Deletion Failed. PQs catalogued for this survey."));
     }
 }
