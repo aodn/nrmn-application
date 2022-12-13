@@ -1,6 +1,6 @@
 package au.org.aodn.nrmn.restapi.enums;
 
 public enum SharedLinkType {
-    SHARED_ENDPOINT,
+    ENDPOINT,
     PASSWORD_RESET
 }
