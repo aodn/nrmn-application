@@ -482,6 +482,6 @@ class CorrectionsControllerIT {
                 .build(testRestTemplate);
 
         // No proper response at the moment, become 500 and screen will blank
-        assertEquals("Correct status code", HttpStatus.OK, response.getStatusCode());
+        assertEquals("Correct status code", HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 }
