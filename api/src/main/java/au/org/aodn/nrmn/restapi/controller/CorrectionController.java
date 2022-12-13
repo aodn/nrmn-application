@@ -465,12 +465,29 @@ public class CorrectionController {
             @RequestBody SpeciesSearchBodyDto bodyDto) {
 
         try {
-            var withLocation = bodyDto.getLocationIds().size() > 0;;
-            var species = observableItemRepository.getAllDistinctForSurveysAndLocationsKML(bodyDto.getStartDate(),
-                    bodyDto.getEndDate(), withLocation, bodyDto.getLocationIds(), bodyDto.getObservableItemId(), bodyDto.getGeometry());
+            if(bodyDto == null) {
+                return ResponseEntity
+                        .badRequest()
+                        .body("{\"message\":\"Missing body in the request.\"}");
+            }
+
+            if(bodyDto.getLocationIds() == null) {
+                //Avoid null in sql
+                bodyDto.setLocationIds(new ArrayList<>());
+            }
+
+            var withLocation = bodyDto.getLocationIds().size() > 0;
+            var species = observableItemRepository.getAllDistinctForSurveysAndLocationsKML(
+                    bodyDto.getStartDate(),
+                    bodyDto.getEndDate(),
+                    withLocation,
+                    bodyDto.getLocationIds(),
+                    bodyDto.getObservableItemId(),
+                    bodyDto.getGeometry());
+
             return ResponseEntity.ok().body(species);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Query failed");
+            return ResponseEntity.badRequest().body("{\"message\":\"Query failed\"}");
         }
     }
 

@@ -6,14 +6,12 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 
 import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRequestBodyDto;
+import au.org.aodn.nrmn.restapi.dto.correction.SpeciesSearchBodyDto;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
-import org.junit.jupiter.api.BeforeEach;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.testcontainers.shaded.com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +22,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.util.ResourceUtils;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.google.common.primitives.Ints;
@@ -40,6 +39,7 @@ import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.transaction.Transactional;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -451,5 +451,37 @@ class CorrectionsControllerIT {
         // No proper response at the moment, become 500 and screen will blank
         assertEquals("Correct status code", HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertTrue("Correct alert message", response.getBody().get("message").equals("Deletion Failed. PQs catalogued for this survey."));
+    }
+    @Test
+    @WithUserDetails("test@example.com")
+    public void testSpeciesSearch() throws Exception {
+        var auth = getContext().getAuthentication();
+        var token = jwtTokenProvider.generateToken(auth);
+
+        SpeciesSearchBodyDto ss = new SpeciesSearchBodyDto();
+        ss.setStartDate("01/01/2006");
+        ss.setEndDate("12/12/2006");
+        ss.setObservableItemId(333);
+
+        // This kml will cover the whole area of Australia
+        ss.setGeometry(
+                FileUtils.readFileToString(
+                        ResourceUtils.getFile("classpath:testdata/testlayer.kml"),
+                        Charset.defaultCharset()
+                ));
+
+        var uri = String.format("http://localhost:%d/api/v1/correction/searchSpecies", localServerPort);
+        var reqBuilder = new RequestWrapper<SpeciesSearchBodyDto, String>();
+        var response = reqBuilder
+                .withUri(uri)
+                .withToken(token)
+                .withEntity(ss)
+                .withMethod(HttpMethod.POST)
+                .withContentType(MediaType.APPLICATION_JSON)
+                .withResponseType(String.class)
+                .build(testRestTemplate);
+
+        // No proper response at the moment, become 500 and screen will blank
+        assertEquals("Correct status code", HttpStatus.OK, response.getStatusCode());
     }
 }
