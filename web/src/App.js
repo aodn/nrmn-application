@@ -14,6 +14,7 @@ import ObservableItemAdd from './components/data-entities/observable-item/Observ
 import ObservableItemEdit from './components/data-entities/observable-item/ObservableItemEdit';
 import ObservableItemList from './components/data-entities/observable-item/ObservableItemList';
 import ObservableItemView from './components/data-entities/observable-item/ObservableItemView';
+import SharedLinkList from './components/data-entities/shared-link/SharedLinkList';
 import SiteEdit from './components/data-entities/site/SiteEdit';
 import SiteList from './components/data-entities/site/SiteList';
 import SiteView from './components/data-entities/site/SiteView';
@@ -122,6 +123,7 @@ const App = () => {
                     <Route path="/data/job/:id/edit" element={<ValidationPage />} />
 
                     <Route path="/data/upload" element={<JobUpload />} />
+                    <Route path="/data/share" element={<SharedLinkList />} />
                     <Route path="/data/extract" element={<ExtractTemplateData />} />
 
                     <Route path="/reference/locations" element={<LocationList />} />

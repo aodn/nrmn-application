@@ -159,6 +159,14 @@ export const updateRows = (jobId, rows, completion) => {
   return axiosInstance.put(`stage/job/${jobId}`, rows).then((res) => completion(res));
 };
 
+export const getSharedLinks = () =>
+  axiosInstance
+    .get('sharedLinks', {
+      validateStatus: () => true
+    })
+    .then((res) => res)
+    .catch((err) => err);
+
 export const submitJobFile = (params, onProgress) => {
   const data = new FormData();
   data.append('file', params.file);
