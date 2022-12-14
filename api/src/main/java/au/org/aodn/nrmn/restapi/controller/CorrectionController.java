@@ -269,7 +269,8 @@ public class CorrectionController {
 
         if (lockedSurveys.size() > 0) {
             var locked = lockedSurveys.stream().map(s -> s.getSurveyId().toString()).collect(Collectors.joining(", "));
-            return ResponseEntity.badRequest().body("Surveys are locked and cannot be corrected: " + locked);
+            // The return type is application/json
+            return ResponseEntity.badRequest().body(String.format("{ \"message\": \"Surveys are locked and cannot be corrected: %s\" }", locked));
         }
 
         var programs = correctionRowRepository.findProgramsBySurveyIds(surveyIds)
@@ -280,7 +281,7 @@ public class CorrectionController {
                 .collect(Collectors.toList());
 
         if (programValidations.size() != 1)
-            return ResponseEntity.badRequest().body("Surveys must share the same program validation");
+            return ResponseEntity.badRequest().body("{ \"message\": \"Surveys must share the same program validation\" }");
         var program = programs.get(0);
 
         var rows = correctionRowRepository.findRowsBySurveyIds(surveyIds);
@@ -424,10 +425,10 @@ public class CorrectionController {
         var survey = surveyOptional.get();
 
         if (survey.getLocked() != null && survey.getLocked())
-            return ResponseEntity.badRequest().body("Deletion Failed. Survey is locked.");
+            return ResponseEntity.badRequest().body("{\"message\" : \"Deletion Failed. Survey is locked.\"}");
 
         if (survey.getPqCatalogued() != null && survey.getPqCatalogued())
-            return ResponseEntity.badRequest().body("Deletion Failed. PQs catalogued for this survey.");
+            return ResponseEntity.badRequest().body("{\"message\" : \"Deletion Failed. PQs catalogued for this survey.\"}");
 
         userActionAuditRepository.save(new UserActionAudit("correction/delete", "survey: " + id));
 
@@ -464,12 +465,29 @@ public class CorrectionController {
             @RequestBody SpeciesSearchBodyDto bodyDto) {
 
         try {
-            var withLocation = bodyDto.getLocationIds().size() > 0;;
-            var species = observableItemRepository.getAllDistinctForSurveysAndLocationsKML(bodyDto.getStartDate(),
-                    bodyDto.getEndDate(), withLocation, bodyDto.getLocationIds(), bodyDto.getObservableItemId(), bodyDto.getGeometry());
+            if(bodyDto == null) {
+                return ResponseEntity
+                        .badRequest()
+                        .body("{\"message\":\"Missing body in the request.\"}");
+            }
+
+            if(bodyDto.getLocationIds() == null) {
+                //Avoid null in sql
+                bodyDto.setLocationIds(new ArrayList<>());
+            }
+
+            var withLocation = bodyDto.getLocationIds().size() > 0;
+            var species = observableItemRepository.getAllDistinctForSurveysAndLocationsKML(
+                    bodyDto.getStartDate(),
+                    bodyDto.getEndDate(),
+                    withLocation,
+                    bodyDto.getLocationIds(),
+                    bodyDto.getObservableItemId(),
+                    bodyDto.getGeometry());
+
             return ResponseEntity.ok().body(species);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Query failed");
+            return ResponseEntity.badRequest().body("{\"message\":\"Query failed\"}");
         }
     }
 

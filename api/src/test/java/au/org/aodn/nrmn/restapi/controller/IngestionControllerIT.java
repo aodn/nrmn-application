@@ -46,17 +46,18 @@ class IngestionControllerIT {
     @WithUserDetails("test@example.com")
     public void ingestWorksForValidatedJob() throws Exception {
 
-        RequestWrapper<String, SecUser> reqBuilder = new RequestWrapper<String, SecUser>();
+        RequestWrapper<String, String> reqBuilder = new RequestWrapper<>();
 
         Authentication auth = getContext().getAuthentication();
         String token = jwtProvider.generateToken(auth);
 
         long initialObservationCount = observationRepository.count();
 
-        ResponseEntity<SecUser> response = reqBuilder
+        ResponseEntity<String> response = reqBuilder
                 .withUri(_createUrl("/api/v1/ingestion/ingest/109"))
                 .withMethod(HttpMethod.POST)
                 .withToken(token)
+                .withResponseType(String.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -70,18 +71,19 @@ class IngestionControllerIT {
     @Test
     @WithUserDetails("test@example.com")
     public void ingestFailsForUnvalidatedJob() throws Exception {
-
-        RequestWrapper<String, SecUser> reqBuilder = new RequestWrapper<String, SecUser>();
+        // Bad request will result in text instead of json
+        RequestWrapper<String, String> reqBuilder = new RequestWrapper<>();
 
         Authentication auth = getContext().getAuthentication();
         String token = jwtProvider.generateToken(auth);
 
         long initialObservationCount = observationRepository.count();
 
-        ResponseEntity<SecUser> response = reqBuilder
+        ResponseEntity<String> response = reqBuilder
                 .withUri(_createUrl("/api/v1/ingestion/ingest/120"))
                 .withMethod(HttpMethod.POST)
                 .withToken(token)
+                .withResponseType(String.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
