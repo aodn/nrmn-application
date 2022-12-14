@@ -1,7 +1,11 @@
 package au.org.aodn.nrmn.restapi.service.upload;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,10 +30,10 @@ public class S3IO {
         return client;
     }
 
-    public void uploadMaterializedView(String path, String data) {
+    public void uploadMaterializedView(String path, File file) {
         try {
             var fullPath = "materialized_views/" + path + ".csv";
-            var res = RequestBody.fromString(data);
+            var res = RequestBody.fromFile(file);
             getClient().putObject(PutObjectRequest.builder().bucket(bucket).key(fullPath).build(), res);
         } catch (AwsServiceException e) {
             throw new RuntimeException("Failed to write to S3: " + e.getMessage());

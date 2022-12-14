@@ -1,7 +1,13 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.persistence.Tuple;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -32,31 +38,88 @@ public class MaterializedViewService {
     @Autowired
     MaterializedViewsRepository materializedViewsRepository;
 
+    private void uploadMaterializedView(String viewName, List<Tuple> viewResult) throws IOException {
+        var headers = viewResult.get(0).getElements().stream().map(e -> e.getAlias()).collect(Collectors.toList());
+        var values = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toList());
+        var headerFormat = CSVFormat.Builder.create().setHeader(headers.toArray(new String[0])).build();
+        var tempFile = File.createTempFile(viewName, ".csv");
+        try (var fileWriter = new FileWriter(tempFile)) {
+            try (var csvPrinter = new CSVPrinter(fileWriter, headerFormat)) {
+                csvPrinter.printRecords(values);
+            }
+            s3IO.uploadMaterializedView(viewName, tempFile);
+        }
+        Files.deleteIfExists(tempFile.toPath());
+    }
+
+    private void uploadEpM1() {
+        try {
+            var offset = 0;
+            var limit = 100000;
+            var viewName = "ep_m1";
+            var max = materializedViewsRepository.countEpM1();
+            var viewResult = materializedViewsRepository.getEpM1(offset, limit);
+            var headers = viewResult.get(0).getElements().stream().map(e -> e.getAlias()).collect(Collectors.toList());
+            var initialValues = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toList());
+            var headerFormat = CSVFormat.Builder.create().setHeader(headers.toArray(new String[0])).build();
+            var tempFile = File.createTempFile(viewName, ".csv");
+            try (var fileWriter = new FileWriter(tempFile)) {
+                try (var csvPrinter = new CSVPrinter(fileWriter, headerFormat)) {
+                    csvPrinter.printRecords(initialValues);
+                    while (offset < max) {
+                        viewResult = materializedViewsRepository.getEpM1(offset, limit);
+                        var nextValues = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toList());
+                        csvPrinter.printRecords(nextValues);
+                        offset += limit;
+                    }
+                }
+            }
+            s3IO.uploadMaterializedView(viewName, tempFile);
+            Files.deleteIfExists(tempFile.toPath());
+        } catch (Exception e) {
+            logger.error("Failed to upload ep_m1", e);
+        }
+    }
+
     public void uploadAllMaterializedViews() {
 
         if (materializedViewsRepository.checkAnyRunning()) {
             logger.error("Failed to upload materialized views as one or more are still refreshing.");
             return;
         }
-       
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        try
-        {
-            var viewResult = materializedViewsRepository.getUiSpeciesAttributes();
-            var headers = viewResult.get(0).getElements().stream().map(e -> e.getAlias()).collect(Collectors.toList());
-            var values = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toList());
-            var headerFormat = CSVFormat.Builder.create().setHeader(headers.toArray(new String[0])).build();
-            var csvPrinter = new CSVPrinter(System.out, headerFormat);
-            csvPrinter.printRecords(values);
-            // s3IO.uploadMaterializedView("ui_species_attributes", );
+
+        try {
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+
+            uploadMaterializedView("ui_species_attributes",
+                    materializedViewsRepository.getUiSpeciesAttributes());
+            uploadMaterializedView("ep_m2_cryptic_fish",
+                    materializedViewsRepository.getEpM2CrypticFish());
+            uploadMaterializedView("ep_m2_inverts",
+                    materializedViewsRepository.getEpM2Inverts());
+            uploadMaterializedView("ep_observable_items",
+                    materializedViewsRepository.getEpObservableItems());
+            uploadMaterializedView("ep_rarity_abundance",
+                    materializedViewsRepository.getEpRarityAbundance());
+            uploadMaterializedView("ep_rarity_extents",
+                    materializedViewsRepository.getEpRarityExtents());
+            uploadMaterializedView("ep_rarity_range",
+                    materializedViewsRepository.getEpRarityRange());
+            uploadMaterializedView("ep_site_list",
+                    materializedViewsRepository.getEpSiteList());
+            uploadMaterializedView("ep_survey_list",
+                    materializedViewsRepository.getEpSurveyList());
+            uploadMaterializedView("ep_rarity_frequency",
+                    materializedViewsRepository.getEpRarityFrequency());
+
+            uploadEpM1();
+
+            stopWatch.stop();
+            logger.info("Uploaded all materialized views in " + stopWatch.getLastTaskTimeMillis() + "ms");
+        } catch (Exception e) {
+            logger.error("Failed to upload all materialized views", e);
         }
-        catch (Exception e)
-        {
-            logger.error("Failed to upload ui_species_attributes", e);
-        }
-        stopWatch.stop();
-        logger.info("ui_species_attributes upload took: " + stopWatch.getLastTaskTimeMillis() + "ms");
     }
 
     @Async
