@@ -66,6 +66,7 @@ public class MaterializedViewService {
             try (var fileWriter = new FileWriter(tempFile)) {
                 try (var csvPrinter = new CSVPrinter(fileWriter, headerFormat)) {
                     csvPrinter.printRecords(initialValues);
+                    offset += limit;
                     while (offset < max) {
                         viewResult = materializedViewsRepository.getEpM1(offset, limit);
                         var nextValues = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toList());
