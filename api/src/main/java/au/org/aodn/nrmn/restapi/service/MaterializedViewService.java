@@ -1,5 +1,10 @@
 package au.org.aodn.nrmn.restapi.service;
 
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,15 +40,21 @@ public class MaterializedViewService {
         }
        
         StopWatch stopWatch = new StopWatch();
-
         stopWatch.start();
-        
-        var viewResult = materializedViewsRepository.getUiSpeciesAttributes();
-
-
-
-        // s3IO.uploadMaterializedView("ui_species_attributes", );
-        
+        try
+        {
+            var viewResult = materializedViewsRepository.getUiSpeciesAttributes();
+            var headers = viewResult.get(0).getElements().stream().map(e -> e.getAlias()).collect(Collectors.toList());
+            var values = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toList());
+            var headerFormat = CSVFormat.Builder.create().setHeader(headers.toArray(new String[0])).build();
+            var csvPrinter = new CSVPrinter(System.out, headerFormat);
+            csvPrinter.printRecords(values);
+            // s3IO.uploadMaterializedView("ui_species_attributes", );
+        }
+        catch (Exception e)
+        {
+            logger.error("Failed to upload ui_species_attributes", e);
+        }
         stopWatch.stop();
         logger.info("ui_species_attributes upload took: " + stopWatch.getLastTaskTimeMillis() + "ms");
     }

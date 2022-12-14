@@ -7,8 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 
+import java.sql.ResultSet;
 import java.util.Collection;
+import java.util.List;
 
+import javax.persistence.Tuple;
 import javax.transaction.Transactional;
 
 @Transactional
@@ -22,6 +25,7 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW CONCURRENTLY nrmn.ep_m1;", nativeQuery = true)
     void refreshEpM1();
 
+    // ------------------
 
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW nrmn.ep_m2_cryptic_fish'", nativeQuery = true)
     Boolean checkEpM2CrypticFishRunning();
@@ -30,6 +34,7 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_m2_cryptic_fish;", nativeQuery = true)
     void refreshEpM2CrypticFish();
 
+    // ------------------
 
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW nrmn.ep_m2_inverts'", nativeQuery = true)
     Boolean checkEpM2InvertsRunning();
@@ -38,6 +43,7 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_m2_inverts;", nativeQuery = true)
     void refreshEpM2Inverts();
 
+    // ------------------
 
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW nrmn.ep_observable_items'", nativeQuery = true)
     Boolean checkEpObservableItemsRunning();
@@ -46,6 +52,7 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_observable_items;", nativeQuery = true)
     void refreshEpObservableItems();
 
+    // ------------------
 
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW nrmn.ep_rarity_abundance'", nativeQuery = true)
     Boolean checkEpRarityAbundanceRunning();
@@ -54,6 +61,7 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_rarity_abundance;", nativeQuery = true)
     void refreshEpRarityAbundance();
 
+    // ------------------
 
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW nrmn.ep_rarity_extents'", nativeQuery = true)
     Boolean checkEpRarityExtentsRunning();
@@ -62,6 +70,7 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_rarity_extents;", nativeQuery = true)
     void refreshEpRarityExtents();
 
+    // ------------------
 
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW CONCURRENTLY nrmn.ep_rarity_frequency'", nativeQuery = true)
     Boolean checkEpRarityFrequencyRunning();
@@ -70,6 +79,7 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW CONCURRENTLY nrmn.ep_rarity_frequency;", nativeQuery = true)
     void refreshEpRarityFrequency();
 
+    // ------------------
 
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW nrmn.ep_rarity_range'", nativeQuery = true)
     Boolean checkEpRarityRangeRunning();
@@ -78,6 +88,7 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_rarity_range;", nativeQuery = true)
     void refreshEpRarityRange();
 
+    // ------------------
 
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW nrmn.ep_site_list'", nativeQuery = true)
     Boolean checkEpSiteListRunning();
@@ -86,6 +97,7 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_site_list;", nativeQuery = true)
     void refreshEpSiteList();
 
+    // ------------------
 
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW nrmn.ep_survey_list'", nativeQuery = true)
     Boolean checkEpSurveyListRunning();
@@ -94,18 +106,20 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_survey_list;", nativeQuery = true)
     void refreshEpSurveyList();
 
+    // ------------------
 
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW nrmn.ui_species_attributes'", nativeQuery = true)
     Boolean checkUiSpeciesAttributesRunning();
-
-    @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query LIKE 'REFRESH MATERIALIZED VIEW %'", nativeQuery = true)
-    Boolean checkAnyRunning();
 
     @Modifying
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ui_species_attributes;", nativeQuery = true)
     void refreshUiSpeciesAttributes();
 
     @Query(value = "SELECT * from nrmn.ui_species_attributes;", nativeQuery = true)
-    Collection<String> getUiSpeciesAttributes();
+    List<Tuple> getUiSpeciesAttributes();
 
+    // ------------------
+
+    @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query LIKE 'REFRESH MATERIALIZED VIEW %'", nativeQuery = true)
+    Boolean checkAnyRunning();
 }
