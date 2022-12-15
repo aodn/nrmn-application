@@ -29,7 +29,7 @@ public class SharedLinkDto {
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public SharedLinkDto(SharedLink sharedLink) {
-        this.publicId = sharedLink.getPublicId();
+        this.publicId = sharedLink.getPublicId().toString();
         this.targetUrl = sharedLink.getTargetUrl();
         this.description = sharedLink.getDescription();
         this.content = sharedLink.getLinkType().toString().toLowerCase();

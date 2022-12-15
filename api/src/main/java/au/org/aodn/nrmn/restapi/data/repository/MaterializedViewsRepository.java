@@ -141,18 +141,6 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
 
     // ------------------
 
-    @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW nrmn.ui_species_attributes'", nativeQuery = true)
-    Boolean checkUiSpeciesAttributesRunning();
-
-    @Modifying
-    @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ui_species_attributes;", nativeQuery = true)
-    void refreshUiSpeciesAttributes();
-
-    @Query(value = "SELECT * from nrmn.ui_species_attributes;", nativeQuery = true)
-    List<Tuple> getUiSpeciesAttributes();
-
-    // ------------------
-
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query LIKE 'REFRESH MATERIALIZED VIEW %'", nativeQuery = true)
     Boolean checkAnyRunning();
 }

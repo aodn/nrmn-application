@@ -19,6 +19,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import au.org.aodn.nrmn.restapi.enums.SharedLinkType;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,8 +35,8 @@ import lombok.NoArgsConstructor;
 public class SharedLink {
 
     @Id
-    @SequenceGenerator(name = "shared_link_shared_link_id_seq", sequenceName = "shared_link_shared_link_id_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="shared_link_shared_link_id_seq")
+    @SequenceGenerator(name = "shared_link_id_seq", sequenceName = "shared_link_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="shared_link_id_seq")
     @Column(name = "id", unique = true, updatable = false, nullable = false)
     private Long linkId;
 
@@ -65,7 +66,7 @@ public class SharedLink {
     private LocalDateTime expired;
 
     @Column(name = "public_id", nullable = false)
-    private String publicId;
+    private UUID publicId;
 
     @Column(name = "target_url", nullable = true)
     private String targetUrl;

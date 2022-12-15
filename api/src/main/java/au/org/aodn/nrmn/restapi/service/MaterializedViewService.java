@@ -93,8 +93,6 @@ public class MaterializedViewService {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
 
-            uploadMaterializedView("ui_species_attributes",
-                    materializedViewsRepository.getUiSpeciesAttributes());
             uploadMaterializedView("ep_m2_cryptic_fish",
                     materializedViewsRepository.getEpM2CrypticFish());
             uploadMaterializedView("ep_m2_inverts",
@@ -133,9 +131,6 @@ public class MaterializedViewService {
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-
-        if (!materializedViewsRepository.checkUiSpeciesAttributesRunning())
-            materializedViewsRepository.refreshUiSpeciesAttributes();
 
         if (!materializedViewsRepository.checkEpM2CrypticFishRunning())
             materializedViewsRepository.refreshEpM2CrypticFish();
