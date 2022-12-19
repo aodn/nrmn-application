@@ -43,7 +43,7 @@ const SharedLinkList = () => {
       description: document.getElementById('description').value ?? '',
       expires: document.getElementById('expires').value
     };
-    createSharedLink(sharedLinkDto).then((res) => setData(null));
+    createSharedLink(sharedLinkDto).then(() => setData(null));
   }, [posting]);
 
   const header = (
