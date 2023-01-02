@@ -40,12 +40,21 @@ public class S3IO {
         }
     }
 
+    public void deleteMaterializedView(String publicId, String path) {
+        try {
+            var fullPath = "materialized_views/" + publicId + "/" + path + ".csv";
+            getClient().deleteObject(b -> b.bucket(bucket).key(fullPath));
+        } catch (AwsServiceException e) {
+            throw new RuntimeException("Failed to delete from S3: " + e.getMessage());
+        }
+    }
+
     public String generatedSignedS3URL(String path) {
         var presigner = S3Presigner.create();
         var getObjectRequest = GetObjectRequest.builder().bucket(bucket).key("materialized_views/" + path + ".csv")
                 .build();
         var getObjectPresignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(10))
+                .signatureDuration(Duration.ofMillis(10))
                 .getObjectRequest(getObjectRequest)
                 .build();
         var presignedGetObjectRequest = presigner.presignGetObject(getObjectPresignRequest);

@@ -39,7 +39,6 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_m2_cryptic_fish;", nativeQuery = true)
     void refreshEpM2CrypticFish();
 
-    // removed geom
     @Query(value = "SELECT survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, method, block, phylum, class, \"order\", family, recorded_species_name, species_name, taxon, reporting_name, size_class, total, biomass from nrmn.ep_m2_cryptic_fish;", nativeQuery = true)
     List<Tuple> getEpM2CrypticFish();
 
