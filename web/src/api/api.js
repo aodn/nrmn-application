@@ -169,7 +169,9 @@ export const getSharedLinks = () =>
     .then((res) => res)
     .catch((err) => err);
 
-export const createSharedLink = (sharedLinkDto) => axiosInstance.put('sharedLinks', sharedLinkDto).then((res) => res);
+export const createSharedLink = (sharedLinkDto) => axiosInstance.put('sharedLink', sharedLinkDto).then((res) => res);
+
+export const deleteSharedLink = (linkId) => axiosInstance.delete(`sharedLink/${linkId}`).then((res) => res);
 
 export const submitJobFile = (params, onProgress) => {
   const data = new FormData();

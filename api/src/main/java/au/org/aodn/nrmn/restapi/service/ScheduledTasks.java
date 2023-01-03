@@ -36,10 +36,7 @@ public class ScheduledTasks {
         } else {
             logger.info("Skipping PQ update as active profile set.");
         }
-
-        // DEV
-        if(environment.getActiveProfiles()[0].equalsIgnoreCase("dev"))
-            materializedViewService.uploadAllMaterializedViews();
+        materializedViewService.refreshAllMaterializedViews();
 
     }
 }

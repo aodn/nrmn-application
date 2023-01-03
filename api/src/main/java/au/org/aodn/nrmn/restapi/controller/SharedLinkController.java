@@ -2,20 +2,20 @@ package au.org.aodn.nrmn.restapi.controller;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import au.org.aodn.nrmn.restapi.data.model.SharedLink;
-import au.org.aodn.nrmn.restapi.data.repository.MaterializedViewsRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SecUserRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SharedLinkRepository;
 import au.org.aodn.nrmn.restapi.dto.sharedlink.SharedLinkDto;
@@ -50,7 +50,20 @@ public class SharedLinkController {
         return ResponseEntity.ok(sharedLinks);
     }
 
-    @PutMapping("/sharedLinks")
+    @DeleteMapping("/sharedLink/{id}")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public ResponseEntity<String> deleteLink(@PathVariable Long id) {
+        try {
+            var link = sharedLinkRepository.getReferenceById(id);
+            s3IO.deleteS3Link(link.getTargetUrl());
+            sharedLinkRepository.delete(link);
+            return ResponseEntity.ok(null);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/sharedLink")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> createSharedLink(Authentication authentication,
             @RequestBody SharedLinkDto sharedLinkDto) {
@@ -61,14 +74,14 @@ public class SharedLinkController {
                 materializedViewService.uploadMaterializedView(sharedLinkDto.getContent().toLowerCase());
             }
 
+            var expires = LocalDate.parse(sharedLinkDto.getExpires()).atStartOfDay();
             var sharedLink = new SharedLink();
             var user = userRepo.findByEmail(authentication.getName());
             sharedLink.setUser(user.get());
-            sharedLink.setDescription(sharedLinkDto.getDescription());
+            sharedLink.setReceipient(sharedLinkDto.getRecipient());
             sharedLink.setLinkType(SharedLinkType.valueOf(sharedLinkDto.getContent().toUpperCase()));
-            sharedLink.setTargetUrl(s3IO.createS3Link(sharedLinkDto.getContent().toLowerCase(), sharedLinkDto.getExpires()));
-            sharedLink.setExpires(LocalDate.parse(sharedLinkDto.getExpires()).atStartOfDay());
-            sharedLink.setPublicId(UUID.randomUUID());
+            sharedLink.setTargetUrl(s3IO.createS3Link(sharedLinkDto.getContent().toLowerCase(), expires));
+            sharedLink.setExpires(expires);
             sharedLinkRepository.save(sharedLink);
             return ResponseEntity.ok(sharedLink.getTargetUrl());
         } catch (Exception e) {

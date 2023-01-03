@@ -19,7 +19,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import au.org.aodn.nrmn.restapi.enums.SharedLinkType;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,8 +47,8 @@ public class SharedLink {
     @JoinColumn(name = "sec_user_id", referencedColumnName = "id", nullable = false)
     private SecUser user;
 
-    @Column(name = "description", nullable = true)
-    private String description;
+    @Column(name = "receipient", nullable = true)
+    private String receipient;
 
     @CreationTimestamp 
     @Column(name = "created", updatable = false)
@@ -64,9 +63,6 @@ public class SharedLink {
 
     @Column(name = "expired", nullable = true)
     private LocalDateTime expired;
-
-    @Column(name = "public_id", nullable = false)
-    private UUID publicId;
 
     @Column(name = "target_url", nullable = true)
     private String targetUrl;

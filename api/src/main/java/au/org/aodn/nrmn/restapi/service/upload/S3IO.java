@@ -3,7 +3,8 @@ package au.org.aodn.nrmn.restapi.service.upload;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.security.SecureRandom;
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -15,6 +16,7 @@ import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
@@ -45,16 +47,7 @@ public class S3IO {
         }
     }
 
-    public void deleteEndpoint(String publicId, String path) {
-        try {
-            var fullPath = "materialized_views/" + publicId + "/" + path + ".csv";
-            getClient().deleteObject(b -> b.bucket(bucket).key(fullPath));
-        } catch (AwsServiceException e) {
-            throw new RuntimeException("Failed to delete from S3: " + e.getMessage());
-        }
-    }
-
-    public String createS3Link(String viewName, String expires) throws Exception {
+    public String createS3Link(String viewName, LocalDateTime expires) throws Exception {
         try {
             var sessionId = RandomStringUtils.random(20, 0, 0, true, true, null, new SecureRandom());
             var sourceKey = String.join("/", List.of("endpoints", viewName + ".csv"));
@@ -63,11 +56,20 @@ public class S3IO {
                     .sourceBucket(bucket).sourceKey(sourceKey)
                     .destinationBucket(bucketShared).destinationKey(destinationKey)
                     .acl(ObjectCannedACL.PUBLIC_READ)
-                    .expires(Instant.parse(expires))
+                    .expires(expires.toInstant(OffsetDateTime.now().getOffset()))
                     .build();
             client.copyObject(request);
             return client.utilities().getUrl(builder -> builder.bucket(bucketShared).key(destinationKey))
                     .toExternalForm();
+        } catch (Exception e) {
+            throw new Exception("Failed to generate shared link: " + e.getMessage());
+        }
+    }
+
+    public void deleteS3Link(String externalForm) throws Exception {
+        try {
+            var key = externalForm.split("amazonaws.com/")[1];
+            client.deleteObject(DeleteObjectRequest.builder().bucket(bucketShared).key(key).build());
         } catch (Exception e) {
             throw new Exception("Failed to generate shared link: " + e.getMessage());
         }

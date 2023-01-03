@@ -91,6 +91,7 @@ public class MaterializedViewService {
         }
     }
 
+    @Async
     public void uploadAllMaterializedViews() {
 
         if (materializedViewsRepository.checkAnyRunning()) {
@@ -104,24 +105,23 @@ public class MaterializedViewService {
 
             uploadMaterializedView("ep_m2_cryptic_fish",
                     materializedViewsRepository.getEpM2CrypticFish());
-            // uploadMaterializedView("ep_m2_inverts",
-            // materializedViewsRepository.getEpM2Inverts());
-            // uploadMaterializedView("ep_observable_items",
-            // materializedViewsRepository.getEpObservableItems());
-            // uploadMaterializedView("ep_rarity_abundance",
-            // materializedViewsRepository.getEpRarityAbundance());
-            // uploadMaterializedView("ep_rarity_extents",
-            // materializedViewsRepository.getEpRarityExtents());
-            // uploadMaterializedView("ep_rarity_range",
-            // materializedViewsRepository.getEpRarityRange());
-            // uploadMaterializedView("ep_site_list",
-            // materializedViewsRepository.getEpSiteList());
-            // uploadMaterializedView("ep_survey_list",
-            // materializedViewsRepository.getEpSurveyList());
-            // uploadMaterializedView("ep_rarity_frequency",
-            // materializedViewsRepository.getEpRarityFrequency());
-
-            // uploadEpM1();
+            uploadMaterializedView("ep_m2_inverts",
+            materializedViewsRepository.getEpM2Inverts());
+            uploadMaterializedView("ep_observable_items",
+            materializedViewsRepository.getEpObservableItems());
+            uploadMaterializedView("ep_rarity_abundance",
+            materializedViewsRepository.getEpRarityAbundance());
+            uploadMaterializedView("ep_rarity_extents",
+            materializedViewsRepository.getEpRarityExtents());
+            uploadMaterializedView("ep_rarity_range",
+            materializedViewsRepository.getEpRarityRange());
+            uploadMaterializedView("ep_site_list",
+            materializedViewsRepository.getEpSiteList());
+            uploadMaterializedView("ep_survey_list",
+            materializedViewsRepository.getEpSurveyList());
+            uploadMaterializedView("ep_rarity_frequency",
+            materializedViewsRepository.getEpRarityFrequency());
+            uploadEpM1();
 
             stopWatch.stop();
             logger.info("Uploaded all materialized views in " + stopWatch.getLastTaskTimeMillis() + "ms");
@@ -144,32 +144,32 @@ public class MaterializedViewService {
         if (!materializedViewsRepository.checkEpM2CrypticFishRunning())
             materializedViewsRepository.refreshEpM2CrypticFish();
 
-        // if (!materializedViewsRepository.checkEpM2InvertsRunning())
-        // materializedViewsRepository.refreshEpM2Inverts();
+        if (!materializedViewsRepository.checkEpM2InvertsRunning())
+        materializedViewsRepository.refreshEpM2Inverts();
 
-        // if (!materializedViewsRepository.checkEpObservableItemsRunning())
-        // materializedViewsRepository.refreshEpObservableItems();
+        if (!materializedViewsRepository.checkEpObservableItemsRunning())
+        materializedViewsRepository.refreshEpObservableItems();
 
-        // if (!materializedViewsRepository.checkEpRarityAbundanceRunning())
-        // materializedViewsRepository.refreshEpRarityAbundance();
+        if (!materializedViewsRepository.checkEpRarityAbundanceRunning())
+        materializedViewsRepository.refreshEpRarityAbundance();
 
-        // if (!materializedViewsRepository.checkEpRarityExtentsRunning())
-        // materializedViewsRepository.refreshEpRarityExtents();
+        if (!materializedViewsRepository.checkEpRarityExtentsRunning())
+        materializedViewsRepository.refreshEpRarityExtents();
 
-        // if (!materializedViewsRepository.checkEpRarityRangeRunning())
-        // materializedViewsRepository.refreshEpRarityRange();
+        if (!materializedViewsRepository.checkEpRarityRangeRunning())
+        materializedViewsRepository.refreshEpRarityRange();
 
-        // if (!materializedViewsRepository.checkEpSiteListRunning())
-        // materializedViewsRepository.refreshEpSiteList();
+        if (!materializedViewsRepository.checkEpSiteListRunning())
+        materializedViewsRepository.refreshEpSiteList();
 
-        // if (!materializedViewsRepository.checkEpSurveyListRunning())
-        // materializedViewsRepository.refreshEpSurveyList();
+        if (!materializedViewsRepository.checkEpSurveyListRunning())
+        materializedViewsRepository.refreshEpSurveyList();
 
-        // if (!materializedViewsRepository.checkEpM1Running())
-        // materializedViewsRepository.refreshEpM1();
+        if (!materializedViewsRepository.checkEpM1Running())
+        materializedViewsRepository.refreshEpM1();
 
-        // if (!materializedViewsRepository.checkEpRarityFrequencyRunning())
-        // materializedViewsRepository.refreshEpRarityFrequency();
+        if (!materializedViewsRepository.checkEpRarityFrequencyRunning())
+        materializedViewsRepository.refreshEpRarityFrequency();
 
         stopWatch.stop();
         logger.info("Endpoints refreshed in {}s", stopWatch.getTotalTimeSeconds());

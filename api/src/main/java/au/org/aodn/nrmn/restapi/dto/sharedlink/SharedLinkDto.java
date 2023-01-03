@@ -12,11 +12,11 @@ import au.org.aodn.nrmn.restapi.data.model.SharedLink;
 @NoArgsConstructor
 public class SharedLinkDto {
 
-    private String publicId;
+    private Long linkId;
 
     private String targetUrl;
 
-    private String description;
+    private String recipient;
 
     private String createdBy;
 
@@ -29,9 +29,9 @@ public class SharedLinkDto {
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public SharedLinkDto(SharedLink sharedLink) {
-        this.publicId = sharedLink.getPublicId().toString();
+        this.linkId = sharedLink.getLinkId();
         this.targetUrl = sharedLink.getTargetUrl();
-        this.description = sharedLink.getDescription();
+        this.recipient = sharedLink.getReceipient();
         this.content = sharedLink.getLinkType().toString().toLowerCase();
         this.createdBy = sharedLink.getUser().getEmail();
         this.created = sharedLink.getCreated().format(formatter);
