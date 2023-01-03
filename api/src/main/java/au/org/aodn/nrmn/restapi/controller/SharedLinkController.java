@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import au.org.aodn.nrmn.restapi.data.model.SharedLink;
+import au.org.aodn.nrmn.restapi.data.repository.MaterializedViewsRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SecUserRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SharedLinkRepository;
 import au.org.aodn.nrmn.restapi.dto.sharedlink.SharedLinkDto;
 import au.org.aodn.nrmn.restapi.enums.SharedLinkType;
+import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.upload.S3IO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -31,6 +33,9 @@ public class SharedLinkController {
 
     @Autowired
     private SharedLinkRepository sharedLinkRepository;
+
+    @Autowired
+    private MaterializedViewService materializedViewService;
 
     @Autowired
     private S3IO s3IO;
@@ -49,15 +54,25 @@ public class SharedLinkController {
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> createSharedLink(Authentication authentication,
             @RequestBody SharedLinkDto sharedLinkDto) {
-        var sharedLink = new SharedLink();
-        var user = userRepo.findByEmail(authentication.getName());
-        sharedLink.setUser(user.get());
-        sharedLink.setDescription(sharedLinkDto.getDescription());
-        sharedLink.setLinkType(SharedLinkType.valueOf(sharedLinkDto.getContent().toUpperCase()));
-        sharedLink.setTargetUrl(s3IO.generatedSignedS3URL(sharedLinkDto.getContent()));
-        sharedLink.setExpires(LocalDate.parse(sharedLinkDto.getExpires()).atStartOfDay());
-        sharedLink.setPublicId(UUID.randomUUID());
-        sharedLinkRepository.save(sharedLink);
-        return ResponseEntity.ok(sharedLink.getTargetUrl());
+        try {
+
+            var currentLinkTypes = sharedLinkRepository.findAllDistinctLinkTypes();
+            if (!currentLinkTypes.contains(sharedLinkDto.getContent())) {
+                materializedViewService.uploadMaterializedView(sharedLinkDto.getContent().toLowerCase());
+            }
+
+            var sharedLink = new SharedLink();
+            var user = userRepo.findByEmail(authentication.getName());
+            sharedLink.setUser(user.get());
+            sharedLink.setDescription(sharedLinkDto.getDescription());
+            sharedLink.setLinkType(SharedLinkType.valueOf(sharedLinkDto.getContent().toUpperCase()));
+            sharedLink.setTargetUrl(s3IO.createS3Link(sharedLinkDto.getContent().toLowerCase(), sharedLinkDto.getExpires()));
+            sharedLink.setExpires(LocalDate.parse(sharedLinkDto.getExpires()).atStartOfDay());
+            sharedLink.setPublicId(UUID.randomUUID());
+            sharedLinkRepository.save(sharedLink);
+            return ResponseEntity.ok(sharedLink.getTargetUrl());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
     }
 }

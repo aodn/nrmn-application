@@ -42,14 +42,14 @@ public class MaterializedViewService {
         var headers = viewResult.get(0).getElements().stream().map(e -> e.getAlias()).collect(Collectors.toList());
         var values = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toList());
         var headerFormat = CSVFormat.Builder.create().setHeader(headers.toArray(new String[0])).build();
-        var tempFile = File.createTempFile(viewName, ".csv");
-        try (var fileWriter = new FileWriter(tempFile)) {
+        var file = File.createTempFile(viewName, ".csv");
+        try (var fileWriter = new FileWriter(file)) {
             try (var csvPrinter = new CSVPrinter(fileWriter, headerFormat)) {
                 csvPrinter.printRecords(values);
             }
-            s3IO.uploadMaterializedView(viewName, tempFile);
+            s3IO.uploadEndpoint(viewName, file);
         }
-        Files.deleteIfExists(tempFile.toPath());
+        Files.deleteIfExists(file.toPath());
     }
 
     private void uploadEpM1() {
@@ -62,8 +62,8 @@ public class MaterializedViewService {
             var headers = viewResult.get(0).getElements().stream().map(e -> e.getAlias()).collect(Collectors.toList());
             var initialValues = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toList());
             var headerFormat = CSVFormat.Builder.create().setHeader(headers.toArray(new String[0])).build();
-            var tempFile = File.createTempFile(viewName, ".csv");
-            try (var fileWriter = new FileWriter(tempFile)) {
+            var file = File.createTempFile(viewName, ".csv");
+            try (var fileWriter = new FileWriter(file)) {
                 try (var csvPrinter = new CSVPrinter(fileWriter, headerFormat)) {
                     csvPrinter.printRecords(initialValues);
                     offset += limit;
@@ -75,10 +75,19 @@ public class MaterializedViewService {
                     }
                 }
             }
-            s3IO.uploadMaterializedView(viewName, tempFile);
-            Files.deleteIfExists(tempFile.toPath());
+            s3IO.uploadEndpoint(viewName, file);
+            Files.deleteIfExists(file.toPath());
         } catch (Exception e) {
             logger.error("Failed to upload ep_m1", e);
+        }
+    }
+
+    public void uploadMaterializedView(String viewName) {
+        try {
+            if (viewName.equalsIgnoreCase("ep_m2_cryptic_fish"))
+                uploadMaterializedView("ep_m2_cryptic_fish", materializedViewsRepository.getEpM2CrypticFish());
+        } catch (Exception e) {
+            logger.error("Failed to upload all materialized views", e);
         }
     }
 
@@ -95,24 +104,24 @@ public class MaterializedViewService {
 
             uploadMaterializedView("ep_m2_cryptic_fish",
                     materializedViewsRepository.getEpM2CrypticFish());
-            uploadMaterializedView("ep_m2_inverts",
-                    materializedViewsRepository.getEpM2Inverts());
-            uploadMaterializedView("ep_observable_items",
-                    materializedViewsRepository.getEpObservableItems());
-            uploadMaterializedView("ep_rarity_abundance",
-                    materializedViewsRepository.getEpRarityAbundance());
-            uploadMaterializedView("ep_rarity_extents",
-                    materializedViewsRepository.getEpRarityExtents());
-            uploadMaterializedView("ep_rarity_range",
-                    materializedViewsRepository.getEpRarityRange());
-            uploadMaterializedView("ep_site_list",
-                    materializedViewsRepository.getEpSiteList());
-            uploadMaterializedView("ep_survey_list",
-                    materializedViewsRepository.getEpSurveyList());
-            uploadMaterializedView("ep_rarity_frequency",
-                    materializedViewsRepository.getEpRarityFrequency());
+            // uploadMaterializedView("ep_m2_inverts",
+            // materializedViewsRepository.getEpM2Inverts());
+            // uploadMaterializedView("ep_observable_items",
+            // materializedViewsRepository.getEpObservableItems());
+            // uploadMaterializedView("ep_rarity_abundance",
+            // materializedViewsRepository.getEpRarityAbundance());
+            // uploadMaterializedView("ep_rarity_extents",
+            // materializedViewsRepository.getEpRarityExtents());
+            // uploadMaterializedView("ep_rarity_range",
+            // materializedViewsRepository.getEpRarityRange());
+            // uploadMaterializedView("ep_site_list",
+            // materializedViewsRepository.getEpSiteList());
+            // uploadMaterializedView("ep_survey_list",
+            // materializedViewsRepository.getEpSurveyList());
+            // uploadMaterializedView("ep_rarity_frequency",
+            // materializedViewsRepository.getEpRarityFrequency());
 
-            uploadEpM1();
+            // uploadEpM1();
 
             stopWatch.stop();
             logger.info("Uploaded all materialized views in " + stopWatch.getLastTaskTimeMillis() + "ms");
@@ -135,35 +144,36 @@ public class MaterializedViewService {
         if (!materializedViewsRepository.checkEpM2CrypticFishRunning())
             materializedViewsRepository.refreshEpM2CrypticFish();
 
-        if (!materializedViewsRepository.checkEpM2InvertsRunning())
-            materializedViewsRepository.refreshEpM2Inverts();
+        // if (!materializedViewsRepository.checkEpM2InvertsRunning())
+        // materializedViewsRepository.refreshEpM2Inverts();
 
-        if (!materializedViewsRepository.checkEpObservableItemsRunning())
-            materializedViewsRepository.refreshEpObservableItems();
+        // if (!materializedViewsRepository.checkEpObservableItemsRunning())
+        // materializedViewsRepository.refreshEpObservableItems();
 
-        if (!materializedViewsRepository.checkEpRarityAbundanceRunning())
-            materializedViewsRepository.refreshEpRarityAbundance();
+        // if (!materializedViewsRepository.checkEpRarityAbundanceRunning())
+        // materializedViewsRepository.refreshEpRarityAbundance();
 
-        if (!materializedViewsRepository.checkEpRarityExtentsRunning())
-            materializedViewsRepository.refreshEpRarityExtents();
+        // if (!materializedViewsRepository.checkEpRarityExtentsRunning())
+        // materializedViewsRepository.refreshEpRarityExtents();
 
-        if (!materializedViewsRepository.checkEpRarityRangeRunning())
-            materializedViewsRepository.refreshEpRarityRange();
+        // if (!materializedViewsRepository.checkEpRarityRangeRunning())
+        // materializedViewsRepository.refreshEpRarityRange();
 
-        if (!materializedViewsRepository.checkEpSiteListRunning())
-            materializedViewsRepository.refreshEpSiteList();
+        // if (!materializedViewsRepository.checkEpSiteListRunning())
+        // materializedViewsRepository.refreshEpSiteList();
 
-        if (!materializedViewsRepository.checkEpSurveyListRunning())
-            materializedViewsRepository.refreshEpSurveyList();
+        // if (!materializedViewsRepository.checkEpSurveyListRunning())
+        // materializedViewsRepository.refreshEpSurveyList();
 
-        if (!materializedViewsRepository.checkEpM1Running())
-            materializedViewsRepository.refreshEpM1();
+        // if (!materializedViewsRepository.checkEpM1Running())
+        // materializedViewsRepository.refreshEpM1();
 
-        if (!materializedViewsRepository.checkEpRarityFrequencyRunning())
-            materializedViewsRepository.refreshEpRarityFrequency();
+        // if (!materializedViewsRepository.checkEpRarityFrequencyRunning())
+        // materializedViewsRepository.refreshEpRarityFrequency();
 
         stopWatch.stop();
         logger.info("Endpoints refreshed in {}s", stopWatch.getTotalTimeSeconds());
 
+        uploadAllMaterializedViews();
     }
 }

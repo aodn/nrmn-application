@@ -33,9 +33,13 @@ public class ScheduledTasks {
         if (environment.getActiveProfiles().length < 1) {
             pqSurveyService.updatePQSurveyFlags();
             materializedViewService.refreshAllMaterializedViews();
-            materializedViewService.uploadAllMaterializedViews();
         } else {
             logger.info("Skipping PQ update as active profile set.");
         }
+
+        // DEV
+        if(environment.getActiveProfiles()[0].equalsIgnoreCase("dev"))
+            materializedViewService.uploadAllMaterializedViews();
+
     }
 }

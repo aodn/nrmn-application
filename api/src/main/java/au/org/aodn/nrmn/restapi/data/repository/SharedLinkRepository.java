@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.data.repository;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,4 +18,7 @@ public interface SharedLinkRepository
 
     @Query("SELECT DISTINCT s FROM SharedLink s where s.publicId = :publicId")
     Optional<SharedLink> findByPublicId(@Param("publicId") UUID publicId);
+
+    @Query("SELECT DISTINCT s.linkType FROM SharedLink s")
+    Collection<String> findAllDistinctLinkTypes();
 }

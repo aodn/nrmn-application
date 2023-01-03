@@ -4,16 +4,16 @@ import React, {useEffect, useState} from 'react';
 import {createSharedLink, getSharedLinks} from '../../../api/api';
 
 const endpoints = [
-  'ep_m1',
-  'ep_m2_cryptic_fish',
-  'ep_m2_inverts',
-  'ep_observable_items',
-  'ep_rarity_abundance',
-  'ep_rarity_extents',
-  'ep_rarity_range',
-  'ep_site_list',
-  'ep_survey_list',
-  'ep_rarity_frequency'
+  'EP_M1',
+  'EP_M2_CRYPTIC_FISH',
+  'EP_M2_INVERTS',
+  'EP_OBSERVABLE_ITEMS',
+  'EP_RARITY_ABUNDANCE',
+  'EP_RARITY_EXTENTS',
+  'EP_RARITY_RANGE',
+  'EP_SITE_LIST',
+  'EP_SURVEY_LIST',
+  'EP_RARITY_FREQUENCY'
 ];
 
 const SharedLinkList = () => {
@@ -32,9 +32,10 @@ const SharedLinkList = () => {
       defaultDate.setDate(defaultDate.getDate() + 1);
       const defaultDateString = defaultDate.toISOString().split('T')[0];
       document.getElementById('expires').value = defaultDateString;
+      setPosting(false);
     });
 
-  }, [data, setData]);
+  }, [data, setData, setPosting]);
 
   useEffect(() => {
     if (!posting) return;

@@ -2,8 +2,11 @@ package au.org.aodn.nrmn.restapi.service.upload;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.time.Duration;
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.util.List;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,16 +14,18 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 @Service
 public class S3IO {
 
     @Value("${app.s3.bucket}")
     private String bucket;
+
+    @Value("${app.s3.bucket-shared}")
+    private String bucketShared;
 
     S3Client client;
 
@@ -30,9 +35,9 @@ public class S3IO {
         return client;
     }
 
-    public void uploadMaterializedView(String path, File file) {
+    public void uploadEndpoint(String viewName, File file) {
         try {
-            var fullPath = "materialized_views/" + path + ".csv";
+            var fullPath = String.join("/", List.of("endpoints", viewName + ".csv"));
             var res = RequestBody.fromFile(file);
             getClient().putObject(PutObjectRequest.builder().bucket(bucket).key(fullPath).build(), res);
         } catch (AwsServiceException e) {
@@ -40,7 +45,7 @@ public class S3IO {
         }
     }
 
-    public void deleteMaterializedView(String publicId, String path) {
+    public void deleteEndpoint(String publicId, String path) {
         try {
             var fullPath = "materialized_views/" + publicId + "/" + path + ".csv";
             getClient().deleteObject(b -> b.bucket(bucket).key(fullPath));
@@ -49,16 +54,23 @@ public class S3IO {
         }
     }
 
-    public String generatedSignedS3URL(String path) {
-        var presigner = S3Presigner.create();
-        var getObjectRequest = GetObjectRequest.builder().bucket(bucket).key("materialized_views/" + path + ".csv")
-                .build();
-        var getObjectPresignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMillis(10))
-                .getObjectRequest(getObjectRequest)
-                .build();
-        var presignedGetObjectRequest = presigner.presignGetObject(getObjectPresignRequest);
-        return presignedGetObjectRequest.url().toString();
+    public String createS3Link(String viewName, String expires) throws Exception {
+        try {
+            var sessionId = RandomStringUtils.random(20, 0, 0, true, true, null, new SecureRandom());
+            var sourceKey = String.join("/", List.of("endpoints", viewName + ".csv"));
+            var destinationKey = String.join("/", List.of("endpoints", sessionId, viewName + ".csv"));
+            var request = CopyObjectRequest.builder()
+                    .sourceBucket(bucket).sourceKey(sourceKey)
+                    .destinationBucket(bucketShared).destinationKey(destinationKey)
+                    .acl(ObjectCannedACL.PUBLIC_READ)
+                    .expires(Instant.parse(expires))
+                    .build();
+            client.copyObject(request);
+            return client.utilities().getUrl(builder -> builder.bucket(bucketShared).key(destinationKey))
+                    .toExternalForm();
+        } catch (Exception e) {
+            throw new Exception("Failed to generate shared link: " + e.getMessage());
+        }
     }
 
     public String write(String path, MultipartFile file) throws Exception {
