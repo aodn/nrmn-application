@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -43,6 +45,8 @@ public class SharedLinkController {
     @Autowired
     private SecUserRepository userRepo;
 
+    private static Logger logger = LoggerFactory.getLogger(SharedLinkController.class);
+
     @GetMapping("/sharedLinks")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<List<SharedLinkDto>> getSharedLinks() {
@@ -59,7 +63,8 @@ public class SharedLinkController {
             sharedLinkRepository.delete(link);
             return ResponseEntity.ok(null);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            logger.error(e.getMessage());
+            return ResponseEntity.internalServerError().body("Failed to delete shared link");
         }
     }
 
@@ -85,7 +90,8 @@ public class SharedLinkController {
             sharedLinkRepository.save(sharedLink);
             return ResponseEntity.ok(sharedLink.getTargetUrl());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            logger.error(e.getMessage());
+            return ResponseEntity.internalServerError().body("Failed to generate shared link");
         }
     }
 }
