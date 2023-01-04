@@ -58,8 +58,8 @@ public class S3IO {
                     .acl(ObjectCannedACL.PUBLIC_READ)
                     .expires(expires.toInstant(OffsetDateTime.now().getOffset()))
                     .build();
-            client.copyObject(request);
-            return client.utilities().getUrl(builder -> builder.bucket(bucketShared).key(destinationKey))
+                    getClient().copyObject(request);
+            return getClient().utilities().getUrl(builder -> builder.bucket(bucketShared).key(destinationKey))
                     .toExternalForm();
         } catch (Exception e) {
             throw new Exception("Failed to generate shared link: " + e.getMessage());
@@ -69,7 +69,7 @@ public class S3IO {
     public void deleteS3Link(String externalForm) throws Exception {
         try {
             var key = externalForm.split("amazonaws.com/")[1];
-            client.deleteObject(DeleteObjectRequest.builder().bucket(bucketShared).key(key).build());
+            getClient().deleteObject(DeleteObjectRequest.builder().bucket(bucketShared).key(key).build());
         } catch (Exception e) {
             throw new Exception("Failed to generate shared link: " + e.getMessage());
         }
