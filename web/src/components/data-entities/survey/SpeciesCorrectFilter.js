@@ -7,7 +7,7 @@ import {PropTypes} from 'prop-types';
 import CustomSearchInput from '../../input/CustomSearchInput';
 import SpeciesCorrectGeometryFilter from './SpeciesCorrectGeometryFilter';
 
-const SpeciesCorrectFilter = ({display, onSearch, onLoadLocations}) => {
+const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
   const [data, setData] = useState();
   const [countries, setCountries] = useState();
   const [states, setState] = useState();
@@ -198,7 +198,7 @@ const SpeciesCorrectFilter = ({display, onSearch, onLoadLocations}) => {
   return (
     <>
       {data?.locationIds && states && countries ? (
-        display && (
+        (
           <>
             <Box ml={1} display="flex" flexDirection="row">
               <Box m={1} minWidth={300} display="flex">
@@ -272,7 +272,7 @@ const SpeciesCorrectFilter = ({display, onSearch, onLoadLocations}) => {
               </Box>
             </Box>
             {visibleLocations && (
-              <Box m={2} display="flex" flexDirection="column">
+              <Box display="flex" flexDirection="column">
                 <Box minWidth={600}>
                   {visibleStagedLocations.map((l) => (
                     <Chip key={l} style={{margin: 5}} label={locations[l]} onClick={() => updateFilter({action: 'addLocation', id: l})} />
@@ -303,13 +303,13 @@ const SpeciesCorrectFilter = ({display, onSearch, onLoadLocations}) => {
                 </Box>
               </Box>
             )}
-            <Box ml={1} display="flex" flexDirection="row">
-              <Box ml={1} mt={3} width={50}>
+            <Box ml={1} py={1} display="flex" flexDirection="row">
+              <Box ml={1} width={50}>
                 <Button onClick={() => updateFilter()} fullWidth variant="outlined">
                   Reset
                 </Button>
               </Box>
-              <Box ml={3} mr={1} my={3} width={220}>
+              <Box ml={3} mr={1} width={220}>
                 <LoadingButton disabled={!canSearch} onClick={() => onSearch(filter)} fullWidth variant="contained">
                   Search
                 </LoadingButton>
@@ -325,9 +325,8 @@ const SpeciesCorrectFilter = ({display, onSearch, onLoadLocations}) => {
 };
 
 SpeciesCorrectFilter.propTypes = {
-  display: PropTypes.bool,
   onSearch: PropTypes.func.isRequired,
-  onLoadLocations: PropTypes.func
+  onLoadLocations: PropTypes.func.isRequired
 };
 
 export default SpeciesCorrectFilter;

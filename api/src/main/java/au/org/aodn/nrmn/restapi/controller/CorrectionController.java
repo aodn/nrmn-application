@@ -472,7 +472,6 @@ public class CorrectionController {
             }
 
             if(bodyDto.getLocationIds() == null) {
-                //Avoid null in sql
                 bodyDto.setLocationIds(new ArrayList<>());
             }
 

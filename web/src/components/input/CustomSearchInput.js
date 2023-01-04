@@ -12,17 +12,22 @@ const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    if (searchTerm.length > minMatchCharacters) {
+    if (searchTerm?.length > minMatchCharacters) {
       const cancelTokenSource = axios.CancelToken.source();
       const query = {searchType: 'NRMN', species: searchTerm, includeSuperseded: false};
       search(query, cancelTokenSource.token).then((resp) => {
-        const resultSet = resp.data ? resp.data.map((i) => ({id: i.observableItemId, species: i.species})).filter((f) => f !== exclude) : [];
+        const resultSet = resp.data
+          ? resp.data.map((i) => ({id: i.observableItemId, species: i.species})).filter((f) => f !== exclude)
+          : [];
         setResults(resultSet);
-        setOptions(resultSet.map(i => i.species));
+        setOptions(resultSet.map((i) => i.species));
+        if (resultSet.length === 1) {
+          onChange(resultSet[0]);
+        }
       });
       return () => cancelTokenSource.cancel();
     }
-  }, [searchTerm, minMatchCharacters, exclude]);
+  }, [searchTerm, minMatchCharacters, exclude, onChange]);
 
   return (
     <>
@@ -33,8 +38,8 @@ const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
         freeSolo
         fullWidth={fullWidth}
         value={formData}
+        onInputChange={(e) => setSearchTerm(e.target.value)}
         onSelect={(e) => onChange(results.filter(r => r.species === e.target.value)[0])}
-        onKeyUp={(e) => setSearchTerm(e.target.value)}
         renderInput={(params) => <TextField {...params} size="small" color="primary" variant="outlined" />}
       />
     </>

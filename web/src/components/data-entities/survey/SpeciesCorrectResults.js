@@ -65,7 +65,7 @@ const SpeciesCorrectResults = ({results, onClick}) => {
                 <TableCell>{r.observableItemName}</TableCell>
                 <TableCell>{r.commonName}</TableCell>
                 <TableCell>{r.supersededBy}</TableCell>
-                <TableCell>{Object.keys(r.surveyJson).length}</TableCell>
+                <TableCell>{r.surveyCount}</TableCell>
               </TableRow>
             ))
           ) : (

@@ -5,9 +5,6 @@ import {getSurveySpecies, postSpeciesCorrection} from '../../../api/api';
 import CustomSearchInput from '../../input/CustomSearchInput';
 import SpeciesCorrectFilter from './SpeciesCorrectFilter';
 import SpeciesCorrectResults from './SpeciesCorrectResults';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-
 import LaunchIcon from '@mui/icons-material/Launch';
 
 const removeNullProperties = (obj) => {
@@ -18,16 +15,15 @@ const SpeciesCorrect = () => {
   const [correction, setCorrection] = useState({newObservableItemName: null});
   const [locationData, setLocationData] = useState([]);
   const [searchResults, setSearchResults] = useState(null);
-  const [hideFilter, setHideFilter] = useState(false);
+  const [searchResultData, setSearchResultData] = useState(null);
   const [selected, setSelected] = useState(null);
   const [correctionLocations, setCorrectionLocations] = useState([]);
 
   useEffect(() => {
     if (!selected || selected.jobId) return;
-    const resultLocations = searchResults.find((r) => r.observableItemId === selected.result).locations;
     setCorrection({newObservableItemName: null});
-    setCorrectionLocations([...resultLocations]);
-  }, [selected, setCorrectionLocations, searchResults]);
+    setCorrectionLocations([...selected.locations]);
+  }, [selected, setCorrectionLocations, searchResultData]);
 
   const [request, dispatch] = useReducer((state, action) => {
     switch (action.type) {
@@ -50,8 +46,6 @@ const SpeciesCorrect = () => {
   }, {});
 
   useEffect(() => {
-    if (request.loading && request.request.type === 'search') setHideFilter(true);
-
     if (request.request)
       switch (request.request.type) {
         case 'search': {
@@ -70,7 +64,16 @@ const SpeciesCorrect = () => {
               return {...p, locations};
             });
 
-            setSearchResults(rowData);
+            setSearchResultData(rowData);
+            const resultSummary = rowData.map((r) => ({
+              observableItemId: r.observableItemId,
+              observableItemName: r.observableItemName,
+              commonName: r.commonName,
+              supersededBy: r.supersededBy,
+              surveyCount: Object.keys(r.surveyJson).length
+            }));
+            setSearchResults(resultSummary);
+
             dispatch({type: 'showResults'});
           });
           break;
@@ -84,17 +87,16 @@ const SpeciesCorrect = () => {
       }
   }, [request.request, request.loading, locationData]);
 
-  const detail = searchResults?.find((r) => r.observableItemId === selected?.result);
+  const detail = searchResultData?.find((r) => r.observableItemId === selected?.observableItemId);
   const req = request.request;
   return (
     <>
       <Box p={1}>
         <Typography variant="h4">Correct Species</Typography>
       </Box>
-      <Box border={1} borderRadius={1} m={1} borderColor="divider" display="flex"  flexDirection="row">
+      <Box border={1} borderRadius={1} m={1} borderColor="divider" display="flex" flexDirection="row">
         <Box flex={1}>
           <SpeciesCorrectFilter
-            display={!hideFilter}
             onLoadLocations={(locations) => setLocationData(locations)}
             onSearch={(filter) => {
               setSearchResults([]);
@@ -105,16 +107,19 @@ const SpeciesCorrect = () => {
             }}
           />
         </Box>
-        <Box>
-          <IconButton onClick={() => setHideFilter(!hideFilter)}>{hideFilter ? <ExpandMoreIcon /> : <ExpandLessIcon />}</IconButton>
-        </Box>
       </Box>
       {request.loading && <LinearProgress />}
       {request.error && <Alert severity="error">{request.error}</Alert>}
       {!request.loading && searchResults && (
         <Box display="flex" flex={2} overflow="hidden" flexDirection="row">
           <Box width="50%" style={{overflowX: 'hidden', overflowY: 'auto'}}>
-            <SpeciesCorrectResults results={searchResults} onClick={(result) => setSelected({result})} />
+            <SpeciesCorrectResults
+              results={searchResults}
+              onClick={(id) => {
+                const res = searchResultData.find((r) => r.observableItemId === id);
+                setSelected(res);
+              }}
+            />
           </Box>
           {selected?.jobId && (
             <Box m={1} width="30%">
@@ -194,11 +199,9 @@ const SpeciesCorrect = () => {
                       </Typography>
                       <Typography variant="caption">
                         {l.surveyIds.map((l) => (
-                          <>
-                            <Link key={l} onClick={() => window.open(`/data/survey/${l}`, '_blank').focus()} href="#">
-                              {l}
-                            </Link>{' '}
-                          </>
+                          <Link key={l} onClick={() => window.open(`/data/survey/${l}`, '_blank').focus()} href="#">
+                            {l}
+                          </Link>
                         ))}
                       </Typography>
                     </Box>
