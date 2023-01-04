@@ -225,38 +225,38 @@ public class Method3Quadrat50Test extends FormattedTestProvider {
      */
     @Test
     public void validateSpeciesBelowToMethod() {
-        StagedRowFormatted stagged = getDefaultFormatted().build();
+        StagedRowFormatted staged = getDefaultFormatted().build();
 
-        ValidationCell error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, stagged);
+        ValidationCell error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, staged);
         assertNull("Null return because species method is null", error);
 
         Method method1 = new Method();
         method1.setMethodId(1);
 
         // Species method not null
-        stagged.setMethod(2);
-        stagged.getSpecies().get().setMethods(Set.of(method1));
-        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, stagged);
+        staged.setMethod(2);
+        staged.getSpecies().get().setMethods(Set.of(method1));
+        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, staged);
         assertNotNull("Stagged method do not appear in species method list", error);
 
-        stagged.setMethod(1);
-        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, stagged);
+        staged.setMethod(1);
+        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, staged);
         assertNull("Stagged method match, so no error", error);
 
-        stagged.setMethod(10);
-        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, stagged);
+        staged.setMethod(10);
+        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, staged);
         assertNull("Method 10 in row will be treat as method 1 in species, so no error", error);
 
         // Now test the allowM11 flag
-        stagged.setMethod(11);
-        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, stagged);
+        staged.setMethod(11);
+        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, staged);
         assertNotNull("Do not allow method 11 so error if row method 11", error);
 
-        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.TRUE, stagged);
+        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.TRUE, staged);
         assertNull("Allow method 11 so no error is user set method 11", error);
 
-        stagged.setMethod(2);
-        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.TRUE, stagged);
+        staged.setMethod(2);
+        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.TRUE, staged);
         assertNotNull("Allow method 11 with method 2, it should yield error", error);
     }
 }
