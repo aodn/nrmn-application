@@ -250,9 +250,13 @@ public class Method3Quadrat50Test extends FormattedTestProvider {
         // Now test the allowM11 flag
         stagged.setMethod(11);
         error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, stagged);
-        assertNull("Disabled method 11 check so no error even species do not have method 11", error);
+        assertNotNull("Do not allow method 11 so error if row method 11", error);
 
         error = surveyValidation.validateSpeciesBelowToMethod(Boolean.TRUE, stagged);
-        assertNotNull("Enable method 11 check so error if species do not have method 11", error);
+        assertNull("Allow method 11 so no error is user set method 11", error);
+
+        stagged.setMethod(2);
+        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.TRUE, stagged);
+        assertNotNull("Allow method 11 with method 2, it should yield error", error);
     }
 }
