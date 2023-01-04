@@ -220,7 +220,7 @@ public class Method3Quadrat50Test extends FormattedTestProvider {
         assertNull("Inverts is 1 no error", error);
     }
     /**
-     * Verify method as specified for the species matches the method use in the stagged row, if not
+     * Verify method as specified for the species matches the method use in the staged row, if not
      * issue error
      */
     @Test
@@ -237,11 +237,11 @@ public class Method3Quadrat50Test extends FormattedTestProvider {
         staged.setMethod(2);
         staged.getSpecies().get().setMethods(Set.of(method1));
         error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, staged);
-        assertNotNull("Stagged method do not appear in species method list", error);
+        assertNotNull("Staged method do not appear in species method list", error);
 
         staged.setMethod(1);
         error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, staged);
-        assertNull("Stagged method match, so no error", error);
+        assertNull("Staged method match, so no error", error);
 
         staged.setMethod(10);
         error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, staged);
