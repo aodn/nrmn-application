@@ -43,7 +43,8 @@ public class SurveyValidation {
             // Handle all M10 as M1
             var method = row.getMethod();
             var useRowMethod = row.getMethod() == 10 ? 1 : row.getMethod();
-            if (!methodIds.contains(useRowMethod) && (allowM11 || useRowMethod != 11)) {
+            var validMethod = methodIds.contains(useRowMethod) || (useRowMethod == 11 && allowM11);
+            if (!validMethod) {
                 var level = useRowMethod == 11 ? ValidationLevel.BLOCKING : ValidationLevel.WARNING;
                 var message = "Method " + method + " invalid for species " + row.getSpecies().get().getObservableItemName();
                 return new ValidationCell(ValidationCategory.DATA, level, message, row.getId(), "method");
