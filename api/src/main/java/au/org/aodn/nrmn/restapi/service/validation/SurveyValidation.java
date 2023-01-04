@@ -57,7 +57,9 @@ public class SurveyValidation {
                         : null;
     }
 
-    public ValidationCell validateDateRange(ProgramValidation validation, StagedRowFormatted row) {
+    public ValidationCell validateDateRange(ProgramValidation v, StagedRowFormatted row) {
+
+        var validation = v == ProgramValidation.RLS ? ProgramValidation.RLS : ProgramValidation.ATRC;
 
         if (row.getDate() == null)
             return null;

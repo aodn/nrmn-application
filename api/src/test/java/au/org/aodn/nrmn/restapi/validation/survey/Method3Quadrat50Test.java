@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.validation.survey;
 
+import au.org.aodn.nrmn.restapi.data.model.Method;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
@@ -12,9 +13,7 @@ import org.mockito.InjectMocks;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -220,5 +219,40 @@ public class Method3Quadrat50Test extends FormattedTestProvider {
         error = surveyValidation.validateInvertsZeroOnM3M4M5(formatted);
         assertNull("Inverts is 1 no error", error);
     }
-    
+    /**
+     * Verify method as specified for the species matches the method use in the stagged row, if not
+     * issue error
+     */
+    @Test
+    public void validateSpeciesBelowToMethod() {
+        StagedRowFormatted stagged = getDefaultFormatted().build();
+
+        ValidationCell error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, stagged);
+        assertNull("Null return because species method is null", error);
+
+        Method method1 = new Method();
+        method1.setMethodId(1);
+
+        // Species method not null
+        stagged.setMethod(2);
+        stagged.getSpecies().get().setMethods(Set.of(method1));
+        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, stagged);
+        assertNotNull("Stagged method do not appear in species method list", error);
+
+        stagged.setMethod(1);
+        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, stagged);
+        assertNull("Stagged method match, so no error", error);
+
+        stagged.setMethod(10);
+        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, stagged);
+        assertNull("Method 10 in row will be treat as method 1 in species, so no error", error);
+
+        // Now test the allowM11 flag
+        stagged.setMethod(11);
+        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.FALSE, stagged);
+        assertNull("Disabled method 11 check so no error even species do not have method 11", error);
+
+        error = surveyValidation.validateSpeciesBelowToMethod(Boolean.TRUE, stagged);
+        assertNotNull("Enable method 11 check so error if species do not have method 11", error);
+    }
 }
