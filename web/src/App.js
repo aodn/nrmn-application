@@ -14,6 +14,7 @@ import ObservableItemAdd from './components/data-entities/observable-item/Observ
 import ObservableItemEdit from './components/data-entities/observable-item/ObservableItemEdit';
 import ObservableItemList from './components/data-entities/observable-item/ObservableItemList';
 import ObservableItemView from './components/data-entities/observable-item/ObservableItemView';
+import SharedLinkList from './components/data-entities/shared-link/SharedLinkList';
 import SiteEdit from './components/data-entities/site/SiteEdit';
 import SiteList from './components/data-entities/site/SiteList';
 import SiteView from './components/data-entities/site/SiteView';
@@ -33,6 +34,41 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import ApplicationError from './components/ui/ApplicationError';
 import SpeciesCorrect from './components/data-entities/survey/SpeciesCorrect';
+import PropTypes from 'prop-types';
+
+class ErrorBoundary extends React.Component {
+  static propTypes = {
+    children: PropTypes.node
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {hasError: false};
+  }
+
+  static getDerivedStateFromError(error) {
+    return {hasError: true, message: error.message};
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="error">
+          <b>Page Error</b>
+          <div>{this.state.message}</div>
+          <button
+            onClick={() => {
+              window.location.reload();
+            }}
+          >
+            Reload
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -101,54 +137,64 @@ const App = () => {
             {applicationError ? (
               <ApplicationError error={applicationError} />
             ) : (
-              <Routes>
-                <Route path="/home" element={<Homepage />} />
+              <ErrorBoundary>
+                <Routes>
+                  <Route path="/home" element={<Homepage />} />
 
-                <Route path="/" element={<Navigate to="/home" />} />
+                  <Route path="/" element={<Navigate to="/home" />} />
 
-                {/** Authenticated Pages */}
-                {loggedIn && (
-                  <>
-                    <Route path="/login" element={<Navigate to="/home" />} />
+                  {/** Authenticated Pages */}
+                  {loggedIn && (
+                    <>
+                      <Route path="/login" element={<Navigate to="/home" />} />
 
-                    <Route path="/data/surveys" element={<SurveyList />} />
-                    <Route path="/data/survey/:id" element={<SurveyView />} />
-                    <Route path="/data/survey/:id/edit" element={<SurveyEdit />} />
-                    {auth?.features?.includes('corrections') && <Route path="/data/survey/:id/correct" element={<SurveyCorrect />} />}
-                    {auth?.features?.includes('corrections') && <Route path="/data/species" element={<SpeciesCorrect />} />}
+                      <Route path="/data/surveys" element={<SurveyList />} />
+                      <Route path="/data/survey/:id" element={<SurveyView />} />
+                      <Route path="/data/survey/:id/edit" element={<SurveyEdit />} />
+                      {auth?.features?.includes('corrections') && <Route path="/data/survey/:id/correct" element={<SurveyCorrect />} />}
+                      {auth?.features?.includes('corrections') && <Route path="/data/species" element={<SpeciesCorrect />} />}
 
-                    <Route path="/data/jobs" element={<JobList />} />
-                    <Route path="/data/job/:id/view" element={<JobView />} />
-                    <Route path="/data/job/:id/edit" element={<ValidationPage />} />
+                      <Route path="/data/jobs" element={<JobList />} />
+                      <Route path="/data/job/:id/view" element={<JobView />} />
+                      <Route path="/data/job/:id/edit" element={<ValidationPage />} />
 
-                    <Route path="/data/upload" element={<JobUpload />} />
-                    <Route path="/data/extract" element={<ExtractTemplateData />} />
+                      <Route path="/data/upload" element={<JobUpload />} />
+                      <Route
+                        path="/data/share"
+                        element={
+                          <ErrorBoundary>
+                            <SharedLinkList />
+                          </ErrorBoundary>
+                        }
+                      />
+                      <Route path="/data/extract" element={<ExtractTemplateData />} />
 
-                    <Route path="/reference/locations" element={<LocationList />} />
-                    <Route path="/reference/location" element={<LocationAdd />} />
-                    <Route path="/reference/location/:id" element={<LocationView />} />
-                    <Route path="/reference/location/:id/edit" element={<LocationAdd />} />
-                    <Route path="/reference/location/:id/:verb" element={<LocationView />} />
+                      <Route path="/reference/locations" element={<LocationList />} />
+                      <Route path="/reference/location" element={<LocationAdd />} />
+                      <Route path="/reference/location/:id" element={<LocationView />} />
+                      <Route path="/reference/location/:id/edit" element={<LocationAdd />} />
+                      <Route path="/reference/location/:id/:verb" element={<LocationView />} />
 
-                    <Route path="/reference/divers" element={<DiverList />} />
-                    <Route path="/reference/diver" element={<DiverAdd />} />
+                      <Route path="/reference/divers" element={<DiverList />} />
+                      <Route path="/reference/diver" element={<DiverAdd />} />
 
-                    <Route path="/reference/sites" element={<SiteList />} />
-                    <Route path="/reference/site" element={<SiteEdit />} />
-                    <Route path="/reference/site/:id" element={<SiteView />} />
-                    <Route path="/reference/site/:id/edit" element={<SiteEdit />} />
-                    <Route path="/reference/site/:id/clone" element={<SiteEdit clone />} />
+                      <Route path="/reference/sites" element={<SiteList />} />
+                      <Route path="/reference/site" element={<SiteEdit />} />
+                      <Route path="/reference/site/:id" element={<SiteView />} />
+                      <Route path="/reference/site/:id/edit" element={<SiteEdit />} />
+                      <Route path="/reference/site/:id/clone" element={<SiteEdit clone />} />
 
-                    <Route path="/reference/observableItems" element={<ObservableItemList />} />
-                    <Route path="/reference/observableItem" element={<ObservableItemAdd />} />
-                    <Route path="/reference/observableItem/:id" element={<ObservableItemView />} />
-                    <Route path="/reference/observableItem/:id/edit" element={<ObservableItemEdit />} />
+                      <Route path="/reference/observableItems" element={<ObservableItemList />} />
+                      <Route path="/reference/observableItem" element={<ObservableItemAdd />} />
+                      <Route path="/reference/observableItem/:id" element={<ObservableItemView />} />
+                      <Route path="/reference/observableItem/:id/edit" element={<ObservableItemEdit />} />
 
-                    <Route path="*" element={<Navigate to="/home" />} />
-                  </>
-                )}
-                <Route path="*" element={<LoginForm />} />
-              </Routes>
+                      <Route path="*" element={<Navigate to="/home" />} />
+                    </>
+                  )}
+                  <Route path="*" element={<LoginForm />} />
+                </Routes>
+              </ErrorBoundary>
             )}
           </AppContent>
         </Router>

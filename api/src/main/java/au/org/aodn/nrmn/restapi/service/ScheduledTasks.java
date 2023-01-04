@@ -36,6 +36,7 @@ public class ScheduledTasks {
         } else {
             logger.info("Skipping PQ update as active profile set.");
         }
+        materializedViewService.refreshAllMaterializedViews();
 
     }
 }

@@ -21,7 +21,7 @@
     "react-router-dom": "6.3.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts start --ignore-pattern 'node_modules/*'",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",

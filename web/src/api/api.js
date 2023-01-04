@@ -120,20 +120,22 @@ export const getDataJob = (jobId) =>
     .catch((err) => err);
 
 export const getSurveySpecies = (payload) => {
-  return axiosInstance.post(`correction/searchSpecies`, payload, {
+  return axiosInstance
+    .post(`correction/searchSpecies`, payload, {
       validateStatus: () => true
     })
     .then((res) => res)
     .catch((err) => err);
-  };
+};
 
-  export const postSpeciesCorrection = (payload) => {
-    return axiosInstance.post(`correction/correctSpecies`, payload, {
-        validateStatus: () => true
-      })
-      .then((res) => res)
-      .catch((err) => err);
-    };
+export const postSpeciesCorrection = (payload) => {
+  return axiosInstance
+    .post(`correction/correctSpecies`, payload, {
+      validateStatus: () => true
+    })
+    .then((res) => res)
+    .catch((err) => err);
+};
 
 export const getCorrections = (surveyIds) =>
   axiosInstance
@@ -158,6 +160,18 @@ export const validateJob = (jobId, completion) => {
 export const updateRows = (jobId, rows, completion) => {
   return axiosInstance.put(`stage/job/${jobId}`, rows).then((res) => completion(res));
 };
+
+export const getSharedLinks = () =>
+  axiosInstance
+    .get('sharedLinks', {
+      validateStatus: () => true
+    })
+    .then((res) => res)
+    .catch((err) => err);
+
+export const createSharedLink = (sharedLinkDto) => axiosInstance.put('sharedLink', sharedLinkDto).then((res) => res);
+
+export const deleteSharedLink = (linkId) => axiosInstance.delete(`sharedLink/${linkId}`).then((res) => res);
 
 export const submitJobFile = (params, onProgress) => {
   const data = new FormData();
