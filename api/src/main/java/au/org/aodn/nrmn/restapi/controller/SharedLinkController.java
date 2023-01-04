@@ -1,6 +1,8 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,7 +81,13 @@ public class SharedLinkController {
                 materializedViewService.uploadMaterializedView(sharedLinkDto.getContent().toLowerCase());
             }
 
-            var expires = LocalDate.parse(sharedLinkDto.getExpires()).atStartOfDay();
+            // Default to 1 week expiry.
+            var expires = LocalDateTime.now().plusWeeks(1);
+            try {
+                expires = LocalDate.parse(sharedLinkDto.getExpires()).atStartOfDay();
+            } catch(DateTimeParseException dtpe) {
+                logger.error(dtpe.getMessage());
+            }
             var sharedLink = new SharedLink();
             var user = userRepo.findByEmail(authentication.getName());
             sharedLink.setUser(user.get());
