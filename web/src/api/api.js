@@ -33,6 +33,22 @@ axiosInstance.interceptors.response.use(
   }
 );
 
+export const changePassword = (params, onResult) => {
+  return axiosInstance
+    .post(
+      'auth/update',
+      {
+        username: params.username,
+        password: params.password,
+        newPassword: params.newPassword
+      },
+      {
+        validateStatus: () => true
+      }
+    )
+    .then((res) => onResult(res));
+};
+
 export const userLogin = (params, onResult) => {
   return axiosInstance
     .post(

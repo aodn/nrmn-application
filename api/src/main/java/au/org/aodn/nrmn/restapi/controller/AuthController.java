@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 @RestController
@@ -50,6 +52,9 @@ public class AuthController {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    SecUserRepository userRepository;
 
     @Value("${app.api.version}")
     private String appVersion;
@@ -91,12 +96,38 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
                         loginRequest.getPassword()));
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = tokenProvider.generateToken(authentication);
+        if (authentication.isAuthenticated()) {
+            var user = userRepository.findByEmail(loginRequest.getUsername()).get();
+            var expires = user.getExpires() != null ? user.getExpires() : LocalDateTime.MAX;
+            if (expires.isBefore(LocalDateTime.now())) {
+                return ResponseEntity.ok(new JwtAuthenticationResponse());
+            }
+        }
+        var jwt = tokenProvider.generateToken(authentication);
         if (SecUserRepository.blackListedTokenPresent(jwt)) {
             SecUserRepository.removeBlackListedToken(jwt);
         }
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, gridLicence, features));
+    }
+
+    @PostMapping(path = "/v1/auth/update", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> updatePassword(@Valid @RequestBody LoginRequest loginRequest) {
+        logger.info(LogInfo.withContext("login attempt"));
+        userAuditRepo.save(
+                new UserActionAudit("update", "update password attempt for username: " + loginRequest.getUsername()));
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()));
+        if (authentication.isAuthenticated()) {
+            var user = userRepository.findByEmail(loginRequest.getUsername()).get();
+            user.setExpires(null);
+            user.setHashedPassword(passwordEncoder.encode(loginRequest.getNewPassword()));
+            userRepository.save(user);
+        }
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping(path = "/v1/auth/hash", consumes = "application/json", produces = "application/json")

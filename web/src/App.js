@@ -35,6 +35,7 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import ApplicationError from './components/ui/ApplicationError';
 import SpeciesCorrect from './components/data-entities/survey/SpeciesCorrect';
 import PropTypes from 'prop-types';
+import ChangePasswordForm from './components/auth/ChangePasswordForm';
 
 class ErrorBoundary extends React.Component {
   static propTypes = {
@@ -192,6 +193,7 @@ const App = () => {
                       <Route path="*" element={<Navigate to="/home" />} />
                     </>
                   )}
+                  <Route path="/changePassword" element={<ChangePasswordForm />} />
                   <Route path="*" element={<LoginForm />} />
                 </Routes>
               </ErrorBoundary>

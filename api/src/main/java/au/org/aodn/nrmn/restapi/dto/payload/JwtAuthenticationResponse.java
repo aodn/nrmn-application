@@ -7,14 +7,17 @@ public class JwtAuthenticationResponse {
 
     private String accessToken;
     private String[] features;
+    private Boolean changePassword;
 
     public JwtAuthenticationResponse() {
+        this.changePassword = true;
     }
 
     public JwtAuthenticationResponse(String accessToken, String gridLicence, String[] features) {
         this.accessToken = accessToken;
         this.gridLicence = gridLicence;
         this.features = features;
+        this.changePassword = false;
     }
 
     public String getAccessToken() {
@@ -31,5 +34,9 @@ public class JwtAuthenticationResponse {
 
     public String[] getFeatures() {
         return this.features;
+    }
+
+    public Boolean changePassword() {
+        return this.changePassword;
     }
 }

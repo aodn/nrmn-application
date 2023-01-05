@@ -94,7 +94,7 @@ public class AuthControllerIT {
     }
 
     private ResponseEntity<JwtAuthenticationResponse> loginResponse(String username, String password) throws Exception {
-        LoginRequest logReq = new LoginRequest(username, password);
+        LoginRequest logReq = new LoginRequest(username, password, null);
         RequestWrapper<LoginRequest, JwtAuthenticationResponse> reqBuilder = new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
 
         return reqBuilder
