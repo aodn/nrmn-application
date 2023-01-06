@@ -62,7 +62,7 @@ public class S3IO {
             return getClient().utilities().getUrl(builder -> builder.bucket(bucketShared).key(destinationKey))
                     .toExternalForm();
         } catch (Exception e) {
-            throw new Exception("Failed to generate shared link: " + e.getMessage());
+            throw new Exception("Failed to generate shared link in bucket "+ bucketShared + " : " + e.getMessage());
         }
     }
 
@@ -71,7 +71,7 @@ public class S3IO {
             var key = externalForm.split("amazonaws.com/")[1];
             getClient().deleteObject(DeleteObjectRequest.builder().bucket(bucketShared).key(key).build());
         } catch (Exception e) {
-            throw new Exception("Failed to delete shared link: " + e.getMessage());
+            throw new Exception("Failed to delete shared linkin bucket "+ bucketShared + " : " + e.getMessage());
         }
     }
 
