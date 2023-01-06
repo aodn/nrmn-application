@@ -76,7 +76,9 @@ const SharedLinkList = () => {
       const defaultDate = new Date();
       defaultDate.setDate(defaultDate.getDate() + 1);
       const defaultDateString = defaultDate.toISOString().split('T')[0];
-      document.getElementById('expires').value = defaultDateString;
+      const expires = document.getElementById('expires');
+      expires.value = defaultDateString;
+      expires.min = defaultDateString;
       setPosting(false);
     });
   }, [data, setData, setPosting]);
@@ -110,9 +112,11 @@ const SharedLinkList = () => {
       <Box m={1} flexDirection={'column'} display={'flex'}>
         <label htmlFor="endpoint">Endpoint</label>
         <select id="endpoint" disabled={posting}>
-          {endpoints.filter(e => enabledEndpoints.includes(e)).map((value) => (
-            <option key={value}>{value}</option>
-          ))}
+          {endpoints
+            .filter((e) => enabledEndpoints.includes(e))
+            .map((value) => (
+              <option key={value}>{value}</option>
+            ))}
         </select>
       </Box>
       <Box m={1} flexDirection={'column'} display={'flex'}>
@@ -121,7 +125,7 @@ const SharedLinkList = () => {
       </Box>
       <Box m={1} flexDirection={'column'} display={'flex'}>
         <label htmlFor="expires">Expires</label>
-        <input id="expires" type="date" disabled={posting} />
+        <input id="expires" min type="date" disabled={posting} />
       </Box>
       <Box m={1} flexDirection={'column'} display={'flex'}>
         <button style={{marginTop: 'auto'}} disabled={posting} onClick={() => setPosting(true)}>

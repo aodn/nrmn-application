@@ -71,7 +71,7 @@ public class S3IO {
             var key = externalForm.split("amazonaws.com/")[1];
             getClient().deleteObject(DeleteObjectRequest.builder().bucket(bucketShared).key(key).build());
         } catch (Exception e) {
-            throw new Exception("Failed to generate shared link: " + e.getMessage());
+            throw new Exception("Failed to delete shared link: " + e.getMessage());
         }
     }
 

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
 import au.org.aodn.nrmn.restapi.data.repository.MaterializedViewsRepository;
+import au.org.aodn.nrmn.restapi.data.repository.SharedLinkRepository;
 import au.org.aodn.nrmn.restapi.service.upload.S3IO;
+import au.org.aodn.nrmn.restapi.service.upload.SharedLinkService;
 
 @Component
 @EnableAsync
@@ -37,6 +40,12 @@ public class MaterializedViewService {
 
     @Autowired
     MaterializedViewsRepository materializedViewsRepository;
+
+    @Autowired
+    SharedLinkRepository sharedLinkRepository;
+
+    @Autowired
+    private SharedLinkService sharedLinkService;
 
     private void uploadMaterializedView(String viewName, List<Tuple> viewResult) throws IOException {
         var headers = viewResult.get(0).getElements().stream().map(e -> e.getAlias()).collect(Collectors.toList());
@@ -91,7 +100,18 @@ public class MaterializedViewService {
         }
     }
 
-    @Async
+    public void expireMaterializedViews() {
+        var now = LocalDateTime.now();
+        for (var link : sharedLinkRepository.findAll()) {
+            try {
+                if (link.getExpires().isBefore(now))
+                    sharedLinkService.expireLink(link);
+            } catch (Exception e) {
+                logger.error("Failed to expire endpoint", e);
+            }
+        }
+    }
+
     public void uploadAllMaterializedViews() {
 
         if (materializedViewsRepository.checkAnyRunning()) {
@@ -106,21 +126,21 @@ public class MaterializedViewService {
             uploadMaterializedView("ep_m2_cryptic_fish",
                     materializedViewsRepository.getEpM2CrypticFish());
             uploadMaterializedView("ep_m2_inverts",
-            materializedViewsRepository.getEpM2Inverts());
+                    materializedViewsRepository.getEpM2Inverts());
             uploadMaterializedView("ep_observable_items",
-            materializedViewsRepository.getEpObservableItems());
+                    materializedViewsRepository.getEpObservableItems());
             uploadMaterializedView("ep_rarity_abundance",
-            materializedViewsRepository.getEpRarityAbundance());
+                    materializedViewsRepository.getEpRarityAbundance());
             uploadMaterializedView("ep_rarity_extents",
-            materializedViewsRepository.getEpRarityExtents());
+                    materializedViewsRepository.getEpRarityExtents());
             uploadMaterializedView("ep_rarity_range",
-            materializedViewsRepository.getEpRarityRange());
+                    materializedViewsRepository.getEpRarityRange());
             uploadMaterializedView("ep_site_list",
-            materializedViewsRepository.getEpSiteList());
+                    materializedViewsRepository.getEpSiteList());
             uploadMaterializedView("ep_survey_list",
-            materializedViewsRepository.getEpSurveyList());
+                    materializedViewsRepository.getEpSurveyList());
             uploadMaterializedView("ep_rarity_frequency",
-            materializedViewsRepository.getEpRarityFrequency());
+                    materializedViewsRepository.getEpRarityFrequency());
             uploadEpM1();
 
             stopWatch.stop();
@@ -145,31 +165,31 @@ public class MaterializedViewService {
             materializedViewsRepository.refreshEpM2CrypticFish();
 
         if (!materializedViewsRepository.checkEpM2InvertsRunning())
-        materializedViewsRepository.refreshEpM2Inverts();
+            materializedViewsRepository.refreshEpM2Inverts();
 
         if (!materializedViewsRepository.checkEpObservableItemsRunning())
-        materializedViewsRepository.refreshEpObservableItems();
+            materializedViewsRepository.refreshEpObservableItems();
 
         if (!materializedViewsRepository.checkEpRarityAbundanceRunning())
-        materializedViewsRepository.refreshEpRarityAbundance();
+            materializedViewsRepository.refreshEpRarityAbundance();
 
         if (!materializedViewsRepository.checkEpRarityExtentsRunning())
-        materializedViewsRepository.refreshEpRarityExtents();
+            materializedViewsRepository.refreshEpRarityExtents();
 
         if (!materializedViewsRepository.checkEpRarityRangeRunning())
-        materializedViewsRepository.refreshEpRarityRange();
+            materializedViewsRepository.refreshEpRarityRange();
 
         if (!materializedViewsRepository.checkEpSiteListRunning())
-        materializedViewsRepository.refreshEpSiteList();
+            materializedViewsRepository.refreshEpSiteList();
 
         if (!materializedViewsRepository.checkEpSurveyListRunning())
-        materializedViewsRepository.refreshEpSurveyList();
+            materializedViewsRepository.refreshEpSurveyList();
 
         if (!materializedViewsRepository.checkEpM1Running())
-        materializedViewsRepository.refreshEpM1();
+            materializedViewsRepository.refreshEpM1();
 
         if (!materializedViewsRepository.checkEpRarityFrequencyRunning())
-        materializedViewsRepository.refreshEpRarityFrequency();
+            materializedViewsRepository.refreshEpRarityFrequency();
 
         stopWatch.stop();
         logger.info("Endpoints refreshed in {}s", stopWatch.getTotalTimeSeconds());
