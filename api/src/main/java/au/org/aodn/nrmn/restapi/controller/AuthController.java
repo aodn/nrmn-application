@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -117,16 +118,22 @@ public class AuthController {
         logger.info(LogInfo.withContext("login attempt"));
         userAuditRepo.save(
                 new UserActionAudit("update", "update password attempt for username: " + loginRequest.getUsername()));
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()));
-        if (authentication.isAuthenticated()) {
-            var user = userRepository.findByEmail(loginRequest.getUsername()).get();
-            user.setExpires(null);
-            user.setHashedPassword(passwordEncoder.encode(loginRequest.getNewPassword()));
-            userRepository.save(user);
+        var newPassword = loginRequest.getNewPassword();
+        if (newPassword.length() < 8) {
+            return ResponseEntity.badRequest().body("New password is less than 8 characters");
         }
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()));
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.badRequest().body("Unauthorized");
+        }
+        var user = userRepository.findByEmail(loginRequest.getUsername()).get();
+        user.setExpires(null);
+        user.setHashedPassword(passwordEncoder.encode(loginRequest.getNewPassword()));
+        userRepository.save(user);
         return ResponseEntity.ok().build();
     }
 
