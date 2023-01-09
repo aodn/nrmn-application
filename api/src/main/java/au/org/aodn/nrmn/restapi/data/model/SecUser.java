@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.data.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,12 +56,15 @@ public class  SecUser implements Serializable {
     @Column(name = "version", nullable = false)
     private Integer version;
 
-
     @Column(name = "full_name")
     private String fullName;
 
+    @Column(name = "expires")
+    private LocalDateTime expires;
+
     @Column(name = "email_address", nullable = false)
     private String email;
+
     @JsonIgnore
     @Column(name = "hashed_password")
     private String hashedPassword;

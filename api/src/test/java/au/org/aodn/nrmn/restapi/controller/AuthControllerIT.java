@@ -89,12 +89,18 @@ public class AuthControllerIT {
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
+    @Test
+    public void expiredSignIn() throws Exception {
+        ResponseEntity<JwtAuthenticationResponse> response = loginResponse("expired@example.com", "abc123");
+        assertEquals(true, response.getBody().changePassword());
+    }
+
     private String _createUrl(String uri) {
         return "http://localhost:" + randomServerPort + uri;
     }
 
     private ResponseEntity<JwtAuthenticationResponse> loginResponse(String username, String password) throws Exception {
-        LoginRequest logReq = new LoginRequest(username, password);
+        LoginRequest logReq = new LoginRequest(username, password, null);
         RequestWrapper<LoginRequest, JwtAuthenticationResponse> reqBuilder = new RequestWrapper<LoginRequest, JwtAuthenticationResponse>();
 
         return reqBuilder

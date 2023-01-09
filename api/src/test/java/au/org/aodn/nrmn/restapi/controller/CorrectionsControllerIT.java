@@ -36,9 +36,6 @@ import au.org.aodn.nrmn.restapi.dto.correction.SpeciesCorrectBodyDto;
 import au.org.aodn.nrmn.restapi.security.JwtTokenProvider;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.transaction.Transactional;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Collectors;
