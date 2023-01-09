@@ -28,6 +28,8 @@ CREATE TABLE nrmn.sec_user_aud (
     full_name_mod boolean,
     hashed_password varchar(255),
     hashed_password_mod boolean,
+    expires TIMESTAMP,
+    expires_mod BOOLEAN,
     status varchar(255),
     status_mod boolean,
     CONSTRAINT sec_user_aud_pkey PRIMARY KEY (id, rev)
@@ -206,6 +208,7 @@ CREATE TABLE nrmn.sec_user (
     full_name varchar(255),
     hashed_password varchar(255),
     status varchar(255) NOT NULL,
+    expires TIMESTAMP,
     version integer NOT NULL,
     CONSTRAINT sec_user_pkey PRIMARY KEY (id)
 );

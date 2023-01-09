@@ -1,6 +1,5 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import au.org.aodn.nrmn.restapi.data.model.SecUser;
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
