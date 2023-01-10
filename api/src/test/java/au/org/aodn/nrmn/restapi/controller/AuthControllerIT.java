@@ -92,7 +92,7 @@ public class AuthControllerIT {
     @Test
     public void expiredSignIn() throws Exception {
         ResponseEntity<JwtAuthenticationResponse> response = loginResponse("expired@example.com", "abc123");
-        assertEquals(true, response.getBody().changePassword());
+        assertEquals(true, response.getBody().getChangePassword());
     }
 
     private String _createUrl(String uri) {
