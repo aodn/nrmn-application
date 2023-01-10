@@ -207,6 +207,7 @@ public class CorrectionController {
     private ValidationResultSet validate(
             ProgramValidation programValidation,
             Boolean isExtended,
+            List<Integer> surveyIds,
             List<Pair<StagedRowFormatted, HashSet<String>>> results) {
 
         var validation = new ValidationResultSet();
@@ -247,6 +248,8 @@ public class CorrectionController {
             // Site distance validation
             validation.add(siteValidation.validateSurveyAtSite(row));
         }
+
+        validation.addAll(surveyValidation.validateSurveysMatch(surveyIds, mappedRows));
 
         validation.addAll(surveyValidation.validateSurveys(programValidation, isExtended, mappedRows));
 
@@ -329,7 +332,7 @@ public class CorrectionController {
             errors.addAll(dataValidation.checkFormatting(programValidation, bodyDto.getIsExtended(), false,
                     siteCodes, observableItems, rows));
 
-            errors.addAll(validate(programValidation, bodyDto.getIsExtended(), mappedRows).getAll());
+            errors.addAll(validate(programValidation, bodyDto.getIsExtended(), surveyIds, mappedRows).getAll());
 
             response.setErrors(errors);
         } catch (Exception e) {
@@ -380,7 +383,7 @@ public class CorrectionController {
             logMessage(job, "Correct Survey " + surveyIds);
 
             var results = mapRows(bodyDto.getRows());
-            var result = validate(programValidation, bodyDto.getIsExtended(), results).getAll();
+            var result = validate(programValidation, bodyDto.getIsExtended(), surveyIds, results).getAll();
             var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
             var blockingErrors = result.stream().filter(r -> r.getLevelId() == ValidationLevel.BLOCKING)
                     .collect(Collectors.toList());
@@ -399,12 +402,12 @@ public class CorrectionController {
 
             var log = StagedJobLog.builder()
                     .stagedJob(job)
-                    .details("Application error attempting correction")
+                    .details(e.getMessage())
                     .eventType(StagedJobEventType.ERROR).build();
 
             stagedJobLogRepository.save(log);
 
-            return ResponseEntity.badRequest().body("Survey failed to delete. No data has been changed.");
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
 
         return ResponseEntity.ok().body(job.getId());

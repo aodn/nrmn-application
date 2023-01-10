@@ -322,6 +322,11 @@ public class SurveyValidation {
         return res;
     }
 
+    public Collection<SurveyValidationError> validateSurveysMatch(List<Integer> surveyIds, Collection<StagedRowFormatted> mappedRows) {
+        var sheetErrors = new HashSet<SurveyValidationError>();
+        return sheetErrors;
+    }
+
     public Collection<SurveyValidationError> validateSurveys(ProgramValidation validation, Boolean isExtended,
             Collection<StagedRowFormatted> mappedRows) {
         var sheetErrors = new HashSet<SurveyValidationError>();
