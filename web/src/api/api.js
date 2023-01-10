@@ -62,7 +62,9 @@ export const userLogin = (params, onResult) => {
       }
     )
     .then((res) => {
-      if (res.data.accessToken) {
+      if (res.data.changePassword) {
+        onResult({changePassword: true});
+      } else if (res.data.accessToken) {
         const jwt = jwtDecode(res.data.accessToken);
         let state = {};
         state.expires = jwt.exp * 1000;

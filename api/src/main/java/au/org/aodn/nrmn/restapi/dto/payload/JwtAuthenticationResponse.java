@@ -36,7 +36,7 @@ public class JwtAuthenticationResponse {
         return this.features;
     }
 
-    public Boolean changePassword() {
+    public Boolean getChangePassword() {
         return this.changePassword;
     }
 }
