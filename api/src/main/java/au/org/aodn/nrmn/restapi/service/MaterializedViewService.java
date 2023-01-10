@@ -123,26 +123,9 @@ public class MaterializedViewService {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
 
-            uploadMaterializedView("ep_m2_cryptic_fish",
-                    materializedViewsRepository.getEpM2CrypticFish());
-            uploadMaterializedView("ep_m2_inverts",
-                    materializedViewsRepository.getEpM2Inverts());
-            uploadMaterializedView("ep_observable_items",
-                    materializedViewsRepository.getEpObservableItems());
-            uploadMaterializedView("ep_rarity_abundance",
-                    materializedViewsRepository.getEpRarityAbundance());
-            uploadMaterializedView("ep_rarity_extents",
-                    materializedViewsRepository.getEpRarityExtents());
-            uploadMaterializedView("ep_rarity_range",
-                    materializedViewsRepository.getEpRarityRange());
             uploadMaterializedView("ep_site_list",
                     materializedViewsRepository.getEpSiteList());
-            uploadMaterializedView("ep_survey_list",
-                    materializedViewsRepository.getEpSurveyList());
-            uploadMaterializedView("ep_rarity_frequency",
-                    materializedViewsRepository.getEpRarityFrequency());
-            uploadEpM1();
-
+                    
             stopWatch.stop();
             logger.info("Uploaded all materialized views in " + stopWatch.getLastTaskTimeMillis() + "ms");
         } catch (Exception e) {
