@@ -249,7 +249,9 @@ public class CorrectionController {
             validation.add(siteValidation.validateSurveyAtSite(row));
         }
 
-        validation.addAll(surveyValidation.validateSurveysMatch(surveyIds, mappedRows));
+        surveyValidation.validateSurveysMatch(surveyIds, mappedRows).forEach(surveyMatchError -> {
+            validation.add(null, ValidationLevel.BLOCKING, "ID", surveyMatchError);
+        });
 
         validation.addAll(surveyValidation.validateSurveys(programValidation, isExtended, mappedRows));
 
