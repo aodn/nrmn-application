@@ -160,19 +160,23 @@ public class SurveyCorrectionService {
         var groupedSurveyIds = rowsGroupedBySurvey.keySet().stream().map(l -> l.intValue())
                 .collect(Collectors.toList());
 
-        if (!surveyIds.containsAll(groupedSurveyIds) || !groupedSurveyIds.containsAll(surveyIds))
-            throw new RuntimeException("Survey IDs in grouped rows do not match the list of survey IDs passed in");
+        if (!surveyIds.containsAll(groupedSurveyIds))
+            throw new RuntimeException("Correction would delete one or more surveys.");
+
+        if (!groupedSurveyIds.containsAll(surveyIds))
+            throw new RuntimeException("Correction would create one or more surveys.");
+
+        // ASSERT: locked surveys are not affected
+        var surveys = surveyRepository.findAllById(surveyIds);
+        if (surveys.stream().anyMatch(s -> s.getLocked() != null && s.getLocked()))
+            throw new RuntimeException("Cannot correct locked survey data");
+
+        surveyMethodRepository.deleteForSurveyIds(surveyIds);
 
         var surveyMethods = new ArrayList<SurveyMethodEntity>();
         var observations = new ArrayList<Observation>();
         var methodEntities = methodRepository.findAll();
         var measureEntities = measureRepository.findAll();
-
-        surveyMethodRepository.deleteForSurveyIds(surveyIds);
-        var surveys = surveyRepository.findAllById(surveyIds);
-
-        if (surveys.stream().anyMatch(s -> s.getLocked() != null && s.getLocked()))
-            throw new RuntimeException("Cannot correct locked survey data");
 
         for (var survey : surveys) {
             messages.add("Correcting Survey ID: " + survey.getSurveyId());

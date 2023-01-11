@@ -322,6 +322,32 @@ public class SurveyValidation {
         return res;
     }
 
+    public List<String> validateSurveysMatch(List<Integer> surveyIds,
+            Collection<StagedRowFormatted> mappedRows) {
+
+        var errors = new ArrayList<String>();
+
+        var rowsGroupedBySurvey = mappedRows.stream()
+                .collect(Collectors.groupingBy(StagedRowFormatted::getSurveyId));
+
+        var groupedSurveyIds = rowsGroupedBySurvey.keySet().stream().map(l -> l.intValue())
+                .collect(Collectors.toList());
+
+        if (!surveyIds.containsAll(groupedSurveyIds)) {
+            groupedSurveyIds.removeAll(surveyIds);
+            errors.add("Survey IDs created: " + String.join(", ", groupedSurveyIds.stream().map(l -> l.toString())
+                .collect(Collectors.toList())));
+        }
+
+        if (!groupedSurveyIds.containsAll(surveyIds)) {
+            surveyIds.removeAll(groupedSurveyIds);
+            errors.add("Survey IDs missing: " + String.join(", ", surveyIds.stream().map(l -> l.toString())
+                    .collect(Collectors.toList())));
+        }
+
+        return errors;
+    }
+
     public Collection<SurveyValidationError> validateSurveys(ProgramValidation validation, Boolean isExtended,
             Collection<StagedRowFormatted> mappedRows) {
         var sheetErrors = new HashSet<SurveyValidationError>();
