@@ -4,8 +4,6 @@ import React, {useEffect, useState} from 'react';
 import {createSharedLink, getSharedLinks, deleteSharedLink} from '../../../api/api';
 import PropTypes from 'prop-types';
 
-const enabledEndpoints = ['EP_SITE_LIST'];
-
 const endpoints = [
   'EP_M1_ALL',
   'EP_M1_AUSTRALIA',
@@ -110,10 +108,9 @@ const SharedLinkList = () => {
   const newLinkForm = (
     <Box m={1} border={1} p={1} borderColor="divider" flexDirection={'row'} display={'flex'}>
       <Box m={1} flexDirection={'column'} display={'flex'}>
-        <label htmlFor="endpoint">Endpoint</label>
-        <select id="endpoint" disabled={posting}>
+        <label htmlFor="endpoint">Endpoints</label>
+        <select size={4} id="endpoint" disabled={posting} multiple>
           {endpoints
-            .filter((e) => enabledEndpoints.includes(e))
             .map((value) => (
               <option key={value}>{value}</option>
             ))}
@@ -124,7 +121,7 @@ const SharedLinkList = () => {
         <input id="recipient" disabled={posting} />
       </Box>
       <Box m={1} flexDirection={'column'} display={'flex'}>
-        <label htmlFor="expires">Expires</label>
+        <label htmlFor="expires">Expire</label>
         <input id="expires" min type="date" disabled={posting} />
       </Box>
       <Box m={1} flexDirection={'column'} display={'flex'}>
