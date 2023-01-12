@@ -4,8 +4,6 @@ import React, {useEffect, useState} from 'react';
 import {createSharedLink, getSharedLinks, deleteSharedLink} from '../../../api/api';
 import PropTypes from 'prop-types';
 
-const enabledEndpoints = ['EP_SITE_LIST'];
-
 const endpoints = [
   'EP_M1_ALL',
   'EP_M1_AUSTRALIA',
@@ -110,10 +108,9 @@ const SharedLinkList = () => {
   const newLinkForm = (
     <Box m={1} border={1} p={1} borderColor="divider" flexDirection={'row'} display={'flex'}>
       <Box m={1} flexDirection={'column'} display={'flex'}>
-        <label htmlFor="endpoint">Endpoint</label>
-        <select id="endpoint" disabled={posting}>
+        <label htmlFor="endpoint">Endpoints</label>
+        <select size={endpoints.length/4} id="endpoint" disabled={posting} multiple>
           {endpoints
-            .filter((e) => enabledEndpoints.includes(e))
             .map((value) => (
               <option key={value}>{value}</option>
             ))}
@@ -122,14 +119,10 @@ const SharedLinkList = () => {
       <Box m={1} flexDirection={'column'} display={'flex'}>
         <label htmlFor="recipient">Recipient</label>
         <input id="recipient" disabled={posting} />
-      </Box>
-      <Box m={1} flexDirection={'column'} display={'flex'}>
-        <label htmlFor="expires">Expires</label>
+        <label style={{marginTop: '10px'}} htmlFor="expires">Expire</label>
         <input id="expires" min type="date" disabled={posting} />
-      </Box>
-      <Box m={1} flexDirection={'column'} display={'flex'}>
-        <button style={{marginTop: 'auto'}} disabled={posting} onClick={() => setPosting(true)}>
-          Create New Shared Link
+        <button style={{marginTop: '10px'}} disabled={posting} onClick={() => setPosting(true)}>
+          Create New Shared Links
         </button>
       </Box>
     </Box>
