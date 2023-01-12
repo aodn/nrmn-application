@@ -263,13 +263,16 @@ class CorrectionsControllerIT {
 
         // Empty body should result in BLOCKING error mentioned in Body
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("1 error returned", response.getBody().getErrors().size(), 1);
+        assertEquals("2 error returned", 2, response.getBody().getErrors().size());
 
         List<SurveyValidationError> e = (List<SurveyValidationError>) response.getBody().getErrors();
-
+        
         assertEquals("Expect blocking level error", e.get(0).getLevelId(), ValidationLevel.BLOCKING);
         assertEquals("Data level error", e.get(0).getCategoryId(), ValidationCategory.DATA);
         assertTrue("Message in error", e.get(0).getMessage().equals("Survey data is missing"));
+        
+        assertEquals("Expect blocking level error", e.get(1).getLevelId(), ValidationLevel.BLOCKING);
+        assertTrue("Survey IDs missing", e.get(1).getMessage().equals("Survey IDs missing: 812300132, 812331346"));
     }
     /**
      * Verify return error on incorrect site code in body
@@ -317,7 +320,7 @@ class CorrectionsControllerIT {
 
         // Empty body should result in BLOCKING error mentioned in Body
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("8 error returned", response.getBody().getErrors().size(), 8);
+        assertEquals("9 error returned", response.getBody().getErrors().size(), 9);
 
         List<SurveyValidationError> e = (List<SurveyValidationError>) response.getBody().getErrors();
 
@@ -328,7 +331,8 @@ class CorrectionsControllerIT {
         assertTrue("Inverts is not an integer", e.get(4).getMessage().equals("Inverts is not an integer"));
         assertTrue("P-Qs Diver is blank", e.get(5).getMessage().equals("P-Qs Diver is blank"));
         assertTrue("Diver does not exist", e.get(6).getMessage().equals("Diver does not exist"));
-        assertTrue("Row has no data and no value recorded for inverts", e.get(7).getMessage().equals("Row has no data and no value recorded for inverts"));
+        assertTrue("Survey IDs missing: 812331346", e.get(7).getMessage().equals("Survey IDs missing: 812331346"));
+        assertTrue("Row has no data and no value recorded for inverts", e.get(8).getMessage().equals("Row has no data and no value recorded for inverts"));
     }
     @Test
     @WithUserDetails("test@example.com")
