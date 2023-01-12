@@ -116,12 +116,25 @@ const SharedLinkList = () => {
             ))}
         </select>
       </Box>
+      <Box m={1} flexDirection={'column'} display={'flex'} justifyContent={'center'}>
+        <button style={{'height': '50px'}}>{'>>'}</button>
+        <button style={{marginTop: '5px', height: '50px'}}>{'<<'}</button>
+      </Box>
       <Box m={1} flexDirection={'column'} display={'flex'}>
+        <label htmlFor="endpoint">Endpoints</label>
+        <select size={endpoints.length/4} id="endpoint" disabled={posting} multiple>
+          {endpoints
+            .map((value) => (
+              <option key={value}>{value}</option>
+            ))}
+        </select>
+      </Box>
+      <Box m={1} width={'80%'} flexDirection={'column'} display={'flex'}>
         <label htmlFor="recipient">Recipient</label>
         <input id="recipient" disabled={posting} />
-        <label style={{marginTop: '10px'}} htmlFor="expires">Expire</label>
+        <label style={{marginTop: '10px'}} htmlFor="expires">Expiry</label>
         <input id="expires" min type="date" disabled={posting} />
-        <button style={{marginTop: '10px'}} disabled={posting} onClick={() => setPosting(true)}>
+        <button style={{marginTop: 'auto'}} disabled={posting} onClick={() => setPosting(true)}>
           Create New Shared Links
         </button>
       </Box>

@@ -15,9 +15,9 @@ const ApplicationError = ({error}) => {
           {data && <><br/>{data}</>}
         </Alert>
       </Box>
-      <Button variant="outlined" onClick={() => window.location.reload()}>
+      <button onClick={() => window.location.reload()}>
         Refresh Page
-      </Button>
+      </button>
     </Box>
   );
 };
