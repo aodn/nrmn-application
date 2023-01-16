@@ -52,25 +52,6 @@ const SharedLinkAdd = (props) => {
   const [posting, setPosting] = useState(false);
   const [disabled, setDisabled] = useState(props.disabled);
 
-  const getDefaultExpiry = () => {
-    const defaultDate = new Date();
-    defaultDate.setDate(defaultDate.getDate() + 1);
-    return defaultDate.toISOString().split('T')[0];
-  };
-
-  const getInitial = () => ({available: [...all_endpoints.sort()], generate: [], expires: getDefaultExpiry(), recipient: ''});
-
-  useEffect(() => {
-    if (!posting) return;
-    setDisabled(true);
-    const sharedLinkDto = {
-      content: endpoints.generate,
-      recipient: endpoints.recipient,
-      expires: endpoints.expires
-    };
-    createSharedLink(sharedLinkDto).then(() => dispatch({verb: 'reset'}));
-  }, [posting, setDisabled, endpoints]);
-
   const reducer = (state, action) => {
     var newState = {};
     switch (action.verb) {
@@ -105,7 +86,26 @@ const SharedLinkAdd = (props) => {
     return {...newState, valid};
   };
 
+  const getDefaultExpiry = () => {
+    const defaultDate = new Date();
+    defaultDate.setDate(defaultDate.getDate() + 1);
+    return defaultDate.toISOString().split('T')[0];
+  };
+
+  const getInitial = () => ({available: [...all_endpoints.sort()], generate: [], expires: getDefaultExpiry(), recipient: ''});
+
   const [endpoints, dispatch] = useReducer(reducer, getInitial());
+
+  useEffect(() => {
+    if (!posting) return;
+    setDisabled(true);
+    const sharedLinkDto = {
+      content: endpoints.generate,
+      recipient: endpoints.recipient,
+      expires: endpoints.expires
+    };
+    createSharedLink(sharedLinkDto).then(() => dispatch({verb: 'reset'}));
+  }, [posting, setDisabled, endpoints]);
 
   return (
     <Box m={1} border={1} p={1} borderColor="divider" flexDirection={'row'} display={'flex'}>

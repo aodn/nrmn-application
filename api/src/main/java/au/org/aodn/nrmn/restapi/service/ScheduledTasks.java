@@ -20,7 +20,7 @@ public class ScheduledTasks {
 
     @Autowired
     private MaterializedViewService materializedViewService;
-    
+
     private static Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
 
     @PostConstruct
@@ -36,6 +36,11 @@ public class ScheduledTasks {
             materializedViewService.expireMaterializedViews();
         } else {
             logger.info("Skipping PQ update as active profile set.");
+            if (environment.getActiveProfiles()[0].equalsIgnoreCase("dev")) {
+                logger.info("Dev profile set, uploading materialized views.");
+                materializedViewService.uploadAllMaterializedViews();
+                materializedViewService.expireMaterializedViews();
+            }
         }
     }
 }

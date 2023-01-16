@@ -68,7 +68,7 @@ public class SharedLinkController {
     public ResponseEntity<?> createSharedLink(Authentication authentication,
             @RequestBody SharedLinkDto sharedLinkDto) {
         try {
-            materializedViewService.uploadMaterializedView(sharedLinkDto.getContent().toLowerCase());
+            // materializedViewService.uploadMaterializedView(sharedLinkDto.getContent().toLowerCase());
             var user = userRepo.findByEmail(authentication.getName());
             return ResponseEntity.ok(sharedLinkService.createLink(user.get(), sharedLinkDto));
         } catch (Exception e) {

@@ -39,8 +39,11 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_m2_cryptic_fish;", nativeQuery = true)
     void refreshEpM2CrypticFish();
 
+    @Query(value = "SELECT count(*) from nrmn.ep_m2_cryptic_fish;", nativeQuery = true)
+    Long countEpM2CrypticFish();
+
     @Query(value = "SELECT survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, method, block, phylum, class, \"order\", family, recorded_species_name, species_name, taxon, reporting_name, size_class, total, biomass from nrmn.ep_m2_cryptic_fish;", nativeQuery = true)
-    List<Tuple> getEpM2CrypticFish();
+    List<Tuple> getEpM2CrypticFish(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
 
@@ -123,8 +126,11 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_site_list;", nativeQuery = true)
     void refreshEpSiteList();
 
-    @Query(value = "SELECT country, area, location, mpa, site_code, site_name, old_site_codes, latitude, longitude, wave_exposure, relief, slope, currents, realm, province, ecoregion, lat_zone, CAST(geom AS varchar), programs, protection_status from nrmn.ep_site_list;", nativeQuery = true)
-    List<Tuple> getEpSiteList();
+    @Query(value = "SELECT count(*) from nrmn.ep_site_list;", nativeQuery = true)
+    Long countEpSiteList();
+
+    @Query(value = "SELECT country, area, location, mpa, site_code, site_name, old_site_codes, latitude, longitude, wave_exposure, relief, slope, currents, realm, province, ecoregion, lat_zone, CAST(geom AS varchar), programs, protection_status from nrmn.ep_site_list OFFSET :offset LIMIT :limit ;", nativeQuery = true)
+    List<Tuple> getEpSiteList(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
 

@@ -26,6 +26,15 @@
       "url": "http://localhost:3000/",
       "webRoot": "${workspaceFolder}",
       "userDataDir": "${env:HOME}/.config/chromium-debug"
+    },
+    {
+      "preLaunchTask": "React Dev Server",
+      "name": "web-firefox",
+      "request": "launch",
+      "type": "firefox",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "profile": "development"
     }
   ]
 }
