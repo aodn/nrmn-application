@@ -46,7 +46,7 @@ public class MaterializedViewService {
     @Autowired
     private SharedLinkService sharedLinkService;
 
-    private final Integer limit = 100000;
+    private final Integer pageSize = 10000;
 
     private final List<Pair<String, String>> countries = Arrays.asList(Pair.of("australia", "Australia"));
 
@@ -67,9 +67,11 @@ public class MaterializedViewService {
         states = states == null ? Arrays.asList() : states;
 
         var offset = 0;
-        var viewResult = getFunction.apply(offset, limit);
-        var headers = viewResult.get(0).getElements().stream().map(e -> e.getAlias()).collect(Collectors.toList());
-        var initialValues = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toList());
+        var viewResult = getFunction.apply(offset, pageSize);
+        offset += pageSize;
+        var headers = viewResult.get(0).getElements().stream().map(e -> e.getAlias())
+                .collect(Collectors.toUnmodifiableList());
+        var initialValues = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toUnmodifiableList());
         var countryIndex = headers.indexOf("country");
         var stateIndex = headers.indexOf("area");
         var requests = Stream.concat(
@@ -83,22 +85,20 @@ public class MaterializedViewService {
 
         requests.add(new CSVFilterPrinter(headers, viewName, null, null));
 
-        for (var request : requests) {
+        for (var request : requests)
             request.writeOut(initialValues);
-            offset += limit;
-            while (offset < count) {
-                viewResult = getFunction.apply(offset, limit);
-                var nextValues = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toList());
+
+        while (offset < count) {
+            var nextValues = getFunction.apply(offset, pageSize).stream()
+                    .map(e -> e.toArray())
+                    .collect(Collectors.toUnmodifiableList());
+            offset += pageSize;
+            for (var request : requests)
                 request.writeOut(nextValues);
-                offset += limit;
-            }
+        }
 
-            try {
-                s3IO.uploadEndpoint(viewName, request.getFile());
-            } catch (Exception e) {
-                logger.error("Failed to generate " + viewName, e);
-            }
-
+        for (var request : requests) {
+            s3IO.uploadEndpoint(request.getViewName(), request.getFile());
             request.close();
         }
     }
@@ -127,7 +127,8 @@ public class MaterializedViewService {
             stopWatch.start();
 
             uploadMaterializedView("ep_site_list", null, null,
-                    materializedViewsRepository.countEpSiteList(), materializedViewsRepository::getEpSiteList);
+                    materializedViewsRepository.countEpSiteList(),
+                    materializedViewsRepository::getEpSiteList);
 
             uploadMaterializedView("ep_m1", countries, states,
                     materializedViewsRepository.countEpM1(),

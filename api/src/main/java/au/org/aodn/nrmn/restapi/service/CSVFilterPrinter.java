@@ -3,7 +3,6 @@ package au.org.aodn.nrmn.restapi.service;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -15,13 +14,22 @@ public class CSVFilterPrinter {
     private File file;
     private FileWriter fileWriter;
     private CSVPrinter csvPrinter;
-
+    private String viewName;
     private String filterValue;
     private Integer filterColumn;
 
     private static final Logger logger = LoggerFactory.getLogger(CSVFilterPrinter.class);
 
+    public File getFile() {
+        return file;
+    }
+
+    public String getViewName() {
+        return viewName;
+    }
+
     public CSVFilterPrinter(List<String> headers, String viewName, Integer filterColumn, String filterValue) {
+        this.viewName = viewName;
         this.filterColumn = filterColumn;
         this.filterValue = filterValue;
         try {
@@ -34,28 +42,22 @@ public class CSVFilterPrinter {
         }
     }
 
-    public void writeOut(List<Object[]> inValues) {
-
-        var values = List.copyOf(inValues);
-        if (filterColumn != null && filterColumn >= 0 && filterValue != null)
-            values = values.stream().filter(v -> v[filterColumn] != null && ((String) v[filterColumn]).equalsIgnoreCase(filterValue)).collect(Collectors.toList());
-
+    public void writeOut(List<Object[]> values) {
+        var filter = (filterColumn != null && filterColumn >= 0 && filterValue != null);
         try {
-            csvPrinter.printRecords(values);
+            var outValues = values.stream().filter(r -> !filter || ((String)r[filterColumn]).equalsIgnoreCase(filterValue)).toArray();
+            csvPrinter.printRecords(outValues);
+            csvPrinter.flush();
         } catch (Exception e) {
             logger.error(filterValue + " " + e.getMessage());
         }
     }
 
-    public File getFile() {
-        return file;
-    }
-
     public void close() {
         try {
-            csvPrinter.close();
+            csvPrinter.close(true);
             fileWriter.close();
-            // file.delete();
+            file.delete();
         } catch (Exception e) {
             logger.error(filterValue + " " + e.getMessage());
         }
