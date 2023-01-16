@@ -46,7 +46,7 @@ public class MaterializedViewService {
     @Autowired
     private SharedLinkService sharedLinkService;
 
-    private final Integer pageSize = 10000;
+    private final Integer pageSize = 50000;
 
     private final List<Pair<String, String>> countries = Arrays.asList(Pair.of("australia", "Australia"));
 
@@ -62,6 +62,8 @@ public class MaterializedViewService {
     private void uploadMaterializedView(String viewName, List<Pair<String, String>> countries,
             List<Pair<String, String>> states,
             Long count, BiFunction<Integer, Integer, List<Tuple>> getFunction) throws IOException {
+
+        logger.info("Generating CSV extracts for view " + viewName);
 
         countries = countries == null ? Arrays.asList() : countries;
         states = states == null ? Arrays.asList() : states;
@@ -85,8 +87,11 @@ public class MaterializedViewService {
 
         requests.add(new CSVFilterPrinter(headers, viewName, null, null));
 
-        for (var request : requests)
+        for (var request : requests) {
+            logger.info("Writing CSV  " + request.getViewName());
             request.writeOut(initialValues);
+        }
+
 
         while (offset < count) {
             var nextValues = getFunction.apply(offset, pageSize).stream()
@@ -98,6 +103,7 @@ public class MaterializedViewService {
         }
 
         for (var request : requests) {
+            logger.info("Uploading CSV " + request.getViewName());
             s3IO.uploadEndpoint(request.getViewName(), request.getFile());
             request.close();
         }
