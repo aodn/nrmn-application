@@ -25,7 +25,6 @@ const SharedLinkList = () => {
 
     getSharedLinks().then((res) => {
       setData(res.data);
-      //document.getElementById('endpoint').value = endpoints[0];
       const defaultDate = new Date();
       defaultDate.setDate(defaultDate.getDate() + 1);
       const defaultDateString = defaultDate.toISOString().split('T')[0];
@@ -74,7 +73,7 @@ const SharedLinkList = () => {
   return (
     <>
       {header}
-      <SharedLinkAdd disabled/>
+      <SharedLinkAdd />
       <Box m={1} border={1} borderColor="divider">
         <TableContainer>
           <Table>
