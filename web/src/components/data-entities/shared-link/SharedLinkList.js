@@ -73,7 +73,7 @@ const SharedLinkList = () => {
   return (
     <>
       {header}
-      <SharedLinkAdd />
+      <SharedLinkAdd onPost={() => setData()} />
       <Box m={1} border={1} borderColor="divider">
         <TableContainer>
           <Table>

@@ -1,6 +1,7 @@
 import React, {useEffect, useReducer} from 'react';
 import {Box} from '@mui/system';
 import {createSharedLink} from '../../../api/api';
+import PropTypes from 'prop-types';
 
 const all_endpoints = [
   {value: 'EP_M1_ALL', disabled: false},
@@ -47,7 +48,7 @@ const all_endpoints = [
   {value: 'EP_SPECIES_SURVEY_OBSERVATION', disabled: true}
 ];
 
-const SharedLinkAdd = () => {
+const SharedLinkAdd = ({onPost}) => {
   const getDefaultExpiry = () => {
     const defaultDate = new Date();
     defaultDate.setDate(defaultDate.getDate() + 1);
@@ -107,8 +108,11 @@ const SharedLinkAdd = () => {
       expires: endpoints.expires,
       endpoints: endpoints.generate.map((e) => e.value)
     };
-    createSharedLink(sharedLinkDto).then(() => dispatch({verb: 'reset'}));
-  }, [endpoints]);
+    createSharedLink(sharedLinkDto).then(() => {
+      dispatch({verb: 'reset'});
+      onPost();
+    });
+  }, [endpoints, onPost]);
 
   return (
     <Box m={1} border={1} p={1} borderColor="divider" flexDirection={'row'} display={'flex'}>
@@ -203,3 +207,7 @@ const SharedLinkAdd = () => {
 };
 
 export default SharedLinkAdd;
+
+SharedLinkAdd.propTypes = {
+  onPost: PropTypes.func.isRequired
+};
