@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import au.org.aodn.nrmn.restapi.data.repository.SecUserRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SharedLinkRepository;
 import au.org.aodn.nrmn.restapi.dto.sharedlink.SharedLinkDto;
-import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
+import au.org.aodn.nrmn.restapi.dto.sharedlink.SharedLinkPutDto;
 import au.org.aodn.nrmn.restapi.service.upload.SharedLinkService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -35,9 +35,6 @@ public class SharedLinkController {
 
     @Autowired
     private SharedLinkService sharedLinkService;
-
-    @Autowired
-    private MaterializedViewService materializedViewService;
 
     @Autowired
     private SecUserRepository userRepo;
@@ -66,14 +63,14 @@ public class SharedLinkController {
     @PutMapping("/sharedLink")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<?> createSharedLink(Authentication authentication,
-            @RequestBody SharedLinkDto sharedLinkDto) {
+            @RequestBody SharedLinkPutDto sharedLinkDto) {
         try {
-            materializedViewService.uploadMaterializedView(sharedLinkDto.getContent().toLowerCase());
             var user = userRepo.findByEmail(authentication.getName());
-            return ResponseEntity.ok(sharedLinkService.createLink(user.get(), sharedLinkDto));
+            var links = sharedLinkService.createLinks(user.get(), sharedLinkDto.getRecipient(), sharedLinkDto.getExpires(), sharedLinkDto.getEndpoints());
+            return ResponseEntity.ok(links);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            return ResponseEntity.internalServerError().body("Failed to generate shared link");
         }
+        return ResponseEntity.internalServerError().body("Failed to generate shared link");
     }
 }

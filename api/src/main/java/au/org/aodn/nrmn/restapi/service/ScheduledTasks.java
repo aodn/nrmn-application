@@ -20,7 +20,7 @@ public class ScheduledTasks {
 
     @Autowired
     private MaterializedViewService materializedViewService;
-    
+
     private static Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
 
     @PostConstruct

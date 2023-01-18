@@ -3,6 +3,9 @@ package au.org.aodn.nrmn.restapi.service.upload;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +30,7 @@ public class SharedLinkService {
     private S3IO s3IO;
 
     public String createLink(SecUser user, SharedLinkDto sharedLinkDto) throws Exception {
+        
         // Default to 1 week expiry.
         var expires = LocalDateTime.now().plusWeeks(1);
         try {
@@ -42,6 +46,31 @@ public class SharedLinkService {
         sharedLink.setExpires(expires);
         sharedLinkRepository.save(sharedLink);
         return sharedLink.getTargetUrl();
+    }
+
+    public Collection<SharedLinkDto> createLinks(SecUser user, String receipient, String expires, Collection<String> endpoints) throws Exception {
+
+        // Default to 1 week expiry.
+        var expiresDt = LocalDateTime.now().plusWeeks(1);
+        try {
+            expiresDt = LocalDate.parse(expires).atStartOfDay();
+        } catch (DateTimeParseException dtpe) {
+            logger.error(dtpe.getMessage());
+        }
+
+        var sharedLinks = new ArrayList<SharedLinkDto>();
+        for(var ep : endpoints) {
+            var sharedLink = new SharedLink();
+            sharedLink.setUser(user);
+            sharedLink.setReceipient(receipient);
+            sharedLink.setLinkType(SharedLinkType.valueOf(ep.toUpperCase()));
+            sharedLink.setTargetUrl(s3IO.createS3Link(ep.toLowerCase(), expiresDt));
+            sharedLink.setExpires(expiresDt);
+            sharedLinkRepository.save(sharedLink);
+            sharedLinks.add(new SharedLinkDto(sharedLink));
+        }
+
+        return sharedLinks;
     }
 
     public void expireLink(Long id) throws Exception {

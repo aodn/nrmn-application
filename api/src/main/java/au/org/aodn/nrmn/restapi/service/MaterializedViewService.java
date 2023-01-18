@@ -1,17 +1,16 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.Tuple;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,56 +46,66 @@ public class MaterializedViewService {
     @Autowired
     private SharedLinkService sharedLinkService;
 
-    private void uploadMaterializedView(String viewName, List<Tuple> viewResult) throws IOException {
-        var headers = viewResult.get(0).getElements().stream().map(e -> e.getAlias()).collect(Collectors.toList());
-        var values = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toList());
-        var headerFormat = CSVFormat.Builder.create().setHeader(headers.toArray(new String[0])).build();
-        var file = File.createTempFile(viewName, ".csv");
-        try (var fileWriter = new FileWriter(file)) {
-            try (var csvPrinter = new CSVPrinter(fileWriter, headerFormat)) {
-                csvPrinter.printRecords(values);
-            }
-            s3IO.uploadEndpoint(viewName, file);
-        }
-        Files.deleteIfExists(file.toPath());
-    }
+    private final Integer pageSize = 50000;
 
-    private void uploadEpM1() {
-        try {
-            var offset = 0;
-            var limit = 100000;
-            var viewName = "ep_m1";
-            var max = materializedViewsRepository.countEpM1();
-            var viewResult = materializedViewsRepository.getEpM1(offset, limit);
-            var headers = viewResult.get(0).getElements().stream().map(e -> e.getAlias()).collect(Collectors.toList());
-            var initialValues = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toList());
-            var headerFormat = CSVFormat.Builder.create().setHeader(headers.toArray(new String[0])).build();
-            var file = File.createTempFile(viewName, ".csv");
-            try (var fileWriter = new FileWriter(file)) {
-                try (var csvPrinter = new CSVPrinter(fileWriter, headerFormat)) {
-                    csvPrinter.printRecords(initialValues);
-                    offset += limit;
-                    while (offset < max) {
-                        viewResult = materializedViewsRepository.getEpM1(offset, limit);
-                        var nextValues = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toList());
-                        csvPrinter.printRecords(nextValues);
-                        offset += limit;
-                    }
-                }
-            }
-            s3IO.uploadEndpoint(viewName, file);
-            Files.deleteIfExists(file.toPath());
-        } catch (Exception e) {
-            logger.error("Failed to upload ep_m1", e);
-        }
-    }
+    private final List<Pair<String, String>> countries = Arrays.asList(Pair.of("australia", "Australia"));
 
-    public void uploadMaterializedView(String viewName) {
-        try {
-            if (viewName.equalsIgnoreCase("ep_m2_cryptic_fish"))
-                uploadMaterializedView("ep_m2_cryptic_fish", materializedViewsRepository.getEpM2CrypticFish());
-        } catch (Exception e) {
-            logger.error("Failed to upload all materialized views", e);
+    private final List<Pair<String, String>> states = Arrays.asList(
+            Pair.of("tas", "Tasmania"),
+            Pair.of("nsw", "New South Wales"),
+            Pair.of("vic", "Victoria"),
+            Pair.of("qld", "Queensland"),
+            Pair.of("sa", "South Australia"),
+            Pair.of("wa", "Western Australia"),
+            Pair.of("nt", "Northern Territory"));
+
+    private void uploadMaterializedView(String viewName, List<Pair<String, String>> countries,
+            List<Pair<String, String>> states,
+            Long count, BiFunction<Integer, Integer, List<Tuple>> getFunction) throws IOException {
+
+        logger.info("Generating CSV extracts for view " + viewName);
+
+        countries = countries == null ? Arrays.asList() : countries;
+        states = states == null ? Arrays.asList() : states;
+
+        var offset = 0;
+        var viewResult = getFunction.apply(offset, pageSize);
+        offset += pageSize;
+        var headers = viewResult.get(0).getElements().stream().map(e -> e.getAlias())
+                .collect(Collectors.toUnmodifiableList());
+        var initialValues = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toUnmodifiableList());
+        var countryIndex = headers.indexOf("country");
+        var stateIndex = headers.indexOf("area");
+        var requests = Stream.concat(
+                states.stream()
+                        .map(state -> new CSVFilterPrinter(headers, viewName + "_" + state.getLeft(), stateIndex,
+                                state.getRight())),
+                countries.stream()
+                        .map(country -> new CSVFilterPrinter(headers, viewName + "_" + country.getLeft(), countryIndex,
+                                country.getRight())))
+                .collect(Collectors.toList());
+
+        requests.add(new CSVFilterPrinter(headers, viewName, null, null));
+
+        for (var request : requests) {
+            logger.info("Writing CSV  " + request.getViewName());
+            request.writeOut(initialValues);
+        }
+
+
+        while (offset < count) {
+            var nextValues = getFunction.apply(offset, pageSize).stream()
+                    .map(e -> e.toArray())
+                    .collect(Collectors.toUnmodifiableList());
+            offset += pageSize;
+            for (var request : requests)
+                request.writeOut(nextValues);
+        }
+
+        for (var request : requests) {
+            logger.info("Uploading CSV " + request.getViewName());
+            s3IO.uploadEndpoint(request.getViewName(), request.getFile());
+            request.close();
         }
     }
 
@@ -123,9 +132,18 @@ public class MaterializedViewService {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
 
-            uploadMaterializedView("ep_site_list",
-                    materializedViewsRepository.getEpSiteList());
-                    
+            uploadMaterializedView("ep_site_list", null, null,
+                    materializedViewsRepository.countEpSiteList(),
+                    materializedViewsRepository::getEpSiteList);
+
+            uploadMaterializedView("ep_m1", countries, states,
+                    materializedViewsRepository.countEpM1(),
+                    materializedViewsRepository::getEpM1);
+
+            uploadMaterializedView("ep_m2_cryptic_fish", countries, states,
+                    materializedViewsRepository.countEpM2CrypticFish(),
+                    materializedViewsRepository::getEpM2CrypticFish);
+
             stopWatch.stop();
             logger.info("Uploaded all materialized views in " + stopWatch.getLastTaskTimeMillis() + "ms");
         } catch (Exception e) {

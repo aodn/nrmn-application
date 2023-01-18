@@ -57,13 +57,7 @@ class ErrorBoundary extends React.Component {
         <div className="error">
           <b>Page Error</b>
           <div>{this.state.message}</div>
-          <button
-            onClick={() => {
-              window.location.reload();
-            }}
-          >
-            Reload
-          </button>
+          <button onClick={() => window.location.reload()}>Refresh Page</button>
         </div>
       );
     }
