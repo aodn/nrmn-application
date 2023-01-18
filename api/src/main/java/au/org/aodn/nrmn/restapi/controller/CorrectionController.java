@@ -396,7 +396,7 @@ public class CorrectionController {
             }
 
             surveyCorrectionService.correctSurvey(job, surveyIds, mappedRows);
-            materializedViewService.refreshAllMaterializedViews();
+            materializedViewService.refreshAllAsync();
 
         } catch (Exception e) {
 
@@ -446,7 +446,7 @@ public class CorrectionController {
 
         try {
             surveyCorrectionService.deleteSurvey(job, survey, Collections.emptyList());
-            materializedViewService.refreshAllMaterializedViews();
+            materializedViewService.refreshAllAsync();
         } catch (Exception e) {
 
             logger.error("Correction Failed", e);
@@ -526,7 +526,7 @@ public class CorrectionController {
 
             surveyCorrectionService.correctSpecies(job, bodyDto.getSurveyIds(), curr, next);
 
-            materializedViewService.refreshAllMaterializedViews();
+            materializedViewService.refreshAllAsync();
 
         } catch (Exception e) {
             logger.error("Correction Failed", e);

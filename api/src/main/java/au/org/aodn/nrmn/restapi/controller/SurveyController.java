@@ -103,7 +103,7 @@ public class SurveyController {
         Survey survey = surveyEditService.updateSurvey(surveyDto);
 
         Survey persistedSurvey = surveyRepository.save(survey);
-        materializedViewService.refreshAllMaterializedViews();
+        materializedViewService.refreshAllAsync();
         SurveyDto updatedSurveyDto = mapper.map(persistedSurvey, SurveyDto.class);
         return ResponseEntity.ok(updatedSurveyDto);
 

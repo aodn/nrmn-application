@@ -92,7 +92,6 @@ public class MaterializedViewService {
             request.writeOut(initialValues);
         }
 
-
         while (offset < count) {
             var nextValues = getFunction.apply(offset, pageSize).stream()
                     .map(e -> e.toArray())
@@ -109,7 +108,10 @@ public class MaterializedViewService {
         }
     }
 
-    public void expireMaterializedViews() {
+    private void expireMaterializedViews() {
+        logger.info("Expiring materialized views");
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         var now = LocalDateTime.now();
         for (var link : sharedLinkRepository.findAll()) {
             try {
@@ -119,9 +121,11 @@ public class MaterializedViewService {
                 logger.error("Failed to expire endpoint", e);
             }
         }
+        stopWatch.stop();
+        logger.info("Materialized views expired in " + stopWatch.getLastTaskTimeMillis() + "ms");
     }
 
-    public void updateSharedLinks() {
+    private void updateSharedLinks() {
         for (var link : sharedLinkRepository.findAll()) {
             try {
                 s3IO.copyEndpoint(link.getLinkType().toString().toLowerCase(), link.getSecret());
@@ -133,16 +137,18 @@ public class MaterializedViewService {
         }
     }
 
-    public void uploadAllMaterializedViews() {
+    private void uploadAllMaterializedViews() {
 
         if (materializedViewsRepository.checkAnyRunning()) {
             logger.error("Failed to upload materialized views as one or more are still refreshing.");
             return;
         }
+        logger.info("Generating materialized views CSV extracts");
+
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
 
         try {
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
 
             uploadMaterializedView("ep_site_list", null, null,
                     materializedViewsRepository.countEpSiteList(),
@@ -163,9 +169,7 @@ public class MaterializedViewService {
         }
     }
 
-    @Async
-    public void refreshAllMaterializedViews() {
-
+    private void refreshAllViews() {
         if (environment.getActiveProfiles().length > 0) {
             logger.info("Skipping refreshAllMaterializedViews as active profile set.");
             return;
@@ -206,9 +210,18 @@ public class MaterializedViewService {
 
         stopWatch.stop();
         logger.info("Endpoints refreshed in {}s", stopWatch.getTotalTimeSeconds());
+    }
 
+    @Async
+    public void runDailyTasksAsync() {
+        refreshAllViews();
+        expireMaterializedViews();
         uploadAllMaterializedViews();
-
         updateSharedLinks();
+    }
+
+    @Async
+    public void refreshAllAsync() {
+        refreshAllViews();
     }
 }

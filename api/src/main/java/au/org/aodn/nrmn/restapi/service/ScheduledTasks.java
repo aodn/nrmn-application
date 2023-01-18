@@ -32,8 +32,7 @@ public class ScheduledTasks {
     public void performDailyTasks() {
         if (environment.getActiveProfiles().length < 1) {
             pqSurveyService.updatePQSurveyFlags();
-            materializedViewService.refreshAllMaterializedViews();
-            materializedViewService.expireMaterializedViews();
+            materializedViewService.runDailyTasksAsync();
         } else {
             logger.info("Skipping PQ update as active profile set.");
         }

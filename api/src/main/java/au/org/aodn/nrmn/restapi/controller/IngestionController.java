@@ -79,7 +79,7 @@ public class IngestionController {
             
             surveyIngestionService.ingestTransaction(job, validatedRows);
             
-            materializedViewService.refreshAllMaterializedViews();
+            materializedViewService.refreshAllAsync();
 
         } catch (Exception e) {
 
