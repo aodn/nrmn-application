@@ -121,6 +121,18 @@ public class MaterializedViewService {
         }
     }
 
+    public void updateSharedLinks() {
+        for (var link : sharedLinkRepository.findAll()) {
+            try {
+                s3IO.copyEndpoint(link.getLinkType().toString().toLowerCase(), link.getSecret());
+                link.setUpdated(LocalDateTime.now());
+                sharedLinkRepository.save(link);
+            } catch (Exception e) {
+                logger.error("Failed to update endpoint", e);
+            }
+        }
+    }
+
     public void uploadAllMaterializedViews() {
 
         if (materializedViewsRepository.checkAnyRunning()) {
@@ -196,5 +208,7 @@ public class MaterializedViewService {
         logger.info("Endpoints refreshed in {}s", stopWatch.getTotalTimeSeconds());
 
         uploadAllMaterializedViews();
+
+        updateSharedLinks();
     }
 }

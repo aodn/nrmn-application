@@ -66,4 +66,7 @@ public class SharedLink {
 
     @Column(name = "target_url", nullable = true)
     private String targetUrl;
+
+    @Column(name = "secret", nullable = true)
+    private String secret;
 }

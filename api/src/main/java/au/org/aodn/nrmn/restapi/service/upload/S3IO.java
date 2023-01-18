@@ -2,12 +2,10 @@ package au.org.aodn.nrmn.restapi.service.upload;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,32 +35,49 @@ public class S3IO {
         return client;
     }
 
+    private String getSourceKey(String viewName) {
+        return String.join("/", List.of("endpoints", viewName + ".csv"));
+    }
+
+    private String getDestinationKey(String viewName, String secret) {
+        return String.join("/", List.of("endpoints", secret, viewName + ".csv"));
+    }
+
     public void uploadEndpoint(String viewName, File file) {
         try {
-            var fullPath = String.join("/", List.of("endpoints", viewName + ".csv"));
             var res = RequestBody.fromFile(file);
-            getClient().putObject(PutObjectRequest.builder().bucket(bucket).key(fullPath).build(), res);
+            getClient().putObject(PutObjectRequest.builder().bucket(bucket).key(getSourceKey(viewName)).build(), res);
         } catch (AwsServiceException e) {
-            throw new RuntimeException("Failed to write to S3: " + e.getMessage());
+            throw new RuntimeException("uploadEndpoint: failed to write to S3: " + e.getMessage());
         }
     }
 
-    public String createS3Link(String viewName, LocalDateTime expires) throws Exception {
+    public void copyEndpoint(String viewName, String secret) {
         try {
-            var sessionId = RandomStringUtils.random(20, 0, 0, true, true, null, new SecureRandom());
-            var sourceKey = String.join("/", List.of("endpoints", viewName + ".csv"));
-            var destinationKey = String.join("/", List.of("endpoints", sessionId, viewName + ".csv"));
+            getClient().copyObject(CopyObjectRequest.builder()
+                    .sourceBucket(bucket)
+                    .sourceKey(getSourceKey(viewName))
+                    .destinationBucket(bucketShared)
+                    .destinationKey(getDestinationKey(viewName, secret))
+                    .build());
+        } catch (AwsServiceException e) {
+            throw new RuntimeException("copyEndpoint: failed to write to S3: " + e.getMessage());
+        }
+    }
+
+    public String createS3Link(String viewName, String secret, LocalDateTime expires) throws Exception {
+        try {
             var request = CopyObjectRequest.builder()
-                    .sourceBucket(bucket).sourceKey(sourceKey)
-                    .destinationBucket(bucketShared).destinationKey(destinationKey)
+                    .sourceBucket(bucket).sourceKey(getSourceKey(viewName))
+                    .destinationBucket(bucketShared).destinationKey(getDestinationKey(viewName, secret))
                     .acl(ObjectCannedACL.PUBLIC_READ)
                     .expires(expires.toInstant(OffsetDateTime.now().getOffset()))
                     .build();
-                    getClient().copyObject(request);
-            return getClient().utilities().getUrl(builder -> builder.bucket(bucketShared).key(destinationKey))
+            getClient().copyObject(request);
+            return getClient().utilities().getUrl(builder -> builder.bucket(bucketShared).key(getDestinationKey(viewName, secret)))
                     .toExternalForm();
         } catch (Exception e) {
-            throw new Exception("Failed to generate shared link in bucket "+ bucketShared + " : " + e.getMessage());
+            throw new Exception("Failed to generate shared link in bucket " + bucketShared + " : " + e.getMessage());
         }
     }
 
@@ -71,7 +86,7 @@ public class S3IO {
             var key = externalForm.split("amazonaws.com/")[1];
             getClient().deleteObject(DeleteObjectRequest.builder().bucket(bucketShared).key(key).build());
         } catch (Exception e) {
-            throw new Exception("Failed to delete shared linkin bucket "+ bucketShared + " : " + e.getMessage());
+            throw new Exception("Failed to delete shared linkin bucket " + bucketShared + " : " + e.getMessage());
         }
     }
 
