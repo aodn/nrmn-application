@@ -8,6 +8,7 @@ CREATE TABLE nrmn.shared_link (
   sec_user_id INTEGER REFERENCES nrmn.sec_user (id),
   link_type TEXT,
   receipient TEXT,
+  secret TEXT,
   expires TIMESTAMP NOT NULL,
   expired TIMESTAMP,
   created TIMESTAMP NOT NULL,

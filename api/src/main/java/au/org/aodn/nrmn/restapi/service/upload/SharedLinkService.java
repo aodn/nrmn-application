@@ -1,12 +1,12 @@
 package au.org.aodn.nrmn.restapi.service.upload;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,25 +29,6 @@ public class SharedLinkService {
     @Autowired
     private S3IO s3IO;
 
-    public String createLink(SecUser user, SharedLinkDto sharedLinkDto) throws Exception {
-        
-        // Default to 1 week expiry.
-        var expires = LocalDateTime.now().plusWeeks(1);
-        try {
-            expires = LocalDate.parse(sharedLinkDto.getExpires()).atStartOfDay();
-        } catch (DateTimeParseException dtpe) {
-            logger.error(dtpe.getMessage());
-        }
-        var sharedLink = new SharedLink();
-        sharedLink.setUser(user);
-        sharedLink.setReceipient(sharedLinkDto.getRecipient());
-        sharedLink.setLinkType(SharedLinkType.valueOf(sharedLinkDto.getContent().toUpperCase()));
-        sharedLink.setTargetUrl(s3IO.createS3Link(sharedLinkDto.getContent().toLowerCase(), expires));
-        sharedLink.setExpires(expires);
-        sharedLinkRepository.save(sharedLink);
-        return sharedLink.getTargetUrl();
-    }
-
     public Collection<SharedLinkDto> createLinks(SecUser user, String receipient, String expires, Collection<String> endpoints) throws Exception {
 
         // Default to 1 week expiry.
@@ -64,7 +45,9 @@ public class SharedLinkService {
             sharedLink.setUser(user);
             sharedLink.setReceipient(receipient);
             sharedLink.setLinkType(SharedLinkType.valueOf(ep.toUpperCase()));
-            sharedLink.setTargetUrl(s3IO.createS3Link(ep.toLowerCase(), expiresDt));
+            var secret = RandomStringUtils.random(20, 0, 0, true, true, null, new SecureRandom());
+            sharedLink.setSecret(secret);
+            sharedLink.setTargetUrl(s3IO.createS3Link(ep.toLowerCase(), secret, expiresDt));
             sharedLink.setExpires(expiresDt);
             sharedLinkRepository.save(sharedLink);
             sharedLinks.add(new SharedLinkDto(sharedLink));
