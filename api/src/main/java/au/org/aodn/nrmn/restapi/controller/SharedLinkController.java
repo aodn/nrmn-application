@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,7 +46,7 @@ public class SharedLinkController {
     @GetMapping("/sharedLinks")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<List<SharedLinkDto>> getSharedLinks() {
-        var sharedLinks = sharedLinkRepository.findAll().stream().map(SharedLinkDto::new).collect(Collectors.toList());
+        var sharedLinks = sharedLinkRepository.findAll(Sort.by(Direction.DESC, "created")).stream().map(SharedLinkDto::new).collect(Collectors.toList());
         return ResponseEntity.ok(sharedLinks);
     }
 

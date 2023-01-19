@@ -199,7 +199,7 @@ const SharedLinkAdd = ({onPost}) => {
           disabled={endpoints.posting}
         />
         <button style={{marginTop: 'auto'}} disabled={endpoints.posting || !endpoints.valid} onClick={() => dispatch({verb: 'posting'})}>
-          Generate Links
+          {endpoints.posting ? 'Generating Links. Please Wait..' : 'Generate Links'}
         </button>
       </Box>
     </Box>
