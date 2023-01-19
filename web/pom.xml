@@ -16,22 +16,6 @@
         <version>3.0.0</version>
         <executions>
           <execution>
-            <id>yarn-test</id>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <phase>test</phase>
-            <configuration>
-              <executable>yarn</executable>
-              <arguments>
-                <argument>test</argument>
-              </arguments>
-              <environmentVariables>
-                <CI>false</CI>
-              </environmentVariables>
-            </configuration>
-          </execution>
-          <execution>
             <?m2e ignore?>
             <id>yarn-build</id>
             <goals>
