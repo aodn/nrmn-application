@@ -26,7 +26,8 @@ public class SharedLinkDto {
 
     private String expires;
 
-    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static DateTimeFormatter createdFormatted = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static DateTimeFormatter expiresFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public SharedLinkDto(SharedLink sharedLink) {
         this.linkId = sharedLink.getLinkId();
@@ -34,7 +35,7 @@ public class SharedLinkDto {
         this.recipient = sharedLink.getReceipient();
         this.content = sharedLink.getLinkType().toString().toLowerCase();
         this.createdBy = sharedLink.getUser().getEmail();
-        this.created = sharedLink.getCreated().format(formatter);
-        this.expires = Objects.nonNull(sharedLink.getExpires()) ? sharedLink.getExpires().format(formatter) : "";
+        this.created = sharedLink.getCreated().format(createdFormatted);
+        this.expires = Objects.nonNull(sharedLink.getExpires()) ? sharedLink.getExpires().format(expiresFormatter) : "";
     }
 }

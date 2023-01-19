@@ -5,25 +5,38 @@ import React, {useEffect, useReducer} from 'react';
 import {getSharedLinks, deleteSharedLink} from '../../../api/api';
 import PropTypes from 'prop-types';
 
-const TargetUrlComponent = ({value}) => (
-  <>
-    <a href={value}>{value.substring(0, 20)}...</a>
-    <button onClick={() => navigator.clipboard.writeText(value)}>Copy</button>
-  </>
-);
+const TargetUrlComponent = ({value}) => {
+  const [label, setLabel] = React.useState('Copy');
+  const copy = () => {
+    navigator.clipboard.writeText(value);
+    setLabel('Copied!');
+    setTimeout(() => setLabel('Copy'), 2000);
+  };
+  return (
+    <>
+      <a href={value}>{value.substring(0, 20)}...</a>
+      <button style={{width: '60px'}} onClick={copy}>
+        {label}
+      </button>
+    </>
+  );
+};
 
 TargetUrlComponent.propTypes = {
-  value: PropTypes.string
+  value: PropTypes.string,
+  disabled: PropTypes.bool
 };
 
 const SharedLinkList = () => {
   const [data, setData] = useReducer(
     (state, action) => {
       switch (action.verb) {
+        case 'disabled':
+          return {...state, disabled: action.data};
         case 'reset':
-          return {data: null, sort: {key: null, asc: true}};
+          return {...state, sort: {key: 'created', asc: false}, reset: true};
         case 'data':
-          return {...state, data: action.data};
+          return {...state, data: action.data, reset: false};
         case 'sort': {
           const sortedData = [...state.data];
           const asc = state.sort.key === action.key ? !state.sort.asc : true;
@@ -36,28 +49,14 @@ const SharedLinkList = () => {
         }
       }
     },
-    {data: null, sort: {key: null, asc: false}}
+    {data: null, sort: {key: 'created', asc: false}, reset: true}
   );
 
   useEffect(() => {
-    if (data.data) return;
-    getSharedLinks().then((res) => setData({verb: 'data', data: res.data}));
+    if (data.reset) {
+      getSharedLinks().then((res) => setData({verb: 'data', data: res.data}));
+    }
   }, [data, setData]);
-
-  const header = (
-    <Box m={1} ml={2}>
-      <Typography variant="h6">Endpoint Links</Typography>
-    </Box>
-  );
-
-  if (!data.data) {
-    return (
-      <>
-        {header}
-        <LinearProgress />
-      </>
-    );
-  }
 
   const columns = {
     recipient: 'Recipient',
@@ -73,44 +72,62 @@ const SharedLinkList = () => {
 
   return (
     <>
-      {header}
+      <Box m={1} ml={2}>
+        <Typography variant="h6">Endpoint Links</Typography>
+      </Box>
       <SharedLinkAdd onPost={() => setData({verb: 'reset'})} />
       <Box m={1} border={1} borderColor="divider">
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                {keys.map((key) => (
-                  <TableCell style={{cursor: 'pointer'}} key={key} onClick={() => setData({verb: 'sort', key})}>
-                    {columns[key]} {data.sort.key === key && (data.sort.asc ? '▼' : '▲')}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.data.length < 1 && (
+        {!data.data ? (
+          <LinearProgress />
+        ) : (
+          <TableContainer>
+            <Table>
+              <TableHead>
                 <TableRow>
-                  <TableCell colSpan={columns.length}>
-                    <i>No Links</i>
-                  </TableCell>
-                </TableRow>
-              )}
-              {data.data.map((row, i) => (
-                <TableRow key={`${row['publicId']}`}>
                   {keys.map((key) => (
-                    <TableCell key={`${key}-${i}`}>
-                      {(key === 'targetUrl' && <TargetUrlComponent value={row[key]} />) ||
-                        (key === 'linkId' && (
-                          <button onClick={() => deleteSharedLink(row[key]).then(() => setData({verb: 'reset'}))}>Delete</button>
-                        )) ||
-                        row[key]}
+                    <TableCell style={{cursor: 'pointer'}} key={key} onClick={() => setData({verb: 'sort', key})}>
+                      {columns[key]} {data.sort.key === key && (data.sort.asc ? '▲' : '▼')}
                     </TableCell>
                   ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {data.data.length < 1 && (
+                  <TableRow>
+                    <TableCell colSpan={columns.length}>
+                      <i>No Links</i>
+                    </TableCell>
+                  </TableRow>
+                )}
+                {data.data.map((row, i) => (
+                  <TableRow key={`${row['linkId']}`}>
+                    {keys.map((key) => {
+                      const disabled = data.disabled === row[key];
+                      return (
+                        <TableCell key={`${key}-${i}`}>
+                          {(key === 'targetUrl' && (disabled ? <></> : <TargetUrlComponent value={row[key]} />)) ||
+                            (key === 'linkId' && (
+                              <button
+                                style={{width: '80px'}}
+                                disabled={disabled}
+                                onClick={() => {
+                                  setData({verb: 'disabled', data: row[key]});
+                                  deleteSharedLink(row[key]).then(() => setData({verb: 'reset'}));
+                                }}
+                              >
+                                {disabled ? 'Deleting...' : 'Delete'}
+                              </button>
+                            )) ||
+                            row[key]}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Box>
     </>
   );

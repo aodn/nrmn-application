@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -85,7 +86,8 @@ public class MaterializedViewService {
                                 country.getRight())))
                 .collect(Collectors.toList());
 
-        requests.add(new CSVFilterPrinter(headers, viewName, null, null));
+        var fullViewName = Objects.isNull(countries) && Objects.isNull(states) ? viewName : viewName + "_all";
+        requests.add(new CSVFilterPrinter(headers, fullViewName, null, null));
 
         for (var request : requests) {
             logger.info("Writing CSV  " + request.getViewName());
