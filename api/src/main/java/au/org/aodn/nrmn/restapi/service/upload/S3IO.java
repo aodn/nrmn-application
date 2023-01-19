@@ -59,6 +59,8 @@ public class S3IO {
                     .sourceKey(getSourceKey(viewName))
                     .destinationBucket(bucketShared)
                     .destinationKey(getDestinationKey(viewName, secret))
+                    .acl(ObjectCannedACL.PUBLIC_READ)
+                    .expires(LocalDateTime.now().plusDays(1).toInstant(OffsetDateTime.now().getOffset()))
                     .build());
         } catch (AwsServiceException e) {
             throw new RuntimeException("copyEndpoint: failed to write to S3: " + e.getMessage());
@@ -67,14 +69,14 @@ public class S3IO {
 
     public String createS3Link(String viewName, String secret, LocalDateTime expires) throws Exception {
         try {
-            var request = CopyObjectRequest.builder()
+            getClient().copyObject(CopyObjectRequest.builder()
                     .sourceBucket(bucket).sourceKey(getSourceKey(viewName))
                     .destinationBucket(bucketShared).destinationKey(getDestinationKey(viewName, secret))
                     .acl(ObjectCannedACL.PUBLIC_READ)
-                    .expires(expires.toInstant(OffsetDateTime.now().getOffset()))
-                    .build();
-            getClient().copyObject(request);
-            return getClient().utilities().getUrl(builder -> builder.bucket(bucketShared).key(getDestinationKey(viewName, secret)))
+                    .expires(LocalDateTime.now().plusDays(1).toInstant(OffsetDateTime.now().getOffset()))
+                    .build());
+            return getClient().utilities()
+                    .getUrl(builder -> builder.bucket(bucketShared).key(getDestinationKey(viewName, secret)))
                     .toExternalForm();
         } catch (Exception e) {
             throw new Exception("Failed to generate shared link in bucket " + bucketShared + " : " + e.getMessage());
