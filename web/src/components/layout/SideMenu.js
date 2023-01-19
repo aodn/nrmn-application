@@ -1,5 +1,5 @@
 import React from 'react';
-import {Box, Divider, Drawer, IconButton, List, ListItem, ListItemText, ListSubheader, Stack, Typography} from '@mui/material';
+import {Box, Divider, Drawer, IconButton, List, ListItemButton, ListItemText, ListSubheader, Stack, Typography} from '@mui/material';
 import Chip from '@mui/material/Chip';
 import MenuIcon from '@mui/icons-material/Menu';
 import {NavLink} from 'react-router-dom';
@@ -18,9 +18,9 @@ const SideMenu = ({open, onClose}) => {
       </Box>
       <Divider />
       <List>
-        <ListItem button onClick={onClose} component={NavLink} to="/home">
+        <ListItemButton onClick={onClose} component={NavLink} to="/home">
           <ListItemText primary="Home" />
-        </ListItem>
+        </ListItemButton>
       </List>
       <Divider />
       <List>
@@ -28,24 +28,21 @@ const SideMenu = ({open, onClose}) => {
           <Typography variant="button">Data</Typography>
         </ListSubheader>
         <List component="div" disablePadding>
-          <ListItem button onClick={onClose} component={NavLink} to="/data/surveys" state={{resetFilters: true}}>
+          <ListItemButton onClick={onClose} component={NavLink} to="/data/surveys" state={{resetFilters: true}}>
             <ListItemText primary="List Surveys" />
-          </ListItem>
-          <ListItem button onClick={onClose} component={NavLink} to="/data/jobs" state={{resetFilters: true}}>
+          </ListItemButton>
+          <ListItemButton onClick={onClose} component={NavLink} to="/data/jobs" state={{resetFilters: true}}>
             <ListItemText primary="List Jobs" />
-          </ListItem>
-          <ListItem button onClick={onClose} component={NavLink} to="/data/upload">
+          </ListItemButton>
+          <ListItemButton onClick={onClose} component={NavLink} to="/data/upload">
             <ListItemText primary="Add Job" />
-          </ListItem>
-          <ListItem button onClick={onClose} component={NavLink} to="/data/extract">
-            <ListItemText primary="Template Data" />
-          </ListItem>
+          </ListItemButton>
           <AuthContext.Consumer>
             {({auth}) =>
               auth?.features?.includes('corrections') && (
-                <ListItem button onClick={onClose} component={NavLink} to="/data/species">
+                <ListItemButton onClick={onClose} component={NavLink} to="/data/species">
                   <ListItemText primary="Correct Species" />
-                </ListItem>
+                </ListItemButton>
               )
             }
           </AuthContext.Consumer>
@@ -56,18 +53,30 @@ const SideMenu = ({open, onClose}) => {
         <ListSubheader>
           <Typography variant="button">Reference Data</Typography>
         </ListSubheader>
-        <ListItem button onClick={onClose} component={NavLink} to={'/reference/locations'} state={{resetFilters: true}}>
+        <ListItemButton onClick={onClose} component={NavLink} to={'/reference/locations'} state={{resetFilters: true}}>
           <ListItemText primary="Locations" />
-        </ListItem>
-        <ListItem button onClick={onClose} component={NavLink} to={'/reference/divers'} state={{resetFilters: true}}>
+        </ListItemButton>
+        <ListItemButton onClick={onClose} component={NavLink} to={'/reference/divers'} state={{resetFilters: true}}>
           <ListItemText primary="Divers" />
-        </ListItem>
-        <ListItem button onClick={onClose} component={NavLink} to={'/reference/sites'} state={{resetFilters: true}}>
+        </ListItemButton>
+        <ListItemButton onClick={onClose} component={NavLink} to={'/reference/sites'} state={{resetFilters: true}}>
           <ListItemText primary="Sites" />
-        </ListItem>
-        <ListItem button onClick={onClose} component={NavLink} to={'/reference/observableItems'} state={{resetFilters: true}}>
+        </ListItemButton>
+        <ListItemButton onClick={onClose} component={NavLink} to={'/reference/observableItems'} state={{resetFilters: true}}>
           <ListItemText primary="Observable Items" />
-        </ListItem>
+        </ListItemButton>
+      </List>
+      <Divider />
+      <List>
+        <ListSubheader>
+          <Typography variant="button">Extract</Typography>
+        </ListSubheader>
+        <ListItemButton onClick={onClose} component={NavLink} to="/data/share">
+          <ListItemText primary="Endpoint Links" />
+        </ListItemButton>
+        <ListItemButton onClick={onClose} component={NavLink} to="/data/extract">
+          <ListItemText primary="Template Data" />
+        </ListItemButton>
       </List>
       <Divider />
       <AuthContext.Consumer>

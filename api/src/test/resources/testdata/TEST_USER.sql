@@ -11,6 +11,10 @@ INSERT INTO
     VALUES( 888888, 'auth@example.com', 'Authentication Testing','$2a$10$GCFwNETRjfuFY103u6/FJOwrTX4KpkFQKHcxs63IL7X2nMP7hn9Ya', 'ACTIVE', 1);
 
 INSERT INTO
+    nrmn.sec_user (id, email_address, full_name,hashed_password, status, version, expires)
+    VALUES( 888889, 'expired@example.com', 'Expired Auth Testing','$2a$10$GCFwNETRjfuFY103u6/FJOwrTX4KpkFQKHcxs63IL7X2nMP7hn9Ya', 'ACTIVE', 1, '2020-01-01');
+
+INSERT INTO
     nrmn.sec_user_roles (sec_user_id, sec_role_id)
     VALUES (888888, 'ROLE_DATA_OFFICER');
 

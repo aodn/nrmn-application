@@ -9,8 +9,10 @@ import {Paper, TextField} from '@mui/material';
 import {userLogin} from '../../api/api';
 import {AuthContext} from '../../contexts/auth-context';
 import Chip from '@mui/material/Chip';
+import {useNavigate} from 'react-router';
 
 const LoginForm = () => {
+  const navigate = useNavigate();
   const [formState, setFormState] = useState();
   const [loading, setLoading] = useState(false);
   const version = process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION.split('.') : [0, 0, 0];
@@ -21,23 +23,37 @@ const LoginForm = () => {
     const {username, password} = event.target.elements;
     const form = {username: username?.value, password: password?.value};
     userLogin(form, (result, error) => {
-      setFormState(error ? {error} : {result});
-      setLoading(false);
-      if (!error) setAuth(result);
+      if (result.changePassword) {
+        navigate('/changePassword', {push: true});
+      } else {
+        setFormState(error ? {error} : {result});
+        setLoading(false);
+        if (!error) setAuth(result);
+      }
     });
   };
+
+  const wasPasswordReset = window.location.search.includes('reset');
 
   return (
     <AuthContext.Consumer>
       {({setAuth}) => (
-        <Grid container alignItems="center" direction="column"  justifyContent="center" style={{minHeight: '70vh'}}>
+        <Grid container alignItems="center" direction="column" justifyContent="center" style={{minHeight: '70vh'}}>
           <Paper>
-            <Box paddingX={20} paddingY={5}>
+            <Box paddingX={20} paddingY={5} minWidth="400px">
               <Typography variant="h4">Login</Typography>
               <hr />
-              <Alert data-testid="alert" severity={formState?.error ? 'error' : 'info'}>
-                {formState?.error ? formState.error : formState?.result ? formState.result.username : 'Please login in to view this page'}
-              </Alert>
+              {wasPasswordReset && !formState?.error ? (
+                <Alert data-testid="alert" severity="success">
+                  Password reset successfully!
+                  <br />
+                  Please log in with your new password
+                </Alert>
+              ) : (
+                <Alert data-testid="alert" severity={formState?.error ? 'error' : 'info'}>
+                  {formState?.error ? formState.error : formState?.result ? formState.result.username : 'Please login in to view this page'}
+                </Alert>
+              )}
               <form role="form" onSubmit={(e) => onSubmit(e, setAuth)}>
                 <Box my={2}>
                   <Typography variant="subtitle2">Email</Typography>
@@ -72,7 +88,7 @@ const LoginForm = () => {
             </Box>
           </Paper>
           <Box m={2}>
-            <Chip variant="outlined" color="primary" size="small" label={`Version ${version[0]}.${version[1]} (${version[2]})`}/>
+            <Chip variant="outlined" color="primary" size="small" label={`Version ${version[0]}.${version[1]} (${version[2]})`} />
           </Box>
         </Grid>
       )}

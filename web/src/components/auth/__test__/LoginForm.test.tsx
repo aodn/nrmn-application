@@ -2,8 +2,10 @@ import LoginForm from '../LoginForm';
 import {DefaultBodyType, rest} from 'msw';
 import {setupServer} from 'msw/node';
 import {render, fireEvent, waitFor} from '@testing-library/react';
+import { Router } from 'react-router-dom';
 import {describe, beforeAll, afterAll, afterEach, test, expect} from "@jest/globals";
 import '@testing-library/jest-dom';
+import { createMemoryHistory } from 'history';
 
 const UNAUTHORIZED = 'Unauthorised';
 const TEST_USERNAME = 'test@example.com';
@@ -29,6 +31,7 @@ const server = setupServer(
   })
 );
 
+const history = createMemoryHistory({initialEntries:[{state: {resetFilters: false}}]});
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
@@ -36,7 +39,7 @@ afterAll(() => server.close());
 describe('<LoginForm/>', () => {
 
   test('login success', async () => {
-    const {getByPlaceholderText, getByText} = render(<LoginForm />);
+    const {getByPlaceholderText, getByText} = render(<Router location={history.location} navigator={history}><LoginForm /></Router>);
     const username = getByPlaceholderText('Email');
     const password = getByPlaceholderText('Password');
     fireEvent.change(username, {target: {value: TEST_USERNAME}});
@@ -48,7 +51,7 @@ describe('<LoginForm/>', () => {
   });
 
   test('login failure', async () => {
-    const {getByText} = render(<LoginForm />);
+    const {getByText} = render(<Router location={history.location} navigator={history}><LoginForm /></Router>);
     fireEvent.click(getByText('Submit'));
     await waitFor(() => {
       expect(getByText(UNAUTHORIZED));
@@ -57,7 +60,7 @@ describe('<LoginForm/>', () => {
 
   test('version display at login box', async () => {
     process.env.REACT_APP_VERSION = '1.2.3';
-    const {getByText} = render(<LoginForm />);
+    const {getByText} = render(<Router location={history.location} navigator={history}><LoginForm /></Router>);
     expect(getByText('Version 1.2 (3)')).toBeTruthy();
   });
 });

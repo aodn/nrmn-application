@@ -30,7 +30,7 @@ class Method3QuadratMax50Test extends FormattedTestProvider {
     public void method3WithQuadratsUnder50ShouldSuccess() {
         StagedRowFormatted row = getDefaultFormatted().build();
         row.setMethod(3);
-        row.setMeasureJson(new HashMap<Integer, Integer>() {
+        row.setMeasureJson(new HashMap<>() {
             {
                 put(1, 30);
                 put(2, 20);
@@ -47,7 +47,7 @@ class Method3QuadratMax50Test extends FormattedTestProvider {
     public void method3WithQuadratsAbove50ShouldFailed() {
         StagedRowFormatted row = getDefaultFormatted().build();
         row.setMethod(3);
-        row.setMeasureJson(new HashMap<Integer, Integer>() {
+        row.setMeasureJson(new HashMap<>() {
             {
                 put(1, 100);
                 put(2, 20);

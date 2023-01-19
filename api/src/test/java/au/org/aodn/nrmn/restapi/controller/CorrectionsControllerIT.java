@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 import au.org.aodn.nrmn.restapi.data.model.StagedRow;
@@ -36,9 +37,7 @@ import au.org.aodn.nrmn.restapi.dto.correction.SpeciesCorrectBodyDto;
 import au.org.aodn.nrmn.restapi.security.JwtTokenProvider;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.transaction.Transactional;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -130,17 +129,19 @@ class CorrectionsControllerIT {
         assertEquals(HttpStatus.OK, surveys.getStatusCode());
 
         // We want a survey locked and one unlock
-        assertTrue("Return object greater than 1", (Integer) surveys.getBody().get("lastRow") > 0);
+        var body =  surveys.getBody();
+        assertNotNull(body);
+        assertTrue("Return object greater than 1", (Integer)body.get("lastRow") > 0);
 
         // Now find the survey id where the item is locked and not locked
-        var locked = ((List<Map<String, Object>>) surveys.getBody().get("items"))
+        var locked = ((List<Map<String, Object>>) body.get("items"))
                 .stream()
                 .filter(i -> i.get("locked") == Boolean.TRUE)
                 .map(i -> i.get("surveyId").toString())
                 .collect(Collectors.toList());
 
         // pq_catalogued and locked both affect the request operation, so filter out pq_catalogued too
-        var unlocked = ((List<Map<String, Object>>) surveys.getBody().get("items"))
+        var unlocked = ((List<Map<String, Object>>) body.get("items"))
                 .stream()
                 .filter(i -> i.get("locked") == Boolean.FALSE)
                 .map(i -> i.get("surveyId").toString())
@@ -266,13 +267,18 @@ class CorrectionsControllerIT {
 
         // Empty body should result in BLOCKING error mentioned in Body
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("1 error returned", response.getBody().getErrors().size(), 1);
+        var body = response.getBody();
+        assertNotNull(body);
+        assertEquals("2 error returned", 2, body.getErrors().size());
 
-        List<SurveyValidationError> e = (List<SurveyValidationError>) response.getBody().getErrors();
-
+        List<SurveyValidationError> e = (List<SurveyValidationError>) body.getErrors();
+        
         assertEquals("Expect blocking level error", e.get(0).getLevelId(), ValidationLevel.BLOCKING);
         assertEquals("Data level error", e.get(0).getCategoryId(), ValidationCategory.DATA);
         assertTrue("Message in error", e.get(0).getMessage().equals("Survey data is missing"));
+        
+        assertEquals("Expect blocking level error", e.get(1).getLevelId(), ValidationLevel.BLOCKING);
+        assertTrue("Survey IDs missing", e.get(1).getMessage().equals("Survey IDs missing: 812300132, 812331346"));
     }
     /**
      * Verify return error on incorrect site code in body
@@ -320,9 +326,13 @@ class CorrectionsControllerIT {
 
         // Empty body should result in BLOCKING error mentioned in Body
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("8 error returned", response.getBody().getErrors().size(), 8);
 
-        List<SurveyValidationError> e = (List<SurveyValidationError>) response.getBody().getErrors();
+        var body = response.getBody();
+        assertNotNull(body);
+
+        assertEquals("9 error returned", body.getErrors().size(), 9);
+
+        List<SurveyValidationError> e = (List<SurveyValidationError>) body.getErrors();
 
         assertTrue("Block must be 0, 1 or 2", e.get(0).getMessage().equals("Block must be 0, 1 or 2"));
         assertTrue("Site Code does not exist", e.get(1).getMessage().equals("Site Code does not exist"));
@@ -331,7 +341,8 @@ class CorrectionsControllerIT {
         assertTrue("Inverts is not an integer", e.get(4).getMessage().equals("Inverts is not an integer"));
         assertTrue("P-Qs Diver is blank", e.get(5).getMessage().equals("P-Qs Diver is blank"));
         assertTrue("Diver does not exist", e.get(6).getMessage().equals("Diver does not exist"));
-        assertTrue("Row has no data and no value recorded for inverts", e.get(7).getMessage().equals("Row has no data and no value recorded for inverts"));
+        assertTrue("Survey IDs missing: 812331346", e.get(7).getMessage().equals("Survey IDs missing: 812331346"));
+        assertTrue("Row has no data and no value recorded for inverts", e.get(8).getMessage().equals("Row has no data and no value recorded for inverts"));
     }
     @Test
     @WithUserDetails("test@example.com")
@@ -418,7 +429,8 @@ class CorrectionsControllerIT {
 
         // No proper response at the moment, become 500 and screen will blank
         assertEquals("Correct status code", HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue("Correct alert message", response.getBody().get("message").equals("Deletion Failed. Survey is locked."));
+        var body = response.getBody();
+        assertTrue("Correct alert message", Objects.nonNull(body) && body.get("message").equals("Deletion Failed. Survey is locked."));
     }
     /**
      * You cannot delete survey with PqCatalogued
@@ -450,7 +462,8 @@ class CorrectionsControllerIT {
 
         // No proper response at the moment, become 500 and screen will blank
         assertEquals("Correct status code", HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue("Correct alert message", response.getBody().get("message").equals("Deletion Failed. PQs catalogued for this survey."));
+        var body = response.getBody();
+        assertTrue("Correct alert message", Objects.nonNull(body) && body.get("message").equals("Deletion Failed. PQs catalogued for this survey."));
     }
     @Test
     @WithUserDetails("test@example.com")

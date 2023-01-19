@@ -30,9 +30,6 @@ public class SurveyValidation {
 
     private static final Integer[] METHODS_TO_CHECK = { 0, 1, 2, 3, 7, 10 };
 
-    private static final LocalDate DATE_MIN_RLS = LocalDate.parse("2006-01-01");
-    private static final LocalDate DATE_MIN_ATRC = LocalDate.parse("1991-01-01");
-
     public ValidationCell validateSpeciesBelowToMethod(Boolean allowM11, StagedRowFormatted row) {
 
         if (row.getSpecies().isPresent() && row.getSpecies().get().getMethods() != null) {
@@ -43,7 +40,8 @@ public class SurveyValidation {
             // Handle all M10 as M1
             var method = row.getMethod();
             var useRowMethod = row.getMethod() == 10 ? 1 : row.getMethod();
-            if (!methodIds.contains(useRowMethod) && (allowM11 || useRowMethod != 11)) {
+            var validMethod = methodIds.contains(useRowMethod) || (useRowMethod == 11 && allowM11);
+            if (!validMethod) {
                 var level = useRowMethod == 11 ? ValidationLevel.BLOCKING : ValidationLevel.WARNING;
                 var message = "Method " + method + " invalid for species " + row.getSpecies().get().getObservableItemName();
                 return new ValidationCell(ValidationCategory.DATA, level, message, row.getId(), "method");
@@ -60,9 +58,9 @@ public class SurveyValidation {
                         : null;
     }
 
-    public ValidationCell validateDateRange(ProgramValidation validation, StagedRowFormatted row) {
+    public ValidationCell validateDateRange(ProgramValidation v, StagedRowFormatted row) {
 
-        var earliest = validation == ProgramValidation.RLS ? DATE_MIN_RLS : DATE_MIN_ATRC;
+        var validation = v == ProgramValidation.RLS ? ProgramValidation.RLS : ProgramValidation.ATRC;
 
         if (row.getDate() == null)
             return null;
@@ -73,9 +71,9 @@ public class SurveyValidation {
                     row.getId(), "date");
 
         // Validation: Future Survey Rule
-        if (row.getDate().isBefore(earliest))
+        if (row.getDate().isBefore(validation.getMinDate()))
             return new ValidationCell(ValidationCategory.DATA, ValidationLevel.WARNING,
-                    "Date must be after " + earliest.toString(), row.getId(), "date");
+                    "Date must be after " + validation.getMinDate().toString(), row.getId(), "date");
 
         return null;
     }
@@ -85,11 +83,16 @@ public class SurveyValidation {
         var columnNames = new HashSet<String>();
         var rowIds = new HashSet<Long>();
 
-        for (int measureIndex : Arrays.asList(1, 2, 3, 4, 5))
-            if (rows.stream().mapToInt(row -> row.getMeasureJson().getOrDefault(measureIndex, 0)).sum() == 0) {
-                rowIds.addAll(rows.stream().map(r -> r.getId()).collect(Collectors.toList()));
-                columnNames.add(Integer.toString(measureIndex));
-            }
+        // Make sure we only validate rows where method is 3, we cannot assume income row are all method 3
+        var t = rows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3)).collect(Collectors.toList());
+
+        if(!t.isEmpty()) {
+            for (int measureIndex : Arrays.asList(1, 2, 3, 4, 5))
+                if (t.stream().mapToInt(row -> row.getMeasureJson().getOrDefault(measureIndex, 0)).sum() == 0) {
+                    rowIds.addAll(rows.stream().map(r -> r.getId()).collect(Collectors.toList()));
+                    columnNames.add(Integer.toString(measureIndex));
+                }
+        }
 
         return rowIds.size() > 0 ? new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING,
                 "Missing quadrats in transect " + transect, rowIds, columnNames) : null;
@@ -98,13 +101,17 @@ public class SurveyValidation {
     public Collection<ValidationCell> validateMethod3QuadratsLT50(List<StagedRowFormatted> rows) {
         var errors = new ArrayList<ValidationCell>();
 
-        for (int measureIndex : Arrays.asList(1, 2, 3, 4, 5))
-            for (var row : rows) {
-                if (row.getMeasureJson().getOrDefault(measureIndex, 0) > 50)
-                    errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING,
-                            "M3 quadrat more than 50", row.getId(), Integer.toString(measureIndex)));
-            }
+        // Make sure we only validate rows where method is 3, we cannot assume income row are all method 3
+        var t = rows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3)).collect(Collectors.toList());
 
+        if(!t.isEmpty()) {
+            for (int measureIndex : Arrays.asList(1, 2, 3, 4, 5))
+                for (var row : t) {
+                    if (row.getMeasureJson().getOrDefault(measureIndex, 0) > 50)
+                        errors.add(new ValidationCell(ValidationCategory.DATA, ValidationLevel.BLOCKING,
+                                "M3 quadrat more than 50", row.getId(), Integer.toString(measureIndex)));
+                }
+        }
         return errors;
     }
 
@@ -112,12 +119,18 @@ public class SurveyValidation {
 
         var columnNames = new HashSet<String>();
 
-        for (var measureIndex : Arrays.asList(1, 2, 3, 4, 5)) {
-            if (rows.stream().mapToInt(row -> row.getMeasureJson().getOrDefault(measureIndex, 0)).sum() < 50)
-                columnNames.add(Integer.toString(measureIndex));
+        // Make sure we only validate rows where method is 3, we cannot assume income row are all method 3
+        var t = rows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3)).collect(Collectors.toList());
+
+        if(!t.isEmpty()) {
+            for (var measureIndex : Arrays.asList(1, 2, 3, 4, 5)) {
+                if (t.stream().mapToInt(row -> row.getMeasureJson().getOrDefault(measureIndex, 0)).sum() < 50)
+                    columnNames.add(Integer.toString(measureIndex));
+            }
+
         }
 
-        var rowIds = rows.stream().map(r -> r.getId()).collect(Collectors.toList());
+        var rowIds = t.stream().map(r -> r.getId()).collect(Collectors.toList());
         return columnNames.size() > 0 ? new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING,
                 "Quadrats do not sum to at least 50 in transect " + transect, rowIds, columnNames) : null;
     }
@@ -307,6 +320,32 @@ public class SurveyValidation {
         res.remove(null);
 
         return res;
+    }
+
+    public List<String> validateSurveysMatch(List<Integer> surveyIds,
+            Collection<StagedRowFormatted> mappedRows) {
+
+        var errors = new ArrayList<String>();
+
+        var rowsGroupedBySurvey = mappedRows.stream()
+                .collect(Collectors.groupingBy(StagedRowFormatted::getSurveyId));
+
+        var groupedSurveyIds = rowsGroupedBySurvey.keySet().stream().map(l -> l.intValue())
+                .collect(Collectors.toList());
+
+        if (!surveyIds.containsAll(groupedSurveyIds)) {
+            groupedSurveyIds.removeAll(surveyIds);
+            errors.add("Survey IDs created: " + String.join(", ", groupedSurveyIds.stream().map(l -> l.toString())
+                .collect(Collectors.toList())));
+        }
+
+        if (!groupedSurveyIds.containsAll(surveyIds)) {
+            surveyIds.removeAll(groupedSurveyIds);
+            errors.add("Survey IDs missing: " + String.join(", ", surveyIds.stream().map(l -> l.toString())
+                    .collect(Collectors.toList())));
+        }
+
+        return errors;
     }
 
     public Collection<SurveyValidationError> validateSurveys(ProgramValidation validation, Boolean isExtended,
