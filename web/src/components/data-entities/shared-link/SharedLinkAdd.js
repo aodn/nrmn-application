@@ -115,8 +115,8 @@ const SharedLinkAdd = ({onPost}) => {
   }, [endpoints, onPost]);
 
   return (
-    <Box m={1} border={1} p={1} borderColor="divider" flexDirection={'row'} display={'flex'}>
-      <Box m={1} flexDirection={'column'} display={'flex'}>
+    <Box m={1} border={1} p={1} borderColor="divider" flexDirection='row' display='flex' justifyContent='center' >
+      <Box m={1} flexDirection='column' display='flex'>
         <label htmlFor="endpoint">Available Endpoints</label>
         <select
           size={all_endpoints.length / 4}
@@ -134,7 +134,7 @@ const SharedLinkAdd = ({onPost}) => {
             ))}
         </select>
       </Box>
-      <Box m={1} flexDirection={'column'} display={'flex'} justifyContent={'center'}>
+      <Box m={1} flexDirection='column' display='flex' justifyContent='center'>
         <button
           style={{height: '50px'}}
           disabled={endpoints.posting}
@@ -144,7 +144,7 @@ const SharedLinkAdd = ({onPost}) => {
             dispatch({verb: 'add', values: all_endpoints.filter((e) => values.includes(e.value))});
           }}
         >
-          {'>>'}
+          {'>'}
         </button>
         <button
           style={{marginTop: '5px', height: '50px'}}
@@ -155,10 +155,10 @@ const SharedLinkAdd = ({onPost}) => {
             dispatch({verb: 'remove', values: all_endpoints.filter((e) => values.includes(e.value))});
           }}
         >
-          {'<<'}
+          {'<'}
         </button>
       </Box>
-      <Box m={1} flexDirection={'column'} display={'flex'}>
+      <Box m={1} flexDirection='column' display='flex'>
         <label htmlFor="endpoint">Endpoint Links To Generate</label>
         <select
           size={all_endpoints.length / 4}
@@ -172,14 +172,15 @@ const SharedLinkAdd = ({onPost}) => {
               onDoubleClick={(e) => {
                 dispatch({verb: 'remove', values: [e.target.value]});
               }}
-              disabled={o.disabled} key={o.value}
+              disabled={o.disabled}
+              key={o.value}
             >
               {o.value}
             </option>
           ))}
         </select>
       </Box>
-      <Box m={1} width={'80%'} flexDirection={'column'} display={'flex'}>
+      <Box m={1} width="275px" flexDirection="column" display="flex">
         <label htmlFor="recipient">Recipient</label>
         <input
           id="recipient"
