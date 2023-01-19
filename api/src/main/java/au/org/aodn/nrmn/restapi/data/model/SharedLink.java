@@ -61,9 +61,6 @@ public class SharedLink {
     @Column(name = "expires", nullable = false)
     private LocalDateTime expires;
 
-    @Column(name = "expired", nullable = true)
-    private LocalDateTime expired;
-
     @Column(name = "target_url", nullable = true)
     private String targetUrl;
 

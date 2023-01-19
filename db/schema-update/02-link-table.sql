@@ -10,7 +10,6 @@ CREATE TABLE nrmn.shared_link (
   receipient TEXT,
   secret TEXT,
   expires TIMESTAMP NOT NULL,
-  expired TIMESTAMP,
   created TIMESTAMP NOT NULL,
   updated TIMESTAMP,
   target_url TEXT
