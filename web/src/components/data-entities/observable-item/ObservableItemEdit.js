@@ -48,6 +48,7 @@ const ObservableItemEdit = () => {
   });
 
   useEffect(() => {
+    document.title = 'Edit Observable Item';
     async function fetchTaxonomyDetail() {
       await getResult('species/taxonomyDetail').then((options) => setOptions(options.data));
     }

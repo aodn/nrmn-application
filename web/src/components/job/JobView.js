@@ -34,6 +34,7 @@ const JobView = () => {
   };
 
   useEffect(() => {
+    document.title = 'View Job';
     async function fetchJob() {
       await getEntity('stage/stagedJob/' + id).then((res) => setJob(res.data));
     }

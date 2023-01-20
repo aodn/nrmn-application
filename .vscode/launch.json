@@ -34,7 +34,8 @@
       "type": "firefox",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}",
-      "profile": "development"
+      "profile": "development",
+      "keepProfileChanges": true
     }
   ]
 }

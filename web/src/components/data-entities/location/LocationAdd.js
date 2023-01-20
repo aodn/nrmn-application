@@ -41,6 +41,7 @@ const LocationAdd = () => {
   };
 
   useEffect(() => {
+    document.title = locationId ? 'Edit Location' : 'New Location';
     async function fetchLocation() {
       await getEntity(`location/${locationId}`).then((res) => {
         dispatch({form: res.data});

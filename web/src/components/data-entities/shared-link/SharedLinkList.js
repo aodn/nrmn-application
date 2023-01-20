@@ -53,6 +53,7 @@ const SharedLinkList = () => {
   );
 
   useEffect(() => {
+    document.title = 'Endpoint Links';
     if (data.reset) {
       getSharedLinks().then((res) => setData({verb: 'data', data: res.data}));
     }
@@ -76,7 +77,7 @@ const SharedLinkList = () => {
         <Typography variant="h6">Endpoint Links</Typography>
       </Box>
       <SharedLinkAdd onPost={() => setData({verb: 'reset'})} />
-      <Box m={1} border={1} borderColor="divider">
+      <Box m={1} border={1} borderColor="divider" sx={{backgroundColor: 'white'}}>
         {!data.data ? (
           <LinearProgress />
         ) : (

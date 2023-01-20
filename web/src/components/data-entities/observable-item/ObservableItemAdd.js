@@ -48,6 +48,7 @@ const ObservableItemAdd = () => {
   });
 
   useEffect(() => {
+    document.title = 'New Observable Item';
     async function fetchTaxonomyDetail() {
       await getResult('species/taxonomyDetail').then((options) => {
         options.data.obsItemTypes = options.data.obsItemTypes.map((i) => {

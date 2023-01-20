@@ -28,6 +28,7 @@ const ObservableItemList = () => {
   };
 
   const onGridReady = useCallback((event) => {
+    document.title = 'Observable Items';
     async function fetchObservableItems(e) {
       e.api.setDatasource({
         // This is the functional structure need for datasource

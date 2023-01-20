@@ -20,6 +20,7 @@ const DiverList = () => {
   const gridRef = useRef(null);
 
   const onGridReady = useCallback((event) => {
+    document.title = 'Divers';
     async function fetchDivers(e) {
       e.api.setDatasource({
         // This is the functional structure need for datasource

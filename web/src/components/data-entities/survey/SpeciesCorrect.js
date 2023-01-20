@@ -23,6 +23,7 @@ const SpeciesCorrect = () => {
   const [correctionLocations, setCorrectionLocations] = useState([]);
 
   useEffect(() => {
+    document.title = 'Species Correction';
     if (!selected || selected.jobId) return;
     const resultLocations = searchResults.find((r) => r.observableItemId === selected.result).locations;
     setCorrection({newObservableItemName: null});
@@ -89,7 +90,7 @@ const SpeciesCorrect = () => {
   return (
     <>
       <Box p={1}>
-        <Typography variant="h4">Correct Species</Typography>
+        <Typography variant="h4">Species Correction</Typography>
       </Box>
       <Box border={1} borderRadius={1} m={1} borderColor="divider" display="flex"  flexDirection="row">
         <Box flex={1}>

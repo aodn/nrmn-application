@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
@@ -17,6 +17,10 @@ const LoginForm = () => {
   const [loading, setLoading] = useState(false);
   const version = process.env.REACT_APP_VERSION ? process.env.REACT_APP_VERSION.split('.') : [0, 0, 0];
 
+  useEffect(() => {
+    document.title = 'Login';
+  }, []);
+  
   const onSubmit = (event, setAuth) => {
     event.preventDefault();
     setLoading(true);

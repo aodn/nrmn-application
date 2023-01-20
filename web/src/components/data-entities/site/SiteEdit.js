@@ -43,6 +43,7 @@ const SiteEdit = ({clone}) => {
   const [site, dispatch] = useReducer(formReducer, {});
 
   useEffect(() => {
+    document.title = edit ? 'Edit Site' : 'New Site';
     async function fetchSiteOptions() {
       await getResult('siteOptions').then((res) => setOptions(res.data));
     }
