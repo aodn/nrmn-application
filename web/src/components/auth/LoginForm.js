@@ -20,7 +20,7 @@ const LoginForm = () => {
   useEffect(() => {
     document.title = 'Login';
   }, []);
-  
+
   const onSubmit = (event, setAuth) => {
     event.preventDefault();
     setLoading(true);

@@ -48,7 +48,7 @@ const SiteEdit = ({clone}) => {
       await getResult('siteOptions').then((res) => setOptions(res.data));
     }
     fetchSiteOptions();
-  }, []);
+  }, [edit]);
 
   useEffect(() => {
     async function fetchSite() {

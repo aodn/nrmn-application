@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import {Link, Typography} from '@mui/material';
 import {makeStyles} from '@mui/styles';
 import Box from '@mui/material/Box';
@@ -19,7 +19,7 @@ const Homepage = () => {
   useEffect(() => {
     document.title = 'National Reef Monitoring Network';
   }, []);
-  
+
   return (
     <>
       <Box flexGrow={11} m={5} maxWidth={900} alignSelf="center">
