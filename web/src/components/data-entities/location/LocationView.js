@@ -17,6 +17,7 @@ const LocationView = () => {
   const [location, setLocation] = useState();
 
   useEffect(() => {
+    document.title = 'View Location';
     async function fetchLocation() {
       await getResult(`location/${locationId}`).then((res) => {
         setLocation(res.data);

@@ -13,6 +13,7 @@ const ObservableItemView = () => {
   const [data, setData] = useState({});
 
   useEffect(() => {
+    document.title = 'View Observable Item';
     async function fetchObservableItem() {
       await getEntity(`reference/observableItem/${id}`).then((res) => setData(res.data));
     }

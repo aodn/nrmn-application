@@ -12,6 +12,7 @@ const SurveyView = () => {
   const [data, setData] = useState({});
 
   useEffect(() => {
+    document.title = 'View Survey';
     async function getSurvey() {
       await getEntity(`data/survey/${id}`).then((res) => setData(res.data));
     }

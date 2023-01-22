@@ -26,6 +26,7 @@ const SiteView = () => {
   const [data, setData] = useState({});
 
   useEffect(() => {
+    document.title = 'View Site';
     async function fetchSite() {
       await getEntity(`site/${id}`).then((res) => setData(res.data));
     }

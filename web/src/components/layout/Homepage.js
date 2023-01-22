@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Link, Typography} from '@mui/material';
 import {makeStyles} from '@mui/styles';
 import Box from '@mui/material/Box';
@@ -15,6 +15,10 @@ const useStyles = makeStyles(() => ({
 
 const Homepage = () => {
   const classes = useStyles();
+
+  useEffect(() => {
+    document.title = 'National Reef Monitoring Network';
+  }, []);
 
   return (
     <>

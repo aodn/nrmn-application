@@ -28,6 +28,7 @@ const SiteList = () => {
   };
 
   const onGridReady = useCallback((event) => {
+    document.title = 'Sites';
     async function fetchSites(e) {
       e.api.setDatasource({
         // This is the functional structure need for datasource

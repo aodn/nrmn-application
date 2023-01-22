@@ -23,6 +23,7 @@ const ExtractTemplateData = () => {
   const [templateLocations, setTemplateLocations] = useState([]);
 
   useEffect(() => {
+    document.title = 'Template Data';
     async function fetchLocations() {
       await getEntity('locations?all=true').then((res) => {
         const locations = [];

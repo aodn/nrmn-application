@@ -52,6 +52,7 @@ const SurveyEdit = () => {
   });
 
   useEffect(() => {
+    document.title = 'Edit Survey';
     async function fetchSurvey() {
       await getResult(`data/survey/${surveyId}`).then((res) => dispatch({form: res.data}));
     }
