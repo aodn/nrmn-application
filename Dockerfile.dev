@@ -1,0 +1,13 @@
+# docker build -t nrmn .
+# docker run -d -p 8080:8080 nrmn
+
+FROM tomcat:8.5.84-jdk11-corretto-al2
+
+ENV SPRING_PROFILES_ACTIVE=dev
+ENV SPRING_DATASOURCE_USERNAME=nrmn_dev
+ENV SPRING_DATASOURCE_PASSWORD=hHMbgzWdxHSafYV5bVHRt1Dn
+ENV SPRING_DATASOURCE_URL=jdbc:postgresql://db1-dev-nec-hob.emii.org.au:5432/nrmn_dev
+
+ENV CATALINA_OPTS="-Dapp.jwt.secretBase64=3zb9O314fW9abnfghxGK7Llab4ZfMemvPsMO8mUjvSKKmTsQya5wZqw6RC9KQPa"
+
+COPY ROOT.war /usr/local/tomcat/webapps/
