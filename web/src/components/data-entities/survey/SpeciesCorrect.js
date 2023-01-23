@@ -51,29 +51,7 @@ const SpeciesCorrect = () => {
         case 'search': {
           var payload = removeNullProperties(request.request.payload);
           getSurveySpecies(payload).then((res) => {
-            const rowData = res.data.map((p) => {
-              const surveyJson = JSON.parse(p.surveyJson);
-
-              const locations = Array.from(new Set(Object.values(surveyJson))).map((l) => {
-                const surveyIds = Object.entries(surveyJson)
-                  .filter((s) => s[1] === l)
-                  .map((e) => e[0]);
-                return {locationId: l, locationName: locationData[l], surveyIds};
-              });
-
-              return {...p, locations};
-            });
-
-            setSearchResultData(rowData);
-            const resultSummary = rowData.map((r) => ({
-              observableItemId: r.observableItemId,
-              observableItemName: r.observableItemName,
-              commonName: r.commonName,
-              supersededBy: r.supersededBy,
-              surveyCount: Object.keys(r.surveyJson).length
-            }));
-            setSearchResults(resultSummary);
-
+            setSearchResults(res.data);
             dispatch({type: 'showResults'});
           });
           break;
@@ -87,15 +65,14 @@ const SpeciesCorrect = () => {
       }
   }, [request.request, request.loading, locationData]);
 
-  const detail = searchResultData?.find((r) => r.observableItemId === selected?.observableItemId);
-  const req = request.request;
+
   return (
     <>
       <Box p={1}>
-        <Typography variant="h4">Correct Species</Typography>
+        <Typography variant="h6">Correct Species</Typography>
       </Box>
-      <Box border={1} borderRadius={1} m={1} borderColor="divider" display="flex" flexDirection="row">
-        <Box flex={1}>
+      <Box>
+        <Box border={1} borderRadius={1} m={1} borderColor="divider" style={{overflow: 'hidden'}} >
           <SpeciesCorrectFilter
             onLoadLocations={(locations) => setLocationData(locations)}
             onSearch={(filter) => {
@@ -107,12 +84,10 @@ const SpeciesCorrect = () => {
             }}
           />
         </Box>
-      </Box>
-      {request.loading && <LinearProgress />}
-      {request.error && <Alert severity="error">{request.error}</Alert>}
-      {!request.loading && searchResults && (
-        <Box display="flex" flex={2} overflow="hidden" flexDirection="row">
-          <Box width="50%" style={{overflowX: 'hidden', overflowY: 'auto'}}>
+        {request.loading && <LinearProgress />}
+        {request.error && <Alert severity="error">{request.error}</Alert>}
+        {!request.loading && searchResults && (
+          <Box m={1}>
             <SpeciesCorrectResults
               results={searchResults}
               onClick={(id) => {
@@ -121,97 +96,8 @@ const SpeciesCorrect = () => {
               }}
             />
           </Box>
-          {selected?.jobId && (
-            <Box m={1} width="30%">
-              <Alert>Species Corrected</Alert>
-              <Box m={1}>
-                <Button
-                  variant="outlined"
-                  endIcon={<LaunchIcon />}
-                  onClick={() => window.open(`/data/job/${selected.jobId}/view`, '_blank').focus()}
-                >
-                  Open Job
-                </Button>
-              </Box>
-            </Box>
-          )}
-          {detail && (
-            <Box width="50%" borderLeft={1} borderColor="divider" style={{overflowX: 'hidden', overflowY: 'auto'}}>
-              <Box mx={1}>
-                <Typography variant="subtitle2">Current species name</Typography>
-                <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
-                  <TextField fullWidth color="primary" size="small" value={detail.observableItemName} spellCheck={false} readOnly />
-                  <IconButton
-                    style={{marginLeft: 5, marginRight: 15}}
-                    onClick={() => window.open(`/reference/observableItem/${detail.observableItemId}`, '_blank').focus()}
-                  >
-                    <LaunchIcon />
-                  </IconButton>
-                </Box>
-              </Box>
-              <Box m={1}>
-                <Typography variant="subtitle2">Correct to</Typography>
-                <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
-                  <CustomSearchInput
-                    fullWidth
-                    formData={correction?.newObservableItemName}
-                    exclude={detail.observableItemName}
-                    onChange={(t) => {
-                      if (t) {
-                        setCorrection({...req, newObservableItemId: t.id, newObservableItemName: t.species});
-                      } else {
-                        setCorrection({...req, newObservableItemId: null, newObservableItemName: null});
-                      }
-                    }}
-                  />
-                  <IconButton
-                    style={{marginLeft: 5, marginRight: 15}}
-                    disabled={!correction?.newObservableItemId}
-                    onClick={() => window.open(`/reference/observableItem/${correction.newObservableItemId}`, '_blank').focus()}
-                  >
-                    <LaunchIcon />
-                  </IconButton>
-                </Box>
-              </Box>
-              <Box m={1}>
-                <Button
-                  variant="contained"
-                  disabled={!correction?.newObservableItemName}
-                  onClick={() => dispatch({type: 'postCorrection'})}
-                >
-                  Submit Correction
-                </Button>
-              </Box>
-              <Box m={1} key={detail.observableItemId}>
-                {correctionLocations?.map((l) => {
-                  return (
-                    <Box key={l.locationId} borderBottom={1} borderColor="divider">
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          setCorrectionLocations([...correctionLocations.filter((c) => c.locationName !== l.locationName)]);
-                        }}
-                      >
-                        <DeleteIcon fontSize="inherit" />
-                      </IconButton>
-                      <Typography variant="caption" sx={{fontWeight: 'medium'}}>
-                        {l.locationName}{' '}
-                      </Typography>
-                      <Typography variant="caption">
-                        {l.surveyIds.map((l) => (
-                          <Link key={l} onClick={() => window.open(`/data/survey/${l}`, '_blank').focus()} href="#">
-                            {l}
-                          </Link>
-                        ))}
-                      </Typography>
-                    </Box>
-                  );
-                })}
-              </Box>
-            </Box>
-          )}
-        </Box>
-      )}
+        )}
+      </Box>
     </>
   );
 };

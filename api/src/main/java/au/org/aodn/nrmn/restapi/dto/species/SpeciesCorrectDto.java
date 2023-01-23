@@ -5,5 +5,5 @@ public interface SpeciesCorrectDto {
     String getCommonName();
     String getObservableItemName();
     String getSupersededBy();
-    String getSurveyJson();
+    Integer getSurveyCount();
 }

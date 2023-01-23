@@ -38,8 +38,8 @@ const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
         freeSolo
         fullWidth={fullWidth}
         value={formData}
-        onInputChange={(e) => setSearchTerm(e.target.value)}
-        onSelect={(e) => onChange(results.filter(r => r.species === e.target.value)[0])}
+        onInputChange={(e) => setSearchTerm(e?.target?.value)}
+        onSelect={(e) => onChange(e?.target ? results.filter(r => r.species === e.target.value)[0] : null)}
         renderInput={(params) => <TextField {...params} size="small" color="primary" variant="outlined" />}
       />
     </>

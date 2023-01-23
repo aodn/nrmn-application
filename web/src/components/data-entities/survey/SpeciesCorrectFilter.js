@@ -201,7 +201,7 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
         (
           <>
             <Box ml={1} display="flex" flexDirection="row">
-              <Box m={1} minWidth={300} display="flex">
+              <Box m={1} minWidth={300}  display="flex">
                 <Box>
                   <Typography variant="subtitle2">Start Date</Typography>
                   <input

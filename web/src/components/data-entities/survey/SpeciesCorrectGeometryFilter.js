@@ -30,6 +30,13 @@ const SpeciesCorrectGeometryFilter = ({onChange, filter}) => {
   }, [file]);
 
   useEffect(() => {
+    if (places) {
+      const keys = Object.keys(places);
+      onChange(places[keys[0]]);
+    }
+  }, [places]);
+
+  useEffect(() => {
     if (!filter.geometry) {
       setPlaces();
       setFile();
@@ -41,9 +48,8 @@ const SpeciesCorrectGeometryFilter = ({onChange, filter}) => {
       {places ? (
         <Autocomplete
           options={Object.keys(places)}
-          onChange={(e) => {
-            onChange(places[e.target.textContent]);
-          }}
+          defaultValue={Object.keys(places)[0]}
+          onChange={(e) => onChange(places[e.target.textContent])}
           renderInput={(params) => <TextField {...params} />}
           size="small"
         />

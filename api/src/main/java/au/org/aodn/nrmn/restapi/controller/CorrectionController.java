@@ -465,6 +465,37 @@ public class CorrectionController {
     }
 
     @PostMapping("searchSpecies")
+    public ResponseEntity<?> getSpeciessummary(
+            Authentication authentication,
+            @RequestBody SpeciesSearchBodyDto bodyDto) {
+
+        try {
+            if(bodyDto == null) {
+                return ResponseEntity
+                        .badRequest()
+                        .body("{\"message\":\"Missing body in the request.\"}");
+            }
+
+            if(bodyDto.getLocationIds() == null) {
+                bodyDto.setLocationIds(new ArrayList<>());
+            }
+
+            var withLocation = bodyDto.getLocationIds().size() > 0;
+            var species = observableItemRepository.getForSpeciesSurveysAndLocationsKML(
+                    bodyDto.getStartDate(),
+                    bodyDto.getEndDate(),
+                    withLocation,
+                    bodyDto.getLocationIds(),
+                    bodyDto.getObservableItemId(),
+                    bodyDto.getGeometry());
+
+            return ResponseEntity.ok().body(species);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("{\"message\":\"Query failed\"}");
+        }
+    }
+
+    @PostMapping("searchSpeciesAtLocation")
     public ResponseEntity<?> getSpeciesForSurveysDateAndLocation(
             Authentication authentication,
             @RequestBody SpeciesSearchBodyDto bodyDto) {
@@ -481,7 +512,7 @@ public class CorrectionController {
             }
 
             var withLocation = bodyDto.getLocationIds().size() > 0;
-            var species = observableItemRepository.getAllDistinctForSurveysAndLocationsKML(
+            var species = observableItemRepository.getCorrectionsSummary(
                     bodyDto.getStartDate(),
                     bodyDto.getEndDate(),
                     withLocation,
@@ -506,8 +537,7 @@ public class CorrectionController {
         var auditMessage = "species correction: " + authentication.getName();
         userActionAuditRepository.save(new UserActionAudit("correctSpecies", auditMessage));
 
-        var referenceMessage = "Correct Species from " + curr.getObservableItemName() + " to "
-                + next.getObservableItemName();
+        var referenceMessage = "Correct Species from " + curr.getObservableItemName() + " to " + next.getObservableItemName();
 
         var user = secUserRepository.findByEmail(authentication.getName());
         var job = StagedJob.builder()
