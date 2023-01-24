@@ -1,11 +1,12 @@
-import {Alert, Box, Button, IconButton, LinearProgress, Link, TextField, Typography} from '@mui/material';
+import {Alert, Box, Button, IconButton, LinearProgress, Link, Tab, Tabs, TextField, Typography} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Close';
 import React, {useEffect, useReducer, useState} from 'react';
-import {getSurveySpecies, postSpeciesCorrection} from '../../../api/api';
+import {searchSpeciesSummary, postSpeciesCorrection} from '../../../api/api';
 import CustomSearchInput from '../../input/CustomSearchInput';
 import SpeciesCorrectFilter from './SpeciesCorrectFilter';
 import SpeciesCorrectResults from './SpeciesCorrectResults';
 import LaunchIcon from '@mui/icons-material/Launch';
+import SpeciesCorrectEdit from './SpeciesCorrectEdit';
 
 const removeNullProperties = (obj) => {
   return obj ? Object.fromEntries(Object.entries(obj).filter((v) => v[1] && v[1] !== '')) : null;
@@ -18,12 +19,7 @@ const SpeciesCorrect = () => {
   const [searchResultData, setSearchResultData] = useState(null);
   const [selected, setSelected] = useState(null);
   const [correctionLocations, setCorrectionLocations] = useState([]);
-
-  useEffect(() => {
-    if (!selected || selected.jobId) return;
-    setCorrection({newObservableItemName: null});
-    setCorrectionLocations([...selected.locations]);
-  }, [selected, setCorrectionLocations, searchResultData]);
+  const [tabIndex, setTabIndex] = useState(0);
 
   const [request, dispatch] = useReducer((state, action) => {
     switch (action.type) {
@@ -50,7 +46,7 @@ const SpeciesCorrect = () => {
       switch (request.request.type) {
         case 'search': {
           var payload = removeNullProperties(request.request.payload);
-          getSurveySpecies(payload).then((res) => {
+          searchSpeciesSummary(payload).then((res) => {
             setSearchResults(res.data);
             dispatch({type: 'showResults'});
           });
@@ -65,14 +61,22 @@ const SpeciesCorrect = () => {
       }
   }, [request.request, request.loading, locationData]);
 
+  useEffect(() => {
+    setTabIndex(selected ? 1 : 0);
+  }, [selected]);
 
   return (
     <>
       <Box p={1}>
         <Typography variant="h6">Correct Species</Typography>
       </Box>
-      <Box>
-        <Box border={1} borderRadius={1} m={1} borderColor="divider" style={{overflow: 'hidden'}} >
+      <Tabs value={tabIndex} onChange={(e, v) => setTabIndex(v)}>
+        <Tab label="Search Results" />
+        <Tab label="Confirm Correction" disabled={!selected} />
+      </Tabs>
+      {tabIndex == 1 && <SpeciesCorrectEdit selected={selected} />}
+      <Box display={tabIndex == 0 ? 'initial' : 'none'}>
+        <Box border={1} borderRadius={1} m={1} borderColor="divider" style={{overflow: 'hidden'}}>
           <SpeciesCorrectFilter
             onLoadLocations={(locations) => setLocationData(locations)}
             onSearch={(filter) => {
@@ -88,13 +92,7 @@ const SpeciesCorrect = () => {
         {request.error && <Alert severity="error">{request.error}</Alert>}
         {!request.loading && searchResults && (
           <Box m={1}>
-            <SpeciesCorrectResults
-              results={searchResults}
-              onClick={(id) => {
-                const res = searchResultData.find((r) => r.observableItemId === id);
-                setSelected(res);
-              }}
-            />
+            <SpeciesCorrectResults results={searchResults} onClick={(id) => setSelected({filter: request.search.payload, result: id})} />
           </Box>
         )}
       </Box>

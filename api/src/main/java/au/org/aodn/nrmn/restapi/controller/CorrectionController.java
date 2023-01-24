@@ -465,7 +465,7 @@ public class CorrectionController {
     }
 
     @PostMapping("searchSpecies")
-    public ResponseEntity<?> getSpeciessummary(
+    public ResponseEntity<?> getSpeciesSurveysLocations(
             Authentication authentication,
             @RequestBody SpeciesSearchBodyDto bodyDto) {
 
@@ -495,8 +495,8 @@ public class CorrectionController {
         }
     }
 
-    @PostMapping("searchSpeciesAtLocation")
-    public ResponseEntity<?> getSpeciesForSurveysDateAndLocation(
+    @PostMapping("searchSpeciesSummary")
+    public ResponseEntity<?> getSpeciesSurveysLocationsSummary(
             Authentication authentication,
             @RequestBody SpeciesSearchBodyDto bodyDto) {
 

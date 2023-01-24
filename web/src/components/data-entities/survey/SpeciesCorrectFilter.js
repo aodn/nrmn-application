@@ -30,7 +30,7 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
       state: null,
       ecoRegion: null,
       observableItemId: null,
-      geometry: '',
+      geometry: null,
       species: null,
       locationIds: []
     };
@@ -96,7 +96,8 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
       });
       setLoading(false);
     }
-    fetchLocations();
+    if(locations.length === 0)
+      fetchLocations();
   }, []);
 
   useEffect(() => {

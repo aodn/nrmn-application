@@ -86,9 +86,9 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
     ObservableItemSuperseded findSupersededForId(@Param("id") Integer id);
 
     @Query(value = ""
-            + "select DISTINCT i.observable_item_id as observableItemId, i.common_name as commonName, i.observable_item_name as observableItemName, i.superseded_by as supersededBy, "
-            + "COUNT(DISTINCT s.survey_id) as surveyCount from nrmn.survey s "
-            + "join nrmn.survey_method m on m.survey_id = s.survey_id "
+            + "select l.location_name as locationName, CONCAT(t.site_code, ' ', t.site_name) as siteName, CAST(json_agg(DISTINCT s.survey_id) AS TEXT) AS surveyIds "
+            + "from nrmn.survey s "
+            + "join nrmn.survey_method m on m.survey_id = s.survey_id  "
             + "join nrmn.observation o on m.survey_method_id = o.survey_method_id "
             + "join nrmn.observable_item_ref i on o.observable_item_id = i.observable_item_id "
             + "join nrmn.site_ref t on s.site_id = t.site_id "
@@ -97,8 +97,7 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "AND (:withLocation IS FALSE OR l.location_id IN :locationIds) "
             + "AND (:observableItemId IS NULL OR o.observable_item_id = :observableItemId) "
             + "AND (:kml IS NULL OR st_within(t.geom, ST_GeomFromKML(:kml))) "
-            + "group by i.observable_item_id, i.observable_item_name, i.common_name, i.superseded_by "
-            + "order by i.observable_item_name, i.common_name, i.superseded_by"
+            + "group by locationName, siteName"
             + "", nativeQuery = true)
     List<SpeciesCorrectDto> getForSpeciesSurveysAndLocationsKML(
             @Param("startDate") String startDate,
@@ -112,8 +111,6 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "select distinct observable_item_id as observableItemId, "
             + "observable_item_name as observableItemName, superseded_by as supersededBy, common_name as commonName, COUNT(DISTINCT survey_id) as surveyCount from "
             + "(select i.observable_item_id, i.common_name, i.observable_item_name, i.superseded_by, s.survey_id from nrmn.survey s "
-            // + "(select i.observable_item_id, i.common_name, i.observable_item_name,
-            // i.superseded_by, l.location_id, s.survey_id from nrmn.survey s "
             + "join nrmn.survey_method m on m.survey_id = s.survey_id   "
             + "join nrmn.observation o on m.survey_method_id = o.survey_method_id "
             + "join nrmn.observable_item_ref i on o.observable_item_id = i.observable_item_id "
@@ -125,7 +122,7 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
             + "AND (:kml IS NULL OR st_within(t.geom, ST_GeomFromKML(:kml))) "
             + ") as ob "
             + "group by observable_item_id, observable_item_name, common_name, superseded_by  "
-            + "order by observableItemName, supersededBy " // LIMIT 100 OFFSET (:offset)"
+            + "order by observableItemName, supersededBy "
             + "", nativeQuery = true)
     List<SpeciesCorrectDto> getCorrectionsSummary(
             @Param("startDate") String startDate,

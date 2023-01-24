@@ -6,4 +6,8 @@ public interface SpeciesCorrectDto {
     String getObservableItemName();
     String getSupersededBy();
     Integer getSurveyCount();
+    
+    String getSurveyIds();
+    String getLocationName();
+    String getSiteName();
 }

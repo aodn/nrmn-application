@@ -137,9 +137,18 @@ export const getDataJob = (jobId) =>
     .then((res) => res)
     .catch((err) => err);
 
-export const getSurveySpecies = (payload) => {
+export const searchSpecies = (payload) => {
   return axiosInstance
     .post(`correction/searchSpecies`, payload, {
+      validateStatus: () => true
+    })
+    .then((res) => res)
+    .catch((err) => err);
+};
+
+export const searchSpeciesSummary = (payload) => {
+  return axiosInstance
+    .post(`correction/searchSpeciesSummary`, payload, {
       validateStatus: () => true
     })
     .then((res) => res)
