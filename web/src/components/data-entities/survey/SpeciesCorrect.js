@@ -15,6 +15,10 @@ const SpeciesCorrect = () => {
   const [selected, setSelected] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
 
+  useEffect(() => {
+    document.title = 'Species Correction';
+  }, []);
+
   const [request, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'getRequest':
@@ -51,7 +55,7 @@ const SpeciesCorrect = () => {
   return (
     <>
       <Box p={1}>
-        <Typography variant="h6">Correct Species</Typography>
+        <Typography variant="h4">Species Correction</Typography>
       </Box>
       <Tabs value={tabIndex} onChange={(e, v) => setTabIndex(v)}>
         <Tab label="Search Results" />

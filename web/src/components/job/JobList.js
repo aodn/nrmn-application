@@ -37,6 +37,7 @@ const JobList = () => {
   };
 
   const onGridReady = (event) => {
+    document.title = 'Jobs';
     async function fetchJobs(e) {
       await getEntity('stage/jobs').then((res) => e.api.setRowData(res.data));
     }

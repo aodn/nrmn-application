@@ -96,6 +96,7 @@ const SurveyCorrect = () => {
   const [metadata, setMetadata] = useState({programName: 'NONE', surveyIds: [], isExtended: false});
 
   useEffect(() => {
+    document.title = 'Survey Correction';
     const undoKeyboardHandler = (event) => {
       if (event.ctrlKey && event.key === 'z') {
         event.preventDefault();

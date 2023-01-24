@@ -52,6 +52,7 @@ const SurveyList = () => {
   const optionLoading = open && options.length === 0;
 
   useEffect(() => {
+    document.title = 'Surveys';
     // Empty array
     cachedOptions.splice(0, cachedOptions.length);
   }, []);

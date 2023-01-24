@@ -14,6 +14,7 @@ const JobUpload = () => {
   const [uploadResponse, setUploadResponse] = useState();
 
   useEffect(() => {
+    document.title = 'Add Job';
     async function fetchPrograms() {
       await axiosInstance.get('data/programs').then((p) => {
         setPrograms(p.data);

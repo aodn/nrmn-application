@@ -115,8 +115,17 @@ const SharedLinkAdd = ({onPost}) => {
   }, [endpoints, onPost]);
 
   return (
-    <Box m={1} border={1} p={1} borderColor="divider" flexDirection='row' display='flex' justifyContent='center' >
-      <Box m={1} flexDirection='column' display='flex'>
+    <Box
+      m={1}
+      border={1}
+      p={1}
+      borderColor="divider"
+      flexDirection="row"
+      display="flex"
+      justifyContent="center"
+      sx={{backgroundColor: 'white'}}
+    >
+      <Box m={1} flexDirection="column" display="flex">
         <label htmlFor="endpoint">Available Endpoints</label>
         <select
           size={all_endpoints.length / 4}
@@ -134,7 +143,7 @@ const SharedLinkAdd = ({onPost}) => {
             ))}
         </select>
       </Box>
-      <Box m={1} flexDirection='column' display='flex' justifyContent='center'>
+      <Box m={1} flexDirection="column" display="flex" justifyContent="center">
         <button
           style={{height: '50px'}}
           disabled={endpoints.posting}
@@ -158,7 +167,7 @@ const SharedLinkAdd = ({onPost}) => {
           {'<'}
         </button>
       </Box>
-      <Box m={1} flexDirection='column' display='flex'>
+      <Box m={1} flexDirection="column" display="flex">
         <label htmlFor="endpoint">Endpoint Links To Generate</label>
         <select
           size={all_endpoints.length / 4}

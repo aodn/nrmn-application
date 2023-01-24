@@ -95,6 +95,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
   const [sideBar, setSideBar] = useState(defaultSideBar);
 
   useEffect(() => {
+    document.title = 'Ingest Sheet';
     const undoKeyboardHandler = (event) => {
       if (event.ctrlKey && event.key === 'z') {
         event.preventDefault();
@@ -230,6 +231,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
       (job) => {
         setState(IngestState.Edited);
         setJob(job);
+        document.title = job.reference;
       },
       isAdmin
     );
