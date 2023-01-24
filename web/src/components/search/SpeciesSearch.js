@@ -15,7 +15,7 @@ import {search} from '../../api/api';
 import PropTypes from 'prop-types';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-const useStyles = makeStyles(({ palette, typography }) => ({
+const useStyles = makeStyles(({palette, typography}) => ({
   root: {
     '& .MuiTable-root': {
       '& .MuiTableHead-root': {
@@ -23,21 +23,21 @@ const useStyles = makeStyles(({ palette, typography }) => ({
           '& .MuiTableCell-head': {
             fontSize: typography?.table.fontSize,
             background: palette?.primary.rowHeader
-          },
-        },
+          }
+        }
       },
       '& .MuiTableRow-root': {
         '&:nth-child(even)': {
-          backgroundColor: palette?.primary.rowHighlight,
-        },
+          backgroundColor: palette?.primary.rowHighlight
+        }
       },
       '& .MuiTableCell-root': {
         fontSize: typography?.table.fontSize,
         padding: typography?.table.padding,
-        color: palette?.text.textPrimary,
-      },
-    },
-  },
+        color: palette?.text.textPrimary
+      }
+    }
+  }
 }));
 
 const SpeciesSearch = ({onRowClick}) => {
@@ -70,8 +70,7 @@ const SpeciesSearch = ({onRowClick}) => {
     if (lastSearch?.species === request?.species && lastSearch?.page === request?.page) {
       // If the search is the same as previous, then no need to execute
       return;
-    }
-    else {
+    } else {
       setInfo(null);
       setSearchError(null);
 
@@ -81,7 +80,7 @@ const SpeciesSearch = ({onRowClick}) => {
         setMaxRows(-1);
       }
 
-      setSearching(prevValue => !prevValue);
+      setSearching((prevValue) => !prevValue);
 
       // Add one more to test if we have next page or reach the end
       search({...request, pageSize: 51})
@@ -94,60 +93,56 @@ const SpeciesSearch = ({onRowClick}) => {
 
           let data = res?.data
             ? res.data.map((r, id) => {
-              // if not a generic name then remove the genus from the species to produce the species epithet
-              let speciesEpithet = '';
-              if (r.species) {
-                const isGenericName =
-                  r.species.toUpperCase().includes('SP.') ||
-                  r.species.toUpperCase().includes('SPP.') ||
-                  r.species.includes('(') ||
-                  r.species.includes('[') ||
-                  !r.species.includes(' ');
-                if (!isGenericName) speciesEpithet = r.species.replace(`${r.genus} `, '');
-              }
-              return {id: id, ...r, speciesEpithet};
-            })
+                // if not a generic name then remove the genus from the species to produce the species epithet
+                let speciesEpithet = '';
+                if (r.species) {
+                  const isGenericName =
+                    r.species.toUpperCase().includes('SP.') ||
+                    r.species.toUpperCase().includes('SPP.') ||
+                    r.species.includes('(') ||
+                    r.species.includes('[') ||
+                    !r.species.includes(' ');
+                  if (!isGenericName) speciesEpithet = r.species.replace(`${r.genus} `, '');
+                }
+                return {id: id, ...r, speciesEpithet};
+              })
             : null;
 
-          if(data?.length === 0) {
-            setGridData((prevValue) => prevValue ? null : []);
+          if (data?.length === 0) {
+            setGridData((prevValue) => (prevValue ? null : []));
           }
 
           // Must use temp variable due to slight time lag in update
           let i = data?.length === 51;
-          if(i) {
+          if (i) {
             // We do not need the last item for now
             data = data.slice(0, -1);
           }
 
-          if(data?.length > 0) {
+          if (data?.length > 0) {
             setGridData((prevValue) => {
-              const k = prevValue ? ([...prevValue, ...data]) : data;
+              const k = prevValue ? [...prevValue, ...data] : data;
               setMaxRows(i ? -1 : k?.length);
 
               return k;
             });
             setPage(request.page);
           }
-
         })
-        .catch((err) =>
-          setSearchError(err.message))
-        .finally(() =>
-          setSearching(prevValue => !prevValue));
+        .catch((err) => setSearchError(err.message))
+        .finally(() => setSearching((prevValue) => !prevValue));
     }
   };
 
   const handleChangePage = (_, newPage) => {
-    if(maxRows < 0 && page < newPage && gridData.length < (newPage + 1) * rowsPerPage) {
+    if (maxRows < 0 && page < newPage && gridData.length < (newPage + 1) * rowsPerPage) {
       doSearch({
         searchType: tabIndex === 0 ? 'WORMS' : 'NRMN',
         species: searchTerm,
         includeSuperseded: true,
         page: newPage
       });
-    }
-    else {
+    } else {
       setPage(newPage);
     }
   };
@@ -307,6 +302,8 @@ const SpeciesSearch = ({onRowClick}) => {
             </Table>
           </TableContainer>
           <TablePagination
+            showFirstButton
+            showLastButton
             component="div"
             rowsPerPageOptions={[]}
             count={maxRows}

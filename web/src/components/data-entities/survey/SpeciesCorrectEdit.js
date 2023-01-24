@@ -1,13 +1,12 @@
 import React, {useEffect} from 'react';
 
-import {Button, Box} from '@mui/material';
+import {Button, Box, LinearProgress} from '@mui/material';
 
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Close';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import PropTypes from 'prop-types';
-import CustomCheckboxInput from '../../input/CustomCheckboxInput';
 import {useState} from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -17,7 +16,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TablePagination from '@mui/material/TablePagination';
 import CustomSearchInput from '../../input/CustomSearchInput';
-import {searchSpecies} from '../../../api/api';
+import {searchSpecies, postSpeciesCorrection} from '../../../api/api';
 import {Paper} from '@mui/material';
 
 import {makeStyles} from '@mui/styles';
@@ -47,20 +46,21 @@ const useStyles = makeStyles(({palette, typography}) => ({
   }
 }));
 
-const SpeciesCorrectEdit = ({selected}) => {
+const SpeciesCorrectEdit = ({selected, onSubmit}) => {
+  const initialCorrectionState = {
+    prevObservableItemId: selected.result.observableItemId,
+    newObservableItemId: null,
+    newObservableItemName: null,
+    invertCondition: false,
+    surveyIds: []
+  };
   const classes = useStyles();
   const pageSize = 10;
   const [page, setPage] = useState(0);
   const [detail, setDetail] = useState();
   const [surveys, setSurveys] = useState();
   const [loading, setLoading] = useState(false);
-  const [correction, setCorrection] = useState({
-    oldObservableItemId: selected.result.observableItemId,
-    newObservableItemId: null,
-    newObservableItemName: null,
-    invertCondition: false,
-    surveyIds: []
-  });
+  const [correction, setCorrection] = useState({...initialCorrectionState});
 
   useEffect(() => {
     if (selected?.filter) {
@@ -97,44 +97,58 @@ const SpeciesCorrectEdit = ({selected}) => {
       });
       return p;
     }, []);
-    setCorrection({...correction, surveyIds});
-  }, [surveys, setCorrection, correction]);
+    setCorrection((c) => ({...c, surveyIds}));
+  }, [surveys]);
 
   return (
     <Box border={1} borderRadius={1} m={1} p={2} borderColor="divider">
-      <Box maxWidth={500}>
-        <Typography variant="subtitle2">Current species name</Typography>
-        <TextField fullWidth color="primary" size="small" value={selected.result.observableItemName} spellCheck={false} readOnly />
-        <Typography variant="subtitle2">Correct to</Typography>
-        <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
-          <CustomSearchInput
-            fullWidth
-            formData={correction?.newObservableItemName}
-            exclude={selected.result.observableItemName}
-            onChange={(t) => {
-              if (t) {
-                setCorrection({...correction, newObservableItemId: t.id, newObservableItemName: t.species});
-              } else {
-                setCorrection({...correction, newObservableItemId: null, newObservableItemName: null});
-              }
-            }}
-          />
+      <Box display="flex" flexDirection="row">
+        <Box flex={1} maxWidth={500} m={1}>
+          <Typography variant="subtitle2">Current species name</Typography>
+          <TextField fullWidth color="primary" size="small" value={selected.result.observableItemName} spellCheck={false} readOnly />
+        </Box>
+        <Box flex={1} maxWidth={500} m={1}>
+          <Typography variant="subtitle2">Correct to</Typography>
+          <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
+            <CustomSearchInput
+              fullWidth
+              formData={correction?.newObservableItemName}
+              exclude={selected.result.observableItemName}
+              onChange={(t) => {
+                if (t) {
+                  setCorrection({...correction, newObservableItemId: t.id, newObservableItemName: t.species});
+                } else {
+                  setCorrection({...correction, newObservableItemId: null, newObservableItemName: null});
+                }
+              }}
+            />
+          </Box>
         </Box>
       </Box>
       {loading ? (
-        <Typography variant="caption">Loading Surveys...</Typography>
+        <LinearProgress />
       ) : (
         <>
-          <Box>
-            <CustomCheckboxInput label="Invert Correction" field="invertCondition" />
-          </Box>
-          <Box>
-            <Button variant="contained" disabled={!correction?.newObservableItemName}>
-              Submit Correction
-            </Button>
+          <Box display="flex" flexDirection="row-reverse">
+            <Box width={200} m={2}>
+              <Button
+                variant="contained"
+                disabled={!correction?.newObservableItemName || correction.surveyIds.length < 1}
+                onClick={() => {
+                  setLoading(true);
+                  postSpeciesCorrection(correction).then((res) => {
+                    setCorrection({...initialCorrectionState});
+                    onSubmit(res.data);});
+                }}
+              >
+                Submit Correction
+              </Button>
+            </Box>
           </Box>
           <TableContainer key={selected.result.observableItemId} classes={classes} component={Paper} disabled>
             <TablePagination
+              showFirstButton
+              showLastButton
               component="div"
               rowsPerPageOptions={[]}
               count={surveys?.length || 0}
@@ -147,14 +161,14 @@ const SpeciesCorrectEdit = ({selected}) => {
                 <TableRow>
                   <TableCell width="25%">Location</TableCell>
                   <TableCell width="50%">Site</TableCell>
-                  <TableCell width="25%">SurveyIDs</TableCell>
+                  <TableCell width="25%">Surveys</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {surveys?.slice(page * pageSize, page * pageSize + pageSize).map((d) => {
                   return (
-                    <TableRow key={d.locationName} borderBottom={1} borderColor="divider">
-                      <TableCell>
+                    <TableRow key={d.locationName}>
+                      <TableCell style={{verticalAlign: 'top'}}>
                         <IconButton size="small" onClick={() => setSurveys(surveys.filter((v) => v.locationName !== d.locationName))}>
                           <DeleteIcon fontSize="inherit" />
                         </IconButton>
@@ -162,7 +176,6 @@ const SpeciesCorrectEdit = ({selected}) => {
                           {d.locationName}{' '}
                         </Typography>
                       </TableCell>
-
                       <TableCell>
                         {d.sites.map((s) => {
                           return (
@@ -202,6 +215,8 @@ const SpeciesCorrectEdit = ({selected}) => {
               </TableBody>
             </Table>
             <TablePagination
+              showFirstButton
+              showLastButton
               component="div"
               rowsPerPageOptions={[]}
               count={surveys?.length || 0}
@@ -219,5 +234,6 @@ const SpeciesCorrectEdit = ({selected}) => {
 export default SpeciesCorrectEdit;
 
 SpeciesCorrectEdit.propTypes = {
-  selected: PropTypes.object
+  selected: PropTypes.object,
+  onSubmit: PropTypes.func,
 };

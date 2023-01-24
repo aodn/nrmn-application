@@ -45,6 +45,8 @@ const SpeciesCorrectResults = ({results, onClick}) => {
   return (
     <TableContainer classes={classes} component={Paper} disabled>
       <TablePagination
+        showFirstButton
+        showLastButton
         component="div"
         rowsPerPageOptions={[]}
         count={results.length}
@@ -65,18 +67,12 @@ const SpeciesCorrectResults = ({results, onClick}) => {
           {results.length > 0 ? (
             results.slice(page * pageSize, page * pageSize + pageSize).map((r) => {
               return (
-                <>
-                  <TableRow
-                    key={r.observableItemId}
-                    onClick={() => onClick(r)}
-                    style={{cursor: 'pointer'}}
-                  >
-                    <TableCell>{r.observableItemName}</TableCell>
-                    <TableCell>{r.commonName}</TableCell>
-                    <TableCell>{r.supersededBy}</TableCell>
-                    <TableCell>{r.surveyCount}</TableCell>
-                  </TableRow>
-                </>
+                <TableRow key={r.observableItemId} onClick={() => onClick(r)} style={{cursor: 'pointer'}}>
+                  <TableCell>{r.observableItemName}</TableCell>
+                  <TableCell>{r.commonName}</TableCell>
+                  <TableCell>{r.supersededBy}</TableCell>
+                  <TableCell>{r.surveyCount}</TableCell>
+                </TableRow>
               );
             })
           ) : (
@@ -87,6 +83,8 @@ const SpeciesCorrectResults = ({results, onClick}) => {
         </TableBody>
       </Table>
       <TablePagination
+        showFirstButton
+        showLastButton
         component="div"
         rowsPerPageOptions={[]}
         count={results.length}

@@ -1,4 +1,4 @@
-import {Box, Button, CircularProgress, Divider, Grid, Typography} from '@mui/material';
+import {Box, Button, Divider, Grid, LinearProgress, Typography} from '@mui/material';
 import Hidden from '@mui/material/Hidden';
 import List from '@mui/material/List';
 import Chip from '@mui/material/Chip';
@@ -15,9 +15,9 @@ import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router';
 import {Navigate} from 'react-router-dom';
 import {getEntity, originalJobFile} from '../../api/api';
-import EntityContainer from '../containers/EntityContainer';
+import PropTypes from 'prop-types';
 
-const JobView = () => {
+const JobView = ({jobId}) => {
   const {id} = useParams();
   const [job, setJob] = useState();
   const [redirect, setRedirect] = useState(false);
@@ -35,11 +35,12 @@ const JobView = () => {
 
   useEffect(() => {
     document.title = 'View Job';
+    const key = id || jobId;
     async function fetchJob() {
-      await getEntity('stage/stagedJob/' + id).then((res) => setJob(res.data));
+      await getEntity('stage/stagedJob/' + key).then((res) => setJob(res.data));
     }
-    if (id) fetchJob();
-  }, [id]);
+    if (key) fetchJob();
+  }, [id, jobId]);
 
   if (redirect) {
     const url = `/data/survey/${job.surveyIds.join(',')}/correct`;
@@ -47,7 +48,7 @@ const JobView = () => {
   }
 
   return (
-    <EntityContainer name="Jobs" goBackTo="/data/jobs">
+    <>
       {job ? (
         <Grid container>
           <Grid item xs={12}>
@@ -175,10 +176,14 @@ const JobView = () => {
           </Grid>
         </Grid>
       ) : (
-        <CircularProgress size={200} color="secondary" />
+        <LinearProgress />
       )}
-    </EntityContainer>
+    </>
   );
 };
 
 export default JobView;
+
+JobView.propTypes = {
+  jobId: PropTypes.string
+};
