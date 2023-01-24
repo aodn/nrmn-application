@@ -1,6 +1,6 @@
 import {Box, Button, Chip, LinearProgress, TextField, Typography} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import React, {useEffect, useMemo, useReducer, useState} from 'react';
+import React, {useEffect, useCallback, useMemo, useReducer, useState} from 'react';
 import {getEntity} from '../../../api/api';
 import LoadingButton from '@mui/lab/LoadingButton';
 import {PropTypes} from 'prop-types';
@@ -171,10 +171,10 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
     updateFilter({field: 'ecoRegion', value: value});
   };
 
-  const updateObservableItem = (e) => {
+  const updateObservableItem = useCallback((e) => {
     updateFilter({field: 'observableItemId', value: e ? e.id : null});
     updateFilter({field: 'species', value: e ? e.species : null});
-  };
+  }, [updateFilter]);
 
   const canSearch = filter.startDate && filter.endDate && (filter.locationIds.length > 0 || filter.observableItemId || filter.geometry);
 

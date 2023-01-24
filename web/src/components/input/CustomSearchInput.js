@@ -21,13 +21,11 @@ const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
           : [];
         setResults(resultSet);
         setOptions(resultSet.map((i) => i.species));
-        if (resultSet.length === 1) {
-          onChange(resultSet[0]);
-        }
+        if (resultSet.length === 1) onChange(resultSet[0]);
       });
       return () => cancelTokenSource.cancel();
     }
-  }, [searchTerm, minMatchCharacters, exclude, onChange]);
+  }, [searchTerm, exclude, onChange]);
 
   return (
     <>
@@ -38,8 +36,8 @@ const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
         freeSolo
         fullWidth={fullWidth}
         value={formData}
-        onInputChange={(e) => setSearchTerm(e?.target?.value)}
-        onSelect={(e) => onChange(e?.target ? results.filter(r => r.species === e.target.value)[0] : null)}
+        onKeyUp={(e) => setSearchTerm(e.target.value)}
+        onSelect={(e) => onChange(results.filter((r) => r.species === e.target.value)[0])}
         renderInput={(params) => <TextField {...params} size="small" color="primary" variant="outlined" />}
       />
     </>
