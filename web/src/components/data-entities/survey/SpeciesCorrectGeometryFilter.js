@@ -34,7 +34,7 @@ const SpeciesCorrectGeometryFilter = ({onChange, filter}) => {
       const keys = Object.keys(places);
       onChange(places[keys[0]]);
     }
-  }, [places]);
+  }, [places, onChange]);
 
   useEffect(() => {
     if (!filter.geometry) {
