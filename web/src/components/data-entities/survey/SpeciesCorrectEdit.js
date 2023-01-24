@@ -4,7 +4,6 @@ import {Button, Box} from '@mui/material';
 
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Close';
-import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import PropTypes from 'prop-types';
@@ -19,7 +18,7 @@ import TableRow from '@mui/material/TableRow';
 import TablePagination from '@mui/material/TablePagination';
 import CustomSearchInput from '../../input/CustomSearchInput';
 import {searchSpecies} from '../../../api/api';
-import {Alert, Paper} from '@mui/material';
+import {Paper} from '@mui/material';
 
 import {makeStyles} from '@mui/styles';
 
@@ -99,7 +98,7 @@ const SpeciesCorrectEdit = ({selected}) => {
       return p;
     }, []);
     setCorrection({...correction, surveyIds});
-  }, [surveys]);
+  }, [surveys, setCorrection, correction]);
 
   return (
     <Box border={1} borderRadius={1} m={1} p={2} borderColor="divider">

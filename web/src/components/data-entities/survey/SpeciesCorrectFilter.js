@@ -98,7 +98,7 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
     }
     if(locations.length === 0)
       fetchLocations();
-  }, []);
+  }, [locations.length]);
 
   useEffect(() => {
     if (data?.locations && onLoadLocations) {
