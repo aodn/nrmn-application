@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 
 import {Button, Box, LinearProgress} from '@mui/material';
 
@@ -100,6 +100,10 @@ const SpeciesCorrectEdit = ({selected, onSubmit}) => {
     setCorrection((c) => ({...c, surveyIds}));
   }, [surveys]);
 
+  const updateCorrection =  useCallback((t) => {
+      setCorrection(c => ({...c, newObservableItemId: t?.id, newObservableItemName: t?.species}));
+  }, [setCorrection]);
+
   return (
     <Box border={1} borderRadius={1} m={1} p={2} borderColor="divider">
       <Box display="flex" flexDirection="row">
@@ -114,13 +118,7 @@ const SpeciesCorrectEdit = ({selected, onSubmit}) => {
               fullWidth
               formData={correction?.newObservableItemName}
               exclude={selected.result.observableItemName}
-              onChange={(t) => {
-                if (t) {
-                  setCorrection({...correction, newObservableItemId: t.id, newObservableItemName: t.species});
-                } else {
-                  setCorrection({...correction, newObservableItemId: null, newObservableItemName: null});
-                }
-              }}
+              onChange={updateCorrection}
             />
           </Box>
         </Box>
