@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {TextField, Typography} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import {PropTypes} from 'prop-types';
@@ -37,7 +37,7 @@ const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
         fullWidth={fullWidth}
         value={formData ? formData : ''}
         onKeyUp={(e) => setSearchTerm(e.target.value)}
-        onInputChange={(e, v, r) => onChange(results.filter((r) => r.species === v)[0])}
+        onInputChange={(e, v) => onChange(results.filter((r) => r.species === v)[0])}
         renderInput={(params) => <TextField {...params} size="small" color="primary" variant="outlined" />}
       />
     </>
