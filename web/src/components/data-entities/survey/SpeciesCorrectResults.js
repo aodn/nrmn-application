@@ -7,6 +7,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import TablePagination from '@mui/material/TablePagination';
 import {Paper} from '@mui/material';
 
 import {makeStyles} from '@mui/styles';
@@ -38,9 +39,21 @@ const useStyles = makeStyles(({palette, typography}) => ({
 
 const SpeciesCorrectResults = ({results, onClick}) => {
   const classes = useStyles();
-  const [selected, setSelected] = useState(null);
+  const pageSize = 50;
+  const [page, setPage] = useState(0);
+
   return (
     <TableContainer classes={classes} component={Paper} disabled>
+      <TablePagination
+        showFirstButton
+        showLastButton
+        component="div"
+        rowsPerPageOptions={[]}
+        count={results.length}
+        rowsPerPage={pageSize}
+        page={page}
+        onPageChange={(e, p) => setPage(p)}
+      />
       <Table>
         <TableHead>
           <TableRow>
@@ -52,22 +65,16 @@ const SpeciesCorrectResults = ({results, onClick}) => {
         </TableHead>
         <TableBody>
           {results.length > 0 ? (
-            results.map((r) => (
-              <TableRow
-                key={r.observableItemId}
-                selected={selected === r.observableItemId}
-                onClick={() => {
-                  setSelected(r.observableItemId);
-                  onClick(r.observableItemId);
-                }}
-                style={{cursor: 'pointer'}}
-              >
-                <TableCell>{r.observableItemName}</TableCell>
-                <TableCell>{r.commonName}</TableCell>
-                <TableCell>{r.supersededBy}</TableCell>
-                <TableCell>{Object.keys(r.surveyJson).length}</TableCell>
-              </TableRow>
-            ))
+            results.slice(page * pageSize, page * pageSize + pageSize).map((r) => {
+              return (
+                <TableRow key={r.observableItemId} onClick={() => onClick(r)} style={{cursor: 'pointer'}}>
+                  <TableCell>{r.observableItemName}</TableCell>
+                  <TableCell>{r.commonName}</TableCell>
+                  <TableCell>{r.supersededBy}</TableCell>
+                  <TableCell>{r.surveyCount}</TableCell>
+                </TableRow>
+              );
+            })
           ) : (
             <TableRow>
               <TableCell colSpan={4}>No Results</TableCell>
@@ -75,6 +82,16 @@ const SpeciesCorrectResults = ({results, onClick}) => {
           )}
         </TableBody>
       </Table>
+      <TablePagination
+        showFirstButton
+        showLastButton
+        component="div"
+        rowsPerPageOptions={[]}
+        count={results.length}
+        rowsPerPage={pageSize}
+        page={page}
+        onPageChange={(e, p) => setPage(p)}
+      />
     </TableContainer>
   );
 };

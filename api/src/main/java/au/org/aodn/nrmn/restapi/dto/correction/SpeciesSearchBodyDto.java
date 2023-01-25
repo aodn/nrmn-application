@@ -12,5 +12,6 @@ public class SpeciesSearchBodyDto {
     private String startDate;
     private String endDate;
     private String geometry;
+    private Integer offset;
     private List<Integer> locationIds;
 }

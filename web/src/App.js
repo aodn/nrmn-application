@@ -30,6 +30,7 @@ import JobView from './components/job/JobView';
 import Homepage from './components/layout/Homepage';
 import SideMenu from './components/layout/SideMenu';
 import TopBar from './components/layout/TopBar';
+import EntityContainer from './components/containers/EntityContainer';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import ApplicationError from './components/ui/ApplicationError';
@@ -150,7 +151,14 @@ const App = () => {
                       {auth?.features?.includes('corrections') && <Route path="/data/species" element={<SpeciesCorrect />} />}
 
                       <Route path="/data/jobs" element={<JobList />} />
-                      <Route path="/data/job/:id/view" element={<JobView />} />
+                      <Route
+                        path="/data/job/:id/view"
+                        element={
+                          <EntityContainer name="Jobs" goBackTo="/data/jobs">
+                            <JobView />
+                          </EntityContainer>
+                        }
+                      />
                       <Route path="/data/job/:id/edit" element={<ValidationPage />} />
 
                       <Route path="/data/upload" element={<JobUpload />} />
