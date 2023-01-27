@@ -13,6 +13,9 @@ const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    // The setTimout is used to delay the whole search operation by 800ms, this
+    // avoid search happens on each key input, and wait user stop entering before
+    // search happens
     const t = setTimeout(() => {
       if (searchTerm?.length > minMatchCharacters) {
         const cancelTokenSource = axios.CancelToken.source();
