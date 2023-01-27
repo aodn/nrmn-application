@@ -49,6 +49,8 @@ const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
         onChange('');
       }
     }, 800);
+
+    // You need to invalidate previous timeout because user have new input
     return () => clearTimeout(t);
   }, [textValue, searchTerm, exclude, onChange]);
 
