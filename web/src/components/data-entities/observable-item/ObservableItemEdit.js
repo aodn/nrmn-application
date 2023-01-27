@@ -25,7 +25,6 @@ const ObservableItemEdit = () => {
     if (action.form) return {...state, ...action.form};
     switch (action.field) {
       default:
-        console.debug('set field value ' + action.field + ' ' + action.value);
         return {...state, [action.field]: action.value};
     }
   };

@@ -5,44 +5,53 @@ import PropTypes from 'prop-types';
 import {search} from '../../api/api';
 import axios from 'axios';
 
-
 const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
   const textValue = formData ? formData : '';
   const minMatchCharacters = 2;
   const [results, setResults] = useState([]);
   const [searchTerm, setSearchTerm] = useState(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (searchTerm?.length > minMatchCharacters) {
-      const cancelTokenSource = axios.CancelToken.source();
-      const query = {searchType: 'NRMN', species: searchTerm, includeSuperseded: false};
-      search(query, cancelTokenSource.token).then((resp) => {
-        const resultSet = resp.data
-          ? resp.data.map((i) => ({id: i.observableItemId, label: i.species})).filter((f) => f.label !== exclude)
-          : [];
-        setResults(resultSet);
+    const t = setTimeout(() => {
+      if (searchTerm?.length > minMatchCharacters) {
+        const cancelTokenSource = axios.CancelToken.source();
+        const query = { searchType: 'NRMN', species: searchTerm, includeSuperseded: false };
+        search(query, cancelTokenSource.token).then((resp) => {
+          const resultSet = resp.data
+            ? resp.data.map((i) => ({ id: i.observableItemId, label: i.species })).filter((f) => f.label !== exclude)
+            : [];
+          setResults(resultSet);
 
-        if(textValue !== searchTerm && resultSet.find(f => f.label === searchTerm) !== undefined) {
-          /**
-           * Handle case where user type the species without select the dropdown
-           * in this case the handleOnInputChanged will only contains reason === 'input' and will not be set
-           * with onChange function.
-           *
-           * This check can make sure the value user type matches an item in the resultSet list (that is valid value)
-           * and not the same as previous value which cause infinity loop
-           */
-          onChange(searchTerm);
-        }
-      });
-      return () => cancelTokenSource.cancel();
-    }
-    else if(searchTerm?.length === 0) {
-      // User clear the input, this is a valid action
-      onChange('');
-    }
-  }, [searchTerm, exclude, onChange]);
+          const isValid = resultSet.find(f => f.label === searchTerm) !== undefined;
+          setError(!isValid);
+
+          if (textValue !== searchTerm && isValid) {
+            /**
+             * Handle case where user type the species without select the dropdown
+             * in this case the handleOnInputChanged will only contains reason === 'input' and will not be set
+             * with onChange function.
+             *
+             * This check can make sure the value user typed matches an item in the resultSet list (that is valid value)
+             * get updated to the datastructure and not cause infinity loop
+             */
+            onChange(searchTerm);
+          }
+        });
+        return () => cancelTokenSource.cancel();
+      }
+      else if (searchTerm?.length === 0) {
+        // User clear the input, this is a valid action
+        setError(false);
+        onChange('');
+      }
+    }, 800);
+    return () => clearTimeout(t);
+  }, [textValue, searchTerm, exclude, onChange]);
 
   const handleOnInputChanged = (event, value, reason) => {
+
+    setError(false);
     if (reason === 'input') {
       // User type text directly to text box
       if(searchTerm !== value) {
@@ -53,7 +62,7 @@ const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
       // Programmatic change or 'clear'
       if(textValue !== value) {
         // Update if diff to avoid looping
-        onChange(value);
+        setSearchTerm(value);
       }
     }
   };
@@ -67,7 +76,7 @@ const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
         fullWidth={fullWidth}
         value={textValue}
         onInputChange={handleOnInputChanged}
-        renderInput={(params) => <TextField {...params} size="small" color="primary" variant="outlined" />}
+        renderInput={(params) => <TextField {...params} error={error} helperText = {error ? 'This species not found in database, please add it' : ''}size="small" color="primary" variant="outlined" />}
       />
     </>
   );
