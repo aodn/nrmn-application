@@ -150,7 +150,7 @@ const ObservableItemEdit = () => {
                   formData={item.supersededBy}
                   field="supersededBy"
                   errors={errors}
-                  onChange={(t) => dispatch({field: 'supersededBy', value: t.species})}
+                  onChange={(t) => dispatch({field: 'supersededBy', value: t})}
                 />
               </Grid>
               <Grid item xs={6}>
