@@ -231,7 +231,7 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
                 <SpeciesCorrectGeometryFilter onChange={updateGeometry} filter={filter} />
               </Box>
               <Box m={1} minWidth={300}>
-                <CustomSearchInput fullWidth label="Species" formData={filter.species || null} onChange={updateObservableItem} />
+                <CustomSearchFilterInput fullWidth label="Species" formData={filter.species || null} onChange={updateObservableItem} />
               </Box>
             </Box>
             <Box ml={1} display="flex" flexDirection="row">
