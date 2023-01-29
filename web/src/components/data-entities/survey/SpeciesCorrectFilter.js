@@ -4,7 +4,7 @@ import React, {useEffect, useCallback, useMemo, useReducer, useState} from 'reac
 import {getEntity} from '../../../api/api';
 import LoadingButton from '@mui/lab/LoadingButton';
 import {PropTypes} from 'prop-types';
-import CustomSearchInput from '../../input/CustomSearchInput';
+import CustomSearchFilterInput from '../../input/CustomSearchFilterInput';
 import SpeciesCorrectGeometryFilter from './SpeciesCorrectGeometryFilter';
 
 const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
