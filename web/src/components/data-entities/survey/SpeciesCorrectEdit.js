@@ -15,7 +15,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TablePagination from '@mui/material/TablePagination';
-import CustomSearchInput from '../../input/CustomSearchInput';
+import CustomSearchFilterInput from '../../input/CustomSearchFilterInput';
 import {searchSpecies, postSpeciesCorrection} from '../../../api/api';
 import {Paper} from '@mui/material';
 
@@ -114,7 +114,7 @@ const SpeciesCorrectEdit = ({selected, onSubmit}) => {
         <Box flex={1} maxWidth={500} m={1}>
           <Typography variant="subtitle2">Correct to</Typography>
           <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
-            <CustomSearchInput
+            <CustomSearchFilterInput
               fullWidth
               formData={correction?.newObservableItemName}
               exclude={selected.result.observableItemName}
