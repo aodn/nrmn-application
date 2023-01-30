@@ -12,7 +12,7 @@ import au.org.aodn.nrmn.restapi.data.model.MeowEcoRegions;
 public interface MeowRegionsRepository
         extends JpaRepository<MeowEcoRegions, Integer>, JpaSpecificationExecutor<MeowEcoRegions> {
 
-    @Query(value = "select ecoregion" +
+    @Query(value = "select ecoregion " +
     "from {h-schema}observable_item_ref oi " +
     "inner join {h-schema}observation o ON o.observable_item_id = oi.observable_item_id " +
     "inner join {h-schema}survey_method sm ON o.survey_method_id = sm.survey_method_id " +
