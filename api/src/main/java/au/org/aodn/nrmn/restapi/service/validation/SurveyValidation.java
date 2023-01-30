@@ -10,14 +10,11 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import au.org.aodn.nrmn.restapi.data.repository.MeowRegionsRepository;
-import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationCell;
@@ -31,15 +28,7 @@ public class SurveyValidation {
     @Autowired
     SurveyRepository surveyRepository;
 
-    @Autowired
-    SiteRepository siteRepository;
-
-    @Autowired
-    MeowRegionsRepository meowRegionsRepository;
-
     private static final Collection<Integer> SURVEY_METHODS_TO_CHECK = Arrays.asList(0, 1, 2, 3, 7, 10);
-
-    private static final Collection<Integer> MEOW_METHODS_TO_CHECK = Arrays.asList(0, 1, 2, 7, 8, 9, 10);
 
     public ValidationCell validateSpeciesBelowToMethod(Boolean allowM11, StagedRowFormatted row) {
 
@@ -275,44 +264,6 @@ public class SurveyValidation {
         return null;
     }
 
-    private SurveyValidationError validateSpeciesEcoregion(Integer siteId, List<StagedRowFormatted> survey) {
-        var siteEcoregion = siteRepository.getEcoregion(siteId);
-        var surveySpecies = survey.stream()
-                .filter(r -> MEOW_METHODS_TO_CHECK.contains(r.getMethod()) && r.getSpecies().isPresent()
-                        && !r.isSurveyNotDone())
-
-                .collect(Collectors.toList());
-
-        var distinctSurveySpecies = surveySpecies.stream().map(r -> r.getSpecies().get().getObservableItemName())
-                .distinct().collect(Collectors.toList());
-
-        distinctSurveySpecies
-                .removeAll(meowRegionsRepository.getEcoregionContains(siteEcoregion, distinctSurveySpecies));
-
-        if (distinctSurveySpecies.size() > 0) {
-            var message = "Species not already observed in site ecoregion " + siteEcoregion;
-            return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
-                    surveySpecies.stream()
-                            .filter(s -> distinctSurveySpecies.contains(s.getSpecies().get().getObservableItemName()))
-                            .map(r -> r.getId()).collect(Collectors.toList()),
-                    Arrays.asList("species"));
-        }
-
-        return null;
-    }
-
-    private Collection<SurveyValidationError> checkSites(Map<Integer, List<StagedRowFormatted>> siteMap) {
-
-        var res = new HashSet<SurveyValidationError>();
-
-        // VALIDATION: MEOW ecoregion
-        for (var siteRows : siteMap.entrySet())
-            res.add(validateSpeciesEcoregion(siteRows.getKey(), siteRows.getValue()));
-        
-        res.remove(null);
-        return res;
-    }
-
     private Collection<SurveyValidationError> checkSurveys(ProgramValidation validation, Boolean isExtended,
             Map<String, List<StagedRowFormatted>> surveyMap) {
         var res = new HashSet<SurveyValidationError>();
@@ -412,10 +363,6 @@ public class SurveyValidation {
 
         var surveyMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
         sheetErrors.addAll(checkSurveys(validation, isExtended, surveyMap));
-
-        var siteMap = mappedRows.stream().filter(r -> Objects.nonNull(r.getSite()))
-                .collect(Collectors.groupingBy(r -> r.getSite().getSiteId()));
-        sheetErrors.addAll(checkSites(siteMap));
 
         var method3SurveyMap = mappedRows.stream()
                 .filter(row -> row.getMethod() != null && row.getMethod().equals(3)
