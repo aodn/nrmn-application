@@ -4,48 +4,59 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.junit.MockitoJUnitRunner;
 
+import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.data.model.Site;
 import au.org.aodn.nrmn.restapi.data.repository.MeowRegionsRepository;
-import au.org.aodn.nrmn.restapi.model.db.MeowRegionTestData;
+import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.service.validation.SiteValidation;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import io.jsonwebtoken.lang.Assert;
 
+@RunWith(MockitoJUnitRunner.class)
 public class MeowEcoregionTest {
 
     @Mock
     MeowRegionsRepository meowRegionsRepository;
 
+    @Mock
+    SiteRepository siteRepository;
+
     @InjectMocks
     SiteValidation siteValidation;
 
-    @Autowired
-    private MeowRegionTestData meowRegionTestData;
-
     @Before
     public void setUp() {
-        when(meowRegionsRepository.getEcoregionContains("INSIDE", Arrays.asList("INSIDE1"))).thenReturn(Arrays.asList("INSIDE1"));
-        when(meowRegionsRepository.getEcoregionContains("INSIDE", Arrays.asList("OUTSIDE1"))).thenReturn(Collections.emptyList());
+        when(siteRepository.getEcoregion(1)).thenReturn("INSIDE");
+        when(meowRegionsRepository.getEcoregionContains("INSIDE", Arrays.asList("INSIDE"))).thenReturn(Arrays.asList("INSIDE"));
+        when(meowRegionsRepository.getEcoregionContains("INSIDE", Arrays.asList("OUTSIDE"))).thenReturn(Collections.emptyList());
     }
 
     @Test
     public void speciesInMeowTest() {
-        // var meow0 = meowRegionTestData.buildWith(0);
-        // meowRegionTestData.persistedMeowRegion(meow0);
+        StagedRowFormatted rowFormatted = new StagedRowFormatted();
+        rowFormatted.setSite(Site.builder().siteId(1).build());
+        rowFormatted.setMethod(2);
+        rowFormatted.setSpecies(Optional.of(ObservableItem.builder().observableItemName("INSIDE").build()));
+        var error = siteValidation.validateSites(Arrays.asList(rowFormatted));
+        Assert.isTrue(error.size() == 0);
+    }
 
-        // var site = siteTestData.buildWith(0, 0.1, -0.1);
-        // var location = locationTestData.buildWith(0);
-        // site.setLocation(location);
-        // site = siteTestData.persistedSite(site);
-
-        // StagedRowFormatted rowFormatted = new StagedRowFormatted();
-        // rowFormatted.setSite(Site.builder().siteCode("A SITE").latitude( -42.886410468013004).longitude(147.33520415427964).build());
-        // var error = siteValidation.validateSites(Arrays.asList(rowFormatted));
+    @Test
+    public void speciesOutsideMeowTest() {
+        StagedRowFormatted rowFormatted = new StagedRowFormatted();
+        rowFormatted.setSite(Site.builder().siteId(1).build());
+        rowFormatted.setMethod(2);
+        rowFormatted.setSpecies(Optional.of(ObservableItem.builder().observableItemName("OUTSIDE").build()));
+        var error = siteValidation.validateSites(Arrays.asList(rowFormatted));
+        Assert.notEmpty(error);
     }
 }
