@@ -308,7 +308,8 @@ public class SurveyValidation {
         // VALIDATION: MEOW ecoregion
         for (var siteRows : siteMap.entrySet())
             res.add(validateSpeciesEcoregion(siteRows.getKey(), siteRows.getValue()));
-
+        
+        res.remove(null);
         return res;
     }
 
