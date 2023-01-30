@@ -301,6 +301,17 @@ public class SurveyValidation {
         return null;
     }
 
+    private Collection<SurveyValidationError> checkSites(Map<Integer, List<StagedRowFormatted>> siteMap) {
+
+        var res = new HashSet<SurveyValidationError>();
+
+        // VALIDATION: MEOW ecoregion
+        for (var siteRows : siteMap.entrySet())
+            res.add(validateSpeciesEcoregion(siteRows.getKey(), siteRows.getValue()));
+
+        return res;
+    }
+
     private Collection<SurveyValidationError> checkSurveys(ProgramValidation validation, Boolean isExtended,
             Map<String, List<StagedRowFormatted>> surveyMap) {
         var res = new HashSet<SurveyValidationError>();
@@ -313,11 +324,6 @@ public class SurveyValidation {
                 // VALIDATION: Survey group transect number valid
                 res.add(validateSurveyTransectNumber(surveyRows));
             }
-
-            // VALIDATION: MEOW ecoregion
-            var site = surveyRows.get(0).getSite();
-            if (Objects.nonNull(site))
-                res.add(validateSpeciesEcoregion(site.getSiteId(), surveyRows));
 
             // VALIDATION: Is Existing Survey
             res.add(validateSurveyIsNew(row));
@@ -405,6 +411,10 @@ public class SurveyValidation {
 
         var surveyMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
         sheetErrors.addAll(checkSurveys(validation, isExtended, surveyMap));
+
+        var siteMap = mappedRows.stream().filter(r -> Objects.nonNull(r.getSite()))
+                .collect(Collectors.groupingBy(r -> r.getSite().getSiteId()));
+        sheetErrors.addAll(checkSites(siteMap));
 
         var method3SurveyMap = mappedRows.stream()
                 .filter(row -> row.getMethod() != null && row.getMethod().equals(3)
