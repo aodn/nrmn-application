@@ -47,8 +47,11 @@ public interface SiteRepository
 
     @Query(nativeQuery = true, value = "" +
             "SELECT sr.site_code || ' ' || '(' || sr.site_name || ' ' || ROUND(CAST(ST_Distance(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography)) AS numeric), 2) || 'm)' " +
-            "FROM nrmn.site_ref sr " +
+            "FROM {h-schema}site_ref sr " +
             "WHERE ST_DWithin(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography), 200) " +
             "AND (sr.site_id <> :siteId)")
     List<String> sitesWithin200m(@Param("siteId") Integer siteId, @Param("longitude") double longitude, @Param("latitude") double latitude);
+
+    @Query(value = "select ecoregion from {h-schema}meow_ecoregions, {h-schema}site_ref where ST_Contains(meow_ecoregions.geom, site_ref.geom) and site_ref.site_id = :site_id", nativeQuery = true)
+    String getEcoregion(@Param("site_id") Integer siteId);
 }

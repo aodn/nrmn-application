@@ -196,6 +196,8 @@ public class ValidationProcess {
 
         sheetErrors.addAll(checkData(validation, job.getIsExtendedSize(), mappedRows));
 
+        sheetErrors.addAll(siteValidation.validateSites(mappedRows));
+
         sheetErrors.addAll(surveyValidation.validateSurveys(validation, job.getIsExtendedSize(), mappedRows));
         
         sheetErrors.addAll(surveyValidation.validateSurveyGroups(validation, false, mappedRows));

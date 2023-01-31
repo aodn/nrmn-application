@@ -28,7 +28,7 @@ public class SurveyValidation {
     @Autowired
     SurveyRepository surveyRepository;
 
-    private static final Integer[] METHODS_TO_CHECK = { 0, 1, 2, 3, 7, 10 };
+    private static final Collection<Integer> SURVEY_METHODS_TO_CHECK = Arrays.asList(0, 1, 2, 3, 7, 10);
 
     public ValidationCell validateSpeciesBelowToMethod(Boolean allowM11, StagedRowFormatted row) {
 
@@ -43,7 +43,8 @@ public class SurveyValidation {
             var validMethod = methodIds.contains(useRowMethod) || (useRowMethod == 11 && allowM11);
             if (!validMethod) {
                 var level = useRowMethod == 11 ? ValidationLevel.BLOCKING : ValidationLevel.WARNING;
-                var message = "Method " + method + " invalid for species " + row.getSpecies().get().getObservableItemName();
+                var message = "Method " + method + " invalid for species "
+                        + row.getSpecies().get().getObservableItemName();
                 return new ValidationCell(ValidationCategory.DATA, level, message, row.getId(), "method");
             }
         }
@@ -83,10 +84,12 @@ public class SurveyValidation {
         var columnNames = new HashSet<String>();
         var rowIds = new HashSet<Long>();
 
-        // Make sure we only validate rows where method is 3, we cannot assume income row are all method 3
-        var t = rows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3)).collect(Collectors.toList());
+        // Make sure we only validate rows where method is 3, we cannot assume income
+        // row are all method 3
+        var t = rows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3))
+                .collect(Collectors.toList());
 
-        if(!t.isEmpty()) {
+        if (!t.isEmpty()) {
             for (int measureIndex : Arrays.asList(1, 2, 3, 4, 5))
                 if (t.stream().mapToInt(row -> row.getMeasureJson().getOrDefault(measureIndex, 0)).sum() == 0) {
                     rowIds.addAll(rows.stream().map(r -> r.getId()).collect(Collectors.toList()));
@@ -101,10 +104,12 @@ public class SurveyValidation {
     public Collection<ValidationCell> validateMethod3QuadratsLT50(List<StagedRowFormatted> rows) {
         var errors = new ArrayList<ValidationCell>();
 
-        // Make sure we only validate rows where method is 3, we cannot assume income row are all method 3
-        var t = rows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3)).collect(Collectors.toList());
+        // Make sure we only validate rows where method is 3, we cannot assume income
+        // row are all method 3
+        var t = rows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3))
+                .collect(Collectors.toList());
 
-        if(!t.isEmpty()) {
+        if (!t.isEmpty()) {
             for (int measureIndex : Arrays.asList(1, 2, 3, 4, 5))
                 for (var row : t) {
                     if (row.getMeasureJson().getOrDefault(measureIndex, 0) > 50)
@@ -119,10 +124,12 @@ public class SurveyValidation {
 
         var columnNames = new HashSet<String>();
 
-        // Make sure we only validate rows where method is 3, we cannot assume income row are all method 3
-        var t = rows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3)).collect(Collectors.toList());
+        // Make sure we only validate rows where method is 3, we cannot assume income
+        // row are all method 3
+        var t = rows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3))
+                .collect(Collectors.toList());
 
-        if(!t.isEmpty()) {
+        if (!t.isEmpty()) {
             for (var measureIndex : Arrays.asList(1, 2, 3, 4, 5)) {
                 if (t.stream().mapToInt(row -> row.getMeasureJson().getOrDefault(measureIndex, 0)).sum() < 50)
                     columnNames.add(Integer.toString(measureIndex));
@@ -170,7 +177,8 @@ public class SurveyValidation {
 
         // VALIDATION: M10 requires B1 and B2
         var method10 = surveyByMethod.get(10);
-        if (method10 != null && !method10.stream().map(r -> r.getBlock()).distinct().collect(Collectors.toList()).containsAll(Arrays.asList(1, 2)))
+        if (method10 != null && !method10.stream().map(r -> r.getBlock()).distinct().collect(Collectors.toList())
+                .containsAll(Arrays.asList(1, 2)))
             return new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING,
                     "M10 requires B1 and B2",
                     method10.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("block"));
@@ -238,7 +246,7 @@ public class SurveyValidation {
     }
 
     private SurveyValidationError validateSurveyIsNew(StagedRowFormatted row) {
-        if (row.getDate() != null && Arrays.asList(METHODS_TO_CHECK).contains(row.getMethod())) {
+        if (row.getDate() != null && SURVEY_METHODS_TO_CHECK.contains(row.getMethod())) {
 
             var surveyDate = Date.from(row.getDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
             var existingSurveyIds = surveyRepository.findBySiteDepthSurveyNumDate(row.getSite(), row.getDepth(),
@@ -273,10 +281,11 @@ public class SurveyValidation {
             res.add(validateSurveyIsNew(row));
 
             // Skip SurveyComplete if M3 and survey exists
-            var surveyExistsM3 = row.getMethod() == 3 && res.stream().anyMatch(e -> e != null && e.getMessage().contains("Survey exists:"));
+            var surveyExistsM3 = row.getMethod() == 3
+                    && res.stream().anyMatch(e -> e != null && e.getMessage().contains("Survey exists:"));
 
             // VALIDATION: Survey Complete
-            if(!surveyExistsM3) {
+            if (!surveyExistsM3) {
                 res.add(validateSurveyComplete(validation, surveyRows));
             }
         }
@@ -336,7 +345,7 @@ public class SurveyValidation {
         if (!surveyIds.containsAll(groupedSurveyIds)) {
             groupedSurveyIds.removeAll(surveyIds);
             errors.add("Survey IDs created: " + String.join(", ", groupedSurveyIds.stream().map(l -> l.toString())
-                .collect(Collectors.toList())));
+                    .collect(Collectors.toList())));
         }
 
         if (!groupedSurveyIds.containsAll(surveyIds)) {
@@ -371,7 +380,7 @@ public class SurveyValidation {
         var surveyGroupMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
 
         // Skip survey group validation if correcting a single survey
-        if(!isCorrection || surveyGroupMap.keySet().size() > 1)
+        if (!isCorrection || surveyGroupMap.keySet().size() > 1)
             sheetErrors.addAll(checkSurveyGroups(validation, surveyGroupMap));
 
         return sheetErrors;
