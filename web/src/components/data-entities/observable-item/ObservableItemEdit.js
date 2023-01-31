@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 
 import EntityContainer from '../../containers/EntityContainer';
 
-import CustomAutoCompleteInput, { ERROR_TYPE } from '../../input/CustomAutoCompleteInput';
+import CustomAutoCompleteInput, {ERROR_TYPE} from '../../input/CustomAutoCompleteInput';
 import CustomTextInput from '../../input/CustomTextInput';
 import CustomSearchInput from '../../input/CustomSearchInput';
 
@@ -24,6 +24,10 @@ const ObservableItemEdit = () => {
   const formReducer = (state, action) => {
     if (action.form) return {...state, ...action.form};
     switch (action.field) {
+      case 'supersededBy': {
+        const supersedingCleared = action.value === '' && state.hasSupersededBy;
+        return {...state, [action.field]: action.value, supersedingCleared};
+      }
       default:
         return {...state, [action.field]: action.value};
     }
@@ -57,7 +61,7 @@ const ObservableItemEdit = () => {
 
   useEffect(() => {
     async function fetchObservableItem() {
-      await getResult(`reference/observableItem/${observableItemId}`).then((res) => dispatch({form: res.data}));
+      await getResult(`reference/observableItem/${observableItemId}`).then((res) => dispatch({form: {...res.data, hasSupersededBy: res.data.supersededBy}}));
     }
     if (observableItemId) fetchObservableItem();
   }, [observableItemId]);
@@ -145,6 +149,11 @@ const ObservableItemEdit = () => {
                 />
               </Grid>
               <Grid item xs={6}>
+                {item.supersedingCleared && (
+                  <span style={{display: 'inline-block', color: 'red', marginLeft: '150px', position: 'absolute'}}>
+                    * Superseding will be removed
+                  </span>
+                )}
                 <CustomSearchInput
                   label="Superseded By"
                   formData={item.supersededBy}
