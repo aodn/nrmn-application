@@ -2,6 +2,8 @@ package au.org.aodn.nrmn.restapi.data.model;
 
 import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,6 +17,7 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.envers.Audited;
 
 import lombok.AllArgsConstructor;
@@ -47,6 +50,10 @@ public class Diver {
     @NotNull
     @NotBlank
     private String fullName;
+
+    @CreationTimestamp 
+    @Column(name = "created", updatable = false)
+    public LocalDateTime created;
 
     public Diver(String initials, String fullName) {
         this.initials = initials;

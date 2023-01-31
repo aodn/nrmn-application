@@ -1,10 +1,12 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import java.text.Normalizer;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -71,6 +73,22 @@ public class DiverController {
     public DiverDto findOne(@PathVariable Integer id) {
         Diver diver = diverRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Diver Id " + id + " not found"));
         return new DiverDto(diver);
+    }
+
+    @DeleteMapping("/diver/{id}")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public ResponseEntity<String> deleteOne(@PathVariable Integer id) {
+        try{
+            var diver = diverRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Diver Id " + id + " not found"));
+            if (Objects.nonNull(diver.getCreated()) && diver.getCreated().isAfter(LocalDateTime.now().minusHours(24))) {
+                diverRepository.delete(diver);
+            } else {
+                return ResponseEntity.badRequest().body("Diver was created more than 24 hours ago and cannot be deleted");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Diver is associated with a survey and cannot be deleted");
+        }
+        return ResponseEntity.ok(null);
     }
 
     @PostMapping("/diver")
