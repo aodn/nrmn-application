@@ -41,22 +41,43 @@ public class MeowEcoregionTest {
     }
 
     @Test
+    public void sndSkipMeowTest() {
+        var snd = StagedRowFormatted.builder().site(Site.builder().siteId(1).build()).code("SND").build();
+        var error = siteValidation.validateSites(Arrays.asList(snd));
+        Assert.isTrue(error.isEmpty());
+    }
+
+    @Test
+    public void dezSkipMeowTest() {
+        var dez = StagedRowFormatted.builder().site(Site.builder().siteId(1).build()).code("DEZ").build();
+        var error = siteValidation.validateSites(Arrays.asList(dez));
+        Assert.isTrue(error.isEmpty());
+    }
+
+    @Test
+    public void methodSkipMeowTest() {
+        var site = Site.builder().siteId(1).build();
+        var species = ObservableItem.builder().observableItemName("OUTSIDE").build();
+        var row = StagedRowFormatted.builder().species(Optional.of(species)).site(site).method(99).build();
+        var error = siteValidation.validateSites(Arrays.asList(row));
+        Assert.isTrue(error.isEmpty());
+    }
+
+    @Test
     public void speciesInMeowTest() {
-        StagedRowFormatted rowFormatted = new StagedRowFormatted();
-        rowFormatted.setSite(Site.builder().siteId(1).build());
-        rowFormatted.setMethod(2);
-        rowFormatted.setSpecies(Optional.of(ObservableItem.builder().observableItemName("INSIDE").build()));
-        var error = siteValidation.validateSites(Arrays.asList(rowFormatted));
-        Assert.isTrue(error.size() == 0);
+        var site = Site.builder().siteId(1).build();
+        var species = ObservableItem.builder().observableItemName("INSIDE").build();
+        var row = StagedRowFormatted.builder().species(Optional.of(species)).site(site).method(2).build();
+        var error = siteValidation.validateSites(Arrays.asList(row));
+        Assert.isTrue(error.isEmpty());
     }
 
     @Test
     public void speciesOutsideMeowTest() {
-        StagedRowFormatted rowFormatted = new StagedRowFormatted();
-        rowFormatted.setSite(Site.builder().siteId(1).build());
-        rowFormatted.setMethod(2);
-        rowFormatted.setSpecies(Optional.of(ObservableItem.builder().observableItemName("OUTSIDE").build()));
-        var error = siteValidation.validateSites(Arrays.asList(rowFormatted));
+        var site = Site.builder().siteId(1).build();
+        var species = ObservableItem.builder().observableItemName("OUTSIDE").build();
+        var row = StagedRowFormatted.builder().species(Optional.of(species)).site(site).method(2).build();
+        var error = siteValidation.validateSites(Arrays.asList(row));
         Assert.notEmpty(error);
     }
 }
