@@ -1,10 +1,10 @@
 import React, {useState, useRef, useCallback} from 'react';
 import {Box, Button, Typography} from '@mui/material';
-import { NavLink, useLocation } from 'react-router-dom';
+import {NavLink, useLocation} from 'react-router-dom';
 import {grey, red} from '@mui/material/colors';
-import {getResult, entityEdit} from '../../../api/api';
+import {getResult, entityEdit, entityDelete} from '../../../api/api';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import {Add, Save} from '@mui/icons-material';
+import {Add, Save, Delete} from '@mui/icons-material';
 import 'ag-grid-enterprise';
 import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 import Backdrop from '@mui/material/Backdrop';
@@ -19,73 +19,74 @@ const DiverList = () => {
   const [errors, setErrors] = useState([]);
   const gridRef = useRef(null);
 
-  const onGridReady = useCallback((event) => {
-    document.title = 'Divers';
-    async function fetchDivers(e) {
-      e.api.setDatasource({
-        // This is the functional structure need for datasource
-        rowCount: rowsPerPage,
-        getRows: (params) => {
-          let url = `divers?page=${params.startRow / 100}`;
-          let conditions = [];
-          // Filter section
-          for(let name in params.filterModel) {
-            const p = params.filterModel[name];
+  const onGridReady = useCallback(
+    (event) => {
+      document.title = 'Divers';
+      async function fetchDivers(e) {
+        e.api.setDatasource({
+          // This is the functional structure need for datasource
+          rowCount: rowsPerPage,
+          getRows: (params) => {
+            let url = `divers?page=${params.startRow / 100}`;
+            let conditions = [];
+            // Filter section
+            for (let name in params.filterModel) {
+              const p = params.filterModel[name];
 
-            if(p.type) {
-              // This is single condition
-              conditions.push({
-                field: name,
-                ops: p.type,
-                val: p.filter
-              });
+              if (p.type) {
+                // This is single condition
+                conditions.push({
+                  field: name,
+                  ops: p.type,
+                  val: p.filter
+                });
+              } else {
+                // This is a multiple condition, currently max two conditions
+                conditions.push({
+                  field: name,
+                  ops: p.operator,
+                  conditions: [
+                    {ops: p.condition1.type, val: p.condition1.filter},
+                    {ops: p.condition2.type, val: p.condition2.filter}
+                  ]
+                });
+              }
             }
-            else {
-              // This is a multiple condition, currently max two conditions
-              conditions.push({
-                field: name,
-                ops: p.operator,
-                conditions: [
-                  { ops: p.condition1.type, val: p.condition1.filter },
-                  { ops: p.condition2.type, val: p.condition2.filter }
-                ]
+
+            // Sorting section, order is important
+            let sort = [];
+            params.sortModel.forEach((i) => {
+              sort.push({
+                field: i.colId,
+                order: i.sort
               });
-            }
-          };
-
-          // Sorting section, order is important
-          let sort = [];
-          params.sortModel.forEach(i => {
-            sort.push({
-              field: i.colId,
-              order: i.sort
             });
-          });
 
-          url = conditions.length !== 0 ? url + `&filters=${encodeURIComponent(JSON.stringify(conditions))}` : url;
-          url = sort.length !== 0 ? url + `&sort=${encodeURIComponent(JSON.stringify(sort))}` : url;
+            url = conditions.length !== 0 ? url + `&filters=${encodeURIComponent(JSON.stringify(conditions))}` : url;
+            url = sort.length !== 0 ? url + `&sort=${encodeURIComponent(JSON.stringify(sort))}` : url;
 
-          setLoading(true);
-          getResult(url)
-            .then(res => {
-              params.successCallback(res.data.items, res.data.lastRow);
-            })
-            .finally(()=> {
-              setLoading(false);
-            });
+            setLoading(true);
+            getResult(url)
+              .then((res) => {
+                params.successCallback(res.data.items, res.data.lastRow);
+              })
+              .finally(() => {
+                setLoading(false);
+              });
+          }
+        });
+      }
+
+      fetchDivers(event).then(() => {
+        if (!location?.state?.resetFilters) {
+          stateFilterHandler.restoreStateFilters(gridRef);
+        } else {
+          stateFilterHandler.resetStateFilters(gridRef);
         }
       });
-    }
-
-    fetchDivers(event).then(() => {
-      if(!(location?.state?.resetFilters)) {
-        stateFilterHandler.restoreStateFilters(gridRef);
-      }
-      else {
-        stateFilterHandler.resetStateFilters(gridRef);
-      }
-    });
-  }, [location]);
+    },
+    [location]
+  );
 
   const onCellValueChanged = (e) => {
     setDelta((data) => {
@@ -96,16 +97,16 @@ const DiverList = () => {
   };
 
   const chooseCellStyle = (params) => {
-    if(params.context !== undefined) {
-      if (params.context.errors.some((e) => e.id === params.data?.diverId)) return { backgroundColor: red[100] };
-      if (params.context.delta[params.data?.diverId]) return { backgroundColor: grey[100] };
+    if (params.context !== undefined) {
+      if (params.context.errors?.some((e) => e.id === params.data?.diverId)) return {backgroundColor: red[100]};
+      if (params.context.delta[params.data?.diverId]) return {backgroundColor: grey[100]};
     }
     return null;
   };
 
   const tooltipValueGetter = (params) => {
-    if(params.context !== undefined) {
-      const error = params.context.errors.find((e) => e.id === params.data.diverId);
+    if (params.context !== undefined) {
+      const error = params.context.errors?.find((e) => e.id === params.data.diverId);
       if (error) return error.message;
     }
   };
@@ -117,11 +118,19 @@ const DiverList = () => {
     });
   };
 
+  const deleteDiver = (e) => {
+    entityDelete(`diver`, e.data.diverId).then((res) => {
+      if (res.data) {
+        setErrors([{id: e.data.diverId, message: res.data}]);
+      } else {
+        e.api.purgeInfiniteCache();
+      }
+    });
+  };
+
   return (
     <>
-      <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading}>
+      <Backdrop sx={{color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1}} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
       <Box display="flex" flexDirection="row" p={1} pb={1}>
@@ -144,7 +153,7 @@ const DiverList = () => {
         id={'diver-list'}
         className="ag-theme-material"
         getRowId={(r) => r.data.diverId}
-        rowHeight={20}
+        rowHeight={25}
         fillHandleDirection="y"
         pagination={true}
         paginationPageSize={rowsPerPage}
@@ -166,8 +175,17 @@ const DiverList = () => {
           tooltipValueGetter: tooltipValueGetter
         }}
       >
-        <AgGridColumn field="initials" colId="diver.initials"/>
-        <AgGridColumn flex={1} field="fullName" colId="diver.fullName"/>
+        <AgGridColumn
+          field=""
+          filter={false}
+          width="50"
+          editable={false}
+          cellStyle={{cursor: 'pointer', textAlign: 'center'}}
+          cellRenderer={() => <Delete fontSize="small" />}
+          onCellClicked={deleteDiver}
+        />
+        <AgGridColumn field="initials" colId="diver.initials" />
+        <AgGridColumn flex={1} field="fullName" colId="diver.fullName" />
       </AgGridReact>
     </>
   );
