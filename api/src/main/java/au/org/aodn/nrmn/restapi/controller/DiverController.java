@@ -31,6 +31,7 @@ import au.org.aodn.nrmn.restapi.data.repository.dynamicQuery.FilterCondition;
 import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
 import au.org.aodn.nrmn.restapi.controller.validation.RowError;
 import au.org.aodn.nrmn.restapi.dto.diver.DiverDto;
+import au.org.aodn.nrmn.restapi.service.DiverService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,13 +48,16 @@ public class DiverController {
     private DiverListRepository diverListRepository;
 
     @Autowired
+    private DiverService diverService;
+
+    @Autowired
     private ObjectMapper objMapper;
 
     @GetMapping("/divers")
     public ResponseEntity<?> getDiversWithFilters(@RequestParam(value = "sort", required = false) String sort,
-                                           @RequestParam(value = "filters", required = false) String filters,
-                                           @RequestParam(value = "page", defaultValue = "0") int page,
-                                           @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) throws JsonProcessingException  {
+            @RequestParam(value = "filters", required = false) String filters,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "pageSize", defaultValue = "100") int pageSize) throws JsonProcessingException {
 
         // RequestParam do not support json object parsing automatically
         List<Filter> f = FilterCondition.parse(objMapper, filters, Filter[].class);
@@ -71,24 +75,17 @@ public class DiverController {
     @GetMapping("/diver/{id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public DiverDto findOne(@PathVariable Integer id) {
-        Diver diver = diverRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Diver Id " + id + " not found"));
+        Diver diver = diverRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Diver Id " + id + " not found"));
         return new DiverDto(diver);
     }
 
     @DeleteMapping("/diver/{id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<String> deleteOne(@PathVariable Integer id) {
-        try{
-            var diver = diverRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Diver Id " + id + " not found"));
-            if (Objects.nonNull(diver.getCreated()) && diver.getCreated().isAfter(LocalDateTime.now().minusHours(24))) {
-                diverRepository.delete(diver);
-            } else {
-                return ResponseEntity.badRequest().body("Diver was created more than 24 hours ago and cannot be deleted");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Diver is associated with a survey and cannot be deleted");
-        }
-        return ResponseEntity.ok(null);
+        var error = diverService.deleteDiver(id);
+        return Objects.nonNull(error) ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error)
+                : ResponseEntity.ok(null);
     }
 
     @PostMapping("/diver")
@@ -114,7 +111,8 @@ public class DiverController {
         for (DiverDto diverDto : diverDtos) {
             Diver diver = diverRepository
                     .findById(diverDto.getDiverId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Diver Id " + diverDto.getDiverId() + " not found"));
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException("Diver Id " + diverDto.getDiverId() + " not found"));
 
             diver.setInitials(diverDto.getInitials());
             diver.setFullName(diverDto.getFullName());

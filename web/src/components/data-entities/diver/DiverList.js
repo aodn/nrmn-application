@@ -181,7 +181,7 @@ const DiverList = () => {
           width="50"
           editable={false}
           cellStyle={{cursor: 'pointer', textAlign: 'center'}}
-          cellRenderer={(e) => <Delete fontSize="small" />}
+          cellRenderer={() => <Delete fontSize="small" />}
           onCellClicked={deleteDiver}
         />
         <AgGridColumn field="initials" colId="diver.initials" />
