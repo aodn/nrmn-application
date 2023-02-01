@@ -71,6 +71,21 @@ const SharedLinkList = () => {
 
   const keys = Object.keys(columns);
 
+  const localDateFormatter = (d, withTime) => {
+    const offset = new Date().getTimezoneOffset() * 60 * 1000;
+    const date = new Date(d);
+    const dateWithOffset = new Date(date.getTime() + offset);
+    const localDate = dateWithOffset.toLocaleString('default', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+    return `${localDate.slice(6, 10)}-${localDate.slice(0, 2)}-${localDate.slice(3, 5)}` + (withTime ? ` ${localDate.slice(-5)}` : '');
+  };
+
   return (
     <>
       <Box m={1} ml={2}>
@@ -107,6 +122,8 @@ const SharedLinkList = () => {
                       return (
                         <TableCell key={`${key}-${i}`}>
                           {(key === 'targetUrl' && (disabled ? <></> : <TargetUrlComponent value={row[key]} />)) ||
+                            (key === 'created' && localDateFormatter(row[key], true)) ||
+                            (key === 'expires' && localDateFormatter(row[key], false)) ||
                             (key === 'linkId' && (
                               <button
                                 style={{width: '80px'}}
