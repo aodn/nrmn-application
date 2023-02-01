@@ -372,9 +372,13 @@ const SurveyCorrect = () => {
 
             messages.push(`Observations: ${mmMessages.join(' ')}`);
           }
+        } else if (isNaN(parseInt(key))) {
+          if (original[key] !== r[key]) {
+            messages.push(`${key}: ${original[key]} to ${r[key]}`);
+          }
         } else {
           const originalValue = parseInt(original[key]) || 0;
-          const updatedValue  = parseInt(r[key]) || 0;
+          const updatedValue = parseInt(r[key]) || 0;
           if (originalValue !== updatedValue) {
             const column = allMeasurements.find((m) => m.field === `measurements.${key}`);
             const bin = r.isInvertSizing !== 'Yes' ? column.fishSize : column.invertSize;
@@ -462,31 +466,35 @@ const SurveyCorrect = () => {
             </Typography>
           )}
         </Box>
-        <Box m={1} ml={0}>
-          <Button variant="outlined" disabled={undoSize < 1} startIcon={<UndoIcon />} onClick={() => eh.handleUndo({api: gridApi})}>
-            Undo
-          </Button>
-        </Box>
-        <Box m={1} ml={0} minWidth={150}>
-          <Button variant="outlined" startIcon={<ResetIcon />} disabled={!isFiltered} onClick={() => setIsFiltered()}>
-            Reset Filter
-          </Button>
-        </Box>
-        <Box m={1} ml={0}>
-          <Button variant="outlined" onClick={() => eh.onClickExcelExport(gridApi, 'Export', true)} startIcon={<CloudDownloadIcon />}>
-            Export
-          </Button>
-        </Box>
-        <Box p={1} minWidth={120}>
-          <Button onClick={onValidate} variant="contained" disabled={!editMode || loading} startIcon={<PlaylistAddCheckOutlinedIcon />}>
-            Validate
-          </Button>
-        </Box>
-        <Box p={1} minWidth={180}>
-          <Button onClick={onSubmit} variant="contained" disabled={!editMode || loading} startIcon={<CloudUploadIcon />}>
-            Submit Correction
-          </Button>
-        </Box>
+        {editMode && (
+          <>
+            <Box m={1} ml={0}>
+              <Button variant="outlined" disabled={undoSize < 1 || !editMode || loading} startIcon={<UndoIcon />} onClick={() => eh.handleUndo({api: gridApi})}>
+                Undo
+              </Button>
+            </Box>
+            <Box m={1} ml={0} minWidth={150}>
+              <Button variant="outlined" disabled={!isFiltered || !editMode || loading}  startIcon={<ResetIcon />} onClick={() => setIsFiltered()}>
+                Reset Filter
+              </Button>
+            </Box>
+            <Box m={1} ml={0}>
+              <Button variant="outlined" disabled={!editMode || loading}  onClick={() => eh.onClickExcelExport(gridApi, 'Export', true)} startIcon={<CloudDownloadIcon />}>
+                Export
+              </Button>
+            </Box>
+            <Box p={1} minWidth={120}>
+              <Button onClick={onValidate} variant="contained" disabled={!editMode || loading} startIcon={<PlaylistAddCheckOutlinedIcon />}>
+                Validate
+              </Button>
+            </Box>
+            <Box p={1} minWidth={180}>
+              <Button onClick={onSubmit} variant="contained" disabled={!editMode || loading} startIcon={<CloudUploadIcon />}>
+                Submit Correction
+              </Button>
+            </Box>
+          </>
+        )}
       </Box>
       <Box display={editMode ? 'block' : 'none'} flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
         <AgGridReact
