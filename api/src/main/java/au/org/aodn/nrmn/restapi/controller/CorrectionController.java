@@ -206,7 +206,6 @@ public class CorrectionController {
 
     private ValidationResultSet validate(
             ProgramValidation programValidation,
-            Boolean isExtended,
             List<Integer> surveyIds,
             List<Pair<StagedRowFormatted, HashSet<String>>> results) {
 
@@ -230,7 +229,7 @@ public class CorrectionController {
 
             var speciesAttrib = row.getSpeciesAttributesOpt();
             if (speciesAttrib.isPresent())
-                validation.addAll(measurementValidation.validate(speciesAttrib.get(), row, isExtended), false);
+                validation.addAll(measurementValidation.validate(speciesAttrib.get(), row, true), false);
 
             // Total Checksum & Missing Data
             validation.addAll(measurementValidation.validateMeasurements(programValidation, row), false);
@@ -255,7 +254,7 @@ public class CorrectionController {
 
         validation.addAll(siteValidation.validateSites(mappedRows));
 
-        validation.addAll(surveyValidation.validateSurveys(programValidation, isExtended, mappedRows));
+        validation.addAll(surveyValidation.validateSurveys(programValidation, true, mappedRows));
 
         validation.addAll(surveyValidation.validateSurveyGroups(programValidation, true, mappedRows));
 
@@ -333,10 +332,10 @@ public class CorrectionController {
             var programValidation = ProgramValidation
                     .fromProgram(programRepository.findById(bodyDto.getProgramId()).get());
 
-            errors.addAll(dataValidation.checkFormatting(programValidation, bodyDto.getIsExtended(), false,
+            errors.addAll(dataValidation.checkFormatting(programValidation, true, false,
                     siteCodes, observableItems, rows));
 
-            errors.addAll(validate(programValidation, bodyDto.getIsExtended(), surveyIds, mappedRows).getAll());
+            errors.addAll(validate(programValidation, surveyIds, mappedRows).getAll());
 
             response.setErrors(errors);
         } catch (Exception e) {
@@ -376,6 +375,7 @@ public class CorrectionController {
                 .reference(reference)
                 .surveyIds(surveyIds)
                 .status(StatusJobType.CORRECTED)
+                .isExtendedSize(true)
                 .program(program)
                 .creator(user.get())
                 .build();
@@ -387,7 +387,7 @@ public class CorrectionController {
             logMessage(job, "Correct Survey " + surveyIds);
 
             var results = mapRows(bodyDto.getRows());
-            var result = validate(programValidation, bodyDto.getIsExtended(), surveyIds, results).getAll();
+            var result = validate(programValidation, surveyIds, results).getAll();
             var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
             var blockingErrors = result.stream().filter(r -> r.getLevelId() == ValidationLevel.BLOCKING)
                     .collect(Collectors.toList());

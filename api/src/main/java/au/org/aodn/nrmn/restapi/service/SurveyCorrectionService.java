@@ -233,7 +233,7 @@ public class SurveyCorrectionService {
 
                         if (speciesMethods.contains(method.getMethodId())) {
 
-                            if (job.getIsExtendedSize() && row.getIsInvertSizing())
+                            if (row.getIsInvertSizing())
                                 measureTypeId = MeasureType.InvertSizeClass;
 
                             var obsItemType = row.getSpecies().get().getObsItemType();

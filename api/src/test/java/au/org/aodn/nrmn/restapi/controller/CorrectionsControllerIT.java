@@ -308,7 +308,6 @@ class CorrectionsControllerIT {
 
         CorrectionRequestBodyDto d = new CorrectionRequestBodyDto();
         d.setProgramId(55);
-        d.setIsExtended(Boolean.FALSE);
         d.setRows(new ArrayList<>());
         d.getRows().add(stagedRow);
 
@@ -330,19 +329,20 @@ class CorrectionsControllerIT {
         var body = response.getBody();
         assertNotNull(body);
 
-        assertEquals("9 error returned", body.getErrors().size(), 9);
+        assertEquals("10 error returned", body.getErrors().size(), 10);
 
         List<SurveyValidationError> e = (List<SurveyValidationError>) body.getErrors();
 
         assertTrue("Block must be 0, 1 or 2", e.get(0).getMessage().equals("Block must be 0, 1 or 2"));
         assertTrue("Site Code does not exist", e.get(1).getMessage().equals("Site Code does not exist"));
-        assertTrue("Latitude is not number", e.get(2).getMessage().equals("Latitude is not number"));
-        assertTrue("Longitude is not number", e.get(3).getMessage().equals("Longitude is not number"));
-        assertTrue("Inverts is not an integer", e.get(4).getMessage().equals("Inverts is not an integer"));
-        assertTrue("P-Qs Diver is blank", e.get(5).getMessage().equals("P-Qs Diver is blank"));
-        assertTrue("Diver does not exist", e.get(6).getMessage().equals("Diver does not exist"));
-        assertTrue("Survey IDs missing: 812331346", e.get(7).getMessage().equals("Survey IDs missing: 812331346"));
-        assertTrue("Row has no data and no value recorded for inverts", e.get(8).getMessage().equals("Row has no data and no value recorded for inverts"));
+        assertTrue("Use Invert Sizing is blank", e.get(2).getMessage().equals("Use Invert Sizing is blank"));
+        assertTrue("Latitude is not number", e.get(3).getMessage().equals("Latitude is not number"));
+        assertTrue("Longitude is not number", e.get(4).getMessage().equals("Longitude is not number"));
+        assertTrue("Inverts is not an integer", e.get(5).getMessage().equals("Inverts is not an integer"));
+        assertTrue("P-Qs Diver is blank", e.get(6).getMessage().equals("P-Qs Diver is blank"));
+        assertTrue("Diver does not exist", e.get(7).getMessage().equals("Diver does not exist"));
+        assertTrue("Survey IDs missing: 812331346", e.get(8).getMessage().equals("Survey IDs missing: 812331346"));
+        assertTrue("Row has no data and no value recorded for inverts", e.get(9).getMessage().equals("Row has no data and no value recorded for inverts"));
     }
     @Test
     @WithUserDetails("test@example.com")

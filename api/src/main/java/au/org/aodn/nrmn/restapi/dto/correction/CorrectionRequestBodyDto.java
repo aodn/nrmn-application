@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CorrectionRequestBodyDto {
     private Integer programId;
-    private Boolean isExtended;
     private Boolean isMultiple;
     private Collection<StagedRow> rows;
 }

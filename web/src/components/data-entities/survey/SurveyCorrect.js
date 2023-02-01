@@ -93,7 +93,7 @@ const SurveyCorrect = () => {
   const [cellValidations, setCellValidations] = useState([]);
   const [redirect, setRedirect] = useState();
   const [undoSize, setUndoSize] = useState(0);
-  const [metadata, setMetadata] = useState({programName: 'NONE', surveyIds: [], isExtended: false});
+  const [metadata, setMetadata] = useState({programName: 'NONE', surveyIds: []});
 
   useEffect(() => {
     document.title = 'Survey Correction';
@@ -267,7 +267,6 @@ const SurveyCorrect = () => {
         if (data.code?.toUpperCase() === 'SND') data.diver = rows.find((row) => row.surveyId === data.surveyId && row.diver)?.diver;
         return {id: (idx + 1) * 100, pos: (idx + 1) * 1000, ...data};
       });
-      const isExtended = unpackedData.includes((r) => Object.keys(r.measurements).includes((k) => k > 28));
       const context = api.gridOptionsWrapper.gridOptions.context;
       const rowData = [...unpackedData];
       context.originalData = JSON.parse(JSON.stringify(rowData));
@@ -275,7 +274,7 @@ const SurveyCorrect = () => {
       context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
       context.originalRowPos = JSON.parse(JSON.stringify(context.rowPos));
       api.setRowData(context.rowData.length > 0 ? context.rowData : null);
-      setMetadata({programName, programId, isExtended, surveyIds: [...surveyIds]});
+      setMetadata({programName, programId, surveyIds: [...surveyIds]});
       setRowData(rowData);
       setGridApi(api);
       columnApi.autoSizeAllColumns();
@@ -373,9 +372,14 @@ const SurveyCorrect = () => {
 
             messages.push(`Observations: ${mmMessages.join(' ')}`);
           }
-        } else if (r[key] !== original[key]) {
-          const columnName = api.gridOptionsWrapper.gridOptions.columnDefs.find((c) => c.field === key).headerName;
-          messages.push(`${columnName}: ${original[key]} to ${r[key]}`);
+        } else {
+          const originalValue = parseInt(original[key]) || 0;
+          const updatedValue  = parseInt(r[key]) || 0;
+          if (originalValue !== updatedValue) {
+            const column = allMeasurements.find((m) => m.field === `measurements.${key}`);
+            const bin = r.isInvertSizing !== 'Yes' ? column.fishSize : column.invertSize;
+            messages.push(`${bin}: ${originalValue} to ${updatedValue}`);
+          }
         }
       }
       if (messages.length > 0) acc.push({row: rowPos, message: messages.join(', ')});
@@ -454,10 +458,7 @@ const SurveyCorrect = () => {
             <Typography variant="h6">
               {metadata.surveyIds.length > 1
                 ? `Correct ${metadata.surveyIds.length} Surveys`
-                : 'Correct Survey Data' +
-                  ` [${row.siteCode}, ${row.date}, ${row.depth}] ` +
-                  metadata.programName +
-                  (metadata.isExtended ? ' Extended' : '')}
+                : 'Correct Survey Data' + ` [${row.siteCode}, ${row.date}, ${row.depth}] ${metadata.programName}`}
             </Typography>
           )}
         </Box>

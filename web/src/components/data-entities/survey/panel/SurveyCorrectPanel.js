@@ -5,7 +5,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
-import {measurements, extendedMeasurements} from '../../../../common/constants';
+import {allMeasurements} from '../../../../common/constants';
 
 const groupArrayByKey = (xs, key) =>
   xs.reduce((rv, x) => {
@@ -55,8 +55,6 @@ const SurveyCorrectPanel = ({api, context}) => {
     setMessages(groupArrayByKey(formatted, 'levelId'));
   }, [context, api]);
 
-  const mm = measurements.concat(extendedMeasurements);
-
   const isContiguous = (sorted) => {
     const first = sorted[0];
     const last = sorted[sorted.length - 1];
@@ -81,7 +79,7 @@ const SurveyCorrectPanel = ({api, context}) => {
                   }
                 >
                   {m.description?.map((d) => {
-                    const mmHeader = mm.find((m) => d.columnName && m.field === d.columnName.replace('measurements.', ''));
+                    const mmHeader = allMeasurements.find((m) => d.columnName && m.field === d.columnName.replace('measurements.', ''));
                     const label = mmHeader ? `${d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
                     return (
                       <TreeItem
