@@ -372,10 +372,14 @@ const SurveyCorrect = () => {
 
             messages.push(`Observations: ${mmMessages.join(' ')}`);
           }
-        } else if (r[key] !== original[key]) {
-          const column = allMeasurements.find((m) => m.field === `measurements.${key}`);
-          const bin = r.isInvertSizing !== 'Yes' ? column.fishSize : column.invertSize;
-          messages.push(`${bin}: ${original[key] ?? 0} to ${r[key] ?? 0}`);
+        } else {
+          const originalValue = parseInt(original[key]) || 0;
+          const updatedValue  = parseInt(r[key]) || 0;
+          if (originalValue !== updatedValue) {
+            const column = allMeasurements.find((m) => m.field === `measurements.${key}`);
+            const bin = r.isInvertSizing !== 'Yes' ? column.fishSize : column.invertSize;
+            messages.push(`${bin}: ${originalValue} to ${updatedValue}`);
+          }
         }
       }
       if (messages.length > 0) acc.push({row: rowPos, message: messages.join(', ')});
