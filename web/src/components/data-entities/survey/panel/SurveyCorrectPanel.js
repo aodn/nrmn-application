@@ -79,6 +79,7 @@ const SurveyCorrectPanel = ({api, context}) => {
                   }
                 >
                   {m.description?.map((d) => {
+                    if (d.columnNames) d.columnName = d.columnNames[0];
                     const mmHeader = allMeasurements.find((m) => d.columnName && m.field === d.columnName.replace('measurements.', ''));
                     const label = mmHeader ? `${d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
                     return (
@@ -99,8 +100,18 @@ const SurveyCorrectPanel = ({api, context}) => {
                               <b>
                                 Check Column{d.columnNames.length > 1 ? 's' : ''} {d.columnNames.join(', ')}
                               </b>
+                            ) : mmHeader ? (
+                              <span>
+                                {d.rowNumbers[0]}
+                                {': '}
+                                <b>{label}</b>
+                              </span>
                             ) : (
-                              <b>Rows {isContiguous(d.rowNumbers) ? `[${d.rowNumbers[0]}-${d.rowNumbers[d.rowNumbers.length-1]}]` : d.rowNumbers.join(', ')}</b>
+                              <span>
+                                {d.rowNumbers.join(',')}
+                                {': '}
+                                <b>{m.columnNames[0]}</b>
+                              </span>
                             )}
                           </Typography>
                         }
