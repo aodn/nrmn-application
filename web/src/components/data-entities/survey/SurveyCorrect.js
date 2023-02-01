@@ -374,8 +374,9 @@ const SurveyCorrect = () => {
             messages.push(`Observations: ${mmMessages.join(' ')}`);
           }
         } else if (r[key] !== original[key]) {
-          const columnName = api.gridOptionsWrapper.gridOptions.columnDefs.find((c) => c.field === key).headerName;
-          messages.push(`${columnName}: ${original[key]} to ${r[key]}`);
+          const column = allMeasurements.find((m) => m.field === `measurements.${key}`);
+          const bin = r.isInvertSizing !== 'Yes' ? column.fishSize : column.invertSize;
+          messages.push(`${bin}: ${original[key] ?? 0} to ${r[key] ?? 0}`);
         }
       }
       if (messages.length > 0) acc.push({row: rowPos, message: messages.join(', ')});
