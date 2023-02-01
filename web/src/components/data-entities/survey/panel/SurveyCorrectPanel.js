@@ -5,7 +5,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
-import {measurements, extendedMeasurements} from '../../../../common/constants';
+import mm from '../../../../common/constants/allMeasurements';
 
 const groupArrayByKey = (xs, key) =>
   xs.reduce((rv, x) => {
@@ -54,8 +54,6 @@ const SurveyCorrectPanel = ({api, context}) => {
     }
     setMessages(groupArrayByKey(formatted, 'levelId'));
   }, [context, api]);
-
-  const mm = measurements.concat(extendedMeasurements);
 
   const isContiguous = (sorted) => {
     const first = sorted[0];

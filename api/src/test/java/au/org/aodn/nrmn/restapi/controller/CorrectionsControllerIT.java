@@ -308,7 +308,6 @@ class CorrectionsControllerIT {
 
         CorrectionRequestBodyDto d = new CorrectionRequestBodyDto();
         d.setProgramId(55);
-        d.setIsExtended(Boolean.FALSE);
         d.setRows(new ArrayList<>());
         d.getRows().add(stagedRow);
 
