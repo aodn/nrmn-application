@@ -31,17 +31,38 @@ const SurveyCorrectPanel = ({api, context}) => {
 
   useEffect(() => {
     var formatted = [];
-    for (const validation of context.validations) {
+    const validations = context.validations;
+    validations.forEach((validation, idx) => {
       if (validation.rowIds?.length == 1 && validation.columnNames) {
-        const rowId = validation.rowIds[0];
-        const rowData = api.getRowNode(rowId)?.data;
-        const columnPath = validation.columnNames[0];
-        const value = rowData ? rowData[columnPath[0]] : '';
-        const col = validation.columnNames.length > 1 ? {columnNames: validation.columnNames} : {columnName: columnPath};
+        const [rowId] = validation.rowIds;
+        const rowNode = api.getRowNode(rowId);
+        const columnPath = validation.columnNames[0].split('.')[1] || validation.columnNames[0];
+        const isInvertSize = rowNode?.data.isInvertSizing.toUpperCase() === 'YES';
+        validation.id = `${validation.levelId}-${idx}`;
+        validation.description = [
+          {
+            ...(validation.columnNames.length > 1 ? {columnNames: validation.columnNames} : {columnName: columnPath}),
+            messageId: `${validation.id}-0`,
+            rowIds: validation.rowIds,
+            rowNumbers: validation.rowIds
+              .map((r) => context.rowData.find((d) => d.id === r)?.pos)
+              .map((r) => context.rowPos.indexOf(r) + 1)
+              .sort((a, b) => a - b),
+            isInvertSize,
+            value: rowNode ? rowNode.data[columnPath] : ''
+          }
+        ];
+      }
+      if (validation.columnNames?.length === 1) {
+        const columnName = validation.columnNames[0].split('.')[1] || validation.columnNames[0];
         const rowPos = validation.rowIds.map((r) => context.rowData.find((d) => d.id === r)?.pos);
         const rowNum = rowPos.map((r) => context.rowPos.indexOf(r) + 1);
         rowNum.sort((a, b) => a - b);
-        validation.description = [{...col, rowIds: validation.rowIds, rowNumbers: rowNum, value}];
+        validation.id = validation.message + rowNum.join('.');
+        const rowData = context.rowData.find((d) => d.id === validation.rowIds[0]);
+        const value = rowData?.[columnName];
+        const isInvertSize = rowData?.isInvertSizing.toUpperCase() === 'YES';
+        validation.description = [{columnName, isInvertSize, rowIds: validation.rowIds, rowNumbers: rowNum, value}];
       } else {
         const rowPos = validation.rowIds.map((r) => context.rowData.find((d) => d.id === r)?.pos);
         const rowNum = rowPos.map((r) => context.rowPos.indexOf(r) + 1);
@@ -51,15 +72,10 @@ const SurveyCorrectPanel = ({api, context}) => {
       }
 
       formatted.push(validation);
-    }
-    setMessages(groupArrayByKey(formatted, 'levelId'));
+    });
+    const groupedMessages = groupArrayByKey(formatted, 'levelId');
+    setMessages(groupedMessages);
   }, [context, api]);
-
-  const isContiguous = (sorted) => {
-    const first = sorted[0];
-    const last = sorted[sorted.length - 1];
-    return last - first + 1 === sorted.length;
-  };
 
   const summary = (
     <Box m={2}>
@@ -67,11 +83,11 @@ const SurveyCorrectPanel = ({api, context}) => {
         {['BLOCKING', 'WARNING', 'DUPLICATE', 'INFO'].map((level) => (
           <div key={level}>
             <Typography variant="button">{messages[level] ? level : 'No ' + level + '✔'}</Typography>
-            {messages[level]?.map((m) => (
-              <Box key={m.id}>
+            {messages[level]?.map((m, i) => (
+              <Box key={i}>
                 <TreeItem
-                  nodeId={`${m.id}`}
-                  key={`${m.id}`}
+                  nodeId={m.id}
+                  key={m.id}
                   label={
                     <Typography variant="body2">
                       {m.message} {m.description?.length > 1 ? '(' + m.description.length + ')' : ''}
@@ -84,35 +100,13 @@ const SurveyCorrectPanel = ({api, context}) => {
                     const label = mmHeader ? `${d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
                     return (
                       <TreeItem
-                        nodeId={`${m.id}-${d.columnName}`}
-                        key={`${m.id}-${d.columnName}`}
+                        nodeId={m.messageId}
+                        key={m.messageId}
                         onClick={() => handleItemClick(d)}
                         label={
                           <Typography variant="body2">
-                            {d.value ? (
-                              <span>
-                                {d.rowNumbers ? `${d.rowNumbers[0]}: ` : ''}
-                                <b>{label}</b> {d.value}
-                              </span>
-                            ) : d.label ? (
-                              <b>{label} is empty</b>
-                            ) : d.columnNames ? (
-                              <b>
-                                Check Column{d.columnNames.length > 1 ? 's' : ''} {d.columnNames.join(', ')}
-                              </b>
-                            ) : mmHeader ? (
-                              <span>
-                                {d.rowNumbers[0]}
-                                {': '}
-                                <b>{label}</b>
-                              </span>
-                            ) : (
-                              <span>
-                                {d.rowNumbers.join(',')}
-                                {': '}
-                                <b>{m.columnNames[0]}</b>
-                              </span>
-                            )}
+                            <b>{label}</b> {d.value ? d.value : d.label ? 'is empty' : ''}
+                            {d.rowNumbers ? ` (${d.rowNumbers.join(',')})` : ''}
                           </Typography>
                         }
                       />
