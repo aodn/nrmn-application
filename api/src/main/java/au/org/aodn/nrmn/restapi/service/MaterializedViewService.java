@@ -86,7 +86,7 @@ public class MaterializedViewService {
                                 country.getRight())))
                 .collect(Collectors.toList());
 
-        var fullViewName = Objects.isNull(countries) && Objects.isNull(states) ? viewName : viewName + "_all";
+        var fullViewName = (countries.isEmpty() && states.isEmpty()) ? viewName : viewName + "_all";
         requests.add(new CSVFilterPrinter(headers, fullViewName, null, null));
 
         for (var request : requests) {
