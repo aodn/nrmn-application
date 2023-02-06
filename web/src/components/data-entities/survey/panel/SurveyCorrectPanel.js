@@ -33,21 +33,35 @@ const SurveyCorrectPanel = ({api, context}) => {
     var formatted = [];
     for (const validation of context.validations) {
       if (validation.rowIds?.length == 1 && validation.columnNames) {
-        const rowId = validation.rowIds[0];
-        const rowData = api.getRowNode(rowId)?.data;
         const columnPath = validation.columnNames[0];
-        const value = rowData ? rowData[columnPath[0]] : '';
-        const col = validation.columnNames.length > 1 ? {columnNames: validation.columnNames} : {columnName: columnPath};
+        const key = columnPath?.includes('.') ? columnPath.split('.')[1] : columnPath;
+        const rowData = api.getRowNode(validation.rowIds[0])?.data;
         const rowPos = validation.rowIds.map((r) => context.rowData.find((d) => d.id === r)?.pos);
         const rowNum = rowPos.map((r) => context.rowPos.indexOf(r) + 1);
         rowNum.sort((a, b) => a - b);
-        validation.description = [{...col, rowIds: validation.rowIds, rowNumbers: rowNum, value}];
+        const col = validation.columnNames.length > 1 ? {columnNames: validation.columnNames} : {columnName: columnPath};
+        validation.description = [
+          {
+            ...col,
+            rowIds: validation.rowIds,
+            rowNumbers: rowNum,
+            value: rowData ? rowData[key] : '',
+            isInvertSizing: rowData?.isInvertSizing?.toUpperCase() === 'YES'
+          }
+        ];
       } else {
         const rowPos = validation.rowIds.map((r) => context.rowData.find((d) => d.id === r)?.pos);
         const rowNum = rowPos.map((r) => context.rowPos.indexOf(r) + 1);
         rowNum.sort((a, b) => a - b);
         validation.id = validation.message + rowNum.join('.');
-        validation.description = [{columnName: 'id', rowIds: validation.rowIds, rowNumbers: rowNum, value: ''}];
+        validation.description = [
+          {
+            columnName: 'id',
+            rowIds: validation.rowIds,
+            rowNumbers: rowNum,
+            value: ''
+          }
+        ];
       }
 
       formatted.push(validation);
@@ -80,7 +94,7 @@ const SurveyCorrectPanel = ({api, context}) => {
                 >
                   {m.description?.map((d) => {
                     const mmHeader = allMeasurements.find((m) => d.columnName && m.field === d.columnName.replace('measurements.', ''));
-                    const label = mmHeader ? `${d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
+                    const label = mmHeader ? `${d.isInvertSizing ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
                     return (
                       <TreeItem
                         nodeId={`${m.id}-${d.columnName}`}
@@ -100,7 +114,12 @@ const SurveyCorrectPanel = ({api, context}) => {
                                 Check Column{d.columnNames.length > 1 ? 's' : ''} {d.columnNames.join(', ')}
                               </b>
                             ) : (
-                              <b>Rows {isContiguous(d.rowNumbers) ? `[${d.rowNumbers[0]}-${d.rowNumbers[d.rowNumbers.length-1]}]` : d.rowNumbers.join(', ')}</b>
+                              <b>
+                                Rows{' '}
+                                {isContiguous(d.rowNumbers)
+                                  ? `[${d.rowNumbers[0]}-${d.rowNumbers[d.rowNumbers.length - 1]}]`
+                                  : d.rowNumbers.join(', ')}
+                              </b>
                             )}
                           </Typography>
                         }

@@ -103,7 +103,7 @@ public class MeasurementValidation {
                 String message = (isInvertSized ? "Invert measurements" : "Measurements") + " outside L5/95 [" + l5
                         + "," + l95 + "] for [" + species + "]";
                 outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA,
-                        ValidationLevel.INFO, message, rowId, "measurements." + col)));
+                        ValidationLevel.INFO, message, rowId, "measurements." + col.toString())));
             }
         }
         return errors;
@@ -131,7 +131,7 @@ public class MeasurementValidation {
                 var message = (isInvertSized ? "Invert measurement" : "Measurement") + " above Lmax [" + lMax
                         + "] for [" + row.getRef().getSpecies() + "]";
                 outOfRange.stream().forEach(col -> errors.add(new ValidationCell(ValidationCategory.DATA,
-                        ValidationLevel.INFO, message, row.getId(), col.toString())));
+                        ValidationLevel.INFO, message, row.getId(), "measurements." + col.toString())));
             }
         }
         return errors;
