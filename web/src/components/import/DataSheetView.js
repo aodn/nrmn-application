@@ -54,8 +54,6 @@ const defaultSideBar = {
   defaultToolPanel: ''
 };
 
-
-
 const IngestState = Object.freeze({Loading: 0, Edited: 1, Valid: 2, ConfirmSubmit: 3});
 
 const DataSheetView = ({onIngest, isAdmin}) => {
@@ -66,7 +64,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
   const [undoSize, setUndoSize] = useState(0);
   const [state, setState] = useState(IngestState.Loading);
   const [sideBar, setSideBar] = useState(defaultSideBar);
-  
+
   const reload = useCallback((api, id, completion, isAdmin) => {
     const context = api.gridOptionsWrapper.gridOptions.context;
     eh.resetContext();
@@ -94,7 +92,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
       }
       if (completion) completion(job);
     });
-  });
+  },[]);
 
   useEffect(() => {
     document.title = 'Ingest Sheet';

@@ -1,6 +1,5 @@
 import React from 'react';
 import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import TreeItem from '@mui/lab/TreeItem';

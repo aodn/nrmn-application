@@ -202,7 +202,14 @@ class DataSheetEventHandlers {
             const rowNumber = rowPos.indexOf(rowPosition) + 1;
             validation.columnNames.forEach((col, descriptionIdx) => {
               const key = col?.includes('.') ? col.split('.')[1] : col;
-              acc.push({id: `description2-${idx}.${rowPosition}`, columnName: key, value: r[key], rowIds: [r.id], rowNumbers: [rowNumber], isInvertSize: r.isInvertSizing === 'Yes'});
+              acc.push({
+                id: `description2-${idx}.${descriptionIdx}`,
+                columnName: key,
+                value: r[key],
+                rowIds: [r.id],
+                rowNumbers: [rowNumber],
+                isInvertSize: r.isInvertSizing === 'Yes'
+              });
             });
             return acc;
           }, []);
@@ -225,7 +232,14 @@ class DataSheetEventHandlers {
                 rowNumbers
               };
             } else {
-              acc.push({id: `description4-${idx}.${acc.length}`, columnName: col, value: r[col], rowIds: [r.id], rowNumbers: [rowNumber], isInvertSize: r.isInvertSizing === 'Yes'});
+              acc.push({
+                id: `description4-${idx}.${acc.length}`,
+                columnName: col,
+                value: r[col],
+                rowIds: [r.id],
+                rowNumbers: [rowNumber],
+                isInvertSize: r.isInvertSizing === 'Yes'
+              });
             }
             return acc;
           }, []);
