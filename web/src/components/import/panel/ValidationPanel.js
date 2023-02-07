@@ -1,5 +1,5 @@
 import React from 'react';
-import {Box, Divider, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@mui/material';
+import {Box, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@mui/material';
 import {PropTypes} from 'prop-types';
 import ValidationSummary from './ValidationSummary';
 
@@ -46,87 +46,59 @@ const ValidationPanel = ({api, context}) => {
         <Table size="small">
           <TableBody>
             <TableRow>
-              <TableCell>{summary.rowCount}</TableCell>
-              <TableCell>rows found</TableCell>
+              <TableCell align="right">{summary.rowCount}</TableCell>
+              <TableCell>rows</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>{summary.surveyCount}</TableCell>
-              <TableCell>distinct surveys found</TableCell>
+              <TableCell align="right">{summary.surveyCount}</TableCell>
+              <TableCell>distinct surveys</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>{summary.existingSurveyCount}</TableCell>
-              <TableCell>existing surveys found</TableCell>
+              <TableCell align="right">{summary.existingSurveyCount}</TableCell>
+              <TableCell>existing surveys</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>{summary.incompleteSurveyCount}</TableCell>
-              <TableCell>incomplete surveys found</TableCell>
+              <TableCell align="right">{summary.incompleteSurveyCount}</TableCell>
+              <TableCell>incomplete surveys</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>{summary.siteCount}</TableCell>
+              <TableCell align="right">{summary.siteCount}</TableCell>
               <Tooltip title={siteTooltip}>
-                <TableCell>distinct sites found</TableCell>
+                <TableCell style={{textDecoration: 'underline dotted'}}>distinct sites</TableCell>
               </Tooltip>
             </TableRow>
             <TableRow>
-              <TableCell></TableCell>
-              <Tooltip title={newSitesTooltip}>
-                <TableCell>{summary.newSiteCount} new sites found</TableCell>
-              </Tooltip>
+              <TableCell align="right">{summary.newSiteCount}</TableCell>
+              {summary.newSiteCount > 0 ? (
+                <Tooltip title={newSitesTooltip}>
+                  <TableCell style={{textDecoration: 'underline dotted'}}>new sites</TableCell>
+                </Tooltip>
+              ) : (
+                <TableCell>new sites</TableCell>
+              )}
             </TableRow>
             <TableRow>
-              <TableCell>{summary.obsItemCount}</TableCell>
-              <TableCell>distinct observable items found</TableCell>
+              <TableCell align="right">{summary.obsItemCount}</TableCell>
+              <TableCell>distinct observable items</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell></TableCell>
-              <TableCell>{summary.newObsItemCount} new observable items found</TableCell>
+              <TableCell align="right">{summary.newObsItemCount}</TableCell>
+              <TableCell>new observable items</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>{summary.diverCount}</TableCell>
-              <TableCell>distinct divers found</TableCell>
+              <TableCell align="right">{summary.diverCount}</TableCell>
+              <TableCell>distinct divers</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell></TableCell>
-              <TableCell>{summary.newDiverCount} new divers found</TableCell>
+              <TableCell align="right">{summary.newDiverCount}</TableCell>
+              <TableCell>new divers</TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </Box>
-      {context.isAdmin ? (
-        <Box m={2} mt={1}>
-          <Typography style={{color: 'red'}} variant="button">
-            Blocking validations disabled. Proceed with caution!
-          </Typography>
-        </Box>
-      ) : (
-        <Box m={2} mt={1}>
-          <Typography variant="button">{Object.keys(errorList.blocking).length > 0 ? `Blocking` : 'No Blocking ✔'}</Typography>
-          {Object.keys(errorList.blocking).length > 0 && <ValidationSummary data={errorList.blocking} onItemClick={handleItemClick} />}
-        </Box>
-      )}
-      <Divider />
-      {errorList.duplicate && Object.keys(errorList.duplicate).length > 0 && (
-        <>
-          <Box m={2} mt={1}>
-            <Typography variant="button">DUPLICATE</Typography>
-            <ValidationSummary data={errorList.duplicate} onItemClick={(item) => handleItemClick(item, true)} />
-          </Box>
-          <Divider />
-        </>
-      )}
-      <Box m={2} mt={1}>
-        <Typography variant="button">{Object.keys(errorList.warning).length > 0 ? `Warning` : 'No Warning ✔'}</Typography>
-        {Object.keys(errorList.warning).length > 0 && <ValidationSummary data={errorList.warning} onItemClick={handleItemClick} />}
+      <Box m={2}>
+        <ValidationSummary data={errorList} onItemClick={handleItemClick} />
       </Box>
-      {errorList.info && Object.keys(errorList.info).length > 0 && (
-        <>
-          <Divider />
-          <Box m={2} mt={1}>
-            <Typography variant="button">Info</Typography>
-            <ValidationSummary data={errorList.info} onItemClick={handleItemClick} />
-          </Box>
-        </>
-      )}
     </>
   );
 };

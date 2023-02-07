@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useCallback, useState} from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -54,34 +54,7 @@ const defaultSideBar = {
   defaultToolPanel: ''
 };
 
-const reload = (api, id, completion, isAdmin) => {
-  const context = api.gridOptionsWrapper.gridOptions.context;
-  eh.resetContext();
-  context.isAdmin = isAdmin;
-  getDataJob(id).then((res) => {
-    const job = {
-      program: res.data.job.program.programName,
-      reference: res.data.job.reference,
-      isExtendedSize: res.data.job.isExtendedSize,
-      source: res.data.job.source,
-      status: res.data.job.status
-    };
-    if (res.data.rows) {
-      const rowData = res.data.rows.map((row) => {
-        const {measureJson} = {...row};
-        Object.getOwnPropertyNames(measureJson || {}).forEach((numKey) => {
-          row[numKey] = measureJson[numKey];
-        });
-        delete row.measureJson;
-        return row;
-      });
-      context.rowData = rowData;
-      context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
-      api.setRowData(rowData.length > 0 ? rowData : null);
-    }
-    if (completion) completion(job);
-  });
-};
+
 
 const IngestState = Object.freeze({Loading: 0, Edited: 1, Valid: 2, ConfirmSubmit: 3});
 
@@ -93,6 +66,35 @@ const DataSheetView = ({onIngest, isAdmin}) => {
   const [undoSize, setUndoSize] = useState(0);
   const [state, setState] = useState(IngestState.Loading);
   const [sideBar, setSideBar] = useState(defaultSideBar);
+  
+  const reload = useCallback((api, id, completion, isAdmin) => {
+    const context = api.gridOptionsWrapper.gridOptions.context;
+    eh.resetContext();
+    context.isAdmin = isAdmin;
+    getDataJob(id).then((res) => {
+      const job = {
+        program: res.data.job.program.programName,
+        reference: res.data.job.reference,
+        isExtendedSize: res.data.job.isExtendedSize,
+        source: res.data.job.source,
+        status: res.data.job.status
+      };
+      if (res.data.rows) {
+        const rowData = res.data.rows.map((row) => {
+          const {measureJson} = {...row};
+          Object.getOwnPropertyNames(measureJson || {}).forEach((numKey) => {
+            row[numKey] = measureJson[numKey];
+          });
+          delete row.measureJson;
+          return row;
+        });
+        context.rowData = rowData;
+        context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
+        api.setRowData(rowData.length > 0 ? rowData : null);
+      }
+      if (completion) completion(job);
+    });
+  });
 
   useEffect(() => {
     document.title = 'Ingest Sheet';
@@ -133,7 +135,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
       delete result.data.errors;
       delete result.data.job;
       context.summary = result.data;
-      context.errorList = eh.generateErrorTree(context.rowData, context.rowPos, context.errors);
+      context.errorList = eh.generateErrorTree(context.rowData, context.errors);
 
       setState(context.errors.some((e) => e.levelId === 'BLOCKING') ? IngestState.Edited : IngestState.Valid);
 

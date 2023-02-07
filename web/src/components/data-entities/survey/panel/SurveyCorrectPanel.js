@@ -1,17 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {PropTypes} from 'prop-types';
-import {Box, Typography} from '@mui/material';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import TreeItem from '@mui/lab/TreeItem';
-import TreeView from '@mui/lab/TreeView';
-import {allMeasurements} from '../../../../common/constants';
-
-const groupArrayByKey = (xs, key) =>
-  xs.reduce((rv, x) => {
-    (rv[x[key]] = rv[x[key]] || []).push(x);
-    return rv;
-  }, {});
+import {Box} from '@mui/material';
+import ValidationSummary from '../../../import/panel/ValidationSummary';
+import eh from '../../../../components/import/DataSheetEventHandlers';
 
 const SurveyCorrectPanel = ({api, context}) => {
   const [messages, setMessages] = useState({});
@@ -29,109 +20,11 @@ const SurveyCorrectPanel = ({api, context}) => {
     api.redrawRows();
   };
 
-  useEffect(() => {
-    var formatted = [];
-    for (const validation of context.validations) {
-      if (validation.rowIds?.length == 1 && validation.columnNames) {
-        const columnPath = validation.columnNames[0];
-        const key = columnPath?.includes('.') ? columnPath.split('.')[1] : columnPath;
-        const rowData = api.getRowNode(validation.rowIds[0])?.data;
-        const rowPos = validation.rowIds.map((r) => context.rowData.find((d) => d.id === r)?.pos);
-        const rowNum = rowPos.map((r) => context.rowPos.indexOf(r) + 1);
-        rowNum.sort((a, b) => a - b);
-        const col = validation.columnNames.length > 1 ? {columnNames: validation.columnNames} : {columnName: columnPath};
-        validation.description = [
-          {
-            ...col,
-            rowIds: validation.rowIds,
-            rowNumbers: rowNum,
-            value: rowData ? rowData[key] : '',
-            isInvertSizing: rowData?.isInvertSizing?.toUpperCase() === 'YES'
-          }
-        ];
-      } else {
-        const rowPos = validation.rowIds.map((r) => context.rowData.find((d) => d.id === r)?.pos);
-        const rowNum = rowPos.map((r) => context.rowPos.indexOf(r) + 1);
-        rowNum.sort((a, b) => a - b);
-        validation.id = validation.message + rowNum.join('.');
-        validation.description = [
-          {
-            columnName: 'id',
-            rowIds: validation.rowIds,
-            rowNumbers: rowNum,
-            value: ''
-          }
-        ];
-      }
-
-      formatted.push(validation);
-    }
-    setMessages(groupArrayByKey(formatted, 'levelId'));
-  }, [context, api]);
-
-  const isContiguous = (sorted) => {
-    const first = sorted[0];
-    const last = sorted[sorted.length - 1];
-    return last - first + 1 === sorted.length;
-  };
+  useEffect(() => setMessages(eh.generateErrorTree(context.rowData, context.validations)), [context, api]);
 
   const summary = (
     <Box m={2}>
-      <TreeView defaultCollapseIcon={<ArrowDropDownIcon />} defaultExpandIcon={<ArrowRightIcon />}>
-        {['BLOCKING', 'WARNING', 'DUPLICATE', 'INFO'].map((level) => (
-          <div key={level}>
-            <Typography variant="button">{messages[level] ? level : 'No ' + level + '✔'}</Typography>
-            {messages[level]?.map((m) => (
-              <Box key={m.id}>
-                <TreeItem
-                  nodeId={`${m.id}`}
-                  key={`${m.id}`}
-                  label={
-                    <Typography variant="body2">
-                      {m.message} {m.description?.length > 1 ? '(' + m.description.length + ')' : ''}
-                    </Typography>
-                  }
-                >
-                  {m.description?.map((d) => {
-                    const mmHeader = allMeasurements.find((m) => d.columnName && m.field === d.columnName.replace('measurements.', ''));
-                    const label = mmHeader ? `${d.isInvertSizing ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
-                    return (
-                      <TreeItem
-                        nodeId={`${m.id}-${d.columnName}`}
-                        key={`${m.id}-${d.columnName}`}
-                        onClick={() => handleItemClick(d)}
-                        label={
-                          <Typography variant="body2">
-                            {d.value ? (
-                              <span>
-                                {d.rowNumbers ? `${d.rowNumbers[0]}: ` : ''}
-                                <b>{label}</b> {d.value}
-                              </span>
-                            ) : d.label ? (
-                              <b>{label} is empty</b>
-                            ) : d.columnNames ? (
-                              <b>
-                                Check Column{d.columnNames.length > 1 ? 's' : ''} {d.columnNames.join(', ')}
-                              </b>
-                            ) : (
-                              <b>
-                                Rows{' '}
-                                {isContiguous(d.rowNumbers)
-                                  ? `[${d.rowNumbers[0]}-${d.rowNumbers[d.rowNumbers.length - 1]}]`
-                                  : d.rowNumbers.join(', ')}
-                              </b>
-                            )}
-                          </Typography>
-                        }
-                      />
-                    );
-                  })}
-                </TreeItem>
-              </Box>
-            ))}
-          </div>
-        ))}
-      </TreeView>
+      <ValidationSummary data={messages} onItemClick={handleItemClick} />
     </Box>
   );
 
