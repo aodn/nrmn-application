@@ -172,7 +172,7 @@ class DataSheetEventHandlers {
 
   generateErrorTree(rowData, errors) {
     var formatted = [];
-    errors.sort((a, b) => (a.message < b.message ? -1 : a.message > b.message ? 1 : 0));
+    errors.sort((a, b) => (a.message < b.message ? -1 : 1));
     errors.forEach((validation, idx) => {
       validation.id = `validation-${idx}`;
       const rowPos = validation.rowIds.map((r) => rowData.find((d) => d.id === r)?.pos);
@@ -180,8 +180,7 @@ class DataSheetEventHandlers {
         const columnPath = validation.columnNames[0];
         const key = columnPath?.includes('.') ? columnPath.split('.')[1] : columnPath;
         const row = rowData.find((d) => d.id === validation.rowIds[0]);
-        // FIXME: next line is wrong
-        const rowNumbers = rowPos.map((r) => rowPos.indexOf(r) + 1);
+        const rowNumbers = rowPos.map((r) => r + 1);
         rowNumbers.sort((a, b) => a - b);
         const col = validation.columnNames.length > 1 ? {columnNames: validation.columnNames} : {columnName: columnPath};
         validation.description = [
@@ -203,7 +202,7 @@ class DataSheetEventHandlers {
             validation.columnNames.forEach((col, descriptionIdx) => {
               const key = col?.includes('.') ? col.split('.')[1] : col;
               acc.push({
-                id: `description2-${idx}.${descriptionIdx}`,
+                id: `description2-${idx}.${acc.length}.${descriptionIdx}`,
                 columnName: key,
                 value: r[key],
                 rowIds: [r.id],
@@ -245,7 +244,7 @@ class DataSheetEventHandlers {
           }, []);
       } else {
         const rowPos = validation.rowIds.map((r) => rowData.find((d) => d.id === r)?.pos);
-        const rowNumbers = rowPos.map((r) => rowPos.indexOf(r) + 1);
+        const rowNumbers = rowPos.map((r) => r + 1);
         rowNumbers.sort((a, b) => a - b);
         validation.description = [
           {

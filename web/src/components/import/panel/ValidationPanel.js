@@ -22,20 +22,20 @@ const ValidationPanel = ({api, context}) => {
 
   const siteTooltip = summary.foundSites
     ? Object.keys(summary.foundSites).map((key) => (
-        <>
+        <div key={key}>
           {key}
           <br />
-        </>
+        </div>
       ))
     : '';
   const newSitesTooltip = summary.foundSites
     ? Object.keys(summary.foundSites)
         .filter((key) => summary.foundSites[key] === true)
         .map((key) => (
-          <>
+          <div key={key}>
             {key}
             <br />
-          </>
+          </div>
         ))
     : '';
 
