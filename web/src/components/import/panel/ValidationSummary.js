@@ -15,6 +15,11 @@ const ValidationSummary = ({data, onItemClick}) => {
     return last - first + 1 === sorted.length;
   };
 
+  const labelForDescription = (d) => {
+    const mmHeader = allMeasurements.find((m) => d.columnName && m.field === d.columnName.replace('measurements.', ''));
+    return mmHeader ? `${d.isInvertSizing ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
+  };
+
   return (
     <TreeView defaultCollapseIcon={<ArrowDropDownIcon />} defaultExpandIcon={<ArrowRightIcon />}>
       {['BLOCKING', 'WARNING', 'DUPLICATE', 'INFO'].map((level) => (
@@ -26,13 +31,12 @@ const ValidationSummary = ({data, onItemClick}) => {
                 key={m.id}
                 label={
                   <Typography variant="body2">
-                    {m.message} {m.description?.length > 1 ? '(' + m.description.length + ')' : ''}
+                    {m.message + ' ' + (m.message.includes('easurements') ? labelForDescription(m.description[0]) : '') + (m.description?.length > 1 ? ' (' + m.description.length + ')' : '')}
                   </Typography>
                 }
               >
                 {m.description?.map((d) => {
-                  const mmHeader = allMeasurements.find((m) => d.columnName && m.field === d.columnName.replace('measurements.', ''));
-                  const label = mmHeader ? `${d.isInvertSizing ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
+                  const label = labelForDescription(d);
                   return (
                     <TreeItem
                       nodeId={d.id}
