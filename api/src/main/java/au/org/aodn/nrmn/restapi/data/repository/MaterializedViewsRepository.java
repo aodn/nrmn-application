@@ -148,8 +148,31 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_survey_list;", nativeQuery = true)
     void refreshEpSurveyList();
 
-    @Query(value = "SELECT survey_id, country, area, location, mpa, site_code, site_name, latitude, longitude, depth, survey_date, latest_surveydate_for_site, has_pq_scores_in_db, has_rugosity_scores_in_db, has_pqs_catalogued_in_db, divers, visibility, hour, direction, survey_latitude, survey_longitude, avg_rugosity, max_rugosity, surface, CAST(geom AS varchar), program, pq_zip_url, protection_status, old_site_codes, methods, survey_notes from nrmn.ep_survey_list;", nativeQuery = true)
-    List<Tuple> getEpSurveyList();
+    @Modifying
+    @Query(value = "SELECT COUNT(*) FROM nrmn.ep_survey_list;", nativeQuery = true)
+    Long countEpSurveyList();
+
+    @Query(value = "SELECT survey_id, country, area, location, mpa, site_code, site_name, latitude, longitude, depth, survey_date, latest_surveydate_for_site, has_pq_scores_in_db, has_rugosity_scores_in_db, has_pqs_catalogued_in_db, divers, visibility, hour, direction, survey_latitude, survey_longitude, avg_rugosity, max_rugosity, surface, CAST(geom AS varchar), program, pq_zip_url, protection_status, old_site_codes, methods, survey_notes from nrmn.ep_survey_list " +
+    "ORDER BY survey_id, country, area, location, mpa, site_code, site_name, latitude, longitude, depth, survey_date, latest_surveydate_for_site, has_pq_scores_in_db, has_rugosity_scores_in_db, has_pqs_catalogued_in_db, divers, visibility, hour, direction, survey_latitude, survey_longitude, avg_rugosity, max_rugosity, surface, CAST(geom AS varchar), program, pq_zip_url, protection_status, old_site_codes, methods, survey_notes;", nativeQuery = true)
+    List<Tuple> getEpSurveyList(@Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    // ------------------
+
+    @Query(value = "SELECT count(*) from nrmn.ep_m0_off_transect_sighting;", nativeQuery = true)
+    Long countEpM0OffTransectSigning();
+
+    @Query(value = "SELECT survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, method, block, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, size_class, total, biomass from nrmn.ep_m0_off_transect_sighting " +
+    "ORDER BY survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, method, block, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, size_class, total, biomass OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    List<Tuple> getEpM0OffTransectSigning(@Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    // ------------------
+
+    @Query(value = "SELECT count(*) from nrmn.ep_observable_items;", nativeQuery = true)
+    Long countEpObservableItems();
+
+    @Query(value = "SELECT observable_item_id, observable_item_name, obs_item_type_name, phylum, class, order, family, genus, common_name, range, frequency, abundance, max_length, common_family_name, common_class_name, common_phylum_name, superseded_by, superseded_ids, superseded_names, a, b, cf, aphia_relation, aphia_id, scientificname, status, unacceptreason, taxon, reporting_name, report_group, habitat_groups, other_groups, mapped_id from nrmn.ep_observable_items " +
+    "ORDER BY observable_item_id, observable_item_name, obs_item_type_name, phylum, class, order, family, genus, common_name, range, frequency, abundance, max_length, common_family_name, common_class_name, common_phylum_name, superseded_by, superseded_ids, superseded_names, a, b, cf, aphia_relation, aphia_id, scientificname, status, unacceptreason, taxon, reporting_name, report_group, habitat_groups, other_groups, mapped_id OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    List<Tuple> getEpObservableItems(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
 

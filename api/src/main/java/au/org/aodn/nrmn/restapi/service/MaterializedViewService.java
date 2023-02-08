@@ -156,6 +156,22 @@ public class MaterializedViewService {
                     materializedViewsRepository.countEpSiteList(),
                     materializedViewsRepository::getEpSiteList);
 
+            uploadMaterializedView("ep_m0_off_transect_sighting", null, null,
+                    materializedViewsRepository.countEpM0OffTransectSigning(),
+                    materializedViewsRepository::getEpM0OffTransectSigning);
+
+            uploadMaterializedView("ep_survey_list", null, null,
+                    materializedViewsRepository.countEpSurveyList(),
+                    materializedViewsRepository::getEpSurveyList);
+
+            uploadMaterializedView("ep_site_list", null, null,
+                    materializedViewsRepository.countEpSiteList(),
+                    materializedViewsRepository::getEpSiteList);
+
+            uploadMaterializedView("ep_observable_items", null, null,
+                    materializedViewsRepository.countEpObservableItems(),
+                    materializedViewsRepository::getEpObservableItems);
+
             uploadMaterializedView("ep_m1", countries, states,
                     materializedViewsRepository.countEpM1(),
                     materializedViewsRepository::getEpM1);
