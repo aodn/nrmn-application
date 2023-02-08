@@ -37,6 +37,8 @@ public class ScheduledTasks {
 
     @PostConstruct
     public void performOnStartup() {
-        globalLockService.releaseLock();
+        if (environment.getActiveProfiles().length < 1) {
+            globalLockService.releaseLock();
+        }
     }
 }
