@@ -4,48 +4,48 @@ import {createSharedLink} from '../../../api/api';
 import PropTypes from 'prop-types';
 
 const all_endpoints = [
-  {value: 'EP_M1_ALL', disabled: false},
-  {value: 'EP_M1_AUSTRALIA', disabled: false},
-  {value: 'EP_M1_TAS', disabled: false},
-  {value: 'EP_M1_NSW', disabled: false},
-  {value: 'EP_M1_VIC', disabled: false},
-  {value: 'EP_M1_WA', disabled: false},
-  {value: 'EP_M1_SA', disabled: false},
-  {value: 'EP_M1_NT', disabled: false},
-  {value: 'EP_M1_QLD', disabled: false},
-  {value: 'EP_M2_CRYPTIC_FISH_ALL', disabled: false},
-  {value: 'EP_M2_CRYPTIC_FISH_AUSTRALIA', disabled: false},
-  {value: 'EP_M2_CRYPTIC_FISH_TAS', disabled: false},
-  {value: 'EP_M2_CRYPTIC_FISH_NSW', disabled: false},
-  {value: 'EP_M2_CRYPTIC_FISH_VIC', disabled: false},
-  {value: 'EP_M2_CRYPTIC_FISH_WA', disabled: false},
-  {value: 'EP_M2_CRYPTIC_FISH_SA', disabled: false},
-  {value: 'EP_M2_CRYPTIC_FISH_NT', disabled: false},
-  {value: 'EP_M2_CRYPTIC_FISH_QLD', disabled: false},
-  {value: 'EP_SITE_LIST', disabled: false},
-  {value: 'EP_M2_INVERTS_ALL', disabled: false},
-  {value: 'EP_M2_INVERTS_AUSTRALIA', disabled: false},
-  {value: 'EP_M2_INVERTS_TAS', disabled: false},
-  {value: 'EP_M2_INVERTS_NSW', disabled: false},
-  {value: 'EP_M2_INVERTS_VIC', disabled: false},
-  {value: 'EP_M2_INVERTS_WA', disabled: false},
-  {value: 'EP_M2_INVERTS_SA', disabled: false},
-  {value: 'EP_M2_INVERTS_NT', disabled: false},
-  {value: 'EP_M2_INVERTS_QLD', disabled: false},
-  {value: 'EP_OBSERVABLE_ITEMS', disabled: false},
-  {value: 'EP_RARITY_ABUNDANCE', disabled: false},
-  {value: 'EP_RARITY_RANGE', disabled: false},
-  {value: 'EP_RARITY_EXTENTS', disabled: false},
-  {value: 'EP_SURVEY_LIST', disabled: false},
-  {value: 'EP_M0_OFF_TRANSECT_SIGHTING', disabled: false},
-  {value: 'EP_M3_ISQ', disabled: false},
-  {value: 'EP_M4_MACROCYSTIS_COUNT', disabled: false},
-  {value: 'EP_M5_LIMPET_QUADRATS', disabled: false},
-  {value: 'EP_M7_LOBSTER_COUNT', disabled: false},
-  {value: 'EP_M11_OFF_TRANSECT_MEASUREMENT', disabled: false},
-  {value: 'EP_M12_DEBRIS', disabled: false},
-  {value: 'EP_M13_PQ_SCORES', disabled: false},
-  {value: 'EP_SPECIES_SURVEY_OBSERVATION', disabled: false}
+  {value: 'EP_M1_ALL'},
+  {value: 'EP_M1_AUSTRALIA'},
+  {value: 'EP_M1_TAS'},
+  {value: 'EP_M1_NSW'},
+  {value: 'EP_M1_VIC'},
+  {value: 'EP_M1_WA'},
+  {value: 'EP_M1_SA'},
+  {value: 'EP_M1_NT'},
+  {value: 'EP_M1_QLD'},
+  {value: 'EP_M2_CRYPTIC_FISH_ALL'},
+  {value: 'EP_M2_CRYPTIC_FISH_AUSTRALIA'},
+  {value: 'EP_M2_CRYPTIC_FISH_TAS'},
+  {value: 'EP_M2_CRYPTIC_FISH_NSW'},
+  {value: 'EP_M2_CRYPTIC_FISH_VIC'},
+  {value: 'EP_M2_CRYPTIC_FISH_WA'},
+  {value: 'EP_M2_CRYPTIC_FISH_SA'},
+  {value: 'EP_M2_CRYPTIC_FISH_NT'},
+  {value: 'EP_M2_CRYPTIC_FISH_QLD'},
+  {value: 'EP_SITE_LIST'},
+  {value: 'EP_M2_INVERTS_ALL'},
+  {value: 'EP_M2_INVERTS_AUSTRALIA'},
+  {value: 'EP_M2_INVERTS_TAS'},
+  {value: 'EP_M2_INVERTS_NSW'},
+  {value: 'EP_M2_INVERTS_VIC'},
+  {value: 'EP_M2_INVERTS_WA'},
+  {value: 'EP_M2_INVERTS_SA'},
+  {value: 'EP_M2_INVERTS_NT'},
+  {value: 'EP_M2_INVERTS_QLD'},
+  {value: 'EP_OBSERVABLE_ITEMS'},
+  {value: 'EP_RARITY_ABUNDANCE'},
+  {value: 'EP_RARITY_RANGE'},
+  {value: 'EP_RARITY_EXTENTS'},
+  {value: 'EP_SURVEY_LIST'},
+  {value: 'EP_M0_OFF_TRANSECT_SIGHTING'},
+  {value: 'EP_M3_ISQ'},
+  {value: 'EP_M4_MACROCYSTIS_COUNT'},
+  {value: 'EP_M5_LIMPET_QUADRATS'},
+  {value: 'EP_M7_LOBSTER_COUNT'},
+  {value: 'EP_M11_OFF_TRANSECT_MEASUREMENT'},
+  {value: 'EP_M12_DEBRIS'},
+  {value: 'EP_M13_PQ_SCORES'},
+  {value: 'EP_SPECIES_SURVEY_OBSERVATION'}
 ];
 
 const SharedLinkAdd = ({onPost}) => {
@@ -137,7 +137,7 @@ const SharedLinkAdd = ({onPost}) => {
           {endpoints.available
             .sort((a, b) => a.value - b.value)
             .map((o) => (
-              <option disabled={o.disabled} key={o.value} onDoubleClick={(e) => dispatch({verb: 'add', values: [e.target.value]})}>
+              <option key={o.value} onDoubleClick={(e) => dispatch({verb: 'add', values: [e.target.value]})}>
                 {o.value}
               </option>
             ))}
@@ -181,7 +181,6 @@ const SharedLinkAdd = ({onPost}) => {
               onDoubleClick={(e) => {
                 dispatch({verb: 'remove', values: [e.target.value]});
               }}
-              disabled={o.disabled}
               key={o.value}
             >
               {o.value}
