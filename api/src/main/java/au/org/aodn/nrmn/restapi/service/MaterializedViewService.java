@@ -164,6 +164,10 @@ public class MaterializedViewService {
                     materializedViewsRepository.countEpM2CrypticFish(),
                     materializedViewsRepository::getEpM2CrypticFish);
 
+            uploadMaterializedView("ep_m2_inverts", countries, states,
+                    materializedViewsRepository.countEpM2Inverts(),
+                    materializedViewsRepository::getEpM2Inverts);
+
             stopWatch.stop();
             logger.info("Uploaded all materialized views in " + stopWatch.getLastTaskTimeMillis() + "ms");
         } catch (Exception e) {
