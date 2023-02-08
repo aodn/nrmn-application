@@ -1,5 +1,7 @@
 package au.org.aodn.nrmn.restapi.service;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ public class ScheduledTasks {
     @Autowired
     private MaterializedViewService materializedViewService;
 
+    @Autowired
+    private GlobalLockService globalLockService;
+
     private static Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
     @Scheduled(cron = "0 0 0 * * ?", zone = "Australia/Sydney")
     public void performDailyTasks() {
@@ -28,5 +33,10 @@ public class ScheduledTasks {
         } else {
             logger.info("Skipping PQ update as active profile set.");
         }
+    }
+
+    @PostConstruct
+    public void performOnStartup() {
+        globalLockService.releaseLock();
     }
 }

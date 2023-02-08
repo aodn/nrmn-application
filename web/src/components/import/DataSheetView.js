@@ -17,6 +17,8 @@ import AlertDialog from '../ui/AlertDialog';
 import FindReplacePanel from './panel/FindReplacePanel';
 import ValidationPanel from './panel/ValidationPanel';
 import eh from './DataSheetEventHandlers';
+import {Paper} from '@mui/material';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 
 // |context| is where all custom properties and helper functions
 // associated with the ag-grid are stored
@@ -83,7 +85,7 @@ const reload = (api, id, completion, isAdmin) => {
   });
 };
 
-const IngestState = Object.freeze({Loading: 0, Edited: 1, Valid: 2, ConfirmSubmit: 3});
+const IngestState = Object.freeze({Loading: 0, Edited: 1, Locked: 2, Valid: 3, ConfirmSubmit: 4});
 
 const DataSheetView = ({onIngest, isAdmin}) => {
   const {id} = useParams();
@@ -93,6 +95,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
   const [undoSize, setUndoSize] = useState(0);
   const [state, setState] = useState(IngestState.Loading);
   const [sideBar, setSideBar] = useState(defaultSideBar);
+  const buttonRef = React.useRef(null);
 
   useEffect(() => {
     document.title = 'Ingest Sheet';
@@ -129,6 +132,11 @@ const DataSheetView = ({onIngest, isAdmin}) => {
     setSideBar(defaultSideBar);
     context.errors = [];
     validateJob(id, (result) => {
+      if (result.data === 'locked') {
+        setState(IngestState.Locked);
+        return;
+      }
+
       context.errors = result.data.errors;
       delete result.data.errors;
       delete result.data.job;
@@ -159,7 +167,13 @@ const DataSheetView = ({onIngest, isAdmin}) => {
     context.useOverlay = 'Submitting';
     setState(IngestState.Loading);
     setSideBar(defaultSideBar);
-    submitIngest(id, (res) => onIngest(res));
+    submitIngest(id, (res) => {
+      if (res.data === 'locked') {
+        setState(IngestState.Locked);
+        return;
+      }
+      onIngest(res);
+    });
   };
 
   const handleSaveAndValidate = () => {
@@ -264,10 +278,22 @@ const DataSheetView = ({onIngest, isAdmin}) => {
         onConfirm={handleSubmit}
       />
       <Box pt={1} pl={1}>
-        <Box width={200}>
-          <NavLink to="/data/jobs" color="secondary">
-            <Typography>{'<< Back to Jobs'}</Typography>
-          </NavLink>
+        <Box display="flex" flexDirection="row">
+          <Box flexGrow={1}>
+            <NavLink to="/data/jobs" color="secondary">
+              <Typography>{'<< Back to Jobs'}</Typography>
+            </NavLink>
+          </Box>
+          {state === IngestState.Locked && (
+            <Paper minWidth={180} display="flex" alignItems="center">
+              <Box display="flex" flexDirection="row">
+                <Box m={1}>
+                  <ReportProblemIcon  sx={{color: 'darkorange'}} />
+                </Box>
+                <Box mx={1} my={2}>Server is busy. Try again in a moment.</Box>
+              </Box>
+            </Paper>
+          )}
         </Box>
         {job?.status && (
           <Box display="flex" flexDirection="row">
@@ -302,6 +328,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
               <>
                 <Box p={1} minWidth={180}>
                   <Button
+                    ref={buttonRef}
                     variant="contained"
                     disabled={state === IngestState.Loading}
                     onClick={handleSaveAndValidate}

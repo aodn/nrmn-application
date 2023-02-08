@@ -17,6 +17,7 @@ import au.org.aodn.nrmn.restapi.data.repository.StagedRowRepository;
 import au.org.aodn.nrmn.restapi.data.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.enums.StatusJobType;
+import au.org.aodn.nrmn.restapi.service.GlobalLockService;
 import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.SurveyIngestionService;
 import au.org.aodn.nrmn.restapi.service.formatting.SpeciesFormattingService;
@@ -43,12 +44,15 @@ public class IngestionController {
 
     @Autowired
     UserActionAuditRepository userActionAuditRepository;
-    
+
     @Autowired
     private SpeciesFormattingService speciesFormatting;
 
     @Autowired
     private MaterializedViewService materializedViewService;
+
+    @Autowired
+    private GlobalLockService globalLockService;
 
     private static Logger logger = LoggerFactory.getLogger(IngestionController.class);
 
@@ -65,6 +69,9 @@ public class IngestionController {
         if (job.getStatus() != StatusJobType.STAGED)
             return ResponseEntity.badRequest().body("Job with given id has not been validated: " + jobId);
 
+        if (!globalLockService.setLock())
+            return ResponseEntity.ok("locked");
+
         try {
 
             var stagedJobLog = StagedJobLog.builder()
@@ -76,9 +83,9 @@ public class IngestionController {
             var rows = rowRepository.findRowsByJobId(job.getId());
             var species = speciesFormatting.getSpeciesForRows(rows);
             var validatedRows = speciesFormatting.formatRowsWithSpecies(rows, species);
-            
+
             surveyIngestionService.ingestTransaction(job, validatedRows);
-            
+
             materializedViewService.refreshAllAsync();
 
         } catch (Exception e) {
@@ -92,7 +99,10 @@ public class IngestionController {
             stagedJobLogRepository.save(log);
 
             return ResponseEntity.badRequest().body("Sheet failed to ingest. No survey data has been inserted.");
+        } finally {
+            globalLockService.releaseLock();
         }
+        
         return ResponseEntity.ok("Job " + jobId + " successfully ingested.");
     }
 }

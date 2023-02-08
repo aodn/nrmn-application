@@ -49,6 +49,7 @@ import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.enums.StatusJobType;
+import au.org.aodn.nrmn.restapi.service.GlobalLockService;
 import au.org.aodn.nrmn.restapi.service.StagedRowService;
 import au.org.aodn.nrmn.restapi.service.upload.S3IO;
 import au.org.aodn.nrmn.restapi.service.upload.SpreadSheetService;
@@ -106,12 +107,15 @@ public class StagedJobController {
     private StagedJobLogRepository logRepo;
 
     @Autowired
+    private GlobalLockService globalLockService;
+
+    @Autowired
     private S3IO s3client;
 
     @Value("${app.s3.bucket}")
     private String bucketName;
 
-    public List<StagedRow> getRowsToSave(ParsedSheet parsedSheet){
+    public List<StagedRow> getRowsToSave(ParsedSheet parsedSheet) {
         List<StagedRow> rowsToSave = parsedSheet.getStagedRows();
 
         // remove rows that are missing diver / site / date / depth
@@ -128,7 +132,7 @@ public class StagedJobController {
                     .stream()
                     .filter(v -> v.getRowIds().contains(lastRowId)).findAny();
 
-            // only apply if there are three or more duplicate rows 
+            // only apply if there are three or more duplicate rows
             // (detect 3 duplicate rows rule)
             if (rowsToTruncate.isPresent() && rowsToTruncate.get().getRowIds().size() >= 3) {
                 Collection<Long> rowIdsToRemove = rowsToTruncate.get().getRowIds();
@@ -236,9 +240,18 @@ public class StagedJobController {
         userAuditRepo.save(new UserActionAudit("stage/validate",
                 "validate job attempt for username " + authentication.getName() + " file: " + jobId));
 
-        return jobRepo.findById(jobId).map(job -> ResponseEntity.ok(validation.process(job)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                        .body(new ValidationResponse()));
+        if (globalLockService.setLock()) {
+            try {
+                return jobRepo.findById(jobId).map(job -> ResponseEntity.ok(validation.process(job)))
+                        .orElseGet(() -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                                .body(new ValidationResponse()));
+            } finally {
+                globalLockService.releaseLock();
+            }
+        } else {
+            return ResponseEntity.ok("locked");
+        }
+
     }
 
     @GetMapping("/jobs")
@@ -261,7 +274,7 @@ public class StagedJobController {
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<StagedJobDto> getStagedJob(@PathVariable Long jobId) {
         var jOptional = jobRepo.findById(jobId);
-        if(!jOptional.isPresent())
+        if (!jOptional.isPresent())
             return ResponseEntity.notFound().build();
 
         var j = jOptional.get();
@@ -291,7 +304,7 @@ public class StagedJobController {
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<Object> deleteJob(@PathVariable Long jobId) {
         var jOptional = jobRepo.findById(jobId);
-        if(!jOptional.isPresent())
+        if (!jOptional.isPresent())
             return ResponseEntity.notFound().build();
         var job = jOptional.get();
         if (job.getStatus() != StatusJobType.INGESTED) {
