@@ -202,6 +202,42 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
 
     // ------------------
 
+    @Query(value = "SELECT count(*) from nrmn.ep_m3_isq;", nativeQuery = true)
+    Long countEpM3Isq();
+
+    @Query(value = "SELECT survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, report_group, habitat_groups, quadrat, total from nrmn.ep_m3_isq " +
+    "ORDER BY ep_observable_items OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    List<Tuple> getEpM3Isq(@Param("offset") Integer offset, @Param("limit") Integer limit);
+    
+    // ------------------
+
+    @Query(value = "SELECT count(*) from nrmn.ep_m4_macrocystis_count;", nativeQuery = true)
+    Long countEpM4Macrocystis();
+
+    @Query(value = "SELECT   survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, block, totalfrom nrmn.ep_m4_macrocystis_count " +
+    "ORDER BY  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, block, total OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    List<Tuple> getEpM4Macrocystis(@Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    // ------------------
+
+    @Query(value = "SELECT count(*) from nrmn.ep_m5_limpet_quadrats;", nativeQuery = true)
+    Long countEpM5LimpetQuadrats();
+
+    @Query(value = "SELECT  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, quadrat, total from nrmn.ep_m5_limpet_quadrats " +
+    "ORDER BY  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, quadrat, total OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    List<Tuple> getEpM5LimpetQuadrats(@Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    // ------------------
+
+    @Query(value = "SELECT count(*) from nrmn.ep_m7_lobster_count;", nativeQuery = true)
+    Long countEpM7LobsterCount();
+
+    @Query(value = "SELECT  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, block, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, size_class, total from nrmn.ep_m7_lobster_count " +
+    "ORDER BY  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, block, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, size_class, total OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    List<Tuple> getEpM7LobsterCount(@Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    // ------------------
+
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query LIKE 'REFRESH MATERIALIZED VIEW %'", nativeQuery = true)
     Boolean checkAnyRunning();
 }

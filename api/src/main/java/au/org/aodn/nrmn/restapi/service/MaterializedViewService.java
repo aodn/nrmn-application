@@ -196,6 +196,22 @@ public class MaterializedViewService {
                     materializedViewsRepository.countEpM2Inverts(),
                     materializedViewsRepository::getEpM2Inverts);
 
+            uploadMaterializedView("ep_m3_isq", null, null,
+                    materializedViewsRepository.countEpM3Isq(),
+                    materializedViewsRepository::getEpM3Isq);
+
+            uploadMaterializedView("ep_m4_macrocystis_count", null, null,
+                    materializedViewsRepository.countEpM4Macrocystis(),
+                    materializedViewsRepository::getEpM4Macrocystis);
+
+            uploadMaterializedView("ep_m5_limpet_quadrats", null, null,
+                    materializedViewsRepository.countEpM5LimpetQuadrats(),
+                    materializedViewsRepository::getEpM5LimpetQuadrats);
+
+            uploadMaterializedView("ep_m7_lobster_count", null, null,
+                    materializedViewsRepository.countEpM7LobsterCount(),
+                    materializedViewsRepository::getEpM7LobsterCount);
+
             stopWatch.stop();
             logger.info("Uploaded all materialized views in " + stopWatch.getLastTaskTimeMillis() + "ms");
         } catch (Exception e) {
