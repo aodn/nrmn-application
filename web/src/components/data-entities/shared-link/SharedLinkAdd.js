@@ -42,11 +42,10 @@ const all_endpoints = [
   {value: 'EP_M4_MACROCYSTIS_COUNT', disabled: false},
   {value: 'EP_M5_LIMPET_QUADRATS', disabled: false},
   {value: 'EP_M7_LOBSTER_COUNT', disabled: false},
-  
-  {value: 'EP_M11_OFF_TRANSECT_MEASUREMENT', disabled: true},
-  {value: 'EP_M12_DEBRIS', disabled: true},
-  {value: 'EP_M13_PQ_SCORES', disabled: true},
-  {value: 'EP_SPECIES_SURVEY_OBSERVATION', disabled: true}
+  {value: 'EP_M11_OFF_TRANSECT_MEASUREMENT', disabled: false},
+  {value: 'EP_M12_DEBRIS', disabled: false},
+  {value: 'EP_M13_PQ_SCORES', disabled: false},
+  {value: 'EP_SPECIES_SURVEY_OBSERVATION', disabled: false}
 ];
 
 const SharedLinkAdd = ({onPost}) => {

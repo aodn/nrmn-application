@@ -238,6 +238,42 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
 
     // ------------------
 
+    @Query(value = "SELECT count(*) from nrmn.ep_m11_off_transect_measurement;", nativeQuery = true)
+    Long countEpM11OffTransectMeasurement();
+
+    @Query(value = "SELECT survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, block, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, size_class, tota from nrmn.ep_m11_off_transect_measurement " +
+    "ORDER BY survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, block, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, size_class, tota OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    List<Tuple> getEpM11OffTransectMeasurement(@Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    // ------------------
+
+    @Query(value = "SELECT count(*) from nrmn.ep_m12_debris;", nativeQuery = true)
+    Long countEpM12Debris();
+
+    @Query(value = "SELECT  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, block, debris, total from nrmn.ep_m12_debris " +
+    "ORDER BY  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, block, debris, total OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    List<Tuple> getEpM12Debris(@Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    // ------------------
+
+    @Query(value = "SELECT count(*) from nrmn.ep_m13_pq_scores;", nativeQuery = true)
+    Long countEpM13PqScores();
+
+    @Query(value = "SELECT survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, resolution, category, major_category, num_points, total_points, percent_cover from nrmn.ep_m13_pq_scores " +
+    "ORDER BY survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, resolution, category, major_category, num_points, total_points, percent_cover OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    List<Tuple> getEpM13PqScores(@Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    // ------------------
+
+    @Query(value = "SELECT count(*) from nrmn.ep_species_survey;", nativeQuery = true)
+    Long countEpSpeciesSurvey();
+
+    @Query(value = "SELECT  species_id, survey_id, latitude, longitude, realm, country, area, geom, program, mapped_i from nrmn.ep_species_survey " +
+    "ORDER BY  species_id, survey_id, latitude, longitude, realm, country, area, geom, program, mapped_i OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    List<Tuple> getEpSpeciesSurvey(@Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    // ------------------
+
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query LIKE 'REFRESH MATERIALIZED VIEW %'", nativeQuery = true)
     Boolean checkAnyRunning();
 }
