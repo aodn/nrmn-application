@@ -157,8 +157,8 @@ public class MaterializedViewService {
                     materializedViewsRepository::getEpSiteList);
 
             uploadMaterializedView("ep_m0_off_transect_sighting", null, null,
-                    materializedViewsRepository.countEpM0OffTransectSigning(),
-                    materializedViewsRepository::getEpM0OffTransectSigning);
+                    materializedViewsRepository.countEpM0OffTransectSighting(),
+                    materializedViewsRepository::getEpM0OffTransectSighting);
 
             uploadMaterializedView("ep_survey_list", null, null,
                     materializedViewsRepository.countEpSurveyList(),

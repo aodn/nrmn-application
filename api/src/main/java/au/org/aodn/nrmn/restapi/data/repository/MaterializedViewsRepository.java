@@ -72,9 +72,6 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_observable_items;", nativeQuery = true)
     void refreshEpObservableItems();
 
-    @Query(value = "SELECT * from nrmn.ep_observable_items;", nativeQuery = true)
-    List<Tuple> getEpObservableItems();
-
     // ------------------
 
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW nrmn.ep_rarity_abundance'", nativeQuery = true)
@@ -83,9 +80,6 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Modifying
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_rarity_abundance;", nativeQuery = true)
     void refreshEpRarityAbundance();
-
-    @Query(value = "SELECT * from nrmn.ep_rarity_abundance;", nativeQuery = true)
-    List<Tuple> getEpRarityAbundance();
 
     // ------------------
 
@@ -96,8 +90,12 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_rarity_extents;", nativeQuery = true)
     void refreshEpRarityExtents();
 
-    @Query(value = "SELECT taxon, CAST(geom AS varchar), CAST(points AS varchar), mean_latitude, mean_longitude, CAST(mean_point AS varchar), km_degr_vertical, km_degr_horizontal from nrmn.ep_rarity_extents;", nativeQuery = true)
-    List<Tuple> getEpRarityExtents();
+    @Query(value = "SELECT count(*) from nrmn.ep_rarity_extents;", nativeQuery = true)
+    Long countEpRarityExtents();
+
+    @Query(value = "SELECT taxon, CAST(geom AS varchar), CAST(points AS varchar), mean_latitude, mean_longitude, CAST(mean_point AS varchar), km_degr_vertical, km_degr_horizontal from nrmn.ep_rarity_extents " +
+    "ORDER BY taxon, CAST(geom AS varchar), CAST(points AS varchar), mean_latitude, mean_longitude, CAST(mean_point AS varchar), km_degr_vertical, km_degr_horizontal  OFFSET :offset LIMIT :limit ", nativeQuery = true)
+    List<Tuple> getEpRarityExtents(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
 
@@ -108,9 +106,6 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW CONCURRENTLY nrmn.ep_rarity_frequency;", nativeQuery = true)
     void refreshEpRarityFrequency();
 
-    @Query(value = "SELECT * from nrmn.ep_rarity_frequency;", nativeQuery = true)
-    List<Tuple> getEpRarityFrequency();
-
     // ------------------
 
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW nrmn.ep_rarity_range'", nativeQuery = true)
@@ -119,9 +114,6 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Modifying
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_rarity_range;", nativeQuery = true)
     void refreshEpRarityRange();
-
-    @Query(value = "SELECT * from nrmn.ep_rarity_range;", nativeQuery = true)
-    List<Tuple> getEpRarityRange();
 
     // ------------------
 
@@ -148,30 +140,29 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_survey_list;", nativeQuery = true)
     void refreshEpSurveyList();
 
-    @Modifying
     @Query(value = "SELECT COUNT(*) FROM nrmn.ep_survey_list;", nativeQuery = true)
     Long countEpSurveyList();
 
     @Query(value = "SELECT survey_id, country, area, location, mpa, site_code, site_name, latitude, longitude, depth, survey_date, latest_surveydate_for_site, has_pq_scores_in_db, has_rugosity_scores_in_db, has_pqs_catalogued_in_db, divers, visibility, hour, direction, survey_latitude, survey_longitude, avg_rugosity, max_rugosity, surface, CAST(geom AS varchar), program, pq_zip_url, protection_status, old_site_codes, methods, survey_notes from nrmn.ep_survey_list " +
-    "ORDER BY survey_id, country, area, location, mpa, site_code, site_name, latitude, longitude, depth, survey_date, latest_surveydate_for_site, has_pq_scores_in_db, has_rugosity_scores_in_db, has_pqs_catalogued_in_db, divers, visibility, hour, direction, survey_latitude, survey_longitude, avg_rugosity, max_rugosity, surface, CAST(geom AS varchar), program, pq_zip_url, protection_status, old_site_codes, methods, survey_notes;", nativeQuery = true)
+    "ORDER BY survey_id, country, area, location, mpa, site_code, site_name, latitude, longitude, depth, survey_date, latest_surveydate_for_site, has_pq_scores_in_db, has_rugosity_scores_in_db, has_pqs_catalogued_in_db, divers, visibility, hour, direction, survey_latitude, survey_longitude, avg_rugosity, max_rugosity, surface, CAST(geom AS varchar), program, pq_zip_url, protection_status, old_site_codes, methods, survey_notes  OFFSET :offset LIMIT :limit", nativeQuery = true)
     List<Tuple> getEpSurveyList(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
 
     @Query(value = "SELECT count(*) from nrmn.ep_m0_off_transect_sighting;", nativeQuery = true)
-    Long countEpM0OffTransectSigning();
+    Long countEpM0OffTransectSighting();
 
-    @Query(value = "SELECT survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, method, block, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, size_class, total, biomass from nrmn.ep_m0_off_transect_sighting " +
-    "ORDER BY survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, method, block, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, size_class, total, biomass OFFSET :offset LIMIT :limit;", nativeQuery = true)
-    List<Tuple> getEpM0OffTransectSigning(@Param("offset") Integer offset, @Param("limit") Integer limit);
+    @Query(value = "SELECT survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, method, block, phylum, class, \"order\", family, recorded_species_name, species_name, taxon, reporting_name, size_class, total, biomass from nrmn.ep_m0_off_transect_sighting " +
+    "ORDER BY survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, method, block, phylum, class, \"order\", family, recorded_species_name, species_name, taxon, reporting_name, size_class, total, biomass OFFSET :offset LIMIT :limit", nativeQuery = true)
+    List<Tuple> getEpM0OffTransectSighting(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
 
     @Query(value = "SELECT count(*) from nrmn.ep_observable_items;", nativeQuery = true)
     Long countEpObservableItems();
 
-    @Query(value = "SELECT observable_item_id, observable_item_name, obs_item_type_name, phylum, class, order, family, genus, common_name, range, frequency, abundance, max_length, common_family_name, common_class_name, common_phylum_name, superseded_by, superseded_ids, superseded_names, a, b, cf, aphia_relation, aphia_id, scientificname, status, unacceptreason, taxon, reporting_name, report_group, habitat_groups, other_groups, mapped_id from nrmn.ep_observable_items " +
-    "ORDER BY observable_item_id, observable_item_name, obs_item_type_name, phylum, class, order, family, genus, common_name, range, frequency, abundance, max_length, common_family_name, common_class_name, common_phylum_name, superseded_by, superseded_ids, superseded_names, a, b, cf, aphia_relation, aphia_id, scientificname, status, unacceptreason, taxon, reporting_name, report_group, habitat_groups, other_groups, mapped_id OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    @Query(value = "SELECT observable_item_id, observable_item_name, obs_item_type_name, phylum, class, \"order\", family, genus, common_name, range, frequency, abundance, max_length, common_family_name, common_class_name, common_phylum_name, superseded_by, superseded_ids, superseded_names, a, b, cf, aphia_relation, aphia_id, scientificname, status, unacceptreason, taxon, reporting_name, report_group, habitat_groups, other_groups, mapped_id from nrmn.ep_observable_items " +
+    "ORDER BY observable_item_id, observable_item_name, obs_item_type_name, phylum, class, \"order\", family, genus, common_name, range, frequency, abundance, max_length, common_family_name, common_class_name, common_phylum_name, superseded_by, superseded_ids, superseded_names, a, b, cf, aphia_relation, aphia_id, scientificname, status, unacceptreason, taxon, reporting_name, report_group, habitat_groups, other_groups, mapped_id OFFSET :offset LIMIT :limit", nativeQuery = true)
     List<Tuple> getEpObservableItems(@Param("offset") Integer offset, @Param("limit") Integer limit);
     // ------------------
 
@@ -179,7 +170,7 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     Long countEpRarityAbundance();
 
     @Query(value = "SELECT  taxon, n_sites, n_surveys, n_blocks, abundance from nrmn.ep_rarity_abundance " +
-    "ORDER BY  taxon, n_sites, n_surveys, n_blocks, abundance OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    "ORDER BY  taxon, n_sites, n_surveys, n_blocks, abundance OFFSET :offset LIMIT :limit", nativeQuery = true)
     List<Tuple> getEpRarityAbundance(@Param("offset") Integer offset, @Param("limit") Integer limit);
     
     // ------------------
@@ -188,25 +179,16 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     Long countEpRarityRange();
 
     @Query(value = "SELECT  taxon, num_sites, range from nrmn.ep_rarity_range " +
-    "ORDER BY  taxon, num_sites, range OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    "ORDER BY  taxon, num_sites, range OFFSET :offset LIMIT :limit", nativeQuery = true)
     List<Tuple> getEpRarityRange(@Param("offset") Integer offset, @Param("limit") Integer limit);
-
-    // ------------------
-
-    @Query(value = "SELECT count(*) from nrmn.ep_rarity_extents;", nativeQuery = true)
-    Long countEpRarityExtents();
-
-    @Query(value = "SELECT  taxon, geom, points, mean_latitude, mean_longitude, mean_point, km_degr_vertical, km_degr_horizontal from nrmn.ep_rarity_extents " +
-    "ORDER BY  taxon, geom, points, mean_latitude, mean_longitude, mean_point, km_degr_vertical, km_degr_horizontal OFFSET :offset LIMIT :limit;", nativeQuery = true)
-    List<Tuple> getEpRarityExtents(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
 
     @Query(value = "SELECT count(*) from nrmn.ep_m3_isq;", nativeQuery = true)
     Long countEpM3Isq();
 
-    @Query(value = "SELECT survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, report_group, habitat_groups, quadrat, total from nrmn.ep_m3_isq " +
-    "ORDER BY ep_observable_items OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    @Query(value = "SELECT survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, \"order\", family, recorded_species_name, species_name, taxon, reporting_name, report_group, habitat_groups, quadrat, total from nrmn.ep_m3_isq " +
+    "ORDER BY survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, \"order\", family, recorded_species_name, species_name, taxon, reporting_name, report_group, habitat_groups, quadrat, total OFFSET :offset LIMIT :limit", nativeQuery = true)
     List<Tuple> getEpM3Isq(@Param("offset") Integer offset, @Param("limit") Integer limit);
     
     // ------------------
@@ -214,8 +196,8 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "SELECT count(*) from nrmn.ep_m4_macrocystis_count;", nativeQuery = true)
     Long countEpM4Macrocystis();
 
-    @Query(value = "SELECT   survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, block, totalfrom nrmn.ep_m4_macrocystis_count " +
-    "ORDER BY  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, block, total OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    @Query(value = "SELECT survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, \"order\", family, recorded_species_name, species_name, taxon, reporting_name, block, total from nrmn.ep_m4_macrocystis_count " +
+    "ORDER BY survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, \"order\", family, recorded_species_name, species_name, taxon, reporting_name, block, total OFFSET :offset LIMIT :limit", nativeQuery = true)
     List<Tuple> getEpM4Macrocystis(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
@@ -223,8 +205,8 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "SELECT count(*) from nrmn.ep_m5_limpet_quadrats;", nativeQuery = true)
     Long countEpM5LimpetQuadrats();
 
-    @Query(value = "SELECT  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, quadrat, total from nrmn.ep_m5_limpet_quadrats " +
-    "ORDER BY  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, quadrat, total OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    @Query(value = "SELECT  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, \"order\", family, recorded_species_name, species_name, taxon, reporting_name, quadrat, total from nrmn.ep_m5_limpet_quadrats " +
+    "ORDER BY  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, phylum, class, \"order\", family, recorded_species_name, species_name, taxon, reporting_name, quadrat, total OFFSET :offset LIMIT :limit", nativeQuery = true)
     List<Tuple> getEpM5LimpetQuadrats(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
@@ -232,8 +214,8 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "SELECT count(*) from nrmn.ep_m7_lobster_count;", nativeQuery = true)
     Long countEpM7LobsterCount();
 
-    @Query(value = "SELECT  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, block, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, size_class, total from nrmn.ep_m7_lobster_count " +
-    "ORDER BY  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, block, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, size_class, total OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    @Query(value = "SELECT  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, block, phylum, class, \"order\", family, recorded_species_name, species_name, taxon, reporting_name, size_class, total from nrmn.ep_m7_lobster_count " +
+    "ORDER BY  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, block, phylum, class, \"order\", family, recorded_species_name, species_name, taxon, reporting_name, size_class, total OFFSET :offset LIMIT :limit", nativeQuery = true)
     List<Tuple> getEpM7LobsterCount(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
@@ -241,8 +223,8 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "SELECT count(*) from nrmn.ep_m11_off_transect_measurement;", nativeQuery = true)
     Long countEpM11OffTransectMeasurement();
 
-    @Query(value = "SELECT survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, block, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, size_class, tota from nrmn.ep_m11_off_transect_measurement " +
-    "ORDER BY survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, block, phylum, class, order, family, recorded_species_name, species_name, taxon, reporting_name, size_class, tota OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    @Query(value = "SELECT survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, block, phylum, class, \"order\", family, recorded_species_name, species_name, taxon, reporting_name, size_class, total from nrmn.ep_m11_off_transect_measurement " +
+    "ORDER BY survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, block, phylum, class, \"order\", family, recorded_species_name, species_name, taxon, reporting_name, size_class, total OFFSET :offset LIMIT :limit", nativeQuery = true)
     List<Tuple> getEpM11OffTransectMeasurement(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
@@ -250,8 +232,8 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "SELECT count(*) from nrmn.ep_m12_debris;", nativeQuery = true)
     Long countEpM12Debris();
 
-    @Query(value = "SELECT  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, block, debris, total from nrmn.ep_m12_debris " +
-    "ORDER BY  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, diver, block, debris, total OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    @Query(value = "SELECT  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, block, debris, total from nrmn.ep_m12_debris " +
+    "ORDER BY  survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, diver, block, debris, total OFFSET :offset LIMIT :limit", nativeQuery = true)
     List<Tuple> getEpM12Debris(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
@@ -259,8 +241,8 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "SELECT count(*) from nrmn.ep_m13_pq_scores;", nativeQuery = true)
     Long countEpM13PqScores();
 
-    @Query(value = "SELECT survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, resolution, category, major_category, num_points, total_points, percent_cover from nrmn.ep_m13_pq_scores " +
-    "ORDER BY survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, geom, program, visibility, hour, survey_latitude, survey_longitude, resolution, category, major_category, num_points, total_points, percent_cover OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    @Query(value = "SELECT survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, resolution, category, major_category, num_points, total_points, percent_cover from nrmn.ep_m13_pq_scores " +
+    "ORDER BY survey_id, country, area, ecoregion, realm, location, site_code, site_name, latitude, longitude, survey_date, depth, CAST(geom AS varchar), program, visibility, hour, survey_latitude, survey_longitude, resolution, category, major_category, num_points, total_points, percent_cover OFFSET :offset LIMIT :limit", nativeQuery = true)
     List<Tuple> getEpM13PqScores(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
@@ -268,8 +250,8 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "SELECT count(*) from nrmn.ep_species_survey;", nativeQuery = true)
     Long countEpSpeciesSurvey();
 
-    @Query(value = "SELECT  species_id, survey_id, latitude, longitude, realm, country, area, geom, program, mapped_i from nrmn.ep_species_survey " +
-    "ORDER BY  species_id, survey_id, latitude, longitude, realm, country, area, geom, program, mapped_i OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    @Query(value = "SELECT  species_id, survey_id, latitude, longitude, realm, country, area, CAST(geom AS varchar), program, mapped_id from nrmn.ep_species_survey " +
+    "ORDER BY  species_id, survey_id, latitude, longitude, realm, country, area, CAST(geom AS varchar), program, mapped_id OFFSET :offset LIMIT :limit", nativeQuery = true)
     List<Tuple> getEpSpeciesSurvey(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
