@@ -172,6 +172,18 @@ public class MaterializedViewService {
                     materializedViewsRepository.countEpObservableItems(),
                     materializedViewsRepository::getEpObservableItems);
 
+            uploadMaterializedView("ep_rarity_abundance", null, null,
+                    materializedViewsRepository.countEpRarityAbundance(),
+                    materializedViewsRepository::getEpRarityAbundance);
+
+            uploadMaterializedView("ep_rarity_range", null, null,
+                    materializedViewsRepository.countEpRarityRange(),
+                    materializedViewsRepository::getEpRarityRange);
+
+            uploadMaterializedView("ep_rarity_extents", null, null,
+                    materializedViewsRepository.countEpRarityExtents(),
+                    materializedViewsRepository::getEpRarityExtents);
+
             uploadMaterializedView("ep_m1", countries, states,
                     materializedViewsRepository.countEpM1(),
                     materializedViewsRepository::getEpM1);

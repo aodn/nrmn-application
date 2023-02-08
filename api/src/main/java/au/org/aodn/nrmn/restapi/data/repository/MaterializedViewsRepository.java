@@ -173,6 +173,32 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "SELECT observable_item_id, observable_item_name, obs_item_type_name, phylum, class, order, family, genus, common_name, range, frequency, abundance, max_length, common_family_name, common_class_name, common_phylum_name, superseded_by, superseded_ids, superseded_names, a, b, cf, aphia_relation, aphia_id, scientificname, status, unacceptreason, taxon, reporting_name, report_group, habitat_groups, other_groups, mapped_id from nrmn.ep_observable_items " +
     "ORDER BY observable_item_id, observable_item_name, obs_item_type_name, phylum, class, order, family, genus, common_name, range, frequency, abundance, max_length, common_family_name, common_class_name, common_phylum_name, superseded_by, superseded_ids, superseded_names, a, b, cf, aphia_relation, aphia_id, scientificname, status, unacceptreason, taxon, reporting_name, report_group, habitat_groups, other_groups, mapped_id OFFSET :offset LIMIT :limit;", nativeQuery = true)
     List<Tuple> getEpObservableItems(@Param("offset") Integer offset, @Param("limit") Integer limit);
+    // ------------------
+
+    @Query(value = "SELECT count(*) from nrmn.ep_rarity_abundance;", nativeQuery = true)
+    Long countEpRarityAbundance();
+
+    @Query(value = "SELECT  taxon, n_sites, n_surveys, n_blocks, abundance from nrmn.ep_rarity_abundance " +
+    "ORDER BY  taxon, n_sites, n_surveys, n_blocks, abundance OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    List<Tuple> getEpRarityAbundance(@Param("offset") Integer offset, @Param("limit") Integer limit);
+    
+    // ------------------
+
+    @Query(value = "SELECT count(*) from nrmn.ep_rarity_range;", nativeQuery = true)
+    Long countEpRarityRange();
+
+    @Query(value = "SELECT  taxon, num_sites, range from nrmn.ep_rarity_range " +
+    "ORDER BY  taxon, num_sites, range OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    List<Tuple> getEpRarityRange(@Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    // ------------------
+
+    @Query(value = "SELECT count(*) from nrmn.ep_rarity_extents;", nativeQuery = true)
+    Long countEpRarityExtents();
+
+    @Query(value = "SELECT  taxon, geom, points, mean_latitude, mean_longitude, mean_point, km_degr_vertical, km_degr_horizontal from nrmn.ep_rarity_extents " +
+    "ORDER BY  taxon, geom, points, mean_latitude, mean_longitude, mean_point, km_degr_vertical, km_degr_horizontal OFFSET :offset LIMIT :limit;", nativeQuery = true)
+    List<Tuple> getEpRarityExtents(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
 
