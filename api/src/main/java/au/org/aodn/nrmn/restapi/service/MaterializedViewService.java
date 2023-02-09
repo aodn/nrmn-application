@@ -8,6 +8,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.Tuple;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -151,81 +152,81 @@ public class MaterializedViewService {
 
         try {
 
-            uploadMaterializedView("ep_site_list", null, null,
-                    materializedViewsRepository.countEpSiteList(),
-                    materializedViewsRepository::getEpSiteList);
+            // uploadMaterializedView("ep_site_list", null, null,
+            //         materializedViewsRepository.countEpSiteList(),
+            //         materializedViewsRepository::getEpSiteList);
 
-            uploadMaterializedView("ep_m0_off_transect_sighting", null, null,
-                    materializedViewsRepository.countEpM0OffTransectSighting(),
-                    materializedViewsRepository::getEpM0OffTransectSighting);
+            // uploadMaterializedView("ep_m0_off_transect_sighting", null, null,
+            //         materializedViewsRepository.countEpM0OffTransectSighting(),
+            //         materializedViewsRepository::getEpM0OffTransectSighting);
 
-            uploadMaterializedView("ep_survey_list", null, null,
-                    materializedViewsRepository.countEpSurveyList(),
-                    materializedViewsRepository::getEpSurveyList);
+            // uploadMaterializedView("ep_survey_list", null, null,
+            //         materializedViewsRepository.countEpSurveyList(),
+            //         materializedViewsRepository::getEpSurveyList);
 
-            uploadMaterializedView("ep_site_list", null, null,
-                    materializedViewsRepository.countEpSiteList(),
-                    materializedViewsRepository::getEpSiteList);
+            // uploadMaterializedView("ep_site_list", null, null,
+            //         materializedViewsRepository.countEpSiteList(),
+            //         materializedViewsRepository::getEpSiteList);
 
-            uploadMaterializedView("ep_observable_items", null, null,
-                    materializedViewsRepository.countEpObservableItems(),
-                    materializedViewsRepository::getEpObservableItems);
+            // uploadMaterializedView("ep_observable_items", null, null,
+            //         materializedViewsRepository.countEpObservableItems(),
+            //         materializedViewsRepository::getEpObservableItems);
 
-            uploadMaterializedView("ep_rarity_abundance", null, null,
-                    materializedViewsRepository.countEpRarityAbundance(),
-                    materializedViewsRepository::getEpRarityAbundance);
+            // uploadMaterializedView("ep_rarity_abundance", null, null,
+            //         materializedViewsRepository.countEpRarityAbundance(),
+            //         materializedViewsRepository::getEpRarityAbundance);
 
-            uploadMaterializedView("ep_rarity_range", null, null,
-                    materializedViewsRepository.countEpRarityRange(),
-                    materializedViewsRepository::getEpRarityRange);
+            // uploadMaterializedView("ep_rarity_range", null, null,
+            //         materializedViewsRepository.countEpRarityRange(),
+            //         materializedViewsRepository::getEpRarityRange);
 
-            uploadMaterializedView("ep_rarity_extents", null, null,
-                    materializedViewsRepository.countEpRarityExtents(),
-                    materializedViewsRepository::getEpRarityExtents);
+            // uploadMaterializedView("ep_rarity_extents", null, null,
+            //         materializedViewsRepository.countEpRarityExtents(),
+            //         materializedViewsRepository::getEpRarityExtents);
 
-            uploadMaterializedView("ep_m1", countries, states,
-                    materializedViewsRepository.countEpM1(),
-                    materializedViewsRepository::getEpM1);
+            // uploadMaterializedView("ep_m1", countries, states,
+            //         materializedViewsRepository.countEpM1(),
+            //         materializedViewsRepository::getEpM1);
 
-            uploadMaterializedView("ep_m2_cryptic_fish", countries, states,
-                    materializedViewsRepository.countEpM2CrypticFish(),
-                    materializedViewsRepository::getEpM2CrypticFish);
+            // uploadMaterializedView("ep_m2_cryptic_fish", countries, states,
+            //         materializedViewsRepository.countEpM2CrypticFish(),
+            //         materializedViewsRepository::getEpM2CrypticFish);
 
-            uploadMaterializedView("ep_m2_inverts", countries, states,
-                    materializedViewsRepository.countEpM2Inverts(),
-                    materializedViewsRepository::getEpM2Inverts);
+            // uploadMaterializedView("ep_m2_inverts", countries, states,
+            //         materializedViewsRepository.countEpM2Inverts(),
+            //         materializedViewsRepository::getEpM2Inverts);
 
-            uploadMaterializedView("ep_m3_isq", null, null,
-                    materializedViewsRepository.countEpM3Isq(),
-                    materializedViewsRepository::getEpM3Isq);
+            // uploadMaterializedView("ep_m3_isq", null, null,
+            //         materializedViewsRepository.countEpM3Isq(),
+            //         materializedViewsRepository::getEpM3Isq);
 
-            uploadMaterializedView("ep_m4_macrocystis_count", null, null,
-                    materializedViewsRepository.countEpM4Macrocystis(),
-                    materializedViewsRepository::getEpM4Macrocystis);
+            // uploadMaterializedView("ep_m4_macrocystis_count", null, null,
+            //         materializedViewsRepository.countEpM4Macrocystis(),
+            //         materializedViewsRepository::getEpM4Macrocystis);
 
-            uploadMaterializedView("ep_m5_limpet_quadrats", null, null,
-                    materializedViewsRepository.countEpM5LimpetQuadrats(),
-                    materializedViewsRepository::getEpM5LimpetQuadrats);
+            // uploadMaterializedView("ep_m5_limpet_quadrats", null, null,
+            //         materializedViewsRepository.countEpM5LimpetQuadrats(),
+            //         materializedViewsRepository::getEpM5LimpetQuadrats);
 
-            uploadMaterializedView("ep_m7_lobster_count", null, null,
-                    materializedViewsRepository.countEpM7LobsterCount(),
-                    materializedViewsRepository::getEpM7LobsterCount);
+            // uploadMaterializedView("ep_m7_lobster_count", null, null,
+            //         materializedViewsRepository.countEpM7LobsterCount(),
+            //         materializedViewsRepository::getEpM7LobsterCount);
 
-            uploadMaterializedView("ep_m11_off_transect_measurement", null, null,
-                    materializedViewsRepository.countEpM11OffTransectMeasurement(),
-                    materializedViewsRepository::getEpM11OffTransectMeasurement);
+            // uploadMaterializedView("ep_m11_off_transect_measurement", null, null,
+            //         materializedViewsRepository.countEpM11OffTransectMeasurement(),
+            //         materializedViewsRepository::getEpM11OffTransectMeasurement);
 
-            uploadMaterializedView("ep_m12_debris", null, null,
-                    materializedViewsRepository.countEpM12Debris(),
-                    materializedViewsRepository::getEpM12Debris);
+            // uploadMaterializedView("ep_m12_debris", null, null,
+            //         materializedViewsRepository.countEpM12Debris(),
+            //         materializedViewsRepository::getEpM12Debris);
 
-            uploadMaterializedView("ep_m13_pq_scores", null, null,
-                    materializedViewsRepository.countEpM13PqScores(),
-                    materializedViewsRepository::getEpM13PqScores);
+            // uploadMaterializedView("ep_m13_pq_scores", null, null,
+            //         materializedViewsRepository.countEpM13PqScores(),
+            //         materializedViewsRepository::getEpM13PqScores);
 
-            uploadMaterializedView("ep_species_survey", null, null,
-                    materializedViewsRepository.countEpSpeciesSurvey(),
-                    materializedViewsRepository::getEpSpeciesSurvey);
+            uploadMaterializedView("ep_species_survey_observation", null, null,
+                    materializedViewsRepository.countEpSpeciesSurveyObservation(),
+                    materializedViewsRepository::getEpSpeciesSurveyObservation);
 
             stopWatch.stop();
             logger.info("Uploaded all materialized views in " + stopWatch.getLastTaskTimeMillis() + "ms");
@@ -288,5 +289,10 @@ public class MaterializedViewService {
     @Async
     public void refreshAllAsync() {
         refreshAllViews();
+    }
+
+    @PostConstruct
+    public void onStartup() {
+        uploadAllMaterializedViews();
     }
 }
