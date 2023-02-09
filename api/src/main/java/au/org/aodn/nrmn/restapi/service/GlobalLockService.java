@@ -1,5 +1,7 @@
 package au.org.aodn.nrmn.restapi.service;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ public class GlobalLockService {
     @Autowired 
     GlobalLockRepository globalLockRepository;
 
+    @Transactional
     public Boolean setLock() {
         try {
             var lock = globalLockRepository.findById(1L);
