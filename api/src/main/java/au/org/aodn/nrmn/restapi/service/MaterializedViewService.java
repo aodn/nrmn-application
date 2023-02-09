@@ -8,6 +8,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.Tuple;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -223,9 +224,9 @@ public class MaterializedViewService {
                     materializedViewsRepository.countEpM13PqScores(),
                     materializedViewsRepository::getEpM13PqScores);
 
-            uploadMaterializedView("ep_species_survey", null, null,
-                    materializedViewsRepository.countEpSpeciesSurvey(),
-                    materializedViewsRepository::getEpSpeciesSurvey);
+            uploadMaterializedView("ep_species_survey_observation", null, null,
+                    materializedViewsRepository.countEpSpeciesSurveyObservation(),
+                    materializedViewsRepository::getEpSpeciesSurveyObservation);
 
             stopWatch.stop();
             logger.info("Uploaded all materialized views in " + stopWatch.getLastTaskTimeMillis() + "ms");
