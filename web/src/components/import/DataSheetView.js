@@ -327,7 +327,6 @@ const DataSheetView = ({onIngest, isAdmin}) => {
               <>
                 <Box p={1} minWidth={180}>
                   <Button
-                    ref={buttonRef}
                     variant="contained"
                     disabled={state === IngestState.Loading}
                     onClick={handleSaveAndValidate}
