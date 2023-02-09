@@ -6,53 +6,70 @@ import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
 import {PropTypes} from 'prop-types';
 
-import {measurements, extendedMeasurements} from '../../../common/constants';
+import {allMeasurements} from '../../../common/constants';
 
-const ValidationSummary = (props) => {
-  const mm = measurements.concat(extendedMeasurements);
+const ValidationSummary = ({data, onItemClick}) => {
+  const isContiguous = (sorted) => {
+    const first = sorted[0];
+    const last = sorted[sorted.length - 1];
+    return last - first + 1 === sorted.length;
+  };
+
+  const labelForDescription = (d) => {
+    const mmHeader = allMeasurements.find((m) => d.columnName && m.field === d.columnName.replace('measurements.', ''));
+    return mmHeader ? `${d.isInvertSizing ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
+  };
+
   return (
     <TreeView defaultCollapseIcon={<ArrowDropDownIcon />} defaultExpandIcon={<ArrowRightIcon />}>
-      {props.data.map((m) => (
-        <TreeItem
-          key={m.key}
-          nodeId={`${m.key}`}
-          label={
-            <Typography variant="body2">
-              {m.message} {m.description.length > 1 ? '(' + m.description.length + ')' : ''}
-            </Typography>
-          }
-        >
-          {m.description.map((d) => {
-            const mmHeader = mm.find((m) => m.field === d.columnName);
-            const label = mmHeader ? `${d.isInvertSize ? mmHeader.invertSize : mmHeader.fishSize}cm` : d.columnName;
-
-            return (
+      {['BLOCKING', 'WARNING', 'DUPLICATE', 'INFO'].map((level) => (
+        <div key={level}>
+          <Typography variant="button">{data[level] ? level : 'No ' + level + '✔'}</Typography>
+          {data[level]?.map((m) => (
               <TreeItem
-                nodeId={`${m.key}-${d.columnName}`}
-                key={`${m.key}-${d.columnName}`}
-                onClick={() => props.onItemClick(d)}
+                nodeId={m.id}
+                key={m.id}
                 label={
                   <Typography variant="body2">
-                    {d.value ? (
-                      <span>
-                        {d.rowNumbers ? `${d.rowNumbers[0]}: ` : ''}
-                        <b>{label}</b> {d.value}
-                      </span>
-                    ) : d.label ? (
-                      <b>{label} is empty</b>
-                    ) : d.columnNames ? (
-                      <b>
-                        Check Column{d.columnNames.length > 1 ? 's' : ''} {d.columnNames.join(', ')}
-                      </b>
-                    ) : (
-                      <b>Rows {d.rowNumbers.join(', ')}</b>
-                    )}
+                    {m.message + ' ' + (m.message.includes('easurements') ? labelForDescription(m.description[0]) : '') + (m.description?.length > 1 ? ' (' + m.description.length + ')' : '')}
                   </Typography>
                 }
-              />
-            );
-          })}
-        </TreeItem>
+              >
+                {m.description?.map((d) => {
+                  const label = labelForDescription(d);
+                  return (
+                    <TreeItem
+                      nodeId={d.id}
+                      key={d.id}
+                      onClick={() => onItemClick(d)}
+                      label={
+                        <Typography variant="body2">
+                          {d.value ? (
+                            <span>
+                              <b>{label}</b> {d.value} {(d.rowNumbers?.length > 1) && `(${d.rowNumbers.length})`}
+                            </span>
+                          ) : d.label ? (
+                            <b>{label} is empty</b>
+                          ) : d.columnNames ? (
+                            <b>
+                              Check Column{d.columnNames.length > 1 ? 's' : ''} {d.columnNames.join(', ')}
+                            </b>
+                          ) : (
+                            <b>
+                              Rows{' '}
+                              {isContiguous(d.rowNumbers)
+                                ? `[${d.rowNumbers[0]}-${d.rowNumbers[d.rowNumbers.length - 1]}]`
+                                : d.rowNumbers.join(', ')}
+                            </b>
+                          )}
+                        </Typography>
+                      }
+                    />
+                  );
+                })}
+              </TreeItem>
+          ))}
+        </div>
       ))}
     </TreeView>
   );
@@ -61,6 +78,6 @@ const ValidationSummary = (props) => {
 export default ValidationSummary;
 
 ValidationSummary.propTypes = {
-  data: PropTypes.array,
+  data: PropTypes.object,
   onItemClick: PropTypes.func
 };

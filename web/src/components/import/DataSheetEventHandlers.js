@@ -170,38 +170,100 @@ class DataSheetEventHandlers {
     return e.context.rowPos ? e.context.rowPos.indexOf(e.data.pos) + 1 : 0;
   }
 
-  generateErrorTree(rowData, rowPos, errors) {
-    const tree = {blocking: [], warning: [], info: [], duplicate: []};
-    errors
-      .sort((a, b) => (a.message < b.message ? -1 : a.message > b.message ? 1 : 0))
-      .forEach((e) => {
-        const rows = rowData.filter((r) => e.rowIds.includes(r.id));
-        let summary = [];
-        if (e.columnNames && e.categoryId !== 'SPAN') {
-          const col = e.columnNames[0];
-          summary = rows.reduce((acc, r) => {
+  generateErrorTree(rowData, errors) {
+    var formatted = [];
+    errors.sort((a, b) => (a.message < b.message ? -1 : 1));
+    errors.forEach((validation, idx) => {
+      validation.id = `validation-${idx}`;
+      const rowPos = validation.rowIds.map((r) => rowData.find((d) => d.id === r)?.pos);
+      if (validation.rowIds?.length === 1 && validation.columnNames) {
+        const columnPath = validation.columnNames[0];
+        const key = columnPath?.includes('.') ? columnPath.split('.')[1] : columnPath;
+        const row = rowData.find((d) => d.id === validation.rowIds[0]);
+        const rowNumbers = rowPos.map((r) => r + 1);
+        rowNumbers.sort((a, b) => a - b);
+        const col = validation.columnNames.length > 1 ? {columnNames: validation.columnNames} : {columnName: columnPath};
+        validation.description = [
+          {
+            ...col,
+            id: `description1-${idx}.1`,
+            rowIds: validation.rowIds,
+            rowNumbers,
+            value: row ? row[key] : '',
+            isInvertSizing: row?.isInvertSizing?.toUpperCase() === 'YES'
+          }
+        ];
+      } else if (validation.rowIds?.length > 1 && validation.message.includes('easurement')) {
+        validation.description = rowData
+          .filter((r) => validation.rowIds.includes(r.id))
+          .reduce((acc, r) => {
+            const rowPosition = rowData.find((d) => d.id === r.id)?.pos;
+            const rowNumber = rowPos.indexOf(rowPosition) + 1;
+            validation.columnNames.forEach((col, descriptionIdx) => {
+              const key = col?.includes('.') ? col.split('.')[1] : col;
+              acc.push({
+                id: `description2-${idx}.${acc.length}.${descriptionIdx}`,
+                columnName: key,
+                value: r[key],
+                rowIds: [r.id],
+                rowNumbers: [rowNumber],
+                isInvertSize: r.isInvertSizing === 'Yes'
+              });
+            });
+            return acc;
+          }, []);
+      } else if (validation.rowIds?.length > 1 && validation.columnNames && validation.categoryId !== 'SPAN') {
+        const col = validation.columnNames[0];
+        validation.description = rowData
+          .filter((r) => validation.rowIds.includes(r.id))
+          .reduce((acc, r) => {
             const rowPosition = rowData.find((d) => d.id === r.id)?.pos;
             const rowNumber = rowPos.indexOf(rowPosition) + 1;
             const existingIdx = acc.findIndex((m) => m.columnName === col && m.value === r[col]);
-            if (existingIdx >= 0 && isNaN(parseInt(acc[existingIdx].columnName)))
+            if (existingIdx >= 0 && isNaN(parseInt(acc[existingIdx].columnName))) {
+              let rowNumbers = [...acc[existingIdx].rowNumbers, rowNumber];
+              rowNumbers.sort((a, b) => a - b);
               acc[existingIdx] = {
+                id: `description3-${idx}.${existingIdx}`,
                 columnName: col,
                 value: r[col],
                 rowIds: [...acc[existingIdx].rowIds, r.id],
-                rowNumbers: [...acc[existingIdx].rowNumbers, rowNumber]
+                rowNumbers
               };
-            else
-              acc.push({columnName: col, value: r[col], rowIds: [r.id], rowNumbers: [rowNumber], isInvertSize: r.isInvertSizing === 'Yes'});
+            } else {
+              acc.push({
+                id: `description4-${idx}.${acc.length}`,
+                columnName: col,
+                value: r[col],
+                rowIds: [r.id],
+                rowNumbers: [rowNumber],
+                isInvertSize: r.isInvertSizing === 'Yes'
+              });
+            }
             return acc;
           }, []);
-        } else {
-          const rowPositions = e.rowIds.map((r) => rowData.find((d) => d.id === r)?.pos).filter((r) => r);
-          const rowNumbers = rowPositions.map((r) => rowPos.indexOf(r) + 1);
-          summary = [{rowIds: e.rowIds, columnNames: e.columnNames, rowNumbers}];
-        }
-        tree[e.levelId.toLowerCase()].push({key: `err-${e.id}`, message: e.message, count: e.rowIds.length, description: summary});
-      });
-    return tree;
+      } else {
+        const rowPos = validation.rowIds.map((r) => rowData.find((d) => d.id === r)?.pos);
+        const rowNumbers = rowPos.map((r) => r + 1);
+        rowNumbers.sort((a, b) => a - b);
+        validation.description = [
+          {
+            id: `description5-${idx}.0`,
+            columnName: 'id',
+            rowIds: validation.rowIds,
+            rowNumbers,
+            value: ''
+          }
+        ];
+      }
+
+      formatted.push(validation);
+    });
+
+    return formatted.reduce((rv, x) => {
+      (rv[x['levelId']] = rv[x['levelId']] || []).push(x);
+      return rv;
+    }, {});
   }
 
   onPasteStart(e) {
