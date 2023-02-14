@@ -157,6 +157,7 @@ const ObservableItemEdit = () => {
                 <CustomSearchInput
                   label="Superseded By"
                   formData={item.supersededBy}
+                  exclude={item.observableItemName}
                   field="supersededBy"
                   errors={errors}
                   onChange={(t) => dispatch({field: 'supersededBy', value: t})}
