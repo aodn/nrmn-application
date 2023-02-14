@@ -81,7 +81,7 @@ const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
         fullWidth={fullWidth}
         value={textValue}
         onInputChange={handleOnInputChanged}
-        renderInput={(params) => <TextField {...params} error={error} helperText = {error ? 'This species not found in database, please add it' : ''}size="small" color="primary" variant="outlined" />}
+        renderInput={(params) => <TextField {...params} error={error} helperText = {error ? 'Not a valid species for this field.' : ''}size="small" color="primary" variant="outlined" />}
       />
     </>
   );
