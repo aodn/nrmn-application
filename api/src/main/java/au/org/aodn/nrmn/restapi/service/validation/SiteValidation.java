@@ -28,7 +28,7 @@ public class SiteValidation {
     @Autowired
     MeowRegionsRepository meowRegionsRepository;
 
-    private static final Collection<Integer> MEOW_METHODS_TO_CHECK = Arrays.asList(0, 1, 2, 7, 8, 9, 10);
+    private static final Collection<Integer> MEOW_METHODS_TO_CHECK = Arrays.asList(0, 1, 2, 3, 7, 8, 9, 10);
 
     private SurveyValidationError validateSpeciesEcoregion(Integer siteId, Collection<StagedRowFormatted> survey) {
         var siteEcoregion = siteRepository.getEcoregion(siteId);
