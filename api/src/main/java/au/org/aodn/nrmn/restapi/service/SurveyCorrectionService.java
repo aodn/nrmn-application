@@ -12,6 +12,8 @@ import java.util.stream.IntStream;
 
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -72,6 +74,8 @@ public class SurveyCorrectionService {
     @Autowired
     StagedJobRepository jobRepository;
 
+    private static Logger logger = LoggerFactory.getLogger(SurveyCorrectionService.class);
+
     private List<Integer> speciesMethods = Arrays.asList(
             SurveyMethod.M0,
             SurveyMethod.M1,
@@ -80,8 +84,8 @@ public class SurveyCorrectionService {
             SurveyMethod.M10,
             SurveyMethod.M11);
 
-    public void correctSurvey(StagedJob job, List<Integer> surveyIds, Collection<StagedRowFormatted> validatedRows) {
-        surveyCorrectionTransaction(job, surveyIds, validatedRows);
+    public void correctSurvey(StagedJob job, List<StagedJobLog> jobLogs, List<Integer> surveyIds, Collection<StagedRowFormatted> validatedRows) {
+        surveyCorrectionTransaction(job, jobLogs, surveyIds, validatedRows);
     }
 
     public void correctSpecies(StagedJob job, List<Integer> surveyIds, ObservableItem curr, ObservableItem next) {
@@ -148,7 +152,9 @@ public class SurveyCorrectionService {
         jobRepository.save(job);
     }
 
-    private void surveyCorrectionTransaction(StagedJob job, List<Integer> surveyIds,
+    private void surveyCorrectionTransaction(StagedJob job,
+            List<StagedJobLog> jobLogs,
+            List<Integer> surveyIds,
             Collection<StagedRowFormatted> validatedRows) {
 
         var messages = new ArrayList<String>();
@@ -179,7 +185,7 @@ public class SurveyCorrectionService {
         var measureEntities = measureRepository.findAll();
 
         for (var survey : surveys) {
-            messages.add("Correcting Survey ID: " + survey.getSurveyId());
+            logger.info("survey-correction", "Correcting Survey ID: " + survey.getSurveyId());
 
             var surveyRows = rowsGroupedBySurvey.get(survey.getSurveyId().longValue());
 
@@ -260,7 +266,8 @@ public class SurveyCorrectionService {
                     }
                 }
 
-                messages.add("Correcting " + firstMethodBlockRow.getBlock() + " : " + method.getMethodId());
+                logger.info("survey-correction",
+                        "Correcting " + firstMethodBlockRow.getBlock() + " : " + method.getMethodId());
             }
         }
 
@@ -268,7 +275,7 @@ public class SurveyCorrectionService {
         surveyMethodRepository.saveAll(surveyMethods);
         var newObservations = observationRepository.saveAll(observations);
 
-        messages.add("Inserting Observations "
+        logger.info("survey-correction", "Inserting Observations "
                 + formatRange(newObservations.stream().map(o -> o.getObservationId()).collect(Collectors.toList())));
 
         var details = messages.stream().collect(Collectors.joining("\n"));

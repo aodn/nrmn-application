@@ -339,69 +339,81 @@ const SurveyCorrect = () => {
   const diffSheet = () => {
     const api = gridRef.current.api;
     const context = api.gridOptionsWrapper.gridOptions.context;
+    var edited = [];
 
-    const edited = context.rowData.reduce((acc, r) => {
-      const rowPos = context.rowPos.indexOf(r.pos) + 1;
-      const original = context.originalData.find((o) => o.id === r.id);
+    const groupedBySurveyId = context.rowData.reduce((acc, r) => {
+      const surveyId = r.surveyId;
+      if (!acc[surveyId]) acc[surveyId] = [];
+      acc[surveyId].push(r);
+      return acc;
+    }, {});
 
-      if (!original) {
-        acc.push({row: rowPos, message: 'Row inserted'});
-        return acc;
-      }
+    for (const survey of Object.values(groupedBySurveyId)) {
+      const thisEdited = survey.reduce((acc, r) => {
+        const rowPos = context.rowPos.indexOf(r.pos) + 1;
+        const original = context.originalData.find((o) => o.id === r.id);
 
-      var messages = [];
+        if (!original) {
+          acc.push({row: rowPos, message: 'Row inserted'});
+          return acc;
+        }
 
-      for (var key of Object.keys(r)) {
-        if (typeof r[key] === 'object') {
-          const mmOriginal = removeNullProperties(original[key]);
-          const mmUpdated = removeNullProperties(r[key]);
-          if (JSON.stringify(mmOriginal) !== JSON.stringify(mmUpdated)) {
-            const changed = {};
+        var messages = [];
 
-            for (var j of Object.keys(mmOriginal)) {
-              if (mmOriginal[j] !== mmUpdated[j]) changed[j] = mmUpdated[j];
+        for (var key of Object.keys(r)) {
+          if (typeof r[key] === 'object') {
+            const mmOriginal = removeNullProperties(original[key]);
+            const mmUpdated = removeNullProperties(r[key]);
+            if (JSON.stringify(mmOriginal) !== JSON.stringify(mmUpdated)) {
+              const changed = {};
+
+              for (var j of Object.keys(mmOriginal)) {
+                if (mmOriginal[j] !== mmUpdated[j]) changed[j] = mmUpdated[j];
+              }
+
+              for (var k of Object.keys(mmUpdated)) {
+                if (mmOriginal[k] !== mmUpdated[k]) changed[k] = mmUpdated[k];
+              }
+
+              var mmMessages = Object.keys(changed).map((c) => {
+                return `[S${c} ${mmOriginal[c] ? mmOriginal[c] : 0} to ${mmUpdated[c] ? mmUpdated[c] : 0}]`;
+              });
+
+              messages.push(`Observations: ${mmMessages.join(' ')}`);
             }
-
-            for (var k of Object.keys(mmUpdated)) {
-              if (mmOriginal[k] !== mmUpdated[k]) changed[k] = mmUpdated[k];
+          } else if (isNaN(parseInt(key))) {
+            if (original[key] !== r[key]) {
+              messages.push(`${key}: ${original[key]} to ${r[key]}`);
             }
-
-            var mmMessages = Object.keys(changed).map((c) => {
-              return `[S${c} ${mmOriginal[c] ? mmOriginal[c] : 0} to ${mmUpdated[c] ? mmUpdated[c] : 0}]`;
-            });
-
-            messages.push(`Observations: ${mmMessages.join(' ')}`);
-          }
-        } else if (isNaN(parseInt(key))) {
-          if (original[key] !== r[key]) {
-            messages.push(`${key}: ${original[key]} to ${r[key]}`);
-          }
-        } else {
-          const originalValue = parseInt(original[key]) || 0;
-          const updatedValue = parseInt(r[key]) || 0;
-          if (originalValue !== updatedValue) {
-            const column = allMeasurements.find((m) => m.field === `measurements.${key}`);
-            const bin = r.isInvertSizing !== 'Yes' ? column.fishSize : column.invertSize;
-            messages.push(`${bin}: ${originalValue} to ${updatedValue}`);
+          } else {
+            const originalValue = parseInt(original[key]) || 0;
+            const updatedValue = parseInt(r[key]) || 0;
+            if (originalValue !== updatedValue) {
+              const column = allMeasurements.find((m) => m.field === `measurements.${key}`);
+              const bin = r.isInvertSizing !== 'Yes' ? column.fishSize : column.invertSize;
+              messages.push(`${bin}: ${originalValue} to ${updatedValue}`);
+            }
           }
         }
-      }
-      if (messages.length > 0) acc.push({row: rowPos, message: messages.join(', ')});
-      return acc;
-    }, []);
+        if (messages.length > 0) acc.push({surveyId: survey.surveyId, row: rowPos, message: messages.join(', ')});
+        return acc;
+      }, []);
+
+      edited = [...edited, ...thisEdited];
+    }
 
     const deleted = context.originalData.reduce((acc, r) => {
       const rowPos = context.originalRowPos.indexOf(r.pos) + 1;
       if (!context.rowData.find((o) => o.id === r.id)) {
-        acc.push({row: rowPos, message: 'Row deleted'});
+        acc.push({surveyId: r.surveyId, row: rowPos, message: 'Row deleted'});
       }
       return acc;
     }, []);
 
     const grouped = [...edited, ...deleted].reduce((acc, r) => {
-      const message = r.message;
-      if (!acc[message]) acc[message] = [];
-      acc[message].push(r.row);
+      const key = r.surveyId + '|' + r.message;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(r.row);
       return acc;
     }, {});
 
@@ -414,7 +426,9 @@ const SurveyCorrect = () => {
         return false;
       }, true);
       const asRange = v.length > 1 && isContinuous;
-      diff.push({message: k, row: asRange ? `${v[0]}-${v[v.length - 1]}` : v.join(',')});
+      // FIXME: this is a hack to get the surveyId and message
+      const msg = k.split('|');
+      diff.push({surveyId: parseInt(msg[0]), message: msg[1], row: asRange ? `${v[0]}-${v[v.length - 1]}` : v.join(',')});
     });
 
     setSurveyDiff(diff);
@@ -434,8 +448,13 @@ const SurveyCorrect = () => {
     const api = gridRef.current.api;
     const context = api.gridOptionsWrapper.gridOptions.context;
     context.useOverlay = 'Correcting Survey...';
+    const logs = surveyDiff.map((r) => ({surveyId: r.surveyId, details: r.message, rowSummary: r.row}));
     api.showLoadingOverlay();
-    const result = await submitSurveyCorrection(surveyId, {...metadata, rows: packedData(gridRef.current.api)});
+    const result = await submitSurveyCorrection(surveyId, {
+      ...metadata,
+      logs,
+      rows: packedData(gridRef.current.api)
+    });
     setRedirect(`/data/job/${result.data}/view`);
   };
 
@@ -469,17 +488,32 @@ const SurveyCorrect = () => {
         {editMode && (
           <>
             <Box m={1} ml={0}>
-              <Button variant="outlined" disabled={undoSize < 1 || !editMode || loading} startIcon={<UndoIcon />} onClick={() => eh.handleUndo({api: gridApi})}>
+              <Button
+                variant="outlined"
+                disabled={undoSize < 1 || !editMode || loading}
+                startIcon={<UndoIcon />}
+                onClick={() => eh.handleUndo({api: gridApi})}
+              >
                 Undo
               </Button>
             </Box>
             <Box m={1} ml={0} minWidth={150}>
-              <Button variant="outlined" disabled={!isFiltered || !editMode || loading}  startIcon={<ResetIcon />} onClick={() => setIsFiltered()}>
+              <Button
+                variant="outlined"
+                disabled={!isFiltered || !editMode || loading}
+                startIcon={<ResetIcon />}
+                onClick={() => setIsFiltered()}
+              >
                 Reset Filter
               </Button>
             </Box>
             <Box m={1} ml={0}>
-              <Button variant="outlined" disabled={!editMode || loading}  onClick={() => eh.onClickExcelExport(gridApi, 'Export', true)} startIcon={<CloudDownloadIcon />}>
+              <Button
+                variant="outlined"
+                disabled={!editMode || loading}
+                onClick={() => eh.onClickExcelExport(gridApi, 'Export', true)}
+                startIcon={<CloudDownloadIcon />}
+              >
                 Export
               </Button>
             </Box>

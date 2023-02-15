@@ -1,7 +1,8 @@
 package au.org.aodn.nrmn.restapi.dto.correction;
 
-import java.util.Collection;
+import java.util.List;
 
+import au.org.aodn.nrmn.restapi.data.model.StagedJobLog;
 import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class CorrectionRequestBodyDto {
     private Integer programId;
     private Boolean isMultiple;
-    private Collection<StagedRow> rows;
+    private List<StagedJobLog> logs;
+    private List<StagedRow> rows;
 }

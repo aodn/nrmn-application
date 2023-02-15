@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -124,7 +125,7 @@ public class SurveyCorrectionServiceTest {
         correctedRow.setMeasureJson(correctedMeasures);
 
         try {
-            surveyCorrectionService.correctSurvey(ingestedJob, Arrays.asList(1), Arrays.asList(correctedRow));
+            surveyCorrectionService.correctSurvey(ingestedJob, Collections.emptyList(), Arrays.asList(1), Arrays.asList(correctedRow));
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -159,7 +160,7 @@ public class SurveyCorrectionServiceTest {
         correctedRow.setMeasureJson(correctedMeasures);
 
         try {
-            surveyCorrectionService.correctSurvey(ingestedJob, Arrays.asList(1), Arrays.asList(correctedRow));
+            surveyCorrectionService.correctSurvey(ingestedJob, Collections.emptyList(), Arrays.asList(1), Arrays.asList(correctedRow));
         } catch (Exception e) {
             assertEquals(e.getMessage(), "Cannot correct locked survey data");
             return;

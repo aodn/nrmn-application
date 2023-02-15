@@ -397,7 +397,7 @@ public class CorrectionController {
                 return ResponseEntity.ok().body(result);
             }
 
-            surveyCorrectionService.correctSurvey(job, surveyIds, mappedRows);
+            surveyCorrectionService.correctSurvey(job, bodyDto.getLogs(), surveyIds, mappedRows);
             materializedViewService.refreshAllAsync();
 
         } catch (Exception e) {

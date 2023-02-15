@@ -60,4 +60,9 @@ public class StagedJobLog {
     @Column(name = "details", columnDefinition = "text")
     private String details;
 
+    @Column(name = "survey_id")
+    private Integer surveyId;
+
+    @Column(name = "row_summary")
+    private String rowSummary;
 }
