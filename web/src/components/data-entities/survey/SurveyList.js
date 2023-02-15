@@ -1,5 +1,4 @@
-import {Box, Button, Typography, Autocomplete, CircularProgress, TextField, Collapse, IconButton}
-  from '@mui/material';
+import {Box, Button, Typography, Autocomplete, CircularProgress, TextField, Collapse, IconButton} from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import 'ag-grid-enterprise';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
@@ -9,10 +8,9 @@ import {getResult} from '../../../api/api';
 import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 import {AuthContext} from '../../../contexts/auth-context';
 import clsx from 'clsx';
-import { makeStyles } from '@mui/styles';
+import {makeStyles} from '@mui/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { createFilterOptions } from '@mui/material/Autocomplete';
-
+import {createFilterOptions} from '@mui/material/Autocomplete';
 
 // We want to keep the value between pages, so we only need to load it once.
 const cachedOptions = [];
@@ -20,22 +18,22 @@ const OBSERVABLE_ITEM_ID_FIELD = 'survey.observableItemId';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    maxWidth: 345,
+    maxWidth: 345
   },
   media: {
     height: 0,
-    paddingTop: '56.25%', // 16:9
+    paddingTop: '56.25%' // 16:9
   },
   expand: {
     transform: 'rotate(0deg)',
     marginLeft: 'auto',
     transition: theme.transitions.create('transform', {
-      duration: theme.transitions.duration.shortest,
-    }),
+      duration: theme.transitions.duration.shortest
+    })
   },
   expandOpen: {
-    transform: 'rotate(180deg)',
-  },
+    transform: 'rotate(180deg)'
+  }
 }));
 
 const SurveyList = () => {
@@ -64,15 +62,14 @@ const SurveyList = () => {
       return undefined;
     }
 
-    if(cachedOptions.length !== 0) {
+    if (cachedOptions.length !== 0) {
       // If user select more than two species, we will not show the dropdown with value such that user cannot enter
       // more than two species
       const f = gridRef.current.api.getFilterInstance(OBSERVABLE_ITEM_ID_FIELD);
-      if(!f.getModel() || !f.getModel().operator) {
+      if (!f.getModel() || !f.getModel().operator) {
         // operator attribute valid if filter on two species
         setOptions(cachedOptions);
-      }
-      else {
+      } else {
         // Close the dropdown
         setOpen(false);
       }
@@ -84,7 +81,7 @@ const SurveyList = () => {
 
       getResult(url)
         .then((res) => {
-          res.data.items.forEach(i => cachedOptions.push(i));
+          res.data.items.forEach((i) => cachedOptions.push(i));
         })
         .finally(() => {
           if (active) {
@@ -108,33 +105,31 @@ const SurveyList = () => {
   const handleSpeciesFilterChange = useCallback((evt, newValue) => {
     const f = gridRef.current.api.getFilterInstance(OBSERVABLE_ITEM_ID_FIELD);
 
-    if(newValue.length === 0) {
+    if (newValue.length === 0) {
       f.setModel(null).then(() => gridRef.current.api.onFilterChanged());
-    }
-    else if(newValue.length === 1) {
+    } else if (newValue.length === 1) {
       f.setModel({
         filter: newValue[0].observableItemId,
         filterType: 'text',
         type: 'equals'
       }).then(() => gridRef.current.api.onFilterChanged());
-    }
-    else {
+    } else {
       const model = {
         filterType: 'text',
         operator: 'OR'
       };
 
-      for(let i = 0; i < newValue.length; i++) {
+      for (let i = 0; i < newValue.length; i++) {
         model['condition' + (i + 1)] = {
           filter: newValue[i].observableItemId,
           filterType: 'text',
           type: 'equals'
         };
-      };
+      }
 
       f.setModel(model).then(() => gridRef.current.api.onFilterChanged());
     }
-  },[]);
+  }, []);
 
   const onGridReady = useCallback(
     (event) => {
@@ -220,7 +215,7 @@ const SurveyList = () => {
             <Box>
               <IconButton
                 className={clsx(classes.expand, {
-                  [classes.expandOpen]: expanded,
+                  [classes.expandOpen]: expanded
                 })}
                 onClick={() => setExpanded((v) => !v)}
                 aria-expanded={expanded}
@@ -243,7 +238,7 @@ const SurveyList = () => {
                 <Autocomplete
                   id="species-filter"
                   multiple
-                  style={{ width: '100%' }}
+                  style={{width: '100%'}}
                   open={open}
                   onOpen={() => setOpen(true)}
                   onClose={() => setOpen(false)}
@@ -254,7 +249,7 @@ const SurveyList = () => {
                   onChange={handleSpeciesFilterChange}
                   filterOptions={createFilterOptions({
                     matchFrom: 'start',
-                    stringify: (option) => option.name,
+                    stringify: (option) => option.name
                   })}
                   renderInput={(params) => (
                     <TextField
@@ -268,7 +263,7 @@ const SurveyList = () => {
                             {optionLoading ? <CircularProgress color="inherit" size={20} /> : null}
                             {params.InputProps.endAdornment}
                           </React.Fragment>
-                        ),
+                        )
                       }}
                     />
                   )}
@@ -298,7 +293,7 @@ const SurveyList = () => {
               stateFilterHandler.stateFilterEventHandler(gridRef, e);
             }}
             suppressCellFocus={true}
-            defaultColDef={{lockVisible: true, sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
+            defaultColDef={{lockVisible: true, sortable: true, resizable: true, filter: 'agTextColumnFilter', filterParams: {debounceMs: 2000}, floatingFilter: true}}
           >
             {auth.features?.includes('corrections') && (
               <AgGridColumn
@@ -370,11 +365,9 @@ const SurveyList = () => {
             <AgGridColumn flex={1} field="state" colId="survey.state" />
             <AgGridColumn flex={1} field="ecoregion" colId="survey.ecoregion" />
             <AgGridColumn flex={1} field="locationName" colId="survey.locationName" />
-            {
-              /**
-               * Hidden field for apply filter to species.
-               */
-            }
+            {/**
+             * Hidden field for apply filter to species.
+             */}
             <AgGridColumn hide={true} flex={1} colId={OBSERVABLE_ITEM_ID_FIELD} />
           </AgGridReact>
         </>
