@@ -293,7 +293,14 @@ const SurveyList = () => {
               stateFilterHandler.stateFilterEventHandler(gridRef, e);
             }}
             suppressCellFocus={true}
-            defaultColDef={{lockVisible: true, sortable: true, resizable: true, filter: 'agTextColumnFilter', filterParams: {debounceMs: 2000}, floatingFilter: true}}
+            defaultColDef={{
+              lockVisible: true,
+              sortable: true,
+              resizable: true,
+              filter: 'agTextColumnFilter',
+              filterParams: {debounceMs: 2000},
+              floatingFilter: true
+            }}
           >
             {auth.features?.includes('corrections') && (
               <AgGridColumn
