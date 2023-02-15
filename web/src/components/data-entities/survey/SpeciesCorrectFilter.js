@@ -24,7 +24,7 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
     const d = new Date();
     const localTime = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
     return {
-      startDate: '1996-01-01',
+      startDate: '1992-01-01',
       endDate: localTime.toISOString().slice(0, 10),
       country: null,
       state: null,
