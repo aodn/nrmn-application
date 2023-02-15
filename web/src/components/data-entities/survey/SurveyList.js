@@ -299,7 +299,9 @@ const SurveyList = () => {
               sortable: true,
               resizable: true,
               filter: 'agTextColumnFilter',
-              filterParams: {debounceMs: 2000},
+              suppressMenu: true,
+              floatingFilterComponentParams: {suppressFilterButton:true},
+              filterParams: {debounceMs: 2000 },
               floatingFilter: true
             }}
           >
