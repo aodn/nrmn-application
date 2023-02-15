@@ -183,6 +183,7 @@ const SurveyList = () => {
               })
               .finally(() => {
                 setLoading(false);
+                e.columnApi.autoSizeAllColumns(false);
               });
           }
         });
