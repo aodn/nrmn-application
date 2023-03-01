@@ -161,28 +161,25 @@ public class SurveyCorrectionService {
         final List<Integer> errorIds = new ArrayList<>();
 
         // The unique constraint in observation table will cause error on single item update, here we loop
-        // each item, so that we can catch which item violate the db unique constraint plus no need to duplicate
-        // verification code here
+        // each item, so that we can catch which item violate the db unique constraint and hence no need to duplicate
+        // verification code here. Cannot use @Transaction here as no control of what to roll back.
         for(int id : surveyIds) {
             try {
                 transactionTemplate.execute(new TransactionCallbackWithoutResult() {
                     @Override
                     protected void doInTransactionWithoutResult(TransactionStatus status) {
                         observationRepository.updateObservableItemsForSurveys(id, curr.getObservableItemId(), next.getObservableItemId());
-
-                        if(!errorIds.isEmpty()) {
-                            status.setRollbackOnly();
-                        }
                     }
                 });
             }
             catch(Exception e) {
+                // Transaction rollback for id
                 errorIds.add(id);
             }
         }
 
         if(!errorIds.isEmpty()) {
-            // There are errors hence we need to throw exception to roll back the whole transaction
+            // There are errors hence we need to throw exception and trigger all previous transaction even success to rollback
             throw new ConstraintViolationException(
                     objectMapper.writeValueAsString(errorIds.stream().distinct().collect(Collectors.toList())),
                     null, "observation_unique");
