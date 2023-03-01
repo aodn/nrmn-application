@@ -307,7 +307,7 @@ const SurveyList = () => {
           >
             {auth.features?.includes('corrections') && (
               <AgGridColumn
-                width={40}
+                width={10}
                 field="surveyId"
                 headerName=""
                 suppressMovable={true}
@@ -316,6 +316,7 @@ const SurveyList = () => {
                 resizable={false}
                 sortable={false}
                 checkboxSelection={(e) => e.data?.locked !== true}
+                valueFormatter={() => ''}
                 cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
                 onCellClicked={(e) => {
                   if (e.event.ctrlKey) {
