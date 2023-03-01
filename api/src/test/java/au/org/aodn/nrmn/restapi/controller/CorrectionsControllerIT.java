@@ -67,8 +67,7 @@ class CorrectionsControllerIT {
     @LocalServerPort
     int localServerPort;
     /**
-     * Update the species for an observation without hitting the unique constraint, initially you have 2 items for id
-     * 331 and 333, after change 333 to zero, 331 to 4
+     * Update the species for an observation without hitting the unique constraint
      * @throws Exception
      */
     @Test
@@ -105,14 +104,65 @@ class CorrectionsControllerIT {
         assertEquals(4, nextObservableItemCount);
     }
     /**
-     * If you change the species name, it may violate items in observation table, the behavior is
+     * If you change the species name, it may violate db unique check in observation table, the behavior is
      * the call success if not violated, else rollback the whole transaction and report which item id
      * cause the problem
      */
     @Test
     @WithUserDetails("test@example.com")
-    public void testCorrectSpeciesViolateObservationUnique() {
+    public void testCorrectSpeciesViolateObservationUnique() throws Exception {
 
+        var reqBuilder = new RequestWrapper<SpeciesCorrectBodyDto, Integer[]>();
+        var auth = getContext().getAuthentication();
+        var token = jwtTokenProvider.generateToken(auth);
+
+        var uri = String.format("http://localhost:%d/api/v1/correction/correctSpecies", localServerPort);
+        var observations = observationRepository.findAll();
+        assertEquals(2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 333).count());
+        assertEquals(2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 330).count());
+        assertEquals(2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 332).count());
+
+        /*
+         812300133 - will cause unique violation
+         812300131 - will not cause problem
+
+         The below cases mix and match the two survey id to prove that even some success some fail or repeated
+         survey id will work
+         */
+        List<List<Integer>> cases = new ArrayList<>();
+        cases.add(Ints.asList(812300133, 812300131));
+        cases.add(Ints.asList(812300131, 812300133));
+        cases.add(Ints.asList(812300131, 812300131, 812300133));
+        cases.add(Ints.asList(812300131, 812300133, 812300133));
+        cases.add(Ints.asList(812300131, 812300133, 812300131, 812300133));
+
+        var speciesCorrection = new SpeciesCorrectBodyDto();
+        speciesCorrection.setPrevObservableItemId(330);
+        speciesCorrection.setNewObservableItemId(333);
+
+        for(var c : cases) {
+            speciesCorrection.setSurveyIds(c);
+
+            var response = reqBuilder
+                    .withUri(uri)
+                    .withMethod(HttpMethod.POST)
+                    .withToken(token)
+                    .withEntity(speciesCorrection)
+                    .withResponseType(Integer[].class)
+                    .build(testRestTemplate);
+
+            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
+            Integer[] errorIds = response.getBody();
+            assertEquals("Case " + c, 1, errorIds.length);
+            assertEquals("Case " + c,812300133, errorIds[0].intValue());
+
+            observations = observationRepository.findAll();
+
+            assertEquals("Case " + c + " expect no change in value for 332", 2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 332).count());
+            assertEquals("Case " + c + " expect no change in value for 333", 2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 333).count());
+            assertEquals("Case " + c + " expect no change in value for 330", 2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 330).count());
+        }
     }
     /**
      * If you make a request to get these survey ids and one of it is a locked survey. Then the whole request will fail.

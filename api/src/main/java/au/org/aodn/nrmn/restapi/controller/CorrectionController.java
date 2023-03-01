@@ -557,10 +557,9 @@ public class CorrectionController {
         try {
             surveyCorrectionService.correctSpecies(job, bodyDto.getSurveyIds(), curr, next);
             materializedViewService.refreshAllAsync();
-
         }
         catch(ConstraintViolationException cv) {
-            logger.error("Correction Failed", cv);
+            logger.error("Correction failed on update species", cv);
 
             var log = StagedJobLog.builder()
                     .stagedJob(job)

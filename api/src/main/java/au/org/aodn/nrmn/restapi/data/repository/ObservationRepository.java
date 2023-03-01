@@ -27,7 +27,6 @@ public interface ObservationRepository
     List<Integer> findObservationIdsForSurvey(@Param("surveyId") Integer surveyId);
 
 	@Modifying
-    @Transactional(propagation = Propagation.REQUIRED)
     @Query(nativeQuery = true, value = "" +
     "update nrmn.observation " +
     "set observable_item_id = :newId " +

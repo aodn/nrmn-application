@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
@@ -38,11 +39,21 @@ import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.enums.SurveyMethod;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import javax.annotation.PostConstruct;
 
 @Service
 @Transactional
 public class SurveyCorrectionService {
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     @Autowired
     SurveyRepository surveyRepository;
@@ -76,6 +87,14 @@ public class SurveyCorrectionService {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    TransactionTemplate transactionTemplate;
+
+    @PostConstruct
+    public void init() {
+        transactionTemplate = new TransactionTemplate(transactionManager);
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+    }
 
     private List<Integer> speciesMethods = Arrays.asList(
             SurveyMethod.M0,
@@ -139,23 +158,34 @@ public class SurveyCorrectionService {
                                               final ObservableItem next) throws JsonProcessingException {
 
         var messages = new ArrayList<String>();
-        final var errorIds = new ArrayList<Integer>();
+        final List<Integer> errorIds = new ArrayList<>();
 
         // The unique constraint in observation table will cause error on single item update, here we loop
         // each item, so that we can catch which item violate the db unique constraint plus no need to duplicate
         // verification code here
-        surveyIds.forEach(id -> {
+        for(int id : surveyIds) {
             try {
-                observationRepository.updateObservableItemsForSurveys(id, curr.getObservableItemId(), next.getObservableItemId());
+                transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+                    @Override
+                    protected void doInTransactionWithoutResult(TransactionStatus status) {
+                        observationRepository.updateObservableItemsForSurveys(id, curr.getObservableItemId(), next.getObservableItemId());
+
+                        if(!errorIds.isEmpty()) {
+                            status.setRollbackOnly();
+                        }
+                    }
+                });
             }
-            catch(ConstraintViolationException ex) {
-                errorIds.add(curr.getObservableItemId());
+            catch(Exception e) {
+                errorIds.add(id);
             }
-        });
+        }
 
         if(!errorIds.isEmpty()) {
-            // There are errors hence we need to throw exception to rollback the whole transaction
-            throw new ConstraintViolationException(objectMapper.writeValueAsString(errorIds), null, "observation_unique");
+            // There are errors hence we need to throw exception to roll back the whole transaction
+            throw new ConstraintViolationException(
+                    objectMapper.writeValueAsString(errorIds.stream().distinct().collect(Collectors.toList())),
+                    null, "observation_unique");
         }
 
         messages.add("Correcting species from " + curr.getObservableItemName() + " to " + next.getObservableItemName());
