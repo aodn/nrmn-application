@@ -43,9 +43,15 @@ VALUES (55, 551, 812300134, '2006-12-04', '00:00:00', 10, 2, 7, 'SW',
 
 INSERT INTO nrmn.survey (program_id, site_id, survey_id, survey_date, survey_time, depth, survey_num, visibility,
                          direction, notes, project_title, inside_marine_park, block_abundance_simulated)
-VALUES (55, 551, 812300133, '2006-12-04', '00:00:00', 15, 3, 7, 'SW',
-        'Surveyed with a BACI design as baseline for a proposed Marine Park with at least a draft zoning plan-As opposed to general biodiversity surveys of general areas, potential MPAs or proposed MPA without draft zoning plans.',
+VALUES (55, 551, 812300133, '2006-12-04', '00:00:01', 15, 3, 7, 'SW',
+        'Almost identical -> Surveyed with a BACI design as baseline for a proposed Marine Park with at least a draft zoning plan-As opposed to general biodiversity surveys of general areas, potential MPAs or proposed MPA without draft zoning plans.',
         'Baseline survey of Batemans Marine park prior to protection', 'No', true);
+
+INSERT INTO nrmn.survey (program_id, site_id, survey_id, survey_date, survey_time, depth, survey_num, visibility,
+                         direction, notes, project_title, inside_marine_park, block_abundance_simulated)
+VALUES (55, 551, 812300130, '2006-12-04', '00:00:00', 15, 3, 7, 'SW',
+    'Surveyed with a BACI design as baseline for a proposed Marine Park with at least a draft zoning plan-As opposed to general biodiversity surveys of general areas, potential MPAs or proposed MPA without draft zoning plans.',
+    'Baseline survey of Batemans Marine park prior to protection', 'No', true);
 
 INSERT INTO nrmn.survey (program_id, site_id, survey_id, survey_date, survey_time, depth, survey_num, visibility,
                          direction, notes, project_title, inside_marine_park, block_abundance_simulated)
@@ -137,7 +143,8 @@ INSERT INTO nrmn.observable_item_ref (observable_item_id, obs_item_type_id, aphi
 VALUES (333, 1, 102, 1, 'Species 56', 'S56'),
        (331, 1, 103, 1, 'Species 57', 'S57'),
        (332, 5, null, null, 'Debris', 'deb'),
-       (334, 1, null, null, 'Haliotis rubra', 'hal');
+       (334, 1, null, null, 'Haliotis rubra', 'hal'),
+       (431, 1, null, null, 'Duplicate rubra', 'dup');
 
 INSERT INTO nrmn.method_ref(method_id, method_name, is_active)
 VALUES (1, 'Standard fish', true), (2, 'Standard invertebrates & cryptic fish', true), (3, 'Standard quadrat', true), (11, 'Off transect', true), (12, 'Debris', true);
@@ -151,7 +158,11 @@ INSERT INTO nrmn.survey_method(survey_method_id, block_num,
                             VALUES (121,1,'{}',false,1,812300133),
                                    (221,2,'{}',false,1,812300133),
                                    (321,1,'{}',false,2,812300133),
-                                   (421,2,'{}',false,2,812300133);
+                                   (421,2,'{}',false,2,812300133),
+                                   (101,1,'{}',false,1,812300131),
+                                   (201,2,'{}',false,1,812300131),
+                                   (301,1,'{}',false,2,812300131),
+                                   (401,2,'{}',false,2,812300131);
 
 INSERT INTO nrmn.measure_type_ref(measure_type_id, measure_type_name, is_active)
 VALUES (1,'Fish Size Class',true),
@@ -266,10 +277,14 @@ VALUES (1,1,'Unsized',0,true),
 INSERT INTO nrmn.observation(observation_id, measure_value,
                              observation_attribute, diver_id, measure_id,
                              observable_item_id, survey_method_id)
-VALUES (551, 1,   '{}',51, 2, 333, 121),
+VALUES (551, 1, '{}',51, 2, 333, 121),
        (552, 500, '{}',51, 7, 333, 221),
-       (554, 40,  '{}',51, 2, 331, 321),
-       (553, 600, '{}',51, 7, 331, 421);
+       (553, 600, '{}',51, 7, 331, 421),
+       (554, 40, '{}',51, 2, 331, 321),
+       (651, 1, '{}',51, 2, 431, 101),
+       (652, 500, '{}',51, 7, 431, 201),
+       (653, 600, '{}',51, 7, 431, 401),
+       (654, 40, '{}',51, 2, 431, 321);
 
 INSERT INTO nrmn.staged_row(pqs, block, buddy, code, created, date, depth, direction, diver,
                             inverts, is_invert_sizing, last_updated, latitude, longitude, 

@@ -10,6 +10,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -554,12 +555,24 @@ public class CorrectionController {
         job = stagedJobRepository.save(job);
 
         try {
-
             surveyCorrectionService.correctSpecies(job, bodyDto.getSurveyIds(), curr, next);
-
             materializedViewService.refreshAllAsync();
 
-        } catch (Exception e) {
+        }
+        catch(ConstraintViolationException cv) {
+            logger.error("Correction Failed", cv);
+
+            var log = StagedJobLog.builder()
+                    .stagedJob(job)
+                    .details("Unique constraint error -> " + cv.getConstraintName())
+                    .eventType(StagedJobEventType.ERROR).build();
+
+            stagedJobLogRepository.save(log);
+
+            // Contain a json of violated id
+            return ResponseEntity.badRequest().body(cv.getMessage());
+        }
+        catch (Exception e) {
             logger.error("Correction Failed", e);
 
             var log = StagedJobLog.builder()

@@ -66,7 +66,11 @@ class CorrectionsControllerIT {
 
     @LocalServerPort
     int localServerPort;
-
+    /**
+     * Update the species for an observation without hitting the unique constraint, initially you have 2 items for id
+     * 331 and 333, after change 333 to zero, 331 to 4
+     * @throws Exception
+     */
     @Test
     @WithUserDetails("test@example.com")
     public void speciesCorrects() throws Exception {
@@ -75,7 +79,9 @@ class CorrectionsControllerIT {
         var auth = getContext().getAuthentication();
         var token = jwtTokenProvider.generateToken(auth);
         var uri = String.format("http://localhost:%d/api/v1/correction/correctSpecies", localServerPort);
-        var prevCount = observationRepository.findAll().size();
+        var observations = observationRepository.findAll();
+        assertEquals(2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 333).count());
+        assertEquals(2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 331).count());
 
         var speciesCorrection = new SpeciesCorrectBodyDto();
         speciesCorrection.setPrevObservableItemId(333);
@@ -91,16 +97,23 @@ class CorrectionsControllerIT {
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        var observations = observationRepository.findAll();
-        var nextCount = observations.size();
+        observations = observationRepository.findAll();
         var prevObservableItemCount = observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 333).count();
         var nextObservableItemCount = observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 331).count();
 
-        assertEquals(prevCount, nextCount);
         assertEquals(0, prevObservableItemCount);
-        assertEquals(nextCount, nextObservableItemCount);
+        assertEquals(4, nextObservableItemCount);
     }
+    /**
+     * If you change the species name, it may violate items in observation table, the behavior is
+     * the call success if not violated, else rollback the whole transaction and report which item id
+     * cause the problem
+     */
+    @Test
+    @WithUserDetails("test@example.com")
+    public void testCorrectSpeciesViolateObservationUnique() {
 
+    }
     /**
      * If you make a request to get these survey ids and one of it is a locked survey. Then the whole request will fail.
      * The UI may not be able to create such request but direct call to API can.

@@ -10,8 +10,9 @@ import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import javax.transaction.Transactional;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +38,7 @@ import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.enums.SurveyMethod;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -72,6 +74,9 @@ public class SurveyCorrectionService {
     @Autowired
     StagedJobRepository jobRepository;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     private List<Integer> speciesMethods = Arrays.asList(
             SurveyMethod.M0,
             SurveyMethod.M1,
@@ -84,7 +89,7 @@ public class SurveyCorrectionService {
         surveyCorrectionTransaction(job, surveyIds, validatedRows);
     }
 
-    public void correctSpecies(StagedJob job, List<Integer> surveyIds, ObservableItem curr, ObservableItem next) {
+    public void correctSpecies(StagedJob job, List<Integer> surveyIds, ObservableItem curr, ObservableItem next) throws JsonProcessingException {
         speciesCorrectionTransaction(job, surveyIds, curr, next);
     }
 
@@ -130,13 +135,28 @@ public class SurveyCorrectionService {
         jobRepository.save(job);
     }
 
-    private void speciesCorrectionTransaction(StagedJob job, List<Integer> surveyIds, ObservableItem curr,
-            ObservableItem next) {
+    void speciesCorrectionTransaction(StagedJob job, List<Integer> surveyIds, final ObservableItem curr,
+                                              final ObservableItem next) throws JsonProcessingException {
 
         var messages = new ArrayList<String>();
+        final var errorIds = new ArrayList<Integer>();
 
-        observationRepository.updateObservableItemsForSurveys(surveyIds, curr.getObservableItemId(),
-                next.getObservableItemId());
+        // The unique constraint in observation table will cause error on single item update, here we loop
+        // each item, so that we can catch which item violate the db unique constraint plus no need to duplicate
+        // verification code here
+        surveyIds.forEach(id -> {
+            try {
+                observationRepository.updateObservableItemsForSurveys(id, curr.getObservableItemId(), next.getObservableItemId());
+            }
+            catch(ConstraintViolationException ex) {
+                errorIds.add(curr.getObservableItemId());
+            }
+        });
+
+        if(!errorIds.isEmpty()) {
+            // There are errors hence we need to throw exception to rollback the whole transaction
+            throw new ConstraintViolationException(objectMapper.writeValueAsString(errorIds), null, "observation_unique");
+        }
 
         messages.add("Correcting species from " + curr.getObservableItemName() + " to " + next.getObservableItemName());
 
