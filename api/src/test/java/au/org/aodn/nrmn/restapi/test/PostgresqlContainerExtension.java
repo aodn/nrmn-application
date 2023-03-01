@@ -15,7 +15,7 @@ public class PostgresqlContainerExtension implements Extension {
 
     private static final Logger logger = LoggerFactory.getLogger(PostgresqlContainerExtension.class);
     
-    private static final DockerImageName POSTGIS_IMAGE_NAME = DockerImageName.parse("mdillon/postgis:10").asCompatibleSubstituteFor("postgres");
+    private static final DockerImageName POSTGIS_IMAGE_NAME = DockerImageName.parse("docker.io/postgis/postgis:14-3.3-alpine").asCompatibleSubstituteFor("postgres");
 
     @Container
     static public PostgreSQLContainer<?> container = new PostgreSQLContainer<>(POSTGIS_IMAGE_NAME);

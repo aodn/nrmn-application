@@ -249,6 +249,8 @@ CREATE TABLE nrmn.staged_job_log (
     event_time timestamp with time zone NOT NULL,
     event_type varchar(255) NOT NULL,
     staged_job_id bigint NOT NULL,
+    survey_id INT,
+    row_summary TEXT,
     CONSTRAINT staged_job_log_pkey PRIMARY KEY (id)
 );
 
@@ -393,3 +395,4 @@ ALTER TABLE nrmn.diver_ref_aud ADD COLUMN created TIMESTAMP;
 ALTER TABLE nrmn.diver_ref_aud ADD COLUMN created_mod BOOLEAN;
 
 CREATE TABLE nrmn.global_lock (id INT, locked BOOLEAN NOT NULL, PRIMARY KEY (id));
+
