@@ -61,13 +61,15 @@ public class DataValidation {
     private static final Pattern VALID_DEPTH_SURVEY_NUM = Pattern.compile("^[0-9]+(\\.[0-9])?$");
 
     // VALIDATION: Rows duplicated
-    public Collection<SurveyValidationError> checkDuplicateRows(boolean includeTotal, boolean includeSpeciesCode,
+    public Collection<SurveyValidationError> checkDuplicateRows(
+            boolean includeTotal,
+            boolean includeSpeciesCode,
             Collection<StagedRow> rows) {
         var mappedRows = new HashMap<String, List<Long>>();
         var mappedSpecies = new HashMap<String, String>();
         rows.stream().forEach(r -> {
-            String rowHash = r.getContentsHash(includeTotal, includeSpeciesCode);
-            List<Long> rowIds = mappedRows.getOrDefault(rowHash, new ArrayList<Long>());
+            var rowHash = r.getContentsHash(includeTotal, includeSpeciesCode, false);
+            var rowIds = mappedRows.getOrDefault(rowHash, new ArrayList<Long>());
             rowIds.add(r.getId());
             if (!mappedSpecies.containsKey(rowHash))
                 mappedSpecies.put(rowHash, r.getSpecies());
@@ -85,7 +87,8 @@ public class DataValidation {
         return duplicateRows;
     }
 
-    public Collection<SurveyValidationError> checkFormatting(ProgramValidation validation,
+    public Collection<SurveyValidationError> checkFormatting(
+            ProgramValidation validation,
             Boolean isExtendedSize,
             Boolean isIngest,
             Collection<String> siteCodes,
@@ -101,7 +104,7 @@ public class DataValidation {
         }
 
         var errors = new ValidationResultSet();
-        if(rows == null || rows.size() == 0) {
+        if (rows == null || rows.size() == 0) {
             errors.add(null, ValidationLevel.BLOCKING, "ID", "Survey data is missing");
             return errors.getAll();
         }
@@ -249,7 +252,7 @@ public class DataValidation {
             }
 
             // Block 0
-            if (row.getBlock().equalsIgnoreCase("0") && 
+            if (row.getBlock().equalsIgnoreCase("0") &&
                     (isIngest || method != 11)
                     && !Arrays.asList(0, 3, 4, 5).contains(method))
                 errors.add(rowId, ValidationLevel.BLOCKING, "block", "Block 0 is invalid for method");

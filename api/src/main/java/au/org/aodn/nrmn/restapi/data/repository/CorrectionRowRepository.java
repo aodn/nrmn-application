@@ -20,7 +20,7 @@ public interface CorrectionRowRepository
     List<Program> findProgramsBySurveyIds(@Param("surveyIds") List<Integer> surveyIds);
 
     @Query(value = "" +
-    "SELECT ROW_NUMBER() OVER (ORDER BY c.survey_id) as rowId, c.survey_id AS surveyId, c.survey_num AS surveyNum, c.diver_id AS diverId, c.initials AS diver, c.pq_initials AS pqDiver, " +
+    "SELECT ROW_NUMBER() OVER (ORDER BY c.survey_id) as diffRowId, c.survey_id AS surveyId, c.survey_num AS surveyNum, c.diver_id AS diverId, c.initials AS diver, c.pq_initials AS pqDiver, " +
     "c.site_code AS siteCode, c.site_name AS siteName, CAST(c.depth AS text) || '.' || CAST(c.survey_num AS text) AS depth, TO_CHAR(c.survey_date, 'dd/MM/yyyy') AS DATE, " +
     "TO_CHAR(c.survey_time, 'HH24:MI') AS time, c.visibility AS vis, c.direction, c.latitudeA as latitude, c.longitudeA as longitude, " +
     "c.observable_item_name AS species, c.common_name as commonName, LOWER(c.letter_code) AS code, " +

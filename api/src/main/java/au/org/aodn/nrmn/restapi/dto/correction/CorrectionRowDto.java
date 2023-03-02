@@ -6,7 +6,7 @@ public interface CorrectionRowDto {
 
     Integer getSurveyId();
 
-    Integer getRowId();
+    String getDiffRowId();
 
     String getDiver();
 

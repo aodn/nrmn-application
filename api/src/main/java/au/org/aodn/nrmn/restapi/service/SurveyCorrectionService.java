@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -19,8 +20,10 @@ import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.data.model.Observation;
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.model.StagedJobLog;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.data.model.Survey;
 import au.org.aodn.nrmn.restapi.data.model.SurveyMethodEntity;
+import au.org.aodn.nrmn.restapi.data.repository.CorrectionRowRepository;
 import au.org.aodn.nrmn.restapi.data.repository.MeasureRepository;
 import au.org.aodn.nrmn.restapi.data.repository.MethodRepository;
 import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
@@ -31,6 +34,9 @@ import au.org.aodn.nrmn.restapi.data.repository.StagedJobLogRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SurveyMethodRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.dto.correction.CorrectionDiffCellDto;
+import au.org.aodn.nrmn.restapi.dto.correction.CorrectionDiffDto;
+import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowDto;
 import au.org.aodn.nrmn.restapi.enums.MeasureType;
 import au.org.aodn.nrmn.restapi.enums.ObservableItemType;
 import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
@@ -70,6 +76,9 @@ public class SurveyCorrectionService {
     StagedJobLogRepository stagedJobLogRepository;
 
     @Autowired
+    CorrectionRowRepository correctionRowRepository;
+
+    @Autowired
     StagedJobRepository jobRepository;
 
     private List<Integer> speciesMethods = Arrays.asList(
@@ -79,6 +88,77 @@ public class SurveyCorrectionService {
             SurveyMethod.M7,
             SurveyMethod.M10,
             SurveyMethod.M11);
+
+    public CorrectionDiffDto diffSurveyCorrections(List<Integer> surveyIds, Collection<StagedRow> correctedRows) {
+
+        var ingestedRows = correctionRowRepository.findRowsBySurveyIds(surveyIds);
+
+        var ingestedRowIds = ingestedRows.stream().map(CorrectionRowDto::getDiffRowId).collect(Collectors.toList());
+        var correctdRowIds = correctedRows.stream().map(StagedRow::getDiffRowId).collect(Collectors.toList());
+
+        var deletedRowIds = ingestedRowIds.stream().filter(i -> !correctdRowIds.contains(i))
+                .collect(Collectors.toList());
+        var insertedRowIds = correctdRowIds.stream().filter(i -> !ingestedRowIds.contains(i))
+                .collect(Collectors.toList());
+
+        List<String> updatedRowsIds = correctdRowIds.stream().filter(i -> ingestedRowIds.contains(i))
+                .collect(Collectors.toList());
+
+        var cellDiffs = new ArrayList<CorrectionDiffCellDto>();
+
+        for (var id : updatedRowsIds) {
+
+            var aOptional = ingestedRows.stream()
+                    .filter(r -> Objects.nonNull(r.getDiffRowId()))
+                    .filter(r -> r.getDiffRowId().contentEquals(id))
+                    .findFirst();
+
+            var bOptional = correctedRows.stream()
+                    .filter(r -> Objects.nonNull(r.getDiffRowId()))
+                    .filter(r -> r.getDiffRowId().contentEquals(id))
+                    .findFirst();
+
+            if (aOptional.isPresent() && bOptional.isPresent()) {
+
+                var a = aOptional.get();
+                var b = bOptional.get();
+
+                if (!a.getDiver().contentEquals(b.getDiver()))
+                    cellDiffs.add(CorrectionDiffCellDto.builder()
+                            .columnName("diver")
+                            .diffRowId(id)
+                            .oldValue(a.getDiver())
+                            .newValue(b.getDiver())
+                            .build());
+
+                if (!a.getLatitude().contentEquals(b.getLatitude()))
+                    cellDiffs.add(CorrectionDiffCellDto.builder()
+                            .columnName("latitude")
+                            .diffRowId(id)
+                            .oldValue(a.getLatitude())
+                            .newValue(b.getLatitude())
+                            .build());
+
+                if (!a.getLongitude().contentEquals(b.getLongitude()))
+                    cellDiffs.add(CorrectionDiffCellDto.builder()
+                            .columnName("longitude")
+                            .diffRowId(id)
+                            .oldValue(a.getLongitude())
+                            .newValue(b.getLongitude())
+                            .build());
+
+            } else {
+                // LOG AND ERROR
+            }
+
+        }
+
+        var diff = new CorrectionDiffDto();
+        diff.setDeletedRows(deletedRowIds);
+        diff.setInsertedRows(insertedRowIds);
+        diff.setCellDiffs(cellDiffs);
+        return diff;
+    }
 
     public void correctSurvey(StagedJob job, List<Integer> surveyIds, Collection<StagedRowFormatted> validatedRows) {
         surveyCorrectionTransaction(job, surveyIds, validatedRows);
@@ -259,7 +339,6 @@ public class SurveyCorrectionService {
                         observations.add(observation);
                     }
                 }
-
                 messages.add("Correcting " + firstMethodBlockRow.getBlock() + " : " + method.getMethodId());
             }
         }

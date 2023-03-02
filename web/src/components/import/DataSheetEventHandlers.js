@@ -414,6 +414,7 @@ class DataSheetEventHandlers {
         : posMap[currentPosIdx] + 1000;
       if (newData.pos % 1 !== 0) return;
       newData.id = newId;
+      newData.diffRowId = newId;
       delete newData.errors;
 
       eh.pushUndo(e.api, [{id: newId}]);
