@@ -12,6 +12,7 @@ import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +40,7 @@ import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,6 +66,9 @@ class CorrectionsControllerIT {
     @Autowired
     ObservationRepository observationRepository;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     @LocalServerPort
     int localServerPort;
     /**
@@ -74,7 +79,7 @@ class CorrectionsControllerIT {
     @WithUserDetails("test@example.com")
     public void speciesCorrects() throws Exception {
 
-        var reqBuilder = new RequestWrapper<SpeciesCorrectBodyDto, Long>();
+        var reqBuilder = new RequestWrapper<SpeciesCorrectBodyDto, Map>();
         var auth = getContext().getAuthentication();
         var token = jwtTokenProvider.generateToken(auth);
         var uri = String.format("http://localhost:%d/api/v1/correction/correctSpecies", localServerPort);
@@ -92,7 +97,7 @@ class CorrectionsControllerIT {
                 .withMethod(HttpMethod.POST)
                 .withToken(token)
                 .withEntity(speciesCorrection)
-                .withResponseType(Long.class)
+                .withResponseType(Map.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -112,7 +117,7 @@ class CorrectionsControllerIT {
     @WithUserDetails("test@example.com")
     public void testCorrectSpeciesViolateObservationUnique() throws Exception {
 
-        var reqBuilder = new RequestWrapper<SpeciesCorrectBodyDto, Integer[]>();
+        var reqBuilder = new RequestWrapper<SpeciesCorrectBodyDto, Map>();
         var auth = getContext().getAuthentication();
         var token = jwtTokenProvider.generateToken(auth);
 
@@ -148,14 +153,14 @@ class CorrectionsControllerIT {
                     .withMethod(HttpMethod.POST)
                     .withToken(token)
                     .withEntity(speciesCorrection)
-                    .withResponseType(Integer[].class)
+                    .withResponseType(Map.class)
                     .build(testRestTemplate);
 
             assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 
-            Integer[] errorIds = response.getBody();
-            assertEquals("Case " + c, 1, errorIds.length);
-            assertEquals("Case " + c,812300133, errorIds[0].intValue());
+            List<Integer> errorIds = (List)response.getBody().get("surveyIds");
+            assertEquals("Case " + c, 1, errorIds.size());
+            assertEquals("Case " + c, 812300133, errorIds.get(0).intValue());
 
             observations = observationRepository.findAll();
 

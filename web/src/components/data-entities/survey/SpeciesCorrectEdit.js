@@ -46,7 +46,7 @@ const useStyles = makeStyles(({palette, typography}) => ({
   }
 }));
 
-const SpeciesCorrectEdit = ({selected, onSubmit}) => {
+const SpeciesCorrectEdit = ({selected, onSubmit, onError}) => {
   const initialCorrectionState = {
     prevObservableItemId: selected.result.observableItemId,
     newObservableItemId: null,
@@ -134,9 +134,16 @@ const SpeciesCorrectEdit = ({selected, onSubmit}) => {
                 disabled={!correction?.newObservableItemName || correction.surveyIds.length < 1}
                 onClick={() => {
                   setLoading(true);
-                  postSpeciesCorrection(correction).then((res) => {
-                    setCorrection({...initialCorrectionState});
-                    onSubmit(res.data);});
+                  postSpeciesCorrection(correction)
+                    .then((res) => {
+                      if(res.status === 200) {
+                        setCorrection({ ...initialCorrectionState });
+                        onSubmit(res.data);
+                      }
+                    })
+                    .catch((err) => {
+                      onError(err);
+                    });
                 }}
               >
                 Submit Correction
@@ -234,4 +241,5 @@ export default SpeciesCorrectEdit;
 SpeciesCorrectEdit.propTypes = {
   selected: PropTypes.object,
   onSubmit: PropTypes.func,
+  onError: PropTypes.func,
 };

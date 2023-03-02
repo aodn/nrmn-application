@@ -1,14 +1,12 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -126,6 +124,9 @@ public class CorrectionController {
 
     @Autowired
     SpeciesFormattingService speciesFormatting;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     private static Logger logger = LoggerFactory.getLogger(CorrectionController.class);
 
@@ -532,7 +533,7 @@ public class CorrectionController {
     @PostMapping("correctSpecies")
     public ResponseEntity<?> updateSpeciesInSurveys(
             Authentication authentication,
-            @RequestBody SpeciesCorrectBodyDto bodyDto) {
+            @RequestBody SpeciesCorrectBodyDto bodyDto) throws IOException {
 
         var curr = observableItemRepository.findById(bodyDto.getPrevObservableItemId()).get();
         var next = observableItemRepository.findById(bodyDto.getNewObservableItemId()).get();
@@ -554,12 +555,16 @@ public class CorrectionController {
 
         job = stagedJobRepository.save(job);
 
+        Map<String, Object> result = new HashMap<>();
+        result.put("message", "Species update success.");
+        result.put("jobId", "");
+
         try {
             surveyCorrectionService.correctSpecies(job, bodyDto.getSurveyIds(), curr, next);
             materializedViewService.refreshAllAsync();
         }
         catch(ConstraintViolationException cv) {
-            logger.error("Correction failed on update species", cv);
+            logger.error("Correction failed on update species, whole transaction rollback!", cv);
 
             var log = StagedJobLog.builder()
                     .stagedJob(job)
@@ -569,7 +574,10 @@ public class CorrectionController {
             stagedJobLogRepository.save(log);
 
             // Contain a json of violated id
-            return ResponseEntity.badRequest().body(cv.getMessage());
+            result.put("message", "Correction failed due to some survey violate unique constraint");
+            result.put("surveyIds", objectMapper.readValue(cv.getMessage().getBytes(StandardCharsets.UTF_8), Integer[].class));
+
+            return ResponseEntity.badRequest().body(result);
         }
         catch (Exception e) {
             logger.error("Correction Failed", e);
@@ -580,10 +588,12 @@ public class CorrectionController {
                     .eventType(StagedJobEventType.ERROR).build();
 
             stagedJobLogRepository.save(log);
+            result.put("message", "Species failed to update. No data has been changed.");
 
-            return ResponseEntity.badRequest().body("Species failed to update. No data has been changed.");
+            return ResponseEntity.badRequest().body(result);
         }
 
-        return ResponseEntity.ok().body(job.getId());
+        result.put("jobId", job.getId());
+        return ResponseEntity.ok().body(result);
     }
 }
