@@ -392,4 +392,21 @@ ALTER TABLE nrmn.diver_ref ADD COLUMN created TIMESTAMP;
 ALTER TABLE nrmn.diver_ref_aud ADD COLUMN created TIMESTAMP;
 ALTER TABLE nrmn.diver_ref_aud ADD COLUMN created_mod BOOLEAN;
 
+CREATE TABLE nrmn.shared_link (
+  id SERIAL PRIMARY KEY,
+  sec_user_id INTEGER REFERENCES nrmn.sec_user (id),
+  link_type TEXT,
+  receipient TEXT,
+  secret TEXT,
+  expires TIMESTAMP NOT NULL,
+  created TIMESTAMP NOT NULL,
+  updated TIMESTAMP,
+  target_url TEXT
+);
+
 CREATE TABLE nrmn.global_lock (id INT, locked BOOLEAN NOT NULL, PRIMARY KEY (id));
+
+CREATE INDEX meow_ecoregion_geom_idx ON nrmn.meow_ecoregions USING GIST (geom);
+
+CREATE INDEX site_geom_idx ON nrmn.site_ref USING GIST (geom);
+
