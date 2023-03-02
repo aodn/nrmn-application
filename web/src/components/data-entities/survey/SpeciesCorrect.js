@@ -59,6 +59,7 @@ const SpeciesCorrect = () => {
   useEffect(() => {
     if (tabIndex === 0) {
       setSelected(null);
+      setSearchResults(null);
       setJobId(null);
     }
   }, [tabIndex]);

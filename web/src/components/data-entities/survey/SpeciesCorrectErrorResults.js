@@ -8,6 +8,7 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import { Paper } from '@mui/material';
 import TableContainer from '@mui/material/TableContainer';
+import {Navigate} from 'react-router-dom';
 
 const useStyles = makeStyles(({palette, typography}) => ({
   root: {
@@ -42,22 +43,24 @@ const SpeciesCorrectErrorResults = ({correctionErrors}) => {
       <Table>
         <TableHead>
           <TableRow>
+            <TableCell colSpan={3} style={{color: 'red', textAlign: 'center', fontSize: 'medium'}}>{correctionErrors.message}</TableCell>
+          </TableRow>
+          <TableRow>
             <TableCell width="30%">Original Species Name</TableCell>
             <TableCell width="30%">Target Species Name</TableCell>
-            <TableCell width="40%">Survey Ids</TableCell>
+            <TableCell width="40%">Problem Survey Id</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           { correctionErrors.surveyIds.length > 0 ? (
-              correctionErrors.surveyIds.forEach(r => {
-                return (
-                  <TableRow key={r}>
-                    <TableCell>A</TableCell>
-                    <TableCell>B</TableCell>
-                    <TableCell>{r}</TableCell>
-                  </TableRow>
-                );
-              })) : (
+              correctionErrors.surveyIds.map((r, i) => (
+                <TableRow key={'surveyid-' + r} style={{ cursor: 'pointer' }} onClick={(id) => <Navigate to={`/data/survey/${id}`} />}>
+                  <TableCell>{correctionErrors.currentSpeciesName}</TableCell>
+                  <TableCell>{correctionErrors.nextSpeciesName}</TableCell>
+                  <TableCell>{r}</TableCell>
+                </TableRow>
+              ))
+          ) : (
               <TableRow>
                 <TableCell colSpan={3}>{correctionErrors.messages}</TableCell>
               </TableRow>

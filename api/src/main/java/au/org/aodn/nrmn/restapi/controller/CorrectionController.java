@@ -574,7 +574,9 @@ public class CorrectionController {
             stagedJobLogRepository.save(log);
 
             // Contain a json of violated id
-            result.put("message", "Correction failed due to some survey violate unique constraint");
+            result.put("message", "Correction failed due to survey violate unique constraint");
+            result.put("currentSpeciesName", curr.getObservableItemName());
+            result.put("nextSpeciesName", next.getObservableItemName());
             result.put("surveyIds", objectMapper.readValue(cv.getMessage().getBytes(StandardCharsets.UTF_8), Integer[].class));
 
             return ResponseEntity.badRequest().body(result);
