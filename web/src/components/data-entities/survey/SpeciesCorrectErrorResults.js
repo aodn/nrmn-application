@@ -17,7 +17,7 @@ const useStyles = makeStyles(({palette, typography}) => ({
         '& .MuiTableRow-head': {
           '& .MuiTableCell-head': {
             fontSize: typography?.table.fontSize,
-            background: palette?.primary.rowHeader
+            background: palette?.primary.rowHeader,
           }
         }
       },
@@ -39,7 +39,7 @@ const SpeciesCorrectErrorResults = ({correctionErrors}) => {
   const classes = useStyles();
 
   return(
-    <TableContainer classes={classes} component={Paper}>
+    <TableContainer classes={classes}>
       <Table>
         <TableHead>
           <TableRow>

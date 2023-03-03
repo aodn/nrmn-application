@@ -1,4 +1,4 @@
-import {Alert, Box, Button, LinearProgress, Tab, Tabs, Typography} from '@mui/material';
+import {Box, Button, LinearProgress, Tab, Tabs, Typography} from '@mui/material';
 import React, {useEffect, useReducer, useState} from 'react';
 import {searchSpeciesSummary} from '../../../api/api';
 import SpeciesCorrectFilter from './SpeciesCorrectFilter';
@@ -42,7 +42,7 @@ const SpeciesCorrect = () => {
     if (request.request)
       switch (request.request.type) {
         case 'search': {
-          var payload = removeNullProperties(request.request.payload);
+          let payload = removeNullProperties(request.request.payload);
           searchSpeciesSummary(payload).then((res) => {
             setSearchResults(res.data);
             dispatch({type: 'showResults'});
@@ -60,6 +60,7 @@ const SpeciesCorrect = () => {
     if (tabIndex === 0) {
       setSelected(null);
       setSearchResults(null);
+      setCorrectionErrors(null);
       setJobId(null);
     }
   }, [tabIndex]);
@@ -100,7 +101,7 @@ const SpeciesCorrect = () => {
         </Box>
       )}
       {tabIndex === 2 && correctionErrors && (
-        <Box  border={1} borderRadius={1} m={1} borderColor="divider">
+        <Box sx={{m: 1, border: '1px red solid', borderRadius: '1px' }}>
           <SpeciesCorrectErrorResults correctionErrors={correctionErrors.errors} />
           <Box width={200} m={2}>
             <Button variant="contained" onClick={() => setTabIndex(0)}>Return to Search</Button>
