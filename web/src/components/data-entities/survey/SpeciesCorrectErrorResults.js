@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {PropTypes} from 'prop-types';
 import {makeStyles} from '@mui/styles';
 import TableHead from '@mui/material/TableHead';
@@ -6,9 +6,7 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import { Paper } from '@mui/material';
 import TableContainer from '@mui/material/TableContainer';
-import {Navigate} from 'react-router-dom';
 
 const useStyles = makeStyles(({palette, typography}) => ({
   root: {
