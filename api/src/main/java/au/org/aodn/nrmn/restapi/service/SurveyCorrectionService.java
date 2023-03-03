@@ -5,12 +5,15 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.function.Function;
 
+import org.apache.commons.lang3.tuple.Pair;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +46,7 @@ import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.enums.SurveyMethod;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
+import au.org.aodn.nrmn.restapi.util.ObjectUtils;
 
 @Service
 @Transactional
@@ -101,10 +105,28 @@ public class SurveyCorrectionService {
         var insertedRowIds = correctdRowIds.stream().filter(i -> !ingestedRowIds.contains(i))
                 .collect(Collectors.toList());
 
-        List<String> updatedRowsIds = correctdRowIds.stream().filter(i -> ingestedRowIds.contains(i))
+        var updatedRowsIds = correctdRowIds.stream().filter(i -> ingestedRowIds.contains(i))
                 .collect(Collectors.toList());
 
         var cellDiffs = new ArrayList<CorrectionDiffCellDto>();
+
+        var propertyChecks = new HashMap<String, Pair<Function<CorrectionRowDto, String>, Function<StagedRow, String>>>() {
+            {
+                put("diver", Pair.of(CorrectionRowDto::getDiver, StagedRow::getDiver));
+                put("latitude", Pair.of(CorrectionRowDto::getLatitude, StagedRow::getLatitude));
+                put("longitude", Pair.of(CorrectionRowDto::getLongitude, StagedRow::getLongitude));
+                put("direction", Pair.of(CorrectionRowDto::getDirection, StagedRow::getDirection));
+                put("vis", Pair.of(CorrectionRowDto::getVis, StagedRow::getVis));
+                put("time", Pair.of(CorrectionRowDto::getTime, StagedRow::getTime));
+                put("pqDiver", Pair.of(CorrectionRowDto::getPqDiver, StagedRow::getPqs));
+                put("method", Pair.of(CorrectionRowDto::getMethod, StagedRow::getMethod));
+                put("block", Pair.of(CorrectionRowDto::getBlock, StagedRow::getBlock));
+                put("code", Pair.of(CorrectionRowDto::getCode, StagedRow::getCode));
+                put("species", Pair.of(CorrectionRowDto::getSpecies, StagedRow::getSpecies));
+                put("commonName", Pair.of(CorrectionRowDto::getCommonName, StagedRow::getCommonName));
+                put("total", Pair.of(CorrectionRowDto::getTotal, StagedRow::getTotal));
+            }
+        };
 
         for (var id : updatedRowsIds) {
 
@@ -122,33 +144,18 @@ public class SurveyCorrectionService {
 
                 var a = aOptional.get();
                 var b = bOptional.get();
+                for (var entry : propertyChecks.entrySet()) {
+                    var getterA = entry.getValue().getLeft();
+                    var getterB = entry.getValue().getRight();
+                    if (ObjectUtils.stringPropertiesDiffer(true, getterA, getterB, a, b))
+                        cellDiffs.add(CorrectionDiffCellDto.builder()
+                                .columnName(entry.getKey())
+                                .diffRowId(id)
+                                .oldValue(getterA.apply(a))
+                                .newValue(getterB.apply(b))
+                                .build());
+                }
 
-                if (!a.getDiver().contentEquals(b.getDiver()))
-                    cellDiffs.add(CorrectionDiffCellDto.builder()
-                            .columnName("diver")
-                            .diffRowId(id)
-                            .oldValue(a.getDiver())
-                            .newValue(b.getDiver())
-                            .build());
-
-                if (!a.getLatitude().contentEquals(b.getLatitude()))
-                    cellDiffs.add(CorrectionDiffCellDto.builder()
-                            .columnName("latitude")
-                            .diffRowId(id)
-                            .oldValue(a.getLatitude())
-                            .newValue(b.getLatitude())
-                            .build());
-
-                if (!a.getLongitude().contentEquals(b.getLongitude()))
-                    cellDiffs.add(CorrectionDiffCellDto.builder()
-                            .columnName("longitude")
-                            .diffRowId(id)
-                            .oldValue(a.getLongitude())
-                            .newValue(b.getLongitude())
-                            .build());
-
-            } else {
-                // LOG AND ERROR
             }
 
         }

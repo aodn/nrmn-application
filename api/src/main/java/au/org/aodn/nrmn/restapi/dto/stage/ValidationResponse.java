@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
+import au.org.aodn.nrmn.restapi.dto.correction.CorrectionDiffDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,4 +33,6 @@ public class ValidationResponse {
     Map<String, Boolean> foundSites;
 
     Collection<SurveyValidationError> errors;
+
+    CorrectionDiffDto summary;
 }

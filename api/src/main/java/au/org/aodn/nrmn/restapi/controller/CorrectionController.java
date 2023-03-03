@@ -317,7 +317,7 @@ public class CorrectionController {
             var errors = new ArrayList<SurveyValidationError>();
             var rows = bodyDto.getRows();
 
-            surveyCorrectionService.diffSurveyCorrections(surveyIds, rows);
+            response.setSummary(surveyCorrectionService.diffSurveyCorrections(surveyIds, rows));
 
             var mappedRows = mapRows(rows);
 
