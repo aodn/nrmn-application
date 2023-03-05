@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
@@ -169,10 +168,6 @@ public class ValidationProcess {
     }
 
     public ValidationResponse process(StagedJob job) {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        var hasAdminRole = authentication != null
-                ? authentication.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"))
-                : false;
 
         var rows = rowRepository.findRowsByJobId(job.getId());
 
@@ -188,11 +183,6 @@ public class ValidationProcess {
         var mappedRows = speciesFormatting.formatRowsWithSpecies(rows, species);
 
         var response = generateSummary(mappedRows);
-
-        if (hasAdminRole) {
-            response.setErrors(sheetErrors);
-            return response;
-        }
 
         sheetErrors.addAll(checkData(validation, job.getIsExtendedSize(), mappedRows));
 
