@@ -35,6 +35,7 @@ const CustomSearchFilterInput = ({label, exclude, formData, onChange, fullWidth}
         clearOnBlur
         freeSolo
         fullWidth={fullWidth}
+        data-testid='species-correction-box'
         value={formData ? formData : ''}
         onKeyUp={(e) => setSearchTerm(e.target.value)}
         onInputChange={(e, v) => onChange(results.filter((r) => r.species === v)[0])}
