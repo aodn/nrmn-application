@@ -60,7 +60,7 @@ const AuthState = () => {
             </Button>
             {auth.username && (
               <Popper open={open} anchorEl={anchorRef.current} role={undefined} placement="bottom-start" transition disablePortal>
-                {({TransitionProps, placement}) => (
+                {({TransitionProps}) => (
                   <Grow
                     {...TransitionProps}
                     style={{
