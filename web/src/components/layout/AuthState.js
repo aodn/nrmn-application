@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AccountCircle } from '@mui/icons-material';
-import { Button, ClickAwayListener, Popper, MenuList, MenuItem, Grow, Paper } from '@mui/material';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {AccountCircle} from '@mui/icons-material';
+import {Button, ClickAwayListener, Divider, Popper, MenuList, MenuItem, Grow, Paper} from '@mui/material';
 import AlertDialog from '../ui/AlertDialog';
-import { userLogout } from '../../api/api';
-import { AuthContext } from '../../contexts/auth-context';
+import {userLogout} from '../../api/api';
+import {AuthContext} from '../../contexts/auth-context';
+
+import {runDailyTasks, runStartupTasks} from '../../api/api';
 
 const AuthState = () => {
   const navigate = useNavigate();
@@ -39,9 +41,9 @@ const AuthState = () => {
 
   return (
     <AuthContext.Consumer>
-      {({ auth, setAuth }) =>
+      {({auth, setAuth}) =>
         auth.expires < Date.now() ? (
-          <Button variant="contained" disableElevation onClick={() => navigate('/login', { push: true })}>
+          <Button variant="contained" disableElevation onClick={() => navigate('/login', {push: true})}>
             Log In
           </Button>
         ) : (
@@ -51,48 +53,72 @@ const AuthState = () => {
               variant="contained"
               disableElevation
               startIcon={<AccountCircle />}
-              onClick={() => setOpen((prevOpen) => !prevOpen)}>
-              {auth.username}
-              {auth.roles.includes('ROLE_ADMIN') && <span style={{ color: 'yellow', marginLeft: 5 }}>(ADMIN)</span>}
-            </Button>
-            {auth.username && <Popper
-              open={open}
-              anchorEl={anchorRef.current}
-              role={undefined}
-              placement="bottom-start"
-              transition
-              disablePortal
+              onClick={() => setOpen((prevOpen) => !prevOpen)}
             >
-              {({ TransitionProps, placement }) => (
-                <Grow
-                  {...TransitionProps}
-                  style={{
-                    transformOrigin:
-                      placement === 'bottom-start' ? 'left top' : 'left bottom',
-                  }}
-                >
-                  <Paper>
-                    <ClickAwayListener onClickAway={handleClose}>
-                      <MenuList
-                        autoFocusItem={open}
-                        id="composition-menu"
-                        aria-labelledby="composition-button"
-                        onKeyDown={handleListKeyDown}
-                      >
-                        <MenuItem onClick={(e) => {
-                          handleClose(e);
-                          navigate('/changePassword', { push: true });
-                        }}>Change Password</MenuItem>
-                        <MenuItem onClick={(e) => {
-                          handleClose(e);
-                          showConfirmLogout(true);
-                        }}>Logout</MenuItem>
-                      </MenuList>
-                    </ClickAwayListener>
-                  </Paper>
-                </Grow>
-              )}
-            </Popper>}
+              {auth.username}
+              {auth.roles.includes('ROLE_ADMIN') && <span style={{color: 'yellow', marginLeft: 5}}>(ADMIN)</span>}
+            </Button>
+            {auth.username && (
+              <Popper open={open} anchorEl={anchorRef.current} role={undefined} placement="bottom-start" transition disablePortal>
+                {({TransitionProps, placement}) => (
+                  <Grow
+                    {...TransitionProps}
+                    style={{
+                      transformOrigin: 'right top'
+                    }}
+                  >
+                    <Paper>
+                      <ClickAwayListener onClickAway={handleClose}>
+                        <MenuList
+                          autoFocusItem={open}
+                          id="composition-menu"
+                          aria-labelledby="composition-button"
+                          onKeyDown={handleListKeyDown}
+                        >
+                          <MenuItem
+                            onClick={(e) => {
+                              handleClose(e);
+                              navigate('/changePassword', {push: true});
+                            }}
+                          >
+                            Change Password
+                          </MenuItem>
+                          <MenuItem
+                            onClick={(e) => {
+                              handleClose(e);
+                              showConfirmLogout(true);
+                            }}
+                          >
+                            Logout
+                          </MenuItem>
+                          {auth.roles.includes('ROLE_ADMIN') && [
+                            <Divider key="adminDivider"/>,
+                            <MenuItem
+                              key="runDailyTasks"
+                              onClick={(e) => {
+                                runDailyTasks();
+                                handleClose(e);
+                              }}
+                            >
+                              Manually Run Daily Tasks (PQ Update, Refresh Materialized Views)
+                            </MenuItem>,
+                            <MenuItem
+                              key="runStartupTasks"
+                              onClick={(e) => {
+                                runStartupTasks();
+                                handleClose(e);
+                              }}
+                            >
+                              Manually Run Startup Tasks (Clear Ingest Lock)
+                            </MenuItem>
+                          ]}
+                        </MenuList>
+                      </ClickAwayListener>
+                    </Paper>
+                  </Grow>
+                )}
+              </Popper>
+            )}
             <AlertDialog
               open={confirmLogout}
               text="Do you want to log out?"
@@ -102,7 +128,7 @@ const AuthState = () => {
                 userLogout().then(() => {
                   showConfirmLogout(false);
                   localStorage.removeItem('auth');
-                  setAuth({ expires: 0 });
+                  setAuth({expires: 0});
                 });
               }}
             />

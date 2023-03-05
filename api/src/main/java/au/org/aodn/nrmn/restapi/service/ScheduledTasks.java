@@ -25,11 +25,20 @@ public class ScheduledTasks {
     private GlobalLockService globalLockService;
 
     private static Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
+
+    public void runStartupTasks() {
+        globalLockService.releaseLock();
+    }
+
+    public void runDailyTasks() {
+        pqSurveyService.updatePQSurveyFlags();
+        materializedViewService.runDailyTasksAsync();
+    }
+
     @Scheduled(cron = "0 0 0 * * ?", zone = "Australia/Sydney")
-    public void performDailyTasks() {
+    public void scheduledDailyTasks() {
         if (environment.getActiveProfiles().length < 1) {
-            pqSurveyService.updatePQSurveyFlags();
-            materializedViewService.runDailyTasksAsync();
+            runDailyTasks();
         } else {
             logger.info("Skipping PQ update as active profile set.");
         }
@@ -38,7 +47,7 @@ public class ScheduledTasks {
     @PostConstruct
     public void performOnStartup() {
         if (environment.getActiveProfiles().length < 1) {
-            globalLockService.releaseLock();
+            runStartupTasks();
         }
     }
 }

@@ -127,7 +127,7 @@ const App = () => {
         <Router>
           <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)}></SideMenu>
           <TopBar onMenuClick={() => setMenuOpen(true)}>
-            {auth?.features?.includes('verification') ? 'NRMN Verification' : 'National Reef Monitoring Network'}
+            {auth?.features?.includes('verification') ? 'NRMN SysTest' : 'National Reef Monitoring Network'}
           </TopBar>
           <AppContent>
             {applicationError ? (
