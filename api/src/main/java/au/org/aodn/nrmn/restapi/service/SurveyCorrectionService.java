@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import java.util.stream.IntStream;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.tuple.Pair;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,10 @@ import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.enums.SurveyMethod;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.util.ObjectUtils;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 
 @Service
 @Transactional
@@ -128,6 +134,8 @@ public class SurveyCorrectionService {
             }
         };
 
+        var objectMapper = new ObjectMapper();
+
         for (var id : updatedRowsIds) {
 
             var aOptional = ingestedRows.stream()
@@ -154,6 +162,44 @@ public class SurveyCorrectionService {
                                 .oldValue(getterA.apply(a))
                                 .newValue(getterB.apply(b))
                                 .build());
+                }
+
+                try {
+                    var measureA = objectMapper.readValue(a.getMeasureJson(),
+                            new TypeReference<Map<Integer, String>>() {
+                            });
+                    var measureB = b.getMeasureJson();
+                    var measureDiff = Maps.difference(measureA, measureB);
+
+                    for (var diff : measureDiff.entriesOnlyOnLeft().entrySet()) {
+                        if(diff.getKey() > 0)
+                        cellDiffs.add(CorrectionDiffCellDto.builder()
+                                .columnName(diff.getKey().toString())
+                                .diffRowId(id)
+                                .oldValue(diff.getValue())
+                                .newValue("0")
+                                .build());
+                    }
+
+                    for (var diff : measureDiff.entriesOnlyOnRight().entrySet()) {
+                        cellDiffs.add(CorrectionDiffCellDto.builder()
+                                .columnName(diff.getKey().toString())
+                                .diffRowId(id)
+                                .oldValue("0")
+                                .newValue(diff.getValue())
+                                .build());
+                    }
+
+                    for (var diff : measureDiff.entriesDiffering().entrySet()) {
+                        cellDiffs.add(CorrectionDiffCellDto.builder()
+                                .columnName(diff.getKey().toString())
+                                .diffRowId(id)
+                                .oldValue(diff.getValue().leftValue())
+                                .newValue(diff.getValue().rightValue())
+                                .build());
+                    }
+                } catch (Exception ex) {
+
                 }
 
             }
