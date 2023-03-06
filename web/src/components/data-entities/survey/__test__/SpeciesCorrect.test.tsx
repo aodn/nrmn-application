@@ -2,6 +2,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import { render, waitFor, screen, fireEvent, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { describe, beforeAll, afterEach } from '@jest/globals';
 import { Router } from 'react-router-dom';
@@ -67,14 +68,14 @@ describe('<SpeciesCorrect/> testing', () => {
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: true}}]});
     const {rerender, container} = render(<Router location={history.location} navigator={history}><SpeciesCorrect/></Router>);
 
-    let speciesAutocomplete;
+    let autocomplete;
     let input;
 
     await waitFor(() => expect(screen.getByTestId('species-correction-box')).toBeInTheDocument(), {timeout: 10000})
       .then(() => {
-        speciesAutocomplete = screen.getByTestId('species-correction-box');
-        input = within(speciesAutocomplete).getByRole('combobox');
-        speciesAutocomplete.focus();
+        autocomplete = screen.getByTestId('species-correction-box');
+        input = within(autocomplete).getByRole('combobox');
+        autocomplete.focus();
 
         // The search button is enabled if you fill in the value in species box
         // which will cause even fire on the auto complete
@@ -82,17 +83,16 @@ describe('<SpeciesCorrect/> testing', () => {
       });
 
     await waitFor(() => expect(mockSearch).toHaveBeenCalledTimes(1), {timeout: 10000})
+      // Make sure the option list contains our target
       .then(() => {
-        // Trigger value in text box then cause button enable
-        fireEvent.change(input, { target: {value: 'Notol'}});
-        screen.debug(undefined, Infinity);
-      });
-
-    const speciesCorrectionButton = screen.getByTestId('species-correction-search-button');
-    await waitFor(() => expect(speciesCorrectionButton).not.toBeDisabled(), {timeout: 10000})
+        // Trigger screen refresh by typing part of the string
+        userEvent.type(input, 'Notola');
+      })
+      .then(() => waitFor(() => expect(screen.getByText('Notolabrus tetricus/fucicola hybrid')).toBeInTheDocument()))
       .then(() => {
-        // Trigger value in text box then cause button enable
-        fireEvent.click(speciesCorrectionButton);
+        // Now the options loaded with our target value at position 1, we select it by arrow down and enter
+        fireEvent.keyDown(autocomplete, { key: 'ArrowDown' });
+        fireEvent.keyDown(autocomplete, { key: 'Enter' });
       });
   });
 });
