@@ -12,6 +12,7 @@ import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +40,7 @@ import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,18 +66,26 @@ class CorrectionsControllerIT {
     @Autowired
     ObservationRepository observationRepository;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     @LocalServerPort
     int localServerPort;
-
+    /**
+     * Update the species for an observation without hitting the unique constraint
+     * @throws Exception
+     */
     @Test
     @WithUserDetails("test@example.com")
     public void speciesCorrects() throws Exception {
 
-        var reqBuilder = new RequestWrapper<SpeciesCorrectBodyDto, Long>();
+        var reqBuilder = new RequestWrapper<SpeciesCorrectBodyDto, Map>();
         var auth = getContext().getAuthentication();
         var token = jwtTokenProvider.generateToken(auth);
         var uri = String.format("http://localhost:%d/api/v1/correction/correctSpecies", localServerPort);
-        var prevCount = observationRepository.findAll().size();
+        var observations = observationRepository.findAll();
+        assertEquals(2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 333).count());
+        assertEquals(2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 331).count());
 
         var speciesCorrection = new SpeciesCorrectBodyDto();
         speciesCorrection.setPrevObservableItemId(333);
@@ -87,20 +97,78 @@ class CorrectionsControllerIT {
                 .withMethod(HttpMethod.POST)
                 .withToken(token)
                 .withEntity(speciesCorrection)
-                .withResponseType(Long.class)
+                .withResponseType(Map.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        var observations = observationRepository.findAll();
-        var nextCount = observations.size();
+        observations = observationRepository.findAll();
         var prevObservableItemCount = observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 333).count();
         var nextObservableItemCount = observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 331).count();
 
-        assertEquals(prevCount, nextCount);
         assertEquals(0, prevObservableItemCount);
-        assertEquals(nextCount, nextObservableItemCount);
+        assertEquals(4, nextObservableItemCount);
     }
+    /**
+     * If you change the species name, it may violate db unique check in observation table, the behavior is
+     * the call success if not violated, else rollback the whole transaction and report which item id
+     * cause the problem
+     */
+    @Test
+    @WithUserDetails("test@example.com")
+    public void testCorrectSpeciesViolateObservationUnique() throws Exception {
 
+        var reqBuilder = new RequestWrapper<SpeciesCorrectBodyDto, Map>();
+        var auth = getContext().getAuthentication();
+        var token = jwtTokenProvider.generateToken(auth);
+
+        var uri = String.format("http://localhost:%d/api/v1/correction/correctSpecies", localServerPort);
+        var observations = observationRepository.findAll();
+        assertEquals(2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 333).count());
+        assertEquals(2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 330).count());
+        assertEquals(2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 332).count());
+
+        /*
+         812300133 - will cause unique violation
+         812300131 - will not cause problem
+
+         The below cases mix and match the two survey id to prove that even some success some fail or repeated
+         survey id will work
+         */
+        List<List<Integer>> cases = new ArrayList<>();
+        cases.add(Ints.asList(812300133, 812300131));
+        cases.add(Ints.asList(812300131, 812300133));
+        cases.add(Ints.asList(812300131, 812300131, 812300133));
+        cases.add(Ints.asList(812300131, 812300133, 812300133));
+        cases.add(Ints.asList(812300131, 812300133, 812300131, 812300133));
+
+        var speciesCorrection = new SpeciesCorrectBodyDto();
+        speciesCorrection.setPrevObservableItemId(330);
+        speciesCorrection.setNewObservableItemId(333);
+
+        for(var c : cases) {
+            speciesCorrection.setSurveyIds(c);
+
+            var response = reqBuilder
+                    .withUri(uri)
+                    .withMethod(HttpMethod.POST)
+                    .withToken(token)
+                    .withEntity(speciesCorrection)
+                    .withResponseType(Map.class)
+                    .build(testRestTemplate);
+
+            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
+            List<Integer> errorIds = (List)response.getBody().get("surveyIds");
+            assertEquals("Case " + c, 1, errorIds.size());
+            assertEquals("Case " + c, 812300133, errorIds.get(0).intValue());
+
+            observations = observationRepository.findAll();
+
+            assertEquals("Case " + c + " expect no change in value for 332", 2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 332).count());
+            assertEquals("Case " + c + " expect no change in value for 333", 2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 333).count());
+            assertEquals("Case " + c + " expect no change in value for 330", 2, observations.stream().filter(o -> o.getObservableItem().getObservableItemId() == 330).count());
+        }
+    }
     /**
      * If you make a request to get these survey ids and one of it is a locked survey. Then the whole request will fail.
      * The UI may not be able to create such request but direct call to API can.

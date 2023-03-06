@@ -26,9 +26,15 @@ axiosInstance.interceptors.response.use(
     if (error?.response?.status === 401) {
       localStorage.removeItem('auth');
       window.location.reload();
-    } else {
-      window.setApplicationError(error);
-      console.error({error});
+    }
+    else {
+      if(!error?.response?.config?.useCustomErrorHandler) {
+        window.setApplicationError(error);
+        console.error({ error });
+      }
+      else {
+        return Promise.reject(error);
+      }
     }
   }
 );
@@ -157,11 +163,8 @@ export const searchSpeciesSummary = (payload) => {
 
 export const postSpeciesCorrection = (payload) => {
   return axiosInstance
-    .post(`correction/correctSpecies`, payload, {
-      validateStatus: () => true
-    })
-    .then((res) => res)
-    .catch((err) => err);
+    .post(`correction/correctSpecies`, payload, {useCustomErrorHandler: true})
+    .then((res) => res);
 };
 
 export const getCorrections = (surveyIds) =>
@@ -187,6 +190,10 @@ export const validateJob = (jobId, completion) => {
 export const updateRows = (jobId, rows, completion) => {
   return axiosInstance.put(`stage/job/${jobId}`, rows).then((res) => completion(res));
 };
+
+export const runDailyTasks = () => axiosInstance.post('admin/runDailyTasks').then((res) => res);
+
+export const runStartupTasks = () => axiosInstance.post('admin/runStartupTasks').then((res) => res);
 
 export const getSharedLinks = () =>
   axiosInstance

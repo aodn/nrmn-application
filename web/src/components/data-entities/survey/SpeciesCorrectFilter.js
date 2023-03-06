@@ -133,12 +133,12 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
       const set_2 = new Set(countries[updated['country']]);
       const set_3 = new Set(ecoRegions[updated['ecoRegion']]);
 
-      var intersect = new Set([...set_1, ...set_2, ...set_3]);
+      let intersect = new Set([...set_1, ...set_2, ...set_3]);
       if (set_1.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_1.has(i)));
       if (set_2.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_2.has(i)));
       if (set_3.size > 0) intersect = new Set(Array.from(intersect).filter((i) => set_3.has(i)));
 
-      var intersect_arr = Array.from(intersect);
+      let intersect_arr = Array.from(intersect);
       intersect_arr.filter((l) => !filter.locationIds.includes(l));
       updated['stagedLocationIds'] = [...new Set(intersect_arr.filter((d) => d))];
 
@@ -231,7 +231,12 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
                 <SpeciesCorrectGeometryFilter onChange={updateGeometry} filter={filter} />
               </Box>
               <Box m={1} minWidth={300}>
-                <CustomSearchFilterInput fullWidth label="Species" formData={filter.species || null} onChange={updateObservableItem} />
+                <CustomSearchFilterInput
+                  fullWidth
+                  dataTestId='species-correction-from'
+                  label="Species"
+                  formData={filter.species || null}
+                  onChange={updateObservableItem} />
               </Box>
             </Box>
             <Box ml={1} display="flex" flexDirection="row">
@@ -311,7 +316,7 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
                 </Button>
               </Box>
               <Box ml={3} mr={1} width={220}>
-                <LoadingButton disabled={!canSearch} onClick={() => onSearch(filter)} fullWidth variant="contained">
+                <LoadingButton disabled={!canSearch} onClick={() => onSearch(filter)} fullWidth variant="contained" data-testid='species-correction-search-button'>
                   Search
                 </LoadingButton>
               </Box>

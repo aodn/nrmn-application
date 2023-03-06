@@ -5,7 +5,7 @@ import {PropTypes} from 'prop-types';
 import {search} from '../../api/api';
 import axios from 'axios';
 
-const CustomSearchFilterInput = ({label, exclude, formData, onChange, fullWidth}) => {
+const CustomSearchFilterInput = ({label, exclude, formData, onChange, fullWidth, dataTestId}) => {
   const minMatchCharacters = 2;
   const [results, setResults] = useState([]);
   const [options, setOptions] = useState([]);
@@ -35,6 +35,7 @@ const CustomSearchFilterInput = ({label, exclude, formData, onChange, fullWidth}
         clearOnBlur
         freeSolo
         fullWidth={fullWidth}
+        data-testid={dataTestId}
         value={formData ? formData : ''}
         onKeyUp={(e) => setSearchTerm(e.target.value)}
         onInputChange={(e, v) => onChange(results.filter((r) => r.species === v)[0])}
@@ -49,6 +50,7 @@ CustomSearchFilterInput.propTypes = {
   formData: PropTypes.string,
   label: PropTypes.string,
   exclude: PropTypes.string,
+  dataTestId: PropTypes.string,
   fullWidth: PropTypes.bool
 };
 

@@ -1,0 +1,1856 @@
+[
+  {
+    "id": 1,
+    "locationName": "American Samoa",
+    "status": "Active",
+    "countries": "American Samoa",
+    "areas": "Olosega, Rose Atoll, Tutuila",
+    "siteCodes": "PAC26, PAC27, PAC28, PAC29, PAC30, PAC31, PAC32, PAC33, PAC34, PAC35, PAC36, PAC37, PAC38, PAC39, PAC40, PAC41, PAC42, PAC43",
+    "ecoRegions": "Samoa Islands"
+  },
+  {
+    "id": 2,
+    "locationName": "Antarctica",
+    "status": "Active",
+    "countries": "Antarctica",
+    "areas": "Graham Land Antarctica",
+    "siteCodes": "ANT1, ANT2, ANT3, ANT4, ANT5, ANT7, ANT8, ANT9",
+    "ecoRegions": "Antarctic Peninsula"
+  },
+  {
+    "id": 3,
+    "locationName": "Argentinian Gulfs",
+    "status": "Active",
+    "countries": "Argentina",
+    "areas": "Chubut, Rio Negro",
+    "siteCodes": "ARG1, ARG10, ARG11, ARG12, ARG13, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8, ARG9",
+    "ecoRegions": "North Patagonian Gulfs"
+  },
+  {
+    "id": 4,
+    "locationName": "Christmas Island",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Christmas Island",
+    "siteCodes": "CI1, CI10, CI11, CI12, CI13, CI14, CI2, CI3, CI4, CI5, CI6, CI7, CI8, CI9",
+    "ecoRegions": "Cocos-Keeling/Christmas Island"
+  },
+  {
+    "id": 5,
+    "locationName": "Cod Grounds",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "New South Wales",
+    "siteCodes": "CG1, CG10, CG11, CG2, CG3, CG4, CG5, CG6, CG7, CG8, CG9",
+    "ecoRegions": "Manning-Hawkesbury"
+  },
+  {
+    "id": 6,
+    "locationName": "NSW - North",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "New South Wales",
+    "siteCodes": "NSW42, NSW43, NSW44, SI27, SI28",
+    "ecoRegions": "Manning-Hawkesbury"
+  },
+  {
+    "id": 7,
+    "locationName": "NSW - Mid North",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "New South Wales",
+    "siteCodes": "NSW39, NSW40, NSW41",
+    "ecoRegions": "Manning-Hawkesbury"
+  },
+  {
+    "id": 8,
+    "locationName": "Port Stephens - North",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "New South Wales",
+    "siteCodes": "NSW23, NSW24, NSW25, NSW26, NSW27, NSW28, NSW29, NSW30, NSW31, NSW32, NSW33, NSW35, NSW37, NSW38, NSW45",
+    "ecoRegions": "Manning-Hawkesbury"
+  },
+  {
+    "id": 9,
+    "locationName": "NSW - Central",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "New South Wales",
+    "siteCodes": "NSW13, NSW14, NSW15, NSW16, NSW17, NSW18, NSW20, NSW21, NSW22, SYD57, SYD59, SYD62, SYD63",
+    "ecoRegions": "Manning-Hawkesbury"
+  },
+  {
+    "id": 10,
+    "locationName": "Sydney",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "New South Wales",
+    "siteCodes": "SYD1, SYD10, SYD11, SYD12, SYD13, SYD14, SYD15, SYD16, SYD17, SYD18, SYD19, SYD2, SYD20, SYD21, SYD23, SYD24, SYD25, SYD26, SYD27, SYD28, SYD29, SYD3, SYD30, SYD31, SYD32, SYD33, SYD34, SYD35, SYD36, SYD37, SYD38, SYD39, SYD4, SYD40, SYD41, SYD42, SYD43, SYD44, SYD45, SYD46, SYD47, SYD48, SYD49, SYD5, SYD50, SYD51, SYD52, SYD53, SYD54, SYD55, SYD56, SYD58, SYD6, SYD61, SYD64, SYD66, SYD67, SYD68, SYD7, SYD8, SYD9",
+    "ecoRegions": "Manning-Hawkesbury"
+  },
+  {
+    "id": 11,
+    "locationName": "NSW - South",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "New South Wales",
+    "siteCodes": "NSW12, NSW36, NSW50",
+    "ecoRegions": "Cape Howe"
+  },
+  {
+    "id": 12,
+    "locationName": "Batemans",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "New South Wales",
+    "siteCodes": "BMP1, BMP10, BMP11, BMP12, BMP13, BMP14, BMP15, BMP16, BMP17, BMP18, BMP19, BMP2, BMP20, BMP21, BMP22, BMP23, BMP24, BMP25, BMP26, BMP27, BMP28, BMP29, BMP3, BMP30, BMP31, BMP32, BMP4, BMP46, BMP5, BMP6, BMP7, BMP8, BMP9, BMP-S1, BMP-S10, BMP-S11, BMP-S12, BMP-S13, BMP-S14, BMP-S15, BMP-S16, BMP-S17, BMP-S18, BMP-S19, BMP-S2, BMP-S20, BMP-S21, BMP-S22, BMP-S23, BMP-S24, BMP-S25, BMP-S26, BMP-S27, BMP-S28, BMP-S29, BMP-S3, BMP-S30, BMP-S31, BMP-S32, BMP-S33, BMP-S34, BMP-S35, BMP-S36, BMP-S37, BMP-S38, BMP-S39, BMP-S4, BMP-S5, BMP-S6, BMP-S7, BMP-S8, BMP-S9, NSW19, NSW34, NSW49",
+    "ecoRegions": "Cape Howe"
+  },
+  {
+    "id": 13,
+    "locationName": "Eden",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "New South Wales",
+    "siteCodes": "NSW1, NSW10, NSW11, NSW2, NSW3, NSW4, NSW46, NSW47, NSW5, NSW6, NSW7, NSW8, NSW9",
+    "ecoRegions": "Cape Howe"
+  },
+  {
+    "id": 14,
+    "locationName": "Carpentaria",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Northern Territory, Queensland",
+    "siteCodes": "GC1, GC10, GC11, GC12, GC13, GC2, GC3, GC4, GC5, GC6, GC7, GC8, GC9, NT44, NT45, NT46, NT47, NT48, NT49, NT50, NT51, NT52, NT53, NT54, NT55, NT56, NT57, NT58, NT59, NT60, NT61, NT62, NT63",
+    "ecoRegions": "Arnhem Coast to Gulf of Carpenteria"
+  },
+  {
+    "id": 15,
+    "locationName": "Wessel",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Northern Territory",
+    "siteCodes": "NT100, NT102, NT103, NT35, NT36, NT37, NT38, NT39, NT40, NT41, NT42, NT43",
+    "ecoRegions": "Arnhem Coast to Gulf of Carpenteria"
+  },
+  {
+    "id": 16,
+    "locationName": "Arafura",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Northern Territory",
+    "siteCodes": "NT20, NT21, NT22, NT23, NT24, NT25, NT26, NT27, NT28, NT29",
+    "ecoRegions": "Arnhem Coast to Gulf of Carpenteria"
+  },
+  {
+    "id": 17,
+    "locationName": "Darwin",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Northern Territory",
+    "siteCodes": "NT11, NT12, NT13, NT14, NT2, NT3, NT4, NT5, NT8, NT9",
+    "ecoRegions": "Bonaparte Coast"
+  },
+  {
+    "id": 18,
+    "locationName": "Oceanic Shoals",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Northern Territory",
+    "siteCodes": "OS1, OS10, OS11, OS12, OS13, OS14, OS15, OS16, OS2, OS3, OS4, OS5, OS6, OS7, OS8, OS9",
+    "ecoRegions": "Bonaparte Coast, Exmouth to Broome"
+  },
+  {
+    "id": 19,
+    "locationName": "Gold Coast",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "QLD1",
+    "ecoRegions": "Tweed-Moreton"
+  },
+  {
+    "id": 20,
+    "locationName": "Great Sandy",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "QLD2, QLD3, QLD4, QLD5, QLD71",
+    "ecoRegions": "Tweed-Moreton"
+  },
+  {
+    "id": 21,
+    "locationName": "Torres Strait",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "TS10, TS11, TS12, TS13, TS14, TS15, TS16, TS17, TS18, TS19, TS20, TS21, TS22, TS23, TS24, TS25, TS26, TS27, TS4, TS5, TS6, TS7, TS8, TS9",
+    "ecoRegions": "Torres Strait Northern Great Barrier Reef"
+  },
+  {
+    "id": 22,
+    "locationName": "West Cape York",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "GC14, GC15, GC16, GC17, GC18, TS1, TS2, TS28, TS3",
+    "ecoRegions": "Torres Strait Northern Great Barrier Reef"
+  },
+  {
+    "id": 23,
+    "locationName": "Upper South East (Robe)",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "South Australia",
+    "siteCodes": "COO30, COO31, COO32, COO33, COO34, COO35, COO36, COO37, COO38, COO39, COO40, OTW18, OTW20, OTW21, OTW22, OTW23, OTW24, OTW25",
+    "ecoRegions": "Western Bassian"
+  },
+  {
+    "id": 24,
+    "locationName": "Adelaide",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "South Australia",
+    "siteCodes": "GSV101, GSV102, GSV105, GSV109, GSV115, GSV125, GSV126, GSV127, GSV132, GSV133, GSV134, GSV137, GSV139, GSV140, GSV98",
+    "ecoRegions": "South Australian Gulfs"
+  },
+  {
+    "id": 25,
+    "locationName": "Yorke Peninsula",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "South Australia",
+    "siteCodes": "GSV103, GSV104, GSV166, GSV167, GSV168, GSV169, GSV170, GSV172, GSV173, GSV174, GSV175, GSV176, GSV177, GSV178, GSV179, GSV180, GSV181, GSV184, GSV186, GSV187, GSV188, GSV189, GSV190, GSV191, GSV192, GSV193, GSV194, SSG13, SSG44, SSG45, SSG46, SSG47, SSG50, SSG51, SSG52, SSG53, SSG54, SSG55, SSG56, SSG60, SSG61, SSG62, SSG63, SSG64, SSG65, SSG66, SSG67, SSG68, SSG69, SSG70, SSG71, SSG72, SSG73, SSG74",
+    "ecoRegions": "South Australian Gulfs"
+  },
+  {
+    "id": 26,
+    "locationName": "Kangaroo Island",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "South Australia",
+    "siteCodes": "EYR23, GSV60, GSV61, GSV62, GSV63, GSV64, GSV65, GSV66, GSV67, GSV68, GSV69, GSV70, GSV71, GSV72, GSV73, GSV74, GSV75, GSV76, GSV77, GSV78, GSV79, GSV81, GSV83, GSV84, GSV85, GSV86, GSV87, GSV91, GSV92",
+    "ecoRegions": "South Australian Gulfs"
+  },
+  {
+    "id": 27,
+    "locationName": "Upper Spencer Gulf",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "South Australia",
+    "siteCodes": "NSG1, NSG10, NSG11, NSG12, NSG2, NSG20, NSG21, NSG22, NSG23, NSG24, NSG25, NSG26, NSG9",
+    "ecoRegions": "South Australian Gulfs"
+  },
+  {
+    "id": 28,
+    "locationName": "Eyre Peninsula",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "South Australia",
+    "siteCodes": "EYR24, EYR25, EYR26, EYR27, EYR28, EYR29, EYR30, EYR31, EYR32, EYR33, EYR34, EYR48, EYR50, EYR51, EYR52, EYR53, EYR54, EYR55, EYR56, EYR57, EYR58, EYR59, EYR60, EYR61, EYR62, EYR63, EYR64, EYR65, EYR66, EYR67, EYR68, EYR69, EYR70, EYR78, SSG48, SSG49",
+    "ecoRegions": "South Australian Gulfs"
+  },
+  {
+    "id": 29,
+    "locationName": "SA - Western",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "South Australia",
+    "siteCodes": "EYR35, EYR36, EYR37, EYR38, EYR39, EYR40, EYR41, EYR42, EYR43, EYR44, EYR45, EYR46, EYR47, EYR71, EYR72, EYR73, EYR74, EYR75, EYR76, EYR77, MUR18, MUR19, MUR2, MUR20, MUR21, MUR22, MUR23, MUR30, MUR31, MUR32, MUR33, MUR34, MUR35, MUR4, MUR5, MUR6",
+    "ecoRegions": "Great Australian Bight, South Australian Gulfs"
+  },
+  {
+    "id": 30,
+    "locationName": "Flinders Island",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "TAS370, TAS371, TAS372, TAS373, TAS374, TAS375, TAS376, TAS377, TAS380, TAS382, TAS384, TAS385, TAS386, TAS394, TAS397, TAS398, TAS69, TAS70, TAS71, TAS72, TAS73, TAS74, TAS75, TAS76, TAS77, TAS78",
+    "ecoRegions": "Cape Howe"
+  },
+  {
+    "id": 31,
+    "locationName": "Tasmania - North East ",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "MIR-S18, TAS100, TAS262, TAS263, TAS266, TAS267, TAS268, TAS269, TAS270, TAS276, TAS277, TAS278, TAS279, TAS280, TAS281, TAS282, TAS283, TAS284, TAS285, TAS290, TAS291, TAS292, TAS293, TAS294, TAS295, TAS296, TAS297, TAS298, TAS299, TAS300, TAS301, TAS302, TAS303, TAS305, TAS336, TAS337, TAS368, TAS369, TAS67, TAS85, TAS87, TNE-S1, TNE-S2, TNE-S3",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 32,
+    "locationName": "Swansea",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "TAS407, TAS408, TAS409, TAS410, TAS411, TAS412",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 33,
+    "locationName": "Bicheno",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "BI-S1, BI-S2, BI-S3, BI-S4, BI-S5, TAS286, TAS289, TAS65, TAS66, TAS83, TAS84, TAS88",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 34,
+    "locationName": "Tasmania - South East",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "ADV, LPN, RR, SBIR02, SBIR06, SBIR07, SBIR09, SBIR13, SBIR14, SBIR15, SBIR16, SBIR17, SBIR18N, SBIR18S, SBIR19, SBIR20, SBIR21, SBIR22, SBIR23, SBIR24, SBIR26, TAS101, TAS102, TAS104, TAS105, TAS106, TAS107, TAS108, TAS109, TAS120, TAS121, TAS158, TAS160, TAS161, TAS162, TAS163, TAS164, TAS166, TAS167, TAS168, TAS170, TAS171, TAS172, TAS173, TAS174, TAS178, TAS179, TAS180, TAS185, TAS189, TAS193, TAS195, TAS198, TAS206, TAS210, TAS216, TAS220, TAS224, TAS227, TAS235, TAS24, TAS242, TAS253, TAS259, TAS260, TAS28, TAS29, TAS32, TAS34, TAS37, TAS38, TAS39, TAS40, TAS41, TAS415, TAS419, TAS47, TAS48, TAS49, TAS50, TAS54, TAS55, TAS56, TAS58, TAS59, TAS60, TAS61, TAS62, TAS79, TAS80, TAS81",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 35,
+    "locationName": "Maria Island",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "MIR-S1, MIR-S10, MIR-S11, MIR-S12, MIR-S13, MIR-S14, MIR-S15, MIR-S16, MIR-S17, MIR-S2, MIR-S3, MIR-S5, MIR-S7, MIR-S8, MIR-S9, TAS254, TAS255, TAS256, TAS257, TAS258, TAS64",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 36,
+    "locationName": "Tasman Peninsula",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "TAS406, TAS413",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 37,
+    "locationName": "Tasmania - North",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "TAS307, TAS309, TAS310, TAS311, TAS312, TAS313, TAS314, TAS315, TAS316, TAS318, TAS320, TAS321, TAS322, TAS323, TAS324, TAS325, TAS326, TAS327, TAS328, TAS329, TAS330, TAS331, TAS332, TAS333, TAS335, TAS338, TAS339, TAS358, TAS359, TAS362, TAS365, TAS366, TAS367, TAS68, TN-S1, TN-S10, TN-S2, TN-S3, TN-S4, TN-S5, TN-S6, TN-S7, TN-S8, TN-S9",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 38,
+    "locationName": "D'Entrecasteaux & Derwent",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "TAS10, TAS11, TAS12, TAS13, TAS134, TAS135, TAS136, TAS137, TAS139, TAS14, TAS143, TAS144, TAS157, TAS159, TAS16, TAS165, TAS177, TAS18, TAS186, TAS19, TAS190, TAS192, TAS194, TAS196, TAS197, TAS199, TAS20, TAS200, TAS201, TAS202, TAS203, TAS205, TAS207, TAS208, TAS209, TAS21, TAS212, TAS213, TAS215, TAS217, TAS218, TAS219, TAS22, TAS221, TAS222, TAS223, TAS225, TAS226, TAS228, TAS229, TAS23, TAS230, TAS231, TAS232, TAS234, TAS236, TAS237, TAS238, TAS239, TAS240, TAS241, TAS243, TAS244, TAS245, TAS246, TAS247, TAS248, TAS249, TAS25, TAS250, TAS26, TAS27, TAS3, TAS30, TAS31, TAS33, TAS35, TAS36, TAS4, TAS42, TAS43, TAS44, TAS45, TAS5, TAS6, TAS7, TAS8, TAS82, TAS9, TAS94",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 39,
+    "locationName": "Tinderbox",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "TAS176, TAS183, TAS184, TAS187, TAS191, TAS46, TAS52, TAS53, TI-S1, TI-S2, TI-S3, TI-S4, TI-S5",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 40,
+    "locationName": "Ninepin Point",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "NIN-S1, NIN-S2, NIN-S3, NIN-S4, NIN-S5, TAS15, TAS17",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 41,
+    "locationName": "Kent Group",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "KG-S1, KG-S10, KG-S11, KG-S12, KG-S13, KG-S14, KG-S15, KG-S16, KG-S17, KG-S18, KG-S19, KG-S2, KG-S20, KG-S21, KG-S22, KG-S23, KG-S25, KG-S3, KG-S4, KG-S7, KG-S8, KG-S9, TAS402, TAS403, TAS404, TAS405",
+    "ecoRegions": "Cape Howe"
+  },
+  {
+    "id": 42,
+    "locationName": "Tasmania - South",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "TAS1, TAS110, TAS111, TAS112, TAS122, TAS123, TAS124, TAS125, TAS126, TAS127, TAS128, TAS129, TAS130, TAS131, TAS132, TAS133, TAS145, TAS2, TAS90, TAS92",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 43,
+    "locationName": "Port Davey",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "PD-S10, PD-S11, PD-S12, PD-S13, PD-S14, PD-S15, PD-S16, PD-S17, PD-S18, PD-S19, PD-S20, PD-S21, PD-S22, PD-S23, PD-S24, PD-S25, PD-S26, PD-S27, PD-S28, PD-S29, PD-S4, PD-S7, TAS103, TAS138, TAS140, TAS141, TAS142, TAS146, TAS147, TAS148, TAS149, TAS150, TAS152, TAS153, TAS154, TAS155, TAS156, TAS414, TAS91",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 44,
+    "locationName": "Tasmania - West",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "TAS169, TAS204, TAS271, TAS272, TAS273, TAS274, TAS275, TAS334, TAS340, TAS347, TAS416, TAS417, TAS418",
+    "ecoRegions": "Bassian, Western Bassian"
+  },
+  {
+    "id": 45,
+    "locationName": "Rocky Cape",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "RC10, RC-S1, RC-S2, RC-S5, TAS343, TAS344, TAS345, TAS346, TAS348, TAS350, TAS351, TAS352, TAS353, TAS355, TAS356",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 46,
+    "locationName": "King Island",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Tasmania",
+    "siteCodes": "TAS378, TAS379, TAS381, TAS383, TAS387, TAS388, TAS389, TAS390, TAS391, TAS392, TAS393, TAS395, TAS396, TAS399, TAS400, TAS401",
+    "ecoRegions": "Western Bassian"
+  },
+  {
+    "id": 47,
+    "locationName": "Cape Howe",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Victoria",
+    "siteCodes": "CHMP-10, CHMP20, CHMP21, CHMP23, CHMP24, CHMP25, CHMP-S1, CHMP-S18, CHMP-S19, CHMP-S2, CHMP-S3, CHMP-S4, CHMP-S5, CHMP-S6, CHMP-S7, CHMP-S8, CHMP-S9",
+    "ecoRegions": "Cape Howe"
+  },
+  {
+    "id": 48,
+    "locationName": "Victoria - North east",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Victoria",
+    "siteCodes": "VIC10, VIC19, VIC4, VIC55",
+    "ecoRegions": "Cape Howe"
+  },
+  {
+    "id": 49,
+    "locationName": "Point Hicks",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Victoria",
+    "siteCodes": "PHMP23, PHMP24, PHMP-S1, PHMP-S16, PHMP-S17, PHMP-S18, PHMP-S2, PHMP-S21, PHMP-S22, PHMP-S3, PHMP-S4, PHMP-S5, PHMP-S6, PHMP-S7",
+    "ecoRegions": "Cape Howe"
+  },
+  {
+    "id": 50,
+    "locationName": "Beware Reef",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Victoria",
+    "siteCodes": "BR1, BR10, BR11, BR12, BR13, BR2, BR23, BR24, BR25, BR26, BR27, BR3, BR4, BR5, BR6, BR7, BR8, BR9",
+    "ecoRegions": "Cape Howe"
+  },
+  {
+    "id": 51,
+    "locationName": "Victoria - Eastern",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Victoria",
+    "siteCodes": "VIC3",
+    "ecoRegions": "Cape Howe"
+  },
+  {
+    "id": 52,
+    "locationName": "Gippsland Lakes",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Victoria",
+    "siteCodes": "VIC56, VIC57, VIC58, VIC8, VIC9",
+    "ecoRegions": "Cape Howe"
+  },
+  {
+    "id": 53,
+    "locationName": "Phillip Island",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Victoria",
+    "siteCodes": "MP-S1, MP-S2, MP-S3, MP-S4, MP-S5, MP-S6",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 54,
+    "locationName": "Port Phillip Bay",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Victoria",
+    "siteCodes": "PPB10, PPB11, PPB12, PPB13, PPB14, PPB15, PPB16, PPB17, PPB18, PPB19, PPB20, PPB21, PPB23, PPB25, PPB26, PPB28, PPB30, PPB31, PPB32, PPB34, PPB37, PPB38, PPB42, PPB48, PPB49, PPB50, PPB51, PPB53, PPB54, PPB55, PPB56, PPB57, PPB58, PPB59, PPB60, PPB61, PPB62, PPB63, PPB64, PPB7, PPB8",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 55,
+    "locationName": "Port Phillip Heads",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Victoria",
+    "siteCodes": "PPH18, PPH19, PPH20, PPH21, PPH22, PPH23, PPH24, PPH25, PPH26, PPH27, PPH28, PPH29, PPH30, PPH31, PPH32, PPH33, PPH34, PPH35, PPH36, PPH37, PPH38, PPH39, PPH40, PPH41, PPH-S1, PPH-S10, PPH-S11, PPH-S12, PPH-S13, PPH-S14, PPH-S15, PPH-S16, PPH-S17, PPH-S18, PPH-S2, PPH-S3, PPH-S4, PPH-S5, PPH-S6, PPH-S7, PPH-S8, PPH-S9",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 56,
+    "locationName": "Victoria - central",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Victoria",
+    "siteCodes": "HMASCAN, VIC11, VIC41, VIC42, VIC43, VIC44",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 57,
+    "locationName": "Point Addis",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Victoria",
+    "siteCodes": "VIC33, VIC34, VIC35, VIC36, VIC37, VIC38, VIC39, VIC40",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 58,
+    "locationName": "Victoria - western",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Victoria",
+    "siteCodes": "VIC1, VIC2, VIC31, VIC32, VIC5, VIC6, VIC60, VIC61, VIC7",
+    "ecoRegions": "Western Bassian"
+  },
+  {
+    "id": 59,
+    "locationName": "Albany",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "WA1, WA109, WA2, WA3, WA4, WA5, WA6, WA7, WA9",
+    "ecoRegions": "Leeuwin"
+  },
+  {
+    "id": 60,
+    "locationName": "WA - South Coast",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "WA10, WA100, WA101, WA11, WA113, WA114, WA115, WA116, WA117, WA118, WA119, WA120, WA121, WA122, WA123, WA124, WA125, WA126, WA127, WA128, WA129, WA130, WA131, WA132, WA133, WA134, WA135, WA136, WA137, WA138, WA139, WA140, WA141, WA142, WA143, WA144, WA145, WA147, WA149, WA150, WA151, WA94, WA95",
+    "ecoRegions": "Leeuwin"
+  },
+  {
+    "id": 61,
+    "locationName": "Recherche",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "WA102, WA103, WA104, WA105, WA106, WA107, WA108, WA12, WA13, WA146",
+    "ecoRegions": "Great Australian Bight, Leeuwin"
+  },
+  {
+    "id": 62,
+    "locationName": "Kimberley",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "NWS163, NWS164, NWS165, NWS166, NWS167, NWS168, NWS169, NWS170, NWS171, NWS197, NWS198, NWS199, NWS200, NWS201, WA83, WA84, WA85, WA86, WA87",
+    "ecoRegions": "Bonaparte Coast"
+  },
+  {
+    "id": 63,
+    "locationName": "Exmouth",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "NMP16, NMP17, NMP-B3, NMP-B4, NMP-B5, NMP-BF1, NMP-BF2, NMP-BF3, NMP-BF4, NWS157, NWS158, NWS159, NWS160, NWS161, NWS162, WA174",
+    "ecoRegions": "Exmouth to Broome"
+  },
+  {
+    "id": 64,
+    "locationName": "Pilbara",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "NWS103, NWS104, NWS105, NWS106, NWS107, NWS108, NWS109, NWS110, NWS111, NWS112, NWS113, NWS114, NWS115, NWS116, NWS117, NWS118, NWS119, NWS121, NWS122, NWS123, NWS124, NWS125, NWS126, NWS127, NWS128, NWS129, NWS130, NWS131, NWS132, NWS133, NWS134, NWS135, NWS136, NWS137, NWS138, NWS139, NWS140, NWS141, NWS142, NWS143, NWS144, NWS145, NWS146, NWS147, NWS148, NWS149, NWS150, NWS152, NWS153, NWS154, NWS155, NWS156, WA184, WA65, WA66, WA67, WA68, WA69, WA70, WA71, WA72, WA73, WA74, WA75, WA76, WA77, WA78, WA79, WA80",
+    "ecoRegions": "Exmouth to Broome"
+  },
+  {
+    "id": 65,
+    "locationName": "Abrolhos (WA)",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "WA110, WA111, WA112, WA154, WA155, WA156, WA157, WA158, WA159, WA160, WA161, WA162, WA163, WA164, WA165, WA166, WA167, WA168, WA169, WA170, WA171, WA172, WA176, WA177, WA178, WA179, WA180, WA181, WA46, WA47, WA48, WA49, WA50, WA51, WA52, WA53, WA54, WA55",
+    "ecoRegions": "Houtman"
+  },
+  {
+    "id": 66,
+    "locationName": "Scott & Seringapatam Reefs",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "NWS172, NWS173, NWS174, NWS175, NWS176, NWS177, NWS194, NWS195, NWS196, NWS26, NWS27, NWS28, NWS29, NWS30, NWS31, NWS32, NWS33, NWS34, NWS35, NWS36, NWS37, NWS38, NWS39, NWS40, NWS41",
+    "ecoRegions": "Exmouth to Broome"
+  },
+  {
+    "id": 67,
+    "locationName": "Ashmore/Cartier",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "NWS1, NWS10, NWS11, NWS12, NWS13, NWS14, NWS15, NWS16, NWS17, NWS178, NWS179, NWS18, NWS180, NWS181, NWS182, NWS183, NWS184, NWS185, NWS186, NWS187, NWS188, NWS189, NWS19, NWS190, NWS191, NWS192, NWS193, NWS2, NWS20, NWS202, NWS203, NWS21, NWS22, NWS23, NWS24, NWS25, NWS3, NWS4, NWS5, NWS6, NWS7, NWS8, NWS9",
+    "ecoRegions": "Exmouth to Broome"
+  },
+  {
+    "id": 68,
+    "locationName": "Ngari Capes",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "NCMP-S1, NCMP-S10, NCMP-S11, NCMP-S12, NCMP-S13, NCMP-S14, NCMP-S15, NCMP-S16, NCMP-S17, NCMP-S18, NCMP-S19, NCMP-S2, NCMP-S20, NCMP-S3, NCMP-S4, NCMP-S5, NCMP-S6, NCMP-S7, NCMP-S8, NCMP-S9, WA14, WA15, WA16, WA19, WA20, WA21, WA22",
+    "ecoRegions": "Leeuwin"
+  },
+  {
+    "id": 69,
+    "locationName": "Shark Bay",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "WA152, WA153, WA173, WA59, WA60, WA61, WA62, WA63, WA64",
+    "ecoRegions": "Shark Bay"
+  },
+  {
+    "id": 70,
+    "locationName": "Rottnest Island",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "RI1, RI10, RI11, RI12, RI13, RI14, RI15, RI16, RI17, RI18, RI19, RI2, RI20, RI21, RI22, RI23, RI24, RI25, RI26, RI27, RI3, RI4, RI5, RI6, RI7, RI8, RI9",
+    "ecoRegions": "Leeuwin"
+  },
+  {
+    "id": 71,
+    "locationName": "Geographe Bay",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "WA17, WA18, WA182, WA183, WA97, WA98, WA99",
+    "ecoRegions": "Leeuwin"
+  },
+  {
+    "id": 72,
+    "locationName": "Bunbury",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "WA23, WA24, WA25, WA26, WA89",
+    "ecoRegions": "Leeuwin"
+  },
+  {
+    "id": 73,
+    "locationName": "Shoalwater",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "SMP1, SMP2, SMP3, SMP4, SMP5, SMP6, WA27, WA28, WA29, WA30",
+    "ecoRegions": "Leeuwin"
+  },
+  {
+    "id": 74,
+    "locationName": "Perth Metro",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "WA31, WA32, WA33, WA34, WA35, WA36, WA37",
+    "ecoRegions": "Leeuwin"
+  },
+  {
+    "id": 75,
+    "locationName": "Cambodia",
+    "status": "Active",
+    "countries": "Cambodia",
+    "areas": "Cambodia",
+    "siteCodes": "CAM2, CAM4, CAM5, CAM6, CAM7, CAM8, CAM9",
+    "ecoRegions": "Gulf of Thailand"
+  },
+  {
+    "id": 76,
+    "locationName": "Vancouver",
+    "status": "Active",
+    "countries": "Canada",
+    "areas": "British Columbia",
+    "siteCodes": "BMSC1, BMSC2, BMSC3, BMSC4, BMSC6, USWC17, USWC18, USWC19, USWC20, USWC21, USWC22, USWC23",
+    "ecoRegions": "Oregon, Washington, Vancouver Coast and Shelf, Puget Trough/Georgia Basin"
+  },
+  {
+    "id": 77,
+    "locationName": "Newfoundland",
+    "status": "Active",
+    "countries": "Canada",
+    "areas": "Newfoundland and Labrador",
+    "siteCodes": "NFLD1, NFLD10, NFLD11, NFLD12, NFLD13, NFLD2, NFLD3, NFLD4, NFLD5, NFLD6, NFLD7, NFLD8, NFLD9",
+    "ecoRegions": "Northern Grand Banks - Southern Labrador"
+  },
+  {
+    "id": 78,
+    "locationName": "Chilean Fjords",
+    "status": "Active",
+    "countries": "Chile",
+    "areas": "Chile",
+    "siteCodes": "HUINAY1, HUINAY10, HUINAY2, HUINAY3, HUINAY4, HUINAY5, HUINAY6, HUINAY7, HUINAY8, HUINAY9",
+    "ecoRegions": "Chiloense"
+  },
+  {
+    "id": 79,
+    "locationName": "Easter Island (Rapa Nui)",
+    "status": "Active",
+    "countries": "Chile",
+    "areas": "Easter Island",
+    "siteCodes": "EI1, EI10, EI11, EI12, EI13, EI14, EI15, EI16, EI17, EI2, EI3, EI4, EI5, EI6, EI7, EI8, EI9",
+    "ecoRegions": "Easter Island"
+  },
+  {
+    "id": 80,
+    "locationName": "Tierra del Fuego",
+    "status": "Active",
+    "countries": "Chile",
+    "areas": "Magallanes",
+    "siteCodes": "CHILE1, CHILE2, CHILE3, CHILE4, CHILE5, CHILE6, CHILE7, CHILE8",
+    "ecoRegions": "Channels and Fjords of Southern Chile"
+  },
+  {
+    "id": 81,
+    "locationName": "Chile",
+    "status": "Active",
+    "countries": "Chile",
+    "areas": "San Antonio, Chile",
+    "siteCodes": "CHILE10, CHILE11, CHILE12, CHILE13, CHILE14, CHILE15, CHILE16, CHILE17",
+    "ecoRegions": "Araucanian"
+  },
+  {
+    "id": 82,
+    "locationName": "Ramuntcho",
+    "status": "Active",
+    "countries": "Chile",
+    "areas": "Concepcion",
+    "siteCodes": "CHILE21, CHILE23",
+    "ecoRegions": "Araucanian"
+  },
+  {
+    "id": 83,
+    "locationName": "Hong Kong",
+    "status": "Active",
+    "countries": "China",
+    "areas": "Hong Kong",
+    "siteCodes": "HK1, HK2, HK3, HK4, HK5, HK6, HK7",
+    "ecoRegions": "Southern China"
+  },
+  {
+    "id": 84,
+    "locationName": "Cook Islands (southern)",
+    "status": "Active",
+    "countries": "Cook Islands",
+    "areas": "Aitutaki, Palmerston, Rarotonga",
+    "siteCodes": "COOK1, COOK2, COOK3, COOK4, COOK5, PAC10, PAC11, PAC12, PAC13, PAC9",
+    "ecoRegions": "Southern Cook/Austral Islands"
+  },
+  {
+    "id": 85,
+    "locationName": "Cook Islands (nothern)",
+    "status": "Active",
+    "countries": "Cook Islands",
+    "areas": "Suwarrow",
+    "siteCodes": "PAC14, PAC15, PAC16, PAC17, PAC18, PAC19, PAC20, PAC21, PAC22, PAC23, PAC24, PAC25",
+    "ecoRegions": "Phoenix/Tokelau/Northern Cook Islands"
+  },
+  {
+    "id": 86,
+    "locationName": "Costa Rica",
+    "status": "Active",
+    "countries": "Costa Rica",
+    "areas": "Guanacaste, Puntarenas",
+    "siteCodes": "ETP115, ETP116, ETP30, ETP31, ETP32, ETP33, ETP34, ETP35, ETP36, ETP37, ETP38, ETP39, ETP40, ETP41, ETP42, ETP43, ETP44, ETP45, ETP46, ETP47, ETP48, ETP49, ETP50, ETP51, ETP52, ETP53, ETP54, ETP55, ETP56",
+    "ecoRegions": "Chiapas-Nicaragua, Nicoya"
+  },
+  {
+    "id": 87,
+    "locationName": "Cocos",
+    "status": "Active",
+    "countries": "Costa Rica",
+    "areas": "Isla del Coco",
+    "siteCodes": "ETP117, ETP118, ETP119, ETP120, ETP121, ETP122, ETP14, ETP15, ETP16, ETP17, ETP18, ETP19, ETP20, ETP21, ETP22, ETP23, ETP234, ETP24, ETP240, ETP25, ETP26, ETP27, ETP28, ETP29",
+    "ecoRegions": "Cocos Islands"
+  },
+  {
+    "id": 88,
+    "locationName": "Timor-Leste",
+    "status": "Active",
+    "countries": "East Timor",
+    "areas": "Timor-Leste",
+    "siteCodes": "ET1",
+    "ecoRegions": "Lesser Sunda"
+  },
+  {
+    "id": 89,
+    "locationName": "Machalilla",
+    "status": "Active",
+    "countries": "Ecuador",
+    "areas": "Manabi",
+    "siteCodes": "ETP126, ETP127, ETP137, ETP163, ETP170, ETP172, ETP175, ETP183, ETP186, ETP189, ETP196, ETP201, ETP202, ETP215, ETP216, ETP235",
+    "ecoRegions": "Guayaquil"
+  },
+  {
+    "id": 90,
+    "locationName": "Red Sea",
+    "status": "Active",
+    "countries": "Egypt",
+    "areas": "Red Sea Governate",
+    "siteCodes": "RED1, RED13",
+    "ecoRegions": "Northern and Central Red Sea"
+  },
+  {
+    "id": 91,
+    "locationName": "Falklands",
+    "status": "Active",
+    "countries": "Falkland Islands (Malvinas)",
+    "areas": "Falkland Islands",
+    "siteCodes": "FI1, FI2, FI3, FI4, FI5",
+    "ecoRegions": "Malvinas/Falklands"
+  },
+  {
+    "id": 92,
+    "locationName": "Marseilles",
+    "status": "Active",
+    "countries": "France",
+    "areas": "Cote d'Azur",
+    "siteCodes": "MED23, MED24",
+    "ecoRegions": "Western Mediterranean"
+  },
+  {
+    "id": 93,
+    "locationName": "Banyuls",
+    "status": "Active",
+    "countries": "France",
+    "areas": "Languedoc-Roussillon",
+    "siteCodes": "MED10, MED11, MED12, MED13, MED14, MED15, MED16, MED17, MED18, MED20, MED21, MED22",
+    "ecoRegions": "Western Mediterranean"
+  },
+  {
+    "id": 94,
+    "locationName": "Tuamotos",
+    "status": "Active",
+    "countries": "French Polynesia",
+    "areas": "Iles Tuamotu",
+    "siteCodes": "FP22, FP23, FP24, FP25, FP26, FP27, FP28, FP29, FP30, FP31, FP32, FP33, FP34, FP35, FP36, FP37, FP38, FP39, FP40, FP41, FP42, FP43, FP44, FP45, FP48, FP49, FP50, FP51, FP52, FP53, FP54, FP55, FP56, FP57, FP58, FP59, FP60, FP61, FP62, FP63, FP64, FP65, FP66, FP67, FP68, FP69, FP70",
+    "ecoRegions": "Tuamotus"
+  },
+  {
+    "id": 95,
+    "locationName": "Austral Islands",
+    "status": "Active",
+    "countries": "French Polynesia",
+    "areas": "Iles Tubuai",
+    "siteCodes": "PAC3, PAC4, PAC5, PAC6, PAC7, PAC8",
+    "ecoRegions": "Southern Cook/Austral Islands"
+  },
+  {
+    "id": 96,
+    "locationName": "Marquesas",
+    "status": "Active",
+    "countries": "French Polynesia",
+    "areas": "Marquesas Islands",
+    "siteCodes": "MI1, MI2, MI3, MI4, MI5, MI6, MI7",
+    "ecoRegions": "Marquesas"
+  },
+  {
+    "id": 97,
+    "locationName": "Society Islands",
+    "status": "Active",
+    "countries": "French Polynesia",
+    "areas": "Society Islands",
+    "siteCodes": "FP1, FP10, FP11, FP12, FP13, FP14, FP15, FP16, FP17, FP18, FP19, FP2, FP20, FP21, FP3, FP4, FP5, FP6, FP7, FP8, FP9, PAC1, PAC2",
+    "ecoRegions": "Society Islands, Tuamotus"
+  },
+  {
+    "id": 98,
+    "locationName": "Greenland",
+    "status": "Active",
+    "countries": "Greenland",
+    "areas": "Greenland",
+    "siteCodes": "GL1",
+    "ecoRegions": "East Greenland Shelf"
+  },
+  {
+    "id": 99,
+    "locationName": "Aceh",
+    "status": "Active",
+    "countries": "Indonesia",
+    "areas": "Aceh",
+    "siteCodes": "ACEH1, ACEH10, ACEH11, ACEH12, ACEH13, ACEH14, ACEH15, ACEH16, ACEH17, ACEH18, ACEH19, ACEH2, ACEH20, ACEH21, ACEH22, ACEH23, ACEH24, ACEH25, ACEH26, ACEH27, ACEH28, ACEH29, ACEH3, ACEH30, ACEH4, ACEH5, ACEH6, ACEH7, ACEH8, ACEH9",
+    "ecoRegions": "Western Sumatra"
+  },
+  {
+    "id": 100,
+    "locationName": "Bali",
+    "status": "Active",
+    "countries": "Indonesia",
+    "areas": "Bali",
+    "siteCodes": "BALI1, BALI2, BALI3, BALI4",
+    "ecoRegions": "Lesser Sunda"
+  },
+  {
+    "id": 101,
+    "locationName": "Banda Sea",
+    "status": "Active",
+    "countries": "Indonesia",
+    "areas": "Banda Archipelago",
+    "siteCodes": "AH1, AH2, AH3, AH4, AH5, BA1, BA10, BA11, BA12, BA13, BA2, BA3, BA4, BA5, BA6, BA7, BA8, BA9, BS1, BS2, BS3, BS4, BS5, BS6, BS7, BS8, BS9, TI1, TI2, TI3, TI4, TI5, TI6, TI7, TI8, TI9",
+    "ecoRegions": "Banda Sea"
+  },
+  {
+    "id": 102,
+    "locationName": "Raja Ampat",
+    "status": "Active",
+    "countries": "Indonesia",
+    "areas": "West Papua",
+    "siteCodes": "RAJA1, RAJA10, RAJA11, RAJA12, RAJA13, RAJA14, RAJA15, RAJA16, RAJA17, RAJA18, RAJA19, RAJA2, RAJA20, RAJA21, RAJA22, RAJA23, RAJA24, RAJA25, RAJA26, RAJA27, RAJA28, RAJA29, RAJA3, RAJA30, RAJA31, RAJA32, RAJA33, RAJA34, RAJA35, RAJA36, RAJA37, RAJA38, RAJA39, RAJA4, RAJA40, RAJA41, RAJA42, RAJA43, RAJA44, RAJA45, RAJA46, RAJA47, RAJA48, RAJA49, RAJA5, RAJA50, RAJA51, RAJA52, RAJA53, RAJA54, RAJA6, RAJA7, RAJA8, RAJA9",
+    "ecoRegions": "Papua"
+  },
+  {
+    "id": 103,
+    "locationName": "Mediterranean (east)",
+    "status": "Active",
+    "countries": "Israel",
+    "areas": "Israel",
+    "siteCodes": "MED29, MED30, MED31, MED32, MED33, MED34",
+    "ecoRegions": "Levantine Sea"
+  },
+  {
+    "id": 104,
+    "locationName": "Mediterranean (central)",
+    "status": "Active",
+    "countries": "Italy",
+    "areas": "Ischia, Marche",
+    "siteCodes": "IT1, IT2, MED1, MED2, MED3, MED4, MED5, MED6, MED7, MED8, MED9",
+    "ecoRegions": "Adriatic Sea, Western Mediterranean"
+  },
+  {
+    "id": 105,
+    "locationName": "Hokkaido",
+    "status": "Active",
+    "countries": "Japan",
+    "areas": "Hokkaido",
+    "siteCodes": "JAPAN24, JAPAN25, JAPAN26, JAPAN27, JAPAN28",
+    "ecoRegions": "Oyashio Current"
+  },
+  {
+    "id": 106,
+    "locationName": "Honshu - North",
+    "status": "Active",
+    "countries": "Japan",
+    "areas": "Honshu",
+    "siteCodes": "JAPAN18, JAPAN19, JAPAN20, JAPAN21, JAPAN22, JAPAN23",
+    "ecoRegions": "Sea of Japan/East Sea"
+  },
+  {
+    "id": 107,
+    "locationName": "Honshu - South",
+    "status": "Active",
+    "countries": "Japan",
+    "areas": "Honshu",
+    "siteCodes": "JAPAN14, JAPAN15, JAPAN16, JAPAN17",
+    "ecoRegions": "Central Kuroshio Current"
+  },
+  {
+    "id": 108,
+    "locationName": "Kyushu",
+    "status": "Active",
+    "countries": "Japan",
+    "areas": "Kyushu",
+    "siteCodes": "JAPAN1, JAPAN13, JAPAN2, JAPAN3, JAPAN4",
+    "ecoRegions": "Central Kuroshio Current"
+  },
+  {
+    "id": 109,
+    "locationName": "Okinawa",
+    "status": "Active",
+    "countries": "Japan",
+    "areas": "Okinawa",
+    "siteCodes": "JAPAN10, JAPAN11, JAPAN12, JAPAN5, JAPAN6, JAPAN7, JAPAN8, JAPAN9",
+    "ecoRegions": "South Kuroshio"
+  },
+  {
+    "id": 110,
+    "locationName": "Maldives",
+    "status": "Active",
+    "countries": "Maldives",
+    "areas": "Alif Alif, Alif dhaalu, Kaafu",
+    "siteCodes": "MAL1, MAL10, MAL11, MAL12, MAL2, MAL3, MAL4, MAL5, MAL6, MAL7, MAL8, MAL9",
+    "ecoRegions": "Maldives"
+  },
+  {
+    "id": 111,
+    "locationName": "Gulf of California",
+    "status": "Active",
+    "countries": "Mexico",
+    "areas": "Baja California",
+    "siteCodes": "GOC1, GOC10, GOC11, GOC12, GOC13, GOC14, GOC15, GOC16, GOC17, GOC18, GOC19, GOC2, GOC20, GOC21, GOC22, GOC3, GOC4, GOC5, GOC6, GOC7, GOC8, GOC9",
+    "ecoRegions": "Cortezian"
+  },
+  {
+    "id": 112,
+    "locationName": "Mediterranean (southwest)",
+    "status": "Active",
+    "countries": "Morocco",
+    "areas": "Morocco",
+    "siteCodes": "MEL1, MEL10, MEL12, MEL2, MEL31, MEL4, MEL5, MEL6, MEL7, MEL8, MEL9",
+    "ecoRegions": "Alboran Sea"
+  },
+  {
+    "id": 113,
+    "locationName": "Tuhua/Mayor Island",
+    "status": "Active",
+    "countries": "New Zealand",
+    "areas": "Bay of Plenty",
+    "siteCodes": "PAC139, PAC140, PAC141, PAC142, PAC165, PAC166, PAC167, PAC168",
+    "ecoRegions": "Northeastern New Zealand"
+  },
+  {
+    "id": 114,
+    "locationName": "Northland",
+    "status": "Active",
+    "countries": "New Zealand",
+    "areas": "Northland",
+    "siteCodes": "PAC100, PAC101, PAC102, PAC103, PAC104, PAC105, PAC106, PAC107, PAC108, PAC109, PAC113, PAC120, PAC121, PAC122, PAC128, PAC131, PAC132, PAC133, PAC134, PAC135, PAC136, PAC137, PAC138, PAC143, PAC144, PAC145, PAC149, PAC150, PAC151, PAC152, PAC153, PAC154, PAC155, PAC156, PAC170, PAC70, PAC71, PAC72, PAC73, PAC74, PAC77, PAC78, PAC79, PAC80, PAC81, PAC82, PAC83, PAC84, PAC85, PAC86, PAC87",
+    "ecoRegions": "Northeastern New Zealand"
+  },
+  {
+    "id": 115,
+    "locationName": "Cathedral Cove",
+    "status": "Active",
+    "countries": "New Zealand",
+    "areas": "Northland",
+    "siteCodes": "PAC159, PAC160, PAC161, PAC162, PAC163, PAC164",
+    "ecoRegions": "Northeastern New Zealand"
+  },
+  {
+    "id": 116,
+    "locationName": "Cape Rodney - Okakari Point",
+    "status": "Active",
+    "countries": "New Zealand",
+    "areas": "Northland",
+    "siteCodes": "NZ12, PAC123, PAC124, PAC125, PAC126, PAC127, PAC169, PAC94, PAC95, PAC96",
+    "ecoRegions": "Northeastern New Zealand"
+  },
+  {
+    "id": 117,
+    "locationName": "Tawharanui",
+    "status": "Active",
+    "countries": "New Zealand",
+    "areas": "Northland",
+    "siteCodes": "PAC110, PAC111, PAC112, PAC171, PAC172",
+    "ecoRegions": "Northeastern New Zealand"
+  },
+  {
+    "id": 118,
+    "locationName": "Three Kings",
+    "status": "Active",
+    "countries": "New Zealand",
+    "areas": "Northland",
+    "siteCodes": "PAC88, PAC89, PAC90, PAC91, PAC92, PAC93",
+    "ecoRegions": "Three Kings-North Cape"
+  },
+  {
+    "id": 119,
+    "locationName": "Southland",
+    "status": "Active",
+    "countries": "New Zealand",
+    "areas": "Southland",
+    "siteCodes": "NZ13",
+    "ecoRegions": "South New Zealand"
+  },
+  {
+    "id": 120,
+    "locationName": "Wellington",
+    "status": "Active",
+    "countries": "New Zealand",
+    "areas": "Wellington",
+    "siteCodes": "KAP1, WELL1, WELL2, WELL3, WELL4, WELL5, WELL6, WELL7",
+    "ecoRegions": "Central New Zealand"
+  },
+  {
+    "id": 121,
+    "locationName": "Nicaragua",
+    "status": "Active",
+    "countries": "Nicaragua",
+    "areas": "Rivas",
+    "siteCodes": "NIC1, NIC10, NIC11, NIC12, NIC13, NIC14, NIC15, NIC16, NIC17, NIC18, NIC19, NIC2, NIC20, NIC21, NIC22, NIC23, NIC24, NIC25, NIC26, NIC27, NIC28, NIC29, NIC3, NIC30, NIC31, NIC32, NIC33, NIC35, NIC36, NIC37, NIC4, NIC5, NIC7, NIC9",
+    "ecoRegions": "Chiapas-Nicaragua"
+  },
+  {
+    "id": 122,
+    "locationName": "Niue",
+    "status": "Active",
+    "countries": "Niue",
+    "areas": "Niue",
+    "siteCodes": "NIUE1, NIUE2, NIUE3, NIUE4, NIUE5, NIUE6, NIUE7",
+    "ecoRegions": "Tonga Islands"
+  },
+  {
+    "id": 123,
+    "locationName": "Svalbard",
+    "status": "Active",
+    "countries": "Norway",
+    "areas": "Svalbard",
+    "siteCodes": "SPI1, SPI2, SPI3",
+    "ecoRegions": "North and East Barents Sea"
+  },
+  {
+    "id": 124,
+    "locationName": "Bocas Del Toro",
+    "status": "Active",
+    "countries": "Panama",
+    "areas": "Bocas del Toro",
+    "siteCodes": "BOCAS1 , BOCAS10 , BOCAS11 , BOCAS12 , BOCAS13 , BOCAS14, BOCAS2, BOCAS3, BOCAS4 , BOCAS5 , BOCAS6 , BOCAS7, BOCAS8 , BOCAS9 ",
+    "ecoRegions": "Southwestern Caribbean"
+  },
+  {
+    "id": 125,
+    "locationName": "Coiba",
+    "status": "Active",
+    "countries": "Panama",
+    "areas": "Chiriqui, Veraguas",
+    "siteCodes": "ETP11, ETP12, ETP123, ETP124, ETP125, ETP13, ETP131, ETP140, ETP141, ETP142, ETP144, ETP151, ETP152, ETP169, ETP173, ETP177, ETP187, ETP188, ETP195, ETP200, ETP206, ETP211, ETP212, ETP223, ETP238, ETP239, ETP242, ETP57, ETP58, ETP59, ETP60, ETP61, ETP62, ETP63, ETP64, ETP65, ETP66, ETP67, ETP68, ETP69, ETP70, ETP71, ETP72, ETP73, ETP74, ETP75, ETP76, ETP77, ETP78, ETP79, ETP80, ETP81, ETP82, ETP83, ETP84, ETP85, ETP86, ETP87, ETP88, ETP89, ETP90, ETP91, ETP92, ETP93, ETP94, ETP95",
+    "ecoRegions": "Nicoya"
+  },
+  {
+    "id": 126,
+    "locationName": "San Blas",
+    "status": "Active",
+    "countries": "Panama",
+    "areas": "Kuna Yala",
+    "siteCodes": "CAR21, CAR22, CAR23, CAR24, CAR25, CAR26",
+    "ecoRegions": "Southwestern Caribbean"
+  },
+  {
+    "id": 127,
+    "locationName": "Panama Pacific",
+    "status": "Active",
+    "countries": "Panama",
+    "areas": "Los Santos, Panama",
+    "siteCodes": "ETP1, ETP2, ETP3, ETP96",
+    "ecoRegions": "Panama Bight"
+  },
+  {
+    "id": 128,
+    "locationName": "New Guinea",
+    "status": "Active",
+    "countries": "Papua New Guinea",
+    "areas": "East New Britain, West New Britain",
+    "siteCodes": "PNG1, PNG10, PNG2, PNG3, PNG4, PNG5, PNG6, PNG7, PNG8, PNG9",
+    "ecoRegions": "Bismarck Sea"
+  },
+  {
+    "id": 129,
+    "locationName": "Pitcairn Islands",
+    "status": "Active",
+    "countries": "Pitcairn Islands",
+    "areas": "Ducie Island, Henderson Island",
+    "siteCodes": "PIT1, PIT2, PIT3, PIT4, PIT5",
+    "ecoRegions": "Rapa-Pitcairn"
+  },
+  {
+    "id": 130,
+    "locationName": "Western Iberia",
+    "status": "Active",
+    "countries": "Portugal",
+    "areas": "Berlengas, Porto, Sagres, Setubal",
+    "siteCodes": "POR1, POR2, POR3, POR4, POR5",
+    "ecoRegions": "South European Atlantic Shelf"
+  },
+  {
+    "id": 131,
+    "locationName": "Qatar",
+    "status": "Active",
+    "countries": "Qatar",
+    "areas": "Qatar",
+    "siteCodes": "QAT10, QAT11, QAT12, QAT9",
+    "ecoRegions": "Arabian (Persian) Gulf"
+  },
+  {
+    "id": 132,
+    "locationName": "Malta",
+    "status": "Active",
+    "countries": "Republic of Malta",
+    "areas": "Malta",
+    "siteCodes": "MALT1",
+    "ecoRegions": "Ionian Sea"
+  },
+  {
+    "id": 133,
+    "locationName": "Marshall Islands",
+    "status": "Active",
+    "countries": "Republic of the Marshall Islands",
+    "areas": "Marshall Islands",
+    "siteCodes": "AL1, AL10, AL2, AL3, AL4, AL5, AL6, AL7, AL8, AL9, RT1, RT10, RT2, RT3, RT4, RT6",
+    "ecoRegions": "Marshall Islands"
+  },
+  {
+    "id": 134,
+    "locationName": "Samoa",
+    "status": "Active",
+    "countries": "Samoa",
+    "areas": "Upolu",
+    "siteCodes": "PAC44, PAC45",
+    "ecoRegions": "Samoa Islands"
+  },
+  {
+    "id": 135,
+    "locationName": "Seychelles (inner)",
+    "status": "Active",
+    "countries": "Seychelles",
+    "areas": "Mahe",
+    "siteCodes": "SEY1, SEY10, SEY11, SEY12, SEY2, SEY3, SEY4, SEY5, SEY6, SEY7, SEY8, SEY9",
+    "ecoRegions": "Seychelles"
+  },
+  {
+    "id": 136,
+    "locationName": "Solomon Islands",
+    "status": "Active",
+    "countries": "Solomon Islands",
+    "areas": "Western Province",
+    "siteCodes": "SOL1, SOL2, SOL3, SOL4, SOL5",
+    "ecoRegions": "Solomon Archipelago"
+  },
+  {
+    "id": 137,
+    "locationName": "South Africa",
+    "status": "Active",
+    "countries": "South Africa",
+    "areas": "Eastern Cape, Western Cape",
+    "siteCodes": "RSA1, RSA10, RSA11, RSA2, RSA3, RSA4, RSA5, RSA6, RSA7, RSA8, RSA9",
+    "ecoRegions": "Agulhas Bank"
+  },
+  {
+    "id": 138,
+    "locationName": "Biscay",
+    "status": "Active",
+    "countries": "Spain",
+    "areas": "Asturias, Basque Country, Cantabria",
+    "siteCodes": "AST1, AST2, AST3, AST4, AST5, AST6, CANT1, CANT2, CANT3, CANT4, PVA1, PVA10, PVA11, PVA12, PVA13, PVA14, PVA15, PVA16, PVA17, PVA18, PVA2, PVA3, PVA5, PVA6, PVA7, PVA8, PVA9",
+    "ecoRegions": "South European Atlantic Shelf"
+  },
+  {
+    "id": 139,
+    "locationName": "Mediterranean (north west)",
+    "status": "Active",
+    "countries": "Spain",
+    "areas": "Alboran Island, Balearic Islands, Catalonia, Ceuta, Gibraltar, Málaga, Melilla, Murcia, Valencia",
+    "siteCodes": "AND1, AND11, AND12, AND13, AND14, AND15, AND16, AND17, AND18, AND19, AND2, AND20, AND21, AND22, AND23, AND24, AND25, AND26, AND27, AND28, AND29, AND3, AND30, AND31, AND32, AND33, AND34, AND35, AND36 , AND37, AND38, AND39, AND4, AND40, AND41, AND42, AND43, AND44, AND45, AND46, AND47, AND48, AND49, AND5, AND51, AND52, AND53, AND54, AND55, AND56, AND57, AND58, AND59, AND6, AND60, AND61, AND62, AND63, AND64, AND65, AND66, AND7, AND8, AND9, BAL1, BAL10, BAL11, BAL12, BAL13, BAL14, BAL15, BAL16, BAL17, BAL18, BAL19, BAL2, BAL20, BAL21, BAL22, BAL23, BAL3, BAL4, BAL5, BAL6, BAL7, BAL8, BAL9, CAT1, CAT10, CAT11, CAT12, CAT13, CAT14, CAT15, CAT16, CAT17, CAT18, CAT19, CAT2, CAT20, CAT21, CAT22, CAT23, CAT24, CAT25, CAT26, CAT27, CAT28, CAT29, CAT3, CAT30, CAT31, CAT32, CAT33, CAT34, CAT35, CAT36, CAT37, CAT38, CAT39, CAT4, CAT40, CAT41, CAT42, CAT43, CAT44, CAT45, CAT5, CAT6, CAT7, CAT8, CAT9, CEU1, CEU2, CEU3, CEU4, GIB1, GIB2, MED19, MED25, MED26, MED27, MED28, MEL3, MURC1, MURC2, MURC3, MURC4, MURC5, MURC6, MURC7, MURC8, MURC9, VAL1, VAL10, VAL11, VAL12, VAL13, VAL14, VAL15, VAL16, VAL17, VAL18, VAL19, VAL2, VAL20, VAL3, VAL4, VAL5, VAL6, VAL7, VAL8, VAL9",
+    "ecoRegions": "Alboran Sea, Saharan Upwelling, Western Mediterranean"
+  },
+  {
+    "id": 140,
+    "locationName": "Canary Islands",
+    "status": "Active",
+    "countries": "Spain",
+    "areas": "Canary Islands",
+    "siteCodes": "CAN1, CAN10, CAN100, CAN101, CAN102, CAN103, CAN104, CAN105, CAN106, CAN107, CAN11, CAN12, CAN13, CAN14, CAN15, CAN16, CAN17, CAN18, CAN19, CAN2, CAN20, CAN21, CAN22, CAN23, CAN24, CAN25, CAN26, CAN27, CAN28, CAN29, CAN3, CAN30, CAN31, CAN32, CAN33, CAN34, CAN35, CAN36, CAN37, CAN38, CAN39, CAN4, CAN40, CAN41, CAN42, CAN43, CAN44, CAN45, CAN46, CAN47, CAN48, CAN5, CAN50, CAN51, CAN52, CAN53, CAN54, CAN55, CAN56, CAN57, CAN58, CAN59, CAN6, CAN60, CAN61, CAN62, CAN63, CAN64, CAN65, CAN66, CAN67, CAN68, CAN69, CAN7, CAN70, CAN71, CAN72, CAN73, CAN74, CAN75, CAN76, CAN77, CAN78, CAN79, CAN8, CAN80, CAN81, CAN82, CAN83, CAN84, CAN85, CAN86, CAN87, CAN88, CAN89, CAN9, CAN90, CAN91, CAN92, CAN93, CAN94, CAN95, CAN96, CAN97, CAN98, CAN99",
+    "ecoRegions": "Azores Canaries Madeira"
+  },
+  {
+    "id": 141,
+    "locationName": "Galicia (Spain)",
+    "status": "Active",
+    "countries": "Spain",
+    "areas": "Galicia",
+    "siteCodes": "GALI1, GALI10, GALI11, GALI12, GALI13, GALI14, GALI17, GALI18, GALI19, GALI2, GALI20, GALI3, GALI4, GALI5, GALI6, GALI7, GALI8, GALI9",
+    "ecoRegions": "South European Atlantic Shelf"
+  },
+  {
+    "id": 142,
+    "locationName": "Tanzania",
+    "status": "Active",
+    "countries": "Tanzania",
+    "areas": "Mtwara",
+    "siteCodes": "TZN1, TZN2, TZN3, TZN4, TZN5, TZN6, TZN7, TZN8, TZN9",
+    "ecoRegions": "East African Coral Coast"
+  },
+  {
+    "id": 143,
+    "locationName": "Tonga",
+    "status": "Active",
+    "countries": "Tonga",
+    "areas": "Ha'Apai, Ha'Apai Group, Tongatapu, Vava'u",
+    "siteCodes": "PAC46, PAC47, PAC48, PAC49, PAC50, PAC51, PAC52, PAC53, PAC54, PAC55, PAC56, PAC57, PAC58, PAC59, PAC60, TONGA1, TONGA10, TONGA11, TONGA12, TONGA13, TONGA14, TONGA2, TONGA3, TONGA4, TONGA5, TONGA6, TONGA7, TONGA8, TONGA9",
+    "ecoRegions": "Samoa Islands, Tonga Islands"
+  },
+  {
+    "id": 144,
+    "locationName": "Minerva Reefs",
+    "status": "Active",
+    "countries": "Tonga",
+    "areas": "Minerva Reefs",
+    "siteCodes": "PAC61, PAC62, PAC63, PAC64, PAC65, PAC66, PAC67, PAC68, PAC69",
+    "ecoRegions": "Fiji Islands"
+  },
+  {
+    "id": 145,
+    "locationName": "Turks and Caicos Islands",
+    "status": "Active",
+    "countries": "Turks and Caicos Islands",
+    "areas": "Turks and Caicos Islands",
+    "siteCodes": "TCI1, TCI2, TCI3, TCI4",
+    "ecoRegions": "Bahamian"
+  },
+  {
+    "id": 146,
+    "locationName": "Scotland (east)",
+    "status": "Active",
+    "countries": "United Kingdom",
+    "areas": "Scotland",
+    "siteCodes": "UK1, UK2, UK3, UK4, UK5, UK6",
+    "ecoRegions": "North Sea"
+  },
+  {
+    "id": 147,
+    "locationName": "Scotland (west)",
+    "status": "Active",
+    "countries": "United Kingdom",
+    "areas": "Scotland",
+    "siteCodes": "UK10, UK7, UK8, UK9",
+    "ecoRegions": "Celtic Seas"
+  },
+  {
+    "id": 148,
+    "locationName": "California (south)",
+    "status": "Active",
+    "countries": "United States",
+    "areas": "California",
+    "siteCodes": "USWC15, USWC16, USWC24, USWC25, USWC26, USWC27, USWC28, USWC29, USWC30",
+    "ecoRegions": "Northern California, Southern California Bight"
+  },
+  {
+    "id": 149,
+    "locationName": "Florida Keys",
+    "status": "Active",
+    "countries": "United States",
+    "areas": "Florida",
+    "siteCodes": "CAR1, CAR2, CAR3, USEC10, USEC11, USEC12, USEC13, USEC14, USEC15, USEC16, USEC17, USEC23, USEC24, USEC25, USEC26, USEC27, USEC4, USEC5, USEC6, USEC7, USEC8, USEC9",
+    "ecoRegions": "Floridian"
+  },
+  {
+    "id": 150,
+    "locationName": "Hawaii (O'ahu)",
+    "status": "Active",
+    "countries": "United States",
+    "areas": "Hawaii",
+    "siteCodes": "HAWAII1, HAWAII2, HAWAII3, HAWAII4, HAWAII5, HAWAII6, HAWAII7, HAWAII8, HAWAII9",
+    "ecoRegions": "Hawaii"
+  },
+  {
+    "id": 151,
+    "locationName": "USA North-East",
+    "status": "Active",
+    "countries": "United States",
+    "areas": "Maine, Massachusetts",
+    "siteCodes": "USEC1, USEC18, USEC19, USEC2, USEC20, USEC21, USEC22, USEC3",
+    "ecoRegions": "Gulf of Maine/Bay of Fundy"
+  },
+  {
+    "id": 152,
+    "locationName": "Vanuatu",
+    "status": "Active",
+    "countries": "Vanuatu",
+    "areas": "Shefa",
+    "siteCodes": "VAN1",
+    "ecoRegions": "Vanuatu"
+  },
+  {
+    "id": 153,
+    "locationName": "Red Sea - Israel",
+    "status": "Active",
+    "countries": "Israel",
+    "areas": "Israel",
+    "siteCodes": "RED14, RED15, RED16, RED17",
+    "ecoRegions": "Northern and Central Red Sea"
+  },
+  {
+    "id": 154,
+    "locationName": "Abrolhos (Brazil)",
+    "status": "Active",
+    "countries": "Brazil",
+    "areas": "Bahia",
+    "siteCodes": "BRA1, BRA10, BRA2, BRA3, BRA4, BRA5, BRA6, BRA7, BRA8, BRA9",
+    "ecoRegions": "Eastern Brazil"
+  },
+  {
+    "id": 155,
+    "locationName": "Arnhem",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Northern Territory",
+    "siteCodes": "NT30, NT31, NT32, NT33, NT34",
+    "ecoRegions": "Arnhem Coast to Gulf of Carpenteria"
+  },
+  {
+    "id": 156,
+    "locationName": "Bonaire",
+    "status": "Active",
+    "countries": "Netherlands Antilles",
+    "areas": "Bonaire",
+    "siteCodes": "BON1, BON10, BON11, BON12, BON13, BON14, BON2, BON3, BON4, BON5, BON6, BON7, BON8, BON9",
+    "ecoRegions": "Southern Caribbean"
+  },
+  {
+    "id": 157,
+    "locationName": "Jervis Bay",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "New South Wales",
+    "siteCodes": "JBMP10, JBMP11, JBMP13, JBMP14, JBMP15, JBMP16, JBMP17, JBMP19, JBMP20, JBMP21, JBMP22, JBMP23, JBMP24, JBMP25, JBMP26, JBMP33, JBMP34, JBMP35, JBMP36, JBMP37, JBMP38, JBMP40, JBMP41, JBMP42, JBMP43, JBMP44, JBMP45, JBMP46, JBMP47, JBMP48, JBMP49, JBMP50, JBMP51, JBMP52, JBMP54, JBMP55, JBMP56, JBMP57, JBMP58, JBMP59, JBMP6, JBMP60, JBMP61, JBMP62, JBMP-S1, JBMP-S10, JBMP-S11, JBMP-S12, JBMP-S13, JBMP-S14, JBMP-S15, JBMP-S16, JBMP-S17, JBMP-S18, JBMP-S19, JBMP-S2, JBMP-S20, JBMP-S21, JBMP-S22, JBMP-S23, JBMP-S24, JBMP-S25, JBMP-S26, JBMP-S27, JBMP-S3, JBMP-S4, JBMP-S5, JBMP-S6, JBMP-S7, JBMP-S8, JBMP-S9, NSW51, NSW52, NSW53, NSW54, NSW55",
+    "ecoRegions": "Cape Howe"
+  },
+  {
+    "id": 158,
+    "locationName": "Bunurong",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Victoria",
+    "siteCodes": "BUN-S1, BUN-S10, BUN-S11, BUN-S2, BUN-S3, BUN-S4, BUN-S5, BUN-S6, BUN-S7, BUN-S8, BUN-S9, VIC25, VIC26, VIC27, VIC28, VIC30",
+    "ecoRegions": "Bassian"
+  },
+  {
+    "id": 159,
+    "locationName": "Byron",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "New South Wales",
+    "siteCodes": "CBMP1, CBMP2, CBMP3",
+    "ecoRegions": "Tweed-Moreton"
+  },
+  {
+    "id": 160,
+    "locationName": "Channel Islands",
+    "status": "Active",
+    "countries": "United States",
+    "areas": "California",
+    "siteCodes": "USWC10, USWC11, USWC12, USWC13, USWC14, USWC2, USWC3, USWC4, USWC5, USWC6, USWC7, USWC8, USWC9",
+    "ecoRegions": "Northern California, Southern California Bight"
+  },
+  {
+    "id": 161,
+    "locationName": "Marmion",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "MMP01, MMP02S, MMP03F, WA38, WA39, WA40, WA41, WA42, WA43, WA44, WA45, WA88, WA90, WA92, WA96",
+    "ecoRegions": "Houtman"
+  },
+  {
+    "id": 162,
+    "locationName": "Coral Sea - Central",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "CS1, CS10, CS100, CS101, CS102, CS103, CS104, CS105, CS106, CS107, CS108, CS109, CS11, CS110, CS111, CS112, CS113, CS114, CS115, CS116, CS117, CS118, CS119, CS12, CS120, CS121, CS122, CS123, CS124, CS125, CS126, CS127, CS128, CS129, CS13, CS130, CS131, CS132, CS133, CS134, CS135, CS136, CS137, CS138, CS139, CS14, CS140, CS141, CS142, CS143, CS144, CS145, CS146, CS147, CS148, CS149, CS15, CS150, CS151, CS152, CS16, CS17, CS170, CS18, CS2, CS219, CS220, CS221, CS222, CS223, CS224, CS225, CS226, CS227, CS228, CS229, CS230, CS231, CS232, CS233, CS234, CS235, CS236, CS240, CS241, CS3, CS4, CS5, CS6, CS7, CS75, CS76, CS77, CS78, CS79, CS8, CS80, CS81, CS82, CS83, CS84, CS85, CS86, CS87, CS88, CS89, CS9, CS90, CS91, CS92, CS93, CS94, CS95, CS96, CS97, CS98, CS99",
+    "ecoRegions": "Coral Sea"
+  },
+  {
+    "id": 163,
+    "locationName": "Coral Sea - South",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "CS19, CS20, CS21, CS22, CS23, CS237, CS238, CS239, CS24, CS25, CS26, CS27, CS28, CS29, CS30, CS31, CS32, CS33, CS34, CS35, CS36, CS37, CS38, CS39, CS40, CS41, CS42, CS43, CS44, CS45, CS46, CS47, CS48, CS49, CS50, CS51, CS52, CS53, CS54, CS55, CS56, CS57, CS58, CS59, CS60, CS61, CS62, CS63, CS64, CS65, CS66, CS67, CS68, CS69, CS70, CS71, CS72, CS73, CS74",
+    "ecoRegions": "Central and Southern Great Barrier Reef, Coral Sea"
+  },
+  {
+    "id": 164,
+    "locationName": "Coral Sea - North",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "CS153, CS154, CS155, CS156, CS157, CS158, CS159, CS171, CS172, CS173, CS174, CS175, CS176, CS177, CS178, CS179, CS180, CS181, CS182, CS183, CS184, CS217",
+    "ecoRegions": "Coral Sea, Torres Strait Northern Great Barrier Reef"
+  },
+  {
+    "id": 165,
+    "locationName": "Coral Sea - Far North",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "CS185, CS186, CS187, CS188, CS189, CS190, CS191, CS192, CS193, CS194, CS195, CS196, CS197, CS198, CS199, CS200, CS201, CS202, CS203, CS204, CS205, CS206, CS207, CS208, CS209, CS210, CS211, CS212, CS213, CS214, CS215, CS216, CS218, CS242",
+    "ecoRegions": "Gulf of Papua, Torres Strait Northern Great Barrier Reef"
+  },
+  {
+    "id": 166,
+    "locationName": "Red Sea - Egypt",
+    "status": "Active",
+    "countries": "Egypt",
+    "areas": "Red Sea Governate",
+    "siteCodes": "RED10, RED11, RED12, RED2, RED3, RED4, RED5, RED6, RED7, RED8, RED9",
+    "ecoRegions": "Northern and Central Red Sea"
+  },
+  {
+    "id": 167,
+    "locationName": "Encounter",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "South Australia",
+    "siteCodes": "COO18, COO19, COO20, GSV1, GSV100, GSV106, GSV107, GSV108, GSV11, GSV110, GSV111, GSV112, GSV113, GSV114, GSV116, GSV117, GSV118, GSV119, GSV12, GSV120, GSV121, GSV122, GSV123, GSV124, GSV128, GSV129, GSV130, GSV131, GSV135, GSV136, GSV138, GSV14, GSV141, GSV142, GSV15, GSV150, GSV151, GSV152, GSV153, GSV154, GSV155, GSV156, GSV157, GSV158, GSV159, GSV160, GSV161, GSV162, GSV163, GSV164, GSV165, GSV17, GSV171, GSV18, GSV182, GSV183, GSV185, GSV19, GSV2, GSV20, GSV21, GSV24, GSV25, GSV26, GSV28, GSV3, GSV30, GSV34, GSV39, GSV4, GSV40, GSV41, GSV42, GSV43, GSV45, GSV46, GSV47, GSV5, GSV53, GSV55, GSV56, GSV57, GSV58, GSV59, GSV7, GSV80, GSV82, GSV88, GSV89, GSV9, GSV90, GSV93, GSV94, GSV95, GSV96, GSV97, GSV99",
+    "ecoRegions": "South Australian Gulfs, Western Bassian"
+  },
+  {
+    "id": 168,
+    "locationName": "Port Stephens",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "New South Wales",
+    "siteCodes": "PS1, PS10, PS11, PS12, PS13, PS15, PS16, PS17, PS18, PS2, PS20, PS21, PS22, PS23, PS24, PS25, PS26, PS27, PS28, PS29, PS3, PS30, PS31, PS32, PS34, PS35, PS36, PS38, PS4, PS40, PS41, PS42, PS43, PS44, PS5, PS50, PS51, PS52, PS53, PS54, PS6, PS7, PS8, PS9",
+    "ecoRegions": "Manning-Hawkesbury"
+  },
+  {
+    "id": 169,
+    "locationName": "Galapagos",
+    "status": "Active",
+    "countries": "Ecuador",
+    "areas": "Galapagos",
+    "siteCodes": "ETP128, ETP129, ETP130, ETP132, ETP133, ETP134, ETP135, ETP136, ETP138, ETP139, ETP143, ETP145, ETP146, ETP147, ETP148, ETP149, ETP150, ETP153, ETP154, ETP155, ETP156, ETP157, ETP158, ETP159, ETP162, ETP164, ETP165, ETP166, ETP167, ETP171, ETP174, ETP176, ETP178, ETP181, ETP182, ETP184, ETP185, ETP190, ETP197, ETP198, ETP203, ETP204, ETP205, ETP207, ETP208, ETP209, ETP210, ETP213, ETP214, ETP217, ETP218, ETP219, ETP220, ETP221, ETP222, ETP224, ETP225, ETP226, ETP227, ETP228, ETP229, ETP230, ETP231, ETP232, ETP233, ETP236, ETP237, ETP241, ETP243, ETP244, ETP245, ETP246, ETP247, ETP248, GAL1, GAL2, GAL3, GAL4",
+    "ecoRegions": "Eastern Galapagos Islands, Northern Galapagos Islands, Western Galapagos Islands"
+  },
+  {
+    "id": 170,
+    "locationName": "Central Caribbean",
+    "status": "Active",
+    "countries": "Cayman Islands",
+    "areas": "Grand Cayman",
+    "siteCodes": "CAR4",
+    "ecoRegions": "Greater Antilles"
+  },
+  {
+    "id": 171,
+    "locationName": "Capricorn-Bunker",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "GBR1, GBR10, GBR11, GBR12, GBR13, GBR14, GBR15, GBR16, GBR17, GBR2, GBR243, GBR244, GBR245, GBR246, GBR247, GBR248, GBR249, GBR250, GBR251, GBR257, GBR258, GBR259, GBR3, GBR4, GBR5, GBR6, GBR7, GBR8, GBR9",
+    "ecoRegions": "Central and Southern Great Barrier Reef"
+  },
+  {
+    "id": 172,
+    "locationName": "GBR - Central",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "GBR100, GBR101, GBR102, GBR103, GBR104, GBR156, GBR157, GBR158, GBR159, GBR160, GBR161, GBR162, GBR163, GBR164, GBR165, GBR166, GBR167, GBR168, GBR169, GBR170, GBR171, GBR172, GBR173, GBR174, GBR175, GBR176, GBR177, GBR178, GBR179, GBR180, GBR181, GBR189, GBR190, GBR191, GBR201, GBR202, GBR203, GBR204, GBR205, GBR206, GBR207, GBR208, GBR209, GBR210, GBR211, GBR212, GBR213, GBR216, GBR217, GBR218, GBR219, GBR29, GBR30, GBR31, GBR32, GBR73, GBR74, GBR75, GBR77, GBR78, GBR98, GBR99",
+    "ecoRegions": "Central and Southern Great Barrier Reef, Torres Strait Northern Great Barrier Reef"
+  },
+  {
+    "id": 173,
+    "locationName": "GBR - South",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "GBR105, GBR106, GBR107, GBR111, GBR112, GBR113, GBR114, GBR117, GBR128, GBR129, GBR130, GBR139, GBR140, GBR141, GBR149, GBR151, GBR152, GBR24, GBR25, GBR26, GBR265, GBR266, GBR267, GBR268, GBR269, GBR27, GBR270, GBR271, GBR272, GBR273, GBR274, GBR275, GBR276, GBR277, GBR278, GBR76, GBR94",
+    "ecoRegions": "Central and Southern Great Barrier Reef"
+  },
+  {
+    "id": 174,
+    "locationName": "QLD inshore - South",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "GBR108, GBR109, GBR110, GBR118, GBR119, GBR120, GBR121, GBR122, GBR123, GBR124, GBR125, GBR126, GBR127, GBR131, GBR132, GBR133, GBR134, GBR135, GBR136, GBR137, GBR138, GBR142, GBR143, GBR144, GBR145, GBR146, GBR147, GBR148, GBR150, GBR23, GBR279",
+    "ecoRegions": "Central and Southern Great Barrier Reef"
+  },
+  {
+    "id": 175,
+    "locationName": "GBR - North",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "GBR115, GBR116, GBR220, GBR221, GBR222, GBR223, GBR224, GBR225, GBR226, GBR227, GBR228, GBR229, GBR230, GBR231, GBR232, GBR233, GBR234, GBR39, GBR40, GBR41, GBR42, GBR43, GBR44, GBR53, GBR54, GBR55, GBR56, GBR57, GBR59, GBR60, GBR61, GBR62, GBR63, GBR64, GBR65, GBR66, GBR67, GBR68, GBR69, GBR85, GBR86, GBR87, GBR88, GBR89, GBR90, GBR91, GBR92, GBR95, GBR96",
+    "ecoRegions": "Torres Strait Northern Great Barrier Reef"
+  },
+  {
+    "id": 176,
+    "locationName": "QLD inshore - Central",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "GBR153, GBR154, GBR155, GBR182, GBR183, GBR184, GBR185, GBR186, GBR187, GBR188, GBR192, GBR193, GBR194, GBR195, GBR196, GBR197, GBR198, GBR199, GBR200, GBR214, GBR215, GBR28, GBR280, GBR281, GBR33, GBR34, GBR35, GBR36, GBR37, GBR70, GBR71, GBR72",
+    "ecoRegions": "Central and Southern Great Barrier Reef"
+  },
+  {
+    "id": 177,
+    "locationName": "Keppels",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "GBR18, GBR19, GBR20, GBR21, GBR22, GBR252, GBR253, GBR254, GBR255, GBR256, GBR260, GBR261, GBR262, GBR263, GBR264",
+    "ecoRegions": "Central and Southern Great Barrier Reef"
+  },
+  {
+    "id": 178,
+    "locationName": "QLD inshore - North",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "GBR235, GBR236, GBR237, GBR238, GBR239, GBR240, GBR241, GBR45, GBR46, GBR47, GBR48, GBR49, GBR58, GBR79, GBR80, GBR81, GBR82, GBR83, GBR84, GBR93, GBR97",
+    "ecoRegions": "Torres Strait Northern Great Barrier Reef"
+  },
+  {
+    "id": 179,
+    "locationName": "British Columbia",
+    "status": "Active",
+    "countries": "Canada",
+    "areas": "British Columbia",
+    "siteCodes": "BC1, BC2, BC3, BC4, BC5, BC6, BC7, BC8, BMSC10, BMSC11, BMSC12, BMSC13, BMSC14, BMSC15, BMSC16, BMSC17, BMSC18, BMSC19, BMSC20, BMSC21, BMSC22, BMSC5, BMSC7, BMSC8, BMSC9",
+    "ecoRegions": "North American Pacific Fijordland, Oregon, Washington, Vancouver Coast and Shelf"
+  },
+  {
+    "id": 180,
+    "locationName": "Jurien",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "JMP-S1, JMP-S10, JMP-S11, JMP-S12, JMP-S13, JMP-S14, JMP-S15, JMP-S16, JMP-S17, JMP-S18, JMP-S19, JMP-S2, JMP-S20, JMP-S21, JMP-S22, JMP-S23, JMP-S24, JMP-S25, JMP-S26, JMP-S27, JMP-S28, JMP-S29, JMP-S3, JMP-S30, JMP-S31, JMP-S32, JMP-S33, JMP-S34, JMP-S35, JMP-S36, JMP-S37, JMP-S38, JMP-S39, JMP-S4, JMP-S40, JMP-S41, JMP-S42, JMP-S44, JMP-S5, JMP-S6, JMP-S62, JMP-S63, JMP-S7, JMP-S8, JMP-S9",
+    "ecoRegions": "Houtman"
+  },
+  {
+    "id": 181,
+    "locationName": "Kermadecs",
+    "status": "Active",
+    "countries": "New Zealand",
+    "areas": "New Zealand",
+    "siteCodes": "KER1, KER10, KER11, KER12, KER13, KER14, KER2, KER3, KER4, KER5, KER6, KER7, KER8, KER9",
+    "ecoRegions": "Kermadec Island"
+  },
+  {
+    "id": 182,
+    "locationName": "Las Perlas",
+    "status": "Active",
+    "countries": "Panama",
+    "areas": "Panama",
+    "siteCodes": "ETP10, ETP100, ETP101, ETP102, ETP103, ETP104, ETP105, ETP106, ETP107, ETP108, ETP109, ETP110, ETP111, ETP112, ETP113, ETP114, ETP4, ETP5, ETP6, ETP7, ETP8, ETP9, ETP97, ETP98, ETP99",
+    "ecoRegions": "Panama Bight"
+  },
+  {
+    "id": 183,
+    "locationName": "Elizabeth and Middleton Reefs",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Other Territories",
+    "siteCodes": "EMR1, EMR10, EMR11, EMR12, EMR13, EMR14, EMR15, EMR16, EMR17, EMR18, EMR19, EMR2, EMR20, EMR21, EMR22, EMR23, EMR24, EMR25, EMR26, EMR27, EMR28, EMR29, EMR3, EMR30, EMR31, EMR32, EMR33, EMR34, EMR35, EMR36, EMR37, EMR38, EMR39, EMR4, EMR40, EMR41, EMR42, EMR5, EMR6, EMR7, EMR8, EMR9",
+    "ecoRegions": "Lord Howe and Norfolk Islands"
+  },
+  {
+    "id": 184,
+    "locationName": "Lord Howe Island",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "New South Wales",
+    "siteCodes": "LHI1, LHI10, LHI11, LHI13, LHI14, LHI15, LHI16, LHI17, LHI18, LHI19, LHI2, LHI21, LHI22, LHI23, LHI24, LHI26, LHI27, LHI28, LHI3, LHI30, LHI31, LHI32, LHI33, LHI34, LHI35, LHI36, LHI37, LHI38, LHI39, LHI40, LHI41, LHI43, LHI45, LHI46, LHI47, LHI48, LHI49, LHI5, LHI50, LHI51, LHI52, LHI53, LHI54, LHI7, LHI9",
+    "ecoRegions": "Lord Howe and Norfolk Islands"
+  },
+  {
+    "id": 185,
+    "locationName": "Malpelo",
+    "status": "Active",
+    "countries": "Colombia",
+    "areas": "Malpelo",
+    "siteCodes": "ETP160, ETP161, ETP179, ETP180, ETP191, ETP192, ETP193, ETP194, MPL6, MPL7, MPL8",
+    "ecoRegions": "Panama Bight"
+  },
+  {
+    "id": 186,
+    "locationName": "Rowley Shoals",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "NWS100, NWS101, NWS102, NWS50, NWS51, NWS52, NWS53, NWS54, NWS55, NWS56, NWS57, NWS58, NWS59, NWS60, NWS61, NWS62, NWS63, NWS64, NWS65, NWS66, NWS67, NWS68, NWS69, NWS70, NWS71, NWS72, NWS73, NWS74, NWS75, NWS76, NWS77, NWS78, NWS79, NWS80, NWS81, NWS82, NWS83, NWS84, NWS85, NWS86, NWS87, NWS88, NWS89, NWS90, NWS91, NWS92, NWS93, NWS94, NWS95, NWS96, NWS97, NWS98, NWS99",
+    "ecoRegions": "Exmouth to Broome"
+  },
+  {
+    "id": 187,
+    "locationName": "Moreton",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Queensland",
+    "siteCodes": "MBMP1, MBMP10, MBMP11, MBMP2, MBMP4, MBMP5, MBMP6, MBMP7, MBMP9",
+    "ecoRegions": "Tweed-Moreton"
+  },
+  {
+    "id": 188,
+    "locationName": "WA - central",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "WA56, WA57, WA58",
+    "ecoRegions": "Houtman"
+  },
+  {
+    "id": 189,
+    "locationName": "Ningaloo Reef",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "NMP1, NMP10, NMP11, NMP12, NMP13, NMP14, NMP19, NMP2, NMP20, NMP21, NMP24, NMP25, NMP26, NMP27, NMP28, NMP29, NMP30, NMP31, NMP32, NMP6, NMP7, NMP8, NMP9, NMP-C1, NMP-C3, NMP-C4, NMP-P2, NMP-S1, NMP-S2, NMP-S3, NMP-S4",
+    "ecoRegions": "Ningaloo"
+  },
+  {
+    "id": 190,
+    "locationName": "Ningaloo Reef - North",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "NMP15, NMP18, NMP22, NMP23",
+    "ecoRegions": "Ningaloo"
+  },
+  {
+    "id": 191,
+    "locationName": "Norfolk Island",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Other Territories",
+    "siteCodes": "NI1, NI10, NI12, NI13, NI14, NI15, NI16, NI17, NI2, NI3, NI4, NI5, NI6, NI7, NI8, NI9",
+    "ecoRegions": "Lord Howe and Norfolk Islands"
+  },
+  {
+    "id": 192,
+    "locationName": "Poor Knights Islands",
+    "status": "Active",
+    "countries": "New Zealand",
+    "areas": "Northland",
+    "siteCodes": "NZ1, NZ10, NZ11, NZ2, NZ3, NZ4, NZ5, NZ6, NZ7, NZ8, NZ9, PAC114, PAC115, PAC118, PAC119, PAC75, PAC98, PAC99",
+    "ecoRegions": "Northeastern New Zealand"
+  },
+  {
+    "id": 193,
+    "locationName": "Mozambique",
+    "status": "Active",
+    "countries": "Mozambique",
+    "areas": "Nampula",
+    "siteCodes": "MOZ1, MOZ2, MOZ3",
+    "ecoRegions": "Bight of Sofala/Swamp Coast"
+  },
+  {
+    "id": 194,
+    "locationName": "San Andres",
+    "status": "Active",
+    "countries": "Caribbean Sea",
+    "areas": "Southwestern Caribbean",
+    "siteCodes": "CAR27, CAR28, CAR29, CAR30, CAR31, CAR32, CAR33, CAR34",
+    "ecoRegions": "Southwestern Caribbean"
+  },
+  {
+    "id": 195,
+    "locationName": "Seaflower",
+    "status": "Active",
+    "countries": "Colombia",
+    "areas": "Archipelago of San Andres, Providencia and Santa Catalina",
+    "siteCodes": "CAR10, CAR11, CAR12, CAR13, CAR14, CAR15, CAR16, CAR17, CAR18, CAR19, CAR20, CAR5, CAR6, CAR7, CAR8, CAR9",
+    "ecoRegions": "Southwestern Caribbean"
+  },
+  {
+    "id": 196,
+    "locationName": "Solitary Islands",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "New South Wales",
+    "siteCodes": "PIMP1, SI1, SI11, SI12, SI13, SI14, SI15, SI16, SI17, SI18, SI19, SI2, SI20, SI21, SI22, SI23, SI24, SI25, SI26, SI29, SI3, SI30, SI31, SI32, SI4, SI6, SI7, SI8, SI9",
+    "ecoRegions": "Tweed-Moreton"
+  },
+  {
+    "id": 197,
+    "locationName": "Belize",
+    "status": "Active",
+    "countries": "Belize",
+    "areas": "Belize",
+    "siteCodes": "BZE1, BZE2, BZE3, BZE4, BZE5, BZE6, CBC1, CBC10, CBC11, CBC12 , CBC13, CBC14, CBC15, CBC16, CBC17, CBC2, CBC3, CBC4, CBC5, CBC6, CBC7, CBC8, CBC9",
+    "ecoRegions": "Western Caribbean"
+  },
+  {
+    "id": 198,
+    "locationName": "Northern Ireland",
+    "status": "Active",
+    "countries": "United Kingdom",
+    "areas": "Northern Ireland",
+    "siteCodes": "IR1, IR2, IR3, IR4, IR5",
+    "ecoRegions": "Celtic Seas"
+  },
+  {
+    "id": 199,
+    "locationName": "Puget Sound",
+    "status": "Active",
+    "countries": "United States",
+    "areas": "Washington",
+    "siteCodes": "USWC1",
+    "ecoRegions": "Puget Trough/Georgia Basin"
+  },
+  {
+    "id": 200,
+    "locationName": "Te Matuku",
+    "status": "Active",
+    "countries": "New Zealand",
+    "areas": "Northland",
+    "siteCodes": "PAC157, PAC158",
+    "ecoRegions": "Northeastern New Zealand"
+  },
+  {
+    "id": 201,
+    "locationName": "Te Paepae o Aotea (Volkner Rocks)",
+    "status": "Active",
+    "countries": "New Zealand",
+    "areas": "Bay of Plenty",
+    "siteCodes": "PAC146, PAC147, PAC148",
+    "ecoRegions": "Northeastern New Zealand"
+  },
+  {
+    "id": 202,
+    "locationName": "Flores",
+    "status": "Active",
+    "countries": "Indonesia",
+    "areas": "Flores",
+    "siteCodes": "FLORES1, FLORES2, FLORES3, FLORES4, FLORES5, FLORES6, FLORES7",
+    "ecoRegions": "Lesser Sunda"
+  },
+  {
+    "id": 203,
+    "locationName": "Wilsons Promontory",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Victoria",
+    "siteCodes": "WP-S1, WP-S10, WP-S11, WP-S12, WP-S13, WP-S14, WP-S15, WP-S16, WP-S17, WP-S18, WP-S19, WP-S2, WP-S20, WP-S21, WP-S22, WP-S23, WP-S24, WP-S25, WP-S26, WP-S27, WP-S28, WP-S3, WP-S4, WP-S5, WP-S6, WP-S7, WP-S8, WP-S9",
+    "ecoRegions": "Cape Howe"
+  },
+  {
+    "id": 204,
+    "locationName": "Valdivia",
+    "status": "Active",
+    "countries": "Chile",
+    "areas": "Los Rios",
+    "siteCodes": "VALD1",
+    "ecoRegions": "Araucanian"
+  },
+  {
+    "id": 205,
+    "locationName": "WA - South west",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "Western Australia",
+    "siteCodes": "WA8",
+    "ecoRegions": "Leeuwin"
+  },
+  {
+    "id": 206,
+    "locationName": "NSW - Central North",
+    "status": "Active",
+    "countries": "Australia",
+    "areas": "New South Wales",
+    "siteCodes": "NSW56",
+    "ecoRegions": "Manning-Hawkesbury"
+  }
+]

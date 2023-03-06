@@ -10,17 +10,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalDouble;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.function.Function;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.lang3.tuple.Pair;
-
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.data.model.Observation;
@@ -51,13 +63,12 @@ import au.org.aodn.nrmn.restapi.enums.SurveyMethod;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.util.ObjectUtils;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
-
 @Service
 @Transactional
 public class SurveyCorrectionService {
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     @Autowired
     SurveyRepository surveyRepository;
@@ -93,6 +104,17 @@ public class SurveyCorrectionService {
     StagedJobRepository jobRepository;
 
     private static Logger logger = LoggerFactory.getLogger(SurveyCorrectionService.class);
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    TransactionTemplate transactionTemplate;
+
+    @PostConstruct
+    public void init() {
+        transactionTemplate = new TransactionTemplate(transactionManager);
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+    }
 
     private List<Integer> speciesMethods = Arrays.asList(
             SurveyMethod.M0,
@@ -231,7 +253,7 @@ public class SurveyCorrectionService {
         surveyCorrectionTransaction(job, surveyIds, validatedRows);
     }
 
-    public void correctSpecies(StagedJob job, List<Integer> surveyIds, ObservableItem curr, ObservableItem next) {
+    public void correctSpecies(StagedJob job, List<Integer> surveyIds, ObservableItem curr, ObservableItem next) throws JsonProcessingException {
         speciesCorrectionTransaction(job, surveyIds, curr, next);
     }
 
@@ -277,13 +299,36 @@ public class SurveyCorrectionService {
         jobRepository.save(job);
     }
 
-    private void speciesCorrectionTransaction(StagedJob job, List<Integer> surveyIds, ObservableItem curr,
-            ObservableItem next) {
+    void speciesCorrectionTransaction(StagedJob job, List<Integer> surveyIds, final ObservableItem curr,
+                                              final ObservableItem next) throws JsonProcessingException {
 
         var messages = new ArrayList<String>();
+        final List<Integer> errorIds = new ArrayList<>();
 
-        observationRepository.updateObservableItemsForSurveys(surveyIds, curr.getObservableItemId(),
-                next.getObservableItemId());
+        // The unique constraint in observation table will cause error on single item update, here we loop
+        // each item, so that we can catch which item violate the db unique constraint and hence no need to duplicate
+        // verification code here. Cannot use @Transaction here as no control of what to roll back.
+        for(int id : surveyIds) {
+            try {
+                transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+                    @Override
+                    protected void doInTransactionWithoutResult(TransactionStatus status) {
+                        observationRepository.updateObservableItemsForSurveys(id, curr.getObservableItemId(), next.getObservableItemId());
+                    }
+                });
+            }
+            catch(Exception e) {
+                // Transaction rollback for id
+                errorIds.add(id);
+            }
+        }
+
+        if(!errorIds.isEmpty()) {
+            // There are errors hence we need to throw exception and trigger all previous transaction even success to rollback
+            throw new ConstraintViolationException(
+                    objectMapper.writeValueAsString(errorIds.stream().distinct().collect(Collectors.toList())),
+                    null, "observation_unique");
+        }
 
         messages.add("Correcting species from " + curr.getObservableItemName() + " to " + next.getObservableItemName());
 

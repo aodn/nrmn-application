@@ -1,9 +1,6 @@
 package au.org.aodn.nrmn.restapi.data.repository;
 
-import java.util.Collection;
 import java.util.List;
-
-import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -14,6 +11,8 @@ import org.springframework.stereotype.Repository;
 
 import au.org.aodn.nrmn.restapi.data.model.Observation;
 import au.org.aodn.nrmn.restapi.data.model.UiSpeciesAttributes;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface ObservationRepository
@@ -28,12 +27,11 @@ public interface ObservationRepository
     List<Integer> findObservationIdsForSurvey(@Param("surveyId") Integer surveyId);
 
 	@Modifying
-    @Transactional
     @Query(nativeQuery = true, value = "" +
     "update nrmn.observation " +
     "set observable_item_id = :newId " +
     "from nrmn.survey_method " +
     "where observation.survey_method_id = survey_method.survey_method_id " +
-    "and observable_item_id = :oldId and survey_id in :surveyIds")
-	void updateObservableItemsForSurveys(@Param("surveyIds") Collection<Integer> surveyIds, @Param("oldId") Integer oldId, @Param("newId") Integer newId);
+    "and observable_item_id = :oldId and survey_id = :surveyId")
+	void updateObservableItemsForSurveys(@Param("surveyId") Integer surveyId, @Param("oldId") Integer oldId, @Param("newId") Integer newId);
 }
