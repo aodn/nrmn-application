@@ -13,7 +13,8 @@ import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.function.Function;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.transaction.Transactional;
@@ -91,6 +92,8 @@ public class SurveyCorrectionService {
     @Autowired
     StagedJobRepository jobRepository;
 
+    private static Logger logger = LoggerFactory.getLogger(SurveyCorrectionService.class);
+
     private List<Integer> speciesMethods = Arrays.asList(
             SurveyMethod.M0,
             SurveyMethod.M1,
@@ -104,10 +107,12 @@ public class SurveyCorrectionService {
         var ingestedRows = correctionRowRepository.findRowsBySurveyIds(surveyIds);
 
         var ingestedRowIds = ingestedRows.stream().map(CorrectionRowDto::getDiffRowId).collect(Collectors.toList());
+
         var correctdRowIds = correctedRows.stream().map(StagedRow::getDiffRowId).collect(Collectors.toList());
 
         var deletedRowIds = ingestedRowIds.stream().filter(i -> !correctdRowIds.contains(i))
                 .collect(Collectors.toList());
+
         var insertedRowIds = correctdRowIds.stream().filter(i -> !ingestedRowIds.contains(i))
                 .collect(Collectors.toList());
 
@@ -135,6 +140,8 @@ public class SurveyCorrectionService {
         };
 
         var objectMapper = new ObjectMapper();
+        var measurementType = new TypeReference<Map<Integer, String>>() {
+        };
 
         for (var id : updatedRowsIds) {
 
@@ -152,6 +159,7 @@ public class SurveyCorrectionService {
 
                 var a = aOptional.get();
                 var b = bOptional.get();
+
                 for (var entry : propertyChecks.entrySet()) {
                     var getterA = entry.getValue().getLeft();
                     var getterB = entry.getValue().getRight();
@@ -165,14 +173,17 @@ public class SurveyCorrectionService {
                 }
 
                 try {
-                    var measureA = objectMapper.readValue(a.getMeasureJson(),
-                            new TypeReference<Map<Integer, String>>() {
-                            });
+                    var measureA = objectMapper.readValue(a.getMeasureJson(), measurementType);
                     var measureB = b.getMeasureJson();
+
+                    // Put inverts into the measurement map for the StagedRow entity.
+                    // StagedRow stores inverts in a column but CorrectionRowDto uses key 0.
+                    if (!b.getInverts().equals("0"))
+                        measureB.put(0, b.getInverts());
+
                     var measureDiff = Maps.difference(measureA, measureB);
 
                     for (var diff : measureDiff.entriesOnlyOnLeft().entrySet()) {
-                        if(diff.getKey() > 0)
                         cellDiffs.add(CorrectionDiffCellDto.builder()
                                 .columnName(diff.getKey().toString())
                                 .diffRowId(id)
@@ -191,15 +202,17 @@ public class SurveyCorrectionService {
                     }
 
                     for (var diff : measureDiff.entriesDiffering().entrySet()) {
+                        var lv = diff.getValue().leftValue();
+                        var rv = diff.getValue().rightValue();
                         cellDiffs.add(CorrectionDiffCellDto.builder()
                                 .columnName(diff.getKey().toString())
                                 .diffRowId(id)
-                                .oldValue(diff.getValue().leftValue())
-                                .newValue(diff.getValue().rightValue())
+                                .oldValue(lv)
+                                .newValue(rv)
                                 .build());
                     }
                 } catch (Exception ex) {
-
+                    logger.error("Failed to measurement diff", ex.getMessage());
                 }
 
             }
