@@ -115,6 +115,7 @@ const SpeciesCorrectEdit = ({selected, onSubmit, onError}) => {
           <Typography variant="subtitle2">Correct to</Typography>
           <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
             <CustomSearchFilterInput
+              dataTestId='species-correction-to'
               fullWidth
               formData={correction?.newObservableItemName}
               exclude={selected.result.observableItemName}

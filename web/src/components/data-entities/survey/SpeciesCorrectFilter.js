@@ -233,7 +233,7 @@ const SpeciesCorrectFilter = ({onSearch, onLoadLocations}) => {
               <Box m={1} minWidth={300}>
                 <CustomSearchFilterInput
                   fullWidth
-                  dataTestId='species-correction-box'
+                  dataTestId='species-correction-from'
                   label="Species"
                   formData={filter.species || null}
                   onChange={updateObservableItem} />
