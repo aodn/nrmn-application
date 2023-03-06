@@ -39,7 +39,12 @@ describe('<SpeciesCorrect/> testing', () => {
     mockPostSpeciesCorrection.mockReset();
     mockSearchSpecies.mockReset();
   });
-
+  /**
+   * This test case test the flow of species correction. User select species to correct
+   * and then select the survey that needs to correct. Finally, user enter new species name
+   * and hit correct button. But this update result in db constraint violation and we click the
+   * return to search button and go back to first tab.
+   */
   test('UI show error on end of flow when backend report error', async () => {
     const locationList = require('./SpeciesCorrect.speciesLocation.json');
     const speciesNotolabrusList = require('./SpeciesCorrect.speciesNotolabrus.json');
