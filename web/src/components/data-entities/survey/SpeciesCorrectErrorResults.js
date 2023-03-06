@@ -37,7 +37,7 @@ const SpeciesCorrectErrorResults = ({correctionErrors}) => {
   const classes = useStyles();
 
   return(
-    <TableContainer classes={classes}>
+    <TableContainer classes={classes} data-testid='species-correct-error-result'>
       <Table>
         <TableHead>
           <TableRow>

@@ -132,6 +132,7 @@ const SpeciesCorrectEdit = ({selected, onSubmit, onError}) => {
             <Box width={200} m={2}>
               <Button
                 variant="contained"
+                data-testid='submit-correction-button'
                 disabled={!correction?.newObservableItemName || correction.surveyIds.length < 1}
                 onClick={() => {
                   setLoading(true);

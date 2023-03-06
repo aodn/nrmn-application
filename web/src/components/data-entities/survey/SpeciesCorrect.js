@@ -104,7 +104,7 @@ const SpeciesCorrect = () => {
         <Box sx={{m: 1, border: '1px red solid', borderRadius: '1px' }}>
           <SpeciesCorrectErrorResults correctionErrors={correctionErrors.errors} />
           <Box width={200} m={2}>
-            <Button variant="contained" onClick={() => setTabIndex(0)}>Return to Search</Button>
+            <Button variant="contained" onClick={() => setTabIndex(0)} data-testid='return-to-search-after-error'>Return to Search</Button>
           </Box>
         </Box>
       )}

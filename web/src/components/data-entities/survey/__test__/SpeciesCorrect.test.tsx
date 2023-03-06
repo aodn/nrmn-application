@@ -18,11 +18,15 @@ describe('<SpeciesCorrect/> testing', () => {
   let mockSearchSpeciesSummary;
   let mockSearch;
   let mockGetEntity;
+  let mockPostSpeciesCorrection;
+  let mockSearchSpecies;
 
   beforeAll(() => {
     mockSearchSpeciesSummary = jest.spyOn(axiosInstance, 'searchSpeciesSummary');
     mockSearch = jest.spyOn(axiosInstance, 'search');
     mockGetEntity = jest.spyOn(axiosInstance,'getEntity');
+    mockPostSpeciesCorrection = jest.spyOn(axiosInstance,'postSpeciesCorrection');
+    mockSearchSpecies = jest.spyOn(axiosInstance,'searchSpecies');
 
     // silence errors caused by not setting an AG Grid licence
     jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -32,12 +36,16 @@ describe('<SpeciesCorrect/> testing', () => {
     mockSearchSpeciesSummary.mockReset();
     mockSearch.mockReset();
     mockGetEntity.mockReset();
+    mockPostSpeciesCorrection.mockReset();
+    mockSearchSpecies.mockReset();
   });
 
   test('UI show error on end of flow when backend report error', async () => {
     const locationList = require('./SpeciesCorrect.speciesLocation.json');
     const speciesNotolabrusList = require('./SpeciesCorrect.speciesNotolabrus.json');
     const speciesNotolabrusTetricusResult = require('./SpeciesCorrect.speciesNotolabrusTetricusResult.json');
+    const speciesResult = require('./SpeciesCorrect.speciesSearch.json');
+    const species404Result = require('./SpeciesCorrect.species404Error.json');
 
     // Override function so that it return the data we set.
     mockGetEntity.mockImplementation((url) => {
@@ -72,6 +80,32 @@ describe('<SpeciesCorrect/> testing', () => {
       const raw = {
         config: undefined,
         data: speciesNotolabrusTetricusResult,
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        status: 200,
+        statusText: url
+      };
+
+      return new Promise<AxiosResponse>((resolve => {
+        resolve(raw);
+      }));
+    });
+
+    mockPostSpeciesCorrection.mockImplementation((url) => {
+      const raw = {
+        config: undefined,
+        data: species404Result,
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        status: 400,
+        statusText: url
+      };
+
+      return Promise.reject({response: raw});
+    });
+
+    mockSearchSpecies.mockImplementation((url) => {
+      const raw = {
+        config: undefined,
+        data: speciesResult,
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         status: 200,
         statusText: url
@@ -156,7 +190,7 @@ describe('<SpeciesCorrect/> testing', () => {
       });
 
     const correctToTargetSpecies = 'Notolabrus tetricus';
-    await waitFor(() => expect(screen.getByText(correctToTargetSpecies)).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText(correctToTargetSpecies)).toBeInTheDocument(), {timeout: 10000})
       .then(() => {
         // Now the options loaded with our target value at position 2, we select it by arrow down x2 and enter
         correctToAutoComplete.focus();
@@ -168,5 +202,18 @@ describe('<SpeciesCorrect/> testing', () => {
         expect(correctToInput.value).toEqual(correctToTargetSpecies);
       });
 
+    await waitFor(() => expect(screen.getByTestId('submit-correction-button')).not.toBeDisabled(), {timeout: 10000})
+      .then(() => fireEvent.click(screen.getByTestId('submit-correction-button')));
+
+    // Now we expect the error result panel shown on screen
+    await waitFor(() => expect(screen.getByTestId('species-correct-error-result')).toBeInTheDocument(), {timeout: 10000})
+      .then(() => {
+        // Now we click the "Return to Search" button.
+        fireEvent.click(screen.getByTestId('return-to-search-after-error'));
+      });
+
+    // Return to first screen, the return button and error panel disappear as expected
+    expect(screen.queryByTestId('return-to-search-after-error')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('species-correct-error-result')).not.toBeInTheDocument();
   });
 });
