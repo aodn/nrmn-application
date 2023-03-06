@@ -26,9 +26,15 @@ axiosInstance.interceptors.response.use(
     if (error?.response?.status === 401) {
       localStorage.removeItem('auth');
       window.location.reload();
-    } else {
-      window.setApplicationError(error);
-      console.error({error});
+    }
+    else {
+      if(!error?.response?.config?.useCustomErrorHandler) {
+        window.setApplicationError(error);
+        console.error({ error });
+      }
+      else {
+        return Promise.reject(error);
+      }
     }
   }
 );
@@ -157,11 +163,8 @@ export const searchSpeciesSummary = (payload) => {
 
 export const postSpeciesCorrection = (payload) => {
   return axiosInstance
-    .post(`correction/correctSpecies`, payload, {
-      validateStatus: () => true
-    })
-    .then((res) => res)
-    .catch((err) => err);
+    .post(`correction/correctSpecies`, payload, {useCustomErrorHandler: true})
+    .then((res) => res);
 };
 
 export const getCorrections = (surveyIds) =>

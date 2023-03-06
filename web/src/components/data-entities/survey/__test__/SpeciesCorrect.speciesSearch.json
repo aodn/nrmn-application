@@ -1,0 +1,102 @@
+[
+  {
+    "siteName": "TAS398 Inner Sister East",
+    "locationName": "Flinders Island",
+    "commonName": null,
+    "supersededBy": null,
+    "observableItemId": null,
+    "observableItemName": null,
+    "surveyIds": "[812316211]",
+    "surveyCount": null
+  },
+  {
+    "siteName": "KG-S10 Erith Island North",
+    "locationName": "Kent Group",
+    "commonName": null,
+    "supersededBy": null,
+    "observableItemId": null,
+    "observableItemName": null,
+    "surveyIds": "[812331731]",
+    "surveyCount": null
+  },
+  {
+    "siteName": "KG-S18 Curtis Island (South West)",
+    "locationName": "Kent Group",
+    "commonName": null,
+    "supersededBy": null,
+    "observableItemId": null,
+    "observableItemName": null,
+    "surveyIds": "[812313973]",
+    "surveyCount": null
+  },
+  {
+    "siteName": "KG-S22 East Island",
+    "locationName": "Kent Group",
+    "commonName": null,
+    "supersededBy": null,
+    "observableItemId": null,
+    "observableItemName": null,
+    "surveyIds": "[812314103]",
+    "surveyCount": null
+  },
+  {
+    "siteName": "KG-S23 Hogan Island (North Beach)",
+    "locationName": "Kent Group",
+    "commonName": null,
+    "supersededBy": null,
+    "observableItemId": null,
+    "observableItemName": null,
+    "surveyIds": "[812325341]",
+    "surveyCount": null
+  },
+  {
+    "siteName": "KG-S7 Karatine Bay",
+    "locationName": "Kent Group",
+    "commonName": null,
+    "supersededBy": null,
+    "observableItemId": null,
+    "observableItemName": null,
+    "surveyIds": "[812314374]",
+    "surveyCount": null
+  },
+  {
+    "siteName": "NIN-S2 Huon Island",
+    "locationName": "Ninepin Point",
+    "commonName": null,
+    "supersededBy": null,
+    "observableItemId": null,
+    "observableItemName": null,
+    "surveyIds": "[812322573]",
+    "surveyCount": null
+  },
+  {
+    "siteName": "TAS142 Breaksea Island",
+    "locationName": "Port Davey",
+    "commonName": null,
+    "supersededBy": null,
+    "observableItemId": null,
+    "observableItemName": null,
+    "surveyIds": "[812323823]",
+    "surveyCount": null
+  },
+  {
+    "siteName": "TAS313 Piggery, 5m",
+    "locationName": "Tasmania - North",
+    "commonName": null,
+    "supersededBy": null,
+    "observableItemId": null,
+    "observableItemName": null,
+    "surveyIds": "[812315284]",
+    "surveyCount": null
+  },
+  {
+    "siteName": "TAS417 Doughboys",
+    "locationName": "Tasmania - West",
+    "commonName": null,
+    "supersededBy": null,
+    "observableItemId": null,
+    "observableItemName": null,
+    "surveyIds": "[812330802]",
+    "surveyCount": null
+  }
+]

@@ -21,7 +21,7 @@ describe('<SurveyList/> filter testing', () => {
   const columnIds = ['survey.surveyId', 'survey.surveyDate', 'survey.siteCode', 'survey.latitude',
     'survey.longitude', 'survey.siteName', 'survey.depth', 'survey.diverName', 'survey.method',
     'survey.programName', 'survey.locationName', 'survey.country', 'survey.state', 'survey.ecoregion',
-    'survey.species'];
+    'survey.pqCatalogued'];
 
   beforeAll(() => {
     mockGetResult = jest.spyOn(axiosInstance, 'getResult');
@@ -37,7 +37,7 @@ describe('<SurveyList/> filter testing', () => {
     mockGetFiltersForId.mockReset();
   });
 
-  test.skip('Render necessary fields and no filter restored', async () => {
+  test('Render necessary fields and no filter restored', async () => {
     const canned = require('./SurveyList.filter.data.json');
 
     // Override function so that it return the data we set.
@@ -81,7 +81,7 @@ describe('<SurveyList/> filter testing', () => {
       });
   });
 
-  test.skip('Render necessary fields with filter restored', async () => {
+  test('Render necessary fields with filter restored', async () => {
     const canned = require('./SurveyList.filter.data.json');
 
     // Filter set will cause some items disappeared

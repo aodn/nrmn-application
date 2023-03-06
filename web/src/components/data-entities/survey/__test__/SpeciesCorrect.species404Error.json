@@ -1,0 +1,18 @@
+{
+  "jobId": "",
+  "nextSpeciesName": "Notolabrus tetricus",
+  "message": "Correction failed due to some survey violate unique constraint",
+  "currentSpeciesName": "Notolabrus tetricus/fucicola hybrid",
+  "surveyIds": [
+    812316211,
+    812331731,
+    812313973,
+    812314103,
+    812325341,
+    812314374,
+    812322573,
+    812323823,
+    812315284,
+    812330802
+  ]
+}
