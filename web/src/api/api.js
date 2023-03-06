@@ -191,6 +191,10 @@ export const updateRows = (jobId, rows, completion) => {
   return axiosInstance.put(`stage/job/${jobId}`, rows).then((res) => completion(res));
 };
 
+export const runDailyTasks = () => axiosInstance.post('admin/runDailyTasks').then((res) => res);
+
+export const runStartupTasks = () => axiosInstance.post('admin/runStartupTasks').then((res) => res);
+
 export const getSharedLinks = () =>
   axiosInstance
     .get('sharedLinks', {
