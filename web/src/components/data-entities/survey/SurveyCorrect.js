@@ -1,6 +1,5 @@
 import {CloudUpload as CloudUploadIcon, PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon} from '@mui/icons-material/';
-import {Alert, Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from '@mui/material';
-import {makeStyles} from '@mui/styles';
+import {Alert, Box, Button, Typography} from '@mui/material';
 import UndoIcon from '@mui/icons-material/Undo';
 import ResetIcon from '@mui/icons-material/LayersClear';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
@@ -17,31 +16,7 @@ import SurveyCorrectPanel from './panel/SurveyCorrectPanel';
 import FindReplacePanel from '../../import/panel/FindReplacePanel';
 import SurveyMeasurementHeader from './SurveyMeasurementHeader';
 import eh from '../../../components/import/DataSheetEventHandlers';
-
-const useStyles = makeStyles(({palette, typography}) => ({
-  root: {
-    '& .MuiTable-root': {
-      '& .MuiTableHead-root': {
-        '& .MuiTableRow-head': {
-          '& .MuiTableCell-head': {
-            fontSize: typography?.table.fontSize,
-            background: palette?.primary.rowHeader
-          }
-        }
-      },
-      '& .MuiTableRow-root': {
-        '&:nth-child(even)': {
-          backgroundColor: palette?.primary.rowHighlight
-        }
-      },
-      '& .MuiTableCell-root': {
-        fontSize: typography?.table.fontSize,
-        padding: typography?.table.padding,
-        color: palette?.text.textPrimary
-      }
-    }
-  }
-}));
+import SurveyDiff from './SurveyDiff';
 
 const toolTipValueGetter = ({context, data, colDef}) => {
   if (!context.cellValidations) return;
@@ -79,7 +54,6 @@ const packedData = (api) => {
 const SurveyCorrect = () => {
   const surveyId = useParams()?.id;
   const gridRef = useRef();
-  const classes = useStyles();
 
   // FUTURE: useReducer
   const [error, setError] = useState();
@@ -340,7 +314,14 @@ const SurveyCorrect = () => {
   const onSubmit = async () => {
     await validate();
 
-    setSurveyDiff(context.diffSummary);
+    const formattedDiff = context.diffSummary.cellDiffs.map((s) => {
+      const c = context.rowData.find((r) => r.diffRowId === s.diffRowId);
+      const mm = allMeasurements.find((m) => m.field === `measurements.${s.columnName}`);
+      const columnName = mm ? (c.isInvertSizing.toUpperCase() === 'YES' ? mm.invertSize : mm.fishSize) : s.columnName;
+      return {...s, columnName};
+    });
+
+    setSurveyDiff({...context.diffSummary, cellDiffs: formattedDiff});
 
     setEditMode(false);
   };
@@ -519,28 +500,7 @@ const SurveyCorrect = () => {
             <Typography variant="h5">Confirm Survey Data Correction?</Typography>
           </Box>
           <Box border={0} borderColor="divider" p={2} margin={3}>
-            <TableContainer classes={classes} component={Paper} disabled>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Row</TableCell>
-                    <TableCell>Column</TableCell>
-                    <TableCell>Old Value</TableCell>
-                    <TableCell>New Value</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {surveyDiff?.cellDiffs?.map((res, idx) => (
-                    <TableRow key={idx}>
-                      <TableCell>{res.diffRowId}</TableCell>
-                      <TableCell>{res.columnName}</TableCell>
-                      <TableCell>{res.oldValue}</TableCell>
-                      <TableCell>{res.newValue}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <SurveyDiff surveyDiff={surveyDiff} />
           </Box>
           <Box flexDirection="row">
             <Button sx={{width: '25px', marginLeft: '20%'}} variant="outlined" onClick={() => setEditMode(true)}>

@@ -136,6 +136,7 @@ public class SurveyCorrectionService {
                 put("species", Pair.of(CorrectionRowDto::getSpecies, StagedRow::getSpecies));
                 put("commonName", Pair.of(CorrectionRowDto::getCommonName, StagedRow::getCommonName));
                 put("total", Pair.of(CorrectionRowDto::getTotal, StagedRow::getTotal));
+                put("isInvertSizing", Pair.of(CorrectionRowDto::getIsInvertSizing, StagedRow::getIsInvertSizing));
             }
         };
 
