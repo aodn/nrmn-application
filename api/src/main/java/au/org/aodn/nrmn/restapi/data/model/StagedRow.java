@@ -59,6 +59,9 @@ public class StagedRow implements Serializable {
     @Builder.Default
     private String surveyId = "";
 
+    @Transient
+    @Builder.Default
+    private String diffRowId = "";
 
     @Column(name = "site_no")
     @Builder.Default
@@ -173,11 +176,12 @@ public class StagedRow implements Serializable {
         }
     }
 
-    public String getContentsHash(boolean includeTotal, boolean includeSpeciesCode) {
-        // String measurements = measureJson.entrySet().stream().map(m -> m.getValue().length() > 0 ? m.getKey().toString() + ":" + m.getValue() + "|" : "").reduce("", (a, b) -> a + b);
-        String rowContents = siteCode + dateNormalised() + diver + depth + method + block + species + buddy + siteName + longitude + latitude + vis + time + direction + pqs + commonName + inverts + isInvertSizing; // + total + measurements;
+    public String getContentsHash(boolean includeTotal, boolean includeSpeciesCode, boolean includeMeasurements) {
+        var measurements = !includeMeasurements ? "" : (measureJson.entrySet().stream().map(m -> m.getValue().length() > 0 ? m.getKey().toString() + ":" + m.getValue() + "|" : "").reduce("", (a, b) -> a + b));
+        var rowContents = !includeSpeciesCode ? "" : (siteCode + dateNormalised() + diver + depth + method + block + species + buddy + siteName + longitude + latitude + vis + time + direction + pqs + commonName + inverts + isInvertSizing); // + total + measurements;
         if(includeTotal) rowContents += total;
         if(includeSpeciesCode) rowContents += code;
+        if(includeMeasurements) rowContents += measurements;
         return Integer.toString(rowContents.hashCode());
     }
 

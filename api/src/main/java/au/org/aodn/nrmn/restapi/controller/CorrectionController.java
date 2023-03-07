@@ -319,6 +319,8 @@ public class CorrectionController {
             var errors = new ArrayList<SurveyValidationError>();
             var rows = bodyDto.getRows();
 
+            response.setSummary(surveyCorrectionService.diffSurveyCorrections(surveyIds, rows));
+
             var mappedRows = mapRows(rows);
 
             var siteCodes = mappedRows.stream()

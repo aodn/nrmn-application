@@ -6,6 +6,8 @@ public interface CorrectionRowDto {
 
     Integer getSurveyId();
 
+    String getDiffRowId();
+
     String getDiver();
 
     @JsonProperty(value = "P-Qs")

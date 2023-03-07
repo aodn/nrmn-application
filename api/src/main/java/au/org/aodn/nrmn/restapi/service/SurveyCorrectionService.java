@@ -5,24 +5,43 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.OptionalDouble;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.data.model.Observation;
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.model.StagedJobLog;
+import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.data.model.Survey;
 import au.org.aodn.nrmn.restapi.data.model.SurveyMethodEntity;
+import au.org.aodn.nrmn.restapi.data.repository.CorrectionRowRepository;
 import au.org.aodn.nrmn.restapi.data.repository.MeasureRepository;
 import au.org.aodn.nrmn.restapi.data.repository.MethodRepository;
 import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
@@ -33,20 +52,16 @@ import au.org.aodn.nrmn.restapi.data.repository.StagedJobLogRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SurveyMethodRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
+import au.org.aodn.nrmn.restapi.dto.correction.CorrectionDiffCellDto;
+import au.org.aodn.nrmn.restapi.dto.correction.CorrectionDiffDto;
+import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowDto;
 import au.org.aodn.nrmn.restapi.enums.MeasureType;
 import au.org.aodn.nrmn.restapi.enums.ObservableItemType;
 import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.enums.SurveyMethod;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
-
-import javax.annotation.PostConstruct;
+import au.org.aodn.nrmn.restapi.util.ObjectUtils;
 
 @Service
 @Transactional
@@ -83,7 +98,12 @@ public class SurveyCorrectionService {
     StagedJobLogRepository stagedJobLogRepository;
 
     @Autowired
+    CorrectionRowRepository correctionRowRepository;
+
+    @Autowired
     StagedJobRepository jobRepository;
+
+    private static Logger logger = LoggerFactory.getLogger(SurveyCorrectionService.class);
 
     @Autowired
     ObjectMapper objectMapper;
@@ -103,6 +123,131 @@ public class SurveyCorrectionService {
             SurveyMethod.M7,
             SurveyMethod.M10,
             SurveyMethod.M11);
+
+    public CorrectionDiffDto diffSurveyCorrections(List<Integer> surveyIds, Collection<StagedRow> correctedRows) {
+
+        var ingestedRows = correctionRowRepository.findRowsBySurveyIds(surveyIds);
+
+        var ingestedRowIds = ingestedRows.stream().map(CorrectionRowDto::getDiffRowId).collect(Collectors.toList());
+
+        var correctdRowIds = correctedRows.stream().map(StagedRow::getDiffRowId).collect(Collectors.toList());
+
+        var deletedRowIds = ingestedRowIds.stream().filter(i -> !correctdRowIds.contains(i))
+                .collect(Collectors.toList());
+
+        var insertedRowIds = correctdRowIds.stream().filter(i -> !ingestedRowIds.contains(i))
+                .collect(Collectors.toList());
+
+        var updatedRowsIds = correctdRowIds.stream().filter(i -> ingestedRowIds.contains(i))
+                .collect(Collectors.toList());
+
+        var cellDiffs = new ArrayList<CorrectionDiffCellDto>();
+
+        var propertyChecks = new HashMap<String, Pair<Function<CorrectionRowDto, String>, Function<StagedRow, String>>>() {
+            {
+                put("diver", Pair.of(CorrectionRowDto::getDiver, StagedRow::getDiver));
+                put("latitude", Pair.of(CorrectionRowDto::getLatitude, StagedRow::getLatitude));
+                put("longitude", Pair.of(CorrectionRowDto::getLongitude, StagedRow::getLongitude));
+                put("direction", Pair.of(CorrectionRowDto::getDirection, StagedRow::getDirection));
+                put("vis", Pair.of(CorrectionRowDto::getVis, StagedRow::getVis));
+                put("time", Pair.of(CorrectionRowDto::getTime, StagedRow::getTime));
+                put("pqDiver", Pair.of(CorrectionRowDto::getPqDiver, StagedRow::getPqs));
+                put("method", Pair.of(CorrectionRowDto::getMethod, StagedRow::getMethod));
+                put("block", Pair.of(CorrectionRowDto::getBlock, StagedRow::getBlock));
+                put("code", Pair.of(CorrectionRowDto::getCode, StagedRow::getCode));
+                put("species", Pair.of(CorrectionRowDto::getSpecies, StagedRow::getSpecies));
+                put("commonName", Pair.of(CorrectionRowDto::getCommonName, StagedRow::getCommonName));
+                put("total", Pair.of(CorrectionRowDto::getTotal, StagedRow::getTotal));
+                put("isInvertSizing", Pair.of(CorrectionRowDto::getIsInvertSizing, StagedRow::getIsInvertSizing));
+            }
+        };
+
+        var objectMapper = new ObjectMapper();
+        var measurementType = new TypeReference<Map<Integer, String>>() {
+        };
+
+        for (var id : updatedRowsIds) {
+
+            var aOptional = ingestedRows.stream()
+                    .filter(r -> Objects.nonNull(r.getDiffRowId()))
+                    .filter(r -> r.getDiffRowId().contentEquals(id))
+                    .findFirst();
+
+            var bOptional = correctedRows.stream()
+                    .filter(r -> Objects.nonNull(r.getDiffRowId()))
+                    .filter(r -> r.getDiffRowId().contentEquals(id))
+                    .findFirst();
+
+            if (aOptional.isPresent() && bOptional.isPresent()) {
+
+                var a = aOptional.get();
+                var b = bOptional.get();
+
+                for (var entry : propertyChecks.entrySet()) {
+                    var getterA = entry.getValue().getLeft();
+                    var getterB = entry.getValue().getRight();
+                    if (ObjectUtils.stringPropertiesDiffer(true, getterA, getterB, a, b))
+                        cellDiffs.add(CorrectionDiffCellDto.builder()
+                                .columnName(entry.getKey())
+                                .diffRowId(id)
+                                .oldValue(getterA.apply(a))
+                                .newValue(getterB.apply(b))
+                                .build());
+                }
+
+                try {
+                    var measureA = objectMapper.readValue(a.getMeasureJson(), measurementType);
+                    var measureB = b.getMeasureJson();
+
+                    // Put inverts into the measurement map for the StagedRow entity.
+                    // StagedRow stores inverts in a column but CorrectionRowDto uses key 0.
+                    if (!b.getInverts().equals("0"))
+                        measureB.put(0, b.getInverts());
+
+                    var measureDiff = Maps.difference(measureA, measureB);
+
+                    for (var diff : measureDiff.entriesOnlyOnLeft().entrySet()) {
+                        cellDiffs.add(CorrectionDiffCellDto.builder()
+                                .columnName(diff.getKey().toString())
+                                .diffRowId(id)
+                                .oldValue(diff.getValue())
+                                .newValue("0")
+                                .build());
+                    }
+
+                    for (var diff : measureDiff.entriesOnlyOnRight().entrySet()) {
+                        cellDiffs.add(CorrectionDiffCellDto.builder()
+                                .columnName(diff.getKey().toString())
+                                .diffRowId(id)
+                                .oldValue("0")
+                                .newValue(diff.getValue())
+                                .build());
+                    }
+
+                    for (var diff : measureDiff.entriesDiffering().entrySet()) {
+                        var lv = diff.getValue().leftValue();
+                        var rv = diff.getValue().rightValue();
+                        cellDiffs.add(CorrectionDiffCellDto.builder()
+                                .columnName(diff.getKey().toString())
+                                .diffRowId(id)
+                                .oldValue(lv)
+                                .newValue(rv)
+                                .build());
+                    }
+                } catch (Exception ex) {
+                    logger.error("Failed to measurement diff", ex.getMessage());
+                }
+
+            }
+
+        }
+
+        var diff = new CorrectionDiffDto();
+        diff.setDeletedRows(deletedRowIds);
+        diff.setInsertedRows(insertedRowIds);
+        diff.setCellDiffs(cellDiffs);
+        return diff;
+    }
 
     public void correctSurvey(StagedJob job, List<Integer> surveyIds, Collection<StagedRowFormatted> validatedRows) {
         surveyCorrectionTransaction(job, surveyIds, validatedRows);
@@ -306,7 +451,6 @@ public class SurveyCorrectionService {
                         observations.add(observation);
                     }
                 }
-
                 messages.add("Correcting " + firstMethodBlockRow.getBlock() + " : " + method.getMethodId());
             }
         }

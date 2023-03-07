@@ -1,6 +1,5 @@
 import {CloudUpload as CloudUploadIcon, PlaylistAddCheckOutlined as PlaylistAddCheckOutlinedIcon} from '@mui/icons-material/';
-import {Alert, Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography} from '@mui/material';
-import {makeStyles} from '@mui/styles';
+import {Alert, Box, Button, Typography} from '@mui/material';
 import UndoIcon from '@mui/icons-material/Undo';
 import ResetIcon from '@mui/icons-material/LayersClear';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
@@ -10,38 +9,14 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Navigate, useParams} from 'react-router-dom';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import {getCorrections, submitSurveyCorrection, validateSurveyCorrection} from '../../../api/api';
-import {allMeasurements} from '../../../common/correctionsConstants';
+import {allMeasurements, unsized} from '../../../common/correctionsConstants';
 import ValidationPanel from '../../import/panel/ValidationPanel';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import SurveyCorrectPanel from './panel/SurveyCorrectPanel';
 import FindReplacePanel from '../../import/panel/FindReplacePanel';
 import SurveyMeasurementHeader from './SurveyMeasurementHeader';
 import eh from '../../../components/import/DataSheetEventHandlers';
-
-const useStyles = makeStyles(({palette, typography}) => ({
-  root: {
-    '& .MuiTable-root': {
-      '& .MuiTableHead-root': {
-        '& .MuiTableRow-head': {
-          '& .MuiTableCell-head': {
-            fontSize: typography?.table.fontSize,
-            background: palette?.primary.rowHeader
-          }
-        }
-      },
-      '& .MuiTableRow-root': {
-        '&:nth-child(even)': {
-          backgroundColor: palette?.primary.rowHighlight
-        }
-      },
-      '& .MuiTableCell-root': {
-        fontSize: typography?.table.fontSize,
-        padding: typography?.table.padding,
-        color: palette?.text.textPrimary
-      }
-    }
-  }
-}));
+import SurveyDiff from './SurveyDiff';
 
 const toolTipValueGetter = ({context, data, colDef}) => {
   if (!context.cellValidations) return;
@@ -79,7 +54,6 @@ const packedData = (api) => {
 const SurveyCorrect = () => {
   const surveyId = useParams()?.id;
   const gridRef = useRef();
-  const classes = useStyles();
 
   // FUTURE: useReducer
   const [error, setError] = useState();
@@ -324,6 +298,7 @@ const SurveyCorrect = () => {
     const result = await validateSurveyCorrection(surveyId, bodyDto);
     setValidationResult(result.data.errors);
     context.validations = result.data.errors;
+    context.diffSummary = result.data.summary;
     setLoading(false);
   };
 
@@ -336,94 +311,17 @@ const SurveyCorrect = () => {
     setSideBar(summarySideBar);
   };
 
-  const diffSheet = () => {
-    const api = gridRef.current.api;
-    const context = api.gridOptionsWrapper.gridOptions.context;
-
-    const edited = context.rowData.reduce((acc, r) => {
-      const rowPos = context.rowPos.indexOf(r.pos) + 1;
-      const original = context.originalData.find((o) => o.id === r.id);
-
-      if (!original) {
-        acc.push({row: rowPos, message: 'Row inserted'});
-        return acc;
-      }
-
-      var messages = [];
-
-      for (var key of Object.keys(r)) {
-        if (typeof r[key] === 'object') {
-          const mmOriginal = removeNullProperties(original[key]);
-          const mmUpdated = removeNullProperties(r[key]);
-          if (JSON.stringify(mmOriginal) !== JSON.stringify(mmUpdated)) {
-            const changed = {};
-
-            for (var j of Object.keys(mmOriginal)) {
-              if (mmOriginal[j] !== mmUpdated[j]) changed[j] = mmUpdated[j];
-            }
-
-            for (var k of Object.keys(mmUpdated)) {
-              if (mmOriginal[k] !== mmUpdated[k]) changed[k] = mmUpdated[k];
-            }
-
-            var mmMessages = Object.keys(changed).map((c) => {
-              return `[S${c} ${mmOriginal[c] ? mmOriginal[c] : 0} to ${mmUpdated[c] ? mmUpdated[c] : 0}]`;
-            });
-
-            messages.push(`Observations: ${mmMessages.join(' ')}`);
-          }
-        } else if (isNaN(parseInt(key))) {
-          if (original[key] !== r[key]) {
-            messages.push(`${key}: ${original[key]} to ${r[key]}`);
-          }
-        } else {
-          const originalValue = parseInt(original[key]) || 0;
-          const updatedValue = parseInt(r[key]) || 0;
-          if (originalValue !== updatedValue) {
-            const column = allMeasurements.find((m) => m.field === `measurements.${key}`);
-            const bin = r.isInvertSizing !== 'Yes' ? column.fishSize : column.invertSize;
-            messages.push(`${bin}: ${originalValue} to ${updatedValue}`);
-          }
-        }
-      }
-      if (messages.length > 0) acc.push({row: rowPos, message: messages.join(', ')});
-      return acc;
-    }, []);
-
-    const deleted = context.originalData.reduce((acc, r) => {
-      const rowPos = context.originalRowPos.indexOf(r.pos) + 1;
-      if (!context.rowData.find((o) => o.id === r.id)) {
-        acc.push({row: rowPos, message: 'Row deleted'});
-      }
-      return acc;
-    }, []);
-
-    const grouped = [...edited, ...deleted].reduce((acc, r) => {
-      const message = r.message;
-      if (!acc[message]) acc[message] = [];
-      acc[message].push(r.row);
-      return acc;
-    }, {});
-
-    const diff = [];
-    Object.keys(grouped).forEach((k) => {
-      const v = grouped[k];
-      const isContinuous = v.reduce((acc, r, idx) => {
-        if (idx === 0) return true;
-        if (r - v[idx - 1] === 1) return acc;
-        return false;
-      }, true);
-      const asRange = v.length > 1 && isContinuous;
-      diff.push({message: k, row: asRange ? `${v[0]}-${v[v.length - 1]}` : v.join(',')});
-    });
-
-    setSurveyDiff(diff);
-  };
-
   const onSubmit = async () => {
     await validate();
 
-    diffSheet();
+    const formattedDiff = context.diffSummary.cellDiffs.map((s) => {
+      const c = context.rowData.find((r) => r.diffRowId === s.diffRowId);
+      const mm = [...unsized, allMeasurements].find((m) => m.field === `measurements.${s.columnName}`);
+      const columnName = mm ? (c.isInvertSizing.toUpperCase() === 'YES' ? mm.invertSize : mm.fishSize) : s.columnName;
+      return {...s, columnName};
+    });
+
+    setSurveyDiff({...context.diffSummary, cellDiffs: formattedDiff});
 
     setEditMode(false);
   };
@@ -469,17 +367,32 @@ const SurveyCorrect = () => {
         {editMode && (
           <>
             <Box m={1} ml={0}>
-              <Button variant="outlined" disabled={undoSize < 1 || !editMode || loading} startIcon={<UndoIcon />} onClick={() => eh.handleUndo({api: gridApi})}>
+              <Button
+                variant="outlined"
+                disabled={undoSize < 1 || !editMode || loading}
+                startIcon={<UndoIcon />}
+                onClick={() => eh.handleUndo({api: gridApi})}
+              >
                 Undo
               </Button>
             </Box>
             <Box m={1} ml={0} minWidth={150}>
-              <Button variant="outlined" disabled={!isFiltered || !editMode || loading}  startIcon={<ResetIcon />} onClick={() => setIsFiltered()}>
+              <Button
+                variant="outlined"
+                disabled={!isFiltered || !editMode || loading}
+                startIcon={<ResetIcon />}
+                onClick={() => setIsFiltered()}
+              >
                 Reset Filter
               </Button>
             </Box>
             <Box m={1} ml={0}>
-              <Button variant="outlined" disabled={!editMode || loading}  onClick={() => eh.onClickExcelExport(gridApi, 'Export', true)} startIcon={<CloudDownloadIcon />}>
+              <Button
+                variant="outlined"
+                disabled={!editMode || loading}
+                onClick={() => eh.onClickExcelExport(gridApi, 'Export', true)}
+                startIcon={<CloudDownloadIcon />}
+              >
                 Export
               </Button>
             </Box>
@@ -573,27 +486,7 @@ const SurveyCorrect = () => {
           justifyContent="center"
           flexDirection="column"
         >
-          {canSubmitCorrection ? (
-            <>
-              <Box>
-                <Typography variant="h5">Confirm Survey Data Correction?</Typography>
-              </Box>
-              <Box border={0} borderColor="divider" p={2} margin={3}>
-                <TableContainer classes={classes} component={Paper} disabled>
-                  <Table>
-                    <TableBody>
-                      {surveyDiff?.map((res, idx) => (
-                        <TableRow key={idx}>
-                          <TableCell>{res.row}</TableCell>
-                          <TableCell>{res.message}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Box>
-            </>
-          ) : (
+          {!canSubmitCorrection && (
             <Box border={0} borderColor="grey" p={2} margin={3}>
               <Typography variant="h6">Survey Correction cannot be submitted until all validation errors are resolved.</Typography>
               {validationResult
@@ -603,6 +496,12 @@ const SurveyCorrect = () => {
                 ))}
             </Box>
           )}
+          <Box>
+            <Typography variant="h5">Confirm Survey Data Correction?</Typography>
+          </Box>
+          <Box border={0} borderColor="divider" p={2} margin={3}>
+            <SurveyDiff surveyDiff={surveyDiff} />
+          </Box>
           <Box flexDirection="row">
             <Button sx={{width: '25px', marginLeft: '20%'}} variant="outlined" onClick={() => setEditMode(true)}>
               Cancel
