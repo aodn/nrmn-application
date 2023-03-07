@@ -41,7 +41,7 @@ const ValidationSummary = ({data, onItemClick}) => {
                     <TreeItem
                       nodeId={d.id}
                       key={d.id}
-                      onClick={() => onItemClick(d)}
+                      onClick={() => onItemClick(d, level === 'DUPLICATE')}
                       label={
                         <Typography variant="body2">
                           {d.value ? (
