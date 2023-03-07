@@ -119,6 +119,6 @@ public class StagedRowFormatted {
     }
 
     public Integer observationTotal() { 
-        return getMeasureJson().entrySet().stream().mapToInt(Map.Entry::getValue).sum() + (getInverts() != null ? getInverts() : 0);
+        return getMeasureJson().entrySet().stream().mapToInt(Map.Entry::getValue).sum() + ((!getMeasureJson().containsKey(0) && getInverts() != null) ? getInverts() : 0);
     }
 }
