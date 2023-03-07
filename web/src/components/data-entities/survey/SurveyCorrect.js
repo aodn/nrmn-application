@@ -9,7 +9,7 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Navigate, useParams} from 'react-router-dom';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import {getCorrections, submitSurveyCorrection, validateSurveyCorrection} from '../../../api/api';
-import {allMeasurements} from '../../../common/correctionsConstants';
+import {allMeasurements, unsized} from '../../../common/correctionsConstants';
 import ValidationPanel from '../../import/panel/ValidationPanel';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 import SurveyCorrectPanel from './panel/SurveyCorrectPanel';
@@ -316,7 +316,7 @@ const SurveyCorrect = () => {
 
     const formattedDiff = context.diffSummary.cellDiffs.map((s) => {
       const c = context.rowData.find((r) => r.diffRowId === s.diffRowId);
-      const mm = allMeasurements.find((m) => m.field === `measurements.${s.columnName}`);
+      const mm = [...unsized, allMeasurements].find((m) => m.field === `measurements.${s.columnName}`);
       const columnName = mm ? (c.isInvertSizing.toUpperCase() === 'YES' ? mm.invertSize : mm.fishSize) : s.columnName;
       return {...s, columnName};
     });
