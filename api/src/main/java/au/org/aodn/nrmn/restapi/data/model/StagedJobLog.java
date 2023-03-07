@@ -17,9 +17,11 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import au.org.aodn.nrmn.restapi.dto.correction.CorrectionDiffDto;
 import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -59,5 +61,9 @@ public class StagedJobLog {
 
     @Column(name = "details", columnDefinition = "text")
     private String details;
+
+    @Column(name = "summary", columnDefinition = "json")
+    @Type(type = "json")
+    private CorrectionDiffDto summary;
 
 }
