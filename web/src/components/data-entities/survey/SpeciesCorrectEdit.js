@@ -136,10 +136,11 @@ const SpeciesCorrectEdit = ({selected, onSubmit, onError}) => {
                 disabled={!correction?.newObservableItemName || correction.surveyIds.length < 1}
                 onClick={() => {
                   setLoading(true);
-                  postSpeciesCorrection(correction)
+                  const postDto = {...correction, filterSet: selected.filter};
+                  postSpeciesCorrection(postDto)
                     .then((res) => {
                       if(res.status === 200) {
-                        setCorrection({ ...initialCorrectionState });
+                        setCorrection({ ...initialCorrectionState});
                         onSubmit(res.data);
                       }
                     })

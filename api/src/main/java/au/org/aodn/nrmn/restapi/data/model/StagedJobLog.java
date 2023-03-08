@@ -18,6 +18,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionDiffDto;
+import au.org.aodn.nrmn.restapi.dto.correction.SpeciesSearchBodyDto;
 import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -66,5 +67,9 @@ public class StagedJobLog {
     @Column(name = "summary", columnDefinition = "jsonb")
     @Type(type = "jsonb")
     private CorrectionDiffDto summary;
+
+    @Column(name = "filter_set", columnDefinition = "jsonb")
+    @Type(type = "jsonb")
+    private SpeciesSearchBodyDto filterSet;
 
 }
