@@ -410,7 +410,7 @@ public class CorrectionController {
 
                 var summary = surveyCorrectionService.diffSurveyCorrections(surveyIds, rows);
 
-                var summaryLog = StagedJobLog.builder().summary(summary).build();
+                var summaryLog = StagedJobLog.builder().eventType(StagedJobEventType.SUMMARY).summary(summary).build();
 
                 stagedJobLogRepository.save(summaryLog);
 

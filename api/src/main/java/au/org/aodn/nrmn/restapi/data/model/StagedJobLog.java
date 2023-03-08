@@ -38,6 +38,7 @@ import lombok.ToString;
 @Builder
 @Table(name = "staged_job_log")
 public class StagedJobLog {
+    
     @Id
     @SequenceGenerator(name = "staged_job_log_id_seq", sequenceName = "staged_job_log_id_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "staged_job_log_id_seq")
@@ -62,8 +63,8 @@ public class StagedJobLog {
     @Column(name = "details", columnDefinition = "text")
     private String details;
 
-    @Column(name = "summary", columnDefinition = "json")
-    @Type(type = "json")
+    @Column(name = "summary", columnDefinition = "jsonb")
+    @Type(type = "jsonb")
     private CorrectionDiffDto summary;
 
 }
