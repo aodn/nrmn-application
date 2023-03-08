@@ -591,14 +591,17 @@ public class CorrectionController {
         result.put("jobId", "");
 
         try {
-            surveyCorrectionService.correctSpecies(job, bodyDto.getSurveyIds(), curr, next);
+            var count = surveyCorrectionService.correctSpecies(job, bodyDto.getSurveyIds(), curr, next);
 
-            var filterSetLog = StagedJobLog.builder()
-                    .stagedJob(job)
-                    .eventType(StagedJobEventType.FILTER)
-                    .filterSet(bodyDto.getFilterSet()).build();
+            stagedJobLogRepository.save(StagedJobLog.builder()
+            .stagedJob(job)
+            .eventType(StagedJobEventType.CORRECTING)
+            .details("Updating " + count + " observations.").build());
 
-            stagedJobLogRepository.save(filterSetLog);
+            stagedJobLogRepository.save(StagedJobLog.builder()
+            .stagedJob(job)
+            .eventType(StagedJobEventType.FILTER)
+            .filterSet(bodyDto.getFilterSet()).build());
 
             materializedViewService.refreshAllAsync();
         } catch (ConstraintViolationException cv) {
