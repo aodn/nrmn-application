@@ -11,8 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import au.org.aodn.nrmn.restapi.data.model.Observation;
 import au.org.aodn.nrmn.restapi.data.model.UiSpeciesAttributes;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface ObservationRepository
