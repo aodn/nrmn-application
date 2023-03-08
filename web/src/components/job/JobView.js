@@ -16,6 +16,7 @@ import {useParams} from 'react-router';
 import {Navigate} from 'react-router-dom';
 import {getEntity, originalJobFile} from '../../api/api';
 import PropTypes from 'prop-types';
+import SurveyDiff from '../data-entities/survey/SurveyDiff';
 
 const JobView = ({jobId}) => {
   const {id} = useParams();
@@ -165,6 +166,7 @@ const JobView = ({jobId}) => {
                                 <br />
                               </div>
                             ))}
+                            {log.summary && <SurveyDiff surveyDiff={log.summary} />}
                           </Typography>
                         </TableCell>
                       </TableRow>

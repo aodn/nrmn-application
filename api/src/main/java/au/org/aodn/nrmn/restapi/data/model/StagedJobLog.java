@@ -17,9 +17,11 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import au.org.aodn.nrmn.restapi.dto.correction.CorrectionDiffDto;
 import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -36,6 +38,7 @@ import lombok.ToString;
 @Builder
 @Table(name = "staged_job_log")
 public class StagedJobLog {
+    
     @Id
     @SequenceGenerator(name = "staged_job_log_id_seq", sequenceName = "staged_job_log_id_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "staged_job_log_id_seq")
@@ -59,5 +62,9 @@ public class StagedJobLog {
 
     @Column(name = "details", columnDefinition = "text")
     private String details;
+
+    @Column(name = "summary", columnDefinition = "jsonb")
+    @Type(type = "jsonb")
+    private CorrectionDiffDto summary;
 
 }

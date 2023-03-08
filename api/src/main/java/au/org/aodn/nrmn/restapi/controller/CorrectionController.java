@@ -278,7 +278,8 @@ public class CorrectionController {
         if (lockedSurveys.size() > 0) {
             var locked = lockedSurveys.stream().map(s -> s.getSurveyId().toString()).collect(Collectors.joining(", "));
             // The return type is application/json
-            return ResponseEntity.badRequest().body(String.format("{ \"message\": \"Surveys are locked and cannot be corrected: %s\" }", locked));
+            return ResponseEntity.badRequest()
+                    .body(String.format("{ \"message\": \"Surveys are locked and cannot be corrected: %s\" }", locked));
         }
 
         var programs = correctionRowRepository.findProgramsBySurveyIds(surveyIds)
@@ -289,7 +290,8 @@ public class CorrectionController {
                 .collect(Collectors.toList());
 
         if (programValidations.size() != 1)
-            return ResponseEntity.badRequest().body("{ \"message\": \"Surveys must share the same program validation\" }");
+            return ResponseEntity.badRequest()
+                    .body("{ \"message\": \"Surveys must share the same program validation\" }");
         var program = programs.get(0);
 
         var rows = correctionRowRepository.findRowsBySurveyIds(surveyIds);
@@ -390,7 +392,8 @@ public class CorrectionController {
 
             logMessage(job, "Correct Survey " + surveyIds);
 
-            var results = mapRows(bodyDto.getRows());
+            var rows = bodyDto.getRows();
+            var results = mapRows(rows);
             var result = validate(programValidation, surveyIds, results).getAll();
             var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
             var blockingErrors = result.stream().filter(r -> r.getLevelId() == ValidationLevel.BLOCKING)
@@ -402,6 +405,30 @@ public class CorrectionController {
             }
 
             surveyCorrectionService.correctSurvey(job, surveyIds, mappedRows);
+
+            try {
+
+                var summary = surveyCorrectionService.diffSurveyCorrections(surveyIds, rows);
+
+                var summaryLog = StagedJobLog.builder()
+                                .stagedJob(job)
+                                .eventType(StagedJobEventType.SUMMARY)
+                                .summary(summary).build();
+
+                stagedJobLogRepository.save(summaryLog);
+
+            } catch (Exception e) {
+
+                logger.error("Correction Diff Summary Failed", e);
+
+                var log = StagedJobLog.builder()
+                        .stagedJob(job)
+                        .details(e.getMessage())
+                        .eventType(StagedJobEventType.ERROR).build();
+
+                stagedJobLogRepository.save(log);
+            }
+
             materializedViewService.refreshAllAsync();
 
         } catch (Exception e) {
@@ -439,7 +466,8 @@ public class CorrectionController {
             return ResponseEntity.badRequest().body("{\"message\" : \"Deletion Failed. Survey is locked.\"}");
 
         if (survey.getPqCatalogued() != null && survey.getPqCatalogued())
-            return ResponseEntity.badRequest().body("{\"message\" : \"Deletion Failed. PQs catalogued for this survey.\"}");
+            return ResponseEntity.badRequest()
+                    .body("{\"message\" : \"Deletion Failed. PQs catalogued for this survey.\"}");
 
         userActionAuditRepository.save(new UserActionAudit("correction/delete", "survey: " + id));
 
@@ -476,13 +504,13 @@ public class CorrectionController {
             @RequestBody SpeciesSearchBodyDto bodyDto) {
 
         try {
-            if(bodyDto == null) {
+            if (bodyDto == null) {
                 return ResponseEntity
                         .badRequest()
                         .body("{\"message\":\"Missing body in the request.\"}");
             }
 
-            if(bodyDto.getLocationIds() == null) {
+            if (bodyDto.getLocationIds() == null) {
                 bodyDto.setLocationIds(new ArrayList<>());
             }
 
@@ -507,13 +535,13 @@ public class CorrectionController {
             @RequestBody SpeciesSearchBodyDto bodyDto) {
 
         try {
-            if(bodyDto == null) {
+            if (bodyDto == null) {
                 return ResponseEntity
                         .badRequest()
                         .body("{\"message\":\"Missing body in the request.\"}");
             }
 
-            if(bodyDto.getLocationIds() == null) {
+            if (bodyDto.getLocationIds() == null) {
                 bodyDto.setLocationIds(new ArrayList<>());
             }
 
@@ -543,7 +571,8 @@ public class CorrectionController {
         var auditMessage = "species correction: " + authentication.getName();
         userActionAuditRepository.save(new UserActionAudit("correctSpecies", auditMessage));
 
-        var referenceMessage = "Correct Species from " + curr.getObservableItemName() + " to " + next.getObservableItemName();
+        var referenceMessage = "Correct Species from " + curr.getObservableItemName() + " to "
+                + next.getObservableItemName();
 
         var user = secUserRepository.findByEmail(authentication.getName());
         var job = StagedJob.builder()
@@ -564,8 +593,7 @@ public class CorrectionController {
         try {
             surveyCorrectionService.correctSpecies(job, bodyDto.getSurveyIds(), curr, next);
             materializedViewService.refreshAllAsync();
-        }
-        catch(ConstraintViolationException cv) {
+        } catch (ConstraintViolationException cv) {
             logger.error("Correction failed on update species, whole transaction rollback!", cv);
 
             var log = StagedJobLog.builder()
@@ -579,11 +607,11 @@ public class CorrectionController {
             result.put("message", "Correction failed due to survey violate unique constraint");
             result.put("currentSpeciesName", curr.getObservableItemName());
             result.put("nextSpeciesName", next.getObservableItemName());
-            result.put("surveyIds", objectMapper.readValue(cv.getMessage().getBytes(StandardCharsets.UTF_8), Integer[].class));
+            result.put("surveyIds",
+                    objectMapper.readValue(cv.getMessage().getBytes(StandardCharsets.UTF_8), Integer[].class));
 
             return ResponseEntity.badRequest().body(result);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Correction Failed", e);
 
             var log = StagedJobLog.builder()

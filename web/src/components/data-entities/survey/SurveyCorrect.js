@@ -486,7 +486,16 @@ const SurveyCorrect = () => {
           justifyContent="center"
           flexDirection="column"
         >
-          {!canSubmitCorrection && (
+          {canSubmitCorrection ? (
+            <>
+              <Box>
+                <Typography variant="h5">Confirm Survey Data Correction?</Typography>
+              </Box>
+              <Box border={0} borderColor="divider" p={2} margin={3}>
+                <SurveyDiff surveyDiff={surveyDiff} />
+              </Box>
+            </>
+          ) : (
             <Box border={0} borderColor="grey" p={2} margin={3}>
               <Typography variant="h6">Survey Correction cannot be submitted until all validation errors are resolved.</Typography>
               {validationResult
@@ -496,12 +505,6 @@ const SurveyCorrect = () => {
                 ))}
             </Box>
           )}
-          <Box>
-            <Typography variant="h5">Confirm Survey Data Correction?</Typography>
-          </Box>
-          <Box border={0} borderColor="divider" p={2} margin={3}>
-            <SurveyDiff surveyDiff={surveyDiff} />
-          </Box>
           <Box flexDirection="row">
             <Button sx={{width: '25px', marginLeft: '20%'}} variant="outlined" onClick={() => setEditMode(true)}>
               Cancel

@@ -249,6 +249,8 @@ CREATE TABLE nrmn.staged_job_log (
     event_time timestamp with time zone NOT NULL,
     event_type varchar(255) NOT NULL,
     staged_job_id bigint NOT NULL,
+    survey_id INT,
+    summary JSONB,
     CONSTRAINT staged_job_log_pkey PRIMARY KEY (id)
 );
 
