@@ -185,9 +185,17 @@ public class SurveyCorrectionService {
 
                 var speciesName = a.getSpecies();
 
+                // Exclude SND diver and inverts from comparison since values not stored for these
+                // observations have dummy values filled in by the UI to ease validation.
+                var isSurveyNotDone = b.getSpecies().equalsIgnoreCase("Survey Not Done");
+
                 for (var entry : propertyChecks.entrySet()) {
                     var getterA = entry.getValue().getLeft();
                     var getterB = entry.getValue().getRight();
+
+                    if (isSurveyNotDone && entry.getKey().equals("diver"))
+                        continue;
+
                     if (ObjectUtils.stringPropertiesDiffer(true, getterA, getterB, a, b))
                         cellDiffs.add(CorrectionDiffCellDto.builder()
                                 .columnName(entry.getKey())
@@ -204,7 +212,7 @@ public class SurveyCorrectionService {
 
                     // Put inverts into the measurement map for the StagedRow entity.
                     // StagedRow stores inverts in a column but CorrectionRowDto uses key 0.
-                    if (!b.getInverts().equals("0"))
+                    if (!b.getInverts().equals("0") || isSurveyNotDone)
                         measureB.put(0, b.getInverts());
 
                     var measureDiff = Maps.difference(measureA, measureB);
@@ -259,7 +267,8 @@ public class SurveyCorrectionService {
         surveyCorrectionTransaction(job, surveyIds, validatedRows);
     }
 
-    public Long correctSpecies(StagedJob job, List<Integer> surveyIds, ObservableItem curr, ObservableItem next) throws JsonProcessingException {
+    public Long correctSpecies(StagedJob job, List<Integer> surveyIds, ObservableItem curr, ObservableItem next)
+            throws JsonProcessingException {
         var count = observationRepository.countObservationsForSurveys(surveyIds, curr.getObservableItemId());
         speciesCorrectionTransaction(job, surveyIds, curr, next);
         return count;
@@ -308,31 +317,35 @@ public class SurveyCorrectionService {
     }
 
     void speciesCorrectionTransaction(StagedJob job, List<Integer> surveyIds, final ObservableItem curr,
-                                              final ObservableItem next) throws JsonProcessingException {
+            final ObservableItem next) throws JsonProcessingException {
 
         var messages = new ArrayList<String>();
         final List<Integer> errorIds = new ArrayList<>();
 
-        // The unique constraint in observation table will cause error on single item update, here we loop
-        // each item, so that we can catch which item violate the db unique constraint and hence no need to duplicate
-        // verification code here. Cannot use @Transaction here as no control of what to roll back.
-        for(int id : surveyIds) {
+        // The unique constraint in observation table will cause error on single item
+        // update, here we loop
+        // each item, so that we can catch which item violate the db unique constraint
+        // and hence no need to duplicate
+        // verification code here. Cannot use @Transaction here as no control of what to
+        // roll back.
+        for (int id : surveyIds) {
             try {
                 transactionTemplate.execute(new TransactionCallbackWithoutResult() {
                     @Override
                     protected void doInTransactionWithoutResult(TransactionStatus status) {
-                        observationRepository.updateObservableItemsForSurveys(id, curr.getObservableItemId(), next.getObservableItemId());
+                        observationRepository.updateObservableItemsForSurveys(id, curr.getObservableItemId(),
+                                next.getObservableItemId());
                     }
                 });
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 // Transaction rollback for id
                 errorIds.add(id);
             }
         }
 
-        if(!errorIds.isEmpty()) {
-            // There are errors hence we need to throw exception and trigger all previous transaction even success to rollback
+        if (!errorIds.isEmpty()) {
+            // There are errors hence we need to throw exception and trigger all previous
+            // transaction even success to rollback
             throw new ConstraintViolationException(
                     objectMapper.writeValueAsString(errorIds.stream().distinct().collect(Collectors.toList())),
                     null, "observation_unique");
