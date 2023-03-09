@@ -253,8 +253,10 @@ public class SurveyCorrectionService {
         surveyCorrectionTransaction(job, surveyIds, validatedRows);
     }
 
-    public void correctSpecies(StagedJob job, List<Integer> surveyIds, ObservableItem curr, ObservableItem next) throws JsonProcessingException {
+    public Long correctSpecies(StagedJob job, List<Integer> surveyIds, ObservableItem curr, ObservableItem next) throws JsonProcessingException {
+        var count = observationRepository.countObservationsForSurveys(surveyIds, curr.getObservableItemId());
         speciesCorrectionTransaction(job, surveyIds, curr, next);
+        return count;
     }
 
     public void deleteSurvey(StagedJob job, Survey survey, Collection<StagedRowFormatted> validatedRows) {

@@ -251,6 +251,7 @@ CREATE TABLE nrmn.staged_job_log (
     staged_job_id bigint NOT NULL,
     survey_id INT,
     summary JSONB,
+    filter_set JSONB,
     CONSTRAINT staged_job_log_pkey PRIMARY KEY (id)
 );
 

@@ -412,9 +412,9 @@ public class CorrectionController {
             try {
 
                 var summaryLog = StagedJobLog.builder()
-                                .stagedJob(job)
-                                .eventType(StagedJobEventType.SUMMARY)
-                                .summary(summary).build();
+                        .stagedJob(job)
+                        .eventType(StagedJobEventType.SUMMARY)
+                        .summary(summary).build();
 
                 stagedJobLogRepository.save(summaryLog);
 
@@ -592,7 +592,18 @@ public class CorrectionController {
         result.put("jobId", "");
 
         try {
-            surveyCorrectionService.correctSpecies(job, bodyDto.getSurveyIds(), curr, next);
+            var count = surveyCorrectionService.correctSpecies(job, bodyDto.getSurveyIds(), curr, next);
+
+            stagedJobLogRepository.save(StagedJobLog.builder()
+            .stagedJob(job)
+            .eventType(StagedJobEventType.CORRECTING)
+            .details("Updating " + count + " observations.").build());
+
+            stagedJobLogRepository.save(StagedJobLog.builder()
+            .stagedJob(job)
+            .eventType(StagedJobEventType.FILTER)
+            .filterSet(bodyDto.getFilterSet()).build());
+
             materializedViewService.refreshAllAsync();
         } catch (ConstraintViolationException cv) {
             logger.error("Correction failed on update species, whole transaction rollback!", cv);

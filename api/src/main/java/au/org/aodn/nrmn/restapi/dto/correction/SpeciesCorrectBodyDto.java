@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class SpeciesCorrectBodyDto {
+    private SpeciesSearchBodyDto filterSet;
     private Integer prevObservableItemId;
     private Integer newObservableItemId;
     private List<Integer> surveyIds;
