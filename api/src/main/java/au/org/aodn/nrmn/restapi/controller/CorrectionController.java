@@ -321,7 +321,8 @@ public class CorrectionController {
             var errors = new ArrayList<SurveyValidationError>();
             var rows = bodyDto.getRows();
 
-            response.setSummary(surveyCorrectionService.diffSurveyCorrections(surveyIds, rows));
+            var summary = surveyCorrectionService.diffSurveyCorrections(surveyIds, rows);
+            response.setSummary(summary);
 
             var mappedRows = mapRows(rows);
 
@@ -404,11 +405,11 @@ public class CorrectionController {
                 return ResponseEntity.ok().body(result);
             }
 
+            var summary = surveyCorrectionService.diffSurveyCorrections(surveyIds, rows);
+
             surveyCorrectionService.correctSurvey(job, surveyIds, mappedRows);
 
             try {
-
-                var summary = surveyCorrectionService.diffSurveyCorrections(surveyIds, rows);
 
                 var summaryLog = StagedJobLog.builder()
                                 .stagedJob(job)
