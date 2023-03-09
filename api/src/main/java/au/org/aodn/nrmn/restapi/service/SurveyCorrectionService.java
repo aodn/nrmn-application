@@ -183,12 +183,15 @@ public class SurveyCorrectionService {
                 var a = aOptional.get();
                 var b = bOptional.get();
 
+                var speciesName = a.getSpecies();
+
                 for (var entry : propertyChecks.entrySet()) {
                     var getterA = entry.getValue().getLeft();
                     var getterB = entry.getValue().getRight();
                     if (ObjectUtils.stringPropertiesDiffer(true, getterA, getterB, a, b))
                         cellDiffs.add(CorrectionDiffCellDto.builder()
                                 .columnName(entry.getKey())
+                                .speciesName(speciesName)
                                 .diffRowId(id)
                                 .oldValue(getterA.apply(a))
                                 .newValue(getterB.apply(b))
@@ -209,6 +212,7 @@ public class SurveyCorrectionService {
                     for (var diff : measureDiff.entriesOnlyOnLeft().entrySet()) {
                         cellDiffs.add(CorrectionDiffCellDto.builder()
                                 .columnName(diff.getKey().toString())
+                                .speciesName(speciesName)
                                 .diffRowId(id)
                                 .oldValue(diff.getValue())
                                 .newValue("0")
@@ -218,6 +222,7 @@ public class SurveyCorrectionService {
                     for (var diff : measureDiff.entriesOnlyOnRight().entrySet()) {
                         cellDiffs.add(CorrectionDiffCellDto.builder()
                                 .columnName(diff.getKey().toString())
+                                .speciesName(speciesName)
                                 .diffRowId(id)
                                 .oldValue("0")
                                 .newValue(diff.getValue())
@@ -229,6 +234,7 @@ public class SurveyCorrectionService {
                         var rv = diff.getValue().rightValue();
                         cellDiffs.add(CorrectionDiffCellDto.builder()
                                 .columnName(diff.getKey().toString())
+                                .speciesName(speciesName)
                                 .diffRowId(id)
                                 .oldValue(lv)
                                 .newValue(rv)
@@ -451,16 +457,12 @@ public class SurveyCorrectionService {
                         observations.add(observation);
                     }
                 }
-                messages.add("Correcting " + firstMethodBlockRow.getBlock() + " : " + method.getMethodId());
             }
         }
 
         surveyRepository.saveAll(surveys);
         surveyMethodRepository.saveAll(surveyMethods);
-        var newObservations = observationRepository.saveAll(observations);
-
-        messages.add("Inserting Observations "
-                + formatRange(newObservations.stream().map(o -> o.getObservationId()).collect(Collectors.toList())));
+        observationRepository.saveAll(observations);
 
         var details = messages.stream().collect(Collectors.joining("\n"));
         var log = StagedJobLog.builder().stagedJob(job).details(details).eventType(StagedJobEventType.CORRECTED);

@@ -15,6 +15,8 @@ public class CorrectionDiffCellDto {
 
     private String columnName;
 
+    private String speciesName;
+
     private String oldValue;
     
     private String newValue;

@@ -47,16 +47,18 @@ const SurveyDiff = ({surveyDiff}) => {
           </TableRow>
           <TableRow>
             <TableCell>Row Changed</TableCell>
+            <TableCell>Species</TableCell>
             <TableCell>Column</TableCell>
             <TableCell>Old Value</TableCell>
             <TableCell>New Value</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {surveyDiff?.cellDiffs?.map((res, idx) => {
+          {surveyDiff?.cellDiffs?.sort((a,b) => (a.columnName - b.columnName)).map((res, idx) => {
             return (
               <TableRow key={idx}>
                 <TableCell>{res.diffRowId}</TableCell>
+                <TableCell>{res.speciesName}</TableCell>
                 <TableCell>{res.columnName}</TableCell>
                 <TableCell>{res.oldValue}</TableCell>
                 <TableCell>{res.newValue}</TableCell>
