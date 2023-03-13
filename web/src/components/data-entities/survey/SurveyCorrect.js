@@ -432,6 +432,7 @@ const SurveyCorrect = () => {
           onPasteStart={eh.onPasteStart}
           onRowDataUpdated={onRowDataUpdated}
           onSortChanged={eh.onSortChanged}
+          processDataFromClipboard={eh.processDataFromClipboard}
           ref={gridRef}
           rowHeight={20}
           rowSelection="multiple"

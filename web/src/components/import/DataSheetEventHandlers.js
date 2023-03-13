@@ -556,6 +556,10 @@ class DataSheetEventHandlers {
     this.onClearRegion(e);
   }
 
+  processDataFromClipboard(params) {
+    return params.data.filter(d => (d.length === 1 && d[0] !== ''));
+  }
+
   handlePasteEnd(e) {
     const context = e.api.gridOptionsWrapper.gridOptions.context;
     context.pasteMode = false;

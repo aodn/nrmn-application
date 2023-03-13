@@ -5,9 +5,22 @@
       "label": "React Dev Server",
       "type": "shell",
       "isBackground": true,
-      "problemMatcher": ["$eslint-stylish"],
-      "command": "yarn --cwd ${workspaceFolder}/web && yarn --cwd ${workspaceFolder}/web --ignore-pattern '**/node_modules/*' start",
-      "options": { "env": { "BROWSER": "none" } }
+      "group": "build",
+      "problemMatcher": [
+        "$eslint-stylish"
+      ],
+      "command": "yarn && BROWSER=none yarn start",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "options": {
+          "cwd": "${workspaceFolder}/web"
+      }
     }
   ]
 }

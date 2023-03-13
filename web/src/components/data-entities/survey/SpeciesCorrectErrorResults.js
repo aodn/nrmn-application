@@ -52,10 +52,10 @@ const SpeciesCorrectErrorResults = ({correctionErrors}) => {
         <TableBody>
           { correctionErrors.surveyIds.length > 0 ? (
               correctionErrors.surveyIds.map((r) => (
-                <TableRow key={'surveyid-' + r} style={{ cursor: 'pointer' }} onClick={() => window.open(`/data/survey/${r}/edit`, '_blank').focus()}>
+                <TableRow key={'surveyid-' + r} style={{ cursor: 'pointer' }}>
                   <TableCell>{correctionErrors.currentSpeciesName}</TableCell>
                   <TableCell>{correctionErrors.nextSpeciesName}</TableCell>
-                  <TableCell>{r}</TableCell>
+                  <TableCell onClick={() => window.open(`/data/survey/${r}/edit`, '_blank').focus()} style={{textDecoration: 'underline dotted'}}>{r}</TableCell>
                 </TableRow>
               ))
           ) : (

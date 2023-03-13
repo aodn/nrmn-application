@@ -373,6 +373,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             onPasteStart={eh.onPasteStart}
             onRowDataUpdated={onRowDataUpdated}
             onSortChanged={eh.onSortChanged}
+            processDataFromClipboard={eh.processDataFromClipboard}
             rowHeight={20}
             rowSelection="multiple"
             sideBar={sideBar}
