@@ -483,7 +483,7 @@ class CorrectionsControllerIT {
 
         CorrectionRequestBodyDto d = new CorrectionRequestBodyDto();
         var uri = String.format("http://localhost:%d/api/v1/correction/correct/{surveyId}", localServerPort);
-        var reqBuilder = new RequestWrapper<CorrectionRequestBodyDto, Map>();
+        var reqBuilder = new RequestWrapper<CorrectionRequestBodyDto, String>();
         var response = reqBuilder
                 .withUri(uri)
                 .withToken(token)
@@ -491,13 +491,13 @@ class CorrectionsControllerIT {
                 .withMethod(HttpMethod.DELETE)
                 .withContentType(MediaType.APPLICATION_JSON)
                 .withParams(param)
-                .withResponseType(Map.class)
+                .withResponseType(String.class)
                 .build(testRestTemplate);
 
         // No proper response at the moment, become 500 and screen will blank
         assertEquals("Correct status code", HttpStatus.BAD_REQUEST, response.getStatusCode());
         var body = response.getBody();
-        assertTrue("Correct alert message", Objects.nonNull(body) && body.get("message").equals("Deletion Failed. Survey is locked."));
+        assertTrue("Correct alert message", Objects.nonNull(body) && body.contains("Deletion Failed. Survey is locked."));
     }
     /**
      * You cannot delete survey with PqCatalogued
@@ -516,7 +516,7 @@ class CorrectionsControllerIT {
 
         CorrectionRequestBodyDto d = new CorrectionRequestBodyDto();
         var uri = String.format("http://localhost:%d/api/v1/correction/correct/{surveyId}", localServerPort);
-        var reqBuilder = new RequestWrapper<CorrectionRequestBodyDto, Map>();
+        var reqBuilder = new RequestWrapper<CorrectionRequestBodyDto, String>();
         var response = reqBuilder
                 .withUri(uri)
                 .withToken(token)
@@ -524,13 +524,13 @@ class CorrectionsControllerIT {
                 .withMethod(HttpMethod.DELETE)
                 .withContentType(MediaType.APPLICATION_JSON)
                 .withParams(param)
-                .withResponseType(Map.class)
+                .withResponseType(String.class)
                 .build(testRestTemplate);
 
         // No proper response at the moment, become 500 and screen will blank
         assertEquals("Correct status code", HttpStatus.BAD_REQUEST, response.getStatusCode());
         var body = response.getBody();
-        assertTrue("Correct alert message", Objects.nonNull(body) && body.get("message").equals("Deletion Failed. PQs catalogued for this survey."));
+        assertTrue("Correct alert message", Objects.nonNull(body) && body.contains("Deletion Failed. PQs catalogued for this survey."));
     }
     @Test
     @WithUserDetails("test@example.com")
