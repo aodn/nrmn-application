@@ -1,4 +1,4 @@
-FROM docker.io/tomcat:9-jdk17-corretto
+FROM docker.io/tomcat:8-jdk11-corretto
 
 ENV SPRING_PROFILES_ACTIVE=dev
 

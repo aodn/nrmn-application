@@ -1,4 +1,4 @@
-FROM amazoncorretto:17-al2-jdk
+FROM amazoncorretto:11-al2-jdk
 
 ARG BUILDER_UID=9999
 
