@@ -347,7 +347,7 @@ ALTER TABLE nrmn.staged_job
 ALTER TABLE nrmn.staged_row
     ADD CONSTRAINT staged_row_staged_job_id_fkey FOREIGN KEY (staged_job_id) REFERENCES nrmn.staged_job (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
-CREATE UNIQUE INDEX unique_email ON nrmn.sec_user (email_address);
+CREATE UNIQUE INDEX IF NOT EXISTS unique_email ON nrmn.sec_user (email_address);
 
 ALTER TABLE nrmn.staged_job_log
     ADD CONSTRAINT staged_job_log_staged_job_id_fkey FOREIGN KEY (staged_job_id) REFERENCES nrmn.staged_job (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
@@ -379,8 +379,8 @@ ALTER SEQUENCE nrmn.staged_row_id_seq INCREMENT BY 100;
 ALTER SEQUENCE nrmn.observation_observation_id INCREMENT BY 100;
 ALTER SEQUENCE nrmn.survey_method_survey_method_id INCREMENT BY 100;
 
-CREATE UNIQUE INDEX idx_unique_ep_rarity_frequency_taxon ON nrmn.ep_rarity_frequency(taxon);
-CREATE UNIQUE INDEX idx_unique_ep_m1 ON nrmn.ep_m1(survey_id, recorded_species_name, size_class, block, "method", diver);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_ep_rarity_frequency_taxon ON nrmn.ep_rarity_frequency(taxon);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_ep_m1 ON nrmn.ep_m1(survey_id, recorded_species_name, size_class, block, "method", diver);
 
 ALTER TABLE nrmn.survey ADD COLUMN created TIMESTAMP;
 ALTER TABLE nrmn.survey_aud ADD COLUMN created TIMESTAMP;
@@ -409,7 +409,6 @@ CREATE TABLE nrmn.shared_link (
 
 CREATE TABLE nrmn.global_lock (id INT, locked BOOLEAN NOT NULL, PRIMARY KEY (id));
 
-CREATE INDEX meow_ecoregion_geom_idx ON nrmn.meow_ecoregions USING GIST (geom);
+CREATE INDEX IF NOT EXISTS meow_ecoregion_geom_idx ON nrmn.meow_ecoregions USING GIST (geom);
 
-CREATE INDEX site_geom_idx ON nrmn.site_ref USING GIST (geom);
-
+CREATE INDEX IF NOT EXISTS site_geom_idx ON nrmn.site_ref USING GIST (geom);

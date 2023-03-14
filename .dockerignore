@@ -1,1 +1,8 @@
+# Ignore everything
 *
+
+# Allow files and directories
+!app/target/nrmn-app-0.0.0.war
+!api/src/main/resources/sql/application.sql
+!api/src/test/resources/testdata/*
+!db/
