@@ -14,9 +14,7 @@
       "mainClass": "au.org.aodn.nrmn.restapi.RestApiApplication",
       "cwd": "${workspaceFolder}/api",
       "args": "--spring.profiles.active=dev",
-      "env": {
-        "AWS_PROFILE": "nonproduction-admin"
-      }
+      "envFile": "${workspaceFolder}/.env.development.local"
     },
     {
       "preLaunchTask": "React Dev Server",

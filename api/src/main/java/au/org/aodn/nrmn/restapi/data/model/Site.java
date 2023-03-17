@@ -116,7 +116,6 @@ public class Site {
 
     @Basic
     @Column(name = "is_active", columnDefinition = "boolean default false")
-    @Builder.Default
     private Boolean isActive = false;
 
     @Basic
