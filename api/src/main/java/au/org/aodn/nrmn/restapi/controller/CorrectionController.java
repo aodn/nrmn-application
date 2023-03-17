@@ -44,6 +44,7 @@ import au.org.aodn.nrmn.restapi.data.repository.UserActionAuditRepository;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRequestBodyDto;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowsDto;
 import au.org.aodn.nrmn.restapi.dto.correction.SpeciesCorrectBodyDto;
+import au.org.aodn.nrmn.restapi.dto.correction.SpeciesCorrectResultDto;
 import au.org.aodn.nrmn.restapi.dto.correction.SpeciesSearchBodyDto;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
@@ -587,9 +588,8 @@ public class CorrectionController {
 
         job = stagedJobRepository.save(job);
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("message", "Species update success.");
-        result.put("jobId", "");
+        var result = new SpeciesCorrectResultDto();
+        result.setMessage("Species update success.");
 
         try {
             var count = surveyCorrectionService.correctSpecies(job, bodyDto.getSurveyIds(), curr, next);
@@ -616,11 +616,10 @@ public class CorrectionController {
             stagedJobLogRepository.save(log);
 
             // Contain a json of violated id
-            result.put("message", "Correction failed due to survey violate unique constraint");
-            result.put("currentSpeciesName", curr.getObservableItemName());
-            result.put("nextSpeciesName", next.getObservableItemName());
-            result.put("surveyIds",
-                    objectMapper.readValue(cv.getMessage().getBytes(StandardCharsets.UTF_8), Integer[].class));
+            result.setMessage("Correction failed due to survey violate unique constraint");
+            result.setCurrentSpeciesName(curr.getObservableItemName());
+            result.setNextSpeciesName(next.getObservableItemName());
+            result.setSurveyIds(objectMapper.readValue(cv.getMessage().getBytes(StandardCharsets.UTF_8), Integer[].class));
 
             return ResponseEntity.badRequest().body(result);
         } catch (Exception e) {
@@ -632,12 +631,12 @@ public class CorrectionController {
                     .eventType(StagedJobEventType.ERROR).build();
 
             stagedJobLogRepository.save(log);
-            result.put("message", "Species failed to update. No data has been changed.");
+            result.setMessage("Species failed to update. No data has been changed.");
 
             return ResponseEntity.badRequest().body(result);
         }
 
-        result.put("jobId", job.getId());
+        result.setJobId(job.getId());
         return ResponseEntity.ok().body(result);
     }
 }

@@ -10,6 +10,7 @@ import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRequestBodyDto;
 import au.org.aodn.nrmn.restapi.dto.correction.SpeciesSearchBodyDto;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
+import au.org.aodn.nrmn.restapi.dto.survey.SurveyListDto;
 import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +36,7 @@ import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.dto.correction.SpeciesCorrectBodyDto;
+import au.org.aodn.nrmn.restapi.dto.correction.SpeciesCorrectResultDto;
 import au.org.aodn.nrmn.restapi.security.JwtTokenProvider;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
@@ -78,7 +80,7 @@ class CorrectionsControllerIT {
     @WithUserDetails("test@example.com")
     public void speciesCorrects() throws Exception {
 
-        var reqBuilder = new RequestWrapper<SpeciesCorrectBodyDto, Map>();
+        var reqBuilder = new RequestWrapper<SpeciesCorrectBodyDto, String>();
         var auth = getContext().getAuthentication();
         var token = jwtTokenProvider.generateToken(auth);
         var uri = String.format("http://localhost:%d/api/v1/correction/correctSpecies", localServerPort);
@@ -96,7 +98,7 @@ class CorrectionsControllerIT {
                 .withMethod(HttpMethod.POST)
                 .withToken(token)
                 .withEntity(speciesCorrection)
-                .withResponseType(Map.class)
+                .withResponseType(String.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -116,7 +118,7 @@ class CorrectionsControllerIT {
     @WithUserDetails("test@example.com")
     public void testCorrectSpeciesViolateObservationUnique() throws Exception {
 
-        var reqBuilder = new RequestWrapper<SpeciesCorrectBodyDto, Map>();
+        var reqBuilder = new RequestWrapper<SpeciesCorrectBodyDto, SpeciesCorrectResultDto>();
         var auth = getContext().getAuthentication();
         var token = jwtTokenProvider.generateToken(auth);
 
@@ -152,14 +154,14 @@ class CorrectionsControllerIT {
                     .withMethod(HttpMethod.POST)
                     .withToken(token)
                     .withEntity(speciesCorrection)
-                    .withResponseType(Map.class)
+                    .withResponseType(SpeciesCorrectResultDto.class)
                     .build(testRestTemplate);
 
             assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 
-            List<Integer> errorIds = (List)response.getBody().get("surveyIds");
-            assertEquals("Case " + c, 1, errorIds.size());
-            assertEquals("Case " + c, 812300133, errorIds.get(0).intValue());
+            var errorIds = response.getBody().getSurveyIds();
+            assertEquals("Case " + c, 1, errorIds.length);
+            assertEquals("Case " + c, 812300133l, Integer.toUnsignedLong(errorIds[0]));
 
             observations = observationRepository.findAll();
 
@@ -181,7 +183,7 @@ class CorrectionsControllerIT {
         var token = jwtTokenProvider.generateToken(auth);
 
         // We will make a request where the return code is a bad request, so using Void return type is fine.
-        var reqBuilder = new RequestWrapper<Void, Map>();
+        var reqBuilder = new RequestWrapper<Void, SurveyListDto>();
 
         // First we need to figure out which survey id is locked which not
         var surveys = reqBuilder
@@ -190,7 +192,7 @@ class CorrectionsControllerIT {
                 .withMethod(HttpMethod.GET)
                 .withAppJson()
                 .withContentType(MediaType.APPLICATION_JSON)
-                .withResponseType(Map.class)
+                .withResponseType(SurveyListDto.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.OK, surveys.getStatusCode());
@@ -198,20 +200,20 @@ class CorrectionsControllerIT {
         // We want a survey locked and one unlock
         var body =  surveys.getBody();
         assertNotNull(body);
-        assertTrue("Return object greater than 1", (Integer)body.get("lastRow") > 0);
+        assertTrue("Return object greater than 1", body.getLastRow() > 0);
 
         // Now find the survey id where the item is locked and not locked
-        var locked = ((List<Map<String, Object>>) body.get("items"))
+        var locked = body.getItems()
                 .stream()
-                .filter(i -> i.get("locked") == Boolean.TRUE)
-                .map(i -> i.get("surveyId").toString())
+                .filter(i -> i.getLocked() == true)
+                .map(i -> Integer.toString(i.getSurveyId()))
                 .collect(Collectors.toList());
 
         // pq_catalogued and locked both affect the request operation, so filter out pq_catalogued too
-        var unlocked = ((List<Map<String, Object>>) body.get("items"))
+        var unlocked = body.getItems()
                 .stream()
-                .filter(i -> i.get("locked") == Boolean.FALSE)
-                .map(i -> i.get("surveyId").toString())
+                .filter(i -> i.getLocked() == false)
+                .map(i -> Integer.toString(i.getSurveyId()))
                 .collect(Collectors.toList());
 
 
@@ -279,14 +281,14 @@ class CorrectionsControllerIT {
 
         var uri = String.format("http://localhost:%d/api/v1/correction/correct?surveyIds={surveyIds}", localServerPort);
         // We will make a request where the return code is a bad request, so using Void return type is fine.
-        var reqBuilder = new RequestWrapper<Void, Map>();
+        var reqBuilder = new RequestWrapper<Void, String>();
         var response = reqBuilder
                 .withUri(uri)
                 .withToken(token)
                 .withMethod(HttpMethod.GET)
                 .withContentType(MediaType.APPLICATION_JSON)
                 .withParams(param)
-                .withResponseType(Map.class)
+                .withResponseType(String.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -299,7 +301,7 @@ class CorrectionsControllerIT {
                 .withMethod(HttpMethod.GET)
                 .withContentType(MediaType.APPLICATION_JSON)
                 .withParams(param)
-                .withResponseType(Map.class)
+                .withResponseType(String.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -483,7 +485,7 @@ class CorrectionsControllerIT {
 
         CorrectionRequestBodyDto d = new CorrectionRequestBodyDto();
         var uri = String.format("http://localhost:%d/api/v1/correction/correct/{surveyId}", localServerPort);
-        var reqBuilder = new RequestWrapper<CorrectionRequestBodyDto, Map>();
+        var reqBuilder = new RequestWrapper<CorrectionRequestBodyDto, String>();
         var response = reqBuilder
                 .withUri(uri)
                 .withToken(token)
@@ -491,13 +493,13 @@ class CorrectionsControllerIT {
                 .withMethod(HttpMethod.DELETE)
                 .withContentType(MediaType.APPLICATION_JSON)
                 .withParams(param)
-                .withResponseType(Map.class)
+                .withResponseType(String.class)
                 .build(testRestTemplate);
 
         // No proper response at the moment, become 500 and screen will blank
         assertEquals("Correct status code", HttpStatus.BAD_REQUEST, response.getStatusCode());
         var body = response.getBody();
-        assertTrue("Correct alert message", Objects.nonNull(body) && body.get("message").equals("Deletion Failed. Survey is locked."));
+        assertTrue("Correct alert message", Objects.nonNull(body) && body.contains("Deletion Failed. Survey is locked."));
     }
     /**
      * You cannot delete survey with PqCatalogued
@@ -516,7 +518,7 @@ class CorrectionsControllerIT {
 
         CorrectionRequestBodyDto d = new CorrectionRequestBodyDto();
         var uri = String.format("http://localhost:%d/api/v1/correction/correct/{surveyId}", localServerPort);
-        var reqBuilder = new RequestWrapper<CorrectionRequestBodyDto, Map>();
+        var reqBuilder = new RequestWrapper<CorrectionRequestBodyDto, String>();
         var response = reqBuilder
                 .withUri(uri)
                 .withToken(token)
@@ -524,13 +526,13 @@ class CorrectionsControllerIT {
                 .withMethod(HttpMethod.DELETE)
                 .withContentType(MediaType.APPLICATION_JSON)
                 .withParams(param)
-                .withResponseType(Map.class)
+                .withResponseType(String.class)
                 .build(testRestTemplate);
 
         // No proper response at the moment, become 500 and screen will blank
         assertEquals("Correct status code", HttpStatus.BAD_REQUEST, response.getStatusCode());
         var body = response.getBody();
-        assertTrue("Correct alert message", Objects.nonNull(body) && body.get("message").equals("Deletion Failed. PQs catalogued for this survey."));
+        assertTrue("Correct alert message", Objects.nonNull(body) && body.contains("Deletion Failed. PQs catalogued for this survey."));
     }
     @Test
     @WithUserDetails("test@example.com")
