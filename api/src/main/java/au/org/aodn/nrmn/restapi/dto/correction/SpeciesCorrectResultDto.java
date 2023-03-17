@@ -1,6 +1,14 @@
 package au.org.aodn.nrmn.restapi.dto.correction;
 
-import java.util.Map;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public interface SpeciesCorrectResultDto extends Map<String, Object> {
+@Data
+@NoArgsConstructor
+public class SpeciesCorrectResultDto {
+    private Long jobId;
+    private String message;
+    private String currentSpeciesName;
+    private String nextSpeciesName;
+    private Integer[] surveyIds;
 }

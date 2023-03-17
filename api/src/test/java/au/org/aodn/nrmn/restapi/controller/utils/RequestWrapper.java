@@ -42,7 +42,7 @@ public class RequestWrapper<E, R> {
         return this;
     }
 
-    public RequestWrapper<E, R>  withMethod( HttpMethod method) {
+    public RequestWrapper<E, R>  withMethod(HttpMethod method) {
         this.method = method;
         return this;
     }
