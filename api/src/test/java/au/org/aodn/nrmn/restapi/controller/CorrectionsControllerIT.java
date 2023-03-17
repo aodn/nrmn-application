@@ -7,7 +7,6 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 
 import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRequestBodyDto;
-import au.org.aodn.nrmn.restapi.dto.correction.CorrectionRowsDto;
 import au.org.aodn.nrmn.restapi.dto.correction.SpeciesSearchBodyDto;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
@@ -282,14 +281,14 @@ class CorrectionsControllerIT {
 
         var uri = String.format("http://localhost:%d/api/v1/correction/correct?surveyIds={surveyIds}", localServerPort);
         // We will make a request where the return code is a bad request, so using Void return type is fine.
-        var reqBuilder = new RequestWrapper<Void, CorrectionRowsDto>();
+        var reqBuilder = new RequestWrapper<Void, String>();
         var response = reqBuilder
                 .withUri(uri)
                 .withToken(token)
                 .withMethod(HttpMethod.GET)
                 .withContentType(MediaType.APPLICATION_JSON)
                 .withParams(param)
-                .withResponseType(CorrectionRowsDto.class)
+                .withResponseType(String.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -302,7 +301,7 @@ class CorrectionsControllerIT {
                 .withMethod(HttpMethod.GET)
                 .withContentType(MediaType.APPLICATION_JSON)
                 .withParams(param)
-                .withResponseType(CorrectionRowsDto.class)
+                .withResponseType(String.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
