@@ -285,7 +285,7 @@ public class SurveyValidation {
                     && res.stream().anyMatch(e -> e != null && e.getMessage().contains("Survey exists:"));
 
             // VALIDATION: Survey Complete
-            if (!surveyExistsM3) {
+            if (!surveyExistsM3 && validation != ProgramValidation.NONE) {
                 res.add(validateSurveyComplete(validation, surveyRows));
             }
         }

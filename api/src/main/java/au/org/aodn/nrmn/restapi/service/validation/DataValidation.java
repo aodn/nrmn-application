@@ -116,7 +116,8 @@ public class DataValidation {
             var rowId = row.getId();
 
             // Site
-            if (row.getSiteCode() == null || !siteCodes.contains(row.getSiteCode().toLowerCase()))
+            if ((validation != ProgramValidation.NONE)
+                    && (row.getSiteCode() == null || !siteCodes.contains(row.getSiteCode().toLowerCase())))
                 errors.add(rowId, ValidationLevel.BLOCKING, "siteCode", "Site Code does not exist");
 
             // Diver

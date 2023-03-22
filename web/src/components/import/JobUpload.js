@@ -93,7 +93,7 @@ const JobUpload = () => {
                   <Box p={3}>
                     <Button
                       variant="contained"
-                      disabled={!formData.file || !formData.programId}
+                      disabled={!formData.file || isNaN(formData.programId)}
                       style={{width: '100%'}}
                       onClick={() =>
                         submitJobFile(formData, setUploadProgress).then(({response}) =>

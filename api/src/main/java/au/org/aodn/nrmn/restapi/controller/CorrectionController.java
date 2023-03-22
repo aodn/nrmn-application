@@ -248,7 +248,8 @@ public class CorrectionController {
             validation.add(surveyValidation.validateDateRange(programValidation, row), false);
 
             // Site distance validation
-            validation.add(siteValidation.validateSurveyAtSite(row));
+            if(programValidation != ProgramValidation.NONE)
+                validation.add(siteValidation.validateSurveyAtSite(row));
         }
 
         surveyValidation.validateSurveysMatch(surveyIds, mappedRows).forEach(surveyMatchError -> {
