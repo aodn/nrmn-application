@@ -10,6 +10,10 @@ VALUES (55, 'RLS', True);
 INSERT INTO nrmn.program_ref(program_id, program_name, is_active)
 VALUES (56, 'ATRC', True);
 
+INSERT INTO nrmn.location_ref (location_id, location_name, is_active) VALUES (0, 'NONE', true);
+
+INSERT INTO nrmn.site_ref (site_id, site_name, site_code, location_id, is_active) VALUES (0, 'NONE', 'NONE', 0, true);
+
 INSERT INTO nrmn.site_ref(site_id, site_code, site_name, longitude, latitude, location_id, state, country,
                           old_site_code, mpa, protection_status, site_attribute, is_active)
 VALUES (551, 'EYR71', 'South East Slade Point', 154, -35, 29, 'South Australia', 'Australia', '{"4117"}',
