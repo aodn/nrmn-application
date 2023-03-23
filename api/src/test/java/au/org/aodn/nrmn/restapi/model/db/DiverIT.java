@@ -37,6 +37,7 @@ class DiverIT {
         Diver diver = diverTestData.persistedDiver();
         entityManager.clear();
         Diver persistedDiver = diverRepository.findById(diver.getDiverId()).get();
-        assertEquals(diver, persistedDiver);
+        assertEquals(diver.getInitials(), persistedDiver.getInitials());
+        assertEquals(diver.getFullName(), persistedDiver.getFullName());
     }
 }

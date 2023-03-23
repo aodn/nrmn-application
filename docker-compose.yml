@@ -5,6 +5,7 @@ services:
     image: nrmn-build
     build:
       context: .
+      dockerfile: ./Dockerfile.build
       args:
         BUILDER_UID: 1000
     stdin_open: true

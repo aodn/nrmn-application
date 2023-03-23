@@ -1,0 +1,23 @@
+FROM docker.io/postgis/postgis:14-3.3-alpine
+
+RUN mkdir -p /docker-entrypoint-initdb.d /scripts /schema-update
+
+COPY db/schema/CreateTables.sql /scripts
+COPY db/schema/CreateMiscAncillaryObjects.sql /scripts
+COPY db/schema/ApplyConstraints.sql /scripts
+COPY db/schema/BasicIndexing.sql /scripts
+COPY db/endpoints/CreatePrivateEndpoints.sql /scripts
+COPY db/endpoints/CreatePublicEndpoints.sql /scripts
+COPY db/endpoints/EndpointIndexes.sql /scripts
+COPY api/src/main/resources/sql/application.sql /scripts
+COPY api/src/test/resources/testdata/FILL_ROLES.sql /scripts
+COPY api/src/test/resources/testdata/TEST_USER.sql /scripts
+COPY api/src/test/resources/testdata/FILL_DATA.sql /scripts
+
+COPY db/schema-update/* /schema-update
+
+RUN chmod -R 644 /scripts/* /schema-update/*
+
+COPY db/initdb-nrmn.sh /docker-entrypoint-initdb.d/20_nrmn.sh
+
+RUN chown postgres:postgres /docker-entrypoint-initdb.d/20_nrmn.sh

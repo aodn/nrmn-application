@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "18"
       - run: yarn --frozen-lock-file --cwd web install
       - run: yarn --frozen-lock-file --cwd web test
       - name: Set up JDK 11
@@ -35,4 +35,4 @@ jobs:
         with:
           name: war-file ${{ matrix.node-version }}
           path: /home/runner/work/nrmn-application/nrmn-application/app/target/nrmn-app-*war
-    timeout-minutes: 45
+    timeout-minutes: 15

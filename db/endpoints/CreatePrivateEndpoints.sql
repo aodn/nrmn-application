@@ -1,5 +1,5 @@
 /* site list */
-DROP MATERIALIZED VIEW nrmn.ep_site_list CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS nrmn.ep_site_list CASCADE;
 CREATE MATERIALIZED VIEW nrmn.ep_site_list AS
 SELECT
 	sit.country,
@@ -100,7 +100,7 @@ FROM nrmn.survey sur
      LEFT JOIN nrmn.surface_type_ref st ON st.surface_type_id = rug.surface_type_id;
 
 /* rarity indices "abundance" */
-DROP MATERIALIZED VIEW nrmn.ep_rarity_abundance CASCADE;
+DROP MATERIALIZED VIEW if exists nrmn.ep_rarity_abundance CASCADE;
 CREATE MATERIALIZED VIEW nrmn.ep_rarity_abundance AS
 with taxa as (
 	select
@@ -137,7 +137,7 @@ from stage2
 group by  taxon;
 
 /* Rarity extents (intemediary table) */
-DROP MATERIALIZED VIEW nrmn.ep_rarity_extents CASCADE;
+DROP MATERIALIZED VIEW if exists nrmn.ep_rarity_extents CASCADE;
 CREATE MATERIALIZED VIEW nrmn.ep_rarity_extents AS
 with taxa as (
 /*

@@ -42,6 +42,37 @@ Build requires Java 11 with Maven and Node v16 with Yarn v1.x. A Dockerfile is a
 
 ## Developing
 
+### Running in Docker / Podman
+
+The project root contains two Dockerfiles `Dockerfile.app` and `Dockerfile.db` for local development, testing and provisioning to a container registry. These same instructions will work for Podman by replacing `docker` with `podman`.
+
+Build the application WAR file:
+
+```
+mvn clean package
+```
+
+Build the application and database images:
+
+```
+docker build -t nrmn-app-dev -f Dockerfile.app .
+docker build -t nrmn-postgis -f Dockerfile.db .
+```
+
+Create a network to connect the two containers then run up the the database and application. Note that `POSTGRES_PASSWORD` is used to access the database user `postgres` and is not used by the application.
+
+```
+docker network create dev-net
+ 
+docker run --name nrmn-postgis-1 --network dev-net -p 5432:5432 -d -e POSTGRES_PASSWORD=5A5qADoVk3 nrmn-postgis
+ 
+docker run --name nrmn-app-dev-1 --network dev-net -p 8080:8080 -d -e POSTGRES_HOST=nrmn-postgis-1 nrmn-app-dev
+```
+
+The web application will now be available at `http://localhost:8080`. 
+
+The application database will be initialised on first load with a basic application schema suitable for development. If this is not sufficient a full database backup may be restored in the usual way through pgAdmin or with pg_restore.
+
 ### Creating an empty database
 
 This application required PostreSQL 11 + the PostGIS extension. Database connection details specified in [application.properties](api/src/main/resources/application.properties).
