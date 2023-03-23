@@ -11,6 +11,7 @@ import java.util.List;
 import javax.persistence.*;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.envers.Audited;
 
@@ -34,8 +35,8 @@ import lombok.Setter;
 @Audited(withModifiedFlag = true)
 public class Survey {
     @Id
-    @SequenceGenerator(name = "survey_survey_id", sequenceName = "survey_survey_id", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "survey_survey_id")
+    @GeneratedValue(generator = "SurveyIdentifierGenerator")
+    @GenericGenerator(name = "SurveyIdentifierGenerator", strategy = "au.org.aodn.nrmn.restapi.data.generator.SurveyIdentifierGenerator")
     @Column(name = "survey_id", unique = true, updatable = false, nullable = false)
     @Schema(title = "Id")
     private Integer surveyId;

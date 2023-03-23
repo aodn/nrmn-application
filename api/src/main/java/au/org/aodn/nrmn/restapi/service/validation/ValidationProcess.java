@@ -89,7 +89,8 @@ public class ValidationProcess {
             results.add(surveyValidation.validateDateRange(validation, row), false);
 
             // Validate survey is at site location
-            results.add(siteValidation.validateSurveyAtSite(row));
+            if(validation != ProgramValidation.NONE)
+                results.add(siteValidation.validateSurveyAtSite(row));
         }
 
         var res = new HashSet<SurveyValidationError>();

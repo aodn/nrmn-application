@@ -76,9 +76,12 @@ public class SurveyIngestionService {
     @Autowired
     StagedJobRepository jobRepository;
 
+    private static int PROGRAM_ID_NONE = 0;
+    private static int SITE_ID_NONE = 0;
+
     public Survey getSurvey(Program program, OptionalDouble visAvg, StagedRowFormatted stagedRow) {
 
-        Site site = stagedRow.getSite();
+        Site site =  program.getProgramId() == PROGRAM_ID_NONE ? siteRepo.getReferenceById(SITE_ID_NONE) : stagedRow.getSite();
 
         if (!site.getIsActive()) {
             site.setIsActive(true);
@@ -182,29 +185,30 @@ public class SurveyIngestionService {
     @Transactional
     public void ingestTransaction(StagedJob job, Collection<StagedRowFormatted> validatedRows) {
 
-        Map<String, List<StagedRowFormatted>> rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
-        List<Integer> surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
+        var rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
+        var surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
             
-            OptionalDouble visAvg = surveyRows.stream().filter(r -> r.getVis().isPresent()).mapToDouble(r -> r.getVis().get()).average();
+            var visAvg = surveyRows.stream().filter(r -> r.getVis().isPresent()).mapToDouble(r -> r.getVis().get()).average();
             if(visAvg.isPresent())
                 visAvg = OptionalDouble.of((double)Math.round(visAvg.getAsDouble()));
 
-            Survey survey = getSurvey(job.getProgram(), visAvg, surveyRows.get(0));
+            var survey = getSurvey(job.getProgram(), visAvg, surveyRows.get(0));
+
             groupRowsByMethodBlock(surveyRows).values().forEach(methodBlockRows -> {
-                SurveyMethodEntity surveyMethod = getSurveyMethod(survey, methodBlockRows.get(0));
+                var surveyMethod = getSurveyMethod(survey, methodBlockRows.get(0));
                 methodBlockRows.forEach(row -> observationRepository.saveAll(getObservations(surveyMethod, row, job.getIsExtendedSize())));
             });
             return survey.getSurveyId();
         }).collect(Collectors.toList());
 
-        long rowCount = validatedRows.size();
-        long siteCount = validatedRows.stream().map(r -> r.getSite()).distinct().count();
-        long surveyCount = surveyIds.size();
-        long obsItemCount = validatedRows.stream().map(r -> r.getSpecies()).filter(o -> o.isPresent()).distinct().count();
-        long diverCount = validatedRows.stream().map(r -> r.getDiver()).distinct().count();
+        var rowCount = validatedRows.size();
+        var siteCount = validatedRows.stream().map(r -> r.getSite()).distinct().count();
+        var surveyCount = surveyIds.size();
+        var obsItemCount = validatedRows.stream().map(r -> r.getSpecies()).filter(o -> o.isPresent()).distinct().count();
+        var diverCount = validatedRows.stream().map(r -> r.getDiver()).distinct().count();
 
-        List<String> messages = Arrays.asList(rowCount + " rows of data", siteCount + " sites", surveyCount + " surveys", obsItemCount + " distinct observable items", diverCount + " divers");
-        String message = messages.stream().collect(Collectors.joining("\n"));
+        var messages = Arrays.asList(rowCount + " rows of data", siteCount + " sites", surveyCount + " surveys", obsItemCount + " distinct observable items", diverCount + " divers");
+        var message = messages.stream().collect(Collectors.joining("\n"));
 
         stagedJobLogRepository.save(StagedJobLog.builder().stagedJob(job).details(message).eventType(StagedJobEventType.INGESTED).build());
         job.setStatus(StatusJobType.INGESTED);

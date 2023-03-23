@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Configuration
@@ -49,8 +50,13 @@ public class SurveyDtoMapperConfig {
                 surveyMethodRepository.findDiversForSurvey(ctx.getSource()));
         Converter<String, String> passThrough = ctx -> Optional.ofNullable(ctx.getSource()).orElse("");
 
-        Converter<Site, String> toSiteLatitude = ctx -> Double.parseDouble(String.format("%.5f", ctx.getSource().getLatitude())) + "";
-        Converter<Site, String> toSiteLongitude = ctx -> Double.parseDouble(String.format("%.5f", ctx.getSource().getLongitude())) + "";
+        Converter<Site, String> toSiteLatitude = ctx -> {
+            return Objects.nonNull(ctx.getSource().getLatitude()) ? Double.parseDouble(String.format("%.5f", ctx.getSource().getLatitude())) + "" : "";
+        };
+
+        Converter<Site, String> toSiteLongitude = ctx -> {
+            return Objects.nonNull(ctx.getSource().getLongitude()) ? Double.parseDouble(String.format("%.5f", ctx.getSource().getLongitude())) + "" : "";
+        };
 
         modelMapper.typeMap(Survey.class, SurveyDto.class).addMappings(mapper -> {
             mapper.using(toSiteLatitude).map(Survey::getSite, SurveyDto::setSiteLatitude);

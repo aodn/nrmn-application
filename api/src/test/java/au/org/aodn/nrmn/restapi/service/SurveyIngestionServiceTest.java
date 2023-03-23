@@ -78,7 +78,7 @@ public class SurveyIngestionServiceTest {
     void init() {
 
         StagedRow ref = StagedRow.builder()
-                .stagedJob(StagedJob.builder().program(Program.builder().programName("PROJECT").build()).build())
+                .stagedJob(StagedJob.builder().program(Program.builder().programName("PROJECT").programId(1).build()).build())
                 .build();
 
         Diver diver = Diver.builder().initials("SAM").build();
@@ -95,7 +95,11 @@ public class SurveyIngestionServiceTest {
     void getSurveyForNewSurvey() {
         when(surveyRepository.save(any())).then(s -> s.getArgument(0));
         when(siteRepo.save(any())).then(s -> s.getArgument(0));
-        Survey survey = surveyIngestionService.getSurvey(new Program(), OptionalDouble.of(15.5), rowBuilder.build());
+
+        var row = rowBuilder.build();
+
+        var survey = surveyIngestionService.getSurvey(row.getRef().getStagedJob().getProgram(), OptionalDouble.of(15.5), row);
+
         assertEquals(1, survey.getDepth());
         assertEquals(2, survey.getSurveyNum());
         assertEquals("A SITE", survey.getSite().getSiteCode());
@@ -114,14 +118,14 @@ public class SurveyIngestionServiceTest {
         when(surveyRepository.save(any())).then(s -> s.getArgument(0));
         when(siteRepo.save(any())).then(s -> s.getArgument(0));
 
-        StagedRowFormatted row1 = rowBuilder.build();
+        var row = rowBuilder.build();
 
-        Survey survey1 = surveyIngestionService.getSurvey(new Program(), OptionalDouble.empty(), row1);
+        var survey1 = surveyIngestionService.getSurvey(row.getRef().getStagedJob().getProgram(), OptionalDouble.empty(), row);
 
-        StagedRowFormatted row2 = rowBuilder.block(2).method(1)
+        var row2 = rowBuilder.block(2).method(1)
                 .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build()).build();
 
-        Survey survey2 = surveyIngestionService.getSurvey(new Program(), OptionalDouble.empty(), row2);
+        var survey2 = surveyIngestionService.getSurvey(row.getRef().getStagedJob().getProgram(), OptionalDouble.empty(), row2);
 
         assertEquals(survey1, survey2);
     }
