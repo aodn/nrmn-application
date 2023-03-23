@@ -11,6 +11,9 @@ import CustomTextInput from '../../input/CustomTextInput';
 import {AuthContext} from '../../../contexts/auth-context';
 import AlertDialog from '../../ui/AlertDialog';
 
+const ATRC_PROGRAM_ID = 2;
+const FRDC_PROGRAM_ID = 4;
+
 const SurveyEdit = () => {
   const surveyId = useParams()?.id;
 
@@ -21,11 +24,16 @@ const SurveyEdit = () => {
   const [sites, setSites] = useState([]);
   const [programs, setPrograms] = useState([]);
 
+  const compatibleProgramIds = [ATRC_PROGRAM_ID, FRDC_PROGRAM_ID];
+  const programsAreCompatible = (a,b) => compatibleProgramIds.includes(a) && compatibleProgramIds.includes(b);
+
   const formReducer = (state, action) => {
     if (action.form) return {...state, ...action.form};
     switch (action.field) {
       case 'siteCode':
         return {...state, siteCode: action.value, siteName: sites?.find((i) => i.siteCode === action.value)?.siteName};
+      case 'program':
+        return {...state, programId: (programsAreCompatible(state.programId, action.value) ? action.value : state.programId)};
       default:
         return {...state, [action.field]: action.value};
     }
