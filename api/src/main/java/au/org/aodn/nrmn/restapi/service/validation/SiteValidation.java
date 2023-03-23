@@ -45,7 +45,7 @@ public class SiteValidation {
                 .removeAll(meowRegionsRepository.getEcoregionContains(siteEcoregion, distinctSurveySpecies));
 
         if (distinctSurveySpecies.size() > 0) {
-            var message = "Species not already observed in site ecoregion " + siteEcoregion;
+            var message = "Species never observed in " + siteEcoregion;
             return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
                     surveySpecies.stream()
                             .filter(s -> distinctSurveySpecies.contains(s.getSpecies().get().getObservableItemName()))
@@ -58,14 +58,13 @@ public class SiteValidation {
 
     private Collection<SurveyValidationError> checkSites(Map<Integer, List<StagedRowFormatted>> siteMap) {
 
-        var res = new HashSet<SurveyValidationError>();
-
+        var res = new ValidationResultSet();
+        
         // VALIDATION: MEOW ecoregion
         for (var siteRows : siteMap.entrySet())
             res.add(validateSpeciesEcoregion(siteRows.getKey(), siteRows.getValue()));
 
-        res.remove(null);
-        return res;
+        return res.getAll();
     }
 
     public Collection<SurveyValidationError> validateSites(Collection<StagedRowFormatted> mappedRows) {
