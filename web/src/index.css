@@ -12,6 +12,10 @@ p,ul,div,button,select {
     '"Segoe UI Symbol"';
 }
 
+button {
+  margin-left: 4px;
+}
+
 .error {
   color: black;
   border: 1px solid red;

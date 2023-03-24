@@ -110,7 +110,17 @@ const AuthState = () => {
                               }}
                             >
                               Manually Run Startup Tasks (Clear Ingest Lock)
-                            </MenuItem>
+                            </MenuItem>,
+                            <Divider key="adminDivider"/>,
+                            <MenuItem
+                            key="userManagement"
+                            onClick={(e) => {
+                              handleClose(e);
+                              navigate('/admin/users', {push: true});
+                            }}
+                          >
+                            User Management
+                          </MenuItem>
                           ]}
                         </MenuList>
                       </ClickAwayListener>
