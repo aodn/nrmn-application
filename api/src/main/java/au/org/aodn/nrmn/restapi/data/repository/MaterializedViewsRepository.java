@@ -17,11 +17,11 @@ import javax.transaction.Transactional;
 @Tag(name = "materialized views")
 public interface MaterializedViewsRepository extends JpaRepository<ObservableItem, Integer> {
 
-    @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW CONCURRENTLY nrmn.ep_m1'", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW nrmn.ep_m1'", nativeQuery = true)
     Boolean checkEpM1Running();
 
     @Modifying
-    @Query(value = "REFRESH MATERIALIZED VIEW CONCURRENTLY nrmn.ep_m1;", nativeQuery = true)
+    @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_m1;", nativeQuery = true)
     void refreshEpM1();
 
     @Query(value = "SELECT count(*) from nrmn.ep_m1;", nativeQuery = true)
@@ -103,11 +103,11 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
 
     // ------------------
 
-    @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW CONCURRENTLY nrmn.ep_rarity_frequency'", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query = 'REFRESH MATERIALIZED VIEW nrmn.ep_rarity_frequency'", nativeQuery = true)
     Boolean checkEpRarityFrequencyRunning();
 
     @Modifying
-    @Query(value = "REFRESH MATERIALIZED VIEW CONCURRENTLY nrmn.ep_rarity_frequency;", nativeQuery = true)
+    @Query(value = "REFRESH MATERIALIZED VIEW nrmn.ep_rarity_frequency;", nativeQuery = true)
     void refreshEpRarityFrequency();
 
     // ------------------
