@@ -179,6 +179,16 @@ public class AdminController {
         if (!isAdmin(authentication))
             return ResponseEntity.badRequest().body("Unauthorized");
 
+        var thisUser = userRepository.findByEmail(authentication.getName()).get();
+
+        var userId = user.getUserId();
+        var thisUserId = thisUser.getUserId();
+        if(userId.equals(thisUserId)){
+            var ret = new SecUserDto(thisUser, null);
+            ret.setError("Cannot update current user");
+            return ResponseEntity.ok(ret);
+        }
+
         var updatedUser = userRepository.getReferenceById(user.getUserId());
 
         return ResponseEntity.ok(persistUserDto(updatedUser, user));
