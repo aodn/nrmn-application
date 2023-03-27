@@ -1,87 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import {Box, Paper, Typography} from '@mui/material';
-import {getResult, entityEdit} from '../../api/api';
-import {PropTypes} from 'prop-types';
-
-const UserInstructions = () => (
-  <Box p={1} border={1} borderRadius={2}>
-    <ul>
-      <li>
-        <b>Add New User</b> will create a new user with the <samp>ROLE_DATA_OFFICER</samp> role and the default password <samp>login</samp>
-        <br />
-      </li>
-      <li>
-        <b>Edit</b> will change the user email or full name
-        <br />
-      </li>
-      <li>
-        <b>Disable Account</b> will prevent the user from logging in next (Removes all the user roles)
-        <br />
-      </li>
-      <li>
-        <b>Reset Password</b> will reset the users password to <samp>login</samp> and require a password change on next login
-        <br />
-      </li>
-      <li>
-        <b>Enable Admin</b> will give user access to the admin options from the user menu (toggles the <samp>ROLE_ADMIN</samp>)
-        <br />
-      </li>
-    </ul>
-  </Box>
-);
-
-const UserComponent = ({value}) => {
-  const [user, setUser] = useState(value);
-  const [userUpdate, setUserUpdate] = useState();
-  const [editMode, setEditMode] = useState(false);
-
-  useEffect(() => {
-    if (!userUpdate) return;
-    entityEdit('admin/user', userUpdate).then((res) => setUser(res.data));
-  }, [userUpdate]);
-
-  const userEnabled = user.roles.length > 0;
-  const userIsAdmin = user.roles.includes('ROLE_ADMIN');
-  return (
-    <Box m={1} border={1} borderColor="lightgray" borderRadius={1} p={1} key={user.userId} display="flex" flexDirection="row">
-      <Box flex={1}>
-        {editMode ? <button onClick={() => setEditMode(false)}>Cancel</button> : <button onClick={() => setEditMode(true)}>Edit</button>}
-      </Box>
-      <Box flex={2}>{editMode ? <input value={user.email} /> : user.email}</Box>
-      <Box flex={2}>{editMode ? <input value={user.fullName} /> : user.fullName}</Box>
-      {editMode ? (
-        <Box flex={3}>
-          <button disabled>Save</button>
-        </Box>
-      ) : (
-        <>
-          <Box flex={3}>
-            {userEnabled ? (
-              <button onClick={() => setUserUpdate({...user, newRoles: []})}>Disable Account</button>
-            ) : (
-              <button onClick={() => setUserUpdate({...user, newRoles: ['ROLE_DATA_OFFICER']})}>Enable Account</button>
-            )}
-            <button disabled>Reset Password</button>
-            {userIsAdmin ? <button disabled>Disable Admin</button> : <button disabled>Enable Admin</button>}
-          </Box>
-        </>
-      )}
-    </Box>
-  );
-};
-
-UserComponent.propTypes = {
-  value: PropTypes.object
-};
+import {getResult} from '../../api/api';
+import UserComponent from './UserComponent';
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
+  const [newUser, setNewUser] = useState(null);
 
   useEffect(() => {
-    getResult('admin/users').then((res) => {
-      setUsers(res.data);
-    });
-  }, []);
+    async function getUsers() {
+      await getResult('admin/users').then((res) => setUsers(res.data));
+    }
+    getUsers();
+  } , []);
 
   return (
     <>
@@ -91,15 +22,47 @@ const UserList = () => {
         </Box>
       </Box>
       <Box m={2} flexGrow={1} minWidth={1000}>
-        <UserInstructions />
+        <Box p={1} border={1} borderRadius={2}>
+          <ul>
+            <li>
+              <b>Add New User</b> will create a new user with the <samp>ROLE_DATA_OFFICER</samp> and assign a random password that must be
+              changed on first login.
+            </li>
+            <li>
+              <b>Edit</b> will change the user email or full name.
+            </li>
+            <li>
+              <b>Disable Account</b> will prevent the user from logging in next time but removing all user roles and setting account status
+              to <samp>DEACTIVATED</samp>.
+            </li>
+            <li>
+              <b>Reset Password</b> will assign a random password that must be changed on first login.
+            </li>
+            <li>
+              <b>Enable Admin</b> will give user access to the admin options from the user menu (toggles the <samp>ROLE_ADMIN</samp>). Admin
+              users will appear highlighted in <span style={{backgroundColor: 'yellow'}}>yellow</span>.
+            </li>
+          </ul>
+        </Box>
         <Paper>
           <Box p={1}>
             <Box p={1}>
-              <button disabled>Add New User</button>
+              <button onClick={() => setNewUser({email: '', fullName: '', roles: []})}>Add New User</button>
             </Box>
-            {users.map((u, i) => (
-              <UserComponent key={i} value={u} />
-            ))}
+            <>
+              {newUser && (
+                <UserComponent
+                  onAdd={(newUser) => {
+                    if (newUser?.userId) setUsers((u) => [newUser, ...u]);
+                    setNewUser(null);
+                  }}
+                  value={newUser}
+                />
+              )}
+              {users.map((u, i) => (
+                <UserComponent key={u.userId} value={u} />
+              ))}
+            </>
           </Box>
         </Paper>
       </Box>

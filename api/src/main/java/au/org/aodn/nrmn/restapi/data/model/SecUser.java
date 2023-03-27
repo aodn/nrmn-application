@@ -24,6 +24,7 @@ import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import au.org.aodn.nrmn.restapi.enums.SecUserStatus;
 
 import org.hibernate.envers.Audited;
@@ -33,9 +34,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 @Builder
@@ -80,10 +83,12 @@ public class  SecUser implements Serializable {
     }
 
     @NotAudited
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "sec_user_roles",
         joinColumns = @JoinColumn(name = "sec_user_id", foreignKey = @ForeignKey(name = "FK_USER_SEC_ROLE")),
         inverseJoinColumns = @JoinColumn(name = "sec_role_id", foreignKey = @ForeignKey(name = "FK_ROLE_USER_SEC")))
     private Set<SecRole> roles;
+
 }
