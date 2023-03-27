@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useReducer} from 'react';
 import {Box, Typography} from '@mui/material';
 import {entityEdit, entitySave} from '../../api/api';
 import {PropTypes} from 'prop-types';
@@ -6,77 +6,126 @@ import TargetUrlComponent from '../input/TargetUrlComponent';
 
 const UserComponent = ({value, onAdd}) => {
   const addMode = typeof onAdd !== 'undefined';
-  const [user, setUser] = useState(value);
-  const [userUpdate, setUserUpdate] = useState(value);
-  const [editMode, setEditMode] = useState(addMode);
 
-  const submitUserUpdate = async () => {
-    const method = addMode ? entitySave : entityEdit;
-    await method('admin/user', userUpdate).then((res) => {
-      if (res.data.error) {
-        setUser((u) => ({...u, error: res.data.error}));
-      } else {
-        setUser(res.data);
-        setEditMode(false);
+  const userRoles = ['ROLE_DATA_OFFICER'];
+  const adminRoles = ['ROLE_DATA_OFFICER', 'ROLE_ADMIN'];
+
+  const [state, dispatch] = useReducer(
+    (state, action) => {
+      switch (action.type) {
+        case 'error':
+          return {...state, error: action.value};
+        case 'user':
+          return {
+            user: action.value,
+            userUpdate: action.value,
+            userEnabled: action.value.roles.length > 0,
+            userIsAdmin: action.value.roles.includes('ROLE_ADMIN'),
+            userPayload: null,
+            editMode: false,
+            error: null
+          };
+        case 'editMode':
+          return {...state, editMode: action.value, userUpdate: {...state.user}, error: null};
+        case 'userUpdate':
+          return {...state, userUpdate: {...state.userUpdate, ...action.value}};
+        case 'submit': {
+          switch (action.value) {
+            case 'resetPassword':
+              return {...state, userPayload: {...state.user, resetPassword: true}};
+            case 'toggleUserEnabled':
+              return {
+                ...state,
+                userPayload: {
+                  ...state.user,
+                  roles: state.user.roles.length > 0 ? [] : userRoles
+                }
+              };
+            case 'toggleIsAdmin':
+              return {
+                ...state,
+                userPayload: {
+                  ...state.user,
+                  roles: state.user.roles.includes('ROLE_ADMIN') ? userRoles : adminRoles
+                }
+              };
+            default:
+              return {...state, userPayload: {...state.userUpdate}};
+          }
+        }
+        default:
+          return state;
       }
-    });
-  };
+    },
+    {
+      user: value,
+      userUpdate: value,
+      userEnabled: value.roles.length > 0,
+      userIsAdmin: value.roles.includes('ROLE_ADMIN'),
+      userPayload: null,
+      editMode: addMode,
+      error: null
+    }
+  );
 
   useEffect(() => {
-    if (onAdd && !editMode) onAdd(null);
-  }, [onAdd, editMode]);
+    const submitUserUpdate = async () => {
+      const method = addMode && state.user.email === '' ? entitySave : entityEdit;
+      await method('admin/user', state.userPayload).then((res) => {
+        if (res.data.error) {
+          dispatch({type: 'error', value: res.data.error});
+        } else {
+          dispatch({type: 'user', value: res.data});
+        }
+      });
+    };
+    if (state.userPayload) submitUserUpdate();
+  }, [state.userPayload, state.user, addMode]);
 
-  useEffect(() => {
-    if (onAdd && user?.userId) onAdd(user);
-  }, [onAdd, user]);
-
-  const userEnabled = user.roles.length > 0;
-  const userIsAdmin = user.roles.includes('ROLE_ADMIN');
   return (
-    <Box m={1} border={1} borderColor="lightgray" borderRadius={1} p={1} key={user.userId} display="flex" flexDirection="row">
+    <Box m={1} border={1} borderColor="lightgray" borderRadius={1} p={1} key={state.user.userId} display="flex" flexDirection="row">
       <Box flex={1}>
-        {editMode ? <button onClick={() => setEditMode(false)}>Cancel</button> : <button onClick={() => setEditMode(true)}>Edit</button>}
+        <button onClick={() => dispatch({type: 'editMode', value: !state.editMode})}>{state.editMode ? 'Cancel' : 'Edit'}</button>
       </Box>
       <Box flex={2}>
-        {editMode ? (
+        {state.editMode ? (
           <>
-            {' '}
-            <input onChange={(e) => setUserUpdate((u) => ({...u, email: e.target.value}))} value={userUpdate.email} />
+            <input onChange={(e) => dispatch({type: 'userUpdate', value: {email: e.target.value}})} value={state.userUpdate.email} />
             <br />
-            <span style={{color: 'red'}}>{user.error}</span>
+            <span style={{color: 'red'}}>{state.error}</span>
           </>
         ) : (
-          <Typography fontSize={13} backgroundColor={userIsAdmin && 'yellow'} color={!userEnabled && 'gray'}>
-            {user.email}
+          <Typography fontSize={13} backgroundColor={state.userIsAdmin && 'yellow'} color={!state.userEnabled && 'gray'}>
+            {state.user.email}
           </Typography>
         )}
       </Box>
       <Box flex={2}>
-        {editMode ? (
-          <input onChange={(e) => setUserUpdate((u) => ({...u, fullName: e.target.value}))} value={userUpdate.fullName} />
+        {state.editMode ? (
+          <input onChange={(e) => dispatch({type: 'userUpdate', value: {fullName: e.target.value}})} value={state.userUpdate.fullName} />
         ) : (
-          <Typography fontSize={13} backgroundColor={userIsAdmin && 'yellow'} color={!userEnabled && 'gray'}>
-            {user.fullName}
+          <Typography fontSize={13} backgroundColor={state.userIsAdmin && 'yellow'} color={!state.userEnabled && 'gray'}>
+            {state.user.fullName}
           </Typography>
         )}
       </Box>
-      {editMode ? (
+      {state.editMode ? (
         <Box flex={3}>
-          <button onClick={() => submitUserUpdate()}>Save</button>
+          <button onClick={() => dispatch({type: 'submit'})}>Save</button>
         </Box>
       ) : (
         <>
           <Box flex={3}>
-            {user.newPassword ? (
-              <TargetUrlComponent value={user.newPassword} />
+            {state.user.newPassword ? (
+              <TargetUrlComponent value={state.user.newPassword} />
             ) : (
-              <button onClick={() => setUserUpdate({...user, resetPassword: true})}>Reset Password</button>
+              <button onClick={() => dispatch({type: 'submit', value: 'resetPassword'})}>Reset Password</button>
             )}
-            <button onClick={() => setUserUpdate({...user, roles: userEnabled ? [] : ['ROLE_DATA_OFFICER']})}>
-              {userEnabled ? 'Disable' : 'Enable'} Account
+            <button onClick={() => dispatch({type: 'submit', value: 'toggleUserEnabled'})}>
+              {state.userEnabled ? 'Disable' : 'Enable'} Account
             </button>
-            <button onClick={() => setUserUpdate({...user, roles: userIsAdmin ? ['ROLE_DATA_OFFICER'] : ['ROLE_ADMIN']})}>
-              {userIsAdmin ? 'Disable' : 'Enable'} Admin
+            <button onClick={() => dispatch({type: 'submit', value: 'toggleIsAdmin'})}>
+              {state.userIsAdmin ? 'Disable' : 'Enable'} Admin
             </button>
           </Box>
         </>
