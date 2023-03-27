@@ -23,12 +23,12 @@ const UserComponent = ({value, onAdd}) => {
   };
 
   useEffect(() => {
-    if (!editMode && onAdd) onAdd(null);
-  }, [editMode]);
+    if (onAdd && !editMode) onAdd(null);
+  }, [onAdd, editMode]);
 
   useEffect(() => {
     if (onAdd && user?.userId) onAdd(user);
-  }, [user]);
+  }, [onAdd, user]);
 
   const userEnabled = user.roles.length > 0;
   const userIsAdmin = user.roles.includes('ROLE_ADMIN');

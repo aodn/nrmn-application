@@ -59,7 +59,7 @@ const UserList = () => {
                   value={newUser}
                 />
               )}
-              {users.map((u, i) => (
+              {users.map((u) => (
                 <UserComponent key={u.userId} value={u} />
               ))}
             </>
