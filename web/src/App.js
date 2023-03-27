@@ -37,6 +37,7 @@ import ApplicationError from './components/ui/ApplicationError';
 import SpeciesCorrect from './components/data-entities/survey/SpeciesCorrect';
 import PropTypes from 'prop-types';
 import ChangePasswordForm from './components/auth/ChangePasswordForm';
+import UserList from './components/admin/UserList';
 
 class ErrorBoundary extends React.Component {
   static propTypes = {
@@ -143,6 +144,8 @@ const App = () => {
                   {loggedIn && (
                     <>
                       <Route path="/login" element={<Navigate to="/home" />} />
+
+                      <Route path="/admin/users" element={<UserList />} />
 
                       <Route path="/data/surveys" element={<SurveyList />} />
                       <Route path="/data/survey/:id" element={<SurveyView />} />

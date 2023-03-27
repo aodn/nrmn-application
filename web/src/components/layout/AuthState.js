@@ -75,6 +75,36 @@ const AuthState = () => {
                           aria-labelledby="composition-button"
                           onKeyDown={handleListKeyDown}
                         >
+                          {auth.roles.includes('ROLE_ADMIN') && [
+                            <MenuItem
+                              key="runDailyTasks"
+                              onClick={(e) => {
+                                runDailyTasks();
+                                handleClose(e);
+                              }}
+                            >
+                              Refresh Endpoints
+                            </MenuItem>,
+                            <MenuItem
+                              key="runStartupTasks"
+                              onClick={(e) => {
+                                runStartupTasks();
+                                handleClose(e);
+                              }}
+                            >
+                              Clear Ingestion Lock
+                            </MenuItem>,
+                            <MenuItem
+                              key="userManagement"
+                              onClick={(e) => {
+                                handleClose(e);
+                                navigate('/admin/users', {push: true});
+                              }}
+                            >
+                              Manage Users
+                            </MenuItem>,
+                            <Divider key="adminDivider" />
+                          ]}
                           <MenuItem
                             onClick={(e) => {
                               handleClose(e);
@@ -91,27 +121,6 @@ const AuthState = () => {
                           >
                             Logout
                           </MenuItem>
-                          {auth.roles.includes('ROLE_ADMIN') && [
-                            <Divider key="adminDivider"/>,
-                            <MenuItem
-                              key="runDailyTasks"
-                              onClick={(e) => {
-                                runDailyTasks();
-                                handleClose(e);
-                              }}
-                            >
-                              Manually Run Daily Tasks (PQ Update, Refresh Materialized Views)
-                            </MenuItem>,
-                            <MenuItem
-                              key="runStartupTasks"
-                              onClick={(e) => {
-                                runStartupTasks();
-                                handleClose(e);
-                              }}
-                            >
-                              Manually Run Startup Tasks (Clear Ingest Lock)
-                            </MenuItem>
-                          ]}
                         </MenuList>
                       </ClickAwayListener>
                     </Paper>

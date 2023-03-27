@@ -3,29 +3,7 @@ import {Box} from '@mui/system';
 import SharedLinkAdd from './SharedLinkAdd';
 import React, {useEffect, useReducer} from 'react';
 import {getSharedLinks, deleteSharedLink} from '../../../api/api';
-import PropTypes from 'prop-types';
-
-const TargetUrlComponent = ({value}) => {
-  const [label, setLabel] = React.useState('Copy');
-  const copy = () => {
-    navigator.clipboard.writeText(value);
-    setLabel('Copied!');
-    setTimeout(() => setLabel('Copy'), 2000);
-  };
-  return (
-    <>
-      <a href={value}>{value.substring(0, 20)}...</a>
-      <button style={{width: '60px'}} onClick={copy}>
-        {label}
-      </button>
-    </>
-  );
-};
-
-TargetUrlComponent.propTypes = {
-  value: PropTypes.string,
-  disabled: PropTypes.bool
-};
+import TargetUrlComponent from '../../input/TargetUrlComponent';
 
 const SharedLinkList = () => {
   const [data, setData] = useReducer(
