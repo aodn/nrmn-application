@@ -88,17 +88,19 @@ const UserComponent = ({value, onAdd}) => {
         <button onClick={() => dispatch({type: 'editMode', value: !state.editMode})}>{state.editMode ? 'Cancel' : 'Edit'}</button>
       </Box>
       <Box flex={2}>
-        {state.editMode ? (
-          <>
-            <input onChange={(e) => dispatch({type: 'userUpdate', value: {email: e.target.value}})} value={state.userUpdate.email} />
-            <br />
-            <span style={{color: 'red'}}>{state.error}</span>
-          </>
-        ) : (
-          <Typography fontSize={13} backgroundColor={state.userIsAdmin && 'yellow'} color={!state.userEnabled && 'gray'}>
-            {state.user.email}
-          </Typography>
-        )}
+        <>
+          {state.editMode ? (
+            <>
+              <input onChange={(e) => dispatch({type: 'userUpdate', value: {email: e.target.value}})} value={state.userUpdate.email} />
+              {state.error && <br />}
+            </>
+          ) : (
+            <Typography fontSize={13} backgroundColor={state.userIsAdmin && 'yellow'} color={!state.userEnabled && 'gray'}>
+              {state.user.email}
+            </Typography>
+          )}
+          <span style={{color: 'red'}}>{state.error}</span>
+        </>
       </Box>
       <Box flex={2}>
         {state.editMode ? (
