@@ -1,7 +1,5 @@
 FROM amazoncorretto:11-al2-jdk
 
-ARG BUILDER_UID=9999
-
 ENV TZ="Australia" \
     NVM_DIR="/opt/nvm" \
     MAVEN_HOME="/opt/maven" \
@@ -29,7 +27,3 @@ RUN set -ex \
     && update-alternatives --install /usr/bin/mvn mvn /opt/maven/bin/mvn 10000
 
 RUN pip3 install bump2version==1.0.1
-RUN /usr/sbin/useradd --no-create-home --no-log-init --shell /bin/bash --uid $BUILDER_UID builder
-RUN chown -R builder:builder /home/builder
-USER builder
-WORKDIR /home/builder

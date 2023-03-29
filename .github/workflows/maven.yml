@@ -1,42 +1,63 @@
-# This workflow builds the application and runs unit and integration tests
-
-name: Build and run tests
+name: Docker Build Pipeline
 
 on:
-#  - push
-  - pull_request
-
-concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: true
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-      - run: yarn --frozen-lock-file --cwd web install
-      - run: yarn --frozen-lock-file --cwd web test
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'corretto'
-          java-version: 11
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
-      - name: Build with Maven
-        run: mvn --batch-mode clean verify
-        env:
-          CI: true
-      - uses: actions/upload-artifact@v3
-        with:
-          name: war-file ${{ matrix.node-version }}
-          path: /home/runner/work/nrmn-application/nrmn-application/app/target/nrmn-app-*war
-    timeout-minutes: 15
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Cache Docker layers
+      uses: actions/cache@v3
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+
+    - name: Build Docker Image
+      uses: docker/build-push-action@v4
+      env:
+        BUILDER_UID: ${{ runner.uid }}
+      with:
+        context: .
+        file: Dockerfile.build
+        load: true
+        build-args: BUILDER_UID=${{ env.BUILDER_UID }}
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache
+        tags: nrmn-build:latest
+
+    - name: Run Pipeline Steps
+      run: |
+        docker run --rm \
+          -v ${{ github.workspace }}:/workspace \
+          -v ${{ runner.home }}/.m2:/home/builder/.m2 \
+          -v ${{ runner.home }}/.cache:/home/builder/.cachejournal/ \
+          -v ${{ runner.home }}/bin:${HOME}/bin \
+          -w /workspace \
+          --entrypoint /bin/bash \
+          nrmn-build:latest -c '
+          git reset --hard
+          git clean --force --force -xd --exclude=web/node_modules
+          yarn --cwd web --frozen-lockfile
+          mvn --batch-mode --threads 2 --define maven.test.skip=true clean package
+        '
+
+    - name: Archive Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: war-file
+        path: app/target/*.war
