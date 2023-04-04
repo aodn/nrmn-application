@@ -60,6 +60,7 @@ import au.org.aodn.nrmn.restapi.enums.ObservableItemType;
 import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
 import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.enums.SurveyMethod;
+import au.org.aodn.nrmn.restapi.service.formatting.ColumnNameFormattingService;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import au.org.aodn.nrmn.restapi.util.ObjectUtils;
 
@@ -102,6 +103,9 @@ public class SurveyCorrectionService {
 
     @Autowired
     StagedJobRepository jobRepository;
+
+    @Autowired
+    ColumnNameFormattingService columnNameFormatter;
 
     private static Logger logger = LoggerFactory.getLogger(SurveyCorrectionService.class);
 
@@ -188,6 +192,7 @@ public class SurveyCorrectionService {
                 // Exclude SND diver and inverts from comparison since values not stored for these
                 // observations have dummy values filled in by the UI to ease validation.
                 var isSurveyNotDone = b.getSpecies().equalsIgnoreCase("Survey Not Done");
+                var isInvertSized = b.getIsInvertSizing().equalsIgnoreCase("YES");
 
                 for (var entry : propertyChecks.entrySet()) {
                     var getterA = entry.getValue().getLeft();
@@ -219,7 +224,7 @@ public class SurveyCorrectionService {
 
                     for (var diff : measureDiff.entriesOnlyOnLeft().entrySet()) {
                         cellDiffs.add(CorrectionDiffCellDto.builder()
-                                .columnName(diff.getKey().toString())
+                                .columnName(columnNameFormatter.formatColumnName(diff.getKey(), isInvertSized))
                                 .speciesName(speciesName)
                                 .diffRowId(id)
                                 .oldValue(diff.getValue())
@@ -229,7 +234,7 @@ public class SurveyCorrectionService {
 
                     for (var diff : measureDiff.entriesOnlyOnRight().entrySet()) {
                         cellDiffs.add(CorrectionDiffCellDto.builder()
-                                .columnName(diff.getKey().toString())
+                                .columnName(columnNameFormatter.formatColumnName(diff.getKey(), isInvertSized))
                                 .speciesName(speciesName)
                                 .diffRowId(id)
                                 .oldValue("0")
@@ -241,7 +246,7 @@ public class SurveyCorrectionService {
                         var lv = diff.getValue().leftValue();
                         var rv = diff.getValue().rightValue();
                         cellDiffs.add(CorrectionDiffCellDto.builder()
-                                .columnName(diff.getKey().toString())
+                                .columnName(columnNameFormatter.formatColumnName(diff.getKey(), isInvertSized))
                                 .speciesName(speciesName)
                                 .diffRowId(id)
                                 .oldValue(lv)
