@@ -17,51 +17,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: corretto
+          cache: maven
 
-    - name: Cache Docker layers
-      uses: actions/cache@v3
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-buildx-
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.16.0
+          cache: yarn
 
-    - name: Build Docker Image
-      uses: docker/build-push-action@v4
-      env:
-        BUILDER_UID: ${{ runner.uid }}
-      with:
-        context: .
-        file: Dockerfile.build
-        load: true
-        build-args: BUILDER_UID=${{ env.BUILDER_UID }}
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache
-        tags: nrmn-build:latest
+      - name: Install Yarn
+        run: npm install -g yarn@1.22.4
+        if: ${{ env.ACT }}
 
-    - name: Run Pipeline Steps
-      run: |
-        docker run --rm \
-          -v ${{ github.workspace }}:/workspace \
-          -v ${{ runner.home }}/.m2:/home/builder/.m2 \
-          -v ${{ runner.home }}/.cache:/home/builder/.cachejournal/ \
-          -v ${{ runner.home }}/bin:${HOME}/bin \
-          -w /workspace \
-          --entrypoint /bin/bash \
-          nrmn-build:latest -c '
-          git reset --hard
-          git clean --force --force -xd --exclude=web/node_modules
+      - name: Install Maven
+        if: ${{ env.ACT }}
+        run: |
+          set -ex \
+          && mkdir -p $MAVEN_HOME \
+          && curl --location --silent --output /var/tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz https://archive.apache.org/dist/maven/maven-3//$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
+          && tar xzf /var/tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz -C $MAVEN_HOME --strip-components=1 \
+          && rm /var/tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz \
+          && update-alternatives --install /usr/bin/mvn mvn /opt/maven/bin/mvn 10000
+        env:
+          MAVEN_VERSION: 3.8.5
+          MAVEN_HOME: /opt/maven
+
+      - name: Run Pipeline Steps
+        run: |
           yarn --cwd web --frozen-lockfile
           mvn --batch-mode --threads 2 --define maven.test.skip=true clean package
-        '
 
-    - name: Archive Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: war-file
-        path: app/target/*.war
+      - name: Archive Artifact
+        uses: actions/upload-artifact@v3
+        if: ${{ !env.ACT }}
+        with:
+          name: war-file
+          path: app/target/*.war
