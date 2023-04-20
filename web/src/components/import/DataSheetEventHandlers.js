@@ -333,7 +333,7 @@ class DataSheetEventHandlers {
       e.api.stopEditing(true);
 
       // After stop edit, the grid lost focus and hence left right key not work
-      // we need to refocus 
+      // we need to refocus
       e.api.ensureIndexVisible(lastRowIndex);
       e.api.setFocusedCell(lastRowIndex, lastColumnIndex);
     }
