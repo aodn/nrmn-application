@@ -377,7 +377,6 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             rowHeight={20}
             rowSelection="multiple"
             sideBar={sideBar}
-            tabToNextCell={eh.onTabToNextCell}
             undoRedoCellEditing={false}
             defaultColDef={{
               lockVisible: true,
