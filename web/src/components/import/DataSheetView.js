@@ -11,7 +11,7 @@ import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import {PropTypes} from 'prop-types';
 import {useParams, NavLink} from 'react-router-dom';
 import {getDataJob, submitIngest, updateRows, validateJob} from '../../api/api';
-import {extendedMeasurements, measurements} from '../../common/constants';
+import { AppConstants, extendedMeasurements, measurements } from '../../common/constants';
 import LoadingOverlay from '../overlays/LoadingOverlay';
 import AlertDialog from '../ui/AlertDialog';
 import FindReplacePanel from './panel/FindReplacePanel';
@@ -66,6 +66,23 @@ const DataSheetView = ({onIngest, isAdmin}) => {
   const [undoSize, setUndoSize] = useState(0);
   const [state, setState] = useState(IngestState.Loading);
   const [sideBar, setSideBar] = useState(defaultSideBar);
+
+  const defaultColDef = {
+    lockVisible: true,
+    cellStyle: eh.chooseCellStyle,
+    editable: true,
+    enableCellChangeFlash: true,
+    filter: true,
+    filterParams: {debounceMs: AppConstants.Filter.WAIT_TIME_ON_FILTER_APPLY },
+    floatingFilter: true,
+    minWidth: AppConstants.AG_GRID.dataColWidth,
+    resizable: true,
+    sortable: true,
+    suppressKeyboardEvent: eh.overrideKeyboardEvents,
+    suppressMenu: true,
+    tooltipValueGetter: eh.toolTipValueGetter,
+    valueParser: ({newValue}) => (newValue ? newValue.trim() : '')
+  };
 
   const reload = useCallback((api, id, completion, isAdmin) => {
     const context = api.gridOptionsWrapper.gridOptions.context;
@@ -357,6 +374,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             cellFadeDelay={100}
             cellFlashDelay={100}
             context={context}
+            defaultColDef={defaultColDef}
             enableBrowserTooltips
             enableRangeHandle
             enableRangeSelection
@@ -378,21 +396,6 @@ const DataSheetView = ({onIngest, isAdmin}) => {
             rowSelection="multiple"
             sideBar={sideBar}
             undoRedoCellEditing={false}
-            defaultColDef={{
-              lockVisible: true,
-              cellStyle: eh.chooseCellStyle,
-              editable: true,
-              enableCellChangeFlash: true,
-              filter: true,
-              floatingFilter: true,
-              minWidth: 70,
-              resizable: true,
-              sortable: true,
-              suppressKeyboardEvent: eh.overrideKeyboardEvents,
-              suppressMenu: true,
-              tooltipValueGetter: eh.toolTipValueGetter,
-              valueParser: ({newValue}) => (newValue ? newValue.trim() : '')
-            }}
             components={{
               validationPanel: ValidationPanel,
               findReplacePanel: FindReplacePanel,
@@ -412,32 +415,32 @@ const DataSheetView = ({onIngest, isAdmin}) => {
               filter={false}
               sortable={false}
             />
-            <AgGridColumn minWidth={120} field="diver" headerName="Diver" />
-            <AgGridColumn minWidth={120} field="buddy" headerName="Buddy" />
-            <AgGridColumn minWidth={120} field="siteCode" headerName="Site No." rowGroup={false} enableRowGroup />
+            <AgGridColumn field="diver" headerName="Diver" />
+            <AgGridColumn field="buddy" headerName="Buddy" />
+            <AgGridColumn field="siteCode" headerName="Site No." rowGroup={false} enableRowGroup />
             <AgGridColumn minWidth={160} field="siteName" headerName="Site Name" />
-            <AgGridColumn minWidth={120} field="latitude" headerName="Latitude" />
-            <AgGridColumn minWidth={120} field="longitude" headerName="Longitude" />
-            <AgGridColumn minWidth={120} field="date" headerName="Date" rowGroup={false} enableRowGroup comparator={eh.dateComparator} />
-            <AgGridColumn minWidth={120} field="vis" headerName="Vis" />
-            <AgGridColumn minWidth={120} field="direction" headerName="Direction" />
-            <AgGridColumn minWidth={120} field="time" headerName="Time" />
-            <AgGridColumn minWidth={120} field="P-Qs" headerName="P-Qs" />
-            <AgGridColumn minWidth={120} field="depth" headerName="Depth" rowGroup={false} enableRowGroup />
-            <AgGridColumn minWidth={120} field="method" headerName="Method" rowGroup={false} enableRowGroup />
-            <AgGridColumn minWidth={120} field="block" headerName="Block" rowGroup={false} enableRowGroup />
-            <AgGridColumn minWidth={120} field="code" headerName="Code" />
+            <AgGridColumn field="latitude" headerName="Latitude" />
+            <AgGridColumn field="longitude" headerName="Longitude" />
+            <AgGridColumn field="date" headerName="Date" rowGroup={false} enableRowGroup comparator={eh.dateComparator} />
+            <AgGridColumn field="vis" headerName="Vis" />
+            <AgGridColumn field="direction" headerName="Direction" />
+            <AgGridColumn field="time" headerName="Time" />
+            <AgGridColumn field="P-Qs" headerName="P-Qs" />
+            <AgGridColumn field="depth" headerName="Depth" rowGroup={false} enableRowGroup />
+            <AgGridColumn field="method" headerName="Method" rowGroup={false} enableRowGroup />
+            <AgGridColumn field="block" headerName="Block" rowGroup={false} enableRowGroup />
+            <AgGridColumn field="code" headerName="Code" />
             <AgGridColumn field="species" headerName="Species" />
             <AgGridColumn field="commonName" headerName="Common Name" />
-            <AgGridColumn minWidth={120} field="total" headerName="Total" aggFunc="count" />
-            <AgGridColumn minWidth={120} field="inverts" headerName="Inverts" />
+            <AgGridColumn field="total" headerName="Total" aggFunc="count" />
+            <AgGridColumn field="inverts" headerName="Inverts" />
             {measurementColumns.map((m) => (
               <AgGridColumn
                 field={m.field}
                 headerName={m.fishSize}
                 key={m.field}
                 editable={editable}
-                width={35}
+                width={AppConstants.AG_GRID.measureColWidth}
                 headerComponentParams={{
                   template: `<div style="width: 48px; float: left; text-align:center"><div style="color: #c4d79b; border-bottom: 1px solid rgba(0, 0, 0, 0.12)">${m.fishSize}</div><div style="color: #da9694">${m.invertSize}</div></div>`
                 }}

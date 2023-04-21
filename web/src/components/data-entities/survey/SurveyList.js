@@ -12,6 +12,7 @@ import {makeStyles} from '@mui/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {createFilterOptions} from '@mui/material/Autocomplete';
 import ResetIcon from '@mui/icons-material/LayersClear';
+import { AppConstants } from '../../../common/constants';
 
 // We want to keep the value between pages, so we only need to load it once.
 const cachedOptions = [];
@@ -50,6 +51,18 @@ const SurveyList = () => {
   const [expanded, setExpanded] = React.useState(false);
   const [isFiltered, setIsFiltered] = useState(false);
   const optionLoading = open && options.length === 0;
+
+  const defaultColDef = {
+    lockVisible: true,
+    minWidth: AppConstants.AG_GRID.dataColWidth,
+    sortable: true,
+    resizable: true,
+    filter: 'agTextColumnFilter',
+    suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true},
+    filterParams: {debounceMs: AppConstants.Filter.WAIT_TIME_ON_FILTER_APPLY },
+    floatingFilter: true
+  };
 
   useEffect(() => {
     document.title = 'Surveys';
@@ -312,20 +325,11 @@ const SurveyList = () => {
               setIsFiltered(Object.getOwnPropertyNames(filterModel).length > 0);
             }}
             suppressCellFocus={true}
-            defaultColDef={{
-              lockVisible: true,
-              sortable: true,
-              resizable: true,
-              filter: 'agTextColumnFilter',
-              suppressMenu: true,
-              floatingFilterComponentParams: {suppressFilterButton:true},
-              filterParams: {debounceMs: 2000 },
-              floatingFilter: true
-            }}
+            defaultColDef={defaultColDef}
           >
             {auth.features?.includes('corrections') && (
               <AgGridColumn
-                width={10}
+                minWidth={10}
                 field="surveyId"
                 headerName=""
                 suppressMovable={true}
@@ -346,7 +350,7 @@ const SurveyList = () => {
               />
             )}
             <AgGridColumn
-              width={40}
+              minWidth={40}
               field="surveyId"
               headerName=""
               suppressMovable={true}
@@ -365,7 +369,6 @@ const SurveyList = () => {
               }}
             />
             <AgGridColumn
-              width={110}
               field="surveyId"
               headerName="Survey ID"
               colId="survey.surveyId"
@@ -380,16 +383,16 @@ const SurveyList = () => {
                 }
               }}
             />
-            <AgGridColumn width={100} field="surveyDate" colId="survey.surveyDate" />
-            <AgGridColumn width={100} field="latitude" colId="survey.latitude" />
-            <AgGridColumn width={100} field="longitude" colId="survey.longitude" />
-            <AgGridColumn width={100} headerName="Has PQs" field="pqCatalogued" colId="survey.pqCatalogued" />
-            <AgGridColumn width={100} field="siteCode" colId="survey.siteCode" />
+            <AgGridColumn field="surveyDate" colId="survey.surveyDate" />
+            <AgGridColumn field="latitude" colId="survey.latitude" />
+            <AgGridColumn field="longitude" colId="survey.longitude" />
+            <AgGridColumn headerName="Has PQs" field="pqCatalogued" colId="survey.pqCatalogued" />
+            <AgGridColumn field="siteCode" colId="survey.siteCode" />
             <AgGridColumn flex={1} field="siteName" colId="survey.siteName" />
             <AgGridColumn width={50} field="depth" colId="survey.depth" />
             <AgGridColumn width={250} field="diverName" colId="survey.diverName" />
             <AgGridColumn width={50} field="method" colId="survey.method" />
-            <AgGridColumn width={100} field="programName" headerName="Program" colId="survey.programName" />
+            <AgGridColumn field="programName" headerName="Program" colId="survey.programName" />
             <AgGridColumn flex={1} field="country" colId="survey.country" />
             <AgGridColumn flex={1} field="state" colId="survey.state" />
             <AgGridColumn flex={1} field="ecoregion" colId="survey.ecoregion" />
