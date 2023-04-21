@@ -459,6 +459,7 @@ const SurveyCorrect = () => {
               hide={header.hide}
               sort={header.sort}
               cellEditor="agTextCellEditor"
+              minWidth={120}
               editable={header.editable ?? true}
             />
           ))}

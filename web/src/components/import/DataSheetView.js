@@ -412,25 +412,25 @@ const DataSheetView = ({onIngest, isAdmin}) => {
               filter={false}
               sortable={false}
             />
-            <AgGridColumn field="diver" headerName="Diver" />
-            <AgGridColumn field="buddy" headerName="Buddy" />
-            <AgGridColumn field="siteCode" headerName="Site No." rowGroup={false} enableRowGroup />
-            <AgGridColumn field="siteName" headerName="Site Name" minWidth={160} />
-            <AgGridColumn field="latitude" headerName="Latitude" />
-            <AgGridColumn field="longitude" headerName="Longitude" />
-            <AgGridColumn field="date" headerName="Date" rowGroup={false} enableRowGroup comparator={eh.dateComparator} />
-            <AgGridColumn field="vis" headerName="Vis" />
-            <AgGridColumn field="direction" headerName="Direction" />
-            <AgGridColumn field="time" headerName="Time" />
-            <AgGridColumn field="P-Qs" headerName="P-Qs" />
-            <AgGridColumn field="depth" headerName="Depth" rowGroup={false} enableRowGroup />
-            <AgGridColumn field="method" headerName="Method" rowGroup={false} enableRowGroup />
-            <AgGridColumn field="block" headerName="Block" rowGroup={false} enableRowGroup />
-            <AgGridColumn field="code" headerName="Code" />
+            <AgGridColumn minWidth={120} field="diver" headerName="Diver" />
+            <AgGridColumn minWidth={120} field="buddy" headerName="Buddy" />
+            <AgGridColumn minWidth={120} field="siteCode" headerName="Site No." rowGroup={false} enableRowGroup />
+            <AgGridColumn minWidth={160} field="siteName" headerName="Site Name" />
+            <AgGridColumn minWidth={120} field="latitude" headerName="Latitude" />
+            <AgGridColumn minWidth={120} field="longitude" headerName="Longitude" />
+            <AgGridColumn minWidth={120} field="date" headerName="Date" rowGroup={false} enableRowGroup comparator={eh.dateComparator} />
+            <AgGridColumn minWidth={120} field="vis" headerName="Vis" />
+            <AgGridColumn minWidth={120} field="direction" headerName="Direction" />
+            <AgGridColumn minWidth={120} field="time" headerName="Time" />
+            <AgGridColumn minWidth={120} field="P-Qs" headerName="P-Qs" />
+            <AgGridColumn minWidth={120} field="depth" headerName="Depth" rowGroup={false} enableRowGroup />
+            <AgGridColumn minWidth={120} field="method" headerName="Method" rowGroup={false} enableRowGroup />
+            <AgGridColumn minWidth={120} field="block" headerName="Block" rowGroup={false} enableRowGroup />
+            <AgGridColumn minWidth={120} field="code" headerName="Code" />
             <AgGridColumn field="species" headerName="Species" />
             <AgGridColumn field="commonName" headerName="Common Name" />
-            <AgGridColumn field="total" headerName="Total" aggFunc="count" />
-            <AgGridColumn field="inverts" headerName="Inverts" />
+            <AgGridColumn minWidth={120} field="total" headerName="Total" aggFunc="count" />
+            <AgGridColumn minWidth={120} field="inverts" headerName="Inverts" />
             {measurementColumns.map((m) => (
               <AgGridColumn
                 field={m.field}
