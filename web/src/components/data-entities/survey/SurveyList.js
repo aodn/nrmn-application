@@ -215,33 +215,37 @@ const SurveyList = () => {
             <Box flexGrow={1}>
               <Typography variant="h4">Surveys</Typography>
             </Box>
-            <Box>
-              <Box m={1} ml={0} minWidth={150}>
-                <IconButton
-                  className={clsx(classes.expand, {
-                    [classes.expandOpen]: expanded
-                  })}
-                  onClick={() => setExpanded((v) => !v)}
-                  aria-expanded={expanded}
-                  aria-label="Show more"
-                >
-                  <ExpandMoreIcon />
-                </IconButton>
-              </Box>
-              <Box m={1} ml={0} minWidth={150}>
-                <Button variant="outlined" startIcon={<ResetIcon />} disabled={!isFiltered} onClick={() => setIsFiltered(false)}>
-                  Reset Filter
-                </Button>
-              </Box>
-              <Box m={1} ml={0} minWidth={150}>
-                <Button
-                  variant="outlined"
-                  onClick={() => setRedirect(`${selected.join(',')}/correct`)}
-                  disabled={!selected || selected.length < 1 || selected.length > 25}
-                >
-                  Correct Survey Data
-                </Button>
-              </Box>
+            <Box m={1} ml={0}>
+              <IconButton
+                className={clsx(classes.expand, {
+                  [classes.expandOpen]: expanded
+                })}
+                onClick={() => setExpanded((v) => !v)}
+                aria-expanded={expanded}
+                aria-label="Show more"
+              >
+                <ExpandMoreIcon />
+              </IconButton>
+            </Box>
+            <Box m={1} ml={0}>
+              <Button variant="outlined"
+                      startIcon={<ResetIcon />}
+                      disabled={!isFiltered}
+                      onClick={() => {
+                        gridRef.current.api.setFilterModel(null);
+                        setIsFiltered(false);
+                      }}>
+                Reset Filter
+              </Button>
+            </Box>
+            <Box m={1} ml={0}>
+              <Button
+                variant="outlined"
+                onClick={() => setRedirect(`${selected.join(',')}/correct`)}
+                disabled={!selected || selected.length < 1 || selected.length > 25}
+              >
+                Correct Survey Data
+              </Button>
             </Box>
           </Box>
           <Box display="flex" flexDirection="row" p={1} pb={1}>
