@@ -145,7 +145,7 @@ const SurveyCorrect = () => {
       filter: true,
       floatingFilter: true,
       lockVisible: true,
-      minWidth: 40,
+      minWidth: 120,
       resizable: true,
       sortable: true,
       suppressKeyboardEvent: eh.overrideKeyboardEvents,
@@ -459,7 +459,6 @@ const SurveyCorrect = () => {
               hide={header.hide}
               sort={header.sort}
               cellEditor="agTextCellEditor"
-              minWidth={120}
               editable={header.editable ?? true}
             />
           ))}
