@@ -11,6 +11,7 @@ import clsx from 'clsx';
 import {makeStyles} from '@mui/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {createFilterOptions} from '@mui/material/Autocomplete';
+import ResetIcon from '@mui/icons-material/LayersClear';
 
 // We want to keep the value between pages, so we only need to load it once.
 const cachedOptions = [];
@@ -47,6 +48,7 @@ const SurveyList = () => {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
   const [expanded, setExpanded] = React.useState(false);
+  const [isFiltered, setIsFiltered] = useState(false);
   const optionLoading = open && options.length === 0;
 
   useEffect(() => {
@@ -213,7 +215,7 @@ const SurveyList = () => {
             <Box flexGrow={1}>
               <Typography variant="h4">Surveys</Typography>
             </Box>
-            <Box>
+            <Box m={1} ml={0}>
               <IconButton
                 className={clsx(classes.expand, {
                   [classes.expandOpen]: expanded
@@ -224,6 +226,19 @@ const SurveyList = () => {
               >
                 <ExpandMoreIcon />
               </IconButton>
+            </Box>
+            <Box m={1} ml={0}>
+              <Button variant="outlined"
+                      startIcon={<ResetIcon />}
+                      disabled={!isFiltered}
+                      onClick={() => {
+                        gridRef.current.api.setFilterModel(null);
+                        setIsFiltered(false);
+                      }}>
+                Reset Filter
+              </Button>
+            </Box>
+            <Box m={1} ml={0}>
               <Button
                 variant="outlined"
                 onClick={() => setRedirect(`${selected.join(',')}/correct`)}
@@ -292,6 +307,9 @@ const SurveyList = () => {
             }}
             onFilterChanged={(e) => {
               stateFilterHandler.stateFilterEventHandler(gridRef, e);
+
+              const filterModel = e.api.getFilterModel();
+              setIsFiltered(Object.getOwnPropertyNames(filterModel).length > 0);
             }}
             suppressCellFocus={true}
             defaultColDef={{
