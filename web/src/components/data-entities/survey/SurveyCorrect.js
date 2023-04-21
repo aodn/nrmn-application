@@ -145,7 +145,7 @@ const SurveyCorrect = () => {
       filter: true,
       floatingFilter: true,
       lockVisible: true,
-      minWidth: 40,
+      minWidth: 120,
       resizable: true,
       sortable: true,
       suppressKeyboardEvent: eh.overrideKeyboardEvents,
