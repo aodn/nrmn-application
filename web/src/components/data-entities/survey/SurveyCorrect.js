@@ -17,6 +17,7 @@ import FindReplacePanel from '../../import/panel/FindReplacePanel';
 import SurveyMeasurementHeader from './SurveyMeasurementHeader';
 import eh from '../../../components/import/DataSheetEventHandlers';
 import SurveyDiff from './SurveyDiff';
+import { AppConstants } from '../../../common/constants';
 
 const toolTipValueGetter = ({context, data, colDef}) => {
   if (!context.cellValidations) return;
@@ -143,9 +144,10 @@ const SurveyCorrect = () => {
       editable: true,
       enableCellChangeFlash: true,
       filter: true,
+      filterParams: {debounceMs: AppConstants.Filter.WAIT_TIME_ON_FILTER_APPLY },
       floatingFilter: true,
       lockVisible: true,
-      minWidth: 40,
+      minWidth: AppConstants.AG_GRID.dataColWidth,
       resizable: true,
       sortable: true,
       suppressKeyboardEvent: eh.overrideKeyboardEvents,
@@ -459,22 +461,19 @@ const SurveyCorrect = () => {
               hide={header.hide}
               sort={header.sort}
               cellEditor="agTextCellEditor"
-              minWidth={120}
               editable={header.editable ?? true}
             />
           ))}
-          {allMeasurements.map((m, idx) => {
-            return (
-              <AgGridColumn
-                editable
-                field={`${idx + 1}`}
-                headerComponent={SurveyMeasurementHeader}
-                headerName={m.fishSize}
-                key={idx}
-                width={35}
-              />
-            );
-          })}
+          {allMeasurements.map((m, idx) => (
+            <AgGridColumn
+              editable
+              field={`${idx + 1}`}
+              headerComponent={SurveyMeasurementHeader}
+              headerName={m.fishSize}
+              key={idx}
+              width={AppConstants.AG_GRID.measureColWidth}
+            />
+          ))}
           <AgGridColumn field="isInvertSizing" headerName="Use InvertSizing" cellEditor="agTextCellEditor" />
         </AgGridReact>
       </Box>

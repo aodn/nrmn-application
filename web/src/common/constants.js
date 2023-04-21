@@ -213,4 +213,14 @@ export const extendedMeasurements = Object.freeze([
   }
 ]);
 
+export const AppConstants = Object.freeze({
+  Filter: {
+    WAIT_TIME_ON_FILTER_APPLY: 3000
+  },
+  AG_GRID: {
+    measureColWidth: 35,
+    dataColWidth: 120
+  }
+});
+
 export const allMeasurements = [...measurements, ...extendedMeasurements];
