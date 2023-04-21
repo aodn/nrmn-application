@@ -323,53 +323,20 @@ class DataSheetEventHandlers {
   }
 
   onCellKeyDown(e) {
-    const editingCells = e.api.getEditingCells();
-    if (editingCells.length === 1) {
-      const context = e.api.gridOptionsWrapper.gridOptions.context;
-      context.navigationKey = e.event.key;
-      if (['ArrowLeft', 'ArrowUp'].includes(e.event.key)) {
-        e.event.preventDefault();
-        e.api.stopEditing();
-        e.api.tabToPreviousCell();
-      }
-      if (['ArrowRight', 'ArrowDown'].includes(e.event.key)) {
-        e.event.preventDefault();
-        e.api.stopEditing();
-        e.api.tabToNextCell();
-      }
-      context.navigationKey = '';
+    if (e.event.key === 'Tab') {
+      // Default behavior for tab is move to next cell and if the previous cell
+      // in edit mode, then the edit is carry over to next cell, so we override
+      // and stop it in edit mode
+      const lastRowIndex = e.api.getFocusedCell().rowIndex;
+      const lastColumnIndex = e.api.getFocusedCell().column;
+
+      e.api.stopEditing(true);
+
+      // After stop edit, the grid lost focus and hence left right key not work
+      // we need to refocus
+      e.api.ensureIndexVisible(lastRowIndex);
+      e.api.setFocusedCell(lastRowIndex, lastColumnIndex);
     }
-  }
-
-  onTabToNextCell(e) {
-    let context = e.api.gridOptionsWrapper.gridOptions.context;
-    let result;
-
-    if (['ArrowUp', 'ArrowDown'].includes(context.navigationKey) && e.previousCellPosition) {
-      let previousCell = e.previousCellPosition,
-        lastRowIndex = previousCell.rowIndex,
-        nextRowIndex = e.backwards ? lastRowIndex - 1 : lastRowIndex + 1,
-        renderedRowCount = e.api.getModel().getRowCount();
-
-      if (nextRowIndex < 0) nextRowIndex = -1;
-      if (nextRowIndex >= renderedRowCount) nextRowIndex = renderedRowCount - 1;
-
-      result = {
-        rowIndex: nextRowIndex,
-        column: previousCell.column,
-        floating: previousCell.floating
-      };
-    }
-
-    if (['ArrowLeft', 'ArrowRight'].includes(context.navigationKey) && e.nextCellPosition) {
-      result = {
-        rowIndex: e.nextCellPosition.rowIndex,
-        column: e.nextCellPosition.column,
-        floating: e.nextCellPosition.floating
-      };
-    }
-
-    return result;
   }
 
   getContextMenuItems(e, eh) {

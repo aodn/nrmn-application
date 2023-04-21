@@ -424,6 +424,7 @@ const SurveyCorrect = () => {
           getRowId={(r) => r.data.id}
           gridOptions={{context}}
           loadingOverlayComponent="loadingOverlay"
+          onCellKeyDown={eh.onCellKeyDown}
           onCellEditingStopped={onCellEditingStopped}
           onCellValueChanged={onCellValueChanged}
           onFilterChanged={onFilterChanged}
@@ -437,7 +438,6 @@ const SurveyCorrect = () => {
           rowHeight={20}
           rowSelection="multiple"
           sideBar={sideBar}
-          tabToNextCell={eh.onTabToNextCell}
           undoRedoCellEditing={false}
         >
           <AgGridColumn
