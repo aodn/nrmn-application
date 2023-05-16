@@ -183,13 +183,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
     context.useOverlay = 'Submitting';
     setState(IngestState.Loading);
     setSideBar(defaultSideBar);
-    submitIngest(id, (res) => {
-      if (res.data === 'locked') {
-        setState(IngestState.Locked);
-        return;
-      }
-      onIngest(res);
-    });
+    submitIngest(id, () => setState(IngestState.Locked), (res) => onIngest(res));
   };
 
   const handleSaveAndValidate = () => {

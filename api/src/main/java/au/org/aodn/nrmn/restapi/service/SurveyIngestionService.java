@@ -15,6 +15,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -82,6 +83,10 @@ public class SurveyIngestionService {
     public Survey getSurvey(Program program, OptionalDouble visAvg, StagedRowFormatted stagedRow) {
 
         Site site =  program.getProgramId() == PROGRAM_ID_NONE ? siteRepo.getReferenceById(SITE_ID_NONE) : stagedRow.getSite();
+
+        if(site == null) {
+            throw new EntityNotFoundException("Site value not found given program id " + program.getProgramId());
+        }
 
         if (!site.getIsActive()) {
             site.setIsActive(true);

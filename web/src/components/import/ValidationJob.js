@@ -20,7 +20,7 @@ const ValidationJob = () => {
           {ingestState.data && (
             <Box mx={2}>
               <Alert severity="error" variant="outlined">
-                <p>{ingestState.data}</p>
+                <p>{ingestState.data.message}</p>
               </Alert>
             </Box>
           )}

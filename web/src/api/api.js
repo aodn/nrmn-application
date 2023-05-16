@@ -8,6 +8,8 @@ if (typeof window.setApplicationError === 'undefined') {
   window.setApplicationError = () => {};
 }
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 axiosInstance.interceptors.request.use(
   (config) => {
     window.setApplicationError(null);
@@ -227,8 +229,9 @@ export const submitJobFile = (params, onProgress) => {
     .catch((err) => ({err}));
 };
 
-export const submitIngest = (jobId, onResult) => {
-  return axiosInstance
+export const submitIngest = async (jobId, onLocked, onResult) => {
+
+  const postResponse = await axiosInstance
     .post(
       'ingestion/ingest/' + jobId,
       {},
@@ -236,7 +239,24 @@ export const submitIngest = (jobId, onResult) => {
         validateStatus: () => true
       }
     )
-    .then((res) => onResult(res));
+    .then(res => res.data)
+    .catch(res => res.data);
+
+  if (postResponse.jobStatus === 'FAILED' && postResponse.reason === 'locked') {
+    onLocked(postResponse);
+    return;
+  };
+
+  let notDone = true;
+  let getResponse;
+
+  for(let i = 0; i < 10 && notDone; i++) {
+    getResponse = await axiosInstance.get('ingestion/ingest/' + postResponse.jobLogId, { validateStatus: () => true }).then(res => res.data);
+    notDone = getResponse.jobStatus === 'INGESTING';
+    if(notDone) await sleep(10000);
+  }
+
+  onResult(getResponse);
 };
 
 export const search = (params) => {
