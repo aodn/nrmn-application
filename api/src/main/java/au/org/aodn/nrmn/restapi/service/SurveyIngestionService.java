@@ -85,7 +85,8 @@ public class SurveyIngestionService {
         Site site =  program.getProgramId() == PROGRAM_ID_NONE ? siteRepo.getReferenceById(SITE_ID_NONE) : stagedRow.getSite();
 
         if(site == null) {
-            throw new EntityNotFoundException("Site value not found given program id " + program.getProgramId());
+            throw new EntityNotFoundException(
+                    String.format("Site value is empty given program name : %s for row id : ", program.getProgramName(), stagedRow.getId()));
         }
 
         if (!site.getIsActive()) {

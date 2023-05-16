@@ -256,7 +256,10 @@ export const submitIngest = async (jobId, onLocked, onResult) => {
     if(notDone) await sleep(10000);
   }
 
-  onResult(getResponse);
+  onResult({
+      status: getResponse.jobStatus === 'INGESTED' ? 200 : 400,
+      data: getResponse
+    });
 };
 
 export const search = (params) => {

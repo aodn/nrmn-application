@@ -154,6 +154,7 @@ public class IngestionController {
         }
         else {
             result.put("jobStatus", optionalJob.get().getEventType());
+            result.put("message", optionalJob.get().getDetails());
         }
         return ResponseEntity.ok(result);
     }
