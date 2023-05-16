@@ -250,7 +250,7 @@ export const submitIngest = async (jobId, onLocked, onResult) => {
   let notDone = true;
   let getResponse;
 
-  for(let i = 0; i < 10 && notDone; i++) {
+  while(notDone) {
     getResponse = await axiosInstance.get('ingestion/ingest/' + postResponse.jobLogId, { validateStatus: () => true }).then(res => res.data);
     notDone = getResponse.jobStatus === 'INGESTING';
     if(notDone) await sleep(10000);
