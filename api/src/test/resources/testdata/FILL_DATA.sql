@@ -106,7 +106,7 @@ INSERT INTO nrmn.staged_job (id,
                              sec_user_id,
                              is_extended_size)
 VALUES (109, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'jobid-rls', 'INGEST', 'STAGED', 55, 123456, false),
-       (110, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'jobid-rls', 'INGEST', 'STAGED', 55, 123456, false);
+       (110, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'jobid-als', 'INGEST', 'STAGED', 55, 123456, false);
 
 INSERT INTO nrmn.staged_job (id,
                              created,
