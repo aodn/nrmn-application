@@ -140,7 +140,12 @@ INSERT INTO nrmn.aphia_rel_type_ref (aphia_rel_type_id, aphia_rel_type_name)
 VALUES (1, 'is');
 
 INSERT INTO nrmn.obs_item_type_ref (obs_item_type_id, obs_item_type_name, is_active)
-VALUES (1, 'Species', true), (5, 'Debris', true);
+VALUES (1, 'Species', true),
+       (2, 'Undescribed Species', true),
+       (3, 'Algae', true),
+       (4, 'Substrate', true),
+       (5, 'Debris', true),
+       (6, 'Absence', true);
 
 INSERT INTO nrmn.observable_item_ref (observable_item_id, obs_item_type_id, aphia_id, aphia_rel_type_id,
                                       observable_item_name, letter_code)

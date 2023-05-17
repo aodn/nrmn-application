@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import au.org.aodn.nrmn.restapi.data.model.StagedJobLog;
@@ -23,12 +26,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @RestController
 @RequestMapping(path = "/api/v1/ingestion")
@@ -64,7 +66,22 @@ public class IngestionController {
     @Autowired
     protected GlobalLockService globalLockService;
 
-    protected ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    protected  TransactionTemplate tx;
+
+    protected ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
+    @PostConstruct
+    public void initialization() {
+        tx = new TransactionTemplate(transactionManager);
+    }
+
+    @PreDestroy
+    public void closeDown() {
+        executorService.shutdown();
+    }
 
     @PostMapping(path = "ingest/{job_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
@@ -105,20 +122,24 @@ public class IngestionController {
                         .eventType(StagedJobEventType.INGESTING)
                         .build());
 
-        // Some upload is very large, use a separate to avoid timeout on web app
-        executorService.schedule(() -> {
-
+        // Some upload is very large, use a separate to avoid timeout on web app.
+        logger.info("Ingest job id {} with transaction", job.getId());
+        executorService.execute(() -> {
             try {
+                // Noted : use transaction template on executor task is needed to avoid no session error on
+                // Hiberate lazy load object happens after the main transaction completed inside call to
+                // ingestTransaction
+                tx.executeWithoutResult(s -> {
+                    logger.info("Execute ingest job id {} with transaction", job.getId());
+                    var rows = rowRepository.findRowsByJobId(job.getId());
+                    var species = speciesFormatting.getSpeciesForRows(rows);
+                    var validatedRows = speciesFormatting.formatRowsWithSpecies(rows, species);
 
-                logger.info("Ingest job id {} with transaction", job.getId());
-                var rows = rowRepository.findRowsByJobId(job.getId());
-                var species = speciesFormatting.getSpeciesForRows(rows);
-                var validatedRows = speciesFormatting.formatRowsWithSpecies(rows, species);
+                    surveyIngestionService.ingestTransaction(job, validatedRows);
 
-                surveyIngestionService.ingestTransaction(job, validatedRows);
-
-                logger.info("Refresh materialized view after job id {} ingested", job.getId());
-                materializedViewService.refreshAllAsync();
+                    logger.info("Refresh materialized view after job id {} ingested", job.getId());
+                    materializedViewService.refreshAllAsync();
+                });
             }
             catch (Exception e) {
 
@@ -132,7 +153,7 @@ public class IngestionController {
             finally {
                 globalLockService.releaseLock();
             }
-        }, scheduleInitDelay, TimeUnit.MILLISECONDS);
+        });
 
         result.put("jobStatus", stagedJobLog.getEventType());
         result.put("jobLogId", stagedJobLog.getId());
