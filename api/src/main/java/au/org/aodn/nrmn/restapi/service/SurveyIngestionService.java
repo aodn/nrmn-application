@@ -86,7 +86,7 @@ public class SurveyIngestionService {
 
         if(site == null) {
             throw new EntityNotFoundException(
-                    String.format("Site value is empty given program name : %s for row : %s", program.getProgramName(), stagedRow.getRef()));
+                    String.format("Site value seems invalid for program name : %s in row : %s", program.getProgramName(), stagedRow.getRef()));
         }
 
         if (!site.getIsActive()) {

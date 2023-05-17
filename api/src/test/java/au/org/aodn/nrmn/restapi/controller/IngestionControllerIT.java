@@ -60,6 +60,10 @@ class IngestionControllerIT {
     @Autowired
     ObservationRepository observationRepository;
 
+    /**
+     * Post the job and then use api to check if the job changed from status INGESTING to INGESTED
+     * @throws Exception
+     */
     @Test
     @WithUserDetails("test@example.com")
     public void ingestWorksForValidatedJob() throws Exception {
@@ -84,6 +88,7 @@ class IngestionControllerIT {
         final String id = response.getBody().get("jobLogId").toString();
         final CountDownLatch latch = new CountDownLatch(1);
 
+        // Separate thread to avoid blocking the injection
         executorService.execute(() -> {
             try {
                 boolean isIngested = false;
@@ -100,7 +105,7 @@ class IngestionControllerIT {
                         break;
                     }
                     else {
-                        latch.await(1, TimeUnit.SECONDS);
+                        latch.await(2, TimeUnit.SECONDS);
                     }
                 }
                 assertTrue("Job status changed to INGESTED", isIngested);
@@ -116,23 +121,26 @@ class IngestionControllerIT {
         latch.await();
         assertEquals(initialObservationCount + 1, observationRepository.count());
     }
-
+    /**
+     * Job ingest fail if you have not validated the job before ingest.
+     * @throws Exception
+     */
     @Test
     @WithUserDetails("test@example.com")
     public void ingestFailsForUnvalidatedJob() throws Exception {
         // Bad request will result in text instead of json
-        RequestWrapper<String, String> reqBuilder = new RequestWrapper<>();
+        RequestWrapper<String, Map> reqBuilder = new RequestWrapper<>();
 
         Authentication auth = getContext().getAuthentication();
         String token = jwtProvider.generateToken(auth);
 
         long initialObservationCount = observationRepository.count();
 
-        ResponseEntity<String> response = reqBuilder
+        ResponseEntity<Map> response = reqBuilder
                 .withUri(_createUrl("/api/v1/ingestion/ingest/120"))
                 .withMethod(HttpMethod.POST)
                 .withToken(token)
-                .withResponseType(String.class)
+                .withResponseType(Map.class)
                 .build(testRestTemplate);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -141,6 +149,92 @@ class IngestionControllerIT {
         assertEquals(StatusJobType.PENDING, job.getStatus());
 
         assertEquals(initialObservationCount, observationRepository.count());
+    }
+    /**
+     * Job ingest fail if job id not found
+     * @throws Exception
+     */
+    @Test
+    @WithUserDetails("test@example.com")
+    public void ingestFailsForUnknownJob() throws Exception {
+        // Bad request will result in text instead of json
+        RequestWrapper<String, Map> reqBuilder = new RequestWrapper<>();
+
+        Authentication auth = getContext().getAuthentication();
+        String token = jwtProvider.generateToken(auth);
+
+        long initialObservationCount = observationRepository.count();
+
+        ResponseEntity<Map> response = reqBuilder
+                .withUri(_createUrl("/api/v1/ingestion/ingest/111111111"))
+                .withMethod(HttpMethod.POST)
+                .withToken(token)
+                .withResponseType(Map.class)
+                .build(testRestTemplate);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(response.getBody().get("jobStatus"), StatusJobType.FAILED.toString());
+        assertEquals(response.getBody().get("message"), "Job with given id does not exist. jobId: 111111111");
+    }
+    /**
+     * Job ingest fail due to invalid job
+     * @throws Exception
+     */
+    @Test
+    @WithUserDetails("test@example.com")
+    public void ingestFailsForInvalidJob() throws Exception {
+        // Bad request will result in text instead of json
+        RequestWrapper<String, Map> reqBuilder = new RequestWrapper<>();
+
+        Authentication auth = getContext().getAuthentication();
+        String token = jwtProvider.generateToken(auth);
+
+        ResponseEntity<Map> response = reqBuilder
+                .withUri(_createUrl("/api/v1/ingestion/ingest/110"))
+                .withMethod(HttpMethod.POST)
+                .withToken(token)
+                .withResponseType(Map.class)
+                .build(testRestTemplate);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        final String id = response.getBody().get("jobLogId").toString();
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        // Separate thread to avoid blocking the injection
+        executorService.execute(() -> {
+            try {
+                boolean isError = false;
+                String errorMessage = "";
+                for (int i = 0; i < 10; i++) {
+                    ResponseEntity<Map> res = reqBuilder
+                            .withUri(_createUrl("/api/v1/ingestion/ingest/" + id))
+                            .withMethod(HttpMethod.GET)
+                            .withToken(token)
+                            .withResponseType(Map.class)
+                            .build(testRestTemplate);
+
+                    if("ERROR".equals(res.getBody().get("jobStatus"))) {
+                        isError = true;
+                        errorMessage = res.getBody().get("message").toString();
+                        break;
+                    }
+                    else {
+                        latch.await(2, TimeUnit.SECONDS);
+                    }
+                }
+                assertTrue("Job status changed to ERROR", isError);
+                assertTrue(errorMessage.startsWith("Site value seems invalid for program name"));
+            }
+            catch(Exception e) {
+                logger.error("Exception when create reqBuilder");
+            }
+            finally {
+                latch.countDown();
+            }
+        });
+
+        latch.await();
     }
 
     private String _createUrl(String uri) {

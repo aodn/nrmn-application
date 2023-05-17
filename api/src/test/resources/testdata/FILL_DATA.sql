@@ -105,7 +105,8 @@ INSERT INTO nrmn.staged_job (id,
                              program_id,
                              sec_user_id,
                              is_extended_size)
-VALUES (109, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'jobid-rls', 'INGEST', 'STAGED', 55, 123456, false);
+VALUES (109, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'jobid-rls', 'INGEST', 'STAGED', 55, 123456, false),
+       (110, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'jobid-rls', 'INGEST', 'STAGED', 55, 123456, false);
 
 INSERT INTO nrmn.staged_job (id,
                              created,
@@ -294,10 +295,7 @@ VALUES (551, 1, '{}',51, 2, 333, 121),
 INSERT INTO nrmn.staged_row(pqs, block, buddy, code, created, date, depth, direction, diver,
                             inverts, is_invert_sizing, last_updated, latitude, longitude, 
                             measure_value, method, site_name, site_no, species, time, total, vis, staged_job_id)
-VALUES ('JEP', 1, 'AZS', 'AAA', '09/09/2009', '03/03/2003', 3.3, 'NW', 'JEP',
-        0, false, '01/01/2001', -5, 35, 
-        '{
-          "1": "5"
-        }', 1, 'Castillo', 'CEU4', 'Species 56', '11:11', 5, 11, 109);
+VALUES ('JEP', 1, 'AZS', 'AAA', '09/09/2009', '03/03/2003', 3.3, 'NW', 'JEP', 0, false, '01/01/2001', -5, 35, '{"1": "5"}', 1, 'Castillo', 'CEU4', 'Species 56', '11:11', 5, 11, 109),
+       ('JEP', 1, 'AZS', 'ZZZ', '09/09/2009', '03/03/2003', 3.3, 'NW', 'JEP', 0, false, '01/01/2001', -5, 35,'{"1": "5"}', 1, 'Castillo1', 'CEU41', 'Species 56', '11:11', 5, 11, 110);
 
 REFRESH MATERIALIZED VIEW nrmn.ui_species_attributes;
