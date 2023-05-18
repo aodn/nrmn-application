@@ -228,10 +228,10 @@ export const submitJobFile = (params, onProgress) => {
     .then((response) => ({response}))
     .catch((err) => ({err}));
 };
+// inst - is use in test to return canned data
+export const submitIngest = async (jobId, onLocked, onResult, inst = axiosInstance, timeout = 5000) => {
 
-export const submitIngest = async (jobId, onLocked, onResult) => {
-
-  const postResponse = await axiosInstance
+  const postResponse = await inst
     .post(
       'ingestion/ingest/' + jobId,
       {},
@@ -251,9 +251,9 @@ export const submitIngest = async (jobId, onLocked, onResult) => {
   let getResponse;
 
   while(notDone) {
-    getResponse = await axiosInstance.get('ingestion/ingest/' + postResponse.jobLogId, { validateStatus: () => true }).then(res => res.data);
+    getResponse = await inst.get('ingestion/ingest/' + postResponse.jobLogId, { validateStatus: () => true }).then(res => res.data);
     notDone = getResponse.jobStatus === 'INGESTING';
-    if(notDone) await sleep(5000);
+    if(notDone) await sleep(timeout);
   }
 
   onResult({
