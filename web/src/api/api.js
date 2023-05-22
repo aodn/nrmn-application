@@ -8,6 +8,8 @@ if (typeof window.setApplicationError === 'undefined') {
   window.setApplicationError = () => {};
 }
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 axiosInstance.interceptors.request.use(
   (config) => {
     window.setApplicationError(null);
@@ -226,9 +228,10 @@ export const submitJobFile = (params, onProgress) => {
     .then((response) => ({response}))
     .catch((err) => ({err}));
 };
+// inst - is use in test to return canned data
+export const submitIngest = async (jobId, onLocked, onResult, inst = axiosInstance, timeout = 5000) => {
 
-export const submitIngest = (jobId, onResult) => {
-  return axiosInstance
+  const postResponse = await inst
     .post(
       'ingestion/ingest/' + jobId,
       {},
@@ -236,7 +239,27 @@ export const submitIngest = (jobId, onResult) => {
         validateStatus: () => true
       }
     )
-    .then((res) => onResult(res));
+    .then(res => res.data)
+    .catch(res => res.data);
+
+  if (postResponse.jobStatus === 'FAILED' && postResponse.reason === 'locked') {
+    onLocked(postResponse);
+    return;
+  };
+
+  let notDone = true;
+  let getResponse;
+
+  while(notDone) {
+    getResponse = await inst.get('ingestion/ingest/' + postResponse.jobLogId, { validateStatus: () => true }).then(res => res.data);
+    notDone = getResponse.jobStatus === 'INGESTING';
+    if(notDone) await sleep(timeout);
+  }
+
+  onResult({
+      status: getResponse.jobStatus === 'INGESTED' ? 200 : 400,
+      data: getResponse
+    });
 };
 
 export const search = (params) => {

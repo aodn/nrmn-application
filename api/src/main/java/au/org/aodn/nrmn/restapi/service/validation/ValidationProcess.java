@@ -167,7 +167,11 @@ public class ValidationProcess {
         response.setObsItemCount(distinctObsItems);
         return response;
     }
-
+    /**
+     * Validate a staged job, if validation failed, we should not allow job move from staged to ingested
+     * @param job - After upload and hence become staged
+     * @return validation result
+     */
     public ValidationResponse process(StagedJob job) {
 
         var rows = rowRepository.findRowsByJobId(job.getId());

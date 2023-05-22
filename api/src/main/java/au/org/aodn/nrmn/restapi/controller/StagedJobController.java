@@ -166,6 +166,8 @@ public class StagedJobController {
                 .reference(file.getOriginalFilename()).status(StatusJobType.PENDING)
                 .program(programOpt.get())
                 .creator(user.get()).build();
+
+        logger.info("JobRepo save job {}", file.getOriginalFilename());
         jobRepo.save(job);
 
         StagedJobLog jobLog = StagedJobLog.builder().eventTime(new Timestamp(System.currentTimeMillis()))
@@ -173,6 +175,7 @@ public class StagedJobController {
                 .details(file.getOriginalFilename() + " uploaded by:" + authentication.getName())
                 .build();
 
+        logger.info("JobLog save job {}", file.getOriginalFilename());
         logRepo.save(jobLog);
 
         ResponseEntity<UploadResponse> responseEntity = null;
@@ -181,6 +184,8 @@ public class StagedJobController {
             ParsedSheet parsedSheet = sheetService.stageXlsxFile(file, withExtendedSizes);
             int totalRows = parsedSheet.getStagedRows().size();
             job.setStatus(StatusJobType.STAGED);
+
+            logger.info("JobRepo save job after file {} parsed", file.getOriginalFilename());
             jobRepo.save(job);
 
             List<StagedRow> rowsToSave = getRowsToSave(parsedSheet);
@@ -192,6 +197,7 @@ public class StagedJobController {
                     .eventType(StagedJobEventType.STAGED).stagedJob(job)
                     .details(message).build();
 
+            logger.info("JobLog save job after file {} parsed", file.getOriginalFilename());
             logRepo.save(stagedLog);
 
             String s3Key = String.format(s3KeyTemplate, job.getId());

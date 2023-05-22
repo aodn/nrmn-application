@@ -3,11 +3,12 @@ package au.org.aodn.nrmn.restapi.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.bind.annotation.*;
 
 import au.org.aodn.nrmn.restapi.data.model.StagedJobLog;
 import au.org.aodn.nrmn.restapi.data.model.audit.UserActionAudit;
@@ -25,84 +26,157 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.*;
+
 @RestController
 @RequestMapping(path = "/api/v1/ingestion")
 @Tag(name = "Survey Ingestion")
 public class IngestionController {
 
-    @Autowired
-    StagedJobRepository jobRepository;
+    protected static final Logger logger = LoggerFactory.getLogger(IngestionController.class);
+
+    @Value("${nrmn.jobs.scheduleInitDelay:1000}")
+    protected int scheduleInitDelay;
 
     @Autowired
-    StagedRowRepository rowRepository;
+    protected StagedJobRepository jobRepository;
 
     @Autowired
-    SurveyIngestionService surveyIngestionService;
+    protected StagedRowRepository rowRepository;
 
     @Autowired
-    StagedJobLogRepository stagedJobLogRepository;
+    protected SurveyIngestionService surveyIngestionService;
 
     @Autowired
-    UserActionAuditRepository userActionAuditRepository;
+    protected StagedJobLogRepository stagedJobLogRepository;
 
     @Autowired
-    private SpeciesFormattingService speciesFormatting;
+    protected UserActionAuditRepository userActionAuditRepository;
 
     @Autowired
-    private MaterializedViewService materializedViewService;
+    protected SpeciesFormattingService speciesFormatting;
 
     @Autowired
-    private GlobalLockService globalLockService;
+    protected MaterializedViewService materializedViewService;
 
-    private static Logger logger = LoggerFactory.getLogger(IngestionController.class);
+    @Autowired
+    protected GlobalLockService globalLockService;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    protected  TransactionTemplate tx;
+
+    protected ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
+    @PostConstruct
+    public void initialization() {
+        tx = new TransactionTemplate(transactionManager);
+    }
+
+    @PreDestroy
+    public void closeDown() {
+        executorService.shutdown();
+    }
 
     @PostMapping(path = "ingest/{job_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<String> ingest(@PathVariable("job_id") Long jobId) {
+    public ResponseEntity<Map> ingest(@PathVariable("job_id") Long jobId) {
         userActionAuditRepository.save(new UserActionAudit("ingestion/ingest", "ingest job: " + jobId));
 
+        Map<String, Object> result = new HashMap<>();
+        result.put("jobId", jobId);
+
         var optionalJob = jobRepository.findById(jobId);
-        if (!optionalJob.isPresent())
-            return ResponseEntity.badRequest().body("Job with given id does not exist. jobId: " + jobId);
 
-        var job = optionalJob.get();
-        if (job.getStatus() != StatusJobType.STAGED)
-            return ResponseEntity.badRequest().body("Job with given id has not been validated: " + jobId);
-
-        if (!globalLockService.setLock())
-            return ResponseEntity.ok("locked");
-
-        try {
-
-            var stagedJobLog = StagedJobLog.builder()
-                    .stagedJob(job)
-                    .eventType(StagedJobEventType.INGESTING)
-                    .build();
-            stagedJobLogRepository.save(stagedJobLog);
-
-            var rows = rowRepository.findRowsByJobId(job.getId());
-            var species = speciesFormatting.getSpeciesForRows(rows);
-            var validatedRows = speciesFormatting.formatRowsWithSpecies(rows, species);
-
-            surveyIngestionService.ingestTransaction(job, validatedRows);
-
-            materializedViewService.refreshAllAsync();
-
-        } catch (Exception e) {
-
-            logger.error("Ingestion Failed", e);
-
-            var log = StagedJobLog.builder()
-                    .stagedJob(job)
-                    .details("Application error ingesting sheet.")
-                    .eventType(StagedJobEventType.ERROR).build();
-            stagedJobLogRepository.save(log);
-
-            return ResponseEntity.badRequest().body("Sheet failed to ingest. No survey data has been inserted.");
-        } finally {
-            globalLockService.releaseLock();
+        if (!optionalJob.isPresent()) {
+            result.put("jobStatus", StatusJobType.FAILED);
+            result.put("message", "Job with given id does not exist. jobId: " + jobId);
+            logger.warn(result.get("message").toString());
+            return ResponseEntity.badRequest().body(result);
         }
-        
-        return ResponseEntity.ok("Job " + jobId + " successfully ingested.");
+
+        final var job = optionalJob.get();
+        if (job.getStatus() != StatusJobType.STAGED) {
+            result.put("jobStatus", StatusJobType.FAILED);
+            result.put("message", "Job with given id has not been validated: " + jobId);
+            logger.warn(result.get("message").toString());
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (!globalLockService.setLock()) {
+            result.put("jobStatus", StatusJobType.FAILED);
+            result.put("reason", "locked");
+            result.put("message", "Failed to set lock for job : " + jobId);
+            logger.warn(result.get("message").toString());
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        final var stagedJobLog = stagedJobLogRepository
+                .save(StagedJobLog.builder()
+                        .stagedJob(job)
+                        .eventType(StagedJobEventType.INGESTING)
+                        .build());
+
+        // Some upload is very large, use a separate to avoid timeout on web app.
+        logger.info("Ingest job id {} with transaction", job.getId());
+        executorService.execute(() -> {
+            try {
+                // Noted : use transaction template on executor task is needed to avoid no session error on
+                // Hiberate lazy load object happens after the main transaction completed inside call to
+                // ingestTransaction
+                tx.executeWithoutResult(s -> {
+                    logger.info("Execute ingest job id {} with transaction", job.getId());
+                    var rows = rowRepository.findRowsByJobId(job.getId());
+                    var species = speciesFormatting.getSpeciesForRows(rows);
+                    var validatedRows = speciesFormatting.formatRowsWithSpecies(rows, species);
+
+                    surveyIngestionService.ingestTransaction(job, validatedRows);
+
+                    logger.info("Refresh materialized view after job id {} ingested", job.getId());
+                    materializedViewService.refreshAllAsync();
+                });
+            }
+            catch (Exception e) {
+
+                logger.error("Ingestion Failed", e);
+
+                stagedJobLog.setDetails(e.getMessage());
+                stagedJobLog.setEventType(StagedJobEventType.ERROR);
+
+                stagedJobLogRepository.save(stagedJobLog);
+            }
+            finally {
+                globalLockService.releaseLock();
+            }
+        });
+
+        result.put("jobStatus", stagedJobLog.getEventType());
+        result.put("jobLogId", stagedJobLog.getId());
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping(path = "ingest/{job_log_id}")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public ResponseEntity<Map> getIngest(@PathVariable("job_log_id") Long jobLogId) {
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("jobLogId", jobLogId);
+
+        var optionalJob = stagedJobLogRepository.findById(jobLogId);
+
+        if (!optionalJob.isPresent()) {
+            result.put("jobStatus", StagedJobEventType.ERROR);
+            result.put("message", "Job log does not exist. jobLogId: " + jobLogId);
+        }
+        else {
+            result.put("jobStatus", optionalJob.get().getEventType());
+            result.put("message", optionalJob.get().getDetails());
+        }
+        return ResponseEntity.ok(result);
     }
 }
