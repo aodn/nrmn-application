@@ -160,18 +160,18 @@ public class IngestionController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping(path = "ingest/{job_id}")
+    @GetMapping(path = "ingest/{job_log_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<Map> getIngest(@PathVariable("job_id") Long jobId) {
+    public ResponseEntity<Map> getIngest(@PathVariable("job_log_id") Long jobLogId) {
 
         Map<String, Object> result = new HashMap<>();
-        result.put("jobId", jobId);
+        result.put("jobLogId", jobLogId);
 
-        var optionalJob = stagedJobLogRepository.findById(jobId);
+        var optionalJob = stagedJobLogRepository.findById(jobLogId);
 
         if (!optionalJob.isPresent()) {
             result.put("jobStatus", StagedJobEventType.ERROR);
-            result.put("message", "Job log does not exist. jobLogId: " + jobId);
+            result.put("message", "Job log does not exist. jobLogId: " + jobLogId);
         }
         else {
             result.put("jobStatus", optionalJob.get().getEventType());
