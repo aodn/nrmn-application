@@ -135,7 +135,7 @@ public class IngestionController {
                     var species = speciesFormatting.getSpeciesForRows(rows);
                     var validatedRows = speciesFormatting.formatRowsWithSpecies(rows, species);
 
-                    surveyIngestionService.ingestTransaction(job, validatedRows);
+                    surveyIngestionService.ingestTransaction(job, stagedJobLog, validatedRows);
 
                     logger.info("Refresh materialized view after job id {} ingested", job.getId());
                     materializedViewService.refreshAllAsync();

@@ -16,6 +16,8 @@ import java.util.stream.IntStream;
 
 import javax.persistence.EntityManager;
 
+import au.org.aodn.nrmn.restapi.data.model.*;
+import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,19 +27,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import au.org.aodn.nrmn.restapi.data.model.Diver;
-import au.org.aodn.nrmn.restapi.data.model.Measure;
-import au.org.aodn.nrmn.restapi.data.model.MeasureTypeEntity;
-import au.org.aodn.nrmn.restapi.data.model.Method;
-import au.org.aodn.nrmn.restapi.data.model.ObsItemType;
-import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
-import au.org.aodn.nrmn.restapi.data.model.Observation;
-import au.org.aodn.nrmn.restapi.data.model.Program;
-import au.org.aodn.nrmn.restapi.data.model.Site;
-import au.org.aodn.nrmn.restapi.data.model.StagedJob;
-import au.org.aodn.nrmn.restapi.data.model.StagedRow;
-import au.org.aodn.nrmn.restapi.data.model.Survey;
-import au.org.aodn.nrmn.restapi.data.model.SurveyMethodEntity;
 import au.org.aodn.nrmn.restapi.data.repository.MeasureRepository;
 import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
@@ -72,6 +61,7 @@ public class SurveyIngestionServiceTest {
 
     @InjectMocks
     SurveyIngestionService surveyIngestionService;
+
     StagedRowFormatted.StagedRowFormattedBuilder rowBuilder;
 
     @BeforeEach
@@ -312,6 +302,7 @@ public class SurveyIngestionServiceTest {
 
         Program program = Program.builder().programId(1).build();
         StagedJob stagedJob = StagedJob.builder().id(1L).program(program).build();
+        StagedJobLog stagedJobLog = StagedJobLog.builder().stagedJob(stagedJob).eventType(StagedJobEventType.INGESTING).build();
         StagedRow stagedRow = StagedRow.builder().stagedJob(stagedJob).species("Survey Not Done").build();
 
         StagedRowFormatted formattedRow1 = StagedRowFormatted
@@ -348,7 +339,7 @@ public class SurveyIngestionServiceTest {
                 .measureJson(Collections.emptyMap())
                 .build();
 
-        surveyIngestionService.ingestTransaction(stagedJob, Arrays.asList(formattedRow1, formattedRow2));
+        surveyIngestionService.ingestTransaction(stagedJob, stagedJobLog, Arrays.asList(formattedRow1, formattedRow2));
 
         ArgumentCaptor<Survey> surveyCaptor = ArgumentCaptor.forClass(Survey.class);
         Mockito.verify(surveyRepository).save(surveyCaptor.capture());
@@ -360,5 +351,8 @@ public class SurveyIngestionServiceTest {
         SurveyMethodEntity surveyMethod = surveyMethodCaptor.getValue();
         assertEquals(true, surveyMethod.getSurveyNotDone());
 
+        // No change in job info
+        assertEquals(stagedJobLog.getStagedJob(), stagedJob);
+        assertEquals(stagedJobLog.getEventType(), StagedJobEventType.INGESTED);
     }
 }
