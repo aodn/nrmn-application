@@ -189,7 +189,7 @@ public class SurveyIngestionService {
     }
     
     @Transactional
-    public void ingestTransaction(StagedJob job, Collection<StagedRowFormatted> validatedRows) {
+    public void ingestTransaction(StagedJob job, StagedJobLog stagedJobLog, Collection<StagedRowFormatted> validatedRows) {
 
         var rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
         var surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
@@ -216,7 +216,10 @@ public class SurveyIngestionService {
         var messages = Arrays.asList(rowCount + " rows of data", siteCount + " sites", surveyCount + " surveys", obsItemCount + " distinct observable items", diverCount + " divers");
         var message = messages.stream().collect(Collectors.joining("\n"));
 
-        stagedJobLogRepository.save(StagedJobLog.builder().stagedJob(job).details(message).eventType(StagedJobEventType.INGESTED).build());
+        stagedJobLog.setDetails(message);
+        stagedJobLog.setEventType(StagedJobEventType.INGESTED);
+        stagedJobLogRepository.save(stagedJobLog);
+
         job.setStatus(StatusJobType.INGESTED);
         job.setSurveyIds(surveyIds);
         jobRepository.save(job);
