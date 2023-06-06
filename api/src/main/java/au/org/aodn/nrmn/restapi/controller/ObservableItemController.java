@@ -2,10 +2,7 @@ package au.org.aodn.nrmn.restapi.controller;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.validation.Valid;
 
@@ -89,7 +86,7 @@ public class ObservableItemController {
 
     @GetMapping("/observableItem/{id}")
     public ResponseEntity<ObservableItemGetDto> findOne(@PathVariable Integer id) {
-        var obsItem = observableItemRepository.findById(id);
+        Optional<ObservableItem> obsItem = observableItemRepository.findById(id);
         return obsItem.map(item -> ResponseEntity.ok(mapper.map(item, ObservableItemGetDto.class)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

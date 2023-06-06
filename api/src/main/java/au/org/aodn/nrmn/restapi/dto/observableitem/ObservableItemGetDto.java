@@ -23,8 +23,11 @@ public class ObservableItemGetDto {
     private String aphiaId;
     private String aphiaRelTypeName;
     private String supersededBy;
+
+    // List of species that supersed this species
     private String supersededNames;
     private String supersededIds;
+
     private String phylum;
     @JsonProperty("class")
     private String className;

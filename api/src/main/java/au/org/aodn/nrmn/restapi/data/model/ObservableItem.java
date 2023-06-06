@@ -6,12 +6,11 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -19,16 +18,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.SecondaryTable;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
@@ -44,8 +40,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Table(name = "observable_item_ref")
-@SecondaryTable(name = "lengthweight_ref", pkJoinColumns = @PrimaryKeyJoinColumn(name = "observable_item_id"),
- foreignKey = @ForeignKey(name = "lengthweight_ref_observable_item_id_fkey"))
 @Audited(withModifiedFlag = true)
 public class ObservableItem {
     @Id
@@ -75,7 +69,7 @@ public class ObservableItem {
     @JoinColumn(name = "obs_item_type_id", referencedColumnName = "obs_item_type_id", nullable = false)
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     private ObsItemType obsItemType;
-    
+
     @Basic
     @Column(name = "common_name")
     private String commonName;
@@ -130,9 +124,14 @@ public class ObservableItem {
     @Type(type = "jsonb")
     private Map<String, String> obsItemAttribute;
 
-    @Embedded
-    @Audited(targetAuditMode = NOT_AUDITED)
+    @ManyToOne(fetch = FetchType.LAZY)
     @Valid
+    @NotAudited
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinFormula(value="(select case " +
+            "when superseded_by = '' or superseded_by is NULL then observable_item_id " +
+            "else (select r.observable_item_id from {h-schema}observable_item_ref r where r.observable_item_name = superseded_by) " +
+            "end) ", referencedColumnName = "observable_item_id")
     private LengthWeight lengthWeight;
 
     @Basic
