@@ -220,6 +220,11 @@ export const AppConstants = Object.freeze({
   AG_GRID: {
     measureColWidth: 35,
     dataColWidth: 120
+  },
+  ROLES: {
+    ADMIN: 'ROLE_ADMIN',
+    DATA_OFFICER: 'ROLE_DATA_OFFICER',
+    SURVEY_EDITOR: 'ROLE_SURVEY_EDITOR'
   }
 });
 

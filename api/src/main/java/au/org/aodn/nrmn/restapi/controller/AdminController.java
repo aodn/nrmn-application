@@ -124,16 +124,24 @@ public class AdminController {
             var isNewUser = Objects.isNull(user.getUserId());
 
             var adminRole = roleRepository.findByName(SecRoleName.ROLE_ADMIN).get();
-            var userRole = roleRepository.findByName(SecRoleName.ROLE_DATA_OFFICER).get();
+            var dataOfficerRole = roleRepository.findByName(SecRoleName.ROLE_DATA_OFFICER).get();
+            var surveyEditorRole = roleRepository.findByName(SecRoleName.ROLE_SURVEY_EDITOR).get();
 
             if (Objects.nonNull(updatedUser.getRoles())) {
                 updatedUser.getRoles().clear();
-                updatedUser.getRoles()
-                        .addAll(user.getRoles().contains("ROLE_ADMIN") ? Set.<SecRole>of(userRole, adminRole)
-                                : user.getRoles().contains("ROLE_DATA_OFFICER") ? Set.<SecRole>of(userRole)
-                                        : Set.<SecRole>of());
-            } else {
-                updatedUser.setRoles(Set.<SecRole>of(userRole));
+
+                if(user.getRoles().contains(SecRoleName.ROLE_ADMIN.toString())) {
+                    updatedUser.getRoles().addAll(Set.of(dataOfficerRole, adminRole));
+                }
+                else if(user.getRoles().contains(SecRoleName.ROLE_DATA_OFFICER.toString())) {
+                    updatedUser.getRoles().add(dataOfficerRole);
+                }
+                else if(user.getRoles().contains(SecRoleName.ROLE_SURVEY_EDITOR.toString())) {
+                    updatedUser.getRoles().add(surveyEditorRole);
+                }
+            }
+            else {
+                updatedUser.setRoles(Set.<SecRole>of(dataOfficerRole));
             }
 
             if (isNewUser || user.isResetPassword()) {
