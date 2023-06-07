@@ -9,6 +9,8 @@ import stateFilterHandler from '../../../common/state-event-handler/StateFilterH
 import 'ag-grid-enterprise';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import {AuthContext} from '../../../contexts/auth-context';
+import {AppConstants} from '../../../common/constants';
 
 const LocationList = () => {
   const rowsPerPage = 50;
@@ -109,9 +111,15 @@ const LocationList = () => {
           <Typography variant="h4">Locations</Typography>
         </Box>
         <Box>
-          <Button variant="contained" to="/reference/location" component={NavLink} startIcon={<Add />}>
-            New Location
-          </Button>
+          <AuthContext.Consumer>
+            {({auth}) => (
+              <Button
+                variant="contained" to="/reference/location"
+                component={NavLink}
+                startIcon={<Add />}
+                disabled={!auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)}>New Location
+              </Button>)}
+            </AuthContext.Consumer>
         </Box>
       </Box>
       <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
