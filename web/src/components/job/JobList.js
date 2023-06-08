@@ -76,7 +76,12 @@ const JobList = () => {
             <Typography variant="h4">Jobs</Typography>
           </Box>
           <Box>
-            <Button variant="contained" to="/data/upload" component={NavLink} startIcon={<CloudUploadOutlined />}>
+            <Button
+              variant="contained"
+              to="/data/upload"
+              component={NavLink}
+              disabled={!(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))}
+              startIcon={<CloudUploadOutlined />}>
               Upload XLSX File
             </Button>
           </Box>
