@@ -4,6 +4,8 @@ import SharedLinkAdd from './SharedLinkAdd';
 import React, {useEffect, useReducer} from 'react';
 import {getSharedLinks, deleteSharedLink} from '../../../api/api';
 import TargetUrlComponent from '../../input/TargetUrlComponent';
+import {AuthContext} from '../../../contexts/auth-context';
+import {AppConstants} from '../../../common/constants';
 
 const SharedLinkList = () => {
   const [data, setData] = useReducer(
@@ -50,65 +52,70 @@ const SharedLinkList = () => {
   const keys = Object.keys(columns);
 
   return (
-    <>
-      <Box m={1} ml={2}>
-        <Typography variant="h6">Endpoint Links</Typography>
-      </Box>
-      <SharedLinkAdd onPost={() => setData({verb: 'reset'})} />
-      <Box m={1} border={1} borderColor="divider" sx={{backgroundColor: 'white'}}>
-        {!data.data ? (
-          <LinearProgress />
-        ) : (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  {keys.map((key) => (
-                    <TableCell style={{cursor: 'pointer'}} key={key} onClick={() => setData({verb: 'sort', key})}>
-                      {columns[key]} {data.sort.key === key && (data.sort.asc ? '▲' : '▼')}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data.data.length < 1 && (
-                  <TableRow>
-                    <TableCell colSpan={columns.length}>
-                      <i>No Links</i>
-                    </TableCell>
-                  </TableRow>
-                )}
-                {data.data.map((row, i) => (
-                  <TableRow key={`${row['linkId']}`}>
-                    {keys.map((key) => {
-                      const disabled = data.disabled === row[key];
-                      return (
-                        <TableCell key={`${key}-${i}`}>
-                          {(key === 'targetUrl' && (disabled ? <></> : <TargetUrlComponent value={row[key]} />)) ||
-                            (key === 'linkId' && (
-                              <button
-                                style={{width: '80px'}}
-                                disabled={disabled}
-                                onClick={() => {
-                                  setData({verb: 'disabled', data: row[key]});
-                                  deleteSharedLink(row[key]).then(() => setData({verb: 'reset'}));
-                                }}
-                              >
-                                {disabled ? 'Deleting...' : 'Delete'}
-                              </button>
-                            )) ||
-                            row[key]}
+    <AuthContext.Consumer>
+      {({ auth }) =>
+        <>
+          <Box m={1} ml={2}>
+            <Typography variant="h6">Endpoint Links</Typography>
+          </Box>
+          {auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) && <SharedLinkAdd onPost={() => setData({ verb: 'reset' })} />}
+          <Box m={1} border={1} borderColor="divider" sx={{ backgroundColor: 'white' }}>
+            {!data.data ? (
+              <LinearProgress />
+            ) : (
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      {keys.map((key) => (
+                        <TableCell style={{ cursor: 'pointer' }} key={key}
+                                   onClick={() => setData({ verb: 'sort', key })}>
+                          {columns[key]} {data.sort.key === key && (data.sort.asc ? '▲' : '▼')}
                         </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </Box>
-    </>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {data.data.length < 1 && (
+                      <TableRow>
+                        <TableCell colSpan={columns.length}>
+                          <i>No Links</i>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {data.data.map((row, i) => (
+                      <TableRow key={`${row['linkId']}`}>
+                        {keys.map((key) => {
+                          const disabled = data.disabled === row[key];
+                          return (
+                            <TableCell key={`${key}-${i}`}>
+                              {(key === 'targetUrl' && (disabled ? <></> : <TargetUrlComponent value={row[key]} />)) ||
+                                (key === 'linkId' && (
+                                  <button
+                                    style={{ width: '80px' }}
+                                    disabled={disabled || !auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)}
+                                    onClick={() => {
+                                      setData({ verb: 'disabled', data: row[key] });
+                                      deleteSharedLink(row[key]).then(() => setData({ verb: 'reset' }));
+                                    }}
+                                  >
+                                    {disabled ? 'Deleting...' : 'Delete'}
+                                  </button>
+                                )) ||
+                                row[key]}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </Box>
+        </>
+      }
+    </AuthContext.Consumer>
   );
 };
 
