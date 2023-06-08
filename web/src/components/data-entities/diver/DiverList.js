@@ -146,7 +146,7 @@ const DiverList = () => {
                 <Button variant="contained" to="/reference/diver"
                         component={NavLink}
                         startIcon={<Add />}
-                        disabled={!auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)}>
+                        disabled={!(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))}>
                   New Diver
                 </Button>
               </Box>
@@ -154,7 +154,10 @@ const DiverList = () => {
                 <Button variant="contained"
                         startIcon={<Save />}
                         onClick={saveGrid}
-                        disabled={Object.keys(delta).length < 1 || !auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)}>
+                        disabled={
+                          Object.keys(delta).length < 1
+                          || !(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))
+                        }>
                   Save Changes
                 </Button>
               </Box>

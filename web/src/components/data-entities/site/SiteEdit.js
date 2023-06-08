@@ -112,7 +112,7 @@ const SiteEdit = ({clone}) => {
   return (
     <AuthContext.Consumer>
       {({ auth }) => {
-        if (auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)) {
+        if (auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN)) {
           return (
             <EntityContainer name="Sites" goBackTo="/reference/sites">
               <Grid container alignItems="flex-start" direction="row">

@@ -58,7 +58,7 @@ const SharedLinkList = () => {
           <Box m={1} ml={2}>
             <Typography variant="h6">Endpoint Links</Typography>
           </Box>
-          {auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) && <SharedLinkAdd onPost={() => setData({ verb: 'reset' })} />}
+          {(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN)) && <SharedLinkAdd onPost={() => setData({ verb: 'reset' })} />}
           <Box m={1} border={1} borderColor="divider" sx={{ backgroundColor: 'white' }}>
             {!data.data ? (
               <LinearProgress />
@@ -93,7 +93,7 @@ const SharedLinkList = () => {
                                 (key === 'linkId' && (
                                   <button
                                     style={{ width: '80px' }}
-                                    disabled={disabled || !auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)}
+                                    disabled={disabled || !(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER || auth.roles.includes(AppConstants.ROLES.ADMIN)))}
                                     onClick={() => {
                                       setData({ verb: 'disabled', data: row[key] });
                                       deleteSharedLink(row[key]).then(() => setData({ verb: 'reset' }));

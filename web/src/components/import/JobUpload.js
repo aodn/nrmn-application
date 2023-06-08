@@ -46,7 +46,7 @@ const JobUpload = () => {
       </Box>
       <AuthContext.Consumer>
         {({auth}) => {
-          if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)) {
+          if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN)) {
             return(<Grid container justifyContent="center">
               <Box style={{background: 'white', width: 800}} boxShadow={1} margin={3} padding={3}>
                 <Grid container alignItems="flex-start" direction="row">

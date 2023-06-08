@@ -49,7 +49,7 @@ const LocationView = () => {
               <Button variant="outlined"
                       component={Link}
                       to={`/reference/location/${locationId}/edit`}
-                      disabled={!auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)}
+                      disabled={!(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))}
                       startIcon={<Edit>edit</Edit>}>
                 Edit
               </Button>

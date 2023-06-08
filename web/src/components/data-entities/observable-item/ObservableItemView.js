@@ -34,7 +34,7 @@ const ObservableItemView = () => {
               {data?.observableItemId && (
                 <Button variant="outlined"
                         component={NavLink}
-                        disabled={!auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)}
+                        disabled={!(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))}
                         to={`/reference/observableItem/${id}/edit`}
                         startIcon={<Edit>edit</Edit>}>
                   Edit

@@ -147,7 +147,7 @@ const SiteList = () => {
               <Button style={{width: '100%'}}
                       to="/reference/site"
                       component={NavLink}
-                      disabled={!auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)}
+                      disabled={!(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))}
                       variant={'contained'}
                       startIcon={<Add></Add>}>
                 New Site
@@ -186,7 +186,7 @@ const SiteList = () => {
                 cellRenderer={() => <Edit/>}
                 cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
                 onCellClicked={(e) => {
-                  if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)) {
+                  if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN)) {
                     if (e.event.ctrlKey) {
                       window.open(`/reference/site/${e.data.siteId}/edit`, '_blank').focus();
                     } else {

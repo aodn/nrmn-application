@@ -47,7 +47,7 @@ const SiteView = () => {
               <Button variant="outlined"
                       component={NavLink}
                       to={`/reference/site/${id}/edit`}
-                      disabled={!auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)}
+                      disabled={!(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))}
                       startIcon={<Edit>edit</Edit>}>
                 Edit
               </Button>

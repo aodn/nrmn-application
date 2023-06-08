@@ -119,7 +119,7 @@ const ObservableItemList = () => {
                     to="/reference/observableItem"
                     component={NavLink}
                     variant="contained"
-                    disabled={!auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)}
+                    disabled={!(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))}
                     startIcon={<Add/>}>
               New Observable Item
             </Button>
@@ -150,7 +150,7 @@ const ObservableItemList = () => {
             valueFormatter={() => '✎'}
             cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
             onCellClicked={(e) => {
-              if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)) {
+              if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN)) {
                 if (e.event.ctrlKey) {
                   window.open(`/reference/observableItem/${e.data.observableItemId}/edit`, '_blank').focus();
                 } else {

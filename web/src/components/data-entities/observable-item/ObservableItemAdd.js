@@ -254,7 +254,7 @@ const ObservableItemAdd = () => {
   return (
     <AuthContext.Consumer>
       {({ auth }) => {
-        if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)) {
+        if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN)) {
           return content();
         }
         else {

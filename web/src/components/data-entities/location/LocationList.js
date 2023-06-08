@@ -117,7 +117,7 @@ const LocationList = () => {
               variant="contained" to="/reference/location"
               component={NavLink}
               startIcon={<Add />}
-              disabled={!auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)}>New Location
+              disabled={!(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))}>New Location
             </Button>
           </Box>
         </Box>
@@ -153,7 +153,7 @@ const LocationList = () => {
               valueFormatter={() => '✎'}
               cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
               onCellClicked={(e) => {
-                if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)) {
+                if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN)) {
                   if (e.event.ctrlKey) {
                     window.open(`/reference/location/${e.data.id}/edit`, '_blank').focus();
                   } else {

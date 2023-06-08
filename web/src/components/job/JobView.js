@@ -71,7 +71,7 @@ const JobView = ({jobId}) => {
                         variant="outlined"
                         component="a"
                         href={`/data/job/${id}/edit`}
-                        disabled={!auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)}
+                        disabled={!(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))}
                         clickable>
                           {['INGESTED'].includes(job.status) ? 'View ingested ' : 'Edit'} Sheet
                       </Button>{' '}
