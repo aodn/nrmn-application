@@ -10,6 +10,9 @@ import {entitySave, entityEdit, getEntity} from '../../../api/api';
 import EntityContainer from '../../containers/EntityContainer';
 import CustomCheckboxInput from '../../input/CustomCheckboxInput';
 import CustomTextInput from '../../input/CustomTextInput';
+import {AuthContext} from '../../../contexts/auth-context';
+import {AppConstants} from '../../../common/constants';
+import Alert from '@mui/material/Alert';
 
 const LocationAdd = () => {
   const locationId = useParams()?.id;
@@ -53,38 +56,52 @@ const LocationAdd = () => {
   if (savedId) return <Navigate to={`/reference/location/${savedId}`} state={{message: 'Location Saved'}} />;
 
   return (
-    <EntityContainer name="Locations" goBackTo="/reference/locations">
-      <Grid container alignItems="flex-start" direction="row" spacing={2}>
-        <Grid item xs={12}>
-          <Typography variant="h4">{locationId ? 'Edit' : 'New'} Location</Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <CustomTextInput
-            label="Location Name"
-            formData={location.locationName}
-            field="locationName"
-            errors={errors}
-            onChange={(t) => dispatch({field: 'locationName', value: t})}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <CustomCheckboxInput
-            label="Is Active"
-            formData={location.isActive}
-            onChange={(t) => dispatch({field: 'isActive', value: t})}
-            field="isActive"
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <Button variant="outlined" component={NavLink} to="/reference/locations">
-            Cancel
-          </Button>
-          <Button variant="contained" style={{width: '50%', marginLeft: '20px'}} type="submit" startIcon={<Save />} onClick={handleSubmit}>
-            Save Location
-          </Button>
-        </Grid>
-      </Grid>
-    </EntityContainer>
+    <AuthContext.Consumer>
+      {({ auth }) => {
+        if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)) {
+          return (<EntityContainer name="Locations" goBackTo="/reference/locations">
+            <Grid container alignItems="flex-start" direction="row" spacing={2}>
+              <Grid item xs={12}>
+                <Typography variant="h4">{locationId ? 'Edit' : 'New'} Location</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <CustomTextInput
+                  label="Location Name"
+                  formData={location.locationName}
+                  field="locationName"
+                  errors={errors}
+                  onChange={(t) => dispatch({ field: 'locationName', value: t })}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <CustomCheckboxInput
+                  label="Is Active"
+                  formData={location.isActive}
+                  onChange={(t) => dispatch({ field: 'isActive', value: t })}
+                  field="isActive"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Button variant="outlined" component={NavLink} to="/reference/locations">
+                  Cancel
+                </Button>
+                <Button variant="contained" style={{ width: '50%', marginLeft: '20px' }} type="submit"
+                        startIcon={<Save />} onClick={handleSubmit}>
+                  Save Location
+                </Button>
+              </Grid>
+            </Grid>
+          </EntityContainer>);
+        }
+        else {
+          return(
+            <Alert severity="error" variant="outlined">
+              <p>Permission Denied</p>
+            </Alert>
+          );
+        }
+      }}
+    </AuthContext.Consumer>
   );
 };
 
