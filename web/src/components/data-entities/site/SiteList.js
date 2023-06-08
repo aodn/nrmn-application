@@ -8,6 +8,8 @@ import {entityDelete} from '../../../api/api';
 import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import {AuthContext} from '../../../contexts/auth-context';
+import {AppConstants} from '../../../common/constants';
 
 import 'ag-grid-enterprise';
 
@@ -128,120 +130,130 @@ const SiteList = () => {
   );
 
   return (
-    <>
-      <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
-      {dialogState.open && dialog}
-      <Box display="flex" flexDirection="row" pt={1}>
-        <Box p={1} pl={2} flexGrow={1}>
-          <Typography variant="h4">Sites</Typography>
-        </Box>
-        <Box mr={4}>
-          <Button style={{width: '100%'}} to="/reference/site" component={NavLink} variant={'contained'} startIcon={<Add></Add>}>
-            New Site
-          </Button>
-        </Box>
-      </Box>
-      <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
-        <AgGridReact
-          ref={gridRef}
-          id={'site-list'}
-          rowHeight={24}
-          pagination={true}
-          paginationPageSize={rowsPerPage}
-          rowModelType={'infinite'}
-          enableCellTextSelection={true}
-          onGridReady={(e) => onGridReady(e)}
-          onBodyScrollEnd={(e) => autoSizeAll(e, false)}
-          onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
-          suppressCellFocus={true}
-          defaultColDef={{
-            lockVisible: true,
-            sortable: true,
-            resizable: true,
-            filter: 'agTextColumnFilter',
-            floatingFilter: true
-          }}
-        >
-          <AgGridColumn
-            field="siteId"
-            headerName=""
-            suppressMovable={true}
-            suppressMenu={true}
-            filter={false}
-            resizable={false}
-            sortable={false}
-            cellRenderer={() => <Edit />}
-            cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
-            onCellClicked={(e) => {
-              if (e.event.ctrlKey) {
-                window.open(`/reference/site/${e.data.siteId}/edit`, '_blank').focus();
-              } else {
-                setRedirect(`${e.data.siteId}/edit`);
-              }
-            }}
-          />
-          <AgGridColumn
-            field="siteCode"
-            colId="site.siteCode"
-            cellStyle={{cursor: 'pointer'}}
-            onCellClicked={(e) => {
-              if (e.event.ctrlKey) {
-                window.open(`/reference/site/${e.data.siteId}`, '_blank').focus();
-              } else {
-                setRedirect(`${e.data.siteId}`);
-              }
-            }}
-          />
-          <AgGridColumn minWidth={500} field="siteName" colId="site.siteName"/>
-          <AgGridColumn minWidth={200} field="locationName" colId="site.locationName"/>
-          <AgGridColumn field="state" colId="site.state"/>
-          <AgGridColumn minWidth={200} field="country" colId="site.country"/>
-          <AgGridColumn field="latitude" colId="site.latitude"/>
-          <AgGridColumn field="longitude" colId="site.longitude"/>
-          <AgGridColumn suppressMenu={true} field="isActive" headerName="Active" colId="site.isActive"/>
-          <AgGridColumn
-            field="siteId"
-            headerName=""
-            suppressMovable={true}
-            suppressMenu={true}
-            filter={false}
-            resizable={false}
-            sortable={false}
-            cellRenderer={() => <CopyAll />}
-            cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
-            onCellClicked={(e) => {
-              if (e.event.ctrlKey) {
-                window.open(`/reference/site/${e.data.siteId}/clone`, '_blank').focus();
-              } else {
-                setRedirect(`${e.data.siteId}/clone`);
-              }
-            }}
-          />
-          <AgGridColumn
-            field="observableItemId"
-            headerName=""
-            suppressMovable={true}
-            suppressMenu={true}
-            filter={false}
-            resizable={false}
-            sortable={false}
-            cellRenderer={(e) => (e.data?.isActive ? <></> : <Delete />)}
-            cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
-            onCellClicked={(e) => {
-              !e.data.isActive &&
-                setDialogState({
-                  open: true,
-                  item: e.data
-                });
-            }}
-          />
-        </AgGridReact>
-      </Box>
-    </>
+    <AuthContext.Consumer>
+      {({auth}) => (
+        <>
+          <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={loading}>
+            <CircularProgress color="inherit" />
+          </Backdrop>
+          {dialogState.open && dialog}
+          <Box display="flex" flexDirection="row" pt={1}>
+            <Box p={1} pl={2} flexGrow={1}>
+              <Typography variant="h4">Sites</Typography>
+            </Box>
+            <Box mr={4}>
+              <Button style={{width: '100%'}}
+                      to="/reference/site"
+                      component={NavLink}
+                      disabled={!auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)}
+                      variant={'contained'}
+                      startIcon={<Add></Add>}>
+                New Site
+              </Button>
+            </Box>
+          </Box>
+          <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
+            <AgGridReact
+              ref={gridRef}
+              id={'site-list'}
+              rowHeight={24}
+              pagination={true}
+              paginationPageSize={rowsPerPage}
+              rowModelType={'infinite'}
+              enableCellTextSelection={true}
+              onGridReady={(e) => onGridReady(e)}
+              onBodyScrollEnd={(e) => autoSizeAll(e, false)}
+              onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
+              suppressCellFocus={true}
+              defaultColDef={{
+                lockVisible: true,
+                sortable: true,
+                resizable: true,
+                filter: 'agTextColumnFilter',
+                floatingFilter: true
+              }}
+            >
+              <AgGridColumn
+                field="siteId"
+                headerName=""
+                suppressMovable={true}
+                suppressMenu={true}
+                filter={false}
+                resizable={false}
+                sortable={false}
+                cellRenderer={() => <Edit/>}
+                cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
+                onCellClicked={(e) => {
+                  if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)) {
+                    if (e.event.ctrlKey) {
+                      window.open(`/reference/site/${e.data.siteId}/edit`, '_blank').focus();
+                    } else {
+                      setRedirect(`${e.data.siteId}/edit`);
+                    }
+                  }
+                }}
+              />
+              <AgGridColumn
+                field="siteCode"
+                colId="site.siteCode"
+                cellStyle={{cursor: 'pointer'}}
+                onCellClicked={(e) => {
+                  if (e.event.ctrlKey) {
+                    window.open(`/reference/site/${e.data.siteId}`, '_blank').focus();
+                  } else {
+                    setRedirect(`${e.data.siteId}`);
+                  }
+                }}
+              />
+              <AgGridColumn minWidth={500} field="siteName" colId="site.siteName"/>
+              <AgGridColumn minWidth={200} field="locationName" colId="site.locationName"/>
+              <AgGridColumn field="state" colId="site.state"/>
+              <AgGridColumn minWidth={200} field="country" colId="site.country"/>
+              <AgGridColumn field="latitude" colId="site.latitude"/>
+              <AgGridColumn field="longitude" colId="site.longitude"/>
+              <AgGridColumn suppressMenu={true} field="isActive" headerName="Active" colId="site.isActive"/>
+              <AgGridColumn
+                field="siteId"
+                headerName=""
+                suppressMovable={true}
+                suppressMenu={true}
+                filter={false}
+                resizable={false}
+                sortable={false}
+                cellRenderer={() => <CopyAll />}
+                cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
+                onCellClicked={(e) => {
+                  if (e.event.ctrlKey) {
+                    window.open(`/reference/site/${e.data.siteId}/clone`, '_blank').focus();
+                  } else {
+                    setRedirect(`${e.data.siteId}/clone`);
+                  }
+                }}
+              />
+              <AgGridColumn
+                field="observableItemId"
+                headerName=""
+                suppressMovable={true}
+                suppressMenu={true}
+                filter={false}
+                resizable={false}
+                sortable={false}
+                cellRenderer={(e) => (e.data?.isActive ? <></> : <Delete />)}
+                cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
+                onCellClicked={(e) => {
+                  !e.data.isActive &&
+                    setDialogState({
+                      open: true,
+                      item: e.data
+                    });
+                }}
+              />
+            </AgGridReact>
+          </Box>
+        </>)}
+    </AuthContext.Consumer>
   );
 };
 
