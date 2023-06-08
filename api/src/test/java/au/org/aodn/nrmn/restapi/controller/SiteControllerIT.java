@@ -2,11 +2,13 @@ package au.org.aodn.nrmn.restapi.controller;
 
 import au.org.aodn.nrmn.restapi.data.model.Location;
 import au.org.aodn.nrmn.restapi.data.model.Site;
+import au.org.aodn.nrmn.restapi.dto.site.SiteDto;
 import au.org.aodn.nrmn.restapi.model.db.LocationTestData;
 import au.org.aodn.nrmn.restapi.model.db.SiteTestData;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -15,9 +17,11 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 import java.util.ArrayList;
@@ -45,6 +49,12 @@ public class SiteControllerIT {
 
     @Autowired
     private JwtToken jwtToken;
+
+    @Autowired
+    private ModelMapper mapper;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private RequestSpecification spec;
 
@@ -174,5 +184,43 @@ public class SiteControllerIT {
         items.forEach(item -> {
             assertTrue(!item.get("locationName").toString().contains("12") && !item.get("locationName").toString().contains("13"));
         });
+    }
+    /**
+     * Expect 403 error as no permission
+     */
+    @Test
+    @WithUserDetails("survey_editor@example.com")
+    public void testWithPermissionErrorOnWrite() {
+
+        Site testSite = siteTestData.persistedSite();
+        SiteDto dto = new SiteDto();
+
+        mapper.map(testSite, dto);
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body(dto)
+                .put("sites/" + testSite.getSiteId())
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    @WithUserDetails("survey_editor@example.com")
+    public void testWithPermissionErrorOnRead() {
+        Site testSite = siteTestData.persistedSite();
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .get("sites")
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .body("items.siteId", hasItems(testSite.getSiteId()));
     }
 }

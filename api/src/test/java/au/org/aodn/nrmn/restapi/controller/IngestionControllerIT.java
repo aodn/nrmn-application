@@ -8,8 +8,15 @@ import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.RestApiApplication;
 import au.org.aodn.nrmn.restapi.controller.utils.RequestWrapper;
 import au.org.aodn.nrmn.restapi.security.JwtTokenProvider;
+import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -31,6 +38,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
@@ -45,20 +53,37 @@ class IngestionControllerIT {
 
     protected Logger logger = LoggerFactory.getLogger(IngestionControllerIT.class);
 
+    @LocalServerPort
+    private int port;
+
     @Autowired
     public TestRestTemplate testRestTemplate;
 
     @Autowired
     JwtTokenProvider jwtProvider;
 
-    @LocalServerPort
-    int randomServerPort;
+    @Autowired
+    private JwtToken jwtToken;
 
     @Autowired
     StagedJobRepository stagedJobRepository;
 
     @Autowired
     ObservationRepository observationRepository;
+
+    RequestSpecification spec;
+
+    @BeforeEach
+    public void setup() {
+
+        spec = new RequestSpecBuilder()
+                .setBaseUri(String.format("http://localhost:%s", port))
+                .setBasePath("/api/v1/")
+                .setContentType(ContentType.JSON)
+                .addFilter(new ResponseLoggingFilter())
+                .addFilter(new RequestLoggingFilter())
+                .build();
+    }
 
     /**
      * Post the job and then use api to check if the job changed from status INGESTING to INGESTED
@@ -238,6 +263,24 @@ class IngestionControllerIT {
     }
 
     private String _createUrl(String uri) {
-        return "http://localhost:" + randomServerPort + uri;
+        return "http://localhost:" + port + uri;
+    }
+
+    /**
+     * expect fail due to permission setting
+     */
+    @Test
+    @WithUserDetails("survey_editor@example.com")
+    public void testPermissionOnItemCreateOrUpdate() {
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body("")           // Content isn't important as permission blocked before parsing body
+                .post("ingest/123")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.FORBIDDEN.value());
     }
 }

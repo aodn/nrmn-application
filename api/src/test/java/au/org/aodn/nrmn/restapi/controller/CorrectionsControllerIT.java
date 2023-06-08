@@ -306,10 +306,23 @@ class CorrectionsControllerIT {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
+    /**
+     * Expect fail on
+     * @throws Exception
+     */
+    @Test
+    @WithUserDetails("survey_editor@example.com")
+    public void testPermissionOnWrite() throws Exception {
+        validateSurveyCorrectionEmptyDtoCommon(HttpStatus.FORBIDDEN);
+    }
 
     @Test
     @WithUserDetails("test@example.com")
     public void validateSurveyCorrectionEmptyDto() throws Exception {
+        validateSurveyCorrectionEmptyDtoCommon(HttpStatus.OK);
+    }
+
+    private void validateSurveyCorrectionEmptyDtoCommon(HttpStatus statusCode) throws Exception {
         var auth = getContext().getAuthentication();
         var token = jwtTokenProvider.generateToken(auth);
 
@@ -335,19 +348,22 @@ class CorrectionsControllerIT {
                 .build(testRestTemplate);
 
         // Empty body should result in BLOCKING error mentioned in Body
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        var body = response.getBody();
-        assertNotNull(body);
-        assertEquals("2 error returned", 2, body.getErrors().size());
+        assertEquals(statusCode, response.getStatusCode());
 
-        List<SurveyValidationError> e = (List<SurveyValidationError>) body.getErrors();
-        
-        assertEquals("Expect blocking level error", e.get(0).getLevelId(), ValidationLevel.BLOCKING);
-        assertEquals("Data level error", e.get(0).getCategoryId(), ValidationCategory.DATA);
-        assertTrue("Message in error", e.get(0).getMessage().equals("Survey data is missing"));
-        
-        assertEquals("Expect blocking level error", e.get(1).getLevelId(), ValidationLevel.BLOCKING);
-        assertTrue("Survey IDs missing", e.get(1).getMessage().equals("Survey IDs missing: 812300132, 812331346"));
+        if(HttpStatus.OK == statusCode) {
+            var body = response.getBody();
+            assertNotNull(body);
+            assertEquals("2 error returned", 2, body.getErrors().size());
+
+            List<SurveyValidationError> e = (List<SurveyValidationError>) body.getErrors();
+
+            assertEquals("Expect blocking level error", e.get(0).getLevelId(), ValidationLevel.BLOCKING);
+            assertEquals("Data level error", e.get(0).getCategoryId(), ValidationCategory.DATA);
+            assertTrue("Message in error", e.get(0).getMessage().equals("Survey data is missing"));
+
+            assertEquals("Expect blocking level error", e.get(1).getLevelId(), ValidationLevel.BLOCKING);
+            assertTrue("Survey IDs missing", e.get(1).getMessage().equals("Survey IDs missing: 812300132, 812331346"));
+        }
     }
     /**
      * Verify return error on incorrect site code in body
@@ -440,10 +456,23 @@ class CorrectionsControllerIT {
         // No proper response at the moment, become 500 and screen will blank
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
+    /**
+     * Expected fail due to use of this user
+     * @throws Exception
+     */
+    @Test
+    @WithUserDetails("survey_editor@example.com")
+    public void testPermissionOnDelete() throws Exception {
+        deleteSurveyUnknownSurveyIdCommon(HttpStatus.FORBIDDEN);
+    }
 
     @Test
     @WithUserDetails("test@example.com")
     public void deleteSurveyUnknownSurveyId() throws Exception {
+        deleteSurveyUnknownSurveyIdCommon(HttpStatus.NOT_FOUND);
+    }
+
+    protected void deleteSurveyUnknownSurveyIdCommon(HttpStatus statusCode) throws Exception {
         var auth = getContext().getAuthentication();
         var token = jwtTokenProvider.generateToken(auth);
 
@@ -466,7 +495,7 @@ class CorrectionsControllerIT {
                 .build(testRestTemplate);
 
         // No proper response at the moment, become 500 and screen will blank
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(statusCode, response.getStatusCode());
     }
     /**
      * You cannot delete locked survey

@@ -46,10 +46,24 @@ public class SpeciesControllerIT {
                 .setBasePath("/api/v1/species").addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter()).build();
     }
-
+    /**
+     * Read will work as before for this user
+     */
+    @Test
+    @WithUserDetails("survey_editor@example.com")
+    public void testPermissionOnNrmnSearchRead() {
+        testNrmnSearchCommon();;
+    }
+    /**
+     *
+     */
     @Test
     @WithUserDetails("test@example.com")
     public void testNrmnSearch() {
+        testNrmnSearchCommon();;
+    }
+
+    protected void testNrmnSearchCommon() {
         ObservableItem species1 = getObservableItem("sea snake", "sea snakes");
         ObservableItem species2 = getObservableItem("sea snakes", "underwater bulldog");
         ObservableItem species3 = getObservableItem("underwater bulldog", null);

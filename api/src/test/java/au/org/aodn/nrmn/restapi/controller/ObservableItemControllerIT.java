@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 import static io.restassured.RestAssured.given;
@@ -62,5 +63,32 @@ public class ObservableItemControllerIT {
                 .statusCode(200)
                 .body("items.observableItemId",
                         hasItems(testObservableItem.getObservableItemId()));
+    }
+    /**
+     * expect fail due to permission setting
+     */
+    @Test
+    @WithUserDetails("survey_editor@example.com")
+    public void testPermissionOnItemCreateOrUpdate() {
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body("")           // Content isn't important as permission blocked before parsing body
+                .post("observableItem")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body("")           // Content isn't important as permission blocked before parsing body
+                .put("observableItem/123")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.FORBIDDEN.value());
     }
 }

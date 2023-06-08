@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 import java.util.ArrayList;
@@ -49,12 +50,12 @@ public class LocationControllerIT {
     @Autowired
     private JwtToken jwtToken;
 
-    RequestSpecification getDataSpec;
+    RequestSpecification spec;
 
     @BeforeEach
     public void setup() {
 
-        getDataSpec = new RequestSpecBuilder()
+        spec = new RequestSpecBuilder()
                 .setBaseUri(String.format("http://localhost:%s", port))
                 .setBasePath("/api/v1/")
                 .setContentType(ContentType.JSON)
@@ -73,7 +74,7 @@ public class LocationControllerIT {
         }
 
         // filter by surveyId contains 12
-        Map<String, ArrayList<Map<String, Object>>> obj = given().spec(getDataSpec)
+        Map<String, ArrayList<Map<String, Object>>> obj = given().spec(spec)
                 .queryParam("filters", "[{\"field\":\"location.locationName\",\"ops\":\"contains\",\"val\":\"12\"}]")
                 .queryParam("page", 0)
                 .auth()
@@ -92,7 +93,7 @@ public class LocationControllerIT {
         });
 
         // filter by surveyId not contains 12
-        obj = given().spec(getDataSpec)
+        obj = given().spec(spec)
                 .queryParam("filters", "[{\"field\":\"location.locationName\",\"ops\":\"notContains\",\"val\":\"12\"}]")
                 .queryParam("page", 0)
                 .auth()
@@ -123,7 +124,7 @@ public class LocationControllerIT {
         }
 
         // filter by surveyId contains 12
-        Map<String, ArrayList<Map<String, Object>>> obj = given().spec(getDataSpec)
+        Map<String, ArrayList<Map<String, Object>>> obj = given().spec(spec)
                 .queryParam("filters", "[{\"field\":\"location.locationName\",\"ops\":\"OR\",\"conditions\":[{\"ops\":\"contains\",\"val\":\"12\"},{\"ops\":\"contains\",\"val\":\"13\"}]}]")
                 .queryParam("page", 0)
                 .auth()
@@ -143,7 +144,7 @@ public class LocationControllerIT {
 
         // filter by surveyId not contains 12 or 13 and go to page 1, basically this means everything and no need assert
         // individual items
-        obj = given().spec(getDataSpec)
+        obj = given().spec(spec)
                 .queryParam("filters", "[{\"field\":\"location.locationName\",\"ops\":\"OR\",\"conditions\":[{\"ops\":\"notContains\",\"val\":\"12\"},{\"ops\":\"notContains\",\"val\":\"13\"}]}]")
                 .queryParam("page", 1)
                 .auth()
@@ -159,7 +160,7 @@ public class LocationControllerIT {
         assertEquals(50, items.size());        // One page max 100, total 150 -100 equals 50
 
         // filter by surveyId not contains 12 and 13 and go to page 1, basically this means skip anything 12 and 13
-        obj = given().spec(getDataSpec)
+        obj = given().spec(spec)
                 .queryParam("filters", "[{\"field\":\"location.locationName\",\"ops\":\"AND\",\"conditions\":[{\"ops\":\"notContains\",\"val\":\"12\"},{\"ops\":\"notContains\",\"val\":\"13\"}]}]")
                 .queryParam("page", 1)
                 .auth()
@@ -206,7 +207,7 @@ public class LocationControllerIT {
         }
 
         // filter by surveyId contains 12
-        Map<String, ArrayList<Map<String, Object>>> obj = given().spec(getDataSpec)
+        Map<String, ArrayList<Map<String, Object>>> obj = given().spec(spec)
                 .queryParam("filters", "[{\"field\":\"location.ecoRegions\",\"ops\":\"OR\",\"conditions\":[{\"ops\":\"contains\",\"val\":\"1\"},{\"ops\":\"contains\",\"val\":\"3\"}]}]")
                 .queryParam("page", 0)
                 .auth()
@@ -225,7 +226,7 @@ public class LocationControllerIT {
         });
 
         // filter by surveyId contains 12
-        obj = given().spec(getDataSpec)
+        obj = given().spec(spec)
                 .queryParam("filters", "[{\"field\":\"location.ecoRegions\",\"ops\":\"endsWith\",\"val\":\"1\"}]")
                 .queryParam("page", 0)
                 .auth()
@@ -236,5 +237,32 @@ public class LocationControllerIT {
                 .statusCode(200).extract().jsonPath().get("");
 
         assertEquals(10, obj.get("lastRow"));
+    }
+    /**
+     * expect fail due to permission setting
+     */
+    @Test
+    @WithUserDetails("survey_editor@example.com")
+    public void testPermissionOnItemCreateOrUpdate() {
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body("")           // Content isn't important as permission blocked before parsing body
+                .post("location")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+
+        given()
+                .spec(spec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body("")           // Content isn't important as permission blocked before parsing body
+                .put("location/123")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.FORBIDDEN.value());
     }
 }
