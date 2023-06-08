@@ -9,6 +9,8 @@ import {Add} from '@mui/icons-material';
 import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import {AuthContext} from '../../../contexts/auth-context';
+import {AppConstants} from '../../../common/constants';
 
 import 'ag-grid-enterprise';
 
@@ -100,81 +102,91 @@ const ObservableItemList = () => {
   if (redirect) return <Navigate to={`/reference/observableItem/${redirect}`} />;
 
   return (
-    <>
-      <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
-      <Box display="flex" flexDirection="row" pt={1}>
-        <Box p={1} pl={2} flexGrow={1}>
-          <Typography variant="h4">Observable Items</Typography>
+    <AuthContext.Consumer>
+      {({auth}) =>
+      <>
+        <Backdrop
+          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={loading}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        <Box display="flex" flexDirection="row" pt={1}>
+          <Box p={1} pl={2} flexGrow={1}>
+            <Typography variant="h4">Observable Items</Typography>
+          </Box>
+          <Box mr={4}>
+            <Button style={{width: '100%'}}
+                    to="/reference/observableItem"
+                    component={NavLink}
+                    variant="contained"
+                    disabled={!auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)}
+                    startIcon={<Add/>}>
+              New Observable Item
+            </Button>
+          </Box>
         </Box>
-        <Box mr={4}>
-          <Button style={{width: '100%'}} to="/reference/observableItem" component={NavLink} variant="contained" startIcon={<Add></Add>}>
-            New Observable Item
-          </Button>
-        </Box>
-      </Box>
-      <AgGridReact
-        ref={gridRef}
-        className="ag-theme-material"
-        id={'observable-item-list'}
-        rowHeight={24}
-        pagination={true}
-        paginationPageSize={rowsPerPage}
-        rowModelType={'infinite'}
-        enableCellTextSelection={true}
-        onGridReady={(e) => onGridReady(e)}
-        onBodyScrollEnd={(e) => autoSizeAll(e, false)}
-        onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
-        suppressCellFocus={true}
-        defaultColDef={{lockVisible: true, sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
-      >
-        <AgGridColumn
-          field="observableItemId"
-          headerName=""
-          suppressMovable={true}
-          filter={false}
-          resizable={false}
-          sortable={false}
-          valueFormatter={() => '✎'}
-          cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
-          onCellClicked={(e) => {
-            if (e.event.ctrlKey) {
-              window.open(`/reference/observableItem/${e.data.observableItemId}/edit`, '_blank').focus();
-            } else {
-              setRedirect(`${e.data.observableItemId}/edit`);
-            }
-          }}
-        />
-        <AgGridColumn
-          field="observableItemId"
-          headerName="ID"
-          sort="desc"
-          colId="observation.observableItemId"
-          cellStyle={{cursor: 'pointer'}}
-          onCellClicked={(e) => {
-            if (e.event.ctrlKey) {
-              window.open(`/reference/observableItem/${e.data.observableItemId}`, '_blank').focus();
-            } else {
-              setRedirect(e.data.observableItemId);
-            }
-          }}
-        />
-        <AgGridColumn field="typeName" headerName="Type" colId="observation.typeName"/>
-        <AgGridColumn minWidth={200} field="name" colId="observation.name"/>
-        <AgGridColumn field="commonName" colId="observation.commonName"/>
-        <AgGridColumn field="supersededBy" colId="observation.supersededBy"/>
-        <AgGridColumn field="supersededNames" colId="observation.supersededNames"/>
-        <AgGridColumn field="supersededIDs" colId="observation.supersededIds"/>
-        <AgGridColumn field="phylum" colId="observation.phylum"/>
-        <AgGridColumn field="class" colId="observation.class"/>
-        <AgGridColumn field="order" colId="observation.order"/>
-        <AgGridColumn field="family" colId="observation.family"/>
-        <AgGridColumn field="genus" colId="observation.genus"/>
-      </AgGridReact>
-    </>
+        <AgGridReact
+          ref={gridRef}
+          className="ag-theme-material"
+          id={'observable-item-list'}
+          rowHeight={24}
+          pagination={true}
+          paginationPageSize={rowsPerPage}
+          rowModelType={'infinite'}
+          enableCellTextSelection={true}
+          onGridReady={(e) => onGridReady(e)}
+          onBodyScrollEnd={(e) => autoSizeAll(e, false)}
+          onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
+          suppressCellFocus={true}
+          defaultColDef={{lockVisible: true, sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true}}
+        >
+          <AgGridColumn
+            field="observableItemId"
+            headerName=""
+            suppressMovable={true}
+            filter={false}
+            resizable={false}
+            sortable={false}
+            valueFormatter={() => '✎'}
+            cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
+            onCellClicked={(e) => {
+              if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER)) {
+                if (e.event.ctrlKey) {
+                  window.open(`/reference/observableItem/${e.data.observableItemId}/edit`, '_blank').focus();
+                } else {
+                  setRedirect(`${e.data.observableItemId}/edit`);
+                }
+              }
+            }}
+          />
+          <AgGridColumn
+            field="observableItemId"
+            headerName="ID"
+            sort="desc"
+            colId="observation.observableItemId"
+            cellStyle={{cursor: 'pointer'}}
+            onCellClicked={(e) => {
+              if (e.event.ctrlKey) {
+                window.open(`/reference/observableItem/${e.data.observableItemId}`, '_blank').focus();
+              } else {
+                setRedirect(e.data.observableItemId);
+              }
+            }}
+          />
+          <AgGridColumn field="typeName" headerName="Type" colId="observation.typeName"/>
+          <AgGridColumn minWidth={200} field="name" colId="observation.name"/>
+          <AgGridColumn field="commonName" colId="observation.commonName"/>
+          <AgGridColumn field="supersededBy" colId="observation.supersededBy"/>
+          <AgGridColumn field="supersededNames" colId="observation.supersededNames"/>
+          <AgGridColumn field="supersededIDs" colId="observation.supersededIds"/>
+          <AgGridColumn field="phylum" colId="observation.phylum"/>
+          <AgGridColumn field="class" colId="observation.class"/>
+          <AgGridColumn field="order" colId="observation.order"/>
+          <AgGridColumn field="family" colId="observation.family"/>
+          <AgGridColumn field="genus" colId="observation.genus"/>
+        </AgGridReact>
+      </>}
+    </AuthContext.Consumer>
   );
 };
 
