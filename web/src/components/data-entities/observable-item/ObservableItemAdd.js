@@ -11,7 +11,8 @@ import CustomDropDownInput from '../../input/CustomDropDownInput';
 import CustomAutoCompleteInput, {ERROR_TYPE} from '../../input/CustomAutoCompleteInput';
 import CustomTextInput from '../../input/CustomTextInput';
 import CustomSearchInput from '../../input/CustomSearchInput';
-
+import {AuthContext} from '../../../contexts/auth-context';
+import {AppConstants} from '../../../common/constants';
 import {getResult, entitySave} from '../../../api/api';
 
 const ObservableItemAdd = () => {
@@ -70,14 +71,11 @@ const ObservableItemAdd = () => {
     });
   };
 
-  if (savedId) return <Navigate to={`/reference/observableItem/${savedId}`} state={{message: 'Observable Item Saved'}} />;
-
-  return (
+  const content = () =>
     <EntityContainer
       name="Observable Items"
       goBackTo="/reference/observableItems"
-      header={<SpeciesSearch onRowClick={(i) => dispatch({form: {...i}})} />}
-    >
+      header={<SpeciesSearch onRowClick={(i) => dispatch({form: {...i}})} />}>
       <Grid container alignItems="flex-start" direction="row">
         <Grid item xs={10}>
           <Typography variant="h5">New Observable Item</Typography>
@@ -249,7 +247,25 @@ const ObservableItemAdd = () => {
           </Box>
         </Box>
       </Grid>
-    </EntityContainer>
+    </EntityContainer>;
+
+  if (savedId) return <Navigate to={`/reference/observableItem/${savedId}`} state={{message: 'Observable Item Saved'}} />;
+
+  return (
+    <AuthContext.Consumer>
+      {({ auth }) => {
+        if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN)) {
+          return content();
+        }
+        else {
+          return(
+            <Alert severity="error" variant="outlined">
+              <p>Permission Denied</p>
+            </Alert>
+          );
+        }
+      }}
+    </AuthContext.Consumer>
   );
 };
 

@@ -25,6 +25,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class SecurityConfig {
+
+    // Note in db, it must prefix with ROLE_, springboot code by default add ROLE_ prefix to
+    // these roles string
+    public static final String SURVEY_EDITOR = "SURVEY_EDITOR";
+    public static final String POWER_USER = "POWER_USER";
+    public static final String DATA_OFFICER = "DATA_OFFICER";
+    public static final String ADMIN = "ADMIN";
+
     @Value("${frontend.pages.whitelist}")
     private String[] frontendPagesWhitelist;
 
@@ -79,22 +87,17 @@ public class SecurityConfig {
                         "/**/*.jpg",
                         "/**/*.html",
                         "/**/*.css",
-                        "/**/*.js")
-                .permitAll()
+                        "/**/*.js").permitAll()
                 .antMatchers(
                         "/v3/api-docs/**",
                         "/swagger-resources/**",
                         "/swagger-ui.html",
-                        "/manifest.json")
-                .permitAll()
-                .antMatchers("/api/v1/auth/**")
-                .permitAll()
-                .antMatchers(HttpMethod.GET, frontendPagesWhitelist)
-                .permitAll()
-                .antMatchers(HttpMethod.GET, "/api/v1/**")
-                .hasAnyRole("POWER_USER", "ADMIN", "DATA_OFFICER")
-                .anyRequest()
-                .hasAnyRole("ADMIN", "DATA_OFFICER");
+                        "/manifest.json").permitAll()
+                .antMatchers("/api/v1/auth/**").permitAll()
+                .antMatchers(HttpMethod.GET, frontendPagesWhitelist).permitAll()
+                .antMatchers(HttpMethod.PUT, "/api/v1/data/survey/**").hasAnyRole(POWER_USER, SURVEY_EDITOR)
+                .antMatchers(HttpMethod.GET, "/api/v1/**").hasAnyRole(POWER_USER, ADMIN, DATA_OFFICER, SURVEY_EDITOR)
+                .anyRequest().hasAnyRole(ADMIN, DATA_OFFICER);
 
         // Add our custom JWT security filter
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

@@ -1,10 +1,13 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import au.org.aodn.nrmn.restapi.data.model.*;
+import au.org.aodn.nrmn.restapi.dto.survey.SurveyDto;
 import au.org.aodn.nrmn.restapi.model.db.*;
 import au.org.aodn.nrmn.restapi.test.JwtToken;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -18,11 +21,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.test.context.support.WithUserDetails;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -48,6 +53,12 @@ public class SurveyControllerIT {
 
     @Autowired
     private ObservationTestData observationTestData;
+
+    @Autowired
+    private ModelMapper mapper;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private DiverTestData diverTestData;
@@ -89,6 +100,34 @@ public class SurveyControllerIT {
                 .body("lastRow", equalTo(1),
                         "items[0].surveyId", equalTo(testSurvey.getSurveyId()));
     }
+    /**
+     * Test the put method, it should not fail with survey_editor rights
+     * @throws JsonProcessingException
+     */
+    @Test
+    @WithUserDetails("survey_editor@example.com")
+    public void testPutSurvey() throws JsonProcessingException {
+
+        Survey testSurvey = surveyTestData.persistedSurvey();
+
+        // Reset the date to avoid put fail.
+        testSurvey.setSurveyDate(Date.valueOf(LocalDate.now()));
+
+        SurveyDto dto = new SurveyDto();
+        // Create a DTO that fit the API, content isn't important, we want to make sure
+        // permission denied is not trigger
+        mapper.map(testSurvey, dto);
+
+        given().spec(getDataSpec)
+                .auth()
+                .oauth2(jwtToken.get())
+                .body(objectMapper.writeValueAsString(dto))
+                .put("survey/" + testSurvey.getSurveyId().toString())
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
 
     @Test
     @WithUserDetails("test@example.com")

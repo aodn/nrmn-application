@@ -9,6 +9,8 @@ import stateFilterHandler from '../../../common/state-event-handler/StateFilterH
 import 'ag-grid-enterprise';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import {AuthContext} from '../../../contexts/auth-context';
+import {AppConstants} from '../../../common/constants';
 
 const LocationList = () => {
   const rowsPerPage = 50;
@@ -98,69 +100,77 @@ const LocationList = () => {
   if (redirect) return <Navigate push to={`/reference/location/${redirect}`} />;
 
   return (
-    <>
-      <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
-      <Box display="flex" flexDirection="row" p={1} pb={1}>
-        <Box flexGrow={1}>
-          <Typography variant="h4">Locations</Typography>
+    <AuthContext.Consumer>
+      {({auth}) =>
+      <>
+        <Backdrop
+          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={loading}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        <Box display="flex" flexDirection="row" p={1} pb={1}>
+          <Box flexGrow={1}>
+            <Typography variant="h4">Locations</Typography>
+          </Box>
+          <Box>
+            <Button
+              variant="contained" to="/reference/location"
+              component={NavLink}
+              startIcon={<Add />}
+              disabled={!(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))}>New Location
+            </Button>
+          </Box>
         </Box>
-        <Box>
-          <Button variant="contained" to="/reference/location" component={NavLink} startIcon={<Add />}>
-            New Location
-          </Button>
-        </Box>
-      </Box>
-      <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
-        <AgGridReact
-          ref={gridRef}
-          id={'location-list'}
-          rowHeight={24}
-          pagination={true}
-          paginationPageSize={rowsPerPage}
-          rowModelType={'infinite'}
-          enableCellTextSelection={true}
-          onGridReady={(e) => onGridReady(e)}
-          onBodyScrollEnd={(e) => autoSizeAll(e, false)}
-          onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
-          suppressCellFocus={true}
-          defaultColDef={{
-            lockVisible: true,
-            sortable: true,
-            resizable: true,
-            filter: 'agTextColumnFilter',
-            floatingFilter: true
-          }}
-        >
-          <AgGridColumn
-            width={40}
-            field="id"
-            headerName=""
-            suppressMovable={true}
-            filter={false}
-            resizable={false}
-            sortable={false}
-            valueFormatter={() => '✎'}
-            cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
-            onCellClicked={(e) => {
-              if (e.event.ctrlKey) {
-                window.open(`/reference/location/${e.data.id}/edit`, '_blank').focus();
-              } else {
-                setRedirect(`${e.data.id}/edit`);
-              }
+        <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
+          <AgGridReact
+            ref={gridRef}
+            id={'location-list'}
+            rowHeight={24}
+            pagination={true}
+            paginationPageSize={rowsPerPage}
+            rowModelType={'infinite'}
+            enableCellTextSelection={true}
+            onGridReady={(e) => onGridReady(e)}
+            onBodyScrollEnd={(e) => autoSizeAll(e, false)}
+            onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
+            suppressCellFocus={true}
+            defaultColDef={{
+              lockVisible: true,
+              sortable: true,
+              resizable: true,
+              filter: 'agTextColumnFilter',
+              floatingFilter: true
             }}
-          />
-          <AgGridColumn field="locationName" colId="location.locationName" sort="asc" cellStyle={{cursor: 'pointer'}} onCellClicked={(e) => setRedirect(e.data.id)} />
-          <AgGridColumn maxWidth={80} field="status" colId="location.status"/>
-          <AgGridColumn minWidth={600} field="ecoRegions" colId="location.ecoRegions"/>
-          <AgGridColumn field="countries" colId="location.countries"/>
-          <AgGridColumn minWidth={600} field="areas" colId="location.areas"/>
-        </AgGridReact>
-      </Box>
-    </>
+          >
+            <AgGridColumn
+              width={40}
+              field="id"
+              headerName=""
+              suppressMovable={true}
+              filter={false}
+              resizable={false}
+              sortable={false}
+              valueFormatter={() => '✎'}
+              cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
+              onCellClicked={(e) => {
+                if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN)) {
+                  if (e.event.ctrlKey) {
+                    window.open(`/reference/location/${e.data.id}/edit`, '_blank').focus();
+                  } else {
+                    setRedirect(`${e.data.id}/edit`);
+                  }
+                }
+              }}
+            />
+            <AgGridColumn field="locationName" colId="location.locationName" sort="asc" cellStyle={{cursor: 'pointer'}} onCellClicked={(e) => setRedirect(e.data.id)} />
+            <AgGridColumn maxWidth={80} field="status" colId="location.status"/>
+            <AgGridColumn minWidth={600} field="ecoRegions" colId="location.ecoRegions"/>
+            <AgGridColumn field="countries" colId="location.countries"/>
+            <AgGridColumn minWidth={600} field="areas" colId="location.areas"/>
+          </AgGridReact>
+        </Box>
+      </>}
+    </AuthContext.Consumer>
   );
 };
 

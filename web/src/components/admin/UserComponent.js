@@ -3,12 +3,14 @@ import {Box, Typography} from '@mui/material';
 import {entityEdit, entitySave} from '../../api/api';
 import {PropTypes} from 'prop-types';
 import TargetUrlComponent from '../input/TargetUrlComponent';
+import { AppConstants } from '../../common/constants';
 
 const UserComponent = ({value, onAdd}) => {
   const addMode = typeof onAdd !== 'undefined';
 
-  const userRoles = ['ROLE_DATA_OFFICER'];
-  const adminRoles = ['ROLE_DATA_OFFICER', 'ROLE_ADMIN'];
+  const dataOfficerRole = [AppConstants.ROLES.DATA_OFFICER];
+  const surveyEditorRole = [AppConstants.ROLES.SURVEY_EDITOR];
+  const adminRoles = [AppConstants.ROLES.DATA_OFFICER, AppConstants.ROLES.ADMIN];
 
   const [state, dispatch] = useReducer(
     (state, action) => {
@@ -20,7 +22,9 @@ const UserComponent = ({value, onAdd}) => {
             user: action.value,
             userUpdate: action.value,
             userEnabled: action.value.roles.length > 0,
-            userIsAdmin: action.value.roles.includes('ROLE_ADMIN'),
+            userIsSurveyEditor: action.value.roles.includes(AppConstants.ROLES.SURVEY_EDITOR),
+            userIsDataOfficer: action.value.roles.includes(AppConstants.ROLES.DATA_OFFICER),
+            userIsAdmin: action.value.roles.includes(AppConstants.ROLES.ADMIN),
             userPayload: null,
             editMode: false,
             error: null
@@ -33,12 +37,20 @@ const UserComponent = ({value, onAdd}) => {
           switch (action.value) {
             case 'resetPassword':
               return {...state, userPayload: {...state.user, resetPassword: true}};
-            case 'toggleUserEnabled':
+            case 'toggleDataOfficer':
               return {
                 ...state,
                 userPayload: {
                   ...state.user,
-                  roles: state.user.roles.length > 0 ? [] : userRoles
+                  roles: !state.user.roles.includes(AppConstants.ROLES.DATA_OFFICER) ? dataOfficerRole : []
+                }
+              };
+            case 'toggleSurveyEditor':
+              return {
+                ...state,
+                userPayload: {
+                  ...state.user,
+                  roles: !state.user.roles.includes(AppConstants.ROLES.SURVEY_EDITOR) ? surveyEditorRole : []
                 }
               };
             case 'toggleIsAdmin':
@@ -46,7 +58,7 @@ const UserComponent = ({value, onAdd}) => {
                 ...state,
                 userPayload: {
                   ...state.user,
-                  roles: state.user.roles.includes('ROLE_ADMIN') ? userRoles : adminRoles
+                  roles: state.user.roles.includes(AppConstants.ROLES.ADMIN) ? dataOfficerRole : adminRoles
                 }
               };
             default:
@@ -61,7 +73,9 @@ const UserComponent = ({value, onAdd}) => {
       user: value,
       userUpdate: value,
       userEnabled: value.roles.length > 0,
-      userIsAdmin: value.roles.includes('ROLE_ADMIN'),
+      userIsSurveyEditor: value.roles.includes(AppConstants.ROLES.SURVEY_EDITOR),
+      userIsDataOfficer: value.roles.includes(AppConstants.ROLES.DATA_OFFICER),
+      userIsAdmin: value.roles.includes(AppConstants.ROLES.ADMIN),
       userPayload: null,
       editMode: addMode,
       error: null
@@ -123,8 +137,11 @@ const UserComponent = ({value, onAdd}) => {
             ) : (
               <button onClick={() => dispatch({type: 'submit', value: 'resetPassword'})}>Reset Password</button>
             )}
-            <button onClick={() => dispatch({type: 'submit', value: 'toggleUserEnabled'})}>
-              {state.userEnabled ? 'Disable' : 'Enable'} Account
+            <button onClick={() => dispatch({type: 'submit', value: 'toggleSurveyEditor'})}>
+              {state.userIsSurveyEditor ? 'Disable' : 'Enable'} Survey Editor
+            </button>
+            <button onClick={() => dispatch({type: 'submit', value: 'toggleDataOfficer'})} disabled={state.userIsAdmin}>
+              {state.userIsDataOfficer || state.userIsAdmin ? 'Disable' : 'Enable'} Data Officer
             </button>
             <button onClick={() => dispatch({type: 'submit', value: 'toggleIsAdmin'})}>
               {state.userIsAdmin ? 'Disable' : 'Enable'} Admin

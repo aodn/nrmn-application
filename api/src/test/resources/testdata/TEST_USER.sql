@@ -42,3 +42,10 @@ INSERT INTO
     nrmn.sec_user_roles (sec_user_id, sec_role_id)
     VALUES (654321, 'ROLE_POWER_USER');
 
+INSERT INTO
+    nrmn.sec_user (id, email_address, full_name,hashed_password, status, version)
+VALUES( 654322, 'survey_editor@example.com', 'Survey Editor','$2a$10$nlGPV/fr5nbbUm/XGQ94cuoN.6TAwW2IqEanB1RVIzUBTifPrdR4q', 'ACTIVE', 1);
+
+INSERT INTO
+    nrmn.sec_user_roles (sec_user_id, sec_role_id)
+VALUES (654322, 'ROLE_SURVEY_EDITOR');

@@ -1,8 +1,5 @@
 package au.org.aodn.nrmn.restapi.controller;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,9 +9,9 @@ import javax.validation.Valid;
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
 
+import au.org.aodn.nrmn.restapi.service.ObservableItemService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +26,6 @@ import au.org.aodn.nrmn.restapi.data.model.ObservationItemListView;
 import au.org.aodn.nrmn.restapi.data.repository.ObservableItemListRepository;
 import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.data.repository.dynamicQuery.FilterCondition;
-import au.org.aodn.nrmn.restapi.controller.exception.ResourceNotFoundException;
-import au.org.aodn.nrmn.restapi.controller.exception.ValidationException;
-import au.org.aodn.nrmn.restapi.controller.validation.FormValidationError;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemGetDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemPutDto;
@@ -42,19 +36,22 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/reference")
 public class ObservableItemController {
 
-    private static Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private static Logger logger = LoggerFactory.getLogger(ObservableItemController.class);
 
     @Autowired
-    private ObservableItemRepository observableItemRepository;
+    protected ObservableItemRepository observableItemRepository;
 
     @Autowired
-    private ObservableItemListRepository observableItemListRepository;
+    protected ObservableItemListRepository observableItemListRepository;
 
     @Autowired
-    private ModelMapper mapper;
+    protected ModelMapper mapper;
 
     @Autowired
-    private ObjectMapper objMapper;
+    protected ObjectMapper objMapper;
+
+    @Autowired
+    protected ObservableItemService observableItemService;
 
     @GetMapping(path = "/observableItems")
     public  ResponseEntity<?> getObservationItemsWithFilters(@RequestParam(value = "sort", required = false) String sort,
@@ -82,7 +79,7 @@ public class ObservableItemController {
     @ResponseStatus(HttpStatus.CREATED)
     public ObservableItemDto newObservableItem(@Valid @RequestBody ObservableItemDto observableItemDto) {
         ObservableItem newObservableItem = mapper.map(observableItemDto, ObservableItem.class);
-        validate(newObservableItem);
+        observableItemService.validate(newObservableItem);
         ObservableItem persistedObservableItem = observableItemRepository.save(newObservableItem);
         return mapper.map(persistedObservableItem, ObservableItemDto.class);
     }
@@ -105,60 +102,6 @@ public class ObservableItemController {
     public ObservableItemGetDto updateObservableItem(@PathVariable Integer id,
                                                      @Valid @RequestBody ObservableItemPutDto observableItemPutDto) {
 
-        var observableItem = observableItemRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Observable Id " + id + " not found in updateObservableItem()"));
-
-        // Only allow the species name to be changed within 72 hours of creation
-        if (!observableItem.getObservableItemName().equals(observableItemPutDto.getObservableItemName()) &&
-                (observableItem.getCreated() == null
-                        || ChronoUnit.HOURS.between(observableItem.getCreated(), LocalDateTime.now()) >= 72)) {
-
-            throw new ValidationException(ObservableItemDto.class.getName(),"observableItemName","Species Name editing not allowed more than 72 hours after creation.");
-        }
-
-        mapper.map(observableItemPutDto, observableItem);
-        validate(observableItem);
-        var persistedObservableItem = observableItemRepository.save(observableItem);
-        return mapper.map(persistedObservableItem, ObservableItemGetDto.class);
-    }
-
-    private void validate(ObservableItem item) {
-
-        List<FormValidationError> errors = new ArrayList<FormValidationError>();
-
-        if (StringUtils.isEmpty(item.getObservableItemName()))
-            errors.add(new FormValidationError(ObservableItemDto.class.getName(), "observableItemName",
-                    item.getObservableItemName(), "Species Name Required."));
-
-        ObservableItem probe = ObservableItem.builder().commonName(item.getCommonName())
-                .letterCode(item.getLetterCode()).observableItemName(item.getObservableItemName()).build();
-        Example<ObservableItem> example = Example.of(probe, ExampleMatcher.matchingAny());
-
-        List<ObservableItem> allMatches = observableItemRepository.findAll(example);
-        for (ObservableItem match : allMatches) {
-
-            if (match.getObservableItemId().equals(item.getObservableItemId()))
-                continue;
-
-            if (StringUtils.isNotEmpty(match.getObservableItemName())
-                    && match.getObservableItemName().equals(item.getObservableItemName()))
-                errors.add(new FormValidationError(ObservableItemDto.class.getName(), "observableItemName",
-                        item.getObservableItemName(), "An item with this name already exists."));
-
-            if (StringUtils.isNotEmpty(match.getLetterCode()) && match.getLetterCode().equals(item.getLetterCode()))
-                errors.add(new FormValidationError(ObservableItemDto.class.getName(), "letterCode", item.getLetterCode(),
-                        "An item with this letter code already exists."));
-        }
-
-        if (StringUtils.isEmpty(item.getSupersededBy())) {
-            item.setSupersededBy(null);
-        } else if (observableItemRepository.exactSearch(item.getSupersededBy()).isEmpty()) {
-            logger.info(String.format("Invalid supersededBy value: \"%s\". Setting to null.", item.getSupersededBy()));
-            item.setSupersededBy(null);
-        }
-
-        if (!errors.isEmpty())
-            throw new ValidationException(errors);
+        return mapper.map(observableItemService.updateObservableItem(id, observableItemPutDto), ObservableItemGetDto.class);
     }
 }

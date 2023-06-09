@@ -6,6 +6,9 @@ import SpeciesCorrectResults from './SpeciesCorrectResults';
 import SpeciesCorrectEdit from './SpeciesCorrectEdit';
 import JobView from '../../job/JobView';
 import SpeciesCorrectErrorResults from './SpeciesCorrectErrorResults';
+import {AuthContext} from '../../../contexts/auth-context';
+import {AppConstants} from '../../../common/constants';
+import Alert from '@mui/material/Alert';
 
 const removeNullProperties = (obj) => {
   return obj ? Object.fromEntries(Object.entries(obj).filter((v) => v[1] && v[1] !== '')) : null;
@@ -82,11 +85,8 @@ const SpeciesCorrect = () => {
     dispatch({type: 'showError', payload: error?.response?.data});
   };
 
-  return (
+  const tabContent = () =>
     <>
-      <Box p={1}>
-        <Typography variant="h6">Species Correction</Typography>
-      </Box>
       <Tabs value={tabIndex} onChange={(e, v) => setTabIndex(v)}>
         <Tab style={{minWidth: '33%'}} label="Search" />
         <Tab style={{minWidth: '33%'}} label="Correcting" disabled={!selected || jobId} />
@@ -96,7 +96,7 @@ const SpeciesCorrect = () => {
         <Box border={1} borderRadius={1} m={1} borderColor="divider">
           <JobView jobId={jobId} />
           <Box width={200} m={2}>
-          <Button variant="contained" onClick={() => setTabIndex(0)}>Return to Search</Button>
+            <Button variant="contained" onClick={() => setTabIndex(0)}>Return to Search</Button>
           </Box>
         </Box>
       )}
@@ -134,6 +134,27 @@ const SpeciesCorrect = () => {
           )}
         </Box>
       }
+    </>;
+
+  return (
+    <>
+      <Box p={1}>
+        <Typography variant="h6">Species Correction</Typography>
+      </Box>
+      <AuthContext.Consumer>
+        {({auth}) => {
+          if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN)) {
+            return tabContent();
+          }
+          else {
+            return(
+              <Alert severity="error" variant="outlined">
+                <p>Permission Denied</p>
+              </Alert>
+            );
+          }
+        }}
+      </AuthContext.Consumer>
     </>
   );
 };

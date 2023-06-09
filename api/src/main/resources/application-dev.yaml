@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    username: nrmn_dev
+    url: jdbc:postgresql://${POSTGRES_HOST}:5432/nrmn_dev
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+app:
+  features: corrections
+
+logging:
+  level:
+    ROOT: info

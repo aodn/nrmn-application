@@ -4,6 +4,9 @@ import React, {useEffect, useState} from 'react';
 import {getEntity, templateZip} from '../../api/api';
 import FileDownload from 'js-file-download';
 import LoadingButton from '@mui/lab/LoadingButton';
+import {AuthContext} from '../../contexts/auth-context';
+import {AppConstants} from '../../common/constants';
+import Alert from '@mui/material/Alert';
 
 const ExtractTemplateData = () => {
   const [locations, setLocations] = useState([]);
@@ -74,7 +77,7 @@ const ExtractTemplateData = () => {
     if (download && templateLocations.length > 0) fetchDownload();
   }, [download, templateLocations]);
 
-  return (
+  const content = () =>
     <>
       <Box p={1}>
         <Typography variant="h4">Template Data</Typography>
@@ -148,7 +151,23 @@ const ExtractTemplateData = () => {
           Download Sheets
         </LoadingButton>
       </Box>
-    </>
+    </>;
+
+  return (
+    <AuthContext.Consumer>
+      {({auth}) => {
+        if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN)) {
+          return content();
+        }
+        else {
+          return(
+            <Alert severity="error" variant="outlined">
+              <p>Permission Denied</p>
+            </Alert>
+          );
+        }
+      }}
+    </AuthContext.Consumer>
   );
 };
 

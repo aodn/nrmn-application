@@ -9,6 +9,8 @@ import 'ag-grid-enterprise';
 import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import {AuthContext} from '../../../contexts/auth-context';
+import {AppConstants} from '../../../common/constants';
 
 const DiverList = () => {
   const rowsPerPage = 50;
@@ -137,16 +139,30 @@ const DiverList = () => {
         <Box flexGrow={1}>
           <Typography variant="h4">Divers</Typography>
         </Box>
-        <Box>
-          <Button variant="contained" to="/reference/diver" component={NavLink} startIcon={<Add />}>
-            New Diver
-          </Button>
-        </Box>
-        <Box mx={2}>
-          <Button variant="contained" startIcon={<Save />} onClick={saveGrid} disabled={Object.keys(delta).length < 1}>
-            Save Changes
-          </Button>
-        </Box>
+        <AuthContext.Consumer>
+          {({auth}) => (
+            <>
+              <Box>
+                <Button variant="contained" to="/reference/diver"
+                        component={NavLink}
+                        startIcon={<Add />}
+                        disabled={!(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))}>
+                  New Diver
+                </Button>
+              </Box>
+              <Box mx={2}>
+                <Button variant="contained"
+                        startIcon={<Save />}
+                        onClick={saveGrid}
+                        disabled={
+                          Object.keys(delta).length < 1
+                          || !(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))
+                        }>
+                  Save Changes
+                </Button>
+              </Box>
+            </>)}
+        </AuthContext.Consumer>
       </Box>
       <AgGridReact
         ref={gridRef}

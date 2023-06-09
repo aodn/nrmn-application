@@ -8,7 +8,7 @@ import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOu
 import UndoIcon from '@mui/icons-material/Undo';
 import ResetIcon from '@mui/icons-material/LayersClear';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import {PropTypes} from 'prop-types';
+import { PropTypes } from 'prop-types';
 import {useParams, NavLink} from 'react-router-dom';
 import {getDataJob, submitIngest, updateRows, validateJob} from '../../api/api';
 import { AppConstants, extendedMeasurements, measurements } from '../../common/constants';
@@ -58,7 +58,7 @@ const defaultSideBar = {
 
 const IngestState = Object.freeze({Loading: 0, Edited: 1, Locked: 2, Valid: 3, ConfirmSubmit: 4});
 
-const DataSheetView = ({onIngest, isAdmin}) => {
+const DataSheetView = ({onIngest, roles}) => {
   const {id} = useParams();
   const [job, setJob] = useState({});
   const [gridApi, setGridApi] = useState();
@@ -66,6 +66,9 @@ const DataSheetView = ({onIngest, isAdmin}) => {
   const [undoSize, setUndoSize] = useState(0);
   const [state, setState] = useState(IngestState.Loading);
   const [sideBar, setSideBar] = useState(defaultSideBar);
+
+  const isAdmin = roles.includes(AppConstants.ROLES.ADMIN);
+  const isDataOfficer = roles.includes(AppConstants.ROLES.DATA_OFFICER);
 
   const defaultColDef = {
     lockVisible: true,
@@ -339,7 +342,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
                 <Box p={1} minWidth={180}>
                   <Button
                     variant="contained"
-                    disabled={state === IngestState.Loading}
+                    disabled={state === IngestState.Loading || !isDataOfficer || !isAdmin}
                     onClick={handleSaveAndValidate}
                     startIcon={<PlaylistAddCheckOutlinedIcon />}
                   >
@@ -450,7 +453,7 @@ const DataSheetView = ({onIngest, isAdmin}) => {
 
 DataSheetView.propTypes = {
   onIngest: PropTypes.func.isRequired,
-  isAdmin: PropTypes.bool.isRequired
+  roles: PropTypes.array.isRequired
 };
 
 export default DataSheetView;
