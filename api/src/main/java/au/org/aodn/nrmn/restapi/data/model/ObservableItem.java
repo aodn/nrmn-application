@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.data.model;
 
 import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
@@ -26,17 +27,10 @@ import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.*;
+import org.hibernate.annotations.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -47,7 +41,7 @@ import lombok.NoArgsConstructor;
 @SecondaryTable(name = "lengthweight_ref", pkJoinColumns = @PrimaryKeyJoinColumn(name = "observable_item_id"),
  foreignKey = @ForeignKey(name = "lengthweight_ref_observable_item_id_fkey"))
 @Audited(withModifiedFlag = true)
-public class ObservableItem {
+public class ObservableItem implements Serializable {
     @Id
     @SequenceGenerator(name = "observable_item_ref_observable_item_id", sequenceName =
             "observable_item_ref_observable_item_id", allocationSize = 1)
@@ -120,6 +114,12 @@ public class ObservableItem {
     @Basic
     @Column(name = "superseded_by")
     private String supersededBy;
+
+    @NotAudited
+    @ManyToOne
+    @NotFound(action= NotFoundAction.IGNORE)
+    @JoinColumn(name="superseded_by", referencedColumnName = "observable_item_name", updatable = false, insertable = false)
+    private ObservableItem supersededBySpecies;
     
     @Basic
     @Column(name = "is_invert_sized")
@@ -133,7 +133,9 @@ public class ObservableItem {
     @Embedded
     @Audited(targetAuditMode = NOT_AUDITED)
     @Valid
-    private LengthWeight lengthWeight;
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private LengthWeight itemLengthWeight;
 
     @Basic
     @Column(name = "aphia_id")
@@ -151,4 +153,14 @@ public class ObservableItem {
     @NotAudited
     @EqualsAndHashCode.Exclude
     private Set<Method> methods;
+
+    public LengthWeight getLengthWeight() {
+        return supersededBySpecies != null ? supersededBySpecies.getLengthWeight() : itemLengthWeight;
+    }
+
+    public void setLengthWeight(LengthWeight lengthWeight) {
+        if(supersededBySpecies == null) {
+            itemLengthWeight = lengthWeight;
+        }
+    }
 }
