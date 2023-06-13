@@ -95,7 +95,9 @@ public class SecurityConfig {
                         "/manifest.json").permitAll()
                 .antMatchers("/api/v1/auth/**").permitAll()
                 .antMatchers(HttpMethod.GET, frontendPagesWhitelist).permitAll()
-                .antMatchers(HttpMethod.PUT, "/api/v1/data/survey/**").hasAnyRole(POWER_USER, SURVEY_EDITOR)
+                .antMatchers(HttpMethod.PUT, "/api/v1/data/survey/**").hasAnyRole(POWER_USER, SURVEY_EDITOR, ADMIN, DATA_OFFICER)
+                .antMatchers(HttpMethod.POST, "/api/v1/correction/**").hasAnyRole(POWER_USER, SURVEY_EDITOR, ADMIN, DATA_OFFICER)
+                .antMatchers(HttpMethod.DELETE, "/api/v1/correction/**").hasAnyRole(POWER_USER, SURVEY_EDITOR, ADMIN, DATA_OFFICER)
                 .antMatchers(HttpMethod.GET, "/api/v1/**").hasAnyRole(POWER_USER, ADMIN, DATA_OFFICER, SURVEY_EDITOR)
                 .anyRequest().hasAnyRole(ADMIN, DATA_OFFICER);
 
