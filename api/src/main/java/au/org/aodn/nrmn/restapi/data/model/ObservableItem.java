@@ -45,7 +45,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Table(name = "observable_item_ref")
 @SecondaryTable(name = "lengthweight_ref", pkJoinColumns = @PrimaryKeyJoinColumn(name = "observable_item_id"),
- foreignKey = @ForeignKey(name = "lengthweight_ref_observable_item_id_fkey"))
+        foreignKey = @ForeignKey(name = "lengthweight_ref_observable_item_id_fkey"))
 @Audited(withModifiedFlag = true)
 public class ObservableItem {
     @Id
@@ -54,9 +54,9 @@ public class ObservableItem {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "observable_item_ref_observable_item_id")
     @Column(name = "observable_item_id", unique = true, updatable = false, nullable = false)
     private Integer observableItemId;
-    
+
     @NotAudited
-    @CreationTimestamp 
+    @CreationTimestamp
     @Column(name = "created", updatable = false)
     private LocalDateTime created;
 
@@ -75,7 +75,7 @@ public class ObservableItem {
     @JoinColumn(name = "obs_item_type_id", referencedColumnName = "obs_item_type_id", nullable = false)
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     private ObsItemType obsItemType;
-    
+
     @Basic
     @Column(name = "common_name")
     private String commonName;
@@ -120,7 +120,7 @@ public class ObservableItem {
     @Basic
     @Column(name = "superseded_by")
     private String supersededBy;
-    
+
     @Basic
     @Column(name = "is_invert_sized")
     private Boolean isInvertSized;
@@ -147,7 +147,7 @@ public class ObservableItem {
 
     @OneToMany()
     @JoinTable(name = "methods_species", joinColumns = @JoinColumn(name = "observable_item_id"),
-      inverseJoinColumns = @JoinColumn(name = "method_id"))
+            inverseJoinColumns = @JoinColumn(name = "method_id"))
     @NotAudited
     @EqualsAndHashCode.Exclude
     private Set<Method> methods;

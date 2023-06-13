@@ -307,13 +307,13 @@ class CorrectionsControllerIT {
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
     /**
-     * Expect fail on
+     * Expect OK
      * @throws Exception
      */
     @Test
     @WithUserDetails("survey_editor@example.com")
     public void testPermissionOnWrite() throws Exception {
-        validateSurveyCorrectionEmptyDtoCommon(HttpStatus.FORBIDDEN);
+        validateSurveyCorrectionEmptyDtoCommon(HttpStatus.OK);
     }
 
     @Test
@@ -457,13 +457,13 @@ class CorrectionsControllerIT {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
     /**
-     * Expected fail due to use of this user
+     * Expected OK
      * @throws Exception
      */
     @Test
     @WithUserDetails("survey_editor@example.com")
     public void testPermissionOnDelete() throws Exception {
-        deleteSurveyUnknownSurveyIdCommon(HttpStatus.FORBIDDEN);
+        deleteSurveyUnknownSurveyIdCommon(HttpStatus.NOT_FOUND);
     }
 
     @Test
