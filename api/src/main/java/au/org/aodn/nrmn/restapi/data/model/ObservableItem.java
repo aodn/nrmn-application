@@ -2,7 +2,6 @@ package au.org.aodn.nrmn.restapi.data.model;
 
 import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
@@ -27,10 +26,17 @@ import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import lombok.*;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -39,18 +45,18 @@ import org.hibernate.envers.NotAudited;
 @Builder
 @Table(name = "observable_item_ref")
 @SecondaryTable(name = "lengthweight_ref", pkJoinColumns = @PrimaryKeyJoinColumn(name = "observable_item_id"),
- foreignKey = @ForeignKey(name = "lengthweight_ref_observable_item_id_fkey"))
+        foreignKey = @ForeignKey(name = "lengthweight_ref_observable_item_id_fkey"))
 @Audited(withModifiedFlag = true)
-public class ObservableItem implements Serializable {
+public class ObservableItem {
     @Id
     @SequenceGenerator(name = "observable_item_ref_observable_item_id", sequenceName =
             "observable_item_ref_observable_item_id", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "observable_item_ref_observable_item_id")
     @Column(name = "observable_item_id", unique = true, updatable = false, nullable = false)
     private Integer observableItemId;
-    
+
     @NotAudited
-    @CreationTimestamp 
+    @CreationTimestamp
     @Column(name = "created", updatable = false)
     private LocalDateTime created;
 
@@ -69,7 +75,7 @@ public class ObservableItem implements Serializable {
     @JoinColumn(name = "obs_item_type_id", referencedColumnName = "obs_item_type_id", nullable = false)
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     private ObsItemType obsItemType;
-    
+
     @Basic
     @Column(name = "common_name")
     private String commonName;
@@ -115,12 +121,6 @@ public class ObservableItem implements Serializable {
     @Column(name = "superseded_by")
     private String supersededBy;
 
-    @NotAudited
-    @ManyToOne
-    @NotFound(action= NotFoundAction.IGNORE)
-    @JoinColumn(name="superseded_by", referencedColumnName = "observable_item_name", updatable = false, insertable = false)
-    private ObservableItem supersededBySpecies;
-    
     @Basic
     @Column(name = "is_invert_sized")
     private Boolean isInvertSized;
@@ -133,9 +133,7 @@ public class ObservableItem implements Serializable {
     @Embedded
     @Audited(targetAuditMode = NOT_AUDITED)
     @Valid
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private LengthWeight itemLengthWeight;
+    private LengthWeight lengthWeight;
 
     @Basic
     @Column(name = "aphia_id")
@@ -149,18 +147,8 @@ public class ObservableItem implements Serializable {
 
     @OneToMany()
     @JoinTable(name = "methods_species", joinColumns = @JoinColumn(name = "observable_item_id"),
-      inverseJoinColumns = @JoinColumn(name = "method_id"))
+            inverseJoinColumns = @JoinColumn(name = "method_id"))
     @NotAudited
     @EqualsAndHashCode.Exclude
     private Set<Method> methods;
-
-    public LengthWeight getLengthWeight() {
-        return supersededBySpecies != null ? supersededBySpecies.getLengthWeight() : itemLengthWeight;
-    }
-
-    public void setLengthWeight(LengthWeight lengthWeight) {
-        if(supersededBySpecies == null) {
-            itemLengthWeight = lengthWeight;
-        }
-    }
 }
