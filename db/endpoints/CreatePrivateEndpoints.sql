@@ -1065,7 +1065,6 @@ select
 from nrmn.ep_observable_items oi
 where oi.obs_item_type_name in ('Species', 'Undescribed Species')
 and exists (select 1 from nrmn.observation obs where obs.observable_item_id = oi.observable_item_id)
-and oi.superseded_by is null
 except
 select epoi.observable_item_id as species_id,
 	epoi.observable_item_name as recorded_species_name,
@@ -1092,7 +1091,6 @@ select epoi.observable_item_id as species_id,
 	from nrmn.ep_observable_items epoi
 where  epoi.obs_item_type_name in ('Species', 'Undescribed Species')
 and exists (select 1 from nrmn.observation obs where obs.observable_item_id = epoi.observable_item_id)
-and epoi.superseded_by is null
 and (epoi.phylum in ('Cnidaria','Echiura','Heterokontophyta')
 or epoi.class in ('Anthozoa','Ascidiacea','Echiuroidea','Phaeophyceae', 'Aves')
 or epoi.observable_item_name ~ 'spp.$');
