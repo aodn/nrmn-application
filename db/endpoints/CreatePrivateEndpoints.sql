@@ -1064,7 +1064,10 @@ select
 	oi.mapped_id
 from nrmn.ep_observable_items oi
 where oi.obs_item_type_name in ('Species', 'Undescribed Species')
-and exists (select 1 from nrmn.observation obs where obs.observable_item_id = oi.observable_item_id)
+and exists (select 1 from nrmn.observation obs
+         join nrmn.observable_item_ref oir on obs.observable_item_id = oir.observable_item_id
+    where observable_item_name = coalesce(oir.superseded_by, oir.observable_item_name))
+and oi.superseded_by is NULL
 except
 select epoi.observable_item_id as species_id,
 	epoi.observable_item_name as recorded_species_name,
