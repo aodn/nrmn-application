@@ -1,0 +1,4 @@
+-- this is the folder to place pg_cron scripts. pg_cron is a postgresql extension 
+-- that provides cron scheduling functionality within a database instance. 
+-- This is particularly useful for AWS RDS instances which are serverless.
+-- See https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/PostgreSQL_pg_cron.html for usage 
