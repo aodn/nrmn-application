@@ -10,6 +10,8 @@ import { AxiosResponse } from 'axios';
 import SiteList from '../SiteList';
 import { createMemoryHistory } from 'history';
 import stateFilterHandler from '../../../../common/state-event-handler/StateFilterHandler';
+import {AuthContext} from '../../../../contexts/auth-context';
+import { AppConstants } from '../../../../common/constants';
 
 jest.setTimeout(30000);
 
@@ -33,7 +35,7 @@ describe('<SiteList/> filter testing', () => {
     mockGetFiltersForId.mockReset();
   });
 
-  test.skip('Render necessary fields and no filter restored', async () => {
+  test('Render necessary fields and no filter restored', async () => {
     const canned = require('./SiteList.filter.data.json');
 
     // Override function so that it return the data we set.
@@ -53,7 +55,12 @@ describe('<SiteList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: true}}]});
-    const {container, rerender} = render(<Router location={history.location} navigator={history}><SiteList/></Router>);
+    const {container, rerender} = render(
+      <Router location={history.location} navigator={history}>
+        <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+          <SiteList/>
+        </AuthContext.Provider>
+      </Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetEntity).toHaveBeenCalledTimes(1), {timeout: 10000})
@@ -65,7 +72,12 @@ describe('<SiteList/> filter testing', () => {
       })
       .finally(() => {
         // Refresh the dom tree
-        rerender(<Router location={history.location} navigator={history}><SiteList/></Router>);
+        rerender(
+          <Router location={history.location} navigator={history}>
+            <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+              <SiteList/>
+            </AuthContext.Provider>
+          </Router>);
 
         expect(screen.getByText('Lhohaesf')).toBeInTheDocument();
         expect(screen.getByText('Silesv')).toBeInTheDocument();
@@ -77,7 +89,7 @@ describe('<SiteList/> filter testing', () => {
       });
   });
 
-  test.skip('Render necessary fields with filter restored', async () => {
+  test('Render necessary fields with filter restored', async () => {
     const canned = require('./SiteList.filter.data.json');
 
     // Filter set will cause some items disappeared
@@ -102,7 +114,12 @@ describe('<SiteList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: false}}]});
-    const {container, rerender} = render(<Router location={history.location} navigator={history}><SiteList/></Router>);
+    const {container, rerender} = render(
+      <Router location={history.location} navigator={history}>
+        <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+          <SiteList/>
+        </AuthContext.Provider>
+      </Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetEntity).toHaveBeenCalledTimes(1), {timeout: 10000})
@@ -114,7 +131,12 @@ describe('<SiteList/> filter testing', () => {
       })
       .finally(() => {
         // Refresh the dom tree
-        rerender(<Router location={history.location} navigator={history}><SiteList/></Router>);
+        rerender(
+          <Router location={history.location} navigator={history}>
+            <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+              <SiteList/>
+            </AuthContext.Provider>
+          </Router>);
 
         // Filter is done on server site, we just need filter restore correctly
         expect(mockGetFiltersForId).toBeCalledTimes(1);

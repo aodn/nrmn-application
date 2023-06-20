@@ -7,6 +7,8 @@ import {rest} from 'msw';
 import SiteList from '../SiteList';
 import {Router} from 'react-router-dom';
 import {waitForDataToHaveLoaded} from '../../../../common/AgGridTestHelper';
+import {AuthContext} from '../../../../contexts/auth-context';
+import { AppConstants } from '../../../../common/constants';
 
 jest.setTimeout(30000);
 
@@ -74,7 +76,9 @@ describe('<SiteList/>', () => {
     const history = createMemoryHistory();
     const {getByText} = render(
       <Router location={history.location} navigator={history}>
-        <SiteList />
+        <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+          <SiteList />
+        </AuthContext.Provider>
       </Router>
     );
     await waitForDataToHaveLoaded();
@@ -89,7 +93,9 @@ describe('<SiteList/>', () => {
     const history = createMemoryHistory({initialEntries: [{state: {resetFilters: true}}]});
     const {queryAllByTestId} = render(
       <Router location={history.location} navigator={history}>
-        <SiteList />
+        <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+          <SiteList />
+        </AuthContext.Provider>
       </Router>
     );
     await waitForDataToHaveLoaded();
@@ -101,7 +107,9 @@ describe('<SiteList/>', () => {
     const history = createMemoryHistory({initialEntries: [{state: {resetFilters: true}}]});
     const {queryAllByTestId} = render(
       <Router location={history.location} navigator={history}>
-        <SiteList />
+        <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+          <SiteList />
+        </AuthContext.Provider>
       </Router>
     );
     await waitForDataToHaveLoaded();

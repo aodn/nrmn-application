@@ -1,4 +1,3 @@
-import React from 'react';
 import {render, waitFor, screen} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import {describe, beforeAll, afterEach, test} from '@jest/globals';
@@ -9,6 +8,7 @@ import DataSheetView from '../DataSheetView';
 import {extendedMeasurements, measurements} from '../../../common/constants';
 import '@testing-library/jest-dom/extend-expect';
 import eh from '../DataSheetEventHandlers';
+import {AppConstants} from '../../../common/constants';
 
 describe('<DataSheetView/>', () => {
   let mockGetDataJob;
@@ -74,7 +74,7 @@ describe('<DataSheetView/>', () => {
     // Need to wrap with a Router otherwise the useLocation() error shows, the result will auto set to screen object
     const {rerender} = render(
       <BrowserRouter>
-        <DataSheetView onIngest={ingest} isAdmin={false} />
+        <DataSheetView onIngest={ingest} roles={[AppConstants.ROLES.ADMIN]} />
       </BrowserRouter>
     );
 
@@ -89,7 +89,7 @@ describe('<DataSheetView/>', () => {
         // Data loaded after initial render, need refresh to trigger HTML update
         rerender(
           <BrowserRouter>
-            <DataSheetView onIngest={ingest} isAdmin={false} />
+            <DataSheetView onIngest={ingest} roles={[AppConstants.ROLES.ADMIN]} />
           </BrowserRouter>
         );
 
@@ -127,7 +127,7 @@ describe('<DataSheetView/>', () => {
     // Need to wrap with a Router otherwise the useLocation() error shows, the result will auto set to screen object
     const {rerender} = render(
       <BrowserRouter>
-        <DataSheetView onIngest={ingest} isAdmin={false} />
+        <DataSheetView onIngest={ingest} roles={[AppConstants.ROLES.ADMIN]} />
       </BrowserRouter>
     );
 
@@ -142,7 +142,7 @@ describe('<DataSheetView/>', () => {
         // Data loaded after initial render, need refresh to trigger HTML update
         rerender(
           <BrowserRouter>
-            <DataSheetView onIngest={ingest} isAdmin={false} />
+            <DataSheetView onIngest={ingest} roles={[AppConstants.ROLES.ADMIN]} />
           </BrowserRouter>
         );
 
@@ -166,5 +166,71 @@ describe('<DataSheetView/>', () => {
     expect(eh.dateComparator('01/01/06', '01/01/00')).toBeGreaterThanOrEqual(0);
     expect(eh.dateComparator('01/01/2000', '01/01/06')).not.toBeGreaterThanOrEqual(0);
     expect(eh.dateComparator('01/01/06', '01/01/2000')).toBeGreaterThanOrEqual(0);
+  });
+
+  test('Save & submit button disabled with survey editor permission', async () => {
+    const nonextend = require('./job17.json');
+
+    // Override function so that it return the data we set.
+    mockGetDataJob.mockImplementation((url) => {
+      const raw = {
+        config: undefined,
+        data: nonextend,
+        headers: {'Content-Type': 'application/json', Accept: 'application/json'},
+        status: 200,
+        statusText: url
+      };
+
+      return (
+        new Promise<AxiosResponse>((resolve) => {
+          resolve(raw);
+        })
+      );
+    });
+
+    // Need to wrap with a Router otherwise the useLocation() error shows, the result will auto set to screen object
+    const {rerender} = render(
+      <BrowserRouter>
+        <DataSheetView onIngest={ingest} roles={[AppConstants.ROLES.SURVEY_EDITOR]} />
+      </BrowserRouter>
+    );
+
+    waitFor(() => screen.findByText('id.xlsx'))
+      .then(() => {
+          expect(screen.getByTestId('save-and-validate-button')).not.toBeEnabled();
+      });
+  });
+
+  test('Save & submit button enabled with data officer permission', async () => {
+    const nonextend = require('./job17.json');
+
+    // Override function so that it return the data we set.
+    mockGetDataJob.mockImplementation((url) => {
+      const raw = {
+        config: undefined,
+        data: nonextend,
+        headers: {'Content-Type': 'application/json', Accept: 'application/json'},
+        status: 200,
+        statusText: url
+      };
+
+      return (
+        new Promise<AxiosResponse>((resolve) => {
+          resolve(raw);
+        })
+      );
+    });
+
+    // Need to wrap with a Router otherwise the useLocation() error shows, the result will auto set to screen object
+    render(
+      <BrowserRouter>
+        <DataSheetView onIngest={ingest} roles={[AppConstants.ROLES.DATA_OFFICER]} />
+      </BrowserRouter>
+    );
+
+    waitFor(() => screen.findByText('id.xlsx'))
+      .then(() => {
+          expect(screen.getByTestId('save-and-validate-button')).toBeEnabled();
+      });
   });
 });

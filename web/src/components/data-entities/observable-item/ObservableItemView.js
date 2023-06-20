@@ -17,7 +17,10 @@ const ObservableItemView = () => {
   useEffect(() => {
     document.title = 'View Observable Item';
     async function fetchObservableItem() {
-      await getEntity(`reference/observableItem/${id}`).then((res) => setData(res.data));
+      await getEntity(`reference/observableItem/${id}`)
+        .then((res) => {
+          setData(res.data);
+        });
     }
     if (id >= 0 && !data.observableItemId) fetchObservableItem();
   }, [id, data]);
@@ -32,12 +35,14 @@ const ObservableItemView = () => {
             </Box>
             <Box>
               {data?.observableItemId && (
-                <Button variant="outlined"
-                        component={NavLink}
-                        disabled={!(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))}
-                        to={`/reference/observableItem/${id}/edit`}
-                        startIcon={<Edit>edit</Edit>}>
-                  Edit
+                <Button
+                  data-testid="edit-button"
+                  variant="outlined"
+                  component={NavLink}
+                  disabled={!(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))}
+                  to={`/reference/observableItem/${id}/edit`}
+                  startIcon={<Edit>edit</Edit>}>
+                  {'Edit'}
                 </Button>
               )}
             </Box>

@@ -8,6 +8,8 @@ import {AxiosResponse} from 'axios';
 import JobList from '../JobList';
 import {createMemoryHistory} from 'history';
 import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
+import {AuthContext} from '../../../contexts/auth-context';
+import { AppConstants } from '../../../common/constants';
 
 jest.setTimeout(30000);
 
@@ -31,7 +33,7 @@ describe('<JobList/> filter testing', () => {
     mockGetFiltersForId.mockReset();
   });
 
-  test.skip('Render necessary fields and no filter restored', async () => {
+  test('Render necessary fields and no filter restored', async () => {
     const canned = require('./JobList.filter.data.json');
 
     // Override function so that it return the data we set.
@@ -54,7 +56,9 @@ describe('<JobList/> filter testing', () => {
     const history = createMemoryHistory({initialEntries: [{state: {resetFilters: true}}]});
     const {container, rerender} = render(
       <Router location={history.location} navigator={history}>
-        <JobList />
+        <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+          <JobList />
+        </AuthContext.Provider>
       </Router>
     );
 
@@ -70,7 +74,9 @@ describe('<JobList/> filter testing', () => {
         // Refresh the dom tree
         rerender(
           <Router location={history.location} navigator={history}>
-            <JobList />
+            <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+              <JobList />
+            </AuthContext.Provider>
           </Router>
         );
 
@@ -82,7 +88,9 @@ describe('<JobList/> filter testing', () => {
         // Refresh the dom tree after click
         rerender(
           <Router location={history.location} navigator={history}>
-            <JobList />
+            <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+              <JobList />
+            </AuthContext.Provider>
           </Router>
         );
 
@@ -100,7 +108,7 @@ describe('<JobList/> filter testing', () => {
       });
   });
 
-  test.skip('Render necessary fields with filter restored', async () => {
+  test('Render necessary fields with filter restored', async () => {
     const canned = require('./JobList.filter.data.json');
 
     // Filter set will cause some items disappeared
@@ -128,7 +136,9 @@ describe('<JobList/> filter testing', () => {
     const history = createMemoryHistory({initialEntries: [{state: {resetFilters: false}}]});
     const {container, rerender} = render(
       <Router location={history.location} navigator={history}>
-        <JobList />
+        <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+          <JobList />
+        </AuthContext.Provider>
       </Router>
     );
 
@@ -144,7 +154,9 @@ describe('<JobList/> filter testing', () => {
         // Refresh the dom tree
         rerender(
           <Router location={history.location} navigator={history}>
-            <JobList />
+            <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+              <JobList />
+            </AuthContext.Provider>
           </Router>
         );
 
@@ -155,7 +167,9 @@ describe('<JobList/> filter testing', () => {
         // Refresh the dom tree after click
         rerender(
           <Router location={history.location} navigator={history}>
-            <JobList />
+            <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+              <JobList />
+            </AuthContext.Provider>
           </Router>
         );
 
@@ -171,6 +185,90 @@ describe('<JobList/> filter testing', () => {
         expect(screen.getByText('ingested2.xlsx')).toBeInTheDocument();
         expect(screen.getByText('ingested3.xlsx')).toBeInTheDocument();
         expect(screen.getByText('staged1.xlsx')).toBeInTheDocument();
+      });
+  });
+
+  test('Upload button disabled for survey editor permission', async () => {
+    const canned = require('./JobList.filter.data.json');
+
+    // Filter set will cause some items disappeared
+    mockGetFiltersForId.mockImplementation((id) => {
+      return '{"reference":{"filterType":"text","type":"contains","filter":"ge"}}';
+    });
+
+    // Override function so that it return the data we set.
+    mockGetResult.mockImplementation((url) => {
+      const raw = {
+        config: undefined,
+        data: canned,
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        status: 200,
+        statusText: url
+      };
+
+      return (
+        new Promise<AxiosResponse>((resolve) => {
+          resolve(raw);
+        })
+      );
+    });
+
+    const history = createMemoryHistory({ initialEntries: [{ state: { resetFilters: false } }] });
+    render(
+      <Router location={history.location} navigator={history}>
+        <AuthContext.Provider value={{ auth: { roles: [AppConstants.ROLES.SURVEY_EDITOR] } }}>
+          <JobList />
+        </AuthContext.Provider>
+      </Router>
+    );
+
+    // Data loaded due to mock object being called once
+    await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(1), { timeout: 10000 })
+      .then(() => {
+        // MUI use aria-disabled="true" to disable the button
+        expect(screen.getByTestId('xls-upload-button')).toHaveAttribute('aria-disabled');
+      });
+  });
+
+  test('Upload button disabled for data officer permission', async () => {
+    const canned = require('./JobList.filter.data.json');
+
+    // Filter set will cause some items disappeared
+    mockGetFiltersForId.mockImplementation((id) => {
+      return '{"reference":{"filterType":"text","type":"contains","filter":"ge"}}';
+    });
+
+    // Override function so that it return the data we set.
+    mockGetResult.mockImplementation((url) => {
+      const raw = {
+        config: undefined,
+        data: canned,
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        status: 200,
+        statusText: url
+      };
+
+      return (
+        new Promise<AxiosResponse>((resolve) => {
+          resolve(raw);
+        })
+      );
+    });
+
+    const history = createMemoryHistory({ initialEntries: [{ state: { resetFilters: false } }] });
+    render(
+      <Router location={history.location} navigator={history}>
+        <AuthContext.Provider value={{ auth: { roles: [AppConstants.ROLES.DATA_OFFICER] } }}>
+          <JobList />
+        </AuthContext.Provider>
+      </Router>
+    );
+
+    // Data loaded due to mock object being called once
+    await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(1), { timeout: 10000 })
+      .then(() => {
+        // MUI use aria-disabled="true" to disable the button
+        expect(screen.getByTestId('xls-upload-button')).not.toHaveAttribute('aria-disabled');
       });
   });
 });

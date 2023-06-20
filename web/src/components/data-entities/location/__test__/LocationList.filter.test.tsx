@@ -8,6 +8,8 @@ import { AxiosResponse } from 'axios';
 import LocationList from '../LocationList';
 import { createMemoryHistory } from 'history';
 import stateFilterHandler from '../../../../common/state-event-handler/StateFilterHandler';
+import {AuthContext} from '../../../../contexts/auth-context';
+import { AppConstants } from '../../../../common/constants';
 
 describe('<LocationList/> filter testing', () => {
   let mockGetResult;
@@ -29,7 +31,7 @@ describe('<LocationList/> filter testing', () => {
     mockGetFiltersForId.mockReset();
   });
 
-  test.skip('Render necessary fields and no filter restored', async () => {
+  test('Render necessary fields and no filter restored', async () => {
     const canned = require('./LocationList.filter.data.json');
 
     // Override function so that it return the data we set.
@@ -49,7 +51,13 @@ describe('<LocationList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: true}}]});
-    const {container, rerender} = render(<Router location={history.location} navigator={history}><LocationList/></Router>);
+    const {container, rerender} = render(
+      <Router location={history.location} navigator={history}>
+        <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+          <LocationList/>
+        </AuthContext.Provider>
+      </Router>
+    );
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(1), {timeout: 10000})
@@ -61,7 +69,12 @@ describe('<LocationList/> filter testing', () => {
       })
       .finally(() => {
         // Refresh the dom tree
-        rerender(<Router location={history.location} navigator={history}><LocationList/></Router>);
+        rerender(
+          <Router location={history.location} navigator={history}>
+            <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+              <LocationList/>
+            </AuthContext.Provider>
+          </Router>);
 
         expect(screen.getByText('Antarctica')).toBeInTheDocument();
         expect(screen.getByText('Interest Bay')).toBeInTheDocument();
@@ -73,7 +86,7 @@ describe('<LocationList/> filter testing', () => {
       });
   });
 
-  test.skip('Render necessary fields with filter restored', async () => {
+  test('Render necessary fields with filter restored', async () => {
     const canned = require('./LocationList.filter.data.json');
 
     // Filter set will cause some items disappeared
@@ -98,7 +111,12 @@ describe('<LocationList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: false}}]});
-    const {container, rerender} = render(<Router location={history.location} navigator={history}><LocationList/></Router>);
+    const {container, rerender} = render(
+      <Router location={history.location} navigator={history}>
+        <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+          <LocationList/>
+        </AuthContext.Provider>
+      </Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(1), {timeout: 10000})
@@ -110,7 +128,12 @@ describe('<LocationList/> filter testing', () => {
       })
       .finally(() => {
         // Refresh the dom tree
-        rerender(<Router location={history.location} navigator={history}><LocationList/></Router>);
+        rerender(
+          <Router location={history.location} navigator={history}>
+            <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+              <LocationList/>
+            </AuthContext.Provider>
+          </Router>);
 
         // Given the filter is now implemented on server side, all we care now is filter restored
         expect(mockGetFiltersForId).toBeCalledTimes(1);

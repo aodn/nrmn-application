@@ -10,6 +10,8 @@ import * as axiosInstance from '../../../../api/api';
 import { AxiosResponse } from 'axios';
 import SpeciesCorrect from '../SpeciesCorrect';
 import { createMemoryHistory } from 'history';
+import {AuthContext} from '../../../../contexts/auth-context';
+import { AppConstants } from '../../../../common/constants';
 
 jest.setTimeout(30000);
 
@@ -122,7 +124,12 @@ describe('<SpeciesCorrect/> testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: true}}]});
-    render(<Router location={history.location} navigator={history}><SpeciesCorrect/></Router>);
+    render(
+      <Router location={history.location} navigator={history}>
+        <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+          <SpeciesCorrect/>
+        </AuthContext.Provider>
+      </Router>);
 
     let correctFromAutoComplete;
     let correctFromInput;

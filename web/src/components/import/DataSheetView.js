@@ -341,6 +341,7 @@ const DataSheetView = ({onIngest, roles}) => {
               <>
                 <Box p={1} minWidth={180}>
                   <Button
+                    data-testid="save-and-validate-button"
                     variant="contained"
                     disabled={state === IngestState.Loading || !(isDataOfficer || isAdmin)}
                     onClick={handleSaveAndValidate}
