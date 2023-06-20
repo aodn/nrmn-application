@@ -342,7 +342,7 @@ const DataSheetView = ({onIngest, roles}) => {
                 <Box p={1} minWidth={180}>
                   <Button
                     variant="contained"
-                    disabled={state === IngestState.Loading || !isDataOfficer || !isAdmin}
+                    disabled={state === IngestState.Loading || !(isDataOfficer || isAdmin)}
                     onClick={handleSaveAndValidate}
                     startIcon={<PlaylistAddCheckOutlinedIcon />}
                   >
@@ -352,7 +352,7 @@ const DataSheetView = ({onIngest, roles}) => {
                 <Box p={1} mr={2}>
                   <Button
                     variant="contained"
-                    disabled={state !== IngestState.Valid && !isAdmin}
+                    disabled={state !== IngestState.Valid || !(isDataOfficer || isAdmin)}
                     onClick={() => setState(IngestState.ConfirmSubmit)}
                     startIcon={<CloudUploadIcon />}
                   >
