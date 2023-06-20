@@ -500,6 +500,13 @@ CREATE TABLE nrmn.obs_item_type_ref (
     is_active boolean NOT NULL
 );
 
+-- auto-generated definition
+create table legacy_common_names
+(
+    rank        varchar(6),
+    name        varchar(18) not null primary key,
+    common_name varchar(32)
+);
 
 --
 -- TOC entry 222 (class 1259 OID 243009)
