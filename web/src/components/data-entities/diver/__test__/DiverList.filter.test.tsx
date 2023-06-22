@@ -8,6 +8,8 @@ import { AxiosResponse } from 'axios';
 import DiverList from '../DiverList';
 import { createMemoryHistory } from 'history';
 import stateFilterHandler from '../../../../common/state-event-handler/StateFilterHandler';
+import {AuthContext} from '../../../../contexts/auth-context';
+import { AppConstants } from '../../../../common/constants';
 
 jest.setTimeout(30000);
 
@@ -51,7 +53,12 @@ describe('<DiverList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: true}}]});
-    const {container, rerender} = render(<Router location={history.location} navigator={history}><DiverList/></Router>);
+    const {container, rerender} = render(
+      <Router location={history.location} navigator={history}>
+        <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+          <DiverList/>
+        </AuthContext.Provider>
+      </Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetResult).toHaveBeenCalled(), {timeout: 10000})
@@ -64,7 +71,12 @@ describe('<DiverList/> filter testing', () => {
       })
       .finally(() => {
         // Refresh the dom tree
-        rerender(<Router location={history.location} navigator={history}><DiverList/></Router>);
+        rerender(
+          <Router location={history.location} navigator={history}>
+            <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+              <DiverList/>
+            </AuthContext.Provider>
+          </Router>);
 
         expect(screen.getByText('Apple Orange')).toBeInTheDocument();
         expect(screen.getByText('Cherry Melon')).toBeInTheDocument();
@@ -101,7 +113,12 @@ describe('<DiverList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: false}}]});
-    const {container, rerender} = render(<Router location={history.location} navigator={history}><DiverList/></Router>);
+    const {container, rerender} = render(
+      <Router location={history.location} navigator={history}>
+        <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+          <DiverList/>
+        </AuthContext.Provider>
+      </Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetResult).toHaveBeenCalled(), {timeout: 10000})
@@ -113,7 +130,13 @@ describe('<DiverList/> filter testing', () => {
       })
       .finally(() => {
         // Refresh the dom tree
-        rerender(<Router location={history.location} navigator={history}><DiverList/></Router>);
+        rerender(
+          <Router location={history.location} navigator={history}>
+            <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+              <DiverList/>
+            </AuthContext.Provider>
+          </Router>
+        );
 
         // All filter operation in server side, we just need to check if filter get restored
         expect(mockGetFiltersForId).toBeCalledTimes(1);

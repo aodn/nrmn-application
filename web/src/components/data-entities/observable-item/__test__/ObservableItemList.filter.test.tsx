@@ -10,6 +10,8 @@ import { AxiosResponse } from 'axios';
 import ObservableItemList from '../ObservableItemList';
 import { createMemoryHistory } from 'history';
 import stateFilterHandler from '../../../../common/state-event-handler/StateFilterHandler';
+import {AuthContext} from '../../../../contexts/auth-context';
+import { AppConstants } from '../../../../common/constants';
 
 jest.setTimeout(30000);
 
@@ -36,7 +38,7 @@ describe('<ObservableItemList/> filter testing', () => {
     mockGetFiltersForId.mockReset();
   });
 
-  test.skip('Render necessary fields and no filter restored', async () => {
+  test('Render necessary fields and no filter restored', async () => {
     const canned = require('./ObservableItemList.filter.data.json');
 
     // Override function so that it return the data we set.
@@ -56,7 +58,12 @@ describe('<ObservableItemList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: true}}]});
-    const {container, rerender} = render(<Router location={history.location} navigator={history}><ObservableItemList/></Router>);
+    const {container, rerender} = render(
+      <Router location={history.location} navigator={history}>
+        <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+          <ObservableItemList/>
+        </AuthContext.Provider>
+      </Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(1), {timeout: 10000})
@@ -68,7 +75,12 @@ describe('<ObservableItemList/> filter testing', () => {
       })
       .finally(() => {
         // Refresh the dom tree
-        rerender(<Router location={history.location} navigator={history}><ObservableItemList/></Router>);
+        rerender(
+          <Router location={history.location} navigator={history}>
+            <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+              <ObservableItemList/>
+            </AuthContext.Provider>
+          </Router>);
 
         expect(screen.getByText('Cardinalfish')).toBeInTheDocument();
         expect(screen.getByText('California')).toBeInTheDocument();
@@ -80,7 +92,7 @@ describe('<ObservableItemList/> filter testing', () => {
       });
   });
 
-  test.skip('Render necessary fields with filter restored', async () => {
+  test('Render necessary fields with filter restored', async () => {
     const canned = require('./ObservableItemList.filter.data.json');
 
     // Filter set will cause some items disappeared
@@ -105,7 +117,12 @@ describe('<ObservableItemList/> filter testing', () => {
     });
 
     const history = createMemoryHistory({initialEntries:[{state: {resetFilters: false}}]});
-    const {container, rerender} = render(<Router location={history.location} navigator={history}><ObservableItemList/></Router>);
+    const {container, rerender} = render(
+      <Router location={history.location} navigator={history}>
+        <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+          <ObservableItemList/>
+        </AuthContext.Provider>
+      </Router>);
 
     // Data loaded due to mock object being called once
     await waitFor(() => expect(mockGetResult).toHaveBeenCalledTimes(1), {timeout: 10000})
@@ -117,7 +134,12 @@ describe('<ObservableItemList/> filter testing', () => {
       })
       .finally(() => {
         // Refresh the dom tree
-        rerender(<Router location={history.location} navigator={history}><ObservableItemList/></Router>);
+        rerender(
+          <Router location={history.location} navigator={history}>
+            <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+              <ObservableItemList/>
+            </AuthContext.Provider>
+          </Router>);
 
         // All filter operation on server side, we just need to check if filter restored
         expect(mockGetFiltersForId).toBeCalledTimes(1);

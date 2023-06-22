@@ -1,11 +1,16 @@
+// @ts-ignore
+import React from 'react';
+import '@testing-library/jest-dom/extend-expect';
 import ObservableItemView from '../ObservableItemView';
 import {rest} from 'msw';
 import {setupServer} from 'msw/node';
-import {render, waitFor} from '@testing-library/react';
+import {render, waitFor, screen} from '@testing-library/react';
 import {createMemoryHistory} from 'history';
-import {describe, beforeAll, afterAll, afterEach, test, expect} from '@jest/globals';
+import {describe, beforeAll, afterAll, afterEach, test} from '@jest/globals';
 import '@testing-library/jest-dom';
 import {Routes, Route, Router} from 'react-router-dom';
+import {AuthContext} from '../../../../contexts/auth-context';
+import { AppConstants } from '../../../../common/constants';
 
 const observableItemTestData = {
   observableItemId: 1,
@@ -53,7 +58,11 @@ describe('<ObservableItemView/>', () => {
     const {getByText} = render(
       <Router location={history.location} navigator={history}>
         <Routes>
-          <Route path="/reference/observableItem/:id" element={<ObservableItemView />} />
+          <Route path="/reference/observableItem/:id" element={
+            <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+              <ObservableItemView />
+            </AuthContext.Provider>
+          } />
         </Routes>
       </Router>
     );
@@ -95,10 +104,37 @@ describe('<ObservableItemView/>', () => {
     const {getByText} = render(
       <Router location={history.location} navigator={history}>
         <Routes>
-          <Route path="/reference/observableItem/:id" element={<ObservableItemView />} />
+          <Route path="/reference/observableItem/:id" element={
+            <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.ADMIN]}}}>
+              <ObservableItemView />
+            </AuthContext.Provider>
+          }/>
         </Routes>
       </Router>
     );
     await waitFor(() => expect(getByText('Observable Items')));
   });
+
+  test('Edit button disabled with survey editor permission', async () => {
+    // Avoid loading filter from storage
+    const history = createMemoryHistory({initialEntries: [{pathname: '/reference/observableItem/1', state: {resetFilters: true}}]});
+
+    render(
+      <Router location={history.location} navigator={history}>
+        <Routes>
+          <Route path="/reference/observableItem/:id" element={
+            <AuthContext.Provider value={{auth : {roles: [AppConstants.ROLES.SURVEY_EDITOR]}}}>
+              <ObservableItemView />
+            </AuthContext.Provider>
+          }/>
+        </Routes>
+      </Router>
+    );
+    // Wait until screen printed with the value from the canned data, then we can do other check
+    await waitFor(() => expect(screen.getByText('supersededByVakyes')),{ timeout: 10000})
+      .then(() => {
+        expect(screen.getByTestId('edit-button')).toHaveAttribute('aria-disabled');
+      });
+  });
+
 });
