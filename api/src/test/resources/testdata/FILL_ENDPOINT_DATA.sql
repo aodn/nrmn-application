@@ -28,3 +28,11 @@ VALUES
     (6849,0.014850099,3.048667987,1,'Gu'),
     (8027,0.0213,3.152,0.859845228,'G'),
     (4935,0.0063,3.217,1,'G');
+
+INSERT INTO nrmn.observation
+(observation_id, measure_value,observation_attribute, diver_id, measure_id,observable_item_id, survey_method_id)
+VALUES (700, 1, '{}', 51, 4, 3762, 721),
+       (701, 5, '{}', 51, 1, 810, 721),
+       (702, 5, '{}', 51, 1, 2367, 721),
+       (703, 1, '{}', 51, 1, 8124, 721),
+       (704, 2, '{}', 51, 4, 6820, 721);
