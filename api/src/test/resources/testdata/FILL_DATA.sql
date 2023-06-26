@@ -290,7 +290,10 @@ VALUES (551, 1, '{}',51, 2, 333, 121),
        (651, 1, '{}',51, 2, 330, 121),
        (652, 500, '{}',51, 7, 330, 221),
        (653, 600, '{}',51, 3, 332, 421),
-       (654, 40, '{}',51, 2, 332, 321);
+       (654, 40, '{}',51, 2, 332, 321),
+       (700, 1, '{}', 51, 4, 3762, 721),
+       (701, 5, '{}', 51, 1, 810, 721),
+       (702, 5, '{}', 51, 1, 2367, 721);
 
 INSERT INTO nrmn.staged_row(pqs, block, buddy, code, created, date, depth, direction, diver,
                             inverts, is_invert_sizing, last_updated, latitude, longitude, 
