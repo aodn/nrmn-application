@@ -138,7 +138,8 @@ INSERT INTO nrmn.aphia_ref (aphia_id,
 VALUES (102, 'Species 56', false),(103, 'Species 57', false);
 
 INSERT INTO nrmn.aphia_rel_type_ref (aphia_rel_type_id, aphia_rel_type_name)
-VALUES (1, 'is');
+VALUES (1, 'is'),
+       (2, 'rolls up to');
 
 INSERT INTO nrmn.obs_item_type_ref (obs_item_type_id, obs_item_type_name, is_active)
 VALUES (1, 'Species', true),

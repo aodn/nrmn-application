@@ -1,8 +1,6 @@
 package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
-import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -19,13 +17,14 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Testcontainers
 @SpringBootTest
-@WithTestData
 @Transactional
 @ExtendWith(PostgresqlContainerExtension.class)
 public class EndPointsViewIT {
@@ -49,9 +48,7 @@ public class EndPointsViewIT {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    @BeforeEach
-    @Sql({"../../../db/endpoints/CreatePrivateEndpoints.sql", "/testdata/FILL_ENDPOINT_DATA.sql"})
-    public void injectTestData() {
+    protected void refreshView() {
         Arrays.asList(
                 "ep_rarity_extents","ep_rarity_range","ep_rarity_abundance","ep_rarity_frequency","ep_observable_items")
                 .forEach(i -> {
@@ -64,11 +61,11 @@ public class EndPointsViewIT {
         List<EpObservableItems> objs = jdbcTemplate.query(sql,
                 (ResultSet rs, int rowNum) -> {
                     EpObservableItems i = new EpObservableItems();
-
                     i.rowNum = rowNum;
-                    i.values.add(rs.getInt((1)));
-                    i.values.add(rs.getString(2));
 
+                    for(int k = 0; k < rs.getMetaData().getColumnCount(); k++) {
+                        i.values.add(rs.getObject((k + 1)));
+                    }
                     return i;
                 });
 
@@ -78,8 +75,12 @@ public class EndPointsViewIT {
         for(int i = 0; i < results.length; i++) {
             Object[] o = results[i];
 
+            // index zero is id
+            Optional<EpObservableItems> target = objs.stream().filter(p -> p.values.get(0).equals(o[0])).findFirst();
+            assertTrue(String.format("Value exist for id %s", o[0]), target.isPresent());
+
             for(int j = 0; j < o.length; j++) {
-                assertEquals(String.format("Item[%s][%s]", i, j), o[j], objs.get(i).values.get(j));
+                assertEquals(String.format("Item[%s][%s]", i, j), o[j], target.get().values.get(j));
             }
         }
     }
@@ -87,7 +88,16 @@ public class EndPointsViewIT {
      * Test on ep_observable_items view
      */
     @Test
+    @Sql({"/sql/drop_nrmn.sql",
+            "/sql/migration.sql",
+            "/sql/application.sql",
+            "/testdata/FILL_ROLES.sql",
+            "/testdata/TEST_USER.sql",
+            "/testdata/FILL_DATA.sql",
+            "/testdata/FILL_ENDPOINT_DATA.sql",
+            "file:../db/endpoints/CreatePrivateEndpoints.sql"})
     public void verifyEPObservableItems() {
+        refreshView();
         Object[][] expected = {
                 {332 , "Debris"},
                 {330, "Duplicate rubra"},
@@ -113,7 +123,16 @@ public class EndPointsViewIT {
      * Test on ep_species_list view
      */
     @Test
+    @Sql({"/sql/drop_nrmn.sql",
+            "/sql/migration.sql",
+            "/sql/application.sql",
+            "/testdata/FILL_ROLES.sql",
+            "/testdata/TEST_USER.sql",
+            "/testdata/FILL_DATA.sql",
+            "/testdata/FILL_ENDPOINT_DATA.sql",
+            "file:../db/endpoints/CreatePrivateEndpoints.sql"})
     public void verifyEPSpeciesList() {
+        refreshView();
         Object[][] expected = {
                 {330, "Duplicate rubra"},
                 {333, "Species 56"},
@@ -121,6 +140,8 @@ public class EndPointsViewIT {
                 {8114, "Ostorhinchus doederleini"},
                 {3762, "Acanthostracion polygonius"},
                 {2367, "Arenigobius frenatus"},
+                {8027, "Tripneustes kermadecensis"},
+                {810, "Apogon doederleini"},
                 {6820, "Acanthurus sp. [pyroferus]"}
         };
 
