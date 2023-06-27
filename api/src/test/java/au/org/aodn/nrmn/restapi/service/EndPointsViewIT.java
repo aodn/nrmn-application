@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -34,6 +35,11 @@ public class EndPointsViewIT {
     class EpObservableItems {
         Integer rowNum;
         List values = new ArrayList();
+
+        @Override
+        public String toString() {
+            return String.format("Row %s, Values %s", rowNum, String.join(",", (List<String>)values.stream().map(f -> String.valueOf(f)).collect(Collectors.toList())));
+        }
     }
 
     JdbcTemplate jdbcTemplate;
@@ -66,6 +72,7 @@ public class EndPointsViewIT {
                     return i;
                 });
 
+        logger.info("Query result : {}", objs);
         assertEquals("Total row count for - " + sql, results.length, objs.size());
 
         for(int i = 0; i < results.length; i++) {
