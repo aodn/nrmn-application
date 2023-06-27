@@ -45,7 +45,7 @@ public class EndPointsViewIT {
     }
 
     @BeforeEach
-    @Sql({"../../../db/endpoints/CeatePrivateEndpoints.sql", "/testdata/FILL_ENDPOINT_DATA.sql"})
+    @Sql({"../../../db/endpoints/CreatePrivateEndpoints.sql", "/testdata/FILL_ENDPOINT_DATA.sql"})
     public void injectTestData() {
         Arrays.asList(
                 "ep_rarity_extents","ep_rarity_range","ep_rarity_abundance","ep_rarity_frequency","ep_observable_items")
@@ -59,8 +59,9 @@ public class EndPointsViewIT {
      * Test on ep_observable_items view
      */
     @Test
-    public void verifyEPSpeciesLIst() {
-        List<EpObservableItems> objs = jdbcTemplate.query("select * from nrmn.ep_observable_items", (ResultSet rs, int rowNum) -> {
+    public void verifyEPObservableItems() {
+        List<EpObservableItems> objs = jdbcTemplate.query("select * from nrmn.ep_observable_items",
+                (ResultSet rs, int rowNum) -> {
             EpObservableItems i = new EpObservableItems();
 
             i.rowNum = rowNum;
@@ -70,11 +71,37 @@ public class EndPointsViewIT {
             return i;
         });
 
-        assertEquals("Total row count for ep_observable_items", 5, objs.size());
+        assertEquals("Total row count for ep_observable_items", 15, objs.size());
 
         AtomicInteger j = new AtomicInteger(0);
-        Arrays.asList("Debris","Duplicate rubra", "Haliotis rubra", "Species 56","Species 57")
+        Arrays.asList("Debris","Duplicate rubra", "Haliotis rubra", "Species 56","Species 57",
+                        "Ostorhinchus doederleini","Apogon doederleini","Acanthostracion polygonius",
+                        "Arenigobius frenatus","Acanthurus sp. [pyroferus]","Acanthurus spp.",
+                        "Tripneustes kermadecensis","Cypraea annulus","Asperaxis karenae","Phalacrocorax varius")
                 .forEach(i -> assertEquals("Species name match", i, objs.get(j.getAndIncrement()).name));
     }
 
+    /**
+     * Test on ep_species_list view
+     */
+    @Test
+    public void verifyEPSpeciesList() {
+        List<EpObservableItems> objs = jdbcTemplate.query("select * from nrmn.ep_species_list",
+                (ResultSet rs, int rowNum) -> {
+            EpObservableItems i = new EpObservableItems();
+
+            i.rowNum = rowNum;
+            i.id = rs.getInt(1);
+            i.name = rs.getString(2);
+
+            return i;
+        });
+
+        assertEquals("Total row count for ep_species_list", 7, objs.size());
+
+        AtomicInteger j = new AtomicInteger(0);
+        Arrays.asList("Duplicate rubra","Species 56","Species 57","Ostorhinchus doederleini"
+                        ,"Acanthostracion polygonius","Arenigobius frenatus", "Acanthurus sp. [pyroferus]")
+                .forEach(i -> assertEquals("Species name match", i, objs.get(j.getAndIncrement()).name));
+    }
 }
