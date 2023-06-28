@@ -232,7 +232,7 @@ WHERE (family IN ('Agonidae','Anarhichadidae','Anguillidae','Antennariidae','Apl
 'Tetrabrachiidae','Tetrarogidae','Torpedinidae','Trachichthyidae','Trachinidae','Tripterygiidae','Uranoscopidae',
 'Urolophidae','Urotrygonidae','Zaproridae','Zoarcidae')
 OR observable_item_name IN ('Unidentified cryptic fish','Unidentified fish (cryptic)','Actinopterygii spp.',
-'Elasmobranchii spp.','Unidentified eel') OR ("class"='Reptilia' AND "order"='Squamata'))
+'Teleostei spp.','Elasmobranchii spp.','Unidentified eel') OR ("class"='Reptilia' AND "order"='Squamata'))
  EXCEPT
  SELECT observable_item_id,'2'::integer from nrmn.observable_item_ref
  WHERE genus IN ('Trachinops','Anthias','Caesioperca','Lepidoperca');
