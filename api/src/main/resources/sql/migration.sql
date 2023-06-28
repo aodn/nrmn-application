@@ -500,7 +500,6 @@ CREATE TABLE nrmn.obs_item_type_ref (
     is_active boolean NOT NULL
 );
 
-
 --
 -- TOC entry 222 (class 1259 OID 243009)
 -- Name: observable_item_ref; Type: TABLE; Schema: nrmn; Owner: -
@@ -526,7 +525,8 @@ CREATE TABLE nrmn.observable_item_ref (
     is_invert_sized boolean DEFAULT false,
     obs_item_attribute jsonb,
     created timestamp,
-    updated timestamp
+    updated timestamp,
+    mapped_id integer
 );
 
 
