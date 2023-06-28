@@ -2,12 +2,12 @@
   "name": "nrmn-web",
   "private": true,
   "dependencies": {
-    "@emotion/react": "^11.9.0",
-    "@emotion/styled": "^11.8.1",
+    "@emotion/react": "11.9.0",
+    "@emotion/styled": "11.8.1",
     "@mui/icons-material": "^5.8.2",
     "@mui/lab": "^5.0.0-alpha.84",
-    "@mui/material": "^5.8.2",
-    "@mui/styles": "^5.8.0",
+    "@mui/material": "5.13.2",
+    "@mui/styles": "5.13.2",
     "ag-grid-community": "27.2.1",
     "ag-grid-enterprise": "27.3.0",
     "ag-grid-react": "27.2.1",
@@ -15,10 +15,11 @@
     "js-file-download": "0.4.12",
     "jwt-decode": "3.1.2",
     "prop-types": "15.8.1",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
+    "react": "18.1.0",
+    "react-dom": "18.1.0",
     "react-router": "6.3.0",
-    "react-router-dom": "6.3.0"
+    "react-router-dom": "6.3.0",
+    "reactflow": "11.7.4"
   },
   "scripts": {
     "start": "react-scripts start --ignore-pattern 'node_modules/*'",
