@@ -563,7 +563,7 @@ from nrmn.observation obs
 	inner join nrmn.methods_species ms ON ms.observable_item_id = obs.observable_item_id
 where sm.method_id = 2 and ms.method_id = 2
 and (
-	(oi.class in ('Actinopterygii', 'Elasmobranchii'))
+	(oi.class in ('Actinopterygii','Actinopteri','Teleostei', 'Elasmobranchii'))
 	or (oi.observable_item_name = 'No species found') or (oi.class='Reptilia' AND oi."order"='Squamata'))
 group by sm.survey_id,
 	sur.country,

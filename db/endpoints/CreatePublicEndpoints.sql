@@ -115,7 +115,7 @@ SELECT
     total,
 	biomass
 FROM nrmn.ep_m1 epm1
-WHERE ("class" IN ('Actinopterygii','Chondrichthyes','Elasmobranchii',
+WHERE ("class" IN ('Actinopterygii','Actinopteri','Teleostei','Chondrichthyes','Elasmobranchii',
 'Mammalia','Reptilia','Cephalopoda') OR phylum IN ('Cnidaria', 'Ctenophora'))
 AND epm1.survey_id NOT IN (
 	SELECT survey_id FROM nrmn.ep_survey_list esl
