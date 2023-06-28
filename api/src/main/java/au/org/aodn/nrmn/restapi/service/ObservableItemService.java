@@ -6,6 +6,8 @@ import au.org.aodn.nrmn.restapi.controller.validation.FormValidationError;
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemDto;
+import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemGetDto;
+import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemNodeDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemPutDto;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
@@ -20,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Main logic related to operations for ObservableItem.
@@ -92,5 +95,38 @@ public class ObservableItemService {
         validate(observableItem);
 
         return observableItemRepository.save(observableItem);
+    }
+
+    public ObservableItemNodeDto createForestOf(ObservableItem i) {
+        ObservableItem root = findRootOf(i);
+        ObservableItemNodeDto r = new ObservableItemNodeDto();
+        r.self = mapper.map(root, ObservableItemGetDto.class);
+        return findChildrenOf(r);
+    }
+
+    protected ObservableItemNodeDto findChildrenOf(ObservableItemNodeDto i) {
+        Optional<List<ObservableItem>> children = observableItemRepository.findBySupersededBy(i.self.getObservableItemName());
+        if(children.isPresent()) {
+            for(ObservableItem oi : children.get()) {
+                ObservableItemNodeDto c = new ObservableItemNodeDto();
+                c.parent = i.self;
+                c.self = mapper.map(oi, ObservableItemGetDto.class);
+                i.children.add(c);
+
+                findChildrenOf(c);
+            }
+        }
+        return i;
+    }
+
+    protected ObservableItem findRootOf(ObservableItem i) {
+        if(i.getSupersededBy() != null && i.getSupersededBy().length() > 0) {
+            // Recursive find parent
+            Optional<ObservableItem> p = observableItemRepository.findByObservableItemName(i.getSupersededBy());
+            return p.isPresent() ? findRootOf(p.get()) : p.get();
+        }
+        else {
+            return i;
+        }
     }
 }

@@ -3,12 +3,14 @@ package au.org.aodn.nrmn.restapi.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
 import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
 
+import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemNodeDto;
 import au.org.aodn.nrmn.restapi.service.ObservableItemService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -88,6 +90,14 @@ public class ObservableItemController {
     public ResponseEntity<ObservableItemGetDto> findOne(@PathVariable Integer id) {
         var obsItem = observableItemRepository.findById(id);
         return obsItem.map(item -> ResponseEntity.ok(mapper.map(item, ObservableItemGetDto.class)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/observableItem/{id}/findRoot")
+    public ResponseEntity<ObservableItemNodeDto> findRootOf(@PathVariable("id") Integer id) {
+        Optional<ObservableItem> observableItem = observableItemRepository.findById(id);
+        return observableItem
+                .map(item -> ResponseEntity.ok(observableItemService.createForestOf(item)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

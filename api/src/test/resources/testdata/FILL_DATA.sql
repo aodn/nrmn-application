@@ -150,12 +150,12 @@ VALUES (1, 'Species', true),
        (6, 'Absence', true);
 
 INSERT INTO nrmn.observable_item_ref (observable_item_id, obs_item_type_id, aphia_id, aphia_rel_type_id,
-                                      observable_item_name, letter_code)
-VALUES (333, 1, 102, 1, 'Species 56', 'S56'),
-       (331, 1, 103, 1, 'Species 57', 'S57'),
-       (332, 5, null, null, 'Debris', 'deb'),
-       (334, 1, null, null, 'Haliotis rubra', 'hal'),
-       (330, 1, null, null, 'Duplicate rubra', 'dup');
+                                      observable_item_name, letter_code, superseded_by)
+VALUES (333, 1, 102, 1, 'Species 56', 'S56', 'Debris'),
+       (331, 1, 103, 1, 'Species 57', 'S57', null),
+       (332, 5, null, null, 'Debris', 'deb', 'Duplicate rubra'),
+       (334, 1, null, null, 'Haliotis rubra', 'hal', 'Debris'),
+       (330, 1, null, null, 'Duplicate rubra', 'dup', null);
 
 INSERT INTO nrmn.method_ref(method_id, method_name, is_active)
 VALUES (1, 'Standard fish', true), (2, 'Standard invertebrates & cryptic fish', true), (3, 'Standard quadrat', true), (11, 'Off transect', true), (12, 'Debris', true);
