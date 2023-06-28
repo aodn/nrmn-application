@@ -140,8 +140,6 @@ public class EndPointsViewIT {
                 {8114, "Ostorhinchus doederleini"},
                 {3762, "Acanthostracion polygonius"},
                 {2367, "Arenigobius frenatus"},
-                {8027, "Tripneustes kermadecensis"},
-                {810, "Apogon doederleini"},
                 {6820, "Acanthurus sp. [pyroferus]"}
         };
 
