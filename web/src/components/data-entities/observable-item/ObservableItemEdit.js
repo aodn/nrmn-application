@@ -110,7 +110,7 @@ const ObservableItemEdit = () => {
     <AuthContext.Consumer>
       {({auth}) => {
         if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN)) {
-          return (<EntityContainer name="Observable Items" goBackTo="/reference/observableItems" containerWidth="80%">
+          return (<EntityContainer name="Observable Items" goBackTo="/reference/observableItems" containerWidth="90%">
             <Grid container alignItems="flex-start" direction="row">
               <Grid item xs={10}>
                 <Box fontWeight="fontWeightBold">

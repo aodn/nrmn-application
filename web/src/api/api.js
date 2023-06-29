@@ -287,7 +287,7 @@ export const getSupersedTreeForReactFlow = (observableItemId) => {
   const createReactFlowNodes = (nodes, value, depth = 0, childCount = 1, childIndex = 1) => {
     nodes.nodes.push({
       id: '' + value.self.observableItemId,
-      data: { label: value.self.observableItemName },
+      data: { label: `${value.self.observableItemName} (${value.self.lengthWeightA}/${value.self.lengthWeightB}/${value.self.lengthWeightCf})` },
       position: { x: 160 * (childIndex - childCount / 2), y: 100 * depth}
     });
 
