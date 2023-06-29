@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import 'reactflow/dist/style.css';
+import SpeciesNode from './SpeciesNode';
 
 import ReactFlow, {
   Background,
@@ -11,8 +12,10 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import {PropTypes} from 'prop-types';
 
+const nodeTypes = { customTreeNode: SpeciesNode };
+
 const FamilyTree = (props) => {
-  const defaultViewport = { x: 0, y: 0, zoom: 1.5 };
+  const defaultViewport = { x: 0, y: 0, zoom: 1 };
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
@@ -22,8 +25,14 @@ const FamilyTree = (props) => {
     if(value != null) {
       nodes.nodes.push({
         id: '' + value.self.observableItemId,
-        data: { label: `${value.self.observableItemName} (${value.self.lengthWeightA}/${value.self.lengthWeightB}/${value.self.lengthWeightCf})` },
-        position: { x: 160 * (childIndex - childCount / 2), y: 120 * depth }
+        type: 'customTreeNode',
+        data: {
+          label: `${value.self.observableItemName}`,
+          lengthWeightA: `${value.self.lengthWeightA}`,
+          lengthWeightB: `${value.self.lengthWeightB}`,
+          lengthWeightCf: `${value.self.lengthWeightCf}`
+        },
+        position: { x: 300 * (childIndex - childCount / 2), y: 450 * depth }
       });
 
       if(value.children != undefined) {
@@ -39,7 +48,7 @@ const FamilyTree = (props) => {
         });
       }
     }
-  });
+  }, []);
 
   useEffect(() => {
     const reactFlowNodes = {
@@ -54,7 +63,7 @@ const FamilyTree = (props) => {
       setEdges(reactFlowNodes.edges);
     }
 
-  }, [props.nodes]);
+  }, [props.nodes, setNodes, setEdges, createReactFlowNodes]);
 
   return (
     <ReactFlow
@@ -62,6 +71,7 @@ const FamilyTree = (props) => {
       defaultViewport={defaultViewport}
       nodes={nodes}
       edges={edges}
+      nodeTypes={nodeTypes}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}>
@@ -71,7 +81,7 @@ const FamilyTree = (props) => {
 };
 
 FamilyTree.propTypes = {
-  nodes: PropTypes.object.isRequired
+  nodes: PropTypes.object
 };
 
 export default FamilyTree;

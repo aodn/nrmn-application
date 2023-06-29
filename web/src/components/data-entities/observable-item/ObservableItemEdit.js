@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import {AuthContext} from '../../../contexts/auth-context';
 import {AppConstants} from '../../../common/constants';
 import EntityContainer from '../../containers/EntityContainer';
-import FamilyTree from './FamilyTree';
+import FamilyTree from '../../../common/relation-graph/FamilyTree';
 
 import CustomAutoCompleteInput, {ERROR_TYPE} from '../../input/CustomAutoCompleteInput';
 import CustomTextInput from '../../input/CustomTextInput';
@@ -110,7 +110,7 @@ const ObservableItemEdit = () => {
     <AuthContext.Consumer>
       {({auth}) => {
         if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN)) {
-          return (<EntityContainer name="Observable Items" goBackTo="/reference/observableItems" containerWidth="90%">
+          return (<EntityContainer name="Observable Items" goBackTo="/reference/observableItems" containerWidth="100%">
             <Grid container alignItems="flex-start" direction="row">
               <Grid item xs={10}>
                 <Box fontWeight="fontWeightBold">
