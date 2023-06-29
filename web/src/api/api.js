@@ -281,3 +281,36 @@ export const templateZip = (params) => {
 export const originalJobFile = (jobId) => {
   return axiosInstance.get(`stage/job/download/${jobId}`, {responseType: 'blob'});
 };
+
+export const getSupersedTreeForReactFlow = (observableItemId) => {
+
+  const createReactFlowNodes = (nodes, value, depth = 0, childCount = 1, childIndex = 1) => {
+    nodes.nodes.push({
+      id: '' + value.self.observableItemId,
+      data: { label: value.self.observableItemName },
+      position: { x: 160 * (childIndex - childCount / 2), y: 100 * depth}
+    });
+
+    let c = 1;
+    value.children.forEach(i => {
+      nodes.edges.push({
+        id: `${value.self.observableItemId}-${i.self.observableItemId}`,
+        source: '' + value.self.observableItemId,
+        target: '' + i.self.observableItemId
+      });
+
+      createReactFlowNodes(nodes, i, depth + 1, value.children.length, c++);
+    });
+  };
+
+  return axiosInstance.get(`reference/observableItem/${observableItemId}/findRoot`)
+    .then((value => {
+      // Need to translate the structure to something fit the react flow
+      const nodes = {
+        nodes: [],
+        edges: []
+      };
+      createReactFlowNodes(nodes, value.data);
+      return nodes;
+    }));
+};

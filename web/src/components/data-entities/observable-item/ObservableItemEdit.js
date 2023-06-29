@@ -13,7 +13,7 @@ import CustomAutoCompleteInput, {ERROR_TYPE} from '../../input/CustomAutoComplet
 import CustomTextInput from '../../input/CustomTextInput';
 import CustomSearchInput from '../../input/CustomSearchInput';
 
-import {getResult, entityEdit, entityDelete} from '../../../api/api';
+import { getResult, entityEdit, entityDelete, getSupersedTreeForReactFlow } from '../../../api/api';
 
 const ObservableItemEdit = () => {
   const observableItemId = useParams()?.id;
@@ -22,6 +22,7 @@ const ObservableItemEdit = () => {
   const [deleted, setDeleted] = useState(false);
   const [errors, setErrors] = useState([]);
   const [options, setOptions] = useState({});
+  const [nodes, setNodes] = useState({nodes:[], edges:[]});
 
   const formReducer = (state, action) => {
     if (action.form) return {...state, ...action.form};
@@ -65,7 +66,15 @@ const ObservableItemEdit = () => {
     async function fetchObservableItem() {
       await getResult(`reference/observableItem/${observableItemId}`).then((res) => dispatch({form: {...res.data, hasSupersededBy: res.data.supersededBy}}));
     }
-    if (observableItemId) fetchObservableItem();
+    if (observableItemId) {
+      fetchObservableItem()
+        .then((s) => {
+          getSupersedTreeForReactFlow(observableItemId)
+            .then(value => {
+              setNodes(value);
+            });
+        });
+    }
   }, [observableItemId]);
 
   const handleSubmit = () => {
@@ -101,7 +110,7 @@ const ObservableItemEdit = () => {
     <AuthContext.Consumer>
       {({auth}) => {
         if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN)) {
-          return (<EntityContainer name="Observable Items" goBackTo="/reference/observableItems" containerWidth="70%">
+          return (<EntityContainer name="Observable Items" goBackTo="/reference/observableItems" containerWidth="80%">
             <Grid container alignItems="flex-start" direction="row">
               <Grid item xs={10}>
                 <Box fontWeight="fontWeightBold">
@@ -127,7 +136,7 @@ const ObservableItemEdit = () => {
                   ) : null}
                   <Grid container spacing={2}>
                     <Grid item xs={4}>
-                      <FamilyTree/>
+                      <FamilyTree nodes={nodes}/>
                     </Grid>
                     <Grid item xs={8}>
                       <Grid container spacing={2}>
