@@ -22,7 +22,7 @@ const ObservableItemEdit = () => {
   const [deleted, setDeleted] = useState(false);
   const [errors, setErrors] = useState([]);
   const [options, setOptions] = useState({});
-  const [nodes, setNodes] = useState({nodes:[], edges:[]});
+  const [nodes, setNodes] = useState(null);
 
   const formReducer = (state, action) => {
     if (action.form) return {...state, ...action.form};
@@ -71,7 +71,7 @@ const ObservableItemEdit = () => {
         .then((s) => {
           getSupersedTreeForReactFlow(observableItemId)
             .then(value => {
-              setNodes(value);
+              setNodes(value.data);
             });
         });
     }
