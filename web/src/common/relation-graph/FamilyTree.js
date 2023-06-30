@@ -10,12 +10,14 @@ import ReactFlow, {
 } from 'reactflow';
 
 import 'reactflow/dist/style.css';
-import {PropTypes} from 'prop-types';
+import { number, PropTypes } from 'prop-types';
 
 const nodeTypes = { customTreeNode: SpeciesNode };
+const nodeHeight = 400;
+const nodeWidth = 300;
 
 const FamilyTree = (props) => {
-  const defaultViewport = { x: 0, y: 0, zoom: 1 };
+  const defaultViewport = { x: 0, y: 0, zoom: 0.8 };
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
@@ -27,12 +29,16 @@ const FamilyTree = (props) => {
         id: '' + value.self.observableItemId,
         type: 'customTreeNode',
         data: {
+          id: '' + value.self.observableItemId,
+          isFocus: value.self.observableItemId === props.focusNodeId,
+          nodeHeight: nodeHeight,
+          nodeWidth: nodeWidth,
           label: `${value.self.observableItemName}`,
-          lengthWeightA: `${value.self.lengthWeightA}`,
-          lengthWeightB: `${value.self.lengthWeightB}`,
-          lengthWeightCf: `${value.self.lengthWeightCf}`
+          lengthWeightA: value.self.lengthWeightA === null ? '' : value.self.lengthWeightA,
+          lengthWeightB: value.self.lengthWeightB === null ? '' : value.self.lengthWeightB,
+          lengthWeightCf: value.self.lengthWeightCf === null ? '' : value.self.lengthWeightCf
         },
-        position: { x: 300 * (childIndex - childCount / 2), y: 450 * depth }
+        position: { x: (nodeWidth + 20) * (childIndex - childCount / 2), y: (nodeHeight + 50) * depth }
       });
 
       if(value.children != undefined) {
@@ -81,7 +87,8 @@ const FamilyTree = (props) => {
 };
 
 FamilyTree.propTypes = {
-  nodes: PropTypes.object
+  nodes: PropTypes.object,
+  focusNodeId: PropTypes.number,
 };
 
 export default FamilyTree;

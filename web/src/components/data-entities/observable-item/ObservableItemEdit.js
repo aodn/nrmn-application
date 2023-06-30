@@ -136,7 +136,7 @@ const ObservableItemEdit = () => {
                   ) : null}
                   <Grid container spacing={2}>
                     <Grid item xs={4}>
-                      <FamilyTree nodes={nodes}/>
+                      <FamilyTree nodes={nodes} focusNodeId={Number(observableItemId)}/>
                     </Grid>
                     <Grid item xs={8}>
                       <Grid container spacing={2}>
