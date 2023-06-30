@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.controller;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,12 @@ public class ObservableItemController {
         return obsItem.map(item -> ResponseEntity.ok(mapper.map(item, ObservableItemGetDto.class)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
+    /**
+     * Continue look up supersededBy until it goes to the root, then create a tree structure starting from the
+     * this root and include all the node below.
+     * @param id
+     * @return
+     */
     @GetMapping("/observableItem/{id}/findRoot")
     public ResponseEntity<ObservableItemNodeDto> findRootOf(@PathVariable("id") Integer id) {
         Optional<ObservableItem> observableItem = observableItemRepository.findById(id);
@@ -113,5 +119,21 @@ public class ObservableItemController {
                                                      @Valid @RequestBody ObservableItemPutDto observableItemPutDto) {
 
         return mapper.map(observableItemService.updateObservableItem(id, observableItemPutDto), ObservableItemGetDto.class);
+    }
+
+    @PostMapping("/observableItem/{id}/supersededBy")
+    @ResponseStatus(HttpStatus.OK)
+    public Integer updateSupersededByObservableItem(@PathVariable Integer id,
+                                                     @Valid @RequestBody ObservableItemPutDto observableItemPutDto) throws InvocationTargetException, IllegalAccessException {
+
+        return observableItemService.updateSupersededByObservableItem(id, observableItemPutDto);
+    }
+
+    @PostMapping("/observableItem/{id}/supersededByCascade")
+    @ResponseStatus(HttpStatus.OK)
+    public Integer updateSupersededCascadeByObservableItem(@PathVariable Integer id,
+                                                           @Valid @RequestBody ObservableItemPutDto observableItemPutDto) throws InvocationTargetException, IllegalAccessException {
+
+        return observableItemService.updateSupersededByObservableItemCascade(id, observableItemPutDto);
     }
 }

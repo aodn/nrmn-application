@@ -3,8 +3,10 @@ package au.org.aodn.nrmn.restapi.service;
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemNodeDto;
+import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemPutDto;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.transaction.Transactional;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -58,5 +61,32 @@ public class ObservableItemServiceIT {
 
         assertTrue("Child00 id correct", Arrays.asList(333,334).contains(child00.self.getObservableItemId()));
         assertTrue("Child01 id correct", Arrays.asList(333,334).contains(child01.self.getObservableItemId()));
+    }
+
+    @Test
+    public void verifyUpdateSupersededCorrect() throws InvocationTargetException, IllegalAccessException {
+        Optional<ObservableItem> observableItem = observableItemRepository.findById(333);
+
+        ObservableItemPutDto putDto = new ObservableItemPutDto();
+        putDto.setLengthWeightA(10.0);
+        putDto.setLengthWeightB(11.0);
+        putDto.setLengthWeightCf(12.0);
+
+        Integer ss = observableItemService.updateSupersededByObservableItem(333, putDto);
+
+        Optional<ObservableItem> reloadObservableItem = observableItemRepository.findById(333);
+        Optional<ObservableItem> reloadSupersededItem = observableItemRepository.findById(ss);
+
+        // This is the value in test pack
+        assertNull("Length Weight A not match", reloadObservableItem.get().getLengthWeight());
+        assertNull("Length Weight B not match", reloadObservableItem.get().getLengthWeight());
+        assertNull("Length Weight Cf not match", reloadObservableItem.get().getLengthWeight());
+
+        // No change in value for 333 as you just want to update superseded
+        assertTrue(EqualsBuilder.reflectionEquals(observableItem,reloadObservableItem));
+
+        assertEquals("Length Weight A updated", putDto.getLengthWeightA(), reloadSupersededItem.get().getLengthWeight().getA());
+        assertEquals("Length Weight B updated", putDto.getLengthWeightB(), reloadSupersededItem.get().getLengthWeight().getB());
+        assertEquals("Length Weight Cf updated", putDto.getLengthWeightCf(), reloadSupersededItem.get().getLengthWeight().getCf());
     }
 }

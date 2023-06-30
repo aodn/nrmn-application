@@ -9,6 +9,8 @@ import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemGetDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemNodeDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemPutDto;
+import au.org.aodn.nrmn.restapi.util.ObjectUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -37,6 +40,8 @@ public class ObservableItemService {
 
     @Autowired
     private ObservableItemRepository observableItemRepository;
+
+    protected BeanUtilsBean nullAwareBeanUtils = ObjectUtils.createNullAwareBeanUtils("observableItemId");
 
     public void validate(ObservableItem item) {
 
@@ -75,6 +80,55 @@ public class ObservableItemService {
 
         if (!errors.isEmpty())
             throw new ValidationException(errors);
+    }
+    /**
+     * Update all superseded items, the code iterate all parents
+     * @param id
+     * @param newObservableItem
+     * @return
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    public Integer updateSupersededByObservableItemCascade(Integer id, ObservableItemPutDto newObservableItem) throws InvocationTargetException, IllegalAccessException {
+
+        Integer lastId = id;
+        Integer currentId = null;
+
+        while (lastId.equals(currentId)) {
+            currentId = updateSupersededByObservableItem(lastId, newObservableItem);
+        }
+        return currentId;
+    }
+    /**
+     *
+     * @param id
+     * @param newObservableItem
+     * @return The id of the superseded item
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    public Integer updateSupersededByObservableItem(Integer id, ObservableItemPutDto newObservableItem) throws InvocationTargetException, IllegalAccessException {
+        // Get what is in db
+        ObservableItem observableItem = observableItemRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Observable Id " + id + " not found in updateSupersededByObservableItem()"));
+
+        if(observableItem.getSupersededBy() != null) {
+            ObservableItem supersededBy = observableItemRepository
+                    .findByObservableItemName(observableItem.getSupersededBy())
+                    .orElseThrow(() -> new ResourceNotFoundException("Observable Superseded Id " + id + " not found in updateSupersededByObservableItem()"));
+
+            ObservableItemPutDto current = mapper.map(supersededBy, ObservableItemPutDto.class);
+
+            // Copy non-null value and then call to save to db.
+            nullAwareBeanUtils.copyProperties(current, newObservableItem);
+            updateObservableItem(supersededBy.getObservableItemId(), current);
+
+            return supersededBy.getObservableItemId();
+        }
+        else {
+            return id;
+        }
     }
 
     public ObservableItem updateObservableItem(Integer id, ObservableItemPutDto newObservableItem) {

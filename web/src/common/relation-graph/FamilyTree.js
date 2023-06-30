@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import 'reactflow/dist/style.css';
-import SpeciesNode from './SpeciesNode';
+import SpeciesNodeForLengthWeight from './SpeciesNodeForLengthWeight';
 
 import ReactFlow, {
   Background,
@@ -12,7 +12,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { number, PropTypes } from 'prop-types';
 
-const nodeTypes = { customTreeNode: SpeciesNode };
+const nodeTypes = { customTreeNode: SpeciesNodeForLengthWeight };
 const nodeHeight = 400;
 const nodeWidth = 300;
 

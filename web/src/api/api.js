@@ -282,6 +282,11 @@ export const originalJobFile = (jobId) => {
   return axiosInstance.get(`stage/job/download/${jobId}`, {responseType: 'blob'});
 };
 
-export const getSupersedTreeForReactFlow = (observableItemId) => {
+export const getSupersededTreeForReactFlow = (observableItemId) => {
   return axiosInstance.get(`reference/observableItem/${observableItemId}/findRoot`);
+};
+
+export const submitSupersededItemCorrection = (id, isCascade = false, bodyDto) => {
+  return axiosInstance
+    .post(`reference/observableItem/${id}/` + isCascade ? 'supersededBy' : 'supersededByCascade', bodyDto);
 };

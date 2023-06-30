@@ -13,7 +13,7 @@ import CustomAutoCompleteInput, {ERROR_TYPE} from '../../input/CustomAutoComplet
 import CustomTextInput from '../../input/CustomTextInput';
 import CustomSearchInput from '../../input/CustomSearchInput';
 
-import { getResult, entityEdit, entityDelete, getSupersedTreeForReactFlow } from '../../../api/api';
+import { getResult, entityEdit, entityDelete, getSupersededTreeForReactFlow } from '../../../api/api';
 
 const ObservableItemEdit = () => {
   const observableItemId = useParams()?.id;
@@ -69,7 +69,7 @@ const ObservableItemEdit = () => {
     if (observableItemId) {
       fetchObservableItem()
         .then((s) => {
-          getSupersedTreeForReactFlow(observableItemId)
+          getSupersededTreeForReactFlow(observableItemId)
             .then(value => {
               setNodes(value.data);
             });
