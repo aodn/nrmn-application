@@ -121,7 +121,7 @@ public class ObservableItemController {
         return mapper.map(observableItemService.updateObservableItem(id, observableItemPutDto), ObservableItemGetDto.class);
     }
 
-    @PostMapping("/observableItem/{id}/supersededBy")
+    @PutMapping("/observableItem/{id}/supersededBy")
     @ResponseStatus(HttpStatus.OK)
     public Integer updateSupersededByObservableItem(@PathVariable Integer id,
                                                      @Valid @RequestBody ObservableItemPutDto observableItemPutDto) throws InvocationTargetException, IllegalAccessException {
@@ -129,7 +129,7 @@ public class ObservableItemController {
         return observableItemService.updateSupersededByObservableItem(id, observableItemPutDto);
     }
 
-    @PostMapping("/observableItem/{id}/supersededByCascade")
+    @PutMapping("/observableItem/{id}/supersededByCascade")
     @ResponseStatus(HttpStatus.OK)
     public Integer updateSupersededCascadeByObservableItem(@PathVariable Integer id,
                                                            @Valid @RequestBody ObservableItemPutDto observableItemPutDto) throws InvocationTargetException, IllegalAccessException {

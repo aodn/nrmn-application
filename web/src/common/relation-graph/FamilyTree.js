@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import 'reactflow/dist/style.css';
 import SpeciesNodeForLengthWeight from './SpeciesNodeForLengthWeight';
 
@@ -10,7 +10,7 @@ import ReactFlow, {
 } from 'reactflow';
 
 import 'reactflow/dist/style.css';
-import { number, PropTypes } from 'prop-types';
+import { PropTypes } from 'prop-types';
 
 const nodeTypes = { customTreeNode: SpeciesNodeForLengthWeight };
 const nodeHeight = 400;
@@ -30,13 +30,16 @@ const FamilyTree = (props) => {
         type: 'customTreeNode',
         data: {
           id: '' + value.self.observableItemId,
+          hasParent: value.parent === null,
+          hasChildren: value.children === null || value.children.length === 0,
           isFocus: value.self.observableItemId === props.focusNodeId,
           nodeHeight: nodeHeight,
           nodeWidth: nodeWidth,
           label: `${value.self.observableItemName}`,
           lengthWeightA: value.self.lengthWeightA === null ? '' : value.self.lengthWeightA,
           lengthWeightB: value.self.lengthWeightB === null ? '' : value.self.lengthWeightB,
-          lengthWeightCf: value.self.lengthWeightCf === null ? '' : value.self.lengthWeightCf
+          lengthWeightCf: value.self.lengthWeightCf === null ? '' : value.self.lengthWeightCf,
+          reload: props.reload
         },
         position: { x: (nodeWidth + 20) * (childIndex - childCount / 2), y: (nodeHeight + 50) * depth }
       });
@@ -54,7 +57,7 @@ const FamilyTree = (props) => {
         });
       }
     }
-  }, []);
+  }, [props]);
 
   useEffect(() => {
     const reactFlowNodes = {
@@ -89,6 +92,7 @@ const FamilyTree = (props) => {
 FamilyTree.propTypes = {
   nodes: PropTypes.object,
   focusNodeId: PropTypes.number,
+  reload: PropTypes.func,
 };
 
 export default FamilyTree;

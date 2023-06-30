@@ -288,5 +288,5 @@ export const getSupersededTreeForReactFlow = (observableItemId) => {
 
 export const submitSupersededItemCorrection = (id, isCascade = false, bodyDto) => {
   return axiosInstance
-    .post(`reference/observableItem/${id}/` + isCascade ? 'supersededBy' : 'supersededByCascade', bodyDto);
+    .put(`reference/observableItem/${id}/${isCascade ? 'supersededByCascade' : 'supersededBy'}`, bodyDto);
 };

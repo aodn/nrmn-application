@@ -92,10 +92,16 @@ public class ObservableItemService {
     public Integer updateSupersededByObservableItemCascade(Integer id, ObservableItemPutDto newObservableItem) throws InvocationTargetException, IllegalAccessException {
 
         Integer lastId = id;
-        Integer currentId = null;
+        Integer currentId;
 
-        while (lastId.equals(currentId)) {
+        while (true) {
             currentId = updateSupersededByObservableItem(lastId, newObservableItem);
+            if(!lastId.equals(currentId)) {
+                lastId = currentId;
+            }
+            else {
+                break;
+            }
         }
         return currentId;
     }

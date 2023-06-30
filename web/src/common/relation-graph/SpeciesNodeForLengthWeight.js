@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, memo } from 'react';
 import { Handle, Position } from 'reactflow';
 import { PropTypes } from 'prop-types';
-import { Card, CardHeader, CardContent, Typography, CardActions } from '@mui/material';
+import { Card, CardHeader, CardContent, CardActions } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -12,7 +12,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardDoubleArrowUpRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowUpRounded';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
-import {  submitSupersededItemCorrection } from '../../../api/api';
+import {  submitSupersededItemCorrection } from '../../api/api';
 
 const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
 
@@ -22,7 +22,9 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
       lengthWeightA: data.lengthWeightA,
       lengthWeightB: data.lengthWeightB,
       lengthWeightCf: data.lengthWeightCf
-    });
+    })
+      .then(() => data.reload());
+
   }, [data]);
 
   return (
@@ -62,16 +64,16 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
           </List>
         </CardContent>
         <CardActions>
-          <IconButton aria-label="Copy one level up" onClick={() => onUpdateSuperseded()}>
+          <IconButton aria-label="Copy one level up" onClick={() => onUpdateSuperseded()} disabled={data.hasParent}>
             <KeyboardArrowUpIcon fontSize="large" />
           </IconButton>
-          <IconButton aria-label="Copy to all level up" onClick={() => onUpdateSuperseded(true)}>
+          <IconButton aria-label="Copy to all level up" onClick={() => onUpdateSuperseded(true)} disabled={data.hasParent}>
             <KeyboardDoubleArrowUpRoundedIcon fontSize="large" />
           </IconButton>
-          <IconButton aria-label="Copy one level down">
+          <IconButton aria-label="Copy one level down" disabled={data.hasChildren}>
             <KeyboardArrowDownIcon fontSize="large" />
           </IconButton>
-          <IconButton aria-label="Copy to all level down">
+          <IconButton aria-label="Copy to all level down" disabled={data.hasChildren}>
             <KeyboardDoubleArrowDownIcon fontSize="large" />
           </IconButton>
         </CardActions>
@@ -87,4 +89,4 @@ SpeciesNodeForLengthWeight.propTypes = {
   isConnectable: PropTypes.bool.isRequired
 };
 
-export default SpeciesNodeForLengthWeight;
+export default memo(SpeciesNodeForLengthWeight);

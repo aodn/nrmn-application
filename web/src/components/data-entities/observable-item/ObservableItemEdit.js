@@ -68,7 +68,7 @@ const ObservableItemEdit = () => {
     }
     if (observableItemId) {
       fetchObservableItem()
-        .then((s) => {
+        .then(() => {
           getSupersededTreeForReactFlow(observableItemId)
             .then(value => {
               setNodes(value.data);
@@ -136,7 +136,12 @@ const ObservableItemEdit = () => {
                   ) : null}
                   <Grid container spacing={2}>
                     <Grid item xs={4}>
-                      <FamilyTree nodes={nodes} focusNodeId={Number(observableItemId)}/>
+                      <FamilyTree nodes={nodes}
+                                  focusNodeId={Number(observableItemId)}
+                                  reload={() => {
+                                    getSupersededTreeForReactFlow(observableItemId)
+                                      .then(value => setNodes(value.data));
+                                  }}/>
                     </Grid>
                     <Grid item xs={8}>
                       <Grid container spacing={2}>
