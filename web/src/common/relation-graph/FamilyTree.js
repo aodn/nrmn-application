@@ -42,7 +42,7 @@ const recalculateNodeXY = (nodes) => {
 };
 
 const FamilyTree = (props) => {
-  const defaultViewport = { x: 0, y: 0, zoom: 0.8 };
+  // const defaultViewport = { x: 0, y: 0, zoom: 0.8 };
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
@@ -106,7 +106,6 @@ const FamilyTree = (props) => {
   return (
     <ReactFlow
       fitView
-      defaultViewport={defaultViewport}
       nodes={nodes}
       edges={edges}
       nodeTypes={nodeTypes}
