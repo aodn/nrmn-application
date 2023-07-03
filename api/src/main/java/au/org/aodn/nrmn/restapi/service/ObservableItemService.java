@@ -106,7 +106,7 @@ public class ObservableItemService {
         return currentId;
     }
     /**
-     *
+     * Update value from the child to the superseded parent.
      * @param id
      * @param newObservableItem
      * @return The id of the superseded item
@@ -135,6 +135,60 @@ public class ObservableItemService {
         else {
             return id;
         }
+    }
+    /**
+     * Recursive update children.
+     * @param id
+     * @param newObservableItem
+     * @return
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    public List<Integer> updateSupersededObservableItemCascade(Integer id, ObservableItemPutDto newObservableItem) throws InvocationTargetException, IllegalAccessException {
+
+        List<Integer> updatedId = new ArrayList<>();
+        List<Integer> updatedChildren = updateSupersededObservableItem(id, newObservableItem);
+
+        if(!updatedChildren.isEmpty()) {
+            for(Integer c : updatedChildren) {
+                List<Integer> i = updateSupersededObservableItemCascade(c, newObservableItem);
+                updatedId.addAll(i);
+                updatedId.add(c);
+            }
+        }
+        return updatedId;
+    }
+    /**
+     * Copy the value from parent to child (superseded)
+     * @param id - The parent id
+     * @param newObservableItem
+     * @return
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    public List<Integer> updateSupersededObservableItem(Integer id, ObservableItemPutDto newObservableItem) throws InvocationTargetException, IllegalAccessException {
+        // Get what is in db
+        ObservableItem observableItem = observableItemRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Observable Id " + id + " not found in updateSupersededObservableItem()"));
+
+        // Find all items that is supersedby this item.
+        List<ObservableItem> superseded = observableItemRepository
+                .findBySupersededBy(observableItem.getObservableItemName())
+                .orElseThrow(() -> new ResourceNotFoundException("Observable Id " + id + " is not supersededby any item(s)"));
+
+        List<Integer> updatedId = new ArrayList<>();
+
+        for(ObservableItem child : superseded) {
+            // Copy non-null value and then call to save to db.
+            ObservableItemPutDto current = mapper.map(child, ObservableItemPutDto.class);
+
+            nullAwareBeanUtils.copyProperties(current, newObservableItem);
+            updateObservableItem(child.getObservableItemId(), current);
+            updatedId.add(child.getObservableItemId());
+        }
+
+        return updatedId;
     }
 
     public ObservableItem updateObservableItem(Integer id, ObservableItemPutDto newObservableItem) {

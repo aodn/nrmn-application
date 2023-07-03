@@ -13,7 +13,12 @@ import CustomAutoCompleteInput, {ERROR_TYPE} from '../../input/CustomAutoComplet
 import CustomTextInput from '../../input/CustomTextInput';
 import CustomSearchInput from '../../input/CustomSearchInput';
 
-import { getResult, entityEdit, entityDelete, getSupersededTreeForReactFlow } from '../../../api/api';
+import {
+  getResult,
+  entityEdit,
+  entityDelete,
+  getFamilyForReactFlow
+} from '../../../api/api';
 
 const ObservableItemEdit = () => {
   const observableItemId = useParams()?.id;
@@ -69,7 +74,7 @@ const ObservableItemEdit = () => {
     if (observableItemId) {
       fetchObservableItem()
         .then(() => {
-          getSupersededTreeForReactFlow(observableItemId)
+          getFamilyForReactFlow(observableItemId)
             .then(value => {
               setNodes(value.data);
             });
@@ -139,7 +144,7 @@ const ObservableItemEdit = () => {
                       <FamilyTree nodes={nodes}
                                   focusNodeId={Number(observableItemId)}
                                   reload={() => {
-                                    getSupersededTreeForReactFlow(observableItemId)
+                                    getFamilyForReactFlow(observableItemId)
                                       .then(value => setNodes(value.data));
                                   }}/>
                     </Grid>

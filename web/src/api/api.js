@@ -282,11 +282,16 @@ export const originalJobFile = (jobId) => {
   return axiosInstance.get(`stage/job/download/${jobId}`, {responseType: 'blob'});
 };
 
-export const getSupersededTreeForReactFlow = (observableItemId) => {
-  return axiosInstance.get(`reference/observableItem/${observableItemId}/findRoot`);
+export const getFamilyForReactFlow = (observableItemId) => {
+  return axiosInstance.get(`reference/observableItem/${observableItemId}/family`);
+};
+
+export const submitSupersededByItemCorrection = (id, isCascade = false, bodyDto) => {
+  return axiosInstance
+    .put(`reference/observableItem/${id}/${isCascade ? 'supersededByCascade' : 'supersededBy'}`, bodyDto);
 };
 
 export const submitSupersededItemCorrection = (id, isCascade = false, bodyDto) => {
   return axiosInstance
-    .put(`reference/observableItem/${id}/${isCascade ? 'supersededByCascade' : 'supersededBy'}`, bodyDto);
+    .put(`reference/observableItem/${id}/${isCascade ? 'supersededCascade' : 'superseded'}`, bodyDto);
 };

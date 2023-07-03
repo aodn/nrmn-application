@@ -99,7 +99,7 @@ public class ObservableItemController {
      * @param id
      * @return
      */
-    @GetMapping("/observableItem/{id}/findRoot")
+    @GetMapping("/observableItem/{id}/family")
     public ResponseEntity<ObservableItemNodeDto> findRootOf(@PathVariable("id") Integer id) {
         Optional<ObservableItem> observableItem = observableItemRepository.findById(id);
         return observableItem
@@ -135,5 +135,21 @@ public class ObservableItemController {
                                                            @Valid @RequestBody ObservableItemPutDto observableItemPutDto) throws InvocationTargetException, IllegalAccessException {
 
         return observableItemService.updateSupersededByObservableItemCascade(id, observableItemPutDto);
+    }
+
+    @PutMapping("/observableItem/{id}/superseded")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Integer> updateSupersededObservableItem(@PathVariable Integer id,
+                                                    @Valid @RequestBody ObservableItemPutDto observableItemPutDto) throws InvocationTargetException, IllegalAccessException {
+
+        return observableItemService.updateSupersededObservableItem(id, observableItemPutDto);
+    }
+
+    @PutMapping("/observableItem/{id}/supersededCascade")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Integer> updateSupersededObservableItemCascade(@PathVariable Integer id,
+                                                        @Valid @RequestBody ObservableItemPutDto observableItemPutDto) throws InvocationTargetException, IllegalAccessException {
+
+        return observableItemService.updateSupersededObservableItemCascade(id, observableItemPutDto);
     }
 }

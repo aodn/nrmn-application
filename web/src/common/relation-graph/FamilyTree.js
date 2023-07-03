@@ -16,6 +16,31 @@ const nodeTypes = { customTreeNode: SpeciesNodeForLengthWeight };
 const nodeHeight = 400;
 const nodeWidth = 300;
 
+/**
+ * We know the number of nodes on each level, we can then calcuate the
+ * x y coordinate so that node align correctly
+ * @param nodes
+ */
+const recalculateNodeXY = (nodes) => {
+  // Get the max depth of all nodes
+  let maxDepth = 0;
+  nodes.forEach(i => {
+    maxDepth = Math.max(maxDepth, i.data.depth);
+  });
+
+  // Re-calculate the x, y position so that nodes will not overlap, node
+  // depth is zero based
+  for(let d = 0; d < (maxDepth + 1); d++) {
+    // All nodes of that depth
+    let ns = nodes.filter(f => f.data.depth === d);
+
+    for(let k = 0; k < ns.length; k++) {
+      ns[k].position.x = (nodeWidth + 20) * (k - ns.length / 2);
+      ns[k].position.y = (nodeHeight + 50) * d;
+    }
+  }
+};
+
 const FamilyTree = (props) => {
   const defaultViewport = { x: 0, y: 0, zoom: 0.8 };
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -23,13 +48,14 @@ const FamilyTree = (props) => {
 
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
-  const createReactFlowNodes = useCallback((nodes, value, depth = 0, childCount = 1, childIndex = 1) => {
+  const createReactFlowNodes = useCallback((nodes, value, depth = 0) => {
     if(value != null) {
       nodes.nodes.push({
         id: '' + value.self.observableItemId,
         type: 'customTreeNode',
         data: {
           id: '' + value.self.observableItemId,
+          depth: depth,
           hasParent: value.parent === null,
           hasChildren: value.children === null || value.children.length === 0,
           isFocus: value.self.observableItemId === props.focusNodeId,
@@ -41,11 +67,11 @@ const FamilyTree = (props) => {
           lengthWeightCf: value.self.lengthWeightCf === null ? '' : value.self.lengthWeightCf,
           reload: props.reload
         },
-        position: { x: (nodeWidth + 20) * (childIndex - childCount / 2), y: (nodeHeight + 50) * depth }
+        position: { x: 0, y: 0 }
       });
 
       if(value.children != undefined) {
-        let c = 1;
+
         value.children.forEach(i => {
           nodes.edges.push({
             id: `${value.self.observableItemId}-${i.self.observableItemId}`,
@@ -53,7 +79,7 @@ const FamilyTree = (props) => {
             target: '' + i.self.observableItemId
           });
 
-          createReactFlowNodes(nodes, i, depth + 1, value.children.length, c++);
+          createReactFlowNodes(nodes, i, depth + 1);
         });
       }
     }
@@ -65,9 +91,12 @@ const FamilyTree = (props) => {
       edges: []
     };
 
+    // Create the node data for react flow
     createReactFlowNodes(reactFlowNodes, props.nodes);
+
     // No need to update if no nodes there
     if(reactFlowNodes.nodes.length != 0) {
+      recalculateNodeXY(reactFlowNodes.nodes);
       setNodes(reactFlowNodes.nodes);
       setEdges(reactFlowNodes.edges);
     }

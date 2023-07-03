@@ -16,6 +16,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import javax.transaction.Transactional;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
@@ -62,9 +64,13 @@ public class ObservableItemServiceIT {
         assertTrue("Child00 id correct", Arrays.asList(333,334).contains(child00.self.getObservableItemId()));
         assertTrue("Child01 id correct", Arrays.asList(333,334).contains(child01.self.getObservableItemId()));
     }
-
+    /**
+     * Test update from child to parent on superseded
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
     @Test
-    public void verifyUpdateSupersededCorrect() throws InvocationTargetException, IllegalAccessException {
+    public void verifyUpdateSupersededByCorrect() throws InvocationTargetException, IllegalAccessException {
         Optional<ObservableItem> observableItem = observableItemRepository.findById(333);
 
         ObservableItemPutDto putDto = new ObservableItemPutDto();
@@ -88,5 +94,50 @@ public class ObservableItemServiceIT {
         assertEquals("Length Weight A updated", putDto.getLengthWeightA(), reloadSupersededItem.get().getLengthWeight().getA());
         assertEquals("Length Weight B updated", putDto.getLengthWeightB(), reloadSupersededItem.get().getLengthWeight().getB());
         assertEquals("Length Weight Cf updated", putDto.getLengthWeightCf(), reloadSupersededItem.get().getLengthWeight().getCf());
+    }
+
+    @Test
+    public void verifyUpdateSupersededCorrect() throws InvocationTargetException, IllegalAccessException {
+        // You have one child below, that children have two child below
+        Optional<ObservableItem> observableItem = observableItemRepository.findById(330);
+
+        ObservableItemPutDto putDto = new ObservableItemPutDto();
+        putDto.setLengthWeightA(10.0);
+        putDto.setLengthWeightB(11.0);
+        putDto.setLengthWeightCf(12.0);
+
+        List<Integer> child = observableItemService.updateSupersededObservableItem(330, putDto);
+
+        assertEquals("One child only", 1, child.size());
+
+        Optional<ObservableItem> reloadObservableItem = observableItemRepository.findById(child.get(0));
+
+        assertEquals("Length Weight A updated", putDto.getLengthWeightA(), reloadObservableItem.get().getLengthWeight().getA());
+        assertEquals("Length Weight B updated", putDto.getLengthWeightB(), reloadObservableItem.get().getLengthWeight().getB());
+        assertEquals("Length Weight Cf updated", putDto.getLengthWeightCf(), reloadObservableItem.get().getLengthWeight().getCf());
+    }
+
+    @Test
+    public void verifyUpdateSupersededCascadeCorrect() throws InvocationTargetException, IllegalAccessException {
+        Optional<ObservableItem> observableItem = observableItemRepository.findById(330);
+
+        ObservableItemPutDto putDto = new ObservableItemPutDto();
+        putDto.setLengthWeightA(10.0);
+        putDto.setLengthWeightB(11.0);
+        putDto.setLengthWeightCf(12.0);
+
+        List<Integer> children = observableItemService.updateSupersededObservableItemCascade(330, putDto);
+
+        // Given the canned data we expect the following
+        assertEquals("Child updated number", 3, children.size());
+        assertTrue("Included these children", new HashSet<>(Arrays.asList(332, 333, 334)).containsAll(children));
+
+        for(int i = 0; i < children.size(); i++) {
+            Optional<ObservableItem> reloadObservableItem = observableItemRepository.findById(children.get(i));
+
+            assertEquals("Length Weight A updated", putDto.getLengthWeightA(), reloadObservableItem.get().getLengthWeight().getA());
+            assertEquals("Length Weight B updated", putDto.getLengthWeightB(), reloadObservableItem.get().getLengthWeight().getB());
+            assertEquals("Length Weight Cf updated", putDto.getLengthWeightCf(), reloadObservableItem.get().getLengthWeight().getCf());
+        }
     }
 }
