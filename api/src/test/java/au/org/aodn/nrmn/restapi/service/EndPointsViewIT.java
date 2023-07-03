@@ -135,7 +135,7 @@ public class EndPointsViewIT {
         refreshView();
         Object[][] expected = {
                 {330, "Duplicate rubra"},
-                {333, "Species 56"},
+                // {333, "Species 56"}, this item now have superseded in test pack and excluded from this view
                 {331, "Species 57"},
                 {8114, "Ostorhinchus doederleini"},
                 {3762, "Acanthostracion polygonius"},
