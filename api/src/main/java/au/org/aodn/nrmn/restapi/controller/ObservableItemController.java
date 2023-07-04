@@ -123,33 +123,21 @@ public class ObservableItemController {
 
     @PutMapping("/observableItem/{id}/supersededBy")
     @ResponseStatus(HttpStatus.OK)
-    public Integer updateSupersededByObservableItem(@PathVariable Integer id,
-                                                     @Valid @RequestBody ObservableItemPutDto observableItemPutDto) throws InvocationTargetException, IllegalAccessException {
-
-        return observableItemService.updateSupersededByObservableItem(id, observableItemPutDto);
-    }
-
-    @PutMapping("/observableItem/{id}/supersededByCascade")
-    @ResponseStatus(HttpStatus.OK)
-    public Integer updateSupersededCascadeByObservableItem(@PathVariable Integer id,
+    public Integer updateSupersededCascadeByObservableItem(@PathVariable Integer id, @RequestParam("cascade") Boolean isCascade,
                                                            @Valid @RequestBody ObservableItemPutDto observableItemPutDto) throws InvocationTargetException, IllegalAccessException {
 
-        return observableItemService.updateSupersededByObservableItemCascade(id, observableItemPutDto);
+        return isCascade ?
+                observableItemService.updateSupersededByObservableItemCascade(id, observableItemPutDto) :
+                observableItemService.updateSupersededByObservableItem(id, observableItemPutDto) ;
     }
 
     @PutMapping("/observableItem/{id}/superseded")
     @ResponseStatus(HttpStatus.OK)
-    public List<Integer> updateSupersededObservableItem(@PathVariable Integer id,
+    public List<Integer> updateSupersededObservableItem(@PathVariable Integer id, @RequestParam("cascade") Boolean isCascade,
                                                     @Valid @RequestBody ObservableItemPutDto observableItemPutDto) throws InvocationTargetException, IllegalAccessException {
 
-        return observableItemService.updateSupersededObservableItem(id, observableItemPutDto);
-    }
-
-    @PutMapping("/observableItem/{id}/supersededCascade")
-    @ResponseStatus(HttpStatus.OK)
-    public List<Integer> updateSupersededObservableItemCascade(@PathVariable Integer id,
-                                                        @Valid @RequestBody ObservableItemPutDto observableItemPutDto) throws InvocationTargetException, IllegalAccessException {
-
-        return observableItemService.updateSupersededObservableItemCascade(id, observableItemPutDto);
+        return isCascade ?
+                observableItemService.updateSupersededObservableItemCascade(id, observableItemPutDto)
+                : observableItemService.updateSupersededObservableItem(id, observableItemPutDto);
     }
 }

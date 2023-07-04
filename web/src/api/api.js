@@ -288,10 +288,10 @@ export const getFamilyForReactFlow = (observableItemId) => {
 
 export const submitSupersededByItemCorrection = (id, isCascade = false, bodyDto) => {
   return axiosInstance
-    .put(`reference/observableItem/${id}/${isCascade ? 'supersededByCascade' : 'supersededBy'}`, bodyDto);
+    .put(`reference/observableItem/${id}/supersededBy?cascade=${isCascade ? 'true' : 'false'}`, bodyDto);
 };
 
 export const submitSupersededItemCorrection = (id, isCascade = false, bodyDto) => {
   return axiosInstance
-    .put(`reference/observableItem/${id}/${isCascade ? 'supersededCascade' : 'superseded'}`, bodyDto);
+    .put(`reference/observableItem/${id}/superseded?cascade=${isCascade ? 'true' : 'false'}`, bodyDto);
 };
