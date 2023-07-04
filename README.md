@@ -40,6 +40,12 @@ Build requires Java 11 with Maven and Node v16 with Yarn v1.x. A Dockerfile is a
     docker run -it -v $PWD:/home/builder/src nrmn-builder yarn --cwd src/web
     docker run -it -v $PWD:/home/builder/src nrmn-builder mvn -f src clean package
 
+## Testing
+
+```sh
+mvn clean install
+```
+
 ## Developing
 
 ### Running in Docker / Podman
