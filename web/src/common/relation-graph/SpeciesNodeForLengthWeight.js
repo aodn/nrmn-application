@@ -44,7 +44,7 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
 
   const onContentClick = useCallback((id) => {
     navigate(`/reference/observableItem/${id}/edit`);
-  },[]);
+  },[navigate]);
 
   return (
     <div className="text-updater-node">
