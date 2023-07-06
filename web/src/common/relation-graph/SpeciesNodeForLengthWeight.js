@@ -1,4 +1,4 @@
-import React, { useCallback, memo } from 'react';
+import React, { useCallback, memo, useState } from 'react';
 import { Handle, Position } from 'reactflow';
 import { PropTypes } from 'prop-types';
 import { Card, CardHeader, CardContent, CardActions, CardActionArea } from '@mui/material';
@@ -17,9 +17,15 @@ import {
   submitSupersededItemCorrection,
   submitSupersededByItemCorrection
 } from '../../api/api';
+import AlertDialog from '../../components/ui/AlertDialog';
+
+const SUPERSEDED = 1;
+const SUPERSEDED_BY = 2;
 
 const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
   const navigate = useNavigate();
+  const [showDialog, setShowDialog] = useState(0);
+  const [showDialogCascade, setShowDialogCascade] = useState(0);
 
   // Update the three fields
   const onUpdateSupersededBy = useCallback((isCascade) => {
@@ -28,7 +34,8 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
       lengthWeightB: data.lengthWeightB,
       lengthWeightCf: data.lengthWeightCf
     })
-      .then(() => data.reload());
+      .then(() => data.reload())
+      .then(() => isCascade ? setShowDialogCascade(0) : setShowDialog(0));
 
   }, [data]);
 
@@ -38,7 +45,8 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
       lengthWeightB: data.lengthWeightB,
       lengthWeightCf: data.lengthWeightCf
     })
-      .then(() => data.reload());
+      .then(() => data.reload())
+      .then(() => isCascade ? setShowDialogCascade(0) : setShowDialog(0));
 
   }, [data]);
 
@@ -48,6 +56,28 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
 
   return (
     <div className="text-updater-node">
+      <AlertDialog
+        open={showDialog !== 0}
+        text="Confirm one level update?"
+        action="Submit"
+        onClose={() => setShowDialog(0)}
+        onConfirm={
+          showDialog === SUPERSEDED_BY ?
+            () => onUpdateSupersededBy(false) :
+            () => onUpdateSuperseded(false)
+        }
+      />
+      <AlertDialog
+        open={showDialogCascade !== 0}
+        text="Confirm multiple level update?"
+        action="Submit"
+        onClose={() => setShowDialogCascade(0)}
+        onConfirm={
+          showDialogCascade === SUPERSEDED_BY ?
+            () => onUpdateSupersededBy(true) :
+            () => onUpdateSuperseded(true)
+        }
+      />
       <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
       <Card sx={{ width: data.nodeWidth, height: data.nodeHeight }}>
         <CardHeader
@@ -86,16 +116,16 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
           </CardContent>
         </CardActionArea>
         <CardActions>
-          <IconButton aria-label="Copy one level up" onClick={() => onUpdateSupersededBy()} disabled={data.hasParent}>
+          <IconButton aria-label="Copy one level up" onClick={() => setShowDialog(SUPERSEDED_BY)} disabled={data.hasParent}>
             <KeyboardArrowUpIcon fontSize="large" />
           </IconButton>
-          <IconButton aria-label="Copy to all level up" onClick={() => onUpdateSupersededBy(true)} disabled={data.hasParent}>
+          <IconButton aria-label="Copy to all level up" onClick={() => setShowDialogCascade(SUPERSEDED_BY)} disabled={data.hasParent}>
             <KeyboardDoubleArrowUpRoundedIcon fontSize="large" />
           </IconButton>
-          <IconButton aria-label="Copy one level down" onClick={() => onUpdateSuperseded()} disabled={data.hasChildren}>
+          <IconButton aria-label="Copy one level down" onClick={() => setShowDialog(SUPERSEDED)} disabled={data.hasChildren}>
             <KeyboardArrowDownIcon fontSize="large" />
           </IconButton>
-          <IconButton aria-label="Copy to all level down" onClick={() => onUpdateSuperseded(true)} disabled={data.hasChildren}>
+          <IconButton aria-label="Copy to all level down" onClick={() => setShowDialogCascade(SUPERSEDED)} disabled={data.hasChildren}>
             <KeyboardDoubleArrowDownIcon fontSize="large" />
           </IconButton>
         </CardActions>
