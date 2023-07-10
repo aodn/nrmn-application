@@ -31,6 +31,10 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
     @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
     List<ObservableItem> findByCriteria(@Param("name") String name);
 
+    Optional<ObservableItem> findByObservableItemName(String observableItemName);
+
+    Optional<List<ObservableItem>> findBySupersededBy(String supersededBy);
+
     @Override
     @RestResource
     Page<ObservableItem> findAll(Pageable pageable);
@@ -46,8 +50,8 @@ public interface ObservableItemRepository extends JpaRepository<ObservableItem, 
     @Query("SELECT o from ObservableItem o WHERE o.observableItemName IN :speciesNames")
     List<ObservableItem> getAllSpeciesNamesMatching(@Param("speciesNames") Collection<String> speciesNames);
 
-    @Query("SELECT o from ObservableItem o WHERE o.observableItemName = :name")
-    ObservableItem getWithName(@Param("name") String name);
+//    @Query("SELECT o from ObservableItem o WHERE o.observableItemName = :name")
+//    ObservableItem getWithName(@Param("name") String name);
 
     @Query(value = "select distinct on (obsitem.observable_item_id) obsitem.observable_item_id as observableItemId, obsitem.observable_item_name as name, obsitem.letter_code as letterCode, obsitem.common_name as commonName "
             + "FROM {h-schema}location_ref loc "

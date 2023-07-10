@@ -6,7 +6,11 @@ import au.org.aodn.nrmn.restapi.controller.validation.FormValidationError;
 import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
 import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemDto;
+import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemGetDto;
+import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemNodeDto;
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemPutDto;
+import au.org.aodn.nrmn.restapi.util.ObjectUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -16,10 +20,12 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Main logic related to operations for ObservableItem.
@@ -34,6 +40,8 @@ public class ObservableItemService {
 
     @Autowired
     private ObservableItemRepository observableItemRepository;
+
+    protected BeanUtilsBean nullAwareBeanUtils = ObjectUtils.createNullAwareBeanUtils("observableItemId");
 
     public void validate(ObservableItem item) {
 
@@ -73,6 +81,115 @@ public class ObservableItemService {
         if (!errors.isEmpty())
             throw new ValidationException(errors);
     }
+    /**
+     * Update all superseded items, the code iterate all parents
+     * @param id
+     * @param newObservableItem
+     * @return
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    public Integer updateSupersededByObservableItemCascade(Integer id, ObservableItemPutDto newObservableItem) throws InvocationTargetException, IllegalAccessException {
+
+        Integer lastId = id;
+        Integer currentId;
+
+        while (true) {
+            currentId = updateSupersededByObservableItem(lastId, newObservableItem);
+            if(!lastId.equals(currentId)) {
+                lastId = currentId;
+            }
+            else {
+                break;
+            }
+        }
+        return currentId;
+    }
+    /**
+     * Update value from the child to the superseded parent.
+     * @param id
+     * @param newObservableItem
+     * @return The id of the superseded item
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    public Integer updateSupersededByObservableItem(Integer id, ObservableItemPutDto newObservableItem) throws InvocationTargetException, IllegalAccessException {
+        // Get what is in db
+        ObservableItem observableItem = observableItemRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Observable Id " + id + " not found in updateSupersededByObservableItem()"));
+
+        if(observableItem.getSupersededBy() != null) {
+            ObservableItem supersededBy = observableItemRepository
+                    .findByObservableItemName(observableItem.getSupersededBy())
+                    .orElseThrow(() -> new ResourceNotFoundException("Observable Superseded Id " + id + " not found in updateSupersededByObservableItem()"));
+
+            ObservableItemPutDto current = mapper.map(supersededBy, ObservableItemPutDto.class);
+
+            // Copy non-null value and then call to save to db.
+            nullAwareBeanUtils.copyProperties(current, newObservableItem);
+            updateObservableItem(supersededBy.getObservableItemId(), current);
+
+            return supersededBy.getObservableItemId();
+        }
+        else {
+            return id;
+        }
+    }
+    /**
+     * Recursive update children.
+     * @param id
+     * @param newObservableItem
+     * @return
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    public List<Integer> updateSupersededObservableItemCascade(Integer id, ObservableItemPutDto newObservableItem) throws InvocationTargetException, IllegalAccessException {
+
+        List<Integer> updatedId = new ArrayList<>();
+        List<Integer> updatedChildren = updateSupersededObservableItem(id, newObservableItem);
+
+        if(!updatedChildren.isEmpty()) {
+            for(Integer c : updatedChildren) {
+                List<Integer> i = updateSupersededObservableItemCascade(c, newObservableItem);
+                updatedId.addAll(i);
+                updatedId.add(c);
+            }
+        }
+        return updatedId;
+    }
+    /**
+     * Copy the value from parent to child (superseded)
+     * @param id - The parent id
+     * @param newObservableItem
+     * @return
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    public List<Integer> updateSupersededObservableItem(Integer id, ObservableItemPutDto newObservableItem) throws InvocationTargetException, IllegalAccessException {
+        // Get what is in db
+        ObservableItem observableItem = observableItemRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Observable Id " + id + " not found in updateSupersededObservableItem()"));
+
+        // Find all items that is supersedby this item.
+        List<ObservableItem> superseded = observableItemRepository
+                .findBySupersededBy(observableItem.getObservableItemName())
+                .orElseThrow(() -> new ResourceNotFoundException("Observable Id " + id + " is not supersededby any item(s)"));
+
+        List<Integer> updatedId = new ArrayList<>();
+
+        for(ObservableItem child : superseded) {
+            // Copy non-null value and then call to save to db.
+            ObservableItemPutDto current = mapper.map(child, ObservableItemPutDto.class);
+
+            nullAwareBeanUtils.copyProperties(current, newObservableItem);
+            updateObservableItem(child.getObservableItemId(), current);
+            updatedId.add(child.getObservableItemId());
+        }
+
+        return updatedId;
+    }
 
     public ObservableItem updateObservableItem(Integer id, ObservableItemPutDto newObservableItem) {
 
@@ -92,5 +209,38 @@ public class ObservableItemService {
         validate(observableItem);
 
         return observableItemRepository.save(observableItem);
+    }
+
+    public ObservableItemNodeDto createForestOf(ObservableItem i) {
+        ObservableItem root = findRootOf(i);
+        ObservableItemNodeDto r = new ObservableItemNodeDto();
+        r.self = mapper.map(root, ObservableItemGetDto.class);
+        return findChildrenOf(r);
+    }
+
+    protected ObservableItemNodeDto findChildrenOf(ObservableItemNodeDto i) {
+        Optional<List<ObservableItem>> children = observableItemRepository.findBySupersededBy(i.self.getObservableItemName());
+        if(children.isPresent()) {
+            for(ObservableItem oi : children.get()) {
+                ObservableItemNodeDto c = new ObservableItemNodeDto();
+                c.parent = i.self;
+                c.self = mapper.map(oi, ObservableItemGetDto.class);
+                i.children.add(c);
+
+                findChildrenOf(c);
+            }
+        }
+        return i;
+    }
+
+    protected ObservableItem findRootOf(ObservableItem i) {
+        if(i.getSupersededBy() != null && i.getSupersededBy().length() > 0) {
+            // Recursive find parent
+            Optional<ObservableItem> p = observableItemRepository.findByObservableItemName(i.getSupersededBy());
+            return p.isPresent() ? findRootOf(p.get()) : p.get();
+        }
+        else {
+            return i;
+        }
     }
 }

@@ -12,7 +12,7 @@ const EntityContainer = (props) => (
     </Box>
     <Grid container justifyContent="center">
       {props.header}
-      <Box style={{background: 'white', width: 900}} boxShadow={1} margin={3} padding={3}>
+      <Box style={{background: 'white', width: props.containerWidth}} boxShadow={1} margin={3} padding={3}>
         <Grid container alignItems="flex-start" direction="row">
           {props.children}
         </Grid>
@@ -23,9 +23,14 @@ const EntityContainer = (props) => (
 
 EntityContainer.propTypes = {
   name: PropTypes.string.isRequired,
+  containerWidth: PropTypes.string,
   goBackTo: PropTypes.string.isRequired,
   children: PropTypes.any,
   header: PropTypes.any
+};
+
+EntityContainer.defaultProps = {
+  containerWidth: '50%',
 };
 
 export default EntityContainer;
