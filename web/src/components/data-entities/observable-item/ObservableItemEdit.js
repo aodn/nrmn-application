@@ -143,10 +143,7 @@ const ObservableItemEdit = () => {
                     <Grid item xs={4}>
                       <FamilyTree nodes={nodes}
                                   focusNodeId={Number(observableItemId)}
-                                  reload={() => {
-                                    getFamilyForReactFlow(observableItemId)
-                                      .then(value => setNodes(value.data));
-                                  }}/>
+                                  reload={() => window.location.reload()}/>
                     </Grid>
                     <Grid item xs={8}>
                       <Grid container spacing={2}>

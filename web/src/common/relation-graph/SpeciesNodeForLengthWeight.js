@@ -27,6 +27,10 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
   const [showDialog, setShowDialog] = useState(0);
   const [showDialogCascade, setShowDialogCascade] = useState(0);
 
+  const onContentClick = useCallback((id) => {
+    navigate(`/reference/observableItem/${id}/edit`);
+  },[navigate]);
+
   // Update the three fields
   const onUpdateSupersededBy = useCallback((isCascade) => {
     submitSupersededByItemCorrection(data.id, isCascade, {
@@ -34,8 +38,7 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
       lengthWeightB: data.lengthWeightB,
       lengthWeightCf: data.lengthWeightCf
     })
-      .then(() => data.reload())
-      .then(() => isCascade ? setShowDialogCascade(0) : setShowDialog(0));
+      .then(() => data.reload());
 
   }, [data]);
 
@@ -45,20 +48,15 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
       lengthWeightB: data.lengthWeightB,
       lengthWeightCf: data.lengthWeightCf
     })
-      .then(() => data.reload())
-      .then(() => isCascade ? setShowDialogCascade(0) : setShowDialog(0));
+      .then(() => data.reload());
 
   }, [data]);
-
-  const onContentClick = useCallback((id) => {
-    navigate(`/reference/observableItem/${id}/edit`);
-  },[navigate]);
 
   return (
     <div className="text-updater-node">
       <AlertDialog
         open={showDialog !== 0}
-        text="Confirm one level update?"
+        text="Confirm one level Update and Save?"
         action="Submit"
         onClose={() => setShowDialog(0)}
         onConfirm={
@@ -69,7 +67,7 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
       />
       <AlertDialog
         open={showDialogCascade !== 0}
-        text="Confirm multiple level update?"
+        text="Confirm multiple level Update and Save?"
         action="Submit"
         onClose={() => setShowDialogCascade(0)}
         onConfirm={
