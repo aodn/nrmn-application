@@ -364,7 +364,8 @@ CREATE MATERIALIZED VIEW nrmn.ep_observable_items AS
 with supersedings as (
 	select oi.superseded_by currentname,
 		STRING_AGG ( oi.observable_item_name, ', ' order by oi.observable_item_name) as names,
-		STRING_AGG ( cast(oi.observable_item_id as varchar(5)), ', ' order by oi.observable_item_name) as ids
+		STRING_AGG ( cast(oi.observable_item_id as varchar(5)), ', ' order by oi.observable_item_name) as ids,
+		STRING_AGG ( cast(oi.mapped_id as varchar(5)), ', ' order by oi.observable_item_name) as mapped_ids
 	from nrmn.observable_item_ref oi
 	where oi.superseded_by is not null
 	group by oi.superseded_by
@@ -402,7 +403,8 @@ select
     oi.report_group,
     oi.habitat_groups,
     oi.obs_item_attribute::jsonb ->> 'OtherGroups' other_groups,
-    oi.mapped_id
+    oi.mapped_id,
+    supersedings.mapped_ids as mapped_superseded_ids
 from nrmn.observable_item_ref oi
 	 inner join nrmn.obs_item_type_ref oit ON oit.obs_item_type_id = oi.obs_item_type_id
 	 left join supersedings on oi.observable_item_name = supersedings.CurrentName
@@ -1061,7 +1063,8 @@ select
 	null as geom,
 	oi.superseded_ids,
 	oi.superseded_names,
-	oi.mapped_id
+	oi.mapped_id,
+	oi.mapped_superseded_ids
 from nrmn.ep_observable_items oi
 where oi.obs_item_type_name in ('Species', 'Undescribed Species')
 and exists (select 1 from nrmn.observation obs
@@ -1089,7 +1092,8 @@ select epoi.observable_item_id as species_id,
 	null as geom,
 	epoi.superseded_ids,
 	epoi.superseded_names,
-	epoi.mapped_id
+	epoi.mapped_id,
+	epoi.mapped_superseded_ids
 	from nrmn.ep_observable_items epoi
 where  epoi.obs_item_type_name in ('Species', 'Undescribed Species')
 and exists (select 1 from nrmn.observation obs
