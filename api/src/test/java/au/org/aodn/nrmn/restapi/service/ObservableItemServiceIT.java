@@ -140,4 +140,14 @@ public class ObservableItemServiceIT {
             assertEquals("Length Weight Cf updated", putDto.getLengthWeightCf(), reloadObservableItem.get().getLengthWeight().getCf());
         }
     }
+
+    @Test
+    public void verifyFindRootOfWithInvalidSupersededBySpecies() {
+        // This test required some knowledge of internal behavior, we test a case where the item with supersededby
+        // is an invalid item, that cause the same item return.
+        ObservableItem i = new ObservableItem();
+        i.setSupersededBy("bird");
+
+        assertEquals("Root node with invalid superseded by works", i, observableItemService.findRootOf(i));
+    }
 }
