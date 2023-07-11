@@ -237,7 +237,9 @@ public class ObservableItemService {
         if(i.getSupersededBy() != null && i.getSupersededBy().length() > 0) {
             // Recursive find parent
             Optional<ObservableItem> p = observableItemRepository.findByObservableItemName(i.getSupersededBy());
-            return p.isPresent() ? findRootOf(p.get()) : p.get();
+            return p.isPresent() ?
+                    findRootOf(p.get()) :
+                    i; // A rare case where the supersededby is deleted but some record still points to it.
         }
         else {
             return i;
