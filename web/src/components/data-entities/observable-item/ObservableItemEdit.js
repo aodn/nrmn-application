@@ -143,7 +143,7 @@ const ObservableItemEdit = () => {
                     <Grid item xs={4}>
                       <FamilyTree nodes={nodes}
                                   focusNodeId={Number(observableItemId)}
-                                  reload={() => window.location.reload()}/>
+                                  reload={() => window.location.reload(false)}/>
                     </Grid>
                     <Grid item xs={8}>
                       <Grid container spacing={2}>
@@ -178,9 +178,7 @@ const ObservableItemEdit = () => {
                         <Grid item xs={6}>
                           {item.supersedingCleared && (
                             <span
-                              style={{ display: 'inline-block', color: 'red', marginLeft: '150px', position: 'absolute' }}>
-                    * Superseding will be removed
-                  </span>
+                              style={{ display: 'inline-block', color: 'red', marginLeft: '150px', position: 'absolute' }}>* Superseding will be removed</span>
                           )}
                           <CustomSearchInput
                             label="Superseded By"

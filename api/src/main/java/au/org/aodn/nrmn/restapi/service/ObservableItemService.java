@@ -232,12 +232,21 @@ public class ObservableItemService {
         }
         return i;
     }
-
+    /**
+     * Find the supersedby recursively until it reach the end. In case the supersedBy species no longer exist
+     * the code assume it find the root node
+     * @param i
+     * @return - Root node that hold the tree structure.
+     */
     protected ObservableItem findRootOf(ObservableItem i) {
         if(i.getSupersededBy() != null && i.getSupersededBy().length() > 0) {
             // Recursive find parent
             Optional<ObservableItem> p = observableItemRepository.findByObservableItemName(i.getSupersededBy());
-            return p.isPresent() ? findRootOf(p.get()) : p.get();
+            return p.isPresent() ?
+                    findRootOf(p.get()) :
+                    // A rare case where the supersededby is deleted but some record still points to it,
+                    // assume this is the root node
+                    i;
         }
         else {
             return i;

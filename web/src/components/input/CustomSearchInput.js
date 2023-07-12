@@ -64,8 +64,10 @@ const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
       }
     }
     else {
-      // Programmatic change or 'clear'
-      if(textValue !== value) {
+      // Programmatic change or 'clear' || run check on init case
+      // it is used to handle case where the species no longer exist but
+      // used in supersededby.
+      if(textValue !== value || searchTerm === null) {
         // Update if diff to avoid looping
         setSearchTerm(value);
       }
