@@ -1,3 +1,8 @@
+-- If you run with local db, and your db is restore from production, make
+-- sure your db_username have the permission by using this sql:
+\echo 'Run sql -> reassign owned by nrmn_prod to <db_username>; if your db is restore from prod';
+\echo 'You must run this sql using psql, e.g. psql -h localhost -d nrmn_dev -U <db_username> -f CreateMiscAncillaryObjects.sql';
+
 create or replace function nrmn.obs_biomass(
 	a float,
 	b float,
@@ -338,3 +343,10 @@ BEGIN
   PERFORM nrmn.set_species_attributes();
 END;
 $$;
+
+-- The above script drop these views and hence need to execute those sql too.
+-- order is important
+\i '../endpoints/CreatePrivateEndpoints.sql';
+\i '../endpoints/CreatePublicEndpoints.sql';
+\i '../endpoints/EndpointIndexes.sql';
+
