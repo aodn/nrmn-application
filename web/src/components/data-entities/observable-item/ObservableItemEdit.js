@@ -103,7 +103,7 @@ const ObservableItemEdit = () => {
 
   const createFamilyTreeGrid = useCallback(() => {
     return(
-      <Grid item xs={16} height={750} width={900}>
+      <Grid item xs={16} height={950} width={900}>
           <FamilyTree items={nodes}
                       focusNodeId={Number(observableItemId)} />
       </Grid>);

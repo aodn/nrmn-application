@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect } from 'react';
 import 'reactflow/dist/style.css';
 import SpeciesNodeForLengthWeight from './SpeciesNodeForLengthWeight';
+import {Button} from '@mui/material';
+import RestoreIcon from '@mui/icons-material/Restore';
 
 import ReactFlow, {
   Background,
@@ -53,16 +55,12 @@ const getAllTargetId = (nodes, currentSpeciesId, direction, isCascade, depth=0) 
   // Exclude self
   const ids = depth === 0 ? [] : ['' + currentSpeciesId];
 
-  if(direction === 'up' && (isCascade || depth ===0)) {
+  if(isCascade || depth ===0) {
     nodes
       .filter(f => f.id === currentSpeciesId)
-      .map(m => m.data.getParentId())
-      .forEach(k => {console.log(k); ids.push(...getAllTargetId(nodes, k, direction, isCascade, depth + 1));});
-  }
-  else if(direction === 'down' && (isCascade || depth === 0)){
-    nodes
-      .filter(f => f.id === currentSpeciesId)
-      .map(m => m.data.getChildrenId())
+      .map(m => direction === 'up' ? m.data.getParentId() : m.data.getChildrenId())
+      .flat()   // getChildrenId() return array, so you will have array of array, hence use flat() to make it to 1d
+      .filter(f => f !== null)  // In case no more parent, then no need to loop
       .forEach(k => ids.push(...getAllTargetId(nodes, k, direction, isCascade, depth + 1)));
   }
 
@@ -74,6 +72,21 @@ const FamilyTree = ({ items, focusNodeId }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+
+  const undoAllChanges = useCallback(() => {
+    setNodes((nodes) =>
+      nodes.map((node) => {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            lengthWeightA: node.data.originalWeightA,
+            lengthWeightB: node.data.originalWeightB,
+            lengthWeightCf: node.data.originalWeightCf
+          }
+        };
+    }));
+  }, [setNodes]);
 
   const onUpdateSpecies = useCallback((currentSpeciesId, data, direction, isCascade) => {
     // Update the useStates of nodes.
@@ -116,25 +129,18 @@ const FamilyTree = ({ items, focusNodeId }) => {
           lengthWeightB: value.self.lengthWeightB === null ? '' : value.self.lengthWeightB,
           lengthWeightCf: value.self.lengthWeightCf === null ? '' : value.self.lengthWeightCf,
 
-          onUpdateParent: (id, isCascade) => onUpdateSpecies(
-            '' + id, {
-                          a: value.self.lengthWeightA,
-                          b: value.self.lengthWeightB,
-                          cf: value.self.lengthWeightCf
-                      }, 'up', isCascade),
+          originalWeightA: value.self.lengthWeightA === null ? '' : value.self.lengthWeightA,
+          originalWeightB: value.self.lengthWeightB === null ? '' : value.self.lengthWeightB,
+          originalWeightCf: value.self.lengthWeightCf === null ? '' : value.self.lengthWeightCf,
 
-          onUpdateChildren: (id, isCascade) => onUpdateSpecies(
-            '' + id, {
-                          a: value.self.lengthWeightA,
-                          b: value.self.lengthWeightB,
-                          cf: value.self.lengthWeightCf
-                      }, 'down', isCascade),
+          onUpdateParent: (id, a, b, cf, isCascade) => onUpdateSpecies(id, { a: a, b: b, cf: cf }, 'up', isCascade),
+          onUpdateChildren: (id, a, b, cf, isCascade) => onUpdateSpecies(id, { a: a, b: b, cf: cf }, 'down', isCascade),
 
           hasParent: () => value.parent === null,
           hasChildren: () => value.children === null || value.children.length === 0,
 
           getParentId: () => value.parent === null ? null : '' + value.parent.observableItemId,
-          getChildrenId: () => value.children === null ? null  : value.children.flatMap(m => '' + m.self.observableItemId)
+          getChildrenId: () => value.children === null ? null  : value.children.map(m => '' + m.self.observableItemId)
         }
       };
     }, [focusNodeId, onUpdateSpecies]);
@@ -177,16 +183,25 @@ const FamilyTree = ({ items, focusNodeId }) => {
   }, [items, createReactFlowNodes, setEdges, setNodes]);
 
   return (
-    <ReactFlow
-      fitView
-      nodes={nodes}
-      edges={edges}
-      nodeTypes={nodeTypes}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      onConnect={onConnect}>
-      <Background />
-    </ReactFlow>
+    <>
+      <ReactFlow
+        fitView
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}>
+        <Background />
+      </ReactFlow>
+      <Button
+        onClick={undoAllChanges}
+        variant="outlined"
+        style={{ float: 'left' }}
+        startIcon={<RestoreIcon/>}>
+        Undo all changes
+      </Button>
+    </>
   );
 };
 

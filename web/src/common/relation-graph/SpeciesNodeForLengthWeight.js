@@ -76,16 +76,24 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
           </CardContent>
         </CardActionArea>
         <CardActions>
-          <IconButton aria-label="Copy one level up" onClick={() => data.onUpdateParent(data.id,false)} disabled={data.hasParent()}>
+          <IconButton aria-label="Copy one level up"
+                      onClick={() => data.onUpdateParent(data.id, data.lengthWeightA, data.lengthWeightB, data.lengthWeightCf,false)}
+                      disabled={data.hasParent()}>
             <KeyboardArrowUpIcon fontSize="large" />
           </IconButton>
-          <IconButton aria-label="Copy to all level up" onClick={() => data.onUpdateParent(data.id,true)} disabled={data.hasParent()}>
+          <IconButton aria-label="Copy to all level up"
+                      onClick={() => data.onUpdateParent(data.id,data.lengthWeightA, data.lengthWeightB, data.lengthWeightCf,true)}
+                      disabled={data.hasParent()}>
             <KeyboardDoubleArrowUpRoundedIcon fontSize="large" />
           </IconButton>
-          <IconButton aria-label="Copy one level down" onClick={() => data.onUpdateChildren(data.id, false)} disabled={data.hasChildren()}>
+          <IconButton aria-label="Copy one level down"
+                      onClick={() => data.onUpdateChildren(data.id,data.lengthWeightA, data.lengthWeightB, data.lengthWeightCf, false)}
+                      disabled={data.hasChildren()}>
             <KeyboardArrowDownIcon fontSize="large" />
           </IconButton>
-          <IconButton aria-label="Copy to all level down" onClick={() => data.onUpdateChildren(data.id,true)} disabled={data.hasChildren()}>
+          <IconButton aria-label="Copy to all level down"
+                      onClick={() => data.onUpdateChildren(data.id,data.lengthWeightA, data.lengthWeightB, data.lengthWeightCf,true)}
+                      disabled={data.hasChildren()}>
             <KeyboardDoubleArrowDownIcon fontSize="large" />
           </IconButton>
         </CardActions>
