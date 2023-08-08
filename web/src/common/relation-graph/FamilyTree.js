@@ -40,35 +40,108 @@ const recalculateNodeXY = (nodes) => {
     }
   }
 };
+/**
+ * Find all the Ids that needs to update with weight value
+ * @param nodes
+ * @param currentSpeciesId
+ * @param direction
+ * @param isCascade - If true, not only update immediate parent child but generations
+ * @param depth
+ * @returns {[string]}
+ */
+const getAllTargetId = (nodes, currentSpeciesId, direction, isCascade, depth=0) => {
+  // Exclude self
+  const ids = depth === 0 ? [] : ['' + currentSpeciesId];
 
-const FamilyTree = (props) => {
+  if(direction === 'up' && (isCascade || depth ===0)) {
+    nodes
+      .filter(f => f.id === currentSpeciesId)
+      .map(m => m.data.getParentId())
+      .forEach(k => {console.log(k); ids.push(...getAllTargetId(nodes, k, direction, isCascade, depth + 1));});
+  }
+  else if(direction === 'down' && (isCascade || depth === 0)){
+    nodes
+      .filter(f => f.id === currentSpeciesId)
+      .map(m => m.data.getChildrenId())
+      .forEach(k => ids.push(...getAllTargetId(nodes, k, direction, isCascade, depth + 1)));
+  }
+
+  return ids;
+};
+
+const FamilyTree = ({ items, focusNodeId }) => {
   // const defaultViewport = { x: 0, y: 0, zoom: 0.8 };
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
-  const createReactFlowNodes = useCallback((nodes, value, depth = 0) => {
-    if(value != null) {
-      nodes.nodes.push({
+  const onUpdateSpecies = useCallback((currentSpeciesId, data, direction, isCascade) => {
+    // Update the useStates of nodes.
+    setNodes((nodes) => {
+      // We get a list of ids that needs to update weight
+      const targetIds = new Set(getAllTargetId(nodes, currentSpeciesId, direction, isCascade));
+
+      return nodes.map((node) => {
+          // We find the target
+          if(!targetIds.has(node.id)) {
+            return node;
+          }
+
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              lengthWeightA: data.a,
+              lengthWeightB: data.b,
+              lengthWeightCf: data.cf
+            }
+          };
+        });
+    });
+  }, [setNodes]);
+
+  const createReactFlowNode = useCallback((value, depth) => {
+    return {
         id: '' + value.self.observableItemId,
         type: 'customTreeNode',
+        position: { x: 0, y: 0 },
         data: {
           id: '' + value.self.observableItemId,
           depth: depth,
-          hasParent: value.parent === null,
-          hasChildren: value.children === null || value.children.length === 0,
-          isFocus: value.self.observableItemId === props.focusNodeId,
+          isFocus: value.self.observableItemId === focusNodeId,
           nodeHeight: nodeHeight,
           nodeWidth: nodeWidth,
           label: `${value.self.observableItemName}`,
           lengthWeightA: value.self.lengthWeightA === null ? '' : value.self.lengthWeightA,
           lengthWeightB: value.self.lengthWeightB === null ? '' : value.self.lengthWeightB,
           lengthWeightCf: value.self.lengthWeightCf === null ? '' : value.self.lengthWeightCf,
-          reload: props.reload
-        },
-        position: { x: 0, y: 0 }
-      });
+
+          onUpdateParent: (id, isCascade) => onUpdateSpecies(
+            '' + id, {
+                          a: value.self.lengthWeightA,
+                          b: value.self.lengthWeightB,
+                          cf: value.self.lengthWeightCf
+                      }, 'up', isCascade),
+
+          onUpdateChildren: (id, isCascade) => onUpdateSpecies(
+            '' + id, {
+                          a: value.self.lengthWeightA,
+                          b: value.self.lengthWeightB,
+                          cf: value.self.lengthWeightCf
+                      }, 'down', isCascade),
+
+          hasParent: () => value.parent === null,
+          hasChildren: () => value.children === null || value.children.length === 0,
+
+          getParentId: () => value.parent === null ? null : '' + value.parent.observableItemId,
+          getChildrenId: () => value.children === null ? null  : value.children.flatMap(m => '' + m.self.observableItemId)
+        }
+      };
+    }, [focusNodeId, onUpdateSpecies]);
+
+  const createReactFlowNodes = useCallback((nodes, value, depth = 0) => {
+    if(value != null) {
+      nodes.nodes.push(createReactFlowNode(value, depth));
 
       if(value.children != undefined) {
 
@@ -83,7 +156,7 @@ const FamilyTree = (props) => {
         });
       }
     }
-  }, [props]);
+  }, [createReactFlowNode]);
 
   useEffect(() => {
     const reactFlowNodes = {
@@ -92,7 +165,7 @@ const FamilyTree = (props) => {
     };
 
     // Create the node data for react flow
-    createReactFlowNodes(reactFlowNodes, props.nodes);
+    createReactFlowNodes(reactFlowNodes, items);
 
     // No need to update if no nodes there
     if(reactFlowNodes.nodes.length != 0) {
@@ -101,7 +174,7 @@ const FamilyTree = (props) => {
       setEdges(reactFlowNodes.edges);
     }
 
-  }, [props.nodes, setNodes, setEdges, createReactFlowNodes]);
+  }, [items, createReactFlowNodes, setEdges, setNodes]);
 
   return (
     <ReactFlow
@@ -118,9 +191,8 @@ const FamilyTree = (props) => {
 };
 
 FamilyTree.propTypes = {
-  nodes: PropTypes.object,
+  items: PropTypes.object,
   focusNodeId: PropTypes.number,
-  reload: PropTypes.func,
 };
 
 export default FamilyTree;

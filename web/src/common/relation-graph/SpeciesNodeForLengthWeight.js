@@ -13,14 +13,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardDoubleArrowUpRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowUpRounded';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
-import {
-  submitSupersededItemCorrection,
-  submitSupersededByItemCorrection
-} from '../../api/api';
 import AlertDialog from '../../components/ui/AlertDialog';
-
-const SUPERSEDED = 1;
-const SUPERSEDED_BY = 2;
 
 const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
   const navigate = useNavigate();
@@ -31,27 +24,6 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
     navigate(`/reference/observableItem/${id}/edit`);
   },[navigate]);
 
-  // Update the three fields
-  const onUpdateSupersededBy = useCallback((isCascade) => {
-    submitSupersededByItemCorrection(data.id, isCascade, {
-      lengthWeightA: data.lengthWeightA,
-      lengthWeightB: data.lengthWeightB,
-      lengthWeightCf: data.lengthWeightCf
-    })
-      .then(() => data.reload());
-
-  }, [data]);
-
-  const onUpdateSuperseded = useCallback((isCascade) => {
-    submitSupersededItemCorrection(data.id, isCascade, {
-      lengthWeightA: data.lengthWeightA,
-      lengthWeightB: data.lengthWeightB,
-      lengthWeightCf: data.lengthWeightCf
-    })
-      .then(() => data.reload());
-
-  }, [data]);
-
   return (
     <div className="text-updater-node">
       <AlertDialog
@@ -59,22 +31,12 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
         text="Confirm one level Update and Save?"
         action="Submit"
         onClose={() => setShowDialog(0)}
-        onConfirm={
-          showDialog === SUPERSEDED_BY ?
-            () => onUpdateSupersededBy(false) :
-            () => onUpdateSuperseded(false)
-        }
       />
       <AlertDialog
         open={showDialogCascade !== 0}
         text="Confirm multiple level Update and Save?"
         action="Submit"
         onClose={() => setShowDialogCascade(0)}
-        onConfirm={
-          showDialogCascade === SUPERSEDED_BY ?
-            () => onUpdateSupersededBy(true) :
-            () => onUpdateSuperseded(true)
-        }
       />
       <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
       <Card sx={{ width: data.nodeWidth, height: data.nodeHeight }}>
@@ -114,16 +76,16 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
           </CardContent>
         </CardActionArea>
         <CardActions>
-          <IconButton aria-label="Copy one level up" onClick={() => setShowDialog(SUPERSEDED_BY)} disabled={data.hasParent}>
+          <IconButton aria-label="Copy one level up" onClick={() => data.onUpdateParent(data.id,false)} disabled={data.hasParent()}>
             <KeyboardArrowUpIcon fontSize="large" />
           </IconButton>
-          <IconButton aria-label="Copy to all level up" onClick={() => setShowDialogCascade(SUPERSEDED_BY)} disabled={data.hasParent}>
+          <IconButton aria-label="Copy to all level up" onClick={() => data.onUpdateParent(data.id,true)} disabled={data.hasParent()}>
             <KeyboardDoubleArrowUpRoundedIcon fontSize="large" />
           </IconButton>
-          <IconButton aria-label="Copy one level down" onClick={() => setShowDialog(SUPERSEDED)} disabled={data.hasChildren}>
+          <IconButton aria-label="Copy one level down" onClick={() => data.onUpdateChildren(data.id, false)} disabled={data.hasChildren()}>
             <KeyboardArrowDownIcon fontSize="large" />
           </IconButton>
-          <IconButton aria-label="Copy to all level down" onClick={() => setShowDialogCascade(SUPERSEDED)} disabled={data.hasChildren}>
+          <IconButton aria-label="Copy to all level down" onClick={() => data.onUpdateChildren(data.id,true)} disabled={data.hasChildren()}>
             <KeyboardDoubleArrowDownIcon fontSize="large" />
           </IconButton>
         </CardActions>
