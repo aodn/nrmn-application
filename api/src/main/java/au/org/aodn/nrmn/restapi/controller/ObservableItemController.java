@@ -123,7 +123,15 @@ public class ObservableItemController {
 
         return mapper.map(observableItemService.updateObservableItem(id, observableItemPutDto), ObservableItemGetDto.class);
     }
-
+    /**
+     * Update multiple species in one transaction. The incoming items do not need to carry all fields, those missing fields
+     * will be copied from values from db. Hence it allows you to update any field by just passing the fields you want to
+     * update.
+     *
+     * @param observableItemPutDto - A list of species to be updated.
+     * @return - List of updated species
+     * @throws Exception - When any update species item id not found
+     */
     @PutMapping("/observableItems")
     @Transactional
     public ResponseEntity<List<ObservableItemGetDto>> updateObservableItem(@Valid @RequestBody List<ObservableItemPutDto> observableItemPutDto) throws Exception {
@@ -133,9 +141,15 @@ public class ObservableItemController {
         // Get the item and copy items to the incoming object when the incoming object field is null
         // hence we apply the changes to object.
         for(ObservableItemPutDto o : observableItemPutDto) {
-            ObservableItemGetDto k = findOne(o.getObservableItemId()).getBody();
-            nullCopyBeanUtils.copyProperties(o, k);
-            result.add(mapper.map(observableItemService.updateObservableItem(o.getObservableItemId(), o), ObservableItemGetDto.class));
+            ResponseEntity k = findOne(o.getObservableItemId());
+
+            if(k.getStatusCode() == HttpStatus.OK) {
+                nullCopyBeanUtils.copyProperties(o, k.getBody());
+                result.add(mapper.map(observableItemService.updateObservableItem(o.getObservableItemId(), o), ObservableItemGetDto.class));
+            }
+            else {
+                throw new NoSuchElementException(String.format("Observation Item Id not found [%s]", o.getObservableItemId()));
+            }
         }
 
         return ResponseEntity.ok(result);
