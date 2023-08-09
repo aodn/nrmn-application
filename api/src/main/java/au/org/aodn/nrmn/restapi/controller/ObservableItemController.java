@@ -125,9 +125,8 @@ public class ObservableItemController {
     }
 
     @PutMapping("/observableItems")
-    @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public List<ObservableItemGetDto> updateObservableItem(@Valid @RequestBody List<ObservableItemPutDto> observableItemPutDto) throws IllegalAccessException, InvocationTargetException {
+    public ResponseEntity<List<ObservableItemGetDto>> updateObservableItem(@Valid @RequestBody List<ObservableItemPutDto> observableItemPutDto) throws Exception {
 
         List<ObservableItemGetDto> result = new ArrayList<>();
 
@@ -139,6 +138,6 @@ public class ObservableItemController {
             result.add(mapper.map(observableItemService.updateObservableItem(o.getObservableItemId(), o), ObservableItemGetDto.class));
         }
 
-        return result;
+        return ResponseEntity.ok(result);
     }
 }

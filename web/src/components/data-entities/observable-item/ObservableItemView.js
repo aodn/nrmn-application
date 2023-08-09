@@ -158,6 +158,11 @@ const ObservableItemView = () => {
               </Alert>
             </Box>
           )}
+          {state?.error && (
+            <Box mx={5} flexGrow={1}>
+              <Alert severity="error">{ state.error }</Alert>
+            </Box>
+          )}
         </EntityContainer>
       }
     </AuthContext.Consumer>

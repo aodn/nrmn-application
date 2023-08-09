@@ -30,6 +30,7 @@ const ObservableItemEdit = () => {
   const [options, setOptions] = useState({});
   const [nodes, setNodes] = useState(null);
   const [savedSpecies, setSavedSpecies] = useState(null);
+  const [saveSpeciesError, setSaveSpeciesError] = useState(null);
 
   const formReducer = (state, action) => {
     if (action.form) return {...state, ...action.form};
@@ -85,9 +86,14 @@ const ObservableItemEdit = () => {
   const handleSaveLengthWeightChange = async(items) => {
     await entityEdit('reference/observableItems', items)
       .then((s) => {
-        setSavedSpecies(s.data);
-        setSteps(3);
-      });
+        if(s.status === 200) {
+          setSavedSpecies(s.data);
+        }
+        else {
+          setSaveSpeciesError('Server error, fail to update species length weight');
+        }
+      })
+      .finally(() => setSteps(3));
   };
 
   const handleSubmit = () => {
@@ -309,7 +315,12 @@ const ObservableItemEdit = () => {
 
   if (steps === 3) {
     const id = saved['observableItemId'];
-    return <Navigate to={`/reference/observableItem/${id}`} state={{message: 'Observable Item Updated', species: savedSpecies}} />;
+    return <Navigate to={`/reference/observableItem/${id}`}
+                     state={{
+                       message: 'Observable Item Updated',
+                       species: savedSpecies,
+                       error: saveSpeciesError
+                     }} />;
   }
 
   if (deleted) {
