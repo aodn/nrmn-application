@@ -1,11 +1,10 @@
 package au.org.aodn.nrmn.restapi.controller;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import au.org.aodn.nrmn.restapi.controller.transform.Filter;
@@ -13,8 +12,10 @@ import au.org.aodn.nrmn.restapi.controller.transform.Sorter;
 
 import au.org.aodn.nrmn.restapi.dto.observableitem.ObservableItemNodeDto;
 import au.org.aodn.nrmn.restapi.service.ObservableItemService;
+import au.org.aodn.nrmn.restapi.util.ObjectUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +56,8 @@ public class ObservableItemController {
 
     @Autowired
     protected ObservableItemService observableItemService;
+
+    protected BeanUtilsBean nullCopyBeanUtils = ObjectUtils.createNullCopyBeanUtils();
 
     @GetMapping(path = "/observableItems")
     public  ResponseEntity<?> getObservationItemsWithFilters(@RequestParam(value = "sort", required = false) String sort,
@@ -121,23 +124,21 @@ public class ObservableItemController {
         return mapper.map(observableItemService.updateObservableItem(id, observableItemPutDto), ObservableItemGetDto.class);
     }
 
-    @PutMapping("/observableItem/{id}/supersededBy")
+    @PutMapping("/observableItems")
     @ResponseStatus(HttpStatus.OK)
-    public Integer updateSupersededCascadeByObservableItem(@PathVariable Integer id, @RequestParam("cascade") Boolean isCascade,
-                                                           @Valid @RequestBody ObservableItemPutDto observableItemPutDto) throws InvocationTargetException, IllegalAccessException {
+    @Transactional
+    public List<ObservableItemGetDto> updateObservableItem(@Valid @RequestBody List<ObservableItemPutDto> observableItemPutDto) throws IllegalAccessException, InvocationTargetException {
 
-        return isCascade ?
-                observableItemService.updateSupersededByObservableItemCascade(id, observableItemPutDto) :
-                observableItemService.updateSupersededByObservableItem(id, observableItemPutDto) ;
-    }
+        List<ObservableItemGetDto> result = new ArrayList<>();
 
-    @PutMapping("/observableItem/{id}/superseded")
-    @ResponseStatus(HttpStatus.OK)
-    public List<Integer> updateSupersededObservableItem(@PathVariable Integer id, @RequestParam("cascade") Boolean isCascade,
-                                                    @Valid @RequestBody ObservableItemPutDto observableItemPutDto) throws InvocationTargetException, IllegalAccessException {
+        // Get the item and copy items to the incoming object when the incoming object field is null
+        // hence we apply the changes to object.
+        for(ObservableItemPutDto o : observableItemPutDto) {
+            ObservableItemGetDto k = findOne(o.getObservableItemId()).getBody();
+            nullCopyBeanUtils.copyProperties(o, k);
+            result.add(mapper.map(observableItemService.updateObservableItem(o.getObservableItemId(), o), ObservableItemGetDto.class));
+        }
 
-        return isCascade ?
-                observableItemService.updateSupersededObservableItemCascade(id, observableItemPutDto)
-                : observableItemService.updateSupersededObservableItem(id, observableItemPutDto);
+        return result;
     }
 }

@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.function.Function;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,6 +33,23 @@ public class ObjectUtils {
             public void copyProperty(Object dest, String name, Object value) throws IllegalAccessException, InvocationTargetException {
                 if(value==null || Arrays.stream(ignoreFields).anyMatch(p -> p.equalsIgnoreCase(name))) return;
                 super.copyProperty(dest, name, value);
+            }
+        };
+    }
+    /**
+     * This copy function copy value when destination field is null
+     */
+    public static BeanUtilsBean createNullCopyBeanUtils(String... ignoreFields) {
+        return new BeanUtilsBean() {
+            @Override
+            public void copyProperty(Object dest, String name, Object value) throws IllegalAccessException, InvocationTargetException {
+                try {
+                    if(BeanUtils.getProperty(dest, name) != null || Arrays.stream(ignoreFields).anyMatch(p -> p.equalsIgnoreCase(name))) return;
+                    super.copyProperty(dest, name, value);
+                }
+                catch (NoSuchMethodException e) {
+                    return;
+                }
             }
         };
     }

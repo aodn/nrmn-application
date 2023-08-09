@@ -285,13 +285,3 @@ export const originalJobFile = (jobId) => {
 export const getFamilyForReactFlow = (observableItemId) => {
   return axiosInstance.get(`reference/observableItem/${observableItemId}/family`);
 };
-
-export const submitSupersededByItemCorrection = (id, isCascade = false, bodyDto) => {
-  return axiosInstance
-    .put(`reference/observableItem/${id}/supersededBy?cascade=${isCascade ? 'true' : 'false'}`, bodyDto);
-};
-
-export const submitSupersededItemCorrection = (id, isCascade = false, bodyDto) => {
-  return axiosInstance
-    .put(`reference/observableItem/${id}/superseded?cascade=${isCascade ? 'true' : 'false'}`, bodyDto);
-};

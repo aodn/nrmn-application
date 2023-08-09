@@ -42,7 +42,7 @@ const SpeciesNodeForLengthWeight = ({ data, isConnectable }) => {
       <Card sx={{ width: data.nodeWidth, height: data.nodeHeight }}>
         <CardHeader
           sx={ data.isFocus ? { backgroundColor: 'lightblue'} : { backgroundColor: 'lightgrey'}}
-          title = {data.label}
+          title = {data.observableItemName}
         />
         <CardActionArea onClick={() => onContentClick(data.id)}>
           <CardContent>

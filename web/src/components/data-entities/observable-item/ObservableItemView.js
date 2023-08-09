@@ -151,6 +151,13 @@ const ObservableItemView = () => {
               </Box>
             </>
           )}
+          {state?.species && (
+            <Box mx={5} flexGrow={1}>
+              <Alert severity="success">
+                Species length weight updated : { state.species.map(s => ' [ ' + s.observableItemName + ' ] ')}
+              </Alert>
+            </Box>
+          )}
         </EntityContainer>
       }
     </AuthContext.Consumer>

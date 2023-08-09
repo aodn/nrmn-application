@@ -29,6 +29,7 @@ const ObservableItemEdit = () => {
   const [errors, setErrors] = useState([]);
   const [options, setOptions] = useState({});
   const [nodes, setNodes] = useState(null);
+  const [savedSpecies, setSavedSpecies] = useState(null);
 
   const formReducer = (state, action) => {
     if (action.form) return {...state, ...action.form};
@@ -76,6 +77,18 @@ const ObservableItemEdit = () => {
       fetchObservableItem();
     }
   }, [observableItemId]);
+  // Just skip to the next screen if nothing change on species weight length.
+  const handleSkipLengthWeightChange = () => {
+    setSteps(3);
+  };
+
+  const handleSaveLengthWeightChange = async(items) => {
+    await entityEdit('reference/observableItems', items)
+      .then((s) => {
+        setSavedSpecies(s.data);
+        setSteps(3);
+      });
+  };
 
   const handleSubmit = () => {
     entityEdit(`reference/observableItem/${observableItemId}`, item).then((res) => {
@@ -103,10 +116,11 @@ const ObservableItemEdit = () => {
 
   const createFamilyTreeGrid = useCallback(() => {
     return(
-      <Grid item xs={16} height={950} width={900}>
           <FamilyTree items={nodes}
-                      focusNodeId={Number(observableItemId)} />
-      </Grid>);
+                      focusNodeId={Number(observableItemId)}
+                      onSkipLengthWeightChange={handleSkipLengthWeightChange}
+                      onSaveLengthWeightChange={handleSaveLengthWeightChange}
+          />);
   },[observableItemId, nodes]);
 
   const createItemEditGrid = () => {
@@ -295,7 +309,7 @@ const ObservableItemEdit = () => {
 
   if (steps === 3) {
     const id = saved['observableItemId'];
-    return <Navigate to={`/reference/observableItem/${id}`} state={{message: 'Observable Item Updated'}} />;
+    return <Navigate to={`/reference/observableItem/${id}`} state={{message: 'Observable Item Updated', species: savedSpecies}} />;
   }
 
   if (deleted) {
@@ -310,13 +324,15 @@ const ObservableItemEdit = () => {
             <Grid container alignItems="flex-start" direction="row">
               <Grid item xs={10}>
                 <Box fontWeight="fontWeightBold">
-                  <Typography variant="h4">Edit Observable Item</Typography>
+                  <Typography variant="h4">{steps === 1 ? 'Edit Observable Item' : 'Edit Length Weight'}</Typography>
                 </Box>
               </Grid>
-              <Button variant="outlined" style={{ float: 'right' }} onClick={handleDelete}
-                      startIcon={<Delete></Delete>}>
-                Delete
-              </Button>
+              { steps === 1 &&
+                (<Button variant="outlined" style={{ float: 'right' }} onClick={handleDelete}
+                        startIcon={<Delete></Delete>}>
+                  Delete
+                </Button>)
+              }
             </Grid>
             <Grid container direction="column" justifyContent="flex-start" alignItems="center">
               {observableItemId && Object.keys(item).length === 0 ? (

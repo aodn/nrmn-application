@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect } from 'react';
 import 'reactflow/dist/style.css';
 import SpeciesNodeForLengthWeight from './SpeciesNodeForLengthWeight';
-import {Button} from '@mui/material';
 import RestoreIcon from '@mui/icons-material/Restore';
-
+import SaveIcon from '@mui/icons-material/Save';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
+import {Button, Grid} from '@mui/material';
 import ReactFlow, {
   Background,
   useNodesState,
@@ -67,11 +68,31 @@ const getAllTargetId = (nodes, currentSpeciesId, direction, isCascade, depth=0) 
   return ids;
 };
 
-const FamilyTree = ({ items, focusNodeId }) => {
+const FamilyTree = ({ items, focusNodeId, onSkipLengthWeightChange, onSaveLengthWeightChange }) => {
   // const defaultViewport = { x: 0, y: 0, zoom: 0.8 };
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+
+  const saveChanges = useCallback(() => {
+      const updatedItems = nodes
+        .filter(f => (
+          f.data.lengthWeightA !== f.data.originalWeightA
+          || f.data.lengthWeightB !== f.data.originalWeightB
+          || f.data.lengthWeightCf !== f.data.originalWeightCf)
+        )
+        .map(i => {
+          return {
+            observableItemId: i.data.id,
+            lengthWeightA: i.data.lengthWeightA,
+            lengthWeightB: i.data.lengthWeightB,
+            lengthWeightCf: i.data.lengthWeightCf,
+          };
+        });
+
+      onSaveLengthWeightChange(updatedItems);
+      // Update changed items
+  }, [nodes, onSaveLengthWeightChange]);
 
   const undoAllChanges = useCallback(() => {
     setNodes((nodes) =>
@@ -124,7 +145,7 @@ const FamilyTree = ({ items, focusNodeId }) => {
           isFocus: value.self.observableItemId === focusNodeId,
           nodeHeight: nodeHeight,
           nodeWidth: nodeWidth,
-          label: `${value.self.observableItemName}`,
+          observableItemName: `${value.self.observableItemName}`,
           lengthWeightA: value.self.lengthWeightA === null ? '' : value.self.lengthWeightA,
           lengthWeightB: value.self.lengthWeightB === null ? '' : value.self.lengthWeightB,
           lengthWeightCf: value.self.lengthWeightCf === null ? '' : value.self.lengthWeightCf,
@@ -182,32 +203,58 @@ const FamilyTree = ({ items, focusNodeId }) => {
 
   }, [items, createReactFlowNodes, setEdges, setNodes]);
 
+
   return (
-    <>
-      <ReactFlow
-        fitView
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}>
-        <Background />
-      </ReactFlow>
-      <Button
-        onClick={undoAllChanges}
-        variant="outlined"
-        style={{ float: 'left' }}
-        startIcon={<RestoreIcon/>}>
-        Undo all changes
-      </Button>
-    </>
+    <Grid container spacing={2}>
+      <Grid item xs={12} height={720} width={900}>
+        <ReactFlow
+          fitView
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}>
+          <Background />
+        </ReactFlow>
+      </Grid>
+      <Grid item xs={3}>
+        <Button
+          onClick={undoAllChanges}
+          variant="outlined"
+          style={{ float: 'left' }}
+          startIcon={<RestoreIcon/>}>
+          Undo all changes
+        </Button>
+      </Grid>
+      <Grid item xs={3}>
+        <Button
+          onClick={onSkipLengthWeightChange}
+          variant="outlined"
+          style={{ width: '90%'}}
+          startIcon={<SkipNextIcon/>}>
+          Skip changes
+        </Button>
+      </Grid>
+      <Grid item xs={6}>
+        <Button
+          variant="contained"
+          style={{ float: 'right'}}
+          onClick={saveChanges}
+          startIcon={<SaveIcon/>}
+        >
+          Save Changes
+        </Button>
+      </Grid>
+    </Grid>
   );
 };
 
 FamilyTree.propTypes = {
   items: PropTypes.object,
   focusNodeId: PropTypes.number,
+  onSkipLengthWeightChange: PropTypes.func,
+  onSaveLengthWeightChange: PropTypes.func,
 };
 
 export default FamilyTree;
