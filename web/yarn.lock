@@ -3201,10 +3201,10 @@ ag-grid-enterprise@27.3.0:
   resolved "https://registry.npmjs.org/ag-grid-enterprise/-/ag-grid-enterprise-27.3.0.tgz"
   integrity sha512-l95eH5cT1D/iOf0ROEpQ8G7RINg2UQ4E1rve4OGveN33Cg0/FFAyja0sraJ4DKgwLBPbPXtFksKq4nSlw0CEeA==
 
-ag-grid-react@27.2.1:
-  version "27.2.1"
-  resolved "https://registry.npmjs.org/ag-grid-react/-/ag-grid-react-27.2.1.tgz"
-  integrity sha512-MWYhi16CHltIojdnHjPp6U5TPsHQHVtX+gJqhEwNM7h55Iwe9NPFfoypBwz9kEyR7dSIL8pvMZ5O/nEeBBoxWA==
+ag-grid-react@27.3.0:
+  version "27.3.0"
+  resolved "https://registry.yarnpkg.com/ag-grid-react/-/ag-grid-react-27.3.0.tgz#fe06647653f8b0b349b8e613aab8ea2e07915562"
+  integrity sha512-2bs9YfJ/shvBZQLLjny4NFvht+ic6VtpTPO0r3bHHOhlL3Fjx2rGvS6AHSwfvu+kJacHCta30PjaEbX8T3UDyw==
   dependencies:
     prop-types "^15.8.1"
 
