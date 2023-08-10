@@ -3191,10 +3191,10 @@ adjust-sourcemap-loader@^4.0.0:
     loader-utils "^2.0.0"
     regex-parser "^2.2.11"
 
-ag-grid-community@27.2.1:
-  version "27.2.1"
-  resolved "https://registry.npmjs.org/ag-grid-community/-/ag-grid-community-27.2.1.tgz"
-  integrity sha512-MCnbqZHVDvd6KNRx1g6vjuz/X9tE8YUV7kaWKpRupFF1M1fPsAt+CqkfOr3X2ybOooorYao3Z/GGskRlGaHlFQ==
+ag-grid-community@27.3.0:
+  version "27.3.0"
+  resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-27.3.0.tgz#b1e94a58026aaf2f0cd7920e35833325b5e762c7"
+  integrity sha512-R5oZMXEHXnOLrmhn91J8lR0bv6IAnRcU6maO+wKLMJxffRWaAYFAuw1jt7bdmcKCv8c65F6LEBx4ykSOALa9vA==
 
 ag-grid-enterprise@27.3.0:
   version "27.3.0"
