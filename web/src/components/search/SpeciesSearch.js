@@ -14,6 +14,7 @@ import TabPanel from '../containers/TabPanel';
 import {search} from '../../api/api';
 import PropTypes from 'prop-types';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { AppConstants } from '../../common/constants';
 
 const useStyles = makeStyles(({palette, typography}) => ({
   root: {
@@ -176,7 +177,9 @@ const SpeciesSearch = ({onRowClick}) => {
               disabled={loading}
               onChange={(e) => setSearchTerm(e.target.value.trim())}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') doSearch({searchType: 'WORMS', species: searchTerm, includeSuperseded: true, page: 0});
+                if (e.key === 'Enter' && searchTerm?.length > AppConstants.Filter.MIN_CHAR_LENGTH_FOR_WORM_SEARCH) {
+                  doSearch({ searchType: 'WORMS', species: searchTerm, includeSuperseded: true, page: 0 });
+                };
               }}
             />
           </Grid>
@@ -185,7 +188,7 @@ const SpeciesSearch = ({onRowClick}) => {
             <LoadingButton
               data-testid="search-button"
               variant="outlined"
-              disabled={!(searchTerm?.length > 3)}
+              disabled={!(searchTerm?.length > AppConstants.Filter.MIN_CHAR_LENGTH_FOR_WORM_SEARCH)}
               loading={loading}
               startIcon={<Search></Search>}
               onClick={() => {

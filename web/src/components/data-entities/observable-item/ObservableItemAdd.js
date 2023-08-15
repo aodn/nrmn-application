@@ -21,7 +21,17 @@ const ObservableItemAdd = () => {
   const [options, setOptions] = useState({});
 
   const formReducer = (state, action) => {
-    if (action.form) return {...state, ...action.form};
+    if (action.form) {
+      if(!action.form.observableItemName) {
+        // Show error if data missing observableItemName which is mandatory field
+        setErrors([{
+          property: 'observableItemName',
+          message: 'Species Name Required.'
+        }]);
+      }
+      return { ...state, ...action.form };
+    };
+
     switch (action.field) {
       default:
         return {...state, [action.field]: action.value};
@@ -62,13 +72,14 @@ const ObservableItemAdd = () => {
   }, []);
 
   const handleSubmit = () => {
-    entitySave(`reference/observableItem`, item).then((res) => {
-      if (res.data.observableItemId) {
-        setSavedId(res.data.observableItemId);
-      } else {
-        setErrors(res.data.errors);
-      }
-    });
+    entitySave(`reference/observableItem`, item)
+      .then((res) => {
+        if (res.data.observableItemId) {
+          setSavedId(res.data.observableItemId);
+        } else {
+          setErrors(res.data);
+        }
+      });
   };
 
   const content = () =>
