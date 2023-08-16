@@ -96,7 +96,7 @@ const ObservableItemAdd = () => {
         <Box pt={2} pb={6} padding={2} width="90%">
           {errors.length > 0 ? (
             <Box py={2}>
-              <Alert severity="error" variant="filled">
+              <Alert severity="error" variant="filled" data-testid="alert-field-missing">
                 Please review this form for errors and try again.
               </Alert>
             </Box>
