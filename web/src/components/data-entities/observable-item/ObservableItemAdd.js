@@ -21,7 +21,17 @@ const ObservableItemAdd = () => {
   const [options, setOptions] = useState({});
 
   const formReducer = (state, action) => {
-    if (action.form) return {...state, ...action.form};
+    if (action.form) {
+      if(!action.form.observableItemName) {
+        // Show error if data missing observableItemName which is mandatory field
+        setErrors([{
+          property: 'observableItemName',
+          message: 'Species Name Required.'
+        }]);
+      }
+      return { ...state, ...action.form };
+    };
+
     switch (action.field) {
       default:
         return {...state, [action.field]: action.value};
@@ -62,13 +72,15 @@ const ObservableItemAdd = () => {
   }, []);
 
   const handleSubmit = () => {
-    entitySave(`reference/observableItem`, item).then((res) => {
-      if (res.data.observableItemId) {
-        setSavedId(res.data.observableItemId);
-      } else {
-        setErrors(res.data.errors);
-      }
-    });
+    entitySave(`reference/observableItem`, item)
+      .then((res) => {
+        if (res.data.observableItemId) {
+          setSavedId(res.data.observableItemId);
+        } else {
+          // Must be res.data
+          setErrors(res.data);
+        }
+      });
   };
 
   const content = () =>
@@ -85,7 +97,7 @@ const ObservableItemAdd = () => {
         <Box pt={2} pb={6} padding={2} width="90%">
           {errors.length > 0 ? (
             <Box py={2}>
-              <Alert severity="error" variant="filled">
+              <Alert severity="error" variant="filled" data-testid="alert-field-missing">
                 Please review this form for errors and try again.
               </Alert>
             </Box>
@@ -102,6 +114,7 @@ const ObservableItemAdd = () => {
             </Grid>
             <Grid item xs={6}>
               <CustomTextInput
+                dataTestId="observable-item-name-text"
                 label="Species Name"
                 formData={item.observableItemName}
                 field="observableItemName"

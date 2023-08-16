@@ -215,7 +215,8 @@ export const extendedMeasurements = Object.freeze([
 
 export const AppConstants = Object.freeze({
   Filter: {
-    WAIT_TIME_ON_FILTER_APPLY: 3000
+    WAIT_TIME_ON_FILTER_APPLY: 3000,
+    MIN_CHAR_LENGTH_FOR_WORM_SEARCH: 3
   },
   AG_GRID: {
     measureColWidth: 35,
