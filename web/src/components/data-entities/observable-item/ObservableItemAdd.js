@@ -77,6 +77,7 @@ const ObservableItemAdd = () => {
         if (res.data.observableItemId) {
           setSavedId(res.data.observableItemId);
         } else {
+          // Must be res.data
           setErrors(res.data);
         }
       });
