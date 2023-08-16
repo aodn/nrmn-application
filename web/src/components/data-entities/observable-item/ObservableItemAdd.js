@@ -113,6 +113,7 @@ const ObservableItemAdd = () => {
             </Grid>
             <Grid item xs={6}>
               <CustomTextInput
+                dataTestId="observable-item-name-text"
                 label="Species Name"
                 formData={item.observableItemName}
                 field="observableItemName"

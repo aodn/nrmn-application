@@ -2,7 +2,7 @@ import React from 'react';
 import {Box, Grid, TextField, Typography} from '@mui/material';
 import {PropTypes} from 'prop-types';
 
-const CustomTextInput = ({field, type, readOnlyInput, readOnlyModify, formData, errors, onChange, onBlur, label, asDate}) => {
+const CustomTextInput = ({field, type, readOnlyInput, readOnlyModify, formData, errors, onChange, onBlur, label, asDate, dataTestId}) => {
   const parseDate = (d) => {
     const parsedDate = Date.parse(d);
     return isNaN(parsedDate) ? '---' : new Date(parsedDate).toLocaleString();
@@ -46,6 +46,7 @@ const CustomTextInput = ({field, type, readOnlyInput, readOnlyModify, formData, 
       <Typography variant="subtitle2">{label}</Typography>
       <TextField
         fullWidth
+        data-testid={dataTestId}
         size="small"
         color="primary"
         type={type ?? 'string'}
@@ -76,7 +77,8 @@ CustomTextInput.propTypes = {
   onBlur: PropTypes.func,
   readOnlyModify: PropTypes.bool,
   readOnlyInput: PropTypes.bool,
-  asDate: PropTypes.bool
+  asDate: PropTypes.bool,
+  dataTestId: PropTypes.string,
 };
 
 export default CustomTextInput;

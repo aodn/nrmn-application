@@ -172,6 +172,7 @@ const SpeciesSearch = ({onRowClick}) => {
           <Grid item xs={5}>
             <TextField
               fullWidth
+              data-testid="worm-search-field"
               placeholder="WoRMS Search"
               size="small"
               disabled={loading}
