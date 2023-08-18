@@ -5909,6 +5909,11 @@ http-proxy@^1.18.1:
     follow-redirects "^1.0.0"
     requires-port "^1.0.0"
 
+http-status-codes@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/http-status-codes/-/http-status-codes-2.0.0.tgz#56d35f3cfc60196193723020bdd63bc2252ace18"
+  integrity sha512-fF3gE9NafcUcfR9u7zO5ypkh590RsmEBq/Fw9G3n+rz5aZV9YRwp9uB+j1teBExbmCsH8NWbgJBGM2Ib10ISyw==
+
 https-proxy-agent@^5.0.0:
   version "5.0.1"
   resolved "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-5.0.1.tgz"

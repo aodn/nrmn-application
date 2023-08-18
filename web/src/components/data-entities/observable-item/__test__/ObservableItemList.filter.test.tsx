@@ -15,6 +15,8 @@ import { AppConstants } from '../../../../common/constants';
 
 jest.setTimeout(30000);
 
+const canned = require('./cannedData/ObservableItemList.filter.data.json');
+
 describe('<ObservableItemList/> filter testing', () => {
   let mockGetResult;
   let mockGetFiltersForId;
@@ -39,7 +41,6 @@ describe('<ObservableItemList/> filter testing', () => {
   });
 
   test('Render necessary fields and no filter restored', async () => {
-    const canned = require('./ObservableItemList.filter.data.json');
 
     // Override function so that it return the data we set.
     mockGetResult.mockImplementation((url) => {
@@ -93,7 +94,6 @@ describe('<ObservableItemList/> filter testing', () => {
   });
 
   test('Render necessary fields with filter restored', async () => {
-    const canned = require('./ObservableItemList.filter.data.json');
 
     // Filter set will cause some items disappeared
     mockGetFiltersForId.mockImplementation((id) => {

@@ -22,6 +22,7 @@
     "react-dom": "18.1.0",
     "react-router": "6.3.0",
     "react-router-dom": "6.3.0",
+    "http-status-codes": "2.0.0",
     "reactflow": "11.7.4"
   },
   "scripts": {
