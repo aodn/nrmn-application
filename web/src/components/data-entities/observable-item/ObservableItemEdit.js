@@ -1,7 +1,7 @@
 import React, {useEffect, useReducer, useState, useCallback} from 'react';
 import {useParams, NavLink, Navigate} from 'react-router-dom';
 import {Box, Button, CircularProgress, Divider, Grid, Typography} from '@mui/material';
-import {Save, Delete} from '@mui/icons-material';
+import {Save, Edit, Delete} from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
 import PropTypes from 'prop-types';
 import { StatusCodes } from 'http-status-codes';
@@ -21,6 +21,11 @@ import {
   entityDelete,
   getFamilyForReactFlow
 } from '../../../api/api';
+
+const STEP_EDIT_SCREEN = 1;
+const STEP_EDIT_SUMMARY_SCREEN = 2;
+const STEP_EDIT_WEIGHT_LENGTH_SCREEN = 3;
+const STEP_EDIT_WEIGHT_LENGTH_SUMMARY_SCREEN = 4;
 
 const ObservableItemEdit = () => {
   const observableItemId = useParams()?.id;
@@ -80,10 +85,6 @@ const ObservableItemEdit = () => {
       fetchObservableItem();
     }
   }, [observableItemId]);
-  // Just skip to the next screen if nothing change on species weight length.
-  const handleSkipLengthWeightChange = () => {
-    setSteps(3);
-  };
 
   const handleSaveLengthWeightChange = async(items) => {
     await entityEdit('reference/observableItems', items)
@@ -95,23 +96,27 @@ const ObservableItemEdit = () => {
           setSaveSpeciesError('Server error, fail to update species length weight');
         }
       })
-      .finally(() => setSteps(3));
+      .finally(() => setSteps(STEP_EDIT_WEIGHT_LENGTH_SUMMARY_SCREEN));
   };
 
   const handleSubmit = () => {
     entityEdit(`reference/observableItem/${observableItemId}`, item).then((res) => {
       if (res.status === StatusCodes.OK) {
         setSaved(res.data);
-        setSteps(2);
+        setSteps(STEP_EDIT_SUMMARY_SCREEN);
         setErrors([]);
-        getFamilyForReactFlow(observableItemId)
-          .then(value => {
-            setNodes(value.data);
-          });
       } else {
         // Must use res.data
         setErrors(res.data);
       }});
+  };
+
+  const handleEditWeigthLength = () => {
+    getFamilyForReactFlow(observableItemId)
+      .then(value => {
+        setNodes(value.data);
+        setSteps(STEP_EDIT_WEIGHT_LENGTH_SCREEN);
+      });
   };
 
   const handleDelete = () => {
@@ -128,7 +133,7 @@ const ObservableItemEdit = () => {
     return(
           <FamilyTree items={nodes}
                       focusNodeId={Number(observableItemId)}
-                      onSkipLengthWeightChange={handleSkipLengthWeightChange}
+                      onExistEdit={() => setSteps(STEP_EDIT_SCREEN)}
                       onSaveLengthWeightChange={handleSaveLengthWeightChange}
           />);
   },[observableItemId, nodes]);
@@ -302,13 +307,19 @@ const ObservableItemEdit = () => {
           </Grid>
         </Grid>
       </Grid>
-      <Box display="flex" justifyContent="center" mt={5}>
+      <Box display="flex" justifyContent="space-between" m={5}>
         <Button variant="outlined" component={NavLink} to="/reference/observableItems">
           Cancel
         </Button>
         <Button
+          variant="outlined"
+          onClick={handleEditWeigthLength}
+          startIcon={<Edit></Edit>}
+        >
+          Edit Superseded(by) Length-Weight
+        </Button>
+        <Button
           variant="contained"
-          style={{ width: '50%', marginLeft: '5%'}}
           data-testid="observable-item-save-btn"
           onClick={handleSubmit}
           startIcon={<Save></Save>}
@@ -319,11 +330,18 @@ const ObservableItemEdit = () => {
     </>);
   };
 
-  if (steps === 3) {
+  if (steps === STEP_EDIT_SUMMARY_SCREEN) {
     const id = saved['observableItemId'];
     return <Navigate to={`/reference/observableItem/${id}`}
                      state={{
                        message: 'Observable Item Updated',
+                       error: saveSpeciesError
+                     }} />;
+  }
+
+  if (steps === STEP_EDIT_WEIGHT_LENGTH_SUMMARY_SCREEN) {
+    return <Navigate to={`/reference/observableItem/${observableItemId}`}
+                     state={{
                        species: savedSpecies,
                        error: saveSpeciesError
                      }} />;
@@ -341,10 +359,10 @@ const ObservableItemEdit = () => {
             <Grid container alignItems="flex-start" direction="row">
               <Grid item xs={10}>
                 <Box fontWeight="fontWeightBold">
-                  <Typography variant="h4">{steps === 1 ? 'Edit Observable Item' : 'Edit Length Weight'}</Typography>
+                  <Typography variant="h4">{steps === STEP_EDIT_SCREEN ? 'Edit Observable Item' : 'Edit Superseded(by) Weight Length'}</Typography>
                 </Box>
               </Grid>
-              { steps === 1 &&
+              { steps === STEP_EDIT_SCREEN &&
                 (<Button variant="outlined" style={{ float: 'right' }} onClick={handleDelete}
                         startIcon={<Delete></Delete>}>
                   Delete
@@ -363,7 +381,7 @@ const ObservableItemEdit = () => {
                       </Alert>
                     </Box>
                   ) : null}
-                  {steps === 1 ? createItemEditGrid() : createFamilyTreeGrid()}
+                  {steps === STEP_EDIT_SCREEN ? createItemEditGrid() : createFamilyTreeGrid()}
                 </Box>
               )}
             </Grid>
