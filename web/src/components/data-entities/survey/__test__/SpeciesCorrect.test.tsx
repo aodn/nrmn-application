@@ -15,6 +15,12 @@ import { AppConstants } from '../../../../common/constants';
 
 jest.setTimeout(30000);
 
+const locationList = require('./cannedData/SpeciesCorrect.speciesLocation.json');
+const speciesNotolabrusList = require('./cannedData/SpeciesCorrect.speciesNotolabrus.json');
+const speciesNotolabrusTetricusResult = require('./cannedData/SpeciesCorrect.speciesNotolabrusTetricusResult.json');
+const speciesResult = require('./cannedData/SpeciesCorrect.speciesSearch.json');
+const species404Result = require('./cannedData/SpeciesCorrect.species404Error.json');
+
 describe('<SpeciesCorrect/> testing', () => {
 
   let mockSearchSpeciesSummary;
@@ -41,6 +47,7 @@ describe('<SpeciesCorrect/> testing', () => {
     mockPostSpeciesCorrection.mockReset();
     mockSearchSpecies.mockReset();
   });
+
   /**
    * This test case test the flow of species correction. User select species to correct
    * and then select the survey that needs to correct. Finally, user enter new species name
@@ -48,11 +55,6 @@ describe('<SpeciesCorrect/> testing', () => {
    * return to search button and go back to first tab.
    */
   test('UI show error on end of flow when backend report error', async () => {
-    const locationList = require('./SpeciesCorrect.speciesLocation.json');
-    const speciesNotolabrusList = require('./SpeciesCorrect.speciesNotolabrus.json');
-    const speciesNotolabrusTetricusResult = require('./SpeciesCorrect.speciesNotolabrusTetricusResult.json');
-    const speciesResult = require('./SpeciesCorrect.speciesSearch.json');
-    const species404Result = require('./SpeciesCorrect.species404Error.json');
 
     // Override function so that it return the data we set.
     mockGetEntity.mockImplementation((url) => {

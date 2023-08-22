@@ -522,9 +522,14 @@ class DataSheetEventHandlers {
     this.onCopyRegion(e);
     this.onClearRegion(e);
   }
-
+  /**
+   * Remove empty cell from copy and paste operation, we cannot have test case
+   * cover because React test is not a real browser and hence no copy and paste support
+   * @param params
+   * @returns {*}
+   */
   processDataFromClipboard(params) {
-    return params.data.filter(d => (d.length === 1 && d[0] !== ''));
+    return params.data.filter(d => (d.length !== 1 || d[0] !== ''));
   }
 
   handlePasteEnd(e) {
