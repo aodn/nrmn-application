@@ -12,8 +12,8 @@ import { AppConstants } from '../../../../common/constants';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router-dom';
 
-const speciesList = require('./ObservableItemAdd.species.json');
-const taxonomyList = require('./ObservableItemAdd.taxonomy.json');
+const speciesList = require('./cannedData/ObservableItemAdd.species.json');
+const taxonomyList = require('./cannedData/ObservableItemAdd.taxonomy.json');
 
 describe('<ObservableItemAdd/>',  ()=>{
   let mockSearch;
@@ -79,8 +79,11 @@ describe('<ObservableItemAdd/>',  ()=>{
       so that we can click it
      */
     const v = 'step';
-    const button = screen.getByTestId('search-button');
     const searchField = screen.getByTestId('worm-search-field').querySelector('input');
+
+    // This page include the WORM search component, this seach-button locates in that component
+    const button = screen.getByTestId('search-button');
+
     await waitFor(() => expect(searchField),{ timeout: 10000})
       .then(() => {
         // Need 3 chars in order to do search

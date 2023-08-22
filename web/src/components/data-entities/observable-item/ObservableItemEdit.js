@@ -4,6 +4,8 @@ import {Box, Button, CircularProgress, Divider, Grid, Typography} from '@mui/mat
 import {Save, Delete} from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
 import PropTypes from 'prop-types';
+import { StatusCodes } from 'http-status-codes';
+
 import {AuthContext} from '../../../contexts/auth-context';
 import {AppConstants} from '../../../common/constants';
 import EntityContainer from '../../containers/EntityContainer';
@@ -86,7 +88,7 @@ const ObservableItemEdit = () => {
   const handleSaveLengthWeightChange = async(items) => {
     await entityEdit('reference/observableItems', items)
       .then((s) => {
-        if(s.status === 200) {
+        if(s.status === StatusCodes.OK) {
           setSavedSpecies(s.data);
         }
         else {
@@ -98,15 +100,17 @@ const ObservableItemEdit = () => {
 
   const handleSubmit = () => {
     entityEdit(`reference/observableItem/${observableItemId}`, item).then((res) => {
-      if (res.data.observableItemId) {
+      if (res.status === StatusCodes.OK) {
         setSaved(res.data);
         setSteps(2);
+        setErrors([]);
         getFamilyForReactFlow(observableItemId)
           .then(value => {
             setNodes(value.data);
           });
       } else {
-        setErrors(res.data.errors);
+        // Must use res.data
+        setErrors(res.data);
       }});
   };
 
@@ -138,6 +142,7 @@ const ObservableItemEdit = () => {
             <Grid item xs={6}>
               <CustomTextInput
                 label="Species Name"
+                dataTestId="observable-item-name-text"
                 formData={item.observableItemName}
                 field="observableItemName"
                 errors={errors}
@@ -304,6 +309,7 @@ const ObservableItemEdit = () => {
         <Button
           variant="contained"
           style={{ width: '50%', marginLeft: '5%'}}
+          data-testid="observable-item-save-btn"
           onClick={handleSubmit}
           startIcon={<Save></Save>}
         >
@@ -352,7 +358,7 @@ const ObservableItemEdit = () => {
                 <Box pt={2} pb={6} padding={2}>
                   {errors.length > 0 ? (
                     <Box py={2}>
-                      <Alert severity="error" variant="filled">
+                      <Alert severity="error" variant="filled" data-testid="alert-field-error">
                         {errors[0]?.banner ? errors[0].banner : 'Please review this form for errors and try again.'}
                       </Alert>
                     </Box>
