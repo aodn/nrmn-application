@@ -69,7 +69,7 @@ const getAllTargetId = (nodes, currentSpeciesId, direction, isCascade, depth=0) 
   return ids;
 };
 
-const FamilyTree = ({ items, focusNodeId, onSkipLengthWeightChange, onSaveLengthWeightChange, onExistEdit }) => {
+const FamilyTree = ({ items, focusNodeId, onSkipLengthWeightChange, onSaveLengthWeightChange, onExitEdit }) => {
   // const defaultViewport = { x: 0, y: 0, zoom: 0.8 };
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -230,7 +230,7 @@ const FamilyTree = ({ items, focusNodeId, onSkipLengthWeightChange, onSaveLength
           Undo all changes
         </Button>
         <Button
-          onClick={onExistEdit}
+          onClick={onExitEdit}
           variant="outlined"
           style={{ float: 'left' }}
           startIcon={<ArrowBackIcon/>}>
@@ -263,7 +263,7 @@ FamilyTree.propTypes = {
   focusNodeId: PropTypes.number,
   onSkipLengthWeightChange: PropTypes.func,
   onSaveLengthWeightChange: PropTypes.func,
-  onExistEdit: PropTypes.func,
+  onExitEdit: PropTypes.func,
 };
 
 export default FamilyTree;

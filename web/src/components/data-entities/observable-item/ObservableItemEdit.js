@@ -133,7 +133,7 @@ const ObservableItemEdit = () => {
     return(
           <FamilyTree items={nodes}
                       focusNodeId={Number(observableItemId)}
-                      onExistEdit={() => setSteps(STEP_EDIT_SCREEN)}
+                      onExitEdit={() => setSteps(STEP_EDIT_SCREEN)}
                       onSaveLengthWeightChange={handleSaveLengthWeightChange}
           />);
   },[observableItemId, nodes]);
