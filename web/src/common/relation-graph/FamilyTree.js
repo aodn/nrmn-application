@@ -4,7 +4,8 @@ import SpeciesNodeForLengthWeight from './SpeciesNodeForLengthWeight';
 import RestoreIcon from '@mui/icons-material/Restore';
 import SaveIcon from '@mui/icons-material/Save';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
-import {Button, Grid} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import {Button, Grid, Box} from '@mui/material';
 import ReactFlow, {
   Background,
   useNodesState,
@@ -68,7 +69,7 @@ const getAllTargetId = (nodes, currentSpeciesId, direction, isCascade, depth=0) 
   return ids;
 };
 
-const FamilyTree = ({ items, focusNodeId, onSkipLengthWeightChange, onSaveLengthWeightChange }) => {
+const FamilyTree = ({ items, focusNodeId, onSkipLengthWeightChange, onSaveLengthWeightChange, onExitEdit }) => {
   // const defaultViewport = { x: 0, y: 0, zoom: 0.8 };
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -205,20 +206,22 @@ const FamilyTree = ({ items, focusNodeId, onSkipLengthWeightChange, onSaveLength
 
 
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} height={720} width={900}>
-        <ReactFlow
-          fitView
-          nodes={nodes}
-          edges={edges}
-          nodeTypes={nodeTypes}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}>
-          <Background />
-        </ReactFlow>
+    <>
+      <Grid container spacing={2}>
+        <Grid item xs={12} height={720} width={900}>
+          <ReactFlow
+            fitView
+            nodes={nodes}
+            edges={edges}
+            nodeTypes={nodeTypes}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}>
+            <Background />
+          </ReactFlow>
+        </Grid>
       </Grid>
-      <Grid item xs={3}>
+      <Box display="flex" justifyContent="space-between" m={5}>
         <Button
           onClick={undoAllChanges}
           variant="outlined"
@@ -226,17 +229,22 @@ const FamilyTree = ({ items, focusNodeId, onSkipLengthWeightChange, onSaveLength
           startIcon={<RestoreIcon/>}>
           Undo all changes
         </Button>
-      </Grid>
-      <Grid item xs={3}>
         <Button
-          onClick={onSkipLengthWeightChange}
+          onClick={onExitEdit}
           variant="outlined"
-          style={{ width: '90%'}}
-          startIcon={<SkipNextIcon/>}>
-          Skip changes
+          style={{ float: 'left' }}
+          startIcon={<ArrowBackIcon/>}>
+          Back to species edit
         </Button>
-      </Grid>
-      <Grid item xs={6}>
+        { onSkipLengthWeightChange &&
+            <Button
+              onClick={onSkipLengthWeightChange}
+              variant="outlined"
+              style={{ width: '90%' }}
+              startIcon={<SkipNextIcon />}>
+              Skip changes
+            </Button>
+        }
         <Button
           variant="contained"
           style={{ float: 'right'}}
@@ -245,8 +253,8 @@ const FamilyTree = ({ items, focusNodeId, onSkipLengthWeightChange, onSaveLength
         >
           Save Changes
         </Button>
-      </Grid>
-    </Grid>
+      </Box>
+    </>
   );
 };
 
@@ -255,6 +263,7 @@ FamilyTree.propTypes = {
   focusNodeId: PropTypes.number,
   onSkipLengthWeightChange: PropTypes.func,
   onSaveLengthWeightChange: PropTypes.func,
+  onExitEdit: PropTypes.func,
 };
 
 export default FamilyTree;

@@ -54,7 +54,14 @@ const ObservableItemView = () => {
               </Alert>
             </Box>
           )}
-          {data?.observableItemId && (
+          {state?.species && (
+            <Box mx={5} flexGrow={1}>
+              <Alert severity="success">
+                { state.species.map(s => ' [ ' + s.observableItemName + ' ] ')} Length-Weight updated.
+              </Alert>
+            </Box>
+          )}
+          {!(state?.species) && data?.observableItemId && (
             <>
               <Box p={2}>
                 <Grid container spacing={2}>
@@ -150,13 +157,6 @@ const ObservableItemView = () => {
                 </Grid>
               </Box>
             </>
-          )}
-          {state?.species && (
-            <Box mx={5} flexGrow={1}>
-              <Alert severity="success">
-                Species length weight updated : { state.species.map(s => ' [ ' + s.observableItemName + ' ] ')}
-              </Alert>
-            </Box>
           )}
           {state?.error && (
             <Box mx={5} flexGrow={1}>
