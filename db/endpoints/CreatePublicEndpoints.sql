@@ -476,13 +476,18 @@ AND epm13.survey_id NOT IN (
 DROP VIEW IF EXISTS nrmn.ep_tpac;
 CREATE OR REPLACE VIEW nrmn.ep_tpac AS
 SELECT
-	survey_id,
+    survey_id,
+    site_code,
+    location,
+    survey_date,
+    depth,
     latitude,
     longitude,
     survey_latitude,
     survey_longitude,
-	CASE WHEN direction ~* '(N|S|W|E|NE|SE|SW|NW|NNE|ENE|ESE|SSE|SSW|WSW|WNW|NNW)'THEN direction
-             WHEN direction ~* '(east|west|north|south)' THEN direction
-             ELSE NULL
-        END AS direction
+    has_pqs_catalogued_in_db,
+    CASE WHEN direction ~* '(N|S|W|E|NE|SE|SW|NW|NNE|ENE|ESE|SSE|SSW|WSW|WNW|NNW)'THEN direction
+         WHEN direction ~* '(east|west|north|south)' THEN direction
+         ELSE NULL
+    END AS direction
 FROM nrmn.ep_survey_list
