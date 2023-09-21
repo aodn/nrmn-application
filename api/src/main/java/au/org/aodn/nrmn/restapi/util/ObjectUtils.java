@@ -7,6 +7,7 @@ import java.util.function.Function;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 public class ObjectUtils {
 
@@ -38,14 +39,33 @@ public class ObjectUtils {
     }
     /**
      * This copy function copy value when destination field is null
+     * @param zeroEqualsNull - If true, when income value is zero, set it to null
      */
-    public static BeanUtilsBean createNullCopyBeanUtils(String... ignoreFields) {
+    public static BeanUtilsBean createNullCopyBeanUtils(boolean zeroEqualsNull, String... ignoreFields) {
         return new BeanUtilsBean() {
             @Override
             public void copyProperty(Object dest, String name, Object value) throws IllegalAccessException, InvocationTargetException {
                 try {
-                    if(BeanUtils.getProperty(dest, name) != null || Arrays.stream(ignoreFields).anyMatch(p -> p.equalsIgnoreCase(name))) return;
-                    super.copyProperty(dest, name, value);
+                    String destValue = BeanUtils.getProperty(dest, name);
+                    if(!Arrays.stream(ignoreFields).anyMatch(p -> p.equalsIgnoreCase(name))) {
+                        Double v = null;
+                        try {
+                            v = Double.valueOf(destValue);
+                        }
+                        catch(Exception e) {}
+
+                        if(zeroEqualsNull && v != null && v == 0) {
+                            // Value is zero and flag is on, so set the zero value in dest to null
+                            super.copyProperty(dest, name, null);
+                        }
+                        else {
+                            if (destValue == null) {
+                                // Copy value since dest is null
+                                super.copyProperty(dest, name, value);
+                            }
+                        }
+
+                    }
                 }
                 catch (NoSuchMethodException e) {
                     return;

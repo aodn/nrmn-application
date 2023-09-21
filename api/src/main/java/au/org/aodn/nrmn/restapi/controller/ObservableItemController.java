@@ -57,7 +57,7 @@ public class ObservableItemController {
     @Autowired
     protected ObservableItemService observableItemService;
 
-    protected BeanUtilsBean nullCopyBeanUtils = ObjectUtils.createNullCopyBeanUtils();
+    protected BeanUtilsBean nullCopyBeanUtils = ObjectUtils.createNullCopyBeanUtils(true);
 
     @GetMapping(path = "/observableItems")
     public  ResponseEntity<?> getObservationItemsWithFilters(@RequestParam(value = "sort", required = false) String sort,
