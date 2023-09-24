@@ -85,9 +85,13 @@ const FamilyTree = ({ items, focusNodeId, onSkipLengthWeightChange, onSaveLength
         .map(i => {
           return {
             observableItemId: i.data.id,
-            lengthWeightA: i.data.lengthWeightA,
-            lengthWeightB: i.data.lengthWeightB,
-            lengthWeightCf: i.data.lengthWeightCf,
+
+            // The update code will treat 0 = null, but if we pass '', it will
+            // translate to null, which cause the update code to assume that
+            // the field is missing and hence keep the value in db.
+            lengthWeightA: i.data.lengthWeightA === '' ? 0 : i.data.lengthWeightA,
+            lengthWeightB: i.data.lengthWeightB === '' ? 0 : i.data.lengthWeightB,
+            lengthWeightCf: i.data.lengthWeightCf === '' ? 0 : i.data.lengthWeightCf
           };
         });
 

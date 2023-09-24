@@ -41,8 +41,6 @@ public class ObservableItemService {
     @Autowired
     private ObservableItemRepository observableItemRepository;
 
-    protected BeanUtilsBean nullAwareBeanUtils = ObjectUtils.createNullAwareBeanUtils("observableItemId");
-
     public void validate(ObservableItem item) {
 
         List<FormValidationError> errors = new ArrayList<FormValidationError>();
