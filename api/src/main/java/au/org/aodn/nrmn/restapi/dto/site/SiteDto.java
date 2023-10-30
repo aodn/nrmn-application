@@ -14,8 +14,8 @@ public class SiteDto {
     private Integer siteId;
     private String siteCode;
     private String siteName;
-    private Float longitude;
-    private Float latitude;
+    private Double longitude;
+    private Double latitude;
     private String state;
     private String country;
     private List<String> oldSiteCodes;
