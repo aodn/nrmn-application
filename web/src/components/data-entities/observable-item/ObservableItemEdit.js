@@ -27,6 +27,10 @@ const STEP_EDIT_SUMMARY_SCREEN = 2;
 const STEP_EDIT_WEIGHT_LENGTH_SCREEN = 3;
 const STEP_EDIT_WEIGHT_LENGTH_SUMMARY_SCREEN = 4;
 
+const WEIGHT_LENGTH_A = 'lengthWeightA';
+const WEIGHT_LENGTH_B = 'lengthWeightB';
+const WEIGHT_LENGTH_CF = 'lengthWeightCf';
+
 const ObservableItemEdit = () => {
   const observableItemId = useParams()?.id;
 
@@ -68,6 +72,43 @@ const ObservableItemEdit = () => {
     lengthWeightB: '',
     lengthWeightCf: ''
   });
+
+  const dispatchAndCheckLengthWeight = useCallback((field, value) => {
+    dispatch({ field: field , value: value });
+
+    // We setup error message if user enter some length weight values but not all
+    // three length weight fields
+    setErrors(prevState => {
+      // Remove any previous error
+      const v = [...prevState]
+        .filter((f) => f.property !== WEIGHT_LENGTH_A && f.property !== WEIGHT_LENGTH_B && f.property !== WEIGHT_LENGTH_CF);
+
+      // Copy value from item and then union the value from event, at this moment item isn't updated fully
+      let temp = {
+        lengthWeightA: item.lengthWeightA,
+        lengthWeightB: item.lengthWeightB,
+        lengthWeightCf: item.lengthWeightCf
+      };
+
+      temp[field] = value;
+
+      // Skip if all null or all have values for the length weight
+      if(!((!temp.lengthWeightA && !temp.lengthWeightB && !temp.lengthWeightCf) || (temp.lengthWeightA && temp.lengthWeightB && temp.lengthWeightCf))) {
+        // Do nothing
+        if(!temp.lengthWeightA) {
+          v.push({property: WEIGHT_LENGTH_A, message: 'Missing value'});
+        }
+        if(!temp.lengthWeightB) {
+          v.push({property: WEIGHT_LENGTH_B, message: 'Missing value'});
+        }
+        if(!temp.lengthWeightCf) {
+          v.push({property: WEIGHT_LENGTH_CF, message: 'Missing value'});
+        }
+      }
+
+      return v;
+    });
+  }, [item]);
 
   useEffect(() => {
     document.title = 'Edit Observable Item';
@@ -281,7 +322,7 @@ const ObservableItemEdit = () => {
                 formData={item.lengthWeightA}
                 field="lengthWeightA"
                 errors={errors}
-                onChange={(t) => dispatch({ field: 'lengthWeightA', value: t })}
+                onChange={(t) => dispatchAndCheckLengthWeight('lengthWeightA', t )}
               />
             </Grid>
             <Grid item xs={6}>
@@ -291,7 +332,7 @@ const ObservableItemEdit = () => {
                 formData={item.lengthWeightB}
                 field="lengthWeightB"
                 errors={errors}
-                onChange={(t) => dispatch({ field: 'lengthWeightB', value: t })}
+                onChange={(t) => dispatchAndCheckLengthWeight('lengthWeightB', t)}
               />
             </Grid>
             <Grid item xs={6}>
@@ -301,7 +342,7 @@ const ObservableItemEdit = () => {
                 formData={item.lengthWeightCf}
                 field="lengthWeightCf"
                 errors={errors}
-                onChange={(t) => dispatch({ field: 'lengthWeightCf', value: t })}
+                onChange={(t) => dispatchAndCheckLengthWeight('lengthWeightCf', t )}
               />
             </Grid>
           </Grid>
