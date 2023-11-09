@@ -32,8 +32,11 @@ import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
+import au.org.aodn.nrmn.restapi.enums.Iirc;
 
 import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
 
@@ -142,6 +145,14 @@ public class Site {
         } else {
             GeometryFactory factory = new GeometryFactory(new PrecisionModel(), 4326);
             geom = factory.createPoint(new Coordinate(longitude, latitude));
+        }
+
+        if(longitude != null) {
+            longitude = new BigDecimal(longitude).setScale(Iirc.ROUNDING_DIGIT, RoundingMode.HALF_UP).doubleValue();
+        }
+
+        if(latitude != null) {
+            latitude = new BigDecimal(latitude).setScale(Iirc.ROUNDING_DIGIT, RoundingMode.HALF_UP).doubleValue();
         }
     }
 }

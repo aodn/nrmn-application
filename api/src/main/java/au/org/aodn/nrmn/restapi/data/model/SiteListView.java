@@ -62,11 +62,11 @@ public class SiteListView {
 
     @Column(name = "latitude")
     @Audited(targetAuditMode = NOT_AUDITED)
-    private Float latitude;
+    private Double latitude;
 
     @Column(name = "longitude")
     @Audited(targetAuditMode = NOT_AUDITED)
-    private Float longitude;
+    private Double longitude;
 
     @Column(name = "status")
     @Audited(targetAuditMode = NOT_AUDITED)
@@ -103,12 +103,12 @@ public class SiteListView {
     }
 
     @JsonGetter
-    public Float getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
     @JsonGetter
-    public Float getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 

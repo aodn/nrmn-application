@@ -16,7 +16,7 @@ public class SiteListItem {
     String locationName;
     String state;
     String country;
-    Float latitude;
-    Float longitude;
+    Double latitude;
+    Double longitude;
     Boolean isActive;
 }
