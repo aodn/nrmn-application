@@ -39,5 +39,22 @@ class SiteIT {
         Site persistedSite = siteRepository.findById(site.getSiteId()).get();
         assertEquals(site, persistedSite);
     }
+    /**
+     * According to spec, the lat / lng needs to round to 5 decimal place.
+     */
+    @Test
+    public void verfiyLatLngRounding() {
+        Site site = siteTestData.persistedSite();
+        entityManager.clear();
+        // Now change the lat/lng to something with more than 5 digit, save it and inspect its rounding
+        site.setLatitude(1.23456789);  // Roundup
+        site.setLongitude(3.44561111); // Round down
 
+        siteRepository.saveAndFlush(site);
+
+        site = siteRepository.findById(site.getSiteId()).get();
+
+        assertEquals(site.getLatitude(), 1.23457);
+        assertEquals(site.getLongitude(), 3.44561);
+    }
 }
