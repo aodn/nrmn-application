@@ -3,22 +3,25 @@ FROM amazoncorretto:11-al2-jdk
 ARG BUILDER_UID=9999
 
 ENV TZ="Australia" \
-    NVM_DIR="/opt/nvm" \
     MAVEN_HOME="/opt/maven" \
     MAVEN_VERSION=3.8.5 \
-    NODE_VERSION=18.18.2 \
+    NODE_MAJOR=18 \
     HOME="/home/builder" \
     JAVA_TOOL_OPTIONS="-Duser.home=/home/builder"
 
 RUN yum install --quiet --assumeyes git python3 python3-pip apache-maven shadow-utils tar
 
 # Install Node
-RUN mkdir -p $NVM_DIR
-RUN curl --silent https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
-RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
-ENV PATH="/opt/nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
-RUN npm install -g yarn@1.22.4
+RUN apt-get update \
+    && apt-get install -y ca-certificates curl gnupg \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+
+RUN apt-get update \
+    && apt-get install nodejs -y \
+    && npm install -g yarn \
+    && yarn set version canary
 
 # Install Maven
 RUN set -ex \
