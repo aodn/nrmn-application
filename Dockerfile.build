@@ -1,4 +1,6 @@
-FROM amazoncorretto:11-al2-jdk
+FROM ubuntu:22.04
+
+ARG BUILDER_UID=9999
 
 ENV TZ="Australia" \
     MAVEN_HOME="/opt/maven" \
@@ -7,7 +9,17 @@ ENV TZ="Australia" \
     HOME="/home/builder" \
     JAVA_TOOL_OPTIONS="-Duser.home=/home/builder"
 
-RUN yum install --quiet --assumeyes git python3 python3-pip apache-maven shadow-utils tar
+# Install required packages and download the Amazon Corretto 11 JDK
+RUN apt-get update && \
+    apt-get install -y wget software-properties-common && \
+    wget -O- https://apt.corretto.aws/corretto.key | apt-key add - && \
+    add-apt-repository 'deb https://apt.corretto.aws stable main' && \
+    apt-get update && \
+    apt-get install -y java-11-amazon-corretto-jdk
+# Set the JAVA_HOME environment variable
+ENV JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto
+
+RUN apt-get install -y git python3 python3-pip curl wget unzip zip
 
 # Install Node
 RUN apt-get update \
