@@ -9,8 +9,6 @@ ENV TZ="Australia" \
     HOME="/home/builder" \
     JAVA_TOOL_OPTIONS="-Duser.home=/home/builder"
 
-RUN yum install --quiet --assumeyes git python3 python3-pip apache-maven shadow-utils tar
-
 # Install required packages and download the Amazon Corretto 11 JDK
 RUN apt-get update && \
     apt-get install -y wget software-properties-common && \

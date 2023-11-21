@@ -72,6 +72,5 @@
     "react-scripts": "^5.0.1",
     "typescript": "^4.7.3",
     "webpack": "^5.76.0"
-  },
-  "packageManager": "yarn@4.0.2"
+  }
 }
