@@ -175,19 +175,19 @@ const JobView = ({jobId}) => {
                                 {log.eventType}
                               </Typography>
                             </TableCell>
-                            {/*<TableCell>*/}
-                            {/*  <Typography variant="caption">*/}
-                            {/*    {log.details?.split('\n').map((e) => (*/}
-                            {/*      <div key={e}>*/}
-                            {/*        {e}*/}
-                            {/*        <br />*/}
-                            {/*      </div>*/}
-                            {/*    ))}*/}
-                            {/*    {log.summary && <SurveyDiff surveyDiff={log.summary} />}*/}
-                            {/*  </Typography>*/}
-                            {/*  {log.filterSet && Object.keys(log.filterSet).map((v) => (log.filterSet[v] ?*/}
-                            {/*    <TableRow><TableCell>{v}</TableCell><TableCell>{log.filterSet[v]}</TableCell></TableRow> : <></>))}*/}
-                            {/*</TableCell>*/}
+                            <TableCell>
+                              <Typography variant="caption">
+                                {log.details?.split('\n').map((e) => (
+                                  <div key={e}>
+                                    {e}
+                                    <br />
+                                  </div>
+                                ))}
+                                {log.summary && <SurveyDiff surveyDiff={log.summary} />}
+                              </Typography>
+                              {log.filterSet && Object.keys(log.filterSet).map((v, index) => (log.filterSet[v] ?
+                                <TableRow key={index}><TableCell>{v}</TableCell><TableCell>{log.filterSet[v]}</TableCell></TableRow> : <></>))}
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
