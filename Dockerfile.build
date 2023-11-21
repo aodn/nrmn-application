@@ -1,7 +1,5 @@
 FROM ubuntu:22.04
 
-ARG BUILDER_UID=9999
-
 ENV TZ="Australia" \
     MAVEN_HOME="/opt/maven" \
     MAVEN_VERSION=3.8.5 \
