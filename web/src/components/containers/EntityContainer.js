@@ -7,7 +7,12 @@ const EntityContainer = (props) => (
   <>
     <Box m={1}>
       <NavLink to={props.goBackTo}>
-        <Typography>{'<< Back to ' + props.name}</Typography>
+        <Typography
+          variant="button"
+          sx={{textTransform: 'none', fontSize: '1rem', fontWeight: 400 }}
+        >
+          {'<< Back to ' + props.name}
+        </Typography>
       </NavLink>
     </Box>
     <Grid container justifyContent="center">
