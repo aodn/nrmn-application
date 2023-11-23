@@ -1,19 +1,12 @@
 import React from 'react';
-import {Box, Grid, Typography} from '@mui/material';
-import {NavLink} from 'react-router-dom';
+import {Box, Grid} from '@mui/material';
 import {PropTypes} from 'prop-types';
+import BackButton from '../ui/BackButton';
 
 const EntityContainer = (props) => (
   <>
     <Box m={1}>
-      <NavLink to={props.goBackTo}>
-        <Typography
-          variant="button"
-          sx={{textTransform: 'none', fontSize: '1rem', fontWeight: 400 }}
-        >
-          {'<< Back to ' + props.name}
-        </Typography>
-      </NavLink>
+      <BackButton goBackTo={props.goBackTo} name={props.name} />
     </Box>
     <Grid container justifyContent="center">
       {props.header}
