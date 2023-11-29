@@ -2,7 +2,10 @@ package au.org.aodn.nrmn.restapi.controller;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import au.org.aodn.nrmn.restapi.util.LogInfo;
@@ -133,10 +136,6 @@ public class StagedJobController {
             // (detect 3 duplicate rows rule)
             if (rowsToTruncate.isPresent() && rowsToTruncate.get().getRowIds().size() >= 3) {
                 Collection<Long> rowIdsToRemove = rowsToTruncate.get().getRowIds();
-
-                // if a row is not the duplicated one in the bottom of the sheet, don't remove it
-                filterNonBottomDuplicateRows(rowIdsToRemove, lastRowId);
-
                 // keep the last row if the data should finish with a true zero
                 if (Arrays.asList("SURVEY NOT DONE", "DEBRIS - ZERO", "NO SPECIES FOUND")
                         .contains(lastRow.getSpecies().toUpperCase()))
@@ -147,13 +146,11 @@ public class StagedJobController {
         return rowsToSave;
     }
 
-
-
     @PostMapping("/upload")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<UploadResponse> uploadFile(@RequestParam("withExtendedSizes") Boolean withExtendedSizes,
-            @RequestParam("programId") Integer programId, @RequestParam("file") MultipartFile file,
-            Authentication authentication) {
+                                                     @RequestParam("programId") Integer programId, @RequestParam("file") MultipartFile file,
+                                                     Authentication authentication) {
 
         userAuditRepo.save(new UserActionAudit("stage/upload", "upload excel file attempt for username: "
                 + authentication.getName() + " file: " + file.getOriginalFilename()));
@@ -327,7 +324,7 @@ public class StagedJobController {
     @PutMapping("/job/{jobId}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<String> updateJob(@PathVariable Long jobId, Authentication authentication,
-            @RequestBody List<RowUpdateDto> rowUpdates) {
+                                            @RequestBody List<RowUpdateDto> rowUpdates) {
 
         List<Long> deletions = rowUpdates.stream().filter(u -> u.getRow() == null).map(u -> u.getRowId())
                 .collect(Collectors.toList());
@@ -380,27 +377,5 @@ public class StagedJobController {
                     "Could not download original file for job %s. %s",
                     jobId, clientException.getMessage())));
         }
-    }
-
-    private void filterNonBottomDuplicateRows(Collection<Long> rowIdsToRemove, Long lastRowId) {
-
-        var toRemoveIds = new ArrayList<Long>();
-
-        if (!rowIdsToRemove.contains(lastRowId)) {
-            rowIdsToRemove.clear();
-            return;
-        }
-
-        toRemoveIds.add(lastRowId);
-        for (var i = 1; i < rowIdsToRemove.size(); i++) {
-            var tempId = lastRowId - i * 1000L;
-            if (rowIdsToRemove.contains(tempId)) {
-                toRemoveIds.add(tempId);
-                continue;
-            }
-            break;
-        }
-
-        rowIdsToRemove.removeIf(r -> !toRemoveIds.contains(r));
     }
 }
