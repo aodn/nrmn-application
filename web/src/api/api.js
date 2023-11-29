@@ -217,7 +217,7 @@ export const submitJobFile = (params, onProgress) => {
 
   const config = {
     validateStatus: () => true,
-    'Content-Type': 'multipart/form-data',
+    headers: {'Content-Type': 'multipart/form-data'},
     onUploadProgress: (progressEvent) => {
       const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
       onProgress(percentCompleted);
@@ -245,7 +245,7 @@ export const submitIngest = async (jobId, onLocked, onResult, inst = axiosInstan
   if (postResponse.jobStatus === 'FAILED' && postResponse.reason === 'locked') {
     onLocked(postResponse);
     return;
-  };
+  }
 
   let notDone = true;
   let getResponse;
