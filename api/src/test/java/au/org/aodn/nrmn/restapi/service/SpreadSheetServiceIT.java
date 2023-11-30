@@ -230,4 +230,13 @@ public class SpreadSheetServiceIT {
         assertEquals(20, validRows.size());
     }
 
+    @Test
+    void removeBottomDuplicateRowsOnly() throws Exception {
+        FileSystemResource file = new FileSystemResource("src/test/resources/sheets/removeDuplicateBottomRows.xlsx");
+        MockMultipartFile mockFile = new MockMultipartFile("sheets/removeDuplicateBottomRows.xlsx", file.getInputStream());
+        var parsedSheet = sheetService.stageXlsxFile(mockFile, false);
+        var validRows = stagedJobController.getRowsToSave(parsedSheet);
+        assertEquals(487, validRows.size());
+    }
+
 }
