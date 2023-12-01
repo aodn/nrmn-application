@@ -392,13 +392,12 @@ public class StagedJobController {
         }
 
         toRemoveIds.add(lastRowId);
+
+        // This for loop here is checking whether there are duplicate rows at the end. start from the bottom of the sheet.
         for (var i = 1; i < rowIdsToRemove.size(); i++) {
             var tempId = lastRowId - i * 1000L;
-            if (rowIdsToRemove.contains(tempId)) {
-                toRemoveIds.add(tempId);
-                continue;
-            }
-            break;
+            if (!rowIdsToRemove.contains(tempId)) break;
+            toRemoveIds.add(tempId);
         }
 
         rowIdsToRemove.removeIf(r -> !toRemoveIds.contains(r));

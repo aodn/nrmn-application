@@ -230,6 +230,11 @@ public class SpreadSheetServiceIT {
         assertEquals(20, validRows.size());
     }
 
+    /** This test is for:
+     * When adding new jobs, only rows (with "total=0" and duplicate more than 3 times) at the end of the sheet should be
+     * removed. Rows (with "total=0" and duplicate more than 3 times) are not at the end of the sheet should be kept.
+     * @throws Exception
+     */
     @Test
     void removeBottomDuplicateRowsOnly() throws Exception {
         FileSystemResource file = new FileSystemResource("src/test/resources/sheets/removeDuplicateBottomRows.xlsx");
