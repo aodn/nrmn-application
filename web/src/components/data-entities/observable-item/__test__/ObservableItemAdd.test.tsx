@@ -1,6 +1,5 @@
 // @ts-ignore
 import React from 'react';
-import '@testing-library/jest-dom/extend-expect';
 import ObservableItemAdd from '../ObservableItemAdd';
 import { render, waitFor, screen, fireEvent } from '@testing-library/react';
 import * as axiosInstance from '../../../../api/api';
@@ -111,8 +110,8 @@ describe('<ObservableItemAdd/>',  ()=>{
     // After click, we expect alert box shown because the observable item name field will not fill by default
     await waitFor(() => expect(screen.getByTestId('alert-field-missing')), { timeout: 10000})
       .then(() => {
-        const errorMessageBox = screen.getByTestId('observable-item-name-text').querySelector('p');
-        expect(errorMessageBox).toHaveTextContent('Species Name Required.');
+        const errorMessageBox = screen.getByTestId('observable-item-name-text').querySelector('p').textContent;
+        expect(errorMessageBox).toBe('Species Name Required.');
       });
   });
 });
