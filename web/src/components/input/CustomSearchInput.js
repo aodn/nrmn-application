@@ -3,7 +3,7 @@ import {TextField, Typography} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import PropTypes from 'prop-types';
 import {search} from '../../api/api';
-const axios = require('axios/dist/axios');
+import axios from 'axios/dist/axios';
 
 const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
   const textValue = formData ? formData : '';
