@@ -3,7 +3,7 @@ import {TextField, Typography} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import PropTypes from 'prop-types';
 import {search} from '../../api/api';
-import axios from 'axios/dist/axios';
+import axios from 'axios';
 
 const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
   const textValue = formData ? formData : '';
@@ -83,7 +83,7 @@ const CustomSearchInput = ({label, exclude, formData, onChange, fullWidth}) => {
         fullWidth={fullWidth}
         value={textValue}
         onInputChange={handleOnInputChanged}
-        renderInput={(params) => <TextField {...params} error={error} helperText = {error ? 'Not a valid species for this field.' : ''}size="small" color="primary" variant="outlined" />}
+        renderInput={(params) => <TextField {...params} error={error} helperText = {error ? 'Not a valid species for this field.' : ''} size="small" color="primary" variant="outlined" />}
       />
     </>
   );

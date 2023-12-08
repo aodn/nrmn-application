@@ -73,5 +73,10 @@
     "typescript": "^4.7.3",
     "webpack": "^5.76.0"
   },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(axios|ag-grid-community|reactflow)/)"
+    ]
+  },
   "packageManager": "yarn@4.0.2"
 }
