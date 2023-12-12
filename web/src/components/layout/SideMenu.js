@@ -39,7 +39,7 @@ const SideMenu = ({open, onClose}) => {
           </ListItemButton>
           <AuthContext.Consumer>
             {({auth}) =>
-              auth?.features?.includes('corrections') && (
+              !auth?.features?.includes('corrections') && (
                 <ListItemButton onClick={onClose} component={NavLink} to="/data/species">
                   <ListItemText primary="Species Correction" />
                 </ListItemButton>

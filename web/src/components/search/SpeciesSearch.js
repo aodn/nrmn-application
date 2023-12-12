@@ -1,6 +1,5 @@
 import React, {useState, useCallback} from 'react';
 import {Box, Divider, Paper, Grid, Tab, Tabs, TextField, Typography} from '@mui/material';
-import {makeStyles} from '@mui/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -16,33 +15,8 @@ import PropTypes from 'prop-types';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { AppConstants } from '../../common/constants';
 
-const useStyles = makeStyles(({palette, typography}) => ({
-  root: {
-    '& .MuiTable-root': {
-      '& .MuiTableHead-root': {
-        '& .MuiTableRow-head': {
-          '& .MuiTableCell-head': {
-            fontSize: typography?.table.fontSize,
-            background: palette?.primary.rowHeader
-          }
-        }
-      },
-      '& .MuiTableRow-root': {
-        '&:nth-child(even)': {
-          backgroundColor: palette?.primary.rowHighlight
-        }
-      },
-      '& .MuiTableCell-root': {
-        fontSize: typography?.table.fontSize,
-        padding: typography?.table.padding,
-        color: palette?.text.textPrimary
-      }
-    }
-  }
-}));
 
 const SpeciesSearch = ({onRowClick}) => {
-  const classes = useStyles();
   const rowsPerPage = 50;
 
   const [tabIndex, setTabIndex] = useState(0);
@@ -240,7 +214,28 @@ const SpeciesSearch = ({onRowClick}) => {
       </TabPanel>
       {gridData ? (
         <>
-          <TableContainer classes={classes} component={Paper} disabled>
+          <TableContainer component={Paper} disabled sx={{
+            '& .MuiTable-root': {
+              '& .MuiTableHead-root': {
+                '& .MuiTableRow-head': {
+                  '& .MuiTableCell-head': {
+                    fontSize: (theme) => theme.typography?.table.fontSize,
+                    background: (theme) => theme.palette?.primary.rowHeader
+                  }
+                }
+              },
+              '& .MuiTableRow-root': {
+                '&:nth-child(even)': {
+                  backgroundColor: (theme) => theme.palette?.primary.rowHighlight
+                }
+              },
+              '& .MuiTableCell-root': {
+                fontSize: (theme) => theme.typography?.table.fontSize,
+                padding: (theme) => theme.typography?.table.padding,
+                background: (theme) => theme.palette?.text.textPrimary
+              }
+            }
+          }}>
             <Table>
               <TableHead>
                 <TableRow>

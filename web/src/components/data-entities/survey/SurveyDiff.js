@@ -1,12 +1,20 @@
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from '@mui/material';
-import {makeStyles} from '@mui/styles';
+import { styled } from '@mui/material/styles';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const useStyles = makeStyles(({palette, typography}) => ({
-  root: {
+const PREFIX = 'SurveyDiff';
+
+const classes = {
+  root: `${PREFIX}-root`
+};
+
+const StyledTableContainer = styled(TableContainer)(({
+  theme: {palette, typography}
+}) => ({
+  [`& .${classes.root}`]: {
     '& .MuiTable-root': {
       '& .MuiTableHead-root': {
         '& .MuiTableRow-head': {
@@ -31,10 +39,10 @@ const useStyles = makeStyles(({palette, typography}) => ({
 }));
 
 const SurveyDiff = ({surveyDiff}) => {
-  const classes = useStyles();
+
 
   return (
-    <TableContainer classes={classes} component={Paper} disabled>
+    <StyledTableContainer classes={classes} component={Paper} disabled>
       <Table>
         <TableHead>
           <TableRow>
@@ -67,7 +75,7 @@ const SurveyDiff = ({surveyDiff}) => {
           })}
         </TableBody>
       </Table>
-    </TableContainer>
+    </StyledTableContainer>
   );
 };
 

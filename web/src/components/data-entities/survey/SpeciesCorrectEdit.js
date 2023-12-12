@@ -1,5 +1,7 @@
 import React, {useCallback, useEffect} from 'react';
 
+import { styled } from '@mui/material/styles';
+
 import {Button, Box, LinearProgress} from '@mui/material';
 
 import IconButton from '@mui/material/IconButton';
@@ -19,10 +21,16 @@ import CustomSearchFilterInput from '../../input/CustomSearchFilterInput';
 import {searchSpecies, postSpeciesCorrection} from '../../../api/api';
 import {Paper} from '@mui/material';
 
-import {makeStyles} from '@mui/styles';
+const PREFIX = 'SpeciesCorrectEdit';
 
-const useStyles = makeStyles(({palette, typography}) => ({
-  root: {
+const classes = {
+  root: `${PREFIX}-root`
+};
+
+const StyledBox = styled(Box)(({
+  theme: {palette, typography}
+}) => ({
+  [`& .${classes.root}`]: {
     '& .MuiTable-root': {
       '& .MuiTableHead-root': {
         '& .MuiTableRow-head': {
@@ -54,7 +62,7 @@ const SpeciesCorrectEdit = ({selected, onSubmit, onError}) => {
     invertCondition: false,
     surveyIds: []
   };
-  const classes = useStyles();
+
   const pageSize = 10;
   const [page, setPage] = useState(0);
   const [detail, setDetail] = useState();
@@ -105,7 +113,7 @@ const SpeciesCorrectEdit = ({selected, onSubmit, onError}) => {
   }, [setCorrection]);
 
   return (
-    <Box border={1} borderRadius={1} m={1} p={2} borderColor="divider">
+    <StyledBox border={1} borderRadius={1} m={1} p={2} borderColor="divider">
       <Box display="flex" flexDirection="row">
         <Box flex={1} maxWidth={500} m={1}>
           <Typography variant="subtitle2">Current species name</Typography>
@@ -235,7 +243,7 @@ const SpeciesCorrectEdit = ({selected, onSubmit, onError}) => {
           </TableContainer>
         </>
       )}
-    </Box>
+    </StyledBox>
   );
 };
 

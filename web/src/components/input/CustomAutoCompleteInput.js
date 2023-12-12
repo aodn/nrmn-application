@@ -2,27 +2,9 @@ import React, {useReducer} from 'react';
 import {CircularProgress, TextField, Typography} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import {PropTypes} from 'prop-types';
-import { makeStyles } from '@mui/styles';
 
 export const ERROR_TYPE = {NORMAL: 0, WARNING: 1, ERROR: 2};
 
-const useStyles = value =>
-  makeStyles(() => ({
-    root: {
-      // Text in the text box color
-      '& .MuiOutlinedInput-root.Mui-error': {
-        color: acquireValidationColor(value.type),
-        // The border color on alert
-        '& fieldset': {
-          borderColor: acquireValidationColor(value.type),
-        },
-      },
-      // Helper text color
-      '& .MuiFormHelperText-root.Mui-error' :{
-        color: acquireValidationColor(value.type)
-      },
-    },
-  }));
 
 const acquireValidationColor = state => {
   switch (state) {
@@ -68,13 +50,11 @@ const CustomAutoCompleteInput = ({label, field, options, onChange, formData, err
     }
   };
 
-  const classes = useStyles(validate)();
 
   return options ? (
     <>
       <Typography variant="subtitle2">{label}</Typography>
       <Autocomplete
-        className={classes.root}
         options={options}
         freeSolo
         value={formData}
@@ -89,6 +69,20 @@ const CustomAutoCompleteInput = ({label, field, options, onChange, formData, err
             error={validate.display}
             helperText={validate.message}/>
         )}
+
+        sx={{
+          '& .MuiOutlinedInput-root.Mui-error': {
+            color: acquireValidationColor(validate.type),
+            // The border color on alert
+            '& fieldset': {
+              borderColor: acquireValidationColor(validate.type),
+            },
+          },
+          // Helper text color
+          '& .MuiFormHelperText-root.Mui-error' :{
+            color: acquireValidationColor(validate.type)
+          },
+        }}
       />
     </>
   ) : (

@@ -7,8 +7,6 @@ import {Navigate, useLocation} from 'react-router-dom';
 import {getResult} from '../../../api/api';
 import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
 import {AuthContext} from '../../../contexts/auth-context';
-import clsx from 'clsx';
-import {makeStyles} from '@mui/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {createFilterOptions} from '@mui/material/Autocomplete';
 import ResetIcon from '@mui/icons-material/LayersClear';
@@ -18,29 +16,10 @@ import { AppConstants } from '../../../common/constants';
 const cachedOptions = [];
 const OBSERVABLE_ITEM_ID_FIELD = 'survey.observableItemId';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    maxWidth: 345
-  },
-  media: {
-    height: 0,
-    paddingTop: '56.25%' // 16:9
-  },
-  expand: {
-    transform: 'rotate(0deg)',
-    marginLeft: 'auto',
-    transition: theme.transitions?.create('transform', {
-      duration: theme.transitions.duration.shortest
-    })
-  },
-  expandOpen: {
-    transform: 'rotate(180deg)'
-  }
-}));
+
 
 const SurveyList = () => {
   const rowsPerPage = 50;
-  const classes = useStyles();
   const location = useLocation();
   const gridRef = useRef(null);
   const [redirect, setRedirect] = useState();
@@ -230,12 +209,16 @@ const SurveyList = () => {
             </Box>
             <Box m={1} ml={0}>
               <IconButton
-                className={clsx(classes.expand, {
-                  [classes.expandOpen]: expanded
-                })}
                 onClick={() => setExpanded((v) => !v)}
                 aria-expanded={expanded}
                 aria-label="Show more"
+                sx={{
+                  transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                  marginLeft: 'auto',
+                  transition: (theme) => theme.transitions?.create('transform', {
+                    duration: theme.transitions.duration.shortest
+                  })
+                }}
               >
                 <ExpandMoreIcon />
               </IconButton>

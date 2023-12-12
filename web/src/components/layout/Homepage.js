@@ -1,20 +1,10 @@
 import React, {useEffect} from 'react';
 import {Link, Typography} from '@mui/material';
-import {makeStyles} from '@mui/styles';
 import Box from '@mui/material/Box';
 
-const useStyles = makeStyles(() => ({
-  supporters: {
-    backgroundColor: '#546e7aab',
-    '& img': {
-      width: '140px',
-      margin: '15px'
-    }
-  }
-}));
+
 
 const Homepage = () => {
-  const classes = useStyles();
 
   useEffect(() => {
     document.title = 'National Reef Monitoring Network';
@@ -58,8 +48,13 @@ const Homepage = () => {
           </Typography>
         </Box>
       </Box>
-      <Box flexGrow={1} className={classes.supporters}>
-        <Box display="flex" flexWrap="wrap" alignItems="center" justifyContent="center">
+      <Box flexGrow={1} sx={{backgroundColor: '#546e7aab'}}>
+        <Box display="flex" flexWrap="wrap" alignItems="center" justifyContent="center" sx={{
+          '& img': {
+            width: '140px',
+            margin: '15px'
+          }
+        }}>
           <Box>
             <a href="https://www.utas.edu.au/">
               <img src="/logos/500x130-UTAS.png" alt="University of Tasmania home page" />
