@@ -467,3 +467,27 @@ AND epm13.survey_id NOT IN (
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
 	WHERE pde.program_id=2);
+
+
+-- TPAC specific SURVEY_LIST for cataloguing purposes- limited fields:
+-- 1) full coordinate precision
+-- 2) full survey list(no exclusions)
+
+DROP VIEW IF EXISTS nrmn.ep_tpac;
+CREATE OR REPLACE VIEW nrmn.ep_tpac AS
+SELECT
+    survey_id,
+    site_code,
+    location,
+    survey_date,
+    depth,
+    latitude,
+    longitude,
+    survey_latitude,
+    survey_longitude,
+    has_pqs_catalogued_in_db,
+    CASE WHEN direction ~* '(N|S|W|E|NE|SE|SW|NW|NNE|ENE|ESE|SSE|SSW|WSW|WNW|NNW)'THEN direction
+         WHEN direction ~* '(east|west|north|south)' THEN direction
+         ELSE NULL
+    END AS direction
+FROM nrmn.ep_survey_list
