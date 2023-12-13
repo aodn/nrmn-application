@@ -17,7 +17,6 @@ public interface LetterCodeRepository extends JpaRepository<Survey, Integer>, Jp
     @Query(value = "WITH stage0 AS (SELECT COALESCE(obsitem.superseded_by, obsitem.observable_item_name) AS species_name, obsitem.observable_item_id, SUM(obs.measure_value) AS abundance "
             + "FROM {h-schema}location_ref loc "
             + "INNER JOIN {h-schema}site_ref site_raw ON site_raw.location_id = loc.location_id "
-            + "INNER JOIN {h-schema}ep_site_list site ON site.site_code = site_raw.site_code "
             + "INNER JOIN {h-schema}survey sur ON sur.site_id = site_raw.site_id "
             + "INNER JOIN {h-schema}survey_method surmet ON surmet.survey_id = sur.survey_id "
             + "INNER JOIN {h-schema}observation obs ON obs.survey_method_id = surmet.survey_method_id "
