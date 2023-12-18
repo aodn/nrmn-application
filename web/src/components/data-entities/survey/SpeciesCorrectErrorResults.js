@@ -22,7 +22,7 @@ const StyledTableContainer = styled(TableContainer)(({
       '& .MuiTableHead-root': {
         '& .MuiTableRow-head': {
           '& .MuiTableCell-head': {
-            fontSize: typography?.table.fontSize,
+            fontSize: typography?.table?.fontSize,
             background: palette?.primary.rowHeader,
           }
         }
@@ -33,8 +33,8 @@ const StyledTableContainer = styled(TableContainer)(({
         }
       },
       '& .MuiTableCell-root': {
-        fontSize: typography?.table.fontSize,
-        padding: typography?.table.padding,
+        fontSize: typography?.table?.fontSize,
+        padding: typography?.table?.padding,
         color: palette?.text.textPrimary
       }
     }

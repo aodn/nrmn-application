@@ -219,20 +219,20 @@ const SpeciesSearch = ({onRowClick}) => {
               '& .MuiTableHead-root': {
                 '& .MuiTableRow-head': {
                   '& .MuiTableCell-head': {
-                    fontSize: (theme) => theme.typography?.table.fontSize,
-                    background: (theme) => theme.palette?.primary.rowHeader
+                    fontSize: (theme) => theme.typography.table?.fontSize,
+                    background: (theme) => theme?.palette.primary?.rowHeader
                   }
                 }
               },
               '& .MuiTableRow-root': {
                 '&:nth-child(even)': {
-                  backgroundColor: (theme) => theme.palette?.primary.rowHighlight
+                  backgroundColor: (theme) => theme?.palette.primary?.rowHighlight
                 }
               },
               '& .MuiTableCell-root': {
-                fontSize: (theme) => theme.typography?.table.fontSize,
-                padding: (theme) => theme.typography?.table.padding,
-                background: (theme) => theme.palette?.text.textPrimary
+                fontSize: (theme) => theme?.typography.table?.fontSize,
+                padding: (theme) => theme?.typography.table?.padding + 'px',
+                background: (theme) => theme?.palette.text?.textPrimary
               }
             }
           }}>

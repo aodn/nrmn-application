@@ -35,7 +35,7 @@ const StyledBox = styled(Box)(({
       '& .MuiTableHead-root': {
         '& .MuiTableRow-head': {
           '& .MuiTableCell-head': {
-            fontSize: typography?.table.fontSize,
+            fontSize: typography?.table?.fontSize,
             background: palette?.primary.rowHeader
           }
         }
@@ -46,8 +46,8 @@ const StyledBox = styled(Box)(({
         }
       },
       '& .MuiTableCell-root': {
-        fontSize: typography?.table.fontSize,
-        padding: typography?.table.padding,
+        fontSize: typography?.table?.fontSize,
+        padding: typography?.table?.padding,
         color: palette?.text.textPrimary
       }
     }
