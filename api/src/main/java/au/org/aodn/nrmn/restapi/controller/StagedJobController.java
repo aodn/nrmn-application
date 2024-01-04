@@ -135,13 +135,13 @@ public class StagedJobController {
                 Collection<Long> rowIdsToRemove = rowsToTruncate.get().getRowIds();
 
                 // if a row is not the duplicated one in the bottom of the sheet, don't remove it
-                filterNonBottomDuplicateRows(rowIdsToRemove, lastRowId);
+                var bottomDuplicateRowIds = filterBottomDuplicateRows(rowIdsToRemove, lastRowId);
 
                 // keep the last row if the data should finish with a true zero
                 if (Arrays.asList("SURVEY NOT DONE", "DEBRIS - ZERO", "NO SPECIES FOUND")
                         .contains(lastRow.getSpecies().toUpperCase()))
-                    rowIdsToRemove.remove(lastRowId);
-                rowsToSave.removeIf(r -> rowIdsToRemove.contains(r.getId()));
+                    bottomDuplicateRowIds.remove(lastRowId);
+                rowsToSave.removeIf(r -> bottomDuplicateRowIds.contains(r.getId()));
             }
         }
         return rowsToSave;
@@ -382,24 +382,26 @@ public class StagedJobController {
         }
     }
 
-    private void filterNonBottomDuplicateRows(Collection<Long> rowIdsToRemove, Long lastRowId) {
+    /**
+     * This method is used to get the bottom duplicate rows.
+     * E.g. If the collection of rowIdsToRemove is {1, 3, 6, 8, 9, 10, 11}, this method will return {8, 9, 10, 11}
+     * @param rowIdsToRemove
+     * @param lastRowId
+     * @return bottom duplicate rows
+     */
+    private Collection<Long> filterBottomDuplicateRows(Collection<Long> rowIdsToRemove, Long lastRowId) {
 
-        var toRemoveIds = new ArrayList<Long>();
-
-        if (!rowIdsToRemove.contains(lastRowId)) {
-            rowIdsToRemove.clear();
-            return;
-        }
-
-        toRemoveIds.add(lastRowId);
+        var bottomDuplicateRowIds = new ArrayList<Long>();
 
         // This for loop here is checking whether there are duplicate rows at the end. start from the bottom of the sheet.
-        for (var i = 1; i < rowIdsToRemove.size(); i++) {
-            var tempId = lastRowId - i * 1000L;
-            if (!rowIdsToRemove.contains(tempId)) break;
-            toRemoveIds.add(tempId);
+        for (var i = 0; i < rowIdsToRemove.size(); i++) {
+
+            // The id will be multiplied by 1000 somewhere. So we need to multiply the index by 1000 to get the correct id.
+            var checked = lastRowId - i * 1000L;
+            if (!rowIdsToRemove.contains(checked)) break;
+            bottomDuplicateRowIds.add(checked);
         }
 
-        rowIdsToRemove.removeIf(r -> !toRemoveIds.contains(r));
+        return bottomDuplicateRowIds;
     }
 }
