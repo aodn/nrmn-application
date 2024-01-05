@@ -1,22 +1,26 @@
 package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.data.repository.LetterCodeRepository;
+import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.data.repository.projections.LetterCodeMapping;
+import au.org.aodn.nrmn.restapi.data.repository.projections.ObservableItemRow;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import javax.sql.DataSource;
 import javax.transaction.Transactional;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Testcontainers
 @SpringBootTest
@@ -24,8 +28,28 @@ import static org.junit.Assert.assertEquals;
 @ExtendWith(PostgresqlContainerExtension.class)
 public class TemplateServiceIT {
 
+    final static Logger logger = LoggerFactory.getLogger(TemplateServiceIT.class);
+
     @Autowired
     protected LetterCodeRepository letterCodeRepository;
+
+    @Autowired
+    protected ObservableItemRepository observableItemRepository;
+
+    protected JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+
+    protected void refreshView() {
+        Arrays.asList("ep_site_list")
+                .forEach(i -> {
+                    logger.info("Populate materialized view " + i);
+                    jdbcTemplate.execute("REFRESH MATERIALIZED VIEW nrmn." + i);
+                });
+    }
 
     @Test
     @Sql({"/sql/drop_nrmn.sql",
@@ -96,5 +120,32 @@ public class TemplateServiceIT {
         // The observable_item_id is 360, supersededBy Chromis kennensis converted to letter code "cke"
         Optional<LetterCodeMapping> t = r.stream().filter(f -> f.getObservableItemId() == 360L).findAny();
         assertEquals("Superseded by name found", "cke", t.get().getLetterCode());
+    }
+
+    @Test
+    @Sql({"/sql/drop_nrmn.sql",
+            "/sql/migration.sql",
+            "/sql/application.sql",
+            "/testdata/FILL_ROLES.sql",
+            "/testdata/TEST_USER.sql",
+            "/testdata/FILL_DATA.sql",
+            "/testdata/FILL_MEOW_ECOREGION.sql",
+            "/testdata/FILL_TEMPLATE_DATA.sql"})
+    public void verifyMethodForSiteIds() {
+        refreshView();
+
+        // Verify the ep_site_list populate correct info as the getAllWithMethodForSite use this materialized view
+        List<AbstractMap.SimpleEntry<String, String>> l = jdbcTemplate.query(
+                "select * from nrmn.ep_site_list where site_code = 'LHI52' or site_code = 'LHI43'",
+                (rs, i) ->
+                     new AbstractMap.SimpleEntry<>(
+                            rs.getString(rs.findColumn("site_code")),
+                            rs.getString(rs.findColumn("site_name"))
+                    )
+                );
+        assertEquals("Two site found", 2, l.size());
+
+        List<ObservableItemRow> r = observableItemRepository.getAllWithMethodForSites(1, List.of(3807,3808));
+        assertTrue("Superseded items included", r.stream().filter(f -> f.getObservableItemId() == 360L).findFirst().isPresent());
     }
 }
