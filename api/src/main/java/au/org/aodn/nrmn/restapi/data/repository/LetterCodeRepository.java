@@ -14,6 +14,15 @@ import au.org.aodn.nrmn.restapi.data.repository.projections.LetterCodeMapping;
 @Repository
 public interface LetterCodeRepository extends JpaRepository<Survey, Integer>, JpaSpecificationExecutor<Survey> {
 
+    /**
+     * This query consider the superseded_by and observable_item_name and return lettercode and observable_item_id
+     * the species_name run through a couple of name to lettercode conversion, where it try to convert it to
+     * lettercode of multiple length (3, 4, 5, max) and pick up the first non-null lettercode for use.
+     *
+     * @param methodId
+     * @param siteIds
+     * @return
+     */
     @Query(value = "WITH stage0 AS (SELECT COALESCE(obsitem.superseded_by, obsitem.observable_item_name) AS species_name, obsitem.observable_item_id, SUM(obs.measure_value) AS abundance "
             + "FROM {h-schema}location_ref loc "
             + "INNER JOIN {h-schema}site_ref site_raw ON site_raw.location_id = loc.location_id "

@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -24,8 +23,6 @@ import static org.junit.Assert.assertEquals;
 @Transactional
 @ExtendWith(PostgresqlContainerExtension.class)
 public class TemplateServiceIT {
-
-    protected JdbcTemplate jdbcTemplate;
 
     @Autowired
     protected LetterCodeRepository letterCodeRepository;
