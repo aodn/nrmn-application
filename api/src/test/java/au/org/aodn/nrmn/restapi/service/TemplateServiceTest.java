@@ -193,7 +193,7 @@ public class TemplateServiceTest {
     }
 
     @Test
-    void getSpeciesForTemplate() throws IOException {
+    void getSpeciesForTemplate() {
 
         UiSpeciesAttributes usa1 = new UiSpeciesAttributes() {
 
@@ -329,7 +329,7 @@ public class TemplateServiceTest {
 
             @Override
             public Integer getObservableItemId() {
-                return 123;
+                return 1;
             }
 
             @Override
@@ -344,7 +344,7 @@ public class TemplateServiceTest {
 
             @Override
             public String getName() {
-                return null;
+                return "Abudefduf saxatilis";
             }
 
             @Override
@@ -434,9 +434,10 @@ public class TemplateServiceTest {
 
         Site site1 = Site.builder().siteId(1).build();
         List<Integer> siteIds = Arrays.asList(site1.getSiteId());
-        int[] obsIds = {123};
+        int[] obsIds = {1};
         when(observableItemRepository.getAllWithMethodForSites(2, siteIds))
                 .thenReturn(Arrays.asList(o1).stream().collect(Collectors.toList()));
+
         when(observationRepository.getSpeciesAttributesByIds(obsIds)).thenReturn(swaList);
         when(letterCodeRepository.getForMethodWithSiteIds(2, siteIds)).thenReturn(Arrays.asList(lcm1, lcm2, lcm3));
         List<SpeciesWithAttributesCsvRow> speciesWithAttributes = templateService.getSpeciesForTemplate(2, siteIds);

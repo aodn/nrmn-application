@@ -177,17 +177,23 @@ public class TemplateService {
 
         List<ObservableItemRow> observableItemRows = observableItemRepository.getAllWithMethodForSites(mode, siteIds);
 
-        Map<Integer, String> speciesName = observableItemRows
+        // We only need the species name from this object where the name can be the supersededBy if not null.
+        // Do not use Collectors.toMap as it will crash on value = null
+        Map<Integer, String> speciesName = new HashMap<>();
+        observableItemRows
                 .stream()
-                .collect(Collectors.toMap(ObservableItemRow::getObservableItemId, ObservableItemRow::getName));
+                .forEach(i -> speciesName.put(i.getObservableItemId(), i.getName()));
 
         var observableItemIds = observableItemRows.stream().mapToInt(ObservableItemRow::getObservableItemId).toArray();
+
+        // The species name in attribute table do not consider supersededBy name, hence we need to use the map above to
+        // remap it.
         List<SpeciesWithAttributesCsvRow> species = observationRepository.getSpeciesAttributesByIds(observableItemIds)
                 .stream()
                 .map(s -> SpeciesWithAttributesCsvRow
                         .builder()
                         .letterCode(letterCodeMap.get(s.getId()))
-                        .speciesName(speciesName.get(s.getId()))
+                        .speciesName(speciesName.get(s.getId().intValue()))
                         .commonName(s.getCommonName())
                         .isInvertSized(s.getIsInvertSized())
                         .l5(s.getL5())
