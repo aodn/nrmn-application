@@ -1,37 +1,24 @@
-FROM ubuntu:22.04
+FROM amazoncorretto:11-al2-jdk
 
 ARG BUILDER_UID=9999
 
 ENV TZ="Australia" \
+    NVM_DIR="/opt/nvm" \
     MAVEN_HOME="/opt/maven" \
     MAVEN_VERSION=3.8.5 \
-    NODE_MAJOR=18 \
+    NODE_VERSION=16.16.0 \
     HOME="/home/builder" \
     JAVA_TOOL_OPTIONS="-Duser.home=/home/builder"
 
-# Install required packages and download the Amazon Corretto 11 JDK
-RUN apt-get update && \
-    apt-get install -y wget software-properties-common && \
-    wget -O- https://apt.corretto.aws/corretto.key | apt-key add - && \
-    add-apt-repository 'deb https://apt.corretto.aws stable main' && \
-    apt-get update && \
-    apt-get install -y java-11-amazon-corretto-jdk
-# Set the JAVA_HOME environment variable
-ENV JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto
-
-RUN apt-get install -y git python3 python3-pip curl wget unzip zip
+RUN yum install --quiet --assumeyes git python3 python3-pip apache-maven shadow-utils tar
 
 # Install Node
-RUN apt-get update \
-    && apt-get install -y ca-certificates curl gnupg \
-    && mkdir -p /etc/apt/keyrings \
-    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
-
-RUN apt-get update \
-    && apt-get install nodejs -y \
-    && npm install -g yarn \
-    && yarn set version canary
+RUN mkdir -p $NVM_DIR
+RUN curl --silent https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
+RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
+ENV PATH="/opt/nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
+RUN npm install -g yarn@1.22.4
 
 # Install Maven
 RUN set -ex \

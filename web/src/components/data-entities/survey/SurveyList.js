@@ -52,6 +52,10 @@ const SurveyList = () => {
   const [isFiltered, setIsFiltered] = useState(false);
   const optionLoading = open && options.length === 0;
 
+  // change the default icons: hide the triangle filter icon in the table head
+  const icons = { menu: ' ', filter: ' '};
+
+
   const defaultColDef = {
     lockVisible: true,
     minWidth: AppConstants.AG_GRID.dataColWidth,
@@ -326,6 +330,9 @@ const SurveyList = () => {
             }}
             suppressCellFocus={true}
             defaultColDef={defaultColDef}
+
+            // customized setting of table icons
+            icons={icons}
           >
             {auth.features?.includes('corrections') && (
               <AgGridColumn
