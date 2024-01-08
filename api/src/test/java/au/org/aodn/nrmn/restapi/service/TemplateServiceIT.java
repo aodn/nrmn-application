@@ -121,7 +121,9 @@ public class TemplateServiceIT {
         Optional<LetterCodeMapping> t = r.stream().filter(f -> f.getObservableItemId() == 360L).findAny();
         assertEquals("Superseded by name found", "cke", t.get().getLetterCode());
     }
-
+    /**
+     * We want to verify that the function getAllWithMethodForSites considered the supersededBy name correctly.
+     */
     @Test
     @Sql({"/sql/drop_nrmn.sql",
             "/sql/migration.sql",
@@ -146,6 +148,11 @@ public class TemplateServiceIT {
         assertEquals("Two site found", 2, l.size());
 
         List<ObservableItemRow> r = observableItemRepository.getAllWithMethodForSites(1, List.of(3807,3808));
-        assertTrue("Superseded items included", r.stream().filter(f -> f.getObservableItemId() == 360L).findFirst().isPresent());
+
+        // The supersededBy item have id 360
+        Optional<ObservableItemRow> supersededBy = r.stream().filter(f -> f.getObservableItemId() == 360L).findFirst();
+        assertTrue("Superseded items included", supersededBy.isPresent());
+
+        assertEquals("Used supersededBy name", "Chromis kennensis", supersededBy.get().getName());
     }
 }
