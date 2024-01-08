@@ -152,8 +152,8 @@ public class StagedJobController {
     @PostMapping("/upload")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<UploadResponse> uploadFile(@RequestParam("withExtendedSizes") Boolean withExtendedSizes,
-            @RequestParam("programId") Integer programId, @RequestParam("file") MultipartFile file,
-            Authentication authentication) {
+                                                     @RequestParam("programId") Integer programId, @RequestParam("file") MultipartFile file,
+                                                     Authentication authentication) {
 
         userAuditRepo.save(new UserActionAudit("stage/upload", "upload excel file attempt for username: "
                 + authentication.getName() + " file: " + file.getOriginalFilename()));
@@ -327,7 +327,7 @@ public class StagedJobController {
     @PutMapping("/job/{jobId}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public ResponseEntity<String> updateJob(@PathVariable Long jobId, Authentication authentication,
-            @RequestBody List<RowUpdateDto> rowUpdates) {
+                                            @RequestBody List<RowUpdateDto> rowUpdates) {
 
         List<Long> deletions = rowUpdates.stream().filter(u -> u.getRow() == null).map(u -> u.getRowId())
                 .collect(Collectors.toList());

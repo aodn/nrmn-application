@@ -7,6 +7,7 @@ import {NavLink} from 'react-router-dom';
 import axiosInstance from '../../api';
 import {AuthContext} from '../../contexts/auth-context';
 import { AppConstants } from '../../common/constants';
+import BackButton from '../ui/BackButton';
 
 const JobUpload = () => {
   const emptyForm = {file: null, withExtendedSizes: false, programId: null};
@@ -35,13 +36,15 @@ const JobUpload = () => {
     <>
       <Box m={1}>
         {uploadProgress < 0 ? (
-          <NavLink to="/data/jobs" color="secondary">
-            <Typography>{'<< Back to Jobs'}</Typography>
-          </NavLink>
+          // <NavLink to="/data/jobs" color="secondary">
+          //   <Typography>{'<< Back to Jobs'}</Typography>
+          // </NavLink>
+          <BackButton goBackTo={`/data/jobs`} name={`Jobs`} />
         ) : (
-          <NavLink onClick={resetForm} to="/data/upload" color="secondary">
-            <Typography>{'<< Back to Upload'}</Typography>
-          </NavLink>
+          // <NavLink onClick={resetForm} to="/data/upload" color="secondary">
+          //   <Typography>{'<< Back to Upload'}</Typography>
+          // </NavLink>
+          <BackButton goBackTo={`/data/upload`} name={`Upload`} onClick={resetForm} />
         )}
       </Box>
       <AuthContext.Consumer>
@@ -138,9 +141,7 @@ const JobUpload = () => {
                                 <span>{uploadResponse.error}</span>
                               </Alert>
                               <Box pt={5}>
-                                <NavLink onClick={resetForm} to="/data/upload" color="secondary">
-                                  <Typography>{'<< Back to Upload'}</Typography>
-                                </NavLink>
+                                <BackButton goBackTo={`/data/upload`} name={`Upload`} onClick={resetForm} />
                               </Box>
                             </>
                           )}

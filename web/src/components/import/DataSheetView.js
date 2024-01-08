@@ -9,7 +9,7 @@ import UndoIcon from '@mui/icons-material/Undo';
 import ResetIcon from '@mui/icons-material/LayersClear';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import { PropTypes } from 'prop-types';
-import {useParams, NavLink} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {getDataJob, submitIngest, updateRows, validateJob} from '../../api/api';
 import { AppConstants, extendedMeasurements, measurements } from '../../common/constants';
 import LoadingOverlay from '../overlays/LoadingOverlay';
@@ -19,6 +19,7 @@ import ValidationPanel from './panel/ValidationPanel';
 import eh from './DataSheetEventHandlers';
 import {Paper} from '@mui/material';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import BackButton from '../ui/BackButton';
 
 // |context| is where all custom properties and helper functions
 // associated with the ag-grid are stored
@@ -293,9 +294,7 @@ const DataSheetView = ({onIngest, roles}) => {
       <Box pt={1} pl={1}>
         <Box display="flex" flexDirection="row">
           <Box flexGrow={1}>
-            <NavLink to="/data/jobs" color="secondary">
-              <Typography>{'<< Back to Jobs'}</Typography>
-            </NavLink>
+            <BackButton goBackTo={`/data/jobs`} name={`Jobs`} />
           </Box>
           {state === IngestState.Locked && (
             <Paper minWidth={180} display="flex" alignItems="center">
