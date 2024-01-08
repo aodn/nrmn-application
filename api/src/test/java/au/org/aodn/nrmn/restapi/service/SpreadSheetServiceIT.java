@@ -230,4 +230,64 @@ public class SpreadSheetServiceIT {
         assertEquals(20, validRows.size());
     }
 
+    /** This test is for:
+     * When adding new jobs, only rows (with "total=0" and duplicate more than 3 times) at the end of the sheet should be
+     * removed. Rows (with "total=0" and duplicate more than 3 times) are not at the end of the sheet should be kept.
+     *
+     * Because the ids are multiplied by 1000, all the id here will be like this: 464000.
+     * @throws Exception
+     */
+    @Test
+    void removeBottomDuplicateRowsOnly() throws Exception {
+
+        // Normal test case, remove the bottom 6 duplicate rows (keep one of them because this is valid row)
+        FileSystemResource file = new FileSystemResource("src/test/resources/sheets/removeDuplicateBottomRows.xlsx");
+        MockMultipartFile mockFile = new MockMultipartFile("sheets/removeDuplicateBottomRows.xlsx", file.getInputStream());
+        var parsedSheet = sheetService.stageXlsxFile(mockFile, false);
+        var validRows = stagedJobController.getRowsToSave(parsedSheet);
+        assertEquals(487, validRows.size());
+        assertTrue(validRows.stream().anyMatch(row -> row.getId() == 464000));
+        assertTrue(validRows.stream().anyMatch(row -> row.getId() == 465000));
+        assertTrue(validRows.stream().anyMatch(row -> row.getId() == 466000));
+        assertTrue(validRows.stream().anyMatch(row -> row.getId() == 467000));
+        assertTrue(validRows.stream().anyMatch(row -> row.getId() == 468000));
+
+        // if the `total` column of the last row is not 0, no rows should be removed
+        FileSystemResource file1 = new FileSystemResource("src/test/resources/sheets/removeDuplicateBottomRows-lastTotalNot0.xlsx");
+        MockMultipartFile mockFile1 = new MockMultipartFile("sheets/removeDuplicateBottomRows-lastTotalNot0.xlsx", file1.getInputStream());
+        var parsedSheet1 = sheetService.stageXlsxFile(mockFile1, false);
+        var validRows1 = stagedJobController.getRowsToSave(parsedSheet1);
+        assertEquals(493, validRows1.size());
+        assertTrue(validRows1.stream().anyMatch(row -> row.getId() == 464000));
+        assertTrue(validRows1.stream().anyMatch(row -> row.getId() == 465000));
+        assertTrue(validRows1.stream().anyMatch(row -> row.getId() == 466000));
+        assertTrue(validRows1.stream().anyMatch(row -> row.getId() == 467000));
+        assertTrue(validRows1.stream().anyMatch(row -> row.getId() == 468000));
+
+        // if the last row is id=486 (no duplicate rows at the bottom)
+        FileSystemResource file2 = new FileSystemResource("src/test/resources/sheets/removeDuplicateBottomRows-lastId486.xlsx");
+        MockMultipartFile mockFile2 = new MockMultipartFile("sheets/removeDuplicateBottomRows-lastId486.xlsx", file2.getInputStream());
+        var parsedSheet2 = sheetService.stageXlsxFile(mockFile2, false);
+        var validRows2 = stagedJobController.getRowsToSave(parsedSheet2);
+        assertEquals(486, validRows2.size());
+        assertTrue(validRows2.stream().anyMatch(row -> row.getId() == 464000));
+        assertTrue(validRows2.stream().anyMatch(row -> row.getId() == 465000));
+        assertTrue(validRows2.stream().anyMatch(row -> row.getId() == 466000));
+        assertTrue(validRows2.stream().anyMatch(row -> row.getId() == 467000));
+        assertTrue(validRows2.stream().anyMatch(row -> row.getId() == 468000));
+
+        // if the last row is id=490 (duplicate rows at the bottom)
+        FileSystemResource file3 = new FileSystemResource("src/test/resources/sheets/removeDuplicateBottomRows-lastId490.xlsx");
+        MockMultipartFile mockFile3 = new MockMultipartFile("sheets/removeDuplicateBottomRows-lastId490.xlsx", file3.getInputStream());
+        var parsedSheet3 = sheetService.stageXlsxFile(mockFile3, false);
+        var validRows3 = stagedJobController.getRowsToSave(parsedSheet3);
+        assertEquals(487, validRows3.size());
+        assertTrue(validRows3.stream().anyMatch(row -> row.getId() == 464000));
+        assertTrue(validRows3.stream().anyMatch(row -> row.getId() == 465000));
+        assertTrue(validRows3.stream().anyMatch(row -> row.getId() == 466000));
+        assertTrue(validRows3.stream().anyMatch(row -> row.getId() == 467000));
+        assertTrue(validRows3.stream().anyMatch(row -> row.getId() == 468000));
+
+    }
+
 }
