@@ -22,6 +22,9 @@ const SiteList = () => {
   const [dialogState, setDialogState] = useState({open: false});
   const gridRef = useRef(null);
 
+  // for refreshing the table
+  const [refresh, setRefresh] = useState(0);
+
   // Auto size function to be call each time data changed, so the grid always autofit
   const autoSizeAll = (evt, skipHeader) => {
     if (evt) {
@@ -120,6 +123,7 @@ const SiteList = () => {
             entityDelete('site', dialogState.item.siteId).then(() => {
               gridRef.current.api.applyTransaction({remove: [dialogState.item]});
               setDialogState({open: false});
+                setRefresh(refresh + 1);
             });
           }}
         >
@@ -158,6 +162,7 @@ const SiteList = () => {
             <AgGridReact
               ref={gridRef}
               id={'site-list'}
+              key = {refresh}
               rowHeight={24}
               pagination={true}
               paginationPageSize={rowsPerPage}
