@@ -118,7 +118,7 @@ const SiteList = () => {
           variant="contained"
           onClick={() => {
             entityDelete('site', dialogState.item.siteId).then(() => {
-              gridRef.current.api.applyTransaction({remove: [dialogState.item]});
+              gridRef.current.api.refreshInfiniteCache();
               setDialogState({open: false});
             });
           }}
@@ -240,10 +240,10 @@ const SiteList = () => {
                 filter={false}
                 resizable={false}
                 sortable={false}
-                cellRenderer={(e) => (e.data?.isActive ? <></> : <Delete />)}
+                cellRenderer={(e) => (e.data?.isActive === 'true' ? <></> : <Delete />)}
                 cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
                 onCellClicked={(e) => {
-                  !e.data.isActive &&
+                  e.data.isActive !== 'true' &&
                     setDialogState({
                       open: true,
                       item: e.data
