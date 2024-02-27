@@ -10,7 +10,9 @@ VALUES (55, 'RLS', True);
 INSERT INTO nrmn.program_ref(program_id, program_name, is_active)
 VALUES (56, 'ATRC', True);
 
-INSERT INTO nrmn.location_ref (location_id, location_name, is_active) VALUES (0, 'NONE', true);
+INSERT INTO nrmn.location_ref (location_id, location_name, is_active)
+    VALUES (0, 'NONE', true),
+           (184, 'Lord Howe Island', true);
 
 INSERT INTO nrmn.site_ref (site_id, site_name, site_code, location_id, is_active) VALUES (0, 'NONE', 'NONE', 0, true);
 
@@ -32,6 +34,10 @@ VALUES (1783, 'CEU4', 'Castillo', -5, 35, 29, 'Ceuta', 'Spain', 'Fishing',
         '{
           "ProxCountry": "Spain"
         }', true);
+
+insert into nrmn.site_ref (site_id, site_code, site_name, longitude, latitude, geom, location_id, state, country, old_site_code, mpa, protection_status, relief, currents, wave_exposure, slope, site_attribute, is_active)
+values  (3807, 'LHI52', 'Sunken Rock', 159.2853, -31.81209, '0101000020E61000009031772D21E963409D685721E5CF3FC0', 184, 'New South Wales', 'Australia', null, 'Lord Howe Island Marine Park', 'No take multizoned', 2, 4, 4, 3, '{"Age": "1", "Zone": "Sanctuary Zone (Balls Pyramid)", "area": "0", "No_take": "1", "Isolation": 5.0, "Zone_name": "Sanctuary Zone (Balls Pyramid)", "NEOLI_Total": "3", "ProxCountry": "Australia", "area_in_km2": "53", "Effectiveness": "High", "Isolation_NEOLI": "0", "year_of_protection": "2004", "Effectiveness_NEOLI": "1", "Rec_methods_permitted": "-", "com_methods_permitted": "-", "Is_rec_fishing_allowed": "N", "Distance_to_boundary_in_km": 2.8, "Is_commercial_fishing_allowed": "N", "Is_it_a_shore_rec_fishing_zone_within_SZ": "N"}', true),
+        (3808, 'LHI43', 'South East Rock', 159.28145, -31.7875, '0101000020E6100000B22E6EA301E963409A99999999C93FC0', 184, 'New South Wales', 'Australia', null, 'Lord Howe Island Marine Park', 'No take multizoned', 3, 3, 4, 4, '{"Age": "1", "Zone": "Balls Pyramid Sanctuary Zone", "area": "0", "No_take": "1", "Isolation": 5.0, "Zone_name": "Balls Pyramid Sanctuary Zone", "NEOLI_Total": "3", "ProxCountry": "Australia", "area_in_km2": "33", "Effectiveness": "High", "Gears_allowed": "Allbanned", "Isolation_NEOLI": "0", "year_of_protection": "2004", "Effectiveness_NEOLI": "1", "Distance_to_boat_ramp": 38.7, "Rec_methods_permitted": "-", "com_methods_permitted": "-", "offshore_extent_in_km": 6.0, "Is_rec_fishing_allowed": "N", "perimeter_length_in_km": 24.0, "Distance_to_boundary_in_km": 1.0, "Is_commercial_fishing_allowed": "N", "Is_it_a_shore_rec_fishing_zone_within_SZ": "N"}', true);
 
 INSERT INTO nrmn.survey (program_id, site_id, survey_id, survey_date, survey_time, depth, survey_num, visibility,
                          direction, notes, project_title, inside_marine_park, block_abundance_simulated)
@@ -73,6 +79,17 @@ INSERT INTO nrmn.survey (program_id, site_id, survey_id, survey_date, survey_tim
                          direction, notes, project_title, inside_marine_park, block_abundance_simulated, locked)
 VALUES (56, 551, 812331346, '2017-11-28', '00:00:00', 25, 1, 10, 'N',
         'Survey locked for edit', 'Not able to correct this', 'Unsure', true, true);
+
+insert into nrmn.survey (survey_id, site_id, program_id, survey_date, survey_time, depth, survey_num, visibility, direction, longitude, latitude, protection_status, inside_marine_park, notes, pq_catalogued, pq_zip_url, pq_diver_id, block_abundance_simulated, project_title, created, updated, locked)
+values  (912350289, 3807, 55, '2018-03-04', '10:00:00', 10, 0, 20, 'W', null, null, null, null, null, true, 'http://rls.tpac.org.au/pq/912350289/zip', null, false, null, null, null, false),
+        (912350275, 3807, 55, '2018-03-04', '10:00:00', 15, 0, 30, 'O', null, null, null, null, null, true, 'http://rls.tpac.org.au/pq/912350275/zip', null, false, null, null, null, false),
+        (2001744, 3808, 55, '2010-02-11', null, 12, 0, null, null, null, null, null, null, null, true, 'http://rls.tpac.org.au/pq/2001744/zip', null, false, null, null, null, false),
+        (912350272, 3808, 55, '2018-03-04', '11:00:00', 8, 0, 30, 'O', null, null, null, null, null, true, 'http://rls.tpac.org.au/pq/912350272/zip', null, false, null, null, null, false),
+        (912340551, 3808, 55, '2012-03-01', '10:00:00', 7, 0, 40, 'NE', null, null, null, null, null, true, 'http://rls.tpac.org.au/pq/912340551/zip', null, false, null, null, null, false),
+        (2001745, 3808, 55, '2010-02-11', null, 14, 0, null, null, null, null, null, null, null, true, 'http://rls.tpac.org.au/pq/2001745/zip', null, false, null, null, null, false),
+        (912340553, 3808, 55, '2012-03-01', '10:00:00', 14, 0, 40, 'NW', null, null, null, null, null, true, 'http://rls.tpac.org.au/pq/912340553/zip', null, false, null, null, null, false),
+        (912340552, 3808, 55, '2012-03-01', '10:00:00', 12, 0, 40, 'S', null, null, null, null, null, true, 'http://rls.tpac.org.au/pq/912340552/zip', null, false, null, null, null, false),
+        (912350271, 3808, 55, '2018-03-04', '11:00:00', 14, 0, 25, 'E', null, null, null, null, null, true, 'http://rls.tpac.org.au/pq/912350271/zip', null, false, null, null, null, false);
 /*
  This survey have pq_catalogued true
  */
@@ -81,14 +98,22 @@ INSERT INTO nrmn.survey (program_id, site_id, survey_id, survey_date, survey_tim
 VALUES (55, 551, 812331347, '2017-11-29', '00:00:00', 25, 1, 10, 'N',
         'Survey locked for edit', 'Not able to correct this', 'Unsure', true, true);
 
-
-INSERT INTO nrmn.diver_ref(diver_id, initials, full_name)
-VALUES (51, 'JEP', 'Juan Espanol Pagina');
-INSERT INTO nrmn.diver_ref(diver_id, initials, full_name)
-VALUES (70, 'AZS', 'Alex Zum Smith');
-INSERT INTO nrmn.diver_ref(diver_id, initials, full_name)
-VALUES (80, 'EVP', 'Eve valerie Piotr');
-
+INSERT INTO nrmn.diver_ref(diver_id, initials, full_name, created)
+    VALUES (51, 'JEP', 'Juan Espanol Pagina', null),
+           (70, 'AZS', 'Alex Zum Smith', null),
+           (80, 'EVP', 'Eve valerie Piotr', null),
+           (419, 'TPC', 'Tim Crawford', null),
+           (373, 'SAG', 'Sallyann Gudge', null),
+           (366, 'RSS', 'Rick Stuart-Smith', null),
+           (208, 'IVS', 'Ian Shaw', null),
+           (421, 'TRD', 'Tom Davis', null),
+           (188, 'GJE', 'Graham Edgar', null),
+           (425, 'WCB', 'Bill Barker', null),
+           (148, 'CTH', 'Christo Haseldon', null),
+           (115, 'ATC', 'Antonia Cooper', null),
+           (97, 'AJG', 'Andrew Green', null),
+           (187, 'GER', 'Germán Soler', null),
+           (378, 'SDL', 'Scott Ling', null);
 /*
    id bigint NOT NULL,
     created timestamp with time zone,
@@ -117,7 +142,7 @@ INSERT INTO nrmn.staged_job (id,
                              program_id,
                              sec_user_id,
                              is_extended_size)
-                             
+
 VALUES (119, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP , 'jobid-atrc', 'INGEST', 'STAGED', 56, 123456, false);
 
 INSERT INTO nrmn.staged_job (id,
@@ -157,10 +182,22 @@ VALUES (333, 1, 102, 1, 'Species 56', 'S56', 'Debris'),
        (334, 1, null, null, 'Haliotis rubra', 'hal', 'Debris'),
        (330, 1, null, null, 'Duplicate rubra', 'dup', null);
 
-INSERT INTO nrmn.method_ref(method_id, method_name, is_active)
-VALUES (1, 'Standard fish', true), (2, 'Standard invertebrates & cryptic fish', true), (3, 'Standard quadrat', true), (11, 'Off transect', true), (12, 'Debris', true);
 
-INSERT INTO nrmn.methods_species 
+INSERT INTO nrmn.method_ref(method_id, method_name, is_active)
+    VALUES (0, 'Off transect sightings or observations', true),
+           (1, 'Standard fish', true),
+           (2, 'Standard invertebrates & cryptic fish', true),
+           (3, 'Standard quadrat', true),
+           (4, 'Macrocystis count', true),
+           (5, 'Limpet quadrat', true),
+           (6, 'Rugosity', true),
+           (7, 'Additional lobster counts (Jurien Bay)', true),
+           (10, 'Seagrass fish survey', false),
+           (11, 'Off transect', true),
+           (12, 'Debris', true),
+           (13, 'Photo quadrat scores', true);
+
+INSERT INTO nrmn.methods_species
 VALUES (331, 1), (333, 1), (331, 2), (333, 2), (331, 3), (333, 3), (332, 12), (334, 11);
 
 INSERT INTO nrmn.survey_method(survey_method_id, block_num,
@@ -293,9 +330,8 @@ VALUES (551, 1, '{}',51, 2, 333, 121),
        (653, 600, '{}',51, 3, 332, 421),
        (654, 40, '{}',51, 2, 332, 321);
 
-
 INSERT INTO nrmn.staged_row(pqs, block, buddy, code, created, date, depth, direction, diver,
-                            inverts, is_invert_sizing, last_updated, latitude, longitude, 
+                            inverts, is_invert_sizing, last_updated, latitude, longitude,
                             measure_value, method, site_name, site_no, species, time, total, vis, staged_job_id)
 VALUES ('JEP', 1, 'AZS', 'AAA', '09/09/2009', '03/03/2003', 3.3, 'NW', 'JEP', 0, false, '01/01/2001', -5, 35, '{"1": "5"}', 1, 'Castillo', 'CEU4', 'Species 56', '11:11', 5, 11, 109),
        ('JEP', 1, 'AZS', 'ZZZ', '09/09/2009', '03/03/2003', 3.3, 'NW', 'JEP', 0, false, '01/01/2001', -5, 35,'{"1": "5"}', 1, 'Castillo1', 'CEU41', 'Species 56', '11:11', 5, 11, 110);

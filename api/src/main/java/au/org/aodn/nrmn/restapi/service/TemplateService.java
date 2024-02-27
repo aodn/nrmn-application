@@ -8,12 +8,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -173,18 +168,39 @@ public class TemplateService {
 
     public List<SpeciesWithAttributesCsvRow> getSpeciesForTemplate(Integer mode, List<Integer> siteIds) {
 
-        HashMap<Long, String> letterCodeMap = new HashMap<Long, String>();
+        Map<Long, String> letterCodeMap = new HashMap<Long, String>();
+
+        // The letter code in observableItemRepository is not the one we want, so we need to get the letterCode
+        // via this letterCodeRepository.
         List<LetterCodeMapping> letterCodeMappings = letterCodeRepository.getForMethodWithSiteIds(mode, siteIds);
         letterCodeMappings.forEach(m -> letterCodeMap.put(Long.valueOf(m.getObservableItemId()), m.getLetterCode()));
 
         List<ObservableItemRow> observableItemRows = observableItemRepository.getAllWithMethodForSites(mode, siteIds);
 
+        // We only need the species name from this object where the name can be the supersededBy if not null.
+        // Do not use Collectors.toMap as it will crash on value = null
+        Map<Integer, String> speciesName = new HashMap<>();
+        observableItemRows
+                .stream()
+                .forEach(i -> speciesName.put(i.getObservableItemId(), i.getName()));
+
         var observableItemIds = observableItemRows.stream().mapToInt(ObservableItemRow::getObservableItemId).toArray();
+
+        // The species name in attribute table do not consider supersededBy name, hence we need to use the map above to
+        // remap it.
         List<SpeciesWithAttributesCsvRow> species = observationRepository.getSpeciesAttributesByIds(observableItemIds)
                 .stream()
-                .map(s -> SpeciesWithAttributesCsvRow.builder().letterCode(letterCodeMap.get(s.getId()))
-                        .speciesName(s.getSpeciesName()).commonName(s.getCommonName())
-                        .isInvertSized(s.getIsInvertSized()).l5(s.getL5()).l95(s.getL95()).lMax(s.getLmax()).build())
+                .map(s -> SpeciesWithAttributesCsvRow
+                        .builder()
+                        .letterCode(letterCodeMap.get(s.getId()))
+                        .speciesName(speciesName.get(s.getId().intValue()))
+                        .commonName(s.getCommonName())
+                        .isInvertSized(s.getIsInvertSized())
+                        .l5(s.getL5())
+                        .l95(s.getL95())
+                        .lMax(s.getLmax())
+                        .build()
+                )
                 .collect(Collectors.toList());
         List<SpeciesWithAttributesCsvRow> speciesResult = species.stream().collect(Collectors.toList());
         speciesResult.add(SpeciesWithAttributesCsvRow.builder().letterCode("snd").speciesName("Survey Not Done")

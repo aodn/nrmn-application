@@ -1,16 +1,11 @@
 insert into nrmn.diver_ref (diver_id, initials, full_name, created)
-values  (155, 'DH', 'Dave Henke', null),
-        (188, 'GJE', 'Graham Edgar', null),
-        (208, 'IVS', 'Ian Shaw', null),
+values
         (248, 'JT', 'John Turnbull', null),
         (268, 'KW', 'Kirsty Whitman', null),
         (276, 'LH', 'Leah Harper', null),
         (315, 'NB', 'Nacor Balanos', null),
         (327, 'NSB', 'Nev Barrett', null),
-        (366, 'RSS', 'Rick Stuart-Smith', null),
-        (378, 'SDL', 'Scott Ling', null),
         (1, '0', 'Unknown diver', null),
-        (115, 'ATC', 'Antonia Cooper', null),
         (437, 'OJ', 'Olivia Johnson', null);
 
 insert into nrmn.location_ref (location_id, location_name, is_active)
@@ -26,9 +21,6 @@ values  (10, 'Sydney', true),
         (21, 'Torres Strait', true),
         (196, 'Solitary Islands', true),
         (195, 'Seaflower', true);
-
-insert into nrmn.method_ref (method_id, method_name, is_active)
-values  (0, 'Off transect sightings or observations', true);
 
 insert into nrmn.site_ref (site_id, site_code, site_name, longitude, latitude, geom, location_id, state, country, old_site_code, mpa, protection_status, relief, currents, wave_exposure, slope, site_attribute, is_active)
 values  (4250, 'GBR287', 'Westari', 151.8633270263672, -23.460689544677734, '0101000020E610000000000060A0FB6240000000C0EF7537C0', 171, 'Queensland', 'Australia', null, 'Great Barrier Reef MP', 'No Take', null, null, null, null, null, true),
