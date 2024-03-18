@@ -1,31 +1,42 @@
 import React from 'react';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import {makeStyles} from '@mui/styles';
+const PREFIX = 'AgGridHeader';
 
-const useStyles = makeStyles((theme) => ({
-  fishSize: {
+const classes = {
+  fishSize: `${PREFIX}-fishSize`,
+  invertSize: `${PREFIX}-invertSize`
+};
+
+const Root = styled('div')((
+    {
+      theme
+    }
+) => ({
+  [`& .${classes.fishSize}`]: {
     color: '#c4d79b',
     borderBottom: '1px solid ' + theme.palette.divider
   },
-  invertSize: {
+
+  [`& .${classes.invertSize}`]: {
     color: '#da9694'
   }
 }));
 
 const AgGridHeader = (props) => {
-  const classes = useStyles();
+
 
   const onSortRequested = (order, event) => {
     props.setSort(order, event.shiftKey);
   };
 
   return (
-    <div style={{width: '100%'}}>
-      <div style={{float: 'left'}} onClick={(event) => onSortRequested(props.column.isSortAscending() ? 'desc' : 'asc', event)}>
-        <div className={classes.fishSize}>{props.displayName}</div>
-        <div className={classes.invertSize}>{props.column.colDef.invertSize}</div>
-      </div>
-    </div>
+      <Root style={{width: '100%'}}>
+        <div style={{float: 'left'}} onClick={(event) => onSortRequested(props.column.isSortAscending() ? 'desc' : 'asc', event)}>
+          <div className={classes.fishSize}>{props.displayName}</div>
+          <div className={classes.invertSize}>{props.column.colDef.invertSize}</div>
+        </div>
+      </Root>
   );
 };
 
