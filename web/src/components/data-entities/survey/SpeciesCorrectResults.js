@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import { styled } from '@mui/material/styles';
 import {PropTypes} from 'prop-types';
 
 import Table from '@mui/material/Table';
@@ -10,15 +11,21 @@ import TableRow from '@mui/material/TableRow';
 import TablePagination from '@mui/material/TablePagination';
 import {Paper} from '@mui/material';
 
-import {makeStyles} from '@mui/styles';
+const PREFIX = 'SpeciesCorrectResults';
 
-const useStyles = makeStyles(({palette, typography}) => ({
-  root: {
+const classes = {
+  root: `${PREFIX}-root`
+};
+
+const StyledTableContainer = styled(TableContainer)(({
+                                                       theme: {palette, typography}
+                                                     }) => ({
+  [`& .${classes.root}`]: {
     '& .MuiTable-root': {
       '& .MuiTableHead-root': {
         '& .MuiTableRow-head': {
           '& .MuiTableCell-head': {
-            fontSize: typography?.table.fontSize,
+            fontSize: typography?.table?.fontSize,
             background: palette?.primary.rowHeader
           }
         }
@@ -29,8 +36,8 @@ const useStyles = makeStyles(({palette, typography}) => ({
         }
       },
       '& .MuiTableCell-root': {
-        fontSize: typography?.table.fontSize,
-        padding: typography?.table.padding,
+        fontSize: typography?.table?.fontSize,
+        padding: typography?.table?.padding,
         color: palette?.text.textPrimary
       }
     }
@@ -38,61 +45,61 @@ const useStyles = makeStyles(({palette, typography}) => ({
 }));
 
 const SpeciesCorrectResults = ({results, onClick}) => {
-  const classes = useStyles();
+
   const pageSize = 50;
   const [page, setPage] = useState(0);
 
   return (
-    <TableContainer classes={classes} component={Paper} disabled>
-      <TablePagination
-        showFirstButton
-        showLastButton
-        component="div"
-        rowsPerPageOptions={[]}
-        count={results.length}
-        rowsPerPage={pageSize}
-        page={page}
-        onPageChange={(e, p) => setPage(p)}
-      />
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell width="30%">Observable Item Name</TableCell>
-            <TableCell width="30%">Common name</TableCell>
-            <TableCell width="30%">Superseded By</TableCell>
-            <TableCell width="10%">Surveys</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {results.length > 0 ? (
-            results.slice(page * pageSize, page * pageSize + pageSize).map((r) => {
-              return (
-                <TableRow key={r.observableItemId} onClick={() => onClick(r)} style={{cursor: 'pointer'}}>
-                  <TableCell>{r.observableItemName}</TableCell>
-                  <TableCell>{r.commonName}</TableCell>
-                  <TableCell>{r.supersededBy}</TableCell>
-                  <TableCell>{r.surveyCount}</TableCell>
-                </TableRow>
-              );
-            })
-          ) : (
+      <StyledTableContainer classes={classes} component={Paper} disabled>
+        <TablePagination
+            showFirstButton
+            showLastButton
+            component="div"
+            rowsPerPageOptions={[]}
+            count={results.length}
+            rowsPerPage={pageSize}
+            page={page}
+            onPageChange={(e, p) => setPage(p)}
+        />
+        <Table>
+          <TableHead>
             <TableRow>
-              <TableCell colSpan={4}>No Results</TableCell>
+              <TableCell width="30%">Observable Item Name</TableCell>
+              <TableCell width="30%">Common name</TableCell>
+              <TableCell width="30%">Superseded By</TableCell>
+              <TableCell width="10%">Surveys</TableCell>
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <TablePagination
-        showFirstButton
-        showLastButton
-        component="div"
-        rowsPerPageOptions={[]}
-        count={results.length}
-        rowsPerPage={pageSize}
-        page={page}
-        onPageChange={(e, p) => setPage(p)}
-      />
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {results.length > 0 ? (
+                results.slice(page * pageSize, page * pageSize + pageSize).map((r) => {
+                  return (
+                      <TableRow key={r.observableItemId} onClick={() => onClick(r)} style={{cursor: 'pointer'}}>
+                        <TableCell>{r.observableItemName}</TableCell>
+                        <TableCell>{r.commonName}</TableCell>
+                        <TableCell>{r.supersededBy}</TableCell>
+                        <TableCell>{r.surveyCount}</TableCell>
+                      </TableRow>
+                  );
+                })
+            ) : (
+                <TableRow>
+                  <TableCell colSpan={4}>No Results</TableCell>
+                </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        <TablePagination
+            showFirstButton
+            showLastButton
+            component="div"
+            rowsPerPageOptions={[]}
+            count={results.length}
+            rowsPerPage={pageSize}
+            page={page}
+            onPageChange={(e, p) => setPage(p)}
+        />
+      </StyledTableContainer>
   );
 };
 

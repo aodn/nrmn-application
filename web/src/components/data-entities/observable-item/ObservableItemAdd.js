@@ -30,7 +30,7 @@ const ObservableItemAdd = () => {
         }]);
       }
       return { ...state, ...action.form };
-    };
+    }
 
     switch (action.field) {
       default:
