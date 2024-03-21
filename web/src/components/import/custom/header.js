@@ -1,6 +1,7 @@
 import React from 'react';
-import { styled } from '@mui/material/styles';
+import {styled} from '@mui/material/styles';
 import PropTypes from 'prop-types';
+
 const PREFIX = 'AgGridHeader';
 
 const classes = {
@@ -8,11 +9,8 @@ const classes = {
   invertSize: `${PREFIX}-invertSize`
 };
 
-const Root = styled('div')((
-    {
-      theme
-    }
-) => ({
+const Root = styled('div')(
+  ({theme}) => ({
   [`& .${classes.fishSize}`]: {
     color: '#c4d79b',
     borderBottom: '1px solid ' + theme.palette.divider
@@ -21,7 +19,8 @@ const Root = styled('div')((
   [`& .${classes.invertSize}`]: {
     color: '#da9694'
   }
-}));
+  })
+);
 
 const AgGridHeader = (props) => {
 

@@ -79,7 +79,7 @@ const CustomAutoCompleteInput = ({label, field, options, onChange, formData, err
                 },
               },
               // Helper text color
-              '& .MuiFormHelperText-root.Mui-error' :{
+              '& .MuiFormHelperText-root.Mui-error': {
                 color: acquireValidationColor(validate.type)
               },
             }}
