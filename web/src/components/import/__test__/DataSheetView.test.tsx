@@ -6,7 +6,6 @@ import * as axiosInstance from '../../../api/api';
 import {AxiosResponse} from 'axios';
 import DataSheetView from '../DataSheetView';
 import {extendedMeasurements, measurements} from '../../../common/constants';
-import '@testing-library/jest-dom/extend-expect';
 import eh from '../DataSheetEventHandlers';
 import {AppConstants} from '../../../common/constants';
 

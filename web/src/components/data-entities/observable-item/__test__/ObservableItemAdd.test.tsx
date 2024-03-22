@@ -1,6 +1,6 @@
 // @ts-ignore
 import React from 'react';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import ObservableItemAdd from '../ObservableItemAdd';
 import { render, waitFor, screen, fireEvent } from '@testing-library/react';
 import * as axiosInstance from '../../../../api/api';
