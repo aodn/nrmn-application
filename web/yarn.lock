@@ -11534,6 +11534,7 @@ __metadata:
     ajv: "npm:^8.12.0"
     autoprefixer: "npm:^10.4.7"
     axios: "npm:1.6.2"
+    clsx: "npm:^2.1.0"
     eslint: "npm:8.17.0"
     eslint-config-prettier: "npm:^8.5.0"
     eslint-plugin-no-console-log: "npm:^2.0.0"
