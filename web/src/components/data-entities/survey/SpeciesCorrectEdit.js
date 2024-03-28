@@ -1,5 +1,7 @@
 import React, {useCallback, useEffect} from 'react';
 
+import { styled } from '@mui/material/styles';
+
 import {Button, Box, LinearProgress} from '@mui/material';
 
 import IconButton from '@mui/material/IconButton';
@@ -19,15 +21,21 @@ import CustomSearchFilterInput from '../../input/CustomSearchFilterInput';
 import {searchSpecies, postSpeciesCorrection} from '../../../api/api';
 import {Paper} from '@mui/material';
 
-import {makeStyles} from '@mui/styles';
+const PREFIX = 'SpeciesCorrectEdit';
 
-const useStyles = makeStyles(({palette, typography}) => ({
-  root: {
+const classes = {
+  root: `${PREFIX}-root`
+};
+
+const StyledBox = styled(Box)(({
+                                 theme: {palette, typography}
+                               }) => ({
+  [`& .${classes.root}`]: {
     '& .MuiTable-root': {
       '& .MuiTableHead-root': {
         '& .MuiTableRow-head': {
           '& .MuiTableCell-head': {
-            fontSize: typography?.table.fontSize,
+            fontSize: typography?.table?.fontSize,
             background: palette?.primary.rowHeader
           }
         }
@@ -38,8 +46,8 @@ const useStyles = makeStyles(({palette, typography}) => ({
         }
       },
       '& .MuiTableCell-root': {
-        fontSize: typography?.table.fontSize,
-        padding: typography?.table.padding,
+        fontSize: typography?.table?.fontSize,
+        padding: typography?.table?.padding,
         color: palette?.text.textPrimary
       }
     }
@@ -54,7 +62,7 @@ const SpeciesCorrectEdit = ({selected, onSubmit, onError}) => {
     invertCondition: false,
     surveyIds: []
   };
-  const classes = useStyles();
+
   const pageSize = 10;
   const [page, setPage] = useState(0);
   const [detail, setDetail] = useState();
@@ -67,16 +75,16 @@ const SpeciesCorrectEdit = ({selected, onSubmit, onError}) => {
       setLoading(true);
       searchSpecies(selected.filter).then((res) => {
         const detail = res.data
-          .map((v) => ({locationName: v.locationName, siteName: v.siteName, surveyIds: JSON.parse(v.surveyIds)}))
-          .reduce((p, v) => {
-            const location = p.find((l) => l.locationName === v.locationName);
-            if (location) {
-              location.sites.push({siteName: v.siteName, surveyIds: v.surveyIds});
-            } else {
-              p.push({locationName: v.locationName, sites: [{siteName: v.siteName, surveyIds: v.surveyIds}]});
-            }
-            return p;
-          }, []);
+            .map((v) => ({locationName: v.locationName, siteName: v.siteName, surveyIds: JSON.parse(v.surveyIds)}))
+            .reduce((p, v) => {
+              const location = p.find((l) => l.locationName === v.locationName);
+              if (location) {
+                location.sites.push({siteName: v.siteName, surveyIds: v.surveyIds});
+              } else {
+                p.push({locationName: v.locationName, sites: [{siteName: v.siteName, surveyIds: v.surveyIds}]});
+              }
+              return p;
+            }, []);
         setDetail(detail);
       });
     }
@@ -101,141 +109,141 @@ const SpeciesCorrectEdit = ({selected, onSubmit, onError}) => {
   }, [surveys]);
 
   const updateCorrection =  useCallback((t) => {
-      setCorrection(c => ({...c, newObservableItemId: t?.id, newObservableItemName: t?.species}));
+    setCorrection(c => ({...c, newObservableItemId: t?.id, newObservableItemName: t?.species}));
   }, [setCorrection]);
 
   return (
-    <Box border={1} borderRadius={1} m={1} p={2} borderColor="divider">
-      <Box display="flex" flexDirection="row">
-        <Box flex={1} maxWidth={500} m={1}>
-          <Typography variant="subtitle2">Current species name</Typography>
-          <TextField fullWidth color="primary" size="small" value={selected.result.observableItemName} spellCheck={false} readOnly />
-        </Box>
-        <Box flex={1} maxWidth={500} m={1}>
-          <Typography variant="subtitle2">Correct to</Typography>
-          <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
-            <CustomSearchFilterInput
-              dataTestId='species-correction-to'
-              fullWidth
-              formData={correction?.newObservableItemName}
-              exclude={selected.result.observableItemName}
-              onChange={updateCorrection}
-            />
+      <StyledBox border={1} borderRadius={1} m={1} p={2} borderColor="divider">
+        <Box display="flex" flexDirection="row">
+          <Box flex={1} maxWidth={500} m={1}>
+            <Typography variant="subtitle2">Current species name</Typography>
+            <TextField fullWidth color="primary" size="small" value={selected.result.observableItemName} spellCheck={false} readOnly />
           </Box>
-        </Box>
-      </Box>
-      {loading ? (
-        <LinearProgress />
-      ) : (
-        <>
-          <Box display="flex" flexDirection="row-reverse">
-            <Box width={200} m={2}>
-              <Button
-                variant="contained"
-                data-testid='submit-correction-button'
-                disabled={!correction?.newObservableItemName || correction.surveyIds.length < 1}
-                onClick={() => {
-                  setLoading(true);
-                  const postDto = {...correction, filterSet: selected.filter};
-                  postSpeciesCorrection(postDto)
-                    .then((res) => {
-                      if(res.status === 200) {
-                        setCorrection({ ...initialCorrectionState});
-                        onSubmit(res.data);
-                      }
-                    })
-                    .catch((err) => {
-                      onError(err);
-                    });
-                }}
-              >
-                Submit Correction
-              </Button>
+          <Box flex={1} maxWidth={500} m={1}>
+            <Typography variant="subtitle2">Correct to</Typography>
+            <Box flexDirection={'row'} display={'flex'} alignItems={'center'}>
+              <CustomSearchFilterInput
+                  dataTestId='species-correction-to'
+                  fullWidth
+                  formData={correction?.newObservableItemName}
+                  exclude={selected.result.observableItemName}
+                  onChange={updateCorrection}
+              />
             </Box>
           </Box>
-          <TableContainer key={selected.result.observableItemId} classes={classes} component={Paper} disabled>
-            <TablePagination
-              showFirstButton
-              showLastButton
-              component="div"
-              rowsPerPageOptions={[]}
-              count={surveys?.length || 0}
-              rowsPerPage={pageSize}
-              page={page}
-              onPageChange={(e, p) => setPage(p)}
-            />
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell width="25%">Location</TableCell>
-                  <TableCell width="50%">Site</TableCell>
-                  <TableCell width="25%">Surveys</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {surveys?.slice(page * pageSize, page * pageSize + pageSize).map((d) => {
-                  return (
-                    <TableRow key={d.locationName}>
-                      <TableCell style={{verticalAlign: 'top'}}>
-                        <IconButton size="small" onClick={() => setSurveys(surveys.filter((v) => v.locationName !== d.locationName))}>
-                          <DeleteIcon fontSize="inherit" />
-                        </IconButton>
-                        <Typography variant="caption" sx={{fontWeight: 'medium'}}>
-                          {d.locationName}{' '}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        {d.sites.map((s) => {
-                          return (
-                            <Box key={s.siteName}>
-                              <Typography
-                                variant="bold"
-                                color="primary"
-                                style={{cursor: 'pointer'}}
-                                onClick={() => {
-                                  setSurveys(
-                                    surveys.map((v) => {
-                                      if (v.locationName === d.locationName) {
-                                        v.sites = v.sites.filter((v) => v.siteName !== s.siteName);
-                                      }
-                                      return v;
-                                    })
-                                  );
-                                }}
-                              >
-                                {'⨯ '}
-                              </Typography>
-                              <Typography variant="caption">{s.siteName}</Typography>
-                            </Box>
-                          );
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        {d.sites.map((s) => (
-                          <Box key={s.surveyIds[0]}>
-                            <Typography variant="caption">{s.surveyIds.length}</Typography>
-                          </Box>
-                        ))}
-                      </TableCell>
+        </Box>
+        {loading ? (
+            <LinearProgress />
+        ) : (
+            <>
+              <Box display="flex" flexDirection="row-reverse">
+                <Box width={200} m={2}>
+                  <Button
+                      variant="contained"
+                      data-testid='submit-correction-button'
+                      disabled={!correction?.newObservableItemName || correction.surveyIds.length < 1}
+                      onClick={() => {
+                        setLoading(true);
+                        const postDto = {...correction, filterSet: selected.filter};
+                        postSpeciesCorrection(postDto)
+                            .then((res) => {
+                              if(res.status === 200) {
+                                setCorrection({ ...initialCorrectionState});
+                                onSubmit(res.data);
+                              }
+                            })
+                            .catch((err) => {
+                              onError(err);
+                            });
+                      }}
+                  >
+                    Submit Correction
+                  </Button>
+                </Box>
+              </Box>
+              <TableContainer key={selected.result.observableItemId} classes={classes} component={Paper} disabled>
+                <TablePagination
+                    showFirstButton
+                    showLastButton
+                    component="div"
+                    rowsPerPageOptions={[]}
+                    count={surveys?.length || 0}
+                    rowsPerPage={pageSize}
+                    page={page}
+                    onPageChange={(e, p) => setPage(p)}
+                />
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell width="25%">Location</TableCell>
+                      <TableCell width="50%">Site</TableCell>
+                      <TableCell width="25%">Surveys</TableCell>
                     </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-            <TablePagination
-              showFirstButton
-              showLastButton
-              component="div"
-              rowsPerPageOptions={[]}
-              count={surveys?.length || 0}
-              rowsPerPage={pageSize}
-              page={page}
-              onPageChange={(e, p) => setPage(p)}
-            />
-          </TableContainer>
-        </>
-      )}
-    </Box>
+                  </TableHead>
+                  <TableBody>
+                    {surveys?.slice(page * pageSize, page * pageSize + pageSize).map((d) => {
+                      return (
+                          <TableRow key={d.locationName}>
+                            <TableCell style={{verticalAlign: 'top'}}>
+                              <IconButton size="small" onClick={() => setSurveys(surveys.filter((v) => v.locationName !== d.locationName))}>
+                                <DeleteIcon fontSize="inherit" />
+                              </IconButton>
+                              <Typography variant="caption" sx={{fontWeight: 'medium'}}>
+                                {d.locationName}{' '}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              {d.sites.map((s) => {
+                                return (
+                                    <Box key={s.siteName}>
+                                      <Typography
+                                          variant="bold"
+                                          color="primary"
+                                          style={{cursor: 'pointer'}}
+                                          onClick={() => {
+                                            setSurveys(
+                                                surveys.map((v) => {
+                                                  if (v.locationName === d.locationName) {
+                                                    v.sites = v.sites.filter((v) => v.siteName !== s.siteName);
+                                                  }
+                                                  return v;
+                                                })
+                                            );
+                                          }}
+                                      >
+                                        {'⨯ '}
+                                      </Typography>
+                                      <Typography variant="caption">{s.siteName}</Typography>
+                                    </Box>
+                                );
+                              })}
+                            </TableCell>
+                            <TableCell>
+                              {d.sites.map((s) => (
+                                  <Box key={s.surveyIds[0]}>
+                                    <Typography variant="caption">{s.surveyIds.length}</Typography>
+                                  </Box>
+                              ))}
+                            </TableCell>
+                          </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+                <TablePagination
+                    showFirstButton
+                    showLastButton
+                    component="div"
+                    rowsPerPageOptions={[]}
+                    count={surveys?.length || 0}
+                    rowsPerPage={pageSize}
+                    page={page}
+                    onPageChange={(e, p) => setPage(p)}
+                />
+              </TableContainer>
+            </>
+        )}
+      </StyledBox>
   );
 };
 
