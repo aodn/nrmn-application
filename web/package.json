@@ -10,8 +10,6 @@
     "@mui/icons-material": "^5.8.2",
     "@mui/lab": "^5.0.0-alpha.84",
     "@mui/material": "5.13.2",
-    "@mui/styles": "5.13.2",
-    "@mui/system": "^5.14.18",
     "ag-grid-community": "27.3.0",
     "ag-grid-enterprise": "27.3.0",
     "ag-grid-react": "27.3.0",

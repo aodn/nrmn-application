@@ -2,27 +2,9 @@ import React, {useReducer} from 'react';
 import {CircularProgress, TextField, Typography} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import {PropTypes} from 'prop-types';
-import { makeStyles } from '@mui/styles';
 
 export const ERROR_TYPE = {NORMAL: 0, WARNING: 1, ERROR: 2};
 
-const useStyles = value =>
-  makeStyles(() => ({
-    root: {
-      // Text in the text box color
-      '& .MuiOutlinedInput-root.Mui-error': {
-        color: acquireValidationColor(value.type),
-        // The border color on alert
-        '& fieldset': {
-          borderColor: acquireValidationColor(value.type),
-        },
-      },
-      // Helper text color
-      '& .MuiFormHelperText-root.Mui-error' :{
-        color: acquireValidationColor(value.type)
-      },
-    },
-  }));
 
 const acquireValidationColor = state => {
   switch (state) {
@@ -39,7 +21,7 @@ const CustomAutoCompleteInput = ({label, field, options, onChange, formData, err
 
   const errorReducer = (state, action) => {
     state.display = action.internalError !== undefined && warnLevelOnNewValue !== ERROR_TYPE.NORMAL ?
-      action.internalError : state.display;
+        action.internalError : state.display;
 
     if(state.display) {
       state.message = state.internalErrorMessage;
@@ -68,34 +50,46 @@ const CustomAutoCompleteInput = ({label, field, options, onChange, formData, err
     }
   };
 
-  const classes = useStyles(validate)();
 
   return options ? (
-    <>
-      <Typography variant="subtitle2">{label}</Typography>
-      <Autocomplete
-        className={classes.root}
-        options={options}
-        freeSolo
-        value={formData}
-        onBlur={(e) => onChange(e.target.value)}
-        onInputChange={(e, v)=> onInputChange(e,v)}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            size="small"
-            color="primary"
-            variant="outlined"
-            error={validate.display}
-            helperText={validate.message}/>
-        )}
-      />
-    </>
+      <>
+        <Typography variant="subtitle2">{label}</Typography>
+        <Autocomplete
+            options={options}
+            freeSolo
+            value={formData}
+            onBlur={(e) => onChange(e.target.value)}
+            onInputChange={(e, v)=> onInputChange(e,v)}
+            renderInput={(params) => (
+                <TextField
+                    {...params}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    error={validate.display}
+                    helperText={validate.message}/>
+            )}
+
+            sx={{
+              '& .MuiOutlinedInput-root.Mui-error': {
+                color: acquireValidationColor(validate.type),
+                // The border color on alert
+                '& fieldset': {
+                  borderColor: acquireValidationColor(validate.type),
+                },
+              },
+              // Helper text color
+              '& .MuiFormHelperText-root.Mui-error': {
+                color: acquireValidationColor(validate.type)
+              },
+            }}
+        />
+      </>
   ) : (
-    <>
-      <Typography variant="subtitle2">{label}</Typography>
-      <CircularProgress size={30} />
-    </>
+      <>
+        <Typography variant="subtitle2">{label}</Typography>
+        <CircularProgress size={30} />
+      </>
   );
 };
 
