@@ -154,7 +154,7 @@ const SpeciesSearch = ({onRowClick}) => {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && searchTerm?.length > AppConstants.Filter.MIN_CHAR_LENGTH_FOR_WORM_SEARCH) {
                       doSearch({ searchType: 'WORMS', species: searchTerm, includeSuperseded: true, page: 0 });
-                    };
+                    }
                   }}
               />
             </Grid>
