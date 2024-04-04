@@ -194,7 +194,7 @@ const DiverList = () => {
         <AgGridColumn
           field=""
           filter={false}
-          width="50"
+          width={50}
           editable={false}
           cellStyle={{cursor: 'pointer', textAlign: 'center'}}
           cellRenderer={() => <Delete fontSize="small" />}
