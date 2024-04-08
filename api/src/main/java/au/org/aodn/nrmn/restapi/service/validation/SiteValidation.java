@@ -92,13 +92,6 @@ public class SiteValidation {
                 return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
                         Arrays.asList(row.getId()), Arrays.asList("latitude", "longitude"));
             }
-            // If survey is less than 10 meters, warn users survey lat & lon will be removed.
-            else {
-                var message = "Survey coordinates within 10m of site (" + String.format("%.1f", distMeters) + "m). " +
-                        "The survey latitude and longitude won't be saved.";
-                return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
-                        Arrays.asList(row.getId()), Arrays.asList("latitude", "longitude"));
-            }
         }
 
         return null;

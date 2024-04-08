@@ -101,7 +101,7 @@ public class SurveyIngestionService {
 
         Optional<Survey> existingSurvey = surveyRepository.findOne(Example.of(survey));
 
-        var surveyResult = existingSurvey.orElseGet(() -> surveyRepository.save(
+        var returningSurvey = existingSurvey.orElseGet(() -> surveyRepository.save(
                 Survey.builder()
                         .locked(false)
                         .depth(stagedRow.getDepth())
@@ -119,16 +119,16 @@ public class SurveyIngestionService {
                         .build()));
 
 
-        var distance = distanceBetween(surveyResult, site);
+        var distance = distanceBetween(returningSurvey, site);
 
         // if the distance between the survey and the site(of the survey) is less than 10 meters, then treat they are at
         // the same location
         if (distance < 10d) {
-            surveyResult.setLatitude(null);
-            surveyResult.setLongitude(null);
+            returningSurvey.setLatitude(null);
+            returningSurvey.setLongitude(null);
         }
 
-        return surveyResult;
+        return returningSurvey;
     }
 
     public List<Observation> getObservations(SurveyMethodEntity surveyMethod, StagedRowFormatted stagedRow,
@@ -238,6 +238,7 @@ public class SurveyIngestionService {
         jobRepository.save(job);
     }
 
+    // A simple method for the readability of the code
     private double distanceBetween(Survey survey, Site site) {
         return SpacialUtil.getDistanceLatLongMeters(site.getLatitude(), site.getLongitude(), survey.getLatitude(), survey.getLongitude());
     }
