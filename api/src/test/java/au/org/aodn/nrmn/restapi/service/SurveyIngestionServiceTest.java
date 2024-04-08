@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.service;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -72,11 +73,19 @@ public class SurveyIngestionServiceTest {
                 .build();
 
         Diver diver = Diver.builder().initials("SAM").build();
-        rowBuilder = StagedRowFormatted.builder().block(1).method(2).diver(diver)
+        rowBuilder = StagedRowFormatted.builder().block(1).method(2)
+                .diver(diver)
                 .species(Optional.of(ObservableItem.builder().observableItemName("THE SPECIES").build()))
-                .site(Site.builder().siteCode("A SITE").isActive(false).build()).depth(1).surveyNum(2)
-                .direction(Directions.N).vis(Optional.of(15.5)).date(LocalDate.of(2003, 03, 03))
-                .time(Optional.of(LocalTime.of(12, 34, 56))).pqs(diver).isInvertSizing(true).code("AAA")
+                .site(Site.builder().siteCode("A SITE").isActive(false).latitude(12.34567).longitude(-9.87654).build())
+                .depth(1)
+                .surveyNum(2)
+                .direction(Directions.N)
+                .vis(Optional.of(15.5))
+                .date(LocalDate.of(2003, 03, 03))
+                .time(Optional.of(LocalTime.of(12, 34, 56)))
+                .pqs(diver)
+                .isInvertSizing(true)
+                .code("AAA")
                 .inverts(0)
                 .measureJson(ImmutableMap.<Integer, Integer>builder().put(1, 4).put(3, 7).build()).ref(ref);
     }
@@ -87,7 +96,6 @@ public class SurveyIngestionServiceTest {
         when(siteRepo.save(any())).then(s -> s.getArgument(0));
 
         var row = rowBuilder.build();
-
         var survey = surveyIngestionService.getSurvey(row.getRef().getStagedJob().getProgram(), OptionalDouble.of(15.5), row);
 
         assertEquals(1, survey.getDepth());
@@ -97,6 +105,33 @@ public class SurveyIngestionServiceTest {
         assertEquals(15.5, survey.getVisibility());
         assertEquals("2003-03-03", survey.getSurveyDate().toString());
         assertEquals("12:34:56", survey.getSurveyTime().toString());
+    }
+
+
+    /**
+     * If Survey location is within 10 metres of the site location, remove the location information (latitude and longitude)
+     * If Survey location is more than 10 metres from the site location, keep the location information (latitude and longitude)
+     */
+    @Test
+    void testSurveyLocationChecking() {
+        when(surveyRepository.save(any())).then(s -> s.getArgument(0));
+        when(siteRepo.save(any())).then(s -> s.getArgument(0));
+
+        var row = rowBuilder.build();
+        row.setLatitude(12.34566);
+        row.setLongitude(-9.87655);
+        var survey1 = surveyIngestionService.getSurvey(row.getRef().getStagedJob().getProgram(), OptionalDouble.of(15.5), row);
+
+        // if within 10 metres, latitude and longitude should be removed
+        assertNull(survey1.getLatitude());
+        assertNull(survey1.getLongitude());
+
+        // if outside 10 metres, latitude and longitude should be kept
+        row.setLatitude(33.33);
+        row.setLongitude(44.44);
+        var survey2 = surveyIngestionService.getSurvey(row.getRef().getStagedJob().getProgram(), OptionalDouble.of(15.5), row);
+        assertEquals(33.33, survey2.getLatitude());
+        assertEquals(44.44, survey2.getLongitude());
     }
 
     /**

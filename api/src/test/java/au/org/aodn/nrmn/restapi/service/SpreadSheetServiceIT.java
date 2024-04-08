@@ -154,8 +154,8 @@ public class SpreadSheetServiceIT {
         StagedRow obs1 = stageSurveys.get(0);
 
         // Test Double
-        assertEquals(obs1.getLatitude(), "-41.25370");
-        assertEquals(obs1.getLongitude(), "148.33974");
+        assertEquals("-41.25371", obs1.getLatitude());
+        assertEquals("148.33975", obs1.getLongitude());
 
         // Test Map filling
         assertEquals(obs1.getMeasureJson().size(), 4);
@@ -170,8 +170,8 @@ public class SpreadSheetServiceIT {
 
         // Test second row
         StagedRow obs2 = stageSurveys.get(1);
-        assertEquals("-41.25370", obs2.getLatitude(), "Row 4 latitude");
-        assertEquals("148.33974", obs2.getLongitude(), "Row 4 longitude");
+        assertEquals("-41.25371", obs2.getLatitude(), "Row 4 latitude");
+        assertEquals("148.33975", obs2.getLongitude(), "Row 4 longitude");
 
         assertEquals(obs1.getMeasureJson().size(), 4);
         assertFalse(obs2.getMeasureJson().containsKey(SurveyField.TWO_FIVE.getPosition()), "Row 4 no measurement at 2.5");
@@ -206,16 +206,16 @@ public class SpreadSheetServiceIT {
     }
 
     @Test
-    void locationShouldBeTrucatedTo5Decimals() throws Exception {
+    void locationShouldBeRoundedTo5Decimals() throws Exception {
         FileSystemResource file = new FileSystemResource("src/test/resources/sheets/locationFormat.xlsx");
         MockMultipartFile mockFile = new MockMultipartFile("sheets/locationFormat.xlsx", file.getInputStream());
         List<StagedRow> stageSurveys = sheetService.stageXlsxFile(mockFile, false).getStagedRows();
 
-        assertEquals("-123.12345", stageSurveys.get(0).getLatitude());
+        assertEquals("-123.12346", stageSurveys.get(0).getLatitude());
         assertEquals("12.1234", stageSurveys.get(0).getLongitude());
 
         assertEquals("-12.12345", stageSurveys.get(3).getLatitude());
-        assertEquals("12.12345", stageSurveys.get(3).getLongitude());
+        assertEquals("12.12346", stageSurveys.get(3).getLongitude());
 
         assertEquals("-1", stageSurveys.get(6).getLatitude());
         assertEquals("1", stageSurveys.get(6).getLongitude());

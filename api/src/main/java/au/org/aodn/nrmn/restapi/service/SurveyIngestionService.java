@@ -18,6 +18,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
+import au.org.aodn.nrmn.restapi.util.SpacialUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -100,7 +101,7 @@ public class SurveyIngestionService {
 
         Optional<Survey> existingSurvey = surveyRepository.findOne(Example.of(survey));
 
-        return existingSurvey.orElseGet(() -> surveyRepository.save(
+        var surveyResult = existingSurvey.orElseGet(() -> surveyRepository.save(
                 Survey.builder()
                         .locked(false)
                         .depth(stagedRow.getDepth())
@@ -116,6 +117,18 @@ public class SurveyIngestionService {
                         .latitude(stagedRow.getLatitude())
                         .pqDiverId(stagedRow.getPqs() != null ? stagedRow.getPqs().getDiverId() : null)
                         .build()));
+
+
+        var distance = distanceBetween(surveyResult, site);
+
+        // if the distance between the survey and the site(of the survey) is less than 10 meters, then treat they are at
+        // the same location
+        if (distance < 10d) {
+            surveyResult.setLatitude(null);
+            surveyResult.setLongitude(null);
+        }
+
+        return surveyResult;
     }
 
     public List<Observation> getObservations(SurveyMethodEntity surveyMethod, StagedRowFormatted stagedRow,
@@ -223,5 +236,9 @@ public class SurveyIngestionService {
         job.setStatus(StatusJobType.INGESTED);
         job.setSurveyIds(surveyIds);
         jobRepository.save(job);
+    }
+
+    private double distanceBetween(Survey survey, Site site) {
+        return SpacialUtil.getDistanceLatLongMeters(site.getLatitude(), site.getLongitude(), survey.getLatitude(), survey.getLongitude());
     }
 }
