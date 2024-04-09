@@ -101,34 +101,34 @@ public class SurveyIngestionService {
 
         Optional<Survey> existingSurvey = surveyRepository.findOne(Example.of(survey));
 
-        var returningSurvey = existingSurvey.orElseGet(() -> surveyRepository.save(
-                Survey.builder()
-                        .locked(false)
-                        .depth(stagedRow.getDepth())
-                        .surveyNum(stagedRow.getSurveyNum())
-                        .direction(stagedRow.getDirection() != null ? stagedRow.getDirection().toString() : null)
-                        .site(site).surveyDate(Date.valueOf(stagedRow.getDate()))
-                        .surveyTime(Time.valueOf(stagedRow.getTime().orElse(LocalTime.NOON)))
-                        .visibility(visAvg.isPresent() ? visAvg.getAsDouble() : null)
-                        .program(stagedRow.getRef().getStagedJob().getProgram())
-                        .protectionStatus(site.getProtectionStatus())
-                        .insideMarinePark(StringUtils.isNotBlank(site.getMpa()) ? "Yes" : "No")
-                        .longitude(stagedRow.getLongitude())
-                        .latitude(stagedRow.getLatitude())
-                        .pqDiverId(stagedRow.getPqs() != null ? stagedRow.getPqs().getDiverId() : null)
-                        .build()));
 
+        var distance = SpacialUtil.getDistanceLatLongMeters(
+                stagedRow.getLatitude(), stagedRow.getLongitude(),
+                site.getLatitude(), site.getLongitude()
+        );
 
-        var distance = distanceBetween(returningSurvey, site);
+        return existingSurvey.orElseGet(
+                () -> surveyRepository.save(
+                        Survey.builder()
+                                .locked(false)
+                                .depth(stagedRow.getDepth())
+                                .surveyNum(stagedRow.getSurveyNum())
+                                .direction(stagedRow.getDirection() != null ? stagedRow.getDirection().toString() : null)
+                                .site(site).surveyDate(Date.valueOf(stagedRow.getDate()))
+                                .surveyTime(Time.valueOf(stagedRow.getTime().orElse(LocalTime.NOON)))
+                                .visibility(visAvg.isPresent() ? visAvg.getAsDouble() : null)
+                                .program(stagedRow.getRef().getStagedJob().getProgram())
+                                .protectionStatus(site.getProtectionStatus())
+                                .insideMarinePark(StringUtils.isNotBlank(site.getMpa()) ? "Yes" : "No")
 
-        // if the distance between the survey and the site(of the survey) is less than 10 meters, then treat they are at
-        // the same location
-        if (distance < 10d) {
-            returningSurvey.setLatitude(null);
-            returningSurvey.setLongitude(null);
-        }
-
-        return returningSurvey;
+                                // if the distance between the survey and the site(of the survey) is less than 10 meters,
+                                // then consider they are at the same location and the survey lat & lon will be null
+                                .longitude(distance < 10? null : stagedRow.getLongitude())
+                                .latitude(distance < 10? null : stagedRow.getLatitude())
+                                .pqDiverId(stagedRow.getPqs() != null ? stagedRow.getPqs().getDiverId() : null)
+                                .build()
+                )
+        );
     }
 
     public List<Observation> getObservations(SurveyMethodEntity surveyMethod, StagedRowFormatted stagedRow,
@@ -238,8 +238,5 @@ public class SurveyIngestionService {
         jobRepository.save(job);
     }
 
-    // A simple method for the readability of the code
-    private double distanceBetween(Survey survey, Site site) {
-        return SpacialUtil.getDistanceLatLongMeters(site.getLatitude(), site.getLongitude(), survey.getLatitude(), survey.getLongitude());
-    }
+
 }
