@@ -1,5 +1,5 @@
 import React from 'react';
-import { styled } from '@mui/material/styles';
+import {styled} from '@mui/material/styles';
 import {PropTypes} from 'prop-types';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
@@ -8,16 +8,10 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
 
-const PREFIX = 'SpeciesCorrectErrorResults';
-
-const classes = {
-  root: `${PREFIX}-root`
-};
-
 const StyledTableContainer = styled(TableContainer)(({
                                                        theme: {palette, typography}
                                                      }) => ({
-  [`& .${classes.root}`]: {
+  [`& .SpeciesCorrectErrorResults-root`]: {
     '& .MuiTable-root': {
       '& .MuiTableHead-root': {
         '& .MuiTableRow-head': {
@@ -45,7 +39,7 @@ const SpeciesCorrectErrorResults = ({correctionErrors}) => {
 
 
   return (
-      <StyledTableContainer classes={classes} data-testid='species-correct-error-result'>
+      <StyledTableContainer classes={{root: `SpeciesCorrectErrorResults-root`}} data-testid='species-correct-error-result'>
         <Table>
           <TableHead>
             <TableRow>

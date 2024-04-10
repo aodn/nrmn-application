@@ -1,24 +1,16 @@
 import React from 'react';
-import { styled } from '@mui/material/styles';
+import {styled} from '@mui/material/styles';
 import PropTypes from 'prop-types';
-const PREFIX = 'GridHeader';
 
-const classes = {
-  fishSize: `${PREFIX}-fishSize`,
-  invertSize: `${PREFIX}-invertSize`
-};
 
-const Root = styled('div')((
-    {
-      theme
-    }
+const Root = styled('div')(({theme}
 ) => ({
-  [`& .${classes.fishSize}`]: {
+  [`& .GridHeader-fishSize`]: {
     color: '#c4d79b',
     borderBottom: '1px solid ' + theme.palette.divider
   },
 
-  [`& .${classes.invertSize}`]: {
+  [`& .GridHeader-invertSize`]: {
     color: '#da9694'
   }
 }));
@@ -33,8 +25,8 @@ const GridHeader = (props) => {
   return (
       <Root style={{width: '100%'}}>
         <div style={{float: 'left'}} onClick={(event) => onSortRequested(props.column.isSortAscending() ? 'desc' : 'asc', event)}>
-          <div className={classes.fishSize}>{props.fishSize}</div>
-          <div className={classes.invertSize}>{props.invertSize}</div>
+          <div className={`GridHeader-fishSize`}>{props.fishSize}</div>
+          <div className={`GridHeader-invertSize`}>{props.invertSize}</div>
         </div>
       </Root>
   );
