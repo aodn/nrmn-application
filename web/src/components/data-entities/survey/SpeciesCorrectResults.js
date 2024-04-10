@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { styled } from '@mui/material/styles';
+import {styled} from '@mui/material/styles';
 import {PropTypes} from 'prop-types';
 
 import Table from '@mui/material/Table';
@@ -11,16 +11,10 @@ import TableRow from '@mui/material/TableRow';
 import TablePagination from '@mui/material/TablePagination';
 import {Paper} from '@mui/material';
 
-const PREFIX = 'SpeciesCorrectResults';
-
-const classes = {
-  root: `${PREFIX}-root`
-};
-
 const StyledTableContainer = styled(TableContainer)(({
                                                        theme: {palette, typography}
                                                      }) => ({
-  [`& .${classes.root}`]: {
+  [`& . SpeciesCorrectResults-root`]: {
     '& .MuiTable-root': {
       '& .MuiTableHead-root': {
         '& .MuiTableRow-head': {
@@ -50,7 +44,9 @@ const SpeciesCorrectResults = ({results, onClick}) => {
   const [page, setPage] = useState(0);
 
   return (
-      <StyledTableContainer classes={classes} component={Paper} disabled>
+      <StyledTableContainer classes={{
+        root: `SpeciesCorrectResults-root`
+      }} component={Paper} disabled>
         <TablePagination
             showFirstButton
             showLastButton

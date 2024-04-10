@@ -1,15 +1,14 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
-import { styled } from '@mui/material/styles';
+import {styled} from '@mui/material/styles';
 
-import {Button, Box, LinearProgress} from '@mui/material';
+import {Box, Button, LinearProgress, Paper} from '@mui/material';
 
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Close';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import PropTypes from 'prop-types';
-import {useState} from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -18,19 +17,12 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TablePagination from '@mui/material/TablePagination';
 import CustomSearchFilterInput from '../../input/CustomSearchFilterInput';
-import {searchSpecies, postSpeciesCorrection} from '../../../api/api';
-import {Paper} from '@mui/material';
-
-const PREFIX = 'SpeciesCorrectEdit';
-
-const classes = {
-  root: `${PREFIX}-root`
-};
+import {postSpeciesCorrection, searchSpecies} from '../../../api/api';
 
 const StyledBox = styled(Box)(({
                                  theme: {palette, typography}
                                }) => ({
-  [`& .${classes.root}`]: {
+  [`& .SpeciesCorrectEdit-root`]: {
     '& .MuiTable-root': {
       '& .MuiTableHead-root': {
         '& .MuiTableRow-head': {
@@ -161,7 +153,9 @@ const SpeciesCorrectEdit = ({selected, onSubmit, onError}) => {
                   </Button>
                 </Box>
               </Box>
-              <TableContainer key={selected.result.observableItemId} classes={classes} component={Paper} disabled>
+              <TableContainer key={selected.result.observableItemId} classes={{
+                root: `SpeciesCorrectEdit-root`
+              }} component={Paper} disabled>
                 <TablePagination
                     showFirstButton
                     showLastButton
