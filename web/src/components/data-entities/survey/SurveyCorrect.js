@@ -69,6 +69,7 @@ const SurveyCorrect = () => {
   const [redirect, setRedirect] = useState();
   const [undoSize, setUndoSize] = useState(0);
   const [metadata, setMetadata] = useState({programName: 'NONE', surveyIds: []});
+  const [hasPassedValidation, setHasPassedValidation] = useState(false);
 
   useEffect(() => {
     document.title = 'Survey Correction';
@@ -298,7 +299,9 @@ const SurveyCorrect = () => {
 
     const bodyDto = {...metadata, rows: packedData(api)};
     const result = await validateSurveyCorrection(surveyId, bodyDto);
-    setValidationResult(result.data.errors);
+    const errors = result.data.errors;
+    setValidationResult(errors);
+    setHasPassedValidation(errors && errors.filter((res) => res.levelId === 'BLOCKING').length < 1);
     context.validations = result.data.errors;
     context.diffSummary = result.data.summary;
     setLoading(false);
@@ -338,8 +341,6 @@ const SurveyCorrect = () => {
     const result = await submitSurveyCorrection(surveyId, {...metadata, rows: packedData(gridRef.current.api)});
     setRedirect(`/data/job/${result.data}/view`);
   };
-
-  const canSubmitCorrection = validationResult && validationResult.filter((res) => res.levelId === 'BLOCKING').length < 1;
 
   if (redirect) return <Navigate push to={redirect} />;
 
@@ -404,7 +405,12 @@ const SurveyCorrect = () => {
               </Button>
             </Box>
             <Box p={1} minWidth={180}>
-              <Button onClick={onSubmit} variant="contained" disabled={!editMode || loading} startIcon={<CloudUploadIcon />}>
+              <Button
+                onClick={onSubmit}
+                variant="contained"
+                disabled={!editMode || loading || !hasPassedValidation}
+                startIcon={<CloudUploadIcon />}
+              >
                 Submit Correction
               </Button>
             </Box>
@@ -487,7 +493,7 @@ const SurveyCorrect = () => {
           justifyContent="center"
           flexDirection="column"
         >
-          {canSubmitCorrection ? (
+          {hasPassedValidation ? (
             <>
               <Box>
                 <Typography variant="h5">Confirm Survey Data Correction?</Typography>
@@ -510,7 +516,7 @@ const SurveyCorrect = () => {
             <Button sx={{width: '25px', marginLeft: '20%'}} variant="outlined" onClick={() => setEditMode(true)}>
               Cancel
             </Button>
-            <Button sx={{width: '50%', marginLeft: '10px'}} variant="contained" disabled={!canSubmitCorrection} onClick={onSubmitConfirm}>
+            <Button sx={{width: '50%', marginLeft: '10px'}} variant="contained" disabled={!hasPassedValidation} onClick={onSubmitConfirm}>
               Apply Correction
             </Button>
           </Box>
