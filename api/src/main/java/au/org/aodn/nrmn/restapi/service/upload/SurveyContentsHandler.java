@@ -131,13 +131,20 @@ public class SurveyContentsHandler implements SheetContentsHandler {
         }
     }
 
-    private String truncateDecimalString(String decimalString) {
-        int idx = decimalString.indexOf('.');
-        int endIdx = idx + 6;
-        if (idx >= 0 && endIdx < decimalString.length())
-            return decimalString.substring(0, endIdx);
-        else
+
+    private static String roundDecimalString(String decimalString) {
+        try {
+            var doubleValue = Double.parseDouble(decimalString);
+            var roundedValue = Math.round(doubleValue * 100000.0) / 100000.0;
+
+            // if the value is an integer, return it as an integer (otherwise it will be returned as a double with a .0 at the end)
+            if (roundedValue == Math.floor(roundedValue)) {
+                return String.valueOf((int) roundedValue);
+            }
+            return Double.toString(roundedValue);
+        } catch (NumberFormatException e) {
             return decimalString;
+        }
     }
 
     private void setValue(SurveyField columnHeader, String formattedValue) {
@@ -162,10 +169,10 @@ public class SurveyContentsHandler implements SheetContentsHandler {
                 currentRow.setSiteName(value);
                 break;
             case LATITUDE:
-                currentRow.setLatitude(truncateDecimalString(value));
+                currentRow.setLatitude(roundDecimalString(value));
                 break;
             case LONGITUDE:
-                currentRow.setLongitude(truncateDecimalString(value));
+                currentRow.setLongitude(roundDecimalString(value));
                 break;
             case DATE:
                 currentRow.setDate(value);
