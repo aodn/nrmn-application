@@ -192,6 +192,14 @@ public class DataValidation {
                 errors.add(rowId, ValidationLevel.BLOCKING, "longitude",
                         (latitude == INVALID_DOUBLE) ? "Longitude is not number" : "Longitude is out of bounds");
 
+            // if more than 5 decimals, add warning;
+            if (row.getLatitude().split("\\.")[1].length() > 5) {
+                errors.add(rowId, ValidationLevel.WARNING, "latitude", "Latitude will be rounded to 5 decimal places");
+            }
+            if (row.getLongitude().split("\\.")[1].length() > 5) {
+                errors.add(rowId, ValidationLevel.WARNING, "longitude", "Longitude will be rounded to 5 decimal places");
+            }
+
             // Date
             try {
                 LocalDate.parse(row.getDate(), TimeUtils.getRowDateFormatter());

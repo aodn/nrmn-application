@@ -10,6 +10,7 @@ import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.enums.SurveyField;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.math3.util.Precision;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
@@ -132,10 +133,10 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     }
 
 
-    private static String roundDecimalString(String decimalString) {
+    private String roundDecimalString(String decimalString) {
         try {
             var doubleValue = Double.parseDouble(decimalString);
-            var roundedValue = Math.round(doubleValue * 100000.0) / 100000.0;
+            var roundedValue = Precision.round(doubleValue, 5);
 
             // if the value is an integer, return it as an integer (otherwise it will be returned as a double with a .0 at the end)
             if (roundedValue == Math.floor(roundedValue)) {

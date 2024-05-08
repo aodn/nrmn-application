@@ -6,8 +6,10 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import au.org.aodn.nrmn.restapi.util.SpacialUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.math3.util.Precision;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -399,6 +401,7 @@ public class CorrectionController {
             var results = mapRows(rows);
             var result = validate(programValidation, surveyIds, results).getAll();
             var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
+            var validatedMappedRows = validateLatLon(mappedRows);
             var blockingErrors = result.stream().filter(r -> r.getLevelId() == ValidationLevel.BLOCKING)
                     .collect(Collectors.toList());
 
@@ -409,7 +412,7 @@ public class CorrectionController {
 
             var summary = surveyCorrectionService.diffSurveyCorrections(surveyIds, rows);
 
-            surveyCorrectionService.correctSurvey(job, surveyIds, mappedRows);
+            surveyCorrectionService.correctSurvey(job, surveyIds, validatedMappedRows);
 
             try {
 
@@ -449,6 +452,26 @@ public class CorrectionController {
         }
 
         return ResponseEntity.ok().body(job.getId());
+    }
+
+    private List<StagedRowFormatted> validateLatLon(List<StagedRowFormatted> mappedRows) {
+        if (mappedRows == null || mappedRows.isEmpty()) {
+            return mappedRows;
+        }
+        var resultRows = new ArrayList<StagedRowFormatted>();
+        for (var row : mappedRows) {
+            row.setLatitude(Precision.round(row.getLatitude(), 5));
+            row.setLongitude(Precision.round(row.getLongitude(), 5));
+
+            var site = row.getSite();
+            var distance = SpacialUtil.getDistanceLatLongMeters(site.getLatitude(), site.getLongitude(), row.getLatitude(), row.getLongitude());
+            if (distance < 10) {
+                row.setLatitude(null);
+                row.setLongitude(null);
+            }
+            resultRows.add(row);
+        }
+        return resultRows;
     }
 
     @DeleteMapping("correct/{id}")

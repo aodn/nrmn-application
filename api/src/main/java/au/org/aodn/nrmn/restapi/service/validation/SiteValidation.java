@@ -24,7 +24,7 @@ public class SiteValidation {
 
     @Autowired
     SiteRepository siteRepository;
-    
+
     @Autowired
     MeowRegionsRepository meowRegionsRepository;
 
@@ -59,7 +59,7 @@ public class SiteValidation {
     private Collection<SurveyValidationError> checkSites(Map<Integer, List<StagedRowFormatted>> siteMap) {
 
         var res = new ValidationResultSet();
-        
+
         // VALIDATION: MEOW ecoregion
         for (var siteRows : siteMap.entrySet())
             res.add(validateSpeciesEcoregion(siteRows.getKey(), siteRows.getValue()));
@@ -72,7 +72,7 @@ public class SiteValidation {
 
         var siteMap = mappedRows.stream().filter(r -> Objects.nonNull(r.getSite()))
                 .collect(Collectors.groupingBy(r -> r.getSite().getSiteId()));
-                
+
         sheetErrors.addAll(checkSites(siteMap));
 
         return sheetErrors;
@@ -92,6 +92,13 @@ public class SiteValidation {
                 return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
                         Arrays.asList(row.getId()), Arrays.asList("latitude", "longitude"));
             }
+            if (distMeters < 10) {
+                var message = "Survey coordinates less than 10m from site (" + String.format("%.1f", distMeters) + "m). " +
+                        "This row will use the site's coordinates.";
+                return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
+                        Arrays.asList(row.getId()), Arrays.asList("latitude", "longitude"));
+            }
+
         }
 
         return null;
