@@ -428,6 +428,30 @@ class CorrectionsControllerIT {
         assertTrue("Diver does not exist", e.get(7).getMessage().equals("Diver does not exist"));
         assertTrue("Survey IDs missing: 812331346", e.get(8).getMessage().equals("Survey IDs missing: 812331346"));
         assertTrue("Row has no data and no value recorded for inverts", e.get(9).getMessage().equals("Row has no data and no value recorded for inverts"));
+
+
+        // Another request for testing lat & lon
+        stagedRow.setLatitude("-14.1596212121");
+        stagedRow.setLongitude("-169.6816212121");
+        var response2 = reqBuilder
+                .withUri(uri)
+                .withToken(token)
+                .withEntity(d)
+                .withMethod(HttpMethod.POST)
+                .withContentType(MediaType.APPLICATION_JSON)
+                .withParams(param)
+                .withResponseType(ValidationResponse.class)
+                .build(testRestTemplate);
+
+        assertEquals(HttpStatus.OK, response2.getStatusCode());
+
+        var body2 = response2.getBody();
+        assertNotNull(body2);
+        var e2 = (List<SurveyValidationError>) body2.getErrors();
+        assertTrue("Latitude is not rounded to 5 decimal places",
+                e2.stream().anyMatch( x -> x.getMessage().contains("Latitude will be rounded to 5 decimal places")));
+        assertTrue("Longitude is not rounded to 5 decimal places",
+                e2.stream().anyMatch(x -> x.getMessage().contains("Longitude will be rounded to 5 decimal places")));
     }
     @Test
     @WithUserDetails("test@example.com")
@@ -563,6 +587,7 @@ class CorrectionsControllerIT {
         var body = response.getBody();
         assertTrue("Correct alert message", Objects.nonNull(body) && body.contains("Deletion Failed. PQs catalogued for this survey."));
     }
+
     @Test
     @WithUserDetails("test@example.com")
     public void testSpeciesSearch() throws Exception {

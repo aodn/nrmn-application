@@ -182,21 +182,20 @@ public class DataValidation {
 
             // Latitude
             var latitude = NumberUtils.toDouble(row.getLatitude(), INVALID_DOUBLE);
-            if (latitude < -90.0 || 90.0 < latitude || latitude == INVALID_DOUBLE)
+            if (latitude < -90.0 || 90.0 < latitude || latitude == INVALID_DOUBLE) {
                 errors.add(rowId, ValidationLevel.BLOCKING, "latitude",
                         (latitude == INVALID_DOUBLE) ? "Latitude is not number" : "Latitude is out of bounds");
+            } else if (hasMoreThanFiveDecimals(latitude)) {
+                errors.add(rowId, ValidationLevel.WARNING, "latitude", "Latitude will be rounded to 5 decimal places");
+            }
+
 
             // Longitude
             var longitude = NumberUtils.toDouble(row.getLongitude(), INVALID_DOUBLE);
-            if (longitude < -180 || 180 < longitude || longitude == INVALID_DOUBLE)
+            if (longitude < -180 || 180 < longitude || longitude == INVALID_DOUBLE) {
                 errors.add(rowId, ValidationLevel.BLOCKING, "longitude",
                         (latitude == INVALID_DOUBLE) ? "Longitude is not number" : "Longitude is out of bounds");
-
-            // if more than 5 decimals, add warning;
-            if (row.getLatitude().split("\\.")[1].length() > 5) {
-                errors.add(rowId, ValidationLevel.WARNING, "latitude", "Latitude will be rounded to 5 decimal places");
-            }
-            if (row.getLongitude().split("\\.")[1].length() > 5) {
+            } else if (hasMoreThanFiveDecimals(longitude)) {
                 errors.add(rowId, ValidationLevel.WARNING, "longitude", "Longitude will be rounded to 5 decimal places");
             }
 
@@ -291,5 +290,15 @@ public class DataValidation {
 
         return errors.getAll();
     }
+
+
+    private boolean hasMoreThanFiveDecimals(double number) {
+        String text = Double.toString(Math.abs(number));
+        int integerPlaces = text.indexOf('.');
+        int decimalPlaces = text.length() - integerPlaces - 1;
+        return decimalPlaces > 5;
+    }
+
+
 
 }

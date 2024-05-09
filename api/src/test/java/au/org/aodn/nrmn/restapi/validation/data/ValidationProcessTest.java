@@ -25,7 +25,7 @@ import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 
 @ExtendWith(MockitoExtension.class)
 class ValidationProcessTest {
-    
+
     @Mock
     ObservationRepository observationRepository;
 
@@ -156,13 +156,13 @@ class ValidationProcessTest {
         StagedJob job = new StagedJob();
         job.setId(1L);
         StagedRow row = new StagedRow();
-        row.setLongitude("-67.192519");
+        row.setLongitude("-67.19219");
         row.setStagedJob(job);
         Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, job.getIsExtendedSize(), true, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("Longitude")));
     }
 
-    
+
     @Test
     void incorrectDateFormatShouldFail() {
         StagedJob job = new StagedJob();
@@ -195,8 +195,8 @@ class ValidationProcessTest {
         Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, job.getIsExtendedSize(), true, Arrays.asList(), Arrays.asList(), Arrays.asList(row));
         assertFalse(errors.stream().anyMatch(e -> e.getMessage().contains("Date format is not valid")));
     }
-    
-    
+
+
     @Test
     void stringNoisValid() {
         StagedJob job = new StagedJob();

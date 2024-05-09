@@ -454,25 +454,6 @@ public class CorrectionController {
         return ResponseEntity.ok().body(job.getId());
     }
 
-    private List<StagedRowFormatted> validateLatLon(List<StagedRowFormatted> mappedRows) {
-        if (mappedRows == null || mappedRows.isEmpty()) {
-            return mappedRows;
-        }
-        var resultRows = new ArrayList<StagedRowFormatted>();
-        for (var row : mappedRows) {
-            row.setLatitude(Precision.round(row.getLatitude(), 5));
-            row.setLongitude(Precision.round(row.getLongitude(), 5));
-
-            var site = row.getSite();
-            var distance = SpacialUtil.getDistanceLatLongMeters(site.getLatitude(), site.getLongitude(), row.getLatitude(), row.getLongitude());
-            if (distance < 10) {
-                row.setLatitude(null);
-                row.setLongitude(null);
-            }
-            resultRows.add(row);
-        }
-        return resultRows;
-    }
 
     @DeleteMapping("correct/{id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
@@ -662,5 +643,27 @@ public class CorrectionController {
 
         result.setJobId(job.getId());
         return ResponseEntity.ok().body(result);
+    }
+
+
+    private List<StagedRowFormatted> validateLatLon(List<StagedRowFormatted> mappedRows) {
+        if (mappedRows == null || mappedRows.isEmpty()) {
+            return mappedRows;
+        }
+        var resultRows = new ArrayList<StagedRowFormatted>();
+        for (var row : mappedRows) {
+            var site = row.getSite();
+            var distance = SpacialUtil.getDistanceLatLongMeters(site.getLatitude(), site.getLongitude(), row.getLatitude(), row.getLongitude());
+
+            if (distance < 10) {
+                row.setLatitude(null);
+                row.setLongitude(null);
+            } else {
+                row.setLatitude(Precision.round(row.getLatitude(), 5));
+                row.setLongitude(Precision.round(row.getLongitude(), 5));
+            }
+            resultRows.add(row);
+        }
+        return resultRows;
     }
 }
