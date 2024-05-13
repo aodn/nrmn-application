@@ -1,20 +1,20 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 
 import au.org.aodn.nrmn.restapi.data.model.Site;
 import au.org.aodn.nrmn.restapi.service.validation.SiteValidation;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+
 class SurveyAtSiteTest extends FormattedTestProvider {
 
     @InjectMocks
     SiteValidation siteValidation;
-    
+
     @Test
     void sameCoordsShouldSucceed() {
         var formatted = getDefaultFormatted().build();
@@ -24,7 +24,8 @@ class SurveyAtSiteTest extends FormattedTestProvider {
 
         formatted.setSite(Site.builder().siteCode("A SITE").latitude( -42.886410468013004).longitude(147.33520415427964).build());
         var error = siteValidation.validateSurveyAtSite(formatted);
-        assertNull(error);
+        assertNotEquals(error.getLevelId(), ValidationLevel.BLOCKING);
+        assertTrue(error.getMessage().contains("This row will use the site's coordinates"));
     }
 
     @Test
@@ -47,5 +48,4 @@ class SurveyAtSiteTest extends FormattedTestProvider {
         assertTrue(error.getColumnNames().contains("latitude"));
         assertTrue(error.getColumnNames().contains("longitude"));
     }
-
 }

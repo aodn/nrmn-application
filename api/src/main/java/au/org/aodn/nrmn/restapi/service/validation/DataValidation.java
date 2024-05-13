@@ -32,6 +32,9 @@ import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.util.TimeUtils;
 
+import static au.org.aodn.nrmn.restapi.util.NumberUtils.getDecimalCount;
+import static au.org.aodn.nrmn.restapi.util.Constants.COORDINATE_VALID_DECIMAL_COUNT;
+
 @Service
 public class DataValidation {
 
@@ -182,15 +185,22 @@ public class DataValidation {
 
             // Latitude
             var latitude = NumberUtils.toDouble(row.getLatitude(), INVALID_DOUBLE);
-            if (latitude < -90.0 || 90.0 < latitude || latitude == INVALID_DOUBLE)
+            if (latitude < -90.0 || 90.0 < latitude || latitude == INVALID_DOUBLE) {
                 errors.add(rowId, ValidationLevel.BLOCKING, "latitude",
                         (latitude == INVALID_DOUBLE) ? "Latitude is not number" : "Latitude is out of bounds");
+            } else if (needsToRound(latitude)) {
+                errors.add(rowId, ValidationLevel.WARNING, "latitude", "Latitude will be rounded to 5 decimal places");
+            }
+
 
             // Longitude
             var longitude = NumberUtils.toDouble(row.getLongitude(), INVALID_DOUBLE);
-            if (longitude < -180 || 180 < longitude || longitude == INVALID_DOUBLE)
+            if (longitude < -180 || 180 < longitude || longitude == INVALID_DOUBLE) {
                 errors.add(rowId, ValidationLevel.BLOCKING, "longitude",
                         (latitude == INVALID_DOUBLE) ? "Longitude is not number" : "Longitude is out of bounds");
+            } else if (needsToRound(longitude)) {
+                errors.add(rowId, ValidationLevel.WARNING, "longitude", "Longitude will be rounded to 5 decimal places");
+            }
 
             // Date
             try {
@@ -284,4 +294,8 @@ public class DataValidation {
         return errors.getAll();
     }
 
+    private boolean needsToRound(double number) {
+        int decimalPlaces = getDecimalCount(number);
+        return decimalPlaces > COORDINATE_VALID_DECIMAL_COUNT;
+    }
 }

@@ -6,8 +6,10 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import au.org.aodn.nrmn.restapi.util.SpacialUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.math3.util.Precision;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +68,9 @@ import au.org.aodn.nrmn.restapi.util.ObjectUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import static au.org.aodn.nrmn.restapi.util.Constants.COORDINATE_VALID_DECIMAL_COUNT;
+import static au.org.aodn.nrmn.restapi.util.Constants.SURVEY_LOCATION_TOLERANCE;
 
 @RestController
 @RequestMapping(path = "/api/v1/correction")
@@ -399,6 +404,7 @@ public class CorrectionController {
             var results = mapRows(rows);
             var result = validate(programValidation, surveyIds, results).getAll();
             var mappedRows = results.stream().map(r -> r.getLeft()).collect(Collectors.toList());
+            var validatedMappedRows = validateLatLon(mappedRows);
             var blockingErrors = result.stream().filter(r -> r.getLevelId() == ValidationLevel.BLOCKING)
                     .collect(Collectors.toList());
 
@@ -409,7 +415,7 @@ public class CorrectionController {
 
             var summary = surveyCorrectionService.diffSurveyCorrections(surveyIds, rows);
 
-            surveyCorrectionService.correctSurvey(job, surveyIds, mappedRows);
+            surveyCorrectionService.correctSurvey(job, surveyIds, validatedMappedRows);
 
             try {
 
@@ -450,6 +456,7 @@ public class CorrectionController {
 
         return ResponseEntity.ok().body(job.getId());
     }
+
 
     @DeleteMapping("correct/{id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
@@ -639,5 +646,27 @@ public class CorrectionController {
 
         result.setJobId(job.getId());
         return ResponseEntity.ok().body(result);
+    }
+
+
+    private List<StagedRowFormatted> validateLatLon(List<StagedRowFormatted> mappedRows) {
+        if (mappedRows == null || mappedRows.isEmpty()) {
+            return mappedRows;
+        }
+        var resultRows = new ArrayList<StagedRowFormatted>();
+        for (var row : mappedRows) {
+            var site = row.getSite();
+            var distance = SpacialUtil.getDistanceLatLongMeters(site.getLatitude(), site.getLongitude(), row.getLatitude(), row.getLongitude());
+
+            if (distance < SURVEY_LOCATION_TOLERANCE) {
+                row.setLatitude(null);
+                row.setLongitude(null);
+            } else {
+                row.setLatitude(Precision.round(row.getLatitude(), COORDINATE_VALID_DECIMAL_COUNT));
+                row.setLongitude(Precision.round(row.getLongitude(), COORDINATE_VALID_DECIMAL_COUNT));
+            }
+            resultRows.add(row);
+        }
+        return resultRows;
     }
 }
