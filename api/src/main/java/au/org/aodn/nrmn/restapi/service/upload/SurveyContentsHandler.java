@@ -16,6 +16,8 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
 
 import lombok.Value;
 
+import static au.org.aodn.nrmn.restapi.util.Constants.COORDINATE_VALID_DECIMAL_COUNT;
+
 public class SurveyContentsHandler implements SheetContentsHandler {
 
     private final List<SurveyField> requiredSurveyFields;
@@ -136,7 +138,7 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     private String roundDecimalString(String decimalString) {
         try {
             var doubleValue = Double.parseDouble(decimalString);
-            var roundedValue = Precision.round(doubleValue, 5);
+            var roundedValue = Precision.round(doubleValue, COORDINATE_VALID_DECIMAL_COUNT);
 
             // if the value is an integer, return it as an integer (otherwise it will be returned as a double with a .0 at the end)
             if (roundedValue == Math.floor(roundedValue)) {

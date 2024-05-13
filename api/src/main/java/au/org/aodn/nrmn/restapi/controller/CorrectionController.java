@@ -69,6 +69,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import static au.org.aodn.nrmn.restapi.util.Constants.COORDINATE_VALID_DECIMAL_COUNT;
+import static au.org.aodn.nrmn.restapi.util.Constants.SURVEY_LOCATION_TOLERANCE;
+
 @RestController
 @RequestMapping(path = "/api/v1/correction")
 @Tag(name = "correction")
@@ -655,12 +658,12 @@ public class CorrectionController {
             var site = row.getSite();
             var distance = SpacialUtil.getDistanceLatLongMeters(site.getLatitude(), site.getLongitude(), row.getLatitude(), row.getLongitude());
 
-            if (distance < 10) {
+            if (distance < SURVEY_LOCATION_TOLERANCE) {
                 row.setLatitude(null);
                 row.setLongitude(null);
             } else {
-                row.setLatitude(Precision.round(row.getLatitude(), 5));
-                row.setLongitude(Precision.round(row.getLongitude(), 5));
+                row.setLatitude(Precision.round(row.getLatitude(), COORDINATE_VALID_DECIMAL_COUNT));
+                row.setLongitude(Precision.round(row.getLongitude(), COORDINATE_VALID_DECIMAL_COUNT));
             }
             resultRows.add(row);
         }

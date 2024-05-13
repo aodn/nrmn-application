@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.service.validation;
 
+import static au.org.aodn.nrmn.restapi.util.Constants.SURVEY_LOCATION_TOLERANCE;
 import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistanceLatLongMeters;
 
 import java.util.Arrays;
@@ -87,12 +88,12 @@ public class SiteValidation {
                     row.getLatitude(), row.getLongitude());
 
             // Warn if survey is more than 10 meters away from site
-            if (distMeters > 10) {
+            if (distMeters > SURVEY_LOCATION_TOLERANCE) {
                 var message = "Survey coordinates more than 10m from site (" + String.format("%.1f", distMeters) + "m)";
                 return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
                         Arrays.asList(row.getId()), Arrays.asList("latitude", "longitude"));
             }
-            if (distMeters < 10) {
+            if (distMeters < SURVEY_LOCATION_TOLERANCE) {
                 var message = "Survey coordinates less than 10m from site (" + String.format("%.1f", distMeters) + "m). " +
                         "This row will use the site's coordinates.";
                 return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
