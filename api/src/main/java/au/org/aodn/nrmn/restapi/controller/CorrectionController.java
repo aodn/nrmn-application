@@ -253,7 +253,7 @@ public class CorrectionController {
             validation.add(surveyValidation.validateDateRange(programValidation, row), false);
 
             // Site distance validation
-            if(programValidation != ProgramValidation.NONE)
+            if (programValidation != ProgramValidation.NONE)
                 validation.add(siteValidation.validateSurveyAtSite(row));
         }
 
@@ -275,7 +275,7 @@ public class CorrectionController {
     }
 
     @GetMapping(path = "correct")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity<?> getSurveyCorrections(@RequestParam("surveyIds") List<Integer> surveyIds) {
 
         var lockedSurveys = surveyRepository.findAllById(surveyIds).stream()
@@ -313,7 +313,7 @@ public class CorrectionController {
     }
 
     @PostMapping(path = "validate")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity<?> validateSurveyCorrection(
             Authentication authentication,
             @RequestParam("surveyIds") List<Integer> surveyIds,
@@ -328,8 +328,6 @@ public class CorrectionController {
             var errors = new ArrayList<SurveyValidationError>();
             var rows = bodyDto.getRows();
 
-            var summary = surveyCorrectionService.diffSurveyCorrections(surveyIds, rows);
-            response.setSummary(summary);
 
             var mappedRows = mapRows(rows);
 
@@ -352,6 +350,12 @@ public class CorrectionController {
             errors.addAll(validate(programValidation, surveyIds, mappedRows).getAll());
 
             response.setErrors(errors);
+
+            Collection<StagedRow> validatedRows = validateLatLonInDiff(rows, errors);
+
+            var summary = surveyCorrectionService.diffSurveyCorrections(surveyIds, validatedRows);
+            response.setSummary(summary);
+
         } catch (Exception e) {
             logger.error("Validation Failed", e);
             return ResponseEntity.badRequest().body("Validation failed. Error: " + e.getMessage());
@@ -360,7 +364,7 @@ public class CorrectionController {
     }
 
     @PostMapping(path = "correct")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity<?> submitSurveyCorrection(
             @RequestParam("surveyIds") List<Integer> surveyIds,
             Authentication authentication,
@@ -459,7 +463,7 @@ public class CorrectionController {
 
 
     @DeleteMapping("correct/{id}")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity<?> submitSurveyDeletion(
             @PathVariable Integer id,
             Authentication authentication) {
@@ -603,14 +607,14 @@ public class CorrectionController {
             var count = surveyCorrectionService.correctSpecies(job, bodyDto.getSurveyIds(), curr, next);
 
             stagedJobLogRepository.save(StagedJobLog.builder()
-            .stagedJob(job)
-            .eventType(StagedJobEventType.CORRECTING)
-            .details("Updating " + count + " observations.").build());
+                    .stagedJob(job)
+                    .eventType(StagedJobEventType.CORRECTING)
+                    .details("Updating " + count + " observations.").build());
 
             stagedJobLogRepository.save(StagedJobLog.builder()
-            .stagedJob(job)
-            .eventType(StagedJobEventType.FILTER)
-            .filterSet(bodyDto.getFilterSet()).build());
+                    .stagedJob(job)
+                    .eventType(StagedJobEventType.FILTER)
+                    .filterSet(bodyDto.getFilterSet()).build());
 
             materializedViewService.refreshAllAsync();
         } catch (ConstraintViolationException cv) {
@@ -666,6 +670,38 @@ public class CorrectionController {
                 row.setLongitude(Precision.round(row.getLongitude(), COORDINATE_VALID_DECIMAL_COUNT));
             }
             resultRows.add(row);
+        }
+        return resultRows;
+    }
+
+
+    private Collection<StagedRow> validateLatLonInDiff(Collection<StagedRow> rows, Collection<SurveyValidationError> errors) {
+        var resultRows = new ArrayList<>(rows);
+        for (var error : errors) {
+            if (error.getMessage().contains("This row will use the site's coordinates.")) {
+                var rowId = error.getRowIds().iterator().next();
+                var row = resultRows.stream().filter(r -> r.getId().equals(rowId)).findFirst().orElse(null);
+                if (row != null) {
+                    row.setLatitude(null);
+                    row.setLongitude(null);
+                }
+                continue;
+            }
+            if (error.getMessage().contains("Longitude will be rounded to 5 decimal places")) {
+                var rowId = error.getRowIds().iterator().next();
+                var row = resultRows.stream().filter(r -> r.getId().equals(rowId)).findFirst().orElse(null);
+                if (row != null) {
+                    row.setLongitude(String.valueOf(Precision.round(Double.parseDouble(row.getLongitude()), COORDINATE_VALID_DECIMAL_COUNT)));
+                }
+                continue;
+            }
+            if (error.getMessage().contains("Latitude will be rounded to 5 decimal places")) {
+                var rowId = error.getRowIds().iterator().next();
+                var row = resultRows.stream().filter(r -> r.getId().equals(rowId)).findFirst().orElse(null);
+                if (row != null) {
+                    row.setLatitude(String.valueOf(Precision.round(Double.parseDouble(row.getLatitude()), COORDINATE_VALID_DECIMAL_COUNT)));
+                }
+            }
         }
         return resultRows;
     }
