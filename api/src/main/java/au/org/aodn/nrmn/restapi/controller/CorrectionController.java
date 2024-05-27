@@ -351,7 +351,7 @@ public class CorrectionController {
 
             response.setErrors(errors);
 
-            Collection<StagedRow> validatedRows = validateLatLonInDiff(rows, errors);
+            Collection<StagedRow> validatedRows = adjustValidatedLatLonInDiff(rows, errors);
 
             var summary = surveyCorrectionService.diffSurveyCorrections(surveyIds, validatedRows);
             response.setSummary(summary);
@@ -675,7 +675,7 @@ public class CorrectionController {
     }
 
 
-    private Collection<StagedRow> validateLatLonInDiff(Collection<StagedRow> rows, Collection<SurveyValidationError> errors) {
+    private Collection<StagedRow> adjustValidatedLatLonInDiff(Collection<StagedRow> rows, Collection<SurveyValidationError> errors) {
         var resultRows = new ArrayList<>(rows);
         for (var error : errors) {
             if (error.getMessage().contains("This row will use the site's coordinates.")) {
@@ -689,18 +689,29 @@ public class CorrectionController {
             }
             if (error.getMessage().contains("Longitude will be rounded to 5 decimal places")) {
                 var rowId = error.getRowIds().iterator().next();
-                var row = resultRows.stream().filter(r -> r.getId().equals(rowId)).findFirst().orElse(null);
-                if (row != null) {
-                    row.setLongitude(String.valueOf(Precision.round(Double.parseDouble(row.getLongitude()), COORDINATE_VALID_DECIMAL_COUNT)));
-                }
+                resultRows
+                        .stream()
+                        .filter(r -> r.getId().equals(rowId))
+                        .findFirst()
+                        .ifPresent(row ->
+                                row.setLongitude(String.valueOf(
+                                        Precision.round(
+                                                Double.parseDouble(row.getLongitude()),
+                                                COORDINATE_VALID_DECIMAL_COUNT
+                                        ))));
                 continue;
             }
             if (error.getMessage().contains("Latitude will be rounded to 5 decimal places")) {
                 var rowId = error.getRowIds().iterator().next();
-                var row = resultRows.stream().filter(r -> r.getId().equals(rowId)).findFirst().orElse(null);
-                if (row != null) {
-                    row.setLatitude(String.valueOf(Precision.round(Double.parseDouble(row.getLatitude()), COORDINATE_VALID_DECIMAL_COUNT)));
-                }
+                resultRows
+                        .stream()
+                        .filter(r -> r.getId().equals(rowId))
+                        .findFirst()
+                        .ifPresent(row ->
+                                row.setLatitude(String.valueOf(
+                                        Precision.round(
+                                                Double.parseDouble(row.getLatitude()), COORDINATE_VALID_DECIMAL_COUNT
+                                        ))));
             }
         }
         return resultRows;
