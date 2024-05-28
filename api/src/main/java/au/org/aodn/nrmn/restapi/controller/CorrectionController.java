@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import au.org.aodn.nrmn.restapi.service.validation.*;
 import au.org.aodn.nrmn.restapi.util.SpacialUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.tuple.Pair;
@@ -58,12 +59,6 @@ import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.SurveyCorrectionService;
 import au.org.aodn.nrmn.restapi.service.formatting.SpeciesFormattingService;
-import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
-import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
-import au.org.aodn.nrmn.restapi.service.validation.SiteValidation;
-import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
-import au.org.aodn.nrmn.restapi.service.validation.SurveyValidation;
-import au.org.aodn.nrmn.restapi.service.validation.ValidationResultSet;
 import au.org.aodn.nrmn.restapi.util.ObjectUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -351,7 +346,7 @@ public class CorrectionController {
 
             response.setErrors(errors);
 
-            Collection<StagedRow> validatedRows = adjustValidatedLatLonInDiff(rows, errors);
+            Collection<StagedRow> validatedRows = new DataRectification(rows, errors).rectify();
 
             var summary = surveyCorrectionService.diffSurveyCorrections(surveyIds, validatedRows);
             response.setSummary(summary);
@@ -670,49 +665,6 @@ public class CorrectionController {
                 row.setLongitude(Precision.round(row.getLongitude(), COORDINATE_VALID_DECIMAL_COUNT));
             }
             resultRows.add(row);
-        }
-        return resultRows;
-    }
-
-
-    private Collection<StagedRow> adjustValidatedLatLonInDiff(Collection<StagedRow> rows, Collection<SurveyValidationError> errors) {
-        var resultRows = new ArrayList<>(rows);
-        for (var error : errors) {
-            if (error.getMessage().contains("This row will use the site's coordinates.")) {
-                var rowId = error.getRowIds().iterator().next();
-                var row = resultRows.stream().filter(r -> r.getId().equals(rowId)).findFirst().orElse(null);
-                if (row != null) {
-                    row.setLatitude(null);
-                    row.setLongitude(null);
-                }
-                continue;
-            }
-            if (error.getMessage().contains("Longitude will be rounded to 5 decimal places")) {
-                var rowId = error.getRowIds().iterator().next();
-                resultRows
-                        .stream()
-                        .filter(r -> r.getId().equals(rowId))
-                        .findFirst()
-                        .ifPresent(row ->
-                                row.setLongitude(String.valueOf(
-                                        Precision.round(
-                                                Double.parseDouble(row.getLongitude()),
-                                                COORDINATE_VALID_DECIMAL_COUNT
-                                        ))));
-                continue;
-            }
-            if (error.getMessage().contains("Latitude will be rounded to 5 decimal places")) {
-                var rowId = error.getRowIds().iterator().next();
-                resultRows
-                        .stream()
-                        .filter(r -> r.getId().equals(rowId))
-                        .findFirst()
-                        .ifPresent(row ->
-                                row.setLatitude(String.valueOf(
-                                        Precision.round(
-                                                Double.parseDouble(row.getLatitude()), COORDINATE_VALID_DECIMAL_COUNT
-                                        ))));
-            }
         }
         return resultRows;
     }
