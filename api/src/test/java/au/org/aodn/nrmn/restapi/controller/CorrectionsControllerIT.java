@@ -602,7 +602,7 @@ class CorrectionsControllerIT {
 
     @Test
     @WithUserDetails("test@example.com")
-    public void validateDiff() throws Exception {
+    public void validateLatLon() throws Exception {
         var auth = getContext().getAuthentication();
         var token = jwtTokenProvider.generateToken(auth);
 
