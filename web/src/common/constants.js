@@ -230,3 +230,8 @@ export const AppConstants = Object.freeze({
 });
 
 export const allMeasurements = [...measurements, ...extendedMeasurements];
+
+export const ErrorMessages = Object.freeze({
+  ROUND_LAT_MSG: 'Latitude will be rounded to 5 decimal places',
+  ROUND_LON_MSG: 'Longitude will be rounded to 5 decimal places',
+});

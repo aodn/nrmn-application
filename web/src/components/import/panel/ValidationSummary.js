@@ -21,7 +21,10 @@ const ValidationSummary = ({data, onItemClick}) => {
   };
 
   return (
-    <SimpleTreeView defaultCollapseIcon={<ArrowDropDownIcon />} defaultExpandIcon={<ArrowRightIcon />}>
+    <SimpleTreeView slots={{
+      collapseIcon: ArrowDropDownIcon,
+      expandIcon: ArrowRightIcon
+    }} >
       {['BLOCKING', 'WARNING', 'DUPLICATE', 'INFO'].map((level) => (
         <div key={level}>
           <Typography variant="button">{data[level] ? level : 'No ' + level + '✔'}</Typography>
