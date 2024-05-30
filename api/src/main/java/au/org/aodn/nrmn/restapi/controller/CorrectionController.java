@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import au.org.aodn.nrmn.restapi.service.validation.*;
 import au.org.aodn.nrmn.restapi.util.SpacialUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.tuple.Pair;
@@ -58,12 +59,6 @@ import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import au.org.aodn.nrmn.restapi.service.MaterializedViewService;
 import au.org.aodn.nrmn.restapi.service.SurveyCorrectionService;
 import au.org.aodn.nrmn.restapi.service.formatting.SpeciesFormattingService;
-import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
-import au.org.aodn.nrmn.restapi.service.validation.MeasurementValidation;
-import au.org.aodn.nrmn.restapi.service.validation.SiteValidation;
-import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
-import au.org.aodn.nrmn.restapi.service.validation.SurveyValidation;
-import au.org.aodn.nrmn.restapi.service.validation.ValidationResultSet;
 import au.org.aodn.nrmn.restapi.util.ObjectUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -253,7 +248,7 @@ public class CorrectionController {
             validation.add(surveyValidation.validateDateRange(programValidation, row), false);
 
             // Site distance validation
-            if(programValidation != ProgramValidation.NONE)
+            if (programValidation != ProgramValidation.NONE)
                 validation.add(siteValidation.validateSurveyAtSite(row));
         }
 
@@ -275,7 +270,7 @@ public class CorrectionController {
     }
 
     @GetMapping(path = "correct")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity<?> getSurveyCorrections(@RequestParam("surveyIds") List<Integer> surveyIds) {
 
         var lockedSurveys = surveyRepository.findAllById(surveyIds).stream()
@@ -313,7 +308,7 @@ public class CorrectionController {
     }
 
     @PostMapping(path = "validate")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity<?> validateSurveyCorrection(
             Authentication authentication,
             @RequestParam("surveyIds") List<Integer> surveyIds,
@@ -328,8 +323,6 @@ public class CorrectionController {
             var errors = new ArrayList<SurveyValidationError>();
             var rows = bodyDto.getRows();
 
-            var summary = surveyCorrectionService.diffSurveyCorrections(surveyIds, rows);
-            response.setSummary(summary);
 
             var mappedRows = mapRows(rows);
 
@@ -352,6 +345,12 @@ public class CorrectionController {
             errors.addAll(validate(programValidation, surveyIds, mappedRows).getAll());
 
             response.setErrors(errors);
+
+            Collection<StagedRow> validatedRows = new DataRectification(rows, errors).rectify();
+
+            var summary = surveyCorrectionService.diffSurveyCorrections(surveyIds, validatedRows);
+            response.setSummary(summary);
+
         } catch (Exception e) {
             logger.error("Validation Failed", e);
             return ResponseEntity.badRequest().body("Validation failed. Error: " + e.getMessage());
@@ -360,7 +359,7 @@ public class CorrectionController {
     }
 
     @PostMapping(path = "correct")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity<?> submitSurveyCorrection(
             @RequestParam("surveyIds") List<Integer> surveyIds,
             Authentication authentication,
@@ -459,7 +458,7 @@ public class CorrectionController {
 
 
     @DeleteMapping("correct/{id}")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @Operation(security = {@SecurityRequirement(name = "bearer-key")})
     public ResponseEntity<?> submitSurveyDeletion(
             @PathVariable Integer id,
             Authentication authentication) {
@@ -603,14 +602,14 @@ public class CorrectionController {
             var count = surveyCorrectionService.correctSpecies(job, bodyDto.getSurveyIds(), curr, next);
 
             stagedJobLogRepository.save(StagedJobLog.builder()
-            .stagedJob(job)
-            .eventType(StagedJobEventType.CORRECTING)
-            .details("Updating " + count + " observations.").build());
+                    .stagedJob(job)
+                    .eventType(StagedJobEventType.CORRECTING)
+                    .details("Updating " + count + " observations.").build());
 
             stagedJobLogRepository.save(StagedJobLog.builder()
-            .stagedJob(job)
-            .eventType(StagedJobEventType.FILTER)
-            .filterSet(bodyDto.getFilterSet()).build());
+                    .stagedJob(job)
+                    .eventType(StagedJobEventType.FILTER)
+                    .filterSet(bodyDto.getFilterSet()).build());
 
             materializedViewService.refreshAllAsync();
         } catch (ConstraintViolationException cv) {

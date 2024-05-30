@@ -15,6 +15,7 @@ import au.org.aodn.nrmn.restapi.enums.ValidationCategory;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -429,29 +430,6 @@ class CorrectionsControllerIT {
         assertTrue("Survey IDs missing: 812331346", e.get(8).getMessage().equals("Survey IDs missing: 812331346"));
         assertTrue("Row has no data and no value recorded for inverts", e.get(9).getMessage().equals("Row has no data and no value recorded for inverts"));
 
-
-        // Another request for testing lat & lon
-        stagedRow.setLatitude("-14.1596212121");
-        stagedRow.setLongitude("-169.6816212121");
-        var response2 = reqBuilder
-                .withUri(uri)
-                .withToken(token)
-                .withEntity(d)
-                .withMethod(HttpMethod.POST)
-                .withContentType(MediaType.APPLICATION_JSON)
-                .withParams(param)
-                .withResponseType(ValidationResponse.class)
-                .build(testRestTemplate);
-
-        assertEquals(HttpStatus.OK, response2.getStatusCode());
-
-        var body2 = response2.getBody();
-        assertNotNull(body2);
-        var e2 = (List<SurveyValidationError>) body2.getErrors();
-        assertTrue("Latitude is not rounded to 5 decimal places",
-                e2.stream().anyMatch( x -> x.getMessage().contains("Latitude will be rounded to 5 decimal places")));
-        assertTrue("Longitude is not rounded to 5 decimal places",
-                e2.stream().anyMatch(x -> x.getMessage().contains("Longitude will be rounded to 5 decimal places")));
     }
     @Test
     @WithUserDetails("test@example.com")
@@ -619,5 +597,74 @@ class CorrectionsControllerIT {
 
         // No proper response at the moment, become 500 and screen will blank
         assertEquals("Correct status code", HttpStatus.BAD_REQUEST, response.getStatusCode());
+
+    }
+
+    @Test
+    @WithUserDetails("test@example.com")
+    public void validateLatLon() throws Exception {
+        var auth = getContext().getAuthentication();
+        var token = jwtTokenProvider.generateToken(auth);
+
+        StagedRow stagedRow = new StagedRow();
+        stagedRow.setId(123123123L);
+        stagedRow.setSiteCode("-1");
+        stagedRow.setSurveyId("812300132");
+        stagedRow.setDate("01/01/2021");
+        stagedRow.setTime("00:00:00");
+        stagedRow.setDepth("1");
+        stagedRow.setMeasureJson(new HashMap<>());
+        stagedRow.setIsInvertSizing("");
+        stagedRow.setMethod("2");
+        stagedRow.setDiffRowId("1");
+
+
+        CorrectionRequestBodyDto d = new CorrectionRequestBodyDto();
+        d.setProgramId(55);
+        d.setRows(new ArrayList<>());
+        d.getRows().add(stagedRow);
+
+        var uri = String.format("http://localhost:%d/api/v1/correction/validate?surveyIds={surveyIds}", localServerPort);
+        var reqBuilder = new RequestWrapper<CorrectionRequestBodyDto, ValidationResponse>();
+
+        var param2 = new HashMap<String, String>() {{
+            put("surveyIds", "812300131");
+        }};
+        // Another request for testing lat & lon
+        stagedRow.setLatitude("-14.1596212121");
+        stagedRow.setLongitude("-169.6816212121");
+        var response2 = reqBuilder
+                .withUri(uri)
+                .withToken(token)
+                .withEntity(d)
+                .withMethod(HttpMethod.POST)
+                .withContentType(MediaType.APPLICATION_JSON)
+                .withParams(param2)
+                .withResponseType(ValidationResponse.class)
+                .build(testRestTemplate);
+
+        Assertions.assertEquals(HttpStatus.OK, response2.getStatusCode());
+
+        var body2 = response2.getBody();
+        assertNotNull(body2);
+        var e2 = (List<SurveyValidationError>) body2.getErrors();
+        Assertions.assertTrue(e2.stream().anyMatch(x -> x.getMessage().contains("Latitude will be rounded to 5 decimal places")), "Latitude is not rounded to 5 decimal places");
+        Assertions.assertTrue(e2.stream().anyMatch(x -> x.getMessage().contains("Longitude will be rounded to 5 decimal places")), "Longitude is not rounded to 5 decimal places");
+
+        var summary = body2.getSummary();
+        var newLatInDiff = summary.getCellDiffs().stream().filter( diff -> diff.getColumnName().equals("latitude")).findFirst();
+
+        // make sure in diff, the new value is rounded to 5 decimal places
+        if (newLatInDiff.isPresent()) {
+            Assertions.assertEquals("-14.15962", newLatInDiff.get().getNewValue());
+        } else {
+            Assertions.fail("Latitude diff not found");
+        }
+        var newLonInDiff = summary.getCellDiffs().stream().filter( diff -> diff.getColumnName().equals("longitude")).findFirst();
+        if (newLonInDiff.isPresent()) {
+            Assertions.assertEquals("-169.68162", newLonInDiff.get().getNewValue());
+        } else {
+            Assertions.fail("Longitude diff not found");
+        }
     }
 }

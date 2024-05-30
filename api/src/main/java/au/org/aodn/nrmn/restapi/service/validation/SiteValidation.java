@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.service.validation;
 
+import static au.org.aodn.nrmn.restapi.util.Constants.NULLIFY_LAT_LON_MSG_SUFFIX;
 import static au.org.aodn.nrmn.restapi.util.Constants.SURVEY_LOCATION_TOLERANCE;
 import static au.org.aodn.nrmn.restapi.util.SpacialUtil.getDistanceLatLongMeters;
 
@@ -95,7 +96,7 @@ public class SiteValidation {
             }
             if (distMeters < SURVEY_LOCATION_TOLERANCE) {
                 var message = "Survey coordinates less than 10m from site (" + String.format("%.1f", distMeters) + "m). " +
-                        "This row will use the site's coordinates.";
+                        NULLIFY_LAT_LON_MSG_SUFFIX;
                 return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
                         Arrays.asList(row.getId()), Arrays.asList("latitude", "longitude"));
             }
