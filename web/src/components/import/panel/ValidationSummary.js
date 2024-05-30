@@ -2,8 +2,8 @@ import React from 'react';
 import Typography from '@mui/material/Typography';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import TreeItem from '@mui/lab/TreeItem';
-import TreeView from '@mui/lab/TreeView';
+import {TreeItem} from '@mui/x-tree-view';
+import {SimpleTreeView} from '@mui/x-tree-view';
 import {PropTypes} from 'prop-types';
 
 import {allMeasurements} from '../../../common/constants';
@@ -21,13 +21,13 @@ const ValidationSummary = ({data, onItemClick}) => {
   };
 
   return (
-    <TreeView defaultCollapseIcon={<ArrowDropDownIcon />} defaultExpandIcon={<ArrowRightIcon />}>
+    <SimpleTreeView defaultCollapseIcon={<ArrowDropDownIcon />} defaultExpandIcon={<ArrowRightIcon />}>
       {['BLOCKING', 'WARNING', 'DUPLICATE', 'INFO'].map((level) => (
         <div key={level}>
           <Typography variant="button">{data[level] ? level : 'No ' + level + '✔'}</Typography>
           {data[level]?.map((m) => (
               <TreeItem
-                nodeId={m.id}
+                itemId={m.id}
                 key={m.id}
                 label={
                   <Typography variant="body2">
@@ -39,7 +39,7 @@ const ValidationSummary = ({data, onItemClick}) => {
                   const label = labelForDescription(d);
                   return (
                     <TreeItem
-                      nodeId={d.id}
+                      itemId={d.id}
                       key={d.id}
                       onClick={() => onItemClick(d, level === 'DUPLICATE')}
                       label={
@@ -71,7 +71,7 @@ const ValidationSummary = ({data, onItemClick}) => {
           ))}
         </div>
       ))}
-    </TreeView>
+    </SimpleTreeView>
   );
 };
 
