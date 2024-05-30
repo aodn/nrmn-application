@@ -20,7 +20,6 @@ class DataRectificationHandler {
     this.rowDtos = rowDtos;
   }
 
-  // reminder: return a state
   async submitRectification(id) {
     this.#findRowsToRectify();
     await updateRows(id, this.rowsToRectify, () => {});
