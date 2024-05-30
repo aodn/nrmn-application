@@ -8,8 +8,8 @@ import {updateRows} from '../../api/api';
 class DataRectificationHandler {
 
   constructor() {
-    const {ROUND_LAT_MSG, ROUND_LON_MSG, NULLIFY_LAT_LON_MSG_SUFFIX} = ErrorMessages;
-    Object.assign(this, {ROUND_LAT_MSG, ROUND_LON_MSG, NULLIFY_LAT_LON_MSG_SUFFIX});
+    const {ROUND_LAT_MSG, ROUND_LON_MSG} = ErrorMessages;
+    Object.assign(this, {ROUND_LAT_MSG, ROUND_LON_MSG});
   }
 
   setValidationResult(validationResult) {
