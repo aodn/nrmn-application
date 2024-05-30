@@ -73,7 +73,6 @@ const DataSheetView = ({onIngest, roles}) => {
   const isDataOfficer = roles.includes(AppConstants.ROLES.DATA_OFFICER);
 
   const dataRectificationHandlerRef = useRef(new DataRectificationHandler());
-  // const dataRectificationHandler = new DataRectificationHandler();
 
   const defaultColDef = {
     lockVisible: true,
