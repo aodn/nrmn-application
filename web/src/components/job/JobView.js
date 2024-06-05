@@ -186,7 +186,7 @@ const JobView = ({jobId}) => {
                                 {log.summary && <SurveyDiff surveyDiff={log.summary} />}
                               </Typography>
                               {log.filterSet && Object.keys(log.filterSet).map((v) => (log.filterSet[v] ?
-                                <TableRow><TableCell>{v}</TableCell><TableCell>{log.filterSet[v]}</TableCell></TableRow> : <></>))}
+                                <TableRow key={v}><TableCell>{v}</TableCell><TableCell>{log.filterSet[v]}</TableCell></TableRow> : <></>))}
                             </TableCell>
                           </TableRow>
                         ))}

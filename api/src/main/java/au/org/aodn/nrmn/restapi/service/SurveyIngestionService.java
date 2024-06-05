@@ -20,6 +20,7 @@ import javax.transaction.Transactional;
 
 import au.org.aodn.nrmn.restapi.util.SpacialUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
@@ -51,6 +52,8 @@ import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 import au.org.aodn.nrmn.restapi.enums.SurveyMethod;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 import lombok.Value;
+
+import static au.org.aodn.nrmn.restapi.util.Constants.COORDINATE_VALID_DECIMAL_COUNT;
 
 @Service
 public class SurveyIngestionService {
@@ -123,8 +126,8 @@ public class SurveyIngestionService {
 
                                 // if the distance between the survey and the site(of the survey) is less than 10 meters,
                                 // then consider they are at the same location and the survey lat & lon will be null
-                                .longitude(distance < 10? null : stagedRow.getLongitude())
-                                .latitude(distance < 10? null : stagedRow.getLatitude())
+                                .longitude(distance < 10? null : Precision.round(stagedRow.getLongitude(), COORDINATE_VALID_DECIMAL_COUNT))
+                                .latitude(distance < 10? null : Precision.round(stagedRow.getLatitude(), COORDINATE_VALID_DECIMAL_COUNT))
                                 .pqDiverId(stagedRow.getPqs() != null ? stagedRow.getPqs().getDiverId() : null)
                                 .build()
                 )
@@ -200,13 +203,13 @@ public class SurveyIngestionService {
                 .surveyNotDone(surveyNotDone).build();
         return surveyMethodRepository.save(surveyMethod);
     }
-    
+
     @Transactional
     public void ingestTransaction(StagedJob job, StagedJobLog stagedJobLog, Collection<StagedRowFormatted> validatedRows) {
 
         var rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
         var surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
-            
+
             var visAvg = surveyRows.stream().filter(r -> r.getVis().isPresent()).mapToDouble(r -> r.getVis().get()).average();
             if(visAvg.isPresent())
                 visAvg = OptionalDouble.of((double)Math.round(visAvg.getAsDouble()));

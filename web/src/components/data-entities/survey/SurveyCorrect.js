@@ -268,6 +268,7 @@ const SurveyCorrect = () => {
         e.api.setFilterModel(filterModel);
       }
     }
+    setHasPassedValidation(false);
   };
 
   const onPasteEnd = (e) => {

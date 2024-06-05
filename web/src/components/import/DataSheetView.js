@@ -1,4 +1,4 @@
-import React, {useEffect, useCallback, useState} from 'react';
+import React, {useEffect, useCallback, useState, useRef} from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -20,6 +20,7 @@ import eh from './DataSheetEventHandlers';
 import {Paper} from '@mui/material';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import BackButton from '../ui/BackButton';
+import DataRectificationHandler from './DataRectificationHandler';
 
 // |context| is where all custom properties and helper functions
 // associated with the ag-grid are stored
@@ -70,6 +71,8 @@ const DataSheetView = ({onIngest, roles}) => {
 
   const isAdmin = roles.includes(AppConstants.ROLES.ADMIN);
   const isDataOfficer = roles.includes(AppConstants.ROLES.DATA_OFFICER);
+
+  const dataRectificationHandlerRef = useRef(new DataRectificationHandler());
 
   const defaultColDef = {
     lockVisible: true,
@@ -163,6 +166,10 @@ const DataSheetView = ({onIngest, roles}) => {
       context.summary = result.data;
       context.errorList = eh.generateErrorTree(context.rowData, context.errors);
 
+      // After validation, the system will set the validation result to the handler in case dev
+      // there are some data need to be rectified by system automatically
+      dataRectificationHandlerRef.current.setValidationResult(context.errors);
+
       setState(context.errors.some((e) => e.levelId === 'BLOCKING') ? IngestState.Edited : IngestState.Valid);
 
       setSideBar((sideBar) => {
@@ -187,7 +194,11 @@ const DataSheetView = ({onIngest, roles}) => {
     context.useOverlay = 'Submitting';
     setState(IngestState.Loading);
     setSideBar(defaultSideBar);
-    submitIngest(id, () => setState(IngestState.Locked), (res) => onIngest(res));
+
+    // Before submit, the system will rectify the data according to the validation result
+    dataRectificationHandlerRef.current.submitRectification(id).then(() => {
+      submitIngest(id, () => setState(IngestState.Locked), (res) => onIngest(res));
+    });
   };
 
   const handleSaveAndValidate = () => {
@@ -220,6 +231,8 @@ const DataSheetView = ({onIngest, roles}) => {
       // response.
       context.fullRefresh = context.fullRefresh || rowId.toString().length === 10 || row === null;
     });
+    // set rows to the handler, because the handler will rectify the data according to the validation result later
+    dataRectificationHandlerRef.current.setRows(rowUpdateDtos);
     updateRows(id, rowUpdateDtos, () => {
       if (context.fullRefresh) {
         reload(gridApi, id, handleValidate, isAdmin);
@@ -297,7 +310,7 @@ const DataSheetView = ({onIngest, roles}) => {
             <BackButton goBackTo={`/data/jobs`} name={`Jobs`} />
           </Box>
           {state === IngestState.Locked && (
-            <Paper minWidth={180} display="flex" alignItems="center">
+            <Paper sx={{ minWidth:180, display:'flex', alignItems:'center' }}>
               <Box display="flex" flexDirection="row">
                 <Box m={1}>
                   <ReportProblemIcon  sx={{color: 'darkorange'}} />

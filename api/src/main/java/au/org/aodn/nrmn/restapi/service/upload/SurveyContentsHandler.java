@@ -10,13 +10,13 @@ import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.enums.SurveyField;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.math3.util.Precision;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
 import lombok.Value;
 
 import static au.org.aodn.nrmn.restapi.util.Constants.COORDINATE_VALID_DECIMAL_COUNT;
+import static au.org.aodn.nrmn.restapi.util.NumberUtils.roundDecimalString;
 
 public class SurveyContentsHandler implements SheetContentsHandler {
 
@@ -135,21 +135,6 @@ public class SurveyContentsHandler implements SheetContentsHandler {
     }
 
 
-    private String roundDecimalString(String decimalString) {
-        try {
-            var doubleValue = Double.parseDouble(decimalString);
-            var roundedValue = Precision.round(doubleValue, COORDINATE_VALID_DECIMAL_COUNT);
-
-            // if the value is an integer, return it as an integer (otherwise it will be returned as a double with a .0 at the end)
-            if (roundedValue == Math.floor(roundedValue)) {
-                return String.valueOf((int) roundedValue);
-            }
-            return Double.toString(roundedValue);
-        } catch (NumberFormatException e) {
-            return decimalString;
-        }
-    }
-
     private void setValue(SurveyField columnHeader, String formattedValue) {
         String value = formattedValue != null ? formattedValue.trim() : "";
         switch (columnHeader) {
@@ -172,10 +157,10 @@ public class SurveyContentsHandler implements SheetContentsHandler {
                 currentRow.setSiteName(value);
                 break;
             case LATITUDE:
-                currentRow.setLatitude(roundDecimalString(value));
+                currentRow.setLatitude(roundDecimalString(value, COORDINATE_VALID_DECIMAL_COUNT));
                 break;
             case LONGITUDE:
-                currentRow.setLongitude(roundDecimalString(value));
+                currentRow.setLongitude(roundDecimalString(value, COORDINATE_VALID_DECIMAL_COUNT));
                 break;
             case DATE:
                 currentRow.setDate(value);
