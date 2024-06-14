@@ -12,6 +12,34 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {AuthContext} from '../../../contexts/auth-context';
 import {AppConstants} from '../../../common/constants';
 
+const tooltipValueGetter = (params) => {
+  if (params.context !== undefined) {
+    const error = params.context.errors?.find((e) => e.id === params.data.diverId);
+    if (error) return error.message;
+  }
+};
+
+const chooseCellStyle = (params) => {
+  if (params.context !== undefined) {
+    if (params.context.errors?.some((e) => e.id === params.data?.diverId)) return {backgroundColor: red[100]};
+    if (params.context.delta[params.data?.diverId]) return {backgroundColor: grey[100]};
+  }
+  return null;
+};
+
+const defaultColDef = {
+  lockVisible: true,
+  editable: true,
+  sortable: true,
+  resizable: true,
+  suppressMenu: true,
+  floatingFilter: true,
+  filter: 'agTextColumnFilter',
+  cellStyle: chooseCellStyle,
+  tooltipValueGetter: tooltipValueGetter,
+  filterParams: {debounceMs: AppConstants.Filter.WAIT_TIME_ON_FILTER_APPLY },
+};
+
 const DiverList = () => {
   const rowsPerPage = 50;
   const [loading, setLoading] = React.useState(false);
@@ -98,21 +126,6 @@ const DiverList = () => {
     });
   };
 
-  const chooseCellStyle = (params) => {
-    if (params.context !== undefined) {
-      if (params.context.errors?.some((e) => e.id === params.data?.diverId)) return {backgroundColor: red[100]};
-      if (params.context.delta[params.data?.diverId]) return {backgroundColor: grey[100]};
-    }
-    return null;
-  };
-
-  const tooltipValueGetter = (params) => {
-    if (params.context !== undefined) {
-      const error = params.context.errors?.find((e) => e.id === params.data.diverId);
-      if (error) return error.message;
-    }
-  };
-
   const saveGrid = () => {
     setErrors([]);
     entityEdit('divers', Object.values(delta)).then((res) => {
@@ -179,17 +192,7 @@ const DiverList = () => {
         context={{delta, errors}}
         onGridReady={(e) => onGridReady(e)}
         onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
-        defaultColDef={{
-          lockVisible: true,
-          editable: true,
-          sortable: true,
-          resizable: true,
-          suppressMenu: true,
-          floatingFilter: true,
-          filter: 'agTextColumnFilter',
-          cellStyle: chooseCellStyle,
-          tooltipValueGetter: tooltipValueGetter
-        }}
+        defaultColDef={defaultColDef}
       >
         <AgGridColumn
           field=""

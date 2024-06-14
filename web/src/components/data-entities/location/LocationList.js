@@ -12,6 +12,15 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {AuthContext} from '../../../contexts/auth-context';
 import {AppConstants} from '../../../common/constants';
 
+const defaultColDef = {
+  lockVisible: true,
+  sortable: true,
+  resizable: true,
+  filter: 'agTextColumnFilter',
+  floatingFilter: true,
+  filterParams: {debounceMs: AppConstants.Filter.WAIT_TIME_ON_FILTER_APPLY },
+};
+
 const LocationList = () => {
   const rowsPerPage = 50;
   const [loading, setLoading] = React.useState(false);
@@ -134,13 +143,7 @@ const LocationList = () => {
             onBodyScrollEnd={(e) => autoSizeAll(e, false)}
             onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
             suppressCellFocus={true}
-            defaultColDef={{
-              lockVisible: true,
-              sortable: true,
-              resizable: true,
-              filter: 'agTextColumnFilter',
-              floatingFilter: true
-            }}
+            defaultColDef={defaultColDef}
           >
             <AgGridColumn
               width={40}
