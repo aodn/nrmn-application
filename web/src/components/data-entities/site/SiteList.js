@@ -13,6 +13,15 @@ import {AppConstants} from '../../../common/constants';
 
 import 'ag-grid-enterprise';
 
+const defaultColDef = {
+  lockVisible: true,
+  sortable: true,
+  resizable: true,
+  filter: 'agTextColumnFilter',
+  floatingFilter: true,
+  filterParams: {debounceMs: AppConstants.Filter.WAIT_TIME_ON_FILTER_APPLY },
+};
+
 const SiteList = () => {
   const rowsPerPage = 50;
   const [loading, setLoading] = React.useState(false);
@@ -167,13 +176,7 @@ const SiteList = () => {
               onBodyScrollEnd={(e) => autoSizeAll(e, false)}
               onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
               suppressCellFocus={true}
-              defaultColDef={{
-                lockVisible: true,
-                sortable: true,
-                resizable: true,
-                filter: 'agTextColumnFilter',
-                floatingFilter: true
-              }}
+              defaultColDef={defaultColDef}
             >
               <AgGridColumn
                 field="siteId"
