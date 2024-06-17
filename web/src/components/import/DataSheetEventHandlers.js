@@ -355,6 +355,30 @@ class DataSheetEventHandlers {
         action: () => eh.fillRegion(e, label)
       });
     }
+    /*
+    * The posMap is a map of all the row's position, currentPostIdx is the row index where user
+    * click the insert row, so row should be insert below, this function is use to move the
+    * existing row accordingly to new index and add the new row pos to it.
+    *
+    * return a map where key is the original position, and value is the updated position due to
+    * new slot
+    */
+    const createNewPosSlot = (currentPosIdx) => {
+      const posIdx = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
+      const updatedPosMap = new Map();
+
+      posIdx.forEach(i => updatedPosMap.set(i,i));
+
+      if(updatedPosMap.has(currentPosIdx)) {
+        // We need to shift item downwards to create room for this item and
+        // posIdx sorted already, find the beginning of the index in the array
+        const p = posIdx.findIndex(e => e === currentPosIdx);
+
+        // Move all items pos by 1
+        posIdx.slice(p).forEach(i => updatedPosMap.set(i, updatedPosMap.get(i) + 1));
+      }
+      return updatedPosMap;
+    };
 
     const cloneRow = (clearData) => {
       const [cells] = e.api.getCellRanges();
@@ -362,8 +386,8 @@ class DataSheetEventHandlers {
       const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
       const data = e.context.rowData.find((d) => d.id == row.data.id);
       const newId = +(new Date().valueOf() + '').slice(-10);
-      const posMap = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
-      const currentPosIdx = posMap.findIndex((p) => p == data.pos);
+      const currentPosIdx = data.pos;
+
       let newData = {};
       Object.keys(data).forEach((key) => {
         newData[key] =
@@ -376,10 +400,14 @@ class DataSheetEventHandlers {
             : data[key];
       });
       newData.measurements = clearData ? {} : {...data.measurements};
-      newData.pos = posMap[currentPosIdx + 1]
-        ? posMap[currentPosIdx] + (posMap[currentPosIdx + 1] - posMap[currentPosIdx]) / 2
-        : posMap[currentPosIdx] + 1000;
-      if (newData.pos % 1 !== 0) return;
+//      newData.pos = posMap[currentPosIdx + 1]
+//        ? posMap[currentPosIdx] + (posMap[currentPosIdx + 1] - posMap[currentPosIdx]) / 2
+//        : posMap[currentPosIdx] + 1000;
+      const updatedPosMap = createNewPosSlot(currentPosIdx + 1);
+      // Update the existing pos of each item
+      e.context.rowData.map((r) => r.pos = updatedPosMap.get(r.pos));
+      // Now safe to assign this pos
+      newData.pos = currentPosIdx + 1;
       newData.id = newId;
       newData.diffRowId = newId;
       delete newData.errors;
@@ -387,6 +415,8 @@ class DataSheetEventHandlers {
       eh.pushUndo(e.api, [{id: newId}]);
       e.context.rowData.push(newData);
       e.api.setRowData(e.context.rowData);
+
+      // Update rowPos to make the sort order correct
       const positions = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
       e.context.rowPos = positions.map((p) => e.context.rowData.find((r) => r.pos === p).pos);
 
