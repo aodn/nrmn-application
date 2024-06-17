@@ -1,6 +1,31 @@
 import {blue, grey, orange, red, yellow} from '@mui/material/colors';
 import {extendedMeasurements, measurements} from '../../common/constants';
 
+/*
+* The posMap is a map of all the row's position, currentPostIdx is the row index where user
+* click the insert row, so row should be insert below, this function is use to move the
+* existing row accordingly to new index and add the new row pos to it.
+*
+* return a map where key is the original position, and value is the updated position due to
+* new slot
+*/
+const createNewPosSlot = (e, currentPosIdx) => {
+  const posIdx = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
+  const updatedPosMap = new Map();
+
+  posIdx.forEach(i => updatedPosMap.set(i,i));
+
+  if(updatedPosMap.has(currentPosIdx)) {
+    // We need to shift item downwards to create room for this item and
+    // posIdx sorted already, find the beginning of the index in the array
+    const p = posIdx.findIndex(e => e === currentPosIdx);
+
+    // Move all items pos by 1
+    posIdx.slice(p).forEach(i => updatedPosMap.set(i, updatedPosMap.get(i) + 1));
+  }
+  return updatedPosMap;
+};
+
 class DataSheetEventHandlers {
   constructor() {
     this.fillRegion = this.fillRegion.bind(this);
@@ -355,30 +380,6 @@ class DataSheetEventHandlers {
         action: () => eh.fillRegion(e, label)
       });
     }
-    /*
-    * The posMap is a map of all the row's position, currentPostIdx is the row index where user
-    * click the insert row, so row should be insert below, this function is use to move the
-    * existing row accordingly to new index and add the new row pos to it.
-    *
-    * return a map where key is the original position, and value is the updated position due to
-    * new slot
-    */
-    const createNewPosSlot = (currentPosIdx) => {
-      const posIdx = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
-      const updatedPosMap = new Map();
-
-      posIdx.forEach(i => updatedPosMap.set(i,i));
-
-      if(updatedPosMap.has(currentPosIdx)) {
-        // We need to shift item downwards to create room for this item and
-        // posIdx sorted already, find the beginning of the index in the array
-        const p = posIdx.findIndex(e => e === currentPosIdx);
-
-        // Move all items pos by 1
-        posIdx.slice(p).forEach(i => updatedPosMap.set(i, updatedPosMap.get(i) + 1));
-      }
-      return updatedPosMap;
-    };
 
     const cloneRow = (clearData) => {
       const [cells] = e.api.getCellRanges();
@@ -400,10 +401,8 @@ class DataSheetEventHandlers {
             : data[key];
       });
       newData.measurements = clearData ? {} : {...data.measurements};
-//      newData.pos = posMap[currentPosIdx + 1]
-//        ? posMap[currentPosIdx] + (posMap[currentPosIdx + 1] - posMap[currentPosIdx]) / 2
-//        : posMap[currentPosIdx] + 1000;
-      const updatedPosMap = createNewPosSlot(currentPosIdx + 1);
+
+      const updatedPosMap = createNewPosSlot(e, currentPosIdx + 1);
       // Update the existing pos of each item
       e.context.rowData.map((r) => r.pos = updatedPosMap.get(r.pos));
       // Now safe to assign this pos
@@ -438,15 +437,15 @@ class DataSheetEventHandlers {
     if (selectedRows.length < 2) {
       if (items.length > 0) items.push('separator');
       items.push({
-        name: 'Delete Row',
+        name: 'Delete 1 Row',
         action: () => eh.deleteRow(e)
       });
       items.push({
-        name: 'Clone Row',
+        name: 'Clone 1 Row',
         action: () => cloneRow(false)
       });
       items.push({
-        name: 'Insert Row',
+        name: 'Insert 1 Row',
         action: () => cloneRow(true)
       });
       if (e.column.colId === 'species') {
@@ -608,3 +607,7 @@ class DataSheetEventHandlers {
 }
 
 export default new DataSheetEventHandlers();
+
+export {
+  createNewPosSlot,
+};
