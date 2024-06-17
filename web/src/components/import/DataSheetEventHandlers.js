@@ -397,6 +397,8 @@ class DataSheetEventHandlers {
               ? []
               : typeof data[key] === 'string'
               ? ''
+              : data[key] === null
+              ? null
               : 0
             : data[key];
       });
@@ -448,7 +450,7 @@ class DataSheetEventHandlers {
         name: 'Insert 1 Row',
         action: () => cloneRow(true)
       });
-      if (e.column.colId === 'species') {
+      if (e.column?.colId === 'species') {
         if (items.length > 0) items.push('separator');
         items.push({
           name: 'View on reeflifesurvey.com',
