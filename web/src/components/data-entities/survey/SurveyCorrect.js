@@ -18,6 +18,7 @@ import SurveyMeasurementHeader from './SurveyMeasurementHeader';
 import eh from '../../../components/import/DataSheetEventHandlers';
 import SurveyDiff from './SurveyDiff';
 import { AppConstants } from '../../../common/constants';
+import PropTypes from 'prop-types';
 
 const toolTipValueGetter = ({context, data, colDef}) => {
   if (!context.cellValidations) return;
@@ -52,7 +53,7 @@ const packedData = (api) => {
   return packedData;
 };
 
-const SurveyCorrect = () => {
+const SurveyCorrect = ({suppressColumnVirtualisation = false}) => {
   const surveyId = useParams()?.id;
   const gridRef = useRef();
 
@@ -443,6 +444,7 @@ const SurveyCorrect = () => {
           onRowDataUpdated={onRowDataUpdated}
           onSortChanged={eh.onSortChanged}
           processDataFromClipboard={eh.processDataFromClipboard}
+          suppressColumnVirtualisation={suppressColumnVirtualisation}
           ref={gridRef}
           rowHeight={20}
           rowSelection="multiple"
@@ -525,6 +527,10 @@ const SurveyCorrect = () => {
       </Box>
     </>
   );
+};
+
+SurveyCorrect.propTypes = {
+  suppressColumnVirtualisation: PropTypes.bool,
 };
 
 export default SurveyCorrect;

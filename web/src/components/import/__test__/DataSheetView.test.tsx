@@ -77,7 +77,7 @@ describe('<DataSheetView/>', () => {
       </BrowserRouter>
     );
 
-    waitFor(() => screen.findByText('user_noextend.xlsx'))
+    screen.findByText('user_noextend.xlsx', {timeout: 2000})
       .then(() => {
         // verify default columns exist
         columns.forEach((x) => {
@@ -130,7 +130,7 @@ describe('<DataSheetView/>', () => {
       </BrowserRouter>
     );
 
-    waitFor(() => screen.findByText('id.xlsx'))
+    screen.findByText('id.xlsx', {timeout: 2000})
       .then(() => {
         // verify default columns exist
         columns.forEach((x) => {
