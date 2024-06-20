@@ -1,6 +1,5 @@
-import {render, waitFor, screen} from '@testing-library/react';
 import '@testing-library/jest-dom';
-import {describe, beforeAll, afterEach, test} from '@jest/globals';
+import {describe, test, expect} from '@jest/globals';
 import { createNewPosSlot } from "../DataSheetEventHandlers";
 
 describe("Datasheet Event Handlers", () => {

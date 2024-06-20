@@ -52,7 +52,7 @@ const packedData = (api) => {
   return packedData;
 };
 
-const SurveyCorrect = () => {
+const SurveyCorrect = ({suppressColumnVirtualisation = false}) => {
   const surveyId = useParams()?.id;
   const gridRef = useRef();
 
@@ -443,6 +443,7 @@ const SurveyCorrect = () => {
           onRowDataUpdated={onRowDataUpdated}
           onSortChanged={eh.onSortChanged}
           processDataFromClipboard={eh.processDataFromClipboard}
+          suppressColumnVirtualisation={suppressColumnVirtualisation}
           ref={gridRef}
           rowHeight={20}
           rowSelection="multiple"

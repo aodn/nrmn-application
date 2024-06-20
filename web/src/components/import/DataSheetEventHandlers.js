@@ -1,6 +1,10 @@
 import {blue, grey, orange, red, yellow} from '@mui/material/colors';
 import {extendedMeasurements, measurements} from '../../common/constants';
 
+const INSERT_ONE_ROW = 'Insert 1 Row';
+const CLONE_ONE_ROW = 'Clone 1 Row';
+const DELETE_ONE_ROW = 'Delete 1 Row';
+
 /*
 * The posMap is a map of all the row's position, currentPostIdx is the row index where user
 * click the insert row, so row should be insert below, this function is use to move the
@@ -24,7 +28,7 @@ const createNewPosSlot = (e, currentPosIdx) => {
     posIdx.slice(p).forEach(i => updatedPosMap.set(i, updatedPosMap.get(i) + 1));
   }
   return updatedPosMap;
-};
+}
 
 class DataSheetEventHandlers {
   constructor() {
@@ -406,7 +410,7 @@ class DataSheetEventHandlers {
 
       const updatedPosMap = createNewPosSlot(e, currentPosIdx + 1);
       // Update the existing pos of each item
-      e.context.rowData.map((r) => r.pos = updatedPosMap.get(r.pos));
+      e.context.rowData.forEach((r) => r.pos = updatedPosMap.get(r.pos));
       // Now safe to assign this pos
       newData.pos = currentPosIdx + 1;
       newData.id = newId;
@@ -439,15 +443,15 @@ class DataSheetEventHandlers {
     if (selectedRows.length < 2) {
       if (items.length > 0) items.push('separator');
       items.push({
-        name: 'Delete 1 Row',
+        name: DELETE_ONE_ROW,
         action: () => eh.deleteRow(e)
       });
       items.push({
-        name: 'Clone 1 Row',
+        name: CLONE_ONE_ROW,
         action: () => cloneRow(false)
       });
       items.push({
-        name: 'Insert 1 Row',
+        name: INSERT_ONE_ROW,
         action: () => cloneRow(true)
       });
       if (e.column?.colId === 'species') {
@@ -612,4 +616,7 @@ export default new DataSheetEventHandlers();
 
 export {
   createNewPosSlot,
+  CLONE_ONE_ROW,
+  INSERT_ONE_ROW,
+  DELETE_ONE_ROW,
 };
