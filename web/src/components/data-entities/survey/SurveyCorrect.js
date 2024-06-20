@@ -18,6 +18,7 @@ import SurveyMeasurementHeader from './SurveyMeasurementHeader';
 import eh from '../../../components/import/DataSheetEventHandlers';
 import SurveyDiff from './SurveyDiff';
 import { AppConstants } from '../../../common/constants';
+import PropTypes from 'prop-types';
 
 const toolTipValueGetter = ({context, data, colDef}) => {
   if (!context.cellValidations) return;
@@ -529,6 +530,7 @@ const SurveyCorrect = ({suppressColumnVirtualisation = false}) => {
 };
 
 SurveyCorrect.propTypes = {
-  suppressColumnVirtualisation: boolean,
-}
+  suppressColumnVirtualisation: PropTypes.bool,
+};
+
 export default SurveyCorrect;
