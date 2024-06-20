@@ -528,4 +528,7 @@ const SurveyCorrect = ({suppressColumnVirtualisation = false}) => {
   );
 };
 
+SurveyCorrect.propTypes = {
+  suppressColumnVirtualisation: boolean,
+}
 export default SurveyCorrect;

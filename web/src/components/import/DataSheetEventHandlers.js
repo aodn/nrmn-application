@@ -28,7 +28,7 @@ const createNewPosSlot = (e, currentPosIdx) => {
     posIdx.slice(p).forEach(i => updatedPosMap.set(i, updatedPosMap.get(i) + 1));
   }
   return updatedPosMap;
-}
+};
 
 class DataSheetEventHandlers {
   constructor() {
