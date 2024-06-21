@@ -3,11 +3,11 @@ import '@testing-library/jest-dom';
 import {describe, beforeAll, afterEach, test} from '@jest/globals';
 import {BrowserRouter} from 'react-router-dom';
 import * as axiosInstance from '../../../api/api';
-import {AxiosResponse} from 'axios';
 import DataSheetView from '../DataSheetView';
 import {extendedMeasurements, measurements} from '../../../common/constants';
 import eh from '../DataSheetEventHandlers';
 import {AppConstants} from '../../../common/constants';
+import React from 'react';
 
 describe('<DataSheetView/>', () => {
   let mockGetDataJob;
@@ -64,7 +64,7 @@ describe('<DataSheetView/>', () => {
       };
 
       return (
-        new Promise<AxiosResponse>((resolve) => {
+        new Promise((resolve) => {
           resolve(raw);
         })
       );
@@ -117,7 +117,7 @@ describe('<DataSheetView/>', () => {
       };
 
       return (
-        new Promise<AxiosResponse>((resolve) => {
+        new Promise((resolve) => {
           resolve(raw);
         })
       );
@@ -181,7 +181,7 @@ describe('<DataSheetView/>', () => {
       };
 
       return (
-        new Promise<AxiosResponse>((resolve) => {
+        new Promise((resolve) => {
           resolve(raw);
         })
       );
@@ -214,7 +214,7 @@ describe('<DataSheetView/>', () => {
       };
 
       return (
-        new Promise<AxiosResponse>((resolve) => {
+        new Promise((resolve) => {
           resolve(raw);
         })
       );

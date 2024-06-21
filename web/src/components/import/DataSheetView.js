@@ -103,7 +103,7 @@ const DataSheetView = ({onIngest, roles}) => {
         source: res.data.job.source,
         status: res.data.job.status
       };
-      if (res.data.rows) {
+      if (res?.data.rows) {
         const rowData = res.data.rows.map((row) => {
           const {measureJson} = {...row};
           Object.getOwnPropertyNames(measureJson || {}).forEach((numKey) => {
@@ -117,7 +117,8 @@ const DataSheetView = ({onIngest, roles}) => {
         api.setRowData(rowData.length > 0 ? rowData : null);
       }
       if (completion) completion(job);
-    });
+    })
+    .catch(() => {});
   },[]);
 
   useEffect(() => {
@@ -233,12 +234,14 @@ const DataSheetView = ({onIngest, roles}) => {
     });
     // set rows to the handler, because the handler will rectify the data according to the validation result later
     dataRectificationHandlerRef.current.setRows(rowUpdateDtos);
-    updateRows(id, rowUpdateDtos, () => {
-      if (context.fullRefresh) {
-        reload(gridApi, id, handleValidate, isAdmin);
-        context.fullRefresh = false;
-      } else {
-        handleValidate();
+    updateRows(id, rowUpdateDtos, (res) => {
+      if(res) {
+        if (context.fullRefresh) {
+          reload(gridApi, id, handleValidate, isAdmin);
+          context.fullRefresh = false;
+        } else {
+          handleValidate();
+        }
       }
     });
   };
