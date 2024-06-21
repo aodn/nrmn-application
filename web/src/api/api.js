@@ -99,6 +99,10 @@ export const userLogin = (params, onResult) => {
           onResult({expires: 0}, res.data.error);
         }
       }
+    })
+    .catch((error) => {
+      // Make sure the api is up and run
+      onResult(null, error);
     });
 };
 
@@ -189,8 +193,11 @@ export const validateJob = (jobId, completion) => {
   return axiosInstance.post(`stage/validate/${jobId}`).then(completion);
 };
 
-export const updateRows = (jobId, rows, completion) => {
-  return axiosInstance.put(`stage/job/${jobId}`, rows).then((res) => completion(res));
+export const updateRows = (jobId, rows, onResult) => {
+  return axiosInstance
+    .put(`stage/job/${jobId}`, rows)
+    .then((res) => onResult(res, null))
+    .catch((error) => onResult(null, error));
 };
 
 export const runDailyTasks = () => axiosInstance.post('admin/runDailyTasks').then((res) => res);

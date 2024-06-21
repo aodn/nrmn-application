@@ -27,7 +27,7 @@ const LoginForm = () => {
     const {username, password} = event.target.elements;
     const form = {username: username?.value, password: password?.value};
     userLogin(form, (result, error) => {
-      if (result.changePassword) {
+      if (result?.changePassword) {
         navigate('/changePassword', {push: true});
       } else {
         setFormState(error ? {error} : {result});
