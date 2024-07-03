@@ -94,8 +94,8 @@ public class SiteValidation {
                 return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
                         Arrays.asList(row.getId()), Arrays.asList("latitude", "longitude"));
             }
-            // No need to show warning if it is zero
-            if (distMeters > 0 && distMeters < SURVEY_LOCATION_TOLERANCE) {
+            // No need to show warning if it is below 0.05 as rounding will show 0.0
+            if (distMeters >= 0.05 && distMeters < SURVEY_LOCATION_TOLERANCE) {
                 var message = "Survey coordinates less than 10m from site (" + String.format("%.1f", distMeters) + "m). " +
                         NULLIFY_LAT_LON_MSG_SUFFIX;
                 return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
