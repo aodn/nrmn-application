@@ -1,6 +1,5 @@
 package au.org.aodn.nrmn.restapi.validation.process;
 
-import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 
@@ -22,10 +21,9 @@ class SurveyAtSiteTest extends FormattedTestProvider {
         formatted.setLatitude(-42.886410468013004);
         formatted.setLongitude(147.33520415427964);
 
-        formatted.setSite(Site.builder().siteCode("A SITE").latitude( -42.886410468013004).longitude(147.33520415427964).build());
+        formatted.setSite(Site.builder().siteCode("A SITE").latitude(-42.886410468013004).longitude(147.33520415427964).build());
         var error = siteValidation.validateSurveyAtSite(formatted);
-        assertNotEquals(error.getLevelId(), ValidationLevel.BLOCKING);
-        assertTrue(error.getMessage().contains("This row will use the site's coordinates"));
+        assertNull(error, "No warning as same site");
     }
 
     @Test
