@@ -26,7 +26,7 @@ public class AWSSecretManagerConfig {
     public DataSource createAwsSecretConnection(AWSSecretManagerProperties properties) {
 
         // Populate the user property with the secret ARN to retrieve user and password from the secret
-        Properties info = new Properties( );
+        Properties info = new Properties();
         info.put( "user", properties.getSecretId());
 
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
