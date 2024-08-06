@@ -2,13 +2,13 @@ import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { Box, Button, Typography, Autocomplete, CircularProgress, TextField, Collapse, IconButton } from '@mui/material';
 import { Navigate, useLocation } from 'react-router-dom';
 import { getResult } from '../../../api/api';
-import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
+import stateFilterHandler, { LocationState } from '../../../common/state-event-handler/StateFilterHandler';
 import { AuthContext } from '../../../contexts/auth-context';
 import { AppConstants } from '../../../common/constants';
 
 import 'ag-grid-enterprise';
 import { AgGridReact } from 'ag-grid-react';
-import { AgPromise, CellClickedEvent, ColDef, GridReadyEvent, SelectionChangedEvent } from 'ag-grid-community';
+import { AgPromise, CellClickedEvent, ColDef, FilterChangedEvent, GridReadyEvent, SelectionChangedEvent } from 'ag-grid-community';
 
 import { createFilterOptions } from '@mui/material/Autocomplete';
 import Backdrop from '@mui/material/Backdrop';
@@ -31,6 +31,7 @@ interface ModelType {
 // We want to keep the value between pages, so we only need to load it once.
 const cachedOptions: Array<Option> = [];
 const OBSERVABLE_ITEM_ID_FIELD = 'survey.observableItemId';
+const SURVEY_LIST_GRID_ID = 'survey-list';
 
 const defaultColDef = {
   lockVisible: true,
@@ -43,10 +44,6 @@ const defaultColDef = {
   filterParams: { debounceMs: AppConstants.Filter.WAIT_TIME_ON_FILTER_APPLY },
   floatingFilter: true
 };
-
-type LocationState = {
-  resetFilters: boolean;
-}
 
 const SurveyList = () => {
   const rowsPerPage = 50;
@@ -392,9 +389,9 @@ const SurveyList = () => {
       fetchSurveys(event).then(() => {
         const filter = location.state as LocationState;
         if (!filter?.resetFilters) {
-          stateFilterHandler.restoreStateFilters(gridRef);
+          stateFilterHandler.restoreStateFilters(gridRef, SURVEY_LIST_GRID_ID);
         } else {
-          stateFilterHandler.resetStateFilters(gridRef);
+          stateFilterHandler.resetStateFilters(SURVEY_LIST_GRID_ID);
         }
       });
     },
@@ -492,7 +489,6 @@ const SurveyList = () => {
           </Box>
           <AgGridReact
             ref={gridRef}
-            key={'survey-list'}
             className='ag-theme-material'
             rowHeight={24}
             rowSelection={'multiple'}
@@ -508,8 +504,8 @@ const SurveyList = () => {
             onSelectionChanged={(e: SelectionChangedEvent) => {
               setSelected(e.api.getSelectedRows().map((i) => i.surveyId));
             }}
-            onFilterChanged={(e) => {
-              stateFilterHandler.stateFilterEventHandler(gridRef, e);
+            onFilterChanged={(e: FilterChangedEvent) => {
+              stateFilterHandler.stateFilterEventHandler(SURVEY_LIST_GRID_ID, e);
 
               const filterModel = e.api.getFilterModel();
               setIsFiltered(Object.getOwnPropertyNames(filterModel).length > 0);
