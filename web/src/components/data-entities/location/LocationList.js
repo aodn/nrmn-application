@@ -68,7 +68,7 @@ const LocationList = () => {
                 ]
               });
             }
-          };
+          }
 
           // Sorting section, order is important
           let sort = [];

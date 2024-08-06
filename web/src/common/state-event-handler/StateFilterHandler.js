@@ -1,11 +1,11 @@
 function getFiltersForId(id) {
-  return localStorage.getItem(id + '-filters');;
+  return localStorage.getItem(id + '-filters');
 }
 
 // Component must set the id property if it needs to use this function
 function stateFilterEventHandler(ref, event) {
   localStorage.setItem(ref.current.props.id + '-filters', JSON.stringify(event.api.getFilterModel()));
-};
+}
 
 function resetStateFilters(ref) {
   localStorage.removeItem(ref.current.props.id + '-filters');

@@ -17,9 +17,9 @@ jest.setTimeout(30000);
 const canned = require('./cannedData/ObservableItemList.filter.data.json');
 
 describe('<ObservableItemList/> filter testing', () => {
-  let mockGetResult;
-  let mockGetFiltersForId;
-  let mockResetStateFilters;
+  let mockGetResult: any;
+  let mockGetFiltersForId: any;
+  let mockResetStateFilters: any;
   const columns = [
     'observation.observableItemId', 'observation.typeName', 'observation.name', 'observation.commonName',
     'observation.supersededBy', 'observation.supersededNames','observation.supersededIds','observation.phylum',
@@ -42,7 +42,7 @@ describe('<ObservableItemList/> filter testing', () => {
   test('Render necessary fields and no filter restored', async () => {
 
     // Override function so that it return the data we set.
-    mockGetResult.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url: string) => {
 
       const raw = {
         config: undefined,
@@ -53,7 +53,7 @@ describe('<ObservableItemList/> filter testing', () => {
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 
@@ -95,12 +95,12 @@ describe('<ObservableItemList/> filter testing', () => {
   test('Render necessary fields with filter restored', async () => {
 
     // Filter set will cause some items disappeared
-    mockGetFiltersForId.mockImplementation((id) => {
+    mockGetFiltersForId.mockImplementation((id: string) => {
       return '{"observation.commonName":{"filterType":"text","type":"contains","filter":"Nap"}}';
     });
 
     // Override function so that it return the data we set.
-    mockGetResult.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url: string) => {
 
       const raw = {
         config: undefined,
@@ -111,7 +111,7 @@ describe('<ObservableItemList/> filter testing', () => {
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 

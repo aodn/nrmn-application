@@ -70,7 +70,7 @@ const ObservableItemList = () => {
                 ]
               });
             }
-          };
+          }
 
           // Sorting section, order is important
           let sort = [];

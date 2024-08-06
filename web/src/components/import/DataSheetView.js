@@ -118,7 +118,9 @@ const DataSheetView = ({onIngest, roles}) => {
       }
       if (completion) completion(job);
     })
-    .catch(() => {});
+    .catch(() => {
+      // Do nothing here
+    });
   },[]);
 
   useEffect(() => {

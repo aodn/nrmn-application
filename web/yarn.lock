@@ -12,6 +12,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ag-grid-community/react@npm:27.3.0":
+  version: 27.3.0
+  resolution: "@ag-grid-community/react@npm:27.3.0"
+  dependencies:
+    prop-types: "npm:^15.8.1"
+  peerDependencies:
+    "@ag-grid-community/core": ~27.3.0
+    react: ^16.3.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.3.0 || ^17.0.0 || ^18.0.0
+  checksum: 10c0/116f135cc961e6d907cc15373ba0c3106e5f110be559e915826d57dd96309a06449147a1ab19b7dfa50c20a23fdc4d3ee250f2ea308b115addeb018f8b3e3119
+  languageName: node
+  linkType: hard
+
 "@alloc/quick-lru@npm:^5.2.0":
   version: 5.2.0
   resolution: "@alloc/quick-lru@npm:5.2.0"
@@ -4029,7 +4042,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.0.0":
+"@types/react-dom@npm:18.3.0, @types/react-dom@npm:^18.0.0":
   version: 18.3.0
   resolution: "@types/react-dom@npm:18.3.0"
   dependencies:
@@ -4047,7 +4060,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*":
+"@types/react@npm:*, @types/react@npm:18.3.3":
   version: 18.3.3
   resolution: "@types/react@npm:18.3.3"
   dependencies:
@@ -11165,6 +11178,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "nrmn-web@workspace:."
   dependencies:
+    "@ag-grid-community/react": "npm:27.3.0"
     "@babel/core": "npm:^7.23.3"
     "@babel/eslint-parser": "npm:^7.23.3"
     "@babel/plugin-syntax-flow": "npm:^7.23.3"
@@ -11182,6 +11196,8 @@ __metadata:
     "@testing-library/react": "npm:13.3.0"
     "@testing-library/user-event": "npm:14.2.0"
     "@types/jest": "npm:^29.5.9"
+    "@types/react": "npm:18.3.3"
+    "@types/react-dom": "npm:18.3.0"
     ag-grid-community: "npm:27.3.0"
     ag-grid-enterprise: "npm:27.3.0"
     ag-grid-react: "npm:27.3.0"

@@ -10,7 +10,7 @@ import {AppConstants} from '../../../common/constants';
 import React from 'react';
 
 describe('<DataSheetView/>', () => {
-  let mockGetDataJob;
+  let mockGetDataJob: any;
   const ingest = () => {};
 
   const columns = [
@@ -54,7 +54,7 @@ describe('<DataSheetView/>', () => {
     const canned = require('./job16.json');
 
     // Override function so that it return the data we set.
-    mockGetDataJob.mockImplementation((url) => {
+    mockGetDataJob.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: canned,
@@ -77,7 +77,7 @@ describe('<DataSheetView/>', () => {
       </BrowserRouter>
     );
 
-    screen.findByText('user_noextend.xlsx', {timeout: 2000})
+    screen.findByText('user_noextend.xlsx',{}, {timeout: 2000})
       .then(() => {
         // verify default columns exist
         columns.forEach((x) => {
@@ -107,7 +107,7 @@ describe('<DataSheetView/>', () => {
     const nonextend = require('./job17.json');
 
     // Override function so that it return the data we set.
-    mockGetDataJob.mockImplementation((url) => {
+    mockGetDataJob.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: nonextend,
@@ -130,7 +130,7 @@ describe('<DataSheetView/>', () => {
       </BrowserRouter>
     );
 
-    screen.findByText('id.xlsx', {timeout: 2000})
+    screen.findByText('id.xlsx', {}, {timeout: 2000})
       .then(() => {
         // verify default columns exist
         columns.forEach((x) => {
@@ -171,7 +171,7 @@ describe('<DataSheetView/>', () => {
     const nonextend = require('./job17.json');
 
     // Override function so that it return the data we set.
-    mockGetDataJob.mockImplementation((url) => {
+    mockGetDataJob.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: nonextend,
@@ -204,7 +204,7 @@ describe('<DataSheetView/>', () => {
     const nonextend = require('./job17.json');
 
     // Override function so that it return the data we set.
-    mockGetDataJob.mockImplementation((url) => {
+    mockGetDataJob.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: nonextend,

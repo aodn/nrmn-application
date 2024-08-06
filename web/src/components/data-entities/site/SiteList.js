@@ -70,7 +70,7 @@ const SiteList = () => {
                 ]
               });
             }
-          };
+          }
 
           // Sorting section, order is important
           let sort = [];

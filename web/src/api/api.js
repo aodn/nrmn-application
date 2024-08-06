@@ -5,7 +5,7 @@ import axiosInstance from './index.js';
 // define setApplicationError if this method is not present
 // eg. in unit tests
 if (typeof window.setApplicationError === 'undefined') {
-  window.setApplicationError = () => {};
+  window.setApplicationError = () => '';
 }
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
