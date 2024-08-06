@@ -1,0 +1,62 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "env": {
+    "node": true,
+    "jest": true,
+    "es6": true,
+    "browser": true
+  },
+  "plugins": ["@typescript-eslint", "no-console-log"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "prettier"
+  ],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly",
+    "ReactClass": false,
+    "axios": true
+  },
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "sourceType": "module"
+  },
+  "settings": {
+    "react": {
+      "createClass": "createReactClass",
+      "pragma": "React",
+      "version": "detect"
+    }
+  },
+  "rules": {
+    "no-process-env": "off",
+    "react/prop-types": ["error"],
+    "react/function-component-definition": [
+      "error",
+      {
+        "namedComponents": "arrow-function"
+      }
+    ],
+    "react/prefer-stateless-function": ["error", {"ignorePureComponents": true}],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "semi": ["error", "always"],
+    "quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true,
+        "allowTemplateLiterals": true
+      }
+    ],
+    "no-console-log/no-console-log": "warn",
+    "no-empty": "warn",
+    "no-trailing-spaces": "warn",
+    "no-unused-vars": "warn",
+    "no-alert": "error",
+    "no-debugger": "warn"
+  }
+}
