@@ -1,16 +1,19 @@
 import React, {useState, useCallback} from 'react';
 import {Box, Button, Typography} from '@mui/material';
-import {AgGridColumn, AgGridReact} from 'ag-grid-react';
+import { AgGridReact } from 'ag-grid-react';
 import { Navigate, NavLink, useLocation } from 'react-router-dom';
 import { getResult } from '../../../api/api';
 import {useRef} from 'react';
 import {Add} from '@mui/icons-material';
-import stateFilterHandler from '../../../common/state-event-handler/StateFilterHandler';
+import stateFilterHandler, { LocationState } from '../../../common/state-event-handler/StateFilterHandler';
 import 'ag-grid-enterprise';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-import {AuthContext} from '../../../contexts/auth-context';
 import {AppConstants} from '../../../common/constants';
+import { BodyScrollEndEvent, CellClickedEvent, ColDef, FilterChangedEvent, GridReadyEvent } from 'ag-grid-community';
+import { AuthContext } from '../../../contexts/auth-context';
+
+const LOCATION_LIST_GRID_ID = 'location-list';
 
 const defaultColDef = {
   lockVisible: true,
@@ -26,27 +29,90 @@ const LocationList = () => {
   const [loading, setLoading] = React.useState(false);
 
   const location = useLocation();
-  const [redirect, setRedirect] = useState();
+  const [redirect, setRedirect] = useState<string | undefined>();
   const gridRef = useRef(null);
 
+  const createColumns = useCallback((roles: Array<string> | undefined): ColDef[] => {
+    const cols: ColDef[] = [];
+
+    cols.push({
+      width: 40,
+      field: 'id',
+      headerName: '',
+      suppressMovable: true,
+      filter: false,
+      resizable: false,
+      sortable: false,
+      valueFormatter: () => '✎',
+      cellStyle: {paddingLeft: '10px', color: 'grey', cursor: 'pointer'},
+      onCellClicked: (event: CellClickedEvent) => {
+        if(roles?.includes(AppConstants.ROLES.DATA_OFFICER) || roles?.includes(AppConstants.ROLES.ADMIN)) {
+          const mouseEvent = event.event as MouseEvent;
+          if (mouseEvent.ctrlKey) {
+            if(event.data) {
+              window.open(`/reference/location/${event.data.id}/edit`, '_blank')?.focus();
+            }
+          } else {
+            setRedirect(`${event.data.id}/edit`);
+          }
+        }
+      }
+
+    });
+
+    cols.push({
+      field: 'locationName',
+      colId: 'location.locationName',
+      sort: 'asc',
+      cellStyle: {cursor: 'pointer'},
+      onCellClicked: (event: CellClickedEvent) => setRedirect(event.data.id),
+    });
+
+    cols.push({
+      maxWidth: 80,
+      field: 'status',
+      colId: 'location.status',
+    });
+
+    cols.push({
+      minWidth: 600,
+      field: 'ecoRegions',
+      colId: 'location.ecoRegions',
+    });
+
+    cols.push({
+      field: 'countries',
+      colId: 'location.countries',
+    });
+
+    cols.push({
+      minWidth: 600,
+      field: 'areas',
+      colId: 'location.areas',
+    });
+
+    return cols;
+
+  }, [setRedirect]);
+
   // Auto size function to be call each time data changed, so the grid always autofit
-  const autoSizeAll = (evt, skipHeader) => {
+  const autoSizeAll = (evt: BodyScrollEndEvent | GridReadyEvent, skipHeader: boolean) => {
     if (evt) {
       evt.columnApi.autoSizeAllColumns(skipHeader);
     }
   };
 
-  const onGridReady = useCallback((event) => {
+  const onGridReady = useCallback((event: GridReadyEvent) => {
     document.title = 'Locations';
-    async function fetchLocations(e) {
+    async function fetchLocations(e: GridReadyEvent) {
       e.api.setDatasource({
         // This is the functional structure need for datasource
         rowCount: rowsPerPage,
         getRows: (params) => {
           let url = `locations?page=${params.startRow / 100}`;
-          let conditions = [];
+          const conditions = [];
           // Filter section
-          for(let name in params.filterModel) {
+          for(const name in params.filterModel) {
             const p = params.filterModel[name];
 
             if(p.type) {
@@ -71,7 +137,8 @@ const LocationList = () => {
           }
 
           // Sorting section, order is important
-          let sort = [];
+          const sort: Array<{ field: string; order: string }> = [];
+
           params.sortModel.forEach(i => {
             sort.push({
               field: i.colId,
@@ -95,18 +162,19 @@ const LocationList = () => {
     }
 
     fetchLocations(event).then(() => {
-      if(!(location?.state?.resetFilters)) {
-        stateFilterHandler.restoreStateFilters(gridRef);
+      const filter = location.state as LocationState;
+      if(!(filter?.resetFilters)) {
+        stateFilterHandler.restoreStateFilters(gridRef, LOCATION_LIST_GRID_ID);
       }
       else {
-        stateFilterHandler.resetStateFilters(gridRef);
+        stateFilterHandler.resetStateFilters(LOCATION_LIST_GRID_ID);
       }
 
       autoSizeAll(event, false);
     });
   }, [location]);
 
-  if (redirect) return <Navigate push to={`/reference/location/${redirect}`} />;
+  if (redirect) return <Navigate to={`/reference/location/${redirect}`} />;
 
   return (
     <AuthContext.Consumer>
@@ -126,50 +194,25 @@ const LocationList = () => {
               variant="contained" to="/reference/location"
               component={NavLink}
               startIcon={<Add />}
-              disabled={!(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN))}>New Location
+              disabled={!(auth?.roles?.includes(AppConstants.ROLES.DATA_OFFICER) || auth?.roles?.includes(AppConstants.ROLES.ADMIN))}>New Location
             </Button>
           </Box>
         </Box>
         <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
           <AgGridReact
             ref={gridRef}
-            id={'location-list'}
             rowHeight={24}
             pagination={true}
             paginationPageSize={rowsPerPage}
             rowModelType={'infinite'}
             enableCellTextSelection={true}
             onGridReady={(e) => onGridReady(e)}
-            onBodyScrollEnd={(e) => autoSizeAll(e, false)}
-            onFilterChanged={(e) => stateFilterHandler.stateFilterEventHandler(gridRef, e)}
+            onBodyScrollEnd={(e: BodyScrollEndEvent) => autoSizeAll(e, false)}
+            onFilterChanged={(e: FilterChangedEvent) => stateFilterHandler.stateFilterEventHandler(LOCATION_LIST_GRID_ID, e)}
             suppressCellFocus={true}
             defaultColDef={defaultColDef}
+            columnDefs={createColumns(auth.roles)}
           >
-            <AgGridColumn
-              width={40}
-              field="id"
-              headerName=""
-              suppressMovable={true}
-              filter={false}
-              resizable={false}
-              sortable={false}
-              valueFormatter={() => '✎'}
-              cellStyle={{paddingLeft: '10px', color: 'grey', cursor: 'pointer'}}
-              onCellClicked={(e) => {
-                if(auth.roles.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles.includes(AppConstants.ROLES.ADMIN)) {
-                  if (e.event.ctrlKey) {
-                    window.open(`/reference/location/${e.data.id}/edit`, '_blank').focus();
-                  } else {
-                    setRedirect(`${e.data.id}/edit`);
-                  }
-                }
-              }}
-            />
-            <AgGridColumn field="locationName" colId="location.locationName" sort="asc" cellStyle={{cursor: 'pointer'}} onCellClicked={(e) => setRedirect(e.data.id)} />
-            <AgGridColumn maxWidth={80} field="status" colId="location.status"/>
-            <AgGridColumn minWidth={600} field="ecoRegions" colId="location.ecoRegions"/>
-            <AgGridColumn field="countries" colId="location.countries"/>
-            <AgGridColumn minWidth={600} field="areas" colId="location.areas"/>
           </AgGridReact>
         </Box>
       </>}
