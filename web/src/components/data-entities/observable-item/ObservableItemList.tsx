@@ -31,7 +31,7 @@ const ObservableItemList = () => {
 
   const location = useLocation();
   const [redirect, setRedirect] = useState<string | undefined>();
-  const gridRef = useRef(null);
+  const gridRef = useRef<AgGridReact>(null);
 
   const createColumns = useCallback((roles: Array<string> | undefined) => {
     const cols: ColDef[] = [];

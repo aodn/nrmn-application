@@ -58,7 +58,7 @@ const DiverList = () => {
   const location = useLocation();
   const [delta, setDelta] = useState<object>([]);
   const [errors, setErrors] = useState<Array<{ id: string, message: string }>>([]);
-  const gridRef = useRef(null);
+  const gridRef = useRef<AgGridReact>(null);
 
   const onGridReady = useCallback(
     (event: GridReadyEvent) => {
