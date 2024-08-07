@@ -163,7 +163,7 @@ const LocationList = () => {
 
     fetchLocations(event).then(() => {
       const filter = location.state as LocationState;
-      if(!(filter?.resetFilters)) {
+      if(!filter?.resetFilters) {
         stateFilterHandler.restoreStateFilters(gridRef, LOCATION_LIST_GRID_ID);
       }
       else {

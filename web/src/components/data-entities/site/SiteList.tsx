@@ -228,7 +228,7 @@ const SiteList = () => {
 
     fetchSites(event).then(() => {
       const filter = location.state as LocationState;
-      if (!(filter.resetFilters)) {
+      if (!filter?.resetFilters) {
         stateFilterHandler.restoreStateFilters(gridRef, SITE_LIST_GRID_ID);
       }
       else {
