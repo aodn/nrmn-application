@@ -5,9 +5,21 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import {PropTypes} from 'prop-types';
 
-const AlertDialog = ({action, text, open, onClose, onConfirm}) => {
+interface AlertDialogProps {
+  action?: string,
+  open: boolean,
+  text?: string,
+  onClose?: React.MouseEventHandler<HTMLButtonElement>,
+  onConfirm?: React.MouseEventHandler<HTMLButtonElement>,
+}
+
+const AlertDialog: React.FC<AlertDialogProps> = ({
+  action, text,
+  open = false,
+  onClose,
+  onConfirm,
+}) => {
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle id="alert-dialog-title">Confirm</DialogTitle>
@@ -27,11 +39,3 @@ const AlertDialog = ({action, text, open, onClose, onConfirm}) => {
 };
 
 export default AlertDialog;
-
-AlertDialog.propTypes = {
-  action: PropTypes.string,
-  open: PropTypes.bool,
-  text: PropTypes.string,
-  onClose: PropTypes.func,
-  onConfirm: PropTypes.func
-};

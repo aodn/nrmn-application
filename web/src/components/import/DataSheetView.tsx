@@ -7,9 +7,8 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
 import ResetIcon from '@mui/icons-material/LayersClear';
-import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-import { PropTypes } from 'prop-types';
-import {useParams} from 'react-router-dom';
+import { AgGridReact} from 'ag-grid-react';
+import  {useParams } from 'react-router-dom';
 import {getDataJob, submitIngest, updateRows, validateJob} from '../../api/api';
 import { AppConstants, extendedMeasurements, measurements } from '../../common/constants';
 import LoadingOverlay from '../overlays/LoadingOverlay';
@@ -21,11 +20,16 @@ import {Paper} from '@mui/material';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import BackButton from '../ui/BackButton';
 import DataRectificationHandler from './DataRectificationHandler';
+import { CellStyle, CellStyleFunc, ColDef, GridApi, SuppressKeyboardEventParams } from 'ag-grid-enterprise';
+import { AxiosResponse } from 'axios';
+import { ValidationResponse, InternalContext, RowUpdate, StagedRow, JobResponse, SourceJobType, StatusJobType, ExtRow, Measurement } from '../../common/types';
+import { CellEditingStoppedEvent, CellValueChangedEvent, FilterChangedEvent, GetContextMenuItemsParams, GridReadyEvent, MenuItemDef, PasteEndEvent, RowDataUpdatedEvent } from 'ag-grid-community';
 
 // |context| is where all custom properties and helper functions
 // associated with the ag-grid are stored
 // see: https://www.ag-grid.com/javascript-grid/context/
-const context = {
+
+const context: InternalContext = {
   useOverlay: 'Loading',
   rowData: [],
   highlighted: [],
@@ -60,23 +64,36 @@ const defaultSideBar = {
 
 const IngestState = Object.freeze({Loading: 0, Edited: 1, Locked: 2, Valid: 3, ConfirmSubmit: 4});
 
-const DataSheetView = ({onIngest, roles}) => {
+interface JobType {
+  program?: string,
+  reference?: string,
+  isExtendedSize?: boolean,
+  source?: SourceJobType,
+  status?: StatusJobType,
+}
+
+interface DataSheetViewProps {
+  onIngest: (resp: AxiosResponse) => void,
+  roles: Array<string>,
+}
+
+const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
   const {id} = useParams();
-  const [job, setJob] = useState({});
-  const [gridApi, setGridApi] = useState();
+  const [job, setJob] = useState<JobType>({});
+  const [gridApi, setGridApi] = useState<GridApi>();
   const [isFiltered, setIsFiltered] = useState(false);
   const [undoSize, setUndoSize] = useState(0);
-  const [state, setState] = useState(IngestState.Loading);
+  const [state, setState] = useState<number>(IngestState.Loading);
   const [sideBar, setSideBar] = useState(defaultSideBar);
 
   const isAdmin = roles.includes(AppConstants.ROLES.ADMIN);
   const isDataOfficer = roles.includes(AppConstants.ROLES.DATA_OFFICER);
 
-  const dataRectificationHandlerRef = useRef(new DataRectificationHandler());
+  const dataRectificationHandlerRef = useRef<DataRectificationHandler>(new DataRectificationHandler());
 
-  const defaultColDef = {
+  const defaultColDef: ColDef = {
     lockVisible: true,
-    cellStyle: eh.chooseCellStyle,
+    cellStyle: eh.chooseCellStyle as CellStyle | CellStyleFunc | undefined,
     editable: true,
     enableCellChangeFlash: true,
     filter: true,
@@ -85,18 +102,18 @@ const DataSheetView = ({onIngest, roles}) => {
     minWidth: AppConstants.AG_GRID.dataColWidth,
     resizable: true,
     sortable: true,
-    suppressKeyboardEvent: eh.overrideKeyboardEvents,
+    suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => eh.overrideKeyboardEvents(params) as boolean,
     suppressMenu: true,
     tooltipValueGetter: eh.toolTipValueGetter,
     valueParser: ({newValue}) => (newValue ? newValue.trim() : '')
   };
 
-  const reload = useCallback((api, id, completion, isAdmin) => {
-    const context = api.gridOptionsWrapper.gridOptions.context;
+  const reload = useCallback((api: GridApi, id: string, completion: (job: JobType) => void, isAdmin: boolean) => {
     eh.resetContext();
     context.isAdmin = isAdmin;
-    getDataJob(id).then((res) => {
-      const job = {
+
+    getDataJob(id).then((res: AxiosResponse<JobResponse>) => {
+      const job: JobType = {
         program: res.data.job.program.programName,
         reference: res.data.job.reference,
         isExtendedSize: res.data.job.isExtendedSize,
@@ -106,26 +123,37 @@ const DataSheetView = ({onIngest, roles}) => {
       if (res?.data.rows) {
         const rowData = res.data.rows.map((row) => {
           const {measureJson} = {...row};
-          Object.getOwnPropertyNames(measureJson || {}).forEach((numKey) => {
-            row[numKey] = measureJson[numKey];
-          });
+          const json = JSON.parse(measureJson || '{}');
+
+          Object.getOwnPropertyNames(json)
+            .forEach((numKey) => {
+              if(measureJson) {
+                (row as ExtRow)[numKey] = json[numKey];
+              }
+            }
+          );
           delete row.measureJson;
           return row;
         });
-        context.rowData = rowData;
-        context.rowPos = rowData.map((r) => r.pos).sort((a, b) => a - b);
-        api.setRowData(rowData.length > 0 ? rowData : null);
+
+        if(rowData) {
+          context.rowData = rowData as ExtRow[];
+          context.rowPos = rowData.map((r: StagedRow) => r.pos as number)
+            .sort((a: number, b: number) => a - b) as number[];
+            
+          api.setRowData(rowData.length > 0 ? rowData : []);
+        }
       }
       if (completion) completion(job);
     })
     .catch(() => {
       // Do nothing here
     });
-  },[]);
+  },[context]);
 
   useEffect(() => {
     document.title = 'Ingest Sheet';
-    const undoKeyboardHandler = (event) => {
+    const undoKeyboardHandler = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.key === 'z') {
         event.preventDefault();
         event.stopPropagation();
@@ -157,88 +185,103 @@ const DataSheetView = ({onIngest, roles}) => {
     setState(IngestState.Loading);
     setSideBar(defaultSideBar);
     context.errors = [];
-    validateJob(id, (result) => {
-      if (result.data === 'locked') {
+
+    validateJob(id, (result: AxiosResponse<ValidationResponse>) => {
+      // Bad design that it comes with either string or structure
+      // we need to cast here just to handle this case.
+      if (result.data as string === 'locked') {
         setState(IngestState.Locked);
         return;
       }
 
-      context.errors = result.data.errors;
-      delete result.data.errors;
-      delete result.data.job;
-      context.summary = result.data;
-      context.errorList = eh.generateErrorTree(context.rowData, context.errors);
+      const data = result.data;
 
-      // After validation, the system will set the validation result to the handler in case dev
-      // there are some data need to be rectified by system automatically
-      dataRectificationHandlerRef.current.setValidationResult(context.errors);
+      if(data.errors) {
+        context.errors = data.errors;
+        
+        delete result.data.errors;
+        delete result.data.job;
+        
+        context.summary = result.data;
+        context.errorList = eh.generateErrorTree(context.rowData, context.errors);
 
-      setState(context.errors.some((e) => e.levelId === 'BLOCKING') ? IngestState.Edited : IngestState.Valid);
+        // After validation, the system will set the validation result to the handler in case dev
+        // there are some data need to be rectified by system automatically
+        dataRectificationHandlerRef.current.setValidationResult(context.errors);
 
-      setSideBar((sideBar) => {
-        return {
-          defaultToolPanel: 'validation',
-          toolPanels: [
-            {
-              id: 'validation',
-              labelDefault: 'Validation',
-              labelKey: 'validation',
-              iconKey: 'columns',
-              toolPanel: 'validationPanel'
-            },
-            ...sideBar.toolPanels
-          ]
-        };
-      });
+        setState(context.errors.some((e) => e.levelId === 'BLOCKING') ? IngestState.Edited : IngestState.Valid);
+
+        setSideBar((sideBar) => {
+          return {
+            defaultToolPanel: 'validation',
+            toolPanels: [
+              {
+                id: 'validation',
+                labelDefault: 'Validation',
+                labelKey: 'validation',
+                iconKey: 'columns',
+                toolPanel: 'validationPanel'
+              },
+              ...sideBar.toolPanels
+            ]
+          };
+        });
+      };
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback((event: React.MouseEvent<HTMLButtonElement>): void => {
     context.useOverlay = 'Submitting';
     setState(IngestState.Loading);
     setSideBar(defaultSideBar);
 
     // Before submit, the system will rectify the data according to the validation result
-    dataRectificationHandlerRef.current.submitRectification(id).then(() => {
-      submitIngest(id, () => setState(IngestState.Locked), (res) => onIngest(res));
-    });
-  };
+    dataRectificationHandlerRef
+      .current
+      .submitRectification(id)
+      .then(() => submitIngest(id, () => setState(IngestState.Locked), (res: AxiosResponse) => onIngest(res))
+    );
+  }, [dataRectificationHandlerRef, setState, setSideBar]);
 
   const handleSaveAndValidate = () => {
     context.useOverlay = 'Saving';
     setState(IngestState.Loading);
     setSideBar(defaultSideBar);
 
-    const rowUpdateDtos = [];
+    const rowUpdateDtos : Array<RowUpdate> = [];
 
-    Array.from(new Set(context.putRowIds)).forEach((rowId) => {
-      const row = context.rowData.find((r) => r.id === rowId);
+    Array.from(new Set(context.putRowIds)).forEach((rowId: number) => {
+      const row = context.rowData?.find((r) => r.id === rowId);
 
-      // Serialise the measure JSON
-      if (row) {
-        let measure = {};
-        Object.getOwnPropertyNames(row || {})
-          .filter((key) => !isNaN(parseFloat(key)))
-          .forEach((numKey) => {
-            measure[numKey] = row[numKey];
-          });
-        row.measureJson = measure;
+      if(row) {
+        // Serialise the measure JSON
+        if (row) {
+          const measure: {[key: string]: number | string} = {};
+          Object.getOwnPropertyNames(row || {})
+            .filter((key) => !isNaN(parseFloat(key)))
+            .forEach((numKey) => {
+              measure[numKey] = row[numKey];
+            });
+          row.measureJson = JSON.stringify(measure);
+        }
+
+        // Null row data means that the row is to be deleted
+        rowUpdateDtos.push({rowId: rowId, row: row as StagedRow});
+
+        // HACK: use the fact that new rows are assigned a long identifier
+        // to determine if we need a full reload to get the server-assigned
+        // row id. A better way would be to do a full reload based on a server
+        // response.
+        context.fullRefresh = context.fullRefresh || rowId.toString().length === 10 || row === null;
       }
-
-      // Null row data means that the row is to be deleted
-      rowUpdateDtos.push({rowId: rowId, row: row});
-
-      // HACK: use the fact that new rows are assigned a long identifier
-      // to determine if we need a full reload to get the server-assigned
-      // row id. A better way would be to do a full reload based on a server
-      // response.
-      context.fullRefresh = context.fullRefresh || rowId.toString().length === 10 || row === null;
     });
+
     // set rows to the handler, because the handler will rectify the data according to the validation result later
     dataRectificationHandlerRef.current.setRows(rowUpdateDtos);
-    updateRows(id, rowUpdateDtos, (res) => {
-      if(res) {
-        if (context.fullRefresh) {
+
+    updateRows(id, rowUpdateDtos, (res: AxiosResponse) => {
+      if(res && id) {
+        if (context.fullRefresh && gridApi) {
           reload(gridApi, id, handleValidate, isAdmin);
           context.fullRefresh = false;
         } else {
@@ -248,58 +291,228 @@ const DataSheetView = ({onIngest, roles}) => {
     });
   };
 
-  const onCellValueChanged = (e) => {
+  const onCellValueChanged = useCallback((e: CellValueChangedEvent) => {
     setUndoSize(eh.handleCellValueChanged(e));
     if (isFiltered) {
+      
       const filterModel = e.api.getFilterModel();
       const field = e.colDef.field;
-      if (filterModel[field]) {
+
+      if (field && filterModel[field]) {
         filterModel[field].values.push(e.newValue);
         e.api.setFilterModel(filterModel);
       }
     }
-  };
+  }, []);
 
-  const onPasteEnd = (e) => {
+  const onPasteEnd = useCallback((e: PasteEndEvent) => {
     setUndoSize(eh.handlePasteEnd(e));
-  };
+  }, [setUndoSize]);
 
-  const onCellEditingStopped = (e) => {
+  const onCellEditingStopped = useCallback((e: CellEditingStoppedEvent) => {
     setUndoSize(eh.handleCellEditingStopped(e));
     setState(IngestState.Edited);
-  };
+  }, [setUndoSize, setState]);
 
-  const onGridReady = (p) => {
+  const onGridReady = (p: GridReadyEvent) => {
     setGridApi(p.api);
-    reload(
-      p.api,
-      id,
-      (job) => {
-        setState(IngestState.Edited);
-        setJob(job);
-        document.title = job.reference;
-      },
-      isAdmin
-    );
+    
+    if(id) {
+      reload(
+        p.api,
+        id,
+        (job) => {
+          if(job.reference) {
+            setState(IngestState.Edited);
+            setJob(job);
+            document.title = job.reference;
+          }
+        },
+        isAdmin
+      );
+    }
   };
 
-  const onFilterChanged = (e) => {
+  const onFilterChanged = useCallback((e: FilterChangedEvent) => {
     e.api.refreshCells();
     const filterModel = e.api.getFilterModel();
     setIsFiltered(Object.getOwnPropertyNames(filterModel).length > 0);
-  };
+  },[]);
 
-  const onRowDataUpdated = (e) => {
-    const ctx = e.api.gridOptionsWrapper.gridOptions.context;
+  const onRowDataUpdated = useCallback((e: RowDataUpdatedEvent) => {
+    const ctx = context;
     if (ctx.putRowIds.length > 0) {
       setState(IngestState.Edited);
     }
     e.columnApi.autoSizeAllColumns();
     setUndoSize(ctx.undoStack.length);
-  };
+  }, [context, setState, setUndoSize]);
 
-  const editable = ['STAGED'].includes(job.status);
-  const measurementColumns = job.isExtendedSize ? measurements.concat(extendedMeasurements) : measurements;
+  const createColumns = useCallback((measurementColumns: Array<Measurement>, isExtendedSize: boolean | undefined): ColDef[] => {
+    // It is a hack, for some reason it use a field that is not def in ColDef
+    const cols: (ColDef & {key?: string})[] = [];
+
+    cols.push({
+      field: 'id',
+      headerName: 'ID',
+      editable: false,
+      hide: true,
+    });
+
+    cols.push({
+      field: 'pos',
+      editable: false,
+      hide: true,
+      sort: 'asc'
+    });
+
+    cols.push({
+      field: 'row',
+      headerName: '',
+      suppressMovable: true,
+      editable: false,
+      valueGetter: eh.rowValueGetter,
+      minWidth: 40,
+      enableCellChangeFlash: false,
+      filter: false,
+      sortable: false,
+    });
+
+    cols.push({
+      field: 'diver',
+      headerName: 'Diver',
+    });
+
+    cols.push({
+      field: 'buddy',
+      headerName: 'Buddy',
+    });
+
+    cols.push({
+      field: 'siteCode',
+      headerName: 'Site No.',
+      rowGroup: false,
+      enableRowGroup: true
+    });
+
+    cols.push({
+      minWidth: 160,
+      field: 'siteName',
+      headerName: 'Site Name',
+    });
+
+    cols.push({
+      field: 'latitude',
+      headerName: 'Latitude',
+    });
+
+    cols.push({
+      field: 'longitude',
+      headerName: 'Longitude',
+    });
+
+    cols.push({
+      field: 'date',
+      headerName: 'Date',
+      rowGroup: false,
+      enableRowGroup: true,
+      comparator: eh.dateComparator,
+    });
+
+    cols.push({
+      field: 'vis',
+      headerName: 'Vis',
+    });
+
+    cols.push({
+      field: 'direction',
+      headerName: 'Direction',
+    });
+
+    cols.push({
+      field: 'time',
+      headerName: 'Time',
+    });
+
+    cols.push({
+      field: 'P-Qs',
+      headerName: 'P-Qs',
+    });
+
+    cols.push({
+      field: 'depth',
+      headerName: 'Depth',
+      rowGroup: false,
+      enableRowGroup: true,
+    });
+
+    cols.push({
+      field: 'method',
+      headerName: 'Method',
+      rowGroup: false,
+      enableRowGroup: true,
+    });
+    
+    cols.push({
+      field: 'block',
+      headerName: 'Block',
+      rowGroup: false,
+      enableRowGroup: true,
+    });
+
+    cols.push({
+      field: 'code',
+      headerName: 'Code',
+    });
+
+    cols.push({
+      field: 'species',
+      headerName: 'Species',
+    });
+
+    cols.push({
+      field: 'commonName',
+      headerName: 'Common Name',
+    });
+
+    cols.push({
+      field: 'total',
+      headerName: 'Total',
+      aggFunc: 'count',
+    });
+
+    cols.push({
+      field: 'inverts',
+      headerName: 'Inverts',
+    });
+
+    measurementColumns.map((m) => (
+      cols.push({
+        field: m.field,
+        headerName: m.fishSize,
+        key: m.field,
+        editable: editable,
+        width: AppConstants.AG_GRID.measureColWidth,
+        headerComponentParams: {
+          template: `<div style="width: 48px; float: left; text-align:center"><div style="color: #c4d79b; border-bottom: 1px solid rgba(0, 0, 0, 0.12)">${m.fishSize}</div><div style="color: #da9694">${m.invertSize}</div></div>`
+        }
+      })
+    ));
+
+    if(isExtendedSize) {
+      cols.push({
+        minWidth: 120,
+        field: 'isInvertSizing',
+        headerName: 'Use InvertSizing',
+      });
+    } 
+    
+    return cols as ColDef[];
+
+  }, []);
+
+  const editable = ['STAGED'].includes(job.status || '');
+  const measurementColumns = (job.isExtendedSize ? measurements.concat(extendedMeasurements) : measurements) as Array<Measurement>;
   return (
     <>
       <AlertDialog
@@ -341,7 +554,7 @@ const DataSheetView = ({onIngest, roles}) => {
               </Button>
             </Box>
             <Box m={1} ml={0} minWidth={150}>
-              <Button variant="outlined" startIcon={<ResetIcon />} disabled={!isFiltered} onClick={() => setIsFiltered()}>
+              <Button variant="outlined" startIcon={<ResetIcon />} disabled={!isFiltered} onClick={() => setIsFiltered(false)}>
                 Reset Filter
               </Button>
             </Box>
@@ -394,7 +607,7 @@ const DataSheetView = ({onIngest, roles}) => {
             enableRangeHandle
             enableRangeSelection
             fillHandleDirection="y"
-            getContextMenuItems={(e) => eh.getContextMenuItems(e, eh)}
+            getContextMenuItems={(params: GetContextMenuItemsParams) => eh.getContextMenuItems(params, eh) as (string | MenuItemDef)[]}
             getRowId={(r) => r.data.id}
             loadingOverlayComponent="loadingOverlay"
             onCellEditingStopped={onCellEditingStopped}
@@ -416,62 +629,13 @@ const DataSheetView = ({onIngest, roles}) => {
               findReplacePanel: FindReplacePanel,
               loadingOverlay: LoadingOverlay
             }}
+            columnDefs={createColumns(measurementColumns, job.isExtendedSize)}
           >
-            <AgGridColumn field="id" headerName="ID" editable={false} hide />
-            <AgGridColumn field="pos" editable={false} hide sort="asc" />
-            <AgGridColumn
-              field="row"
-              headerName=""
-              suppressMovable
-              editable={false}
-              valueGetter={eh.rowValueGetter}
-              minWidth={40}
-              enableCellChangeFlash={false}
-              filter={false}
-              sortable={false}
-            />
-            <AgGridColumn field="diver" headerName="Diver" />
-            <AgGridColumn field="buddy" headerName="Buddy" />
-            <AgGridColumn field="siteCode" headerName="Site No." rowGroup={false} enableRowGroup />
-            <AgGridColumn minWidth={160} field="siteName" headerName="Site Name" />
-            <AgGridColumn field="latitude" headerName="Latitude" />
-            <AgGridColumn field="longitude" headerName="Longitude" />
-            <AgGridColumn field="date" headerName="Date" rowGroup={false} enableRowGroup comparator={eh.dateComparator} />
-            <AgGridColumn field="vis" headerName="Vis" />
-            <AgGridColumn field="direction" headerName="Direction" />
-            <AgGridColumn field="time" headerName="Time" />
-            <AgGridColumn field="P-Qs" headerName="P-Qs" />
-            <AgGridColumn field="depth" headerName="Depth" rowGroup={false} enableRowGroup />
-            <AgGridColumn field="method" headerName="Method" rowGroup={false} enableRowGroup />
-            <AgGridColumn field="block" headerName="Block" rowGroup={false} enableRowGroup />
-            <AgGridColumn field="code" headerName="Code" />
-            <AgGridColumn field="species" headerName="Species" />
-            <AgGridColumn field="commonName" headerName="Common Name" />
-            <AgGridColumn field="total" headerName="Total" aggFunc="count" />
-            <AgGridColumn field="inverts" headerName="Inverts" />
-            {measurementColumns.map((m) => (
-              <AgGridColumn
-                field={m.field}
-                headerName={m.fishSize}
-                key={m.field}
-                editable={editable}
-                width={AppConstants.AG_GRID.measureColWidth}
-                headerComponentParams={{
-                  template: `<div style="width: 48px; float: left; text-align:center"><div style="color: #c4d79b; border-bottom: 1px solid rgba(0, 0, 0, 0.12)">${m.fishSize}</div><div style="color: #da9694">${m.invertSize}</div></div>`
-                }}
-              />
-            ))}
-            {job.isExtendedSize && <AgGridColumn minWidth={120} field="isInvertSizing" headerName="Use InvertSizing" />}
           </AgGridReact>
         )}
       </Box>
     </>
   );
-};
-
-DataSheetView.propTypes = {
-  onIngest: PropTypes.func.isRequired,
-  roles: PropTypes.array.isRequired
 };
 
 export default DataSheetView;

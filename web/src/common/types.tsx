@@ -1,9 +1,11 @@
-enum SourceJobType {
+import { GridApi } from "ag-grid-enterprise";
+
+export enum SourceJobType {
     INGEST = 'INGEST',
     CORRECTION = 'CORRECTION'
 }
 
-enum StatusJobType {
+export enum StatusJobType {
     FAILED = 'FAILED',
     STAGED = 'STAGED',
     PENDING = 'PENDING',
@@ -37,11 +39,12 @@ enum StagedJobEventType {
     SUMMARY = 'SUMMARY',
     FILTER = 'FILTER'
 }
-
-export type ExtCorrectionRow = 
-    {[key: string]: number | string} & 
-    {id: number, pos: number} & 
-    CorrectionRow;
+// Not very good but no way as the type are 
+// not specificed initiall so all hack around
+export type ExtRow =
+    { [key: string]: number | string } &
+    { id: number, pos: number } &
+    (CorrectionRow | StagedRow);
 
 export interface CellFormatType {
     [key: string]: {
@@ -352,8 +355,47 @@ export interface ValidationResponse {
 }
 
 export interface CorrectionRequestBody {
-    programId?: Number;
+    programId?: number;
     isMultiple?: boolean;
     surveyIds?: Array<number>;
     rows?: StagedRow[];
+}
+
+export interface InternalContext {
+    errors: Array<SurveyValidationError>,
+    highlighted: [],
+    popUndo: (api: GridApi) => any,
+    pushUndo: (api: GridApi) => any,
+    putRowIds: [],
+    undoStack: [],
+    fullRefresh: boolean,
+    useOverlay: string,
+    validations?: Array<SurveyValidationError>,
+    diffSummary?: CorrectionDiff,
+    pendingPasteUndo: [],
+    summary?: [] | ValidationResponse,
+    errorList?: [],
+    pasteMode: boolean,
+    cellValidations?: CellFormatType[],
+    originalData?: CorrectionRow[],
+    rowData?: ExtRow[],
+    rowPos?: number[],
+    originalRowPos?: number[],
+    isAdmin?: boolean,
+}
+
+export interface RowUpdate {
+    rowId: number,
+    row: StagedRow,
+}
+
+export interface JobResponse {
+    job: StagedJob,
+    rows: Array<StagedRow>,
+}
+
+export interface Measurement {
+    field: string,
+    invertSize: string,
+    fishSize: string,
 }

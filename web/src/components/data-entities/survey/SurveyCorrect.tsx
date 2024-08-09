@@ -18,10 +18,9 @@ import SurveyMeasurementHeader from './SurveyMeasurementHeader';
 import eh from '../../import/DataSheetEventHandlers';
 import SurveyDiff from './SurveyDiff';
 import { AppConstants } from '../../../common/constants';
-import PropTypes from 'prop-types';
 import { ColDef, ITooltipParams } from 'ag-grid-enterprise';
 import { CellEditingStoppedEvent, CellStyle, CellStyleFunc, CellValueChangedEvent, FilterChangedEvent, GetContextMenuItemsParams, GridApi, GridReadyEvent, KeyCreatorParams, MenuItemDef, PasteEndEvent, RowDataUpdatedEvent, SuppressKeyboardEventParams } from 'ag-grid-community';
-import { CellFormatType, CorrectionDiff, CorrectionRequestBody, CorrectionRow, CorrectionRows, ExtCorrectionRow, StagedRow, SurveyValidationError } from '../../../common/types';
+import { CellFormatType, CorrectionDiff, CorrectionRequestBody, CorrectionRow, CorrectionRows, ExtRow, InternalContext, StagedRow, SurveyValidationError } from '../../../common/types';
 
 interface Header {
   field: string,
@@ -29,26 +28,6 @@ interface Header {
   editable?: boolean,
   hide?: boolean,
   sort?: 'asc' | 'desc'
-}
-
-interface InternalContext {
-  errors: Array<SurveyValidationError>,
-  highlighted: [],
-  popUndo: (api: GridApi) => any,
-  pushUndo: (api: GridApi) => any,
-  putRowIds: [],
-  undoStack: [],
-  fullRefresh: false,
-  useOverlay: string,
-  validations?: Array<SurveyValidationError>,
-  diffSummary?: CorrectionDiff,
-  pendingPasteUndo: [],
-  pasteMode: boolean,
-  cellValidations?: CellFormatType[],
-  originalData?: CorrectionRow[],
-  rowData?: CorrectionRow[],
-  rowPos?: number[],
-  originalRowPos?: number[],
 }
 
 const toolTipValueGetter = ({ context, data, colDef }: ITooltipParams) => {
@@ -98,7 +77,7 @@ const SurveyCorrect: React.FC<SurveyCorrectProps> = ({ suppressColumnVirtualisat
   // FUTURE: useReducer
   const [error, setError] = useState();
   const [editMode, setEditMode] = useState(true);
-  const [rowData, setRowData] = useState<Array<ExtCorrectionRow>>();
+  const [rowData, setRowData] = useState<Array<ExtRow>>();
   const [gridApi, setGridApi] = useState<GridApi>();
   const [isFiltered, setIsFiltered] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -322,7 +301,7 @@ const SurveyCorrect: React.FC<SurveyCorrectProps> = ({ suppressColumnVirtualisat
       }
       const { rows, programName, programId, surveyIds } = (res.data as CorrectionRows);
 
-      const unpackedData: Array<ExtCorrectionRow> = rows?.map((data: CorrectionRow, idx: number) => {
+      const unpackedData: Array<ExtRow> = rows?.map((data: CorrectionRow, idx: number) => {
         const { measureJson } = { ...data };
         const measure = measureJson ? JSON.parse(measureJson) : {};
 
