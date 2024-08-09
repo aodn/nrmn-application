@@ -14,9 +14,9 @@ import stateFilterHandler from '../../../../common/state-event-handler/StateFilt
 jest.setTimeout(30000);
 
 describe('<SurveyList/> filter testing', () => {
-  let mockGetResult;
-  let mockGetFiltersForId;
-  let mockResetStateFilters;
+  let mockGetResult: any;
+  let mockGetFiltersForId: any;
+  let mockResetStateFilters: any;
 
   const columnIds = ['survey.surveyId', 'survey.surveyDate', 'survey.siteCode', 'survey.latitude',
     'survey.longitude', 'survey.siteName', 'survey.depth', 'survey.diverName', 'survey.method',
@@ -41,7 +41,7 @@ describe('<SurveyList/> filter testing', () => {
     const canned = require('./cannedData/SurveyList.filter.data.json');
 
     // Override function so that it return the data we set.
-    mockGetResult.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url: string) => {
 
       const raw = {
         config: undefined,
@@ -52,7 +52,7 @@ describe('<SurveyList/> filter testing', () => {
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 
@@ -85,13 +85,13 @@ describe('<SurveyList/> filter testing', () => {
     const canned = require('./cannedData/SurveyList.filter.data.json');
 
     // Filter set will cause some items disappeared
-    mockGetFiltersForId.mockImplementation((id) => {
+    mockGetFiltersForId.mockImplementation((id: string) => {
       return '{"survey.siteName":{"filterType":"text","type":"contains","filter":"South East Apple"}}';
     });
 
     let requestURL = '';
     // Override function so that it return the data we set.
-    mockGetResult.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url: string) => {
       requestURL = url;
 
       const raw = {
@@ -103,7 +103,7 @@ describe('<SurveyList/> filter testing', () => {
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 

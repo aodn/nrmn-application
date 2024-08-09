@@ -1,4 +1,10 @@
-export const unsized = [
+export interface SizeCorrection {
+  field: string,
+  invertSize: string,
+  fishSize: string
+}
+
+export const unsized: Array<SizeCorrection> = [
   {
     field: 'measurements.0',
     invertSize: '',
@@ -148,7 +154,7 @@ export const measurements = Object.freeze([
     fishSize: '400',
     invertSize: '14'
   }
-]);
+] as Array<SizeCorrection>);
 
 export const extendedMeasurements = Object.freeze([
   {
@@ -211,6 +217,6 @@ export const extendedMeasurements = Object.freeze([
     fishSize: '1000',
     invertSize: '30'
   }
-]);
+] as Array<SizeCorrection>);
 
 export const allMeasurements = [...measurements, ...extendedMeasurements];

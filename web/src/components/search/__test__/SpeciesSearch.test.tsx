@@ -9,15 +9,15 @@ const visibleProps = ['class', 'family', 'genus', 'order', 'phylum', 'species', 
 const props = [...visibleProps, 'supersededBy', 'unacceptReason', 'aphiaId'];
 
 // dynamic create an array where size of page size and data contains identity of page value
-const createPageData = (page, pageSize) =>
+const createPageData = (page: number, pageSize: number) =>
   Array.from({length: pageSize}, (_, i) => i).map((i) => {
-    return props.reduce((row, prop) => {
+    return props.reduce((row: any, prop) => {
       row[prop] = `${prop}.${page}.${i}`;
       return row;
     }, {});
   });
 
-const handler = (properties) =>
+const handler = (properties: any) =>
   rest.get('/api/v1/species', (req, res, ctx) => {
     const pageParam = req.url.search.match(/page=.[0-9]*/gm)?.pop();
     const pageSizeParam = req.url.search.match(/pageSize=.[0-9]*/gm)?.pop();
@@ -33,7 +33,7 @@ const handler = (properties) =>
     return res(ctx.json(createPageData(page,length)));
   });
 
-const expectedPage = (page, pageSize) => {
+const expectedPage = (page: number, pageSize: number) => {
   for (const prop of visibleProps) {
     expect(screen.queryByText(`${prop}.${page}.0`)).toBeInTheDocument();
     expect(screen.queryByText(`${prop}.${page + 1}.0`)).not.toBeInTheDocument();
@@ -47,7 +47,7 @@ const expectedPage = (page, pageSize) => {
 
 describe('<SiteList/>', () => {
 
-  let myServer = null;
+  let myServer: any = null;
 
   beforeAll(() => {
     myServer = setupServer();

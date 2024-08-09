@@ -11,9 +11,9 @@ import {AuthContext} from '../../../../contexts/auth-context';
 import { AppConstants } from '../../../../common/constants';
 
 describe('<LocationList/> filter testing', () => {
-  let mockGetResult;
-  let mockGetFiltersForId;
-  let mockResetStateFilters;
+  let mockGetResult: any;
+  let mockGetFiltersForId: any;
+  let mockResetStateFilters: any;
   const columns = ['location.locationName','location.status','location.ecoRegions','location.countries','location.areas'];
 
   beforeAll(() => {
@@ -34,7 +34,7 @@ describe('<LocationList/> filter testing', () => {
     const canned = require('./LocationList.filter.data.json');
 
     // Override function so that it return the data we set.
-    mockGetResult.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url: string) => {
 
       const raw = {
         config: undefined,
@@ -45,7 +45,7 @@ describe('<LocationList/> filter testing', () => {
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 
@@ -89,12 +89,12 @@ describe('<LocationList/> filter testing', () => {
     const canned = require('./LocationList.filter.data.json');
 
     // Filter set will cause some items disappeared
-    mockGetFiltersForId.mockImplementation((id) => {
+    mockGetFiltersForId.mockImplementation((id: string) => {
       return '{"location.locationName":{"filterType":"text","type":"contains","filter":"Interest Bay"}}';
     });
 
     // Override function so that it return the data we set.
-    mockGetResult.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url: string) => {
 
       const raw = {
         config: undefined,
@@ -105,7 +105,7 @@ describe('<LocationList/> filter testing', () => {
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 

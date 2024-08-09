@@ -14,9 +14,9 @@ import { AppConstants } from '../../../common/constants';
 jest.setTimeout(30000);
 
 describe('<JobList/> filter testing', () => {
-  let mockGetResult;
-  let mockGetFiltersForId;
-  let mockResetStateFilters;
+  let mockGetResult: any;
+  let mockGetFiltersForId: any;
+  let mockResetStateFilters: any;
   const columns = ['reference', 'isExtendedSize', 'program', 'creator', 'created'];
 
   beforeAll(() => {
@@ -37,7 +37,7 @@ describe('<JobList/> filter testing', () => {
     const canned = require('./JobList.filter.data.json');
 
     // Override function so that it return the data we set.
-    mockGetResult.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: canned,
@@ -48,7 +48,7 @@ describe('<JobList/> filter testing', () => {
 
       return (
           new Promise<AxiosResponse>((resolve) => {
-            resolve(raw);
+            resolve(raw as any);
           })
       );
     });
@@ -112,12 +112,12 @@ describe('<JobList/> filter testing', () => {
     const canned = require('./JobList.filter.data.json');
 
     // Filter set will cause some items disappeared
-    mockGetFiltersForId.mockImplementation((id) => {
+    mockGetFiltersForId.mockImplementation((id: string) => {
       return '{"reference":{"filterType":"text","type":"contains","filter":"ge"}}';
     });
 
     // Override function so that it return the data we set.
-    mockGetResult.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: canned,
@@ -128,7 +128,7 @@ describe('<JobList/> filter testing', () => {
 
       return (
           new Promise<AxiosResponse>((resolve) => {
-            resolve(raw);
+            resolve(raw as any);
           })
       );
     });
@@ -192,12 +192,12 @@ describe('<JobList/> filter testing', () => {
     const canned = require('./JobList.filter.data.json');
 
     // Filter set will cause some items disappeared
-    mockGetFiltersForId.mockImplementation((id) => {
+    mockGetFiltersForId.mockImplementation((id: string) => {
       return '{"reference":{"filterType":"text","type":"contains","filter":"ge"}}';
     });
 
     // Override function so that it return the data we set.
-    mockGetResult.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: canned,
@@ -208,7 +208,7 @@ describe('<JobList/> filter testing', () => {
 
       return (
         new Promise<AxiosResponse>((resolve) => {
-          resolve(raw);
+          resolve(raw as any);
         })
       );
     });
@@ -234,12 +234,12 @@ describe('<JobList/> filter testing', () => {
     const canned = require('./JobList.filter.data.json');
 
     // Filter set will cause some items disappeared
-    mockGetFiltersForId.mockImplementation((id) => {
+    mockGetFiltersForId.mockImplementation((id: string) => {
       return '{"reference":{"filterType":"text","type":"contains","filter":"ge"}}';
     });
 
     // Override function so that it return the data we set.
-    mockGetResult.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: canned,
@@ -250,7 +250,7 @@ describe('<JobList/> filter testing', () => {
 
       return (
         new Promise<AxiosResponse>((resolve) => {
-          resolve(raw);
+          resolve(raw as any);
         })
       );
     });

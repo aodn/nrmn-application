@@ -16,8 +16,8 @@ const speciesList = require('./cannedData/ObservableItemAdd.species.json');
 const taxonomyList = require('./cannedData/ObservableItemAdd.taxonomy.json');
 
 describe('<ObservableItemAdd/>',  ()=>{
-  let mockSearch;
-  let mockGetResult;
+  let mockSearch: any;
+  let mockGetResult: any;
 
   beforeAll(() => {
     mockSearch = jest.spyOn(axiosInstance, 'search');
@@ -36,7 +36,7 @@ describe('<ObservableItemAdd/>',  ()=>{
    */
   test('Renders error on missing ObservableItem name', async () => {
 
-    mockGetResult.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: taxonomyList,
@@ -46,11 +46,11 @@ describe('<ObservableItemAdd/>',  ()=>{
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 
-    mockSearch.mockImplementation((url) => {
+    mockSearch.mockImplementation((url: string) => {
 
       const raw = {
         config: undefined,
@@ -61,7 +61,7 @@ describe('<ObservableItemAdd/>',  ()=>{
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 
@@ -88,10 +88,12 @@ describe('<ObservableItemAdd/>',  ()=>{
       .then(() => {
         // Need 3 chars in order to do search
         // Trigger screen refresh by typing the string
-        userEvent.type(searchField, v);
+        if(searchField) {
+          userEvent.type(searchField, v);
+        }
       });
 
-    await waitFor(() => expect(searchField.value).toBe(v), { timeout: 10000})
+    await waitFor(() => expect(searchField?.value).toBe(v), { timeout: 10000})
       .then(() => {
         fireEvent.click(button);
       });

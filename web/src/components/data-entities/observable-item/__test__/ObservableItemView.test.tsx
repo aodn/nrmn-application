@@ -38,10 +38,10 @@ const observableItemTestData = {
   class: 'Ulvophyceae'
 };
 
-const observableItemNullData = {...observableItemTestData};
+const observableItemNullData: any = {...observableItemTestData};
 for (const key in observableItemNullData) observableItemNullData[key] = null;
 
-const getTestData = (req, res, ctx) => {
+const getTestData = (req: any, res: any, ctx: any) => {
   return res(ctx.json(req.params[0] == '1' ? observableItemTestData : observableItemNullData));
 };
 
@@ -89,7 +89,9 @@ describe('<ObservableItemView/>', () => {
         'lengthWeightCf',
         'class'
       ])
-        expect(getByText(observableItemTestData[key]));
+
+      expect(getByText((observableItemTestData as any)[key]));
+
       // Observable Item Attributes
       expect(getByText(observableItemTestData.obsItemAttribute.Attribute1));
       expect(getByText(observableItemTestData.obsItemAttribute.Attribute2));

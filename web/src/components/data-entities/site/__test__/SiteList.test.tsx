@@ -83,9 +83,9 @@ describe('<SiteList/>', () => {
     );
     await waitForDataToHaveLoaded();
     for (const field of visibleColumns) {
-      expect(getByText(`${siteTestData.items[0][field]}`)).toBeInTheDocument();
-      expect(getByText(`${siteTestData.items[1][field]}`)).toBeInTheDocument();
-      expect(getByText(`${siteTestData.items[2][field]}`)).toBeInTheDocument();
+      expect(getByText(`${(siteTestData as any).items[0][field]}`)).toBeInTheDocument();
+      expect(getByText(`${(siteTestData as any).items[1][field]}`)).toBeInTheDocument();
+      expect(getByText(`${(siteTestData as any).items[2][field]}`)).toBeInTheDocument();
     }
   });
 

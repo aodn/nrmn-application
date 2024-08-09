@@ -7,7 +7,7 @@ import CustomAutoCompleteInput, {ERROR_TYPE} from '../CustomAutoCompleteInput';
 jest.setTimeout(30000);
 
 describe('<CustomAutoCompleteInput/> options behavior', () => {
-  let onChangeFunction;
+  let onChangeFunction: any;
 
   const cannedOptions = ['item1', 'item2', 'item3'];
 
@@ -21,7 +21,7 @@ describe('<CustomAutoCompleteInput/> options behavior', () => {
 
   test('Input appears in options, no warning created', async () => {
     let i;
-    onChangeFunction.mockImplementation((t) => (i = t));
+    onChangeFunction.mockImplementation((t: any) => (i = t));
 
     render(
       <div>
@@ -48,7 +48,7 @@ describe('<CustomAutoCompleteInput/> options behavior', () => {
 
   test('Input do not appears in options, created warning', async () => {
     let i;
-    onChangeFunction.mockImplementation((t) => (i = t));
+    onChangeFunction.mockImplementation((t: any) => (i = t));
 
     render(
       <CustomAutoCompleteInput
@@ -71,7 +71,7 @@ describe('<CustomAutoCompleteInput/> options behavior', () => {
 
   test('Input do not appears in options, no warning created due to warnLevelOnNewValue default value', async () => {
     let i;
-    onChangeFunction.mockImplementation((t) => (i = t));
+    onChangeFunction.mockImplementation((t: any) => (i = t));
 
     render(
       <CustomAutoCompleteInput

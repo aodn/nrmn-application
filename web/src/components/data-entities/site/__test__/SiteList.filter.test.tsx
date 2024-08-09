@@ -15,9 +15,9 @@ import { AppConstants } from '../../../../common/constants';
 jest.setTimeout(30000);
 
 describe('<SiteList/> filter testing', () => {
-  let mockGetEntity;
-  let mockGetFiltersForId;
-  let mockResetStateFilters;
+  let mockGetEntity: any;
+  let mockGetFiltersForId: any;
+  let mockResetStateFilters: any;
   const columns = ['site.siteCode','site.siteName','site.locationName','site.state','site.country','site.latitude','site.longitude','site.isActive'];
 
   beforeAll(() => {
@@ -38,7 +38,7 @@ describe('<SiteList/> filter testing', () => {
     const canned = require('./SiteList.filter.data.json');
 
     // Override function so that it return the data we set.
-    mockGetEntity.mockImplementation((url) => {
+    mockGetEntity.mockImplementation((url: string) => {
 
       const raw = {
         config: undefined,
@@ -49,7 +49,7 @@ describe('<SiteList/> filter testing', () => {
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 
@@ -92,12 +92,12 @@ describe('<SiteList/> filter testing', () => {
     const canned = require('./SiteList.filter.data.json');
 
     // Filter set will cause some items disappeared
-    mockGetFiltersForId.mockImplementation((id) => {
+    mockGetFiltersForId.mockImplementation((id: string) => {
       return '{"site.siteName":{"filterType":"text","type":"contains","filter":"Channel"}}';
     });
 
     // Override function so that it return the data we set.
-    mockGetEntity.mockImplementation((url) => {
+    mockGetEntity.mockImplementation((url: string) => {
 
       const raw = {
         config: undefined,
@@ -108,7 +108,7 @@ describe('<SiteList/> filter testing', () => {
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 
