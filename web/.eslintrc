@@ -21,6 +21,7 @@
     "axios": true
   },
   "parserOptions": {
+    "parser": "@typescript-eslint/parser",
     "project": "./tsconfig.json",
     "sourceType": "module"
   },
