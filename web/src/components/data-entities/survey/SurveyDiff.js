@@ -1,7 +1,7 @@
 import React from 'react';
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from '@mui/material';
 import {styled} from '@mui/material/styles';
-import 'ag-grid-community/dist/styles/ag-theme-material.css';
+import 'ag-grid-community/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 import PropTypes from 'prop-types';
 

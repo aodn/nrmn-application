@@ -1,4 +1,4 @@
-import { GridApi } from "ag-grid-enterprise";
+import { GridApi } from 'ag-grid-enterprise';
 
 export enum SourceJobType {
     INGEST = 'INGEST',
@@ -301,7 +301,7 @@ export interface StagedRow {
     inverts?: string;
     pos?: number;
     isInvertSizing?: string;
-    measureJson?: string;
+    measureJson?: any;
     stagedJob?: StagedJob;
     created?: string; // Timestamp can be represented as a string in TypeScript
     lastUpdated?: string;

@@ -12,16 +12,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ag-grid-community/react@npm:27.3.0":
-  version: 27.3.0
-  resolution: "@ag-grid-community/react@npm:27.3.0"
+"@ag-grid-community/react@npm:30.2.1":
+  version: 30.2.1
+  resolution: "@ag-grid-community/react@npm:30.2.1"
   dependencies:
     prop-types: "npm:^15.8.1"
   peerDependencies:
-    "@ag-grid-community/core": ~27.3.0
+    "@ag-grid-community/core": ~30.2.1
     react: ^16.3.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.3.0 || ^17.0.0 || ^18.0.0
-  checksum: 10c0/116f135cc961e6d907cc15373ba0c3106e5f110be559e915826d57dd96309a06449147a1ab19b7dfa50c20a23fdc4d3ee250f2ea308b115addeb018f8b3e3119
+  checksum: 10c0/41a150326422c4ec75bb5f9a83c5d1b49ec3d2cc8c0922c8a0c7afd82e4ef09805d63eaf394f39e2b999e73fc62b5f014cfd099da1c94c915b031926882e9721
   languageName: node
   linkType: hard
 
@@ -4601,30 +4601,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ag-grid-community@npm:27.3.0":
-  version: 27.3.0
-  resolution: "ag-grid-community@npm:27.3.0"
-  checksum: 10c0/e361683983694cefd2d530fd5b5a5c4672de75243c4ebfb0ebb535d1bfa72e133ef92dd29a9bd93781cbed8faafc0e34f8952da74dbe2d20da2ba7760eb2bb57
+"ag-grid-community@npm:30.2.1":
+  version: 30.2.1
+  resolution: "ag-grid-community@npm:30.2.1"
+  checksum: 10c0/0eb89416e7dd1e253a1580ad2deb0a94612b21def187bf25ed615bf17c0d0b2e883ff844134937b944609541beba6beea96f70b06f3dfa26dd6b407fea538c8e
   languageName: node
   linkType: hard
 
-"ag-grid-enterprise@npm:27.3.0":
-  version: 27.3.0
-  resolution: "ag-grid-enterprise@npm:27.3.0"
-  checksum: 10c0/a57383bb7463fd264e3336737b5d2ac6fb0b5f42a43b430b9e18831d02da348fa3832884e8e6580a8dafb3f81d6fe4d1b1595638ef80d0e529fcebbef83c0ed9
+"ag-grid-enterprise@npm:30.2.1":
+  version: 30.2.1
+  resolution: "ag-grid-enterprise@npm:30.2.1"
+  checksum: 10c0/028f09a22a713afb1a54a6320e576f6b224dff0ff852670e5d55f1d396e42713e7840a2afea8338ec011a56b6bc8a2ca3fb0affc4c500bb6c4c98961d64d58bf
   languageName: node
   linkType: hard
 
-"ag-grid-react@npm:27.3.0":
-  version: 27.3.0
-  resolution: "ag-grid-react@npm:27.3.0"
+"ag-grid-react@npm:30.2.1":
+  version: 30.2.1
+  resolution: "ag-grid-react@npm:30.2.1"
   dependencies:
     prop-types: "npm:^15.8.1"
   peerDependencies:
-    ag-grid-community: ~27.3.0
+    ag-grid-community: ~30.2.1
     react: ^16.3.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.3.0 || ^17.0.0 || ^18.0.0
-  checksum: 10c0/27cec0f6035ae04dcc333007e8c65db8fec4434110715eabd3c25608cfd21424c995ac497f5fb4e440c115d74de90eafff50abd42e6c164b8ebace961633a1ce
+  checksum: 10c0/210bd7fce0ee6ccbe6bf51a145ffe64eda85bed1f8e4ae3d91b8a97230778f4cef5281e1bedb5eec87da2fc1daabc5c7c326d6aa7e3901c992096cee17219c32
   languageName: node
   linkType: hard
 
@@ -11178,7 +11178,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "nrmn-web@workspace:."
   dependencies:
-    "@ag-grid-community/react": "npm:27.3.0"
+    "@ag-grid-community/react": "npm:30.2.1"
     "@babel/core": "npm:^7.23.3"
     "@babel/eslint-parser": "npm:^7.23.3"
     "@babel/plugin-syntax-flow": "npm:^7.23.3"
@@ -11198,9 +11198,9 @@ __metadata:
     "@types/jest": "npm:^29.5.9"
     "@types/react": "npm:18.3.3"
     "@types/react-dom": "npm:18.3.0"
-    ag-grid-community: "npm:27.3.0"
-    ag-grid-enterprise: "npm:27.3.0"
-    ag-grid-react: "npm:27.3.0"
+    ag-grid-community: "npm:30.2.1"
+    ag-grid-enterprise: "npm:30.2.1"
+    ag-grid-react: "npm:30.2.1"
     ajv: "npm:^8.12.0"
     autoprefixer: "npm:^10.4.7"
     axios: "npm:1.6.2"

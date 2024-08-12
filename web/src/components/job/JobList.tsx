@@ -25,11 +25,7 @@ const TimeStampCell = (params: ValueFormatterParams): string => {
     : '';
 };
 
-interface JobListProps {
-
-}
-
-const JobList: React.FC<JobListProps> = () => {
+const JobList: React.FC = () => {
   const location = useLocation();
   const gridRef = useRef<AgGridReact>(null);
   const [redirect, setRedirect] = useState<string | undefined>();
@@ -173,15 +169,15 @@ const JobList: React.FC<JobListProps> = () => {
           onClose={() => setDeleteJobId(undefined)}
           onConfirm={() => {
             deleteJob(deleteJobId)
-              .then(() => {
+              .then(() => 
                 setDeleteJobId((value) => {
                   if(value) {
                     gridRef.current?.api.getRowNode(value)?.setSelected(true);
                     gridRef.current?.api.applyTransaction({remove: gridRef.current.api.getSelectedRows()});    
                   }
-                  return undefined
-                });
-            });
+                  return undefined;
+                })
+            );
           }}
         />
         <Box display="flex" flexDirection="row" p={1} pb={1}>

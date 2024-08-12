@@ -3,7 +3,7 @@ import { CloudUpload as CloudUploadIcon, PlaylistAddCheckOutlined as PlaylistAdd
 import { Alert, Box, Button, Typography } from '@mui/material';
 import UndoIcon from '@mui/icons-material/Undo';
 import ResetIcon from '@mui/icons-material/LayersClear';
-import 'ag-grid-community/dist/styles/ag-theme-material.css';
+import 'ag-grid-community/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
 import { AgGridReact } from 'ag-grid-react';
 import { Navigate, useParams } from 'react-router-dom';
@@ -88,6 +88,21 @@ const SurveyCorrect: React.FC<SurveyCorrectProps> = ({ suppressColumnVirtualisat
   const [undoSize, setUndoSize] = useState(0);
   const [metadata, setMetadata] = useState<{ programId?: number, programName?: string, surveyIds?: Array<number> }>({ programName: 'NONE', surveyIds: [] });
   const [hasPassedValidation, setHasPassedValidation] = useState(false);
+  const context = useRef<InternalContext>(
+    {
+      errors: [],
+      highlighted: [],
+      popUndo: eh.popUndo,
+      pushUndo: eh.pushUndo,
+      putRowIds: [],
+      undoStack: [],
+      fullRefresh: false,
+      useOverlay: 'Loading Survey Correction...',
+      validations: [],
+      pendingPasteUndo: [],
+      pasteMode: false
+    });
+
 
   useEffect(() => {
     document.title = 'Survey Correction';
@@ -109,7 +124,7 @@ const SurveyCorrect: React.FC<SurveyCorrectProps> = ({ suppressColumnVirtualisat
       context.current.cellValidations = cellValidations;
       gridRef.current.api.redrawRows();
     }
-  }, [cellValidations]);
+  }, [cellValidations, context]);
 
   useEffect(() => {
     if (!validationResult) return;
@@ -274,21 +289,6 @@ const SurveyCorrect: React.FC<SurveyCorrectProps> = ({ suppressColumnVirtualisat
     }),
     []
   );
-
-  const context = useRef<InternalContext>(
-    {
-      errors: [],
-      highlighted: [],
-      popUndo: eh.popUndo,
-      pushUndo: eh.pushUndo,
-      putRowIds: [],
-      undoStack: [],
-      fullRefresh: false,
-      useOverlay: 'Loading Survey Correction...',
-      validations: [],
-      pendingPasteUndo: [],
-      pasteMode: false
-    });
 
   const [sideBar, setSideBar] = useState(defaultSideBar);
 
@@ -519,7 +519,6 @@ const SurveyCorrect: React.FC<SurveyCorrectProps> = ({ suppressColumnVirtualisat
       <Box display={editMode ? 'block' : 'none'} flexGrow={1} overflow="hidden" className="ag-theme-material" id="validation-grid">
         <AgGridReact
           animateRows
-          context={context.current}
           cellFadeDelay={10}
           cellFlashDelay={10}
           components={components}
@@ -530,6 +529,7 @@ const SurveyCorrect: React.FC<SurveyCorrectProps> = ({ suppressColumnVirtualisat
           fillHandleDirection="y"
           getContextMenuItems={(params: GetContextMenuItemsParams) => eh.getContextMenuItems(params, eh) as (string | MenuItemDef)[]}
           getRowId={(r) => r.data.id}
+          context={context.current}
           loadingOverlayComponent="loadingOverlay"
           onCellKeyDown={eh.onCellKeyDown}
           onCellEditingStopped={onCellEditingStopped}
