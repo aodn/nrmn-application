@@ -11,7 +11,8 @@ export enum StatusJobType {
     PENDING = 'PENDING',
     INGESTING = 'INGESTING',
     INGESTED = 'INGESTED',
-    CORRECTED = 'CORRECTED'
+    CORRECTED = 'CORRECTED',
+    ERROR = 'ERROR',
 }
 
 enum SecUserStatus {
