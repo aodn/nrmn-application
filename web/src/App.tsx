@@ -77,7 +77,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 }
 
-const App = () => {
+const App: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [auth, setAuth] = useState(JSON.parse(localStorage.getItem('auth') + '') || { expires: 0, username: null, features: [] });
 
