@@ -281,7 +281,7 @@ public class SurveyValidation {
             res.add(validateSurveyIsNew(row));
 
             // Skip SurveyComplete if M3 and survey exists
-            var surveyExistsM3 = row.getMethod() == 3
+            var surveyExistsM3 = row.getMethod() != null && row.getMethod() == 3
                     && res.stream().anyMatch(e -> e != null && e.getMessage().contains("Survey exists:"));
 
             // VALIDATION: Survey Complete

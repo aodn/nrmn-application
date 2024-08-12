@@ -29,7 +29,7 @@ enum SecRoleName {
     ROLE_SURVEY_EDITOR = 'ROLE_SURVEY_EDITOR'
 }
 
-enum StagedJobEventType {
+export enum StagedJobEventType {
     UPLOADED = 'UPLOADED',
     STAGED = 'STAGED',
     INGESTING = 'INGESTING',
@@ -40,6 +40,14 @@ enum StagedJobEventType {
     SUMMARY = 'SUMMARY',
     FILTER = 'FILTER'
 }
+
+export enum SurveyValidationErrorLevel {
+    BLOCKING = 'BLOCKING',
+    WARNING = 'WARNING',
+    DUPLICATE = 'DUPLICATE',
+    INFO = 'INFO',
+}
+
 // Not very good but no way as the type are 
 // not specificed initiall so all hack around
 export type ExtRow =
@@ -65,7 +73,7 @@ export interface SurveyValidationError {
     id: number,
     message: string,
     categoryId: 'FORMAT' | 'DATA' | 'SPAN',
-    levelId: 'BLOCKING' | 'WARNING' | 'DUPLICATE' | 'INFO',
+    levelId: SurveyValidationErrorLevel,
     rowIds: Array<number>,
     columnNames: Array<string>,
 };

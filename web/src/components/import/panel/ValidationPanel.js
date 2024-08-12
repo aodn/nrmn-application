@@ -12,10 +12,12 @@ const ValidationPanel = ({api, context}) => {
     context.focusedRows = noFilter ? item.rowIds || [item.row] : [];
     const row = context.rowData.find((r) => r.id === rowId);
     let visible = false;
-    api.forEachNodeAfterFilter((n) => (visible = n.data.id === row.id || visible));
+    api.forEachNodeAfterFilter((n) => (visible = n.data.id === row?.id || visible));
+
     if (visible) api.ensureNodeVisible(row, 'middle');
     if (item.columnName) api.ensureColumnVisible(item.columnName);
     if (item.columnNames) for (const column of item.columnNames) api.ensureColumnVisible(column);
+    
     api.setFilterModel(noFilter ? null : {id: {type: 'set', values: item.rowIds.map((id) => id.toString())}});
     api.redrawRows();
   };

@@ -1,4 +1,4 @@
-import React, {useEffect, useCallback, useState, useRef} from 'react';
+import React, { useEffect, useCallback, useState, useRef } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -7,22 +7,22 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
 import ResetIcon from '@mui/icons-material/LayersClear';
-import { AgGridReact} from 'ag-grid-react';
-import  {useParams } from 'react-router-dom';
-import {getDataJob, submitIngest, updateRows, validateJob} from '../../api/api';
+import { AgGridReact } from 'ag-grid-react';
+import { useParams } from 'react-router-dom';
+import { getDataJob, submitIngest, updateRows, validateJob } from '../../api/api';
 import { AppConstants, extendedMeasurements, measurements } from '../../common/constants';
 import LoadingOverlay from '../overlays/LoadingOverlay';
 import AlertDialog from '../ui/AlertDialog';
 import FindReplacePanel from './panel/FindReplacePanel';
 import ValidationPanel from './panel/ValidationPanel';
 import eh from './DataSheetEventHandlers';
-import {Paper} from '@mui/material';
+import { Paper } from '@mui/material';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import BackButton from '../ui/BackButton';
 import DataRectificationHandler from './DataRectificationHandler';
 import { CellStyle, CellStyleFunc, ColDef, GridApi, SuppressKeyboardEventParams } from 'ag-grid-enterprise';
 import { AxiosResponse } from 'axios';
-import { ValidationResponse, InternalContext, RowUpdate, StagedRow, JobResponse, SourceJobType, StatusJobType, ExtRow, Measurement } from '../../common/types';
+import { ValidationResponse, InternalContext, RowUpdate, StagedRow, JobResponse, SourceJobType, StatusJobType, ExtRow, Measurement, SurveyValidationErrorLevel } from '../../common/types';
 import { CellEditingStoppedEvent, CellValueChangedEvent, FilterChangedEvent, GetContextMenuItemsParams, GridReadyEvent, MenuItemDef, PasteEndEvent, RowDataUpdatedEvent } from 'ag-grid-community';
 
 // |context| is where all custom properties and helper functions
@@ -62,7 +62,7 @@ const defaultSideBar = {
   defaultToolPanel: ''
 };
 
-const IngestState = Object.freeze({Loading: 0, Edited: 1, Locked: 2, Valid: 3, ConfirmSubmit: 4});
+const IngestState = Object.freeze({ Loading: 0, Edited: 1, Locked: 2, Valid: 3, ConfirmSubmit: 4 });
 
 interface JobType {
   program?: string,
@@ -77,8 +77,8 @@ interface DataSheetViewProps {
   roles: Array<string>,
 }
 
-const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
-  const {id} = useParams();
+const DataSheetView: React.FC<DataSheetViewProps> = ({ onIngest, roles }) => {
+  const { id } = useParams();
   const [job, setJob] = useState<JobType>({});
   const [gridApi, setGridApi] = useState<GridApi>();
   const [isFiltered, setIsFiltered] = useState(false);
@@ -90,6 +90,7 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
   const isDataOfficer = roles.includes(AppConstants.ROLES.DATA_OFFICER);
 
   const dataRectificationHandlerRef = useRef<DataRectificationHandler>(new DataRectificationHandler());
+  const editable = ['STAGED'].includes(job.status || '');
 
   const defaultColDef: ColDef = {
     lockVisible: true,
@@ -97,7 +98,7 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
     editable: true,
     enableCellChangeFlash: true,
     filter: true,
-    filterParams: {debounceMs: AppConstants.Filter.WAIT_TIME_ON_FILTER_APPLY },
+    filterParams: { debounceMs: AppConstants.Filter.WAIT_TIME_ON_FILTER_APPLY },
     floatingFilter: true,
     minWidth: AppConstants.AG_GRID.dataColWidth,
     resizable: true,
@@ -105,7 +106,7 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
     suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => eh.overrideKeyboardEvents(params) as boolean,
     suppressMenu: true,
     tooltipValueGetter: eh.toolTipValueGetter,
-    valueParser: ({newValue}) => (newValue ? newValue.trim() : '')
+    valueParser: ({ newValue }) => (newValue ? newValue.trim() : '')
   };
 
   const reload = useCallback((api: GridApi, id: string, completion: (job: JobType) => void, isAdmin: boolean) => {
@@ -122,34 +123,34 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
       };
       if (res?.data.rows) {
         const rowData = res.data.rows.map((row) => {
-          const {measureJson} = {...row};
+          const { measureJson } = { ...row };
           const json = measureJson || '{}';
 
           Object.getOwnPropertyNames(json)
             .forEach((numKey) => {
-              if(measureJson) {
+              if (measureJson) {
                 (row as ExtRow)[numKey] = json[numKey];
               }
             }
-          );
+            );
           delete row.measureJson;
           return row;
         });
 
-        if(rowData) {
+        if (rowData) {
           context.rowData = rowData as ExtRow[];
           context.rowPos = rowData.map((r: StagedRow) => r.pos as number)
             .sort((a: number, b: number) => a - b) as number[];
-            
+
           api.setRowData(rowData.length > 0 ? rowData : []);
         }
       }
       if (completion) completion(job);
     })
-    .catch(() => {
-      // Do nothing here
-    });
-  },[context]);
+      .catch(() => {
+        // Do nothing here
+      });
+  }, []);
 
   useEffect(() => {
     document.title = 'Ingest Sheet';
@@ -157,7 +158,7 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
       if (event.ctrlKey && event.key === 'z') {
         event.preventDefault();
         event.stopPropagation();
-        eh.handleUndo({api: gridApi});
+        eh.handleUndo({ api: gridApi });
       }
     };
     document.body.addEventListener('keydown', undoKeyboardHandler);
@@ -180,7 +181,7 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
     if (gridApi && !isFiltered) gridApi.setFilterModel(null);
   }, [gridApi, isFiltered]);
 
-  const handleValidate = () => {
+  const handleValidate = useCallback(() => {
     context.useOverlay = 'Validating';
     setState(IngestState.Loading);
     setSideBar(defaultSideBar);
@@ -196,12 +197,12 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
 
       const data = result.data;
 
-      if(data.errors) {
+      if (data.errors) {
         context.errors = data.errors;
-        
+
         delete result.data.errors;
         delete result.data.job;
-        
+
         context.summary = result.data;
         context.errorList = eh.generateErrorTree(context.rowData, context.errors);
 
@@ -209,7 +210,7 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
         // there are some data need to be rectified by system automatically
         dataRectificationHandlerRef.current.setValidationResult(context.errors);
 
-        setState(context.errors.some((e) => e.levelId === 'BLOCKING') ? IngestState.Edited : IngestState.Valid);
+        setState(context.errors.some((e) => e.levelId === SurveyValidationErrorLevel.BLOCKING) ? IngestState.Edited : IngestState.Valid);
 
         setSideBar((sideBar) => {
           return {
@@ -228,7 +229,7 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
         });
       };
     });
-  };
+  }, [id, dataRectificationHandlerRef, setState, setSideBar]);
 
   const handleSubmit = useCallback((event: React.MouseEvent<HTMLButtonElement>): void => {
     context.useOverlay = 'Submitting';
@@ -240,47 +241,45 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
       .current
       .submitRectification(id)
       .then(() => submitIngest(id, () => setState(IngestState.Locked), (res: AxiosResponse) => onIngest(res))
-    );
-  }, [dataRectificationHandlerRef, setState, setSideBar]);
+      );
+  }, [id, dataRectificationHandlerRef, setState, setSideBar, onIngest]);
 
-  const handleSaveAndValidate = () => {
+  const handleSaveAndValidate = useCallback(() => {
     context.useOverlay = 'Saving';
     setState(IngestState.Loading);
     setSideBar(defaultSideBar);
 
-    const rowUpdateDtos : Array<RowUpdate> = [];
+    const rowUpdateDtos: Array<RowUpdate> = [];
 
     Array.from(new Set(context.putRowIds)).forEach((rowId: number) => {
       const row = context.rowData?.find((r) => r.id === rowId);
 
-      if(row) {
+      if (row) {
         // Serialise the measure JSON
-        if (row) {
-          const measure: {[key: string]: number | string} = {};
-          Object.getOwnPropertyNames(row || {})
-            .filter((key) => !isNaN(parseFloat(key)))
-            .forEach((numKey) => {
-              measure[numKey] = row[numKey];
-            });
-          row.measureJson = JSON.stringify(measure);
-        }
-
-        // Null row data means that the row is to be deleted
-        rowUpdateDtos.push({rowId: rowId, row: row as StagedRow});
-
-        // HACK: use the fact that new rows are assigned a long identifier
-        // to determine if we need a full reload to get the server-assigned
-        // row id. A better way would be to do a full reload based on a server
-        // response.
-        context.fullRefresh = context.fullRefresh || rowId.toString().length === 10 || row === null;
+        const measure: { [key: string]: number | string } = {};
+        Object.getOwnPropertyNames(row || {})
+          .filter((key) => !isNaN(parseFloat(key)))
+          .forEach((numKey) => {
+            measure[numKey] = row[numKey];
+          });
+        row.measureJson = measure;
       }
+
+      // Null row data means that the row is to be deleted
+      rowUpdateDtos.push({ rowId: rowId, row: row as StagedRow });
+
+      // HACK: use the fact that new rows are assigned a long identifier
+      // to determine if we need a full reload to get the server-assigned
+      // row id. A better way would be to do a full reload based on a server
+      // response.
+      context.fullRefresh = context.fullRefresh || rowId.toString().length === 10 || row === null;
     });
 
     // set rows to the handler, because the handler will rectify the data according to the validation result later
     dataRectificationHandlerRef.current.setRows(rowUpdateDtos);
 
     updateRows(id, rowUpdateDtos, (res: AxiosResponse) => {
-      if(res && id) {
+      if (res && id) {
         if (context.fullRefresh && gridApi) {
           reload(gridApi, id, handleValidate, isAdmin);
           context.fullRefresh = false;
@@ -289,12 +288,12 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
         }
       }
     });
-  };
+  }, [dataRectificationHandlerRef, gridApi, id, isAdmin, handleValidate, setState, setSideBar, reload]);
 
   const onCellValueChanged = useCallback((e: CellValueChangedEvent) => {
     setUndoSize(eh.handleCellValueChanged(e));
     if (isFiltered) {
-      
+
       const filterModel = e.api.getFilterModel();
       const field = e.colDef.field;
 
@@ -303,7 +302,7 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
         e.api.setFilterModel(filterModel);
       }
     }
-  }, []);
+  }, [isFiltered]);
 
   const onPasteEnd = useCallback((e: PasteEndEvent) => {
     setUndoSize(eh.handlePasteEnd(e));
@@ -316,13 +315,13 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
 
   const onGridReady = (p: GridReadyEvent) => {
     setGridApi(p.api);
-    
-    if(id) {
+
+    if (id) {
       reload(
         p.api,
         id,
         (job) => {
-          if(job.reference) {
+          if (job.reference) {
             setState(IngestState.Edited);
             setJob(job);
             document.title = job.reference;
@@ -337,7 +336,7 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
     e.api.refreshCells();
     const filterModel = e.api.getFilterModel();
     setIsFiltered(Object.getOwnPropertyNames(filterModel).length > 0);
-  },[]);
+  }, []);
 
   const onRowDataUpdated = useCallback((e: RowDataUpdatedEvent) => {
     const ctx = context;
@@ -346,11 +345,11 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
     }
     e.columnApi.autoSizeAllColumns();
     setUndoSize(ctx.undoStack.length);
-  }, [context, setState, setUndoSize]);
+  }, [setState, setUndoSize]);
 
   const createColumns = useCallback((measurementColumns: Array<Measurement>, isExtendedSize: boolean | undefined): ColDef[] => {
     // It is a hack, for some reason it use a field that is not def in ColDef
-    const cols: (ColDef & {key?: string})[] = [];
+    const cols: (ColDef & { key?: string })[] = [];
 
     cols.push({
       field: 'id',
@@ -452,7 +451,7 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
       rowGroup: false,
       enableRowGroup: true,
     });
-    
+
     cols.push({
       field: 'block',
       headerName: 'Block',
@@ -499,19 +498,18 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
       })
     ));
 
-    if(isExtendedSize) {
+    if (isExtendedSize) {
       cols.push({
         minWidth: 120,
         field: 'isInvertSizing',
         headerName: 'Use InvertSizing',
       });
-    } 
-    
+    }
+
     return cols as ColDef[];
 
-  }, []);
+  }, [editable]);
 
-  const editable = ['STAGED'].includes(job.status || '');
   const measurementColumns = (job.isExtendedSize ? measurements.concat(extendedMeasurements) : measurements) as Array<Measurement>;
   return (
     <>
@@ -528,10 +526,10 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
             <BackButton goBackTo={`/data/jobs`} name={`Jobs`} />
           </Box>
           {state === IngestState.Locked && (
-            <Paper sx={{ minWidth:180, display:'flex', alignItems:'center' }}>
+            <Paper sx={{ minWidth: 180, display: 'flex', alignItems: 'center' }}>
               <Box display="flex" flexDirection="row">
                 <Box m={1}>
-                  <ReportProblemIcon  sx={{color: 'darkorange'}} />
+                  <ReportProblemIcon sx={{ color: 'darkorange' }} />
                 </Box>
                 <Box mx={1} my={2}>Server is busy. Try again in a moment.</Box>
               </Box>
@@ -544,12 +542,11 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({onIngest, roles}) => {
               <Typography noWrap variant="subtitle2">
                 {job.reference}
               </Typography>
-              <Typography variant="body2">{`${job.source} (${job.status}) - ${job.program} ${
-                job.isExtendedSize ? 'Extended Size' : ''
-              } `}</Typography>
+              <Typography variant="body2">{`${job.source} (${job.status}) - ${job.program} ${job.isExtendedSize ? 'Extended Size' : ''
+                } `}</Typography>
             </Box>
             <Box m={1} ml={0}>
-              <Button variant="outlined" disabled={undoSize < 1} startIcon={<UndoIcon />} onClick={() => eh.handleUndo({api: gridApi})}>
+              <Button variant="outlined" disabled={undoSize < 1} startIcon={<UndoIcon />} onClick={() => eh.handleUndo({ api: gridApi })}>
                 Undo
               </Button>
             </Box>
