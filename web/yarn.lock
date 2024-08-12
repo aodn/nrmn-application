@@ -25,6 +25,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ag-grid-community/styles@npm:30.2.1":
+  version: 30.2.1
+  resolution: "@ag-grid-community/styles@npm:30.2.1"
+  checksum: 10c0/f142513ca1d42be029014b3343dee861627491ae77eb61a9b55da0b0b0154c8da060e17dfb6a7e29b3d3fc33c0078e36b6bb87b571aea45fe5cf6633fabf5896
+  languageName: node
+  linkType: hard
+
 "@alloc/quick-lru@npm:^5.2.0":
   version: 5.2.0
   resolution: "@alloc/quick-lru@npm:5.2.0"
@@ -11179,6 +11186,7 @@ __metadata:
   resolution: "nrmn-web@workspace:."
   dependencies:
     "@ag-grid-community/react": "npm:30.2.1"
+    "@ag-grid-community/styles": "npm:30.2.1"
     "@babel/core": "npm:^7.23.3"
     "@babel/eslint-parser": "npm:^7.23.3"
     "@babel/plugin-syntax-flow": "npm:^7.23.3"

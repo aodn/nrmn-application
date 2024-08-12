@@ -19,8 +19,31 @@ import eh from '../../import/DataSheetEventHandlers';
 import SurveyDiff from './SurveyDiff';
 import { AppConstants } from '../../../common/constants';
 import { ColDef, ITooltipParams } from 'ag-grid-enterprise';
-import { CellEditingStoppedEvent, CellStyle, CellStyleFunc, CellValueChangedEvent, FilterChangedEvent, GetContextMenuItemsParams, GridApi, GridReadyEvent, KeyCreatorParams, MenuItemDef, PasteEndEvent, RowDataUpdatedEvent, SuppressKeyboardEventParams } from 'ag-grid-community';
-import { CellFormatType, CorrectionDiff, CorrectionRequestBody, CorrectionRow, CorrectionRows, ExtRow, InternalContext, StagedRow, SurveyValidationError } from '../../../common/types';
+import {
+  CellEditingStoppedEvent,
+  CellStyle,
+  CellStyleFunc,
+  CellValueChangedEvent,
+  FilterChangedEvent,
+  GetContextMenuItemsParams,
+  GridApi,
+  GridReadyEvent,
+  MenuItemDef,
+  PasteEndEvent,
+  RowDataUpdatedEvent,
+  SuppressKeyboardEventParams
+} from 'ag-grid-community';
+import { 
+  CellFormatType,
+  CorrectionDiff,
+  CorrectionRequestBody,
+  CorrectionRow,
+  CorrectionRows,
+  ExtRow,
+  InternalContext,
+  StagedRow,
+  SurveyValidationError
+} from '../../../common/types';
 
 interface Header {
   field: string,
@@ -211,7 +234,6 @@ const SurveyCorrect: React.FC<SurveyCorrectProps> = ({ suppressColumnVirtualisat
 
     headers.map((header, idx) =>
       cols.push({
-        keyCreator: (_: KeyCreatorParams) => '' + idx,
         field: header.field,
         headerName: header.label,
         hide: header.hide,
@@ -227,7 +249,6 @@ const SurveyCorrect: React.FC<SurveyCorrectProps> = ({ suppressColumnVirtualisat
         field: `${idx + 1}`,
         headerComponent: SurveyMeasurementHeader,
         headerName: m.fishSize,
-        keyCreator: (params: KeyCreatorParams) => '' + idx,
         width: AppConstants.AG_GRID.measureColWidth,
       })
     );

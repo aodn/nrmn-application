@@ -6,6 +6,7 @@
   "private": true,
   "dependencies": {
     "@ag-grid-community/react": "30.2.1",
+    "@ag-grid-community/styles": "30.2.1",
     "@emotion/react": "11.9.0",
     "@emotion/styled": "11.8.1",
     "@mui/icons-material": "^5.8.2",
