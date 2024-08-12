@@ -1,17 +1,17 @@
-import React, {useState, useRef, useCallback} from 'react';
-import {Navigate} from 'react-router';
-import {NavLink, useLocation} from 'react-router-dom';
-import {Box, Button, Typography} from '@mui/material';
-import {CloudUploadOutlined} from '@mui/icons-material';
+import React, { useState, useRef, useCallback } from 'react';
+import { Navigate } from 'react-router';
+import { NavLink, useLocation } from 'react-router-dom';
+import { Box, Button, Typography } from '@mui/material';
+import { CloudUploadOutlined } from '@mui/icons-material';
 import 'ag-grid-enterprise';
 import { AgGridReact } from 'ag-grid-react';
-import {deleteJob, getEntity} from '../../api/api';
+import { deleteJob, getEntity } from '../../api/api';
 import LoadingOverlay from '../overlays/LoadingOverlay';
 import AlertDialog from '../ui/AlertDialog';
-import {GridOn, Delete, Info} from '@mui/icons-material';
+import { GridOn, Delete, Info } from '@mui/icons-material';
 import stateFilterHandler, { LocationState } from '../../common/state-event-handler/StateFilterHandler';
-import {AuthContext} from '../../contexts/auth-context';
-import {AppConstants} from '../../common/constants';
+import { AuthContext } from '../../contexts/auth-context';
+import { AppConstants } from '../../common/constants';
 import { CellClickedEvent, ColDef, FilterChangedEvent, GetRowIdParams, GridReadyEvent, ICellRendererParams, ValueFormatterParams } from 'ag-grid-community';
 import { StatusJobType } from '../../common/types';
 
@@ -20,8 +20,8 @@ const JOBLIST_GRID_ID = 'job-list';
 const TimeStampCell = (params: ValueFormatterParams): string => {
   return params.value
     ? new Date(params.value).toLocaleDateString('en-AU') +
-        ' ' +
-        new Date(params.value).toLocaleTimeString('en-AU', {hour: 'numeric', minute: '2-digit'})
+    ' ' +
+    new Date(params.value).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' })
     : '';
 };
 
@@ -57,7 +57,7 @@ const JobList: React.FC = () => {
         stateFilterHandler.resetStateFilters(JOBLIST_GRID_ID);
       }
     });
-  }, [stateFilterHandler, location]);
+  }, [location]);
 
   const createColumns = useCallback((roles: Array<string> | undefined) => {
     const cols: ColDef[] = [];
@@ -72,7 +72,7 @@ const JobList: React.FC = () => {
       resizable: false,
       sortable: false,
       cellRenderer: (e: ICellRendererParams) => (e.data?.id ? <Info viewBox={iconViewBoxDimension} /> : <></>),
-      cellStyle: {paddingLeft: '10px', color: 'grey', cursor: 'pointer'},
+      cellStyle: { paddingLeft: '10px', color: 'grey', cursor: 'pointer' },
       onCellClicked: (event: CellClickedEvent) => {
         if (event.data.id) {
           const mouseEvent = event.event as MouseEvent;
@@ -87,9 +87,9 @@ const JobList: React.FC = () => {
 
     cols.push({
       width: 40,
-      cellStyle: {cursor: 'pointer'},
+      cellStyle: { cursor: 'pointer' },
       cellRenderer: (e: ICellRendererParams) =>
-        [ StatusJobType.STAGED, StatusJobType.INGESTED]
+        [StatusJobType.STAGED, StatusJobType.INGESTED]
           .includes(e.data?.status) ? <GridOn htmlColor={'#808080'} viewBox={iconViewBoxDimension} /> : <></>,
       onCellClicked: onCellClicked,
     });
@@ -97,7 +97,7 @@ const JobList: React.FC = () => {
     cols.push({
       flex: 1,
       field: 'reference',
-      cellStyle: {cursor: 'pointer'},
+      cellStyle: { cursor: 'pointer' },
       onCellClicked: onCellClicked,
     });
 
@@ -114,7 +114,7 @@ const JobList: React.FC = () => {
       rowGroup: true,
       hide: true,
       comparator: (a, b) => {
-        const status = [ StatusJobType.STAGED, StatusJobType.INGESTED, StatusJobType.CORRECTED, StatusJobType.FAILED];
+        const status = [StatusJobType.STAGED, StatusJobType.INGESTED, StatusJobType.CORRECTED, StatusJobType.FAILED];
         return status.indexOf(a) - status.indexOf(b);
       }
     });
@@ -145,9 +145,9 @@ const JobList: React.FC = () => {
       sortable: false,
       cellRenderer: (e: ICellRendererParams) =>
         e.data && [StatusJobType.STAGED, StatusJobType.ERROR].includes(e.data.status) ? <Delete viewBox={iconViewBoxDimension} /> : <></>,
-      cellStyle: {paddingLeft: '10px', color: 'grey', cursor: 'pointer'},
+      cellStyle: { paddingLeft: '10px', color: 'grey', cursor: 'pointer' },
       onCellClicked: (event: CellClickedEvent) => {
-        if(roles?.includes(AppConstants.ROLES.DATA_OFFICER) || roles?.includes(AppConstants.ROLES.ADMIN))
+        if (roles?.includes(AppConstants.ROLES.DATA_OFFICER) || roles?.includes(AppConstants.ROLES.ADMIN))
           setDeleteJobId(event.data.id);
       }
 
@@ -160,64 +160,64 @@ const JobList: React.FC = () => {
 
   return (
     <AuthContext.Consumer>
-      {({auth}) =>
-      <>
-        <AlertDialog
-          open={deleteJobId ? true : false}
-          text="Delete Job?"
-          action="Delete"
-          onClose={() => setDeleteJobId(undefined)}
-          onConfirm={() => {
-            deleteJob(deleteJobId)
-              .then(() => 
-                setDeleteJobId((value) => {
-                  if(value) {
-                    gridRef.current?.api.getRowNode(value)?.setSelected(true);
-                    gridRef.current?.api.applyTransaction({remove: gridRef.current.api.getSelectedRows()});    
-                  }
-                  return undefined;
-                })
-            );
-          }}
-        />
-        <Box display="flex" flexDirection="row" p={1} pb={1}>
-          <Box flexGrow={1}>
-            <Typography variant="h4">Jobs</Typography>
+      {({ auth }) =>
+        <>
+          <AlertDialog
+            open={deleteJobId ? true : false}
+            text="Delete Job?"
+            action="Delete"
+            onClose={() => setDeleteJobId(undefined)}
+            onConfirm={() => {
+              deleteJob(deleteJobId)
+                .then(() =>
+                  setDeleteJobId((value) => {
+                    if (value) {
+                      gridRef.current?.api.getRowNode(value)?.setSelected(true);
+                      gridRef.current?.api.applyTransaction({ remove: gridRef.current.api.getSelectedRows() });
+                    }
+                    return undefined;
+                  })
+                );
+            }}
+          />
+          <Box display="flex" flexDirection="row" p={1} pb={1}>
+            <Box flexGrow={1}>
+              <Typography variant="h4">Jobs</Typography>
+            </Box>
+            <Box>
+              <Button
+                data-testid="xls-upload-button"
+                variant="contained"
+                to="/data/upload"
+                component={NavLink}
+                disabled={!(auth.roles?.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles?.includes(AppConstants.ROLES.ADMIN))}
+                startIcon={<CloudUploadOutlined />}>
+                {'Upload XLSX File'}
+              </Button>
+            </Box>
           </Box>
-          <Box>
-            <Button
-              data-testid="xls-upload-button"
-              variant="contained"
-              to="/data/upload"
-              component={NavLink}
-              disabled={!(auth.roles?.includes(AppConstants.ROLES.DATA_OFFICER) || auth.roles?.includes(AppConstants.ROLES.ADMIN))}
-              startIcon={<CloudUploadOutlined />}>
-              {'Upload XLSX File'}
-            </Button>
+          <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
+            <AgGridReact
+              ref={gridRef}
+              rowHeight={24}
+              pagination={false}
+              getRowId={getRowId}
+              enableCellTextSelection={true}
+              onGridReady={(e) => onGridReady(e)}
+              onFilterChanged={(e: FilterChangedEvent) => stateFilterHandler.stateFilterEventHandler(JOBLIST_GRID_ID, e)}
+              context={{ useOverlay: 'Loading Jobs' }}
+              components={{ loadingOverlay: LoadingOverlay }}
+              loadingOverlayComponent="loadingOverlay"
+              suppressCellFocus={true}
+              isGroupOpenByDefault={(params) => params.key === 'STAGED'}
+              autoGroupColumnDef={{ sortable: true, sort: 'asc', width: 150 }}
+              groupDisplayType="singleColumn"
+              defaultColDef={{ lockVisible: true, sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true, suppressMenu: true }}
+              columnDefs={createColumns(auth.roles)}
+            >
+            </AgGridReact>
           </Box>
-        </Box>
-        <Box flexGrow={1} overflow="hidden" className="ag-theme-material">
-          <AgGridReact
-            ref={gridRef}
-            rowHeight={24}
-            pagination={false}
-            getRowId={getRowId}
-            enableCellTextSelection={true}
-            onGridReady={(e) => onGridReady(e)}
-            onFilterChanged={(e: FilterChangedEvent) => stateFilterHandler.stateFilterEventHandler(JOBLIST_GRID_ID, e)}
-            context={{useOverlay: 'Loading Jobs'}}
-            components={{loadingOverlay: LoadingOverlay}}
-            loadingOverlayComponent="loadingOverlay"
-            suppressCellFocus={true}
-            isGroupOpenByDefault={(params) => params.key === 'STAGED'}
-            autoGroupColumnDef={{sortable: true, sort: 'asc', width: 150}}
-            groupDisplayType="singleColumn"
-            defaultColDef={{lockVisible: true, sortable: true, resizable: true, filter: 'agTextColumnFilter', floatingFilter: true, suppressMenu: true}}
-            columnDefs={createColumns(auth.roles)}
-          >
-          </AgGridReact>
-        </Box>
-      </>}
+        </>}
     </AuthContext.Consumer>
   );
 };

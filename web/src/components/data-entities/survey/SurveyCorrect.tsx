@@ -33,7 +33,7 @@ import {
   RowDataUpdatedEvent,
   SuppressKeyboardEventParams
 } from 'ag-grid-community';
-import { 
+import {
   CellFormatType,
   CorrectionDiff,
   CorrectionRequestBody,
