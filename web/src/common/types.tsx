@@ -48,8 +48,8 @@ export enum SurveyValidationErrorLevel {
     INFO = 'INFO',
 }
 
-// Not very good but no way as the type are 
-// not specificed initiall so all hack around
+// TODO: Not very good but no way as the type are 
+// not specificed initially so all hack around
 export type ExtRow =
     { [key: string]: number | string } &
     { id: number, pos: number } &
@@ -66,7 +66,7 @@ export interface CellFormatType {
 export interface Location {
     locationId: number;
     locationName: string;
-    isActive: boolean;
+    isActive?: boolean;
 }
 
 export interface SurveyValidationError {
@@ -94,7 +94,7 @@ export interface Site {
     slope?: number;
     waveExposure?: number;
     currents?: number;
-    isActive: boolean;
+    isActive?: boolean;
     siteAttribute?: Record<string, string>;
 }
 
@@ -196,10 +196,10 @@ export interface SurveyMethodEntity {
 
 export interface Survey {
     surveyId: number,
-    surveyDate: Date,
-    created: Date,
-    updated: Date,
-    surveyTime: Date,
+    surveyDate: string,
+    created: string,
+    updated: string,
+    surveyTime: string,
     depth: number,
     surveyNum: number,
     visibility: number,
@@ -315,6 +315,10 @@ export interface StagedRow {
     lastUpdated?: string;
 }
 
+interface UndoFunction {
+    (api: GridApi): void;
+}
+
 export interface CorrectionRow {
     surveyId?: number;
     diffRowId?: string;
@@ -373,8 +377,8 @@ export interface CorrectionRequestBody {
 export interface InternalContext {
     errors: Array<SurveyValidationError>,
     highlighted: [],
-    popUndo: (api: GridApi) => any,
-    pushUndo: (api: GridApi) => any,
+    popUndo: UndoFunction,
+    pushUndo: UndoFunction,
     putRowIds: [],
     undoStack: [],
     fullRefresh: boolean,

@@ -73,7 +73,7 @@ interface JobType {
 }
 
 interface DataSheetViewProps {
-  onIngest: (resp: AxiosResponse) => void,
+  onIngest: (res: AxiosResponse) => void,
   roles: Array<string>,
 }
 

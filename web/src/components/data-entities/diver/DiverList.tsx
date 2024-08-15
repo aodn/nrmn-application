@@ -13,6 +13,7 @@ import { AuthContext } from '../../../contexts/auth-context';
 import { AppConstants } from '../../../common/constants';
 import { ITooltipParams } from 'ag-grid-enterprise';
 import { CellClassParams, CellClickedEvent, CellStyle, CellValueChangedEvent, ColDef, GridReadyEvent } from 'ag-grid-community';
+import { HttpStatusCode } from 'axios';
 
 const DIVER_LIST_GRID_ID = 'diver-list';
 
@@ -23,7 +24,7 @@ const tooltipValueGetter = (params: ITooltipParams) => {
   }
 };
 
-const chooseCellStyle = (params: CellClassParams): CellStyle | null | undefined => {
+const chooseCellStyle = (params: CellClassParams): CellStyle | null => {
   if (params.context !== undefined) {
     if (params.context.errors?.some((e: { id: string }) => e.id === params.data?.diverId)) {
       return { backgroundColor: red[100] };
@@ -144,7 +145,7 @@ const DiverList = () => {
     setErrors([]);
     entityEdit('divers', Object.values(delta))
       .then((res) => {
-        res.status === 400 ? setErrors(res.data) : setDelta({});
+        res.status !== HttpStatusCode.Ok ? setErrors(res.data) : setDelta({});
       });
   };
 

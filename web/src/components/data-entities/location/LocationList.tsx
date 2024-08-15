@@ -194,7 +194,8 @@ const LocationList = () => {
               variant="contained" to="/reference/location"
               component={NavLink}
               startIcon={<Add />}
-              disabled={!(auth?.roles?.includes(AppConstants.ROLES.DATA_OFFICER) || auth?.roles?.includes(AppConstants.ROLES.ADMIN))}>New Location
+              disabled={!(auth?.roles?.includes(AppConstants.ROLES.DATA_OFFICER) || auth?.roles?.includes(AppConstants.ROLES.ADMIN))}>
+                New Location
             </Button>
           </Box>
         </Box>

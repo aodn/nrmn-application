@@ -1,14 +1,16 @@
 import React from 'react';
 
-interface Authenticate {
-  auth: {
-    features?: Array<string>,
-    roles?: Array<string>,
-  },
-  setAuth?: React.Dispatch<Authenticate>;
+interface Auth {
+  features?: Array<string>,
+  roles?: Array<string>,
 }
 
-export const AuthContext = React.createContext<Authenticate>({
+interface AuthContextType {
+  auth: Auth,
+  setAuth?: React.Dispatch<React.SetStateAction<Auth>>;
+}
+
+export const AuthContext = React.createContext<AuthContextType>({
   auth: {},
   setAuth: undefined
 });
