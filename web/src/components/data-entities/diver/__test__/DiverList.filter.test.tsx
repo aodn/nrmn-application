@@ -14,9 +14,9 @@ import { AppConstants } from '../../../../common/constants';
 jest.setTimeout(30000);
 
 describe('<DiverList/> filter testing', () => {
-  let mockGetResult;
-  let mockGetFiltersForId;
-  let mockResetStateFilters;
+  let mockGetResult: any;
+  let mockGetFiltersForId: any;
+  let mockResetStateFilters: any;
   const columns = ['diver.initials', 'diver.fullName'];
 
   beforeAll(() => {
@@ -37,7 +37,7 @@ describe('<DiverList/> filter testing', () => {
     const canned = require('./DiverList.filter.data.json');
 
     // Override function so that it return the data we set.
-    mockGetResult.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url: string) => {
 
       const raw = {
         config: undefined,
@@ -48,7 +48,7 @@ describe('<DiverList/> filter testing', () => {
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 
@@ -92,12 +92,12 @@ describe('<DiverList/> filter testing', () => {
     const canned = require('./DiverList.filter.data.json');
 
     // Filter set will cause some items disappeared
-    mockGetFiltersForId.mockImplementation((id) => {
+    mockGetFiltersForId.mockImplementation((id: string) => {
       return '{"diver.fullName":{"filterType":"text","type":"contains","filter":"Orange"}}';
     });
 
     // Override function so that it return the data we set.
-    mockGetResult.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url: string) => {
 
       const raw = {
         config: undefined,
@@ -108,7 +108,7 @@ describe('<DiverList/> filter testing', () => {
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 

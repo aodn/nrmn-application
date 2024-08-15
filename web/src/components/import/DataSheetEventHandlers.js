@@ -41,7 +41,7 @@ class DataSheetEventHandlers {
   }
 
   pushUndo(api, delta) {
-    const context = api.gridOptionsWrapper.gridOptions.context;
+    const context = api.gos.gridOptions.context;
     context.undoStack.push(
       delta.map((d) => {
         context.putRowIds.push(d.id);
@@ -109,7 +109,7 @@ class DataSheetEventHandlers {
   }
 
   popUndo(api) {
-    const context = api.gridOptionsWrapper.gridOptions.context;
+    const context = api.gos.gridOptions.context;
     const deltaSet = context.undoStack.pop();
     let rowData = context.rowData;
     for (const deltaIdx in deltaSet) {
@@ -296,7 +296,7 @@ class DataSheetEventHandlers {
   }
 
   onPasteStart(e) {
-    const context = e.api.gridOptionsWrapper.gridOptions.context;
+    const context = e.api.gos.gridOptions.context;
     context.pasteMode = true;
   }
 
@@ -568,7 +568,7 @@ class DataSheetEventHandlers {
   }
 
   handlePasteEnd(e) {
-    const context = e.api.gridOptionsWrapper.gridOptions.context;
+    const context = e.api.gos.gridOptions.context;
     context.pasteMode = false;
     let oldRows = [];
     Array.from(new Set(context.pendingPasteUndo.map((u) => u.id))).forEach((id) => {
@@ -598,7 +598,7 @@ class DataSheetEventHandlers {
   }
 
   handleUndo(e) {
-    const context = e.api.gridOptionsWrapper.gridOptions.context;
+    const context = e.api.gos.gridOptions.context;
     if (context.undoStack.length < 1) return;
     this.popUndo(e.api);
     e.api.refreshCells();

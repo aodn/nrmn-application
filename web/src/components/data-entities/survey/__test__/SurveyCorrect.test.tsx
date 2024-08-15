@@ -8,16 +8,17 @@ import * as axiosInstance from '../../../../api/api';
 import { AxiosResponse } from 'axios';
 import SurveyCorrect from '../SurveyCorrect';
 import { INSERT_ONE_ROW } from '../../../import/DataSheetEventHandlers';
+import { PointerInput } from '@testing-library/user-event/dist/types/pointer';
 
 jest.setTimeout(50000);
 
-const toNonNullString = (s): string => s ? s : "";
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const range = (start, stop, step) => 
+const toNonNullString = (s: string | undefined): string => s ? s : "";
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const range = (start: any, stop: any, step: any) => 
   Array.from({ length: (stop - start) / step + 1}, (_, i) => "" + (start + (i * step)))
 
 describe('<SurveyCorrect/> testing', () => {
-  let mockGetDataJob;
+  let mockGetDataJob: any;
 
   beforeAll(() => {
     mockGetDataJob = jest.spyOn(axiosInstance, 'getCorrections');
@@ -35,7 +36,7 @@ describe('<SurveyCorrect/> testing', () => {
     const temp = require('./cannedData/SurveyCorrect.contextMenu.json');
 
     // Override function so that it return the data we set.
-    mockGetDataJob.mockImplementation((url) => {
+    mockGetDataJob.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: temp,
@@ -46,7 +47,7 @@ describe('<SurveyCorrect/> testing', () => {
 
       return (
         new Promise<AxiosResponse>((resolve) => {
-          resolve(raw);
+          resolve(raw as any);
         })
       );
     });
@@ -82,7 +83,7 @@ describe('<SurveyCorrect/> testing', () => {
     // We repeat the insert a couple of times, previously a bug appear where we cannot add more then 3 times
     for(let i = 0; i < 5; i++) {
       // Highlight the row
-      userEvent.pointer({ keys: '[MouseLeft]', target: rowTwoDriverColumn });
+      userEvent.pointer({ keys: '[MouseLeft]', target: rowTwoDriverColumn } as PointerInput);
       // Show context menu
       userEvent.pointer({ keys: '[MouseRight]', target: rowTwo });
     

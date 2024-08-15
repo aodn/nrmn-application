@@ -1,9 +1,9 @@
 import React from 'react';
-import {Box, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@mui/material';
-import {PropTypes} from 'prop-types';
+import { Box, Table, TableBody, TableCell, TableRow, Tooltip, Typography } from '@mui/material';
+import { PropTypes } from 'prop-types';
 import ValidationSummary from './ValidationSummary';
 
-const ValidationPanel = ({api, context}) => {
+const ValidationPanel = ({ api, context }) => {
   const summary = context.summary;
   const errorList = context.errorList;
 
@@ -12,31 +12,33 @@ const ValidationPanel = ({api, context}) => {
     context.focusedRows = noFilter ? item.rowIds || [item.row] : [];
     const row = context.rowData.find((r) => r.id === rowId);
     let visible = false;
-    api.forEachNodeAfterFilter((n) => (visible = n.data.id === row.id || visible));
+    api.forEachNodeAfterFilter((n) => (visible = n.data?.id === row?.id || visible));
+
     if (visible) api.ensureNodeVisible(row, 'middle');
     if (item.columnName) api.ensureColumnVisible(item.columnName);
     if (item.columnNames) for (const column of item.columnNames) api.ensureColumnVisible(column);
-    api.setFilterModel(noFilter ? null : {id: {type: 'set', values: item.rowIds.map((id) => id.toString())}});
+
+    api.setFilterModel(noFilter ? null : { id: { type: 'set', values: item.rowIds.map((id) => id.toString()) } });
     api.redrawRows();
   };
 
   const siteTooltip = summary.foundSites
     ? Object.keys(summary.foundSites).map((key) => (
+      <div key={key}>
+        {key}
+        <br />
+      </div>
+    ))
+    : '';
+  const newSitesTooltip = summary.foundSites
+    ? Object.keys(summary.foundSites)
+      .filter((key) => summary.foundSites[key] === true)
+      .map((key) => (
         <div key={key}>
           {key}
           <br />
         </div>
       ))
-    : '';
-  const newSitesTooltip = summary.foundSites
-    ? Object.keys(summary.foundSites)
-        .filter((key) => summary.foundSites[key] === true)
-        .map((key) => (
-          <div key={key}>
-            {key}
-            <br />
-          </div>
-        ))
     : '';
 
   return (
@@ -64,14 +66,14 @@ const ValidationPanel = ({api, context}) => {
             <TableRow>
               <TableCell align="right">{summary.siteCount}</TableCell>
               <Tooltip title={siteTooltip}>
-                <TableCell style={{textDecoration: 'underline dotted'}}>distinct sites</TableCell>
+                <TableCell style={{ textDecoration: 'underline dotted' }}>distinct sites</TableCell>
               </Tooltip>
             </TableRow>
             <TableRow>
               <TableCell align="right">{summary.newSiteCount}</TableCell>
               {summary.newSiteCount > 0 ? (
                 <Tooltip title={newSitesTooltip}>
-                  <TableCell style={{textDecoration: 'underline dotted'}}>new sites</TableCell>
+                  <TableCell style={{ textDecoration: 'underline dotted' }}>new sites</TableCell>
                 </Tooltip>
               ) : (
                 <TableCell>new sites</TableCell>

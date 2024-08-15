@@ -16,8 +16,8 @@ const observableItem = require('./cannedData/ObservableItemEdit.item.json');
 const taxonomyList = require('./cannedData/ObservableItemEdit.taxonomy.json');
 
 describe('<ObservableItemEdit/>',  ()=>{
-  let mockGetResult;
-  let mockEntityEdit;
+  let mockGetResult: any;
+  let mockEntityEdit: any;
 
   beforeAll(() => {
     mockGetResult = jest.spyOn(axiosInstance,'getResult');
@@ -34,7 +34,7 @@ describe('<ObservableItemEdit/>',  ()=>{
    * when all items correct after save, the errors should disappear.
    */
   test('Test update species name', async() => {
-    mockGetResult.mockImplementation((url) => {
+    mockGetResult.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: url.includes('taxonomyDetail') ? taxonomyList : observableItem,
@@ -44,11 +44,11 @@ describe('<ObservableItemEdit/>',  ()=>{
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 
-    mockEntityEdit.mockImplementation((url) => {
+    mockEntityEdit.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: [{
@@ -63,7 +63,7 @@ describe('<ObservableItemEdit/>',  ()=>{
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 
@@ -81,13 +81,15 @@ describe('<ObservableItemEdit/>',  ()=>{
     const textField = screen.getByTestId('observable-item-name-text').querySelector('input');
     const button = screen.getByTestId('observable-item-save-btn');
 
-    await waitFor(() => expect(textField.value).toBe('Pinnidae spp.'), { timeout: 10000})
+    await waitFor(() => expect(textField?.value).toBe('Pinnidae spp.'), { timeout: 10000})
       .then(() => {
         // Then we change to species name that isn't exit, mainly the update api call result in error.
-        userEvent.type(textField,v);
+        if(textField) {
+          userEvent.type(textField,v);
+        }
       });
 
-    await waitFor(() => expect(textField.value).toBe(v), { timeout: 10000})
+    await waitFor(() => expect(textField?.value).toBe(v), { timeout: 10000})
       .then(() => {
         fireEvent.click(button);
       });

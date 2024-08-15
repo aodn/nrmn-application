@@ -251,9 +251,9 @@ public class StagedJobController {
 
         if (globalLockService.setLock()) {
             try {
-                return jobRepo.findById(jobId).map(job -> ResponseEntity.ok(validation.process(job)))
-                        .orElseGet(() -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                                .body(new ValidationResponse()));
+                return jobRepo.findById(jobId)
+                        .map(job -> ResponseEntity.ok(validation.process(job)))
+                        .orElseGet(() -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ValidationResponse()));
             } finally {
                 globalLockService.releaseLock();
             }

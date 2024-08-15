@@ -22,11 +22,11 @@ const species404Result = require('./cannedData/SpeciesCorrect.species404Error.js
 
 describe('<SpeciesCorrect/> testing', () => {
 
-  let mockSearchSpeciesSummary;
-  let mockSearch;
-  let mockGetEntity;
-  let mockPostSpeciesCorrection;
-  let mockSearchSpecies;
+  let mockSearchSpeciesSummary: any;
+  let mockSearch: any;
+  let mockGetEntity: any;
+  let mockPostSpeciesCorrection: any;
+  let mockSearchSpecies: any;
 
   beforeAll(() => {
     mockSearchSpeciesSummary = jest.spyOn(axiosInstance, 'searchSpeciesSummary');
@@ -56,7 +56,7 @@ describe('<SpeciesCorrect/> testing', () => {
   test('UI show error on end of flow when backend report error', async () => {
 
     // Override function so that it return the data we set.
-    mockGetEntity.mockImplementation((url) => {
+    mockGetEntity.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: locationList,
@@ -66,11 +66,11 @@ describe('<SpeciesCorrect/> testing', () => {
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 
-    mockSearch.mockImplementation((url) => {
+    mockSearch.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: speciesNotolabrusList,
@@ -80,11 +80,11 @@ describe('<SpeciesCorrect/> testing', () => {
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 
-    mockSearchSpeciesSummary.mockImplementation((url) => {
+    mockSearchSpeciesSummary.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: speciesNotolabrusTetricusResult,
@@ -94,11 +94,11 @@ describe('<SpeciesCorrect/> testing', () => {
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 
-    mockPostSpeciesCorrection.mockImplementation((url) => {
+    mockPostSpeciesCorrection.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: species404Result,
@@ -110,7 +110,7 @@ describe('<SpeciesCorrect/> testing', () => {
       return Promise.reject({response: raw});
     });
 
-    mockSearchSpecies.mockImplementation((url) => {
+    mockSearchSpecies.mockImplementation((url: string) => {
       const raw = {
         config: undefined,
         data: speciesResult,
@@ -120,7 +120,7 @@ describe('<SpeciesCorrect/> testing', () => {
       };
 
       return new Promise<AxiosResponse>((resolve => {
-        resolve(raw);
+        resolve(raw as any);
       }));
     });
 
@@ -132,8 +132,8 @@ describe('<SpeciesCorrect/> testing', () => {
         </AuthContext.Provider>
       </Router>);
 
-    let correctFromAutoComplete;
-    let correctFromInput;
+    let correctFromAutoComplete: any;
+    let correctFromInput: any;
 
     const targetSpeciesName = 'Notolabrus tetricus/fucicola hybrid';
 
@@ -175,13 +175,16 @@ describe('<SpeciesCorrect/> testing', () => {
       });
 
     // Search result loaded and the common name of species appear
-    let correctToAutoComplete;
-    let correctToInput;
+    let correctToAutoComplete: any;
+    let correctToInput: any;
 
     await waitFor(() => expect(mockSearchSpeciesSummary).toHaveBeenCalledTimes(1), { timeout: 10000})
       .then(() => {
         expect(screen.getByText('Blue-throat/Purple wrasse hybrid')).toBeInTheDocument();
-        userEvent.click(screen.getByText('Blue-throat/Purple wrasse hybrid').closest('tr'));
+        const i = screen.getByText('Blue-throat/Purple wrasse hybrid').closest('tr');
+        if(i) {
+          userEvent.click(i);
+        }
       });
 
     await waitFor(() => expect(screen.getByTestId('species-correction-to')).toBeInTheDocument(), { timeout: 10000})

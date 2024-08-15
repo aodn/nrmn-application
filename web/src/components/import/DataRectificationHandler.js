@@ -22,7 +22,7 @@ class DataRectificationHandler {
 
   async submitRectification(id) {
     this.#findRowsToRectify();
-    await updateRows(id, this.rowsToRectify, () => {});
+    await updateRows(id, this.rowsToRectify, () => '');
   }
 
   #findRowsToRectify() {
