@@ -30,6 +30,7 @@ pipeline {
                 }
                 stage('build') {
                     steps {
+                        sh 'yarn --version'
                         sh 'yarn --cwd web --frozen-lockfile'
                         sh 'mvn --batch-mode --threads 2 --define maven.test.skip=true clean package'
                     }
