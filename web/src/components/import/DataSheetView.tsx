@@ -124,7 +124,7 @@ const DataSheetView: React.FC<DataSheetViewProps> = ({ onIngest, roles }) => {
       if (res?.data.rows) {
         const rowData = res.data.rows.map((row) => {
           const { measureJson } = { ...row };
-          const json = measureJson || '{}';
+          const json = (measureJson || '{}') as { [key: string]: number | string };
 
           Object.getOwnPropertyNames(json)
             .forEach((numKey) => {
