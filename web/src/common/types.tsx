@@ -48,7 +48,7 @@ export enum SurveyValidationErrorLevel {
     INFO = 'INFO',
 }
 
-// TODO: Not very good but no way as the type are 
+// TODO: Not very good but no way as the type are
 // not specificed initially so all hack around
 export type ExtRow =
     { [key: string]: number | string } &
@@ -309,7 +309,7 @@ export interface StagedRow {
     inverts?: string;
     pos?: number;
     isInvertSizing?: string;
-    measureJson?: any;
+    measureJson?: { [key: string]: number | string } | string;
     stagedJob?: StagedJob;
     created?: string; // Timestamp can be represented as a string in TypeScript
     lastUpdated?: string;

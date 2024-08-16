@@ -56,7 +56,8 @@
     "no-console-log/no-console-log": "warn",
     "no-empty": "warn",
     "no-trailing-spaces": "warn",
-    "no-unused-vars": "warn",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "off",
     "no-alert": "error",
     "no-debugger": "warn"
   }
