@@ -1039,7 +1039,7 @@ CREATE MATERIALIZED VIEW nrmn.ep_survey_list AS
     sit.old_site_codes,
     ( SELECT string_agg(DISTINCT ((sm1.method_id)::character varying(3))::text, ', '::text ORDER BY ((sm1.method_id)::character varying(3))::text) AS string_agg
            FROM nrmn.survey_method sm1
-          WHERE (sm1.survey_id = sur.survey_id)
+          WHERE (sm1.survey_id = sur.survey_id AND sm1.survey_not_done=false)
           GROUP BY sm1.survey_id) AS methods,
     sur.notes AS survey_notes
    FROM ((((((((nrmn.survey sur
