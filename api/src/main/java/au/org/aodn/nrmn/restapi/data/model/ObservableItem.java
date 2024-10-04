@@ -145,7 +145,7 @@ public class ObservableItem {
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     private AphiaRelType aphiaRelType;
 
-    @OneToMany()
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "methods_species", joinColumns = @JoinColumn(name = "observable_item_id"),
             inverseJoinColumns = @JoinColumn(name = "method_id"))
     @NotAudited
