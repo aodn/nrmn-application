@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.service;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,6 +20,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import au.org.aodn.nrmn.restapi.util.SpacialUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,6 @@ import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import au.org.aodn.nrmn.restapi.data.model.Diver;
-import au.org.aodn.nrmn.restapi.data.model.Measure;
 import au.org.aodn.nrmn.restapi.data.model.Method;
 import au.org.aodn.nrmn.restapi.data.model.Observation;
 import au.org.aodn.nrmn.restapi.data.model.Program;
@@ -36,10 +37,7 @@ import au.org.aodn.nrmn.restapi.data.model.StagedJobLog;
 import au.org.aodn.nrmn.restapi.data.model.Survey;
 import au.org.aodn.nrmn.restapi.data.model.SurveyMethodEntity;
 import au.org.aodn.nrmn.restapi.data.repository.MeasureRepository;
-import au.org.aodn.nrmn.restapi.data.repository.MethodRepository;
-import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
-import au.org.aodn.nrmn.restapi.data.repository.ProgramRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedJobLogRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
@@ -55,23 +53,18 @@ import lombok.Value;
 
 import static au.org.aodn.nrmn.restapi.util.Constants.COORDINATE_VALID_DECIMAL_COUNT;
 
+@Slf4j
 @Service
 public class SurveyIngestionService {
 
     @Autowired
     SurveyRepository surveyRepository;
     @Autowired
-    MethodRepository methodRepository;
-    @Autowired
     MeasureRepository measureRepository;
     @Autowired
     ObservationRepository observationRepository;
     @Autowired
     SurveyMethodRepository surveyMethodRepository;
-    @Autowired
-    ObservableItemRepository observableItemRepository;
-    @Autowired
-    ProgramRepository programRepository;
     @Autowired
     SiteRepository siteRepo;
     @Autowired
@@ -81,8 +74,8 @@ public class SurveyIngestionService {
     @Autowired
     StagedJobRepository jobRepository;
 
-    private static int PROGRAM_ID_NONE = 0;
-    private static int SITE_ID_NONE = 0;
+    private final static int PROGRAM_ID_NONE = 0;
+    private final static int SITE_ID_NONE = 0;
 
     public Survey getSurvey(Program program, OptionalDouble visAvg, StagedRowFormatted stagedRow) {
 
@@ -136,7 +129,7 @@ public class SurveyIngestionService {
 
     public List<Observation> getObservations(SurveyMethodEntity surveyMethod, StagedRowFormatted stagedRow,
             Boolean withExtendedSizing) {
-        if (!stagedRow.getSpecies().isPresent())
+        if (stagedRow.getSpecies().isEmpty())
             return Collections.emptyList();
 
         Diver diver = stagedRow.getDiver();
@@ -148,8 +141,8 @@ public class SurveyIngestionService {
 
         @Value
         class MeasureValue {
-            private Integer seqNo;
-            private Integer measureValue;
+            Integer seqNo;
+            Integer measureValue;
         }
 
         Stream<MeasureValue> unsized = Stream.empty();
@@ -185,8 +178,10 @@ public class SurveyIngestionService {
                 measureTypeId = MeasureType.SingleItem;
             }
 
-            Measure measure = measureRepository.findByMeasureTypeIdAndSeqNo(measureTypeId, m.getSeqNo()).orElse(null);
-            return baseObservationBuilder.measure(measure).measureValue(m.getMeasureValue()).build();
+            return baseObservationBuilder
+                    .measure(measureRepository.findByMeasureTypeIdAndSeqNo(measureTypeId, m.getSeqNo()).orElse(null))
+                    .measureValue(m.getMeasureValue())
+                    .build();
         }).collect(Collectors.toList());
 
         return observations;
@@ -207,27 +202,40 @@ public class SurveyIngestionService {
     @Transactional
     public void ingestTransaction(StagedJob job, StagedJobLog stagedJobLog, Collection<StagedRowFormatted> validatedRows) {
 
+        final boolean isExtSize = job.getIsExtendedSize();
+        final Program program = job.getProgram();
+
         var rowsGroupedBySurvey = validatedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
-        var surveyIds = rowsGroupedBySurvey.values().stream().map(surveyRows -> {
+        var surveyIds = rowsGroupedBySurvey
+                .values()
+                .stream()
+                .map(surveyRows -> {
+                    var visAvg = surveyRows.stream().filter(r -> r.getVis().isPresent()).mapToDouble(r -> r.getVis().get()).average();
+                    if(visAvg.isPresent())
+                        visAvg = OptionalDouble.of((double)Math.round(visAvg.getAsDouble()));
 
-            var visAvg = surveyRows.stream().filter(r -> r.getVis().isPresent()).mapToDouble(r -> r.getVis().get()).average();
-            if(visAvg.isPresent())
-                visAvg = OptionalDouble.of((double)Math.round(visAvg.getAsDouble()));
+                    final Survey survey = getSurvey(program, visAvg, surveyRows.get(0));
 
-            var survey = getSurvey(job.getProgram(), visAvg, surveyRows.get(0));
+                    groupRowsByMethodBlock(surveyRows).values().forEach(methodBlockRows -> {
+                        log.debug("Start getSurveyMethod, {}", ZonedDateTime.now());
+                        var surveyMethod = getSurveyMethod(survey, methodBlockRows.get(0));
+                        log.debug("End getSurveyMethod, {}", ZonedDateTime.now());
 
-            groupRowsByMethodBlock(surveyRows).values().forEach(methodBlockRows -> {
-                var surveyMethod = getSurveyMethod(survey, methodBlockRows.get(0));
-                methodBlockRows.forEach(row -> observationRepository.saveAll(getObservations(surveyMethod, row, job.getIsExtendedSize())));
-            });
-            return survey.getSurveyId();
-        }).collect(Collectors.toList());
+                        methodBlockRows.forEach(row -> {
+                            log.debug("Start methodBlockRows.forEach, {}", ZonedDateTime.now());
+                            List<Observation> o = getObservations(surveyMethod, row, isExtSize);
+                            observationRepository.saveAll(o);
+                            log.debug("End methodBlockRows.forEach, {} size {}", ZonedDateTime.now(), o.size());
+                        });
+                    });
+                    return survey.getSurveyId();
+                }).collect(Collectors.toList());
 
         var rowCount = validatedRows.size();
-        var siteCount = validatedRows.stream().map(r -> r.getSite()).distinct().count();
+        var siteCount = validatedRows.stream().map(StagedRowFormatted::getSite).distinct().count();
         var surveyCount = surveyIds.size();
-        var obsItemCount = validatedRows.stream().map(r -> r.getSpecies()).filter(o -> o.isPresent()).distinct().count();
-        var diverCount = validatedRows.stream().map(r -> r.getDiver()).distinct().count();
+        var obsItemCount = validatedRows.stream().map(StagedRowFormatted::getSpecies).filter(Optional::isPresent).distinct().count();
+        var diverCount = validatedRows.stream().map(StagedRowFormatted::getDiver).distinct().count();
 
         var messages = Arrays.asList(rowCount + " rows of data", siteCount + " sites", surveyCount + " surveys", obsItemCount + " distinct observable items", diverCount + " divers");
         var message = messages.stream().collect(Collectors.joining("\n"));

@@ -9,6 +9,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        use_sql_comments: true
 
 app:
   features: corrections
