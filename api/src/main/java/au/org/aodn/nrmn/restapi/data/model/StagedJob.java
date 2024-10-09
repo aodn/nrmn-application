@@ -26,9 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import au.org.aodn.nrmn.restapi.enums.SourceJobType;
 import au.org.aodn.nrmn.restapi.enums.StatusJobType;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -36,12 +34,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.cache.annotation.Cacheable;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Cacheable
+@Cache(region = "entities", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Table(name = "staged_job")
 @JsonIgnoreProperties(ignoreUnknown = true, value = {"hibernateLazyInitializer"})
 public class StagedJob implements Serializable {

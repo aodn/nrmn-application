@@ -26,9 +26,7 @@ import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
@@ -37,12 +35,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Cacheable
+@Cache(region = "entities", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Table(name = "observable_item_ref")
 @SecondaryTable(name = "lengthweight_ref", pkJoinColumns = @PrimaryKeyJoinColumn(name = "observable_item_id"),
         foreignKey = @ForeignKey(name = "lengthweight_ref_observable_item_id_fkey"))
@@ -145,7 +146,7 @@ public class ObservableItem {
     @Audited(targetAuditMode = NOT_AUDITED, withModifiedFlag = true)
     private AphiaRelType aphiaRelType;
 
-    @OneToMany()
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "methods_species", joinColumns = @JoinColumn(name = "observable_item_id"),
             inverseJoinColumns = @JoinColumn(name = "method_id"))
     @NotAudited

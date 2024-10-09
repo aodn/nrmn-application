@@ -1,6 +1,5 @@
 package au.org.aodn.nrmn.restapi.data.model;
 
-import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
 import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 import java.sql.Date;
@@ -10,10 +9,12 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.envers.Audited;
+import org.hibernate.annotations.Cache;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -24,10 +25,12 @@ import lombok.Data;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.cache.annotation.Cacheable;
 
 @Entity
 @Data
-@org.hibernate.annotations.Cache(region = "entities", usage = READ_WRITE)
+@Cacheable
+@Cache(region = "entities", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

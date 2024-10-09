@@ -12,6 +12,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ag-grid-community/core@npm:30.2.1":
+  version: 30.2.1
+  resolution: "@ag-grid-community/core@npm:30.2.1"
+  checksum: 10c0/79c7646227bdc5fae133f5e66cc5830cdd0bf56f627934ea8d34704da4f7806fcd348e33d6269281a2721e0a2d4f688af19b8f23178484a72731ef4e45761faf
+  languageName: node
+  linkType: hard
+
 "@ag-grid-community/react@npm:30.2.1":
   version: 30.2.1
   resolution: "@ag-grid-community/react@npm:30.2.1"
@@ -11224,6 +11231,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "nrmn-web@workspace:."
   dependencies:
+    "@ag-grid-community/core": "npm:30.2.1"
     "@ag-grid-community/react": "npm:30.2.1"
     "@ag-grid-community/styles": "npm:30.2.1"
     "@babel/core": "npm:^7.23.3"
