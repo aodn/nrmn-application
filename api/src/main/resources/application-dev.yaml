@@ -17,3 +17,5 @@ app:
 logging:
   level:
     ROOT: info
+    org.springframework.cache: INFO
+    org.hibernate.cache: INFO

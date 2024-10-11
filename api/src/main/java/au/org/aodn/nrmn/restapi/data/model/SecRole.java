@@ -18,12 +18,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.springframework.cache.annotation.Cacheable;
 
 @Entity
 @Data
-@Cacheable
-@Cache(region = "entities", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@Cache(region = "entities", usage = CacheConcurrencyStrategy.READ_WRITE)
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor

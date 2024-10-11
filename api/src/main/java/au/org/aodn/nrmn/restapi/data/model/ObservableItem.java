@@ -42,8 +42,7 @@ import org.springframework.cache.annotation.Cacheable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Cacheable
-@Cache(region = "entities", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@Cache(region = "entities", usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "observable_item_ref")
 @SecondaryTable(name = "lengthweight_ref", pkJoinColumns = @PrimaryKeyJoinColumn(name = "observable_item_id"),
         foreignKey = @ForeignKey(name = "lengthweight_ref_observable_item_id_fkey"))

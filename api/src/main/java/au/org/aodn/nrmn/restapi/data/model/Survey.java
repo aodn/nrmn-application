@@ -25,12 +25,10 @@ import lombok.Data;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.cache.annotation.Cacheable;
 
 @Entity
 @Data
-@Cacheable
-@Cache(region = "entities", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@Cache(region = "entities", usage = CacheConcurrencyStrategy.READ_WRITE)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
