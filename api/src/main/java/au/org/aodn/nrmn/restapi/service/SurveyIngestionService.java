@@ -3,7 +3,6 @@ package au.org.aodn.nrmn.restapi.service;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalTime;
-import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -211,12 +210,7 @@ public class SurveyIngestionService {
                                 var surveyMethod = getSurveyMethod(survey, methodBlockRows.get(0));
                                 return methodBlockRows
                                         .parallelStream()
-                                        .map(row -> {
-                                            log.info("Start methodBlockRows.forEach, {}", ZonedDateTime.now());
-                                            List<Observation> o = getObservations(surveyMethod, row, isExtSize);
-                                            log.info("End methodBlockRows.forEach, {} size {}", ZonedDateTime.now(), o.size());
-                                            return o;
-                                        })
+                                        .map(row -> getObservations(surveyMethod, row, isExtSize))
                                         .flatMap(List::stream)
                                         .collect(Collectors.toList());
                             })
