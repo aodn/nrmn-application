@@ -41,6 +41,7 @@ import org.springframework.cache.annotation.Cacheable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Cacheable
 @Cache(region = "entities", usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "staged_job")
 @JsonIgnoreProperties(ignoreUnknown = true, value = {"hibernateLazyInitializer"})
