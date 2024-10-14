@@ -60,7 +60,10 @@ public class SurveyIngestionIT {
 
         // Make sure the items are set
         List<StagedRow> row = rowRepository.findRowsByJobId(6L);
-        Assertions.assertEquals(row.size(), 2, "Needed record in the db");
+        /*
+         * This test case contains an entry "Survey not Done", so you should see fewer entries,
+         */
+        Assertions.assertEquals(row.size(), 4, "Needed record in the db");
 
         Set<Integer> existingObservations = observationRepository.findAll()
                 .stream().map(Observation::getObservationId).collect(Collectors.toSet());
@@ -102,7 +105,7 @@ public class SurveyIngestionIT {
                 .filter(f -> !existingObservations.contains(f.getObservationId()))
                 .collect(Collectors.toList());
 
-        Assertions.assertEquals(6, observations.size(), "Inserted match");
+        Assertions.assertEquals(7, observations.size(), "Inserted match");
 
         List<Observation> twelvePointFive = observations.stream().filter(f -> f.getMeasure().getMeasureName().equalsIgnoreCase("12.5cm")).collect(Collectors.toList());
         Assertions.assertEquals(twelvePointFive.size(), 1, "12.5cm size correct");
@@ -133,5 +136,12 @@ public class SurveyIngestionIT {
         Assertions.assertEquals(thirtyFive.size(), 1, "35cm size correct");
         Assertions.assertEquals(10, thirtyFive.get(0).getMeasure().getSeqNo(), "35cm seqno correct");
         Assertions.assertEquals(1, thirtyFive.get(0).getMeasureValue(), "35cm measure correct");
+        Assertions.assertEquals("Antonia Cooper", thirtyFive.get(0).getDiver().getFullName(), "50cm diver correct");
+
+        List<Observation> fifty = observations.stream().filter(f -> f.getMeasure().getMeasureName().equalsIgnoreCase("50cm")).collect(Collectors.toList());
+        Assertions.assertEquals(fifty.size(), 1, "50cm size correct");
+        Assertions.assertEquals(12, fifty.get(0).getMeasure().getSeqNo(), "50cm seqno correct");
+        Assertions.assertEquals(1, fifty.get(0).getMeasureValue(), "50cm measure correct");
+        Assertions.assertEquals("Antonia Cooper", fifty.get(0).getDiver().getFullName(), "50cm diver correct");
     }
 }
