@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -38,9 +37,6 @@ import java.util.concurrent.*;
 public class IngestionController {
 
     protected static final Logger logger = LoggerFactory.getLogger(IngestionController.class);
-
-    @Value("${nrmn.jobs.scheduleInitDelay:1000}")
-    protected int scheduleInitDelay;
 
     @Autowired
     protected StagedJobRepository jobRepository;
@@ -85,7 +81,7 @@ public class IngestionController {
 
     @PostMapping(path = "ingest/{job_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<Map> ingest(@PathVariable("job_id") Long jobId) {
+    public ResponseEntity<Map<String, Object>> ingest(@PathVariable("job_id") Long jobId) {
         userActionAuditRepository.save(new UserActionAudit("ingestion/ingest", "ingest job: " + jobId));
 
         Map<String, Object> result = new HashMap<>();
@@ -93,7 +89,7 @@ public class IngestionController {
 
         var optionalJob = jobRepository.findById(jobId);
 
-        if (!optionalJob.isPresent()) {
+        if (optionalJob.isEmpty()) {
             result.put("jobStatus", StatusJobType.FAILED);
             result.put("message", "Job with given id does not exist. jobId: " + jobId);
             logger.warn(result.get("message").toString());
@@ -162,14 +158,14 @@ public class IngestionController {
 
     @GetMapping(path = "ingest/{job_log_id}")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public ResponseEntity<Map> getIngest(@PathVariable("job_log_id") Long jobLogId) {
+    public ResponseEntity<Map<String, Object>> getIngest(@PathVariable("job_log_id") Long jobLogId) {
 
         Map<String, Object> result = new HashMap<>();
         result.put("jobLogId", jobLogId);
 
         var optionalJob = stagedJobLogRepository.findById(jobLogId);
 
-        if (!optionalJob.isPresent()) {
+        if (optionalJob.isEmpty()) {
             result.put("jobStatus", StagedJobEventType.ERROR);
             result.put("message", "Job log does not exist. jobLogId: " + jobLogId);
         }
