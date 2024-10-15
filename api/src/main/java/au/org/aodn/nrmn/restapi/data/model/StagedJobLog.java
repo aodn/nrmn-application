@@ -9,9 +9,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import au.org.aodn.nrmn.restapi.dto.correction.CorrectionDiffDto;
 import au.org.aodn.nrmn.restapi.dto.correction.SpeciesSearchBodyDto;
 import au.org.aodn.nrmn.restapi.enums.StagedJobEventType;
-
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Cache;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @Table(name = "staged_job_log")
+@Cache(region = "entities", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class StagedJobLog {
     
     @Id

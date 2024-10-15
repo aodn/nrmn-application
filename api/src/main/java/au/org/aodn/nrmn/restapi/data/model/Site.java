@@ -38,11 +38,9 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import au.org.aodn.nrmn.restapi.enums.Iirc;
-import org.springframework.cache.annotation.Cacheable;
 
 @Entity
-@Cacheable
-@Cache(region = "entities", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@Cache(region = "entities", usage = CacheConcurrencyStrategy.READ_WRITE)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

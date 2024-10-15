@@ -46,8 +46,7 @@ import org.springframework.cache.annotation.Cacheable;
 @EqualsAndHashCode
 @Builder
 @Table(name = "sec_user", uniqueConstraints = {@UniqueConstraint(name = "UNIQUE_EMAIL", columnNames = {"email_address"})})
-@Cacheable
-@Cache(region = "entities", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@Cache(region = "entities", usage = CacheConcurrencyStrategy.READ_WRITE)
 @Audited(withModifiedFlag = true)
 public class  SecUser implements Serializable {
 

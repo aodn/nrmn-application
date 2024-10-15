@@ -13,13 +13,11 @@ import org.springframework.stereotype.Repository;
 
 import au.org.aodn.nrmn.restapi.data.model.Measure;
 
-import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
-
 @Repository
 public interface MeasureRepository extends JpaRepository<Measure, Integer>, JpaSpecificationExecutor<Measure> {
 
     @Query("SELECT m FROM Measure m WHERE m.measureType.measureTypeId = :measureTypeId and m.seqNo = :seqNo")
-    @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
+    @QueryHints({@QueryHint(name = "org.hibernate.cacheable", value = "true")})
     Optional<Measure> findByMeasureTypeIdAndSeqNo(@Param("measureTypeId") Integer measureTypeId,
                                                   @Param("seqNo") Integer seqNo);
 
