@@ -5,7 +5,7 @@
     <parent>
         <artifactId>nrmn</artifactId>
         <groupId>au.org.aodn.nrmn</groupId>
-        <version>0.0.0</version>
+        <version>12.3.880</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>nrmn-app</artifactId>
@@ -19,13 +19,13 @@
         <dependency>
             <groupId>au.org.aodn.nrmn</groupId>
             <artifactId>nrmn-api</artifactId>
-            <version>0.0.0</version>
+            <version>12.3.880</version>
             <type>war</type>
          </dependency>
         <dependency>
             <groupId>au.org.aodn.nrmn</groupId>
             <artifactId>nrmn-web</artifactId>
-            <version>0.0.0</version>
+            <version>12.3.880</version>
         </dependency>
     </dependencies>
 
