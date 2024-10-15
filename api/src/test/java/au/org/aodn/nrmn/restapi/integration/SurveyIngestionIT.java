@@ -63,7 +63,7 @@ public class SurveyIngestionIT {
         /*
          * This test case contains an entry "Survey not Done", so you should see fewer entries,
          */
-        Assertions.assertEquals(row.size(), 4, "Needed record in the db");
+        Assertions.assertEquals(row.size(), 5, "Needed record in the db");
 
         Set<Integer> existingObservations = observationRepository.findAll()
                 .stream().map(Observation::getObservationId).collect(Collectors.toSet());
@@ -105,12 +105,14 @@ public class SurveyIngestionIT {
                 .filter(f -> !existingObservations.contains(f.getObservationId()))
                 .collect(Collectors.toList());
 
-        Assertions.assertEquals(7, observations.size(), "Inserted match");
+        Assertions.assertEquals(8, observations.size(), "Inserted match");
 
         List<Observation> twelvePointFive = observations.stream().filter(f -> f.getMeasure().getMeasureName().equalsIgnoreCase("12.5cm")).collect(Collectors.toList());
-        Assertions.assertEquals(twelvePointFive.size(), 1, "12.5cm size correct");
-        Assertions.assertEquals(5, twelvePointFive.get(0).getMeasure().getSeqNo(), "12.5cm seqno correct");
-        Assertions.assertEquals(1, twelvePointFive.get(0).getMeasureValue(), "12.5cm measure correct");
+        Assertions.assertEquals(twelvePointFive.size(), 2, "12.5cm size correct");
+        Assertions.assertEquals(5, twelvePointFive.get(0).getMeasure().getSeqNo(), "12.5cm seqno correct 0");
+        Assertions.assertEquals(4, twelvePointFive.get(0).getMeasureValue(), "12.5cm measure correct 0");
+        Assertions.assertEquals(5, twelvePointFive.get(1).getMeasure().getSeqNo(), "12.5cm seqno correct 1");
+        Assertions.assertEquals(1, twelvePointFive.get(1).getMeasureValue(), "12.5cm measure correct 1");
 
         List<Observation> fifteen = observations.stream().filter(f -> f.getMeasure().getMeasureName().equalsIgnoreCase("15cm")).collect(Collectors.toList());
         Assertions.assertEquals(fifteen.size(), 1, "15cm size correct");
