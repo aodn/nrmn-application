@@ -34,7 +34,7 @@ RUN apt-get update \
 RUN apt-get update \
     && apt-get install nodejs -y \
     && npm install -g yarn \
-    && yarn set version 4.3.0
+    && npm install -g corepack
 
 
 
