@@ -5,6 +5,7 @@ To get started with running this React application, [install the `yarn` tool](ht
 ## Install package dependencies
 
 ```
+corepack enable
 yarn install
 ```
 
