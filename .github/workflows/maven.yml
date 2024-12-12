@@ -56,7 +56,7 @@ jobs:
           nrmn-build:latest -c '
           git reset --hard
           git clean --force --force -xd --exclude=web/node_modules
-          yarn --cwd web --frozen-lockfile
+          yarn install --cwd web --immutable
           mvn -e --batch-mode --threads 2 --define maven.test.skip=true clean package
         '
 
