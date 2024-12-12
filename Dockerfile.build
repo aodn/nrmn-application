@@ -21,8 +21,6 @@ ENV JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto
 RUN apt-get install -y git python3 python3-pip curl wget unzip zip
 
 
-
-
 # Install Node
 RUN apt-get update \
     && apt-get install -y ca-certificates curl gnupg \
@@ -32,9 +30,9 @@ RUN apt-get update \
 
 RUN apt-get update \
     && apt-get install nodejs -y \
-    && npm install -g yarn \
-    && yarn set version canary
-
+    && npm install -g corepack \
+    && corepack enable \
+    && npm install -g yarn
 
 # Install Maven
 RUN set -ex \
