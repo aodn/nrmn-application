@@ -33,8 +33,9 @@ RUN apt-get update \
 
 RUN apt-get update \
     && apt-get install nodejs -y \
-    && npm install -g yarn \
-    && npm install -g corepack
+    && npm install -g corepack \
+    && corepack enable \
+    && npm install -g yarn
 
 
 
