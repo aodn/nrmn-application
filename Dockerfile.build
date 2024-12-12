@@ -31,7 +31,7 @@ RUN apt-get update \
 RUN apt-get update \
     && apt-get install nodejs -y
 
-RUN corepack enable
+RUN corepack enable \
     && npm install -g --force yarn
 
 # Install Maven
