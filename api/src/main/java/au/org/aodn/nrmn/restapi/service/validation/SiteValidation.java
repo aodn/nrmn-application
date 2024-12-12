@@ -93,14 +93,14 @@ public class SiteValidation {
             if (distMeters > SURVEY_LOCATION_TOLERANCE) {
                 var message = "Survey coordinates more than 10m from site (" + String.format("%.1f", distMeters) + "m)";
                 return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
-                        List.of(row.getId()), List.of("latitude", "longitude"));
+                        Arrays.asList(row.getId()), List.of("latitude", "longitude"));
             }
             // No need to show warning if it is below 0.05 as rounding will show 0.0
             if (distMeters >= 0.05 && distMeters < SURVEY_LOCATION_TOLERANCE) {
                 var message = "Survey coordinates less than 10m from site (" + String.format("%.1f", distMeters) + "m). " +
                         NULLIFY_LAT_LON_MSG_SUFFIX;
                 return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
-                        List.of(row.getId()), List.of("latitude", "longitude"));
+                        Arrays.asList(row.getId()), List.of("latitude", "longitude"));
             }
 
         }
