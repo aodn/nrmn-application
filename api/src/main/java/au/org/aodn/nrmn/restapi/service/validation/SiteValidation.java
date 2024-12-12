@@ -34,25 +34,29 @@ public class SiteValidation {
 
     private SurveyValidationError validateSpeciesEcoregion(Integer siteId, Collection<StagedRowFormatted> survey) {
         var siteEcoregion = siteRepository.getEcoregion(siteId);
-        var surveySpecies = survey.stream()
+        var surveySpecies = survey.parallelStream()
                 .filter(r -> MEOW_METHODS_TO_CHECK.contains(r.getMethod()) && r.getSpecies().isPresent()
                         && !r.isSurveyNotDone())
-
                 .collect(Collectors.toList());
 
-        var distinctSurveySpecies = surveySpecies.stream().map(r -> r.getSpecies().get().getObservableItemName())
+        var distinctSurveySpecies = surveySpecies
+                .parallelStream()
+                .filter(i -> i.getSpecies().isPresent())
+                .map(r -> r.getSpecies().get().getObservableItemName())
                 .distinct().collect(Collectors.toList());
 
         distinctSurveySpecies
                 .removeAll(meowRegionsRepository.getEcoregionContains(siteEcoregion, distinctSurveySpecies));
 
-        if (distinctSurveySpecies.size() > 0) {
+        if (!distinctSurveySpecies.isEmpty()) {
             var message = "Species never observed in " + siteEcoregion;
             return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
-                    surveySpecies.stream()
+                    surveySpecies
+                            .parallelStream()
+                            .filter(s -> s.getSpecies().isPresent())
                             .filter(s -> distinctSurveySpecies.contains(s.getSpecies().get().getObservableItemName()))
-                            .map(r -> r.getId()).collect(Collectors.toList()),
-                    Arrays.asList("species"));
+                            .map(StagedRowFormatted::getId).collect(Collectors.toList()),
+                    List.of("species"));
         }
 
         return null;
@@ -70,14 +74,11 @@ public class SiteValidation {
     }
 
     public Collection<SurveyValidationError> validateSites(Collection<StagedRowFormatted> mappedRows) {
-        var sheetErrors = new HashSet<SurveyValidationError>();
 
-        var siteMap = mappedRows.stream().filter(r -> Objects.nonNull(r.getSite()))
+        var siteMap = mappedRows.parallelStream().filter(r -> Objects.nonNull(r.getSite()))
                 .collect(Collectors.groupingBy(r -> r.getSite().getSiteId()));
 
-        sheetErrors.addAll(checkSites(siteMap));
-
-        return sheetErrors;
+        return new HashSet<>(checkSites(siteMap));
     }
 
     // VALIDATION: Survey coordinates match site coordinates
@@ -92,14 +93,14 @@ public class SiteValidation {
             if (distMeters > SURVEY_LOCATION_TOLERANCE) {
                 var message = "Survey coordinates more than 10m from site (" + String.format("%.1f", distMeters) + "m)";
                 return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
-                        Arrays.asList(row.getId()), Arrays.asList("latitude", "longitude"));
+                        Arrays.asList(row.getId()), List.of("latitude", "longitude"));
             }
             // No need to show warning if it is below 0.05 as rounding will show 0.0
             if (distMeters >= 0.05 && distMeters < SURVEY_LOCATION_TOLERANCE) {
                 var message = "Survey coordinates less than 10m from site (" + String.format("%.1f", distMeters) + "m). " +
                         NULLIFY_LAT_LON_MSG_SUFFIX;
                 return new SurveyValidationError(ValidationCategory.DATA, ValidationLevel.WARNING, message,
-                        Arrays.asList(row.getId()), Arrays.asList("latitude", "longitude"));
+                        Arrays.asList(row.getId()), List.of("latitude", "longitude"));
             }
 
         }

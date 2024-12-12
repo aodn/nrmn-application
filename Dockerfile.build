@@ -21,8 +21,6 @@ ENV JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto
 RUN apt-get install -y git python3 python3-pip curl wget unzip zip
 
 
-
-
 # Install Node
 RUN apt-get update \
     && apt-get install -y ca-certificates curl gnupg \
@@ -31,15 +29,16 @@ RUN apt-get update \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
 
 RUN apt-get update \
-    && apt-get install nodejs -y \
-    && npm install -g yarn \
-    && yarn set version canary
+    && apt-get install nodejs -y
 
+RUN corepack enable
+RUN npm install -g --force yarn && yarn set version 4.3.0
+RUN yarn --version
 
 # Install Maven
 RUN set -ex \
     && mkdir -p $MAVEN_HOME \
-    && curl --location --silent --output /var/tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz https://archive.apache.org/dist/maven/maven-3//$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
+    && curl --location --silent --output /var/tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
     && tar xzf /var/tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz -C $MAVEN_HOME --strip-components=1 \
     && rm /var/tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz \
     && update-alternatives --install /usr/bin/mvn mvn /opt/maven/bin/mvn 10000

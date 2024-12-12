@@ -15,11 +15,8 @@ import org.springframework.stereotype.Component;
 
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
-import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedRowRepository;
-import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
@@ -32,19 +29,10 @@ public class ValidationProcess {
     DiverRepository diverRepository;
 
     @Autowired
-    ObservableItemRepository observableItemRepository;
-
-    @Autowired
-    ObservationRepository observationRepository;
-
-    @Autowired
     SiteRepository siteRepository;
 
     @Autowired
     StagedRowRepository rowRepository;
-
-    @Autowired
-    SurveyRepository surveyRepository;
 
     @Autowired
     DataValidation dataValidation;
@@ -66,9 +54,9 @@ public class ValidationProcess {
             Collection<StagedRowFormatted> rows) {
 
         var results = new ValidationResultSet();
-
-
-        /** Row-level Checks */
+        /*
+         * Row-level Checks
+         * */
         for (var row : rows) {
 
             // Validate measurements if species attributes are present
@@ -180,7 +168,7 @@ public class ValidationProcess {
 
         var validation = ProgramValidation.fromProgram(job.getProgram());
 
-        var enteredSiteCodes = rows.stream().map(s -> s.getSiteCode().toUpperCase()).collect(Collectors.toSet());
+        var enteredSiteCodes = rows.parallelStream().map(s -> s.getSiteCode().toUpperCase()).collect(Collectors.toSet());
         var siteCodes = siteRepository.getAllSiteCodesMatching(enteredSiteCodes);
 
         var species = speciesFormatting.getSpeciesForRows(rows);
