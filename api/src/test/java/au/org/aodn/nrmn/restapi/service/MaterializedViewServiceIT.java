@@ -43,7 +43,7 @@ public class MaterializedViewServiceIT {
         repository.refreshEpSurveyList();
 
         List<Tuple> l = repository.getEpSiteList(0, 100);
-        assertEquals(2, l.size(), "Size match");
+        assertEquals(3, l.size(), "Size match");
 
         Object[] expect1 = new Object[] {
                 "Australia", "New South Wales", "\"Lord Howe Island\"", "Lord Howe Island Marine Park", "LHI37",
@@ -60,5 +60,30 @@ public class MaterializedViewServiceIT {
                 "RLS", "No take multizoned"
         };
         assertArrayEquals(expect2, l.get(1).toArray(), "Second match");
+
+        Object[] expect3 = new Object[] {
+                "Australia", "Tasmania", "Kent Group", "Kent Group Marine Park", "KG-S11",
+                "Deal Island (Murray Pass)", "1111", -39.46125, 147.31422, 1, 3, 3, 4, "Temperate Australasia", "Southeast Australian Shelf",
+                "Cape Howe", "Temperate", "0101000020E6100000F9F719170E6A6240D7A3703D0ABB43C0",
+                "ATRC", "No take multizoned"
+        };
+        assertArrayEquals(expect3, l.get(2).toArray(), "Third match");
     }
+
+    @Test
+    @Sql({
+            "/sql/drop_nrmn.sql",
+            "/sql/migration.sql",
+            "/sql/application.sql",
+            "/testdata/FILL_ROLES.sql",
+            "/testdata/TEST_USER.sql",
+            "/testdata/FILL_MEOW_ECOREGION.sql",
+            "/testdata/FILL_MATERIALIZED_VIEW_DATA.sql"
+    })
+    public void verifyEpM2Inverts() {
+        repository.refreshEpSiteList();
+        repository.refreshEpM2Inverts();
+
+    }
+
 }

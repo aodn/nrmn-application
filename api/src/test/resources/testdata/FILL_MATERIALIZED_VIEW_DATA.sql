@@ -4,14 +4,20 @@ INSERT INTO nrmn.method_ref(method_id,method_name,is_active)
     (2,'Standard invertebrates & cryptic fish',true);
 
 INSERT INTO nrmn.program_ref(program_id, program_name, is_active)
-    VALUES (1, 'RLS', True);
+    VALUES (1, 'RLS', True),
+            (2, 'ATRC',	true);
 
 INSERT INTO nrmn.location_ref (location_id, location_name, is_active)
-    VALUES (184, '"Lord Howe Island"', true);
+    VALUES (184, '"Lord Howe Island"',true),
+            (41,'Kent Group',true);
 
 INSERT INTO nrmn.site_ref(site_id,site_code,site_name,longitude,latitude,geom,location_id,state,
     country,old_site_code,mpa,protection_status,relief,currents,wave_exposure,slope,site_attribute,is_active)
-VALUES (3834,'LHI37','Malabar 2',159.05615,-31.5113,'0101000020E610000074B515FBCBE16340DE718A8EE4823FC0',
+VALUES  (914,'KG-S11','Deal Island (Murray Pass)',147.31422,-39.46125,'0101000020E6100000F9F719170E6A6240D7A3703D0ABB43C0',
+        41,'Tasmania','Australia','{1111}','Kent Group Marine Park','No take multizoned',3,4,1,3,
+        '{"Isolation": 1.0, "Zone_name": "Deal Island No take", "ProxCountry": "Australia", "area_in_km2": "138", "Effectiveness": "High", "year_of_protection": "2001", "Distance_to_boundary_in_km": 1.26}',
+        true),
+        (3834,'LHI37','Malabar 2',159.05615,-31.5113,'0101000020E610000074B515FBCBE16340DE718A8EE4823FC0',
         184,'New South Wales','Australia',null,'Lord Howe Island Marine Park','No take multizoned',4,3,3,2,
         '{
             "Age": "1",
@@ -50,7 +56,8 @@ INSERT INTO nrmn.survey (survey_id,site_id,program_id,survey_date,survey_time,de
     block_abundance_simulated,project_title,created,updated,locked)
 VALUES (912351270,3834,1,'2008-02-27',NULL,10,0,NULL,'',NULL,NULL,NULL,NULL,NULL,False,'None',NULL,False,NULL,NULL,NULL,False),
     (912351271,3844,1,'2008-02-27',NULL,1,3,NULL,'',NULL,NULL,NULL,NULL,NULL,False,'None',NULL,False,NULL,NULL,NULL,False),
-    (912351272,3844,1,'2008-02-27',NULL,1,5,NULL,'',NULL,NULL,NULL,NULL,NULL,False,'None',NULL,False,NULL,NULL,NULL,False);
+    (912351272,3844,1,'2008-02-27',NULL,1,5,NULL,'',NULL,NULL,NULL,NULL,NULL,False,'None',NULL,False,NULL,NULL,NULL,False),
+    (812331754,914,2,'2018-06-03',null,5,4,15,NULL,NULL,NULL,NULL,'Unsure',NULL,false,'None',NULL,true,NULL,NULL,NULL,false);
 
 INSERT INTO nrmn.survey_method(survey_method_id,survey_id,method_id,block_num,survey_not_done,survey_method_attribute)
     VALUES (85720,912351270,2,2,false,'{}'),
