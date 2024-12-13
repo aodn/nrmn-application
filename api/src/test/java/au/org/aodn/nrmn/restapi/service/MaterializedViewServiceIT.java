@@ -13,6 +13,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import javax.persistence.Tuple;
 import javax.transaction.Transactional;
 import java.util.List;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Verify the materialized view sql correct
@@ -34,12 +35,30 @@ public class MaterializedViewServiceIT {
             "/sql/application.sql",
             "/testdata/FILL_ROLES.sql",
             "/testdata/TEST_USER.sql",
-            "/testdata/MATERIALIZED_VIEW_DATA.sql"
+            "/testdata/FILL_MEOW_ECOREGION.sql",
+            "/testdata/FILL_MATERIALIZED_VIEW_DATA.sql"
     })
     public void verifyEpSurveyList() {
         repository.refreshEpSiteList();
+        repository.refreshEpSurveyList();
+
         List<Tuple> l = repository.getEpSiteList(0, 100);
-        Tuple i = l.get(0);
-        System.out.println(i);
+        assertEquals(2, l.size(), "Size match");
+
+        Object[] expect1 = new Object[] {
+                "Australia", "New South Wales", "\"Lord Howe Island\"", "Lord Howe Island Marine Park", "LHI37",
+                "Malabar 2", null, -31.5113, 159.05615, 3, 4, 2, 3, "Central Indo-Pacific", "Lord Howe and Norfolk Islands",
+                "Lord Howe and Norfolk Islands", "Tropical", "0101000020E610000074B515FBCBE16340DE718A8EE4823FC0",
+                "RLS", "No take multizoned"
+        };
+        assertArrayEquals(expect1, l.get(0).toArray(), "First match");
+
+        Object[] expect2 = new Object[] {
+                "Australia", "New South Wales", "\"Lord Howe Island\"", "Lord Howe Island Marine Park", "LHI38",
+                "North Bay 2", null, -31.52113, 159.04688000000002, 1, 3, 1, 1, "Central Indo-Pacific", "Lord Howe and Norfolk Islands",
+                "Lord Howe and Norfolk Islands", "Tropical", "0101000020E6100000C55A7C0A80E16340E8F692C668853FC0",
+                "RLS", "No take multizoned"
+        };
+        assertArrayEquals(expect2, l.get(1).toArray(), "Second match");
     }
 }

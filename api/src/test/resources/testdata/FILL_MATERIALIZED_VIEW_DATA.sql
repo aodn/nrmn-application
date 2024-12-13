@@ -1,4 +1,7 @@
-INSERT INTO nrmn.survey
+INSERT INTO nrmn.method_ref(method_id,method_name,is_active)
+    VALUES(0,'Off transect sightings or observations',true),
+    (1,'Standard fish',true),
+    (2,'Standard invertebrates & cryptic fish',true);
 
 INSERT INTO nrmn.program_ref(program_id, program_name, is_active)
     VALUES (1, 'RLS', True);
@@ -48,3 +51,10 @@ INSERT INTO nrmn.survey (survey_id,site_id,program_id,survey_date,survey_time,de
 VALUES (912351270,3834,1,'2008-02-27',NULL,10,0,NULL,'',NULL,NULL,NULL,NULL,NULL,False,'None',NULL,False,NULL,NULL,NULL,False),
     (912351271,3844,1,'2008-02-27',NULL,1,3,NULL,'',NULL,NULL,NULL,NULL,NULL,False,'None',NULL,False,NULL,NULL,NULL,False),
     (912351272,3844,1,'2008-02-27',NULL,1,5,NULL,'',NULL,NULL,NULL,NULL,NULL,False,'None',NULL,False,NULL,NULL,NULL,False);
+
+INSERT INTO nrmn.survey_method(survey_method_id,survey_id,method_id,block_num,survey_not_done,survey_method_attribute)
+    VALUES (85720,912351270,2,2,false,'{}'),
+        (85721,912351270,1,1,false,'{}'),
+        (85722,912351270,1,2,false,'{}'),
+        (85723,912351270,2,1,false,'{}');
+
