@@ -1,3 +1,5 @@
+-- nrmn.rugosity is empty for (85720, 85721, 85722, 85723)
+
 INSERT INTO nrmn.method_ref(method_id,method_name,is_active)
     VALUES(0,'Off transect sightings or observations',true),
     (1,'Standard fish',true),
