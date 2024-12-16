@@ -15,7 +15,6 @@ import javax.persistence.Tuple;
 import javax.sql.DataSource;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -93,5 +92,35 @@ public class MaterializedViewServiceIT {
                 "ATRC", "None", null, "1111", null, null
         };
         assertArrayEquals(expect4, siteList.get(0).toArray(), "Site list first match");
+
+        Object[] expect5 = new Object[] {
+                912351270, "Australia", "New South Wales", "\"Lord Howe Island\"", "Lord Howe Island Marine Park",
+                "LHI37", "Malabar 2", -31.5113, 159.05615, new BigDecimal("10.0"),
+                java.sql.Date.valueOf("2008-02-27"), true, false,
+                false, false, null, null, null, "", null, null, null, null, null,
+                "0101000020E610000074B515FBCBE16340DE718A8EE4823FC0",
+                "RLS", "None", null, null, "1, 2", null
+        };
+        assertArrayEquals(expect5, siteList.get(1).toArray(), "Site list second match");
+
+        Object[] expect6 = new Object[] {
+                912351271, "Australia", "New South Wales", "\"Lord Howe Island\"", "Lord Howe Island Marine Park",
+                "LHI38", "North Bay 2", -31.52113, 159.04688000000002, new BigDecimal("1.3"),
+                java.sql.Date.valueOf("2008-02-27"), true, false,
+                false, false, null, null, null, "", null, null, null, null, null,
+                "0101000020E6100000C55A7C0A80E16340E8F692C668853FC0",
+                "RLS", "None", null, null, "1, 2", null
+        };
+        assertArrayEquals(expect6, siteList.get(2).toArray(), "Site list third match");
+
+        Object[] expect7 = new Object[] {
+                912351272, "Australia", "New South Wales", "\"Lord Howe Island\"", "Lord Howe Island Marine Park",
+                "LHI38", "North Bay 2", -31.52113, 159.04688000000002, new BigDecimal("1.5"),
+                java.sql.Date.valueOf("2008-02-27"), true, false,
+                false, false, null, null, null, "", null, null, null, null, null,
+                "0101000020E6100000C55A7C0A80E16340E8F692C668853FC0",
+                "RLS", "None", null, null, "1, 2", null
+        };
+        assertArrayEquals(expect7, siteList.get(3).toArray(), "Site list third match");
     }
 }
