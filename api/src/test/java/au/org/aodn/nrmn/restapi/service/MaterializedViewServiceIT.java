@@ -69,4 +69,30 @@ public class MaterializedViewServiceIT {
         };
         assertArrayEquals(expect3, l.get(2).toArray(), "Third match");
     }
+
+    @Test
+    @Sql({
+            "/sql/drop_nrmn.sql",
+            "/sql/migration.sql",
+            "/sql/application.sql",
+            "/testdata/FILL_ROLES.sql",
+            "/testdata/TEST_USER.sql",
+            "/testdata/FILL_MEOW_ECOREGION.sql",
+            "/testdata/FILL_MATERIALIZED_VIEW_DATA.sql"
+    })
+    public void verifyEpM2Inverts() {
+        repository.refreshEpSiteList();
+        repository.refreshEpSurveyList();
+        repository.refreshEpRarityExtents();
+        repository.refreshEpRarityAbundance();
+        repository.refreshEpRarityRange();
+        repository.refreshEpRarityFrequency();
+        repository.refreshEpObservableItems();
+        repository.refreshEpM2Inverts();
+
+        List<Tuple> l = repository.getEpM2Inverts(0, 100);
+        assertEquals(3, l.size(), "Size match");
+
+    }
+
 }
