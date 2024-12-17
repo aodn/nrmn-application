@@ -15,7 +15,10 @@ import javax.persistence.Tuple;
 import javax.sql.DataSource;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -122,5 +125,75 @@ public class MaterializedViewServiceIT {
                 "RLS", "None", null, null, "1, 2", null
         };
         assertArrayEquals(expect7, siteList.get(3).toArray(), "Site list third match");
+    }
+
+    @Test
+    @Sql({
+            "/sql/drop_nrmn.sql",
+            "/sql/migration.sql",
+            "/sql/application.sql",
+            "/testdata/FILL_ROLES.sql",
+            "/testdata/TEST_USER.sql",
+            "/testdata/FILL_MEOW_ECOREGION.sql",
+            "/testdata/FILL_MATERIALIZED_VIEW_DATA.sql",
+            "file:../db/endpoints/CreatePrivateEndpoints.sql"
+    })
+    public void verifyEpM2Inverts() {
+        repository.refreshEpSiteList();
+        repository.refreshEpSurveyList();
+        repository.refreshEpRarityExtents();
+        repository.refreshEpRarityAbundance();
+        repository.refreshEpRarityRange();
+        repository.refreshEpRarityFrequency();
+        repository.refreshEpObservableItems();
+        repository.refreshEpM2Inverts();
+
+        List<Tuple> l = repository.getEpM2Inverts(0, 100);
+        assertEquals(9, l.size(), "Size match");
+
+        List<Tuple> t1 = l.stream()
+                .filter(i -> i.get("reporting_name") != null)
+                .filter(i -> "Plagusia chabrus".equals(i.get("reporting_name").toString())).collect(Collectors.toList());
+        assertEquals(1, t1.size(), "t1 size match");
+
+        assertEquals(2, t1.get(0).get("method"), "t1 method match");
+        assertEquals(1, t1.get(0).get("block"), "t1 block match");
+        assertEquals(BigDecimal.valueOf(7.5), t1.get(0).get("size_class"), "t1 size_class match");
+        assertEquals(BigInteger.valueOf(1), t1.get(0).get("total"), "t1 total match");
+
+        List<Tuple> t2 = l.stream()
+                .filter(i -> i.get("reporting_name") != null)
+                .filter(i -> "Centrostephanus rodgersii".equals(i.get("reporting_name").toString())).collect(Collectors.toList());
+        assertEquals(3, t2.size(), "t2 size match");
+
+        assertEquals(2, t2.get(0).get("method"), "t2 0 method match");
+        assertEquals(1, t2.get(0).get("block"), "t2 0  block match");
+        assertEquals(BigDecimal.valueOf(10), t2.get(0).get("size_class"), "t2 0 size_class match");
+        assertEquals(BigInteger.valueOf(1), t2.get(0).get("total"), "t2 0 total match");
+
+        assertEquals(2, t2.get(1).get("method"), "t2 1 method match");
+        assertEquals(1, t2.get(1).get("block"), "t2 1 block match");
+        assertEquals(BigDecimal.valueOf(10), t2.get(1).get("size_class"), "t2 1 size_class match");
+        assertEquals(BigInteger.valueOf(4), t2.get(1).get("total"), "t2 1 total match");
+
+        assertEquals(2, t2.get(2).get("method"), "t2 2 method match");
+        assertEquals(1, t2.get(2).get("block"), "t2 2 block match");
+        assertEquals(BigDecimal.valueOf(10), t2.get(2).get("size_class"), "t2 2 size_class match");
+        assertEquals(BigInteger.valueOf(8), t2.get(2).get("total"), "t2 2 total match");
+
+        List<Tuple> t3 = l.stream()
+                .filter(i -> i.get("reporting_name") != null)
+                .filter(i -> "Heliocidaris erythrogramma".equals(i.get("reporting_name").toString())).collect(Collectors.toList());
+        assertEquals(2, t3.size(), "t3 size match");
+
+        assertEquals(2, t3.get(0).get("method"), "t3 0 method match");
+        assertEquals(1, t3.get(0).get("block"), "t3 0  block match");
+        assertEquals(BigDecimal.valueOf(7.5), t3.get(0).get("size_class"), "t3 0 size_class match");
+        assertEquals(BigInteger.valueOf(1), t3.get(0).get("total"), "t3 0 total match");
+
+        assertEquals(2, t3.get(1).get("method"), "t3 1 method match");
+        assertEquals(1, t3.get(1).get("block"), "t3 1 block match");
+        assertEquals(BigDecimal.valueOf(10), t3.get(1).get("size_class"), "t3 1 size_class match");
+        assertEquals(BigInteger.valueOf(5), t3.get(1).get("total"), "t3 1 total match");
     }
 }
