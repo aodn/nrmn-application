@@ -132,7 +132,8 @@ public class MaterializedViewServiceIT {
             "/testdata/FILL_ROLES.sql",
             "/testdata/TEST_USER.sql",
             "/testdata/FILL_MEOW_ECOREGION.sql",
-            "/testdata/FILL_MATERIALIZED_VIEW_DATA.sql"
+            "/testdata/FILL_MATERIALIZED_VIEW_DATA.sql",
+            "file:../db/endpoints/CreatePrivateEndpoints.sql"
     })
     public void verifyEpM2Inverts() {
         repository.refreshEpSiteList();
@@ -145,7 +146,7 @@ public class MaterializedViewServiceIT {
         repository.refreshEpM2Inverts();
 
         List<Tuple> l = repository.getEpM2Inverts(0, 100);
-        assertEquals(3, l.size(), "Size match");
+        assertEquals(9, l.size(), "Size match");
 
     }
 
