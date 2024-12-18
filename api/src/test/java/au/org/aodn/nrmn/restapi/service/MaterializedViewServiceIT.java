@@ -110,7 +110,7 @@ public class MaterializedViewServiceIT {
                 java.sql.Date.valueOf("2008-02-27"), true, false,
                 false, false, null, null, null, "", null, null, null, null, null,
                 "0101000020E6100000C55A7C0A80E16340E8F692C668853FC0",
-                "RLS", "None", null, null, "1, 2", null
+                "RLS", "None", null, null, "1", null
         };
         assertArrayEquals(expect6, siteList.get(2).toArray(), "Site list third match");
 
@@ -120,7 +120,7 @@ public class MaterializedViewServiceIT {
                 java.sql.Date.valueOf("2008-02-27"), true, false,
                 false, false, null, null, null, "", null, null, null, null, null,
                 "0101000020E6100000C55A7C0A80E16340E8F692C668853FC0",
-                "RLS", "None", null, null, "1, 2", null
+                "RLS", "None", null, null, "1", null
         };
         assertArrayEquals(expect7, siteList.get(3).toArray(), "Site list third match");
     }
