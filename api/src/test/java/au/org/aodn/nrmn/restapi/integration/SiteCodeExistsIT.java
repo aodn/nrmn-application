@@ -1,10 +1,8 @@
 package au.org.aodn.nrmn.restapi.integration;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import java.util.List;
 
-import java.util.Arrays;
-
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +22,11 @@ import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 
+import javax.transaction.Transactional;
+
 @SpringBootTest
 @ExtendWith(PostgresqlContainerExtension.class)
+@Transactional
 @WithTestData
 class SiteCodeExistsIT {
 
@@ -46,7 +47,9 @@ class SiteCodeExistsIT {
 
     @Test
     void notFoundSiteCodeShouldFail() {
-        StagedJob job = jobRepo.findByReference("jobid-atrc").get();
+        StagedJob job = jobRepo.findByReference("jobid-atrc").orElse(null);
+        Assertions.assertNotNull(job);
+
         String date = "11/09/2020";
         StagedRow row = new StagedRow();
         row.setDate(date);
@@ -59,9 +62,9 @@ class SiteCodeExistsIT {
         program.setProgramId(1);
         program.setProgramName("RLS");
         stagedRowRepo.deleteAll();
-        stagedRowRepo.saveAll(Arrays.asList(row));
+        stagedRowRepo.saveAll(List.of(row));
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Site Code does not exist")));
+        Assertions.assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Site Code does not exist")));
     }
 
     @Test
@@ -82,8 +85,8 @@ class SiteCodeExistsIT {
         program.setProgramId(1);
         program.setProgramName("RLS");
         stagedRowRepo.deleteAll();
-        stagedRowRepo.saveAll(Arrays.asList(row));
+        stagedRowRepo.saveAll(List.of(row));
         ValidationResponse response = validationProcess.process(job);
-        assertFalse(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Site Code does not exist")));
+        Assertions.assertFalse(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Site Code does not exist")));
     }
 }

@@ -57,7 +57,7 @@ jobs:
           git reset --hard
           git clean --force --force -xd --exclude=web/node_modules
           yarn --cwd web --immutable
-          mvn -e --batch-mode --threads 2 --define maven.test.skip=true clean package
+          mvn -e --batch-mode --threads 2 --define maven.test.skip=false clean package
         '
 
     - name: Archive Artifact

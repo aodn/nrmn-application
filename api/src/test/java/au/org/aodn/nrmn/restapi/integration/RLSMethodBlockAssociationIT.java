@@ -14,12 +14,14 @@ import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 
 import org.apache.commons.lang3.SerializationUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import javax.transaction.Transactional;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @Testcontainers
 @SpringBootTest
+@Transactional
 @ExtendWith(PostgresqlContainerExtension.class)
 @WithTestData
 class RLSMethodBlockAssociationIT {
@@ -55,7 +58,9 @@ class RLSMethodBlockAssociationIT {
 
         siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
 
-        StagedJob job = jobRepo.findByReference("jobid-rls").get();
+        StagedJob job = jobRepo.findByReference("jobid-rls").orElse(null);
+        Assertions.assertNotNull(job);
+
         String date = "11/09/2020";
         String depth = "7";
         String siteNo = "ERZ1";
@@ -68,13 +73,13 @@ class RLSMethodBlockAssociationIT {
         m1b1.setSiteCode(siteNo);
         m1b1.setStagedJob(job);
 
-        StagedRow m1b2 = (StagedRow) SerializationUtils.clone(m1b1);
+        StagedRow m1b2 = SerializationUtils.clone(m1b1);
         m1b2.setBlock("2");
 
-        StagedRow m2b1 = (StagedRow) SerializationUtils.clone(m1b1);
+        StagedRow m2b1 = SerializationUtils.clone(m1b1);
         m2b1.setMethod("2");
 
-        StagedRow m2b2 = (StagedRow) SerializationUtils.clone(m2b1);
+        StagedRow m2b2 = SerializationUtils.clone(m2b1);
         m2b2.setBlock("2");
 
         stagedRowRepo.saveAll(Arrays.asList(m1b1, m1b2, m2b1, m2b2));
@@ -92,7 +97,9 @@ class RLSMethodBlockAssociationIT {
 
         siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
 
-        StagedJob job = jobRepo.findByReference("jobid-rls").get();
+        StagedJob job = jobRepo.findByReference("jobid-rls").orElse(null);
+        Assertions.assertNotNull(job);
+
         String date = "11/09/2020";
         String depth = "7.1";
         String siteNo = "ERZ1";
@@ -105,10 +112,10 @@ class RLSMethodBlockAssociationIT {
         m1b1.setSiteCode(siteNo);
         m1b1.setStagedJob(job);
 
-        StagedRow m1b2 = (StagedRow) SerializationUtils.clone(m1b1);
+        StagedRow m1b2 = SerializationUtils.clone(m1b1);
         m1b2.setBlock("2");
 
-        StagedRow m2b1 = (StagedRow) SerializationUtils.clone(m1b1);
+        StagedRow m2b1 = SerializationUtils.clone(m1b1);
         m2b1.setMethod("2");
         // Missing Block 2
 
@@ -128,7 +135,9 @@ class RLSMethodBlockAssociationIT {
 
         siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
 
-        StagedJob job = jobRepo.findByReference("jobid-rls").get();
+        StagedJob job = jobRepo.findByReference("jobid-rls").orElse(null);
+        Assertions.assertNotNull(job);
+
         String date = "11/09/2020";
         String depth = "7.1";
         String siteNo = "ERZ1";
@@ -141,10 +150,10 @@ class RLSMethodBlockAssociationIT {
         m1b1.setSiteCode(siteNo);
         m1b1.setStagedJob(job);
 
-        StagedRow m1b2 = (StagedRow) SerializationUtils.clone(m1b1);
+        StagedRow m1b2 = SerializationUtils.clone(m1b1);
         m1b2.setBlock("4");
 
-        StagedRow m2b1 = (StagedRow) SerializationUtils.clone(m1b1);
+        StagedRow m2b1 = SerializationUtils.clone(m1b1);
         m2b1.setMethod("5");
         // M0 missing B0 or B1 or 2
 
@@ -164,7 +173,9 @@ class RLSMethodBlockAssociationIT {
 
         siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
 
-        var job = jobRepo.findByReference("jobid-rls").get();
+        var job = jobRepo.findByReference("jobid-rls").orElse(null);
+        Assertions.assertNotNull(job);
+
         var date = "11/09/2020";
         var depth = "7.1";
         var siteNo = "ERZ1";
@@ -177,7 +188,7 @@ class RLSMethodBlockAssociationIT {
         m1b1.setSiteCode(siteNo);
         m1b1.setStagedJob(job);
 
-        var m1b2 = (StagedRow) SerializationUtils.clone(m1b1);
+        var m1b2 = SerializationUtils.clone(m1b1);
         m1b2.setBlock("1");
 
         stagedRowRepo.saveAll(Arrays.asList(m1b1, m1b2));
@@ -196,7 +207,9 @@ class RLSMethodBlockAssociationIT {
 
         siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
 
-        var job = jobRepo.findByReference("jobid-rls").get();
+        var job = jobRepo.findByReference("jobid-rls").orElse(null);
+        Assertions.assertNotNull(job);
+
         var date = "11/09/2020";
         var depth = "7.1";
         var siteNo = "ERZ1";
@@ -208,9 +221,9 @@ class RLSMethodBlockAssociationIT {
         row1.setDepth(depth);
         row1.setSiteCode(siteNo);
         row1.setStagedJob(job);
-        var row2 = (StagedRow) SerializationUtils.clone(row1);
-        var row3 = (StagedRow) SerializationUtils.clone(row1);
-        var row4 = (StagedRow) SerializationUtils.clone(row1);
+        var row2 = SerializationUtils.clone(row1);
+        var row3 = SerializationUtils.clone(row1);
+        var row4 = SerializationUtils.clone(row1);
 
         row2.setBlock("1");
         row3.setBlock("2");
