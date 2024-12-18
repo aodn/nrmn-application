@@ -63,13 +63,13 @@ public class SurveyIngestionIT {
         /*
          * This test case contains an entry "Survey not Done", so you should see fewer entries,
          */
-        Assertions.assertEquals(row.size(), 5, "Needed record in the db");
+        Assertions.assertEquals(5, row.size(), "Needed record in the db");
 
         Set<Integer> existingObservations = observationRepository.findAll()
                 .stream().map(Observation::getObservationId).collect(Collectors.toSet());
 
         ResponseEntity<Map<String, Object>> v = ingestionController.ingest(6L);
-        Assertions.assertEquals(v.getStatusCode(), HttpStatus.OK, "Ingesting OK");
+        Assertions.assertEquals(HttpStatus.OK, v.getStatusCode(), "Ingesting OK");
 
         // We need to loop and check if job completed
         Assertions.assertEquals(StagedJobEventType.INGESTING, Objects.requireNonNull(v.getBody()).get("jobStatus"), "Status correct");
@@ -84,7 +84,7 @@ public class SurveyIngestionIT {
                 latch.await(1, TimeUnit.SECONDS);
                 job = ingestionController.getIngest(logId);
 
-                Assertions.assertEquals(job.getStatusCode(), HttpStatus.OK, "Ingesting OK");
+                Assertions.assertEquals(HttpStatus.OK, job.getStatusCode(), "Ingesting OK");
                 StagedJobEventType eventType = (StagedJobEventType)Objects.requireNonNull(job.getBody()).get("jobStatus");
 
                 if(eventType == StagedJobEventType.ERROR) {
@@ -108,40 +108,40 @@ public class SurveyIngestionIT {
         Assertions.assertEquals(8, observations.size(), "Inserted match");
 
         List<Observation> twelvePointFive = observations.stream().filter(f -> f.getMeasure().getMeasureName().equalsIgnoreCase("12.5cm")).collect(Collectors.toList());
-        Assertions.assertEquals(twelvePointFive.size(), 2, "12.5cm size correct");
+        Assertions.assertEquals(2, twelvePointFive.size(), "12.5cm size correct");
         Assertions.assertEquals(5, twelvePointFive.get(0).getMeasure().getSeqNo(), "12.5cm seqno correct 0");
         Assertions.assertEquals(4, twelvePointFive.get(0).getMeasureValue(), "12.5cm measure correct 0");
         Assertions.assertEquals(5, twelvePointFive.get(1).getMeasure().getSeqNo(), "12.5cm seqno correct 1");
         Assertions.assertEquals(1, twelvePointFive.get(1).getMeasureValue(), "12.5cm measure correct 1");
 
         List<Observation> fifteen = observations.stream().filter(f -> f.getMeasure().getMeasureName().equalsIgnoreCase("15cm")).collect(Collectors.toList());
-        Assertions.assertEquals(fifteen.size(), 1, "15cm size correct");
+        Assertions.assertEquals(1, fifteen.size(), "15cm size correct");
         Assertions.assertEquals(6, fifteen.get(0).getMeasure().getSeqNo(), "15cm seqno correct");
         Assertions.assertEquals(1, fifteen.get(0).getMeasureValue(), "15cm measure correct");
 
         List<Observation> twenty = observations.stream().filter(f -> f.getMeasure().getMeasureName().equalsIgnoreCase("20cm")).collect(Collectors.toList());
-        Assertions.assertEquals(twenty.size(), 1, "20cm size correct");
+        Assertions.assertEquals(1, twenty.size(), "20cm size correct");
         Assertions.assertEquals(7, twenty.get(0).getMeasure().getSeqNo(), "20cm seqno correct");
         Assertions.assertEquals(2, twenty.get(0).getMeasureValue(), "20cm measure correct");
 
         List<Observation> twentyFive = observations.stream().filter(f -> f.getMeasure().getMeasureName().equalsIgnoreCase("25cm")).collect(Collectors.toList());
-        Assertions.assertEquals(twentyFive.size(), 1, "25cm size correct");
+        Assertions.assertEquals(1, twentyFive.size(), "25cm size correct");
         Assertions.assertEquals(8, twentyFive.get(0).getMeasure().getSeqNo(), "25cm seqno correct");
         Assertions.assertEquals(2, twentyFive.get(0).getMeasureValue(), "25cm measure correct");
 
         List<Observation> thirty = observations.stream().filter(f -> f.getMeasure().getMeasureName().equalsIgnoreCase("30cm")).collect(Collectors.toList());
-        Assertions.assertEquals(thirty.size(), 1, "30cm size correct");
+        Assertions.assertEquals(1, thirty.size(), "30cm size correct");
         Assertions.assertEquals(9, thirty.get(0).getMeasure().getSeqNo(), "30cm seqno correct");
         Assertions.assertEquals(1, thirty.get(0).getMeasureValue(), "30cm measure correct");
 
         List<Observation> thirtyFive = observations.stream().filter(f -> f.getMeasure().getMeasureName().equalsIgnoreCase("35cm")).collect(Collectors.toList());
-        Assertions.assertEquals(thirtyFive.size(), 1, "35cm size correct");
+        Assertions.assertEquals(1, thirtyFive.size(), "35cm size correct");
         Assertions.assertEquals(10, thirtyFive.get(0).getMeasure().getSeqNo(), "35cm seqno correct");
         Assertions.assertEquals(1, thirtyFive.get(0).getMeasureValue(), "35cm measure correct");
         Assertions.assertEquals("Antonia Cooper", thirtyFive.get(0).getDiver().getFullName(), "50cm diver correct");
 
         List<Observation> fifty = observations.stream().filter(f -> f.getMeasure().getMeasureName().equalsIgnoreCase("50cm")).collect(Collectors.toList());
-        Assertions.assertEquals(fifty.size(), 1, "50cm size correct");
+        Assertions.assertEquals(1, fifty.size(), "50cm size correct");
         Assertions.assertEquals(12, fifty.get(0).getMeasure().getSeqNo(), "50cm seqno correct");
         Assertions.assertEquals(1, fifty.get(0).getMeasureValue(), "50cm measure correct");
         Assertions.assertEquals("Antonia Cooper", fifty.get(0).getDiver().getFullName(), "50cm diver correct");

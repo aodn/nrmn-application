@@ -2,7 +2,6 @@ package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.data.repository.MaterializedViewsRepository;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
-import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @Testcontainers
 @SpringBootTest
 @Transactional
-@WithTestData
 @ExtendWith(PostgresqlContainerExtension.class)
 public class MaterializedViewServiceIT {
 
@@ -46,11 +44,11 @@ public class MaterializedViewServiceIT {
             "/sql/drop_nrmn.sql",
             "/sql/migration.sql",
             "/sql/application.sql",
+            "file:../db/endpoints/CreatePrivateEndpoints.sql",
             "/testdata/FILL_ROLES.sql",
             "/testdata/TEST_USER.sql",
             "/testdata/FILL_MEOW_ECOREGION.sql",
             "/testdata/FILL_MATERIALIZED_VIEW_DATA.sql",
-            "file:../db/endpoints/CreatePrivateEndpoints.sql"
     })
     public void verifyEpSurveyList() {
         repository.refreshEpSiteList();
@@ -90,9 +88,9 @@ public class MaterializedViewServiceIT {
                 812331754, "Australia", "Tasmania", "Kent Group", "Kent Group Marine Park",
                 "KG-S11", "Deal Island (Murray Pass)", -39.46125, 147.31422, new BigDecimal("5.4"),
                 java.sql.Date.valueOf("2018-06-03"), true, false,
-                false, false, null, 15.0, null, null, null, null, null, null, null,
+                false, false, "Jan Jansen, Liz Oh", 15.0, null, null, null, null, null, null, null,
                 "0101000020E6100000F9F719170E6A6240D7A3703D0ABB43C0",
-                "ATRC", "None", null, "1111", null, null
+                "ATRC", "None", null, "1111", "1, 2, 3, 5", null
         };
         assertArrayEquals(expect4, siteList.get(0).toArray(), "Site list first match");
 
@@ -132,11 +130,11 @@ public class MaterializedViewServiceIT {
             "/sql/drop_nrmn.sql",
             "/sql/migration.sql",
             "/sql/application.sql",
+            "file:../db/endpoints/CreatePrivateEndpoints.sql",
             "/testdata/FILL_ROLES.sql",
             "/testdata/TEST_USER.sql",
             "/testdata/FILL_MEOW_ECOREGION.sql",
             "/testdata/FILL_MATERIALIZED_VIEW_DATA.sql",
-            "file:../db/endpoints/CreatePrivateEndpoints.sql"
     })
     public void verifyEpM2Inverts() {
         repository.refreshEpSiteList();

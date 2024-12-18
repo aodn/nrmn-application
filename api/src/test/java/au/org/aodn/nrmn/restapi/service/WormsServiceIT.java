@@ -4,7 +4,9 @@ import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,8 +18,7 @@ import au.org.aodn.nrmn.restapi.dto.species.SpeciesRecordDto;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+import java.util.Objects;
 
 public class WormsServiceIT {
 
@@ -43,13 +44,13 @@ public class WormsServiceIT {
         Dispatcher dispatcher = new Dispatcher() {
 
             @Override
-            public MockResponse dispatch (RecordedRequest request) {
+            public @NotNull MockResponse dispatch (RecordedRequest request) {
 
-                switch (request.getPath().substring(0, request.getPath().indexOf("?"))) {
+                switch (Objects.requireNonNull(request.getPath()).substring(0, request.getPath().indexOf("?"))) {
                     case "/api/v1/species/AphiaRecordsByName/anyworks": {
                         try {
                             // We need to extract the offset
-                            int offset = Integer.parseInt(request.getRequestUrl().queryParameter("offset")) - 1;
+                            int offset = Integer.parseInt(Objects.requireNonNull(request.getRequestUrl().queryParameter("offset"))) - 1;
                             List<SpeciesRecordDto> item = target.subList(offset, target.size());
                             item = item.subList(0, (item.size() >= 50 ? 50 : item.size()));
 
@@ -96,13 +97,13 @@ public class WormsServiceIT {
         WormsService wormsService = new WormsService(mock);
 
         List<SpeciesRecordDto> results = wormsService.partialSearch(0, 50, "anyworks");
-        assertEquals("Record size match", 14, results.size());
+        Assertions.assertEquals(14, results.size(), "Record size match");
 
         results = wormsService.partialSearch(0, 10, "anyworks");
-        assertEquals("Record size match", 10, results.size());
+        Assertions.assertEquals(10, results.size(), "Record size match");
 
         results = wormsService.partialSearch(1, 10, "anyworks");
-        assertEquals("Record size match", 4, results.size());
+        Assertions.assertEquals(4, results.size(), "Record size match");
     }
 
     @Test
@@ -114,13 +115,13 @@ public class WormsServiceIT {
         WormsService wormsService = new WormsService(mock);
 
         List<SpeciesRecordDto> results = wormsService.partialSearch(0, 50, "anyworks");
-        assertEquals("Record size match", 50, results.size());
+        Assertions.assertEquals(50, results.size(), "Record size match");
 
         results = wormsService.partialSearch(0, 10, "anyworks");
-        assertEquals("Record size match", 10, results.size());
+        Assertions.assertEquals(10, results.size(), "Record size match");
 
         results = wormsService.partialSearch(1, 50, "anyworks");
-        assertEquals("Record size match", 0, results.size());
+        Assertions.assertEquals(0, results.size(), "Record size match");
     }
 
     @Test
@@ -132,12 +133,12 @@ public class WormsServiceIT {
         WormsService wormsService = new WormsService(mock);
 
         List<SpeciesRecordDto> results = wormsService.partialSearch(0, 50, "anyworks");
-        assertEquals("Record size match", 50, results.size());
+        Assertions.assertEquals(50, results.size(), "Record size match");
 
         results = wormsService.partialSearch(1, 50, "anyworks");
-        assertEquals("Record size match", 50, results.size());
+        Assertions.assertEquals(50, results.size(), "Record size match");
 
         results = wormsService.partialSearch(2, 50, "anyworks");
-        assertEquals("Record size match", 20, results.size());
+        Assertions.assertEquals(20, results.size(), "Record size match");
     }
 }

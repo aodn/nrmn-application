@@ -225,7 +225,7 @@ public class SurveyValidation {
                     level = ValidationLevel.BLOCKING;
                     messages.add("M3 " + (!hasBlocks.isEmpty() ? "recorded on wrong block" : "missing B0"));
                 } else {
-                    messages.add(String.format("M %s missing B %s", method, missingBlocks.stream().map(Object::toString).collect(Collectors.joining(", "))));
+                    messages.add(String.format("M%s missing B%s", method, missingBlocks.stream().map(Object::toString).collect(Collectors.joining(", "))));
                 }
                 rowIds.addAll(methodRows.parallelStream().map(StagedRowFormatted::getId).collect(Collectors.toList()));
                 flagColumns.add("block");
