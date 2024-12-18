@@ -1,11 +1,10 @@
 package au.org.aodn.nrmn.restapi.integration;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.SerializationUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +28,7 @@ import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 @Testcontainers
 @SpringBootTest
 @ExtendWith(PostgresqlContainerExtension.class)
+@Transactional
 @WithTestData
 class RLSMethodCheckIT {
 
@@ -54,7 +54,9 @@ class RLSMethodCheckIT {
         locationRepository.save(location);
         siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
 
-        StagedJob job = jobRepo.findByReference("jobid-rls").get();
+        StagedJob job = jobRepo.findByReference("jobid-rls").orElse(null);
+        Assertions.assertNotNull(job);
+
         String date = "11/09/2020";
         String depth = "7";
         String siteNo = "ERZ1";
@@ -67,21 +69,21 @@ class RLSMethodCheckIT {
         m1b1.setSiteCode(siteNo);
         m1b1.setStagedJob(job);
 
-        StagedRow m2b1 = (StagedRow) SerializationUtils.clone(m1b1);
+        StagedRow m2b1 = SerializationUtils.clone(m1b1);
         m2b1.setMethod("2");
-        StagedRow m2b2 = (StagedRow) SerializationUtils.clone(m2b1);
+        StagedRow m2b2 = SerializationUtils.clone(m2b1);
         m2b1.setBlock("2");
 
-        StagedRow m1b1d8 = (StagedRow) SerializationUtils.clone(m1b1);
+        StagedRow m1b1d8 = SerializationUtils.clone(m1b1);
         m1b1d8.setDepth("8");
-        StagedRow m2b1d8 = (StagedRow) SerializationUtils.clone(m1b1d8);
+        StagedRow m2b1d8 = SerializationUtils.clone(m1b1d8);
         m1b1d8.setMethod("2");
         stagedRowRepo.deleteAll();
 
         stagedRowRepo.saveAll(Arrays.asList(m1b1, m2b1, m2b2, m1b1d8, m2b1d8));
 
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(response.getErrors().stream()
+        Assertions.assertTrue(response.getErrors().stream()
                 .anyMatch(e -> e.getMessage().contains("Survey incomplete")));
     }
 
@@ -92,7 +94,9 @@ class RLSMethodCheckIT {
         locationRepository.save(location);
         siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
 
-        StagedJob job = jobRepo.findByReference("jobid-rls").get();
+        StagedJob job = jobRepo.findByReference("jobid-rls").orElse(null);
+        Assertions.assertNotNull(job);
+
         String date = "11/09/2020";
         String depth = "7";
         String siteNo = "ERZ1";
@@ -105,23 +109,23 @@ class RLSMethodCheckIT {
         m0b1.setSiteCode(siteNo);
         m0b1.setStagedJob(job);
 
-        StagedRow m0b2 = (StagedRow) SerializationUtils.clone(m0b1);
+        StagedRow m0b2 = SerializationUtils.clone(m0b1);
         m0b2.setBlock("2");
 
-        StagedRow m3b1 = (StagedRow) SerializationUtils.clone(m0b1);
+        StagedRow m3b1 = SerializationUtils.clone(m0b1);
         m3b1.setMethod("3");
 
-        StagedRow m3b3 = (StagedRow) SerializationUtils.clone(m3b1);
+        StagedRow m3b3 = SerializationUtils.clone(m3b1);
         m3b3.setBlock("3");
 
-        StagedRow m5b3 = (StagedRow) SerializationUtils.clone(m3b1);
+        StagedRow m5b3 = SerializationUtils.clone(m3b1);
         m3b3.setBlock("5");
         stagedRowRepo.deleteAll();
 
         stagedRowRepo.saveAll(Arrays.asList(m0b1, m0b2, m3b1, m3b3, m5b3));
 
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(response.getErrors().stream()
+        Assertions.assertTrue(response.getErrors().stream()
                 .anyMatch(e -> e.getMessage().startsWith("RLS Method must be [0-2], 10 or 12")));
     }
 
@@ -133,7 +137,9 @@ class RLSMethodCheckIT {
         locationRepository.save(location);
         siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
 
-        var job = jobRepo.findByReference("jobid-rls").get();
+        var job = jobRepo.findByReference("jobid-rls").orElse(null);
+        Assertions.assertNotNull(job);
+
         var date = "11/09/2020";
         var depth = "7";
         var siteNo = "ERZ1";
@@ -159,8 +165,8 @@ class RLSMethodCheckIT {
 
         var response = validationProcess.process(job);
 
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("RLS Method 12 must be recorded on block 2")));
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Method 12 invalid for species")));
+        Assertions.assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("RLS Method 12 must be recorded on block 2")));
+        Assertions.assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Method 12 invalid for species")));
     }
 
     @Test
@@ -171,7 +177,9 @@ class RLSMethodCheckIT {
         locationRepository.save(location);
         siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
 
-        var job = jobRepo.findByReference("jobid-rls").get();
+        var job = jobRepo.findByReference("jobid-rls").orElse(null);
+        Assertions.assertNotNull(job);
+
         var date = "11/09/2020";
         var depth = "7";
         var siteNo = "ERZ1";
@@ -187,11 +195,11 @@ class RLSMethodCheckIT {
         row1.setSpecies("Debris");
 
         stagedRowRepo.deleteAll();
-        stagedRowRepo.saveAll(Arrays.asList(row1));
+        stagedRowRepo.saveAll(List.of(row1));
 
         var response = validationProcess.process(job);
         
-        assertFalse(response.getErrors().stream().anyMatch(e -> e.getMessage().contains("Method 12")));
+        Assertions.assertFalse(response.getErrors().stream().anyMatch(e -> e.getMessage().contains("Method 12")));
     }
 
     @Test
@@ -201,7 +209,9 @@ class RLSMethodCheckIT {
         locationRepository.save(location);
         siteRepository.save(Site.builder().siteName("ERZ1").siteCode("ERZ1").location(location).isActive(true).build());
 
-        StagedJob job = jobRepo.findByReference("jobid-rls").get();
+        StagedJob job = jobRepo.findByReference("jobid-rls").orElse(null);
+        Assertions.assertNotNull(job);
+
         String date = "11/09/2020";
         String depth = "7";
         String siteNo = "ERZ1";
@@ -214,16 +224,16 @@ class RLSMethodCheckIT {
         m1b1.setSiteCode(siteNo);
         m1b1.setStagedJob(job);
 
-        StagedRow m1b1d10 = (StagedRow) SerializationUtils.clone(m1b1);
+        StagedRow m1b1d10 = SerializationUtils.clone(m1b1);
         m1b1d10.setDepth("10");
-        StagedRow m1b1d8 = (StagedRow) SerializationUtils.clone(m1b1);
+        StagedRow m1b1d8 = SerializationUtils.clone(m1b1);
         m1b1d8.setDepth("8");
 
         stagedRowRepo.deleteAll();
         stagedRowRepo.saveAll(Arrays.asList(m1b1, m1b1d10, m1b1d8));
 
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(response.getErrors().stream()
+        Assertions.assertTrue(response.getErrors().stream()
                 .anyMatch(e -> e.getMessage().contains("missing M2")));
     }
 }

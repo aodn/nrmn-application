@@ -32,9 +32,11 @@ RUN apt-get update \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
 
 RUN apt-get update \
-    && apt-get install nodejs -y \
-    && npm install -g yarn \
-    && yarn set version canary
+    && apt-get install nodejs -y
+
+RUN corepack enable
+RUN npm install -g --force yarn && yarn set version 4.3.0
+RUN yarn --version
 
 
 

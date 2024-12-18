@@ -27,6 +27,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import au.org.aodn.nrmn.restapi.enums.SecUserStatus;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
@@ -35,6 +37,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 
 @Entity
 @Data
@@ -43,6 +46,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @Builder
 @Table(name = "sec_user", uniqueConstraints = {@UniqueConstraint(name = "UNIQUE_EMAIL", columnNames = {"email_address"})})
+@Cache(region = "entities", usage = CacheConcurrencyStrategy.READ_WRITE)
 @Audited(withModifiedFlag = true)
 public class  SecUser implements Serializable {
 

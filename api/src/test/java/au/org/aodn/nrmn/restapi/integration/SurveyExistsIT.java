@@ -1,12 +1,9 @@
 package au.org.aodn.nrmn.restapi.integration;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
+import java.util.List;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,21 +13,21 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.model.StagedRow;
 import au.org.aodn.nrmn.restapi.data.model.Survey;
-import au.org.aodn.nrmn.restapi.data.repository.StagedJobRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedRowRepository;
-import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.ValidationLevel;
-import au.org.aodn.nrmn.restapi.model.db.SiteTestData;
 import au.org.aodn.nrmn.restapi.model.db.StagedJobTestData;
 import au.org.aodn.nrmn.restapi.model.db.SurveyTestData;
 import au.org.aodn.nrmn.restapi.service.validation.ValidationProcess;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 
+import javax.transaction.Transactional;
+
 @Testcontainers
 @SpringBootTest
 @WithNoData
+@Transactional
 @ExtendWith(PostgresqlContainerExtension.class)
 class SurveyExistsIT {
 
@@ -38,19 +35,10 @@ class SurveyExistsIT {
     StagedRowRepository stagedRowRepo;
 
     @Autowired
-    SurveyRepository surveyRepository;
-
-    @Autowired
     SurveyTestData surveyTestData;
 
     @Autowired
     StagedJobTestData stagedJobTestData;
-
-    @Autowired
-    SiteTestData siteTestData;
-    
-    @Autowired
-    StagedJobRepository jobRepo;
 
     @Autowired
     ValidationProcess validationProcess;
@@ -66,10 +54,10 @@ class SurveyExistsIT {
         sn1.setSiteCode("ERZ1");
         sn1.setStagedJob(job);
         stagedRowRepo.deleteAll();
-        stagedRowRepo.saveAll(Arrays.asList(sn1));
+        stagedRowRepo.saveAll(List.of(sn1));
         ValidationResponse response = validationProcess.process(job);
-        assertFalse(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey exists:")));
-        assertEquals(0, response.getExistingSurveyCount());
+        Assertions.assertFalse(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey exists:")));
+        Assertions.assertEquals(0, response.getExistingSurveyCount());
     }
 
     @Test
@@ -83,10 +71,10 @@ class SurveyExistsIT {
         sn1.setSiteCode(survey.getSite().getSiteCode());
         sn1.setStagedJob(job);
         stagedRowRepo.deleteAll();
-        stagedRowRepo.saveAll(Arrays.asList(sn1));
+        stagedRowRepo.saveAll(List.of(sn1));
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey exists:") && e.getLevelId() == ValidationLevel.BLOCKING));
-        assertEquals(1, response.getExistingSurveyCount());
+        Assertions.assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey exists:") && e.getLevelId() == ValidationLevel.BLOCKING));
+        Assertions.assertEquals(1, response.getExistingSurveyCount());
     }
 
     @Test
@@ -100,9 +88,9 @@ class SurveyExistsIT {
         sn1.setSiteCode(survey.getSite().getSiteCode());
         sn1.setStagedJob(job);
         stagedRowRepo.deleteAll();
-        stagedRowRepo.saveAll(Arrays.asList(sn1));
+        stagedRowRepo.saveAll(List.of(sn1));
         ValidationResponse response = validationProcess.process(job);
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey exists:") && e.getLevelId() == ValidationLevel.WARNING));
-        assertEquals(1, response.getExistingSurveyCount());
+        Assertions.assertTrue(response.getErrors().stream().anyMatch(e -> e.getMessage().startsWith("Survey exists:") && e.getLevelId() == ValidationLevel.WARNING));
+        Assertions.assertEquals(1, response.getExistingSurveyCount());
     }
 }

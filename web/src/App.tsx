@@ -1,8 +1,8 @@
-import {responsiveFontSizes, ThemeProvider, createTheme} from '@mui/material/styles';
-import {LicenseManager} from 'ag-grid-enterprise';
-import React, {useState, useMemo} from 'react';
-import {BrowserRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
-import {AuthContext} from './contexts/auth-context';
+import { responsiveFontSizes, ThemeProvider, createTheme } from '@mui/material/styles';
+import { LicenseManager } from 'ag-grid-enterprise';
+import React, { useState, useMemo, ReactNode } from 'react';
+import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
+import { AuthContext } from './contexts/auth-context';
 import LoginForm from './components/auth/LoginForm';
 import AppContent from './components/containers/AppContent';
 import DiverAdd from './components/data-entities/diver/DiverAdd';
@@ -31,26 +31,36 @@ import Homepage from './components/layout/Homepage';
 import SideMenu from './components/layout/SideMenu';
 import TopBar from './components/layout/TopBar';
 import EntityContainer from './components/containers/EntityContainer';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-material.css';
+import '@ag-grid-community/styles/ag-grid.css';
+import '@ag-grid-community/styles/ag-theme-material.css';
 import ApplicationError from './components/ui/ApplicationError';
 import SpeciesCorrect from './components/data-entities/survey/SpeciesCorrect';
 import PropTypes from 'prop-types';
 import ChangePasswordForm from './components/auth/ChangePasswordForm';
 import UserList from './components/admin/UserList';
 
-class ErrorBoundary extends React.Component {
+interface ErrorBoundaryProps {
+  children: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  message?: string;
+  error?: Error | null;
+}
+
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   static propTypes = {
     children: PropTypes.node
   };
 
-  constructor(props) {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = {hasError: false};
+    this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error) {
-    return {hasError: true, message: error.message};
+  static getDerivedStateFromError(error: ErrorBoundaryState) {
+    return { hasError: true, message: error.message };
   }
 
   render() {
@@ -67,17 +77,17 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-const App = () => {
+const App: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [auth, setAuth] = useState(JSON.parse(localStorage.getItem('auth')) || {expires: 0, username: null, features: []});
+  const [auth, setAuth] = useState(JSON.parse(localStorage.getItem('auth') + '') || { expires: 0, username: null, features: [] });
 
   const [applicationError, setApplicationError] = useState();
 
-  window.setApplicationError = setApplicationError;
+  (window as Window & typeof globalThis & { setApplicationError: React.Dispatch<React.SetStateAction<undefined>> }).setApplicationError = setApplicationError;
 
   const loggedIn = Date.now() < auth.expires;
 
-  const licenceKey = JSON.parse(localStorage.getItem('gridLicense'));
+  const licenceKey = JSON.parse(localStorage.getItem('gridLicense') + '');
   if (licenceKey) LicenseManager.setLicenseKey(licenceKey);
 
   const productionTheme = useMemo(
@@ -88,15 +98,27 @@ const App = () => {
             body2: {
               fontSize: 12
             },
-            table: {
-              fontSize: 12,
-              padding: 6
-            }
+            // table: {
+            //   fontSize: 12,
+            //   padding: 6
+            // }
           },
           palette: {
             mode: 'light',
-            primary: {main: '#546E7B', light: '#AADFFA', dark: '#546E7B', rowHeader: '#E4EAED', rowHighlight: '#F2F6F7'},
-            secondary: {main: '#563FF2', light: '#7D69FF', dark: '#5844DB', rowHeader: '#E4EAED', rowHighlight: '#F2F6F7'}
+            primary: {
+              main: '#546E7B',
+              light: '#AADFFA',
+              dark: '#546E7B',
+              //rowHeader: '#E4EAED',
+              //rowHighlight: '#F2F6F7'
+            },
+            secondary: {
+              main: '#563FF2',
+              light: '#7D69FF',
+              dark: '#5844DB',
+              //rowHeader: '#E4EAED',
+              //rowHighlight: '#F2F6F7'
+            }
           }
         })
       ),
@@ -108,14 +130,26 @@ const App = () => {
       responsiveFontSizes(
         createTheme({
           typography: {
-            table: {
-              fontSize: 12
-            }
+            // table: {
+            //   fontSize: 12
+            // }
           },
           palette: {
             mode: 'light',
-            primary: {main: '#7B6154', light: '#AADFFA', dark: '#546E7B', rowHeader: '#E4EAED', rowHighlight: '#F2F6F7'},
-            secondary: {main: '#563FF2', light: '#7D69FF', dark: '#5844DB', rowHeader: '#E4EAED', rowHighlight: '#F2F6F7'}
+            primary: {
+              main: '#7B6154',
+              light: '#AADFFA',
+              dark: '#546E7B',
+              //rowHeader: '#E4EAED',
+              //rowHighlight: '#F2F6F7'
+            },
+            secondary: {
+              main: '#563FF2',
+              light: '#7D69FF',
+              dark: '#5844DB',
+              //rowHeader: '#E4EAED',
+              //rowHighlight: '#F2F6F7'
+            }
           }
         })
       ),
@@ -123,7 +157,7 @@ const App = () => {
   );
 
   return (
-    <AuthContext.Provider value={{auth: auth, setAuth: setAuth}}>
+    <AuthContext.Provider value={{ auth: auth, setAuth: setAuth }}>
       <ThemeProvider theme={auth?.features?.includes('verification') ? verificationTheme : productionTheme}>
         <Router>
           <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)}></SideMenu>

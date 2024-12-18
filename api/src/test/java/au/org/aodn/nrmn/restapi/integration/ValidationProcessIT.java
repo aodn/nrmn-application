@@ -28,23 +28,26 @@ import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithNoData;
 import au.org.aodn.nrmn.restapi.validation.process.FormattedTestProvider;
 
+import javax.transaction.Transactional;
+
 @Testcontainers
 @SpringBootTest
 @ExtendWith(PostgresqlContainerExtension.class)
+@Transactional
 @WithNoData
 public class ValidationProcessIT extends FormattedTestProvider {
 
     @Autowired
-    private DataValidation dataValidation;
+    protected DataValidation dataValidation;
 
     @Autowired
-    private ValidationProcess validationProcess;
+    protected ValidationProcess validationProcess;
 
     @Autowired
-    private ProgramTestData ptd;
+    protected ProgramTestData ptd;
 
     @Autowired
-    private SecUserTestData utd;
+    protected SecUserTestData utd;
 
     private final String date = "11/09/2020";
     private final String depth = "7";

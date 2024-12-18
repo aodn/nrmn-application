@@ -16,18 +16,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
 @Data
+@Cache(region = "entities", usage = CacheConcurrencyStrategy.READ_WRITE)
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
 @EqualsAndHashCode
 @Table(name = "sec_role")
 public class SecRole implements Serializable {
-    public SecRole(SecRoleName status) {
-        this.name = status;
-    }
 
     @Id
     @Column(name = "name", nullable = false)

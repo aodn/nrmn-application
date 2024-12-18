@@ -1,16 +1,15 @@
 package au.org.aodn.nrmn.restapi.service.formatting;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import au.org.aodn.nrmn.restapi.data.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowFormattedMapperConfig;
-import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
-import au.org.aodn.nrmn.restapi.data.model.StagedRow;
-import au.org.aodn.nrmn.restapi.data.model.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
 import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
 import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
@@ -33,7 +32,7 @@ public class SpeciesFormattingService {
     SiteRepository siteRepository;
 
     public Collection<ObservableItem> getSpeciesForRows(Collection<StagedRow> rows) {
-        var enteredSpeciesNames = rows.stream().map(s -> s.getSpecies()).collect(Collectors.toSet());
+        var enteredSpeciesNames = rows.stream().map(StagedRow::getSpecies).collect(Collectors.toSet());
         return observableItemRepository.getAllSpeciesNamesMatching(enteredSpeciesNames);
     }
 
@@ -43,7 +42,7 @@ public class SpeciesFormattingService {
         var rowMap = rows.stream().collect(Collectors.toMap(StagedRow::getId, r -> r));
 
         var speciesIds = species.stream()
-                .mapToInt(s -> s.getObservableItemId())
+                .mapToInt(ObservableItem::getObservableItemId)
                 .toArray();
 
         var speciesAttributesMap = observationRepository
@@ -52,9 +51,8 @@ public class SpeciesFormattingService {
 
         var speciesMap = species.stream().collect(Collectors.toMap(ObservableItem::getObservableItemName, o -> o));
 
-        var divers = diverRepository.getAll().stream().collect(Collectors.toList());
-
-        var sites = siteRepository.getAll().stream().collect(Collectors.toList());
+        var divers = new ArrayList<>(diverRepository.getAll());
+        var sites = new ArrayList<>(siteRepository.getAll());
 
         var mapperConfig = new StagedRowFormattedMapperConfig();
         var mapper = mapperConfig.getModelMapper(speciesMap, rowMap, speciesAttributesMap, divers, sites);

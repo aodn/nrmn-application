@@ -1,6 +1,35 @@
 import {blue, grey, orange, red, yellow} from '@mui/material/colors';
 import {extendedMeasurements, measurements} from '../../common/constants';
 
+const INSERT_ONE_ROW = 'Insert 1 Row';
+const CLONE_ONE_ROW = 'Clone 1 Row';
+const DELETE_ONE_ROW = 'Delete 1 Row';
+
+/*
+* The posMap is a map of all the row's position, currentPostIdx is the row index where user
+* click the insert row, so row should be insert below, this function is use to move the
+* existing row accordingly to new index and add the new row pos to it.
+*
+* return a map where key is the original position, and value is the updated position due to
+* new slot
+*/
+const createNewPosSlot = (e, currentPosIdx) => {
+  const posIdx = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
+  const updatedPosMap = new Map();
+
+  posIdx.forEach(i => updatedPosMap.set(i,i));
+
+  if(updatedPosMap.has(currentPosIdx)) {
+    // We need to shift item downwards to create room for this item and
+    // posIdx sorted already, find the beginning of the index in the array
+    const p = posIdx.findIndex(e => e === currentPosIdx);
+
+    // Move all items pos by 1
+    posIdx.slice(p).forEach(i => updatedPosMap.set(i, updatedPosMap.get(i) + 1));
+  }
+  return updatedPosMap;
+};
+
 class DataSheetEventHandlers {
   constructor() {
     this.fillRegion = this.fillRegion.bind(this);
@@ -12,7 +41,7 @@ class DataSheetEventHandlers {
   }
 
   pushUndo(api, delta) {
-    const context = api.gridOptionsWrapper.gridOptions.context;
+    const context = api.gos.gridOptions.context;
     context.undoStack.push(
       delta.map((d) => {
         context.putRowIds.push(d.id);
@@ -80,7 +109,7 @@ class DataSheetEventHandlers {
   }
 
   popUndo(api) {
-    const context = api.gridOptionsWrapper.gridOptions.context;
+    const context = api.gos.gridOptions.context;
     const deltaSet = context.undoStack.pop();
     let rowData = context.rowData;
     for (const deltaIdx in deltaSet) {
@@ -267,7 +296,7 @@ class DataSheetEventHandlers {
   }
 
   onPasteStart(e) {
-    const context = e.api.gridOptionsWrapper.gridOptions.context;
+    const context = e.api.gos.gridOptions.context;
     context.pasteMode = true;
   }
 
@@ -362,8 +391,8 @@ class DataSheetEventHandlers {
       const row = e.api.getDisplayedRowAtIndex(cells.startRow.rowIndex);
       const data = e.context.rowData.find((d) => d.id == row.data.id);
       const newId = +(new Date().valueOf() + '').slice(-10);
-      const posMap = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
-      const currentPosIdx = posMap.findIndex((p) => p == data.pos);
+      const currentPosIdx = data.pos;
+
       let newData = {};
       Object.keys(data).forEach((key) => {
         newData[key] =
@@ -372,14 +401,18 @@ class DataSheetEventHandlers {
               ? []
               : typeof data[key] === 'string'
               ? ''
+              : data[key] === null
+              ? null
               : 0
             : data[key];
       });
       newData.measurements = clearData ? {} : {...data.measurements};
-      newData.pos = posMap[currentPosIdx + 1]
-        ? posMap[currentPosIdx] + (posMap[currentPosIdx + 1] - posMap[currentPosIdx]) / 2
-        : posMap[currentPosIdx] + 1000;
-      if (newData.pos % 1 !== 0) return;
+
+      const updatedPosMap = createNewPosSlot(e, currentPosIdx + 1);
+      // Update the existing pos of each item
+      e.context.rowData.forEach((r) => r.pos = updatedPosMap.get(r.pos));
+      // Now safe to assign this pos
+      newData.pos = currentPosIdx + 1;
       newData.id = newId;
       newData.diffRowId = newId;
       delete newData.errors;
@@ -387,6 +420,8 @@ class DataSheetEventHandlers {
       eh.pushUndo(e.api, [{id: newId}]);
       e.context.rowData.push(newData);
       e.api.setRowData(e.context.rowData);
+
+      // Update rowPos to make the sort order correct
       const positions = e.context.rowData.map((r) => r.pos).sort((a, b) => a - b);
       e.context.rowPos = positions.map((p) => e.context.rowData.find((r) => r.pos === p).pos);
 
@@ -408,18 +443,18 @@ class DataSheetEventHandlers {
     if (selectedRows.length < 2) {
       if (items.length > 0) items.push('separator');
       items.push({
-        name: 'Delete Row',
+        name: DELETE_ONE_ROW,
         action: () => eh.deleteRow(e)
       });
       items.push({
-        name: 'Clone Row',
+        name: CLONE_ONE_ROW,
         action: () => cloneRow(false)
       });
       items.push({
-        name: 'Insert Row',
+        name: INSERT_ONE_ROW,
         action: () => cloneRow(true)
       });
-      if (e.column.colId === 'species') {
+      if (e.column?.colId === 'species') {
         if (items.length > 0) items.push('separator');
         items.push({
           name: 'View on reeflifesurvey.com',
@@ -533,7 +568,7 @@ class DataSheetEventHandlers {
   }
 
   handlePasteEnd(e) {
-    const context = e.api.gridOptionsWrapper.gridOptions.context;
+    const context = e.api.gos.gridOptions.context;
     context.pasteMode = false;
     let oldRows = [];
     Array.from(new Set(context.pendingPasteUndo.map((u) => u.id))).forEach((id) => {
@@ -563,7 +598,7 @@ class DataSheetEventHandlers {
   }
 
   handleUndo(e) {
-    const context = e.api.gridOptionsWrapper.gridOptions.context;
+    const context = e.api.gos.gridOptions.context;
     if (context.undoStack.length < 1) return;
     this.popUndo(e.api);
     e.api.refreshCells();
@@ -578,3 +613,10 @@ class DataSheetEventHandlers {
 }
 
 export default new DataSheetEventHandlers();
+
+export {
+  createNewPosSlot,
+  CLONE_ONE_ROW,
+  INSERT_ONE_ROW,
+  DELETE_ONE_ROW,
+};

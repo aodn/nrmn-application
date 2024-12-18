@@ -16,12 +16,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Cache(region = "entities", usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "measure_ref")
 public class Measure {
     @Id

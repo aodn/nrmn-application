@@ -1,19 +1,20 @@
+import React from 'react';
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from '@mui/material';
 import {styled} from '@mui/material/styles';
-import 'ag-grid-community/dist/styles/ag-theme-material.css';
+import 'ag-grid-community/styles/ag-theme-material.css';
 import 'ag-grid-enterprise';
-import React from 'react';
 import PropTypes from 'prop-types';
 
-const StyledTableContainer = styled(TableContainer)(({
-                                                       theme: {palette, typography}
-                                                     }) => ({
+const StyledTableContainer = styled(TableContainer)((
+  {
+    theme: {palette, typography}
+  }) => ({
   [`& .SurveyDiff-root`]: {
     '& .MuiTable-root': {
       '& .MuiTableHead-root': {
         '& .MuiTableRow-head': {
           '& .MuiTableCell-head': {
-            fontSize: typography?.table.fontSize,
+            fontSize: typography?.table?.fontSize,
             background: palette?.primary.rowHeader
           }
         }
@@ -24,8 +25,8 @@ const StyledTableContainer = styled(TableContainer)(({
         }
       },
       '& .MuiTableCell-root': {
-        fontSize: typography?.table.fontSize,
-        padding: typography?.table.padding,
+        fontSize: typography?.table?.fontSize,
+        padding: typography?.table?.padding,
         color: palette?.text.textPrimary
       }
     }

@@ -35,7 +35,7 @@ const FindReplacePanel = (props) => {
   const [initialPosition, setInitialPosition] = useState({});
 
   // where all grid data and metadata is stored
-  const context = props.api.gridOptionsWrapper.gridOptions.context;
+  const context = props.api.gos.gridOptions.context;
 
   const reset = () => {
     setInProgress(false);
