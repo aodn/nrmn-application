@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.locationtech.jts.geom.Coordinate;
@@ -38,10 +39,8 @@ import java.util.List;
 import java.util.Map;
 import au.org.aodn.nrmn.restapi.enums.Iirc;
 
-import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
-
 @Entity
-@Cache(region = "entities", usage = READ_WRITE)
+@Cache(region = "entities", usage = CacheConcurrencyStrategy.READ_WRITE)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

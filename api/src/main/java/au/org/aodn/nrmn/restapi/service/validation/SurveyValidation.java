@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import au.org.aodn.nrmn.restapi.data.model.Method;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,7 @@ public class SurveyValidation {
 
         if (row.getSpecies().isPresent() && row.getSpecies().get().getMethods() != null) {
 
-            var methodIds = row.getSpecies().get().getMethods().stream().map(m -> m.getMethodId())
+            var methodIds = row.getSpecies().get().getMethods().stream().map(Method::getMethodId)
                     .collect(Collectors.toSet());
 
             // Handle all M10 as M1
@@ -86,18 +87,20 @@ public class SurveyValidation {
 
         // Make sure we only validate rows where method is 3, we cannot assume income
         // row are all method 3
-        var t = rows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3))
+        var t = rows
+                .parallelStream()
+                .filter(row -> row.getMethod() != null && row.getMethod().equals(3))
                 .collect(Collectors.toList());
 
         if (!t.isEmpty()) {
             for (int measureIndex : Arrays.asList(1, 2, 3, 4, 5))
                 if (t.stream().mapToInt(row -> row.getMeasureJson().getOrDefault(measureIndex, 0)).sum() == 0) {
-                    rowIds.addAll(rows.stream().map(r -> r.getId()).collect(Collectors.toList()));
+                    rowIds.addAll(rows.stream().map(StagedRowFormatted::getId).collect(Collectors.toList()));
                     columnNames.add(Integer.toString(measureIndex));
                 }
         }
 
-        return rowIds.size() > 0 ? new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING,
+        return !rowIds.isEmpty() ? new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING,
                 "Missing quadrats in transect " + transect, rowIds, columnNames) : null;
     }
 
@@ -106,7 +109,9 @@ public class SurveyValidation {
 
         // Make sure we only validate rows where method is 3, we cannot assume income
         // row are all method 3
-        var t = rows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3))
+        var t = rows
+                .parallelStream()
+                .filter(row -> row.getMethod() != null && row.getMethod().equals(3))
                 .collect(Collectors.toList());
 
         if (!t.isEmpty()) {
@@ -126,7 +131,9 @@ public class SurveyValidation {
 
         // Make sure we only validate rows where method is 3, we cannot assume income
         // row are all method 3
-        var t = rows.stream().filter(row -> row.getMethod() != null && row.getMethod().equals(3))
+        var t = rows
+                .parallelStream()
+                .filter(row -> row.getMethod() != null && row.getMethod().equals(3))
                 .collect(Collectors.toList());
 
         if (!t.isEmpty()) {
@@ -137,31 +144,35 @@ public class SurveyValidation {
 
         }
 
-        var rowIds = t.stream().map(r -> r.getId()).collect(Collectors.toList());
-        return columnNames.size() > 0 ? new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING,
+        var rowIds = t.parallelStream().map(StagedRowFormatted::getId).collect(Collectors.toList());
+
+        return !columnNames.isEmpty() ? new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING,
                 "Quadrats do not sum to at least 50 in transect " + transect, rowIds, columnNames) : null;
     }
 
     public SurveyValidationError validateSurveyTransectNumber(List<StagedRowFormatted> surveyRows) {
-        var invalidTransectRows = surveyRows.stream()
+        var invalidTransectRows = surveyRows
+                .parallelStream()
                 .filter(r -> !Arrays.asList(0, 1, 2, 3, 4).contains(r.getSurveyNum())).collect(Collectors.toList());
-        if (invalidTransectRows.size() > 0)
+        if (!invalidTransectRows.isEmpty())
             return new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING,
                     "Survey group transect invalid",
-                    invalidTransectRows.stream().map(r -> r.getId()).collect(Collectors.toList()),
-                    Arrays.asList("depth"));
+                    invalidTransectRows.parallelStream().map(StagedRowFormatted::getId).collect(Collectors.toList()),
+                    List.of("depth"));
         return null;
     }
 
     private SurveyValidationError validateSurveyComplete(ProgramValidation validation,
             List<StagedRowFormatted> surveyRows) {
 
-        if (surveyRows.stream().anyMatch(r -> r.getMethod() == null || r.getBlock() == null))
+        if (surveyRows.parallelStream().anyMatch(r -> r.getMethod() == null || r.getBlock() == null))
             return null;
 
         var messagePrefix = "Survey incomplete: " + surveyRows.get(0).getDecimalSurvey();
 
-        var surveyByMethod = surveyRows.stream().filter(sr -> sr.getMethod() != null && sr.getBlock() != null)
+        var surveyByMethod = surveyRows
+                .parallelStream()
+                .filter(sr -> sr.getMethod() != null && sr.getBlock() != null)
                 .collect(Collectors.groupingBy(StagedRowFormatted::getMethod));
 
         var rowIds = new HashSet<Long>();
@@ -170,27 +181,27 @@ public class SurveyValidation {
 
         // VALIDATION: If method = 0 then Block should be 0, 1 or 2
         var method0Rows = surveyByMethod.get(0);
-        if (method0Rows != null && method0Rows.stream().anyMatch(r -> !Arrays.asList(0, 1, 2).contains(r.getBlock())))
+        if (method0Rows != null && method0Rows.parallelStream().anyMatch(r -> !Arrays.asList(0, 1, 2).contains(r.getBlock())))
             return new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING,
                     "Method 0 must have block 0, 1 or 2",
-                    method0Rows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("block"));
+                    method0Rows.parallelStream().map(StagedRowFormatted::getId).collect(Collectors.toList()), List.of("block"));
 
         // VALIDATION: M10 requires B1 and B2
         var method10 = surveyByMethod.get(10);
-        if (method10 != null && !method10.stream().map(r -> r.getBlock()).distinct().collect(Collectors.toList())
-                .containsAll(Arrays.asList(1, 2)))
+        if (method10 != null &&
+                !method10.stream().map(StagedRowFormatted::getBlock).distinct().collect(Collectors.toList()).containsAll(List.of(1, 2)))
             return new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING,
                     "M10 requires B1 and B2",
-                    method10.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("block"));
+                    method10.stream().map(StagedRowFormatted::getId).collect(Collectors.toList()), List.of("block"));
 
         // VALIDATION: M1, M2 (and M3 if ATRC) are present
         var requiredMethods = validation == ProgramValidation.ATRC ? Arrays.asList(1, 2, 3) : Arrays.asList(1, 2);
-        var missingMethods = new ArrayList<Integer>(requiredMethods);
+        var missingMethods = new ArrayList<>(requiredMethods);
         missingMethods.removeAll(surveyByMethod.keySet());
-        if (missingMethods.size() > 0) {
-            var missingMethodsList = missingMethods.stream().map(m -> m.toString()).collect(Collectors.toList());
+        if (!missingMethods.isEmpty()) {
+            var missingMethodsList = missingMethods.parallelStream().map(Object::toString).collect(Collectors.toList());
             messages.add("missing M" + String.join(", M", missingMethodsList));
-            rowIds.addAll(surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()));
+            rowIds.addAll(surveyRows.parallelStream().map(StagedRowFormatted::getId).collect(Collectors.toList()));
             flagColumns.add("method");
         }
 
@@ -202,27 +213,26 @@ public class SurveyValidation {
             if (methodRows == null)
                 continue;
 
-            var blocksRequired = validation == ProgramValidation.RLS ? new ArrayList<Integer>(Arrays.asList(1, 2))
-                    : new ArrayList<Integer>(method == 3 ? Arrays.asList(0) : Arrays.asList(1, 2));
+            var blocksRequired = validation == ProgramValidation.RLS ? new ArrayList<>(List.of(1, 2))
+                    : new ArrayList<>(method == 3 ? List.of(0) : List.of(1, 2));
 
-            var hasBlocks = methodRows.stream().map(r -> r.getBlock()).distinct().collect(Collectors.toList());
+            var hasBlocks = methodRows.stream().map(StagedRowFormatted::getBlock).distinct().collect(Collectors.toList());
             var missingBlocks = blocksRequired.stream().filter(b -> !hasBlocks.contains(b))
                     .collect(Collectors.toList());
 
-            if (missingBlocks.size() > 0) {
+            if (!missingBlocks.isEmpty()) {
                 if (method == 3) {
                     level = ValidationLevel.BLOCKING;
-                    messages.add("M3 " + (hasBlocks.size() > 0 ? "recorded on wrong block" : "missing B0"));
+                    messages.add("M3 " + (!hasBlocks.isEmpty() ? "recorded on wrong block" : "missing B0"));
                 } else {
-                    messages.add("M" + method + " missing B" + String.join(", ",
-                            missingBlocks.stream().map(m -> m.toString()).collect(Collectors.toList())));
+                    messages.add(String.format("M%s missing B%s", method, missingBlocks.stream().map(Object::toString).collect(Collectors.joining(", "))));
                 }
-                rowIds.addAll(methodRows.stream().map(r -> r.getId()).collect(Collectors.toList()));
+                rowIds.addAll(methodRows.parallelStream().map(StagedRowFormatted::getId).collect(Collectors.toList()));
                 flagColumns.add("block");
             }
         }
 
-        if (messages.size() > 0) {
+        if (!messages.isEmpty()) {
             return new SurveyValidationError(ValidationCategory.SPAN, level,
                     messagePrefix + " " + String.join(". ", messages), rowIds, flagColumns);
         }
@@ -231,16 +241,16 @@ public class SurveyValidation {
     }
 
     private SurveyValidationError validateSurveyGroup(List<StagedRowFormatted> surveyRows) {
-        var surveyGroup = surveyRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyNum));
-        if (!surveyGroup.keySet().containsAll(Arrays.asList(1, 2, 3, 4))) {
-            var missingSurveys = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4));
+        var surveyGroup = surveyRows.parallelStream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyNum));
+        if (!surveyGroup.keySet().containsAll(List.of(1, 2, 3, 4))) {
+            var missingSurveys = new ArrayList<>(List.of(1, 2, 3, 4));
             missingSurveys.removeAll(surveyGroup.keySet());
-            var missingSurveysMessage = missingSurveys.stream().map(s -> s.toString()).collect(Collectors.toList());
+            var missingSurveysMessage = missingSurveys.stream().map(Object::toString).collect(Collectors.toList());
             var row = surveyRows.get(0).getRef();
             var message = "Survey group " + row.getSurveyGroup() + " missing transect "
                     + String.join(", ", missingSurveysMessage);
             return new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.WARNING, message,
-                    surveyRows.stream().map(r -> r.getId()).collect(Collectors.toList()), Arrays.asList("depth"));
+                    surveyRows.stream().map(StagedRowFormatted::getId).collect(Collectors.toList()), List.of("depth"));
         }
         return null;
     }
@@ -252,12 +262,12 @@ public class SurveyValidation {
             var existingSurveyIds = surveyRepository.findBySiteDepthSurveyNumDate(row.getSite(), row.getDepth(),
                     row.getSurveyNum(), surveyDate);
 
-            if (existingSurveyIds.size() > 0 && !existingSurveyIds.contains(row.getSurveyId())) {
+            if (!existingSurveyIds.isEmpty() && !existingSurveyIds.contains(row.getSurveyId())) {
                 var existingSurveyId = existingSurveyIds.get(0);
                 var message = "Survey exists: " + existingSurveyId + " includes " + row.getDecimalSurvey();
                 var level = (row.getMethod() == 3) ? ValidationLevel.WARNING : ValidationLevel.BLOCKING;
                 return new SurveyValidationError(ValidationCategory.DATA, level, message,
-                        Arrays.asList(row.getId()), Arrays.asList("siteCode"));
+                        List.of(row.getId()), List.of("siteCode"));
             }
 
         }
@@ -282,7 +292,7 @@ public class SurveyValidation {
 
             // Skip SurveyComplete if M3 and survey exists
             var surveyExistsM3 = row.getMethod() != null && row.getMethod() == 3
-                    && res.stream().anyMatch(e -> e != null && e.getMessage().contains("Survey exists:"));
+                    && res.parallelStream().anyMatch(e -> e != null && e.getMessage().contains("Survey exists:"));
 
             // VALIDATION: Survey Complete
             if (!surveyExistsM3 && validation != ProgramValidation.NONE) {
@@ -336,21 +346,25 @@ public class SurveyValidation {
 
         var errors = new ArrayList<String>();
 
-        var rowsGroupedBySurvey = mappedRows.stream()
+        var rowsGroupedBySurvey = mappedRows
+                .parallelStream()
                 .collect(Collectors.groupingBy(StagedRowFormatted::getSurveyId));
 
-        var groupedSurveyIds = rowsGroupedBySurvey.keySet().stream().map(l -> l.intValue())
+        var groupedSurveyIds = rowsGroupedBySurvey
+                .keySet()
+                .parallelStream()
+                .map(Long::intValue)
                 .collect(Collectors.toList());
 
         if (!surveyIds.containsAll(groupedSurveyIds)) {
             groupedSurveyIds.removeAll(surveyIds);
-            errors.add("Survey IDs created: " + String.join(", ", groupedSurveyIds.stream().map(l -> l.toString())
+            errors.add("Survey IDs created: " + String.join(", ", groupedSurveyIds.parallelStream().map(Object::toString)
                     .collect(Collectors.toList())));
         }
 
         if (!groupedSurveyIds.containsAll(surveyIds)) {
             surveyIds.removeAll(groupedSurveyIds);
-            errors.add("Survey IDs missing: " + String.join(", ", surveyIds.stream().map(l -> l.toString())
+            errors.add("Survey IDs missing: " + String.join(", ", surveyIds.parallelStream().map(Object::toString)
                     .collect(Collectors.toList())));
         }
 
@@ -359,12 +373,14 @@ public class SurveyValidation {
 
     public Collection<SurveyValidationError> validateSurveys(ProgramValidation validation, Boolean isExtended,
             Collection<StagedRowFormatted> mappedRows) {
-        var sheetErrors = new HashSet<SurveyValidationError>();
 
-        var surveyMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
-        sheetErrors.addAll(checkSurveys(validation, isExtended, surveyMap));
+        var surveyMap = mappedRows
+                .parallelStream()
+                .collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
+        var sheetErrors = new HashSet<>(checkSurveys(validation, isExtended, surveyMap));
 
-        var method3SurveyMap = mappedRows.stream()
+        var method3SurveyMap = mappedRows
+                .parallelStream()
                 .filter(row -> row.getMethod() != null && row.getMethod().equals(3)
                         && !row.getRef().getSpecies().equalsIgnoreCase("Survey Not Done"))
                 .collect(Collectors.groupingBy(StagedRowFormatted::getSurvey));
@@ -377,10 +393,10 @@ public class SurveyValidation {
             Collection<StagedRowFormatted> mappedRows) {
         var sheetErrors = new HashSet<SurveyValidationError>();
 
-        var surveyGroupMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
+        var surveyGroupMap = mappedRows.parallelStream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
 
         // Skip survey group validation if correcting a single survey
-        if (!isCorrection || surveyGroupMap.keySet().size() > 1)
+        if (!isCorrection || surveyGroupMap.size() > 1)
             sheetErrors.addAll(checkSurveyGroups(validation, surveyGroupMap));
 
         return sheetErrors;

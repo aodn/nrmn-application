@@ -1,11 +1,10 @@
 package au.org.aodn.nrmn.restapi.integration;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +20,12 @@ import au.org.aodn.nrmn.restapi.service.validation.DataValidation;
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
 import au.org.aodn.nrmn.restapi.test.annotations.WithTestData;
 
+import javax.transaction.Transactional;
+
 @Testcontainers
 @SpringBootTest
 @ExtendWith(PostgresqlContainerExtension.class)
+@Transactional
 @WithTestData
 class ObservableItemExistsIT {
 
@@ -37,9 +39,9 @@ class ObservableItemExistsIT {
         StagedRow row = new StagedRow();
         row.setSpecies("Species 20");
         row.setStagedJob(job);
-        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList(),
-                Arrays.asList(), Arrays.asList(row));
-        assertTrue(errors.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Species does not exist")));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, List.of(),
+                List.of(), List.of(row));
+        Assertions.assertTrue(errors.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Species does not exist")));
     }
 
     @Test
@@ -49,9 +51,9 @@ class ObservableItemExistsIT {
         StagedRow row = new StagedRow();
         row.setSpecies("Species 56");
         row.setStagedJob(job);
-        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList(),
-                Arrays.asList(ObservableItem.builder().observableItemName("Species 56").build()), Arrays.asList(row));
-        assertFalse(errors.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Species does not exist")));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, List.of(),
+                Collections.singletonList(ObservableItem.builder().observableItemName("Species 56").build()), List.of(row));
+        Assertions.assertFalse(errors.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Species does not exist")));
     }
 
     @Test
@@ -61,8 +63,8 @@ class ObservableItemExistsIT {
         StagedRow row = new StagedRow();
         row.setSpecies("Survey not done");
         row.setStagedJob(job);
-        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, Arrays.asList(),
-                Arrays.asList(), Arrays.asList(row));
-        assertFalse(errors.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Species does not exist")));
+        Collection<SurveyValidationError> errors = dataValidation.checkFormatting(ProgramValidation.ATRC, false, true, List.of(),
+                List.of(), List.of(row));
+        Assertions.assertFalse(errors.stream().anyMatch(e -> e.getMessage().equalsIgnoreCase("Species does not exist")));
     }
 }

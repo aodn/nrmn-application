@@ -87,7 +87,8 @@ SELECT
 	sur.pq_zip_url,
 	sur.protection_status,
 	sit.old_site_codes,
-	(SELECT string_agg(DISTINCT sm1.method_id::varchar(3), ', ' ORDER BY sm1.method_id::varchar(3)) FROM nrmn.survey_method sm1 WHERE sm1.survey_id = sur.survey_id GROUP BY sm1.survey_id) methods,
+	(SELECT string_agg(DISTINCT sm1.method_id::character varying(3)::text, ', '::text ORDER BY (sm1.method_id::character varying(3)::text)) AS string_agg
+	 FROM nrmn.survey_method sm1 WHERE sm1.survey_id = sur.survey_id AND sm1.survey_not_done=false GROUP BY sm1.survey_id) methods,
 	sur.notes AS survey_notes
 FROM nrmn.survey sur
 	 INNER JOIN nrmn.site_ref sit1 ON sit1.site_id = sur.site_id

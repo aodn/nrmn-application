@@ -43,8 +43,7 @@ public class StagedRowFormattedMapperConfig {
                             || (StringUtils.isNotEmpty(d.getInitials())
                                     && d.getInitials().equalsIgnoreCase(ctx.getSource())))
                     .findFirst();
-            Diver returnDiver = diver.isPresent() ? diver.get() : null;
-            return returnDiver;
+            return diver.orElse(null);
         };
 
         Converter<Long, StagedRow> toRef = ctx -> rowMap.get(ctx.getSource());
@@ -61,7 +60,7 @@ public class StagedRowFormattedMapperConfig {
                     .filter(d -> (StringUtils.isNotEmpty(d.getSiteCode())
                             && d.getSiteCode().equalsIgnoreCase(ctx.getSource())))
                     .findFirst();
-            return site.isPresent() ? site.get() : null;
+            return site.orElse(null);
         };
 
         Converter<String, LocalDate> toDate = ctx -> {
@@ -94,7 +93,7 @@ public class StagedRowFormattedMapperConfig {
         };
 
         Converter<String, Optional<Double>> toVis = ctx -> {
-            Double vis = NumberUtils.toDouble(ctx.getSource(), Double.MIN_VALUE);
+            double vis = NumberUtils.toDouble(ctx.getSource(), Double.MIN_VALUE);
             return (vis != Double.MIN_VALUE) ? Optional.of(vis) : Optional.empty();
         };
 
@@ -114,13 +113,13 @@ public class StagedRowFormattedMapperConfig {
                 : false;
 
         Converter<String, Double> toDouble = ctx -> {
-            Double dbl = NumberUtils.toDouble(ctx.getSource(), Double.NaN);
+            double dbl = NumberUtils.toDouble(ctx.getSource(), Double.NaN);
             return Double.isNaN(dbl) ? null : dbl;
         };
 
         Converter<String, Integer> toInteger = ctx -> {
             try {
-                Integer i = NumberUtils.toInt(ctx.getSource(), Integer.MIN_VALUE);
+                int i = NumberUtils.toInt(ctx.getSource(), Integer.MIN_VALUE);
                 return (i != Integer.MIN_VALUE) ? i : null;
             }
             catch (NumberFormatException e) {
@@ -135,7 +134,7 @@ public class StagedRowFormattedMapperConfig {
         };
 
         Converter<Map<Integer, String>, Map<Integer, Integer>> toMeasureJson = ctx -> {
-            Map<Integer, Integer> measures = new HashMap<Integer, Integer>();
+            Map<Integer, Integer> measures = new HashMap<>();
             if (ctx.getSource() != null) {
                 for (Map.Entry<Integer, String> entry : ctx.getSource().entrySet()) {
                     int val = NumberUtils.toInt(entry.getValue(), Integer.MIN_VALUE);

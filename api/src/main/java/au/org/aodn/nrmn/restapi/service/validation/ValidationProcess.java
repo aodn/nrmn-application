@@ -15,11 +15,8 @@ import org.springframework.stereotype.Component;
 
 import au.org.aodn.nrmn.restapi.data.model.StagedJob;
 import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
-import au.org.aodn.nrmn.restapi.data.repository.ObservableItemRepository;
-import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.data.repository.StagedRowRepository;
-import au.org.aodn.nrmn.restapi.data.repository.SurveyRepository;
 import au.org.aodn.nrmn.restapi.dto.stage.SurveyValidationError;
 import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
@@ -32,19 +29,10 @@ public class ValidationProcess {
     DiverRepository diverRepository;
 
     @Autowired
-    ObservableItemRepository observableItemRepository;
-
-    @Autowired
-    ObservationRepository observationRepository;
-
-    @Autowired
     SiteRepository siteRepository;
 
     @Autowired
     StagedRowRepository rowRepository;
-
-    @Autowired
-    SurveyRepository surveyRepository;
 
     @Autowired
     DataValidation dataValidation;
@@ -66,15 +54,14 @@ public class ValidationProcess {
             Collection<StagedRowFormatted> rows) {
 
         var results = new ValidationResultSet();
-
-
-        /** Row-level Checks */
+        /*
+         * Row-level Checks
+         * */
         for (var row : rows) {
 
             // Validate measurements if species attributes are present
             var speciesAttrib = row.getSpeciesAttributesOpt();
-            if (speciesAttrib.isPresent())
-                results.addAll(speciesMeasurement.validate(speciesAttrib.get(), row, isExtended), false);
+            speciesAttrib.ifPresent(uiSpeciesAttributes -> results.addAll(speciesMeasurement.validate(uiSpeciesAttributes, row, isExtended), false));
 
             // Total Checksum & Missing Data
             results.addAll(speciesMeasurement.validateMeasurements(validation, row), false);
@@ -93,8 +80,7 @@ public class ValidationProcess {
                 results.add(siteValidation.validateSurveyAtSite(row));
         }
 
-        var res = new HashSet<SurveyValidationError>();
-        res.addAll(results.getAll());
+        var res = new HashSet<>(results.getAll());
         res.remove(null);
         return res;
     }
@@ -104,15 +90,15 @@ public class ValidationProcess {
         response.setRowCount(mappedRows.size());
 
         var distinctSites = mappedRows.stream().map(r -> r.getRef().getSiteCode().toUpperCase())
-                .filter(s -> s.length() > 0).distinct().collect(Collectors.toList());
+                .filter(s -> !s.isEmpty()).distinct().collect(Collectors.toList());
         var distinctSitesExisting = mappedRows.stream().filter(r -> r.getSite() != null)
                 .map(r -> r.getSite().getSiteCode().toUpperCase()).distinct().collect(Collectors.toList());
         response.setSiteCount(distinctSites.size());
 
         var foundSites = new HashMap<String, Boolean>();
-        distinctSites.stream().forEach(s -> foundSites.put(s, !distinctSitesExisting.contains(s)));
+        distinctSites.forEach(s -> foundSites.put(s, !distinctSitesExisting.contains(s)));
         response.setFoundSites(foundSites);
-        response.setNewSiteCount(foundSites.values().stream().filter(e -> e == true).count());
+        response.setNewSiteCount(foundSites.values().stream().filter(e -> e).count());
 
         // Diver Count
 
@@ -121,14 +107,17 @@ public class ValidationProcess {
         var distinctSurveyDivers = mappedRows.stream()
                 .map(d -> Normalizer.normalize(d.getRef().getDiver(), Normalizer.Form.NFD)
                         .replaceAll("[^\\p{ASCII}]", "").toUpperCase())
-                .filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
+                .filter(d -> !d.isEmpty()).distinct().collect(Collectors.toList());
+
         var distinctPQDivers = mappedRows.stream()
                 .map(d -> Normalizer.normalize(d.getRef().getPqs(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "")
                         .toUpperCase())
-                .filter(d -> d.length() > 0 && !d.equalsIgnoreCase("0")).distinct().collect(Collectors.toList());
+                .filter(d -> !d.isEmpty() && !d.equalsIgnoreCase("0")).distinct().collect(Collectors.toList());
+
         var distinctBuddies = mappedRows.stream().flatMap(r -> Stream.of(r.getRef().getBuddy().split(",")))
                 .map(d -> Normalizer.normalize(d, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").toUpperCase())
-                .filter(d -> d.length() > 0).distinct().collect(Collectors.toList());
+                .filter(d -> !d.isEmpty()).distinct().collect(Collectors.toList());
+
         distinctSurveyDivers.addAll(distinctPQDivers);
         distinctSurveyDivers.addAll(distinctBuddies);
 
@@ -156,7 +145,8 @@ public class ValidationProcess {
         // End Diver Count
 
         var obsItemNames = mappedRows.stream().map(r -> r.getRef().getSpecies().toUpperCase())
-                .filter(r -> r.length() > 0).distinct().collect(Collectors.toList());
+                .filter(r -> !r.isEmpty()).distinct().collect(Collectors.toList());
+
         var distinctObsItems = obsItemNames.size();
         var distinctObsItemsExisting = mappedRows.stream().filter(r -> r.getSpecies().isPresent())
                 .map(r -> r.getSpecies().get().getObservableItemName()).distinct().count();
@@ -178,13 +168,11 @@ public class ValidationProcess {
 
         var validation = ProgramValidation.fromProgram(job.getProgram());
 
-        var enteredSiteCodes = rows.stream().map(s -> s.getSiteCode().toUpperCase()).collect(Collectors.toSet());
+        var enteredSiteCodes = rows.parallelStream().map(s -> s.getSiteCode().toUpperCase()).collect(Collectors.toSet());
         var siteCodes = siteRepository.getAllSiteCodesMatching(enteredSiteCodes);
-        var sheetErrors = new HashSet<SurveyValidationError>();
 
         var species = speciesFormatting.getSpeciesForRows(rows);
-        sheetErrors
-                .addAll(dataValidation.checkFormatting(validation, job.getIsExtendedSize(), true, siteCodes, species, rows));
+        var sheetErrors = new HashSet<>(dataValidation.checkFormatting(validation, job.getIsExtendedSize(), true, siteCodes, species, rows));
         var mappedRows = speciesFormatting.formatRowsWithSpecies(rows, species);
 
         var response = generateSummary(mappedRows);
@@ -201,7 +189,7 @@ public class ValidationProcess {
         response.setExistingSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("Survey exists:")).count());
 
         var distinctSurveys = mappedRows.stream().filter(r -> Arrays.asList(1, 2).contains(r.getMethod()))
-                .map(r -> r.getSurvey()).distinct().count();
+                .map(StagedRowFormatted::getSurvey).distinct().count();
         response.setSurveyCount(distinctSurveys);
 
         var errorId = 0;

@@ -1,6 +1,7 @@
 package au.org.aodn.nrmn.restapi.service;
 
 import au.org.aodn.nrmn.restapi.test.PostgresqlContainerExtension;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -20,9 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 @Testcontainers
 @SpringBootTest
 @Transactional
@@ -31,13 +29,16 @@ public class EndPointsViewIT {
 
     final static Logger logger = LoggerFactory.getLogger(EndPointsViewIT.class);
 
-    class EpObservableItems {
+    static class EpObservableItems {
         Integer rowNum;
-        List values = new ArrayList();
+        List<Object> values = new ArrayList<>();
 
         @Override
         public String toString() {
-            return String.format("Row %s, Values %s", rowNum, String.join(",", (List<String>)values.stream().map(f -> String.valueOf(f)).collect(Collectors.toList())));
+            return String.format(
+                    "Row %s, Values %s", rowNum,
+                    values.stream().map(String::valueOf).collect(Collectors.joining(","))
+            );
         }
     }
 
@@ -52,7 +53,7 @@ public class EndPointsViewIT {
         Arrays.asList(
                 "ep_rarity_extents","ep_rarity_range","ep_rarity_abundance","ep_rarity_frequency","ep_observable_items")
                 .forEach(i -> {
-                    logger.info("Populate materialized view " + i);
+                    logger.info("Populate materialized view {}", i);
                     jdbcTemplate.execute("REFRESH MATERIALIZED VIEW nrmn." + i);
                 });
     }
@@ -70,17 +71,17 @@ public class EndPointsViewIT {
                 });
 
         logger.info("Query result : {}", objs);
-        assertEquals("Total row count for - " + sql, results.length, objs.size());
+        Assertions.assertEquals(results.length, objs.size(), "Total row count for - " + sql);
 
         for(int i = 0; i < results.length; i++) {
             Object[] o = results[i];
 
             // index zero is id
             Optional<EpObservableItems> target = objs.stream().filter(p -> p.values.get(0).equals(o[0])).findFirst();
-            assertTrue(String.format("Value exist for id %s", o[0]), target.isPresent());
+            Assertions.assertTrue(target.isPresent(), String.format("Value exist for id %s", o[0]));
 
             for(int j = 0; j < o.length; j++) {
-                assertEquals(String.format("Item[%s][%s]", i, j), o[j], target.get().values.get(j));
+                Assertions.assertEquals(o[j], target.get().values.get(j), String.format("Item[%s][%s]", i, j));
             }
         }
     }
