@@ -841,10 +841,13 @@ species_name,
 taxon,
 reporting_name,
 bfc.nominal size_class,
-total,
-biomass
+sum(total)::bigint as total,
+sum(biomass) as biomass
 from invert_sized m2
-	 inner join bounded_fish_classes bfc on m2.size_class > bfc.lower_bound and m2.size_class <= bfc.upper_bound;
+	 inner join bounded_fish_classes bfc on m2.size_class > bfc.lower_bound and m2.size_class <= bfc.upper_bound
+group by survey_id,country,area,ecoregion,realm,location,site_code,site_name,latitude,longitude,survey_date,depth,geom,
+program,visibility,hour,survey_latitude,survey_longitude,diver,"method",block,phylum,"class","order",family,
+recorded_species_name,species_name,taxon,reporting_name,bfc.nominal;
 
 /* Endpoint "M12 Debris" #172 */
 CREATE OR REPLACE VIEW nrmn.ep_m12_debris AS
