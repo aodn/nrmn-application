@@ -841,7 +841,7 @@ species_name,
 taxon,
 reporting_name,
 bfc.nominal size_class,
-sum(total) as total,
+sum(total)::bigint as total,
 sum(biomass) as biomass
 from invert_sized m2
 	 inner join bounded_fish_classes bfc on m2.size_class > bfc.lower_bound and m2.size_class <= bfc.upper_bound
