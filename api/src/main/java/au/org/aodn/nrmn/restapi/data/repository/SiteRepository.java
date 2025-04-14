@@ -13,8 +13,9 @@ import au.org.aodn.nrmn.restapi.data.repository.model.EntityCriteria;
 
 import javax.persistence.QueryHint;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
 
@@ -28,12 +29,30 @@ public interface SiteRepository
     @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
     List<Site> findByCriteria(@Param("code") String siteCode);
 
-    @Query(value = "SELECT LOWER(siteCode) FROM Site WHERE siteCode IN :siteCodes")
-    List<String> getAllSiteCodesMatching(@Param("siteCodes") Collection<String> siteCodes);
+    default List<String> getAllSiteCodesMatching(Collection<String> siteCodes) {
+        if (siteCodes == null || siteCodes.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return findSiteCodesMatching(siteCodes);
+    }
+    // Use nativeQuery to reduce the number of object create for site s, which is not necessary, always call the
+    // getAllSiteCodesMatching as it handle edge cases
+    @Query(value = "SELECT LOWER(s.site_code) FROM {h-schema}site_ref s WHERE s.site_code IN :siteCodes", nativeQuery = true)
+    List<String> findSiteCodesMatching(@Param("siteCodes") Collection<String> siteCodes);
 
     @Query("SELECT s FROM Site s")
     @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
     Collection<Site> getAll();
+    // A function to create a map of key = siteCode and value is the Site
+    default Map<String, Site> getAllMap() {
+        return getAll().parallelStream()
+                .filter(Objects::nonNull)
+                .filter(s -> s.getSiteCode() != null)
+                .collect(Collectors.toMap(
+                        s -> s.getSiteCode().toUpperCase(), // Convert siteCode to uppercase,
+                        Function.identity()
+                ));
+    }
 
     @Query("SELECT s FROM Site s WHERE lower(s.siteCode) = lower(:code)")
     @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
@@ -45,8 +64,7 @@ public interface SiteRepository
     @Query(value = "SELECT DISTINCT country FROM Site WHERE country is not null ORDER BY country")
     List<String> findAllCountries();
 
-    @Query(nativeQuery = true, value = "" +
-            "SELECT sr.site_code || ' ' || '(' || sr.site_name || ' ' || ROUND(CAST(ST_Distance(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography)) AS numeric), 2) || 'm)' " +
+    @Query(nativeQuery = true, value = "SELECT sr.site_code || ' ' || '(' || sr.site_name || ' ' || ROUND(CAST(ST_Distance(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography)) AS numeric), 2) || 'm)' " +
             "FROM {h-schema}site_ref sr " +
             "WHERE ST_DWithin(CAST(st_makepoint(sr.longitude, sr.latitude) AS geography), CAST(st_makepoint(:longitude, :latitude) AS geography), 200) " +
             "AND (sr.site_id <> :siteId)")

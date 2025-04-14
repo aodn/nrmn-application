@@ -3,9 +3,11 @@ package au.org.aodn.nrmn.restapi.service.formatting;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import au.org.aodn.nrmn.restapi.data.model.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import au.org.aodn.nrmn.restapi.data.repository.ObservationRepository;
 import au.org.aodn.nrmn.restapi.data.repository.SiteRepository;
 import au.org.aodn.nrmn.restapi.service.validation.StagedRowFormatted;
 
+@Slf4j
 @Service
 public class SpeciesFormattingService {
 
@@ -39,7 +42,7 @@ public class SpeciesFormattingService {
     public List<StagedRowFormatted> formatRowsWithSpecies(Collection<StagedRow> rows,
             Collection<ObservableItem> species) {
 
-        var rowMap = rows.stream().collect(Collectors.toMap(StagedRow::getId, r -> r));
+        Map<Long, StagedRow> rowMap = rows.stream().collect(Collectors.toMap(StagedRow::getId, r -> r));
 
         var speciesIds = species.stream()
                 .mapToInt(ObservableItem::getObservableItemId)
@@ -50,14 +53,16 @@ public class SpeciesFormattingService {
                 .collect(Collectors.toMap(UiSpeciesAttributes::getSpeciesName, a -> a));
 
         var speciesMap = species.stream().collect(Collectors.toMap(ObservableItem::getObservableItemName, o -> o));
-
         var divers = new ArrayList<>(diverRepository.getAll());
-        var sites = new ArrayList<>(siteRepository.getAll());
 
+        Map<String, Site> sites = siteRepository.getAllMap();
         var mapperConfig = new StagedRowFormattedMapperConfig();
-        var mapper = mapperConfig.getModelMapper(speciesMap, rowMap, speciesAttributesMap, divers, sites);
 
-        return rows.stream().map(stagedRow -> mapper.map(stagedRow, StagedRowFormatted.class))
+        // 58716919 ns
+        var mapper = mapperConfig.getModelMapper(speciesMap, rowMap, speciesAttributesMap, divers, sites);
+        return rows
+                .parallelStream()
+                .map(stagedRow -> mapper.map(stagedRow, StagedRowFormatted.class))
                 .collect(Collectors.toList());
     }
 }

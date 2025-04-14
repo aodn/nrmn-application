@@ -66,11 +66,11 @@ class ATRCSurveyGroupCompleteIT {
         sn1.setMethod("2");
         sn1.setSiteCode(siteNo);
         sn1.setStagedJob(job);
-        StagedRow sn2 = (StagedRow) SerializationUtils.clone(sn1);
+        StagedRow sn2 = SerializationUtils.clone(sn1);
         sn2.setDepth("7.2");
-        StagedRow sn3 = (StagedRow) SerializationUtils.clone(sn1);
+        StagedRow sn3 = SerializationUtils.clone(sn1);
         sn3.setDepth("7.3");
-        StagedRow sn4 = (StagedRow) SerializationUtils.clone(sn1);
+        StagedRow sn4 = SerializationUtils.clone(sn1);
         sn4.setDepth("7.4");
         stagedRowRepo.deleteAll();
         stagedRowRepo.saveAll(Arrays.asList(sn1, sn2, sn3, sn4));
@@ -94,10 +94,10 @@ class ATRCSurveyGroupCompleteIT {
         sn1.setSiteCode(siteNo);
         sn1.setStagedJob(job);
 
-        StagedRow sn2 = (StagedRow) SerializationUtils.clone(sn1);
+        StagedRow sn2 = SerializationUtils.clone(sn1);
         sn2.setDepth("7.2");
 
-        StagedRow sn4 = (StagedRow) SerializationUtils.clone(sn1);
+        StagedRow sn4 = SerializationUtils.clone(sn1);
         sn4.setDepth("7.4");
         stagedRowRepo.deleteAll();
 
@@ -128,22 +128,22 @@ class ATRCSurveyGroupCompleteIT {
         sn1b1.setSiteCode(siteNo);
         sn1b1.setStagedJob(job);
 
-        StagedRow sn1b2 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn1b2 =  SerializationUtils.clone(sn1b1);
         sn1b2.setBlock("2");
 
-        StagedRow sn2b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn2b1 =  SerializationUtils.clone(sn1b1);
         sn2b1.setDepth("7.2");
-        StagedRow sn2b2 = (StagedRow) SerializationUtils.clone(sn2b1);
+        StagedRow sn2b2 =  SerializationUtils.clone(sn2b1);
         sn2b2.setBlock("2");
 
-        StagedRow sn3b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn3b1 =  SerializationUtils.clone(sn1b1);
         sn3b1.setDepth("7.3");
-        StagedRow sn3b2 = (StagedRow) SerializationUtils.clone(sn3b1);
+        StagedRow sn3b2 =  SerializationUtils.clone(sn3b1);
         sn3b2.setBlock("2");
 
-        StagedRow sn4b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn4b1 =  SerializationUtils.clone(sn1b1);
         sn4b1.setDepth("7.4");
-        StagedRow sn4b2 = (StagedRow) SerializationUtils.clone(sn4b1);
+        StagedRow sn4b2 =  SerializationUtils.clone(sn4b1);
         sn4b2.setBlock("2");
 
         Location location = Location.builder().locationName("LOC1").isActive(false).build();
@@ -173,28 +173,28 @@ class ATRCSurveyGroupCompleteIT {
         sn1b1.setSiteCode(siteNo);
         sn1b1.setStagedJob(job);
 
-        StagedRow sn1b2 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn1b2 =  SerializationUtils.clone(sn1b1);
         sn1b2.setDate(date1);
         sn1b2.setBlock("2");
 
-        StagedRow sn2b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn2b1 =  SerializationUtils.clone(sn1b1);
         sn2b1.setDate(date1);
         sn2b1.setDepth("7.2");
-        StagedRow sn2b2 = (StagedRow) SerializationUtils.clone(sn2b1);
+        StagedRow sn2b2 =  SerializationUtils.clone(sn2b1);
         sn2b2.setDate(date2);
         sn2b2.setBlock("2");
 
-        StagedRow sn3b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn3b1 =  SerializationUtils.clone(sn1b1);
         sn3b1.setDate(date2);
         sn3b1.setDepth("7.3");
-        StagedRow sn3b2 = (StagedRow) SerializationUtils.clone(sn3b1);
+        StagedRow sn3b2 =  SerializationUtils.clone(sn3b1);
         sn3b2.setDate(date2);
         sn3b2.setBlock("2");
 
-        StagedRow sn4b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn4b1 =  SerializationUtils.clone(sn1b1);
         sn4b1.setDate(date2);
         sn4b1.setDepth("7.4");
-        StagedRow sn4b2 = (StagedRow) SerializationUtils.clone(sn4b1);
+        StagedRow sn4b2 =  SerializationUtils.clone(sn4b1);
         sn4b2.setBlock("2");
 
         Location location = Location.builder().locationName("LOC1").isActive(false).build();
@@ -223,21 +223,21 @@ class ATRCSurveyGroupCompleteIT {
         sn1b1.setSiteCode(siteNo);
         sn1b1.setStagedJob(job);
 
-        StagedRow sn1b2 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn1b2 =  SerializationUtils.clone(sn1b1);
         sn1b2.setBlock("2");
 
-        StagedRow sn2b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn2b1 =  SerializationUtils.clone(sn1b1);
         sn2b1.setDepth("7.2");
-        StagedRow sn2b2 = (StagedRow) SerializationUtils.clone(sn2b1);
+        StagedRow sn2b2 =  SerializationUtils.clone(sn2b1);
         sn2b2.setBlock("2");
 
-        StagedRow sn3b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn3b1 =  SerializationUtils.clone(sn1b1);
         sn3b1.setDepth("7.3");
-        StagedRow sn3b2 = (StagedRow) SerializationUtils.clone(sn3b1);
+        StagedRow sn3b2 =  SerializationUtils.clone(sn3b1);
         sn3b2.setBlock("2");
 
         // Incomplete - missing block 2
-        StagedRow sn4b1 = (StagedRow) SerializationUtils.clone(sn1b1);
+        StagedRow sn4b1 =  SerializationUtils.clone(sn1b1);
         sn4b1.setDepth("7.4");
 
         Location location = Location.builder().locationName("LOC1").isActive(false).build();

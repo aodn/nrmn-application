@@ -61,7 +61,7 @@ jobs:
         '
 
     - name: Archive Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: war-file
         path: app/target/*.war

@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import au.org.aodn.nrmn.restapi.data.model.*;
 import au.org.aodn.nrmn.restapi.service.validation.*;
 import au.org.aodn.nrmn.restapi.util.SpacialUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,11 +28,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import au.org.aodn.nrmn.restapi.controller.mapping.StagedRowMapperConfig;
-import au.org.aodn.nrmn.restapi.data.model.ObservableItem;
-import au.org.aodn.nrmn.restapi.data.model.StagedJob;
-import au.org.aodn.nrmn.restapi.data.model.StagedJobLog;
-import au.org.aodn.nrmn.restapi.data.model.StagedRow;
-import au.org.aodn.nrmn.restapi.data.model.UiSpeciesAttributes;
 import au.org.aodn.nrmn.restapi.data.model.audit.UserActionAudit;
 import au.org.aodn.nrmn.restapi.data.repository.CorrectionRowRepository;
 import au.org.aodn.nrmn.restapi.data.repository.DiverRepository;
@@ -277,16 +273,14 @@ public class CorrectionController {
                 .filter(s -> s.getLocked() != null && s.getLocked())
                 .collect(Collectors.toList());
 
-        if (lockedSurveys.size() > 0) {
+        if (!lockedSurveys.isEmpty()) {
             var locked = lockedSurveys.stream().map(s -> s.getSurveyId().toString()).collect(Collectors.joining(", "));
             // The return type is application/json
             return ResponseEntity.badRequest()
                     .body(String.format("{ \"message\": \"Surveys are locked and cannot be corrected: %s\" }", locked));
         }
 
-        var programs = correctionRowRepository.findProgramsBySurveyIds(surveyIds)
-                .stream()
-                .collect(Collectors.toList());
+        var programs = new ArrayList<>(correctionRowRepository.findProgramsBySurveyIds(surveyIds));
 
         var programValidations = programs.stream().map(ProgramValidation::fromProgram)
                 .collect(Collectors.toList());
@@ -297,7 +291,7 @@ public class CorrectionController {
         var program = programs.get(0);
 
         var rows = correctionRowRepository.findRowsBySurveyIds(surveyIds);
-        var exists = rows != null && rows.size() > 0;
+        var exists = rows != null && !rows.isEmpty();
         var bodyDto = new CorrectionRowsDto();
         bodyDto.setRows(rows);
         bodyDto.setProgramName(program.getProgramName());

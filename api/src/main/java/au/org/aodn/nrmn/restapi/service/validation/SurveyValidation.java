@@ -132,7 +132,7 @@ public class SurveyValidation {
         // Make sure we only validate rows where method is 3, we cannot assume income
         // row are all method 3
         var t = rows
-                .parallelStream()
+                .stream()
                 .filter(row -> row.getMethod() != null && row.getMethod().equals(3))
                 .collect(Collectors.toList());
 
@@ -189,7 +189,7 @@ public class SurveyValidation {
         // VALIDATION: M10 requires B1 and B2
         var method10 = surveyByMethod.get(10);
         if (method10 != null &&
-                !method10.stream().map(StagedRowFormatted::getBlock).distinct().collect(Collectors.toList()).containsAll(List.of(1, 2)))
+                !method10.stream().map(StagedRowFormatted::getBlock).collect(Collectors.toSet()).containsAll(List.of(1, 2)))
             return new SurveyValidationError(ValidationCategory.SPAN, ValidationLevel.BLOCKING,
                     "M10 requires B1 and B2",
                     method10.stream().map(StagedRowFormatted::getId).collect(Collectors.toList()), List.of("block"));
@@ -347,25 +347,25 @@ public class SurveyValidation {
         var errors = new ArrayList<String>();
 
         var rowsGroupedBySurvey = mappedRows
-                .parallelStream()
+                .stream()
                 .collect(Collectors.groupingBy(StagedRowFormatted::getSurveyId));
 
         var groupedSurveyIds = rowsGroupedBySurvey
                 .keySet()
-                .parallelStream()
+                .stream()
                 .map(Long::intValue)
                 .collect(Collectors.toList());
 
-        if (!surveyIds.containsAll(groupedSurveyIds)) {
+        if (!new HashSet<>(surveyIds).containsAll(groupedSurveyIds)) {
             groupedSurveyIds.removeAll(surveyIds);
-            errors.add("Survey IDs created: " + String.join(", ", groupedSurveyIds.parallelStream().map(Object::toString)
-                    .collect(Collectors.toList())));
+            errors.add("Survey IDs created: " + groupedSurveyIds.parallelStream().map(Object::toString)
+                    .collect(Collectors.joining(", ")));
         }
 
-        if (!groupedSurveyIds.containsAll(surveyIds)) {
+        if (!new HashSet<>(groupedSurveyIds).containsAll(surveyIds)) {
             surveyIds.removeAll(groupedSurveyIds);
-            errors.add("Survey IDs missing: " + String.join(", ", surveyIds.parallelStream().map(Object::toString)
-                    .collect(Collectors.toList())));
+            errors.add("Survey IDs missing: " + surveyIds.parallelStream().map(Object::toString)
+                    .collect(Collectors.joining(", ")));
         }
 
         return errors;
@@ -393,7 +393,7 @@ public class SurveyValidation {
             Collection<StagedRowFormatted> mappedRows) {
         var sheetErrors = new HashSet<SurveyValidationError>();
 
-        var surveyGroupMap = mappedRows.parallelStream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
+        var surveyGroupMap = mappedRows.stream().collect(Collectors.groupingBy(StagedRowFormatted::getSurveyGroup));
 
         // Skip survey group validation if correcting a single survey
         if (!isCorrection || surveyGroupMap.size() > 1)
