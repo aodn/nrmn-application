@@ -30,38 +30,31 @@ public class StagedRowFormattedMapperConfig {
     Logger logger = LoggerFactory.getLogger(StagedRowFormattedMapperConfig.class);
 
     public ModelMapper getModelMapper(Map<String, ObservableItem> speciesMap, Map<Long, StagedRow> rowMap,
-            Map<String, UiSpeciesAttributes> speciesAttributesMap, Collection<Diver> divers, Collection<Site> sites) {
+            Map<String, UiSpeciesAttributes> speciesAttributesMap, Collection<Diver> divers, Map<String, Site> sites) {
 
         Converter<String, Diver> toDiver = ctx -> {
-            if (ctx.getSource() == null)
+            if (ctx.getSource() == null) {
                 return null;
-            Optional<Diver> diver = divers.stream()
-                    .filter(d -> (StringUtils.isNotEmpty(d.getFullName()) && Normalizer
-                            .normalize(d.getFullName(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "")
-                            .equalsIgnoreCase(Normalizer.normalize(ctx.getSource(), Normalizer.Form.NFD)
-                                    .replaceAll("[^\\p{ASCII}]", "")))
-                            || (StringUtils.isNotEmpty(d.getInitials())
-                                    && d.getInitials().equalsIgnoreCase(ctx.getSource())))
-                    .findFirst();
-            return diver.orElse(null);
+            }
+            else {
+                return divers.stream()
+                        .filter(d -> (StringUtils.isNotEmpty(d.getFullName()) && Normalizer
+                                .normalize(d.getFullName(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "")
+                                .equalsIgnoreCase(Normalizer.normalize(ctx.getSource(), Normalizer.Form.NFD)
+                                        .replaceAll("[^\\p{ASCII}]", "")))
+                                || (StringUtils.isNotEmpty(d.getInitials())
+                                && d.getInitials().equalsIgnoreCase(ctx.getSource())))
+                        .findFirst()
+                        .orElse(null);
+            }
         };
 
         Converter<Long, StagedRow> toRef = ctx -> rowMap.get(ctx.getSource());
 
-        Converter<String, Optional<UiSpeciesAttributes>> toSpeciesAttribute = ctx -> {
-            UiSpeciesAttributes speciesAttributes = speciesAttributesMap.get(ctx.getSource());
-            return speciesAttributes != null ? Optional.of(speciesAttributes) : Optional.empty();
-        };
+        Converter<String, Optional<UiSpeciesAttributes>> toSpeciesAttribute = ctx ->
+                Optional.ofNullable(speciesAttributesMap.get(ctx.getSource()));
 
-        Converter<String, Site> toSite = ctx -> {
-            if (ctx.getSource() == null)
-                return null;
-            Optional<Site> site = sites.stream()
-                    .filter(d -> (StringUtils.isNotEmpty(d.getSiteCode())
-                            && d.getSiteCode().equalsIgnoreCase(ctx.getSource())))
-                    .findFirst();
-            return site.orElse(null);
-        };
+        Converter<String, Site> toSite = ctx -> sites.get(ctx.getSource().toUpperCase());
 
         Converter<String, LocalDate> toDate = ctx -> {
             try {
@@ -76,11 +69,11 @@ public class StagedRowFormattedMapperConfig {
 
         Converter<String, Optional<LocalTime>> toTime = ctx -> TimeUtils.parseTime(ctx.getSource());
 
-        Converter<String, Directions> toDirection = ctx -> {
-            if(StringUtils.isEmpty(ctx.getSource()))
-                return Directions.O;
-            return EnumUtils.getEnumIgnoreCase(Directions.class,ctx.getSource());
-        };
+        Converter<String, Directions> toDirection = ctx ->
+                StringUtils.isEmpty(ctx.getSource()) ?
+                    Directions.O :
+                    EnumUtils.getEnumIgnoreCase(Directions.class,ctx.getSource());
+
 
         Converter<String, Integer> toDepth = ctx -> {
             try {
@@ -108,9 +101,8 @@ public class StagedRowFormattedMapperConfig {
             }
         };
 
-        Converter<String, Boolean> toInvertSizing = ctx -> StringUtils.isNotEmpty(ctx.getSource())
-                ? ctx.getSource().equalsIgnoreCase("Yes")
-                : false;
+        Converter<String, Boolean> toInvertSizing = ctx ->
+                StringUtils.isNotEmpty(ctx.getSource()) && ctx.getSource().equalsIgnoreCase("Yes");
 
         Converter<String, Double> toDouble = ctx -> {
             double dbl = NumberUtils.toDouble(ctx.getSource(), Double.NaN);
@@ -128,17 +120,15 @@ public class StagedRowFormattedMapperConfig {
             }
         };
 
-        Converter<String, Optional<ObservableItem>> toObservableItem = ctx -> {
-            ObservableItem observableItem = speciesMap.get(ctx.getSource());
-            return (observableItem != null) ? Optional.of(observableItem) : Optional.empty();
-        };
+        Converter<String, Optional<ObservableItem>> toObservableItem = ctx ->
+                Optional.ofNullable(speciesMap.get(ctx.getSource()));
 
         Converter<Map<Integer, String>, Map<Integer, Integer>> toMeasureJson = ctx -> {
             Map<Integer, Integer> measures = new HashMap<>();
             if (ctx.getSource() != null) {
                 for (Map.Entry<Integer, String> entry : ctx.getSource().entrySet()) {
                     int val = NumberUtils.toInt(entry.getValue(), Integer.MIN_VALUE);
-                    if (val != Integer.MIN_VALUE && val > 0)
+                    if (val > 0)
                         measures.put(entry.getKey(), val);
                 }
             }
