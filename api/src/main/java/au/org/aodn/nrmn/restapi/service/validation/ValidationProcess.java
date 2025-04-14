@@ -1,14 +1,11 @@
 package au.org.aodn.nrmn.restapi.service.validation;
 
-
 import java.text.Normalizer;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,6 +19,7 @@ import au.org.aodn.nrmn.restapi.dto.stage.ValidationResponse;
 import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import au.org.aodn.nrmn.restapi.service.formatting.SpeciesFormattingService;
 
+@Slf4j
 @Component
 public class ValidationProcess {
 
@@ -163,18 +161,13 @@ public class ValidationProcess {
      * @return validation result
      */
     public ValidationResponse process(StagedJob job) {
-
         var rows = rowRepository.findRowsByJobId(job.getId());
-
         var validation = ProgramValidation.fromProgram(job.getProgram());
-
-        var enteredSiteCodes = rows.parallelStream().map(s -> s.getSiteCode().toUpperCase()).collect(Collectors.toSet());
+        var enteredSiteCodes = rows.stream().map(s -> s.getSiteCode().toUpperCase()).collect(Collectors.toSet());
         var siteCodes = siteRepository.getAllSiteCodesMatching(enteredSiteCodes);
-
         var species = speciesFormatting.getSpeciesForRows(rows);
         var sheetErrors = new HashSet<>(dataValidation.checkFormatting(validation, job.getIsExtendedSize(), true, siteCodes, species, rows));
         var mappedRows = speciesFormatting.formatRowsWithSpecies(rows, species);
-
         var response = generateSummary(mappedRows);
 
         sheetErrors.addAll(checkData(validation, job.getIsExtendedSize(), mappedRows));
@@ -188,8 +181,13 @@ public class ValidationProcess {
         response.setIncompleteSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("Survey incomplete")).count());
         response.setExistingSurveyCount(sheetErrors.stream().filter(e -> e.getMessage().contains("Survey exists:")).count());
 
-        var distinctSurveys = mappedRows.stream().filter(r -> Arrays.asList(1, 2).contains(r.getMethod()))
-                .map(StagedRowFormatted::getSurvey).distinct().count();
+        var distinctSurveys = mappedRows
+                .stream()
+                .filter(r -> Set.of(1, 2).contains(r.getMethod()))
+                .map(StagedRowFormatted::getSurvey)
+                .distinct()
+                .count();
+
         response.setSurveyCount(distinctSurveys);
 
         var errorId = 0;

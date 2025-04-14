@@ -14,6 +14,7 @@ import au.org.aodn.nrmn.restapi.data.repository.model.EntityCriteria;
 import javax.persistence.QueryHint;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
@@ -28,8 +29,16 @@ public interface SiteRepository
     @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})
     List<Site> findByCriteria(@Param("code") String siteCode);
 
-    @Query(value = "SELECT LOWER(siteCode) FROM Site WHERE siteCode IN :siteCodes")
-    List<String> getAllSiteCodesMatching(@Param("siteCodes") Collection<String> siteCodes);
+    default List<String> getAllSiteCodesMatching(Collection<String> siteCodes) {
+        if (siteCodes == null || siteCodes.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return findSiteCodesMatching(siteCodes);
+    }
+    // Use nativeQuery to reduce the number of object create for site s, which is not necessary, always call the
+    // getAllSiteCodesMatching as it handle edge cases
+    @Query(value = "SELECT LOWER(s.site_code) FROM {h-schema}site_ref s WHERE s.site_code IN :siteCodes", nativeQuery = true)
+    List<String> findSiteCodesMatching(@Param("siteCodes") Collection<String> siteCodes);
 
     @Query("SELECT s FROM Site s")
     @QueryHints({@QueryHint(name = HINT_CACHEABLE, value = "true")})

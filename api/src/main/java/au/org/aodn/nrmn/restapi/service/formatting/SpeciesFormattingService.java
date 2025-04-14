@@ -3,6 +3,7 @@ package au.org.aodn.nrmn.restapi.service.formatting;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import au.org.aodn.nrmn.restapi.data.model.*;
@@ -39,7 +40,7 @@ public class SpeciesFormattingService {
     public List<StagedRowFormatted> formatRowsWithSpecies(Collection<StagedRow> rows,
             Collection<ObservableItem> species) {
 
-        var rowMap = rows.stream().collect(Collectors.toMap(StagedRow::getId, r -> r));
+        Map<Long, StagedRow> rowMap = rows.stream().collect(Collectors.toMap(StagedRow::getId, r -> r));
 
         var speciesIds = species.stream()
                 .mapToInt(ObservableItem::getObservableItemId)
