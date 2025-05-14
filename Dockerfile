@@ -16,7 +16,7 @@ RUN apt-get update && \
     wget -O- https://apt.corretto.aws/corretto.key | apt-key add - && \
     add-apt-repository 'deb https://apt.corretto.aws stable main' && \
     apt-get update && \
-    apt-get install -y java-11-amazon-corretto-jdk
+    apt-get install -y java-17-amazon-corretto-jdk
 # Set the JAVA_HOME environment variable
 ENV JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto
 
