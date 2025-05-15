@@ -24,17 +24,17 @@ This project is licensed under the terms of the GNU GPLv3 license.
 This repository contains a multi-module maven project used to build both the front-end react application, the backend end 
 spring boot application and the war. The maven project is structured as follows:
 
-Project | Description
---- | ---
-. | multi-module maven project containing all sub-modules used to build the project and containing common settings
-api | maven sub-module used to build the spring boot backend
-web | maven sub-module project used to build the react front-end
-app | maven project to assemble the api and web artifacts in a single application WAR
-db | SQL scripts containing the data and application DDL and scripts to insert data for testing
+| Project | Description                                                                                                    |
+|---------|----------------------------------------------------------------------------------------------------------------|
+| .       | multi-module maven project containing all sub-modules used to build the project and containing common settings |
+| api     | maven sub-module used to build the spring boot backend                                                         |
+| web     | maven sub-module project used to build the react front-end                                                     |
+| app     | maven project to assemble the api and web artifacts in a single application WAR                                |
+| db      | SQL scripts containing the data and application DDL and scripts to insert data for testing                     |
 
 ## Building
 
-Build requires Java 11 with Maven and Node v16 with Yarn v1.x. A Dockerfile is also provided with the necessary prerequisites. 
+Build requires Java 17 with Maven and Node v16 with Yarn v1.x. A Dockerfile is also provided with the necessary prerequisites. 
 
     docker build --tag nrmn-builder --build-arg BUILDER_UID=$(id -u) .
     docker run -it -v $PWD:/home/builder/src nrmn-builder yarn --cwd src/web
