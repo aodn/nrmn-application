@@ -18,7 +18,7 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install -y java-17-amazon-corretto-jdk
 # Set the JAVA_HOME environment variable
-ENV JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto
+ENV JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto
 
 RUN apt-get install -y git python3 python3-pip curl wget unzip zip
 
