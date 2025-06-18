@@ -34,13 +34,23 @@ public class SiteGetDto {
 
     @JsonGetter
     public Double getLongitude() {
-        String str = String.format(Iirc.FORMAT_DIGIT, longitude);
-        return Double.valueOf(str);
+        if (longitude == null) {
+            return null;
+        }
+        else {
+            String str = String.format(Iirc.FORMAT_DIGIT, longitude);
+            return Double.valueOf(str);
+        }
     }
 
     @JsonGetter
     public Double getLatitude() {
-        String str = String.format(Iirc.FORMAT_DIGIT, latitude);
-        return Double.valueOf(str);
+        if(latitude == null) {
+            return null;
+        }
+        else {
+            String str = String.format(Iirc.FORMAT_DIGIT, latitude);
+            return Double.valueOf(str);
+        }
     }
 }
