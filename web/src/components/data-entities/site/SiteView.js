@@ -33,7 +33,7 @@ const SiteView = () => {
       await getEntity(`site/${id}`)
         .then((res) => setData(res?.data))
         .catch((error) => {
-            console.log('Error', error);
+            // console.log('Error', error);
         });
     }
     id && fetchSite();
