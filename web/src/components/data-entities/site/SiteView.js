@@ -30,9 +30,13 @@ const SiteView = () => {
   useEffect(() => {
     document.title = 'View Site';
     async function fetchSite() {
-      await getEntity(`site/${id}`).then((res) => setData(res.data));
+      await getEntity(`site/${id}`)
+        .then((res) => setData(res?.data))
+        .catch((error) => {
+            console.log('Error', error);
+        });
     }
-    if (id) fetchSite();
+    id && fetchSite();
   }, [id]);
 
   return (
