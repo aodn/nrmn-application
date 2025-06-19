@@ -106,11 +106,11 @@ public class SiteFilterCondition extends FilterCondition<SiteListView> {
     public static Specification<SiteListView> createSpecification(List<Filter> filters, List<Sorter> sort) {
         SiteFilterCondition condition = new SiteFilterCondition();
 
-        if(!(filters == null || filters.size() == 0 || !containsSupportField(filters, SiteFilterCondition.SupportedFields.class))) {
+        if(filters != null && !filters.isEmpty() && containsSupportField(filters, SiteFilterCondition.SupportedFields.class)) {
             condition.applyFilters(filters);
         }
 
-        if(!(sort == null  || sort.size() == 0 || !containsSupportField(sort, SiteFilterCondition.SupportedFields.class))) {
+        if(sort != null  && !sort.isEmpty() && containsSupportField(sort, SiteFilterCondition.SupportedFields.class)) {
             condition.applySort(sort);
         }
 

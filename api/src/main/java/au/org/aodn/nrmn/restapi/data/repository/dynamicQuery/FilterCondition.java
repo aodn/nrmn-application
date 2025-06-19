@@ -87,16 +87,16 @@ public abstract class FilterCondition<T> {
     }
 
     protected static <T extends Enum<T>> boolean containsSupportField(List<? extends Field> fs, Class<T> e) {
-        return fs.stream().filter(filter -> isSupportedField(filter.getFieldName(), e)).findFirst().isPresent();
+        return fs.stream().allMatch(filter -> isSupportedField(filter.getFieldName(), e));
     }
 
     protected static <T extends Enum<T>> boolean isSupportedField(String f, Class<T> e) {
-        return Arrays.stream(e.getEnumConstants()).filter(v -> v.toString().equals(f)).findFirst().isPresent();
+        return Arrays.stream(e.getEnumConstants()).anyMatch(v -> v.toString().equals(f.trim()));
     }
 
     protected static <T extends Enum<T>> T getFieldEnum(String f, Class<T> e) {
-        Optional<T> k = Arrays.stream(e.getEnumConstants()).filter(v -> v.toString().equals(f)).findFirst();
-        return k.isPresent() ? k.get() : null;
+        Optional<T> k = Arrays.stream(e.getEnumConstants()).filter(v -> v.toString().equals(f.trim())).findFirst();
+        return k.orElse(null);
     }
 
     protected Predicate getSimpleFieldSpecification(From<?,?> table, CriteriaBuilder criteriaBuilder, DBField field,  boolean isAnd, Filter filter1, Filter filter2) {
