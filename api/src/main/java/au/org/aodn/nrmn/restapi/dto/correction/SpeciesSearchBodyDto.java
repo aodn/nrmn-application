@@ -1,5 +1,6 @@
 package au.org.aodn.nrmn.restapi.dto.correction;
 
+import java.io.Serializable;
 import java.util.List;
 
 import lombok.Data;
@@ -7,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class SpeciesSearchBodyDto {
+public class SpeciesSearchBodyDto implements Serializable {
     private Integer observableItemId;
     private String startDate;
     private String endDate;
