@@ -5,11 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CorrectionDiffCellDto {
+public class CorrectionDiffCellDto implements Serializable {
 
     private String diffRowId;
 
@@ -18,7 +20,7 @@ public class CorrectionDiffCellDto {
     private String speciesName;
 
     private String oldValue;
-    
+
     private String newValue;
 
 }
