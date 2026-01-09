@@ -208,17 +208,17 @@ TRUNCATE TABLE nrmn.methods_species;
 INSERT INTO nrmn.methods_species(observable_item_id,method_id)
 SELECT observable_item_id,'1'::integer from nrmn.observable_item_ref  obs
 WHERE obs."class" IN ('Actinopterygii','Actinopteri','Teleostei','Reptilia','Elasmobranchii','Mammalia',
-'Cephalopoda','Aves')
+'Cephalopoda','Aves','Scyphozoa','Cubozoa','Hydrozoa','Anthozoa')
 EXCEPT
 SELECT observable_item_id,'1'::integer from nrmn.observable_item_ref
 WHERE observable_item_name IN ('Unidentified cryptic fish','Unidentified fish (cryptic)','Unidentified eel');
 --M2 inverts
 INSERT INTO nrmn.methods_species(observable_item_id,method_id)
 SELECT observable_item_id,'2'::integer from nrmn.observable_item_ref  obs
-WHERE obs."class" IN ('Asteroidea','Anopla','Bivalvia','Cephalopoda','Crinoidea','Cubozoa','Echinoidea','Gastropoda',
+WHERE obs."class" IN ('Anthozoa','Asteroidea','Anopla','Bivalvia','Cephalopoda','Crinoidea','Cubozoa','Echinoidea','Gastropoda',
 'Hexanauplia','Holothuroidea','Hydrozoa','Ophiuroidea','Malacostraca','Maxillopoda','Merostomata','Polychaeta',
-'Polyplacophora','Pycnogonida','Rhabditophora','Tentaculata','Turbellaria') or
-coalesce(superseded_by,observable_item_name) ='Phlyctenactis tuberculosa';
+'Polyplacophora','Pycnogonida','Rhabditophora','Scyphozoa','Tentaculata','Turbellaria') or
+coalesce(superseded_by,observable_item_name) in ('Phlyctenactis tuberculosa', 'Molva molva');
 --M2 cryptic
 --Update has to be applied after updating M1, as it targets Fishes(Actinopterygii,Elasmobranchii) at family level
 INSERT INTO nrmn.methods_species(observable_item_id,method_id)
@@ -227,12 +227,12 @@ WHERE (family IN ('Agonidae','Anarhichadidae','Anguillidae','Antennariidae','Apl
 'Bathymasteridae','Batrachoididae','Blenniidae','Bothidae','Bovichtidae','Brachaeluridae','Brachionichthyidae',
 'Bythitidae','Callionymidae','Caracanthidae','Carapidae','Chaenopsidae','Chironemidae','Cirrhitidae','Clinidae',
 'Congiopodidae','Congridae','Congrogadidae','Cottidae','Creediidae','Cryptacanthodidae','Cyclopteridae','Cynoglossidae',
-'Dasyatidae','Diodontidae','Eleotridae','Gnathanacanthidae','Gobiesocidae','Gobiidae','Grammistidae','Harpagiferidae',
+'Dasyatidae','Diodontidae','Eleotridae','Gasterosteidae','Gnathanacanthidae','Gobiesocidae','Gobiidae','Grammistidae','Harpagiferidae',
 'Hemiscylliidae','Heterodontidae','Hexagrammidae','Holocentridae','Hypnidae','Labrisomidae','Latidae','Leptoscopidae',
 'Liparidae','Lotidae','Monocentridae','Moridae','Muraenidae','Nototheniidae','Ophichthidae','Ophidiidae',
 'Opistognathidae','Orectolobidae','Paralichthyidae','Parascylliidae','Pataecidae','Pegasidae','Pempheridae',
 'Percophidae','Phycidae','Pholidae','Pholidichthyidae','Pinguipedidae','Platycephalidae','Plesiopidae','Pleuronectidae',
-'Plotosidae','Priacanthidae','Pseudochromidae','Psychrolutidae','Rajidae','Rhinobatidae','Scorpaenidae','Serranidae',
+'Plotosidae','Priacanthidae','Pseudochromidae','Psychrolutidae','Rajidae','Rhinobatidae','Scophthalmidae','Scorpaenidae','Serranidae',
 'Scyliorhinidae','Soleidae','Solenostomidae','Stichaeidae','Synanceiidae','Syngnathidae','Synodontidae',
 'Tetrabrachiidae','Tetrarogidae','Torpedinidae','Trachichthyidae','Trachinidae','Tripterygiidae','Uranoscopidae',
 'Urolophidae','Urotrygonidae','Zaproridae','Zoarcidae')
