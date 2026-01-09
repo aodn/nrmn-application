@@ -685,7 +685,7 @@ and (
 	                                     or (oi.class = 'Ophiuroidea' and oi."order" ='Phrynophiurida')))
 	or (oi.phylum = 'Platyhelminthes')
 	or (oi.phylum = 'Cnidaria' and (coalesce(oi.superseded_by, oi.observable_item_name)='Phlyctenactis tuberculosa'))
-	or (oi.phylum = 'Cnidaria' and (oi.class IN ('Hydrozoa','Cubozoa')))
+	or (oi.phylum = 'Cnidaria' and (oi.class IN ('Hydrozoa','Cubozoa','Scyphozoa','Anthozoa')))
 	or (phylum = 'Chordata' and oi.family = 'Pyuridae')
 	or (phylum = 'Echiura')
 	or (phylum = 'Ctenophora')
