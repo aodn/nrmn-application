@@ -218,7 +218,7 @@ SELECT observable_item_id,'2'::integer from nrmn.observable_item_ref  obs
 WHERE obs."class" IN ('Anthozoa','Asteroidea','Anopla','Bivalvia','Cephalopoda','Crinoidea','Cubozoa','Echinoidea','Gastropoda',
 'Hexanauplia','Holothuroidea','Hydrozoa','Ophiuroidea','Malacostraca','Maxillopoda','Merostomata','Polychaeta',
 'Polyplacophora','Pycnogonida','Rhabditophora','Scyphozoa','Tentaculata','Turbellaria') or
-coalesce(superseded_by,observable_item_name) in ('Phlyctenactis tuberculosa', 'Molva molva');
+coalesce(superseded_by,observable_item_name) = 'Phlyctenactis tuberculosa';
 --M2 cryptic
 --Update has to be applied after updating M1, as it targets Fishes(Actinopterygii,Elasmobranchii) at family level
 INSERT INTO nrmn.methods_species(observable_item_id,method_id)
