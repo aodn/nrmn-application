@@ -208,7 +208,7 @@ TRUNCATE TABLE nrmn.methods_species;
 INSERT INTO nrmn.methods_species(observable_item_id,method_id)
 SELECT observable_item_id,'1'::integer from nrmn.observable_item_ref  obs
 WHERE obs."class" IN ('Actinopterygii','Actinopteri','Teleostei','Reptilia','Elasmobranchii','Mammalia',
-'Cephalopoda','Aves','Scyphozoa','Cubozoa','Hydrozoa','Anthozoa')
+'Cephalopoda','Aves','Scyphozoa','Cubozoa','Hydrozoa')
 EXCEPT
 SELECT observable_item_id,'1'::integer from nrmn.observable_item_ref
 WHERE observable_item_name IN ('Unidentified cryptic fish','Unidentified fish (cryptic)','Unidentified eel');
