@@ -653,6 +653,8 @@ CREATE TABLE nrmn.site_ref (
 --
 -- TOC entry 254 (class 1259 OID 243339)
 -- Name: ep_rarity_extents; Type: MATERIALIZED VIEW; Schema: nrmn; Owner: -
+-- A New version of ep_rarity_extents view is in file CreatePrivateEndpoints.sql.
+-- This file is kept for historical reasons only.
 --
 
 CREATE MATERIALIZED VIEW nrmn.ep_rarity_extents AS
