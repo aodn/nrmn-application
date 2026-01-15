@@ -1,5 +1,5 @@
 CREATE
-OR REPLACE FUNCTION safe_geom_from_text_with_details(wkt text, srid int, minlongitude text, minlatitude text, maxlongitude text, maxlatitude text, taxon text) RETURNS geometry AS $$
+OR REPLACE FUNCTION safe_geom_from_text(wkt text, srid int, minlongitude text, minlatitude text, maxlongitude text, maxlatitude text, taxon text) RETURNS geometry AS $$
 DECLARE
 geom geometry;
 BEGIN

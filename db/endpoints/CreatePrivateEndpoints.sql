@@ -204,19 +204,19 @@ MaxWestLongitude, effectively spanning the dateline
 		numsites,
 		st_envelope(
 		    st_buffer(
-		        (st_geomfromtext(concat('MULTIPOINT  ((', minLongitude, ' ', minLatitude, '), (',
-		            maxLongitude, ' ', maxLatitude, '))'), 4326))::geometry, 0.005)) one,
+		        safe_geom_from_text(concat('MULTIPOINT  ((', minLongitude, ' ', minLatitude, '), (',
+		            maxLongitude, ' ', maxLatitude, '))'), 4326, minLongitude, minLatitude, maxLongitude, maxLatitude, taxon), 0.005)) one,
 		case
 			when MaxWestLongitude is not null and MinEastLongitude is not null then
 				st_union(
 					st_envelope(
 					    st_buffer(
-					        (st_geomfromtext(concat('MULTIPOINT  ((', MinEastLongitude, ' ',
-					            minlatitude, '), ( 180.0 ', maxlatitude, '))'), 4326))::geometry, 0.005)),
+					        safe_geom_from_text(concat('MULTIPOINT  ((', MinEastLongitude, ' ',
+					            minlatitude, '), ( 180.0 ', maxlatitude, '))'), 4326, MinEastLongitude, minlatitude, '180.0', maxlatitude, taxon), 0.005)),
 					st_envelope(
 					    st_buffer(
-					        (st_geomfromtext(concat('MULTIPOINT  ((-180.0 ', MinLatitude,
-					            '), ( ', MaxWestLongitude, ' ', maxlatitude, '))'), 4326))::geometry, 0.005))
+					        safe_geom_from_text(concat('MULTIPOINT ((-180.0 ', MinLatitude,
+					            '), ( ', MaxWestLongitude, ' ', maxlatitude, '))'), 4326, '-180.0', MinLatitude, MaxWestLongitude, maxlatitude, taxon), 0.005))
 				)
 			else
 				null::geometry
@@ -681,7 +681,7 @@ and (
 	or (oi.phylum = 'Arthropoda' and oi.class='Pycnogonida' )
 	or (oi.phylum = 'Mollusca' and oi.class IN ('Gastropoda', 'Cephalopoda'))
 	or (oi.phylum = 'Mollusca' and oi.family IN ('Tridacnidae','Cardiidae','Pectinidae','Pteriidae','Pinnidae'))
-	or (oi.phylum = 'Echinodermata' and (oi.class IN ('Asteroidea', 'Holothuroidea', 'Echinoidea','Crinoidea')
+	or (oi.phylum = 'Echinodermata' and (oi.class IN ('Asteroidea', 'Holothuroidea', 'Echinoidea,'Crinoidea')
 	                                     or (oi.class = 'Ophiuroidea' and oi."order" ='Phrynophiurida')))
 	or (oi.phylum = 'Platyhelminthes')
 	or (oi.phylum = 'Cnidaria' and (coalesce(oi.superseded_by, oi.observable_item_name)='Phlyctenactis tuberculosa'))
@@ -1629,5 +1629,4 @@ SELECT DISTINCT habitat_groups FROM nrmn.observable_item_ref WHERE habitat_group
 
 
 SELECT nrmn.refresh_materialized_views();
-
 
