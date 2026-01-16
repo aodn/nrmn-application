@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import au.org.aodn.nrmn.restapi.enums.ProgramValidation;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -55,6 +56,7 @@ public class SurveyEditService {
     private static final int ATRC_PROGRAM_ID = 2;
     private static final int PARKS_VIC_PROGRAM_ID = 3;
     private static final int FRDC_PROGRAM_ID = 4;
+    private static final int RRH_PROGRAM_ID = 5;
 
     public Survey updateSurvey(SurveyDto surveyDto) {
 
@@ -123,13 +125,13 @@ public class SurveyEditService {
                         "A survey date cannot be in the future."));
             }
 
-            if(surveyDto.getProgramId() != null && (surveyDto.getProgramId() == RLS_PROGRAM_ID || surveyDto.getProgramId() == PARKS_VIC_PROGRAM_ID) && 
+            if(surveyDto.getProgramId() != null && (surveyDto.getProgramId() == RLS_PROGRAM_ID || surveyDto.getProgramId() == PARKS_VIC_PROGRAM_ID) &&
                 surveyDate.before(Date.from(LocalDate.of(2006, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant()))) {
                     errors.add(new FormValidationError("Survey", "surveyDate", surveyDto.getSurveyDate(),
                             "A survey date cannot be before January 1st, 2006."));
             }
-            
-            if(surveyDto.getProgramId() != null && (surveyDto.getProgramId() == ATRC_PROGRAM_ID || surveyDto.getProgramId() == FRDC_PROGRAM_ID) && 
+
+            if(surveyDto.getProgramId() != null && (surveyDto.getProgramId() == ATRC_PROGRAM_ID || surveyDto.getProgramId() == FRDC_PROGRAM_ID) &&
                 surveyDate.before(Date.from(LocalDate.of(1991, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant()))) {
                     errors.add(new FormValidationError("Survey", "surveyDate", surveyDto.getSurveyDate(),
                             "A survey date cannot be before January 1st, 1991."));
