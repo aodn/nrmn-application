@@ -9,9 +9,7 @@ public enum ProgramValidation {
     NONE(null),
     RLS(LocalDate.parse("2006-01-01")),
     ATRC(LocalDate.parse("1991-01-01")),
-
-    // TODO: confirm date
-    RRH(LocalDate.parse("1991-01-01"))
+    RRH(LocalDate.parse("2024-01-01")),
     ;
 
     LocalDate minDate;
