@@ -137,14 +137,6 @@ public class SurveyEditService {
                             "A survey date cannot be before January 1st, 1991."));
             }
 
-            if (surveyDto.getProgramId() != null && surveyDto.getProgramId() == RRH_PROGRAM_ID ) {
-                var minDate = ProgramValidation.RRH.getMinDate();
-                if (surveyDate.before(Date.from(minDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))) {
-                    errors.add(new FormValidationError("Survey", "surveyDate", surveyDto.getSurveyDate(),
-                            "A survey date for RRH program cannot be before " + minDate + "."));
-                }
-            }
-
         }
 
         // Time validations
