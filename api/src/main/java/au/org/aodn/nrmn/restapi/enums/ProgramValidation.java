@@ -9,7 +9,6 @@ public enum ProgramValidation {
     NONE(null),
     RLS(LocalDate.parse("2006-01-01")),
     ATRC(LocalDate.parse("1991-01-01")),
-    RRH(LocalDate.parse("2024-01-01")),
     ;
 
     LocalDate minDate;
@@ -18,16 +17,15 @@ public enum ProgramValidation {
         this.minDate = minDate;
     }
 
+    // Return validation rules based on the program name. ATRC and FRDC share the same rules,
+    // RLS, PARKS VIC and RRH share the same rules.
     public static ProgramValidation fromProgram(Program program) {
         var programName = program.getProgramName().toUpperCase();
         if (Arrays.asList("ATRC", "FRDC").contains(programName)) {
             return ProgramValidation.ATRC;
         }
-        if (Arrays.asList("RLS", "PARKS VIC").contains(programName)) {
+        if (Arrays.asList("RLS", "PARKS VIC", "RRH").contains(programName)) {
             return ProgramValidation.RLS;
-        }
-        if (Arrays.asList("RRH").contains(programName)) {
-            return ProgramValidation.RRH;
         }
         return ProgramValidation.NONE;
     }
