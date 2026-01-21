@@ -54,37 +54,45 @@ public class MaterializedViewServiceIT {
         repository.refreshEpSiteList();
         repository.refreshEpSurveyList();
 
-        List<Tuple> l = repository.getEpSiteList(0, 100);
-        assertEquals(3, l.size(), "Size match");
+        List<Tuple> siteList = repository.getEpSiteList(0, 100);
+        assertEquals(4, siteList.size(), "Size match");
 
-        Object[] expect1 = new Object[] {
+        Object[] expectSite1 = new Object[] {
                 "Australia", "New South Wales", "\"Lord Howe Island\"", "Lord Howe Island Marine Park", "LHI37",
                 "Malabar 2", null, -31.5113, 159.05615, 3, 4, 2, 3, "Central Indo-Pacific", "Lord Howe and Norfolk Islands",
                 "Lord Howe and Norfolk Islands", "Tropical", "0101000020E610000074B515FBCBE16340DE718A8EE4823FC0",
                 "RLS", "No take multizoned"
         };
-        assertArrayEquals(expect1, l.get(0).toArray(), "First match");
+        assertArrayEquals(expectSite1, siteList.get(0).toArray(), "First match");
 
-        Object[] expect2 = new Object[] {
+        Object[] expectSite2 = new Object[] {
                 "Australia", "New South Wales", "\"Lord Howe Island\"", "Lord Howe Island Marine Park", "LHI38",
                 "North Bay 2", null, -31.52113, 159.04688000000002, 1, 3, 1, 1, "Central Indo-Pacific", "Lord Howe and Norfolk Islands",
                 "Lord Howe and Norfolk Islands", "Tropical", "0101000020E6100000C55A7C0A80E16340E8F692C668853FC0",
                 "RLS", "No take multizoned"
         };
-        assertArrayEquals(expect2, l.get(1).toArray(), "Second match");
+        assertArrayEquals(expectSite2, siteList.get(1).toArray(), "Second match");
 
-        Object[] expect3 = new Object[] {
+        Object[] expectSite3 = new Object[] {
+                "Australia", "Northern Territory", "Carpentaria", null, "NT59", "Cape Beatrice Islet West", null,  -14.351170000000002,
+                136.94027, 2,4,3,2,"Central Indo-Pacific", "Sahul Shelf", "Arnhem Coast to Gulf of Carpenteria", "Tropical",
+                "0101000020E61000001E6D1CB1161E614033ACE28DCCB32CC0", "RRH", "Fishing"
+        };
+
+        assertArrayEquals(expectSite3, siteList.get(2).toArray(), "RRH match");
+
+        Object[] expectSite4 = new Object[] {
                 "Australia", "Tasmania", "Kent Group", "Kent Group Marine Park", "KG-S11",
                 "Deal Island (Murray Pass)", "1111", -39.46125, 147.31422, 1, 3, 3, 4, "Temperate Australasia", "Southeast Australian Shelf",
                 "Cape Howe", "Temperate", "0101000020E6100000F9F719170E6A6240D7A3703D0ABB43C0",
                 "ATRC", "No take multizoned"
         };
-        assertArrayEquals(expect3, l.get(2).toArray(), "Third match");
+        assertArrayEquals(expectSite4, siteList.get(3).toArray(), "Third match");
 
-        List<Tuple> siteList = repository.getEpSurveyList(0, 100);
-        assertEquals(4, siteList.size(), "Survey size match");
+        List<Tuple> surveyList = repository.getEpSurveyList(0, 100);
+        assertEquals(5, surveyList.size(), "Survey size match");
 
-        Object[] expect4 = new Object[] {
+        Object[] expectSurvey1 = new Object[] {
                 812331754, "Australia", "Tasmania", "Kent Group", "Kent Group Marine Park",
                 "KG-S11", "Deal Island (Murray Pass)", -39.46125, 147.31422, new BigDecimal("5.4"),
                 java.sql.Date.valueOf("2018-06-03"), true, false,
@@ -92,9 +100,19 @@ public class MaterializedViewServiceIT {
                 "0101000020E6100000F9F719170E6A6240D7A3703D0ABB43C0",
                 "ATRC", "None", null, "1111", "1, 2, 3, 5", null
         };
-        assertArrayEquals(expect4, siteList.get(0).toArray(), "Site list first match");
+        assertArrayEquals(expectSurvey1, surveyList.get(0).toArray(), "Site list first match");
 
-        Object[] expect5 = new Object[] {
+        Object[] expectedSurvey2 = new Object[] {
+                812331755, "Australia", "Northern Territory", "Carpentaria", null,
+                "NT59", "Cape Beatrice Islet West", -14.351170000000002, 136.94027, new BigDecimal("5.4"),
+                java.sql.Date.valueOf("2018-06-04"), true, false,
+                false, false, null, 15.0, null, null, null, null, null, null, null,
+                "0101000020E61000001E6D1CB1161E614033ACE28DCCB32CC0",
+                "RRH", "None", null, null, null, null
+        };
+        assertArrayEquals(expectedSurvey2, surveyList.get(1).toArray(), "Site list RRH match");
+
+        Object[] expectSurvey3 = new Object[] {
                 912351270, "Australia", "New South Wales", "\"Lord Howe Island\"", "Lord Howe Island Marine Park",
                 "LHI37", "Malabar 2", -31.5113, 159.05615, new BigDecimal("10.0"),
                 java.sql.Date.valueOf("2008-02-27"), true, false,
@@ -102,9 +120,9 @@ public class MaterializedViewServiceIT {
                 "0101000020E610000074B515FBCBE16340DE718A8EE4823FC0",
                 "RLS", "None", null, null, "1, 2", null
         };
-        assertArrayEquals(expect5, siteList.get(1).toArray(), "Site list second match");
+        assertArrayEquals(expectSurvey3, surveyList.get(2).toArray(), "Site list second match");
 
-        Object[] expect6 = new Object[] {
+        Object[] expectSurvey4 = new Object[] {
                 912351271, "Australia", "New South Wales", "\"Lord Howe Island\"", "Lord Howe Island Marine Park",
                 "LHI38", "North Bay 2", -31.52113, 159.04688000000002, new BigDecimal("1.3"),
                 java.sql.Date.valueOf("2008-02-27"), true, false,
@@ -112,9 +130,9 @@ public class MaterializedViewServiceIT {
                 "0101000020E6100000C55A7C0A80E16340E8F692C668853FC0",
                 "RLS", "None", null, null, "1", null
         };
-        assertArrayEquals(expect6, siteList.get(2).toArray(), "Site list third match");
+        assertArrayEquals(expectSurvey4, surveyList.get(3).toArray(), "Site list third match");
 
-        Object[] expect7 = new Object[] {
+        Object[] expectSurvey5 = new Object[] {
                 912351272, "Australia", "New South Wales", "\"Lord Howe Island\"", "Lord Howe Island Marine Park",
                 "LHI38", "North Bay 2", -31.52113, 159.04688000000002, new BigDecimal("1.5"),
                 java.sql.Date.valueOf("2008-02-27"), true, false,
@@ -122,7 +140,7 @@ public class MaterializedViewServiceIT {
                 "0101000020E6100000C55A7C0A80E16340E8F692C668853FC0",
                 "RLS", "None", null, null, "1", null
         };
-        assertArrayEquals(expect7, siteList.get(3).toArray(), "Site list third match");
+        assertArrayEquals(expectSurvey5, surveyList.get(4).toArray(), "Site list third match");
     }
 
     @Test

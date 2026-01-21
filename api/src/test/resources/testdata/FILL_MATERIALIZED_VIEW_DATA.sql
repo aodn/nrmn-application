@@ -61,11 +61,13 @@ INSERT INTO nrmn.measure_ref(measure_id,measure_type_id,measure_name,seq_no,is_a
 
 INSERT INTO nrmn.program_ref (program_id, program_name, is_active)
     VALUES (1, 'RLS', True),
-            (2, 'ATRC',	true);
+            (2, 'ATRC',	true),
+            (5, 'RRH', true);
 
 INSERT INTO nrmn.location_ref (location_id, location_name, is_active)
     VALUES (184, '"Lord Howe Island"',true),
-            (41,'Kent Group',true);
+            (41,'Kent Group',true),
+            (14, 'Carpentaria', true);
 
 INSERT INTO nrmn.diver_ref (diver_id,initials,full_name,created)
     VALUES (21,'134','Jan Jansen', null),
@@ -109,7 +111,13 @@ VALUES  (914,'KG-S11','Deal Island (Murray Pass)',147.31422,-39.46125,'010100002
         (3844,'LHI38','North Bay 2',159.04688000000002,-31.52113,'0101000020E6100000C55A7C0A80E16340E8F692C668853FC0',
          184,'New South Wales','Australia',null,'Lord Howe Island Marine Park','No take multizoned',3,1,1,1,
          '{"Age": "1", "Zone": "North Bay Sanctuary Zone", "area": "0", "No_take": "1", "Isolation": 1.0, "Zone_name": "North Bay Sanctuary Zone", "NEOLI_Total": "3", "ProxCountry": "Australia", "area_in_km2": "0.5", "Effectiveness": "High", "Gears_allowed": "Allbanned", "Isolation_NEOLI": "0", "year_of_protection": "2004", "Effectiveness_NEOLI": "1", "Shore_fishing_index": 1.0, "Distance_to_boat_ramp": 1.2, "Rec_methods_permitted": "-", "com_methods_permitted": "-", "offshore_extent_in_km": 0.5, "Is_rec_fishing_allowed": "N", "perimeter_length_in_km": 3.1, "Distance_to_boundary_in_km": 0.2, "Is_commercial_fishing_allowed": "N", "Is_it_a_shore_rec_fishing_zone_within_SZ": "N"}',
-         true);
+         true),
+        (255,'NT59'	,'Cape Beatrice Islet West'	,
+         136.94027	,-14.351170000000002	,
+         '0101000020E61000001E6D1CB1161E614033ACE28DCCB32CC0'	,14,
+         'Northern Territory',	'Australia'		,	null, null, 'Fishing',	4,
+         2,	2,	3,
+         '{"ProxCountry": "Australia", "Distance_to_boat_ramp": 88.0, "Rec_methods_permitted": "ALL", "com_methods_permitted": "ALL", "Is_rec_fishing_allowed": "A", "Is_commercial_fishing_allowed": "A", "Is_it_a_shore_rec_fishing_zone_within_SZ": "N"}',	true);
 
 INSERT INTO nrmn.observable_item_ref (
         observable_item_id,observable_item_name,obs_item_type_id,aphia_id,aphia_rel_type_id,common_name,superseded_by,
@@ -173,7 +181,8 @@ INSERT INTO nrmn.survey (survey_id,site_id,program_id,survey_date,survey_time,de
 VALUES (912351270,3834,1,'2008-02-27',NULL,10,0,NULL,'',NULL,NULL,NULL,NULL,NULL,False,'None',NULL,False,NULL,NULL,NULL,False),
     (912351271,3844,1,'2008-02-27',NULL,1,3,NULL,'',NULL,NULL,NULL,NULL,NULL,False,'None',NULL,False,NULL,NULL,NULL,False),
     (912351272,3844,1,'2008-02-27',NULL,1,5,NULL,'',NULL,NULL,NULL,NULL,NULL,False,'None',NULL,False,NULL,NULL,NULL,False),
-    (812331754,914,2,'2018-06-03',null,5,4,15,NULL,NULL,NULL,NULL,'Unsure',NULL,false,'None',NULL,true,NULL,NULL,NULL,false);
+    (812331754,914,2,'2018-06-03',null,5,4,15,NULL,NULL,NULL,NULL,'Unsure',NULL,false,'None',NULL,true,NULL,NULL,NULL,false),
+       (812331755,255,5,'2018-06-04',null,5,4,15,NULL,NULL,NULL,NULL,'Unsure',NULL,false,'None',NULL,true,NULL,NULL,NULL,false);
 
 INSERT INTO nrmn.survey_method(survey_method_id,survey_id,method_id,block_num,survey_not_done,survey_method_attribute)
     VALUES (85720,912351270,2,2,false,'{}'),

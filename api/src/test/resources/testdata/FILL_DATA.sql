@@ -10,6 +10,9 @@ VALUES (55, 'RLS', True);
 INSERT INTO nrmn.program_ref(program_id, program_name, is_active)
 VALUES (56, 'ATRC', True);
 
+INSERT INTO nrmn.program_ref(program_id, program_name, is_active)
+VALUES (57, 'RRH', True);
+
 INSERT INTO nrmn.location_ref (location_id, location_name, is_active)
     VALUES (0, 'NONE', true),
            (184, 'Lord Howe Island', true);
