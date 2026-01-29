@@ -1950,7 +1950,6 @@ UPDATE nrmn.lengthweight_ref SET a=0.01096,b=3.12,cf=1 where observable_item_id=
 UPDATE nrmn.lengthweight_ref SET a=0.01096,b=3.12,cf=1 where observable_item_id=8432;
 UPDATE nrmn.lengthweight_ref SET a=0.01096,b=3.12,cf=1 where observable_item_id=1997;
 UPDATE nrmn.lengthweight_ref SET a=0.01096,b=3.12,cf=1 where observable_item_id=8397;
-UPDATE nrmn.lengthweight_ref SET a=nan,b=nan,cf=1 where observable_item_id=6344;
 UPDATE nrmn.lengthweight_ref SET a=0.00724,b=3.05,cf=1 where observable_item_id=8021;
 UPDATE nrmn.lengthweight_ref SET a=0.01,b=3.08,cf=1 where observable_item_id=1343;
 UPDATE nrmn.lengthweight_ref SET a=0.01,b=3.08,cf=1 where observable_item_id=1642;
