@@ -66,7 +66,7 @@ WHERE epsl.survey_id NOT IN (
 	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id=2);
+	WHERE pde.program_id in (2,5));
 
 -- Species list
 -- 1) 2-decimal coordinate precision
@@ -122,7 +122,7 @@ AND epm1.survey_id NOT IN (
 	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id=2);
+	WHERE pde.program_id in (2,5));
 
 
 -- M2 Inverts
@@ -167,7 +167,7 @@ WHERE epm2i.survey_id NOT IN (
 	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id=2);
+	WHERE pde.program_id in (2,5));
 
 
 -- M2 Cryptic fish
@@ -215,7 +215,7 @@ WHERE epm2cf.survey_id NOT IN (
 	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id=2);
+	WHERE pde.program_id in (2,5));
 
 -- M0 Off transect sightings
 -- 1) 2-decimal coordinate precision
@@ -259,7 +259,7 @@ WHERE epm0.survey_id NOT IN (
 	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id=2);
+	WHERE pde.program_id in (2,5));
 
 
 -- M3 In situ quadrats
@@ -303,7 +303,7 @@ WHERE epm3.survey_id NOT IN (
 	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id=2);
+	WHERE pde.program_id in (2,5));
 
 -- M4 Macrocystis counts
 -- 1) 2-decimal coordinate precision
@@ -344,7 +344,7 @@ WHERE epm4.survey_id NOT IN (
 	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id='2');
+	WHERE pde.program_id in (2,5));
 
 --M5 Limpet quadrats
 -- 1) 2-decimal coordinate precision
@@ -385,7 +385,7 @@ WHERE epm5.survey_id NOT IN (
 	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id='2');
+	WHERE pde.program_id in (2,5));
 
 -- M11 Off-transect measurements
 -- 1) 2-decimal coordinate precision
@@ -426,7 +426,7 @@ WHERE epm11.survey_id NOT IN (
 	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id='2');
+	WHERE pde.program_id in (2,5));
 
 -- M13 Photo Quadrat scores
 -- 1) 2-decimal coordinate precision
@@ -466,7 +466,7 @@ AND epm13.survey_id NOT IN (
 	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
 	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
 	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id=2);
+	WHERE pde.program_id in (2,5));
 
 
 -- TPAC specific SURVEY_LIST for cataloguing purposes- limited fields:
