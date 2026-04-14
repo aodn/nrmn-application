@@ -162,12 +162,12 @@ public class SiteController {
 
         if (site.getLatitude() == null)
             errors.add(new FormValidationError("Site", "latitude", "", "Latitude is required."));
-        else if (site.getLatitude() <= -90.0 || site.getLatitude() >= 90.0)
+        else if (site.getLatitude() < -90.0 || site.getLatitude() > 90.0)
             errors.add(new FormValidationError("Site", "latitude", site.getLatitude().toString(), "Latitude must be between -90.0 and 90.0."));
 
         if (site.getLongitude() == null)
             errors.add(new FormValidationError("Site", "longitude", "", "Longitude is required."));
-        else if (site.getLongitude() <= -180.0 || site.getLongitude() >= 180.0)
+        else if (site.getLongitude() < -180.0 || site.getLongitude() > 180.0)
             errors.add(new FormValidationError("Site", "longitude", site.getLongitude().toString(), "Longitude must be between -180.0 and 180.0."));
 
         if (errors.size() > 0)
