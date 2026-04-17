@@ -113,12 +113,25 @@ SELECT
 FROM nrmn.ep_m1 epm1
 WHERE ("class" IN ('Actinopterygii','Actinopteri','Teleostei','Chondrichthyes','Elasmobranchii',
 'Mammalia','Reptilia','Cephalopoda') OR phylum IN ('Cnidaria', 'Ctenophora'))
-AND epm1.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl
-	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id in (2,5));
+AND NOT EXISTS (
+    SELECT 1
+    FROM nrmn.ep_survey_list esl
+    JOIN nrmn.program_ref pr ON esl.program = pr.program_name
+    JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
+    JOIN nrmn.public_data_exclusion pde
+        ON sr.site_id = pde.site_id
+        AND pr.program_id = pde.program_id
+    WHERE esl.survey_id = epm1.survey_id
+    )
+AND NOT EXISTS (
+    SELECT 1
+    FROM nrmn.ep_survey_list esl
+    JOIN nrmn.program_ref pr ON esl.program = pr.program_name
+    JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
+    WHERE esl.survey_id = epm1.survey_id
+      AND pr.program_id = 1
+      AND site_id in(379,380)-- ( %%%% TBD%%%)
+      AND esl.survey_date BETWEEN '2026-01-01' AND '2026-03-31');
 
 
 -- M2 Inverts
@@ -158,12 +171,25 @@ SELECT
        total,
        biomass
 FROM nrmn.ep_m2_inverts epm2i
-WHERE epm2i.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl
-	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id in (2,5));
+WHERE NOT EXISTS (
+        SELECT 1
+        FROM nrmn.ep_survey_list esl
+        JOIN nrmn.program_ref pr ON esl.program = pr.program_name
+        JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
+        JOIN nrmn.public_data_exclusion pde
+            ON sr.site_id = pde.site_id
+            AND pr.program_id = pde.program_id
+        WHERE esl.survey_id = epm2i.survey_id
+    )
+AND NOT EXISTS (
+    SELECT 1
+    FROM nrmn.ep_survey_list esl
+    JOIN nrmn.program_ref pr ON esl.program = pr.program_name
+    JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
+    WHERE esl.survey_id = epm2i.survey_id
+      AND pr.program_id = 1
+      AND site_id in(379,380)-- ( %%%% TBD%%%)
+      AND esl.survey_date BETWEEN '2026-01-01' AND '2026-03-31');
 
 
 -- M2 Cryptic fish
@@ -206,12 +232,25 @@ SELECT
     total,
 	biomass
 FROM nrmn.ep_m2_cryptic_fish epm2cf
-WHERE epm2cf.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl
-	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id in (2,5));
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM nrmn.ep_survey_list esl
+    JOIN nrmn.program_ref pr ON esl.program = pr.program_name
+    JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
+    JOIN nrmn.public_data_exclusion pde
+        ON sr.site_id = pde.site_id
+        AND pr.program_id = pde.program_id
+    WHERE esl.survey_id = epm2cf.survey_id
+    )
+AND NOT EXISTS (
+    SELECT 1
+    FROM nrmn.ep_survey_list esl
+    JOIN nrmn.program_ref pr ON esl.program = pr.program_name
+    JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
+    WHERE esl.survey_id = epm2cf.survey_id
+      AND pr.program_id = 1
+      AND site_id in(379,380)-- ( %%%% TBD%%%)
+      AND esl.survey_date BETWEEN '2026-01-01' AND '2026-03-31');
 
 -- M0 Off transect sightings
 -- 1) 2-decimal coordinate precision
@@ -250,12 +289,25 @@ SELECT
     total,
     biomass
 FROM nrmn.ep_m0_off_transect_sighting epm0
-WHERE epm0.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl
-	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id in (2,5));
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM nrmn.ep_survey_list esl
+    JOIN nrmn.program_ref pr ON esl.program = pr.program_name
+    JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
+    JOIN nrmn.public_data_exclusion pde
+        ON sr.site_id = pde.site_id
+        AND pr.program_id = pde.program_id
+    WHERE esl.survey_id = epm0.survey_id
+    )
+AND NOT EXISTS (
+    SELECT 1
+    FROM nrmn.ep_survey_list esl
+    JOIN nrmn.program_ref pr ON esl.program = pr.program_name
+    JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
+    WHERE esl.survey_id = epm0.survey_id
+      AND pr.program_id = 1
+      AND site_id in(379,380)-- ( %%%% TBD%%%)
+      AND esl.survey_date BETWEEN '2026-01-01' AND '2026-03-31');
 
 
 -- M3 In situ quadrats
@@ -294,12 +346,16 @@ SELECT
 	quadrat,
 	total
 FROM nrmn.ep_m3_isq epm3
-WHERE epm3.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl
-	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id in (2,5));
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM nrmn.ep_survey_list esl
+    JOIN nrmn.program_ref pr ON esl.program = pr.program_name
+    JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
+    JOIN nrmn.public_data_exclusion pde
+        ON sr.site_id = pde.site_id
+        AND pr.program_id = pde.program_id
+    WHERE esl.survey_id = epm3.survey_id
+    );
 
 -- M4 Macrocystis counts
 -- 1) 2-decimal coordinate precision
@@ -335,12 +391,16 @@ SELECT
     block,
     total
 from nrmn.ep_m4_macrocystis_count epm4
-WHERE epm4.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl
-	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id in (2,5));
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM nrmn.ep_survey_list esl
+    JOIN nrmn.program_ref pr ON esl.program = pr.program_name
+    JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
+    JOIN nrmn.public_data_exclusion pde
+        ON sr.site_id = pde.site_id
+        AND pr.program_id = pde.program_id
+    WHERE esl.survey_id = epm4.survey_id
+    );
 
 --M5 Limpet quadrats
 -- 1) 2-decimal coordinate precision
@@ -376,12 +436,16 @@ SELECT
 	quadrat,
 	total
 FROM nrmn.ep_m5_limpet_quadrats epm5
-WHERE epm5.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl
-	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id in (2,5));
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM nrmn.ep_survey_list esl
+    JOIN nrmn.program_ref pr ON esl.program = pr.program_name
+    JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
+    JOIN nrmn.public_data_exclusion pde
+        ON sr.site_id = pde.site_id
+        AND pr.program_id = pde.program_id
+    WHERE esl.survey_id = epm5.survey_id
+    );
 
 -- M11 Off-transect measurements
 -- 1) 2-decimal coordinate precision
@@ -417,12 +481,16 @@ SELECT
 	size_class,
     total
 FROM nrmn.ep_m11_off_transect_measurement epm11
-WHERE epm11.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl
-	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id in (2,5));
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM nrmn.ep_survey_list esl
+    JOIN nrmn.program_ref pr ON esl.program = pr.program_name
+    JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
+    JOIN nrmn.public_data_exclusion pde
+        ON sr.site_id = pde.site_id
+        AND pr.program_id = pde.program_id
+    WHERE esl.survey_id = epm11.survey_id
+    );
 
 -- M13 Photo Quadrat scores
 -- 1) 2-decimal coordinate precision
@@ -457,12 +525,16 @@ SELECT
     percent_cover
 FROM nrmn.ep_m13_pq_scores epm13
 WHERE category <> 'Tape'
-AND epm13.survey_id NOT IN (
-	SELECT survey_id FROM nrmn.ep_survey_list esl
-	JOIN nrmn.program_ref pr ON esl.program=pr.program_name
-	JOIN nrmn.site_ref sr ON esl.site_code =sr.site_code
-	JOIN nrmn.public_data_exclusion pde ON sr.site_id =pde.site_id AND pr.program_id =pde.program_id
-	WHERE pde.program_id in (2,5));
+AND NOT EXISTS (
+    SELECT 1
+    FROM nrmn.ep_survey_list esl
+    JOIN nrmn.program_ref pr ON esl.program = pr.program_name
+    JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
+    JOIN nrmn.public_data_exclusion pde
+        ON sr.site_id = pde.site_id
+        AND pr.program_id = pde.program_id
+    WHERE esl.survey_id = epm13.survey_id
+    );
 
 
 -- TPAC specific SURVEY_LIST for cataloguing purposes- limited fields:
