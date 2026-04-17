@@ -52,7 +52,6 @@ SELECT
         END AS direction,
 	round(survey_latitude::numeric, 2) AS survey_latitude,
 	round(survey_longitude::numeric, 2) AS survey_longitude,
-	surface,
 	ST_SetSrid(ST_MakePoint(round (longitude::numeric, 2), round (latitude::numeric, 2)),4326)::geometry AS geom,
 	pq_zip_url,
 	old_site_codes,
