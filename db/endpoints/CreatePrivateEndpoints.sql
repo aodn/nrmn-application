@@ -1116,15 +1116,15 @@ or epoi.observable_item_name ~ 'spp.$');
 /* Endpoint: species survey #185 */
 CREATE OR REPLACE VIEW nrmn.ep_species_survey AS
 select obs.observable_item_id as species_id
-	  ,sur.survey_id
-	  ,round(sur.latitude::numeric, 2) AS latitude
-      ,round(sur.longitude::numeric, 2) AS longitude
-	  ,sit.realm
-	  ,sur.country
-	  ,sur.area
-	  ,sur.geom
-	  ,sur.program
-	  ,mapped_id
+      sur.program,
+	  sur.survey_id,
+	  round(sur.latitude::numeric, 2) AS latitude,
+      round(sur.longitude::numeric, 2) AS longitude,
+	  sit.realm,
+	  sur.country,
+	  sur.area,
+	  sur.geom,
+	  mapped_id
 from nrmn.ep_survey_list sur
 	 inner join nrmn.survey_method sm on sur.survey_id = sm.survey_id
 	 inner join nrmn.observation obs on obs.survey_method_id = sm.survey_method_id
@@ -1136,35 +1136,35 @@ where oi.obs_item_type_name in ('Species', 'Undescribed Species');
 /*endpoint: species survey observation #186*/
 CREATE OR REPLACE VIEW nrmn.ep_species_survey_observation AS
 select
-	oi.observable_item_id species_id
-	,sur.survey_id
-	,sur.site_code
-	,round(sur.latitude::numeric, 2) AS latitude
-    ,round(sur.longitude::numeric, 2) AS longitude
-	,sur.site_name
-	,sit.ecoregion
-	,sit.province
-	,sit.realm
-	,sur.country
-	,sur.area
-	,sit.location
-	,sur.survey_date
-	,sur.depth
-	,ST_SetSrid(ST_MakePoint(round (sur.latitude::numeric, 2), round (sur.longitude::numeric, 2)),4326)::geometry AS geom
-	,sur.program
-	,div.full_name diver
-	,obs.measure_value total
-	,sm.block_num as block
-	,sm.method_id
-	,meas.measure_name size_class
-	,nrmn.obs_biomass(
+    sur.program,
+	oi.observable_item_id species_id,
+	sur.survey_id,
+	sur.site_code,
+	round(sur.latitude::numeric, 2) AS latitude,
+    round(sur.longitude::numeric, 2) AS longitude,
+	sur.site_name,
+	sit.ecoregion,
+	sit.province,
+	sit.realm,
+	sur.country,
+	sur.area,
+	sit.location,
+	sur.survey_date,
+	sur.depth,
+	ST_SetSrid(ST_MakePoint(round (sur.latitude::numeric, 2), round (sur.longitude::numeric, 2)),4326)::geometry AS geom,
+	div.full_name diver,
+	obs.measure_value total,
+	sm.block_num as block,
+	sm.method_id,
+	meas.measure_name size_class,
+	nrmn.obs_biomass(
 			oi.a,
 			oi.b,
 			oi.cf, (
 			case when meas.measure_name ~ 'cm$' then replace(meas.measure_name, 'cm', '') else '0' end )::float,
 			(obs.measure_value)::int,true
-		) biomass
-	,mapped_id
+		) biomass,
+	mapped_id
 from nrmn.ep_site_list sit
 	inner join nrmn.ep_survey_list sur on sit.site_code = sur.site_code
 	inner join nrmn.survey_method sm on sur.survey_id = sm.survey_id
