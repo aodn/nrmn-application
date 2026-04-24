@@ -1,6 +1,6 @@
 import csv
 
-# Using the data in worms_taxonomy.csv, this script generates two SQL scripts:
+# Using the data in worms_taxonomy.csv, this script generates two SQL scripts ("Aphia_Insert.sql","Taxonomy_Update.sql") and:
 # 1) Clears (deletes all rows from) the aphia_id table and repopulates it with
 #    taxonomy data from worms_taxonomy.csv.
 # 2) Updates taxonomy fields (down to family level) in the observable_item_ref table.
@@ -103,7 +103,7 @@ WHERE observable_item_id = {sql_value(row.get("observable_item_id"))};
 
     with open(OUTPUT_SQL2, "w", encoding="utf-8") as f_insert:
         f_insert.write("BEGIN;\n")
-        f_insert.write("DELETE FROM nrmn.aphia_id;\n")
+        f_insert.write("DELETE FROM nrmn.aphia_ref;\n")
 
         for row in rows:
             values_sql = ", ".join(
@@ -112,7 +112,7 @@ WHERE observable_item_id = {sql_value(row.get("observable_item_id"))};
 
             f_insert.write(
                 f"""
-INSERT INTO nrmn.aphia_id ({columns_sql})
+INSERT INTO nrmn.aphia_ref ({columns_sql})
 VALUES ({values_sql});
 """
             )
