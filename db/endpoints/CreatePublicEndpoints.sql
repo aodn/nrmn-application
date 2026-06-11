@@ -130,8 +130,14 @@ AND NOT EXISTS (
     JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
     WHERE esl.survey_id = epm1.survey_id
       AND pr.program_id = 1
-      AND site_id in(379,380)-- ( %%%% TBD%%%)
-      AND esl.survey_date BETWEEN '2026-01-01' AND '2026-03-31');
+      AND sr.site_code in ('GSV26','GSV116','GSV93','GSV183','GSV182','GSV118','COO20','GSV125','GSV21','GSV1','GSV3',
+                    'GSV45','GSV46','GSV47','SSG62','GSV119','GSV9','GSV191','GSV121','GSV39','GSV15','GLSR_SHI',
+                    'GSV57','GSV185','GSV140','GSV2','GSV19','GSV124','GSV131','GSV95','GSV105','GSV53','GSV138',
+                    'GSV18','GSV7','GSV34','GSV14','GSV136','GSV112','OSSR_SHI','GSV107','GSV11','GSV55','GSV58',
+                    'SSG64','SSG46','GSV30','COO19','GSV115','GSV194','GSV134','GSV135','GSV59','GSV4','GSV41','GSV5',
+                    'GSV43','GSV42','GSV24','GSV127','GSV20','GSV128','GSV56','GSV17','GSV190','GSV189','GSV40',
+                    'GSV129','GSV134','GSV109','GSV137','GSV139','GSV110','GSV111','GSV106','GSV114','GSV113')
+        AND esl.survey_date BETWEEN '2026-01-01' AND '2026-06-01');
 
 
 -- M2 Inverts
@@ -188,8 +194,14 @@ AND NOT EXISTS (
     JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
     WHERE esl.survey_id = epm2i.survey_id
       AND pr.program_id = 1
-      AND site_id in(379,380)-- ( %%%% TBD%%%)
-      AND esl.survey_date BETWEEN '2026-01-01' AND '2026-03-31');
+      AND sr.site_code in ('GSV26','GSV116','GSV93','GSV183','GSV182','GSV118','COO20','GSV125','GSV21','GSV1','GSV3',
+                    'GSV45','GSV46','GSV47','SSG62','GSV119','GSV9','GSV191','GSV121','GSV39','GSV15','GLSR_SHI',
+                    'GSV57','GSV185','GSV140','GSV2','GSV19','GSV124','GSV131','GSV95','GSV105','GSV53','GSV138',
+                    'GSV18','GSV7','GSV34','GSV14','GSV136','GSV112','OSSR_SHI','GSV107','GSV11','GSV55','GSV58',
+                    'SSG64','SSG46','GSV30','COO19','GSV115','GSV194','GSV134','GSV135','GSV59','GSV4','GSV41','GSV5',
+                    'GSV43','GSV42','GSV24','GSV127','GSV20','GSV128','GSV56','GSV17','GSV190','GSV189','GSV40',
+                    'GSV129','GSV134','GSV109','GSV137','GSV139','GSV110','GSV111','GSV106','GSV114','GSV113')
+      AND esl.survey_date BETWEEN '2026-01-01' AND '2026-06-01');
 
 
 -- M2 Cryptic fish
@@ -249,8 +261,14 @@ AND NOT EXISTS (
     JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
     WHERE esl.survey_id = epm2cf.survey_id
       AND pr.program_id = 1
-      AND site_id in(379,380)-- ( %%%% TBD%%%)
-      AND esl.survey_date BETWEEN '2026-01-01' AND '2026-03-31');
+      AND sr.site_code in ('GSV26','GSV116','GSV93','GSV183','GSV182','GSV118','COO20','GSV125','GSV21','GSV1','GSV3',
+                    'GSV45','GSV46','GSV47','SSG62','GSV119','GSV9','GSV191','GSV121','GSV39','GSV15','GLSR_SHI',
+                    'GSV57','GSV185','GSV140','GSV2','GSV19','GSV124','GSV131','GSV95','GSV105','GSV53','GSV138',
+                    'GSV18','GSV7','GSV34','GSV14','GSV136','GSV112','OSSR_SHI','GSV107','GSV11','GSV55','GSV58',
+                    'SSG64','SSG46','GSV30','COO19','GSV115','GSV194','GSV134','GSV135','GSV59','GSV4','GSV41','GSV5',
+                    'GSV43','GSV42','GSV24','GSV127','GSV20','GSV128','GSV56','GSV17','GSV190','GSV189','GSV40',
+                    'GSV129','GSV134','GSV109','GSV137','GSV139','GSV110','GSV111','GSV106','GSV114','GSV113')
+      AND esl.survey_date BETWEEN '2026-01-01' AND '2026-06-01');
 
 -- M0 Off transect sightings
 -- 1) 2-decimal coordinate precision
@@ -306,8 +324,14 @@ AND NOT EXISTS (
     JOIN nrmn.site_ref sr ON esl.site_code = sr.site_code
     WHERE esl.survey_id = epm0.survey_id
       AND pr.program_id = 1
-      AND site_id in(379,380)-- ( %%%% TBD%%%)
-      AND esl.survey_date BETWEEN '2026-01-01' AND '2026-03-31');
+      AND sr.site_code in ('GSV26','GSV116','GSV93','GSV183','GSV182','GSV118','COO20','GSV125','GSV21','GSV1','GSV3',
+                    'GSV45','GSV46','GSV47','SSG62','GSV119','GSV9','GSV191','GSV121','GSV39','GSV15','GLSR_SHI',
+                    'GSV57','GSV185','GSV140','GSV2','GSV19','GSV124','GSV131','GSV95','GSV105','GSV53','GSV138',
+                    'GSV18','GSV7','GSV34','GSV14','GSV136','GSV112','OSSR_SHI','GSV107','GSV11','GSV55','GSV58',
+                    'SSG64','SSG46','GSV30','COO19','GSV115','GSV194','GSV134','GSV135','GSV59','GSV4','GSV41','GSV5',
+                    'GSV43','GSV42','GSV24','GSV127','GSV20','GSV128','GSV56','GSV17','GSV190','GSV189','GSV40',
+                    'GSV129','GSV134','GSV109','GSV137','GSV139','GSV110','GSV111','GSV106','GSV114','GSV113')
+      AND esl.survey_date BETWEEN '2026-01-01' AND '2026-06-01');
 
 
 -- M3 In situ quadrats
