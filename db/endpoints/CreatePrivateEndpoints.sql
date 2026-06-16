@@ -1115,7 +1115,8 @@ or epoi.observable_item_name ~ 'spp.$');
 
 /* Endpoint: species survey #185 */
 CREATE OR REPLACE VIEW nrmn.ep_species_survey AS
-select obs.observable_item_id as species_id
+select
+      obs.observable_item_id as species_id,
       sur.program,
 	  sur.survey_id,
 	  round(sur.latitude::numeric, 2) AS latitude,
