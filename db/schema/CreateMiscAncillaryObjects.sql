@@ -229,7 +229,7 @@ WHERE (family IN ('Agonidae','Anarhichadidae','Anguillidae','Antennariidae','Apl
 'Congiopodidae','Congridae','Congrogadidae','Cottidae','Creediidae','Cryptacanthodidae','Cyclopteridae','Cynoglossidae',
 'Dasyatidae','Diodontidae','Eleotridae','Gasterosteidae','Gnathanacanthidae','Gobiesocidae','Gobiidae','Grammistidae','Harpagiferidae',
 'Hemiscylliidae','Heterodontidae','Hexagrammidae','Holocentridae','Hypnidae','Labrisomidae','Latidae','Leptoscopidae',
-'Liparidae','Lotidae','Monocentridae','Moridae','Muraenidae','Nototheniidae','Ophichthidae','Ophidiidae',
+'Liparidae','Lotidae','Monocentridae','Moridae','Muraenidae','Neosebastidae','Nototheniidae','Ophichthidae','Ophidiidae',
 'Opistognathidae','Orectolobidae','Paralichthyidae','Parascylliidae','Pataecidae','Pegasidae','Pempheridae',
 'Percophidae','Phycidae','Pholidae','Pholidichthyidae','Pinguipedidae','Platycephalidae','Plesiopidae','Pleuronectidae',
 'Plotosidae','Priacanthidae','Pseudochromidae','Psychrolutidae','Rajidae','Rhinobatidae','Scophthalmidae','Scorpaenidae','Serranidae',

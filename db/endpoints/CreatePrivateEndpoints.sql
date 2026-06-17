@@ -58,6 +58,7 @@ with divers AS (
 	group by sm.survey_id
 	)
 SELECT
+    pro.program_name AS program,
 	sur.survey_id,
 	sit.country,
 	sit.area,
@@ -70,7 +71,6 @@ SELECT
 	sur.depth + 0.1*survey_num AS depth,
 	sur.survey_date AS survey_date,
 	sur.survey_date = MAX(sur.survey_date) OVER (PARTITION BY sit.site_code) AS latest_surveydate_for_site,
-	(sm13.survey_id IS NOT null)::boolean AS  has_pq_scores_in_db,
 	(sm6.survey_id IS NOT null)::boolean AS has_rugosity_scores_in_db,
 	(COALESCE(sur.pq_catalogued,false))::boolean AS has_pqs_catalogued_in_db,
 	div.full_names AS divers,
@@ -83,7 +83,6 @@ SELECT
 	rug.max_rugosity,
 	st.surface_type_name surface,
 	sit.geom,
-	pro.program_name AS program,
 	sur.pq_zip_url,
 	sur.protection_status,
 	sit.old_site_codes,
@@ -423,6 +422,7 @@ from nrmn.observable_item_ref oi
 CREATE MATERIALIZED VIEW  nrmn.ep_m1 AS
 with cte_to_force_joins_evaluated_first as(
 select
+    sur.program,
 	sm.survey_id,
 	sur.country,
 	sur.area,
@@ -436,7 +436,6 @@ select
 	sur.survey_date,
 	sur.depth,
 	sur.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -474,7 +473,9 @@ from nrmn.observation obs
 	inner join nrmn.ep_observable_items oi on oi.observable_item_id = obs.observable_item_id
 	inner join nrmn.measure_ref meas ON meas.measure_id = obs.measure_id
 where sm.method_id in (1,8,9,10)
-group by sm.survey_id,
+group by
+    sur.program,
+    sm.survey_id,
 	sur.country,
 	sur.area,
 	sit.ecoregion,
@@ -487,7 +488,6 @@ group by sm.survey_id,
 	sur.survey_date,
 	sur.depth,
 	sur.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -513,6 +513,7 @@ group by sm.survey_id,
 CREATE MATERIALIZED VIEW nrmn.ep_m2_cryptic_fish AS
 with cte_to_force_joins_evaluated_first as(
 select
+    sur.program,
 	sm.survey_id,
 	sur.country,
 	sur.area,
@@ -526,7 +527,6 @@ select
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -568,7 +568,9 @@ where sm.method_id = 2 and ms.method_id = 2
 and (
 	(oi.class in ('Actinopterygii','Actinopteri','Teleostei', 'Elasmobranchii'))
 	or (oi.observable_item_name = 'No species found') or (oi.class='Reptilia' AND oi."order"='Squamata'))
-group by sm.survey_id,
+group by
+    sur.program,
+    sm.survey_id,
 	sur.country,
 	sur.area,
 	sit.ecoregion,
@@ -581,7 +583,6 @@ group by sm.survey_id,
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -625,6 +626,7 @@ bounded_fish_classes as (
 ),
 invert_sized as (
 select
+    sur.program,
 	sm.survey_id,
 	sur.country,
 	sur.area,
@@ -638,7 +640,6 @@ select
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -691,7 +692,9 @@ and (
 	or (phylum = 'Ctenophora')
 	or (oi.observable_item_name = 'No species found')
 )
-group by sm.survey_id,
+group by
+    sur.program,
+    sm.survey_id,
 	sur.country,
 	sur.area,
 	sit.ecoregion,
@@ -704,7 +707,6 @@ group by sm.survey_id,
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -726,6 +728,7 @@ group by sm.survey_id,
 	sm.method_id
 	EXCEPT
 	SELECT
+	sur.program,
 	sm.survey_id,
 	sur.country,
 	sur.area,
@@ -739,7 +742,6 @@ group by sm.survey_id,
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -778,7 +780,9 @@ from nrmn.observation obs
 	inner join nrmn.measure_ref meas ON meas.measure_id = obs.measure_id
 where sm.method_id = 2 and  (oi.phylum = 'Arthropoda' and oi.class ='Malacostraca' and oi.family='Palaemonidae')
 
-group by sm.survey_id,
+group by
+    sur.program,
+    sm.survey_id,
 	sur.country,
 	sur.area,
 	sit.ecoregion,
@@ -791,7 +795,6 @@ group by sm.survey_id,
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -811,7 +814,9 @@ group by sm.survey_id,
 		else (replace(meas.measure_name, 'cm', ''))::numeric
 	end,
 	sm.method_id)
-select survey_id,
+select
+program,
+survey_id,
 country,
 area,
 ecoregion,
@@ -824,7 +829,6 @@ longitude,
 survey_date,
 depth,
 geom,
-program,
 visibility,
 hour,
 survey_latitude,
@@ -845,13 +849,14 @@ sum(total)::bigint as total,
 sum(biomass) as biomass
 from invert_sized m2
 	 inner join bounded_fish_classes bfc on m2.size_class > bfc.lower_bound and m2.size_class <= bfc.upper_bound
-group by survey_id,country,area,ecoregion,realm,location,site_code,site_name,latitude,longitude,survey_date,depth,geom,
-program,visibility,hour,survey_latitude,survey_longitude,diver,"method",block,phylum,"class","order",family,
+group by program,survey_id,country,area,ecoregion,realm,location,site_code,site_name,latitude,longitude,survey_date,depth,geom
+,visibility,hour,survey_latitude,survey_longitude,diver,"method",block,phylum,"class","order",family,
 recorded_species_name,species_name,taxon,reporting_name,bfc.nominal;
 
 /* Endpoint "M12 Debris" #172 */
 CREATE OR REPLACE VIEW nrmn.ep_m12_debris AS
 select
+    sur.program,
 	sm.survey_id,
 	sur.country,
 	sur.area,
@@ -865,7 +870,6 @@ select
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -885,6 +889,7 @@ where sm.method_id = 12;
 /* Endpoint "M0 off transect sightings" #173 */
 CREATE OR REPLACE VIEW nrmn.ep_m0_off_transect_sighting AS
 select
+    sur.program,
 	sm.survey_id,
 	sur.country,
 	sur.area,
@@ -898,7 +903,6 @@ select
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -936,7 +940,9 @@ from nrmn.observation obs
 	inner join nrmn.ep_observable_items oi on oi.observable_item_id = obs.observable_item_id
 	inner join nrmn.measure_ref meas ON meas.measure_id = obs.measure_id
 where sm.method_id = 0
-group by sm.survey_id,
+group by
+    sur.program,
+    sm.survey_id,
 	sur.country,
 	sur.area,
 	sit.ecoregion,
@@ -949,7 +955,6 @@ group by sm.survey_id,
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -973,6 +978,7 @@ group by sm.survey_id,
 /* Endpoint "M3 in-situ quadrats" #175 */
 CREATE OR REPLACE VIEW nrmn.ep_m3_isq AS
 select
+    sur.program,
 	sm.survey_id,
 	sur.country,
 	sur.area,
@@ -986,7 +992,6 @@ select
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -1012,7 +1017,9 @@ from nrmn.observation obs
 	inner join nrmn.ep_observable_items oi on oi.observable_item_id = obs.observable_item_id
 	inner join nrmn.measure_ref mr ON mr.measure_id = obs.measure_id
 where sm.method_id = 3
-group by sm.survey_id,
+group by
+    sur.program,
+    sm.survey_id,
 	sur.country,
 	sur.area,
 	sit.ecoregion,
@@ -1025,7 +1032,6 @@ group by sm.survey_id,
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -1109,16 +1115,17 @@ or epoi.observable_item_name ~ 'spp.$');
 
 /* Endpoint: species survey #185 */
 CREATE OR REPLACE VIEW nrmn.ep_species_survey AS
-select obs.observable_item_id as species_id
-	  ,sur.survey_id
-	  ,round(sur.latitude::numeric, 2) AS latitude
-      ,round(sur.longitude::numeric, 2) AS longitude
-	  ,sit.realm
-	  ,sur.country
-	  ,sur.area
-	  ,sur.geom
-	  ,sur.program
-	  ,mapped_id
+select
+      obs.observable_item_id as species_id,
+      sur.program,
+	  sur.survey_id,
+	  round(sur.latitude::numeric, 2) AS latitude,
+      round(sur.longitude::numeric, 2) AS longitude,
+	  sit.realm,
+	  sur.country,
+	  sur.area,
+	  sur.geom,
+	  mapped_id
 from nrmn.ep_survey_list sur
 	 inner join nrmn.survey_method sm on sur.survey_id = sm.survey_id
 	 inner join nrmn.observation obs on obs.survey_method_id = sm.survey_method_id
@@ -1130,35 +1137,35 @@ where oi.obs_item_type_name in ('Species', 'Undescribed Species');
 /*endpoint: species survey observation #186*/
 CREATE OR REPLACE VIEW nrmn.ep_species_survey_observation AS
 select
-	oi.observable_item_id species_id
-	,sur.survey_id
-	,sur.site_code
-	,round(sur.latitude::numeric, 2) AS latitude
-    ,round(sur.longitude::numeric, 2) AS longitude
-	,sur.site_name
-	,sit.ecoregion
-	,sit.province
-	,sit.realm
-	,sur.country
-	,sur.area
-	,sit.location
-	,sur.survey_date
-	,sur.depth
-	,ST_SetSrid(ST_MakePoint(round (sur.latitude::numeric, 2), round (sur.longitude::numeric, 2)),4326)::geometry AS geom
-	,sur.program
-	,div.full_name diver
-	,obs.measure_value total
-	,sm.block_num as block
-	,sm.method_id
-	,meas.measure_name size_class
-	,nrmn.obs_biomass(
+    sur.program,
+	oi.observable_item_id species_id,
+	sur.survey_id,
+	sur.site_code,
+	round(sur.latitude::numeric, 2) AS latitude,
+    round(sur.longitude::numeric, 2) AS longitude,
+	sur.site_name,
+	sit.ecoregion,
+	sit.province,
+	sit.realm,
+	sur.country,
+	sur.area,
+	sit.location,
+	sur.survey_date,
+	sur.depth,
+	ST_SetSrid(ST_MakePoint(round (sur.latitude::numeric, 2), round (sur.longitude::numeric, 2)),4326)::geometry AS geom,
+	div.full_name diver,
+	obs.measure_value total,
+	sm.block_num as block,
+	sm.method_id,
+	meas.measure_name size_class,
+	nrmn.obs_biomass(
 			oi.a,
 			oi.b,
 			oi.cf, (
 			case when meas.measure_name ~ 'cm$' then replace(meas.measure_name, 'cm', '') else '0' end )::float,
 			(obs.measure_value)::int,true
-		) biomass
-	,mapped_id
+		) biomass,
+	mapped_id
 from nrmn.ep_site_list sit
 	inner join nrmn.ep_survey_list sur on sit.site_code = sur.site_code
 	inner join nrmn.survey_method sm on sur.survey_id = sm.survey_id
@@ -1175,6 +1182,7 @@ and not oi.class in ('Anthozoa','Ascidiacea','Echiuroidea','Phaeophyceae', 'Aves
 /* Endpoint pq scores #188 */
 CREATE OR REPLACE VIEW nrmn.ep_m13_pq_scores AS
 select
+    sur.program,
     sur.survey_id,
 	sur.country,
 	sur.area,
@@ -1188,7 +1196,6 @@ select
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -1211,6 +1218,7 @@ from nrmn.pq_score pq
 /* Endpoint: Off transect measurements #189 */
 CREATE OR REPLACE VIEW nrmn.ep_m11_off_transect_measurement AS
 select
+    sur.program,
 	sm.survey_id,
 	sur.country,
 	sur.area,
@@ -1224,7 +1232,6 @@ select
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -1256,6 +1263,7 @@ where sm.method_id = 11;
 /* Endpoint: M4 Macrocystis count #190 */
 CREATE OR REPLACE VIEW nrmn.ep_m4_macrocystis_count AS
 select
+    sur.program,
 	sm.survey_id,
 	sur.country,
 	sur.area,
@@ -1269,7 +1277,6 @@ select
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -1293,7 +1300,9 @@ from nrmn.observation obs
 	inner join nrmn.ep_observable_items oi on oi.observable_item_id = obs.observable_item_id
 	inner join nrmn.measure_ref mr ON mr.measure_id = obs.measure_id
 where sm.method_id = 4
-group by sm.survey_id,
+group by
+    sur.program,
+    sm.survey_id,
 	sur.country,
 	sur.area,
 	sit.ecoregion,
@@ -1306,7 +1315,6 @@ group by sm.survey_id,
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -1325,6 +1333,7 @@ group by sm.survey_id,
 /* Endpoint: M5 Limpet Quadrats #191 */
 CREATE OR REPLACE VIEW nrmn.ep_m5_limpet_quadrats AS
 select
+    sur.program,
 	sm.survey_id,
 	sur.country,
 	sur.area,
@@ -1338,7 +1347,6 @@ select
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -1362,7 +1370,9 @@ from nrmn.observation obs
 	inner join nrmn.ep_observable_items oi on oi.observable_item_id = obs.observable_item_id
 	inner join nrmn.measure_ref mr ON mr.measure_id = obs.measure_id
 where sm.method_id = 5
-group by sm.survey_id,
+group by
+    sur.program,
+    sm.survey_id,
 	sur.country,
 	sur.area,
 	sit.ecoregion,
@@ -1375,7 +1385,6 @@ group by sm.survey_id,
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -1394,6 +1403,7 @@ group by sm.survey_id,
 /* endpoint M7 Lobster counts jurien bay #192 */
 CREATE OR REPLACE VIEW nrmn.ep_m7_lobster_count AS
 select
+    sur.program,
 	sm.survey_id,
 	sur.country,
 	sur.area,
@@ -1407,7 +1417,6 @@ select
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -1435,7 +1444,9 @@ from nrmn.observation obs
 	inner join nrmn.ep_observable_items oi on oi.observable_item_id = obs.observable_item_id
 	inner join nrmn.measure_ref meas ON meas.measure_id = obs.measure_id
 where sm.method_id = 7
-group by sm.survey_id,
+group by
+    sur.program,
+    sm.survey_id,
 	sur.country,
 	sur.area,
 	sit.ecoregion,
@@ -1448,7 +1459,6 @@ group by sm.survey_id,
 	sur.survey_date,
 	sur.depth,
 	sit.geom,
-	sur.program,
 	sur.visibility,
 	sur.hour,
 	sur.survey_latitude,
@@ -1472,6 +1482,7 @@ group by sm.survey_id,
 CREATE OR REPLACE VIEW nrmn.ep_lobster_haliotis AS
 with cte_to_force_joins_evaluated_first as(
     select
+        sur.program,
         sm.survey_id,
         sur.country,
         sur.area,
@@ -1485,7 +1496,6 @@ with cte_to_force_joins_evaluated_first as(
         sur.survey_date,
         sur.depth,
         sit.geom,
-        sur.program,
         sur.visibility,
         sur.hour,
         sur.survey_latitude,
@@ -1517,7 +1527,9 @@ with cte_to_force_joins_evaluated_first as(
         (oi.family = 'Palinuridae')
         or (oi.family = 'Haliotidae')
     )
-    group by sm.survey_id,
+    group by
+        sur.program,
+        sm.survey_id,
         sur.country,
         sur.area,
         sit.ecoregion,
@@ -1530,7 +1542,6 @@ with cte_to_force_joins_evaluated_first as(
         sur.survey_date,
         sur.depth,
         sit.geom,
-        sur.program,
         sur.visibility,
         sur.hour,
         sur.survey_latitude,
