@@ -4,7 +4,7 @@
 DROP VIEW IF EXISTS nrmn.ep_site_list_public;
 CREATE OR REPLACE VIEW nrmn.ep_site_list_public AS
 SELECT
-    epl.programs
+    epl.programs,
     sr.country,
 	epl.area,
 	epl.location,
