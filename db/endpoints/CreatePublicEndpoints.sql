@@ -4,7 +4,6 @@
 DROP VIEW IF EXISTS nrmn.ep_site_list_public;
 CREATE OR REPLACE VIEW nrmn.ep_site_list_public AS
 SELECT
-    epl.programs,
     sr.country,
 	epl.area,
 	epl.location,
@@ -17,7 +16,8 @@ SELECT
 	epl.province,
 	epl.ecoregion,
 	epl.lat_zone,
-	ST_SetSrid(ST_MakePoint(round (epl.longitude::numeric, 2), round (epl.latitude::numeric, 2)),4326)::geometry AS geom
+	ST_SetSrid(ST_MakePoint(round (epl.longitude::numeric, 2), round (epl.latitude::numeric, 2)),4326)::geometry AS geom,
+	epl.programs
 FROM nrmn.ep_site_list epl
 JOIN nrmn.site_ref sr ON sr.site_code = epl.site_code
 WHERE EXISTS (SELECT 1 FROM nrmn.survey WHERE survey.site_id = sr.site_id);
@@ -30,7 +30,6 @@ WHERE EXISTS (SELECT 1 FROM nrmn.survey WHERE survey.site_id = sr.site_id);
 DROP VIEW IF EXISTS nrmn.ep_survey_list_public;
 CREATE OR REPLACE VIEW nrmn.ep_survey_list_public AS
 SELECT
-    "program",
 	survey_id,
 	country,
 	area,
@@ -42,6 +41,7 @@ SELECT
 	depth,
 	survey_date,
 	latest_surveydate_for_site,
+	has_pq_scores_in_db,
 	has_rugosity_scores_in_db,
 	has_pqs_catalogued_in_db,
     visibility,
@@ -52,7 +52,11 @@ SELECT
         END AS direction,
 	round(survey_latitude::numeric, 2) AS survey_latitude,
 	round(survey_longitude::numeric, 2) AS survey_longitude,
+	avg_rugosity,
+	max_rugosity,
+	surface,
 	ST_SetSrid(ST_MakePoint(round (longitude::numeric, 2), round (latitude::numeric, 2)),4326)::geometry AS geom,
+	"program",
 	pq_zip_url,
 	old_site_codes,
 	methods
@@ -81,7 +85,6 @@ SELECT * FROM nrmn.ep_species_list;
 DROP VIEW IF EXISTS nrmn.ep_m1_public;
 CREATE OR REPLACE VIEW nrmn.ep_m1_public AS
 SELECT
-    program,
 	survey_id,
 	country,
 	area,
@@ -95,6 +98,7 @@ SELECT
 	survey_date,
 	depth,
 	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
+	program,
 	visibility,
 	hour,
 	round(survey_latitude::numeric, 2) AS survey_latitude,
@@ -147,7 +151,6 @@ AND NOT EXISTS (
 DROP VIEW IF EXISTS nrmn.ep_m2_inverts_public;
 CREATE OR REPLACE VIEW  nrmn.ep_m2_inverts_public AS
 SELECT
-       program,
        survey_id,
        country,
        area,
@@ -161,6 +164,7 @@ SELECT
        survey_date,
        depth,
        ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
+       program,
        visibility,
        hour,
        round(survey_latitude::numeric, 2) AS survey_latitude,
@@ -212,7 +216,6 @@ AND NOT EXISTS (
 DROP VIEW IF EXISTS nrmn.ep_m2_cryptic_fish_public;
 CREATE OR REPLACE VIEW nrmn.ep_m2_cryptic_fish_public AS
 SELECT
-    program,
 	survey_id,
 	country,
 	area,
@@ -226,6 +229,7 @@ SELECT
 	survey_date,
 	depth,
 	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
+    program,
 	visibility,
 	hour,
 	round(survey_latitude::numeric, 2) AS survey_latitude,
@@ -277,7 +281,6 @@ AND NOT EXISTS (
 DROP VIEW IF EXISTS nrmn.ep_m0_off_transect_sighting_public;
 CREATE OR REPLACE VIEW nrmn.ep_m0_off_transect_sighting_public AS
 SELECT
-    program,
 	survey_id,
 	country,
 	area,
@@ -291,6 +294,7 @@ SELECT
 	survey_date,
 	depth,
 	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
+	program,
 	visibility,
 	hour,
 	round(survey_latitude::numeric, 2) AS survey_latitude,
@@ -341,7 +345,6 @@ AND NOT EXISTS (
 DROP VIEW IF EXISTS nrmn.ep_m3_isq_public;
 CREATE OR REPLACE VIEW nrmn.ep_m3_isq_public AS
 SELECT
-    program,
 	survey_id,
 	country,
 	area,
@@ -355,6 +358,7 @@ SELECT
 	survey_date,
 	depth,
 	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
+	program,
 	visibility,
 	hour,
 	round(survey_latitude::numeric, 2) AS survey_latitude,
@@ -388,7 +392,6 @@ WHERE NOT EXISTS (
 DROP VIEW IF EXISTS nrmn.ep_m4_macrocystis_count_public;
 CREATE OR REPLACE VIEW nrmn.ep_m4_macrocystis_count_public AS
 SELECT
-    program,
 	survey_id,
 	country,
 	area,
@@ -402,6 +405,7 @@ SELECT
 	survey_date,
 	depth,
 	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
+	program,
 	visibility,
 	hour,
 	round(survey_latitude::numeric, 2) AS survey_latitude,
@@ -433,7 +437,6 @@ WHERE NOT EXISTS (
 DROP VIEW IF EXISTS nrmn.ep_m5_limpet_quadrats_public;
 CREATE OR REPLACE VIEW nrmn.ep_m5_limpet_quadrats_public as
 SELECT
-    program,
 	survey_id,
 	country,
 	area,
@@ -447,6 +450,7 @@ SELECT
 	survey_date,
 	depth,
 	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
+	program,
 	visibility,
 	hour,
 	round(survey_latitude::numeric, 2) AS survey_latitude,
@@ -478,7 +482,6 @@ WHERE NOT EXISTS (
 DROP VIEW IF EXISTS nrmn.ep_m11_off_transect_measurement_public;
 CREATE OR REPLACE VIEW nrmn.ep_m11_off_transect_measurement_public AS
 SELECT
-    program,
 	survey_id,
 	country,
 	area,
@@ -492,6 +495,7 @@ SELECT
 	survey_date,
 	depth,
 	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
+	program,
 	visibility,
 	hour,
 	round(survey_latitude::numeric, 2) AS survey_latitude,
@@ -523,7 +527,6 @@ WHERE NOT EXISTS (
 DROP VIEW IF EXISTS nrmn.ep_m13_pq_scores_public;
 CREATE OR REPLACE VIEW nrmn.ep_m13_pq_scores_public AS
 SELECT
-    program,
  	survey_id,
 	country,
 	area,
@@ -537,6 +540,7 @@ SELECT
 	survey_date,
 	depth,
 	ST_SetSrid(ST_MakePoint(round (latitude::numeric, 2), round (longitude::numeric, 2)),4326)::geometry AS geom,
+	program,
 	visibility,
 	hour,
 	round(survey_latitude::numeric, 2) AS survey_latitude,
