@@ -227,6 +227,18 @@ public class MaterializedViewService {
                     materializedViewsRepository.countEpSpeciesSurveyObservation(),
                     materializedViewsRepository::getEpSpeciesSurveyObservation);
 
+            uploadMaterializedView("ep_species_survey", null, null,
+                    materializedViewsRepository.countEpSpeciesSurvey(),
+                    materializedViewsRepository::getEpSpeciesSurvey);
+
+            uploadMaterializedView("ep_species_list", null, null,
+                    materializedViewsRepository.countEpSpeciesList(),
+                    materializedViewsRepository::getEpSpeciesList);
+
+            uploadMaterializedView("ep_tpac", null, null,
+                    materializedViewsRepository.countEpTpac(),
+                    materializedViewsRepository::getEpTpac);
+
             stopWatch.stop();
             logger.info("Uploaded all materialized views in " + stopWatch.getLastTaskTimeMillis() + "ms");
         } catch (Exception e) {
