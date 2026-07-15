@@ -71,6 +71,10 @@ public class MaterializedViewService {
         var offset = 0;
         var viewResult = getFunction.apply(offset, pageSize);
         offset += pageSize;
+        if (viewResult.isEmpty()) {
+            logger.warn("No rows returned for view " + viewName + ", skipping CSV generation");
+            return;
+        }
         var headers = viewResult.get(0).getElements().stream().map(e -> e.getAlias())
                 .collect(Collectors.toUnmodifiableList());
         var initialValues = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toUnmodifiableList());

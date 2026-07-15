@@ -285,9 +285,9 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "SELECT count(*) from nrmn.ep_species_list;", nativeQuery = true)
     Long countEpSpeciesList();
 
-    @Query(value = "SELECT species_id, recorded_species_name, species_name, taxon, longitude, reporting_name, phylum, class, \"order\", family, genus, common_name, range, frequency, abundance, common_family_name, common_class_name, common_phylum_name, geom, superseded_ids, superseded_names, mapped_id, mapped_superseded_ids from nrmn.ep_species_list "
+    @Query(value = "SELECT species_id, recorded_species_name, species_name, taxon, reporting_name, phylum, class, \"order\", family, genus, common_name, range, frequency, abundance, max_length, common_family_name, common_class_name, common_phylum_name, geom, superseded_ids, superseded_names, mapped_id, mapped_superseded_ids from nrmn.ep_species_list "
             +
-            "ORDER BY species_id, recorded_species_name, species_name, taxon, longitude, reporting_name, phylum, class, \"order\", family, genus, common_name, range, frequency, abundance, common_family_name, common_class_name, common_phylum_name, geom, superseded_ids, superseded_names, mapped_id, mapped_superseded_ids  OFFSET :offset LIMIT :limit", nativeQuery = true)
+            "ORDER BY species_id, recorded_species_name, species_name, taxon, reporting_name, phylum, class, \"order\", family, genus, common_name, range, frequency, abundance, max_length, common_family_name, common_class_name, common_phylum_name, geom, superseded_ids, superseded_names, mapped_id, mapped_superseded_ids  OFFSET :offset LIMIT :limit", nativeQuery = true)
     List<Tuple> getEpSpeciesList(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------
