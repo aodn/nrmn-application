@@ -7,6 +7,7 @@ import au.org.aodn.nrmn.restapi.data.repository.SecUserRepository;
 import au.org.aodn.nrmn.restapi.dto.auth.SecUserDto;
 import au.org.aodn.nrmn.restapi.enums.SecRoleName;
 import au.org.aodn.nrmn.restapi.enums.SecUserStatus;
+import au.org.aodn.nrmn.restapi.service.PublicViewService;
 import au.org.aodn.nrmn.restapi.service.ScheduledTasks;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -42,6 +43,9 @@ public class AdminController {
 
     @Autowired
     ScheduledTasks scheduledTasks;
+
+    @Autowired
+    PublicViewService publicViewService;
 
     @Autowired
     SecUserRepository userRepository;
@@ -98,6 +102,20 @@ public class AdminController {
         logger.info("Manual daily tasks run by admin: " + authentication.getName());
 
         scheduledTasks.runDailyTasks();
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @PostMapping(path = "/v1/admin/publishPublicViews")
+    public ResponseEntity<?> adminPublishPublicViews(Authentication authentication) {
+
+        if (!isAdmin(authentication))
+            return ResponseEntity.badRequest().body("Unauthorized");
+
+        logger.info("Manual public view publish by admin: " + authentication.getName());
+
+        publicViewService.publishPublicViews();
 
         return ResponseEntity.ok().build();
     }

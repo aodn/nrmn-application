@@ -2,6 +2,7 @@ package au.org.aodn.nrmn.restapi.service;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -55,6 +56,7 @@ public class PublicViewService {
             try {
                 // as requested, the file naming follows "relation_data.csv" such as "ep_m0_off_transect_sighting_public_data.csv"
                 publishView(relation, relation + "_data");
+                logger.info("Public public view " + relation + "_data");
             } catch (Exception e) {
                 logger.error("Failed to publish public view " + relation, e);
             }
@@ -67,28 +69,31 @@ public class PublicViewService {
         logger.info("Extracting public view " + relation);
         File file = File.createTempFile(outputName, ".csv");
         var sql = "SELECT * FROM " + sourceSchema + "." + relation;
-        try (Connection connection = dataSource.getConnection()) {
-            // Postgres only streams a ResultSet via a server-side cursor when autoCommit is
-            // off and a fetch size is set; otherwise it loads every row into memory.
-            connection.setAutoCommit(false);
-            try (Statement statement = connection.createStatement()) {
-                statement.setFetchSize(FETCH_SIZE);
-                try (ResultSet rs = statement.executeQuery(sql);
-                        FileWriter writer = new FileWriter(file);
-                        CSVPrinter csvPrinter = new CSVPrinter(writer, buildCsvFormat(rs.getMetaData()))) {
+        try {
+            try (Connection connection = dataSource.getConnection()) {
+                // Postgres only streams a ResultSet via a server-side cursor when autoCommit is
+                // off and a fetch size is set; otherwise it loads every row into memory.
+                connection.setAutoCommit(false);
+                try (Statement statement = connection.createStatement()) {
+                    statement.setFetchSize(FETCH_SIZE);
+                    try (ResultSet rs = statement.executeQuery(sql);
+                            FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8);
+                            CSVPrinter csvPrinter = new CSVPrinter(writer, buildCsvFormat(rs.getMetaData()))) {
 
-                    var columnCount = rs.getMetaData().getColumnCount();
-                    var row = new Object[columnCount];
-                    while (rs.next()) {
-                        for (var i = 0; i < columnCount; i++) {
-                            row[i] = rs.getObject(i + 1);
+                        var columnCount = rs.getMetaData().getColumnCount();
+                        var row = new Object[columnCount];
+                        while (rs.next()) {
+                            for (var i = 0; i < columnCount; i++) {
+                                row[i] = rs.getObject(i + 1);
+                            }
+                            csvPrinter.printRecord(row);
                         }
-                        csvPrinter.printRecord(row);
+                        csvPrinter.flush();
                     }
-                    csvPrinter.flush();
                 }
+                connection.commit();
             }
-            connection.commit();
+            // Upload after the DB connection is released back to the pool.
             logger.info("Uploading public CSV " + outputName);
             s3IO.uploadPublicView(outputName, file);
         } finally {
