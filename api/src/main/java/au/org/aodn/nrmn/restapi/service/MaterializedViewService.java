@@ -46,6 +46,9 @@ public class MaterializedViewService {
     @Autowired
     private SharedLinkService sharedLinkService;
 
+    @Autowired
+    private PublicViewService publicViewService;
+
     private final Integer pageSize = 50000;
 
     private final List<Pair<String, String>> countries = Arrays.asList(Pair.of("australia", "Australia"));
@@ -298,6 +301,7 @@ public class MaterializedViewService {
         refreshAllViews();
         expireMaterializedViews();
         uploadAllMaterializedViews();
+        publicViewService.publishPublicViews();
         updateSharedLinks();
     }
 
