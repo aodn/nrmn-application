@@ -94,7 +94,7 @@ public class PublicViewService {
                 connection.commit();
             }
             // Upload after the DB connection is released back to the pool.
-            logger.info("Uploading public CSV " + outputName);
+            logger.info("Uploading public CSV " + outputName + ".csv");
             s3IO.uploadPublicView(outputName, file);
         } finally {
             file.delete();
