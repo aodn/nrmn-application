@@ -1118,7 +1118,6 @@ or epoi.observable_item_name ~ 'spp.$');
 CREATE OR REPLACE VIEW nrmn.ep_species_survey AS
 select
       obs.observable_item_id as species_id,
-      sur.program,
 	  sur.survey_id,
 	  round(sur.latitude::numeric, 2) AS latitude,
       round(sur.longitude::numeric, 2) AS longitude,
@@ -1126,6 +1125,7 @@ select
 	  sur.country,
 	  sur.area,
 	  sur.geom,
+	  sur.program,
 	  mapped_id
 from nrmn.ep_survey_list sur
 	 inner join nrmn.survey_method sm on sur.survey_id = sm.survey_id
@@ -1138,7 +1138,6 @@ where oi.obs_item_type_name in ('Species', 'Undescribed Species');
 /*endpoint: species survey observation #186*/
 CREATE OR REPLACE VIEW nrmn.ep_species_survey_observation AS
 select
-    sur.program,
 	oi.observable_item_id species_id,
 	sur.survey_id,
 	sur.site_code,
@@ -1154,6 +1153,7 @@ select
 	sur.survey_date,
 	sur.depth,
 	ST_SetSrid(ST_MakePoint(round (sur.latitude::numeric, 2), round (sur.longitude::numeric, 2)),4326)::geometry AS geom,
+	sur.program,
 	div.full_name diver,
 	obs.measure_value total,
 	sm.block_num as block,
