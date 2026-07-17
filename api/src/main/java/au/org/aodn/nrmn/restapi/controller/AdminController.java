@@ -115,7 +115,7 @@ public class AdminController {
 
         logger.info("Manual public view publish by admin: " + authentication.getName());
 
-        publicViewService.publishPublicViews();
+        publicViewService.publishPublicViewsAsync();
 
         return ResponseEntity.ok().build();
     }

@@ -295,9 +295,9 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
     @Query(value = "SELECT count(*) from nrmn.ep_tpac;", nativeQuery = true)
     Long countEpTpac();
 
-    @Query(value = "SELECT survey_id,site_code, location, survey_date, depth, latitude, longitude, survey_latitude, survey_longitude, has_pqs_catalogued_in_db from nrmn.ep_tpac "
+    @Query(value = "SELECT survey_id,site_code, location, survey_date, depth, latitude, longitude, survey_latitude, survey_longitude, has_pqs_catalogued_in_db, direction from nrmn.ep_tpac "
             +
-            "ORDER BY survey_id,site_code, location, survey_date, depth, latitude, longitude, survey_latitude, survey_longitude, has_pqs_catalogued_in_db  OFFSET :offset LIMIT :limit", nativeQuery = true)
+            "ORDER BY survey_id,site_code, location, survey_date, depth, latitude, longitude, survey_latitude, survey_longitude, has_pqs_catalogued_in_db, direction  OFFSET :offset LIMIT :limit", nativeQuery = true)
     List<Tuple> getEpTpac(@Param("offset") Integer offset, @Param("limit") Integer limit);
 
     // ------------------

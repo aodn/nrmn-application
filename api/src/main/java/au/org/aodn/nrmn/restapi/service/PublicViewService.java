@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
@@ -48,6 +49,11 @@ public class PublicViewService {
     @Autowired
     private DataSource dataSource;
 
+    @Async
+    public void publishPublicViewsAsync() {
+        publishPublicViews();
+    }
+
     public void publishPublicViews() {
         logger.info("Publishing public views to imos-data");
         StopWatch stopWatch = new StopWatch();
@@ -56,7 +62,7 @@ public class PublicViewService {
             try {
                 // as requested, the file naming follows "relation_data.csv" such as "ep_m0_off_transect_sighting_public_data.csv"
                 publishView(relation, relation + "_data");
-                logger.info("Public public view " + relation + "_data");
+                logger.info("Published public view " + relation + "_data");
             } catch (Exception e) {
                 logger.error("Failed to publish public view " + relation, e);
             }

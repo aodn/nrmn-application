@@ -337,7 +337,9 @@ public class MaterializedViewService {
         refreshAllViews();
         expireMaterializedViews();
         uploadAllMaterializedViews();
+        // refresh nrmn public data
         publicViewService.publishPublicViews();
+        // refresh for shared RLS and TPAC
         publishObfuscatedEndpoints();
         updateSharedLinks();
     }
