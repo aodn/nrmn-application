@@ -27,11 +27,11 @@ public class S3IO {
     @Value("${app.s3.bucket-shared}")
     private String bucketShared;
 
-    @Value("${app.s3.bucket-imos-data}")
-    private String bucketImosData;
+    @Value("${app.s3.bucket-landing}")
+    private String bucketLanding;
 
-    @Value("${app.s3.imos-data-prefix:endpoints}")
-    private String imosDataPrefix;
+    @Value("${app.s3.bucket-landing-prefix:public}")
+    private String bucketLandingPrefix;
 
     S3Client client;
 
@@ -58,15 +58,15 @@ public class S3IO {
         }
     }
 
-    private String getImosDataKey(String objectName) {
-        return String.join("/", List.of(imosDataPrefix, objectName + ".csv"));
+    private String getBucketLandingDataKey(String objectName) {
+        return String.join("/", List.of(bucketLandingPrefix, objectName + ".csv"));
     }
 
     public void uploadPublicView(String objectName, File file) {
         try {
             var res = RequestBody.fromFile(file);
             getClient().putObject(
-                    PutObjectRequest.builder().bucket(bucketImosData).key(getImosDataKey(objectName)).build(), res);
+                    PutObjectRequest.builder().bucket(bucketLanding).key(getBucketLandingDataKey(objectName)).build(), res);
         } catch (AwsServiceException e) {
             throw new RuntimeException("uploadPublicView: failed to write to S3: " + e.getMessage());
         }
