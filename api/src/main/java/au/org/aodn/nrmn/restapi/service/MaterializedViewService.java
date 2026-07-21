@@ -14,6 +14,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -46,6 +47,22 @@ public class MaterializedViewService {
     @Autowired
     private SharedLinkService sharedLinkService;
 
+    @Autowired
+    private PublicViewService publicViewService;
+
+    @Value("${app.s3.rls-key:}")
+    private String rlsKey;
+
+    @Value("${app.s3.tpac-key:}")
+    private String tpacKey;
+
+    private static final List<String> RLS_ENDPOINTS = Arrays.asList(
+            "ep_species_survey_observation",
+            "ep_species_survey",
+            "ep_species_list");
+
+    private static final List<String> TPAC_ENDPOINTS = Arrays.asList("ep_tpac");
+
     private final Integer pageSize = 50000;
 
     private final List<Pair<String, String>> countries = Arrays.asList(Pair.of("australia", "Australia"));
@@ -71,6 +88,10 @@ public class MaterializedViewService {
         var offset = 0;
         var viewResult = getFunction.apply(offset, pageSize);
         offset += pageSize;
+        if (viewResult.isEmpty()) {
+            logger.warn("No rows returned for view " + viewName + ", skipping CSV generation");
+            return;
+        }
         var headers = viewResult.get(0).getElements().stream().map(e -> e.getAlias())
                 .collect(Collectors.toUnmodifiableList());
         var initialValues = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toUnmodifiableList());
@@ -124,6 +145,28 @@ public class MaterializedViewService {
         }
         stopWatch.stop();
         logger.info("Materialized views expired in " + stopWatch.getLastTaskTimeMillis() + "ms");
+    }
+
+    // Unlike shared links these have no expiry and are not created from the front end, RLS and TPAC endpoints
+    // are required to be published under a fixed key, so the recipient's folder stays constant across daily runs.
+    private void publishUnderFixedKey(String label, List<String> viewNames, String key) {
+        if (key == null || key.isBlank()) {
+            logger.warn("Skipping {} endpoint publication: no obfuscation key configured.", label);
+            return;
+        }
+        for (var viewName : viewNames) {
+            try {
+                s3IO.copyEndpoint(viewName, key);
+                logger.info("Published {} endpoint {}", label, viewName);
+            } catch (Exception e) {
+                logger.error("Failed to publish " + label + " endpoint " + viewName, e);
+            }
+        }
+    }
+
+    private void publishObfuscatedEndpoints() {
+        publishUnderFixedKey("RLS", RLS_ENDPOINTS, rlsKey);
+        publishUnderFixedKey("TPAC", TPAC_ENDPOINTS, tpacKey);
     }
 
     private void updateSharedLinks() {
@@ -227,6 +270,18 @@ public class MaterializedViewService {
                     materializedViewsRepository.countEpSpeciesSurveyObservation(),
                     materializedViewsRepository::getEpSpeciesSurveyObservation);
 
+            uploadMaterializedView("ep_species_survey", null, null,
+                    materializedViewsRepository.countEpSpeciesSurvey(),
+                    materializedViewsRepository::getEpSpeciesSurvey);
+
+            uploadMaterializedView("ep_species_list", null, null,
+                    materializedViewsRepository.countEpSpeciesList(),
+                    materializedViewsRepository::getEpSpeciesList);
+
+            uploadMaterializedView("ep_tpac", null, null,
+                    materializedViewsRepository.countEpTpac(),
+                    materializedViewsRepository::getEpTpac);
+
             stopWatch.stop();
             logger.info("Uploaded all materialized views in " + stopWatch.getLastTaskTimeMillis() + "ms");
         } catch (Exception e) {
@@ -282,6 +337,10 @@ public class MaterializedViewService {
         refreshAllViews();
         expireMaterializedViews();
         uploadAllMaterializedViews();
+        // refresh nrmn public data
+        publicViewService.publishPublicViews();
+        // refresh for shared RLS and TPAC
+        publishObfuscatedEndpoints();
         updateSharedLinks();
     }
 

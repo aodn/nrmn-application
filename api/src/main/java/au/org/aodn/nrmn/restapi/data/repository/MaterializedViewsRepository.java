@@ -272,6 +272,36 @@ public interface MaterializedViewsRepository extends JpaRepository<ObservableIte
 
     // ------------------
 
+    @Query(value = "SELECT count(*) from nrmn.ep_species_survey;", nativeQuery = true)
+    Long countEpSpeciesSurvey();
+
+    @Query(value = "SELECT species_id, program, survey_id, latitude, longitude, realm, country, area, CAST(geom AS varchar), mapped_id from nrmn.ep_species_survey "
+            +
+            "ORDER BY species_id, program, survey_id, latitude, longitude, realm, country, area, CAST(geom AS varchar), mapped_id  OFFSET :offset LIMIT :limit", nativeQuery = true)
+    List<Tuple> getEpSpeciesSurvey(@Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    // ------------------
+
+    @Query(value = "SELECT count(*) from nrmn.ep_species_list;", nativeQuery = true)
+    Long countEpSpeciesList();
+
+    @Query(value = "SELECT species_id, recorded_species_name, species_name, taxon, reporting_name, phylum, class, \"order\", family, genus, common_name, range, frequency, abundance, max_length, common_family_name, common_class_name, common_phylum_name, CAST(geom AS varchar), superseded_ids, superseded_names, mapped_id, mapped_superseded_ids from nrmn.ep_species_list "
+            +
+            "ORDER BY species_id, recorded_species_name, species_name, taxon, reporting_name, phylum, class, \"order\", family, genus, common_name, range, frequency, abundance, max_length, common_family_name, common_class_name, common_phylum_name, CAST(geom AS varchar), superseded_ids, superseded_names, mapped_id, mapped_superseded_ids  OFFSET :offset LIMIT :limit", nativeQuery = true)
+    List<Tuple> getEpSpeciesList(@Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    // ------------------
+
+    @Query(value = "SELECT count(*) from nrmn.ep_tpac;", nativeQuery = true)
+    Long countEpTpac();
+
+    @Query(value = "SELECT survey_id,site_code, location, survey_date, depth, latitude, longitude, survey_latitude, survey_longitude, has_pqs_catalogued_in_db, direction from nrmn.ep_tpac "
+            +
+            "ORDER BY survey_id,site_code, location, survey_date, depth, latitude, longitude, survey_latitude, survey_longitude, has_pqs_catalogued_in_db, direction  OFFSET :offset LIMIT :limit", nativeQuery = true)
+    List<Tuple> getEpTpac(@Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    // ------------------
+
     @Query(value = "SELECT COUNT(*) > 0 FROM pg_stat_activity WHERE query LIKE 'REFRESH MATERIALIZED VIEW %'", nativeQuery = true)
     Boolean checkAnyRunning();
 }

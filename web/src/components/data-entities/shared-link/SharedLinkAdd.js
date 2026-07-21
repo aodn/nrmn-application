@@ -44,8 +44,7 @@ const all_endpoints = [
   {value: 'EP_M7_LOBSTER_COUNT'},
   {value: 'EP_M11_OFF_TRANSECT_MEASUREMENT'},
   {value: 'EP_M12_DEBRIS'},
-  {value: 'EP_M13_PQ_SCORES'},
-  {value: 'EP_SPECIES_SURVEY_OBSERVATION'}
+  {value: 'EP_M13_PQ_SCORES'}
 ];
 
 const SharedLinkAdd = ({onPost}) => {
