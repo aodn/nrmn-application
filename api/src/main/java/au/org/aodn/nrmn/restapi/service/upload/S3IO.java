@@ -30,7 +30,7 @@ public class S3IO {
     @Value("${app.s3.bucket-landing}")
     private String bucketLanding;
 
-    @Value("${app.s3.bucket-landing-prefix:public}")
+    @Value("${app.s3.bucket-landing-prefix:IMOS/NRMN}")
     private String bucketLandingPrefix;
 
     S3Client client;
