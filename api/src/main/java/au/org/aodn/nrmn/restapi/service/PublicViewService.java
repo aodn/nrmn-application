@@ -1,26 +1,20 @@
 package au.org.aodn.nrmn.restapi.service;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.Statement;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
-import javax.sql.DataSource;
+import javax.persistence.Tuple;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
+import au.org.aodn.nrmn.restapi.data.repository.PublicViewsRepository;
 import au.org.aodn.nrmn.restapi.service.upload.S3IO;
 
 @Service
@@ -28,26 +22,13 @@ public class PublicViewService {
 
     private static final Logger logger = LoggerFactory.getLogger(PublicViewService.class);
 
-    // fetch rows in batches
-    private static final int FETCH_SIZE = 50000;
-
-    private static final List<String> NRMN_PUBLIC_ENDPOINTS = List.of(
-            "ep_m0_off_transect_sighting_public",
-            "ep_m1_public",
-            "ep_m2_cryptic_fish_public",
-            "ep_m2_inverts_public",
-            "ep_m3_isq_public",
-            "ep_site_list_public",
-            "ep_survey_list_public");
-
-    @Value("${app.public-views.schema:nrmn}")
-    private String sourceSchema;
+    private final Integer pageSize = 50000;
 
     @Autowired
     private S3IO s3IO;
 
     @Autowired
-    private DataSource dataSource;
+    private PublicViewsRepository publicViewsRepository;
 
     @Async
     public void publishPublicViewsAsync() {
@@ -58,60 +39,82 @@ public class PublicViewService {
         logger.info("Publishing public views to imos-data");
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        for (var relation : NRMN_PUBLIC_ENDPOINTS) {
-            try {
-                // as requested, the file naming follows "relation_data.csv" such as "ep_m0_off_transect_sighting_public_data.csv"
-                publishView(relation, relation + "_data");
-                logger.info("Published public view " + relation + "_data");
-            } catch (Exception e) {
-                logger.error("Failed to publish public view " + relation, e);
-            }
-        }
+
+        publishView("ep_m0_off_transect_sighting_public",
+                publicViewsRepository::countEpM0OffTransectSightingPublic,
+                publicViewsRepository::getEpM0OffTransectSightingPublic);
+
+        publishView("ep_m1_public",
+                publicViewsRepository::countEpM1Public,
+                publicViewsRepository::getEpM1Public);
+
+        publishView("ep_m2_cryptic_fish_public",
+                publicViewsRepository::countEpM2CrypticFishPublic,
+                publicViewsRepository::getEpM2CrypticFishPublic);
+
+        publishView("ep_m2_inverts_public",
+                publicViewsRepository::countEpM2InvertsPublic,
+                publicViewsRepository::getEpM2InvertsPublic);
+
+        publishView("ep_m3_isq_public",
+                publicViewsRepository::countEpM3IsqPublic,
+                publicViewsRepository::getEpM3IsqPublic);
+
+        publishView("ep_site_list_public",
+                publicViewsRepository::countEpSiteListPublic,
+                publicViewsRepository::getEpSiteListPublic);
+
+        publishView("ep_survey_list_public",
+                publicViewsRepository::countEpSurveyListPublic,
+                publicViewsRepository::getEpSurveyListPublic);
+
         stopWatch.stop();
         logger.info("Published all public views in " + stopWatch.getLastTaskTimeMillis() + "ms");
     }
 
-    private void publishView(String relation, String outputName) throws Exception {
-        logger.info("Extracting public view " + relation);
-        File file = File.createTempFile(outputName, ".csv");
-        var sql = "SELECT * FROM " + sourceSchema + "." + relation;
+    private void publishView(String viewName, Supplier<Long> countFunction,
+            BiFunction<Integer, Integer, List<Tuple>> getFunction) {
         try {
-            try (Connection connection = dataSource.getConnection()) {
-                // Postgres only streams a ResultSet via a server-side cursor when autoCommit is
-                // off and a fetch size is set; otherwise it loads every row into memory.
-                connection.setAutoCommit(false);
-                try (Statement statement = connection.createStatement()) {
-                    statement.setFetchSize(FETCH_SIZE);
-                    try (ResultSet rs = statement.executeQuery(sql);
-                            FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8);
-                            CSVPrinter csvPrinter = new CSVPrinter(writer, buildCsvFormat(rs.getMetaData()))) {
-
-                        var columnCount = rs.getMetaData().getColumnCount();
-                        var row = new Object[columnCount];
-                        while (rs.next()) {
-                            for (var i = 0; i < columnCount; i++) {
-                                row[i] = rs.getObject(i + 1);
-                            }
-                            csvPrinter.printRecord(row);
-                        }
-                        csvPrinter.flush();
-                    }
-                }
-                connection.commit();
-            }
-            // Upload after the DB connection is released back to the pool.
-            logger.info("Uploading public CSV " + outputName + ".csv");
-            s3IO.uploadPublicView(outputName, file);
-        } finally {
-            file.delete();
+            uploadPublicView(viewName, countFunction.get(), getFunction);
+        } catch (Exception e) {
+            logger.error("Failed to publish public view " + viewName, e);
         }
     }
 
-    private CSVFormat buildCsvFormat(ResultSetMetaData metaData) throws Exception {
-        var headers = new String[metaData.getColumnCount()];
-        for (var i = 0; i < headers.length; i++) {
-            headers[i] = metaData.getColumnLabel(i + 1);
+    private void uploadPublicView(String viewName, Long count,
+            BiFunction<Integer, Integer, List<Tuple>> getFunction) {
+
+        logger.info("Generating CSV extract for public view " + viewName);
+
+        var offset = 0;
+        var viewResult = getFunction.apply(offset, pageSize);
+        offset += pageSize;
+        // ignore the file generation if no rows (keep the last version)
+        if (viewResult.isEmpty()) {
+            logger.warn("No rows returned for view " + viewName + ", skipping CSV generation");
+            return;
         }
-        return CSVFormat.Builder.create().setHeader(headers).build();
+
+        var headers = viewResult.get(0).getElements().stream().map(e -> e.getAlias())
+                .collect(Collectors.toUnmodifiableList());
+        var initialValues = viewResult.stream().map(e -> e.toArray()).collect(Collectors.toUnmodifiableList());
+
+        // as requested, the file naming follows "relation_data.csv" such as "ep_m0_off_transect_sighting_public_data.csv"
+        var request = new CSVFilterPrinter(headers, viewName + "_data", null, null);
+
+        logger.info("Writing CSV  " + request.getViewName() + ".csv");
+        request.writeOut(initialValues);
+
+        while (offset < count) {
+            var nextValues = getFunction.apply(offset, pageSize).stream()
+                    .map(e -> e.toArray())
+                    .collect(Collectors.toUnmodifiableList());
+            offset += pageSize;
+            request.writeOut(nextValues);
+        }
+
+        logger.info("Uploading CSV " + request.getViewName() + ".csv");
+        s3IO.uploadPublicView(request.getViewName(), request.getFile());
+        request.close();
     }
 }

@@ -1,22 +1,21 @@
 package au.org.aodn.nrmn.restapi.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.Statement;
 import java.util.List;
 
-import javax.sql.DataSource;
+import javax.persistence.Tuple;
+import javax.persistence.TupleElement;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,9 +27,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.test.util.ReflectionTestUtils;
 
+import au.org.aodn.nrmn.restapi.data.repository.PublicViewsRepository;
 import au.org.aodn.nrmn.restapi.service.upload.S3IO;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,19 +36,7 @@ import au.org.aodn.nrmn.restapi.service.upload.S3IO;
 public class PublicViewServiceTest {
 
     @Mock
-    DataSource dataSource;
-
-    @Mock
-    Connection connection;
-
-    @Mock
-    Statement statement;
-
-    @Mock
-    ResultSet resultSet;
-
-    @Mock
-    ResultSetMetaData resultSetMetaData;
+    PublicViewsRepository publicViewsRepository;
 
     @Mock
     S3IO s3IO;
@@ -61,18 +47,33 @@ public class PublicViewServiceTest {
     @Captor
     ArgumentCaptor<String> objectNameCaptor;
 
-    @BeforeEach
-    public void setUp() throws Exception {
-        ReflectionTestUtils.setField(publicViewService, "sourceSchema", "nrmn");
+    private Tuple aRow() {
+        var element = mock(TupleElement.class);
+        when(element.getAlias()).thenReturn("survey_id");
 
-        when(dataSource.getConnection()).thenReturn(connection);
-        when(connection.createStatement()).thenReturn(statement);
-        when(statement.executeQuery(anyString())).thenReturn(resultSet);
-        when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
-        when(resultSetMetaData.getColumnCount()).thenReturn(1);
-        when(resultSetMetaData.getColumnLabel(1)).thenReturn("survey_id");
-        // no rows, the CSV still gets a header and is still uploaded
-        when(resultSet.next()).thenReturn(false);
+        var tuple = mock(Tuple.class);
+        when(tuple.getElements()).thenReturn(List.of(element));
+        when(tuple.toArray()).thenReturn(new Object[] { 1 });
+        return tuple;
+    }
+
+    @BeforeEach
+    public void setUp() {
+        var page = List.of(aRow());
+        when(publicViewsRepository.countEpM0OffTransectSightingPublic()).thenReturn(1L);
+        when(publicViewsRepository.getEpM0OffTransectSightingPublic(anyInt(), anyInt())).thenReturn(page);
+        when(publicViewsRepository.countEpM1Public()).thenReturn(1L);
+        when(publicViewsRepository.getEpM1Public(anyInt(), anyInt())).thenReturn(page);
+        when(publicViewsRepository.countEpM2CrypticFishPublic()).thenReturn(1L);
+        when(publicViewsRepository.getEpM2CrypticFishPublic(anyInt(), anyInt())).thenReturn(page);
+        when(publicViewsRepository.countEpM2InvertsPublic()).thenReturn(1L);
+        when(publicViewsRepository.getEpM2InvertsPublic(anyInt(), anyInt())).thenReturn(page);
+        when(publicViewsRepository.countEpM3IsqPublic()).thenReturn(1L);
+        when(publicViewsRepository.getEpM3IsqPublic(anyInt(), anyInt())).thenReturn(page);
+        when(publicViewsRepository.countEpSiteListPublic()).thenReturn(1L);
+        when(publicViewsRepository.getEpSiteListPublic(anyInt(), anyInt())).thenReturn(page);
+        when(publicViewsRepository.countEpSurveyListPublic()).thenReturn(1L);
+        when(publicViewsRepository.getEpSurveyListPublic(anyInt(), anyInt())).thenReturn(page);
     }
 
     @Test
@@ -92,9 +93,20 @@ public class PublicViewServiceTest {
     }
 
     @Test
-    public void oneFailingViewDoesNotStopTheRest() {
+    public void anEmptyViewIsSkippedRatherThanUploadedEmpty() {
+        when(publicViewsRepository.countEpM1Public()).thenReturn(0L);
+        when(publicViewsRepository.getEpM1Public(anyInt(), anyInt())).thenReturn(List.of());
+
+        publicViewService.publishPublicViews();
+
+        verify(s3IO, times(6)).uploadPublicView(objectNameCaptor.capture(), any(File.class));
+        assertFalse(objectNameCaptor.getAllValues().contains("ep_m1_public_data"));
+    }
+
+    @Test
+    public void oneFailingUploadDoesNotStopTheRest() {
         doThrow(new RuntimeException("failed to write to S3"))
-                .when(s3IO).uploadPublicView(objectNameCaptor.capture(), any(File.class));
+                .when(s3IO).uploadPublicView(anyString(), any(File.class));
 
         publicViewService.publishPublicViews();
 
