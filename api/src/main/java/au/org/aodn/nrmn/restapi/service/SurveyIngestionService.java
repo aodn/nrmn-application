@@ -132,7 +132,17 @@ public class SurveyIngestionService {
 
         Stream<MeasureValue> unsized = Stream.empty();
 
-        if (!stagedRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done") && stagedRow.getInverts() != null && stagedRow.getInverts() > 0) {
+        boolean isNoSpeciesFound = stagedRow.getSpecies().get().getObsItemType() != null
+                && stagedRow.getSpecies().get().getObsItemType().getObsItemTypeId() == ObservableItemType.NoSpeciesFound;
+
+        if (isNoSpeciesFound) {
+            // 'No species found' is an Absence record and must always be persisted (value 0 or 1)
+            // so that the entry remains visible in downstream endpoints and materialized views.
+            // Its measureTypeId is overridden to MeasureType.Absence below.
+            Integer value = stagedRow.getTotal() != null ? stagedRow.getTotal() : 0;
+            unsized = Stream.of(new MeasureValue(0, value));
+        } else if (!stagedRow.getRef().getSpecies().equalsIgnoreCase("Survey Not Done")
+                && stagedRow.getInverts() != null && stagedRow.getInverts() > 0) {
             unsized = Stream.of(new MeasureValue(0, stagedRow.getInverts()));
         }
 

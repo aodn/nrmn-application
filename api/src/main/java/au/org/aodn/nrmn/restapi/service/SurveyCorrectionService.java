@@ -100,7 +100,7 @@ public class SurveyCorrectionService {
     @Autowired
     ColumnNameFormattingService columnNameFormatter;
 
-    private static Logger logger = LoggerFactory.getLogger(SurveyCorrectionService.class);
+    private static final Logger logger = LoggerFactory.getLogger(SurveyCorrectionService.class);
 
     @Autowired
     ObjectMapper objectMapper;
@@ -125,9 +125,9 @@ public class SurveyCorrectionService {
 
         var ingestedRows = correctionRowRepository.findRowsBySurveyIds(surveyIds);
 
-        var ingestedRowIds = ingestedRows.stream().map(CorrectionRowDto::getDiffRowId).collect(Collectors.toList());
+        var ingestedRowIds = ingestedRows.stream().map(CorrectionRowDto::getDiffRowId).toList();
 
-        var correctdRowIds = correctedRows.stream().map(StagedRow::getDiffRowId).collect(Collectors.toList());
+        var correctdRowIds = correctedRows.stream().map(StagedRow::getDiffRowId).toList();
 
         var deletedRowIds = ingestedRowIds.stream().filter(i -> !correctdRowIds.contains(i))
                 .collect(Collectors.toList());
@@ -135,8 +135,8 @@ public class SurveyCorrectionService {
         var insertedRowIds = correctdRowIds.stream().filter(i -> !ingestedRowIds.contains(i))
                 .collect(Collectors.toList());
 
-        var updatedRowsIds = correctdRowIds.stream().filter(i -> ingestedRowIds.contains(i))
-                .collect(Collectors.toList());
+        var updatedRowsIds = correctdRowIds.stream().filter(ingestedRowIds::contains)
+                .toList();
 
         var cellDiffs = new ArrayList<CorrectionDiffCellDto>();
 
@@ -435,8 +435,17 @@ public class SurveyCorrectionService {
 
                     var measures = row.getMeasureJson();
 
-                    if (!surveyNotDone && row.getInverts() != null && row.getInverts() > 0)
+                    var obsItemTypeForRow = row.getSpecies().isPresent() ? row.getSpecies().get().getObsItemType() : null;
+                    boolean isNoSpeciesFound = obsItemTypeForRow != null
+                            && obsItemTypeForRow.getObsItemTypeId() == ObservableItemType.NoSpeciesFound;
+
+                    if (isNoSpeciesFound) {
+                        // 'No species found' is an Absence record and must always round-trip as a single
+                        // observation (value 0 or 1) so the entry stays visible downstream, matching ingest.
+                        measures.put(0, row.getTotal() != null ? row.getTotal() : 0);
+                    } else if (!surveyNotDone && row.getInverts() != null && row.getInverts() > 0) {
                         measures.put(0, row.getInverts());
+                    }
 
                     for (var m : measures.entrySet()) {
 
