@@ -81,7 +81,7 @@ public class SurveyIngestionServiceTest {
                 .surveyNum(2)
                 .direction(Directions.N)
                 .vis(Optional.of(15.5))
-                .date(LocalDate.of(2003, 03, 03))
+                .date(LocalDate.of(2003, 3, 3))
                 .time(Optional.of(LocalTime.of(12, 34, 56)))
                 .pqs(diver)
                 .isInvertSizing(true)
@@ -330,6 +330,74 @@ public class SurveyIngestionServiceTest {
     }
 
     @Test
+    void getObservationNoSpeciesFoundZeroTotalIsStillWritten() {
+        // 'No species found' with total = 0 and inverts = 0 must still produce exactly one
+        // Absence observation (value 0) so the entry remains visible in downstream endpoints.
+        Measure absence = Measure.builder()
+                .measureName("No specimen found")
+                .measureType(MeasureTypeEntity.builder().measureTypeId(MeasureType.Absence).build())
+                .build();
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(MeasureType.Absence, 0)).then(m -> Optional.of(absence));
+
+        SurveyMethodEntity surveyMethod = SurveyMethodEntity.builder().survey(Survey.builder().surveyId(8).build())
+                .method(Method.builder().methodId(2).methodName("").isActive(true).build()).blockNum(1).build();
+
+        StagedRow ref = StagedRow.builder().species("No Species Found").build();
+        StagedRowFormatted row = rowBuilder
+                .ref(ref)
+                .inverts(0)
+                .total(0)
+                .measureJson(Collections.emptyMap())
+                .isInvertSizing(false)
+                .method(2)
+                .species(Optional.of(ObservableItem.builder()
+                        .observableItemName("No Species Found")
+                        .obsItemType(ObsItemType.builder().obsItemTypeId(ObservableItemType.NoSpeciesFound).build())
+                        .build()))
+                .build();
+
+        List<Observation> observations = surveyIngestionService.getObservations(surveyMethod, row, false);
+
+        assertEquals(1, observations.size());
+        assertEquals(MeasureType.Absence, observations.get(0).getMeasure().getMeasureType().getMeasureTypeId());
+        assertEquals("No specimen found", observations.get(0).getMeasure().getMeasureName());
+        assertEquals(0, observations.get(0).getMeasureValue());
+    }
+
+    @Test
+    void getObservationNoSpeciesFoundTotalOneIsWritten() {
+        // 'No species found' with total = 1 must produce a single Absence observation with value 1.
+        Measure absence = Measure.builder()
+                .measureName("No specimen found")
+                .measureType(MeasureTypeEntity.builder().measureTypeId(MeasureType.Absence).build())
+                .build();
+        when(measureRepository.findByMeasureTypeIdAndSeqNo(MeasureType.Absence, 0)).then(m -> Optional.of(absence));
+
+        SurveyMethodEntity surveyMethod = SurveyMethodEntity.builder().survey(Survey.builder().surveyId(9).build())
+                .method(Method.builder().methodId(2).methodName("").isActive(true).build()).blockNum(1).build();
+
+        StagedRow ref = StagedRow.builder().species("No Species Found").build();
+        StagedRowFormatted row = rowBuilder
+                .ref(ref)
+                .inverts(0)
+                .total(1)
+                .measureJson(Collections.emptyMap())
+                .isInvertSizing(false)
+                .method(2)
+                .species(Optional.of(ObservableItem.builder()
+                        .observableItemName("No Species Found")
+                        .obsItemType(ObsItemType.builder().obsItemTypeId(ObservableItemType.NoSpeciesFound).build())
+                        .build()))
+                .build();
+
+        List<Observation> observations = surveyIngestionService.getObservations(surveyMethod, row, false);
+
+        assertEquals(1, observations.size());
+        assertEquals(MeasureType.Absence, observations.get(0).getMeasure().getMeasureType().getMeasureTypeId());
+        assertEquals(1, observations.get(0).getMeasureValue());
+    }
+
+    @Test
     void ingestSurvey() {
         when(surveyRepository.save(any())).then(s -> s.getArgument(0));
         when(surveyMethodRepository.save(any())).then(s -> s.getArgument(0));
@@ -388,6 +456,6 @@ public class SurveyIngestionServiceTest {
 
         // No change in job info
         assertEquals(stagedJobLog.getStagedJob(), stagedJob);
-        assertEquals(stagedJobLog.getEventType(), StagedJobEventType.INGESTED);
+        assertEquals(StagedJobEventType.INGESTED, stagedJobLog.getEventType());
     }
 }
